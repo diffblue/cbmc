@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ class without operators: SUCCESS$
+^\[main\.assertion\.2\] line \d+ operator==: SUCCESS$
+^\[main\.assertion\.3\] line \d+ conversion: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+C's member-wise struct comparison made `a == b' valid for a class without
+operator==, so `requires { a == b; }' held.  libc++'s equality_comparable,
+and with it __cpp17_input_iterator, was then true for an iterator without
+operator==, and iterator_traits took the wrong specialization.

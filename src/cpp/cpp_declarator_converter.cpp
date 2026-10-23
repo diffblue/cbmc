@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_declarator_converter.h"
 
 #include <util/c_types.h>
-#include <util/mathematical_types.h>
 #include <util/source_location.h>
 #include <util/std_types.h>
 #include <util/symbol_table_base.h>
@@ -20,16 +19,18 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_type2name.h"
 #include "cpp_typecheck.h"
 #include "cpp_typecheck_fargs.h"
+#include "cpp_typecheck_resolve.h"
 
 cpp_declarator_convertert::cpp_declarator_convertert(
-  class cpp_typecheckt &_cpp_typecheck):
-  is_typedef(false),
-  is_template(false),
-  is_template_parameter(false),
-  is_friend(false),
-  linkage_spec(_cpp_typecheck.current_linkage_spec),
-  cpp_typecheck(_cpp_typecheck),
-  is_code(false)
+  class cpp_typecheckt &_cpp_typecheck)
+  : is_typedef(false),
+    is_template(false),
+    is_template_parameter(false),
+    is_friend(false),
+    friend_class_scope(nullptr),
+    linkage_spec(_cpp_typecheck.current_linkage_spec),
+    cpp_typecheck(_cpp_typecheck),
+    is_code(false)
 {
 }
 
@@ -41,7 +42,13 @@ symbolt &cpp_declarator_convertert::convert(
 {
   PRECONDITION(declaration_type.is_not_nil());
 
-  if(declaration_type.id()=="cpp-cast-operator")
+  const bool is_cast_operator =
+    declaration_type.id() == "cpp-cast-operator" ||
+    (declaration_type.id() == ID_already_typechecked &&
+     to_type_with_subtype(declaration_type).subtype().id() ==
+       "cpp-cast-operator");
+
+  if(is_cast_operator)
   {
     typet type;
     type.swap(declarator.name().get_sub().back());
@@ -52,8 +59,33 @@ symbolt &cpp_declarator_convertert::convert(
   }
 
   PRECONDITION(declarator.id() == ID_cpp_declarator);
-  final_type=declarator.merge_type(declaration_type);
+  final_type = declarator.merge_type(declaration_type);
   CHECK_RETURN(final_type.is_not_nil());
+
+  // N5008 [dcl.fct]/6-7: the cv-qualifier-seq after a parameter list is part
+  // of the FUNCTION type.  For a member function declarator it qualifies the
+  // implicit object parameter through add_this_to_method_type below; when
+  // the declarator declares something ELSE whose type contains a function
+  // type -- `typedef int (S::*TPMF)(int) const;`, a pointer-to-member
+  // variable or parameter -- rDeclarator has still reported the qualifier
+  // separately, and it must reach the pointed-to function type (as
+  // Parser::rTypeName does for a type-id, `using PMF = int (S::*)(int)
+  // const;`), where typecheck_type turns it into the cv of `this`.
+  if(
+    !declarator.method_qualifier().id().empty() && final_type.id() != ID_code &&
+    final_type.id() != ID_function_type)
+  {
+    irept *t = &final_type;
+    while(t->id() != ID_function_type && t->id() != ID_code &&
+          !t->get_sub().empty())
+      t = &t->get_sub().front();
+    if(
+      (t->id() == ID_function_type || t->id() == ID_code) &&
+      t->find(ID_method_qualifier).is_nil())
+    {
+      t->add(ID_method_qualifier) = declarator.method_qualifier();
+    }
+  }
 
   cpp_storage_spect final_storage_spec = storage_spec;
   final_storage_spec |= cpp_storage_spect(final_type);
@@ -74,26 +106,152 @@ symbolt &cpp_declarator_convertert::convert(
     if(is_friend)
     {
       friend_scope = &cpp_typecheck.cpp_scopes.current_scope();
+      // Remember the class scope for adding as secondary scope later
+      if(friend_scope->id_class == cpp_idt::id_classt::CLASS)
+        friend_class_scope = friend_scope;
+      // For unqualified friend functions, navigate up past
+      // class/block/template scopes to the enclosing namespace so that
+      // the friend is visible via ADL and unqualified lookup.
+      // For qualified friend functions (e.g., friend ... C::f(...)),
+      // resolve_scope already set the scope to the target class, so we
+      // must keep it.
+      if(!declarator.name().is_qualified())
+      {
+        while(friend_scope->id_class == cpp_idt::id_classt::CLASS ||
+              friend_scope->id_class == cpp_idt::id_classt::BLOCK_SCOPE ||
+              friend_scope->id_class == cpp_idt::id_classt::TEMPLATE_SCOPE)
+        {
+          friend_scope = &friend_scope->get_parent();
+        }
+      }
       save_scope.restore();
     }
 
-    scope=&cpp_typecheck.cpp_scopes.current_scope();
+    scope = &cpp_typecheck.cpp_scopes.current_scope();
 
     // check the declarator-part of the type, in the current scope
     if(declarator.value().is_nil() || !cpp_typecheck.has_auto(final_type))
-      cpp_typecheck.typecheck_type(final_type);
+    {
+      // Most vexing parse: if the declarator looks like a function
+      // declaration but the parameter "types" are actually values
+      // (e.g., constexpr error_type x(_S_error_collate)), rewrite it
+      // as a variable with direct initialization.
+      if(
+        final_type.id() == ID_function_type && declarator.value().is_nil() &&
+        final_type.find(ID_parameters).is_not_nil())
+      {
+        const auto &params = final_type.find(ID_parameters).get_sub();
+        bool reinterpret = !params.empty();
+        exprt::operandst init_args;
+        for(const auto &p_irep : params)
+        {
+          if(p_irep.id() != ID_cpp_declaration)
+          {
+            reinterpret = false;
+            break;
+          }
+          const auto &p_decl =
+            to_cpp_declaration(static_cast<const exprt &>(p_irep));
+          // Must have exactly one unnamed declarator
+          if(
+            p_decl.declarators().size() != 1 ||
+            !p_decl.declarators().front().name().is_nil())
+          {
+            reinterpret = false;
+            break;
+          }
+          // The type must be a cpp_name
+          if(p_decl.type().id() != ID_cpp_name)
+          {
+            reinterpret = false;
+            break;
+          }
+          // Try to resolve the name as a type
+          cpp_typecheck_resolvet resolver(cpp_typecheck);
+          exprt result = resolver.resolve(
+            to_cpp_name(p_decl.type()),
+            cpp_typecheck_resolvet::wantt::TYPE,
+            cpp_typecheck_fargst(),
+            false); // fail_with_exception=false
+          if(result.is_not_nil())
+          {
+            reinterpret = false;
+            break;
+          }
+          // Save the cpp_name as an expression argument
+          init_args.push_back(static_cast<const exprt &>(
+            static_cast<const irept &>(p_decl.type())));
+        }
+
+        if(reinterpret)
+        {
+          // Reinterpret as variable with direct initialization
+          final_type = declaration_type;
+          cpp_typecheck.typecheck_type(final_type);
+          declarator.type() = typet(ID_nil);
+          declarator.value() = exprt(ID_initializer_list);
+          declarator.value().operands() = std::move(init_args);
+        }
+        else
+        {
+          cpp_typecheck.typecheck_type(final_type);
+        }
+      }
+      else
+      {
+        cpp_typecheck.typecheck_type(final_type);
+      }
+    }
 
     if(friend_scope)
       scope = friend_scope;
   }
 
-  is_code=is_code_type(final_type);
+  // N5008 [dcl.typedef]/2: the function type of an alias-declaration
+  // `using F = void(int);' (see convert_parsed_parameters)
+  if(is_typedef && final_type.id() == ID_code)
+    cpp_typecheck.convert_parsed_parameters(to_code_type(final_type));
+
+  is_code = is_code_type(final_type);
 
   // global-scope arrays must have fixed size
   if(scope->is_global_scope())
     cpp_typecheck.check_fixed_size_array(final_type);
 
   get_final_identifier();
+
+  // For explicit template instantiations (e.g., extern template
+  // __try_use_facet<collate<char>>), include the template arguments
+  // in the identifier to distinguish different instantiations.
+  if(template_args.is_not_nil() && !template_args.arguments().empty())
+  {
+    cpp_template_args_tct tc_args;
+    try
+    {
+      for(const auto &arg : template_args.arguments())
+      {
+        if(arg.id() == ID_type || arg.id() == ID_ambiguous)
+        {
+          typet t = arg.type();
+          cpp_typecheck.typecheck_type(t);
+          exprt e(ID_type);
+          e.type() = t;
+          tc_args.arguments().push_back(e);
+        }
+        else
+        {
+          exprt e = arg;
+          cpp_typecheck.typecheck_expr(e);
+          tc_args.arguments().push_back(e);
+        }
+      }
+      final_identifier =
+        id2string(final_identifier) + cpp_typecheck.template_suffix(tc_args);
+    }
+    catch(...)
+    {
+    }
+  }
 
   if(is_typedef)
     final_type.set(ID_C_typedef, final_identifier);
@@ -103,11 +261,11 @@ symbolt &cpp_declarator_convertert::convert(
   {
     // it's a member! it must be declared already, unless it's a friend
 
-    typet &method_qualifier=
+    typet &method_qualifier =
       static_cast<typet &>(declarator.method_qualifier());
 
     // adjust template type
-    if(final_type.id()==ID_template)
+    if(final_type.id() == ID_template)
     {
       UNREACHABLE;
       typet tmp;
@@ -116,13 +274,16 @@ symbolt &cpp_declarator_convertert::convert(
     }
 
     // try static first
-    auto maybe_symbol=
+    auto maybe_symbol =
       cpp_typecheck.symbol_table.get_writeable(final_identifier);
 
     if(!maybe_symbol)
     {
       // adjust type if it's a non-static member function
-      if(final_type.id()==ID_code)
+      // (but not for unqualified friend functions, which are free functions)
+      if(
+        final_type.id() == ID_code &&
+        (!is_friend || declarator.name().is_qualified()))
       {
         cpp_save_scopet save_scope(cpp_typecheck.cpp_scopes);
         cpp_typecheck.cpp_scopes.go_to(*scope);
@@ -136,7 +297,7 @@ symbolt &cpp_declarator_convertert::convert(
       get_final_identifier();
 
       // try again
-      maybe_symbol=cpp_typecheck.symbol_table.get_writeable(final_identifier);
+      maybe_symbol = cpp_typecheck.symbol_table.get_writeable(final_identifier);
       if(!maybe_symbol && is_friend)
       {
         symbolt &friend_symbol =
@@ -147,16 +308,36 @@ symbolt &cpp_declarator_convertert::convert(
       }
       else if(!maybe_symbol)
       {
-        cpp_typecheck.error().source_location=
-          declarator.name().source_location();
-        cpp_typecheck.error()
-          << "member '" << base_name << "' not found in scope '"
-          << scope->identifier << "'" << messaget::eom;
-        throw 0;
+        if(final_storage_spec.is_extern())
+        {
+          // extern template instantiation declaration for a member
+          // that hasn't been instantiated yet — silently skip by
+          // creating a weak extern symbol.
+          symbolt &new_symbol =
+            convert_new_symbol(final_storage_spec, member_spec, declarator);
+          new_symbol.is_extern = true;
+          new_symbol.is_weak = true;
+          return new_symbol;
+        }
+
+        // Out-of-class definition of a member not found in the
+        // instantiated template scope (e.g., basic_string::npos,
+        // basic_string::swap, basic_string_view::find in .tcc files).
+        // Create a weak symbol to allow type-checking to continue.
+        // For functions, clear the body since it can't be type-checked
+        // without the class scope.
+        {
+          if(final_type.id() == ID_code)
+            declarator.value().make_nil();
+          symbolt &weak_sym =
+            convert_new_symbol(final_storage_spec, member_spec, declarator);
+          weak_sym.is_weak = true;
+          return weak_sym;
+        }
       }
     }
 
-    symbolt &symbol=*maybe_symbol;
+    symbolt &symbol = *maybe_symbol;
 
     combine_types(declarator.name().source_location(), final_type, symbol);
     enforce_rules(symbol);
@@ -167,40 +348,66 @@ symbolt &cpp_declarator_convertert::convert(
       final_type.id() == ID_code &&
       to_code_type(final_type).return_type().id() == ID_constructor)
     {
-      const cpp_namet &name=declarator.name();
+      const cpp_namet &name = declarator.name();
 
-      exprt symbol_expr=
-        cpp_typecheck.resolve(
-          name,
-          cpp_typecheck_resolvet::wantt::TYPE,
-          cpp_typecheck_fargst());
+      exprt symbol_expr = cpp_typecheck.resolve(
+        name, cpp_typecheck_resolvet::wantt::TYPE, cpp_typecheck_fargst());
 
       if(symbol_expr.id() != ID_type)
       {
-        cpp_typecheck.error().source_location=name.source_location();
+        cpp_typecheck.error().source_location = name.source_location();
         cpp_typecheck.error() << "expected type" << messaget::eom;
         throw 0;
       }
 
-      irep_idt identifier=symbol_expr.type().get(ID_identifier);
-      const symbolt &symb=cpp_typecheck.lookup(identifier);
+      irep_idt identifier = symbol_expr.type().get(ID_identifier);
+      const symbolt &symb = cpp_typecheck.lookup(identifier);
       const struct_typet &type = to_struct_type(symb.type);
 
       if(declarator.find(ID_member_initializers).is_nil())
         declarator.set(ID_member_initializers, ID_member_initializers);
 
+      // N5008 [class.base.init]/2, [class.mfct]/1: the mem-initializer-ids
+      // of an out-of-class constructor definition are looked up in the
+      // class's scope -- a base named by a member typedef (`derived::
+      // derived(int x) : my_base(x)' with `typedef base<...> my_base' in the
+      // class) resolved in the enclosing namespace scope was "unknown".
+      cpp_save_scopet save_scope(cpp_typecheck.cpp_scopes);
+      cpp_typecheck.cpp_scopes.set_scope(symb.name);
+
       cpp_typecheck.check_member_initializers(
-        type.bases(), type.components(), declarator.member_initializers());
+        type.bases(),
+        type.components(),
+        declarator.member_initializers(),
+        symb.name);
 
       cpp_typecheck.full_member_initialization(
         type, declarator.member_initializers());
     }
 
     if(!final_storage_spec.is_extern())
-      symbol.is_extern=false;
+      symbol.is_extern = false;
 
     // initializer?
-    handle_initializer(symbol, declarator);
+    // N5008 [class.access.general]/7: an out-of-class definition of a
+    // member (reached here through its qualified name) is considered
+    // part of the class for access purposes -- a static data member's
+    // INITIALIZER may use the class's private members, including a
+    // private constructor (goto_trace.h's
+    // trace_optionst::default_options).  resolve_scope entered the
+    // member's class earlier but the scope was restored; re-enter it
+    // around the initializer's type-checking so accessibility is
+    // judged from within the class.
+    if(
+      scope != nullptr && scope->id_class == cpp_idt::id_classt::CLASS &&
+      declarator.name().is_qualified())
+    {
+      cpp_save_scopet save_scope(cpp_typecheck.cpp_scopes);
+      cpp_typecheck.cpp_scopes.go_to(*scope);
+      handle_initializer(symbol, declarator);
+    }
+    else
+      handle_initializer(symbol, declarator);
 
     return symbol;
   }
@@ -209,21 +416,23 @@ symbolt &cpp_declarator_convertert::convert(
     // no, it's no way a method
 
     // we won't allow the constructor/destructor type
-    if(final_type.id()==ID_code &&
-       to_code_type(final_type).return_type().id()==ID_constructor)
+    if(
+      final_type.id() == ID_code &&
+      to_code_type(final_type).return_type().id() == ID_constructor)
     {
-      cpp_typecheck.error().source_location=declarator.name().source_location();
-      cpp_typecheck.error() << "function must have return type"
-                            << messaget::eom;
+      cpp_typecheck.error().source_location =
+        declarator.name().source_location();
+      cpp_typecheck.error()
+        << "function must have return type" << messaget::eom;
       throw 0;
     }
 
     // already there?
-    const auto maybe_symbol=
+    const auto maybe_symbol =
       cpp_typecheck.symbol_table.get_writeable(final_identifier);
     if(!maybe_symbol)
       return convert_new_symbol(final_storage_spec, member_spec, declarator);
-    symbolt &symbol=*maybe_symbol;
+    symbolt &symbol = *maybe_symbol;
 
     if(!final_storage_spec.is_extern())
       symbol.is_extern = false;
@@ -231,22 +440,30 @@ symbolt &cpp_declarator_convertert::convert(
     if(declarator.get_bool(ID_C_template_case))
       return symbol;
 
+    const irept hidden_friend_of = symbol.type.find(ID_C_hidden_friend_of);
     combine_types(declarator.name().source_location(), final_type, symbol);
     enforce_rules(symbol);
+    // [dcl.meaning.general]/2.1: a namespace-scope declaration of a function
+    // first declared as a friend binds its name; another friend declaration
+    // does not
+    if(is_friend && hidden_friend_of.is_not_nil())
+      symbol.type.add(ID_C_hidden_friend_of) = hidden_friend_of;
+    else if(!is_friend)
+      symbol.type.remove(ID_C_hidden_friend_of);
 
     // initializer?
     handle_initializer(symbol, declarator);
 
-    if(symbol.type.id()=="cpp-template-type")
+    if(symbol.type.id() == "cpp-template-type")
     {
       const auto id_set = scope->lookup_identifier(
         symbol.name, cpp_idt::id_classt::TEMPLATE_PARAMETER);
 
       if(id_set.empty())
       {
-        cpp_idt &identifier=
+        cpp_idt &identifier =
           cpp_typecheck.cpp_scopes.put_into_scope(symbol, *scope);
-        identifier.id_class=cpp_idt::id_classt::TEMPLATE_PARAMETER;
+        identifier.id_class = cpp_idt::id_classt::TEMPLATE_PARAMETER;
       }
     }
 
@@ -254,40 +471,59 @@ symbolt &cpp_declarator_convertert::convert(
   }
 }
 
+/// N5008 [dcl.spec.auto.general]/3: whether \p type is or contains, under
+/// pointer and reference declarators, an undeduced placeholder (`auto',
+/// `auto &&', `const auto *'); [dcl.spec.auto.general]/13: a redeclaration
+/// of a function with a deduced return type uses the placeholder, so its
+/// type does not conflict with the deduced one
+static bool placeholder_return_type(const typet &type)
+{
+  if(type.id() == ID_auto)
+    return true;
+  if(type.id() == ID_pointer)
+    return placeholder_return_type(to_pointer_type(type).base_type());
+  return false;
+}
+
 void cpp_declarator_convertert::combine_types(
   const source_locationt &source_location,
   const typet &decl_type,
   symbolt &symbol)
 {
-  if(symbol.type.id()==decl_type.id() &&
-     decl_type.id()==ID_code)
+  if(symbol.type.id() == decl_type.id() && decl_type.id() == ID_code)
   {
     // functions need special treatment due
     // to argument names, default values, and inlined-ness
-    const code_typet &decl_code_type=to_code_type(decl_type);
-    code_typet &symbol_code_type=to_code_type(symbol.type);
+    const code_typet &decl_code_type = to_code_type(decl_type);
+    code_typet &symbol_code_type = to_code_type(symbol.type);
 
     if(decl_code_type.get_inlined())
       symbol_code_type.set_inlined(true);
 
-    if(decl_code_type.return_type()==symbol_code_type.return_type() &&
-       decl_code_type.parameters().size()==symbol_code_type.parameters().size())
+    if(
+      decl_code_type.return_type() == symbol_code_type.return_type() &&
+      decl_code_type.parameters().size() ==
+        symbol_code_type.parameters().size())
     {
-      for(std::size_t i=0; i<decl_code_type.parameters().size(); i++)
+      for(std::size_t i = 0; i < decl_code_type.parameters().size(); i++)
       {
-        const code_typet::parametert &decl_parameter=
+        const code_typet::parametert &decl_parameter =
           decl_code_type.parameters()[i];
-        code_typet::parametert &symbol_parameter=
+        code_typet::parametert &symbol_parameter =
           symbol_code_type.parameters()[i];
 
         // first check type
-        if(decl_parameter.type()!=symbol_parameter.type())
+        if(decl_parameter.type() != symbol_parameter.type())
         {
           // The 'this' parameter of virtual functions mismatches
           if(i != 0 || !symbol_code_type.get_bool(ID_C_is_virtual))
           {
-            cpp_typecheck.error().source_location=source_location;
-            cpp_typecheck.error()
+            // Parameter type mismatch: this is likely a different
+            // overload that was given the same mangled name (e.g.,
+            // due to system header inline namespace handling).
+            // Treat as a harmless redeclaration rather than an error.
+            cpp_typecheck.warning().source_location = source_location;
+            cpp_typecheck.warning()
               << "symbol '" << symbol.display_name() << "': parameter "
               << (i + 1) << " type mismatch\n"
               << "previous type: "
@@ -295,7 +531,7 @@ void cpp_declarator_convertert::combine_types(
               << "\nnew type: "
               << cpp_typecheck.to_string(decl_parameter.type())
               << messaget::eom;
-            throw 0;
+            return;
           }
         }
 
@@ -304,7 +540,7 @@ void cpp_declarator_convertert::combine_types(
           symbol_parameter.set_base_name(decl_parameter.get_base_name());
           // set an empty identifier when no body is available
           symbol_parameter.set_identifier(irep_idt());
-          symbol_parameter.add_source_location()=
+          symbol_parameter.add_source_location() =
             decl_parameter.source_location();
         }
       }
@@ -312,8 +548,21 @@ void cpp_declarator_convertert::combine_types(
       // ok
       return;
     }
+
+    // Return types differ but parameters match: if the existing
+    // symbol has a resolved return type and the new one has
+    // unresolved auto/decltype, keep the existing type.
+    const auto &existing_ret = symbol_code_type.return_type();
+    const auto &new_ret = decl_code_type.return_type();
+    if(
+      !placeholder_return_type(existing_ret) &&
+      (placeholder_return_type(new_ret) ||
+       id2string(new_ret.id()).find("decltype") != std::string::npos))
+    {
+      return;
+    }
   }
-  else if(symbol.type==decl_type)
+  else if(symbol.type == decl_type)
     return; // ok
   else if(
     symbol.type.id() == ID_array &&
@@ -324,8 +573,71 @@ void cpp_declarator_convertert::combine_types(
     symbol.type = decl_type;
     return; // ok
   }
+  // N5008 [basic.link]/11: declarations of an array object may differ in
+  // the presence of the major array bound.  A variable template's
+  // instantiation from a primary template declared `T v[] = {...}' meets an
+  // explicit specialization `template <> T v<char>[200]' declared first
+  // (the MSVC STL's __DIGIT_TABLE, [temp.expl.spec]/7: that specialization
+  // is the entity named); keep the declared bound.
+  else if(
+    symbol.type.id() == ID_array && decl_type.id() == ID_array &&
+    to_array_type(decl_type).size().is_nil() &&
+    to_array_type(symbol.type).size().is_not_nil())
+  {
+    typet existing_element = to_array_type(symbol.type).element_type();
+    typet new_element = to_array_type(decl_type).element_type();
+    existing_element.remove(ID_C_constant);
+    new_element.remove(ID_C_constant);
+    if(existing_element == new_element)
+      return; // ok
+  }
 
-  cpp_typecheck.error().source_location=source_location;
+  else if(
+    symbol.type.id() == ID_code && decl_type.id() == ID_code &&
+    to_code_type(symbol.type).parameters().size() ==
+      to_code_type(decl_type).parameters().size())
+  {
+    // When the existing symbol has a resolved return type (e.g.,
+    // auto deduced to int*) and the new declaration has an
+    // unresolved auto/decltype return type, keep the existing
+    // resolved type.  This happens when a function template is
+    // instantiated twice — the first deduces auto, the second
+    // doesn't.
+    const auto &existing_ret = to_code_type(symbol.type).return_type();
+    const auto &new_ret = to_code_type(decl_type).return_type();
+    if(
+      !placeholder_return_type(existing_ret) &&
+      (placeholder_return_type(new_ret) ||
+       id2string(new_ret.id()).find("decltype") != std::string::npos))
+    {
+      return; // keep existing resolved type
+    }
+  }
+
+  // N5008 [temp.spec.general]/5 + [basic.def.odr]/1: a template
+  // specialization is defined at most once, and every instantiation of
+  // the same specialization denotes the SAME entity -- the first
+  // instantiation IS its definition.  An alias-template instance is
+  // materialized here as a typedef symbol (its type carries the
+  // #template marker); when a LATER re-instantiation computes a
+  // divergent type, that recomputation happened in a context where
+  // SFINAE-steered selection went wrong (e.g. libc++'s
+  // `_And<...> = decltype(__and_helper<...>(0))` re-evaluated during a
+  // deferred method-body drain, where the system-header recovery guard
+  // swallows the enable_if substitution failure that must select the
+  // false_type overload).  The specialization's meaning cannot change
+  // between points of instantiation ([temp.point]/7): keep the first
+  // definition rather than erroring out (which silently dropped the
+  // enclosing method body -- the vector::push_back
+  // __uninitialized_allocator_move_if_noexcept shape).
+  if(
+    symbol.is_type && symbol.type.find(ID_C_template).is_not_nil() &&
+    decl_type.find(ID_C_template).is_not_nil())
+  {
+    return;
+  }
+
+  cpp_typecheck.error().source_location = source_location;
   cpp_typecheck.error() << "symbol '" << symbol.display_name()
                         << "' already declared with different type:\n"
                         << "original: " << cpp_typecheck.to_string(symbol.type)
@@ -347,10 +659,29 @@ void cpp_declarator_convertert::handle_initializer(
   symbolt &symbol,
   cpp_declaratort &declarator)
 {
-  exprt &value=declarator.value();
+  exprt &value = declarator.value();
+
+  // N5008 [dcl.fct.def.default]/1,5: a function explicitly defaulted on a
+  // declaration after its first one -- an out-of-line `X::X(const X &) =
+  // default;', also of a class template member (libstdc++'s
+  // basic_streambuf) -- is user-provided and has the implicit definition.
+  // Represent it like the in-class form: an empty body marked
+  // #defaulted_function, from which convert_function generates the
+  // memberwise copy/move (construction or assignment); the bare `default'
+  // statement otherwise reached the C type-checker ("unexpected statement:
+  // default") and symbolic execution.
+  if(
+    symbol.type.id() == ID_code && value.id() == ID_code &&
+    to_code(value).get_statement() == ID_default)
+  {
+    source_locationt location = value.source_location();
+    value = code_blockt{};
+    value.add_source_location() = location;
+    value.set("#defaulted_function", true);
+  }
 
   // moves member initializers into 'value' - only methods have these
-  if(symbol.type.id() == ID_code)
+  if(symbol.type.id() == ID_code && value.is_not_nil())
     cpp_typecheck.move_member_initializers(
       declarator.member_initializers(), to_code_type(symbol.type), value);
 
@@ -361,7 +692,7 @@ void cpp_declarator_convertert::handle_initializer(
   if(symbol.is_extern)
   {
     // the symbol is really located here
-    symbol.is_extern=false;
+    symbol.is_extern = false;
   }
 
   if(symbol.value.is_nil())
@@ -369,8 +700,24 @@ void cpp_declarator_convertert::handle_initializer(
     // no initial value yet
     symbol.value.swap(value);
 
+    // N5008 [class.friend]/6 (note 3): "If a friend function is defined
+    // outside a class, it is not in the scope of the class."  A function
+    // first declared as a friend and defined at namespace scope (the MSVC
+    // STL's filesystem::_Copy_impl, a friend of directory_entry) looks names
+    // up from there: the class's members must not hide namespace-scope
+    // functions.
+    if(is_code && !(is_friend && friend_class_scope != nullptr))
+      symbol.type.remove(ID_C_class);
+
     if(!is_code)
-      cpp_typecheck.convert_initializer(symbol);
+    {
+      // N5008 [temp.constr.atomic]/3, [temp.constr.op]: a concept's
+      // initializer is its constraint-expression
+      if(declarator.get_bool("#concept"))
+        cpp_typecheck.convert_concept_initializer(symbol);
+      else
+        cpp_typecheck.convert_initializer(symbol);
+    }
   }
   else
   {
@@ -397,39 +744,39 @@ void cpp_declarator_convertert::handle_initializer(
 
 void cpp_declarator_convertert::get_final_identifier()
 {
-  std::string identifier=id2string(base_name);
+  std::string identifier = id2string(base_name);
 
   // main is always "C" linkage, as a matter of principle
   if(is_code && base_name == ID_main && scope->prefix.empty())
   {
-    linkage_spec=ID_C;
+    linkage_spec = ID_C;
   }
 
   if(is_code)
   {
-    if(linkage_spec==ID_C)
+    if(linkage_spec == ID_C)
     {
       // fine as is
     }
-    else if(linkage_spec==ID_auto ||
-            linkage_spec==ID_cpp)
+    else if(linkage_spec == ID_auto || linkage_spec == ID_cpp)
     {
       // Is there already an `extern "C"' function with the same name
       // and the same signature?
       symbol_table_baset::symbolst::const_iterator c_it =
         cpp_typecheck.symbol_table.symbols.find(identifier);
 
-      if(c_it!=cpp_typecheck.symbol_table.symbols.end() &&
-         c_it->second.type.id()==ID_code &&
-         cpp_typecheck.function_identifier(final_type)==
-         cpp_typecheck.function_identifier(c_it->second.type))
+      if(
+        c_it != cpp_typecheck.symbol_table.symbols.end() &&
+        c_it->second.type.id() == ID_code &&
+        cpp_typecheck.function_identifier(final_type) ==
+          cpp_typecheck.function_identifier(c_it->second.type))
       {
         // leave as is, no decoration
       }
       else
       {
         // add C++ decoration
-        identifier+=id2string(cpp_typecheck.function_identifier(final_type));
+        identifier += id2string(cpp_typecheck.function_identifier(final_type));
       }
     }
   }
@@ -442,22 +789,95 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
   const cpp_member_spect &member_spec,
   cpp_declaratort &declarator)
 {
-  irep_idt pretty_name=get_pretty_name();
+  irep_idt pretty_name = get_pretty_name();
+
+  // N5008 [basic.def.odr], [dcl.type.general]/... : the DEFINITION of an
+  // object requires a complete type; an array's element type must be
+  // complete ([dcl.array]/1).  [temp.inst]/2: a class template
+  // specialization that is only NAMED by the type (a pointer or reference
+  // to it, an extern declaration, a typedef, a function declaration) is not
+  // instantiated by that.
+  if(
+    !is_typedef && !is_code && !storage_spec.is_extern() &&
+    !declarator.get_is_parameter())
+  {
+    const typet *object_type = &final_type;
+    while(object_type->id() == ID_array)
+      object_type = &to_array_type(*object_type).element_type();
+    if(object_type->id() == ID_struct_tag || object_type->id() == ID_union_tag)
+    {
+      cpp_typecheck.elaborate_class_template(*object_type);
+    }
+  }
 
   symbolt symbol{
     final_identifier,
     final_type,
     linkage_spec == ID_auto ? ID_cpp : linkage_spec};
-  symbol.base_name=base_name;
-  symbol.value=declarator.value();
-  symbol.location=declarator.name().source_location();
+  symbol.base_name = base_name;
+  symbol.value = declarator.value();
+  symbol.location = declarator.name().source_location();
   symbol.is_extern = storage_spec.is_extern();
+  // [dcl.link]/7: a declaration directly in a linkage-specification
+  // without a storage class specifier is treated as extern.
+  // For non-POD class types without an initializer, mark as extern
+  // to prevent default construction attempts that may fail
+  // (e.g., MSVC's 'extern "C++" istream cin;').
+  if(
+    !symbol.is_extern && !is_code && linkage_spec != ID_auto &&
+    declarator.value().is_nil() && !storage_spec.is_static() &&
+    (final_type.id() == ID_struct_tag || final_type.id() == ID_union_tag) &&
+    !cpp_typecheck.cpp_is_pod(final_type))
+  {
+    symbol.is_extern = true;
+  }
   symbol.is_parameter = declarator.get_is_parameter();
   symbol.is_weak = storage_spec.is_weak();
-  symbol.module=cpp_typecheck.module;
-  symbol.is_type=is_typedef;
-  symbol.is_macro=is_typedef && !is_template_parameter;
-  symbol.pretty_name=pretty_name;
+  symbol.module = cpp_typecheck.module;
+  symbol.is_type = is_typedef;
+  // GCC: an `aligned' attribute that is part of a typedef sets the alignment
+  // exactly (it may decrease it); see ansi-c/padding.cpp
+  if(is_typedef && symbol.type.find(ID_C_alignment).is_not_nil())
+  {
+    static_cast<exprt &>(symbol.type.add(ID_C_alignment))
+      .set(ID_C_typedef_alignment, true);
+  }
+  symbol.is_macro =
+    (is_typedef && !is_template_parameter) || storage_spec.is_constexpr();
+  // N5008 [dcl.constexpr]/1: a constexpr VARIABLE is still an object;
+  // for an ARRAY the object identity is essential -- its elements are
+  // lvalues ([expr.sub]) and libc++ takes their address
+  // (&__digits_base_10[i] in <charconv>).  Keep it a real, statically
+  // initialized object rather than a fold-away macro (the matching
+  // resolve-side exemption keeps uses as symbol expressions); constant
+  // folding of constant-indexed reads still happens through the
+  // initializer downstream.  Likewise a constexpr object of CLASS type
+  // ([dcl.constexpr]/6, [basic.def.odr]: a const object with static storage
+  // duration at namespace scope, whose address can be taken and which binds
+  // to a reference); its value for constant expressions is recorded
+  // separately (record_constexpr_object_value) and is its initializer.
+  if(
+    storage_spec.is_constexpr() && !is_typedef &&
+    (symbol.type.id() == ID_array || symbol.type.id() == ID_struct_tag ||
+     symbol.type.id() == ID_union_tag))
+  {
+    symbol.is_macro = false;
+    cpp_typecheck.constexpr_objects.insert(symbol.name);
+  }
+  // N5008 [dcl.constexpr]/6: "A constexpr specifier used in an object
+  // declaration declares the object as const."  The const of a constexpr
+  // ARRAY was lost (`constexpr int a[] = {1, 2, 3}' had type `int[3]', not
+  // `const int[3]' as `const int a[]' does), so a constant expression over
+  // an element (`static_assert(a[1] == 2)') did not see a constant object.
+  if(storage_spec.is_constexpr() && !is_typedef && !is_code && !symbol.is_type)
+  {
+    if(symbol.type.id() == ID_array)
+      to_array_type(symbol.type).element_type().set(ID_C_constant, true);
+    else if(
+      symbol.type.id() == ID_struct_tag || symbol.type.id() == ID_union_tag)
+      symbol.type.set(ID_C_constant, true);
+  }
+  symbol.pretty_name = pretty_name;
 
   if(is_code && !symbol.is_type)
   {
@@ -479,26 +899,33 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
   }
   else
   {
-    symbol.is_lvalue = !is_reference(symbol.type) &&
-                       !(symbol.type.get_bool(ID_C_constant) &&
-                         is_number(symbol.type) && symbol.value.is_constant());
+    symbol.is_lvalue = !is_reference(symbol.type);
+
+    // N5008 [temp.expl.spec]/2, [basic.stc.static]/1: an explicit
+    // specialization of a variable template declared at namespace scope (in
+    // the scope of its empty template-parameter-list, `template <>') is a
+    // namespace-scope variable with static storage duration
+    const cpp_scopet *declaring_scope =
+      &cpp_typecheck.cpp_scopes.current_scope();
+    while(declaring_scope->id_class == cpp_idt::id_classt::TEMPLATE_SCOPE &&
+          !declaring_scope->is_root_scope())
+    {
+      declaring_scope = &declaring_scope->get_parent();
+    }
+    const bool at_namespace_scope = declaring_scope->is_global_scope();
 
     symbol.is_static_lifetime =
       !symbol.is_macro && !symbol.is_type &&
-      (cpp_typecheck.cpp_scopes.current_scope().is_global_scope() ||
-       storage_spec.is_static());
+      (at_namespace_scope || storage_spec.is_static());
 
     symbol.is_thread_local =
       (!symbol.is_static_lifetime && !storage_spec.is_extern()) ||
       storage_spec.is_thread_local();
 
-    symbol.is_file_local =
-      symbol.is_macro ||
-      (!cpp_typecheck.cpp_scopes.current_scope().is_global_scope() &&
-       !storage_spec.is_extern()) ||
-      (cpp_typecheck.cpp_scopes.current_scope().is_global_scope() &&
-       storage_spec.is_static()) ||
-      symbol.is_parameter;
+    symbol.is_file_local = (symbol.is_macro && !storage_spec.is_constexpr()) ||
+                           (!at_namespace_scope && !storage_spec.is_extern()) ||
+                           (at_namespace_scope && storage_spec.is_static()) ||
+                           symbol.is_parameter;
   }
 
   if(symbol.is_static_lifetime)
@@ -507,9 +934,31 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
   // move early, it must be visible before doing any value
   symbolt *new_symbol;
 
+  // For friend functions defined inside a class, record the enclosing
+  // class so that the class scope is visible during body type-checking.
+  if(is_friend && friend_class_scope != nullptr)
+    symbol.type.set(ID_C_class, friend_class_scope->identifier);
+
+  // N5008 [dcl.meaning.general]/2.1, [basic.lookup.argdep]/4.2: a friend
+  // declaration does not bind a name, so a function first declared by one
+  // is found only by argument-dependent lookup with the befriending class
+  // among the associated classes (filter_hidden_friends); a later
+  // namespace-scope declaration makes it visible (see below).  A friend
+  // `operator==(const __shared_count &, const __shared_count &)' was a
+  // candidate for `__ti == typeid(...)' in libstdc++'s
+  // _Sp_counted_ptr_inplace::_M_get_deleter.
+  if(
+    is_friend && is_code && friend_class_scope != nullptr &&
+    !declarator.name().is_qualified())
+  {
+    irept entry{ID_symbol};
+    entry.set(ID_identifier, friend_class_scope->identifier);
+    symbol.type.add(ID_C_hidden_friend_of).move_to_sub(entry);
+  }
+
   if(cpp_typecheck.symbol_table.move(symbol, new_symbol))
   {
-    cpp_typecheck.error().source_location=symbol.location;
+    cpp_typecheck.error().source_location = symbol.location;
     cpp_typecheck.error()
       << "cpp_typecheckt::convert_declarator: symbol_table.move() failed"
       << messaget::eom;
@@ -529,7 +978,7 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
 
       if(!id.is_class() && !id.is_enum())
       {
-        cpp_typecheck.error().source_location=new_symbol->location;
+        cpp_typecheck.error().source_location = new_symbol->location;
         cpp_typecheck.error()
           << "'" << base_name << "' already in scope" << messaget::eom;
         throw 0;
@@ -538,26 +987,164 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
   }
 
   // put into scope
-  cpp_idt &identifier=
+  cpp_idt &identifier =
     cpp_typecheck.cpp_scopes.put_into_scope(*new_symbol, *scope, is_friend);
 
   if(is_template)
-    identifier.id_class=cpp_idt::id_classt::TEMPLATE;
+    identifier.id_class = cpp_idt::id_classt::TEMPLATE;
   else if(is_template_parameter)
-    identifier.id_class=cpp_idt::id_classt::TEMPLATE_PARAMETER;
+    identifier.id_class = cpp_idt::id_classt::TEMPLATE_PARAMETER;
   else if(is_typedef)
-    identifier.id_class=cpp_idt::id_classt::TYPEDEF;
+    identifier.id_class = cpp_idt::id_classt::TYPEDEF;
   else
-    identifier.id_class=cpp_idt::id_classt::SYMBOL;
+    identifier.id_class = cpp_idt::id_classt::SYMBOL;
 
   // do the value
   if(!new_symbol->is_type)
   {
-    if(is_code && declarator.type().id()!=ID_template)
-      cpp_typecheck.add_method_body(new_symbol);
+    if(is_code)
+    {
+      if(is_friend)
+      {
+        // Friend function bodies are deferred because the enclosing
+        // class may not be fully type-checked yet.
+        cpp_typecheck.add_method_body(new_symbol);
+      }
+      else if(new_symbol->is_macro)
+      {
+        // A `constexpr` function is marked is_macro.  Per N5008 [temp.point]/1
+        // and [temp.inst]/5, convert its definition eagerly *only* when this
+        // instantiation was reached from a constant-expression context (so the
+        // constant can be folded now -- e.g. a `constexpr` specialization used
+        // as an `enable_if` non-type argument, an array bound, or std::tuple's
+        // constructor SFINAE), or when it has a deduced
+        // (`auto`/`decltype(auto)`)
+        // return type that must be deduced before any call site (mirroring the
+        // non-macro branch below).  When reached for an ordinary run-time call
+        // it is otherwise deferred to the clean method-body drain, exactly like
+        // a non-constexpr function: the eager conversion would otherwise run
+        // nested in the referencing body's degraded context, where a
+        // [temp.deduct.call]/4.3 derived-to-base call whose callee has a
+        // trailing parameter pack fails to build (and poisons the callee's
+        // sub-instantiations), even though the deferred drain resolves it.
+        // N5008 [expr.const]/22, [temp.inst]/8: a constexpr function named
+        // in an unevaluated operand -- a requirement `__s - __i' of
+        // libstdc++'s sized_sentinel_for checked for an incomplete
+        // __normal_iterator -- is neither odr-used nor needed for constant
+        // evaluation (the operand is not potentially constant evaluated);
+        // its body is held back as for a non-constexpr function below.
+        const bool unevaluated = cpp_typecheck.unevaluated_operand_depth > 0 &&
+                                 !cpp_typecheck.instantiation_stack.empty();
+        if(
+          (cpp_typecheck.instantiating_for_constant_eval && !unevaluated) ||
+          cpp_typecheck.has_auto(new_symbol->type))
+        {
+          cpp_typecheck.convert_function(*new_symbol);
+        }
+        else
+        {
+          if(unevaluated)
+            cpp_typecheck.speculative_instances.insert(new_symbol->name);
+          cpp_typecheck.add_method_body(new_symbol);
+        }
+      }
+      else if(declarator.type().id() != ID_template)
+      {
+        // If the function has auto return type, type-check immediately
+        // so the return type is deduced before any call sites
+        // ([dcl.spec.auto.general]/13 -- needed even when the function is
+        // only named in an unevaluated operand).
+        if(cpp_typecheck.has_auto(new_symbol->type))
+          cpp_typecheck.convert_function(*new_symbol);
+        else
+        {
+          // N5008 [temp.inst]/4 + [basic.def.odr]/5: a specialization
+          // named only in an unevaluated operand (`decltype(swap(declval<T
+          // &>(), declval<T &>()))' of a SFINAE trait) is not odr-used;
+          // its definition -- possibly ill-formed for these arguments,
+          // `swap' of a non-copyable type -- is instantiated only if an
+          // odr-use appears later.  The body is held back like a
+          // conversion probe's (speculative_instances) and released when
+          // a converted body refers to it.
+          if(
+            cpp_typecheck.unevaluated_operand_depth > 0 &&
+            !cpp_typecheck.instantiation_stack.empty())
+          {
+            cpp_typecheck.speculative_instances.insert(new_symbol->name);
+          }
+          cpp_typecheck.add_method_body(new_symbol);
+        }
+      }
+    }
+    else
+    {
+      // N5008 [dcl.init.ref], [dcl.init]/16: reference direct-initialization
+      // written with parentheses or braces, `T &r(init)` / `T &r{init}`, is
+      // stored by the parser as init_args rather than as a value.  A reference
+      // is not an object initialized by a constructor, so it is not handled by
+      // the object init_args path; attach the single initializer as the symbol
+      // value so convert_initializer performs the reference binding (exactly
+      // like `T &r = init`), and clear init_args so the declaration statement
+      // does not later see leftover init_args.
+      // N5008 [dcl.type.auto.deduct]/2.2.3: for a variable with a placeholder
+      // type, a parenthesized expression-list initializer shall be a single
+      // assignment-expression, which is the initializer-clause E
+      // (`auto x2a(i);' -- Example 3 -- is `int'); deduce from it exactly as
+      // for `auto x = i'.
+      if(
+        new_symbol->value.is_nil() &&
+        (is_reference(new_symbol->type) ||
+         cpp_typecheck.has_auto(new_symbol->type)) &&
+        declarator.init_args().has_operands() &&
+        declarator.init_args().operands().size() == 1)
+      {
+        new_symbol->value = declarator.init_args().operands().front();
+        declarator.remove(ID_init_args);
+      }
+      // N5008 [dcl.init.general]/16.9: direct-initialization of a
+      // NON-CLASS type from a single parenthesized initializer
+      // initializes it with the (converted) value of that expression.
+      // For a constexpr object this must land in the symbol's VALUE
+      // -- a constexpr symbol is a fold-away macro whose uses
+      // substitute symbol.value, and the generic init_args path
+      // produces a void constructor-call statement instead, so
+      // `constexpr error_type error_collate(_S_error_collate);` (the
+      // libstdc++ regex_constants shape, re-interpreted as a variable
+      // by the [dcl.ambig.res]/1 name-lookup disambiguation) leaked a
+      // VOID value into every use.
+      if(
+        new_symbol->value.is_nil() && new_symbol->is_macro &&
+        new_symbol->type.id() != ID_struct_tag &&
+        new_symbol->type.id() != ID_union_tag &&
+        !is_reference(new_symbol->type) &&
+        declarator.init_args().has_operands() &&
+        declarator.init_args().operands().size() == 1)
+      {
+        new_symbol->value = declarator.init_args().operands().front();
+        declarator.remove(ID_init_args);
+      }
+      // N5008 [temp.constr.atomic]/3, [temp.constr.op] (see handle_initializer)
+      if(declarator.get_bool("#concept"))
+        cpp_typecheck.convert_concept_initializer(*new_symbol);
+      else
+        cpp_typecheck.convert_initializer(*new_symbol);
 
-    if(!is_code)
-      cpp_typecheck.convert_initializer(*new_symbol);
+      // N5008 [dcl.constexpr]/6: a constexpr object of class type is a
+      // constant whose members are readable in constant expressions.  The
+      // front end represents a constexpr variable as a fold-away macro, so
+      // the object's VALUE must be the struct constant its initialization
+      // produces -- `constexpr S g;' (default member initializers),
+      // `constexpr P p(42);' (a constexpr constructor), `constexpr S u =
+      // S();'.  Without it a namespace-scope object was never initialized
+      // at all (reads saw zero), and a block-scope one could not be folded.
+      if(
+        storage_spec.is_constexpr() && !is_code && !is_typedef &&
+        (new_symbol->type.id() == ID_struct_tag ||
+         new_symbol->type.id() == ID_union_tag))
+      {
+        cpp_typecheck.record_constexpr_object_value(*new_symbol, declarator);
+      }
+    }
   }
 
   enforce_rules(*new_symbol);
@@ -569,56 +1156,82 @@ irep_idt cpp_declarator_convertert::get_pretty_name()
 {
   if(is_code)
   {
-    const irept::subt &parameters=
-      final_type.find(ID_parameters).get_sub();
+    const irept::subt &parameters = final_type.find(ID_parameters).get_sub();
 
-    std::string result=scope->prefix+id2string(base_name)+"(";
+    std::string result = scope->prefix + id2string(base_name) + "(";
 
     for(auto it = parameters.begin(); it != parameters.end(); ++it)
     {
       const typet &parameter_type = ((exprt &)*it).type();
 
-      if(it!=parameters.begin())
-        result+=", ";
+      if(it != parameters.begin())
+        result += ", ";
 
-      result+=cpp_typecheck.to_string(parameter_type);
+      result += cpp_typecheck.to_string(parameter_type);
     }
 
-    result+=')';
+    result += ')';
 
     return result;
   }
 
-  return scope->prefix+id2string(base_name);
+  return scope->prefix + id2string(base_name);
 }
 
 void cpp_declarator_convertert::operator_overloading_rules(
-  const symbolt &)
-{
-}
-
-void cpp_declarator_convertert::main_function_rules(
   const symbolt &symbol)
 {
-  if(symbol.name==ID_main)
+  if(symbol.type.id() != ID_code)
+    return;
+
+  const irep_idt &base = symbol.base_name;
+
+  // C++ [over.oper]: operator=, operator[], operator(), and operator->
+  // must be non-static member functions.
+  if(
+    base == "operator=" || base == "operator[]" || base == "operator()" ||
+    base == "operator->")
   {
-    if(symbol.type.id()!=ID_code)
+    // Member functions have a 'this' parameter.
+    const code_typet &code_type = to_code_type(symbol.type);
+    bool is_member = false;
+    if(!code_type.parameters().empty())
     {
-      cpp_typecheck.error().source_location=symbol.location;
+      const auto &first_param = code_type.parameters().front();
+      if(first_param.get_this())
+        is_member = true;
+    }
+    if(!is_member)
+    {
+      cpp_typecheck.error().source_location = symbol.location;
+      cpp_typecheck.error()
+        << "'" << base << "' must be a non-static member function"
+        << messaget::eom;
+      throw 0;
+    }
+  }
+}
+
+void cpp_declarator_convertert::main_function_rules(const symbolt &symbol)
+{
+  if(symbol.name == ID_main)
+  {
+    if(symbol.type.id() != ID_code)
+    {
+      cpp_typecheck.error().source_location = symbol.location;
       cpp_typecheck.error() << "main must be function" << messaget::eom;
       throw 0;
     }
 
-    const typet &return_type=
-      to_code_type(symbol.type).return_type();
+    const typet &return_type = to_code_type(symbol.type).return_type();
 
-    if(return_type!=signed_int_type())
+    if(return_type != signed_int_type())
     {
-      // Too many embedded compilers ignore this rule.
-      #if 0
+// Too many embedded compilers ignore this rule.
+#if 0
       cpp_typecheck.error().source_location=symbol.location;
       throw "main must return int";
-      #endif
+#endif
     }
   }
 }

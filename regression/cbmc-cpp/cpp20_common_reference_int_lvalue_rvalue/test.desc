@@ -1,0 +1,24 @@
+CORE
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [meta.trans.other] COMMON-REF: common_reference_t<int&, int&&> is
+const int& (COMMON-REF(A&&, B&) = D = COMMON-REF(const A&, B&) when A&& is
+convertible to D), common_reference_t<int&&, const int&> likewise, and
+common_reference_with<int&, int&&> holds -- the conjunct of
+indirectly_readable that blocked every user-defined iterator.  Exercises the
+libstdc++ machinery end to end: __match_cv_qualifiers' private member
+typedef used as a nested-name-specifier, __common_ref_impl's constrained
+rvalue partial specializations (_Require<is_convertible<...>>), and an
+inherited `value' looked up right after the class is completed.
+With the libstdc++ 16 headers common_reference_t<int &, long &> failed
+(tagged broken-libstdcxx16); the root cause,
+cpp20_constrained_partial_specialization_reached_through_base_chain, is
+fixed, and the test passes with GCC 16.2.1.

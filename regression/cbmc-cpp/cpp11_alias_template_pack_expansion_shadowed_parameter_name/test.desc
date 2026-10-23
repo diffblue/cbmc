@@ -1,0 +1,23 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ pack expanded: SUCCESS$
+^\[main\.assertion\.2\] line \d+ nested in a compound type: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [temp.alias]/2, [temp.variadic]/5: holder_of<int &, long &> is
+holder<char, int &, long &>: the i-th element of the expansion of
+`typename id<A>::type...' substitutes the i-th element of the alias's
+pack A.  template_mapt::apply substituted only a pattern that is the bare
+pack; the A nested in id<A> stayed a name, later looked up where the
+using function template's own pack A was visible, and became its first
+element: holder<char, int &, int &>, and the conversion failed ("already
+declared with different type", bin53).  The nested reference is now
+substituted as well.  g++ 13 and clang++ 18 accept this program, and it
+fails only its WRONG assertion.

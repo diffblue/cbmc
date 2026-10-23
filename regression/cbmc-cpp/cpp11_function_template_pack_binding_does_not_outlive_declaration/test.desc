@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ one argument passed: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Declaring a function template recorded each of its parameter packs as
+empty in the global template map and never removed the entry; the
+trailing return type of call() then expanded `args...' as that empty
+pack, `c()' had too few arguments and call had no viable candidate.

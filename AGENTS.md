@@ -30,6 +30,7 @@ formal verification of C and C++ programs.
 ### What CBMC Does
 - Bounded model checking for C/C++ programs
 - Supports C89, C99, most of C11, C17, C23
+- Supports C++98, C++03, C++11, C++14, and C++17
 - Supports most compiler extensions from gcc and Visual Studio
 - Verifies array bounds, pointer safety, exceptions, and user-specified
   assertions

@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ one-parameter constructor template: SUCCESS$
+^\[main\.assertion\.2\] line \d+ three-parameter constructor template: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+no body for callee
+--
+Two constructor templates of a partial specialization, both defined out of
+line.  The instantiated one-parameter template took no definition: among
+same-named definitions the one with the most template parameters was
+preferred before the arity was compared, and that was the three-parameter
+template's.  libc++'s std::function defines `template <class _Fp,
+class> function(_Fp)' and its allocator-extended constructor templates,
+which have more template parameters, out of line.

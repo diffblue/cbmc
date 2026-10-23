@@ -1,0 +1,31 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ not satisfied for int: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [expr.prim.req.compound]/1-2, [temp.constr.atomic]: `{ t.begin() }
+-> pointer_like;' requires `t.begin()' to be a valid expression whose type
+satisfies pointer_like; for T = int the substitution fails, so has_begin<int>
+is false.  The front end treats it as satisfied (the static_assert fails):
+the parser's fast path for a requires-expression whose body is a single
+compound requirement with a type-constraint ("Try compound requirement: {
+{ expr } -> concept<type>; }" in parse.cpp) builds a requirement without
+its operand, which is taken as satisfied.  Removing the fast path is the
+fix, but it currently breaks cpp20_ranges_basic: take_view / ref_view
+begin() are resolved while their class is being defined and find the
+customization-point object `begin' (see cpp20_ranges_upper_bound_array,
+and the 152-line reduction in /tmp/r163/red/constraint_incomplete_class).
+g++ 13 and clang++ 18 accept the program.  Pre-existing (fails on bin52).
+Round 163m: passes.  The parser's compound-requirement fast path is removed
+(a single `{ expr } -> concept;' requirement is parsed like any other
+requirement body), member-qualified names are looked up in the object's
+class only ([basic.lookup.qual.general]/2), and deduced-return members of
+class template specializations are instantiated on use.  Fails on bin53.

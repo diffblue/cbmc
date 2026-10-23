@@ -53,19 +53,39 @@ public:
     Z3
   };
 
+  /// \param _ns: namespace for looking up symbols and types
+  /// \param _benchmark: benchmark name, for the header
+  /// \param _notes: notes, for the header
+  /// \param _logic: the SMT-LIB logic to declare
+  /// \param _solver: the solver the output is meant for
+  /// \param _out: the output stream
+  /// \param _complete_problem: the output is a complete problem, written
+  ///   in one go when solving (and on destruction): a quantifier-free
+  ///   logic declared in the header (`QF_...`) is then replaced by its
+  ///   quantified form if the encoding emits a quantifier.  Otherwise the
+  ///   output is streamed as it is produced.
   smt2_convt(
     const namespacet &_ns,
     const std::string &_benchmark,
     const std::string &_notes,
     const std::string &_logic,
     solvert _solver,
-    std::ostream &_out);
+    std::ostream &_out,
+    bool _complete_problem = false);
 
-  ~smt2_convt() override = default;
+  ~smt2_convt() override
+  {
+    // output held back but never solved (e.g. every property simplified
+    // away) is still written
+    flush_deferred_output();
+  }
 
   bool use_FPA_theory = false;
   bool use_array_of_bool = false;
   bool use_as_const = false;
+  /// The solver accepts `((as const T) v)' only for a VALUE v (cvc5:
+  /// "expected a value"), not for an arbitrary term.
+  bool as_const_requires_value = false;
   bool use_check_sat_assuming = false;
   bool use_datatypes = false;
   bool use_lambda_for_array = false;
@@ -97,6 +117,17 @@ public:
 
 protected:
   const namespacet &ns;
+  /// The stream given to the constructor.  When the declared logic is
+  /// quantifier-free (`QF_...`) the output is held back in
+  /// `deferred_output` until it is complete enough to know whether a
+  /// quantifier was emitted (see `flush_deferred_output`).
+  std::ostream &final_out;
+  std::stringstream deferred_output;
+  const bool defer_output;
+  bool header_written = false;
+  /// A `forall` or `exists` was emitted (also as the substitute for
+  /// `array_of` / `array_comprehension` without `as const` or lambdas).
+  bool quantifier_emitted = false;
   std::ostream &out;
   std::string benchmark, notes, logic;
   solvert solver;
@@ -112,6 +143,15 @@ protected:
   resultt dec_solve(const exprt &) override;
 
   void write_header();
+  /// Write the header -- with the logic made quantified if a quantifier was
+  /// emitted (an SMT-LIB logic named `QF_...` admits no quantifiers) -- and
+  /// the output held back so far to `final_out`.
+  void flush_deferred_output();
+  /// Write the all-zero VALUE of \p type in the SMT sort `unflatten'
+  /// produces for it (a literal usable under `as const').
+  void convert_zero_value(const typet &type);
+  /// Whether `array_of' of \p what can be written with `as const'.
+  bool as_const_admits(const exprt &what) const;
   /// Writes the end of the SMT file to the `smt_convt::out` stream. These parts
   /// of the output may be changed when using multiple rounds of solving. They
   /// include the following parts of the output file -
@@ -201,6 +241,9 @@ protected:
 
   // we use this to build a bit-vector encoding of the FPA theory
   void convert_floatbv(const exprt &expr);
+  std::string datatype_selector_name(
+    const std::string &smt_typename,
+    const irep_idt &component_name);
   std::string type2id(const typet &) const;
   std::string floatbv_suffix(const exprt &) const;
   std::set<irep_idt> bvfp_set; // already converted

@@ -42,6 +42,8 @@ public:
 
   bool packed, aligned;
   exprt vector_size, alignment, bv_width, fraction_width;
+  // the `#pragma pack(n)' alignment cap for a member (nil when none)
+  exprt pragma_pack;
   exprt msc_based; // this is Visual Studio
   bool constructor, destructor;
 
@@ -110,6 +112,7 @@ protected:
       alignment(nil_exprt{}),
       bv_width(nil_exprt{}),
       fraction_width(nil_exprt{}),
+      pragma_pack(nil_exprt{}),
       msc_based(nil_exprt{}),
       constructor(false),
       destructor(false),

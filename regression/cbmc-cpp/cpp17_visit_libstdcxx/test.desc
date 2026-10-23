@@ -1,0 +1,22 @@
+CORE libstdcxx13
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] .* visit: SUCCESS$
+^\[main\.assertion\.2\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+libstdc++ 13 std::visit (variant line 1851) lost its body:
+__gen_vtable_impl's partial specialization for _Multi_array<_Result_type
+(*)(_Visitor, _Variants...)> was not matched
+(cpp98_partial_specialization_compound_type_in_template_argument).  g++ 13
+and clang++ 18 accept this program, and it fails only its WRONG assertion.
+libstdcxx13: with GCC 11's headers _S_apply_single_alt was dropped:
+the static __visit_invoke was converted under the caller's template map
+(cpp14_static_member_deduced_return_class_template_parameter).  GCC 11
+now verifies it, but declval<decltype()> is still instantiated and dropped.

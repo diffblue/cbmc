@@ -65,7 +65,7 @@ std::basic_string<char32_t> convert_one_string_literal(const std::string &src)
   }
 }
 
-exprt convert_string_literal(const std::string &src)
+exprt convert_string_literal(const std::string &src, bool char8)
 {
   // note that 'src' could be a concatenation of string literals,
   // e.g., something like "asd" "xyz".
@@ -74,6 +74,7 @@ exprt convert_string_literal(const std::string &src)
   std::basic_string<char32_t> value;
 
   char wide=0;
+  bool utf8 = false;
 
   for(std::size_t i=0; i<src.size(); i++)
   {
@@ -87,6 +88,8 @@ exprt convert_string_literal(const std::string &src)
       wide=ch;
     if((ch=='u' || ch=='U') && i+1<src.size() && src[i+1]=='"')
       wide=ch;
+    if(ch == 'u' && i + 2 < src.size() && src[i + 1] == '8')
+      utf8 = true;
 
     // find start of sequence
     std::size_t j=src.find('"', i);
@@ -103,6 +106,25 @@ exprt convert_string_literal(const std::string &src)
     std::basic_string<char32_t> tmp_value = convert_one_string_literal(tmp_src);
     value.append(tmp_value);
     i=j;
+  }
+
+  // C++20 [lex.string]/6: a UTF-8 string literal has type `array of n
+  // const char8_t'; its elements are the UTF-8 code units
+  if(wide == 0 && utf8 && char8)
+  {
+    value.push_back(0);
+    const typet subtype = char8_t_type();
+    exprt result{ID_array};
+    result.set(ID_C_string_constant, true);
+    result.type() =
+      array_typet(subtype, from_integer(value.size(), c_index_type()));
+    result.operands().resize(value.size());
+    for(std::size_t i = 0; i < value.size(); i++)
+    {
+      result.operands()[i] =
+        from_integer(static_cast<unsigned char>(value[i]), subtype);
+    }
+    return result;
   }
 
   if(wide!=0)

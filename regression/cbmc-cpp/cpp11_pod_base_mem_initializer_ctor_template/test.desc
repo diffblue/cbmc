@@ -1,0 +1,22 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ POD base from a forwarding constructor: SUCCESS$
+^\[main\.assertion\.2\] line \d+ empty base, default: SUCCESS$
+^\[main\.assertion\.3\] line \d+ empty base, forwarding constructor: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+Invariant check failed
+dropped the body
+not found
+--
+N5008 [class.base.init]/7: a POD base named in a constructor template's
+mem-initializer-list is copy-initialized from the expression-list -- lowered
+to an assignment through the sliced base, as for a non-template constructor.
+Also the libstdc++ _Hashtable_ebo_helper EBO shape now reached through
+is_empty ([meta.unary.prop]).

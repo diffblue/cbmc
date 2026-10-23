@@ -1,0 +1,12 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ copy-deduced Box<int> preserves the value: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+dropped the body
+--
+no body for callee
+^CONVERSION ERROR$

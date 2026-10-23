@@ -1,0 +1,17 @@
+CORE
+non_template.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ inherited: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [namespace.udecl]/3, [over.match.funcs.general]/9: the inherited
+constructor `tb(const traits &)' has a reference parameter to a class
+unrelated to tb, so it is a candidate (not the base's copy constructor),
+also without any template.  Fails on the round-163 build bin52.

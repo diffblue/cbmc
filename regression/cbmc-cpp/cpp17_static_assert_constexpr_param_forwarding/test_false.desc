@@ -1,0 +1,11 @@
+CORE
+false.cpp
+--cpp17
+static assertion failed: f\(1\) is 2
+^CONVERSION ERROR$
+^EXIT=6$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+g++ 13 and clang++ 18 reject false.cpp for its failed static_assert.

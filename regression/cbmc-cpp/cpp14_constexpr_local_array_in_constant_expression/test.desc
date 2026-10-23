@@ -1,0 +1,29 @@
+CORE
+main.cpp
+--cpp14
+^\[main\.assertion\.1\] line \d+ the constant at run time: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+static assertion failed
+could not be evaluated
+dropped the body
+--
+N5008 [expr.const]/4: a constexpr variable is usable in constant expressions
+after its initializing declaration, whatever its storage duration;
+[dcl.constexpr]/6: its initializer is a constant expression (manifestly
+constant-evaluated), and constexpr declares the object const.  Three gaps
+in the front end's constant evaluation: (1) the initializer of a constexpr
+ARRAY (kept a real object, not a macro) was not type-checked in a constant-
+expression context, so `classify(3)' stayed a call; (2) the constexpr
+interpreter read array values only of objects with static storage duration,
+so a constexpr LOCAL array passed by reference had no value; (3) a
+modification of an element of a local array whose lifetime began within
+the evaluation (`++seen[t]', [expr.const]/5 as relaxed in C++14) was not
+supported.  This is libc++'s __get_comp_type / __compute_comp_type behind
+common_comparison_category_t and std::compare_three_way (KNOWNBUG
+cpp20_compare_three_way_pointers_libcxx).  Fixed in round 163b.

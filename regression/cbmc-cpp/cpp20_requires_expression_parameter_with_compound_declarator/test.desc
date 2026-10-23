@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ parameters declared: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The parameters of a requires-expression were parsed as a type-id followed
+by an optional name.  `int (&a)[5]' did not parse, so the list was
+skipped, and `int (*fp)(int)' parsed as an unnamed `int (*)(int)'; either
+way the names were unknown in the requirements, which then failed.

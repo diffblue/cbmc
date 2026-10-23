@@ -1,0 +1,27 @@
+CORE
+main.cpp
+--cpp14
+^\[main\.assertion\.1\] line \d+ explicit this: SUCCESS$
+^\[main\.assertion\.2\] line \d+ member function call: SUCCESS$
+^\[main\.assertion\.3\] line \d+ generic lambda: SUCCESS$
+^\[main\.assertion\.4\] line \d+ capture-default: SUCCESS$
+^\[main\.assertion\.5\] line \d+ modifies the object: SUCCESS$
+^\[main\.assertion\.6\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [expr.prim.this]/2, [class.mfct.non.static]/2,
+[expr.prim.lambda.capture]/10: in a lambda capturing `this', `this' and an
+unqualified member function call denote the enclosing object.  Such lambdas
+were not given a closure (only data-member odr-uses were modelled, as
+reference members); a generic one was lowered to a function pointer with
+`int' for `auto', so the call with a class argument computed the wrong value
+(bin53).  The closure now keeps the captured pointer (lambda_this_capture)
+and the body's `this' and member calls use it (rewrite_lambda_this_uses).
+libstdc++ <format>'s _Formatting_scanner::_M_format_arg visitor (format:3648)
+is such a lambda.  The generic lambda needs C++14.
+g++ 13 and clang++ 18 accept it, and it fails only its WRONG assertion.

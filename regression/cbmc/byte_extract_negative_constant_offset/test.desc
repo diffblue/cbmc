@@ -1,0 +1,15 @@
+CORE
+main.c
+--no-standard-checks
+^\[main\.assertion\.1\] line \d+ read before the object: FAILURE$
+^\[main\.assertion\.2\] line \d+ in bounds: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+Invariant check failed
+--
+lower_byte_extract passed the negative offset on as the number of nil
+bytes to insert before the unpacked array, and numeric_cast_v aborted.

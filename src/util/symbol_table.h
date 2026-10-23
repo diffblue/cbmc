@@ -8,6 +8,8 @@
 
 #include "symbol_table_base.h"
 
+#include <unordered_map>
+
 /// \brief The symbol table
 /// \ingroup gr_symbol_table
 class symbol_tablet : public symbol_table_baset
@@ -19,6 +21,23 @@ private:
   symbol_base_mapt internal_symbol_base_map;
   /// Value referenced by \ref symbol_table_baset::symbol_module_map.
   symbol_module_mapt internal_symbol_module_map;
+
+  /// Where a symbol's entries in the base-name and module multimaps are.
+  /// Without it, erasing a symbol scanned the entries of its base name and
+  /// of its MODULE for the one naming it -- a module holds every symbol of
+  /// a translation unit, so removing many symbols (remove_internal_symbols,
+  /// the C++ front end's clean-up) was quadratic in the unit's size.
+  /// Multimap iterators stay valid while other entries come and go, and
+  /// remain valid across a move or swap of the containers.
+  struct index_entryt
+  {
+    symbol_base_mapt::iterator base_entry;
+    symbol_module_mapt::iterator module_entry;
+    bool has_module_entry;
+  };
+  std::unordered_map<irep_idt, index_entryt> internal_index;
+
+  void rebuild_index();
 
 public:
   symbol_tablet()
@@ -39,6 +58,7 @@ public:
       internal_symbol_base_map(other.internal_symbol_base_map),
       internal_symbol_module_map(other.internal_symbol_module_map)
   {
+    rebuild_index();
   }
 
   /// Copy assignment operator.
@@ -56,7 +76,8 @@ public:
         internal_symbol_module_map),
       internal_symbols(std::move(other.internal_symbols)),
       internal_symbol_base_map(std::move(other.internal_symbol_base_map)),
-      internal_symbol_module_map(std::move(other.internal_symbol_module_map))
+      internal_symbol_module_map(std::move(other.internal_symbol_module_map)),
+      internal_index(std::move(other.internal_index))
   {
   }
 
@@ -66,6 +87,7 @@ public:
     internal_symbols = std::move(other.internal_symbols);
     internal_symbol_base_map = std::move(other.internal_symbol_base_map);
     internal_symbol_module_map = std::move(other.internal_symbol_module_map);
+    internal_index = std::move(other.internal_index);
     return *this;
   }
 
@@ -76,6 +98,7 @@ public:
     internal_symbols.swap(other.internal_symbols);
     internal_symbol_base_map.swap(other.internal_symbol_base_map);
     internal_symbol_module_map.swap(other.internal_symbol_module_map);
+    internal_index.swap(other.internal_index);
   }
 
 public:
@@ -103,6 +126,7 @@ public:
     internal_symbols.clear();
     internal_symbol_base_map.clear();
     internal_symbol_module_map.clear();
+    internal_index.clear();
   }
 
   virtual iteratort begin() override

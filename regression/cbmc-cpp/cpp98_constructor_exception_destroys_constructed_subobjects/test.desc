@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp98
+^\[main\.assertion\.1\] line \d+ unwound in reverse: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [except.ctor]/3: when the initialization of member t of S throws,
+the already constructed m2 and base B (and its member b) are destroyed in
+reverse order.  The front end only unwound local objects, so nothing was
+destroyed (bin53).  The converted constructor body now wraps what follows
+each subobject initialization in `try { ... } catch(...) { destroy;
+throw; }'.  g++ 13 and clang++ 18 accept this program, and it fails only
+its WRONG assertion.

@@ -1,0 +1,21 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ function: before: SUCCESS$
+^\[main\.assertion\.2\] line \d+ function: deduced: SUCCESS$
+^\[main\.assertion\.3\] line \d+ function: after: SUCCESS$
+^\[main\.assertion\.4\] line \d+ member: deduced: SUCCESS$
+^\[main\.assertion\.5\] line \d+ member: ellipsis: SUCCESS$
+^\[main\.assertion\.6\] line \d+ constructor: ellipsis: SUCCESS$
+^\[main\.assertion\.7\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+guess_template_args_template_id ignored A's surplus arguments, so `f(tup<A>)'
+deduced A = char from tup<char, char> and was viable through tup's
+converting constructor template; for S, the already-instantiated S(tup<int>)
+was offered as a candidate and selected the same way.  g++ 13 and clang++ 18
+accept this program, and it fails only its WRONG assertion.

@@ -1,4 +1,4 @@
-CORE no-new-smt gcc-only
+CORE no-new-smt gcc-only thorough-z3-smt-backend
 main.c
 
 ^\[main.assertion.1\] line 12 right: SUCCESS$
@@ -11,3 +11,6 @@ main.c
 --
 Visual Studio does not directly support `complex` or `_Complex`, or using
 standard arithmetic operators over complex numbers.
+thorough-z3-smt-backend: z3 4.8.12 needs 6.2 GB and about 150 s for this
+program, above the 2.5 GB CBMC_TEST_MEMLIMIT of the CI jobs, which the
+solver process inherits ("VERIFICATION ERROR" in test-z3).

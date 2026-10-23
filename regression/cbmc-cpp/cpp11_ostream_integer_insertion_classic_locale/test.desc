@@ -1,0 +1,20 @@
+CORE libstdcxx
+main.cpp
+--cpp11 --unwind 8 --object-bits 12
+^\[main\.assertion\.1\] line \d+ negative decimal: SUCCESS$
+^\[main\.assertion\.2\] line \d+ padded to the field width: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [locale.general]/8, [facet.numpunct.virtuals]: the "C"-locale
+num_put<char> and numpunct<char> data live in libstdc++.so; the front end
+models them (cpp_typecheck_stdlib.cpp classic_num_put and
+classic_numpunct_cache).
+libstdcxx: with libc++ integer insertion does not terminate
+(cpp11_ostream_integer_insertion_libcxx); it timed out on macOS 14.

@@ -1,0 +1,27 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ moved string keeps its size: SUCCESS$
+^\[main\.assertion\.2\] line \d+ and its second member: SUCCESS$
+^\[main\.assertion\.3\] line \d+ the moved-from object is reset: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [expr.prim.lambda.closure]/4: the closure type's function call
+operator has the lambda's compound-statement as its body.  The front end
+type-checks that body in place when the lambda-expression is encountered
+but did not mark it converted, so the end-of-unit sweep that completes
+half-converted SYSTEM-HEADER bodies (cpp_typecheckt::typecheck) converted
+it a second time; the re-check of `return mv(o.r_)' saw the call's xvalue
+result as an lvalue ("invalid implicit conversion from 'pair &' to
+'pair &&'") and the lambda's body was dropped.  This is libc++ 18's
+basic_string(basic_string &&) (<string> line 925): the moved-to string was
+nondet under libc++ (KNOWNBUG libcxx_string_move_ctor_lambda, cvise
+reduction /tmp/r163/red).  Fixed in round 163b.  The #line directive
+places the class in a system header; user code was unaffected.

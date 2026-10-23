@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp11 --unwind 6 --no-unwinding-assertions
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ array in anonymous union, template: SUCCESS$
+^\[main\.assertion\.2\] line \d+ array in anonymous union: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+not an lvalue
+dropped the body
+--
+N5008 [class.union.anon]/1, [expr.ref]/6.2: the anonymous union subobject
+reached through `this' is an lvalue, so its array member's elements are
+assignable.

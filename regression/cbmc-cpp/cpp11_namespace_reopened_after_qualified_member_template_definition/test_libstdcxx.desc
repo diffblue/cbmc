@@ -1,0 +1,24 @@
+CORE libstdcxx13 broken-libstdcxx16
+libstdcxx.cpp
+--cpp20 --object-bits 12
+^\[main\.assertion\.1\] line \d+ the translation unit converts: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+libstdc++ 13's <format>: the four inline std::vformat overloads
+(format:3784/3793/3802/3811) were dropped with "scope '__format' is
+ambiguous" -- see test.desc (header-free, CORE).  The later drops are
+fixed too: format:1422 and format:3124 _M_visit
+(cpp11_lambda_closure_per_template_specialization), _M_parse_format_spec
+(cpp11_specialization_distinguishes_fundamental_types) and format:1899
+(cpp11_member_template_argument_converted_to_non_deduced_parameter); bin53
+dropped more than ten bodies.  g++ 13 accepts this program, and it fails
+only its WRONG assertion.
+broken-libstdcxx16: with libstdc++ 16, __do_vformat_to loses its body
+(cpp17_constexpr_lambda_call_in_constant_expression).

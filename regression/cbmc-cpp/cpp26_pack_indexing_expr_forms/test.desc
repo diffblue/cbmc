@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp26
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+static_assert condition could not be evaluated
+dropped the body
+--
+N5008 [expr.prim.pack.index]/1-2: pack-index-expressions over a function
+parameter pack -- the first of three, the sole element of a one-element pack,
+`ts...[sizeof...(ts) - 1]` (the index is a converted constant expression),
+two indexings in one expression, and in a constexpr function folded by a
+static_assert.  Non-vacuous: the last assertion states a wrong value and must
+FAIL.  (No host compiler here implements C++26 pack indexing; the expected
+values follow the wording.)

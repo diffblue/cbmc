@@ -1,0 +1,13 @@
+CORE libcxx
+main.cpp
+--cpp17 --stdlib libc++
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [expr.typeid]/1, [type.info]: with libc++ the type_info object's name
+member is `__type_name' (libstdc++: `__name'); it was left zero, so all
+type_info objects compared equal and typeid(int) != typeid(char) failed.

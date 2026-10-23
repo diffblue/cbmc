@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ bool <=> bool equal: SUCCESS$
+^\[main\.assertion\.2\] line \d+ false < true: SUCCESS$
+^\[main\.assertion\.3\] line \d+ comparison result <=> true: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [expr.spaceship]/4: the usual arithmetic conversions are applied to
+arithmetic operands of <=>.  The lowering to the comparison-category
+constants compared the operands as given, so `(a == b) <=> true' -- a
+comparison result (internal bool) against a C++ bool, the closing
+`return (__first2 == __last2) <=> true;' of libstdc++ 16's
+lexicographical_compare_three_way -- evaluated wrongly.

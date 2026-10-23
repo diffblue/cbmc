@@ -1,0 +1,25 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ alive while bound: SUCCESS$
+^\[main\.assertion\.2\] line \d+ destroyed with the reference: SUCCESS$
+^\[main\.assertion\.3\] line \d+ call result, member: SUCCESS$
+^\[main\.assertion\.4\] line \d+ both destroyed: SUCCESS$
+^\[main\.assertion\.5\] line \d+ argument destroyed at once: SUCCESS$
+^\[main\.assertion\.6\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [class.temporary]/6, /8: `const D &r = D(3)' extends the
+temporary's lifetime to that of r, and the temporary is destroyed (its
+destructor runs) when r's lifetime ends.  Goto conversion kept every
+temporary of a reference's initializer alive until the end of the scope
+but never destroyed it: ~D did not run (bin53).  The temporary the
+reference is bound to is now destroyed with the reference; the other
+temporaries of the initializer, such as the argument of id() (/6.10), are
+destroyed at the end of the full-expression.  g++ 13 and clang++ 18 accept
+this program, and it fails only its WRONG assertion.

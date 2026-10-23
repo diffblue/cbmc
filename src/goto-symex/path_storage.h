@@ -130,7 +130,10 @@ public:
   inline std::shared_ptr<lexical_loopst>
   get_loop_analysis(const irep_idt &function_id)
   {
-    return loop_analysis_map.at(function_id);
+    auto it = loop_analysis_map.find(function_id);
+    if(it != loop_analysis_map.end())
+      return it->second;
+    return nullptr;
   }
 
 private:

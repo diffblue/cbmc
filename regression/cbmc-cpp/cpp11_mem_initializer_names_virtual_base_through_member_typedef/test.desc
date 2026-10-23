@@ -1,0 +1,24 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ moved through the typedef: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [class.base.init]/2: a mem-initializer-id may name a base class
+through a typedef-name; here the virtual base ios<C> of the class template
+ostream<C> is named through the member typedef ios_type. The front end
+reported "symbol 'ios_type' is unknown" and dropped the constructor: the
+virtual-base initializer was resolved in the base's own scope, where the
+derived class's typedef is not visible; it now names the base itself. This
+is libstdc++'s basic_ostream / basic_istream move constructors (`:
+__ios_type()', ostream:440, istream:576/703), dropped in
+cpp11_ofstream_from_string and the goto-programs TUs; test_libstdcxx.desc
+is that program and forbids only the ostream:440 drop. g++ 13 and clang++
+18 accept both programs. Fails on bin53.

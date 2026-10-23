@@ -1,0 +1,11 @@
+CORE
+main.cpp
+--cpp11
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+dropped the body
+--
+Forward-declared enums with underlying type in C++11.

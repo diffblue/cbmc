@@ -1,0 +1,19 @@
+CORE libcxx
+main.cpp
+--cpp17 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ global NSDMI applied: SUCCESS$
+^\[main\.assertion\.2\] line \d+ global NSDMI first member: SUCCESS$
+^\[main\.assertion\.3\] line \d+ global NSDMI second member: SUCCESS$
+^\[main\.assertion\.4\] line \d+ global NSDMI with a non-NSDMI member: SUCCESS$
+^\[main\.assertion\.5\] line \d+ non-NSDMI member zero-initialized: SUCCESS$
+^\[main\.assertion\.6\] line \d+ file-static NSDMI applied: SUCCESS$
+^\[main\.assertion\.7\] line \d+ WRONG: must fail: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+Header-free counterpart of test.desc under libc++; static initialization of a
+value-less object whose class has an NSDMI is a front-end property independent
+of the standard library.  See test.desc for the N5008 rationale.

@@ -266,6 +266,16 @@ public:
   typedef jsont value_type; // NOLINT(readability/identifiers)
 };
 
+// GCC 16.0 and 16.1 report -Warray-bounds for the implicit destructor of
+// json_stringt when it is inlined into
+// std::_Sp_counted_ptr_inplace::_M_dispose after speculative
+// devirtualization (ranget::map's std::make_shared<std::function<...>>).
+// This is a false positive, GCC PR 122197; libstdc++ 16.2 suppresses it in
+// its own headers.  Disable the warning for this class only.
+#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 16
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
 class json_stringt:public jsont
 {
 public:
@@ -284,6 +294,10 @@ public:
   {
   }
 };
+
+#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 16
+#  pragma GCC diagnostic pop
+#endif
 
 class json_numbert:public jsont
 {

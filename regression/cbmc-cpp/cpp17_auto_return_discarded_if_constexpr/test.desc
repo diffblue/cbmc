@@ -1,0 +1,24 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+static_assert condition could not be evaluated
+dropped the body
+--
+N5008 [stmt.if]/2: return type deduction took the FIRST return statement in
+source order even when it sat in an `if constexpr` branch that is discarded
+for the instantiation -- libstdc++'s views::all (`if constexpr
+(view<decay_t<_Range>>) return std::forward<_Range>(__r); ... else return
+ref_view{...}`) deduced `int*` for an array argument.  A return under an `if
+constexpr` now defers deduction until the body is type-checked and the
+discarded branch is gone.  Also [dcl.type.auto.deduct]/4: the deduced type
+drops a reference and top-level cv-qualifiers (`return static_cast<R &&>(r)`
+with R = int*& used to give the function the return type `int *&`).
+Non-vacuous: the last assertion states a wrong
+value and must FAIL.

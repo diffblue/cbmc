@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ run-time static member: SUCCESS$
+^\[main\.assertion\.2\] line \d+ folded: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+--
+static_assert condition could not be evaluated
+static assertion failed
+^warning: ignoring
+Invariant check failed
+dropped the body
+--
+N5008 [temp.variadic]/5, [class.static.data]/4, [expr.const].  (`static
+inline' needs --cpp17.)  Non-vacuous: the last assertion is deliberately
+wrong and must FAIL.  Before the fix: "run-time static member: FAILURE"
+(rt was 1) and the static_asserts could not be evaluated.

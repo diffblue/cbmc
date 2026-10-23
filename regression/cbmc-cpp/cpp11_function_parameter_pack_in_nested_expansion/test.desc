@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] .* two and two: SUCCESS$
+^\[main\.assertion\.2\] .* three and two: SUCCESS$
+^\[main\.assertion\.3\] .* empty inner pack: SUCCESS$
+^\[main\.assertion\.4\] .* member: SUCCESS$
+^\[main\.assertion\.5\] .* member, empty inner pack: SUCCESS$
+^\[main\.assertion\.6\] .* empty inner pack: SUCCESS$
+^\[main\.assertion\.7\] .* template arguments: SUCCESS$
+^\[main\.assertion\.8\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+dropped the body
+--
+N5008 [temp.variadic]/5: a nested pack expansion expands its own pack.

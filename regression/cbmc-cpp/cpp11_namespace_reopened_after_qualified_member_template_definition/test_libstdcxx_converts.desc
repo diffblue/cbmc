@@ -1,0 +1,20 @@
+CORE libstdcxx13
+libstdcxx.cpp
+--cpp20 --object-bits 12
+^\[main\.assertion\.1\] line \d+ the translation unit converts: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^warning: ignoring
+Invariant check failed
+--
+libstdc++ 13's <format> converts: the `scope __format is ambiguous' error
+is fixed (test.desc), and so is the goto-conversion invariant failure that
+followed it ("function must not return value", visit_format_arg): a
+decltype(auto) function whose return operand calls a function with a
+still undeduced return type (its body dropped) no longer takes the
+operand's placeholder type, N5008 [dcl.spec.auto.general]/13.  Remaining
+drops are tracked by test_libstdcxx.desc (KNOWNBUG).

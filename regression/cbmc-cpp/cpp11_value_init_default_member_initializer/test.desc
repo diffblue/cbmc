@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.9\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+Wrong verdict: `S()` for a class with default member initializers but no
+user-provided constructor produced the all-zero value (the class is a POD to
+the front end and the functional cast zero-initialized it), so `S c = S();`
+had c.v == 0 and the assertion `c.v == 3` FAILED.  Value-initialization now
+zero-initializes the temporary and runs the synthesized default constructor
+over it ([dcl.init.general]/9.1).  Non-vacuous: the last assertion states a
+wrong value and must FAIL.

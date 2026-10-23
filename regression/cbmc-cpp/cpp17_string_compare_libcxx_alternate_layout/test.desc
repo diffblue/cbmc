@@ -1,0 +1,17 @@
+CORE libcxx
+main.cpp
+--cpp17 --stdlib libc++ -D_LIBCPP_ABI_ALTERNATE_STRING_LAYOUT
+^\[main\.assertion\.1\] line \d+ compare: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+libc++'s alternate string layout, the one Apple uses on arm64: the size of
+a short string is a 7-bit bit field after the characters.  It stayed
+symbolic after the characters were written, and the comparison's memcmp
+did not terminate (four cbmc-cpp timeouts on macOS 14).  See
+regression/cbmc/union_bit_field_after_other_byte_updates.

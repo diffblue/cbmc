@@ -60,6 +60,27 @@ std::size_t struct_union_typet::component_number(
   UNREACHABLE;
 }
 
+std::size_t
+struct_union_typet::data_component_number(const irep_idt &component_name) const
+{
+  std::size_t number = 0;
+
+  for(const auto &c : components())
+  {
+    if(c.get_name() == component_name)
+      return number;
+
+    if(
+      c.type().id() != ID_code && !c.get_bool(ID_is_type) &&
+      !c.get_bool(ID_is_static))
+    {
+      number++;
+    }
+  }
+
+  UNREACHABLE;
+}
+
 /// Get the reference to a component with given name.
 const struct_union_typet::componentt &struct_union_typet::get_component(
   const irep_idt &component_name) const
@@ -106,7 +127,19 @@ struct_typet::get_base(const irep_idt &id) const
 {
   for(const auto &b : bases())
   {
-    if(to_struct_tag_type(b.type()).get_identifier() == id)
+    // Avoid `baset::type()` here: it returns `struct_tag_typet&` and
+    // contains an unconditional `to_struct_tag_type(exprt::type())`
+    // whose precondition aborts when `b`'s underlying type was left
+    // as something other than a struct_tag (e.g. an unresolved
+    // cpp_name) by an error-recovery branch in the C++ front-end.
+    // Read the type field directly via `irept::find` and gate on
+    // its id, then read the identifier with `irept::get`.  This is
+    // observably equivalent to the precondition-respecting path on
+    // well-formed inputs.
+    const typet &raw_type = static_cast<const typet &>(b.find(ID_type));
+    if(raw_type.id() != ID_struct_tag)
+      continue;
+    if(raw_type.get(ID_identifier) == id)
       return b;
   }
   return {};

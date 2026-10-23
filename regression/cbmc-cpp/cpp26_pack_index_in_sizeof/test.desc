@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp26
+^\[main\.assertion\.1\] .* first: SUCCESS$
+^\[main\.assertion\.2\] .* second: SUCCESS$
+^\[main\.assertion\.3\] .* last: SUCCESS$
+^\[main\.assertion\.4\] .* an array is no pack: SUCCESS$
+^\[main\.assertion\.5\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+N5008 [dcl.type.pack.index]/1: the parser marks `T...[N]' as a pack index
+(ID_C_pack_index); type-checking selects the N-th element of the pack.

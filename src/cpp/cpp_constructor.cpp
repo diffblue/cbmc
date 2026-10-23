@@ -9,11 +9,17 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
-#include "cpp_typecheck.h"
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/pointer_expr.h>
+#include <util/prefix.h>
+
+#include "cpp_sfinae_context.h"
+#include "cpp_typecheck.h"
+#include "itanium_abi_cpp_zero_initializer.h"
+
+#include <map>
 
 /// \param source_location: source location for generated code
 /// \param object: non-typechecked object
@@ -24,7 +30,7 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
   const exprt &object,
   const exprt::operandst &operands)
 {
-  exprt object_tc=object;
+  exprt object_tc = object;
 
   typecheck_expr(object_tc);
 
@@ -32,8 +38,66 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
 
   CHECK_RETURN(!is_reference(object_tc.type()));
 
+  // N5008 [dcl.init.list]/3.5: an empty braced-init-list for a class type
+  // with a default constructor value-initializes the object;
+  // [dcl.init.general]/9.1: when that constructor is not user-provided the
+  // object is zero-initialized first, then default-initialized.  Construct
+  // by the default constructor (as for default-initialization) and prepend
+  // the zero-initialization.  A POD class has no constructor to run and is
+  // handled by the POD path below.
+  if(
+    operands.size() == 1 && operands.front().id() == ID_initializer_list &&
+    operands.front().operands().empty() &&
+    !operands.front().get_bool(ID_C_paren_init) &&
+    (object_tc.type().id() == ID_struct_tag ||
+     object_tc.type().id() == ID_union_tag))
+  {
+    // (also for a POD class: `E f{}' with E an aggregate whose base has a
+    // default member initializer zero-initializes the other members,
+    // [dcl.init.aggr]/5 -- default-initialization left them indeterminate)
+    auto code = cpp_constructor(source_location, object, {});
+    if(value_initialization_zero_initializes(object_tc.type()))
+    {
+      const auto zero = itanium_abi_cpp_zero_initializer(
+        object_tc.type(), source_location, *this);
+      if(zero.has_value())
+      {
+        exprt zero_target = object_tc;
+        zero_target.type().set(ID_C_constant, false);
+        zero_target.set(ID_C_lvalue, true);
+        code_blockt value_init;
+        value_init.add(code_expressiont{side_effect_expr_assignt{
+          std::move(zero_target),
+          zero.value(),
+          object_tc.type(),
+          source_location}});
+        if(code.has_value())
+          value_init.add(std::move(*code));
+        return std::move(value_init);
+      }
+    }
+    return code;
+  }
+
   if(object_tc.type().id() == ID_array)
   {
+    // Deduce the bound of an array of unknown bound from its initializer
+    // ([dcl.array]/1, [dcl.init.aggr]/5): the number of elements equals the
+    // number of initializers.  This is needed for element types with a
+    // non-trivial constructor, where initialization goes through per-element
+    // construction below and would otherwise read a nil array size.  (Scalar
+    // and trivial element types are sized on a separate initializer path.)
+    if(to_array_type(object_tc.type()).size().is_nil() && !operands.empty())
+    {
+      const exprt &first_operand = operands.front();
+      const std::size_t deduced_size = first_operand.get_bool(ID_C_array_ini)
+                                         ? first_operand.operands().size()
+                                         : operands.size();
+      array_typet completed_type = to_array_type(object_tc.type());
+      completed_type.size() = from_integer(deduced_size, c_index_type());
+      object_tc.type() = completed_type;
+    }
+
     // We allow only one operand and it must be tagged with '#array_ini'.
     // Note that the operand is an array that is used for copy-initialization.
     // In the general case, a program is not allowed to use this form of
@@ -43,30 +107,111 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
 
     if(!operands.empty() && !operands.front().get_bool(ID_C_array_ini))
     {
-      error().source_location=source_location;
-      error() << "bad array initializer" << eom;
-      throw 0;
+      const array_typet &array_type = to_array_type(object_tc.type());
+      const typet &element_type = array_type.element_type();
+
+      // [dcl.init.aggr]/1, [dcl.init.list]/3: a class with a user-provided
+      // constructor is not an aggregate, so each array element is
+      // list-initialized by a constructor call rather than member-wise.  For
+      // such element types, building an array_exprt from the brace elements (as
+      // the aggregate/scalar path below does) would leave each element's
+      // braced-init-list untyped -- indexing that array during construction
+      // then yields a nil-typed expression that aborts simplification.  Detect
+      // a
+      // user-provided constructor exactly as the base-class-aggregate code does
+      // (a constructor component that is neither the default nor a copy/move
+      // constructor, or a constructor template).
+      const bool element_has_user_ctor =
+        element_type.id() == ID_struct_tag &&
+        array_elements_have_user_constructor(array_type);
+
+      if(element_has_user_ctor)
+      {
+        // Construct each element in place from its own initializer-clause
+        // ([dcl.init.aggr]/2): a brace-init element `{args}` forwards its
+        // elements as the element's constructor arguments; a plain
+        // value/temporary is a single initializer (copy/move construction); an
+        // element without an initializer-clause is value-initialized.
+        exprt tmp_size = array_type.size();
+        make_constant_index(tmp_size);
+        mp_integer array_size;
+        if(to_integer(to_constant_expr(tmp_size), array_size))
+        {
+          error().source_location = source_location;
+          error() << "array size '" << to_string(array_type.size())
+                  << "' is not a constant" << eom;
+          throw 0;
+        }
+
+        const std::size_t n = numeric_cast_v<std::size_t>(array_size);
+        code_blockt new_code;
+        for(std::size_t i = 0; i < n; ++i)
+        {
+          exprt constant = from_integer(i, c_index_type());
+          constant.add_source_location() = source_location;
+          index_exprt index{object_tc, constant};
+          index.add_source_location() = source_location;
+
+          exprt::operandst element_args;
+          if(i < operands.size())
+          {
+            const exprt &init = operands[i];
+            if(init.id() == ID_initializer_list)
+              element_args = init.operands();
+            else
+              element_args.push_back(init);
+          }
+
+          auto element_code =
+            cpp_constructor(source_location, index, element_args);
+          if(element_code.has_value())
+            new_code.add(std::move(element_code.value()));
+        }
+        return std::move(new_code);
+      }
+
+      // C++11 brace-enclosed initialization of an aggregate/scalar element
+      // type ([dcl.init.aggr]/4): build the array value with the shared
+      // do_initializer, as for a block-scope declaration -- it resolves
+      // nested braced lists (an array of arrays or of aggregates,
+      // `int m[2][2] = {{1, 2}, {3, 4}}'), brace elision
+      // ([dcl.init.aggr]/16), string literals, and value-initializes the
+      // elements without a clause (`int part[3] = {9};',
+      // [dcl.init.aggr]/5.2) -- then copy it.  Building an array_exprt from
+      // the clauses kept raw nested lists and left missing elements
+      // indeterminate.
+      exprt list{ID_initializer_list};
+      list.operands() = operands;
+      list.add_source_location() = source_location;
+      typecheck_expr(list);
+      do_initializer(list, array_type, false);
+      list.set(ID_C_array_ini, true);
+      return cpp_constructor(source_location, object, {std::move(list)});
     }
 
     DATA_INVARIANT(
       operands.empty() || operands.size() == 1,
       "array constructor must have at most one operand");
 
-    if(operands.empty() && cpp_is_pod(object_tc.type()))
+    if(
+      operands.empty() && cpp_is_pod(object_tc.type()) &&
+      !has_default_member_initializer(object_tc.type()))
+    {
       return {};
+    }
 
     const exprt &size_expr = to_array_type(object_tc.type()).size();
 
     if(size_expr.id() == ID_infinity)
       return {}; // don't initialize
 
-    exprt tmp_size=size_expr;
+    exprt tmp_size = size_expr;
     make_constant_index(tmp_size);
 
     mp_integer s;
     if(to_integer(to_constant_expr(tmp_size), s))
     {
-      error().source_location=source_location;
+      error().source_location = source_location;
       error() << "array size '" << to_string(size_expr) << "' is not a constant"
               << eom;
       throw 0;
@@ -92,20 +237,24 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
       code_blockt new_code;
 
       // for each element of the array, call the default constructor
-      for(mp_integer i=0; i < s; ++i)
+      for(mp_integer i = 0; i < s; ++i)
       {
         exprt::operandst tmp_operands;
 
         exprt constant = from_integer(i, c_index_type());
-        constant.add_source_location()=source_location;
+        constant.add_source_location() = source_location;
 
         index_exprt index = index_exprt(object_tc, constant);
-        index.add_source_location()=source_location;
+        index.add_source_location() = source_location;
 
         if(!operands.empty())
         {
           index_exprt operand(operands.front(), constant);
-          operand.add_source_location()=source_location;
+          operand.add_source_location() = source_location;
+          // an element of an array of arrays is itself an array value
+          // initializing the element array ([dcl.init.aggr]/4)
+          if(operand.type().id() == ID_array)
+            operand.set(ID_C_array_ini, true);
           tmp_operands.push_back(operand);
         }
 
@@ -119,7 +268,7 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
   }
   else if(cpp_is_pod(object_tc.type()))
   {
-    exprt::operandst operands_tc=operands;
+    exprt::operandst operands_tc = operands;
 
     for(auto &op : operands_tc)
     {
@@ -129,37 +278,463 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
 
     if(operands_tc.empty())
     {
+      // C++11: apply default member initializers for POD types
+      if(object_tc.type().id() == ID_struct_tag)
+      {
+        const struct_typet &struct_type =
+          follow_tag(to_struct_tag_type(object_tc.type()));
+        code_blockt block;
+        for(const auto &comp : struct_type.components())
+        {
+          if(
+            comp.get_bool(ID_is_type) || comp.get_bool(ID_is_static) ||
+            comp.type().id() == ID_code)
+            continue;
+          const irept &default_val = comp.find(ID_C_default_value);
+          if(default_val.is_not_nil())
+          {
+            // Type-check in the class scope so that using-declarations
+            // (e.g., using enum) are visible.
+            cpp_save_scopet save_scope(cpp_scopes);
+            cpp_scopes.set_scope(
+              to_struct_tag_type(object_tc.type()).get_identifier());
+            member_exprt member(object_tc, comp.get_name(), comp.type());
+            member.set(ID_C_lvalue, true);
+
+            // N5008 [expr.prim.id.general]/4, [class.mem.general]/11: in a
+            // default member initializer an unqualified member name `x' is
+            // `(*this).x', `this' being the object under initialization;
+            // without it `&x' formed a pointer to member.  Bind the class
+            // scope's `this' to this object while the initializer is
+            // type-checked.
+            struct this_bindingt
+            {
+              exprt &slot;
+              exprt saved;
+              ~this_bindingt()
+              {
+                slot = std::move(saved);
+              }
+            } this_binding{
+              cpp_scopes.current_scope().this_expr,
+              cpp_scopes.current_scope().this_expr};
+            this_binding.slot = address_of_exprt{object_tc};
+
+            // An empty brace initializer ({}) value-initializes the member
+            // ([dcl.init]).  Type-checking the bare empty initializer_list
+            // would otherwise yield a value with no determinate
+            // representation (e.g. an initializer_list cast to a scalar,
+            // which has no bit-width).  Use proper (zero-)value
+            // initialization for any member type instead.
+            if(
+              default_val.id() == ID_initializer_list &&
+              default_val.get_sub().empty())
+            {
+              auto zero = itanium_abi_cpp_zero_initializer(
+                comp.type(), source_location, *this);
+              if(zero.has_value())
+                block.add(
+                  code_frontend_assignt(std::move(member), std::move(*zero)));
+            }
+            else
+            {
+              // N5008 [dcl.init.list], [dcl.init.aggr]: a non-empty braced
+              // default member initializer initializes the member by
+              // list-initialization -- a scalar from the single element
+              // ([dcl.init.list]/3.9), an aggregate member-wise, a class via
+              // its constructors.  Delegating to cpp_constructor (forwarding
+              // the braced-init-list's elements as the initializer operands)
+              // performs exactly that.  The previous code instead type-checked
+              // the braced-init-list as a whole and cast it to the member type,
+              // which left a raw initializer_list in the model (aborting the
+              // bit-vector flattener for a scalar member, e.g. `int x{42}`).
+              exprt init_val = static_cast<const exprt &>(default_val);
+              exprt::operandst init_ops;
+              if(init_val.id() == ID_initializer_list)
+                init_ops = init_val.operands();
+              else
+                init_ops.push_back(std::move(init_val));
+
+              auto member_init =
+                cpp_constructor(source_location, member, init_ops);
+              if(member_init.has_value())
+                block.add(std::move(*member_init));
+            }
+          }
+          else if(has_default_member_initializer(comp.type()))
+          {
+            // N5008 [class.base.init]/9-10: a member with no mem-initializer
+            // and no default member initializer of its own, but whose type has
+            // a non-trivial default constructor because a subobject carries a
+            // default member initializer, is default-constructed.  Delegating
+            // to cpp_constructor with no operands recursively applies the
+            // subobject's initializers (e.g. `struct Q { int t = 5; }; struct
+            // O { Q q; }; O o;` must leave `o.q.t == 5`).  A truly trivial
+            // member is filtered out by has_default_member_initializer, so no
+            // spurious construction code is added.
+            cpp_save_scopet save_scope(cpp_scopes);
+            cpp_scopes.set_scope(
+              to_struct_tag_type(object_tc.type()).get_identifier());
+            member_exprt member(object_tc, comp.get_name(), comp.type());
+            member.set(ID_C_lvalue, true);
+            exprt::operandst no_operands;
+            auto member_init =
+              cpp_constructor(source_location, member, no_operands);
+            if(member_init.has_value())
+              block.add(std::move(*member_init));
+          }
+        }
+        if(!block.statements().empty())
+          return std::move(block);
+      }
       // a POD is NOT initialized
       return {};
     }
-    else if(operands_tc.size()==1)
+    else if(operands_tc.size() == 1)
     {
+      exprt rhs = operands_tc.front();
+
+      // N5008 [dcl.init.list]/3.9-3.11: when a scalar (more generally, a
+      // non-class, non-array object) is list-initialized from a
+      // braced-init-list with a single element, it is initialized from that
+      // element.  A brace-init-list that reaches here as a raw
+      // `initializer_list` operand -- e.g. a scalar member's braced default
+      // member initializer `int x{42}` -- would otherwise be assigned to the
+      // scalar wholesale and flow into GOTO conversion unresolved, aborting
+      // the bit-vector flattener.  Unwrap it to its single element.  (An empty
+      // `{}` has already been routed to value-initialization by the caller, so
+      // only the single-element case needs handling here; a multi-element list
+      // for a scalar is ill-formed and is left for the assignment below to
+      // reject.)
+      if(
+        rhs.id() == ID_initializer_list && rhs.operands().size() == 1 &&
+        object_tc.type().id() != ID_struct_tag &&
+        object_tc.type().id() != ID_union_tag)
+      {
+        rhs = to_unary_expr(rhs).op();
+      }
+
+      // N5008 [dcl.init.list]/3.2 + /3.4: list-initializing a class from a
+      // braced-init-list whose single element is of the SAME class type is
+      // copy-initialization from that element; any other non-empty list for
+      // an aggregate initializes it member-wise ([dcl.init.aggr]).  A POD
+      // aggregate target (e.g. the base subobject in `Derived() : Base{42}`,
+      // [class.base.init]/7) reached the assignment below with the raw list,
+      // and the element-to-class implicit conversion was rejected
+      // ("invalid implicit conversion from 'signed int' to 'struct Base'").
+      // N5008 [dcl.init.general]/16.6.2.2 (C++20): `T x(e)' with T an
+      // aggregate class -- no constructor is viable when e does not convert
+      // to T (the implicit copy and move constructors are the only ones) --
+      // initializes the first element from e and value-initializes the
+      // rest, as `T x{e}' would without narrowing checks (P0960).
+      if(
+        config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP20 &&
+        rhs.id() != ID_initializer_list &&
+        object_tc.type().id() == ID_struct_tag &&
+        !follow_tag(to_struct_tag_type(object_tc.type())).is_incomplete())
+      {
+        exprt probe = rhs;
+        unsigned rank = 0;
+        if(!implicit_conversion_sequence(probe, object_tc.type(), rank))
+          goto aggregate_initialization;
+      }
+
+      if(
+        rhs.id() == ID_initializer_list &&
+        object_tc.type().id() == ID_struct_tag)
+      {
+        bool same_class_copy = false;
+        if(rhs.operands().size() == 1)
+        {
+          exprt elem = to_unary_expr(rhs).op();
+          typecheck_expr(elem);
+          typet elem_type = elem.type();
+          if(is_reference(elem_type))
+            elem_type = to_reference_type(elem_type).base_type();
+          same_class_copy =
+            elem_type.id() == ID_struct_tag &&
+            to_struct_tag_type(elem_type).get_identifier() ==
+              to_struct_tag_type(object_tc.type()).get_identifier();
+          if(same_class_copy)
+            rhs = std::move(elem);
+        }
+        if(!same_class_copy)
+        {
+          // Member-wise aggregate initialization: hand the list's
+          // elements to the parenthesized-aggregate branch below, which
+          // implements exactly [dcl.init.aggr] (explicit elements in
+          // order, trailing members value-initialized).
+          exprt::operandst elements = rhs.operands();
+          for(auto &e : elements)
+          {
+            typecheck_expr(e);
+            add_implicit_dereference(e);
+          }
+          operands_tc = std::move(elements);
+          goto aggregate_initialization;
+        }
+      }
+
       // Override constantness
       object_tc.type().set(ID_C_constant, false);
       object_tc.set(ID_C_lvalue, true);
-      side_effect_expr_assignt assign(
-        object_tc, operands_tc.front(), typet(), source_location);
+      side_effect_expr_assignt assign(object_tc, rhs, typet(), source_location);
+      // N5008 [dcl.init.general]/16.9 + [over.match.conv]/1: this is the
+      // direct-initialization `T t(e)' of a non-class object; an explicit
+      // conversion function of e's class is a candidate (`bool b(loc)' with
+      // `explicit operator bool()')
+      std::optional<direct_initialization_contextt> direct_init;
+      if(
+        object_tc.type().id() != ID_struct_tag &&
+        object_tc.type().id() != ID_union_tag)
+      {
+        direct_init.emplace(*this);
+      }
       typecheck_side_effect_assignment(assign);
       return code_expressiont(std::move(assign));
     }
     else
     {
-      error().source_location=source_location;
+    aggregate_initialization:
+      // C++20 aggregate parenthesized initialization
+      if(object_tc.type().id() == ID_struct_tag)
+      {
+        const struct_typet &struct_type =
+          follow_tag(to_struct_tag_type(object_tc.type()));
+        const auto &components = struct_type.components();
+        code_blockt block;
+        std::size_t idx = 0;
+        for(const auto &comp : components)
+        {
+          if(
+            comp.get_bool(ID_from_base) || comp.get_bool(ID_is_type) ||
+            comp.get_bool(ID_is_static) || comp.type().id() == ID_code ||
+            comp.get_is_padding()) // [dcl.init.aggr]/2: not an element
+            continue;
+          member_exprt member(object_tc, comp.get_name(), comp.type());
+          member.set(ID_C_lvalue, true);
+          exprt val;
+          if(idx < operands_tc.size())
+          {
+            // look through an already_typechecked wrapper (nil-typed)
+            const exprt &op_probe =
+              operands_tc[idx].id() == ID_already_typechecked
+                ? to_unary_expr(operands_tc[idx]).op()
+                : operands_tc[idx];
+            if(
+              comp.type().id() == ID_array &&
+              (op_probe.id() == ID_initializer_list ||
+               op_probe.type().id() == ID_array ||
+               to_array_type(comp.type()).size().is_constant()))
+            {
+              // N5008 [dcl.init.aggr]/4.2: an ARRAY element is itself
+              // aggregate-initialized, element-wise -- arrays are not
+              // assignable, so the assignment below would be rejected
+              // ("direct assignments to arrays not permitted"; the
+              // shape of a default member initializer `vec v_{{7,8}};`
+              // whose member contains an array).  Recurse: a braced
+              // list contributes its elements, an already-typed array
+              // VALUE is copied element-wise by the array branch (it
+              // requires the #array_ini tag).
+              exprt array_member = member;
+              already_typechecked_exprt::make_already_typechecked(array_member);
+              exprt::operandst elem_ops;
+              if(op_probe.id() == ID_initializer_list)
+              {
+                for(const auto &el : op_probe.operands())
+                  elem_ops.push_back(already_typechecked_exprt{el});
+              }
+              else if(op_probe.type().id() == ID_array)
+              {
+                exprt aval = op_probe;
+                aval.set(ID_C_array_ini, true);
+                elem_ops.push_back(already_typechecked_exprt{aval});
+              }
+              else
+              {
+                // N5008 [dcl.init.aggr]/16 (brace elision): the
+                // initializer list of the SUBAGGREGATE was elided; the
+                // array element consumes the next N operands.
+                const auto n = numeric_cast_v<std::size_t>(
+                  to_constant_expr(to_array_type(comp.type()).size()));
+                for(std::size_t k = 0; k < n && idx < operands_tc.size();
+                    ++k, ++idx)
+                {
+                  elem_ops.push_back(
+                    already_typechecked_exprt{operands_tc[idx]});
+                }
+                --idx; // the shared ++idx below advances past the last
+              }
+              auto elem_call =
+                cpp_constructor(source_location, array_member, elem_ops);
+              if(elem_call.has_value())
+                block.add(std::move(*elem_call));
+              ++idx;
+              continue;
+            }
+            // [dcl.init.aggr]/4.2: a scalar element is copy-initialized;
+            // see the parenthesized-aggregate branch below
+            if(
+              op_probe.type().id() == ID_struct_tag &&
+              comp.type().id() != ID_struct_tag &&
+              comp.type().id() != ID_union_tag)
+            {
+              val = operands_tc[idx];
+              implicit_typecast(val, comp.type());
+            }
+            else
+            {
+              val =
+                typecast_exprt::conditional_cast(operands_tc[idx], comp.type());
+            }
+          }
+          else
+          {
+            // N5008 [dcl.init.aggr]/5: elements without an explicit
+            // initializer are initialized from their default member
+            // initializer or copy-initialized from {} -- approximate
+            // with zero initialization.  Trailing members were
+            // previously left uninitialized (`aggt x(1, 2)` with three
+            // members read garbage from the third).
+            const auto zero = itanium_abi_cpp_zero_initializer(
+              comp.type(), source_location, namespacet{symbol_table});
+            if(!zero.has_value())
+            {
+              ++idx;
+              continue;
+            }
+            val = *zero;
+          }
+          side_effect_expr_assignt assign(
+            std::move(member), std::move(val), typet(), source_location);
+          typecheck_side_effect_assignment(assign);
+          block.add(code_expressiont(std::move(assign)));
+          ++idx;
+        }
+        return std::move(block);
+      }
+      // GCC's __complex__ extension (also accepted by Clang): two scalar
+      // initializers give the real and the imaginary part -- as for a
+      // variable, `__complex__ float w{r, i}', also for a mem-initializer
+      // `v{r, i}' (libstdc++'s complex<float>, `_M_value{ __r, __i }').
+      if(object_tc.type().id() == ID_complex && operands_tc.size() == 2)
+      {
+        const typet &part_type = to_complex_type(object_tc.type()).subtype();
+        exprt real = operands_tc[0];
+        exprt imag = operands_tc[1];
+        implicit_typecast(real, part_type);
+        implicit_typecast(imag, part_type);
+        object_tc.type().set(ID_C_constant, false);
+        object_tc.set(ID_C_lvalue, true);
+        side_effect_expr_assignt assign(
+          object_tc,
+          complex_exprt{
+            std::move(real),
+            std::move(imag),
+            to_complex_type(object_tc.type())},
+          typet(),
+          source_location);
+        typecheck_side_effect_assignment(assign);
+        return code_expressiont{std::move(assign)};
+      }
+      error().source_location = source_location;
       error() << "initialization of POD requires one argument, "
-                 "but got " << operands.size() << eom;
+                 "but got "
+              << operands.size() << eom;
       throw 0;
     }
   }
   else if(object_tc.type().id() == ID_union_tag)
   {
-    UNREACHABLE; // Todo: union
+    // [class.union]/2: a (non-POD) union may have a user-declared constructor;
+    // construct it by an overload-resolved call to that constructor.  A union
+    // has no base classes, virtual tables or most-derived flag, so this is the
+    // constructor-call core of the struct case below.
+    exprt::operandst operands_tc = operands;
+    for(auto &op : operands_tc)
+    {
+      typecheck_expr(op);
+      add_implicit_dereference(op);
+    }
+
+    const union_typet &union_type =
+      follow_tag(to_union_tag_type(object_tc.type()));
+
+    cpp_save_scopet save_scope(cpp_scopes);
+    cpp_scopes.set_scope(union_type.get(ID_name));
+
+    irep_idt constructor_name;
+    for(const auto &c : union_type.components())
+    {
+      const typet &type = c.type();
+      if(
+        !c.get_bool(ID_from_base) && type.id() == ID_code &&
+        to_code_type(type).return_type().id() == ID_constructor)
+      {
+        constructor_name = c.get_base_name();
+        break;
+      }
+    }
+
+    if(constructor_name.empty())
+    {
+      if(operands.empty())
+        return code_expressiont{
+          side_effect_expr_nondett{object.type(), source_location}};
+      error().source_location = source_location;
+      error() << "non-POD union has no constructor" << eom;
+      throw 0;
+    }
+
+    side_effect_expr_function_callt function_call(
+      cpp_namet(constructor_name, source_location).as_expr(),
+      operands_tc,
+      uninitialized_typet(),
+      source_location);
+    // this call constructs the object the caller initializes; the caller
+    // decides between default- and value-initialization ([dcl.init.general]
+    // /9, /12), so the call itself must not zero-initialize
+    function_call.set(ID_C_default_initialization, true);
+
+    typecheck_side_effect_function_call(function_call);
+
+    if(function_call.get(ID_statement) != ID_temporary_object)
+    {
+      error().source_location = source_location;
+      error() << "constructor call did not resolve to temporary object" << eom;
+      throw 0;
+    }
+
+    exprt &initializer =
+      static_cast<exprt &>(function_call.add(ID_initializer));
+
+    DATA_INVARIANT(
+      initializer.id() == ID_code &&
+        initializer.get(ID_statement) == ID_expression,
+      "initializer must be expression statement");
+
+    auto &statement_expr = to_code_expression(to_code(initializer));
+    side_effect_expr_function_callt &func_ini =
+      to_side_effect_expr_function_call(statement_expr.expression());
+    exprt &tmp_this = func_ini.arguments().front();
+    DATA_INVARIANT(
+      to_address_of_expr(tmp_this).object().id() == ID_new_object,
+      "expected new_object operand in address_of expression");
+    tmp_this = address_of_exprt(object_tc);
+
+    return to_code(initializer);
   }
   else if(object_tc.type().id() == ID_struct_tag)
   {
-    exprt::operandst operands_tc=operands;
+    exprt::operandst operands_tc = operands;
 
     for(auto &op : operands_tc)
     {
+      // the elements of a braced-init-list argument belong to the
+      // initialization's context, not the constructor's class scope the
+      // overload resolution below runs in ([class.access.general]/5)
+      if(op.id() == ID_initializer_list)
+        typecheck_braced_argument_elements(op);
       typecheck_expr(op);
       add_implicit_dereference(op);
     }
@@ -167,37 +742,589 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
     const struct_typet &struct_type =
       follow_tag(to_struct_tag_type(object_tc.type()));
 
-    // set most-derived bits
-    code_blockt block;
-    for(const auto &component : struct_type.components())
+    // N5008 [dcl.init.general]/16.6.3 + [over.match.copy]: initialising a
+    // class T from a single operand of a DIFFERENT class S (not derived
+    // from T) is a user-defined conversion -- the conversion functions of
+    // S yielding T, or a converting constructor of T whose parameter takes
+    // S without a further user-defined conversion ([over.best.ics.general]
+    // /4) -- followed by copy/move construction from the result.  g++ and
+    // clang apply the same to direct-initialization (CWG 2327).  Overload
+    // resolution over ALL constructors, each argument free to use a
+    // user-defined conversion, made `std::vector<int> v = range;'
+    // ambiguous: the conversion function TEMPLATE `operator C() const'
+    // reaches vector(size_type), vector(vector &&) and
+    // vector(initializer_list) alike, with a different C each time.
+    if(operands_tc.size() == 1)
     {
-      if(component.get_base_name() != "@most_derived")
-        continue;
-
-      member_exprt member(object_tc, component.get_name(), bool_typet());
-      member.add_source_location()=source_location;
-      member.set(ID_C_lvalue, object_tc.get_bool(ID_C_lvalue));
-
-      exprt val=false_exprt();
-
-      if(!component.get_bool(ID_from_base))
-        val=true_exprt();
-
-      side_effect_expr_assignt assign(
-        std::move(member), std::move(val), typet(), source_location);
-
-      typecheck_side_effect_assignment(assign);
-
-      block.add(code_expressiont(std::move(assign)));
+      typet source_type = operands_tc.front().type();
+      if(is_reference(source_type))
+        source_type = to_reference_type(source_type).base_type();
+      // A constructor of T whose parameter takes S itself (by value or
+      // reference, or a base of S) is an exact match and wins the
+      // ordinary overload resolution below; only when no such constructor
+      // exists can the conversion functions of S decide.
+      bool has_direct_ctor = false;
+      if(
+        source_type.id() == ID_struct_tag &&
+        to_struct_tag_type(source_type).get_identifier() !=
+          to_struct_tag_type(object_tc.type()).get_identifier())
+      {
+        for(const auto &c : struct_type.components())
+        {
+          if(
+            c.type().id() != ID_code ||
+            to_code_type(c.type()).return_type().id() != ID_constructor)
+            continue;
+          const auto &params = to_code_type(c.type()).parameters();
+          if(params.size() < 2)
+            continue;
+          typet pt = params[1].type();
+          if(is_reference(pt))
+            pt = to_reference_type(pt).base_type();
+          if(pt.id() != ID_struct_tag)
+            continue;
+          if(
+            to_struct_tag_type(pt).get_identifier() ==
+              to_struct_tag_type(source_type).get_identifier() ||
+            subtype_typecast(
+              follow_tag(to_struct_tag_type(source_type)),
+              follow_tag(to_struct_tag_type(pt))))
+          {
+            has_direct_ctor = true;
+            break;
+          }
+        }
+      }
+      if(
+        !has_direct_ctor && source_type.id() == ID_struct_tag &&
+        to_struct_tag_type(source_type).get_identifier() !=
+          to_struct_tag_type(object_tc.type()).get_identifier() &&
+        !subtype_typecast(
+          follow_tag(to_struct_tag_type(source_type)), struct_type))
+      {
+        exprt converted;
+        unsigned rank = 0;
+        bool converts = false;
+        try
+        {
+          sfinae_contextt sfinae_guard{*this};
+          converts = user_defined_conversion_sequence(
+            operands_tc.front(), object_tc.type(), converted, rank);
+        }
+        catch(...)
+        {
+          converts = false;
+        }
+        if(converts && converted.is_not_nil())
+        {
+          already_typechecked_exprt::make_already_typechecked(converted);
+          return cpp_constructor(source_location, object, {converted});
+        }
+      }
     }
+
+    // C++17 aggregate initialization with base classes, and C++20
+    // parenthesized aggregate initialization (P0960, N5008
+    // [dcl.init.general]/16.6.2.2): if the struct has bases but no
+    // user-declared constructors, initialize the elements from the
+    // operands.  For a SINGLE operand this must not shadow copy/move
+    // construction ([dcl.init.general]/16.6.1 considers constructors
+    // first): skip when the operand is the class itself or derived
+    // from it -- the synthesized copy/move constructor handles those.
+    // N5008 [dcl.init.aggr]/1: an aggregate also must not have virtual
+    // functions.  CBMC represents those via internal '@'-prefixed
+    // components (vtable pointer); their presence disqualifies the
+    // member-wise path (an operand must not be spliced into a vtable
+    // slot).
+    bool has_internal_component = false;
+    for(const auto &c : struct_type.components())
+    {
+      if(
+        !c.get_bool(ID_from_base) && c.type().id() != ID_code &&
+        !c.get_bool(ID_is_type) && !c.get_bool(ID_is_static) &&
+        has_prefix(id2string(c.get_base_name()), "@"))
+      {
+        has_internal_component = true;
+        break;
+      }
+    }
+    bool single_operand_aggregate = false;
+    if(!has_internal_component && operands_tc.size() == 1)
+    {
+      typet op_t = operands_tc.front().type();
+      if(op_t.id() == ID_struct_tag)
+      {
+        const irep_idt &op_id = to_struct_tag_type(op_t).get_identifier();
+        single_operand_aggregate =
+          op_id != to_struct_tag_type(object_tc.type()).get_identifier() &&
+          !subtype_typecast(
+            follow_tag(to_struct_tag_type(op_t)),
+            follow_tag(to_struct_tag_type(object_tc.type())));
+      }
+      else
+        single_operand_aggregate = true;
+    }
+    // C++20 parenthesized aggregate initialization applies regardless of
+    // whether the aggregate has bases ([dcl.init.general]/16.6.2.2); the
+    // no-bases case matters for aggregates that are non-POD only because
+    // of a member, e.g. a REFERENCE member (`struct R { int &r; }; R
+    // r(x);`), which otherwise fell through to constructor resolution
+    // and failed against the synthesized copy constructor.
+    if(
+      !has_internal_component &&
+      (operands_tc.size() >= 2 || single_operand_aggregate))
+    {
+      // [dcl.init.aggr]/1: a class with a user-declared constructor is not an
+      // aggregate.  A template constructor is not stored as a regular component
+      // (so the scan below would miss it); the struct carries a flag instead.
+      // C++17: inherited constructors (using Base::Base) also make the class a
+      // non-aggregate.
+      bool has_user_ctor = struct_type.get_bool("has_template_constructor") ||
+                           struct_type.get_bool("has_inherited_constructor");
+      for(const auto &c : struct_type.components())
+      {
+        if(c.type().id() != ID_code || c.get_bool(ID_from_base))
+          continue;
+        const code_typet &ct = to_code_type(c.type());
+        if(ct.return_type().id() != ID_constructor)
+          continue;
+        // N5008 [dcl.init.aggr]/1 (C++20 rule): ANY user-declared
+        // constructor -- including a user-declared default or copy/move
+        // constructor -- disqualifies the aggregate.  Only the
+        // compiler-synthesized ones (marked #is_implicit_ctor) are
+        // ignored.  The previous shape-based skip (this-only and
+        // (this, reference) signatures) also skipped USER-declared
+        // default constructors, so `base_type(10)` inside Constructor13
+        // aggregate-initialized a class with user constructors.
+        if(c.type().get_bool("#is_implicit_ctor"))
+          continue;
+        has_user_ctor = true;
+        break;
+      }
+      if(!has_user_ctor)
+      {
+        code_blockt block;
+        std::size_t idx = 0;
+        // Initialize base class subobjects: for each base, the
+        // corresponding operand initializes the from_base data members.
+        for(std::size_t b = 0; b < struct_type.bases().size(); ++b)
+        {
+          // N5008 [dcl.init.aggr]/5: a base without an initializer is
+          // initialized from an empty initializer list -- member-wise, as
+          // below, with no elements
+          const bool has_element = idx < operands_tc.size();
+          // N5008 [dcl.init.aggr]/4.1: when the element is a BASE and
+          // the initializer is of the base's own type (or derived),
+          // the base SUBOBJECT is copy-initialized from it -- a sliced
+          // whole-object copy, not a member-wise splice (member-wise
+          // treated the whole takeish value as the first member's
+          // initializer, leaving the base nondet: the closure CTAD
+          // wrong-code shape).
+          if(has_element)
+          {
+            typet op_t = operands_tc[idx].type();
+            if(is_reference(op_t))
+              op_t = to_reference_type(op_t).base_type();
+            const typet &base_t = struct_type.bases()[b].type();
+            if(
+              op_t.id() == ID_struct_tag && base_t.id() == ID_struct_tag &&
+              (to_struct_tag_type(op_t).get_identifier() ==
+                 to_struct_tag_type(base_t).get_identifier() ||
+               subtype_typecast(
+                 follow_tag(to_struct_tag_type(op_t)),
+                 follow_tag(to_struct_tag_type(base_t)))))
+            {
+              typet clean_base_t = base_t;
+              clean_base_t.remove(ID_C_base_name);
+              address_of_exprt obj_addr(object_tc);
+              typecast_exprt base_ptr(obj_addr, pointer_type(clean_base_t));
+              dereference_exprt base_lval(base_ptr);
+              base_lval.set(ID_C_lvalue, true);
+              exprt val = typecast_exprt::conditional_cast(
+                operands_tc[idx], clean_base_t);
+              side_effect_expr_assignt assign(
+                std::move(base_lval), std::move(val), typet(), source_location);
+              typecheck_side_effect_assignment(assign);
+              block.add(code_expressiont(std::move(assign)));
+              ++idx;
+              continue;
+            }
+          }
+
+          // Collect from_base data members belonging to this base
+          exprt::operandst base_ops;
+          if(has_element && operands_tc[idx].id() == ID_initializer_list)
+            base_ops = operands_tc[idx].operands();
+          else if(has_element)
+            base_ops.push_back(operands_tc[idx]);
+          // N5008 [dcl.init.aggr]/4-5: the base is itself
+          // aggregate-initialized from its element: its members in order
+          // (only THIS base's subobject -- #subobject_path), those without
+          // an initializer from their default member initializer or, if
+          // none, value-initialized
+          const irep_idt base_id =
+            struct_type.bases()[b].type().id() == ID_struct_tag
+              ? to_struct_tag_type(struct_type.bases()[b].type())
+                  .get_identifier()
+              : irep_idt{};
+          // [dcl.init.aggr]/3.1: a designated-initializer-list names the
+          // elements it initializes (`{.a = 2}'); the others are initialized
+          // as without an initializer (/5)
+          std::map<irep_idt, exprt> designated;
+          for(const auto &op : base_ops)
+          {
+            const exprt &designated_op =
+              op.id() == ID_already_typechecked ? to_unary_expr(op).op() : op;
+            if(designated_op.id() != ID_designated_initializer)
+              continue;
+            const irept &designator = designated_op.find(ID_designator);
+            if(
+              designator.get_sub().size() == 1 &&
+              designated_op.operands().size() == 1)
+            {
+              designated[designator.get_sub().front().get(ID_component_name)] =
+                designated_op.operands().front();
+            }
+          }
+          std::size_t bidx = 0;
+          for(const auto &comp : struct_type.components())
+          {
+            if(
+              !comp.get_bool(ID_from_base) || comp.get_bool(ID_is_type) ||
+              comp.get_bool(ID_is_static) || comp.type().id() == ID_code ||
+              comp.get_is_padding())
+              continue;
+            const auto &path = comp.find(ID_C_subobject_path).get_sub();
+            if(!path.empty() && path.front().id() != base_id)
+              continue;
+            member_exprt member(object_tc, comp.get_name(), comp.type());
+            member.set(ID_C_lvalue, true);
+            exprt val;
+            const auto designated_it = designated.find(comp.get_base_name());
+            if(designated_it != designated.end())
+            {
+              exprt value = designated_it->second;
+              typecheck_expr(value);
+              implicit_typecast(value, comp.type());
+              val = std::move(value);
+            }
+            else if(!designated.empty())
+            {
+              // not designated: default member initializer or zero, below
+              if(comp.find(ID_C_default_value).is_not_nil())
+                val = static_cast<const exprt &>(comp.find(ID_C_default_value));
+              else
+              {
+                const auto zero = itanium_abi_cpp_zero_initializer(
+                  comp.type(), source_location, namespacet{symbol_table});
+                if(!zero.has_value())
+                  continue;
+                val = *zero;
+              }
+            }
+            else if(bidx < base_ops.size())
+            {
+              val =
+                typecast_exprt::conditional_cast(base_ops[bidx], comp.type());
+              ++bidx;
+            }
+            else if(comp.find(ID_C_default_value).is_not_nil())
+            {
+              val = static_cast<const exprt &>(comp.find(ID_C_default_value));
+            }
+            else
+            {
+              const auto zero = itanium_abi_cpp_zero_initializer(
+                comp.type(), source_location, namespacet{symbol_table});
+              if(!zero.has_value())
+                continue;
+              val = *zero;
+            }
+            side_effect_expr_assignt assign(
+              std::move(member), std::move(val), typet(), source_location);
+            typecheck_side_effect_assignment(assign);
+            block.add(code_expressiont(std::move(assign)));
+          }
+          ++idx;
+        }
+        // Initialize non-static data members
+        for(const auto &comp : struct_type.components())
+        {
+          if(
+            comp.get_bool(ID_from_base) || comp.get_bool(ID_is_type) ||
+            comp.get_bool(ID_is_static) || comp.type().id() == ID_code ||
+            comp.get_is_padding()) // [dcl.init.aggr]/2: not an element
+            continue;
+          member_exprt member(object_tc, comp.get_name(), comp.type());
+          member.set(ID_C_lvalue, true);
+          exprt val;
+          if(idx < operands_tc.size())
+          {
+            // N5008 [dcl.init.aggr]/4.2 + [dcl.init.ref]: a REFERENCE
+            // element is BOUND to its initializer, not assigned through.
+            if(is_reference(comp.type()))
+            {
+              val = operands_tc[idx];
+              reference_initializer(val, to_reference_type(comp.type()));
+            }
+            else
+            {
+              // look through an already_typechecked wrapper (nil-typed)
+              const exprt &op_probe =
+                operands_tc[idx].id() == ID_already_typechecked
+                  ? to_unary_expr(operands_tc[idx]).op()
+                  : operands_tc[idx];
+              if(
+                comp.type().id() == ID_array &&
+                (op_probe.id() == ID_initializer_list ||
+                 op_probe.type().id() == ID_array ||
+                 to_array_type(comp.type()).size().is_constant()))
+              {
+                // N5008 [dcl.init.aggr]/4.2: an ARRAY element is itself
+                // aggregate-initialized, element-wise -- arrays are not
+                // assignable, so the assignment below would be rejected
+                // ("direct assignments to arrays not permitted"; the
+                // shape of a default member initializer `vec v_{{7,8}};`
+                // whose member contains an array).  Recurse: a braced
+                // list contributes its elements, an already-typed array
+                // VALUE is copied element-wise by the array branch (it
+                // requires the #array_ini tag).
+                exprt array_member = member;
+                already_typechecked_exprt::make_already_typechecked(
+                  array_member);
+                exprt::operandst elem_ops;
+                if(op_probe.id() == ID_initializer_list)
+                {
+                  for(const auto &el : op_probe.operands())
+                    elem_ops.push_back(already_typechecked_exprt{el});
+                }
+                else if(op_probe.type().id() == ID_array)
+                {
+                  exprt aval = op_probe;
+                  aval.set(ID_C_array_ini, true);
+                  elem_ops.push_back(already_typechecked_exprt{aval});
+                }
+                else
+                {
+                  // N5008 [dcl.init.aggr]/16 (brace elision): the
+                  // initializer list of the SUBAGGREGATE was elided; the
+                  // array element consumes the next N operands.
+                  const auto n = numeric_cast_v<std::size_t>(
+                    to_constant_expr(to_array_type(comp.type()).size()));
+                  for(std::size_t k = 0; k < n && idx < operands_tc.size();
+                      ++k, ++idx)
+                  {
+                    elem_ops.push_back(
+                      already_typechecked_exprt{operands_tc[idx]});
+                  }
+                  --idx; // the shared ++idx below advances past the last
+                }
+                auto elem_call =
+                  cpp_constructor(source_location, array_member, elem_ops);
+                if(elem_call.has_value())
+                  block.add(std::move(*elem_call));
+                ++idx;
+                continue;
+              }
+              // [dcl.init.aggr]/4.2: an element of class type is
+              // copy-initialized from its initializer -- by a constructor,
+              // not by assignment to the (not yet constructed) member
+              // (libc++'s `__tuple_leaf<tuple<int>>(__u)', whose member
+              // tuple<int> is constructed from an int, P0960)
+              if(
+                comp.type().id() == ID_struct_tag && !cpp_is_pod(comp.type()) &&
+                op_probe.id() != ID_initializer_list)
+              {
+                exprt class_member = member;
+                already_typechecked_exprt::make_already_typechecked(
+                  class_member);
+                auto member_init = cpp_constructor(
+                  source_location,
+                  class_member,
+                  {already_typechecked_exprt{operands_tc[idx]}});
+                if(member_init.has_value())
+                  block.add(std::move(*member_init));
+                ++idx;
+                continue;
+              }
+              // ... and from a braced list: an aggregate member is itself
+              // aggregate-initialized ([dcl.init.aggr]/4.2), its non-POD
+              // elements constructed; any other class is list-initialized
+              // by a constructor ([dcl.init.list]/3.7).  Assigning the
+              // list itself left an initializer_list value for symex.
+              if(
+                comp.type().id() == ID_struct_tag && !cpp_is_pod(comp.type()) &&
+                op_probe.id() == ID_initializer_list)
+              {
+                const struct_typet member_struct =
+                  follow_tag(to_struct_tag_type(comp.type()));
+                if(
+                  member_struct.bases().empty() &&
+                  !has_user_declared_constructor(member_struct))
+                {
+                  exprt::operandst element_ops;
+                  for(const auto &el : op_probe.operands())
+                    element_ops.push_back(already_typechecked_exprt{el});
+                  aggregate_member_initialization(
+                    member, member_struct, element_ops, source_location, block);
+                }
+                else
+                {
+                  exprt class_member = member;
+                  already_typechecked_exprt::make_already_typechecked(
+                    class_member);
+                  auto member_init = cpp_constructor(
+                    source_location,
+                    class_member,
+                    {already_typechecked_exprt{op_probe}});
+                  if(member_init.has_value())
+                    block.add(std::move(*member_init));
+                }
+                ++idx;
+                continue;
+              }
+              // N5008 [dcl.init.aggr]/4.2, [dcl.init.general]/16.6.3: a
+              // scalar element is COPY-initialized from its initializer;
+              // from a class object that is an implicit conversion, which
+              // does not consider explicit conversion functions
+              // ([over.match.copy]/1.2) -- an explicit cast accepted them
+              if(
+                op_probe.type().id() == ID_struct_tag &&
+                comp.type().id() != ID_struct_tag &&
+                comp.type().id() != ID_union_tag)
+              {
+                val = operands_tc[idx];
+                implicit_typecast(val, comp.type());
+              }
+              else
+              {
+                val = typecast_exprt::conditional_cast(
+                  operands_tc[idx], comp.type());
+              }
+            }
+            ++idx;
+          }
+          else
+          {
+            // N5008 [dcl.init.aggr]/5: an aggregate element without an
+            // explicit initializer is initialized from its default
+            // member initializer or copy-initialized from {} --
+            // value-initialization, approximated by zero
+            // initialization.  Previously trailing members were left
+            // uninitialized, so `aggt x(1, 2)` with three members read
+            // garbage from the third.
+            const auto zero = itanium_abi_cpp_zero_initializer(
+              comp.type(), source_location, namespacet{symbol_table});
+            if(!zero.has_value())
+              continue;
+            val = *zero;
+          }
+          side_effect_expr_assignt assign(
+            std::move(member), std::move(val), typet(), source_location);
+          typecheck_side_effect_assignment(assign);
+          block.add(code_expressiont(std::move(assign)));
+        }
+        return std::move(block);
+      }
+    }
+
+    // N5008 [dcl.init.general]/16.6.1 (C++17 guaranteed copy elision): if
+    // the initializer is a prvalue of the same class, cv-unqualified, it
+    // initializes the object directly -- no temporary is materialized,
+    // copied and destroyed.  For a constructor-built prvalue `T(args)' the
+    // object is constructed by that constructor in place; for a call
+    // returning T by value, the call's result is the object (goto
+    // conversion passes the destination as the return slot).
+    if(
+      config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP17 &&
+      operands_tc.size() == 1)
+    {
+      exprt prvalue = operands_tc.front();
+      if(prvalue.id() == ID_already_typechecked)
+        prvalue = to_unary_expr(prvalue).op();
+      typet prvalue_type = prvalue.type();
+      prvalue_type.remove(ID_C_constant);
+      prvalue_type.remove(ID_C_volatile);
+      typet object_type = object_tc.type();
+      object_type.remove(ID_C_constant);
+      object_type.remove(ID_C_volatile);
+      if(
+        prvalue_type == object_type && prvalue.id() == ID_side_effect &&
+        prvalue.get(ID_statement) == ID_temporary_object &&
+        prvalue.operands().empty() &&
+        prvalue.find(ID_initializer).id() == ID_code)
+      {
+        // the temporary's constructor call names it as `new_object'; the
+        // object takes its place (as goto conversion's replace_new_object
+        // does for the temporary)
+        exprt initializer =
+          static_cast<const exprt &>(prvalue.find(ID_initializer));
+        bool replaced = false;
+        std::function<void(exprt &)> rebind = [&](exprt &e)
+        {
+          if(e.id() == ID_new_object && e.type() == prvalue.type())
+          {
+            e = object_tc;
+            replaced = true;
+            return;
+          }
+          // a nested temporary keeps its own new_object
+          if(
+            e.id() == ID_side_effect &&
+            e.get(ID_statement) == ID_temporary_object)
+          {
+            return;
+          }
+          for(auto &op : e.operands())
+            rebind(op);
+        };
+        rebind(initializer);
+        if(replaced)
+          return to_code(initializer);
+      }
+      // (not for the new_object of a temporary being materialized: goto
+      // conversion gives the call its own result object, which would be
+      // copied bitwise into the temporary and both destroyed -- the
+      // temporary's initialization is the call itself there)
+      if(
+        prvalue_type == object_type && prvalue.id() == ID_side_effect &&
+        prvalue.get(ID_statement) == ID_function_call &&
+        !is_reference(prvalue.type()) && object_tc.id() != ID_new_object)
+      {
+        code_frontend_assignt init{object_tc, prvalue};
+        init.add_source_location() = source_location;
+        return std::move(init);
+      }
+    }
+
+    code_blockt block;
 
     // enter struct scope
     cpp_save_scopet save_scope(cpp_scopes);
+    // Constructor overload resolution below runs with the current scope
+    // moved into the class; record the caller's scope as the point of
+    // use so accessibility of argument conversions -- in particular
+    // derived-to-base conversions relying on FRIENDSHIP of the caller
+    // ([class.access.base]/4) -- is judged from here.  Restored
+    // alongside the scope itself.
+    struct access_scope_guardt
+    {
+      cpp_typecheckt &tc;
+      cpp_scopet *saved;
+      explicit access_scope_guardt(cpp_typecheckt &t)
+        : tc(t), saved(t.access_judgment_scope)
+      {
+        tc.access_judgment_scope = t.cpp_scopes.current_scope_ptr;
+      }
+      ~access_scope_guardt()
+      {
+        tc.access_judgment_scope = saved;
+      }
+    } access_scope_guard{*this};
     cpp_scopes.set_scope(struct_type.get(ID_name));
 
     // find name of constructor
-    const struct_typet::componentst &components=
-      struct_type.components();
+    const struct_typet::componentst &components = struct_type.components();
 
     irep_idt constructor_name;
 
@@ -214,16 +1341,88 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
       }
     }
 
-    INVARIANT(!constructor_name.empty(), "non-PODs should have a constructor");
+    if(constructor_name.empty())
+    {
+      // [class.default.ctor]: a defaulted default constructor
+      // zero-initializes all members. If the type has no explicit
+      // constructor (e.g., template instantiation where the
+      // "= default" constructor was not elaborated), fall through
+      // to zero-initialization instead of reporting an error.
+      if(operands.empty())
+      {
+        // Default construction with no arguments — treat as
+        // zero-initialization (same as "= default" semantics).
+        return code_expressiont{
+          side_effect_expr_nondett{object.type(), source_location}};
+      }
+      // N5008 [class.ctor.general]/[temp.inst]: the type is non-POD and is
+      // being constructed with arguments, but no constructor is present as a
+      // component of this struct type.  This happens when the target type's
+      // constructors have not been materialised as components at the point an
+      // out-of-line / deferred member-function body is type-checked -- e.g.
+      // constructing std::filesystem::path from a std::string inside
+      // `T::~T()`, where the string->path converting-constructor conversion is
+      // computed while type-checking the deferred destructor body and path's
+      // constructor components are not yet visible there.  A constructor is
+      // named after its class ([class.ctor.general]/1); since the class scope
+      // has already been entered above, resolve the constructor by the class's
+      // own name.  Overload resolution in that scope finds the constructors,
+      // including constructor *templates* (never stored as plain components),
+      // instantiating the matching one.  If the class genuinely has no usable
+      // constructor the call below fails with the ordinary "no match".
+      if(object_tc.type().id() == ID_struct_tag)
+      {
+        const symbolt &tag_symbol =
+          lookup(to_struct_tag_type(object_tc.type()));
+        constructor_name = tag_symbol.base_name;
+      }
+    }
+
+    if(constructor_name.empty())
+    {
+      error().source_location = source_location;
+      error() << "non-POD type has no constructor" << eom;
+      throw 0;
+    }
 
     side_effect_expr_function_callt function_call(
       cpp_namet(constructor_name, source_location).as_expr(),
       operands_tc,
       uninitialized_typet(),
       source_location);
+    // this call constructs the object the caller initializes; the caller
+    // decides between default- and value-initialization ([dcl.init.general]
+    // /9, /12), so the call itself must not zero-initialize
+    function_call.set(ID_C_default_initialization, true);
 
     typecheck_side_effect_function_call(function_call);
-    CHECK_RETURN(function_call.get(ID_statement) == ID_temporary_object);
+
+    // N5008 [over.match.copy]/1.2: in the direct-initialization `T{s}' /
+    // `T(s)' the copy constructor's `const T &' parameter may bind to the
+    // result of an EXPLICIT conversion function `S::operator T()' (libc++'s
+    // `local_days{year() / month() / day()}', year_month_day's `explicit
+    // operator local_days()').  Overload resolution then yields the call
+    // of that conversion function, a prvalue of type T; it initializes the
+    // object ([dcl.init.general]/16.6.1, the copy being elided as GCC and
+    // Clang do, CWG 2327).
+    if(
+      function_call.get(ID_statement) == ID_function_call &&
+      function_call.type() == object_tc.type())
+    {
+      code_frontend_assignt init{object_tc, function_call};
+      init.add_source_location() = source_location;
+      if(block.statements().empty())
+        return std::move(init);
+      block.add(std::move(init));
+      return std::move(block);
+    }
+
+    if(function_call.get(ID_statement) != ID_temporary_object)
+    {
+      error().source_location = source_location;
+      error() << "constructor call did not resolve to temporary object" << eom;
+      throw 0;
+    }
 
     exprt &initializer =
       static_cast<exprt &>(function_call.add(ID_initializer));
@@ -238,14 +1437,32 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
     side_effect_expr_function_callt &func_ini =
       to_side_effect_expr_function_call(statement_expr.expression());
 
-    exprt &tmp_this=func_ini.arguments().front();
-    DATA_INVARIANT(
-      to_address_of_expr(tmp_this).object().id() == ID_new_object,
-      "expected new_object operand in address_of expression");
+    exprt &tmp_this = func_ini.arguments().front();
+    if(
+      tmp_this.id() == ID_typecast &&
+      to_typecast_expr(tmp_this).op().id() == ID_address_of)
+    {
+      // An INHERITED constructor ([class.inhctor.init]/1): the temporary
+      // is typed D but the selected base constructor takes B* -- the
+      // materialization wrapped `this` in a derived-to-base conversion
+      // ([conv.ptr]/3).  Rebind the underlying address to the real object,
+      // keeping the conversion.
+      exprt &inner = to_typecast_expr(tmp_this).op();
+      DATA_INVARIANT(
+        to_address_of_expr(inner).object().id() == ID_new_object,
+        "expected new_object operand in address_of expression");
+      inner = address_of_exprt(object_tc);
+    }
+    else
+    {
+      DATA_INVARIANT(
+        to_address_of_expr(tmp_this).object().id() == ID_new_object,
+        "expected new_object operand in address_of expression");
 
-    tmp_this=address_of_exprt(object_tc);
+      tmp_this = address_of_exprt(object_tc);
+    }
 
-    const auto &initializer_code=to_code(initializer);
+    const auto &initializer_code = to_code(initializer);
 
     if(block.statements().empty())
       return initializer_code;
@@ -270,15 +1487,54 @@ void cpp_typecheckt::new_temporary(
   // create temporary object
   side_effect_exprt tmp_object_expr(ID_temporary_object, type, source_location);
   tmp_object_expr.set(ID_mode, ID_cpp);
+  // N5008 [class.temporary]/2, [conv.rval]: the temporary object materialised
+  // here is an object with identity; binding a reference to it (a const T&
+  // or T&& parameter, [dcl.init.ref]/5.3) refers to THIS object and must not
+  // materialise a second one.  The front end marks such an object with
+  // ID_C_lvalue (as typecheck_function_expr does for `T(args)`); without the
+  // mark, reference binding wrapped `T{args}` into another temporary_object
+  // and goto conversion turned that into a bitwise copy of the constructed
+  // object -- a self-pointing member (std::function's _M_manager /
+  // _M_functor, a string's local buffer pointer) then pointed into an object
+  // that was already dead when the callee used it.
+  tmp_object_expr.set(ID_C_lvalue, true);
 
   exprt new_object(ID_new_object);
-  new_object.add_source_location()=tmp_object_expr.source_location();
+  new_object.add_source_location() = tmp_object_expr.source_location();
   new_object.set(ID_C_lvalue, true);
-  new_object.type()=tmp_object_expr.type();
+  new_object.type() = tmp_object_expr.type();
 
   already_typechecked_exprt::make_already_typechecked(new_object);
 
   auto new_code = cpp_constructor(source_location, new_object, ops);
+
+  // N5008 [expr.type.conv]/2 + [dcl.init.general]/16.4: `T()' and `T{}'
+  // value-initialize the result object; [dcl.init.general]/9.1: a class
+  // whose default constructor is not user-provided is zero-initialized
+  // before that constructor runs.  cpp_constructor only calls the
+  // constructor, which is right for default-initialization (`T t;') but
+  // left the members of `T()' indeterminate -- libc++ 23's basic_string
+  // resets its representation with `__rep_ = __rep()', a union whose
+  // variant member has a defaulted default constructor.
+  if(
+    ops.empty() && new_code.has_value() &&
+    new_code->get_statement() != ID_assign &&
+    (type.id() == ID_struct_tag || type.id() == ID_union_tag) &&
+    !cpp_is_pod(type) && value_initialization_zero_initializes(type))
+  {
+    const auto zero =
+      itanium_abi_cpp_zero_initializer(type, source_location, *this);
+    if(zero.has_value())
+    {
+      exprt zero_target(ID_new_object, type);
+      zero_target.set(ID_C_lvalue, true);
+      code_blockt value_init;
+      value_init.add(code_expressiont{side_effect_expr_assignt{
+        std::move(zero_target), zero.value(), type, source_location}});
+      value_init.add(std::move(*new_code));
+      new_code = std::move(value_init);
+    }
+  }
 
   if(new_code.has_value())
   {
@@ -291,6 +1547,53 @@ void cpp_typecheckt::new_temporary(
   temporary.swap(tmp_object_expr);
 }
 
+bool cpp_typecheckt::value_initialization_zero_initializes(const typet &type)
+{
+  if(type.id() == ID_array)
+  {
+    // [dcl.init.general]/9.2: each element is value-initialized
+    return value_initialization_zero_initializes(
+      to_array_type(type).element_type());
+  }
+  if(type.id() != ID_struct_tag && type.id() != ID_union_tag)
+    return true; // [dcl.init.general]/9.3
+  if(cpp_is_pod(type))
+    return true; // no user-declared constructor at all
+  // [dcl.init.general]/9.1: the constructor selected to default-initialize
+  // the object is the class's default constructor; it is user-provided
+  // unless implicitly declared or explicitly defaulted on its first
+  // declaration ([dcl.fct.def.default]/5).
+  const struct_union_typet &class_type =
+    follow_tag(to_struct_or_union_tag_type(type));
+  for(const auto &c : class_type.components())
+  {
+    if(c.get_bool(ID_from_base) || c.type().id() != ID_code)
+      continue;
+    const code_typet &code_type = to_code_type(c.type());
+    if(
+      code_type.return_type().id() != ID_constructor ||
+      code_type.parameters().size() != 1)
+      continue;
+    return code_type.get_bool("#is_implicit_ctor") ||
+           code_type.get_bool("#explicitly_defaulted");
+  }
+  // [class.default.ctor]/1: without any user-declared constructor (and
+  // none synthesized yet) the default constructor is implicitly declared,
+  // so not user-provided
+  bool any_constructor = class_type.get_bool("has_template_constructor") ||
+                         class_type.get_bool("has_inherited_constructor");
+  for(const auto &c : class_type.components())
+  {
+    if(
+      !c.get_bool(ID_from_base) && c.type().id() == ID_code &&
+      to_code_type(c.type()).return_type().id() == ID_constructor)
+    {
+      any_constructor = true;
+    }
+  }
+  return !any_constructor;
+}
+
 void cpp_typecheckt::new_temporary(
   const source_locationt &source_location,
   const typet &type,
@@ -300,4 +1603,49 @@ void cpp_typecheckt::new_temporary(
   exprt::operandst ops;
   ops.push_back(op);
   new_temporary(source_location, type, ops, temporary);
+}
+
+bool cpp_typecheckt::array_elements_have_user_constructor(
+  const typet &array_type)
+{
+  const typet *element_type = &array_type;
+  while(element_type->id() == ID_array)
+    element_type = &to_array_type(*element_type).element_type();
+  if(element_type->id() != ID_struct_tag)
+    return false;
+  const struct_typet &element_struct =
+    follow_tag(to_struct_tag_type(*element_type));
+  if(element_struct.get_bool("has_template_constructor"))
+    return true;
+  for(const auto &c : element_struct.components())
+  {
+    if(c.type().id() != ID_code || c.get_bool(ID_from_base))
+      continue;
+    const code_typet &ct = to_code_type(c.type());
+    if(ct.return_type().id() != ID_constructor)
+      continue;
+    if(ct.parameters().size() <= 1) // default constructor
+      continue;
+    if(
+      ct.parameters().size() == 2 &&
+      is_reference(ct.parameters()[1].type())) // copy/move constructor
+    {
+      continue;
+    }
+    return true;
+  }
+  return false;
+}
+
+exprt::operandst
+cpp_typecheckt::paren_init_arguments(const exprt::operandst &arguments)
+{
+  exprt::operandst result = arguments;
+  if(
+    result.size() == 1 && result.front().id() == ID_initializer_list &&
+    result.front().operands().empty())
+  {
+    result.front().set(ID_C_paren_init, true);
+  }
+  return result;
 }

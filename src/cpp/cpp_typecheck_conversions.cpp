@@ -9,8 +9,6 @@ Author:
 /// \file
 /// C++ Language Type Checking
 
-#include "cpp_typecheck.h"
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
@@ -18,10 +16,22 @@ Author:
 #include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
+#include <util/string_constant.h>
+#include <util/symbol.h>
+#include <util/symbol_table_base.h>
 
 #include <ansi-c/c_qualifiers.h>
 
+#include "cpp_convert_type.h"
+#include "cpp_exception_id.h"
+#include "cpp_sfinae_context.h"
+#include "cpp_type2name.h"
+#include "cpp_typecheck.h"
 #include "cpp_util.h"
+#include "itanium_abi_cpp_zero_initializer.h"
+
+#include <functional>
+#include <set>
 
 /// Lvalue-to-rvalue conversion
 ///
@@ -60,7 +70,7 @@ bool cpp_typecheckt::standard_conversion_lvalue_to_rvalue(
   if(expr.type().id() == ID_union && to_union_type(expr.type()).is_incomplete())
     return false;
 
-  new_expr=expr;
+  new_expr = expr;
   new_expr.remove(ID_C_lvalue);
 
   return true;
@@ -84,7 +94,7 @@ bool cpp_typecheckt::standard_conversion_array_to_pointer(
 
   index.set(ID_C_lvalue, true);
 
-  new_expr=address_of_exprt(index);
+  new_expr = address_of_exprt(index);
 
   return true;
 }
@@ -97,13 +107,41 @@ bool cpp_typecheckt::standard_conversion_array_to_pointer(
 /// \return True iff the array-to-pointer conversion is possible. The result of
 ///   the conversion is stored in 'new_expr'.
 bool cpp_typecheckt::standard_conversion_function_to_pointer(
-  const exprt &expr, exprt &new_expr) const
+  const exprt &expr,
+  exprt &new_expr) const
 {
   if(!expr.get_bool(ID_C_lvalue))
     return false;
 
-  new_expr=address_of_exprt(expr);
+  new_expr = address_of_exprt(expr);
 
+  return true;
+}
+
+/// Whether \p a and \p b, which operator== already found equal, also
+/// agree in the \#c_type comment of every subtree.  operator== ignores
+/// comments, but \#c_type tells distinct fundamental types of the same
+/// representation apart (int and a 32-bit long, char and signed char, char8_t
+/// and unsigned char; N5008 [basic.fundamental]), including in the parameter
+/// types of a function type: int(*)(long) is not int(*)(long long).
+static bool same_c_types(const irept &a, const irept &b)
+{
+  if(a.get(ID_C_c_type) != b.get(ID_C_c_type))
+    return false;
+  const auto &sa = a.get_sub();
+  const auto &sb = b.get_sub();
+  if(sa.size() != sb.size())
+    return false;
+  for(std::size_t i = 0; i < sa.size(); ++i)
+    if(!same_c_types(sa[i], sb[i]))
+      return false;
+  for(const auto &named : a.get_named_sub())
+  {
+    if(irept::is_comment(named.first))
+      continue;
+    if(!same_c_types(named.second, b.find(named.first)))
+      return false;
+  }
   return true;
 }
 
@@ -117,32 +155,42 @@ bool cpp_typecheckt::standard_conversion_qualification(
   const typet &type,
   exprt &new_expr) const
 {
-  if(expr.type().id()!=ID_pointer ||
-     is_reference(expr.type()))
+  if(expr.type().id() != ID_pointer || is_reference(expr.type()))
     return false;
 
   if(expr.get_bool(ID_C_lvalue))
     return false;
 
-  if(expr.type()!=type)
+  if(expr.type() != type)
     return false;
 
   typet sub_from = to_pointer_type(expr.type()).base_type();
   typet sub_to = to_pointer_type(type).base_type();
-  bool const_to=true;
+  bool const_to = true;
 
-  while(sub_from.id()==ID_pointer)
+  // N5008 [conv.qual]/1-3 is about cv-qualifiers (const, volatile);
+  // `restrict' is a GNU extension ([basic.type.qualifier] has no such
+  // qualifier) that GCC and Clang do not weigh in a qualification
+  // conversion: `char **' converts to `char *__restrict *' (glibc's
+  // `strtod(const char *__restrict, char **__restrict)', `mbsrtowcs' --
+  // every libc++ locale body calling them failed "found no match").
+  const auto ignore_restrict = [](c_qualifierst &q)
+  { q.is_restricted = false; };
+
+  while(sub_from.id() == ID_pointer)
   {
     c_qualifierst qual_from(sub_from);
     c_qualifierst qual_to(sub_to);
+    ignore_restrict(qual_from);
+    ignore_restrict(qual_to);
 
     if(!qual_to.is_constant)
-      const_to=false;
+      const_to = false;
 
     if(qual_from.is_constant && !qual_to.is_constant)
       return false;
 
-    if(qual_from!=qual_to && !const_to)
+    if(qual_from != qual_to && !const_to)
       return false;
 
     typet tmp1 = to_pointer_type(sub_from).base_type();
@@ -152,13 +200,21 @@ bool cpp_typecheckt::standard_conversion_qualification(
     sub_to.swap(tmp2);
   }
 
+  // [conv.qual]/3 requires similar types; operator== above ignores the
+  // #c_type comment, which distinguishes char8_t from an unsigned char
+  // (aarch64), and char from signed char
+  if(!same_c_types(sub_from, sub_to))
+    return false;
+
   c_qualifierst qual_from(sub_from);
   c_qualifierst qual_to(sub_to);
+  ignore_restrict(qual_from);
+  ignore_restrict(qual_to);
 
   if(qual_from.is_subset_of(qual_to))
   {
-    new_expr=expr;
-    new_expr.type()=type;
+    new_expr = expr;
+    new_expr.type() = type;
     return true;
   }
 
@@ -200,21 +256,60 @@ bool cpp_typecheckt::standard_conversion_integral_promotion(
   c_qualifierst qual_from;
   qual_from.read(expr.type());
 
-  typet int_type=signed_int_type();
+  typet int_type = signed_int_type();
   qual_from.write(int_type);
 
-  if(expr.type().id()==ID_signedbv)
+  // N5008 [conv.prom]/2: a prvalue of type char8_t, char16_t, char32_t or
+  // wchar_t converts to the first of int, unsigned int, long, unsigned
+  // long, long long, unsigned long long that can represent all the values
+  // of its underlying type -- also when that is as wide as int: a char32_t
+  // (32-bit unsigned) promotes to unsigned int, a 32-bit wchar_t to int.
+  // These were not promoted at all, so `f(c)' for a char32_t c against
+  // f(int) / f(unsigned) / f(long) ... overloads (mp_integer's
+  // constructors) found no best candidate (CBMC's own
+  // convert_character_literal.cpp, dog-fooding).
   {
-    std::size_t width=to_signedbv_type(expr.type()).get_width();
+    const irep_idt &c_type = expr.type().get(ID_C_c_type);
+    if(
+      (c_type == ID_char8_t || c_type == ID_char16_t || c_type == ID_char32_t ||
+       c_type == ID_wchar_t) &&
+      (expr.type().id() == ID_signedbv || expr.type().id() == ID_unsignedbv))
+    {
+      const std::size_t width = to_bitvector_type(expr.type()).get_width();
+      const bool is_unsigned = expr.type().id() == ID_unsignedbv;
+      typet target;
+      if(
+        width < config.ansi_c.int_width ||
+        (!is_unsigned && width == config.ansi_c.int_width))
+        target = signed_int_type();
+      else if(width == config.ansi_c.int_width)
+        target = unsigned_int_type();
+      else if(
+        width < config.ansi_c.long_int_width ||
+        (!is_unsigned && width == config.ansi_c.long_int_width))
+        target = signed_long_int_type();
+      else if(width == config.ansi_c.long_int_width)
+        target = unsigned_long_int_type();
+      else
+        return false;
+      qual_from.write(target);
+      new_expr = typecast_exprt(expr, target);
+      return true;
+    }
+  }
+
+  if(expr.type().id() == ID_signedbv)
+  {
+    std::size_t width = to_signedbv_type(expr.type()).get_width();
     if(width >= config.ansi_c.int_width)
       return false;
     new_expr = typecast_exprt(expr, int_type);
     return true;
   }
 
-  if(expr.type().id()==ID_unsignedbv)
+  if(expr.type().id() == ID_unsignedbv)
   {
-    std::size_t width=to_unsignedbv_type(expr.type()).get_width();
+    std::size_t width = to_unsignedbv_type(expr.type()).get_width();
     if(width >= config.ansi_c.int_width)
       return false;
     new_expr = typecast_exprt(expr, int_type);
@@ -227,7 +322,7 @@ bool cpp_typecheckt::standard_conversion_integral_promotion(
     return true;
   }
 
-  if(expr.type().id()==ID_c_enum_tag)
+  if(expr.type().id() == ID_c_enum_tag)
   {
     new_expr = typecast_exprt(expr, int_type);
     return true;
@@ -252,12 +347,12 @@ bool cpp_typecheckt::standard_conversion_floating_point_promotion(
 
   // we only do that with 'float',
   // not with 'double' or 'long double'
-  if(expr.type()!=float_type())
+  if(expr.type() != float_type())
     return false;
 
-  std::size_t width=to_floatbv_type(expr.type()).get_width();
+  std::size_t width = to_floatbv_type(expr.type()).get_width();
 
-  if(width!=config.ansi_c.single_width)
+  if(width != config.ansi_c.single_width)
     return false;
 
   c_qualifierst qual_from;
@@ -302,9 +397,8 @@ bool cpp_typecheckt::standard_conversion_integral_conversion(
   const typet &type,
   exprt &new_expr) const
 {
-  if(type.id()!=ID_signedbv &&
-     type.id()!=ID_unsignedbv)
-      return false;
+  if(type.id() != ID_signedbv && type.id() != ID_unsignedbv)
+    return false;
 
   if(
     expr.type().id() != ID_signedbv && expr.type().id() != ID_unsignedbv &&
@@ -352,19 +446,16 @@ bool cpp_typecheckt::standard_conversion_floating_integral_conversion(
   if(expr.get_bool(ID_C_lvalue))
     return false;
 
-  if(expr.type().id()==ID_floatbv ||
-     expr.type().id()==ID_fixedbv)
+  if(expr.type().id() == ID_floatbv || expr.type().id() == ID_fixedbv)
   {
-    if(type.id()!=ID_signedbv &&
-       type.id()!=ID_unsignedbv)
+    if(type.id() != ID_signedbv && type.id() != ID_unsignedbv)
       return false;
   }
-  else if(expr.type().id()==ID_signedbv ||
-          expr.type().id()==ID_unsignedbv ||
-          expr.type().id()==ID_c_enum_tag)
+  else if(
+    expr.type().id() == ID_signedbv || expr.type().id() == ID_unsignedbv ||
+    expr.type().id() == ID_c_enum_tag)
   {
-    if(type.id()!=ID_fixedbv &&
-       type.id()!=ID_floatbv)
+    if(type.id() != ID_fixedbv && type.id() != ID_floatbv)
       return false;
   }
   else
@@ -377,7 +468,6 @@ bool cpp_typecheckt::standard_conversion_floating_integral_conversion(
 
   return true;
 }
-
 
 /// Floating-point conversion
 ///
@@ -400,13 +490,11 @@ bool cpp_typecheckt::standard_conversion_floating_point_conversion(
   const typet &type,
   exprt &new_expr) const
 {
-  if(expr.type().id()!=ID_floatbv &&
-     expr.type().id()!=ID_fixedbv)
+  if(expr.type().id() != ID_floatbv && expr.type().id() != ID_fixedbv)
     return false;
 
-  if(type.id()!=ID_floatbv &&
-     type.id()!=ID_fixedbv)
-      return false;
+  if(type.id() != ID_floatbv && type.id() != ID_fixedbv)
+    return false;
 
   if(expr.get_bool(ID_C_lvalue))
     return false;
@@ -457,8 +545,7 @@ bool cpp_typecheckt::standard_conversion_pointer(
   const typet &type,
   exprt &new_expr)
 {
-  if(type.id()!=ID_pointer ||
-     is_reference(type))
+  if(type.id() != ID_pointer || is_reference(type))
     return false;
 
   if(expr.get_bool(ID_C_lvalue))
@@ -467,9 +554,16 @@ bool cpp_typecheckt::standard_conversion_pointer(
   // integer 0 to NULL pointer conversion?
   if(simplify_expr(expr, *this) == 0 && expr.type().id() != ID_pointer)
   {
-    new_expr=expr;
+    // N5008 [conv.mem]/1: to the null member pointer value for a pointer to
+    // data member (see null_pointer_to_data_member)
+    if(is_pointer_to_data_member_type(type))
+    {
+      new_expr = null_pointer_to_data_member(type);
+      return true;
+    }
+    new_expr = expr;
     new_expr.set(ID_value, ID_NULL);
-    new_expr.type()=type;
+    new_expr.type() = type;
     return true;
   }
 
@@ -488,11 +582,11 @@ bool cpp_typecheckt::standard_conversion_pointer(
   const typet &sub_to = pointer_type.base_type();
 
   // std::nullptr_t to _any_ pointer type
-  if(sub_from.id()==ID_nullptr)
+  if(sub_from.id() == ID_nullptr)
     return true;
 
   // anything but function pointer to void *
-  if(sub_from.id()!=ID_code && sub_to.id()==ID_empty)
+  if(sub_from.id() != ID_code && sub_to.id() == ID_empty)
   {
     c_qualifierst qual_from;
     qual_from.read(to_pointer_type(expr.type()).base_type());
@@ -504,13 +598,22 @@ bool cpp_typecheckt::standard_conversion_pointer(
   // struct * to struct *
   if(sub_from.id() == ID_struct_tag && sub_to.id() == ID_struct_tag)
   {
+    // N5008 [temp.inst]/2 (Note 2): a conversion between pointers to class
+    // types depends on the inheritance relationship, so it implicitly
+    // instantiates the class template specializations involved -- which a
+    // member typedef `typedef node<V> *link_type;' did not do
+    // ([temp.inst]/1: forming the pointer type does not require it).
+    elaborate_class_template(sub_from);
+    elaborate_class_template(sub_to);
     const struct_typet &from_struct = follow_tag(to_struct_tag_type(sub_from));
     const struct_typet &to_struct = follow_tag(to_struct_tag_type(sub_to));
-    if(subtype_typecast(from_struct, to_struct))
+    if(
+      subtype_typecast(from_struct, to_struct) &&
+      base_publicly_accessible(from_struct, to_struct))
     {
       c_qualifierst qual_from;
       qual_from.read(to_pointer_type(expr.type()).base_type());
-      new_expr=expr;
+      new_expr = expr;
       make_ptr_typecast(new_expr, pointer_type);
       qual_from.write(to_pointer_type(new_expr.type()).base_type());
       return true;
@@ -576,13 +679,13 @@ bool cpp_typecheckt::standard_conversion_pointer_to_member(
     {
       code_typet code1 = to_code_type(to_pointer_type(expr.type()).base_type());
       DATA_INVARIANT(!code1.parameters().empty(), "must have parameters");
-      code_typet::parametert this1=code1.parameters()[0];
+      code_typet::parametert this1 = code1.parameters()[0];
       INVARIANT(this1.get_this(), "first parameter should be `this'");
       code1.parameters().erase(code1.parameters().begin());
 
       code_typet code2 = to_code_type(to_pointer_type(type).base_type());
       DATA_INVARIANT(!code2.parameters().empty(), "must have parameters");
-      code_typet::parametert this2=code2.parameters()[0];
+      code_typet::parametert this2 = code2.parameters()[0];
       INVARIANT(this2.get_this(), "first parameter should be `this'");
       code2.parameters().erase(code2.parameters().begin());
 
@@ -592,7 +695,7 @@ bool cpp_typecheckt::standard_conversion_pointer_to_member(
         return false;
 
       // give a second chance ignoring `this'
-      if(code1!=code2)
+      if(code1 != code2)
         return false;
     }
     else
@@ -604,7 +707,9 @@ bool cpp_typecheckt::standard_conversion_pointer_to_member(
 
   if(expr.is_constant() && to_constant_expr(expr).is_null_pointer())
   {
-    new_expr = typecast_exprt::conditional_cast(expr, type);
+    new_expr = is_pointer_to_data_member_type(type)
+                 ? null_pointer_to_data_member(type)
+                 : typecast_exprt::conditional_cast(expr, type);
     return true;
   }
 
@@ -616,11 +721,52 @@ bool cpp_typecheckt::standard_conversion_pointer_to_member(
 
   if(subtype_typecast(to_struct, from_struct))
   {
+    // N5008 [conv.mem]/2: the result refers to the member in D's instance
+    // of B.  A pointer to DATA member is the member's offset in B (see
+    // typecheck_expr_address_of); in D it is offset by the B subobject's
+    // offset, the null member pointer value staying null.
+    if(to_pointer_type(type).base_type().id() != ID_code)
+    {
+      const auto base_offset = base_subobject_offset(
+        static_cast<const typet &>(type.find(ID_to_member)),
+        static_cast<const typet &>(expr.type().find(ID_to_member)));
+      if(!base_offset.has_value())
+        return false;
+      if(*base_offset != 0)
+      {
+        const exprt value = typecast_exprt{expr, signed_size_type()};
+        const exprt shifted =
+          plus_exprt{value, from_integer(*base_offset, signed_size_type())};
+        const exprt null = typecast_exprt{
+          null_pointer_to_data_member(expr.type()), signed_size_type()};
+        new_expr = typecast_exprt{
+          if_exprt{equal_exprt{value, null}, null, shifted}, type};
+        return true;
+      }
+    }
     new_expr = typecast_exprt::conditional_cast(expr, type);
     return true;
   }
 
   return false;
+}
+
+/// The offset of the (non-virtual) \p base subobject within an object of
+/// class \p derived; empty if it cannot be determined, or if \p base is an
+/// ambiguous or virtual base ([conv.mem]/2 forbids both).
+std::optional<mp_integer>
+cpp_typecheckt::base_subobject_offset(const typet &derived, const typet &base)
+{
+  if(derived.id() != ID_struct_tag || base.id() != ID_struct_tag)
+    return {};
+  const auto subobjects = base_subobjects(
+    follow_tag(to_struct_tag_type(derived)),
+    to_struct_tag_type(base).get_identifier());
+  if(subobjects.empty())
+    return mp_integer{0}; // an empty base shares its address
+  if(subobjects.size() > 1 || !subobjects.front().virtual_base.empty())
+    return {};
+  return subobjects.front().offset;
 }
 
 /// Boolean conversion
@@ -633,7 +779,8 @@ bool cpp_typecheckt::standard_conversion_pointer_to_member(
 /// \return True iff the boolean conversion is possible. The result of the
 ///   conversion is stored in 'new_expr'.
 bool cpp_typecheckt::standard_conversion_boolean(
-  const exprt &expr, exprt &new_expr) const
+  const exprt &expr,
+  exprt &new_expr) const
 {
   if(expr.get_bool(ID_C_lvalue))
     return false;
@@ -651,6 +798,16 @@ bool cpp_typecheckt::standard_conversion_boolean(
 
   typet Bool = c_bool_type();
   qual_from.write(Bool);
+
+  // N5008 [conv.bool]/1: the null member pointer value converts to false;
+  // for a pointer to data member that is null_pointer_to_data_member, -1
+  // in the exact Itanium C++ ABI encoding
+  if(is_pointer_to_data_member_type(expr.type()))
+  {
+    new_expr = typecast_exprt{
+      notequal_exprt{expr, null_pointer_to_data_member(expr.type())}, Bool};
+    return true;
+  }
 
   new_expr = typecast_exprt::conditional_cast(expr, Bool);
   return true;
@@ -682,30 +839,55 @@ bool cpp_typecheckt::standard_conversion_sequence(
   exprt &new_expr,
   unsigned &rank)
 {
+  // whether a pointer conversion ([conv.ptr]) is part of the sequence
+  bool pointer_converted = false;
+
   PRECONDITION(!is_reference(expr.type()) && !is_reference(type));
 
-  exprt curr_expr=expr;
+  exprt curr_expr = expr;
 
   // bit fields are converted like their underlying type
-  if(type.id()==ID_c_bit_field)
+  if(type.id() == ID_c_bit_field)
     return standard_conversion_sequence(
       expr, to_c_bit_field_type(type).underlying_type(), new_expr, rank);
 
   // we turn bit fields into their underlying type
-  if(curr_expr.type().id()==ID_c_bit_field)
+  if(curr_expr.type().id() == ID_c_bit_field)
     curr_expr = typecast_exprt(
       curr_expr, to_c_bit_field_type(curr_expr.type()).underlying_type());
 
-  if(curr_expr.type().id()==ID_array)
+  // N5008 [conv.general]/1.1: the first conversion of a standard
+  // conversion sequence may be array-to-pointer whatever the target type;
+  // a later step then converts the pointer, e.g. the boolean conversion of
+  // `!"literal"' ([expr.unary.op]/9, [conv.bool]).  Only an array target
+  // keeps the array.
+  if(curr_expr.type().id() == ID_array)
   {
-    if(type.id()==ID_pointer)
+    if(type.id() != ID_array)
     {
       if(!standard_conversion_array_to_pointer(curr_expr, new_expr))
         return false;
+
+      // C++03 [conv.array]/2: a string literal (`const char[n]', N5008
+      // [lex.string]/6) converts to `char *'.  N5008 dropped this, but
+      // GCC and clang still accept `char *p = "...";' with a warning, so
+      // we do too -- ranked below every standard conversion (a `const
+      // char *' candidate must always beat it).
+      if(expr.id() == ID_string_constant && type.id() == ID_pointer)
+      {
+        typet from_base = to_pointer_type(new_expr.type()).base_type();
+        from_base.remove(ID_C_constant);
+        const typet &to_base = to_pointer_type(type).base_type();
+        if(!to_base.get_bool(ID_C_constant) && to_base == from_base)
+        {
+          new_expr = typecast_exprt{new_expr, type};
+          rank += 4;
+          return true;
+        }
+      }
     }
   }
-  else if(curr_expr.type().id()==ID_code &&
-          type.id()==ID_pointer)
+  else if(curr_expr.type().id() == ID_code && type.id() == ID_pointer)
   {
     if(!standard_conversion_function_to_pointer(curr_expr, new_expr))
       return false;
@@ -716,7 +898,7 @@ bool cpp_typecheckt::standard_conversion_sequence(
       return false;
   }
   else
-    new_expr=curr_expr;
+    new_expr = curr_expr;
 
   curr_expr.swap(new_expr);
 
@@ -738,39 +920,45 @@ bool cpp_typecheckt::standard_conversion_sequence(
     }
   }
 
-  // need to consider #c_type
-  if(
-    curr_expr.type() != type ||
-    curr_expr.type().get(ID_C_c_type) != type.get(ID_C_c_type))
+  // need to consider #c_type, also below the top level (pointers to
+  // functions whose parameter types differ only in it)
+  if(curr_expr.type() != type || !same_c_types(curr_expr.type(), type))
   {
     if(
       type.id() == ID_signedbv || type.id() == ID_unsignedbv ||
       type.id() == ID_c_enum_tag)
     {
-      if(!standard_conversion_integral_promotion(curr_expr, new_expr) ||
-         new_expr.type() != type)
+      // [conv.prom]: the promoted type must be the target type itself, not
+      // merely of the same representation (int vs. a 32-bit long)
+      if(
+        !standard_conversion_integral_promotion(curr_expr, new_expr) ||
+        new_expr.type() != type ||
+        new_expr.type().get(ID_C_c_type) != type.get(ID_C_c_type))
       {
         if(!standard_conversion_integral_conversion(curr_expr, type, new_expr))
         {
           if(!standard_conversion_floating_integral_conversion(
-              curr_expr, type, new_expr))
+               curr_expr, type, new_expr))
             return false;
         }
 
-        rank+=3;
+        rank += 3;
       }
       else
-        rank+=2;
+        rank += 2;
     }
-    else if(type.id()==ID_floatbv || type.id()==ID_fixedbv)
+    else if(type.id() == ID_floatbv || type.id() == ID_fixedbv)
     {
-      if(!standard_conversion_floating_point_promotion(curr_expr, new_expr) ||
-         new_expr.type() != type)
+      if(
+        !standard_conversion_floating_point_promotion(curr_expr, new_expr) ||
+        new_expr.type() != type ||
+        new_expr.type().get(ID_C_c_type) != type.get(ID_C_c_type))
       {
-        if(!standard_conversion_floating_point_conversion(
+        if(
+          !standard_conversion_floating_point_conversion(
             curr_expr, type, new_expr) &&
-           !standard_conversion_floating_integral_conversion(
-             curr_expr, type, new_expr))
+          !standard_conversion_floating_integral_conversion(
+            curr_expr, type, new_expr))
           return false;
 
         rank += 3;
@@ -778,14 +966,18 @@ bool cpp_typecheckt::standard_conversion_sequence(
       else
         rank += 2;
     }
-    else if(type.id()==ID_pointer)
+    else if(type.id() == ID_pointer)
     {
       if(
         expr.type().id() == ID_pointer &&
         to_pointer_type(expr.type()).base_type().id() == ID_nullptr)
       {
-        // std::nullptr_t to _any_ pointer type is ok
-        new_expr = typecast_exprt::conditional_cast(new_expr, type);
+        // std::nullptr_t to _any_ pointer type is ok; [conv.mem]/1 for a
+        // pointer to data member: the null member pointer value
+        if(is_pointer_to_data_member_type(type))
+          new_expr = null_pointer_to_data_member(type);
+        else
+          new_expr = typecast_exprt::conditional_cast(new_expr, type);
       }
       else if(!standard_conversion_pointer(curr_expr, type, new_expr))
       {
@@ -794,6 +986,7 @@ bool cpp_typecheckt::standard_conversion_sequence(
       }
 
       rank += 3;
+      pointer_converted = true;
     }
     else if(type.id() == ID_c_bool)
     {
@@ -804,22 +997,48 @@ bool cpp_typecheckt::standard_conversion_sequence(
     }
     else if(type.id() == ID_bool)
     {
-      new_expr = is_not_zero(curr_expr, *this);
+      if(
+        curr_expr.type().id() == ID_signedbv ||
+        curr_expr.type().id() == ID_unsignedbv ||
+        curr_expr.type().id() == ID_floatbv ||
+        curr_expr.type().id() == ID_fixedbv ||
+        curr_expr.type().id() == ID_pointer ||
+        curr_expr.type().id() == ID_c_bool ||
+        curr_expr.type().id() == ID_c_enum_tag)
+      {
+        // N5008 [conv.bool]/1: the null member pointer value converts to
+        // false -- null_pointer_to_data_member for a pointer to data member
+        if(is_pointer_to_data_member_type(curr_expr.type()))
+        {
+          new_expr = notequal_exprt{
+            curr_expr, null_pointer_to_data_member(curr_expr.type())};
+        }
+        else
+          new_expr = is_not_zero(curr_expr, *this);
+      }
+      else
+        return false;
 
-      rank += 3;
+      // C++'s `bool' (c_bool) and the front end's internal boolean type
+      // are the same language type: an identity conversion.  Anything else
+      // is a boolean conversion ([conv.bool], Conversion rank), so that
+      // `explicit operator bool()' beats `explicit operator int()' for a
+      // contextual conversion to bool ([over.match.best]).
+      if(curr_expr.type().id() != ID_c_bool)
+        rank += 3;
     }
     else
       return false;
   }
   else
-    new_expr=curr_expr;
+    new_expr = curr_expr;
 
   curr_expr.swap(new_expr);
 
-  if(curr_expr.type().id()==ID_pointer)
+  if(curr_expr.type().id() == ID_pointer)
   {
-    typet sub_from=curr_expr.type();
-    typet sub_to=type;
+    typet sub_from = curr_expr.type();
+    typet sub_to = type;
 
     do
     {
@@ -834,23 +1053,1438 @@ bool cpp_typecheckt::standard_conversion_sequence(
       c_qualifierst qual_to;
       qual_to.read(sub_to);
 
-      if(qual_from!=qual_to)
+      if(qual_from != qual_to)
       {
-        rank+=1;
+        // N5008 [over.ics.scs]/3: a qualification adjustment following a
+        // pointer conversion is part of that Conversion.  The extra rank step
+        // orders `Derived * -> Base *' before `-> const Base *'
+        // ([over.ics.rank]/3.2.5) and is kept for that; for a conversion to
+        // `cv void *' it made `int * -> const void *' worse than the boolean
+        // conversion, which [over.ics.rank]/4.1 makes worse -- there the
+        // qualification is a tie-breaker of cpp_typecheck_fargst::match.
+        if(!pointer_converted || sub_to.id() != ID_empty)
+          rank += 1;
         break;
       }
-    }
-    while(sub_from.id()==ID_pointer);
+    } while(sub_from.id() == ID_pointer);
 
     if(!standard_conversion_qualification(curr_expr, type, new_expr))
       return false;
   }
   else
   {
-    new_expr=curr_expr;
-    new_expr.type()=type;
+    new_expr = curr_expr;
+    new_expr.type() = type;
   }
 
+  return true;
+}
+
+/// Phase 4B: per [temp.deduct.conv]/1, deduce template arguments
+/// for a conversion-function template by unifying the template's
+/// return type (P) with the destination type (A).
+///
+/// Called from `user_defined_conversion_sequence` for the case where
+/// the source class has a `has_template_conversion_operator` flag
+/// (set by `typecheck_compound_body` in
+/// `cpp_typecheck_compound_type.cpp`).  Iterates template cast
+/// operators of the source class, runs SFINAE-guarded deduction per
+/// [temp.deduct]/8, applies [temp.deduct.partial]/3.2 partial
+/// ordering to disambiguate when multiple specialisations would
+/// be viable for the same destination type, instantiates the
+/// most-specialised (or unique) match, then builds the same kind
+/// of member-function call expression as the non-template path.
+///
+/// Per [over.ics.user]/3 the second standard conversion sequence
+/// after the user-defined conversion shall have Exact Match rank,
+/// which is enforced here by requiring the post-deduction standard
+/// conversion to add zero rank.
+///
+/// Returns `true` on a successful unambiguous deduction (after
+/// partial ordering), with `new_expr` set to the typechecked
+/// conversion expression and `rank` incremented by the second
+/// standard conversion's rank.  Returns `false` if no candidate is
+/// found, deduction fails for every candidate, or partial ordering
+/// cannot pick a unique most-specialised candidate (genuine
+/// ambiguity).
+namespace
+{
+/// Result of [temp.deduct.conv]/1 deduction for a single template
+/// cast operator candidate.  Used in two phases: first a deduction-
+/// only collection pass, then partial ordering across the survivors,
+/// then instantiation of the unique winner.
+struct conversion_deduction_resultt
+{
+  /// The template symbol that survived deduction.
+  const symbolt *cand_sym;
+  /// The deduced specialisation arguments.
+  cpp_template_args_tct guessed_args;
+  /// The candidate's return-type pattern (P), already with
+  /// [temp.deduct.conv]/2 reference-stripping applied so it can be
+  /// compared via [temp.deduct.partial]/5 + /7.
+  typet P_for_partial_ordering;
+};
+} // namespace
+
+/// [temp.deduct.partial]/3.2: in conversion-function context, the
+/// types used for partial ordering are the return types of the two
+/// conversion function templates.  Returns `true` if F is at-least-
+/// as-specialised as G under this rule.
+///
+/// Per [temp.deduct.partial]/2 + /8: deduction uses F's *transformed*
+/// type as the argument (A) and G's *original* type as the parameter
+/// (P).  If deduction of G's template parameters succeeds against
+/// F's transformed pattern, then F's type is at-least-as-specialised
+/// as G's type.  In CBMC, since template parameters carry their
+/// containing scope's prefix in their identifier, F's and G's
+/// parameters never collide in `template_map`, so the
+/// "transformation" reduces to "treat F's parameters as concrete
+/// inert types, deduce G's parameters only".
+///
+/// /5 (drop reference) and /7 (drop top-level cv) are applied to
+/// both P and A before the deduction.
+bool cpp_typecheckt::conversion_template_at_least_as_specialised(
+  const cpp_declarationt &F,
+  const cpp_declarationt &G,
+  const irep_idt &F_scope_id,
+  const irep_idt &G_scope_id)
+{
+  if(F.declarators().empty() || G.declarators().empty())
+    return false;
+  const cpp_declaratort &F_dcl = F.declarators()[0];
+  const cpp_declaratort &G_dcl = G.declarators()[0];
+  if(F_dcl.name().get_sub().size() < 2 || G_dcl.name().get_sub().size() < 2)
+    return false;
+
+  // Per /2 + /8: A = F's transformed, P = G's original; the
+  // deduction binds G's parameters.  In CBMC's representation we
+  // can use the original return types directly because F's and G's
+  // parameter symbols are disjoint (different scope prefixes).
+  typet A = static_cast<const typet &>(F_dcl.name().get_sub()[1]);
+  typet P = static_cast<const typet &>(G_dcl.name().get_sub()[1]);
+
+  // [temp.deduct.partial]/5: drop reference on both.  Handle both
+  // post-typecheck (ID_pointer + ID_C_reference) and pre-typecheck
+  // (ID_frontend_pointer + ID_C_reference) representations.
+  auto strip_top_reference = [](typet &t)
+  {
+    if(
+      (t.id() == ID_pointer || t.id() == ID_frontend_pointer) &&
+      t.get_bool(ID_C_reference))
+    {
+      t = static_cast<const typet &>(to_type_with_subtype(t).subtype());
+    }
+  };
+  strip_top_reference(P);
+  strip_top_reference(A);
+
+  // [temp.deduct.partial]/7: drop top-level cv on both.
+  auto drop_top_cv = [](typet &t)
+  {
+    c_qualifierst q;
+    q.read(t);
+    if(q.is_constant || q.is_volatile || q.is_restricted || q.is_atomic)
+    {
+      c_qualifierst empty;
+      empty.write(t);
+    }
+  };
+  drop_top_cv(P);
+  drop_top_cv(A);
+
+  cpp_save_scopet save_scope{cpp_scopes};
+  cpp_saved_template_mapt saved_map{template_map};
+
+  try
+  {
+    sfinae_contextt sfinae_guard{*this};
+    template_map.clear();
+    // Mark only G's parameters as deducible — that's whose pattern
+    // sits in P.  F's parameters appear in A but are not in
+    // template_map, so the deduction treats them as concrete
+    // (the "transformed type" trick).
+    template_map.build_unassigned(G.template_type());
+
+    // Move into G's template scope so cpp_name lookup of G's
+    // parameters during deduction resolves correctly.
+    auto scope_it = cpp_scopes.id_map.find(G_scope_id);
+    if(scope_it != cpp_scopes.id_map.end())
+      cpp_scopes.go_to(static_cast<cpp_scopet &>(*scope_it->second));
+
+    cpp_typecheck_resolvet resolver{*this};
+    resolver.guess_template_args(P, A);
+
+    cpp_template_args_tct guessed =
+      template_map.build_template_args(G.template_type());
+    return !guessed.has_unassigned();
+  }
+  catch(...)
+  {
+    return false;
+  }
+
+  (void)F_scope_id; // currently unused; reserved for future
+                    // synthetic-type substitution into F's pattern.
+}
+
+/// N5008 [temp.func.order] + [temp.deduct.partial]/3.1: is function template
+/// F at-least-as-specialised as G?  The types used for partial ordering are
+/// the function parameter-type-lists.  Per /2 + /8, A = F's transformed
+/// parameter types, P = G's parameter types, and the deduction binds G's
+/// template parameters.  As in the conversion-operator case, F's and G's
+/// template parameters are disjoint (different scope prefixes), so F's
+/// parameters can be used directly as inert "transformed" types and we only
+/// mark G's parameters deducible.  /5 (drop reference) and /7 (drop
+/// top-level cv) are applied to each P/A pair.
+bool cpp_typecheckt::function_template_at_least_as_specialised(
+  const cpp_declarationt &F,
+  const cpp_declarationt &G,
+  const irep_idt &F_scope_id,
+  const irep_idt &G_scope_id)
+{
+  if(F.declarators().empty() || G.declarators().empty())
+    return false;
+
+  // [temp.deduct.partial]/3.1: use the function parameter-type-lists.
+  typet F_ft = F.declarators().front().merge_type(F.type());
+  typet G_ft = G.declarators().front().merge_type(G.type());
+  // merge_type yields a frontend ID_function_type; convert to a proper
+  // code type so the parameter list and (frontend) pointer/reference forms
+  // are in the shape guess_template_args and the strippers expect.  This is
+  // a structural conversion only; template-parameter cpp_names are left
+  // unresolved (resolved per-pair below under G's scope).
+  cpp_convert_plain_type(F_ft, get_message_handler());
+  cpp_convert_plain_type(G_ft, get_message_handler());
+  if(F_ft.id() != ID_code || G_ft.id() != ID_code)
+    return false;
+  const code_typet::parameterst &F_params = to_code_type(F_ft).parameters();
+  const code_typet::parameterst &G_params = to_code_type(G_ft).parameters();
+
+  // N5008 [temp.deduct.partial]/8, /11: a function parameter pack of G
+  // (`Args &&...') deduces from every remaining parameter of F, while a
+  // pack of F matches no non-pack parameter of G.  Handle the case of a G
+  // whose whole parameter-type-list is one pack of a forwarding reference
+  // or a plain type parameter -- libc++'s fall-back `__nat
+  // __invoke(_Args&&...)' against `__invoke(_Fp&&, _Args&&...)': every F is
+  // at least as specialized as it, and it as no F with a non-pack
+  // parameter.
+  const auto is_pack = [](const code_typet::parametert &p)
+  { return p.get_bool(ID_ellipsis) || p.type().get_bool(ID_ellipsis); };
+  const auto only_pack = [&](const code_typet::parameterst &ps)
+  { return ps.size() == 1 && is_pack(ps.front()); };
+  if(F_params.size() != G_params.size() || F_params.empty())
+  {
+    if(only_pack(G_params) && !only_pack(F_params))
+      return true;
+    // Partial ordering across other differing arities (default arguments,
+    // packs in other positions) is out of scope here; such candidates are
+    // left to the other tie-breakers / reported as ambiguous, never wrongly
+    // ordered.
+    return false;
+  }
+
+  auto strip_top_reference = [](typet &t)
+  {
+    if(
+      (t.id() == ID_pointer || t.id() == ID_frontend_pointer) &&
+      t.get_bool(ID_C_reference))
+      t = static_cast<const typet &>(to_type_with_subtype(t).subtype());
+  };
+  auto drop_top_cv = [](typet &t)
+  {
+    // a declaration-level `const T' is still a merged_type of the
+    // qualifier and the name ([temp.deduct.partial]/7 drops it as well)
+    if(t.id() == ID_merged_type)
+    {
+      std::vector<typet> rest;
+      for(const auto &sub : to_type_with_subtypes(t).subtypes())
+      {
+        if(sub.id() != ID_const && sub.id() != ID_volatile)
+          rest.push_back(sub);
+      }
+      if(rest.size() == 1)
+      {
+        typet only = rest.front();
+        t = std::move(only);
+      }
+    }
+    c_qualifierst q;
+    q.read(t);
+    if(q.is_constant || q.is_volatile || q.is_restricted || q.is_atomic)
+    {
+      c_qualifierst empty;
+      empty.write(t);
+    }
+  };
+
+  cpp_save_scopet save_scope{cpp_scopes};
+  cpp_saved_template_mapt saved_map{template_map};
+
+  try
+  {
+    sfinae_contextt sfinae_guard{*this};
+    template_map.clear();
+    // Mark only G's parameters as deducible -- that's whose pattern sits in
+    // P.  F's parameters appear in A but are not in template_map, so the
+    // deduction treats them as concrete (the "transformed type" device).
+    template_map.build_unassigned(G.template_type());
+
+    auto scope_it = cpp_scopes.id_map.find(G_scope_id);
+    if(scope_it != cpp_scopes.id_map.end())
+      cpp_scopes.go_to(static_cast<cpp_scopet &>(*scope_it->second));
+
+    cpp_typecheck_resolvet resolver{*this};
+    // N5008 [temp.deduct.partial]/5-7 remove only the TOP-LEVEL reference
+    // and cv-qualifiers (done below); beneath them the types must match
+    // exactly ([temp.deduct.type]/1), so `const T *' is not deduced from
+    // `U *': without this, f(T *) and f(const T *) were each at least as
+    // specialized as the other and the call `f(&const_int)' selected
+    // f(T *) (T = const int) instead of the more specialized f(const T *).
+    resolver.strict_cv_deduction = true;
+    const auto is_frontend_reference = [](const typet &t)
+    {
+      return (t.id() == ID_pointer || t.id() == ID_frontend_pointer) &&
+             t.get_bool(ID_C_reference);
+    };
+    // the cv-qualification of a (possibly merged) type, as a bit set:
+    // const = 1, volatile = 2
+    const auto cv_of = [](const typet &t) -> unsigned
+    {
+      unsigned cv = 0;
+      if(t.id() == ID_merged_type)
+      {
+        for(const auto &sub : to_type_with_subtypes(t).subtypes())
+        {
+          if(sub.id() == ID_const)
+            cv |= 1;
+          else if(sub.id() == ID_volatile)
+            cv |= 2;
+        }
+      }
+      if(t.get_bool(ID_C_constant))
+        cv |= 1;
+      if(t.get_bool(ID_C_volatile))
+        cv |= 2;
+      return cv;
+    };
+    for(std::size_t i = 0; i < G_params.size(); ++i)
+    {
+      typet A = F_params[i].type();
+      typet P = G_params[i].type();
+      // N5008 [temp.deduct.partial]/9: when both types were reference
+      // types and are identical after the transformations (the deduction
+      // in the other direction, P from F's type and A from G's, succeeds),
+      // the type from that deduction's PARAMETER template -- F's -- is not
+      // at least as specialized as the one from its argument template --
+      // G's -- if G's was an lvalue reference and F's is not (/9.1), or
+      // if G's is more cv-qualified than F's (/9.2).  Here P is G's type
+      // and A is F's: h(const T &) is more specialized than h(T &) (both
+      // deduce from each other), and h(T &) than h(T &&).
+      if(is_frontend_reference(P) && is_frontend_reference(A))
+      {
+        const bool p_lvalue_ref = !P.get_bool(ID_C_rvalue_reference);
+        const bool a_lvalue_ref = !A.get_bool(ID_C_rvalue_reference);
+        if(p_lvalue_ref && !a_lvalue_ref)
+          return false;
+        const unsigned p_cv = cv_of(to_type_with_subtype(P).subtype());
+        const unsigned a_cv = cv_of(to_type_with_subtype(A).subtype());
+        if((p_cv & ~a_cv) != 0)
+          return false;
+      }
+      strip_top_reference(P);
+      strip_top_reference(A);
+      drop_top_cv(P);
+      drop_top_cv(A);
+      // Put A into a fully-converted form so structural patterns (e.g.
+      // pointer types) match guess_template_args' ID_pointer branch rather
+      // than its frontend variant.
+      cpp_convert_plain_type(A, get_message_handler());
+
+      // N5008 [temp.deduct.type]/3: a P of the form TT<args> is matched
+      // only by an A that is a specialization of the same template TT.
+      // Both P and A are still unresolved cpp_names here (the compared
+      // patterns are taken from the DECLARATIONS), and matching a
+      // template-id pattern against an unrelated bare name would bind
+      // the pattern's arguments to nothing meaningful -- making
+      // deduction succeed in BOTH directions for e.g. range.h's
+      // `zip(ranget<OtherIt>)` vs `zip(containert &)` and leaving the
+      // pair unordered (reported ambiguous instead of selecting the more
+      // specialised overload).  Reject the mismatch here.
+      if(
+        P.id() == ID_cpp_name && A.id() == ID_cpp_name &&
+        !P.get_sub().empty() && !A.get_sub().empty())
+      {
+        bool p_has_args = false;
+        for(const auto &sub : P.get_sub())
+          if(sub.id() == ID_template_args)
+            p_has_args = true;
+        if(
+          p_has_args && P.get_sub().front().get(ID_identifier) !=
+                          A.get_sub().front().get(ID_identifier))
+        {
+          return false;
+        }
+        // [temp.deduct.type]/1: the deduced A must be identical to the
+        // pattern with the parameters substituted.  A non-dependent constant
+        // argument of P (`in_place_index_t<0>') therefore matches only the
+        // same constant in A, not a (transformed) template parameter of F
+        // (`in_place_index_t<_Np>'); otherwise both templates were at least
+        // as specialized as each other (libstdc++'s _Variadic_union).
+        const auto args_of = [](const typet &t) -> const irept *
+        {
+          for(const auto &sub : t.get_sub())
+            if(sub.id() == ID_template_args)
+              return &sub.find(ID_arguments);
+          return nullptr;
+        };
+        const irept *p_args = args_of(P);
+        const irept *a_args = args_of(A);
+        if(
+          p_args != nullptr && a_args != nullptr &&
+          p_args->get_sub().size() == a_args->get_sub().size())
+        {
+          for(std::size_t k = 0; k < p_args->get_sub().size(); ++k)
+          {
+            const exprt &pa = static_cast<const exprt &>(p_args->get_sub()[k]);
+            const exprt &aa = static_cast<const exprt &>(a_args->get_sub()[k]);
+            if(pa.is_constant() && !(aa.is_constant() && aa == pa))
+              return false;
+          }
+        }
+      }
+
+      resolver.guess_template_args(P, A);
+    }
+
+    cpp_template_args_tct guessed =
+      template_map.build_template_args(G.template_type());
+
+    // N5008 [temp.deduct.partial]/12: for partial ordering a template
+    // parameter of G may remain WITHOUT A VALUE provided it is not used
+    // in the types being compared.  Requiring every parameter to be
+    // deduced made any candidate pair whose templates carry a parameter
+    // absent from the parameter-type-list -- e.g. the leading defaulted
+    // non-type parameter of CBMC's own range.h
+    // `template <bool same_size = true, class C> ... zip(C &)` --
+    // unorderable in BOTH directions, so the more specialised overload
+    // never won and the call was reported ambiguous ("does not uniquely
+    // resolve").  Require values only for the parameters that actually
+    // occur in the compared types.
+    std::set<irep_idt> used_names;
+    std::function<void(const irept &)> collect_names = [&](const irept &node)
+    {
+      if(node.id() == ID_cpp_name)
+      {
+        for(const auto &sub : node.get_sub())
+          if(sub.id() == ID_name)
+            used_names.insert(sub.get(ID_identifier));
+      }
+      for(const auto &sub : node.get_sub())
+        collect_names(sub);
+      for(const auto &named : node.get_named_sub())
+        collect_names(named.second);
+    };
+    for(const auto &gp : G_params)
+      collect_names(gp.type());
+
+    const auto &g_params_decl = G.template_type().template_parameters();
+    const auto &guessed_args = guessed.arguments();
+    for(std::size_t pi = 0; pi < g_params_decl.size(); ++pi)
+    {
+      if(pi >= guessed_args.size())
+        break;
+      const exprt &arg = guessed_args[pi];
+      if(arg.id() != ID_unassigned && arg.type().id() != ID_unassigned)
+        continue;
+      const irep_idt pid = g_params_decl[pi].id() == ID_type
+                             ? g_params_decl[pi].type().get(ID_identifier)
+                             : g_params_decl[pi].get(ID_identifier);
+      std::string short_name = id2string(pid);
+      const auto sep = short_name.rfind("::");
+      if(sep != std::string::npos)
+        short_name = short_name.substr(sep + 2);
+      if(used_names.count(irep_idt{short_name}) != 0)
+        return false; // a compared-type parameter stayed undeduced
+    }
+    return true;
+  }
+  catch(...)
+  {
+    return false;
+  }
+
+  (void)F_scope_id;
+}
+
+bool cpp_typecheckt::partial_specialization_at_least_as_specialised(
+  const cpp_declarationt &F,
+  const cpp_declarationt &G,
+  const irep_idt &G_scope_id)
+{
+  const auto &F_args = F.partial_specialization_args().arguments();
+  const auto &G_args = G.partial_specialization_args().arguments();
+  if(F_args.empty() || F_args.size() != G_args.size())
+    return false;
+
+  cpp_save_scopet save_scope{cpp_scopes};
+  cpp_saved_template_mapt saved_map{template_map};
+
+  try
+  {
+    sfinae_contextt sfinae_guard{*this};
+    template_map.clear();
+    // Only G's parameters are deducible; F's appear in A with F's scope
+    // prefix and are treated as concrete ("transformed") types.
+    template_map.build_unassigned(G.template_type());
+
+    auto scope_it = cpp_scopes.id_map.find(G_scope_id);
+    if(scope_it != cpp_scopes.id_map.end())
+      cpp_scopes.go_to(static_cast<cpp_scopet &>(*scope_it->second));
+
+    cpp_typecheck_resolvet resolver{*this};
+    // [temp.deduct.type]/8: cv-qualifiers are part of the pattern -- a P
+    // of `const T*` must NOT deduce from an A of `T*`, or `T*` and
+    // `const T*` would each be at least as specialised as the other.
+    resolver.strict_cv_deduction = true;
+
+    // N5008 [temp.spec.partial.order]/1, [temp.func.order]/3: A is F's
+    // argument with each of F's template parameters replaced by a unique
+    // type.  Its names are looked up in G's scope here, so an F parameter
+    // whose name G also uses (`U' a pack in F, a type in G) stood for G's
+    // parameter; rename F's to names G cannot declare.
+    std::set<irep_idt> f_parameter_names;
+    for(const auto &param : F.template_type().template_parameters())
+    {
+      const irep_idt pid = param.id() == ID_type
+                             ? param.type().get(ID_identifier)
+                             : param.get(ID_identifier);
+      std::string short_name = id2string(pid);
+      const auto sep = short_name.rfind("::");
+      if(sep != std::string::npos)
+        short_name = short_name.substr(sep + 2);
+      if(!short_name.empty())
+        f_parameter_names.insert(short_name);
+    }
+    std::function<void(irept &)> rename_f_parameters = [&](irept &node)
+    {
+      if(node.id() == ID_cpp_name)
+      {
+        auto &subs = node.get_sub();
+        for(std::size_t k = 0; k < subs.size(); ++k)
+        {
+          if(
+            subs[k].id() == ID_name && (k == 0 || subs[k - 1].id() != "::") &&
+            f_parameter_names.count(subs[k].get(ID_identifier)) != 0)
+          {
+            subs[k].set(
+              ID_identifier,
+              "#partial_order_F::" + id2string(subs[k].get(ID_identifier)));
+          }
+        }
+      }
+      for(auto &sub : node.get_sub())
+        rename_f_parameters(sub);
+      for(auto &named : node.get_named_sub())
+        rename_f_parameters(named.second);
+    };
+
+    for(std::size_t i = 0; i < G_args.size(); ++i)
+    {
+      const exprt &fa = F_args[i];
+      const exprt &ga = G_args[i];
+      const bool f_is_type = fa.id() == ID_type || fa.id() == ID_ambiguous;
+      const bool g_is_type = ga.id() == ID_type || ga.id() == ID_ambiguous;
+      if(f_is_type != g_is_type)
+        return false;
+      // N5008 [temp.deduct.type]/9.2: during partial ordering, if A_i was
+      // originally a pack expansion and P_i is not, deduction fails --
+      // `S<T1, const Z &...>' is not at least as specialized as `S<T1,
+      // const T2 &>' (Example 4).  Without this both were, and the sorted
+      // keys preferred the pack (libstdc++ 13's views::__adaptor::_Partial,
+      // whose single-argument specialization was never chosen).
+      const auto is_pack_expansion = [](const exprt &arg)
+      {
+        return arg.get_bool(ID_ellipsis) || arg.type().get_bool(ID_ellipsis) ||
+               arg.find(ID_type).get_bool(ID_ellipsis);
+      };
+      if(is_pack_expansion(fa) && !is_pack_expansion(ga))
+        return false;
+      if(g_is_type)
+      {
+        typet A = fa.id() == ID_ambiguous
+                    ? static_cast<const typet &>(fa.find(ID_type))
+                    : fa.type();
+        typet P = ga.id() == ID_ambiguous
+                    ? static_cast<const typet &>(ga.find(ID_type))
+                    : ga.type();
+        rename_f_parameters(A);
+        cpp_convert_plain_type(A, get_message_handler());
+        // [temp.deduct.type]/9.1: a pack expansion P_i's pattern is compared
+        // with the remaining argument (the argument lists have equal length
+        // here, so with A_i alone)
+        P.remove(ID_ellipsis);
+        cpp_convert_plain_type(P, get_message_handler());
+        // `const X' is a merged type here; deduction matches a qualified
+        // pattern (P) against an argument (A) whose qualifiers are flags of
+        // its type, so write A's that way
+        std::function<void(typet &)> fold_qualifiers = [&](typet &type)
+        {
+          for(auto &sub : type.get_sub())
+            fold_qualifiers(static_cast<typet &>(sub));
+          if(type.id() != ID_merged_type)
+            return;
+          bool is_const = false, is_volatile = false;
+          typet rest{ID_nil};
+          std::size_t others = 0;
+          for(const auto &sub : type.get_sub())
+          {
+            if(sub.id() == ID_const)
+              is_const = true;
+            else if(sub.id() == ID_volatile)
+              is_volatile = true;
+            else
+            {
+              rest = static_cast<const typet &>(sub);
+              ++others;
+            }
+          }
+          if(others != 1)
+            return;
+          if(is_const)
+            rest.set(ID_C_constant, true);
+          if(is_volatile)
+            rest.set(ID_C_volatile, true);
+          type = rest;
+        };
+        fold_qualifiers(A);
+        // N5008 [temp.deduct.type]/3, /8: a template-id pattern only matches
+        // a specialisation of the SAME template, and then its template
+        // arguments are deduced from the corresponding arguments.  A is
+        // not an instantiated specialisation here (F's parameters are
+        // unique, never-declared types), so compare the two template-ids
+        // argument by argument: `box<R *>' deduces R = X(char) from
+        // `box<X (*)(char)>', but `box<R (*)(char)>' nothing from `box<X *>'.
+        const auto template_id_args = [](const typet &type) -> const irept *
+        {
+          if(type.id() != ID_cpp_name || type.get_sub().size() < 2)
+            return nullptr;
+          for(const auto &sub : type.get_sub())
+            if(sub.id() == ID_template_args)
+              return &sub.find(ID_arguments);
+          return nullptr;
+        };
+        // N5008 [temp.deduct.type]/1, [temp.deduct.partial]/10: deduction
+        // succeeds only if the deduced P is identical to A, so a part of P
+        // that names none of G's parameters must equal A as written --
+        // `int *' (from `b<A, int *>') does not match `C *' (from
+        // `b<A, C *>', C one of F's unique types)
+        std::set<irep_idt> g_parameter_names;
+        for(const auto &param : G.template_type().template_parameters())
+        {
+          const std::string pid = id2string(
+            param.id() == ID_type ? param.type().get(ID_identifier)
+                                  : param.get(ID_identifier));
+          const auto sep = pid.rfind("::");
+          g_parameter_names.insert(
+            sep == std::string::npos ? pid : pid.substr(sep + 2));
+        }
+        std::function<bool(const irept &)> names_g_parameter =
+          [&](const irept &node)
+        {
+          if(node.id() == ID_cpp_name)
+          {
+            for(const auto &sub : node.get_sub())
+              if(
+                sub.id() == ID_name &&
+                g_parameter_names.count(sub.get(ID_identifier)) != 0)
+              {
+                return true;
+              }
+          }
+          for(const auto &sub : node.get_sub())
+            if(names_g_parameter(sub))
+              return true;
+          for(const auto &named : node.get_named_sub())
+            if(names_g_parameter(named.second))
+              return true;
+          return false;
+        };
+        std::function<void(irept &)> strip_locations = [&](irept &node)
+        {
+          node.remove(ID_C_source_location);
+          for(auto &sub : node.get_sub())
+            strip_locations(sub);
+          for(auto &named : node.get_named_sub())
+            strip_locations(named.second);
+        };
+        std::function<bool(const typet &, const typet &)> deduce_from =
+          [&](const typet &pattern, const typet &argument)
+        {
+          const irept *p_args = template_id_args(pattern);
+          if(p_args == nullptr)
+          {
+            if(!names_g_parameter(pattern))
+            {
+              irept p_plain = pattern, a_plain = argument;
+              strip_locations(p_plain);
+              strip_locations(a_plain);
+              if(p_plain != a_plain)
+                return false;
+            }
+            resolver.guess_template_args(pattern, argument);
+            return true;
+          }
+          const irept *a_args = template_id_args(argument);
+          if(
+            a_args == nullptr ||
+            pattern.get_sub().front().get(ID_identifier) !=
+              argument.get_sub().front().get(ID_identifier))
+          {
+            return false;
+          }
+          // N5008 [temp.arg.general]/9 (default template arguments): a
+          // template-id written with fewer arguments (`equal_to<>') stands
+          // for the one with the defaults filled in (`equal_to<void>')
+          irept p_padded, a_padded;
+          if(p_args->get_sub().size() != a_args->get_sub().size())
+          {
+            const auto pad = [&](const irept &args, irept &padded) -> bool
+            {
+              padded = args;
+              const auto ids = cpp_scopes.current_scope().lookup(
+                pattern.get_sub().front().get(ID_identifier),
+                cpp_scopet::RECURSIVE,
+                cpp_idt::id_classt::TEMPLATE);
+              if(ids.empty())
+                return false;
+              const symbolt *template_symbol =
+                symbol_table.lookup((*ids.begin())->identifier);
+              if(
+                template_symbol == nullptr ||
+                template_symbol->type.id() != ID_cpp_declaration)
+              {
+                return false;
+              }
+              const auto &parameters = to_cpp_declaration(template_symbol->type)
+                                         .template_type()
+                                         .template_parameters();
+              for(std::size_t k = padded.get_sub().size();
+                  k < parameters.size();
+                  ++k)
+              {
+                if(
+                  !parameters[k].has_default_argument() ||
+                  parameters[k].default_argument().id() != ID_type)
+                {
+                  return false;
+                }
+                padded.get_sub().push_back(parameters[k].default_argument());
+              }
+              return true;
+            };
+            if(
+              p_args->get_sub().size() < a_args->get_sub().size()
+                ? !pad(*p_args, p_padded)
+                : !pad(*a_args, a_padded))
+            {
+              return false;
+            }
+            if(p_padded.is_not_nil() && !p_padded.get_sub().empty())
+              p_args = &p_padded;
+            if(a_padded.is_not_nil() && !a_padded.get_sub().empty())
+              a_args = &a_padded;
+            if(p_args->get_sub().size() != a_args->get_sub().size())
+              return false;
+          }
+          for(std::size_t k = 0; k < p_args->get_sub().size(); ++k)
+          {
+            const exprt &pk = static_cast<const exprt &>(p_args->get_sub()[k]);
+            const exprt &ak = static_cast<const exprt &>(a_args->get_sub()[k]);
+            const bool pk_type = pk.id() == ID_type || pk.id() == ID_ambiguous;
+            const bool ak_type = ak.id() == ID_type || ak.id() == ID_ambiguous;
+            if(!pk_type || !ak_type)
+            {
+              // a non-type argument: a bare parameter deduces from
+              // anything, otherwise the expressions agree structurally
+              if(!pk_type && pk.id() == ID_cpp_name && pk.get_sub().size() == 1)
+                continue;
+              if(pk != ak)
+                return false;
+              continue;
+            }
+            typet pt = static_cast<const typet &>(pk.find(ID_type));
+            typet at = static_cast<const typet &>(ak.find(ID_type));
+            pt.remove(ID_ellipsis);
+            cpp_convert_plain_type(pt, get_message_handler());
+            cpp_convert_plain_type(at, get_message_handler());
+            fold_qualifiers(at);
+            if(!deduce_from(pt, at))
+              return false;
+          }
+          return true;
+        };
+        if(!deduce_from(P, A))
+          return false;
+      }
+      else
+      {
+        // Non-type argument: G's bare template parameter deduces from
+        // anything; otherwise the expressions must agree structurally.
+        if(ga.id() == ID_cpp_name && ga.get_sub().size() == 1)
+          continue;
+        if(fa != ga)
+          return false;
+      }
+    }
+
+    cpp_template_args_tct guessed =
+      template_map.build_template_args(G.template_type());
+
+    // [temp.deduct.partial]/12: only the parameters that occur in the
+    // compared patterns need a value.
+    std::set<irep_idt> used_names;
+    std::function<void(const irept &)> collect_names = [&](const irept &node)
+    {
+      if(node.id() == ID_cpp_name)
+      {
+        for(const auto &sub : node.get_sub())
+          if(sub.id() == ID_name)
+            used_names.insert(sub.get(ID_identifier));
+      }
+      for(const auto &sub : node.get_sub())
+        collect_names(sub);
+      for(const auto &named : node.get_named_sub())
+        collect_names(named.second);
+    };
+    for(const auto &ga : G_args)
+      collect_names(ga);
+
+    const auto &g_params_decl = G.template_type().template_parameters();
+    const auto &guessed_args = guessed.arguments();
+    for(std::size_t pi = 0; pi < g_params_decl.size(); ++pi)
+    {
+      if(pi >= guessed_args.size())
+        break;
+      const exprt &arg = guessed_args[pi];
+      if(arg.id() != ID_unassigned && arg.type().id() != ID_unassigned)
+        continue;
+      const irep_idt pid = g_params_decl[pi].id() == ID_type
+                             ? g_params_decl[pi].type().get(ID_identifier)
+                             : g_params_decl[pi].get(ID_identifier);
+      std::string short_name = id2string(pid);
+      const auto sep = short_name.rfind("::");
+      if(sep != std::string::npos)
+        short_name = short_name.substr(sep + 2);
+      if(used_names.count(irep_idt{short_name}) != 0)
+        return false;
+    }
+    return true;
+  }
+  catch(...)
+  {
+    return false;
+  }
+}
+
+/// Phase 4B core helper: deduction + partial ordering + instantiation
+/// for template conversion operators.  See header for the contract.
+const symbolt *cpp_typecheckt::find_template_conversion_specialisation(
+  const exprt &expr,
+  const typet &to)
+{
+  // N5008 [over.best.ics]/4: see cpp_typecheck.h.  Reference binding of
+  // a constructor candidate's parameter must not instantiate the
+  // argument's template conversion operator.
+  if(copy_init_ctor_exploration > 0 && constant_expression_context == 0)
+    return nullptr;
+
+  if(expr.type().id() != ID_struct_tag)
+    return nullptr;
+
+  const struct_typet &from_followed =
+    follow_tag(to_struct_tag_type(expr.type()));
+
+  if(!from_followed.get_bool("has_template_conversion_operator"))
+    return nullptr;
+
+  // Determine the class scope prefix used for member symbols.  The
+  // symbol_table keys members with the class's `pretty_name`-style
+  // prefix (e.g., `any_t::`), not the struct-tag identifier
+  // (`tag-any_t`).  Get the prefix from the tag symbol's pretty_name.
+  const irep_idt &class_id_with_tag =
+    to_struct_tag_type(expr.type()).get_identifier();
+  const symbolt *class_sym = symbol_table.lookup(class_id_with_tag);
+  if(class_sym == nullptr)
+    return nullptr;
+  // For an instantiated class template the members are keyed by the
+  // INSTANCE scope's prefix (`ranget<ptr_signed_int>::`), while the tag
+  // symbol's pretty_name is just the base name (`ranget`) -- scanning
+  // with the latter finds nothing and the conversion operator of a
+  // class-template instance was never considered ([temp.deduct.conv];
+  // the ranget-to-vector dog-food shape).  Take the prefix from the
+  // class's scope when it is registered.
+  std::string class_prefix = id2string(class_sym->pretty_name) + "::";
+  {
+    const auto scope_it = cpp_scopes.id_map.find(class_id_with_tag);
+    if(
+      scope_it != cpp_scopes.id_map.end() && scope_it->second != nullptr &&
+      !scope_it->second->prefix.empty())
+    {
+      class_prefix = scope_it->second->prefix;
+    }
+  }
+
+  // Collect candidate template-cast-operator symbols up front: the
+  // symbol_table grows during instantiation, which would invalidate
+  // an in-place iterator.  The class is complete here (the flag above is
+  // set while its body is type-checked), so its set of conversion function
+  // templates is final: compute it once per class -- the scan of the whole
+  // symbol table on every implicit conversion attempt involving an object
+  // of such a class was 13% of a libstdc++ <ranges> run.
+  auto cached_candidates =
+    template_conversion_candidates.find(class_id_with_tag);
+  if(cached_candidates == template_conversion_candidates.end())
+  {
+    std::vector<irep_idt> found;
+    for(const auto &name_sym : symbol_table.symbols)
+    {
+      const symbolt &sym = name_sym.second;
+
+      const std::string &sym_name = id2string(sym.name);
+      if(sym_name.compare(0, class_prefix.size(), class_prefix) != 0)
+        continue;
+
+      if(sym.type.id() != ID_cpp_declaration)
+        continue;
+      const cpp_declarationt &decl = to_cpp_declaration(sym.type);
+      if(!decl.is_template())
+        continue;
+      if(decl.type().id() != "cpp-cast-operator")
+        continue;
+      if(decl.declarators().empty())
+        continue;
+
+      found.push_back(sym.name);
+    }
+    cached_candidates =
+      template_conversion_candidates.emplace(class_id_with_tag, found).first;
+  }
+
+  std::vector<const symbolt *> candidate_syms;
+  std::vector<irep_idt> candidate_scope_ids;
+  for(const irep_idt &candidate : cached_candidates->second)
+  {
+    const symbolt *sym = symbol_table.lookup(candidate);
+    if(sym == nullptr)
+      continue;
+    candidate_syms.push_back(sym);
+    candidate_scope_ids.push_back(candidate);
+  }
+
+  if(candidate_syms.empty())
+    return nullptr;
+
+  // Phase 1: deduce-only pass.  For each candidate, run [temp.deduct.conv]/1
+  // deduction and remember successful candidates.  Instantiation is
+  // deferred until after partial ordering picks a unique winner, so
+  // we don't pollute the symbol table with side-effects of losing
+  // candidates.
+  std::vector<conversion_deduction_resultt> survivors;
+  std::vector<irep_idt> survivor_scope_ids; // parallel: F_scope_id per survivor
+  for(std::size_t cand_i = 0; cand_i < candidate_syms.size(); ++cand_i)
+  {
+    const symbolt *cand_sym = candidate_syms[cand_i];
+    const irep_idt &cand_name = candidate_scope_ids[cand_i];
+    if(cand_sym == nullptr)
+      continue;
+
+    const cpp_declarationt cand_decl = to_cpp_declaration(cand_sym->type);
+    const cpp_declaratort &declarator = cand_decl.declarators()[0];
+
+    // N5008 [over.match.copy]/1.2, [over.match.conv]/1: an explicit
+    // conversion function (template) is a candidate only in a
+    // direct-initialization (and a contextual conversion to bool); as for
+    // the non-template ones in implicit_conversion_sequence.  A
+    // conditionally explicit one (`explicit(cond)') is kept.
+    if(
+      cand_decl.member_spec().is_explicit() &&
+      cand_decl.member_spec().find(ID_C_explicit_condition).is_nil() &&
+      direct_initialization == 0 &&
+      !(contextual_bool_conversion > 0 &&
+        (to.id() == ID_bool || to.id() == ID_c_bool)))
+    {
+      continue;
+    }
+
+    // P = return type of the conversion-function template per
+    // [temp.deduct.conv]/1.  For a template cast operator, the
+    // return type is stored in the second sub-element of the
+    // declarator name (parsed from `operator <type-id>()`).  The
+    // stored representation is unprocessed, with template
+    // parameters embedded as cpp_names — exactly the input shape
+    // `guess_template_args` expects.
+    if(declarator.name().get_sub().size() < 2)
+      continue;
+    typet P = static_cast<const typet &>(declarator.name().get_sub()[1]);
+    typet A = to;
+
+    // The template cast operator's return type comes straight from
+    // the parser, so its top-level reference may be encoded with
+    // `ID_frontend_pointer` rather than `ID_pointer`.  Treat both as
+    // references for the purposes of [temp.deduct.conv]/2.
+    auto strip_top_reference = [](typet &t)
+    {
+      if(
+        (t.id() == ID_pointer || t.id() == ID_frontend_pointer) &&
+        t.get_bool(ID_C_reference))
+      {
+        t = static_cast<const typet &>(to_type_with_subtype(t).subtype());
+      }
+    };
+
+    // [temp.deduct.conv]/2: P-reference -> use referred type.
+    strip_top_reference(P);
+
+    // [temp.deduct.conv]/4: A-reference -> use referred type.
+    const bool A_was_reference =
+      is_reference(A) ||
+      (A.id() == ID_frontend_pointer && A.get_bool(ID_C_reference));
+    strip_top_reference(A);
+
+    // [temp.deduct.conv]/3: A non-reference -> P array→pointer,
+    // function→pointer, drop top-level cv from P.
+    if(!A_was_reference)
+    {
+      if(P.id() == ID_array)
+      {
+        const typet element = to_array_type(P).element_type();
+        P = pointer_type(element);
+      }
+      else if(P.id() == ID_code)
+      {
+        P = pointer_type(P);
+      }
+      else
+      {
+        c_qualifierst pq;
+        pq.read(P);
+        if(pq.is_constant || pq.is_volatile || pq.is_restricted || pq.is_atomic)
+        {
+          c_qualifierst empty;
+          empty.write(P);
+        }
+      }
+    }
+
+    // [temp.deduct.conv]/4 cont.: A cv-qualified -> drop top-level cv.
+    {
+      c_qualifierst aq;
+      aq.read(A);
+      if(aq.is_constant || aq.is_volatile || aq.is_restricted || aq.is_atomic)
+      {
+        c_qualifierst empty;
+        empty.write(A);
+      }
+    }
+
+    // SFINAE-guarded deduction per [temp.deduct]/8.
+    cpp_save_scopet save_scope{cpp_scopes};
+    cpp_saved_template_mapt saved_map{template_map};
+
+    cpp_template_args_tct guessed_args;
+    bool deduction_ok = false;
+
+    try
+    {
+      sfinae_contextt sfinae_guard{*this};
+
+      template_map.build_unassigned(cand_decl.template_type());
+
+      // Move into the template's spec scope so cpp_name lookup
+      // during deduction finds the template parameters.
+      auto scope_it = cpp_scopes.id_map.find(cand_name);
+      if(scope_it != cpp_scopes.id_map.end())
+        cpp_scopes.go_to(static_cast<cpp_scopet &>(*scope_it->second));
+
+      cpp_typecheck_resolvet resolver{*this};
+      resolver.guess_template_args(P, A);
+
+      guessed_args =
+        template_map.build_template_args(cand_decl.template_type());
+
+      // N5008 [temp.deduct]/5: template arguments that were not deduced
+      // are obtained from default template arguments -- the SFINAE
+      // constraint idiom `template <class U, class = enable_if_t<...>>
+      // operator U() const'.  Only `U' is deducible from the target
+      // ([temp.deduct.conv]/1); the defaulted parameter was left
+      // unassigned and the candidate dropped ("invalid implicit
+      // conversion", user-reported Issue 13).  A default whose
+      // substitution fails is a deduction failure ([temp.deduct]/8).
+      if(guessed_args.has_unassigned())
+      {
+        // The default may name the ENCLOSING class template's parameters
+        // (`enable_if_t<is_convertible_v<T, U>>' in `Wrap<T>'): bind them
+        // from the class instance's recorded arguments, as
+        // instantiate_template does for nested templates.
+        for(cpp_scopet *scope = &cpp_scopes.current_scope();
+            scope != nullptr && !scope->is_root_scope();
+            scope = &scope->get_parent())
+        {
+          if(!scope->is_class())
+            continue;
+          const symbolt *class_sym = symbol_table.lookup(scope->identifier);
+          if(
+            class_sym != nullptr &&
+            class_sym->type.find(ID_C_template).is_not_nil() &&
+            class_sym->type.find(ID_C_template_arguments).is_not_nil())
+          {
+            template_map.build(
+              static_cast<const template_typet &>(
+                class_sym->type.find(ID_C_template)),
+              static_cast<const cpp_template_args_tct &>(
+                class_sym->type.find(ID_C_template_arguments)));
+          }
+        }
+        const auto &params = cand_decl.template_type().template_parameters();
+        auto &args = guessed_args.arguments();
+        for(std::size_t i = 0; i < params.size() && i < args.size(); ++i)
+        {
+          const bool unassigned =
+            args[i].id() == ID_unassigned ||
+            (args[i].id() == ID_type && args[i].type().id() == ID_unassigned);
+          if(!unassigned || !params[i].has_default_argument())
+            continue;
+          if(params[i].id() == ID_type)
+          {
+            typet default_type = params[i].default_argument().type();
+            template_map.apply(default_type);
+            typecheck_type(default_type);
+            args[i] = exprt(ID_type);
+            args[i].type() = default_type;
+          }
+          else
+          {
+            exprt default_val = params[i].default_argument();
+            template_map.apply(default_val);
+            typecheck_expr(default_val);
+            args[i] = default_val;
+          }
+          template_map.set(params[i], args[i]);
+        }
+      }
+
+      if(!guessed_args.has_unassigned())
+      {
+        // [temp.deduct]/5 with [temp.constr.decl]/1: after successful
+        // argument deduction, the conversion-function template's
+        // associated constraints (its requires-clause) must be
+        // satisfied with the deduced arguments.  An unsatisfied
+        // constraint is a deduction failure ([temp.deduct]/5), so the
+        // candidate is removed rather than instantiated.  Without this
+        // check a non-viable deduction such as deducing the unsigned
+        // __max_size_type's `template<integral _Tp> operator _Tp()` for
+        // a class destination (e.g. __max_diff_type) would survive and
+        // be instantiated, producing a spurious "operator ... is
+        // unknown" error.
+        bool constraint_ok = true;
+        // N5008 [temp.param]/4, [temp.constr.decl]/3: the type-constraints
+        // of the template parameters (`template <integral _Ty> explicit
+        // operator _Ty()', the MSVC STL's _Base128) are part of the
+        // associated constraints, conjoined with the requires-clause
+        exprt req_clause = static_cast<const exprt &>(
+          cand_decl.template_type().find(ID_C_requires_clause));
+        for(const auto &param : cand_decl.template_type().template_parameters())
+        {
+          const exprt &type_constraint =
+            static_cast<const exprt &>(param.find("#C_type_constraint"));
+          if(type_constraint.is_nil())
+            continue;
+          if(req_clause.is_nil() || req_clause.id() == ID_nil)
+            req_clause = type_constraint;
+          else
+          {
+            exprt conjunction{ID_and, bool_typet{}};
+            conjunction.add_to_operands(
+              std::move(req_clause), exprt{type_constraint});
+            req_clause = std::move(conjunction);
+          }
+        }
+        if(req_clause.is_not_nil() && req_clause.id() != ID_nil)
+        {
+          exprt req_copy = req_clause;
+          template_map.apply(req_copy);
+          typecheck_expr(req_copy);
+          // N5008 [temp.constr.atomic]/3: unsatisfied when the value is
+          // false.  A disjunction of concept-ids (`integral<_Tp> ||
+          // __is_int128<_Tp>', libstdc++'s __max_size_type::operator _Tp)
+          // is left as `or(false, false)' by the type checker; fold it,
+          // and accept a numeric zero as false (as the class-template
+          // partial specialization matching does).  Otherwise the explicit
+          // conversion function template was instantiated for every
+          // probed class type and its body (`return _M_val;' to that
+          // type) dropped.
+          simplify(req_copy, *this);
+          if(req_copy.is_false() || req_copy.is_zero())
+            constraint_ok = false;
+        }
+        deduction_ok = constraint_ok;
+      }
+    }
+    catch(...)
+    {
+      // [temp.deduct]/8: SFINAE — substitution failure in the
+      // immediate context is a deduction failure, not an error.
+    }
+
+    if(!deduction_ok)
+      continue;
+
+    conversion_deduction_resultt res;
+    res.cand_sym = cand_sym;
+    res.guessed_args = std::move(guessed_args);
+    res.P_for_partial_ordering = P;
+    survivors.push_back(std::move(res));
+    survivor_scope_ids.push_back(cand_name);
+  }
+
+  if(survivors.empty())
+    return nullptr;
+
+  // Phase 2: [temp.deduct.partial]/3.2 + [over.match.best]/2.
+  // Find the unique most-specialised survivor.
+  std::size_t winner_idx = 0;
+  if(survivors.size() > 1)
+  {
+    auto more_specialised_than = [&](std::size_t i, std::size_t j) -> bool
+    {
+      // i is more-specialised than j iff
+      //   i at-least-as-specialised as j AND not (j at-least-as-
+      //   specialised as i).
+      const cpp_declarationt &Fi =
+        to_cpp_declaration(survivors[i].cand_sym->type);
+      const cpp_declarationt &Fj =
+        to_cpp_declaration(survivors[j].cand_sym->type);
+      const bool i_aas_j = conversion_template_at_least_as_specialised(
+        Fi, Fj, survivor_scope_ids[i], survivor_scope_ids[j]);
+      const bool j_aas_i = conversion_template_at_least_as_specialised(
+        Fj, Fi, survivor_scope_ids[j], survivor_scope_ids[i]);
+      return i_aas_j && !j_aas_i;
+    };
+
+    bool unique_winner = false;
+    for(std::size_t i = 0; i < survivors.size(); ++i)
+    {
+      bool dominates_all = true;
+      for(std::size_t j = 0; j < survivors.size(); ++j)
+      {
+        if(i == j)
+          continue;
+        if(!more_specialised_than(i, j))
+        {
+          dominates_all = false;
+          break;
+        }
+      }
+      if(dominates_all)
+      {
+        winner_idx = i;
+        unique_winner = true;
+        break;
+      }
+    }
+
+    if(!unique_winner)
+      return nullptr; // genuine ambiguity — no most-specialised candidate.
+  }
+
+  // Phase 3: instantiate the unique winner.
+  const symbolt *cand_sym = survivors[winner_idx].cand_sym;
+  cpp_template_args_tct guessed_args =
+    std::move(survivors[winner_idx].guessed_args);
+
+  const symbolt *instance = nullptr;
+  try
+  {
+    sfinae_contextt sfinae_guard{*this};
+    instance = &instantiate_template(
+      expr.source_location(), *cand_sym, guessed_args, guessed_args);
+  }
+  catch(...)
+  {
+    return nullptr;
+  }
+
+  if(instance == nullptr)
+    return nullptr;
+
+  // The instantiated symbol's type is `code_typet` with one
+  // implicit `this` parameter (a pointer).
+  if(instance->type.id() != ID_code)
+    return nullptr;
+  const code_typet &inst_code = to_code_type(instance->type);
+  if(inst_code.parameters().size() != 1)
+    return nullptr;
+  if(!inst_code.parameters().front().get_this())
+    return nullptr;
+
+  // Mark the instantiated cast-operator component (added to the
+  // class's components vector by `instantiate_template` ->
+  // `typecheck_compound_declarator`) so the non-template branches
+  // of `user_defined_conversion_sequence` and `reference_binding`
+  // skip it on subsequent calls.  Otherwise it would shadow a
+  // fresh deduction for a different destination type
+  // ([over.ics.user]/3 + [over.match.conv]).
+  {
+    symbolt *class_sym_w = symbol_table.get_writeable(class_id_with_tag);
+    if(class_sym_w != nullptr && class_sym_w->type.id() == ID_struct)
+    {
+      struct_typet &cls_struct = to_struct_type(class_sym_w->type);
+      for(auto &component : cls_struct.components())
+      {
+        if(component.get_name() == instance->name)
+        {
+          component.set("#is_template_specialization", true);
+          break;
+        }
+      }
+    }
+    // Also mark the instance *symbol* itself.  The component flag above
+    // lives on the class struct_type and is lost if the class is later
+    // re-elaborated (which happens for mutually-dependent class types),
+    // whereas the member symbol persists in the symbol table.  The
+    // non-template branch of user_defined_conversion_sequence /
+    // reference_binding consults this flag to skip an instantiated
+    // template conversion operator (it is not a non-template candidate
+    // and is not name-resolvable in the class cpp_scope).
+    if(symbolt *inst_w = symbol_table.get_writeable(instance->name))
+      inst_w->type.set("#instantiated_conversion_operator", true);
+  }
+
+  return instance;
+}
+
+bool cpp_typecheckt::deduce_conversion_template(
+  const exprt &expr,
+  const typet &to,
+  exprt &new_expr,
+  unsigned &rank)
+{
+  const symbolt *instance = find_template_conversion_specialisation(expr, to);
+  if(instance == nullptr)
+    return false;
+
+  const code_typet &inst_code = to_code_type(instance->type);
+
+  // Build the conversion expression as a direct call to the
+  // instantiated symbol.  We bypass the cpp_name-driven member-
+  // call resolver because the freshly-instantiated cast operator,
+  // although registered as a component of the source class by
+  // `instantiate_template`, is *not* registered in the class
+  // cpp_scope under a base_name lookup-friendly key.  Building the
+  // call from `cpp_symbol_expr(*instance)` with the source object
+  // as the implicit `this` argument is direct and avoids the
+  // resolver.
+  address_of_exprt this_arg{expr};
+  this_arg.type() = inst_code.parameters().front().type();
+
+  side_effect_expr_function_callt func_expr{
+    cpp_symbol_expr(*instance),
+    {this_arg},
+    inst_code.return_type(),
+    expr.source_location()};
+
+  // [over.ics.user]/3: the second standard conversion sequence
+  // shall have Exact Match rank.  In CBMC's encoding, Exact Match
+  // adds zero rank (identity / qualification conversion).
+  unsigned post_rank = 0;
+  exprt post_expr;
+  if(!standard_conversion_sequence(func_expr, to, post_expr, post_rank))
+    return false;
+  if(post_rank > 0)
+    return false;
+
+  rank += post_rank;
+  new_expr.swap(post_expr);
+  return true;
+}
+
+bool cpp_typecheckt::deduce_conversion_template_for_reference(
+  const exprt &expr,
+  const reference_typet &reference_type,
+  exprt &new_expr,
+  unsigned &rank)
+{
+  const symbolt *instance =
+    find_template_conversion_specialisation(expr, reference_type);
+  if(instance == nullptr)
+    return false;
+
+  const code_typet &inst_code = to_code_type(instance->type);
+
+  // The cast operator must return a reference type for direct
+  // reference binding ([over.match.ref]).
+  if(!is_reference(inst_code.return_type()))
+    return false;
+
+  // Build the call as a direct symbol-driven function-call expr,
+  // mirroring the value-target path.
+  address_of_exprt this_arg{expr};
+  this_arg.type() = inst_code.parameters().front().type();
+
+  side_effect_expr_function_callt func_expr{
+    cpp_symbol_expr(*instance),
+    {this_arg},
+    inst_code.return_type(),
+    expr.source_location()};
+
+  // The returned value of a reference-returning function is an
+  // lvalue (the dereferenced pointer-to-reference).  Mirror the
+  // shape that the non-template path in `reference_binding`
+  // expects: take the address of the returned value via the
+  // standard `add_implicit_dereference` plus reference_compatible
+  // dance.  See the analogous block in `reference_binding`.
+  exprt returned_value = func_expr;
+  add_implicit_dereference(returned_value);
+
+  unsigned ref_rank = 0;
+  if(!returned_value.get_bool(ID_C_lvalue))
+    return false;
+  if(!reference_compatible(returned_value, reference_type, ref_rank))
+    return false;
+
+  // [over.ics.user]/3: when the user-defined conversion is by a
+  // template specialisation the second standard conversion
+  // sequence is required to have Exact Match rank.  For reference
+  // binding the analogous requirement is that
+  // `reference_compatible` succeed without adding any rank beyond
+  // the identity (i.e., `ref_rank == 0`).
+  if(ref_rank > 0)
+    return false;
+
+  // Returned values are lvalues only via references; the inner
+  // operand is the pointer-to-reference whose dereference produced
+  // the lvalue.
+  if(returned_value.id() != ID_dereference)
+    return false;
+  if(!is_reference(to_dereference_expr(returned_value).op().type()))
+    return false;
+
+  exprt addr = to_multi_ary_expr(returned_value).op0();
+
+  if(returned_value.type() != reference_type.base_type())
+  {
+    c_qualifierst qual_from;
+    qual_from.read(returned_value.type());
+    make_ptr_typecast(addr, reference_type);
+    qual_from.write(to_reference_type(addr.type()).base_type());
+  }
+
+  // [over.ics.user] gives a user-defined conversion an extra rank
+  // bump of 4 to dominate any standard conversion sequence; the
+  // existing non-template reference-conversion path uses the same
+  // constant.  Stay consistent with it.
+  rank += 4 + ref_rank;
+  new_expr.swap(addr);
   return true;
 }
 
@@ -868,6 +2502,26 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
   PRECONDITION(!is_reference(expr.type()));
   PRECONDITION(!is_reference(to));
 
+  // N5008 [over.best.ics]/4: while constructor candidates of a
+  // copy-initialization are being explored, a user-defined conversion
+  // sequence for a candidate's parameter is not considered (also
+  // [over.ics.user]: at most one user-defined conversion per sequence).
+  // Nested queries inside a constant-expression evaluation or a
+  // substitution (SFINAE constraints such as `is_constructible`, whose
+  // sfinae_contextt suspends the constant-expression context) are separate
+  // conversion sequences and stay allowed, mirroring the
+  // template-constructor fallback's re-entry rule below.  Without the
+  // substitution case, `is_constructible<function<int()>, int (*&&)()>`
+  // evaluated inside std::pair's constructor constraint
+  // (`_PCC::_MoveConstructiblePair`) was false, and
+  // `pair<int, function<int()>> p(1, f)` found no constructor.
+  if(
+    copy_init_ctor_exploration > 0 && constant_expression_context == 0 &&
+    sfinae_context_depth == 0)
+  {
+    return false;
+  }
+
   const typet &from = expr.type();
 
   new_expr.make_nil();
@@ -876,13 +2530,48 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
   // A conversion from a type to the same type is given an exact
   // match rank even though a user-defined conversion is used
 
-  if(from==to)
-    rank+=0;
+  if(from == to)
+    rank += 0;
+  else if(
+    from.id() == ID_struct_tag && to.id() == ID_struct_tag &&
+    subtype_typecast(
+      follow_tag(to_struct_tag_type(from)), follow_tag(to_struct_tag_type(to))))
+  {
+    // N5008 [over.best.ics]/7: a parameter of class type initialized from
+    // an argument of a derived class type is a derived-to-base Conversion
+    // (rank 3), not a user-defined conversion sequence -- it was ranked
+    // with them, so `g(ex)' and `g(other)' (other(if_ex)) tied for an
+    // if_ex argument, and `return r;' into resultt<> tied resultt(exprt)
+    // with the copy constructor (CBMC's own simplify_expr_*.cpp,
+    // dog-fooding)
+    rank += 3;
+  }
   else
-    rank+=4; // higher than all the standard conversions
+    rank += 4; // higher than all the standard conversions
 
   if(to.id() == ID_struct_tag)
   {
+    // See [over.best.ics]/4 note above: everything in this branch
+    // explores CONSTRUCTOR candidates of the target, so a user-defined
+    // conversion sequence must not be used for their parameters.
+    struct explorationt final
+    {
+      explicit explorationt(unsigned &c) : counter(c)
+      {
+        ++counter;
+      }
+      ~explorationt()
+      {
+        --counter;
+      }
+      unsigned &counter;
+    } exploration_guard{copy_init_ctor_exploration};
+
+    // Ensure the target type is complete before looking for constructors.
+    // For libc++ std::function, the type may be incomplete from a
+    // forward declaration and needs elaboration.
+    elaborate_class_template(to);
+
     std::string err_msg;
 
     if(cpp_is_pod(to))
@@ -897,10 +2586,10 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
 
         if(subtype_typecast(from_struct, to_struct))
         {
-          exprt address=address_of_exprt(expr);
+          exprt address = address_of_exprt(expr);
 
           // simplify address
-          if(expr.id()==ID_dereference)
+          if(expr.id() == ID_dereference)
             address = to_dereference_expr(expr).pointer();
 
           pointer_typet ptr_sub = pointer_type(to);
@@ -925,7 +2614,23 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
     }
     else
     {
-      bool found=false;
+      bool found = false;
+      // Per [over.match.best]: when multiple converting
+      // constructors are viable for a given source, pick the one
+      // with the best conversion rank.  Ambiguity is only reported
+      // when two or more candidates are *equally best*.  The
+      // straightforward `found = true; if(found) return false;`
+      // pattern below treats *any* second viable candidate as
+      // ambiguous, which incorrectly rejects calls like
+      // `power(2, size_t{})` on a class with overloaded
+      // `BigInt(int)` / `BigInt(unsigned)` / `BigInt(long)` /
+      // `BigInt(unsigned long)` constructors — the int argument
+      // matches `BigInt(int)` exactly and should win unambiguously.
+      // Track the best rank seen so far and the result expression
+      // for the best candidate; flag ambiguity only on a tie.
+      unsigned best_rank = 0;
+      exprt best_expr = nil_exprt{};
+      bool best_is_ambiguous = false;
       const auto &struct_type_to = follow_tag(to_struct_tag_type(to));
 
       for(const auto &component : struct_type_to.components())
@@ -938,21 +2643,118 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
 
         const typet &comp_type = component.type();
 
-        if(comp_type.id() !=ID_code)
+        if(comp_type.id() != ID_code)
           continue;
 
         if(to_code_type(comp_type).return_type().id() != ID_constructor)
           continue;
 
+        // N5008 [over.match.funcs]/8 + [temp.deduct.call]: a constructor
+        // TEMPLATE contributes the one specialization deduced from the
+        // argument, not its earlier instantiations.  Those are members of
+        // the class too (`__max_size_type(_Tp)' instantiated for int and
+        // for unsigned __int128, libstdc++ 16's ranges size type), and
+        // treated as ordinary converting constructors they made a `size_t'
+        // argument ambiguous between them.  They are the template trial's
+        // business, below.
+        {
+          const symbolt *comp_symbol =
+            symbol_table.lookup(component.get_name());
+          if(
+            comp_type.find(ID_C_template).is_not_nil() ||
+            (comp_symbol != nullptr &&
+             comp_symbol->type.find(irep_idt{"#fn_template_args"})
+               .is_not_nil()))
+          {
+            continue;
+          }
+        }
+
         // TODO: ellipsis
 
         const auto &parameters = to_code_type(comp_type).parameters();
 
-        if(parameters.size() != 2)
+        // Accept constructors with exactly one real parameter (the
+        // traditional single-arg converting constructor) OR
+        // constructors where every parameter from position 2
+        // onwards has a default value — i.e., still a single-arg
+        // call site from the user's perspective.  Without this,
+        // constructors like
+        //   basic_string(const char*, const _Alloc& = _Alloc())
+        // would be skipped even though they are the standard
+        // conversion path for `const char*` / `char[N]` to
+        // std::string.
+        if(parameters.size() < 2)
+          continue;
+        // the hidden `@most_derived' parameter of a constructor of a class
+        // with virtual bases (add_this_to_method_type) is not a parameter
+        // of the program: the DEFAULT constructor of std::istringstream
+        // (`this, @most_derived = true') looked like a converting
+        // constructor from bool, and `std::istringstream in("text")' was
+        // ambiguous between istringstream(const string &) and
+        // istringstream(istringstream &&) -- the latter "converting" the
+        // char array to bool
+        if(parameters[1].get_base_name() == "@most_derived")
+          continue;
+        bool all_extras_have_default = true;
+        for(std::size_t pi = 2; pi < parameters.size(); ++pi)
+        {
+          if(!parameters[pi].has_default_value())
+          {
+            all_extras_have_default = false;
+            break;
+          }
+        }
+        if(!all_extras_have_default)
           continue;
 
         exprt curr_arg1 = parameters[1];
-        typet arg1_type=curr_arg1.type();
+        typet arg1_type = curr_arg1.type();
+
+        // [dcl.init.ref]/5, [over.ics.ref]: an rvalue-reference
+        // parameter cannot bind to an lvalue argument, so such a
+        // converting-constructor candidate is not viable for an lvalue.
+        // Skipping it prevents a spurious ambiguity between the two
+        // instantiations of std::optional<T>'s member converting
+        // constructor `optional(_Up&&)` — `optional(const T&)` and
+        // `optional(T&&)` — once both have been instantiated: when
+        // copy-initializing an optional<T> from an lvalue T (e.g.
+        // `return out;` with `out` an lvalue `mp_integer` in
+        // numeric_castt<mp_integer>::operator()), both otherwise tie at
+        // the same rank and the conversion is wrongly rejected as
+        // ambiguous.
+        if(
+          arg1_type.get_bool(ID_C_rvalue_reference) &&
+          expr.get_bool(ID_C_lvalue))
+          continue;
+
+        // [dcl.init.ref]/5: symmetrically, a non-const lvalue-reference
+        // parameter binds only to an lvalue, so such a converting-constructor
+        // candidate is not viable for an rvalue argument.  Skipping it (rather
+        // than letting the reference binding fail hard below) matters once a
+        // forwarding-reference converting-constructor *template* has been
+        // instantiated with an lvalue-reference parameter for an earlier query
+        // (e.g. is_constructible<T, X&>): a later query with an rvalue argument
+        // (is_constructible<T, X&&>) would otherwise reach that concrete
+        // `T(X&)` candidate and abort with "invalid implicit conversion from X
+        // to X&", dropping the enclosing function body.
+        if(
+          is_reference(arg1_type) &&
+          !arg1_type.get_bool(ID_C_rvalue_reference) &&
+          !to_reference_type(arg1_type).base_type().get_bool(ID_C_constant) &&
+          !expr.get_bool(ID_C_lvalue))
+          continue;
+
+        // N5008 [over.ics.rank]/3.2.3: of two reference bindings of an
+        // rvalue argument, the one to an rvalue reference is better than the
+        // one to an lvalue reference -- the converting-constructor template
+        // instantiated for both `const X &' and `X &&' (is_constructible
+        // queries) otherwise ties at the same rank ("ambiguous") for an
+        // rvalue X.  Rank the rvalue-reference binding one step better.
+        const bool binds_rvalue_to_const_lref =
+          is_reference(arg1_type) &&
+          !arg1_type.get_bool(ID_C_rvalue_reference) &&
+          !expr.get_bool(ID_C_lvalue);
 
         if(is_reference(arg1_type))
         {
@@ -960,110 +2762,710 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
           arg1_type.swap(tmp);
         }
 
-        unsigned tmp_rank=0;
+        unsigned tmp_rank = 0;
         if(arg1_type.id() != ID_struct_tag)
         {
-            exprt tmp_expr;
-            if(standard_conversion_sequence(
-                expr, arg1_type, tmp_expr, tmp_rank))
-            {
-              // check if it's ambiguous
-              if(found)
-                return false;
-              found=true;
-
-              if(expr.get_bool(ID_C_lvalue))
-                tmp_expr.set(ID_C_lvalue, true);
-
-              tmp_expr.add_source_location()=expr.source_location();
-
-              exprt func_symb = cpp_symbol_expr(lookup(component.get_name()));
-              func_symb.type()=comp_type;
-              already_typechecked_exprt::make_already_typechecked(func_symb);
-
-              // create temporary object
-              side_effect_expr_function_callt ctor_expr(
-                std::move(func_symb),
-                {tmp_expr},
-                uninitialized_typet{},
-                expr.source_location());
-              typecheck_side_effect_function_call(ctor_expr);
-              CHECK_RETURN(ctor_expr.get(ID_statement) == ID_temporary_object);
-
-              new_expr.swap(ctor_expr);
-
-              if(struct_type_to.get_bool(ID_C_constant))
-                new_expr.type().set(ID_C_constant, true);
-
-              rank += tmp_rank;
-            }
-          }
-          else if(from.id() == ID_struct_tag && arg1_type.id() == ID_struct_tag)
+          exprt tmp_expr;
+          if(standard_conversion_sequence(expr, arg1_type, tmp_expr, tmp_rank))
           {
-            // try derived-to-base conversion
-            address_of_exprt expr_pfrom(expr, pointer_type(expr.type()));
-            pointer_typet pto=pointer_type(arg1_type);
+            if(expr.get_bool(ID_C_lvalue))
+              tmp_expr.set(ID_C_lvalue, true);
 
-            exprt expr_ptmp;
-            tmp_rank=0;
-            if(standard_conversion_sequence(
-                expr_pfrom, pto, expr_ptmp, tmp_rank))
+            tmp_expr.add_source_location() = expr.source_location();
+
+            exprt func_symb = cpp_symbol_expr(lookup(component.get_name()));
+            func_symb.type() = comp_type;
+            already_typechecked_exprt::make_already_typechecked(func_symb);
+
+            // create temporary object
+            side_effect_expr_function_callt ctor_expr(
+              std::move(func_symb),
+              {tmp_expr},
+              uninitialized_typet{},
+              expr.source_location());
+            // N5008 [over.best.ics.general]/2: if no conversion sequence
+            // can be formed for an argument, the candidate is simply not
+            // viable -- it must not be reported as a hard error.  Trying
+            // this constructor may still fail here even though the
+            // standard_conversion_sequence above succeeded on the value:
+            // the constructor call re-binds the ORIGINAL argument to the
+            // reference parameter, and e.g. an xvalue (the implicit
+            // dereference of std::forward's return) cannot bind to the
+            // non-const lvalue-reference parameter of a concrete
+            // candidate such as _Head_base<0, int&&>'s
+            // `_Head_base(const _Head&)`, which instantiates to
+            // `_Head_base(int&)` by reference collapsing ([dcl.ref]/6).
+            // The forwarding-reference constructor template remains the
+            // viable candidate.  Guard with a SFINAE context so the
+            // failed trial's diagnostics are suppressed.
+            try
             {
-              // check if it's ambiguous
-              if(found)
-                return false;
-              found=true;
-
-              rank+=tmp_rank;
-
-              // create temporary object
-              dereference_exprt expr_deref(expr_ptmp);
-              expr_deref.set(ID_C_lvalue, true);
-              expr_deref.add_source_location()=expr.source_location();
-
-              exprt new_object(ID_new_object, to);
-              new_object.set(ID_C_lvalue, true);
-              new_object.type().set(ID_C_constant, false);
-
-              exprt func_symb = cpp_symbol_expr(lookup(component.get_name()));
-              func_symb.type()=comp_type;
-              already_typechecked_exprt::make_already_typechecked(func_symb);
-
-              side_effect_expr_function_callt ctor_expr(
-                std::move(func_symb),
-                {expr_deref},
-                uninitialized_typet{},
-                expr.source_location());
+              sfinae_contextt sfinae_guard{*this};
               typecheck_side_effect_function_call(ctor_expr);
+            }
+            catch(...)
+            {
+              continue;
+            }
+            CHECK_RETURN(ctor_expr.get(ID_statement) == ID_temporary_object);
 
-              new_expr.swap(ctor_expr);
+            if(struct_type_to.get_bool(ID_C_constant))
+              ctor_expr.type().set(ID_C_constant, true);
 
-              INVARIANT(
-                new_expr.get(ID_statement)==ID_temporary_object,
-                "statement ID");
+            // see binds_rvalue_to_const_lref: rank in units of two so that
+            // the reference-binding tie-break fits between two ranks
+            tmp_rank = 2 * tmp_rank + (binds_rvalue_to_const_lref ? 1 : 0);
 
-              if(struct_type_to.get_bool(ID_C_constant))
-                new_expr.type().set(ID_C_constant, true);
+            // Track the best-ranked viable candidate per
+            // [over.match.best].  A strictly lower rank replaces
+            // the current best; an equal rank flags ambiguity.
+            if(!found || tmp_rank < best_rank)
+            {
+              found = true;
+              best_rank = tmp_rank;
+              best_expr = std::move(ctor_expr);
+              best_is_ambiguous = false;
+            }
+            else if(tmp_rank == best_rank)
+            {
+              best_is_ambiguous = true;
             }
           }
         }
-        if(found)
-          return true;
+        else if(from.id() == ID_struct_tag && arg1_type.id() == ID_struct_tag)
+        {
+          // try derived-to-base conversion
+          //
+          // Per [class.copy.ctor]/1 and [dcl.init]/14: copy-initialization
+          // of an object of type `T` from an expression of type `T` (or
+          // `const T`) uses the copy constructor.  When `from == arg1_type`
+          // modulo cv-qualifiers, this is the SAME-TYPE copy-construction,
+          // not derived-to-base.  The address-of + standard-conversion
+          // path below would build `from* -> arg1*` via
+          // `standard_conversion_sequence`, which DROPS const-qualifiers
+          // on the pointee — that's not a valid implicit conversion
+          // (per [conv.qual]) so the path silently rejects the
+          // converting-ctor match for any `const T` source binding into a
+          // `T` parameter.  This shows up in CBMC's own
+          // `simplify_expr_*.cpp` files where simplification helpers
+          // return `const exprt&` into a class-typed `resultt<>`
+          // returned-value.  Fall through to the same-type path: strip
+          // cv-qualifiers from `from` before computing the
+          // address-of and let the standard-conversion sequence run on
+          // the unqualified pointer types.  The conversion is still a
+          // user-defined conversion (constructor call) so the rank
+          // adjustment is unchanged.
+          typet from_unqual = expr.type();
+          from_unqual.remove(ID_C_constant);
+          from_unqual.remove(ID_C_volatile);
+          exprt expr_for_addr = expr;
+          expr_for_addr.type() = from_unqual;
+          address_of_exprt expr_pfrom(expr_for_addr, pointer_type(from_unqual));
+          pointer_typet pto = pointer_type(arg1_type);
+
+          exprt expr_ptmp;
+          tmp_rank = 0;
+          if(standard_conversion_sequence(expr_pfrom, pto, expr_ptmp, tmp_rank))
+          {
+            // create temporary object
+            dereference_exprt expr_deref(expr_ptmp);
+            // [basic.lval] p1, [expr.static.cast] p3: if the original
+            // expression is an rvalue, the derived-to-base result is an
+            // xvalue (not an lvalue), so it can bind to rvalue references.
+            if(expr.get_bool(ID_C_lvalue))
+              expr_deref.set(ID_C_lvalue, true);
+            expr_deref.add_source_location() = expr.source_location();
+
+            exprt new_object(ID_new_object, to);
+            new_object.set(ID_C_lvalue, true);
+            new_object.type().set(ID_C_constant, false);
+
+            exprt func_symb = cpp_symbol_expr(lookup(component.get_name()));
+            func_symb.type() = comp_type;
+            already_typechecked_exprt::make_already_typechecked(func_symb);
+
+            side_effect_expr_function_callt ctor_expr(
+              std::move(func_symb),
+              {expr_deref},
+              uninitialized_typet{},
+              expr.source_location());
+            // [over.match.viable]: trying this constructor candidate may
+            // fail to bind the argument — for example an rvalue argument
+            // against a non-const lvalue-reference parameter of a member
+            // converting-constructor template that was instantiated with
+            // `_Up=T&` during the class's own elaboration (from an
+            // lvalue payload access).  A candidate with no implicit
+            // conversion sequence for an argument is simply non-viable
+            // and must be excluded, not reported as a hard error; the
+            // forwarding-reference constructor template is re-deduced
+            // for this argument's value category in the
+            // template-constructor fallback below.  Guard with a SFINAE
+            // context so the failed trial's diagnostics are suppressed.
+            try
+            {
+              sfinae_contextt sfinae_guard{*this};
+              typecheck_side_effect_function_call(ctor_expr);
+            }
+            catch(...)
+            {
+              continue;
+            }
+
+            INVARIANT(
+              ctor_expr.get(ID_statement) == ID_temporary_object,
+              "statement ID");
+
+            if(struct_type_to.get_bool(ID_C_constant))
+              ctor_expr.type().set(ID_C_constant, true);
+
+            // Track best candidate as above.
+            if(!found || tmp_rank < best_rank)
+            {
+              found = true;
+              best_rank = tmp_rank;
+              best_expr = std::move(ctor_expr);
+              best_is_ambiguous = false;
+            }
+            else if(tmp_rank == best_rank)
+            {
+              best_is_ambiguous = true;
+            }
+          }
+        }
       }
+      // [over.match.best]: ambiguity is only an error when two or
+      // more candidates are equally best.  If we found a unique
+      // best, commit to it.
+      if(found && best_is_ambiguous)
+        return false;
+      if(found)
+      {
+        // N5008 [over.ics.rank]/3.3: two user-defined conversion sequences
+        // are distinguished only when they use the same converting
+        // constructor, by their SECOND standard conversion sequence (the
+        // identity here, the result being the class type itself).  The
+        // first standard conversion -- that of the argument to the
+        // constructor's parameter -- decided which constructor is used
+        // (best_rank, [over.match.ctor]) but does not rank the sequence:
+        // `0 -> unspec' through unspec(unspec *) is no worse than `0 ->
+        // count' through count(int) (libstdc++'s `partial_ordering == 0'
+        // against a candidate taking a class with a converting constructor
+        // template).
+        new_expr.swap(best_expr);
+        return true;
+      }
+
+      // No non-template converting constructor found. Try template
+      // constructors via the full constructor resolution path, but
+      // only if there are non-explicit template constructors.
+      //
+      // The recursion guard is keyed by the *destination* type rather than a
+      // single global boolean: converting to `to` may legitimately require a
+      // nested conversion to a *different* class type with its own template
+      // constructor (e.g. evaluating `is_constructible<Wrap, X>` -- which
+      // converts `X -> Wrap` -- while already converting `X -> optional<Wrap>`
+      // to check `optional`'s converting-constructor constraint).  A conversion
+      // to the *same* `to` re-entered here is genuine unbounded recursion and
+      // must be cut ([over.ics.user]: a user-defined conversion sequence
+      // contains at most one user-defined conversion, but a nested
+      // is_constructible query about a distinct type is a separate sequence).
+      //
+      // Nested re-entry (the in-progress set is non-empty) is permitted only
+      // inside a constant-expression evaluation (`constant_expression_context
+      // > 0`) or a substitution (`sfinae_context_depth > 0`) -- i.e. while
+      // evaluating a converting constructor's SFINAE constraint, which is
+      // exactly where the nested is_constructible/is_convertible query
+      // arises (sfinae_contextt suspends the constant-expression context, so
+      // the depth is what identifies a constraint evaluation there: libstdc++
+      // 11's `is_convertible<default_delete<D>, default_delete<B>>` probe,
+      // `__test_aux<_To1>(declval<_From1>())`, inside the unique_ptr<U, E>&&
+      // converting constructor's constraint needs default_delete's converting
+      // constructor template).  Ordinary run-time conversions never need this
+      // nesting; letting them re-enter the (expensive) per-candidate
+      // `new_temporary` trial below roughly doubled compile time on
+      // numeric-heavy translation units (e.g. expr.cpp, mp_arith.cpp).  The
+      // `size() < 5` bound additionally caps nesting depth.  Four levels
+      // are needed for a braced {k, lambda} argument of a
+      // std::pair<K, std::function<unique_ptr<B>()>> parameter: pair's
+      // constructor template, whose constraint constructs the
+      // std::function, whose constraint converts unique_ptr<D> to
+      // unique_ptr<B>, whose constraint converts default_delete<D> to
+      // default_delete<B> (std::map's initializer list in CBMC's own
+      // path_storage.cpp, dog-fooding); one nested level suffices for plain
+      // std::optional / std::unique_ptr conversions.
+      const irep_idt to_ctor_key = to_struct_tag_type(to).get_identifier();
+      // The trial below runs full constructor overload resolution over the
+      // class's constructor templates; the same (destination, source type,
+      // value category) question is asked again and again while resolving
+      // overloaded calls (9727 trials, 484 distinct, on one libc++ <span>
+      // test) and its answer depends only on those, as long as the class
+      // has the same constructors.  Remember the negative answers.
+      const std::string trial_key =
+        id2string(to_ctor_key) + "|" + cpp_type2name(expr.type()) +
+        (expr.get_bool(ID_C_lvalue) ? "|l" : "|r") +
+        (expr.type().get_bool(ID_C_constant) ? "c" : "") + "|" +
+        std::to_string(struct_type_to.components().size());
+      if(
+        template_conversions_in_progress.find(to_ctor_key) ==
+          template_conversions_in_progress.end() &&
+        (template_conversions_in_progress.empty() ||
+         constant_expression_context > 0 || sfinae_context_depth > 0) &&
+        template_conversions_in_progress.size() < 5 &&
+        struct_type_to.get_bool("has_template_constructor") &&
+        failed_template_conversions.find(trial_key) ==
+          failed_template_conversions.end())
+      {
+        template_conversions_in_progress.insert(to_ctor_key);
+        // [over.ics.user] + [temp.deduct]/8: a user-defined
+        // conversion that instantiates a template constructor is
+        // SFINAE-guarded — substitution failure means "no viable
+        // conversion sequence", not a compilation error.  The
+        // conversion is simply dropped from the candidate set.
+        try
+        {
+          sfinae_contextt sfinae_guard{*this};
+          exprt tmp_expr;
+          exprt::operandst ops;
+          // Wrap the source as already-typechecked: cpp_constructor's
+          // argument-typecheck step (typecheck_expr) would otherwise
+          // re-traverse a struct-typed prvalue source -- e.g. a lambda
+          // closure passed as a `side_effect` -- and abort with
+          // "unexpected expression: struct" in
+          // c_typecheck_baset::typecheck_expr_main, spuriously dropping a
+          // valid user-defined conversion through a converting-constructor
+          // template (the same guard used for the initializer_list path).
+          ops.push_back(already_typechecked_exprt{expr});
+          new_temporary(expr.source_location(), to, ops, tmp_expr);
+          template_conversions_in_progress.erase(to_ctor_key);
+          // [class.conv.ctor]/2 + [over.match.copy]: only
+          // non-explicit constructors participate in a user-
+          // defined conversion sequence.  `new_temporary` runs
+          // *direct*-initialisation semantics, which allow
+          // explicit constructors — this is wrong for a UDCS.
+          // Furthermore, a UDCS may use only standard conversions
+          // for the constructor's argument; chaining a second
+          // user-defined conversion ([over.best.ics]) is
+          // forbidden.  Both errors manifest the same way: the
+          // ctor selected by `new_temporary` is a non-template
+          // explicit ctor that the regular loop above already
+          // rejected.  The regular loop has already considered
+          // every non-template, non-explicit converting ctor; if
+          // it didn't find a match, the template fallback may
+          // only legitimately succeed by selecting a *template*
+          // specialisation.  Reject any non-template ctor here.
+          //
+          // Find the called ctor symbol inside `tmp_expr` and
+          // check whether it carries `ID_specialization_of` (set
+          // on template-instantiated symbols by
+          // `cpp_typecheck_template.cpp:550`).
+          std::function<const symbolt *(const exprt &)> find_ctor =
+            [&](const exprt &e) -> const symbolt *
+          {
+            if(
+              e.id() == ID_side_effect &&
+              e.get(ID_statement) == ID_function_call)
+            {
+              const auto &fc = to_side_effect_expr_function_call(e);
+              if(fc.function().id() == ID_symbol)
+              {
+                const symbolt *s = symbol_table.lookup(
+                  to_symbol_expr(fc.function()).get_identifier());
+                // Only a constructor of the *target* type `to`
+                // realises this conversion.  `new_temporary`'s result
+                // may also contain constructor calls that merely
+                // materialise the source argument as a temporary —
+                // e.g. the source iterator's own copy constructor when
+                // the argument is a prvalue such as `c.begin()`.  Those
+                // construct a *different* type; mistaking one for the
+                // conversion's constructor spuriously rejects a valid
+                // user-defined conversion (the visible symptom was that
+                // `iterator -> const_iterator` worked for an lvalue
+                // argument but not for a prvalue argument).  Skip any
+                // call that is not a constructor of `to`, but keep
+                // searching the sub-expressions for the real one.
+                if(s != nullptr && s->type.id() == ID_code)
+                {
+                  const code_typet &ct = to_code_type(s->type);
+                  const irep_idt to_id =
+                    to_struct_tag_type(to).get_identifier();
+                  bool is_ctor_of_to =
+                    ct.return_type().id() == ID_constructor &&
+                    s->type.get(ID_C_member_name) == to_id;
+                  if(
+                    !is_ctor_of_to && ct.return_type().id() == ID_constructor &&
+                    !ct.parameters().empty() &&
+                    ct.parameters().front().get_this() &&
+                    ct.parameters().front().type().id() == ID_pointer)
+                  {
+                    const typet &base =
+                      to_pointer_type(ct.parameters().front().type())
+                        .base_type();
+                    if(
+                      base.id() == ID_struct_tag &&
+                      to_struct_tag_type(base).get_identifier() == to_id)
+                      is_ctor_of_to = true;
+                  }
+                  if(is_ctor_of_to)
+                    return s;
+                }
+              }
+            }
+            for(const auto &op : e.operands())
+            {
+              if(const symbolt *r = find_ctor(op))
+                return r;
+            }
+            const auto &init = e.find(ID_initializer);
+            if(init.is_not_nil() && init.id() == ID_code)
+            {
+              if(const symbolt *r = find_ctor(static_cast<const exprt &>(init)))
+                return r;
+            }
+            return nullptr;
+          };
+          const symbolt *ctor_sym = find_ctor(tmp_expr);
+          // A constructor selected here is acceptable only if it is
+          // a template specialization — the regular loop above has
+          // already considered every non-template, non-explicit
+          // converting ctor, so a non-template ctor selected here
+          // is one it already rejected (e.g., `explicit`).
+          //
+          // CBMC tags template instantiations two different ways:
+          //   * CLASS template specializations carry
+          //     `ID_specialization_of`
+          //     (cpp_typecheck_template.cpp).
+          //   * FUNCTION template instantiations (which a member
+          //     converting constructor template such as
+          //     `optional(_Up&&)` becomes once `_Up` is deduced)
+          //     carry `#fn_template_args`
+          //     (cpp_instantiate_template.cpp).
+          // The previous check only looked at `ID_specialization_of`
+          // and therefore wrongly rejected a perfectly valid
+          // function-template converting-constructor instantiation,
+          // which has `#fn_template_args` set but
+          // `ID_specialization_of` nil.  The visible symptom was
+          //   invalid implicit conversion from 'T' to 'struct optional'
+          // for any `return v;` (or other copy-initialization via
+          // `implicit_typecast`) where the target is a class whose
+          // only viable converting constructor is a template — e.g.,
+          // `std::optional<T>`'s `optional(_Up&&)`.  Four files in
+          // CBMC's own source (`c_types.cpp`, `pointer_offset_size.cpp`,
+          // `source_location.cpp`, `substitute_symbols.cpp`) hit this
+          // when returning a `T` into a `std::optional<T>`.
+          //
+          // Treat the ctor as a template specialization (accept it)
+          // when EITHER tag is present.  A function-template ctor
+          // instantiation must additionally be non-explicit:
+          // [over.match.copy]/1 + [class.conv.ctor]/2 admit only
+          // non-explicit constructors into a user-defined conversion
+          // sequence (copy-initialization), and `new_temporary` runs
+          // direct-initialization semantics that would otherwise let
+          // an explicit template ctor through.
+          const bool ctor_is_template_specialization =
+            ctor_sym != nullptr &&
+            (ctor_sym->type.find(ID_specialization_of).is_not_nil() ||
+             ctor_sym->type.find(irep_idt{"#fn_template_args"}).is_not_nil());
+          // `explicit' is recorded on the class component
+          // (typecheck_compound_declarator), not on the symbol's type:
+          // reading only the type let an explicit constructor template
+          // (analyses' loop_templatet(InstructionSet &&)) convert a
+          // function argument, contrary to [over.match.copy]/1.1
+          bool ctor_is_explicit =
+            ctor_sym != nullptr && ctor_sym->type.get_bool(ID_is_explicit);
+          if(ctor_sym != nullptr && !ctor_is_explicit)
+          {
+            const auto &to_struct = follow_tag(to_struct_tag_type(to));
+            for(const auto &c : to_struct.components())
+            {
+              if(c.get_name() == ctor_sym->name && c.get_bool(ID_is_explicit))
+                ctor_is_explicit = true;
+            }
+          }
+          // N5008 [temp.inst]/4, /11: this constructor template was
+          // instantiated to test a candidate conversion; its body is
+          // needed only if the candidate is selected (see
+          // speculative_instances).
+          if(ctor_is_template_specialization)
+            speculative_instances.insert(ctor_sym->name);
+          if(
+            ctor_sym != nullptr &&
+            (!ctor_is_template_specialization || ctor_is_explicit))
+          {
+            // Non-template (or explicit) ctor selected — the regular
+            // loop either already rejected it or it is `explicit`.
+            // Either way, this is not a valid user-defined
+            // conversion.  Drop the result and continue to the
+            // basic_string fallback / final `return false`.
+          }
+          else
+          {
+            // Either a non-explicit template-specialization
+            // constructor of `to` was selected (accept it), or no
+            // constructor of `to` was emitted at all.  The latter is
+            // the trivial/aggregate initialization CBMC performs for
+            // layout-compatible class types (e.g. converting between
+            // two specializations of the same iterator class template,
+            // `__normal_iterator<T*> -> __normal_iterator<const T*>`):
+            // the fallback is only entered when `to` has a non-explicit
+            // converting constructor template, so a successful trivial
+            // initialization from the source realises that
+            // constructor's effect as a single user-defined conversion
+            // ([over.match.copy], [class.conv.ctor]/2) with no explicit
+            // constructor and no second user-defined conversion.
+            new_expr.swap(tmp_expr);
+            return true;
+          }
+        }
+        catch(...)
+        {
+          template_conversions_in_progress.erase(to_ctor_key);
+        }
+        // no conversion through a constructor template: remember it (the
+        // successful path returned above)
+        failed_template_conversions.insert(trial_key);
+      }
+
+      // libstdc++ basic_string fallback: when both the regular and
+      // template constructor paths fail, recognise the
+      // char-array/char-pointer → basic_string<char> case and
+      // synthesise a call to the 4-arg
+      //   basic_string(const _CharT*, size_type, const _Alloc& = _Alloc())
+      // constructor (basic_string.h:619), which is *not* template-
+      // gated and is reliably present in the components list.  The
+      // 3-arg
+      //   basic_string(const _CharT*, const _Alloc& = _Alloc())
+      // constructor (basic_string.h:641) is the natural conversion
+      // path but is wrapped in a member template with a SFINAE
+      // guard `template<typename = _RequireAllocator<_Alloc>>` —
+      // CBMC's class elaboration fails to specialise the wrapper
+      // in some translation-unit states (notably after
+      // <bits/locale_classes.h> participates), and the constructor
+      // disappears from the components list.
+      //
+      // This mirrors the workaround in `implicit_typecast` for
+      // explicit casts; here we extend it to argument conversions
+      // and reference bindings so calls like
+      //   void f(const std::string&);  f("hello");
+      // succeed regardless of the missing converting constructor.
+      if(
+        id2string(to_struct_tag_type(to).get_identifier())
+          .find("tag-basic_string<") != std::string::npos)
+      {
+        const typet &src_t = expr.type();
+        bool src_is_char_array =
+          src_t.id() == ID_array &&
+          (to_array_type(src_t).element_type().id() == ID_signedbv ||
+           to_array_type(src_t).element_type().id() == ID_unsignedbv) &&
+          to_bitvector_type(to_array_type(src_t).element_type()).get_width() ==
+            config.ansi_c.char_width;
+        bool src_is_char_ptr =
+          src_t.id() == ID_pointer &&
+          (to_pointer_type(src_t).base_type().id() == ID_signedbv ||
+           to_pointer_type(src_t).base_type().id() == ID_unsignedbv) &&
+          to_bitvector_type(to_pointer_type(src_t).base_type()).get_width() ==
+            config.ansi_c.char_width;
+        if(src_is_char_array || src_is_char_ptr)
+        {
+          exprt char_ptr = expr;
+          if(src_is_char_array)
+          {
+            pointer_typet ptr_type =
+              pointer_type(to_array_type(src_t).element_type());
+            ptr_type.base_type().set(ID_C_constant, true);
+            char_ptr = typecast_exprt(
+              address_of_exprt(index_exprt(
+                expr,
+                from_integer(0, c_index_type()),
+                to_array_type(src_t).element_type())),
+              ptr_type);
+          }
+          // Determine the source string length: for a literal we
+          // can compute it exactly; otherwise leave it
+          // non-deterministic.
+          exprt length_expr;
+          if(
+            char_ptr.id() == ID_typecast &&
+            to_typecast_expr(char_ptr).op().id() == ID_address_of &&
+            to_address_of_expr(to_typecast_expr(char_ptr).op()).object().id() ==
+              ID_index &&
+            to_index_expr(
+              to_address_of_expr(to_typecast_expr(char_ptr).op()).object())
+                .array()
+                .id() == ID_string_constant)
+          {
+            const irep_idt &raw =
+              to_string_constant(
+                to_index_expr(
+                  to_address_of_expr(to_typecast_expr(char_ptr).op()).object())
+                  .array())
+                .value();
+            length_expr = from_integer(id2string(raw).size(), size_type());
+          }
+          else
+          {
+            length_expr =
+              side_effect_expr_nondett{size_type(), expr.source_location()};
+          }
+          // Find the 4-arg `basic_string(const _CharT*, size_type,
+          // const _Alloc& = _Alloc())` ctor in components.
+          for(const auto &component : struct_type_to.components())
+          {
+            if(component.get_bool(ID_from_base))
+              continue;
+            const typet &comp_type = component.type();
+            if(comp_type.id() != ID_code)
+              continue;
+            if(to_code_type(comp_type).return_type().id() != ID_constructor)
+              continue;
+            const auto &parameters = to_code_type(comp_type).parameters();
+            if(parameters.size() != 4)
+              continue;
+            const typet &p1 = parameters[1].type();
+            if(p1.id() != ID_pointer)
+              continue;
+            const typet &p1_base = to_pointer_type(p1).base_type();
+            if(p1_base.id() != ID_signedbv && p1_base.id() != ID_unsignedbv)
+              continue;
+            // Only the char instantiation: the source is a narrow char
+            // pointer/array, so a wider element type (basic_string<
+            // wchar_t>'s const wchar_t*) must not be offered this
+            // fallback -- the synthesized call would demand a
+            // const char* -> const wchar_t* argument conversion, which
+            // does not exist ([conv.ptr]).
+            if(
+              to_bitvector_type(p1_base).get_width() !=
+              config.ansi_c.char_width)
+            {
+              continue;
+            }
+            const typet &p2 = parameters[2].type();
+            if(p2.id() != ID_unsignedbv && p2.id() != ID_signedbv)
+              continue;
+            // Build the constructor call.
+            exprt func_symb = cpp_symbol_expr(lookup(component.get_name()));
+            func_symb.type() = comp_type;
+            already_typechecked_exprt::make_already_typechecked(func_symb);
+            side_effect_expr_function_callt ctor_expr(
+              std::move(func_symb),
+              {char_ptr, length_expr},
+              uninitialized_typet{},
+              expr.source_location());
+            // The call is speculative: a failure must leave no trace,
+            // neither the exception nor already-emitted diagnostics
+            // (which would still fail the type-checking run after the
+            // catch below swallows the exception).
+            const std::size_t errors_before =
+              get_message_handler().get_message_count(messaget::M_ERROR);
+            try
+            {
+              typecheck_side_effect_function_call(ctor_expr);
+              if(ctor_expr.get(ID_statement) == ID_temporary_object)
+              {
+                new_expr.swap(ctor_expr);
+                return true;
+              }
+            }
+            catch(...)
+            {
+              // Fall through; conversion fails as before.
+            }
+            get_message_handler().set_message_count(
+              messaget::M_ERROR, errors_before);
+            break;
+          }
+        }
+      }
+    }
   }
 
   // conversion operators
   if(from.id() == ID_struct_tag)
   {
-    bool found=false;
-    for(const auto &component :
-        follow_tag(to_struct_tag_type(from)).components())
+    // N5008 [over.match.conv]/1 + [over.match.best]: of several viable
+    // conversion functions the one whose second standard conversion
+    // sequence is better wins (`operator int()' is an exact match for a
+    // target of int, `operator bool()' needs an integral conversion); only
+    // a tie is ambiguous.  `found' is the best candidate so far, with its
+    // rank; `ambiguous' a tie at that rank.
+    bool found = false;
+    bool ambiguous = false;
+    unsigned found_rank = 0;
+    exprt found_expr;
+    // N5008 [class.access.general]/5: "The interpretation of a given
+    // construct is established without regard to access control" -- access
+    // is checked for the conversion function selected.  An inaccessible one
+    // (of a private base, not named by a using-declaration) is still a
+    // candidate; only selecting it is an error.  `found_call' is the
+    // selected candidate's call, re-checked with access control at the end.
+    bool found_inaccessible = false;
+    side_effect_expr_function_callt found_call{
+      nil_exprt{}, {}, uninitialized_typet{}, source_locationt{}};
+    const struct_typet &from_struct = follow_tag(to_struct_tag_type(from));
+    for(const auto &component : from_struct.components())
     {
-      if(component.get_bool(ID_from_base))
-        continue;
+      // Per [class.conv.fct]/1 + [class.member.lookup]/4: the set
+      // of viable conversion operators in `from`'s class scope
+      // includes those declared in `from` itself AND those
+      // inherited from base classes (subject to access
+      // resolution and potentially `using`-declaration hiding).
+      // Don't filter out `from_base` components here — that
+      // mirrors the standard's name-lookup rule.  Without this,
+      // an inherited `operator T()` (e.g. `operator bool()`
+      // inherited from `integral_constant<bool, V>` into
+      // `__and_<...>`) is silently invisible to
+      // user-defined-conversion search and the call site fails
+      // with "invalid implicit conversion from 'struct __and_'
+      // to 'bool'".
 
       if(!component.get_bool(ID_is_cast_operator))
         continue;
+
+      // N5008 [class.conv.fct]/2: an EXPLICIT conversion function is only
+      // considered for direct-initialization ([over.match.copy]/1.2,
+      // [over.match.conv]/1, [over.match.ref]/1 with explicit casts); this
+      // is the implicit conversion sequence, so it is not a candidate here.
+      // (`explicit operator iterator()' and `explicit operator
+      // const_iterator()' on libstdc++ 16's _Hashtable::__location_type
+      // otherwise made BOTH const_iterator constructors viable for
+      // `const_iterator(__loc)' -- "does not uniquely resolve".)
+      // [conv.general]/4: a contextual conversion to bool is the
+      // direct-initialization `bool t(e)', so `explicit operator bool()' is
+      // a candidate there (implicit_typecast_bool sets the counter);
+      // likewise any explicit conversion function in a direct-initialization
+      // of a non-class object ([over.match.conv]/1, `static_cast<T>(e)',
+      // `T t(e)').
+      if(
+        component.get_bool(ID_is_explicit) && direct_initialization == 0 &&
+        !(contextual_bool_conversion > 0 &&
+          (to.id() == ID_bool || to.id() == ID_c_bool)))
+      {
+        continue;
+      }
+
+      // Skip cast operators that originated from a template
+      // specialisation: per [over.match.conv] the candidate set
+      // for a given destination type is the *non-template* cast
+      // operators plus freshly-deduced specialisations.  A
+      // specialisation that exists only because an *earlier*
+      // user-defined conversion already deduced and instantiated
+      // it must not shadow a fresh deduction for a different
+      // destination type.  Mark applied below in
+      // `deduce_conversion_template`.
+      if(component.get_bool("#is_template_specialization"))
+        continue;
+
+      // The component flag above is lost when the class is re-elaborated
+      // (mutually-dependent class types), so also consult the persistent
+      // flag on the member symbol set by
+      // find_template_conversion_specialisation.  An instantiated
+      // template conversion operator is not a non-template candidate
+      // ([over.match.conv]) and is not name-resolvable in the class
+      // cpp_scope; the fresh template deduction handles it.
+      if(const symbolt *comp_sym = symbol_table.lookup(component.get_name()))
+      {
+        if(comp_sym->type.get_bool("#instantiated_conversion_operator"))
+          continue;
+      }
 
       const code_typet &comp_type = to_code_type(component.type());
       DATA_INVARIANT(
@@ -1075,18 +3477,17 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
       exprt this_expr(expr);
       this_type.set(ID_C_this, true);
 
-      unsigned tmp_rank=0;
+      unsigned tmp_rank = 0;
       exprt tmp_expr;
 
-      if(implicit_conversion_sequence(
-        this_expr, this_type, tmp_expr, tmp_rank))
+      if(implicit_conversion_sequence(this_expr, this_type, tmp_expr, tmp_rank))
       {
         // To take care of the possible virtual case,
         // we build the function as a member expression.
         const cpp_namet cpp_func_name(component.get_base_name());
 
         exprt member_func(ID_member);
-        member_func.add(ID_component_cpp_name)=cpp_func_name;
+        member_func.add(ID_component_cpp_name) = cpp_func_name;
         member_func.copy_to_operands(already_typechecked_exprt{expr});
 
         side_effect_expr_function_callt func_expr(
@@ -1094,26 +3495,120 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
           {},
           uninitialized_typet{},
           expr.source_location());
-        typecheck_side_effect_function_call(func_expr);
+        const side_effect_expr_function_callt unchecked_call = func_expr;
+        const bool inaccessible =
+          check_component_access(component, from_struct);
+        {
+          const bool saved_disable = disable_access_control;
+          if(inaccessible)
+            disable_access_control = true;
+          try
+          {
+            typecheck_side_effect_function_call(func_expr);
+          }
+          catch(...)
+          {
+            disable_access_control = saved_disable;
+            throw;
+          }
+          disable_access_control = saved_disable;
+        }
 
         if(standard_conversion_sequence(func_expr, to, tmp_expr, tmp_rank))
         {
-          // check if it's ambiguous
-          if(found)
-            return false;
-          found=true;
+          if(!found || tmp_rank < found_rank)
+          {
+            found = true;
+            ambiguous = false;
+            found_rank = tmp_rank;
+            found_expr.swap(tmp_expr);
+            found_inaccessible = inaccessible;
+            found_call = unchecked_call;
+          }
+          else if(tmp_rank == found_rank)
+            ambiguous = true;
+        }
+        else if(
+          to.id() == ID_struct_tag && func_expr.type().id() == ID_struct_tag)
+        {
+          // N5008 [over.match.copy]/1: a (non-explicit) conversion function of
+          // the source is a candidate when it yields "a type whose
+          // cv-unqualified version is the same as T or is a derived class
+          // thereof".  When the operator yields a class *derived* from the
+          // target class T, the result initializes T by a derived-to-base
+          // conversion (slicing).  standard_conversion_sequence does not model
+          // a class-prvalue derived-to-base value conversion, so build it
+          // explicitly via address-of + pointer derived-to-base conversion +
+          // dereference, exactly as the converting-constructor path above
+          // does.  A non-derived class yields no pointer conversion and is
+          // correctly rejected.
+          unsigned d2b_rank = 0;
+          address_of_exprt addr_func{func_expr, pointer_type(func_expr.type())};
+          exprt casted_ptr;
+          if(standard_conversion_sequence(
+               addr_func, pointer_type(to), casted_ptr, d2b_rank))
+          {
+            dereference_exprt base_deref{casted_ptr};
+            base_deref.add_source_location() = expr.source_location();
 
-          rank+=tmp_rank;
-          new_expr.swap(tmp_expr);
+            // [over.ics.scs], [conv.qual]: a derived-to-base conversion is a
+            // Conversion-rank standard conversion (worse than the exact match
+            // a same-type operator yields).
+            const unsigned this_rank = d2b_rank + 4;
+            if(!found || this_rank < found_rank)
+            {
+              found = true;
+              ambiguous = false;
+              found_rank = this_rank;
+              found_expr.swap(base_deref);
+              found_inaccessible = inaccessible;
+              found_call = unchecked_call;
+            }
+            else if(this_rank == found_rank)
+              ambiguous = true;
+          }
         }
       }
     }
+    if(found && ambiguous)
+      return false;
+
+    // N5008 [over.match.best]/2: a conversion function template's
+    // specialization deduced for the destination ([temp.deduct.conv]) is
+    // a candidate alongside the non-template conversion functions and is
+    // compared by the conversion sequence from its return type; only on a
+    // tie is the non-template preferred (/2.4).  `static_cast<int>(x)' on
+    // a class with `explicit operator bool()' and `template <class T>
+    // explicit operator T()' selects the template's `operator int()'
+    // (identity), not operator bool plus an integral conversion (which
+    // used to be taken whenever any non-template matched, giving 1 for a
+    // value of 5).
+    if(!found || found_rank > 0)
+    {
+      unsigned tmpl_rank = 0;
+      exprt tmpl_expr;
+      if(
+        deduce_conversion_template(expr, to, tmpl_expr, tmpl_rank) &&
+        (!found || tmpl_rank < found_rank))
+      {
+        rank += tmpl_rank;
+        new_expr.swap(tmpl_expr);
+        return true;
+      }
+    }
     if(found)
+    {
+      // the selected conversion function: diagnose its access now
+      if(found_inaccessible)
+        typecheck_side_effect_function_call(found_call);
+      rank += found_rank;
+      new_expr.swap(found_expr);
       return true;
+    }
   }
 
   return new_expr.is_not_nil();
-}
+} // NOLINT(readability/fn_size)
 
 /// Reference-related
 /// \par parameters: A typechecked expression 'expr',
@@ -1144,13 +3639,30 @@ bool cpp_typecheckt::reference_related(
   if(from_followed.get(ID_C_c_type) != to_followed.get(ID_C_c_type))
     return false;
 
-  if(from==to)
+  if(from == to)
     return true;
 
   if(from.id() == ID_struct_tag && to.id() == ID_struct_tag)
   {
-    return subtype_typecast(
-      to_struct_type(from_followed), to_struct_type(to_followed));
+    const auto &from_s = to_struct_type(from_followed);
+    const auto &to_s = to_struct_type(to_followed);
+    if(!subtype_typecast(from_s, to_s))
+      return false;
+    // N5008 [namespace.udecl]/16,19 + [over.match.funcs]/5: a base
+    // member republished in the derived class by a USING-DECLARATION
+    // is a member of the DERIVED class for access purposes; calling it
+    // on a derived object adjusts the implicit object argument to the
+    // base even when the inheritance edge itself is PRIVATE (libc++'s
+    // `class __split_buffer : _Layout<...>` -- class default access --
+    // with `public: using __base_type::__relocate;`).  The
+    // accessibility of the base class gates ordinary derived-to-base
+    // conversions ([class.access.base]/5), not the implicit-object
+    // binding of an accessible member; member access itself is
+    // enforced separately.  The reference type carries ID_C_this
+    // exactly for the implicit object parameter.
+    if(reference_type.get_bool(ID_C_this))
+      return true;
+    return base_publicly_accessible(from_s, to_s);
   }
 
   if(
@@ -1171,24 +3683,81 @@ bool cpp_typecheckt::reference_related(
 bool cpp_typecheckt::reference_compatible(
   const exprt &expr,
   const reference_typet &reference_type,
-  unsigned &rank) const
+  unsigned &rank,
+  unsigned *cv_distance) const
 {
   PRECONDITION(!is_reference(expr.type()));
 
   if(!reference_related(expr, reference_type))
     return false;
 
-  if(expr.type() != reference_type.base_type())
-    rank+=3;
+  // N5008 [dcl.init.ref]/[over.ics.ref]: binding a reference to a
+  // reference-compatible object is the identity conversion; only a
+  // derived-to-base reference binding is a (worse-ranked) Conversion.  A
+  // difference in top-level cv-qualification alone (e.g. binding a non-const
+  // `X` lvalue to `const X&`) is *not* a genuine type difference.  Detect a
+  // real derived-to-base difference by comparing the base types with their
+  // top-level cv-qualifiers removed.
+  typet from_unqualified = expr.type();
+  typet to_unqualified = reference_type.base_type();
+  c_qualifierst{}.write(from_unqualified);
+  c_qualifierst{}.write(to_unqualified);
+  const bool genuine_type_difference = from_unqualified != to_unqualified;
+
+  // N5008 [basic.type.qualifier]/3: cv-qualifiers applied to an array type
+  // attach to its element type -- an array type has no qualification of its
+  // own.  The front end sometimes carries a `const' on the array node
+  // (the operand of `static_cast<const char (&)[4]>(t)' with T deduced
+  // from a string literal, std::forward) and sometimes on the element
+  // only (the written reference type); compare the element qualification.
+  const auto array_element = [](const typet &t) -> const typet &
+  {
+    const typet *e = &t;
+    while(e->id() == ID_array)
+      e = &to_array_type(*e).element_type();
+    return *e;
+  };
 
   c_qualifierst qual_from;
-    qual_from.read(expr.type());
+  qual_from.read(array_element(expr.type()));
 
   c_qualifierst qual_to;
-  qual_to.read(reference_type.base_type());
+  qual_to.read(array_element(reference_type.base_type()));
 
-  if(qual_from!=qual_to)
-    rank+=1;
+  const bool cv_difference = qual_from != qual_to;
+
+  if(cv_distance != nullptr)
+  {
+    // Argument-matching path: keep the identity-rank cv-qualification
+    // difference out of the primary conversion rank and report it separately
+    // as a tie-breaker.  Per [over.ics.rank]/3.2.6 the cv-qualification of a
+    // reference binding is only a tie-breaker *between reference bindings*,
+    // ranked below the non-template preference ([over.match.best]/2.4);
+    // folding it into the primary rank would let a by-value match by a
+    // *template* specialization wrongly beat a reference binding by the
+    // (non-template) copy/move special member.
+    if(genuine_type_difference)
+      rank += 3;
+    // [over.ics.rank]/3.2.6: the binding to the LESS cv-qualified referenced
+    // type is better, so `const T &' beats `const volatile T &' (also for a
+    // derived-to-base binding, where both types differ from the argument's);
+    // count the qualifiers the binding adds.  Incomparable qualifications
+    // (`const' vs `volatile') add as many and stay a tie.
+    if(cv_difference)
+    {
+      *cv_distance += (qual_to.is_constant && !qual_from.is_constant ? 1 : 0) +
+                      (qual_to.is_volatile && !qual_from.is_volatile ? 1 : 0);
+    }
+  }
+  else
+  {
+    // Legacy path (non-argument-matching callers, e.g. return-value and
+    // initialization checks): preserve the existing combined ranking.
+    if(expr.type() != reference_type.base_type())
+      rank += 3;
+    if(cv_difference)
+      rank += 1;
+  }
 
   if(qual_from.is_subset_of(qual_to))
     return true;
@@ -1230,23 +3799,139 @@ bool cpp_typecheckt::reference_compatible(
 /// reference 'type'.
 /// \return True iff an the reference can be bound to the expression. The result
 ///   of the conversion is stored in 'new_expr'.
+/// N5008 [basic.lval]: the value category of an expression, as far as
+/// reference binding and forwarding-reference deduction need it.  The front
+/// end marks a materialised temporary (temporary_object) with ID_C_lvalue --
+/// it is an object with identity -- and the shared C representation marks a
+/// braced aggregate literal (compound_literal, an lvalue in C) likewise; as
+/// C++ expressions both are prvalues.  A dereference of an UNNAMED rvalue
+/// reference (the result of std::move, a T&& return) is an xvalue; a named
+/// one -- a variable or a class member of rvalue-reference type
+/// ([expr.ref]/6) -- is an lvalue.
+bool cpp_typecheckt::is_lvalue_expression(const exprt &expr) const
+{
+  if(!expr.get_bool(ID_C_lvalue))
+    return false;
+  // a conditional over two xvalues is an xvalue ([expr.cond]/4.1); the
+  // conditional's type check records it
+  if(expr.get_bool(ID_C_xvalue))
+    return false;
+  if(
+    expr.id() == ID_side_effect &&
+    expr.get(ID_statement) == ID_temporary_object)
+    return false;
+  if(
+    expr.id() == ID_compound_literal || expr.id() == ID_struct ||
+    expr.id() == ID_array)
+    return false;
+  if(expr.id() == ID_dereference && expr.operands().size() == 1)
+  {
+    const exprt &pointer = to_dereference_expr(expr).pointer();
+    if(
+      pointer.type().id() == ID_pointer &&
+      pointer.type().get_bool(ID_C_rvalue_reference) &&
+      pointer.id() != ID_symbol && pointer.id() != ID_member)
+      return false;
+  }
+  return true;
+}
+
 bool cpp_typecheckt::reference_binding(
   exprt expr,
   const reference_typet &reference_type,
   exprt &new_expr,
-  unsigned &rank)
+  unsigned &rank,
+  unsigned *cv_distance)
 {
   PRECONDITION(!is_reference(expr.type()));
 
-  unsigned backup_rank=rank;
+  unsigned backup_rank = rank;
+
+  // N5008 [dcl.init.ref]/5.1.1 and 5.3.1: a reference to function type
+  // binds directly to a function lvalue whose type is reference-compatible
+  // ([dcl.init.ref]/4: the same function type, or a noexcept function type
+  // converted by a function pointer conversion, [conv.fctptr]).  A
+  // function designator arrives here either still of code type or already
+  // decayed to an implicit address_of ([conv.func]); an explicit `&f' is a
+  // prvalue pointer and does not bind.  References are pointers here, so
+  // the bound reference is the function's address.
+  if(reference_type.base_type().id() == ID_code)
+  {
+    exprt function = nil_exprt{};
+    if(expr.type().id() == ID_code)
+      function = expr;
+    else if(
+      expr.id() == ID_address_of && expr.get_bool(ID_C_implicit) &&
+      to_address_of_expr(expr).object().type().id() == ID_code)
+    {
+      function = to_address_of_expr(expr).object();
+    }
+    if(function.is_nil())
+      return false;
+    code_typet from = to_code_type(function.type());
+    code_typet to = to_code_type(reference_type.base_type());
+    // [conv.fctptr]: only noexcept may be dropped
+    const auto is_noexcept = [](const typet &t)
+    { return t.get_bool("#C_noexcept") || t.get_bool(ID_noexcept); };
+    if(is_noexcept(to) && !is_noexcept(from))
+      return false;
+    for(code_typet *t : {&from, &to})
+    {
+      t->remove("#C_noexcept");
+      t->remove(ID_noexcept);
+    }
+    if(from != to)
+      return false;
+    address_of_exprt address{function, reference_type};
+    address.add_source_location() = expr.source_location();
+    new_expr = std::move(address);
+    return true;
+  }
 
   if(reference_type.get_bool(ID_C_this) && !expr.get_bool(ID_C_lvalue))
   {
     // `this' has to be an lvalue
-    if(expr.get(ID_statement)==ID_temporary_object)
+    if(expr.get(ID_statement) == ID_temporary_object)
       expr.set(ID_C_lvalue, true);
-    else if(expr.get(ID_statement)==ID_function_call)
+    else if(expr.id() == ID_ptrmember)
+    {
+      // N5008 [expr.ref]/2 + [expr.unary.op]/1: E1->E2 is (*E1).E2 and
+      // indirection yields an lvalue, so a class-member access through
+      // -> naming a non-static data member is ALWAYS an lvalue,
+      // whatever flags the expression carries.  An unlowered ptrmember
+      // reaches this gate without its lvalue mark when a member
+      // operator (here operator*) is resolved on it inside a
+      // TRAILING-RETURN decltype during template-argument deduction
+      // (`auto map(F f) const -> decltype(f(*b_))`, the 26-line
+      // trailing-decltype kernel): the candidate was rejected as a
+      // non-lvalue object and the member template silently dropped.
       expr.set(ID_C_lvalue, true);
+    }
+    else if(expr.get(ID_statement) == ID_function_call)
+      expr.set(ID_C_lvalue, true);
+    else if(expr.id() == ID_member)
+    {
+      // N5008 [expr.ref]/8: a member access on a prvalue or xvalue is
+      // itself an xvalue, and [over.match.funcs]/5.3 permits binding
+      // the implied object argument of a member function without a
+      // ref-qualifier to an rvalue.  Walk the member chain: if the
+      // ultimate object is itself a temporary (function-call result or
+      // materialised temporary), the member is callable.  The shape of
+      // `f(...).first->x`, i.e. libc++
+      // `__emplace_unique_key_args(...).first.operator->()` in
+      // std::map::operator[].
+      const exprt *c = &expr;
+      while(c->id() == ID_member)
+        c = &to_member_expr(*c).compound();
+      if(
+        c->get(ID_statement) == ID_temporary_object ||
+        c->get(ID_statement) == ID_function_call)
+      {
+        expr.set(ID_C_lvalue, true);
+      }
+      else
+        return false;
+    }
     else if(expr.get_bool(ID_C_temporary_avoided))
     {
       expr.remove(ID_C_temporary_avoided);
@@ -1259,12 +3944,180 @@ bool cpp_typecheckt::reference_binding(
       return false;
   }
 
+  // C++11: rvalue references cannot bind to lvalues.
+  // Temporaries are internally marked as lvalues but are rvalues in C++.
+  // Also, implicit dereferences of rvalue references are xvalues, not lvalues,
+  // but only when the rvalue reference is unnamed (e.g., from static_cast or
+  // function return). Named rvalue reference variables are lvalues.
   if(
-    expr.get_bool(ID_C_lvalue) ||
-    reference_type.base_type().get_bool(ID_C_constant))
+    is_rvalue_reference(reference_type) && expr.get_bool(ID_C_lvalue) &&
+    expr.get(ID_statement) != ID_temporary_object &&
+    !(expr.id() == ID_dereference && expr.get_bool(ID_C_implicit) &&
+      ((is_rvalue_reference(to_dereference_expr(expr).pointer().type()) &&
+        to_dereference_expr(expr).pointer().id() != ID_symbol) ||
+       (to_dereference_expr(expr).pointer().id() == ID_address_of &&
+        to_address_of_expr(to_dereference_expr(expr).pointer())
+            .object()
+            .get(ID_statement) == ID_temporary_object))))
   {
-    if(reference_compatible(expr, reference_type, rank))
+    // N5008 [dcl.init.ref]/5.4: an rvalue reference cannot bind to an
+    // lvalue.  [basic.lval]: the value category is determined by the
+    // expression's FORM -- an id-expression, unary *, member access or
+    // subscript is a genuine lvalue, and the candidate is NOT viable
+    // (with a copy constructor available, overload resolution selects
+    // it instead; a previous workaround materialized a bitwise
+    // temporary copy of such lvalues and bound the rvalue reference to
+    // it, mis-selecting the MOVE constructor: for self-referential
+    // classes -- the small-string optimization -- the bitwise copy
+    // breaks the class invariant and the move steals a pointer into
+    // the temporary).  Other expression forms that arrive here with a
+    // stale lvalue marking (constructor temporaries, braced-init
+    // results, value expressions) are PRVALUES; temporary
+    // materialization ([conv.rval], [class.temporary]) binds the
+    // rvalue reference to them.
+    // /5.4 only applies when T1 is reference-related to T2; an lvalue of
+    // an unrelated type (`const char *p; w(p);' for `void w(W &&)') goes
+    // through /5.3: a temporary W is copy-initialised from p (converting
+    // constructor or conversion function) and the rvalue reference binds
+    // to it -- handled below.
+    // [expr.sub]/1: `E1[E2]' is an lvalue if E1 is an lvalue and an xvalue
+    // otherwise -- the subscript of an array prvalue (`arr3{1, 2, 3}[i]',
+    // [class.temporary]/6.3) binds to an rvalue reference.
+    const bool subscript_of_rvalue_array =
+      expr.id() == ID_index &&
+      (to_index_expr(expr).array().id() == ID_array ||
+       (to_index_expr(expr).array().id() == ID_side_effect &&
+        to_index_expr(expr).array().get(ID_statement) == ID_temporary_object) ||
+       to_index_expr(expr).array().id() == ID_compound_literal);
+    const bool genuine_lvalue_form =
+      expr.id() == ID_symbol || expr.id() == ID_dereference ||
+      expr.id() == ID_member ||
+      (expr.id() == ID_index && !subscript_of_rvalue_array) ||
+      expr.id() == ID_string_constant; // [expr.prim.literal]: an lvalue
+    const bool unrelated_lvalue_to_class =
+      genuine_lvalue_form && reference_type.base_type().id() == ID_struct_tag &&
+      (expr.type().id() != ID_struct_tag ||
+       !reference_related(expr, reference_type));
+    // an xvalue subscript is bound like a glvalue below (its array
+    // temporary is materialized by goto conversion, [class.temporary]/6.3)
+    if(!unrelated_lvalue_to_class && !subscript_of_rvalue_array)
     {
+      if(genuine_lvalue_form)
+        return false;
+
+      // N5008 [expr.type.conv]/2: `E{2}' (a compound literal here, lvalue
+      // marked for address-taking) is a prvalue of class type; binding
+      // `E &&' to it is the identity conversion ([over.ics.ref]/1) and
+      // better than `const E &' ([over.ics.rank]/3.2.3).  Bind like a
+      // materialized temporary below, with no rank penalty.
+      if(expr.id() == ID_compound_literal && expr.type().id() == ID_struct_tag)
+      {
+        expr.remove(ID_C_lvalue);
+      }
+      // ... and `T{}' of a scalar type T (`pointer{}' in the MSVC STL's
+      // `exchange(_Ptr, pointer{})') is the prvalue of its value
+      // ([expr.type.conv]/2, [dcl.init.list]/3.11); the rvalue reference
+      // binds to a temporary materialized from it ([dcl.init.ref]/5.3.1,
+      // [conv.rval]), below.  Binding to the compound literal passed its
+      // value where the reference's address belongs.
+      else if(
+        expr.id() == ID_compound_literal && expr.operands().size() == 1 &&
+        expr.type().id() != ID_array && expr.type().id() != ID_union_tag &&
+        expr.type().id() != ID_struct_tag)
+      {
+        exprt value = to_unary_expr(expr).op();
+        value.remove(ID_C_lvalue);
+        expr.swap(value);
+      }
+      else
+      {
+        typet base = reference_type.base_type();
+        base.remove(ID_C_constant);
+        typet expr_base = expr.type();
+        expr_base.remove(ID_C_constant);
+        if(base == expr_base)
+        {
+          exprt tmp = expr;
+          tmp.remove(ID_C_lvalue);
+          tmp.set(ID_statement, ID_temporary_object);
+          if(reference_compatible(tmp, reference_type, rank))
+          {
+            new_expr = tmp;
+            rank += 4;
+            return true;
+          }
+        }
+        return false;
+      }
+    }
+  }
+
+  // C++11: xvalues (implicit dereferences of rvalue references) cannot
+  // bind to non-const lvalue references. Named rvalue reference variables
+  // are lvalues, so only reject unnamed rvalue references (e.g., from
+  // static_cast or function return values).
+  //
+  // Exception: the implicit object parameter of a member function call
+  // (`reference_type.get_bool(ID_C_this)`) is special — it is not a
+  // user-visible lvalue reference parameter but the result of CBMC's
+  // internal pointer-to-`this`-as-reference conversion.  An xvalue
+  // receiver (e.g. `std::move(*this).method()`) must be allowed to
+  // bind to it for `&&`-qualified member functions to be callable at
+  // all.  Without this exception, every `std::move(receiver).method()`
+  // fails overload resolution because the candidate's implicit `this`
+  // is interpreted as a non-const lvalue ref.
+  if(
+    !is_rvalue_reference(reference_type) &&
+    !reference_type.base_type().get_bool(ID_C_constant) &&
+    !reference_type.get_bool(ID_C_this) && expr.id() == ID_dereference &&
+    expr.get_bool(ID_C_implicit) &&
+    is_rvalue_reference(to_dereference_expr(expr).pointer().type()) &&
+    to_dereference_expr(expr).pointer().id() != ID_symbol &&
+    // N5008 [expr.ref]/6: a class member access naming a member declared
+    // with reference type is an LVALUE of the referenced type (regardless
+    // of & or &&), so it binds to a non-const lvalue reference -- e.g.
+    // returning std::_Head_base<I, T&&>::_M_head_impl as _Head& in
+    // std::_Tuple_impl::_M_head.
+    to_dereference_expr(expr).pointer().id() != ID_member)
+    return false;
+
+  // N5008 [over.ics.rank]/3.2.3: of two reference bindings of an RVALUE
+  // (here an xvalue: the implicit dereference of an unnamed rvalue
+  // reference, e.g. the result of std::move), the one binding an rvalue
+  // reference is better than the one binding an lvalue reference.  The
+  // const& and && converting constructors of libstdc++'s __shared_ptr
+  // (`shared_ptr(shared_ptr<_Yp>&& __r) : __shared_ptr<_Tp>(std::move(
+  // __r))`) both bound the xvalue with identical rank, and which one
+  // was selected came down to candidate order.  Record the preference
+  // in the lowest-order key, as for the cv tie-break of /3.2.6.
+  const bool binds_xvalue_to_lvalue_reference =
+    !is_rvalue_reference(reference_type) && expr.id() == ID_dereference &&
+    expr.get_bool(ID_C_implicit) &&
+    is_rvalue_reference(to_dereference_expr(expr).pointer().type()) &&
+    to_dereference_expr(expr).pointer().id() != ID_symbol &&
+    to_dereference_expr(expr).pointer().id() != ID_member;
+
+  // N5008 [dcl.init.ref]/5, [over.ics.ref]/3: a non-const lvalue reference
+  // binds only to an lvalue: `void f(S &); f(S{1, 2});' does not match, and
+  // with `f(S)' also declared the by-value overload is the only viable one
+  // (it was reported ambiguous, e.g. ranget::zip(containert &) vs
+  // zip(ranget<I>) called with a prvalue).
+  // The implicit object parameter (ID_C_this) is exempt: a member function
+  // may be called on an rvalue object ([over.match.funcs]/5 -- the
+  // ref-qualifier, when present, is checked by the caller); the object
+  // expression is marked ID_C_lvalue at the top of this function.
+  const bool expr_is_lvalue =
+    is_lvalue_expression(expr) ||
+    (reference_type.get_bool(ID_C_this) && expr.get_bool(ID_C_lvalue));
+
+  if(
+    expr_is_lvalue || reference_type.base_type().get_bool(ID_C_constant) ||
+    is_rvalue_reference(reference_type))
+  {
+    if(reference_compatible(expr, reference_type, rank, cv_distance))
+    {
+      if(binds_xvalue_to_lvalue_reference && cv_distance != nullptr)
+        ++*cv_distance;
       if(!expr.get_bool(ID_C_lvalue))
       {
         // create temporary object
@@ -1279,7 +4132,7 @@ bool cpp_typecheckt::reference_binding(
 
       {
         address_of_exprt tmp(expr, ::reference_type(expr.type()));
-        tmp.add_source_location()=expr.source_location();
+        tmp.add_source_location() = expr.source_location();
         new_expr.swap(tmp);
       }
 
@@ -1287,14 +4140,23 @@ bool cpp_typecheckt::reference_binding(
       {
         c_qualifierst qual_from;
         qual_from.read(expr.type());
-        new_expr = typecast_exprt::conditional_cast(new_expr, reference_type);
+        if(
+          expr.type().id() == ID_struct_tag &&
+          reference_type.base_type().id() == ID_struct_tag)
+        {
+          make_ptr_typecast(new_expr, reference_type);
+        }
+        else
+        {
+          new_expr = typecast_exprt::conditional_cast(new_expr, reference_type);
+        }
         qual_from.write(to_reference_type(new_expr.type()).base_type());
       }
 
       return true;
     }
 
-    rank=backup_rank;
+    rank = backup_rank;
   }
 
   // conversion operators
@@ -1309,6 +4171,28 @@ bool cpp_typecheckt::reference_binding(
       if(!component.get_bool(ID_is_cast_operator))
         continue;
 
+      // Skip components that are template-conversion-operator
+      // specialisations from a previous deduction; their
+      // counterpart for *this* destination type (which may be a
+      // different reference) is found below by
+      // `deduce_conversion_template_for_reference`.
+      // ([over.ics.user]/3 + [over.match.conv])
+      if(component.get_bool("#is_template_specialization"))
+        continue;
+
+      // The component flag above is lost when the class is re-elaborated
+      // (mutually-dependent class types), so also consult the persistent
+      // flag on the member symbol set by
+      // find_template_conversion_specialisation.  An instantiated
+      // template conversion operator is not a non-template candidate
+      // ([over.match.conv]) and is not name-resolvable in the class
+      // cpp_scope; the fresh template deduction handles it.
+      if(const symbolt *comp_sym = symbol_table.lookup(component.get_name()))
+      {
+        if(comp_sym->type.get_bool("#instantiated_conversion_operator"))
+          continue;
+      }
+
       const code_typet &component_type = to_code_type(component.type());
 
       // otherwise it cannot bind directly (not an lvalue)
@@ -1318,26 +4202,24 @@ bool cpp_typecheckt::reference_binding(
       DATA_INVARIANT(
         component_type.parameters().size() == 1, "exactly one parameter");
 
-      typet this_type =
-        component_type.parameters().front().type();
+      typet this_type = component_type.parameters().front().type();
       this_type.set(ID_C_reference, true);
 
       exprt this_expr(expr);
 
       this_type.set(ID_C_this, true);
 
-      unsigned tmp_rank=0;
+      unsigned tmp_rank = 0;
 
       exprt tmp_expr;
-      if(implicit_conversion_sequence(
-        this_expr, this_type, tmp_expr, tmp_rank))
+      if(implicit_conversion_sequence(this_expr, this_type, tmp_expr, tmp_rank))
       {
         // To take care of the possible virtual case,
         // we build the function as a member expression.
         const cpp_namet cpp_func_name(component.get_base_name());
 
         exprt member_func(ID_member);
-        member_func.add(ID_component_cpp_name)=cpp_func_name;
+        member_func.add(ID_component_cpp_name) = cpp_func_name;
         member_func.copy_to_operands(already_typechecked_exprt{expr});
 
         side_effect_expr_function_callt func_expr(
@@ -1348,7 +4230,7 @@ bool cpp_typecheckt::reference_binding(
         typecheck_side_effect_function_call(func_expr);
 
         // let's check if the returned value binds directly
-        exprt returned_value=func_expr;
+        exprt returned_value = func_expr;
         add_implicit_dereference(returned_value);
 
         if(
@@ -1369,9 +4251,26 @@ bool cpp_typecheckt::reference_binding(
             make_ptr_typecast(new_expr, reference_type);
             qual_from.write(to_reference_type(new_expr.type()).base_type());
           }
-          rank+=4+tmp_rank;
+          rank += 4 + tmp_rank;
           return true;
         }
+      }
+    }
+
+    // No non-template reference-returning cast operator matched.
+    // Per [temp.deduct.conv]/1 + [over.match.ref], try template
+    // conversion-function specialisations whose return type
+    // (after [temp.deduct.conv]/2 reference-stripping) deduces a
+    // reference-compatible match against `reference_type`.
+    {
+      unsigned tmpl_rank = 0;
+      exprt tmpl_expr;
+      if(deduce_conversion_template_for_reference(
+           expr, reference_type, tmpl_expr, tmpl_rank))
+      {
+        rank += tmpl_rank;
+        new_expr.swap(tmpl_expr);
+        return true;
       }
     }
   }
@@ -1380,18 +4279,38 @@ bool cpp_typecheckt::reference_binding(
   if(reference_type.get_bool(ID_C_this))
     return false;
 
+  // N5008 [dcl.init.ref]/5.3: a temporary is created and bound only when
+  // the reference is an lvalue reference to a non-volatile const type OR an
+  // rvalue reference (`void w(W &&); w(5);' with W(int) -- /5.3.2: the
+  // initializer is copy-initialised into a temporary of the referenced
+  // type via the converting constructor).  Rvalue references were rejected
+  // here together with non-const lvalue references, so `std::string &&'
+  // parameters could not take a string literal.
   if(
-    !reference_type.base_type().get_bool(ID_C_constant) ||
-    reference_type.base_type().get_bool(ID_C_volatile))
+    !is_rvalue_reference(reference_type) &&
+    (!reference_type.base_type().get_bool(ID_C_constant) ||
+     reference_type.base_type().get_bool(ID_C_volatile)))
     return false;
 
-  // TODO: handle the case for implicit parameters
+  // N5008 [dcl.init.ref]/5.4.1: when T1 is reference-related to T2 (the
+  // same class, or a base of it), cv1 shall be the same as or greater than
+  // cv2 -- `E &&' does not bind to a `const E' prvalue by copying it into
+  // a non-const temporary (`push_back(c ? neg(op) : op)' with `const E
+  // &op', a `const E' prvalue by [expr.cond]/4.3, was ambiguous between
+  // push_back(const E &) and push_back(E &&)).
   if(
-    !reference_type.base_type().get_bool(ID_C_constant) &&
-    !expr.get_bool(ID_C_lvalue))
-    return false;
+    expr.type().id() == ID_struct_tag &&
+    reference_type.base_type().id() == ID_struct_tag &&
+    reference_related(expr, reference_type))
+  {
+    c_qualifierst qual_from, qual_to;
+    qual_from.read(expr.type());
+    qual_to.read(reference_type.base_type());
+    if(!qual_from.is_subset_of(qual_to))
+      return false;
+  }
 
-  exprt arg_expr=expr;
+  exprt arg_expr = expr;
 
   if(arg_expr.type().id() == ID_struct_tag)
   {
@@ -1399,16 +4318,23 @@ bool cpp_typecheckt::reference_binding(
     arg_expr.set(ID_C_lvalue, true);
   }
 
+  // N5008 [over.ics.rank]/3.2.3: the temporary is an rvalue; of `W &&' and
+  // `const W &' (same converting constructor, otherwise identical
+  // sequences) the rvalue reference binding is better.  Record the lvalue
+  // reference's disadvantage in the lowest-order key, as for /3.2.6.
+  if(!is_rvalue_reference(reference_type) && cv_distance != nullptr)
+    ++*cv_distance;
+
   if(user_defined_conversion_sequence(
        arg_expr, reference_type.base_type(), new_expr, rank))
   {
     address_of_exprt tmp(new_expr, ::reference_type(new_expr.type()));
-    tmp.add_source_location()=new_expr.source_location();
+    tmp.add_source_location() = new_expr.source_location();
     new_expr.swap(tmp);
     return true;
   }
 
-  rank=backup_rank;
+  rank = backup_rank;
   if(standard_conversion_sequence(
        expr, reference_type.base_type(), new_expr, rank))
   {
@@ -1426,9 +4352,9 @@ bool cpp_typecheckt::reference_binding(
 
     address_of_exprt tmp(new_expr, pointer_type(new_expr.type()));
     tmp.type().set(ID_C_reference, true);
-    tmp.add_source_location()=new_expr.source_location();
+    tmp.add_source_location() = new_expr.source_location();
 
-    new_expr=tmp;
+    new_expr = tmp;
     return true;
   }
 
@@ -1445,27 +4371,57 @@ bool cpp_typecheckt::implicit_conversion_sequence(
   const exprt &expr,
   const typet &type,
   exprt &new_expr,
-  unsigned &rank)
+  unsigned &rank,
+  unsigned *cv_distance)
 {
-  unsigned backup_rank=rank;
+  unsigned backup_rank = rank;
 
-  exprt e=expr;
+  exprt e = expr;
+
+  // A braced-init-list element pre-typechecked at its call site (see
+  // typecheck_side_effect_function_call, [class.access.general]/5) is
+  // wrapped as already-typechecked; the conversion machinery operates
+  // on the real expression inside.
+  while(e.id() == ID_already_typechecked)
+    e = to_already_typechecked_expr(e).get_expr();
+
   add_implicit_dereference(e);
+
+  // N5008 [temp.inst]/2, [over.best.ics]: an expression of class type
+  // converts through the class's conversion functions, so its class must
+  // be complete here.  A class template specialization is instantiated
+  // lazily; the type of an `auto' variable deduced from a call to a
+  // member function declared LATER in the class (`auto n = lookup(s); if(n)'
+  // with `opt<unsigned> lookup(int)') was a still-unelaborated struct tag
+  // ("invalid implicit conversion from 'struct nil' to bool").
+  if(e.type().id() == ID_struct_tag)
+    elaborate_class_template(e.type());
 
   if(is_reference(type))
   {
-    if(!reference_binding(e, to_reference_type(type), new_expr, rank))
+    if(!reference_binding(
+         e, to_reference_type(type), new_expr, rank, cv_distance))
+    {
+      // A failed conversion attempt must not leave `rank` modified: the
+      // rank of a non-existent implicit conversion sequence is undefined,
+      // and callers commonly try several alternative conversions in
+      // sequence sharing the same `rank` accumulator (see
+      // `cpp_typecheck_fargst::match`).  A failed attempt that leaks a
+      // partial rank would inflate the next, viable attempt's rank and
+      // corrupt [over.ics.rank] ranking.  Restore the entry value.
+      rank = backup_rank;
       return false;
+    }
 
-    #if 0
+#if 0
     simplify_exprt simplify(*this);
     simplify.simplify(new_expr);
     new_expr.type().set(ID_C_reference, true);
-    #endif
+#endif
   }
   else if(!standard_conversion_sequence(e, type, new_expr, rank))
   {
-    rank=backup_rank;
+    rank = backup_rank;
     if(!user_defined_conversion_sequence(e, type, new_expr, rank))
     {
       if(
@@ -1489,7 +4445,10 @@ bool cpp_typecheckt::implicit_conversion_sequence(
         return true;
       }
 
-      // no conversion
+      // no conversion: restore the entry rank so a failed attempt does
+      // not pollute a subsequent viable conversion's rank (see the note
+      // on the reference-binding failure above).
+      rank = backup_rank;
       return false;
     }
 
@@ -1512,7 +4471,7 @@ bool cpp_typecheckt::implicit_conversion_sequence(
   const typet &type,
   exprt &new_expr)
 {
-  unsigned rank=0;
+  unsigned rank = 0;
   return implicit_conversion_sequence(expr, type, new_expr, rank);
 }
 
@@ -1530,27 +4489,1244 @@ bool cpp_typecheckt::implicit_conversion_sequence(
   return implicit_conversion_sequence(expr, type, new_expr, rank);
 }
 
+/// N5008 [dcl.init.list]/5-6: the backing array of a braced-init-list (the
+/// `const E[N]' an initializer_list<E> refers to, or the temporary array a
+/// reference to array binds to) with \p elements, each already converted to
+/// the element type.  The array is a static-lifetime symbol; its elements
+/// are its static initializer when they are constants, and are otherwise
+/// assigned where the list is evaluated: \p prefix then receives that
+/// assignment, which the caller must sequence before its result (a comma
+/// expression) -- a static initializer naming a local (`{e}' with `E e')
+/// read the local before it existed.
+/// \return the array symbol, an lvalue
+symbol_exprt cpp_typecheckt::initializer_list_backing_array(
+  exprt::operandst elements,
+  const array_typet &array_type,
+  const source_locationt &source_location,
+  bool constant,
+  std::optional<exprt> &prefix)
+{
+  const std::function<bool(const exprt &)> is_constant_initializer =
+    [&](const exprt &e)
+  {
+    if(e.is_constant() || e.id() == ID_string_constant || e.is_nil())
+      return true;
+    if(
+      e.id() == ID_struct || e.id() == ID_array || e.id() == ID_union ||
+      e.id() == ID_typecast || e.id() == ID_address_of)
+    {
+      for(const auto &op : e.operands())
+        if(!is_constant_initializer(op))
+          return false;
+      return true;
+    }
+    return false;
+  };
+  bool all_constant = true;
+  for(const auto &e : elements)
+    if(!is_constant_initializer(e))
+      all_constant = false;
+  // Elements of a class type with a destructor are OBJECTS of the array
+  // ([dcl.init.list]/5), to be destroyed with it ([dcl.init.list]/6); the
+  // assignment below would destroy the constructor temporaries at the end
+  // of the full-expression and never the elements.  Keep such elements
+  // in the static initializer (the previous behaviour, which destroys
+  // nothing) until the array gets a lifetime of its own.
+  typet element_type = array_type.element_type();
+  while(element_type.id() == ID_array)
+    element_type = to_array_type(element_type).element_type();
+  if(element_type.id() == ID_struct_tag && !cpp_is_pod(element_type))
+    all_constant = true;
+
+  const auto arr_id = "__init_list_arr$" + std::to_string(anon_counter++);
+  auxiliary_symbolt arr_sym;
+  arr_sym.name = arr_id;
+  arr_sym.base_name = arr_id;
+  arr_sym.type = array_type;
+  if(constant)
+    arr_sym.type.set(ID_C_constant, true);
+  arr_sym.mode = ID_cpp;
+  arr_sym.is_static_lifetime = true;
+  arr_sym.is_lvalue = true;
+  arr_sym.location = source_location;
+  symbol_exprt arr_ref{arr_id, arr_sym.type};
+  arr_ref.set(ID_C_lvalue, true);
+  arr_ref.add_source_location() = source_location;
+  // An element that is a constructor call on a temporary is constructed in
+  // place instead ([dcl.init.list]/5: each element is copy-initialized as an
+  // object of the array).  Copying the temporary into the array kept the
+  // pointers it holds into itself: the elements of an
+  // initializer_list<std::string> read the characters of a dead temporary.
+  std::optional<exprt> in_place =
+    construct_elements_in_place(elements, arr_ref, array_type, source_location);
+  if(in_place.has_value())
+  {
+    prefix = std::move(*in_place);
+    arr_sym.value = nil_exprt{};
+  }
+  else if(all_constant)
+    arr_sym.value = array_exprt{std::move(elements), array_type};
+  else
+  {
+    // the elements are evaluated where the list is ([dcl.init.list]/5:
+    // the array's elements are copy-initialized from the list's)
+    symbol_exprt lhs = arr_ref;
+    lhs.type() = array_type; // assignable
+    side_effect_exprt assign{
+      ID_assign,
+      {std::move(lhs), array_exprt{std::move(elements), array_type}},
+      array_type,
+      source_location};
+    prefix = std::move(assign);
+  }
+  symbol_table.add(arr_sym);
+  return arr_ref;
+}
+
+/// The constructor calls that build each element of \p elements, all of
+/// them temporary objects (`S(args)' on a new object), in place as element
+/// \p array [k] instead, as a comma expression; nothing if any element is
+/// of another form.
+std::optional<exprt> cpp_typecheckt::construct_elements_in_place(
+  const exprt::operandst &elements,
+  const symbol_exprt &array,
+  const array_typet &array_type,
+  const source_locationt &source_location)
+{
+  if(elements.empty())
+    return {};
+  exprt::operandst calls;
+  for(std::size_t k = 0; k < elements.size(); ++k)
+  {
+    const exprt &e = elements[k];
+    if(e.id() != ID_side_effect || e.get(ID_statement) != ID_temporary_object)
+    {
+      return {};
+    }
+    const exprt &init = static_cast<const exprt &>(e.find(ID_initializer));
+    if(
+      init.id() != ID_code || to_code(init).get_statement() != ID_expression ||
+      init.operands().size() != 1)
+    {
+      return {};
+    }
+    const exprt &call = init.operands().front();
+    if(
+      call.id() != ID_side_effect || call.get(ID_statement) != ID_function_call)
+    {
+      return {};
+    }
+    const auto &arguments = to_side_effect_expr_function_call(call).arguments();
+    if(
+      arguments.empty() || arguments.front().id() != ID_address_of ||
+      to_address_of_expr(arguments.front()).object().id() != ID_new_object)
+    {
+      return {};
+    }
+    symbol_exprt assignable = array;
+    assignable.type() = array_type;
+    side_effect_expr_function_callt in_place =
+      to_side_effect_expr_function_call(call);
+    in_place.arguments().front() = address_of_exprt{
+      index_exprt{
+        std::move(assignable),
+        from_integer(k, c_index_type()),
+        array_type.element_type()},
+      to_pointer_type(arguments.front().type())};
+    calls.push_back(std::move(in_place));
+  }
+  exprt result = std::move(calls.back());
+  calls.pop_back();
+  while(!calls.empty())
+  {
+    exprt comma{ID_comma, result.type()};
+    comma.add_to_operands(std::move(calls.back()), std::move(result));
+    comma.add_source_location() = source_location;
+    result = std::move(comma);
+    calls.pop_back();
+  }
+  return result;
+}
+
+/// \p prefix (see initializer_list_backing_array) sequenced before \p result
+exprt cpp_typecheckt::sequence_before(
+  std::optional<exprt> prefix,
+  exprt result,
+  const source_locationt &source_location)
+{
+  if(!prefix.has_value())
+    return result;
+  exprt comma{ID_comma, result.type()};
+  comma.add_to_operands(std::move(*prefix), std::move(result));
+  comma.add_source_location() = source_location;
+  return comma;
+}
+
+/// N5008 [dcl.init.list]/3.4 + [dcl.init.ref]/5.4.2: a braced-init-list
+/// for a REFERENCE TO ARRAY parameter (`_Dest (&&)[1]', libc++ variant's
+/// narrowing check `__test_impl<_Dest>({std::declval<_Source>()})')
+/// aggregate-initializes a temporary array of the element type -- each
+/// element converted ([dcl.init.aggr]), the remaining ones value-initialized
+/// ([dcl.init.aggr]/5.2) -- and binds the reference to it.  The list must
+/// fit the bound ([dcl.init.aggr]/6).
+/// \return true and \p result set to the bound reference on success
+bool cpp_typecheckt::brace_init_to_array_reference(
+  const exprt &init_list,
+  const pointer_typet &reference_type,
+  exprt &result)
+{
+  const array_typet &array_type = to_array_type(reference_type.base_type());
+  const auto bound = numeric_cast<mp_integer>(array_type.size());
+  if(!bound.has_value() || mp_integer(init_list.operands().size()) > *bound)
+    return false;
+  typet elem_type = array_type.element_type();
+  exprt::operandst elements;
+  for(const auto &op : init_list.operands())
+  {
+    exprt element = op;
+    implicit_typecast(element, elem_type);
+    elements.push_back(std::move(element));
+  }
+  for(mp_integer i = elements.size(); i < *bound; ++i)
+  {
+    const auto zero = itanium_abi_cpp_zero_initializer(
+      elem_type, init_list.source_location(), *this);
+    if(!zero.has_value())
+      return false;
+    elements.push_back(*zero);
+  }
+  array_typet temporary_type = array_type;
+  temporary_type.remove(ID_C_constant);
+  std::optional<exprt> prefix;
+  symbol_exprt arr_ref = initializer_list_backing_array(
+    std::move(elements),
+    temporary_type,
+    init_list.source_location(),
+    false,
+    prefix);
+  address_of_exprt bound_ref{arr_ref, reference_type};
+  bound_ref.add_source_location() = init_list.source_location();
+  result = sequence_before(
+    std::move(prefix), std::move(bound_ref), init_list.source_location());
+  return true;
+}
+
+cpp_typecheckt::explicit_constructorst
+cpp_typecheckt::viable_one_argument_constructors(
+  const struct_tag_typet &class_type,
+  const exprt &value)
+{
+  // A copy: probing a conversion may instantiate templates that add
+  // components to this class, reallocating its component vector.
+  const struct_typet::componentst components =
+    follow_tag(class_type).components();
+  bool explicit_viable = false;
+  bool converting_viable = false;
+  for(const auto &c : components)
+  {
+    if(
+      c.get_bool(ID_from_base) || c.type().id() != ID_code ||
+      to_code_type(c.type()).return_type().id() != ID_constructor)
+    {
+      continue;
+    }
+    const auto &params = to_code_type(c.type()).parameters();
+    // this + one argument (the rest defaulted, the @most_derived flag too)
+    if(params.size() < 2)
+      continue;
+    bool rest_defaulted = true;
+    for(std::size_t i = 2; i < params.size(); ++i)
+      if(params[i].default_value().is_nil())
+        rest_defaulted = false;
+    if(!rest_defaulted)
+      continue;
+    exprt converted;
+    unsigned rank = 0;
+    bool ok = false;
+    {
+      sfinae_contextt probe{*this};
+      try
+      {
+        typet param_type = params[1].type();
+        if(is_reference(param_type))
+        {
+          ok = reference_binding(
+            value, to_reference_type(param_type), converted, rank);
+        }
+        else
+          ok = standard_conversion_sequence(value, param_type, converted, rank);
+      }
+      catch(...)
+      {
+        ok = false;
+      }
+    }
+    if(!ok)
+      continue;
+    if(c.get_bool(ID_is_explicit))
+      explicit_viable = true;
+    else
+      converting_viable = true;
+  }
+  if(!explicit_viable)
+    return explicit_constructorst::NONE_VIABLE;
+  return converting_viable ? explicit_constructorst::ALSO_CONVERTING
+                           : explicit_constructorst::ONLY_EXPLICIT;
+}
+
+bool cpp_typecheckt::aggregate_list_initialization_is_viable(
+  const exprt &list,
+  const typet &type)
+{
+  if(
+    list.id() != ID_initializer_list || list.operands().empty() ||
+    !(type.id() == ID_array ||
+      (type.id() == ID_struct_tag && cpp_is_pod(type))))
+  {
+    return false;
+  }
+  try
+  {
+    sfinae_contextt sfinae_guard{*this};
+    // [dcl.init.aggr]/16: an initializer-clause left over after all
+    // elements and subaggregates are initialized makes the program
+    // ill-formed; do_initializer only warns about it ("member designator
+    // index ... out of bounds"), so any warning means not viable.
+    const auto warnings_before =
+      get_message_handler().get_message_count(messaget::M_WARNING);
+    exprt value = list;
+    do_initializer(value, type, false);
+    return get_message_handler().get_message_count(messaget::M_WARNING) ==
+           warnings_before;
+  }
+  catch(...)
+  {
+    return false;
+  }
+}
+
 void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
 {
-  exprt e=expr;
+  const exprt orig_expr = expr;
+  exprt e = expr;
+
+  // N5008 [dcl.init.list]/3.11: an empty braced-init-list value-initializes
+  // the object -- for a scalar ([dcl.init.general]/9) that is
+  // zero-initialization: `e = {}' on a scoped enumeration, an integer or a
+  // floating-point type ([expr.ass]/8.1: `x = B' means `x = t' with `T t =
+  // B').  Class types (default constructor), pointers and references are
+  // handled by their own rules below.
+  if(
+    e.id() == ID_initializer_list && e.operands().empty() &&
+    (type.id() == ID_signedbv || type.id() == ID_unsignedbv ||
+     type.id() == ID_bool || type.id() == ID_c_bool ||
+     type.id() == ID_c_enum_tag || type.id() == ID_c_enum ||
+     type.id() == ID_floatbv || type.id() == ID_fixedbv))
+  {
+    const auto zero =
+      itanium_abi_cpp_zero_initializer(type, e.source_location(), *this);
+    if(zero.has_value())
+    {
+      expr = *zero;
+      expr.add_source_location() = orig_expr.source_location();
+      return;
+    }
+  }
+
+  // N5008 [dcl.init.list]/3.2-3.4: copy-list-initialization of an
+  // aggregate -- an array, or a class that the front end treats as POD --
+  // is aggregate initialization ([dcl.init.aggr]), including brace elision
+  // ([dcl.init.aggr]/16: `return {2};' for `struct A { int v[1]; }', the
+  // `return {_S_to_enum<_Args>()...};' of libstdc++'s
+  // basic_format_args::_S_types_to_pack into std::array).  Only a single
+  // element whose type is T or a class derived from T initializes the object
+  // from that element ([dcl.init.list]/3.2); [dcl.init.list]/3.9 comes after
+  // 3.4.  Use the aggregate initialization of variables (do_initializer).
+  if(
+    e.id() == ID_initializer_list && !e.operands().empty() &&
+    (type.id() == ID_array ||
+     (type.id() == ID_struct_tag && cpp_is_pod(type))) &&
+    std::none_of(
+      e.operands().begin(),
+      e.operands().end(),
+      [](const exprt &op) { return op.id() == ID_designated_initializer; }))
+  {
+    bool from_element = false;
+    if(e.operands().size() == 1 && type.id() == ID_struct_tag)
+    {
+      const typet &element_type = e.operands().front().type();
+      from_element = element_type.id() == ID_struct_tag &&
+                     (to_struct_tag_type(element_type).get_identifier() ==
+                        to_struct_tag_type(type).get_identifier() ||
+                      subtype_typecast(
+                        follow_tag(to_struct_tag_type(element_type)),
+                        follow_tag(to_struct_tag_type(type))));
+    }
+    if(
+      !from_element && aggregate_list_initialization_is_viable(orig_expr, type))
+    {
+      exprt value = orig_expr;
+      do_initializer(value, type, false);
+      expr = std::move(value);
+      return;
+    }
+  }
 
   if(
-    e.id() == ID_initializer_list && cpp_is_pod(type) &&
+    e.id() == ID_initializer_list && (cpp_is_pod(type) || is_reference(type)) &&
     e.operands().size() == 1)
   {
+    // [dcl.init.list]/3.9-3.10, [over.ics.list]/8: a single-element
+    // braced-init-list initializes a scalar, and binds a reference,
+    // from that element.
     e = to_unary_expr(expr).op();
   }
 
   if(!implicit_conversion_sequence(e, type, expr))
   {
+    // Fallback: if the source is a char array (a string literal
+    // after C++17 array-to-pointer decay) and the target is a
+    // basic_string struct, try converting the source to `const
+    // char*` first and retry.  libstdc++'s
+    //   basic_string(const _CharT* __s, const _Alloc& __a = _Alloc())
+    // constructor (basic_string.h line 641) is wrapped in a member
+    // template with a SFINAE guard
+    //   template<typename = _RequireAllocator<_Alloc>>
+    // and is therefore not present in the struct's components
+    // list.  The other `const char*` constructor,
+    //   basic_string(const _CharT*, size_type, const _Alloc& = _Alloc())
+    // requires an explicit size argument and is therefore unusable
+    // for a plain `std::string = "hello"` initializer.
+    //
+    // Rather than teach the general conversion-sequence logic to
+    // enumerate member-template constructors (an architectural
+    // change), recognise this specific pattern and emit the
+    // explicit `basic_string(const char*, size_type, Alloc())`
+    // constructor call using strlen to compute the size.
+    if(
+      type.id() == ID_struct_tag &&
+      id2string(to_struct_tag_type(type).get_identifier())
+          .find("tag-basic_string<") != std::string::npos)
+    {
+      typet src_t = e.type();
+      bool src_is_char_array =
+        src_t.id() == ID_array &&
+        (to_array_type(src_t).element_type().id() == ID_signedbv ||
+         to_array_type(src_t).element_type().id() == ID_unsignedbv) &&
+        to_bitvector_type(to_array_type(src_t).element_type()).get_width() ==
+          config.ansi_c.char_width;
+      bool src_is_char_ptr =
+        src_t.id() == ID_pointer &&
+        (to_pointer_type(src_t).base_type().id() == ID_signedbv ||
+         to_pointer_type(src_t).base_type().id() == ID_unsignedbv) &&
+        to_bitvector_type(to_pointer_type(src_t).base_type()).get_width() ==
+          config.ansi_c.char_width;
+      if(src_is_char_array || src_is_char_ptr)
+      {
+        // Decay array to pointer if needed.
+        exprt char_ptr = e;
+        if(src_is_char_array)
+        {
+          pointer_typet ptr_type =
+            pointer_type(to_array_type(src_t).element_type());
+          ptr_type.base_type().set(ID_C_constant, true);
+          char_ptr = typecast_exprt(
+            address_of_exprt(index_exprt(
+              e,
+              from_integer(0, c_index_type()),
+              to_array_type(src_t).element_type())),
+            ptr_type);
+        }
+        // Use strlen-style length: front end's __builtin_strlen is
+        // recognised by CBMC.  Fall back to a nondet size if the
+        // char_ptr is a non-constant expression.
+        exprt length_expr;
+        if(
+          char_ptr.id() == ID_typecast &&
+          to_typecast_expr(char_ptr).op().id() == ID_address_of &&
+          to_address_of_expr(to_typecast_expr(char_ptr).op()).object().id() ==
+            ID_index &&
+          to_index_expr(
+            to_address_of_expr(to_typecast_expr(char_ptr).op()).object())
+              .array()
+              .id() == ID_string_constant)
+        {
+          const irep_idt &raw =
+            to_string_constant(
+              to_index_expr(
+                to_address_of_expr(to_typecast_expr(char_ptr).op()).object())
+                .array())
+              .value();
+          length_expr = from_integer(id2string(raw).size(), size_type());
+        }
+        else
+        {
+          length_expr =
+            side_effect_expr_nondett{size_type(), e.source_location()};
+        }
+        // Find `basic_string(const _CharT*, size_type, const _Alloc&)`.
+        const struct_typet &struct_type_to =
+          follow_tag(to_struct_tag_type(type));
+        for(const auto &component : struct_type_to.components())
+        {
+          if(component.get_bool(ID_from_base))
+            continue;
+          const typet &comp_type = component.type();
+          if(comp_type.id() != ID_code)
+            continue;
+          if(to_code_type(comp_type).return_type().id() != ID_constructor)
+            continue;
+          const auto &parameters = to_code_type(comp_type).parameters();
+          // Look for (this, const char*, size_type, const Alloc&=...)
+          if(parameters.size() != 4)
+            continue;
+          const typet &p1 = parameters[1].type();
+          if(p1.id() != ID_pointer)
+            continue;
+          const typet &p1_base = to_pointer_type(p1).base_type();
+          if(p1_base.id() != ID_signedbv && p1_base.id() != ID_unsignedbv)
+            continue;
+          const typet &p2 = parameters[2].type();
+          if(p2.id() != ID_unsignedbv && p2.id() != ID_signedbv)
+            continue;
+          // Build the constructor call.
+          exprt func_symb = cpp_symbol_expr(lookup(component.get_name()));
+          func_symb.type() = comp_type;
+          already_typechecked_exprt::make_already_typechecked(func_symb);
+          side_effect_expr_function_callt ctor_expr(
+            std::move(func_symb),
+            {char_ptr, length_expr},
+            uninitialized_typet{},
+            e.source_location());
+          try
+          {
+            typecheck_side_effect_function_call(ctor_expr);
+            if(ctor_expr.get(ID_statement) == ID_temporary_object)
+            {
+              expr = std::move(ctor_expr);
+              return;
+            }
+          }
+          catch(...)
+          {
+            // fall through to the standard error below
+          }
+          break;
+        }
+      }
+    }
+
+    // Empty brace-init {} to pointer type: produces null pointer.
+    // Used by MSVC's <exception> header: void* ptr = {};
+    if(
+      orig_expr.id() == ID_initializer_list && orig_expr.operands().empty() &&
+      type.id() == ID_pointer && !is_reference(type))
+    {
+      expr = null_pointer_exprt(to_pointer_type(type));
+      return;
+    }
+
+    // C++11 [dcl.init.list]/3: list-initialization with an empty
+    // brace-init list `{}` value-initializes the destination.
+    // For a class type (or reference to a class type) with an
+    // accessible default constructor, this synthesises a default-
+    // constructed temporary; for a reference target the caller
+    // binds the reference via the address of the temporary.
+    //
+    // The match in `cpp_typecheck_fargst::match` (via
+    // `brace_init_is_viable`) accepts `{}` as a viable conversion
+    // for class types and class-reference types; this branch
+    // performs the corresponding actual conversion so the
+    // overall implicit-typecast succeeds rather than reaching
+    // the "invalid implicit conversion" error path below.
+    if(
+      orig_expr.id() == ID_initializer_list && orig_expr.operands().empty() &&
+      (type.id() == ID_struct_tag || type.id() == ID_struct ||
+       (type.id() == ID_pointer && is_reference(type))))
+    {
+      typet base_type = type;
+      bool target_is_reference = false;
+      if(type.id() == ID_pointer && is_reference(type))
+      {
+        base_type = to_reference_type(type).base_type();
+        target_is_reference = true;
+      }
+      if(base_type.id() == ID_struct_tag || base_type.id() == ID_struct)
+      {
+        // Skip std::initializer_list itself — the dedicated
+        // brace-to-initializer_list block below handles those.
+        const std::string base_id_str =
+          base_type.id() == ID_struct_tag
+            ? id2string(to_struct_tag_type(base_type).get_identifier())
+            : std::string{};
+        if(base_id_str.find("tag-initializer_list<") == std::string::npos)
+        {
+          try
+          {
+            // Default-construct via cpp_constructor on a marker
+            // new_object so any user-defined default ctor (or the
+            // POD zero-init path) is honoured uniformly.
+            exprt temp;
+            new_temporary(
+              orig_expr.source_location(), base_type, exprt::operandst{}, temp);
+            if(target_is_reference)
+            {
+              address_of_exprt addr{temp, pointer_type(base_type)};
+              addr.type().set(ID_C_reference, true);
+              if(is_rvalue_reference(type))
+                addr.type().set(ID_C_rvalue_reference, true);
+              expr = std::move(addr);
+            }
+            else
+            {
+              expr = std::move(temp);
+            }
+            return;
+          }
+          catch(...)
+          {
+            // Fall through to standard error path.
+          }
+        }
+      }
+    }
+
+    // N5008 [dcl.init.aggr]/3 designated-initializer-list, and
+    // [dcl.init.list]/3.5 `{}' for a union: the shared do_initializer
+    // knows designators (`return {.a = i, .b = 2};', user-reported Issue
+    // 9) and value-initialises a POD union from an empty list (`return
+    // {};' with a union return type, Issue 10); the positional loop below
+    // knows neither ("invalid implicit conversion from '<<type:>>'").
+    if(
+      orig_expr.id() == ID_initializer_list && cpp_is_pod(type) &&
+      ((type.id() == ID_struct_tag && std::any_of(
+                                        orig_expr.operands().begin(),
+                                        orig_expr.operands().end(),
+                                        [](const exprt &op) {
+                                          return op.id() ==
+                                                 ID_designated_initializer;
+                                        })) ||
+       type.id() == ID_union_tag))
+    {
+      exprt value = orig_expr;
+      do_initializer(value, type, false);
+      expr = std::move(value);
+      return;
+    }
+
+    // C++11 [dcl.init.list]/3.5: non-empty brace-init list to a
+    // class (or reference-to-class) type with an accessible
+    // `initializer_list<U>` constructor.
+    //
+    // Algorithm:
+    //   1. Locate the `initializer_list<U>` ctor on the class and
+    //      extract `U`.
+    //   2. Recurse via `implicit_typecast` to materialise the
+    //      brace-init as a value of type `std::initializer_list<U>`
+    //      (handled by the existing brace-to-initializer_list block
+    //      below — that block produces a `struct_exprt` of the
+    //      `tag-initializer_list<U>` struct).
+    //   3. Mark the synthesised initializer_list value as
+    //      `already_typechecked` so that `cpp_constructor`'s
+    //      argument-typecheck step doesn't reject it as
+    //      `unexpected expression: struct`.
+    //   4. Call `new_temporary` to construct the destination class
+    //      temporary with the initializer_list as its argument.
+    //   5. For a reference-typed target, bind the reference via
+    //      `address_of` of the temporary.
+    if(
+      orig_expr.id() == ID_initializer_list && !orig_expr.operands().empty() &&
+      (type.id() == ID_struct_tag || type.id() == ID_struct ||
+       (type.id() == ID_pointer && is_reference(type))))
+    {
+      typet base_type = type;
+      bool target_is_reference = false;
+      if(type.id() == ID_pointer && is_reference(type))
+      {
+        base_type = to_reference_type(type).base_type();
+        target_is_reference = true;
+      }
+      if(base_type.id() == ID_struct_tag || base_type.id() == ID_struct)
+      {
+        const std::string base_id_str =
+          base_type.id() == ID_struct_tag
+            ? id2string(to_struct_tag_type(base_type).get_identifier())
+            : std::string{};
+        // Skip std::initializer_list itself — the dedicated
+        // brace-to-initializer_list block below handles those.
+        if(base_id_str.find("tag-initializer_list<") == std::string::npos)
+        {
+          const struct_typet &class_type =
+            base_type.id() == ID_struct_tag
+              ? follow_tag(to_struct_tag_type(base_type))
+              : to_struct_type(base_type);
+          // Locate `initializer_list<U>` ctor and extract U.
+          typet init_list_param_type;
+          bool found_il_ctor = false;
+          for(const auto &c : class_type.components())
+          {
+            if(c.type().id() != ID_code)
+              continue;
+            if(to_code_type(c.type()).return_type().id() != ID_constructor)
+              continue;
+            if(c.get_bool(ID_is_explicit))
+              continue;
+            const auto &params = to_code_type(c.type()).parameters();
+            if(params.size() < 2)
+              continue;
+            typet p1_type = params[1].type();
+            if(is_reference(p1_type))
+              p1_type = to_reference_type(p1_type).base_type();
+            if(p1_type.id() != ID_struct_tag)
+              continue;
+            if(
+              id2string(to_struct_tag_type(p1_type).get_identifier())
+                .find("tag-initializer_list<") == std::string::npos)
+              continue;
+            bool all_extras_default = true;
+            for(std::size_t i = 2; i < params.size(); ++i)
+            {
+              if(!params[i].has_default_value())
+              {
+                all_extras_default = false;
+                break;
+              }
+            }
+            if(!all_extras_default)
+              continue;
+            init_list_param_type = p1_type;
+            found_il_ctor = true;
+            break;
+          }
+          if(found_il_ctor)
+          {
+            try
+            {
+              // Recurse: convert the brace-init to
+              // std::initializer_list<U>.  This dispatches to
+              // the existing brace-to-initializer_list handler
+              // below, which produces a `struct_exprt` of the
+              // initializer-list struct.
+              exprt init_list_value = orig_expr;
+              implicit_typecast(init_list_value, init_list_param_type);
+              // Mark it as already typechecked so that
+              // `cpp_constructor`'s `typecheck_expr(op)` call on
+              // the argument does not re-traverse into the raw
+              // `struct_exprt` (which would trip the
+              // "unexpected expression: struct" path in
+              // `c_typecheck_baset::typecheck_expr_main`).
+              already_typechecked_exprt::make_already_typechecked(
+                init_list_value);
+              exprt temp;
+              new_temporary(
+                orig_expr.source_location(), base_type, init_list_value, temp);
+              if(target_is_reference)
+              {
+                address_of_exprt addr{temp, pointer_type(base_type)};
+                addr.type().set(ID_C_reference, true);
+                if(is_rvalue_reference(type))
+                  addr.type().set(ID_C_rvalue_reference, true);
+                expr = std::move(addr);
+              }
+              else
+              {
+                expr = std::move(temp);
+              }
+              return;
+            }
+            catch(...)
+            {
+              // Fall through to the standard error path.
+            }
+          }
+        }
+      }
+    }
+
+    // Brace-init {a, b, ...} to aggregate struct: assign members
+    // in order. Used by MSVC's <ratio> _Big_multiply return statement.
+    //
+    // Skip type-alias components (`first_type` / `second_type` on
+    // std::pair etc.), static data members, and from-base
+    // components in addition to padding and code so the
+    // operands map to the actual non-static data members.
+    // Without this filter, e.g. a brace-init `{x, y}` for
+    // `std::pair<T1, T2>` assigns to `first_type` and
+    // `second_type` (the public typedefs) and never reaches
+    // `first` / `second`, causing the recursive
+    // `implicit_typecast(val, struct_tag(typedef))` call to
+    // fail with "invalid implicit conversion".
+    //
+    // Also accept reference-to-class targets: bind the resulting
+    // temporary by `address_of`, mirroring the empty-`{}` case.
+    if(
+      orig_expr.id() == ID_initializer_list && !orig_expr.operands().empty() &&
+      (type.id() == ID_struct_tag || type.id() == ID_struct ||
+       (type.id() == ID_pointer && is_reference(type))))
+    {
+      typet base_type = type;
+      bool target_is_reference = false;
+      if(type.id() == ID_pointer && is_reference(type))
+      {
+        base_type = to_reference_type(type).base_type();
+        target_is_reference = true;
+      }
+      const bool target_is_struct =
+        base_type.id() == ID_struct_tag || base_type.id() == ID_struct;
+      const bool target_is_init_list =
+        base_type.id() == ID_struct_tag &&
+        id2string(to_struct_tag_type(base_type).get_identifier())
+            .find("tag-initializer_list<") != std::string::npos;
+      if(target_is_struct && !target_is_init_list)
+      {
+        const struct_typet &st = base_type.id() == ID_struct_tag
+                                   ? follow_tag(to_struct_tag_type(base_type))
+                                   : to_struct_type(base_type);
+        const auto &comps = st.components();
+        // A class with base subobjects that have DATA MEMBERS cannot be
+        // initialised by assigning the brace elements to its own data
+        // members in order: the base subobjects would be omitted,
+        // yielding a struct value with fewer operands than the type has
+        // components (which later aborts goto-symex's
+        // assign_from_struct).  Such a type is either a non-aggregate --
+        // list-initialization selects a constructor ([dcl.init.list]/3)
+        // -- or a C++17 aggregate with bases (not handled here); defer
+        // to the constructor path below.
+        bool has_base_subobject = false;
+        for(const auto &c : comps)
+        {
+          if(
+            c.get_bool(ID_from_base) && !c.get_is_padding() &&
+            c.type().id() != ID_code && !c.get_bool(ID_is_type) &&
+            !c.get_bool(ID_is_static))
+          {
+            has_base_subobject = true;
+            break;
+          }
+        }
+        // N5008 [dcl.init.aggr]/2.2: the aggregate's elements START
+        // with the direct base classes, in declaration order.  When
+        // every direct base is EMPTY (no data members -- the libc++
+        // range-adaptor `__take_closure{{}, __n}` shape, whose base
+        // __range_adaptor_closure<...> is empty), a base element's
+        // clause initializes nothing; consume one leading braced
+        // clause per base so the remaining clauses pair with the data
+        // members.  Bases WITH data members keep the constructor-path
+        // deferral above.
+        std::size_t leading_base_clauses = 0;
+        if(!has_base_subobject)
+        {
+          for(const auto &b : st.find(ID_bases).get_sub())
+          {
+            if(b.is_nil())
+              continue;
+            if(
+              leading_base_clauses < orig_expr.operands().size() &&
+              orig_expr.operands()[leading_base_clauses].id() ==
+                ID_initializer_list &&
+              orig_expr.operands()[leading_base_clauses].operands().empty())
+            {
+              ++leading_base_clauses;
+            }
+          }
+        }
+        if(!has_base_subobject)
+        {
+          // N5008 [dcl.init.aggr]/5: when the list has fewer initializers
+          // than the aggregate has elements, the remaining elements are
+          // value-initialized.  Padding is only valid for an AGGREGATE
+          // ([dcl.init.aggr]/1: no user-declared constructor; the
+          // compiler-synthesized ones are marked #is_implicit_ctor) --
+          // for a class with constructors the elements are constructor
+          // arguments instead and missing ones must not be invented.
+          bool has_user_ctor = st.get_bool("has_template_constructor") ||
+                               st.get_bool("has_inherited_constructor");
+          if(!has_user_ctor)
+          {
+            for(const auto &c : comps)
+            {
+              if(c.type().id() != ID_code || c.get_bool(ID_from_base))
+                continue;
+              if(to_code_type(c.type()).return_type().id() != ID_constructor)
+                continue;
+              if(c.type().get_bool("#is_implicit_ctor"))
+                continue;
+              has_user_ctor = true;
+              break;
+            }
+          }
+
+          // The value starts out all-zero so that the layout's padding
+          // components are present ([dcl.init.aggr]/5 value-initialises
+          // the elements without an initializer anyway).
+          auto result_opt =
+            zero_struct_value(base_type, orig_expr.source_location());
+          struct_exprt result =
+            result_opt.has_value() ? *result_opt : struct_exprt({}, base_type);
+          std::size_t i = leading_base_clauses;
+          // N5008 [dcl.init.list]/3.4: a class with a user-declared
+          // constructor is not an aggregate ([dcl.init.aggr]/1); its
+          // braced elements are constructor arguments, resolved by the
+          // constructor path below.  Building a memberwise struct value
+          // here instead bypassed the constructors: for a nested
+          // `{1, {2, lambda}}` into std::pair<int, std::pair<int,
+          // std::function<int()>>> the inner pair's std::function was
+          // copied bitwise from a temporary before that temporary's
+          // constructor had run, and the call operator later reached
+          // __throw_bad_function_call.  Skip the memberwise path.
+          bool ok = !has_user_ctor && result_opt.has_value();
+          for(const auto &c : comps)
+          {
+            if(!ok)
+              break;
+            if(
+              c.get_is_padding() || c.type().id() == ID_code ||
+              c.get_bool(ID_is_type) || c.get_bool(ID_is_static) ||
+              c.get_bool(ID_from_base))
+              continue;
+            if(i < orig_expr.operands().size())
+            {
+              exprt val = orig_expr.operands()[i++];
+              try
+              {
+                implicit_typecast(val, c.type());
+              }
+              catch(...)
+              {
+                ok = false;
+                break;
+              }
+              set_struct_member_value(result, st, c, std::move(val));
+            }
+            // (the remaining elements keep their zero value)
+          }
+          if(ok && i == orig_expr.operands().size())
+          {
+            if(target_is_reference)
+            {
+              // Materialise a temporary, bind the reference via &temp.
+              exprt temp;
+              new_temporary(
+                orig_expr.source_location(),
+                base_type,
+                already_typechecked_exprt{std::move(result)},
+                temp);
+              address_of_exprt addr{temp, pointer_type(base_type)};
+              addr.type().set(ID_C_reference, true);
+              if(is_rvalue_reference(type))
+                addr.type().set(ID_C_rvalue_reference, true);
+              expr = std::move(addr);
+              return;
+            }
+            expr = std::move(result);
+            return;
+          }
+        }
+      }
+    }
+
+    // List-initialization of a non-aggregate class type selects a
+    // constructor ([dcl.init.list]/3, [over.match.list]).  When the
+    // braced-init-list was not consumed as aggregate member-
+    // initialization above -- e.g. because the class has base classes or
+    // user-provided constructors, so its own data members do not line up
+    // with the elements -- treat the elements as constructor arguments
+    // and construct a temporary.  Also handles a reference target (bind
+    // the reference to the materialised temporary).
+    {
+      typet ctor_target = type;
+      bool ctor_target_is_reference = false;
+      if(type.id() == ID_pointer && is_reference(type))
+      {
+        ctor_target = to_reference_type(type).base_type();
+        ctor_target_is_reference = true;
+      }
+      if(
+        orig_expr.id() == ID_initializer_list &&
+        !orig_expr.operands().empty() &&
+        (ctor_target.id() == ID_struct_tag || ctor_target.id() == ID_struct) &&
+        !cpp_is_pod(ctor_target) &&
+        !(ctor_target.id() == ID_struct_tag &&
+          id2string(to_struct_tag_type(ctor_target).get_identifier())
+              .find("tag-initializer_list<") != std::string::npos))
+      {
+        const struct_typet &st = ctor_target.id() == ID_struct_tag
+                                   ? follow_tag(to_struct_tag_type(ctor_target))
+                                   : to_struct_type(ctor_target);
+        bool has_constructor = false;
+        for(const auto &c : st.components())
+        {
+          if(
+            !c.get_bool(ID_from_base) && c.type().id() == ID_code &&
+            to_code_type(c.type()).return_type().id() == ID_constructor)
+          {
+            has_constructor = true;
+            break;
+          }
+        }
+        if(has_constructor)
+        {
+          exprt::operandst ops;
+          ops.reserve(orig_expr.operands().size());
+          for(const auto &op : orig_expr.operands())
+            ops.push_back(already_typechecked_exprt{op});
+          try
+          {
+            exprt temp;
+            new_temporary(orig_expr.source_location(), ctor_target, ops, temp);
+            if(ctor_target_is_reference)
+            {
+              address_of_exprt addr{temp, pointer_type(ctor_target)};
+              addr.type().set(ID_C_reference, true);
+              if(is_rvalue_reference(type))
+                addr.type().set(ID_C_rvalue_reference, true);
+              expr = std::move(addr);
+            }
+            else
+              expr = std::move(temp);
+            return;
+          }
+          catch(...)
+          {
+            // No viable constructor for these arguments; fall through to
+            // the diagnostics below.
+          }
+        }
+      }
+    }
+
+    // N5008 [over.ics.list]/10 + [dcl.init.list]/3.10: a brace-init-list
+    // for a REFERENCE to std::initializer_list<T> (`initializer_list<T> &&',
+    // `const initializer_list<T> &', libstdc++ and user code alike)
+    // initializes a temporary initializer_list -- the conversion below --
+    // and binds the reference to it.
+    if(
+      orig_expr.id() == ID_initializer_list && type.id() == ID_pointer &&
+      is_reference(type) &&
+      to_pointer_type(type).base_type().id() == ID_struct_tag &&
+      id2string(
+        to_struct_tag_type(to_pointer_type(type).base_type()).get_identifier())
+          .find("tag-initializer_list<") != std::string::npos)
+    {
+      const typet &il_type = to_pointer_type(type).base_type();
+      exprt il_value = orig_expr;
+      implicit_typecast(il_value, il_type);
+      if(il_value.type() == il_type)
+      {
+        // The initializer_list object itself lives alongside its backing
+        // array (see below); the reference binds to that object.
+        const auto il_id = "__init_list$" + std::to_string(anon_counter++);
+        auxiliary_symbolt il_sym;
+        il_sym.name = il_id;
+        il_sym.base_name = il_id;
+        il_sym.type = il_type;
+        il_sym.mode = ID_cpp;
+        il_sym.is_static_lifetime = true;
+        il_sym.is_lvalue = true;
+        il_sym.location = orig_expr.source_location();
+        // the construction of the backing array's elements (the prefix of
+        // the conversion, see initializer_list_backing_array) is evaluated
+        // here, where the list is, not as part of a static initializer
+        std::optional<exprt> prefix;
+        if(il_value.id() == ID_comma && il_value.operands().size() == 2)
+        {
+          prefix = to_binary_expr(il_value).op0();
+          il_sym.value = to_binary_expr(il_value).op1();
+        }
+        else
+          il_sym.value = il_value;
+        symbol_table.add(il_sym);
+        symbol_exprt il_ref(il_id, il_type);
+        il_ref.set(ID_C_lvalue, true);
+        il_ref.add_source_location() = orig_expr.source_location();
+        address_of_exprt bound{il_ref, to_pointer_type(type)};
+        bound.add_source_location() = orig_expr.source_location();
+        expr = sequence_before(
+          std::move(prefix), std::move(bound), orig_expr.source_location());
+        return;
+      }
+    }
+
+    // N5008 [dcl.init.list]/3.4 + [dcl.init.ref]/5.4.2: a braced-init-list
+    // for a REFERENCE TO ARRAY parameter aggregate-initializes a temporary
+    // array and binds the reference to it.
+    if(
+      orig_expr.id() == ID_initializer_list && type.id() == ID_pointer &&
+      is_reference(type) &&
+      to_pointer_type(type).base_type().id() == ID_array &&
+      brace_init_to_array_reference(orig_expr, to_pointer_type(type), expr))
+    {
+      return;
+    }
+
+    // Brace-init-list to std::initializer_list<T> conversion (C++11):
+    // {a, b, c} creates a backing array and constructs the
+    // initializer_list with _begin and _size.
+    if(
+      orig_expr.id() == ID_initializer_list && type.id() == ID_struct_tag &&
+      id2string(to_struct_tag_type(type).get_identifier())
+          .find("tag-initializer_list<") != std::string::npos)
+    {
+      const struct_typet &struct_type = follow_tag(to_struct_tag_type(type));
+      const auto &components = struct_type.components();
+
+      // the element type, from the layout's pointer member (libstdc++
+      // _M_array, libc++ __begin_, MSVC _begin -- by position, not name)
+      typet elem_type = initializer_list_element_type(to_struct_tag_type(type));
+      const bool found = elem_type.is_not_nil();
+
+      if(found)
+      {
+        const auto &ops = orig_expr.operands();
+        const std::size_t n = ops.size();
+
+        // Typecheck each element against T
+        exprt::operandst typed_elems;
+        bool ok = true;
+        for(const auto &op : ops)
+        {
+          exprt val = op;
+          try
+          {
+            implicit_typecast(val, elem_type);
+          }
+          catch(...)
+          {
+            ok = false;
+            break;
+          }
+          typed_elems.push_back(std::move(val));
+        }
+
+        if(ok)
+        {
+          // Create backing array type: T[n]
+          const auto arr_type =
+            array_typet(elem_type, from_integer(n, size_type()));
+
+          // Create a symbol for the backing array (an lvalue, so that the
+          // `&arr[0]' built below is one)
+          std::optional<exprt> prefix;
+          symbol_exprt arr_ref = initializer_list_backing_array(
+            std::move(typed_elems),
+            arr_type,
+            orig_expr.source_location(),
+            true,
+            prefix);
+          arr_ref.type() = arr_type;
+
+          // Build struct { &arr[0], n }
+          // Find the two data members (pointer and size)
+          const struct_typet::componentt *ptr_comp = nullptr;
+          const struct_typet::componentt *size_comp = nullptr;
+          for(const auto &c : components)
+          {
+            if(
+              c.type().id() == ID_code || c.get_bool(ID_is_type) ||
+              c.get_bool(ID_is_static) || c.get_is_padding())
+            {
+              continue;
+            }
+            if(!ptr_comp)
+              ptr_comp = &c;
+            else if(!size_comp)
+              size_comp = &c;
+          }
+
+          auto result_opt =
+            zero_struct_value(type, orig_expr.source_location());
+          if(ptr_comp && size_comp && result_opt.has_value())
+          {
+            struct_exprt &result = *result_opt;
+            index_exprt first_elem(
+              arr_ref, from_integer(0, c_index_type()), elem_type);
+            address_of_exprt addr(first_elem);
+            addr.type() = ptr_comp->type();
+            set_struct_member_value(result, struct_type, *ptr_comp, addr);
+            set_struct_member_value(
+              result,
+              struct_type,
+              *size_comp,
+              initializer_list_extent(
+                arr_ref, elem_type, n, size_comp->type()));
+            result.add_source_location() = orig_expr.source_location();
+            expr = sequence_before(
+              std::move(prefix),
+              std::move(result),
+              orig_expr.source_location());
+            return;
+          }
+        }
+      }
+    }
+
+    // Aggregate initialization from braced-init-list (C++11):
+    // { args... } can initialize a POD struct by assigning each element
+    // to the corresponding data member.
+    if(
+      orig_expr.id() == ID_initializer_list && cpp_is_pod(type) &&
+      type.id() == ID_struct_tag)
+    {
+      const struct_typet &struct_type = follow_tag(to_struct_tag_type(type));
+      const auto &ops = orig_expr.operands();
+      // all-zero start: padding components present, missing elements
+      // value-initialised ([dcl.init.aggr]/5)
+      auto result_opt = zero_struct_value(type, orig_expr.source_location());
+      struct_exprt result =
+        result_opt.has_value() ? *result_opt : struct_exprt({}, type);
+      std::size_t idx = 0;
+      bool ok = result_opt.has_value();
+      for(const auto &c : struct_type.components())
+      {
+        if(!ok)
+          break;
+        if(
+          c.get_bool(ID_from_base) || c.get_bool(ID_is_type) ||
+          c.get_bool(ID_is_static) || c.type().id() == ID_code ||
+          c.get_is_padding())
+        {
+          continue;
+        }
+        if(idx < ops.size())
+        {
+          exprt val = ops[idx++];
+          try
+          {
+            implicit_typecast(val, c.type());
+          }
+          catch(...)
+          {
+            ok = false;
+            break;
+          }
+          set_struct_member_value(result, struct_type, c, std::move(val));
+        }
+      }
+      if(ok)
+      {
+        expr = std::move(result);
+        return;
+      }
+    }
+
+    // Downgrade to non-fatal when the target type is malformed (e.g.,
+    // from failed template instantiation in system headers).  A valid
+    // type has a recognized id like signedbv, unsignedbv, struct_tag, etc.
+    // An empty or unrecognized id indicates a broken type from template
+    // instantiation failure.
+    if(id2string(type.id()).empty() || type.is_nil())
+    {
+      warning().source_location = e.find_source_location();
+      warning() << "invalid implicit conversion from '" << to_string(e.type())
+                << "' to '" << to_string(type) << "'" << eom;
+      e = typecast_exprt(e, type);
+      return;
+    }
+
     show_instantiation_stack(error());
-    error().source_location=e.find_source_location();
+    error().source_location = e.find_source_location();
     error() << "invalid implicit conversion from '" << to_string(e.type())
             << "' to '" << to_string(type) << "'" << eom;
-#if 0
-    str << "\n " << e.type().pretty() << '\n';
-    str << "\n " << type.pretty() << '\n';
-#endif
     throw 0;
   }
 }
@@ -1601,9 +5777,21 @@ void cpp_typecheckt::reference_initializer(
   exprt &expr,
   const reference_typet &reference_type)
 {
+  // N5008 [dcl.init.list]/3.10: list-initialization of a reference with
+  // a single-element braced-init-list initializes the reference FROM
+  // THAT ELEMENT (`symbolt &s{table.get_ref(...)};`).  Unwrap before
+  // computing the binding; multi-element/empty lists (which would bind
+  // to a materialized prvalue temporary) keep the existing diagnosis.
+  if(expr.id() == ID_initializer_list && expr.operands().size() == 1)
+  {
+    exprt element = to_unary_expr(expr).op();
+    typecheck_expr(element);
+    expr.swap(element);
+  }
+
   add_implicit_dereference(expr);
 
-  unsigned rank=0;
+  unsigned rank = 0;
   exprt new_expr;
   if(reference_binding(expr, reference_type, new_expr, rank))
   {
@@ -1611,18 +5799,49 @@ void cpp_typecheckt::reference_initializer(
     return;
   }
 
-  error().source_location=expr.find_source_location();
+  error().source_location = expr.find_source_location();
   error() << "bad reference initializer" << eom;
   throw 0;
 }
 
-bool cpp_typecheckt::cast_away_constness(
-  const typet &t1,
-  const typet &t2) const
+bool cpp_typecheckt::cast_away_constness(const typet &t1, const typet &t2) const
 {
   PRECONDITION(t1.id() == ID_pointer && t2.id() == ID_pointer);
-  typet nt1=t1;
-  typet nt2=t2;
+
+  // When casting to void* or const void*, only the top-level const
+  // qualifier of the source pointer's base type matters.  The generic
+  // subtype-chain comparison below breaks when the chains have
+  // different depths (e.g., pointer-to-array vs pointer-to-void).
+  if(to_pointer_type(t2).base_type().id() == ID_empty)
+  {
+    c_qualifierst q_from;
+    q_from.read(to_pointer_type(t1).base_type());
+    c_qualifierst q_to;
+    q_to.read(to_pointer_type(t2).base_type());
+    return q_from.is_constant && !q_to.is_constant;
+  }
+
+  // Symmetric case: casting FROM a (cv) void* to a pointer to some other
+  // type.  N5008 [expr.static.cast]/13 + [conv.qual]: a prvalue of type
+  // "pointer to cv1 void" converts to "pointer to cv2 T" when cv2 is at least
+  // as cv-qualified as cv1, i.e. it casts away constness only if the source
+  // pointee is const and the target pointee is not.  Only the top-level cv of
+  // each pointee matters; the generic subtype-chain comparison below mis-ranks
+  // this when the chains have different depths -- e.g. `const void*` (depth 2)
+  // to `const FP*` where `FP` is a function pointer (depth 3) -- and would
+  // wrongly reject the (valid) cast, which surfaces in libstdc++'s
+  // std::function `_M_get_pointer` (`__source._M_access<_Functor*>()`).
+  if(to_pointer_type(t1).base_type().id() == ID_empty)
+  {
+    c_qualifierst q_from;
+    q_from.read(to_pointer_type(t1).base_type());
+    c_qualifierst q_to;
+    q_to.read(to_pointer_type(t2).base_type());
+    return q_from.is_constant && !q_to.is_constant;
+  }
+
+  typet nt1 = t1;
+  typet nt2 = t2;
 
   if(is_reference(nt1))
     nt1.remove(ID_C_reference);
@@ -1632,13 +5851,42 @@ bool cpp_typecheckt::cast_away_constness(
     nt2.remove(ID_C_reference);
   nt2.remove(ID_to_member);
 
+  // N5008 [basic.type.qualifier]/3: cv-qualifiers applied to an array type
+  // attach to its element type, so an array level of the type chain below
+  // ([expr.const.cast]/8) carries no qualification of its own.  The front
+  // end represents `const char[4]' both with the const on the array node
+  // (`remove_reference<const char (&)[4]>::type', std::forward of a string
+  // literal) and on the element (the written type); move it down before
+  // comparing, otherwise the two spellings read as casting const away.
+  const auto push_array_qualifiers_to_element = [](typet &t)
+  {
+    typet *p = &t;
+    while(p->id() == ID_pointer || p->id() == ID_array)
+    {
+      if(p->id() == ID_array)
+      {
+        c_qualifierst q;
+        q.read(*p);
+        c_qualifierst{}.write(*p);
+        typet &element = to_array_type(*p).element_type();
+        c_qualifierst eq;
+        eq.read(element);
+        eq += q;
+        eq.write(element);
+      }
+      p = &to_type_with_subtype(*p).subtype();
+    }
+  };
+  push_array_qualifiers_to_element(nt1);
+  push_array_qualifiers_to_element(nt2);
+
   // substitute final subtypes
   std::vector<typet> snt1;
   snt1.push_back(nt1);
 
   while(snt1.back().has_subtype())
   {
-    snt1.reserve(snt1.size()+1);
+    snt1.reserve(snt1.size() + 1);
     snt1.push_back(to_type_with_subtype(snt1.back()).subtype());
   }
 
@@ -1647,13 +5895,13 @@ bool cpp_typecheckt::cast_away_constness(
 
   bool_typet newnt1;
   q1.write(newnt1);
-  snt1.back()=newnt1;
+  snt1.back() = newnt1;
 
   std::vector<typet> snt2;
   snt2.push_back(nt2);
   while(snt2.back().has_subtype())
   {
-    snt2.reserve(snt2.size()+1);
+    snt2.reserve(snt2.size() + 1);
     snt2.push_back(to_type_with_subtype(snt2.back()).subtype());
   }
 
@@ -1662,11 +5910,11 @@ bool cpp_typecheckt::cast_away_constness(
 
   bool_typet newnt2;
   q2.write(newnt2);
-  snt2.back()=newnt2;
+  snt2.back() = newnt2;
 
-  const std::size_t k=snt1.size() < snt2.size() ? snt1.size() : snt2.size();
+  const std::size_t k = snt1.size() < snt2.size() ? snt1.size() : snt2.size();
 
-  for(std::size_t i=k; i > 1; i--)
+  for(std::size_t i = k; i > 1; i--)
   {
     to_type_with_subtype(snt1[snt1.size() - 2]).subtype() =
       snt1[snt1.size() - 1];
@@ -1690,21 +5938,20 @@ bool cpp_typecheckt::const_typecast(
 {
   PRECONDITION(!is_reference(expr.type()));
 
-  exprt curr_expr=expr;
+  exprt curr_expr = expr;
 
-  if(curr_expr.type().id()==ID_array)
+  if(curr_expr.type().id() == ID_array)
   {
-    if(type.id()==ID_pointer)
+    if(type.id() == ID_pointer)
     {
       if(!standard_conversion_array_to_pointer(curr_expr, new_expr))
         return false;
     }
   }
-  else if(curr_expr.type().id()==ID_code &&
-          type.id()==ID_pointer)
+  else if(curr_expr.type().id() == ID_code && type.id() == ID_pointer)
   {
     if(!standard_conversion_function_to_pointer(curr_expr, new_expr))
-        return false;
+      return false;
   }
   else if(curr_expr.get_bool(ID_C_lvalue))
   {
@@ -1712,28 +5959,36 @@ bool cpp_typecheckt::const_typecast(
       return false;
   }
   else
-    new_expr=curr_expr;
+    new_expr = curr_expr;
 
   if(is_reference(type))
   {
     if(!expr.get_bool(ID_C_lvalue))
       return false;
 
-    if(new_expr.type() != to_reference_type(type).base_type())
+    typet expr_type_nq = new_expr.type();
+    expr_type_nq.remove(ID_C_constant);
+    expr_type_nq.remove(ID_C_volatile);
+    typet target_type_nq = to_reference_type(type).base_type();
+    target_type_nq.remove(ID_C_constant);
+    target_type_nq.remove(ID_C_volatile);
+
+    if(expr_type_nq != target_type_nq)
       return false;
 
     address_of_exprt address_of(expr, to_pointer_type(type));
     add_implicit_dereference(address_of);
-    new_expr=address_of;
+    new_expr = address_of;
     return true;
   }
-  else if(type.id()==ID_pointer)
+  else if(type.id() == ID_pointer)
   {
-    if(type!=new_expr.type())
+    if(type != new_expr.type())
       return false;
 
-    // add proper typecast
-    typecast_exprt typecast_expr(expr, type);
+    // add proper typecast -- to the CONVERTED operand (the array-to-pointer
+    // conversion above, [expr.const.cast]/1), not to the array itself
+    typecast_exprt typecast_expr(new_expr, type);
     new_expr.swap(typecast_expr);
     return true;
   }
@@ -1748,13 +6003,12 @@ bool cpp_typecheckt::dynamic_typecast(
 {
   exprt e(expr);
 
-  if(type.id()==ID_pointer)
+  if(type.id() == ID_pointer)
   {
-    if(e.id()==ID_dereference && e.get_bool(ID_C_implicit))
+    if(e.id() == ID_dereference && e.get_bool(ID_C_implicit))
       e = to_dereference_expr(expr).pointer();
 
-    if(e.type().id()==ID_pointer &&
-       cast_away_constness(e.type(), type))
+    if(e.type().id() == ID_pointer && cast_away_constness(e.type(), type))
       return false;
   }
 
@@ -1764,8 +6018,51 @@ bool cpp_typecheckt::dynamic_typecast(
   {
     if(to_reference_type(type).base_type().id() != ID_struct_tag)
       return false;
+    // N5008 [expr.dynamic.cast]/10: for a reference, the run-time check of
+    // the corresponding pointer cast ([expr.dynamic.cast]/9) applies, and a
+    // failed check throws an exception matching a std::bad_cast handler
+    if(
+      e.type().id() == ID_struct_tag && e.get_bool(ID_C_lvalue) &&
+      !has_subexpr(e, ID_side_effect))
+    {
+      const pointer_typet target_pointer =
+        pointer_type(to_reference_type(type).base_type());
+      exprt pointer_result;
+      if(
+        dynamic_typecast(address_of_exprt{e}, target_pointer, pointer_result) &&
+        has_subexpr(pointer_result, ID_cpp_runtime_dynamic_cast))
+      {
+        const symbolt *bad_cast = symbol_table.lookup("std::tag-bad_cast");
+        if(bad_cast != nullptr && bad_cast->type.id() == ID_struct)
+        {
+          const source_locationt &location = e.source_location();
+          exprt exception;
+          new_temporary(
+            location,
+            struct_tag_typet{bad_cast->name},
+            exprt::operandst{},
+            exception);
+          side_effect_exprt throw_expr{ID_throw, empty_typet{}, location};
+          throw_expr.add_to_operands(std::move(exception));
+          throw_expr.set(
+            ID_exception_list,
+            cpp_exception_list(struct_tag_typet{bad_cast->name}, *this));
+          exprt reference = typecast_exprt{pointer_result, type};
+          exprt failure{ID_comma, type};
+          failure.add_to_operands(
+            std::move(throw_expr), null_pointer_exprt{to_pointer_type(type)});
+          new_expr = if_exprt{
+            notequal_exprt{pointer_result, null_pointer_exprt{target_pointer}},
+            std::move(reference),
+            std::move(failure),
+            type};
+          new_expr.add_source_location() = location;
+          return true;
+        }
+      }
+    }
   }
-  else if(type.id()==ID_pointer)
+  else if(type.id() == ID_pointer)
   {
     if(type.find(ID_to_member).is_not_nil())
       return false;
@@ -1786,11 +6083,98 @@ bool cpp_typecheckt::dynamic_typecast(
           return false;
       }
     }
-    else return false;
+    else
+      return false;
   }
-  else return false;
+  else
+    return false;
 
-  return static_typecast(e, type, new_expr);
+  // N5008 [expr.dynamic.cast]/5: a cast to a base class is the static
+  // derived-to-base conversion.  [expr.dynamic.cast]/6-9: otherwise, for a
+  // polymorphic operand, the result depends on the most derived object --
+  // a run-time check, resolved once every class of the translation unit
+  // is known (resolve_runtime_dynamic_casts).
+  if(
+    type.id() == ID_pointer && !is_reference(type) &&
+    to_pointer_type(type).base_type().id() == ID_struct_tag &&
+    e.type().id() == ID_pointer &&
+    to_pointer_type(e.type()).base_type().id() == ID_struct_tag &&
+    !has_subexpr(e, ID_side_effect))
+  {
+    const struct_typet &op_struct =
+      follow_tag(to_struct_tag_type(to_pointer_type(e.type()).base_type()));
+    const struct_typet &target_struct =
+      follow_tag(to_struct_tag_type(to_pointer_type(type).base_type()));
+    bool polymorphic = false;
+    for(const auto &c : op_struct.components())
+      polymorphic = polymorphic || c.get_bool(ID_is_vtptr);
+    if(
+      polymorphic && !target_struct.is_incomplete() &&
+      !subtype_typecast(op_struct, target_struct))
+    {
+      exprt check{ID_cpp_runtime_dynamic_cast, type};
+      check.add_to_operands(e);
+      check.add_source_location() = e.source_location();
+      new_expr = std::move(check);
+      return true;
+    }
+  }
+
+  if(static_typecast(e, type, new_expr))
+    return true;
+
+  // N5008 [expr.dynamic.cast]/5-6: when the required static up-cast does
+  // not exist, the cast is still well-formed if the operand points to a
+  // POLYMORPHIC class type and the target is a pointer to a complete
+  // class type -- the run-time check then decides: a pointer to the
+  // (possibly cross-cast) subobject when the most-derived object has a
+  // unique public base of the target type, a null pointer otherwise
+  // ([expr.dynamic.cast]/7-8).  This is the shape of
+  //   dynamic_cast<hardness_collectort *>(&prop)
+  // over unrelated interface bases (prop_conv_solver.h).  CBMC does not
+  // track dynamic types precisely enough to evaluate the check, so model
+  // the result as a nondeterministic choice between the reinterpreted
+  // pointer and null: a sound over-approximation of both outcomes
+  // (callers must null-check, exactly as the language requires).
+  if(
+    type.id() == ID_pointer && !is_reference(type) &&
+    to_pointer_type(type).base_type().id() == ID_struct_tag &&
+    e.type().id() == ID_pointer &&
+    to_pointer_type(e.type()).base_type().id() == ID_struct_tag)
+  {
+    const struct_typet &op_struct =
+      follow_tag(to_struct_tag_type(to_pointer_type(e.type()).base_type()));
+    // [expr.dynamic.cast]/6: the operand's class must be polymorphic --
+    // it has (or inherits) a virtual function, visible as a vtable
+    // pointer component.
+    bool polymorphic = false;
+    for(const auto &c : op_struct.components())
+    {
+      if(c.get_base_name() == "@vtable_pointer")
+      {
+        polymorphic = true;
+        break;
+      }
+    }
+    // the target class must be complete ([expr.dynamic.cast]/2)
+    if(
+      polymorphic &&
+      !follow_tag(to_struct_tag_type(to_pointer_type(type).base_type()))
+         .is_incomplete())
+    {
+      side_effect_expr_nondett nondet_choice{bool_typet{}, e.source_location()};
+      null_pointer_exprt null_result{to_pointer_type(type)};
+      new_expr = if_exprt{
+        std::move(nondet_choice),
+        typecast_exprt{e, type},
+        std::move(null_result),
+        type};
+      new_expr.add_source_location() = e.source_location();
+      return true;
+    }
+  }
+
+  return false;
 }
 
 bool cpp_typecheckt::reinterpret_typecast(
@@ -1799,15 +6183,28 @@ bool cpp_typecheckt::reinterpret_typecast(
   exprt &new_expr,
   bool check_constantness)
 {
-  exprt e=expr;
+  exprt e = expr;
 
-  if(check_constantness && type.id()==ID_pointer)
+  // N5008 [expr.reinterpret.cast]/1: the result has type T.  conditional_cast
+  // leaves the operand alone when the types compare equal, and irept's
+  // comparison ignores #c_type: `long long *' to `long *' (or, on Windows,
+  // `long *' to `int *') kept the source type, and overload resolution,
+  // which does distinguish them, found no match (the MSVC STL's
+  // `__iso_volatile_load32(reinterpret_cast<volatile int *>(&_Uses))' with
+  // a `long' _Uses).
+  const auto cast_to = [&type](const exprt &op)
   {
-    if(e.id()==ID_dereference && e.get_bool(ID_C_implicit))
+    exprt result = typecast_exprt::conditional_cast(op, type);
+    result.type() = type;
+    return result;
+  };
+
+  if(check_constantness && type.id() == ID_pointer)
+  {
+    if(e.id() == ID_dereference && e.get_bool(ID_C_implicit))
       e = to_dereference_expr(expr).pointer();
 
-    if(e.type().id()==ID_pointer &&
-       cast_away_constness(e.type(), type))
+    if(e.type().id() == ID_pointer && cast_away_constness(e.type(), type))
       return false;
   }
 
@@ -1817,15 +6214,15 @@ bool cpp_typecheckt::reinterpret_typecast(
   {
     exprt tmp;
 
-    if(e.id()==ID_code)
+    if(e.id() == ID_code)
     {
       if(standard_conversion_function_to_pointer(e, tmp))
-         e.swap(tmp);
+        e.swap(tmp);
       else
         return false;
     }
 
-    if(e.type().id()==ID_array)
+    if(e.type().id() == ID_array)
     {
       if(standard_conversion_array_to_pointer(e, tmp))
         e.swap(tmp);
@@ -1842,51 +6239,146 @@ bool cpp_typecheckt::reinterpret_typecast(
     }
   }
 
-  if(e.type().id()==ID_pointer &&
-     (type.id()==ID_unsignedbv || type.id()==ID_signedbv))
+  if(
+    e.type().id() == ID_pointer &&
+    (type.id() == ID_unsignedbv || type.id() == ID_signedbv))
   {
     // pointer to integer, always ok
-    new_expr = typecast_exprt::conditional_cast(e, type);
+    new_expr = cast_to(e);
     return true;
   }
 
+  // N5008 [expr.reinterpret.cast]/5: a value of integral type or
+  // enumeration type can be converted to a pointer (the MSVC STL's
+  // `reinterpret_cast<void *>(_Handle)' for an enum __std_fs_file_handle)
   if(
     (e.type().id() == ID_unsignedbv || e.type().id() == ID_signedbv ||
-     e.type().id() == ID_c_bool || e.is_boolean()) &&
+     e.type().id() == ID_c_bool || e.is_boolean() ||
+     e.type().id() == ID_c_enum_tag || e.type().id() == ID_c_enum) &&
     type.id() == ID_pointer && !is_reference(type))
   {
     // integer to pointer
     if(simplify_expr(e, *this) == 0)
     {
       // NULL
-      new_expr=e;
+      new_expr = e;
       new_expr.set(ID_value, ID_NULL);
-      new_expr.type()=type;
+      new_expr.type() = type;
     }
     else
     {
-      new_expr = typecast_exprt::conditional_cast(e, type);
+      new_expr = cast_to(e);
     }
     return true;
   }
 
-  if(e.type().id()==ID_pointer &&
-     type.id()==ID_pointer &&
-     !is_reference(type))
+  if(
+    e.type().id() == ID_pointer && type.id() == ID_pointer &&
+    !is_reference(type))
   {
     // pointer to pointer: we ok it all.
     // This is more generous than the standard.
-    new_expr = typecast_exprt::conditional_cast(expr, type);
+    // The cast applies to the CONVERTED operand `e' ([expr.reinterpret.cast]
+    // /1: the array-to-pointer conversion above): casting the original
+    // array (`reinterpret_cast<int *>(buf)' for `unsigned char buf[4]', the
+    // aligned-storage idiom) produced a typecast of an array value, which
+    // symbolic execution cannot relate to the object's address (pointer
+    // differences UNKNOWN, reads through it FAILURE).
+    new_expr = cast_to(e);
     return true;
   }
 
   if(is_reference(type) && e.get_bool(ID_C_lvalue))
   {
-    new_expr = typecast_exprt::conditional_cast(address_of_exprt(e), type);
+    // Per [expr.reinterpret.cast]/11: a glvalue of type T1 can be cast
+    // to a reference-to-T2 if an expression of type "pointer to T1" can
+    // be explicitly converted to "pointer to T2" via reinterpret_cast.
+    // The resulting glvalue refers to the same storage.
+    //
+    // In CBMC's IR, `T&` is modelled as `T*` with `C_reference` set.
+    // Take the address of the source lvalue, cast it to the target
+    // pointer type, and hand it back as the reference value.
+    address_of_exprt addr{e};
+    typecast_exprt cast_ptr{
+      addr, pointer_type(to_reference_type(type).base_type())};
+    cast_ptr.type() = type;
+    new_expr.swap(cast_ptr);
+    return true;
+  }
+
+  // reinterpret_cast to reference from an array type (arrays are always
+  // lvalues, even when constexpr has replaced the symbol with a constant)
+  if(is_reference(type) && e.type().id() == ID_array)
+  {
+    new_expr = cast_to(address_of_exprt(e));
     return true;
   }
 
   return false;
+}
+
+/// N5008 [over.match.copy]/1.2 for direct-initialization: an EXPLICIT
+/// conversion function of \p expr's class whose return type is the class
+/// \p to (or a reference to it).  Sets \p new_expr to the call and returns
+/// true when exactly one such function exists (non-explicit ones are the
+/// implicit path's business).
+bool cpp_typecheckt::explicit_conversion_function_to(
+  const exprt &expr_in,
+  const typet &to,
+  exprt &new_expr)
+{
+  // an expression of reference type denotes the referred object
+  // ([expr.type]/1): `T(r)' with `S &r' (CBMC's own parse.cpp, dog-fooding;
+  // the to_struct_tag_type below failed its precondition)
+  exprt expr = expr_in;
+  add_implicit_dereference(expr);
+  if(expr.type().id() != ID_struct_tag || to.id() != ID_struct_tag)
+    return false;
+  elaborate_class_template(expr.type());
+  const struct_typet &from_struct = follow_tag(to_struct_tag_type(expr.type()));
+  const irep_idt &to_id = to_struct_tag_type(to).get_identifier();
+  const struct_typet::componentt *found = nullptr;
+  for(const auto &component : from_struct.components())
+  {
+    if(
+      !component.get_bool(ID_is_cast_operator) ||
+      !component.get_bool(ID_is_explicit) || component.type().id() != ID_code)
+    {
+      continue;
+    }
+    typet return_type = to_code_type(component.type()).return_type();
+    if(is_reference(return_type) || is_rvalue_reference(return_type))
+      return_type = to_pointer_type(return_type).base_type();
+    if(
+      return_type.id() != ID_struct_tag ||
+      to_struct_tag_type(return_type).get_identifier() != to_id)
+    {
+      continue;
+    }
+    if(found != nullptr)
+      return false; // ambiguous: leave the diagnosis to the general path
+    found = &component;
+  }
+  if(found == nullptr)
+    return false;
+  // the object parameter must accept the expression (cv-qualification)
+  typet this_type = to_code_type(found->type()).parameters().front().type();
+  this_type.set(ID_C_reference, true);
+  this_type.set(ID_C_this, true);
+  exprt this_expr;
+  unsigned rank = 0;
+  if(!implicit_conversion_sequence(expr, this_type, this_expr, rank))
+    return false;
+  const cpp_namet cpp_func_name(found->get_base_name());
+  exprt member_func(ID_member);
+  member_func.add(ID_component_cpp_name) = cpp_func_name;
+  member_func.copy_to_operands(already_typechecked_exprt{expr});
+  side_effect_expr_function_callt func_expr(
+    std::move(member_func), {}, uninitialized_typet{}, expr.source_location());
+  typecheck_side_effect_function_call(func_expr);
+  new_expr = std::move(func_expr);
+  add_implicit_dereference(new_expr);
+  return true;
 }
 
 bool cpp_typecheckt::static_typecast(
@@ -1895,24 +6387,106 @@ bool cpp_typecheckt::static_typecast(
   exprt &new_expr,
   bool check_constantness)
 {
-  exprt e=expr;
+  exprt e = expr;
 
-  if(check_constantness && type.id()==ID_pointer)
+  // N5008 [expr.static.cast]/11, [temp.inst]/2: a cast between pointers or
+  // references to classes needs the classes complete (their base-class
+  // relation); a class template specialization named only through a
+  // typedef so far is instantiated here.
+  for(const typet *t : {&type, &expr.type()})
   {
-    if(e.id()==ID_dereference && e.get_bool(ID_C_implicit))
+    const typet *pointee = t;
+    while(pointee->id() == ID_pointer)
+      pointee = &to_pointer_type(*pointee).base_type();
+    if(pointee->id() == ID_struct_tag || pointee->id() == ID_union_tag)
+      elaborate_class_template(*pointee);
+  }
+
+  if(check_constantness && type.id() == ID_pointer)
+  {
+    if(e.id() == ID_dereference && e.get_bool(ID_C_implicit))
       e = to_dereference_expr(expr).pointer();
 
-    if(e.type().id()==ID_pointer &&
-       cast_away_constness(e.type(), type))
+    // N5008 [expr.static.cast]/1 with [conv.array]: a reference to an
+    // array converts through its array-to-pointer conversion, so the
+    // qualification check compares the ELEMENT pointer type
+    // (`char (&)[N]' -> `char *', libstdc++'s span constructor), not the
+    // pointer to the whole array that the implicit dereference hid
+    typet from = e.type();
+    if(
+      !is_reference(type) && from.id() == ID_pointer &&
+      to_pointer_type(from).base_type().id() == ID_array &&
+      to_pointer_type(type).base_type().id() != ID_array)
+    {
+      from = pointer_type(
+        to_array_type(to_pointer_type(from).base_type()).element_type());
+    }
+    if(from.id() == ID_pointer && cast_away_constness(from, type))
       return false;
   }
 
   add_implicit_dereference(e);
 
+  // rvalue reference: static_cast<T&&>(expr)
+  // Must be checked before lvalue reference since rvalue references
+  // also have C_reference set.
+  if(type.get_bool(ID_C_rvalue_reference))
+  {
+    typet subto = to_pointer_type(type).base_type();
+    if(e.type() == subto)
+    {
+      new_expr = address_of_exprt(e, to_pointer_type(type));
+      new_expr.add_source_location() = e.source_location();
+      return true;
+    }
+    // N5008 [expr.static.cast]/3: an lvalue (or xvalue) of type cv1 T1 can
+    // be cast to "rvalue reference to cv2 T2" if T2 is reference-compatible
+    // with T1 -- including T2 a BASE of T1 ([dcl.init.ref]/4); the result
+    // designates the base subobject as an xvalue.  This is std::_Tuple_impl's
+    // move constructor shape, `: _Base(static_cast<_Base&&>(__in))`, without
+    // which the tuple move constructor fails to convert and std::map's
+    // piecewise-construction chain breaks.  Also [expr.static.cast]/11: the
+    // inverse (base -> derived) downcast is permitted symmetrically.
+    {
+      typet from = e.type();
+      if(subto.id() == ID_struct_tag && from.id() == ID_struct_tag)
+      {
+        c_qualifierst qual_from;
+        qual_from.read(from);
+        c_qualifierst qual_to;
+        qual_to.read(subto);
+        if(qual_to.is_subset_of(qual_from))
+        {
+          const struct_typet &from_struct =
+            follow_tag(to_struct_tag_type(from));
+          const struct_typet &subto_struct =
+            follow_tag(to_struct_tag_type(subto));
+          if(
+            subtype_typecast(from_struct, subto_struct) ||
+            subtype_typecast(subto_struct, from_struct))
+          {
+            reference_typet rref = to_reference_type(type);
+            if(e.id() == ID_dereference)
+            {
+              make_ptr_typecast(to_dereference_expr(e).pointer(), rref);
+              new_expr.swap(to_dereference_expr(e).pointer());
+              return true;
+            }
+            exprt address_of = address_of_exprt(e);
+            make_ptr_typecast(address_of, rref);
+            new_expr.swap(address_of);
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
   if(type.get_bool(ID_C_reference))
   {
     const reference_typet &reference_type = to_reference_type(type);
-    unsigned rank=0;
+    unsigned rank = 0;
     if(reference_binding(e, reference_type, new_expr, rank))
       return true;
 
@@ -1921,7 +6495,14 @@ bool cpp_typecheckt::static_typecast(
 
     if(subto.id() == ID_struct_tag && from.id() == ID_struct_tag)
     {
-      if(!expr.get_bool(ID_C_lvalue))
+      // N5008 [expr.static.cast]/2 requires an LVALUE operand for the
+      // base-to-derived reference downcast.  Judge the operand AFTER
+      // add_implicit_dereference: a call with reference return type
+      // (e.g. `*ranges` via unique_ptr::operator*) is an lvalue
+      // ([expr.call]/14) and arrives here as the implicit dereference
+      // `e`, while the original `expr` (the call) carries no lvalue
+      // marking.
+      if(!e.get_bool(ID_C_lvalue) && e.id() != ID_dereference)
         return false;
 
       c_qualifierst qual_from;
@@ -1930,7 +6511,12 @@ bool cpp_typecheckt::static_typecast(
       c_qualifierst qual_to;
       qual_to.read(subto);
 
-      if(!qual_to.is_subset_of(qual_from))
+      // N5008 [expr.static.cast]/2: "cv2 shall be the same
+      // cv-qualification as, or greater cv-qualification than, cv1" --
+      // the TARGET may add qualifiers (base& -> const derived&); only
+      // casting qualifiers AWAY is ill-formed.  The test was reversed,
+      // rejecting any qualification-adding downcast.
+      if(!qual_from.is_subset_of(qual_to))
         return false;
 
       const struct_typet &from_struct = follow_tag(to_struct_tag_type(from));
@@ -1938,14 +6524,14 @@ bool cpp_typecheckt::static_typecast(
 
       if(subtype_typecast(subto_struct, from_struct))
       {
-        if(e.id()==ID_dereference)
+        if(e.id() == ID_dereference)
         {
           make_ptr_typecast(to_dereference_expr(e).pointer(), reference_type);
           new_expr.swap(to_dereference_expr(e).pointer());
           return true;
         }
 
-        exprt address_of=address_of_exprt(e);
+        exprt address_of = address_of_exprt(e);
         make_ptr_typecast(address_of, reference_type);
         new_expr.swap(address_of);
         return true;
@@ -1954,32 +6540,72 @@ bool cpp_typecheckt::static_typecast(
     return false;
   }
 
-  if(type.id()==ID_empty)
+  if(type.id() == ID_empty)
   {
     new_expr = typecast_exprt::conditional_cast(e, type);
     return true;
   }
 
   // int/enum to enum
-  if(type.id()==ID_c_enum_tag &&
-     (e.type().id()==ID_signedbv ||
-      e.type().id()==ID_unsignedbv ||
-      e.type().id()==ID_c_enum_tag))
+  if(
+    type.id() == ID_c_enum_tag &&
+    (e.type().id() == ID_signedbv || e.type().id() == ID_unsignedbv ||
+     e.type().id() == ID_c_enum_tag))
   {
     new_expr = typecast_exprt::conditional_cast(e, type);
     new_expr.remove(ID_C_lvalue);
     return true;
   }
 
+  // N5008 [over.match.copy]/1.2: in the direct-initialization `T(e)' /
+  // `static_cast<T>(e)' ([expr.static.cast]/4: `T t(e);'), a conversion
+  // function of e's class yielding T is a candidate for the temporary bound
+  // to the copy/move constructor's `T&' parameter EVEN IF EXPLICIT.  Such a
+  // function converts e to T directly (the copy/move is elided,
+  // [class.copy.elision]).  Try it first: the implicit path below skips
+  // explicit conversion functions ([class.conv.fct]/2).
+  if(
+    type.id() == ID_struct_tag && e.type().id() == ID_struct_tag &&
+    explicit_conversion_function_to(e, type, new_expr))
+  {
+    return true;
+  }
+
+  // [over.match.conv]/1: `static_cast<T>(e)' / `T(e)' with T a non-class
+  // type is a direct-initialization, where explicit conversion functions of
+  // e's class are candidates
+  std::optional<direct_initialization_contextt> direct_init;
+  if(type.id() != ID_struct_tag && type.id() != ID_union_tag)
+    direct_init.emplace(*this);
+
   if(implicit_conversion_sequence(e, type, new_expr))
   {
     if(!cpp_is_pod(type))
     {
+      // N5008 [dcl.init]/(16.6.2): copy-initialization of a class type
+      // constructs the destination from the source expression; the
+      // constructor is chosen by overload resolution against the
+      // ARGUMENT's value category ([over.match.viable], [over.ics.ref]:
+      // an rvalue reference cannot bind to an lvalue, so an lvalue
+      // source selects the copy constructor and an rvalue source the
+      // move constructor).  For the identity conversion,
+      // `implicit_conversion_sequence` strips the lvalue marking
+      // ([conv.lval] yields a prvalue), which would mis-select the MOVE
+      // constructor for an lvalue source; restore the source's value
+      // category when the conversion changed nothing else.
+      exprt constructor_source = new_expr;
+      if(e.get_bool(ID_C_lvalue))
+      {
+        exprt restored = new_expr;
+        restored.set(ID_C_lvalue, true);
+        if(restored == e)
+          constructor_source = e;
+      }
       exprt temporary;
       new_temporary(
         e.source_location(),
         type,
-        already_typechecked_exprt{new_expr},
+        already_typechecked_exprt{constructor_source},
         temporary);
       new_expr.swap(temporary);
     }
@@ -1994,7 +6620,33 @@ bool cpp_typecheckt::static_typecast(
     return true;
   }
 
-  if(type.id()==ID_pointer && e.type().id()==ID_pointer)
+  // N5008 [expr.static.cast]/4, [dcl.init.general]/16.6.2.1: for a class T,
+  // `static_cast<T>(e)' is the direct-initialization `T t(e);', for which
+  // explicit constructors are candidates ([over.match.ctor]/1) -- the
+  // implicit conversion sequence above only considered converting ones
+  // (`static_cast<reverse_iterator<int *>>(p)' in the MSVC STL's
+  // reverse_iterator::_Unwrapped)
+  if(type.id() == ID_struct_tag && !cpp_is_pod(type))
+  {
+    const std::size_t errors_before =
+      get_message_handler().get_message_count(messaget::M_ERROR);
+    try
+    {
+      sfinae_contextt sfinae_guard{*this};
+      exprt temporary;
+      new_temporary(
+        e.source_location(), type, already_typechecked_exprt{e}, temporary);
+      get_message_handler().set_message_count(messaget::M_ERROR, errors_before);
+      new_expr.swap(temporary);
+      return true;
+    }
+    catch(...)
+    {
+      get_message_handler().set_message_count(messaget::M_ERROR, errors_before);
+    }
+  }
+
+  if(type.id() == ID_pointer && e.type().id() == ID_pointer)
   {
     const pointer_typet &pointer_type = to_pointer_type(type);
     if(type.find(ID_to_member).is_nil() && e.type().find(ID_to_member).is_nil())
@@ -2002,7 +6654,13 @@ bool cpp_typecheckt::static_typecast(
       typet to = pointer_type.base_type();
       typet from = to_pointer_type(e.type()).base_type();
 
-      if(from.id()==ID_empty)
+      if(from.id() == ID_empty)
+      {
+        new_expr = typecast_exprt::conditional_cast(e, type);
+        return true;
+      }
+
+      if(to.id() == ID_empty)
       {
         new_expr = typecast_exprt::conditional_cast(e, type);
         return true;
@@ -2070,4 +6728,122 @@ bool cpp_typecheckt::static_typecast(
   }
 
   return false;
+}
+
+/// Apply C++ user-defined conversions before falling through to C-style
+/// arithmetic typechecking.
+///
+/// Per N5008 [over.match.oper]/9: when a binary operator with no viable
+/// non-member or member operator overload is processed, the operator is
+/// treated as a built-in operator per [over.built]; the operands are then
+/// subject to standard or user-defined conversion sequences to the built-in
+/// operator's parameter types.
+///
+/// Concretely, for `T > 0` where `T` is a class with `operator long() const`
+/// (e.g., `std::fpos<mbstate_t>`), the conversion sequence
+/// `T -> long` (user-defined) followed by the built-in `long > int` must
+/// apply.  The C parent-class implementation of
+/// `implicit_typecast_arithmetic(exprt&, exprt&)` only knows about
+/// arithmetic standard conversions, so the struct operand reaches
+/// `c_typecastt::implicit_typecast_arithmetic` unchanged and surfaces as
+///
+///   conversion from 'struct fpos' to 'signed int':
+///   implicit arithmetic conversion not permitted
+///
+/// even though the user-defined conversion is unambiguous.  Visible
+/// symptom: `if(this->tellp() > 0)` in CBMC's own
+/// `src/util/message.h:250` — `tellp()` returns
+/// `std::fpos<mbstate_t>` whose `operator streamoff()` is the user-defined
+/// conversion to `long`.  Every translation unit that includes
+/// `<message.h>` (10+ files in the CBMC dog-food set) hit this on the
+/// rvalue path.
+///
+/// The fix: detect each operand whose type is a class with at least one
+/// arithmetic-typed user-defined conversion operator and apply
+/// `implicit_typecast(operand, conversion-target)` to materialise the
+/// conversion.  The C parent's `implicit_typecast_arithmetic(expr1, expr2)`
+/// then sees two arithmetic operands and proceeds normally.
+///
+/// Restrict to single-conversion-candidate cases: where multiple
+/// arithmetic conversion operators exist, the choice depends on the
+/// context (e.g., usual arithmetic conversions to a common type), which
+/// is already handled by the existing overload resolution machinery for
+/// any explicit cast.  The narrow case here is precisely
+/// `<class with one arithmetic conversion> RELOP <arithmetic>`.
+static bool single_arithmetic_conversion_target(
+  const cpp_typecheckt &cpp_typecheck,
+  const struct_union_typet &class_type,
+  typet &target)
+{
+  bool found = false;
+  for(const auto &c : class_type.components())
+  {
+    if(c.type().id() != ID_code)
+      continue;
+    const std::string base = id2string(c.get_base_name());
+    if(base.compare(0, 8, "operator") != 0)
+      continue;
+    // operator <ArithmeticType>() — return type is the conversion target.
+    const typet &rt = to_code_type(c.type()).return_type();
+    bool is_arith = rt.id() == ID_signedbv || rt.id() == ID_unsignedbv ||
+                    rt.id() == ID_floatbv || rt.id() == ID_fixedbv ||
+                    rt.id() == ID_bool || rt.id() == ID_c_bool;
+    if(!is_arith)
+      continue;
+    if(found && target != rt)
+      return false; // ambiguous: multiple distinct arithmetic targets
+    target = rt;
+    found = true;
+  }
+  (void)cpp_typecheck;
+  return found;
+}
+
+void cpp_typecheckt::implicit_typecast_arithmetic(exprt &expr1, exprt &expr2)
+{
+  auto try_class_to_arith = [this](exprt &op)
+  {
+    typet t = op.type();
+    if(is_reference(t))
+      t = to_reference_type(t).base_type();
+    if(t.id() != ID_struct_tag && t.id() != ID_union_tag)
+      return;
+    const struct_union_typet &class_type =
+      t.id() == ID_struct_tag ? static_cast<const struct_union_typet &>(
+                                  follow_tag(to_struct_tag_type(t)))
+                              : static_cast<const struct_union_typet &>(
+                                  follow_tag(to_union_tag_type(t)));
+    typet target;
+    if(!single_arithmetic_conversion_target(*this, class_type, target))
+      return;
+    // Apply the user-defined conversion via the C++ implicit-typecast
+    // path so that any required lvalue-to-rvalue / qualification
+    // adjustments are handled along the way.
+    implicit_typecast(op, target);
+  };
+
+  try_class_to_arith(expr1);
+  try_class_to_arith(expr2);
+
+  c_typecheck_baset::implicit_typecast_arithmetic(expr1, expr2);
+}
+
+void cpp_typecheckt::implicit_typecast_arithmetic(exprt &expr)
+{
+  typet t = expr.type();
+  if(is_reference(t))
+    t = to_reference_type(t).base_type();
+  if(t.id() == ID_struct_tag || t.id() == ID_union_tag)
+  {
+    const struct_union_typet &class_type =
+      t.id() == ID_struct_tag ? static_cast<const struct_union_typet &>(
+                                  follow_tag(to_struct_tag_type(t)))
+                              : static_cast<const struct_union_typet &>(
+                                  follow_tag(to_union_tag_type(t)));
+    typet target;
+    if(single_arithmetic_conversion_target(*this, class_type, target))
+      implicit_typecast(expr, target);
+  }
+
+  c_typecheck_baset::implicit_typecast_arithmetic(expr);
 }

@@ -1,0 +1,16 @@
+CORE gnu-extensions
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ the template is selected: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+static assertion failed
+--
+The fold expansion substituted the pack element as an `ID_type' wrapper
+expression, which the function-call (functional cast) path did not
+accept: "unexpected expression: type".

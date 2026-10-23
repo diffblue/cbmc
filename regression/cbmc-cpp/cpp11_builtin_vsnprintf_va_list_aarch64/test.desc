@@ -1,0 +1,15 @@
+CORE gnu-extensions
+main.cpp
+--arch arm64 --validate-goto-model
+^\[main\.assertion\.1\] line \d+ returns: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+va_list not found
+--
+Every C++ program using streams failed --validate-goto-model on aarch64
+(cpp11_iostream_cerr and 15 more on the ARM CI job).

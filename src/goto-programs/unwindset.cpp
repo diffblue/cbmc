@@ -180,12 +180,51 @@ void unwindsett::parse_unwindset_one_loop(
   }
 }
 
+/// Every unwindset entry ends in `:\<limit\>'.  A loop identifier of a C++
+/// function contains commas (`fill<signed_int,3>(ptr_signed_int).0', the
+/// template arguments and parameter types of the function), and splitting
+/// the option at every comma cuts such an entry into pieces; join the pieces
+/// of \p elements up to the one that ends in `:\<digits\>'.
+static std::vector<std::string>
+join_loop_identifiers(const std::vector<std::string> &elements)
+{
+  const auto ends_with_limit = [](const std::string &element)
+  {
+    const auto colon = element.rfind(':');
+    return colon != std::string::npos && colon + 1 < element.size() &&
+           std::all_of(
+             element.begin() + colon + 1,
+             element.end(),
+             [](char c) { return isdigit(c); });
+  };
+  std::vector<std::string> result;
+  std::string pending;
+  bool have_pending = false;
+  for(const auto &element : elements)
+  {
+    if(have_pending)
+      pending += ',' + element;
+    else
+      pending = element;
+    have_pending = true;
+    if(ends_with_limit(pending))
+    {
+      result.push_back(pending);
+      have_pending = false;
+    }
+  }
+  if(have_pending)
+    result.push_back(pending);
+  return result;
+}
+
 void unwindsett::parse_unwindset(
   const std::list<std::string> &unwindset,
   abstract_goto_modelt &goto_model,
   message_handlert &message_handler)
 {
-  for(auto &element : unwindset)
+  const std::vector<std::string> elements{unwindset.begin(), unwindset.end()};
+  for(auto &element : join_loop_identifiers(elements))
     parse_unwindset_one_loop(element, goto_model, message_handler);
 }
 
@@ -227,6 +266,6 @@ void unwindsett::parse_unwindset_file(
   std::vector<std::string> unwindset_elements =
     split_string(buffer.str(), ',', true, true);
 
-  for(auto &element : unwindset_elements)
+  for(auto &element : join_loop_identifiers(unwindset_elements))
     parse_unwindset_one_loop(element, goto_model, message_handler);
 }

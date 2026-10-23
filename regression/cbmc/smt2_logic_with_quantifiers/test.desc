@@ -1,0 +1,15 @@
+CORE broken-smt-backend no-new-smt
+main.c
+--smt2 --outfile -
+^\(set-logic AUFBV\)$
+^\(assert \(forall
+^EXIT=0$
+^SIGNAL=0$
+--
+QF_AUFBV
+--
+The generic SMT2 encoding writes a zero-initialised array of symbolic size
+(array_of without `as const') as a universally quantified assertion.  A
+logic named QF_... admits no quantifiers, so the declared logic is AUFBV;
+z3 and cvc5 rejected the file ("logic does not support quantifiers").
+broken-smt-backend: the test inspects the generic output only.

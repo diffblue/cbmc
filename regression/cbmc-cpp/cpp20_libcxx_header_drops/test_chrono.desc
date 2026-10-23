@@ -1,0 +1,20 @@
+CORE libcxx
+chrono.cpp
+--cpp20 --stdlib libc++ --object-bits 12
+^\[main\.assertion\.1\] line \d+ duration: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body of system-header function
+could not fully type-check
+system-header declaration
+--
+libc++ (LLVM 18) <chrono> converts without dropped bodies.  Fixed: the
+year_month_day_last members (cpp_member_function_named_like_earlier_used_
+class) and, in round 163w, year_month_day.h:212 operator local_days
+(cpp11_direct_init_through_explicit_conversion_function).  clang++ 18
+-stdlib=libc++ accepts this program, and it fails only its WRONG assertion.

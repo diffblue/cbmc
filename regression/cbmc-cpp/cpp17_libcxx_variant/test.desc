@@ -1,0 +1,25 @@
+CORE libcxx
+main.cpp
+--cpp17 --stdlib libc++ --unwind 3
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ index: SUCCESS$
+^\[main\.assertion\.2\] line \d+ holds int: SUCCESS$
+^\[main\.assertion\.3\] line \d+ get<int>: SUCCESS$
+^\[main\.assertion\.4\] line \d+ get<0>: SUCCESS$
+^\[main\.assertion\.5\] line \d+ assign double: SUCCESS$
+^\[main\.assertion\.6\] line \d+ in_place_index: SUCCESS$
+^\[main\.assertion\.7\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+no body for callee
+Invariant check failed
+--
+libc++ std::variant end to end: converting constructor (`__best_match_t' over a
+using-declaration pack of base operator()s and the array-reference narrowing
+check), index/holds_alternative/get (<tuple>'s constexpr __find_exactly_one),
+converting assignment (`__emplace' calling a static member template of a base
+through `this'; the union storage accessed from another class).

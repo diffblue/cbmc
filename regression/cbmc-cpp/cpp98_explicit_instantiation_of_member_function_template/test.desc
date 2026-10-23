@@ -1,0 +1,22 @@
+CORE
+main.cpp
+--cpp98
+^\[main\.assertion\.1\] line \d+ explicitly instantiated: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+no body for callee
+--
+N5008 [temp.explicit]/1, /10: `template int box<char>::put(long);' is an
+explicit instantiation definition of a member function template
+specialization, its template argument deduced from the function type
+([temp.explicit]/2).  The front end declared it as written, a bodiless
+non-template member put(long) that hid the member template ("no body for
+callee box<char>::put", bin53).  It is now accepted and the
+specialization instantiated on use.  libstdc++ instantiates
+basic_ostream's _M_insert this way (bits/ostream.tcc).  g++ 13 and
+clang++ 18 accept this program, and it fails only its WRONG assertion.

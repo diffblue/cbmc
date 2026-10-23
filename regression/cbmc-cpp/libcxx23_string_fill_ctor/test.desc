@@ -1,0 +1,33 @@
+CORE libcxx
+main.ii
+--cpp11 --stdlib libc++ --unwind 6 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ size after fill ctor: SUCCESS$
+^\[main\.assertion\.2\] line \d+ content after fill ctor: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Representative of the round-129 libc++-23 sweep's persistent string
+failure family: `std::string s(3, 'x')` against libc++-23 headers
+(preprocessed in the cxx23-gate image; 17.5k lines).  Two pinned
+diagnostics: `found no match for symbol '__rep'` (basic_string's
+internal union rep accessor chain, __init_internal_buffer /
+~basic_string) and `offset-of of member failed to find component
+'__first_padding_' ` (datasizeof.h:44, _LIBCPP_DATASIZEOF machinery --
+N5008 [basic.types.general] object-representation tail padding).  The
+sweep (/tmp/docker_tumbleweed3.log, 2026-09-14) counts ~28 persistent
+libc++-23 failures of which the string family is the largest block;
+the vector family flipped CORE in round 128.
+Round 163b (cvise reduction to 40 lines, /tmp/r163/red): the `__rep'
+diagnostic was the functional cast `__rep()' of a union whose variant
+member `__long' has a defaulted default constructor -- overload resolution
+produced constructor candidates for struct types only, so
+__init_internal_buffer and ~basic_string (both `__rep_ = __rep()') were
+dropped and the string was nondet; and `__rep()' must zero-initialize
+([dcl.init.general]/9.1).  Both fixed
+(cpp11_union_value_initialization_defaulted_member,
+cpp11_value_initialization_zero_initializes); the `__first_padding_byte_'
+offsetof part was the member-class-template instantiation order, fixed
+with cpp11_member_class_template_in_static_member_initializer.  The test
+is CORE.  Still dropped: numeric_limits<>::max (<limits> line 202).

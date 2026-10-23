@@ -1,0 +1,11 @@
+CORE
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+dropped the body
+--
+Fixed 2026-07-19: recognize c_bool/integral constants at the
+requires-satisfaction evaluator's entry (concept-free clauses only).

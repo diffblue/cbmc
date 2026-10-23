@@ -1293,6 +1293,11 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
 
   // determine an upper bound of the last byte we might need
   auto upper_bound_opt = size_of_expr(src.type(), ns);
+  // the extracted size, when constant, for the bound of a constant offset
+  const auto size_int_opt =
+    upper_bound_opt.has_value()
+      ? numeric_cast<mp_integer>(simplify_expr(*upper_bound_opt, ns))
+      : std::optional<mp_integer>{};
   if(upper_bound_opt.has_value())
   {
     upper_bound_opt = simplify_expr(
@@ -1305,9 +1310,25 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
   else if(src.type().id() == ID_empty)
     upper_bound_opt = from_integer(0, size_type());
 
-  const auto lower_bound_int_opt = numeric_cast<mp_integer>(src.offset());
-  const auto upper_bound_int_opt =
-    numeric_cast<mp_integer>(upper_bound_opt.value_or(nil_exprt()));
+  auto lower_bound_int_opt = numeric_cast<mp_integer>(src.offset());
+  // With a constant offset, offset plus size in mathematical integers: the
+  // sum above, in the unsigned size type, made a negative offset a huge
+  // bound with a 32-bit size_t (4 + (size_t)-8 is 4294967292), and the
+  // lowering then unpacked that many bytes.
+  auto upper_bound_int_opt =
+    lower_bound_int_opt.has_value() && size_int_opt.has_value()
+      ? std::optional<mp_integer>{*lower_bound_int_opt + *size_int_opt}
+      : numeric_cast<mp_integer>(upper_bound_opt.value_or(nil_exprt()));
+  // An offset before the start of the object (reading `((T *)p)[-1]',
+  // a path symbolic execution has not yet ruled out) leaves no bytes of the
+  // object before it to fill with nil values, and the bytes of the object
+  // needed are those up to the (possibly non-positive) upper bound.  The
+  // extraction itself then reads out of bounds, i.e., unconstrained bytes,
+  // as for other out-of-bounds offsets.
+  if(lower_bound_int_opt.has_value() && *lower_bound_int_opt < 0)
+    lower_bound_int_opt = mp_integer{0};
+  if(upper_bound_int_opt.has_value() && *upper_bound_int_opt < 0)
+    upper_bound_int_opt = mp_integer{0};
 
   byte_extract_exprt unpacked(src);
   unpacked.op() = unpack_rec(

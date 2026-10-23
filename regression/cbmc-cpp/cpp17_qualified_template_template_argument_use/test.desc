@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ run time: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+--
+static_assert condition could not be evaluated
+static assertion failed
+found no match for symbol
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [temp.arg.template]/1, [temp.names]/2, [temp.param]/1: a qualified
+template-name bound to a template template parameter, used with arguments
+inside the template.  Non-vacuous: the last assertion is deliberately wrong
+and must FAIL.  Before the fix: "found no match for symbol 'ns'" / 'std' and
+"invalid implicit conversion from '<<type:>>' to '__CPROVER_bool'".

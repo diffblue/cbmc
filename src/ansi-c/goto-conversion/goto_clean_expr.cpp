@@ -561,6 +561,32 @@ goto_convertt::clean_expr_resultt goto_convertt::clean_expr(
       expr = nil_exprt();
     }
 
+    // N5008 [class.temporary]/4: a temporary is destroyed only if it was
+    // created, i.e., one created in a single branch only on the path through
+    // that branch.  Record which branch ran in a flag (as compilers do) when
+    // a branch has temporaries; destroying them unconditionally ran the
+    // destructor of an object never constructed (`~bad_cast' on the
+    // non-throwing path of a reference dynamic_cast).
+    std::optional<symbol_exprt> took_true_branch;
+    if(!tmp_true.temporaries.empty() || !tmp_false.temporaries.empty())
+    {
+      took_true_branch = new_tmp_symbol(
+                           bool_typet{},
+                           "if_branch",
+                           side_effects.side_effects,
+                           source_location,
+                           mode)
+                           .symbol_expr();
+      tmp_true.side_effects.insert_before(
+        tmp_true.side_effects.instructions.begin(),
+        goto_programt::make_assignment(
+          *took_true_branch, true_exprt{}, source_location));
+      tmp_false.side_effects.insert_before(
+        tmp_false.side_effects.instructions.begin(),
+        goto_programt::make_assignment(
+          *took_true_branch, false_exprt{}, source_location));
+    }
+
     // generate guard for argument side-effects
     generate_ifthenelse(
       if_expr.cond(),
@@ -572,8 +598,29 @@ goto_convertt::clean_expr_resultt goto_convertt::clean_expr(
       side_effects.side_effects,
       mode);
 
-    destruct_locals(tmp_false.temporaries, side_effects.side_effects, ns);
-    destruct_locals(tmp_true.temporaries, side_effects.side_effects, ns);
+    // the destructors of one branch's temporaries, run if it was taken
+    auto destruct_branch =
+      [&](const std::list<irep_idt> &temporaries, const exprt &taken)
+    {
+      if(temporaries.empty())
+        return;
+      goto_programt destructors;
+      destruct_locals(temporaries, destructors, ns);
+      goto_programt skip;
+      goto_programt::targett skip_target =
+        skip.add(goto_programt::make_skip(source_location));
+      side_effects.side_effects.add(goto_programt::make_goto(
+        skip_target, boolean_negate(taken), source_location));
+      side_effects.side_effects.destructive_append(destructors);
+      side_effects.side_effects.destructive_append(skip);
+    };
+    if(took_true_branch.has_value())
+    {
+      destruct_branch(tmp_false.temporaries, not_exprt{*took_true_branch});
+      destruct_branch(tmp_true.temporaries, *took_true_branch);
+      side_effects.side_effects.add(
+        goto_programt::make_dead(*took_true_branch, source_location));
+    }
     destruct_locals(side_effects.temporaries, side_effects.side_effects, ns);
     side_effects.temporaries.clear();
 
@@ -827,6 +874,26 @@ goto_convertt::clean_expr_address_of(exprt &expr, const irep_idt &mode)
   }
   else if(expr.id() == ID_side_effect)
   {
+    // C++ ([expr.assign]/1, [expr.pre.incr]/1): an assignment or prefix
+    // increment/decrement is an lvalue designating its (first) operand, whose
+    // address may be taken (`&(x += 1)', a reference bound to `(x += a) +=
+    // c').  As in clean_expr, the operands' side effects come first: the
+    // first operand is itself used as an lvalue, the others as values.
+    // Without this an assignment nested in the first operand was both
+    // converted and left in the resulting lvalue expression.
+    const irep_idt &statement = to_side_effect_expr(expr).get_statement();
+    if(
+      statement != ID_function_call && statement != ID_temporary_object &&
+      statement != ID_statement_expression && !expr.operands().empty())
+    {
+      side_effects.add(clean_expr_address_of(expr.operands().front(), mode));
+      for(auto it = std::next(expr.operands().begin());
+          it != expr.operands().end();
+          ++it)
+      {
+        side_effects.add(clean_expr(*it, mode));
+      }
+    }
     side_effects.add(
       remove_side_effect(to_side_effect_expr(expr), mode, true, true));
   }

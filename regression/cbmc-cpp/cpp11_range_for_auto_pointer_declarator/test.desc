@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp11 --unwind 4
+^\[main\.assertion\.1\] .* auto \* from a const-reference-returning iterator: SUCCESS$
+^\[main\.assertion\.2\] .* auto \* over an array of pointers: SUCCESS$
+^\[main\.assertion\.3\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+g++ 13 (-fsanitize=address,undefined) and clang++ 18 accept this program,
+and it fails only its WRONG assertion.

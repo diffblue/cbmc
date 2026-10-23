@@ -1,0 +1,25 @@
+CORE
+main.cpp
+--cpp14
+^\[main\.assertion\.1\] line \d+ generic lambda: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [expr.prim.lambda.closure]/4, [temp.inst]/11: the function call
+operator of a generic lambda is a member function template, instantiated
+only for the argument types it is called with (auto = double here).  The
+front end also type-checked the body with `signed int' for auto: it
+instantiated fmt<int>, whose call h(int) is ambiguous, and dropped that body
+("C++ front-end dropped the body of function 'fmt<signed_int>'", bin53).
+For a lambda lowered to a closure with a template operator() that trial is
+no longer made (cpp_typecheckt::typecheck_expr_lambda).  libstdc++ 13
+<format> still drops __formatter_fp::format (format:1422), reached through
+_M_format_arg's visitor, which is not closure-lowered (it captures `this'
+in a member function).  g++ 13 and clang++ 18 accept
+this program, and it fails only its WRONG assertion.

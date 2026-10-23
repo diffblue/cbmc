@@ -1,0 +1,16 @@
+CORE libcxx
+main.cpp
+--stdlib libc++ --cpp11 --object-bits 12
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+FAILURE
+dropped the body
+--
+N5008 [locale.general]/8, [facet.ctype.special]: libc++ keeps the "C"
+classification table in ctype<char>::__tab_ and its ctype_base masks have
+their own bit values; the classic ctype<char> model only knew libstdc++'s
+_M_table and glibc's encoding, so use_facet returned an unmodelled facet.

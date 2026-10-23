@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+^\[main\.assertion\.1\] line 74 rebind chain resolved: SUCCESS$
+--
+^CONVERSION ERROR$
+dropped the body
+--
+template scope 'rebind' is ambiguous
+template scope 'rebind' not found

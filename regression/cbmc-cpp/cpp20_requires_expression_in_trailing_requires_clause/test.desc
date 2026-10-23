@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] .* calls: SUCCESS$
+^\[main\.assertion\.2\] .* parameters, satisfied: SUCCESS$
+^\[main\.assertion\.3\] .* parameters, unsatisfied: SUCCESS$
+^\[main\.assertion\.4\] .* constructor, satisfied: SUCCESS$
+^\[main\.assertion\.5\] .* constructor, unsatisfied: SUCCESS$
+^\[main\.assertion\.6\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+static assertion
+--
+g++ 13 and clang++ 18 accept this program, and it fails only its WRONG
+assertion.
