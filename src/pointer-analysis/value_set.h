@@ -237,6 +237,19 @@ public:
   ///   are object_descriptor_exprt or have id ID_invalid or ID_unknown.
   std::vector<exprt> get_value_set(exprt expr, const namespacet &ns) const;
 
+  /// Gets values pointed to by `expr`, including following dereference
+  /// operators (i.e. this is not a simple lookup in `valuest`). Unlike the
+  /// single-argument overload above, the result is returned as a map over
+  /// object numbers (in \ref object_numbering), avoiding materializing an
+  /// `object_descriptor_exprt` per element.
+  /// \param expr: query expression
+  /// \param ns: global namespace
+  /// \param is_simplified: if false, simplify `expr` before reading.
+  /// \return the set of object numbers pointed to, together with per-object
+  ///   offsets
+  object_mapt
+  get_value_set(exprt expr, const namespacet &ns, bool is_simplified) const;
+
   void clear()
   {
     values.clear();
@@ -419,15 +432,6 @@ public:
   void erase_symbol(const symbol_exprt &symbol_expr, const namespacet &ns);
 
 protected:
-  /// Reads the set of objects pointed to by `expr`, including making
-  /// recursive lookups for dereference operations etc.
-  /// \param expr: query expression
-  /// \param ns: global namespace
-  /// \param is_simplified: if false, simplify `expr` before reading.
-  /// \return the set of object numbers pointed to
-  object_mapt
-  get_value_set(exprt expr, const namespacet &ns, bool is_simplified) const;
-
   /// See the other overload of `get_reference_set`. This one returns object
   /// numbers and offsets instead of expressions.
   void get_reference_set(
