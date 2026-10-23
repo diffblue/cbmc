@@ -1137,6 +1137,38 @@ TEST_CASE(
 }
 
 TEST_CASE(
+  "smt2_incremental_decision_proceduret set_to over empty type",
+  "[core][smt2_incremental]")
+{
+  // Equality of two empty-typed (void) operands is vacuously true. The
+  // decision procedure should therefore short-circuit set_to without
+  // descending into convert_expr_to_smt (which has no SMT sort for
+  // empty_typet) and without declaring the void-typed leaves: for
+  // value == true nothing extra is sent; for value == false a single
+  // `(assert false)` is sent.
+  auto test = decision_procedure_test_environmentt::make();
+  const symbolt x{"x", empty_typet{}, ID_C};
+  test.symbol_table.insert(x);
+  const symbolt y{"y", empty_typet{}, ID_C};
+  test.symbol_table.insert(y);
+
+  INFO("Sanity checking decision procedure and flushing size definitions");
+  test.mock_responses.push_front(smt_check_sat_responset{smt_sat_responset{}});
+  CHECK(test.procedure() == decision_proceduret::resultt::D_SATISFIABLE);
+  test.sent_commands.clear();
+
+  INFO("set_to(equal_exprt{x, y}, true) sends no extra commands");
+  test.procedure.set_to(equal_exprt{x.symbol_expr(), y.symbol_expr()}, true);
+  CHECK(test.sent_commands == std::vector<smt_commandt>{});
+
+  INFO("set_to(equal_exprt{x, y}, false) sends a single `(assert false)`");
+  test.procedure.set_to(equal_exprt{x.symbol_expr(), y.symbol_expr()}, false);
+  const std::vector<smt_commandt> expected_commands{
+    smt_assert_commandt{smt_bool_literal_termt{false}}};
+  CHECK(test.sent_commands == expected_commands);
+}
+
+TEST_CASE(
   "smt2_incremental_decision_proceduret getting value of struct-symbols with "
   "value in the symbol table",
   "[core][util][expr_initializer]")
