@@ -1592,9 +1592,19 @@ void value_sett::assign(
     }
     else
     {
+      // For array assignments the indices were abstracted to
+      // exprt(ID_unknown, c_index_type()) above, so the array's index type
+      // does not affect materialisation here. We therefore require only the
+      // element types to match and intentionally ignore both the array size
+      // and the index type (the latter being what enables struct-keyed
+      // "map" arrays to be assigned).
       DATA_INVARIANT(
-        rhs.type() == lhs.type(),
-        "value_sett::assign types should match, got: "
+        rhs.type() == lhs.type() ||
+          (rhs.type().id() == ID_array && lhs.type().id() == ID_array &&
+           to_array_type(rhs.type()).element_type() ==
+             to_array_type(lhs.type()).element_type()),
+        "value_sett::assign types should match (for arrays, modulo array size "
+        "and index type, as array indices are abstracted here), got: "
         "rhs.type():\n" +
           rhs.type().pretty() + "\n" + "type:\n" + lhs.type().pretty());
 
