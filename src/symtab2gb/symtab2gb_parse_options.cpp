@@ -13,12 +13,16 @@ Author: Diffblue Ltd.
 #include <util/exit_codes.h>
 #include <util/help_formatter.h>
 #include <util/json.h>
+#include <util/namespace.h>
+#include <util/validate_expressions.h>
+#include <util/validate_types.h>
 #include <util/version.h>
 
 #include <goto-programs/goto_model.h>
 #include <goto-programs/write_goto_binary.h>
 
 #include <ansi-c/ansi_c_language.h>
+#include <ansi-c/c_expr.h>
 #include <ansi-c/goto-conversion/goto_convert_functions.h>
 #include <json-symtab-language/json_goto_functions.h>
 #include <json-symtab-language/json_symtab_language.h>
@@ -41,6 +45,45 @@ symtab2gb_parse_optionst::symtab2gb_parse_optionst(int argc, const char *argv[])
 static inline bool failed(bool error_indicator)
 {
   return error_indicator;
+}
+
+/// Recursively check well-formedness of ansi-c specific expressions, which the
+/// dispatch table in util/validate_expressions.cpp cannot cover as util must
+/// not depend on ansi-c.
+static void check_ansi_c_exprs_rec(const exprt &expr, const validation_modet vm)
+{
+  for(const auto &op : expr.operands())
+    check_ansi_c_exprs_rec(op, vm);
+
+  if(can_cast_expr<conditional_target_group_exprt>(expr))
+    conditional_target_group_exprt::check(expr, vm);
+}
+
+/// Validate the expressions and types in every symbol of the given symbol
+/// table. Throws invalid_input_exceptiont on the first malformed expression or
+/// type encountered, rather than letting downstream code read out of bounds.
+static void validate_symbol_table_expressions(const symbol_tablet &symbol_table)
+{
+  const namespacet ns{symbol_table};
+  for(const auto &symbol_pair : symbol_table.symbols)
+  {
+    const symbolt &symbol = symbol_pair.second;
+    try
+    {
+      validate_full_type(symbol.type, ns, validation_modet::EXCEPTION);
+      if(symbol.value.is_not_nil())
+      {
+        validate_full_expr(symbol.value, ns, validation_modet::EXCEPTION);
+        check_ansi_c_exprs_rec(symbol.value, validation_modet::EXCEPTION);
+      }
+    }
+    catch(const incorrect_goto_program_exceptiont &e)
+    {
+      throw invalid_input_exceptiont{
+        "malformed symbol table entry `" + id2string(symbol.name) +
+        "': " + e.what()};
+    }
+  }
 }
 
 static void run_symtab2gb(
@@ -109,6 +152,7 @@ static void run_symtab2gb(
       throw invalid_source_file_exceptiont{
         "failed to typecheck symbol table", source_location};
     }
+    validate_symbol_table_expressions(symtab);
     config.set_from_symbol_table(symtab);
 
     if(failed(linking(linked_symbol_table, symtab, message_handler)))

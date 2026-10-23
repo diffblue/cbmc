@@ -1,0 +1,10 @@
+CORE
+assert_ctg1.json_symtab
+
+^EXIT=6$
+^SIGNAL=0$
+malformed symbol table entry
+conditional target expression must have two operands
+--
+Rejects a symbol table with a malformed conditional_target_group expression that
+has only a single operand, which would cause a heap out-of-bounds read.

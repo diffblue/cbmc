@@ -359,7 +359,10 @@ void member_exprt::validate(
     "component");
 }
 
-void let_exprt::validate(const exprt &expr, const validation_modet vm)
+void let_exprt::validate(
+  const exprt &expr,
+  const namespacet &,
+  const validation_modet vm)
 {
   check(expr, vm);
 
