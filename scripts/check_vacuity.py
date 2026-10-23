@@ -17,7 +17,8 @@ closing brace), and cbmc runs with the test's options.  The test is
 
 Selected are the tests of the given directories whose level is CORE, whose
 expected output (before the first `--') contains ^VERIFICATION SUCCESSFUL$,
-and which carry none of the excluded tags (as test.pl -X) nor the tag
+or ^EXIT=0$ without an option that only displays the program (--show-*,
+...), and which carry none of the excluded tags (as test.pl -X) nor the tag
 `no-vacuity-check' (for a test whose main legitimately does not end, e.g.,
 one that returns from every branch of a try block).  Tests with more than one
 source file are skipped.
@@ -39,6 +40,11 @@ import sys
 
 MARK = '__vacuity_reach'
 SOURCE_SUFFIXES = ('.c', '.i', '.cpp', '.cc', '.ii')
+# options with which cbmc does not verify the program
+DISPLAY_OPTIONS = (
+    '--version', '--help', '--list-goto-functions', '--dump-c', '--dump-cpp',
+    '--preprocess', '--test-preprocessor', '--validate-goto-binary',
+    '--symex-coverage-report')
 
 
 def find_main_body(src, match):
@@ -112,7 +118,13 @@ def selected(desc_lines, excluded_tags):
         if line.strip() == '--':
             break
         expected.append(line.strip())
-    return '^VERIFICATION SUCCESSFUL$' in expected
+    # success is required: the verdict, or the exit status 0 of a run that
+    # verifies (not one that only displays the program)
+    if '^VERIFICATION SUCCESSFUL$' in expected:
+        return True
+    display_only = any(o.startswith('--show-') or o in DISPLAY_OPTIONS
+                       for o in desc_lines[2].split())
+    return '^EXIT=0$' in expected and not display_only
 
 
 def check(cbmc, timeout, desc_path):
