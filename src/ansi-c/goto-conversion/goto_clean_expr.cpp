@@ -567,8 +567,22 @@ goto_convertt::clean_expr_resultt goto_convertt::clean_expr(
     // a branch has temporaries; destroying them unconditionally ran the
     // destructor of an object never constructed (`~bad_cast' on the
     // non-throwing path of a reference dynamic_cast).
+    // Only a temporary with a destructor needs this: destroying one without
+    // is just its DEAD, which is harmless on a path that did not create it
+    // (the result of a C function call), and the flag would cost a branch.
+    const auto has_destructor = [this](const std::list<irep_idt> &temporaries)
+    {
+      for(const auto &id : temporaries)
+      {
+        if(get_destructor(ns, ns.lookup(id).type).is_not_nil())
+          return true;
+      }
+      return false;
+    };
     std::optional<symbol_exprt> took_true_branch;
-    if(!tmp_true.temporaries.empty() || !tmp_false.temporaries.empty())
+    if(
+      has_destructor(tmp_true.temporaries) ||
+      has_destructor(tmp_false.temporaries))
     {
       took_true_branch = new_tmp_symbol(
                            bool_typet{},
@@ -620,6 +634,11 @@ goto_convertt::clean_expr_resultt goto_convertt::clean_expr(
       destruct_branch(tmp_true.temporaries, *took_true_branch);
       side_effects.side_effects.add(
         goto_programt::make_dead(*took_true_branch, source_location));
+    }
+    else
+    {
+      destruct_locals(tmp_false.temporaries, side_effects.side_effects, ns);
+      destruct_locals(tmp_true.temporaries, side_effects.side_effects, ns);
     }
     destruct_locals(side_effects.temporaries, side_effects.side_effects, ns);
     side_effects.temporaries.clear();
