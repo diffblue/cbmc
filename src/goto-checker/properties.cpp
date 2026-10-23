@@ -144,6 +144,80 @@ void json(
   json<json_stream_objectt>(result, property_id, property_info);
 }
 
+/// Convert property to SARIF result format
+json_objectt
+sarif_result(const irep_idt &property_id, const property_infot &property_info)
+{
+  json_objectt result;
+
+  // Map property status to a SARIF result kind and level. SARIF consumers
+  // (e.g. GitHub code scanning) surface every result whose kind is "fail" as a
+  // finding, so only genuine failures use kind "fail". Passing and
+  // not-applicable results use a non-"fail" kind with level "none" so that a
+  // fully-verified program does not produce a wall of diagnostics.
+  std::string kind;
+  std::string level = "none";
+  switch(property_info.status)
+  {
+  case property_statust::FAIL:
+  case property_statust::ERROR:
+    kind = "fail";
+    level = "error";
+    break;
+  case property_statust::UNKNOWN:
+    // Verification was inconclusive: flag for human review.
+    kind = "open";
+    level = "warning";
+    break;
+  case property_statust::PASS:
+    kind = "pass";
+    break;
+  case property_statust::NOT_REACHABLE:
+  case property_statust::NOT_CHECKED:
+    kind = "notApplicable";
+    break;
+  }
+
+  result["ruleId"] = json_stringt(property_id);
+  result["kind"] = json_stringt(kind);
+  result["level"] = json_stringt(level);
+
+  json_objectt message;
+  message["text"] = json_stringt(
+    property_info.description + " (" + as_string(property_info.status) + ")");
+  result["message"] = message;
+
+  // Add location information
+  json_arrayt locations;
+  json_objectt location;
+  json_objectt physical_location;
+  json_objectt artifact_location;
+  json_objectt region;
+
+  const auto &src_loc = property_info.pc->source_location();
+  if(!src_loc.get_file().empty())
+  {
+    artifact_location["uri"] = json_stringt(src_loc.get_file());
+    physical_location["artifactLocation"] = artifact_location;
+
+    if(!src_loc.get_line().empty())
+    {
+      region["startLine"] = json_numbert(id2string(src_loc.get_line()));
+      if(!src_loc.get_column().empty())
+      {
+        region["startColumn"] = json_numbert(id2string(src_loc.get_column()));
+      }
+      physical_location["region"] = region;
+    }
+
+    location["physicalLocation"] = physical_location;
+    locations.push_back(location);
+    result["locations"] = locations;
+  }
+
+  return result;
+}
+
 int result_to_exit_code(resultt result)
 {
   switch(result)
