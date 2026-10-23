@@ -14,13 +14,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_program.h>
 
-#include "renamed.h"
-
 class ssa_exprt;
 
 /// The interface of the target _container_ for symbolic execution to record its
 /// symbolic steps into. Presently, \ref symex_target_equationt is the only
 /// implementation of this interface.
+///
+/// All expression parameters (`exprt`, `ssa_exprt`) passed to the methods below
+/// are expected to be L2-renamed unless the parameter's docstring says
+/// otherwise (notably, `assignment`'s `original_full_lhs`). "L2-renamed" means
+/// the expression has been processed by `goto_symex_statet::rename` (and
+/// possibly simplified) before being recorded.
 class symex_targett
 {
 public:
@@ -79,8 +83,8 @@ public:
   /// right--hand side of assignment): we effectively assign the value stored in
   /// \p ssa_object by another thread to \p ssa_object in the memory scope of
   /// this thread.
-  /// \param guard: Precondition for this read event
-  /// \param ssa_object: Variable to be read from
+  /// \param guard: Precondition for this read event (L2-renamed)
+  /// \param ssa_object: Variable to be read from (L2-renamed)
   /// \param atomic_section_id: ID of the atomic section in which this read
   ///  takes place (if any)
   /// \param source: Pointer to location in the input GOTO program of this read
@@ -92,8 +96,8 @@ public:
 
   /// Write to a shared variable \p ssa_object: we effectively assign a value
   /// from this thread to be visible by other threads.
-  /// \param guard: Precondition for this write event
-  /// \param ssa_object: Variable to be written to
+  /// \param guard: Precondition for this write event (L2-renamed)
+  /// \param ssa_object: Variable to be written to (L2-renamed)
   /// \param atomic_section_id: ID of the atomic section in which this write
   ///  takes place (if any)
   /// \param source: Pointer to location in the input GOTO program of this write
@@ -104,12 +108,14 @@ public:
     const sourcet &source) = 0;
 
   /// Write to a local variable. The `cond_expr` is _lhs==rhs_.
-  /// \param guard: Precondition for this read event
-  /// \param ssa_lhs: Variable to be written to, must be a symbol (and not nil)
-  /// \param ssa_full_lhs: Full left-hand side with symex level annotations
+  /// \param guard: Precondition for this assignment (L2-renamed)
+  /// \param ssa_lhs: L2-renamed variable to be written to, must be a
+  ///  symbol (and not nil)
+  /// \param ssa_full_lhs: L2-renamed full left-hand side with symex level
+  ///  annotations
   /// \param original_full_lhs: Full left-hand side without symex level
   ///  annotations
-  /// \param ssa_rhs: Right-hand side of the assignment
+  /// \param ssa_rhs: Right-hand side of the assignment (L2-renamed)
   /// \param source: Pointer to location in the input GOTO program of this
   ///  assignment
   /// \param assignment_type: To distinguish between different types of
@@ -124,9 +130,10 @@ public:
     assignment_typet assignment_type)=0;
 
   /// Declare a fresh variable. The `cond_expr` is _lhs==lhs_.
-  /// \param guard: Precondition for a declaration of this variable
-  /// \param ssa_lhs: Variable to be declared, must be symbol (and not nil)
-  /// \param initializer: Initial value
+  /// \param guard: Precondition for a declaration of this variable (L2-renamed)
+  /// \param ssa_lhs: L2-renamed variable to be declared, must be symbol
+  ///  (and not nil)
+  /// \param initializer: Initial value (L2-renamed)
   /// \param source: Pointer to location in the input GOTO program of this
   ///  declaration
   /// \param assignment_type: To distinguish between different types of
@@ -139,8 +146,8 @@ public:
     assignment_typet assignment_type) = 0;
 
   /// Remove a variable from the scope.
-  /// \param guard: Precondition for removal of this variable
-  /// \param ssa_lhs: Variable to be removed, must be symbol
+  /// \param guard: Precondition for removal of this variable (L2-renamed)
+  /// \param ssa_lhs: Variable to be removed, must be symbol (L2-renamed)
   /// \param source: Pointer to location in the input GOTO program of this
   ///  removal
   virtual void dead(
@@ -149,25 +156,26 @@ public:
     const sourcet &source)=0;
 
   /// Record a function call.
-  /// \param guard: Precondition for calling a function
+  /// \param guard: Precondition for calling a function (L2-renamed)
   /// \param function_id: Name of the function
   /// \param ssa_function_arguments: Vector of arguments in SSA form
-  /// \param source: To location in the input GOTO program of this
-  /// \param hidden: Should this step be recorded as hidden?
+  ///  (L2-renamed and value-set-simplified)
+  /// \param source: Pointer to location in the input GOTO program of this
   ///  function call
+  /// \param hidden: Should this step be recorded as hidden?
   virtual void function_call(
     const exprt &guard,
     const irep_idt &function_id,
-    const std::vector<renamedt<exprt, L2>> &ssa_function_arguments,
+    const std::vector<exprt> &ssa_function_arguments,
     const sourcet &source,
     bool hidden) = 0;
 
   /// Record return from a function.
-  /// \param guard: Precondition for returning from a function
+  /// \param guard: Precondition for returning from a function (L2-renamed)
   /// \param function_id: Name of the function from which we return
   /// \param source: Pointer to location in the input GOTO program of this
-  /// \param hidden: Should this step be recorded as hidden?
   ///  function return
+  /// \param hidden: Should this step be recorded as hidden?
   virtual void function_return(
     const exprt &guard,
     const irep_idt &function_id,
@@ -175,7 +183,7 @@ public:
     bool hidden) = 0;
 
   /// Record a location.
-  /// \param guard: Precondition for reaching this location
+  /// \param guard: Precondition for reaching this location (L2-renamed)
   /// \param source: Pointer to location in the input GOTO program to be
   ///  recorded
   virtual void location(
@@ -183,24 +191,24 @@ public:
     const sourcet &source)=0;
 
   /// Record an output.
-  /// \param guard: Precondition for writing to the output
+  /// \param guard: Precondition for writing to the output (L2-renamed)
   /// \param source: Pointer to location in the input GOTO program of this
   ///  output
   /// \param output_id: Name of the output
-  /// \param args: A list of IO arguments
+  /// \param args: A list of IO arguments (L2-renamed)
   virtual void output(
     const exprt &guard,
     const sourcet &source,
     const irep_idt &output_id,
-    const std::list<renamedt<exprt, L2>> &args) = 0;
+    const std::list<exprt> &args) = 0;
 
   /// Record formatted output.
-  /// \param guard: Precondition for writing to the output
+  /// \param guard: Precondition for writing to the output (L2-renamed)
   /// \param source: Pointer to location in the input GOTO program of this
   ///  output
   /// \param output_id: Name of the output
   /// \param fmt: Formatting string
-  /// \param args: A list of IO arguments
+  /// \param args: A list of IO arguments (L2-renamed)
   virtual void output_fmt(
     const exprt &guard,
     const sourcet &source,
@@ -209,11 +217,11 @@ public:
     const std::list<exprt> &args)=0;
 
   /// Record an input.
-  /// \param guard: Precondition for reading from the input
+  /// \param guard: Precondition for reading from the input (L2-renamed)
   /// \param source: Pointer to location in the input GOTO program of this
   ///  input
   /// \param input_id: Name of the input
-  /// \param args: A list of IO arguments
+  /// \param args: A list of IO arguments (L2-renamed)
   virtual void input(
     const exprt &guard,
     const sourcet &source,
@@ -221,8 +229,8 @@ public:
     const std::list<exprt> &args)=0;
 
   /// Record an assumption.
-  /// \param guard: Precondition for reaching this assumption
-  /// \param cond: Condition this assumption represents
+  /// \param guard: Precondition for reaching this assumption (L2-renamed)
+  /// \param cond: Condition this assumption represents (L2-renamed)
   /// \param source: Pointer to location in the input GOTO program of this
   ///  assumption
   virtual void assumption(
@@ -231,8 +239,8 @@ public:
     const sourcet &source)=0;
 
   /// Record an assertion.
-  /// \param guard: Precondition for reaching this assertion
-  /// \param cond: Condition this assertion represents
+  /// \param guard: Precondition for reaching this assertion (L2-renamed)
+  /// \param cond: Condition this assertion represents (L2-renamed)
   /// \param property_id: Unique property identifier of this assertion
   /// \param msg: The message associated with this assertion
   /// \param source: Pointer to location in the input GOTO program of this
@@ -245,17 +253,17 @@ public:
     const sourcet &source) = 0;
 
   /// Record a goto instruction.
-  /// \param guard: Precondition for reaching this goto instruction
-  /// \param cond: Condition under which this goto should be taken
+  /// \param guard: Precondition for reaching this goto instruction (L2-renamed)
+  /// \param cond: Condition under which this goto should be taken (L2-renamed)
   /// \param source: Pointer to location in the input GOTO program of this
   ///  goto instruction
   virtual void goto_instruction(
     const exprt &guard,
-    const renamedt<exprt, L2> &cond,
+    const exprt &cond,
     const sourcet &source) = 0;
 
   /// Record a _global_ constraint: there is no guard limiting its scope.
-  /// \param cond: Condition represented by this constraint
+  /// \param cond: Condition represented by this constraint (L2-renamed)
   /// \param msg: The message associated with this constraint
   /// \param source: Pointer to location in the input GOTO program of this
   ///  constraint
@@ -265,7 +273,7 @@ public:
     const sourcet &source)=0;
 
   /// Record spawning a new thread
-  /// \param guard: Precondition for reaching spawning a new thread
+  /// \param guard: Precondition for reaching spawning a new thread (L2-renamed)
   /// \param source: Pointer to location in the input GOTO program where a new
   ///  thread is to be spawned
   virtual void spawn(
@@ -273,7 +281,7 @@ public:
     const sourcet &source)=0;
 
   /// Record creating a memory barrier
-  /// \param guard: Precondition for reaching this barrier
+  /// \param guard: Precondition for reaching this barrier (L2-renamed)
   /// \param source: Pointer to location in the input GOTO program where a new
   ///  barrier is created
   virtual void memory_barrier(
@@ -281,7 +289,7 @@ public:
     const sourcet &source)=0;
 
   /// Record a beginning of an atomic section
-  /// \param guard: Precondition for reaching this atomic section
+  /// \param guard: Precondition for reaching this atomic section (L2-renamed)
   /// \param atomic_section_id: Identifier for this atomic section
   /// \param source: Pointer to location in the input GOTO program where an
   ///  atomic section begins
@@ -292,6 +300,7 @@ public:
 
   /// Record ending an atomic section
   /// \param guard: Precondition for reaching the end of this atomic section
+  ///  (L2-renamed)
   /// \param atomic_section_id: Identifier for this atomic section
   /// \param source: Pointer to location in the input GOTO program where an
   ///  atomic section ends
