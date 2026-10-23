@@ -15340,7 +15340,13 @@ base.  Hand-written reproducers of the virtual-base swap pass; not reduced.
   With --unwind 5 the strlen of "out.txt" is cut and main is unreachable.
   cvise (/tmp/r199/cv, gate: `pointer invalid' of ~locale's _Decref with a
   trace through std::ios_base::swap, --slice-formula, 22 s per check)
-  reduced it from 2.2 MB to 31 KB so far.
+  reduced it from 2.2 MB to 998 bytes, but the result is ill-formed C++
+  (`using string = class _Facet_base {...}', a destructor declared inside
+  a member class's base clause): the gate checks only cbmc's failure, and
+  the MSVC headers do not compile with g++ or clang++ to check validity.
+  Not a usable reproducer; a reduction needs a validity check (cbmc's own
+  conversion of a variant of the program, or clang -fms-compatibility on
+  the reduced headers).
 - C preprocessing (01377b3ffe): data-model options (-m64, -m32, -mabi=)
   only for gcc of the target's family, probed from `gcc's predefined
   macros; for another family the family's macros are undefined
@@ -15380,7 +15386,7 @@ identical to merge 1; passes 2-4 identical to merges 2, 3 and a fresh
 merge of the branch with develop, except one CI step that merge 2 had
 dropped by mistake (windows-msi-package's `Save ccache', present in
 develop) and which the rebase keeps.  Two commits became empty (develop
-#9024 made the same gcc 16 fixes) and were dropped.  The 3233 remaining
+#9024 made the same gcc 16 fixes) and were dropped.  The 3235 remaining
 commits keep author, date, message and order; 32 have adapted patches
 (develop's symbol_exprt::identifier(), quote_begin/end, string_view, CI
 packages).  Builds of 40 commits (the adapted ones and the segment
