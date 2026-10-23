@@ -1,0 +1,14 @@
+CORE
+main.c
+--show-goto-functions
+^[[:space:]]*ASSERT.*lower bound in arr\[.*i\]$
+^[[:space:]]*ASSERT.*upper bound in arr\[.*i\]$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Bounds checking arrays with mathematical integer element types must not crash.
+The element type has no byte size, so the byte-offset-based lower-bound check
+is replaced by a simple index-based check. Both lower and upper bound checks
+must be generated.
