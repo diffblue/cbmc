@@ -48,6 +48,22 @@ jobs:
           MERGE_BRANCH: ${{ github.ref }}
         run: ./.github/workflows/pull-request-check-cpplint.sh
 
+  # This job takes a few seconds
+  check-man-pages:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Fetch dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -yq mandoc
+      - name: Check man pages for formatting errors
+        run: mandoc -Tlint -W warning doc/man/*.1
+      - name: Check man pages are consistent with implementation
+        run: ./scripts/check_man_page_consistency.sh
+
   # This job should take about a minute (est)
   check-rustfmt:
     runs-on: ubuntu-latest

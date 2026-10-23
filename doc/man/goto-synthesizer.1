@@ -1,4 +1,4 @@
-.TH GOTO-SYNTHESIZER "1" "December 2022" "goto-synthesizer-5.59.0" "User Commands"
+.TH GOTO-SYNTHESIZER "1" "March 1, 2026" "goto-synthesizer-6.10.0" "User Commands"
 .SH NAME
 goto\-synthesizer \- Synthesize and apply loop contracts of goto binaries.
 .SH SYNOPSIS
@@ -12,18 +12,19 @@ show version and exit
 .B goto\-synthesizer [options] \fIin\fR [\fIout\fR]
 perform synthesis and loop-contracts transformation
 .SH DESCRIPTION
-\fBgoto-synthesis\fR reads a GOTO binary, performs loop-contracts synthesis and
-program transformation for the synthesized contracts, and then writes the
-resulting program as GOTO binary on disk.
+\fBgoto\-synthesizer\fR reads a GOTO binary, performs loop-contracts synthesis
+and program transformation for the synthesized contracts, and then writes
+the resulting program as a GOTO binary on disk.
 .SH OPTIONS
 .TP
-\fB\-loop\-contracts\-no\-unwind\fR
-do not unwind transformed loops after applying the synthesized loop contracts
+\fB\-\-loop\-contracts\-no\-unwind\fR
+Do not unwind transformed loops after applying the synthesized loop
+contracts.
 .TP
-\fB\-\-dump\-loop\-contracts
+\fB\-\-dump\-loop\-contracts\fR
 dump the synthesized loop contracts as JSON
 .TP
-\fB\-\-json-\output\fR \fIfile\fR
+\fB\-\-json\-output\fR \fIfile\fR
 specify the output destination of the loop-contracts JSON
 .SS "Accepts all of cbmc's options plus the following backend options:"
 .TP
@@ -96,18 +97,21 @@ arithmetic expressions
 \fB\-\-incremental\-smt2\-solver\fR \fIcmd\fR
 Use the incremental SMT backend where \fIcmd\fR is the command to invoke the SMT
 solver of choice.
-.br
+.sp
 Example invocations:
-.br
-  --incremental-smt2-solver 'z3 -smt2 -in' (use the Z3 solver).
-.br
-  --incremental-smt2-solver 'cvc5 --lang=smtlib2.6 --incremental' (use the CVC5 solver).
+.RS
+.IP \(bu 2
+\-\-incremental\-smt2\-solver 'z3 \-smt2 \-in' (use the Z3 solver).
+.IP \(bu 2
+\-\-incremental\-smt2\-solver 'cvc5 \-\-lang=smtlib2.6 \-\-incremental' (use the
+CVC5 solver).
+.RE
 .sp
 Note that:
-.br
+.sp
 The solver name must be in the "PATH" or be an executable with full path.
-.br
-The SMT solver should accept incremental SMTlib v2.6 formatted input from the stdin.
+The SMT solver should accept incremental SMTlib v2.6 formatted input from the
+stdin.
 .br
 The SMT solver should support the QF_AUFBV logic.
 .TP
@@ -136,14 +140,16 @@ use JSON\-formatted output
 \fB\-\-verbosity\fR \fIn\fR
 verbosity level
 .SH ENVIRONMENT
-All tools honor the TMPDIR environment variable when generating temporary
-files and directories.
+.TP
+.B TMPDIR
+All CProver tools honor this variable when creating temporary files and
+directories.
 .SH BUGS
 If you encounter a problem please create an issue at
 .B https://github.com/diffblue/cbmc/issues
 .SH SEE ALSO
 .BR cbmc (1),
-.BR goto-cc (1)
-.BR goto-instrument (1)
+.BR goto\-cc (1),
+.BR goto\-instrument (1)
 .SH COPYRIGHT
 2022, Qinheping Hu
