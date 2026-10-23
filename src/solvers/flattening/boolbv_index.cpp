@@ -65,7 +65,7 @@ bvt boolbvt::convert_index(const index_exprt &expr)
         // free variables
         bv = prop.new_variables(boolbv_width(expr.type()));
 
-        record_array_index(expr);
+        record_key(expr);
 
         // record type if array is a symbol
         if(array.id() == ID_symbol || array.id() == ID_nondet_symbol)
