@@ -292,7 +292,34 @@ void local_bitvector_analysist::build()
     {
       const auto &lhs = instruction.call_lhs();
       if(lhs.is_not_nil())
+      {
+        // malloc/calloc/realloc/valloc return a dynamic heap pointer (or
+        // NULL). valloc is modeled as malloc in the CPROVER library, so it
+        // allocates on the heap just the same. posix_memalign is not handled
+        // here as it returns its pointer via an out-parameter, not the call
+        // return value.
+        const auto &callee = instruction.call_function();
+        if(callee.id() == ID_symbol)
+        {
+          const irep_idt &id = to_symbol_expr(callee).get_identifier();
+          if(
+            id == "malloc" || id == "calloc" || id == "realloc" ||
+            id == "valloc")
+          {
+            if(
+              lhs.id() == ID_symbol &&
+              is_tracked(to_symbol_expr(lhs).get_identifier()))
+            {
+              const auto dest_pointer =
+                pointers.number(to_symbol_expr(lhs).get_identifier());
+              loc_info_dest[dest_pointer] =
+                flagst::mk_dynamic_heap() | flagst::mk_null();
+            }
+            break;
+          }
+        }
         assign_lhs(lhs, nil_exprt(), loc_info_src, loc_info_dest);
+      }
       break;
     }
 
