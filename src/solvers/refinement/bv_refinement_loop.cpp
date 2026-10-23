@@ -11,7 +11,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/xml.h>
 
 bv_refinementt::bv_refinementt(const infot &info)
-  : bv_pointerst(*info.ns, *info.prop, *info.message_handler),
+  : bv_pointerst(
+      *info.ns,
+      *info.prop,
+      *info.message_handler,
+      false,
+      info.wide_pointer_encoding),
     progress(false),
     config_(info)
 {
@@ -129,6 +134,13 @@ void bv_refinementt::check_SAT()
 
   for(approximationt &approximation : this->approximations)
     check_SAT(approximation);
+
+  // Check backward I2P constraints (from wide pointer encoding)
+  if(wide_pointer_encoding)
+  {
+    if(check_SAT_backward_i2p())
+      progress = true;
+  }
 }
 
 void bv_refinementt::check_UNSAT()

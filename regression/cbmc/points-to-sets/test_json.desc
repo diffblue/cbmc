@@ -1,4 +1,4 @@
-CORE
+CORE no-wide-pointer-encoding
 main.c
 --show-points-to-sets --json-ui --no-standard-checks
 activate-multi-line-match
