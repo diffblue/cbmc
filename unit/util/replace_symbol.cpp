@@ -6,11 +6,12 @@ Author: Michael Tautschnig
 
 \*******************************************************************/
 
-#include <testing-utils/use_catch.h>
-
+#include <util/mathematical_expr.h>
 #include <util/pointer_expr.h>
 #include <util/replace_symbol.h>
 #include <util/std_expr.h>
+
+#include <testing-utils/use_catch.h>
 
 TEST_CASE("Replace all symbols in expression", "[core][util][replace_symbol]")
 {
@@ -104,4 +105,81 @@ TEST_CASE("Replace always", "[core][util][replace_symbol]")
     to_index_expr(to_address_of_expr(binary.op1()).object());
   REQUIRE(to_array_type(index_expr.array().type()).size() == c);
   REQUIRE(index_expr.index() == c);
+}
+
+TEST_CASE("Let expression hides bound variable", "[core][util][replace_symbol]")
+{
+  const typet t{"some_type"};
+  const symbol_exprt x{"x", t};
+  const symbol_exprt y{"y", t};
+  const constant_exprt replacement{"val", t};
+
+  // let x = y in x + y
+  const binary_exprt body{x, "plus", y, t};
+  const let_exprt let{x, y, body};
+
+  replace_symbolt r;
+  r.insert(x, replacement);
+  r.insert(y, replacement);
+
+  exprt result = let;
+  // replacements happen, so return value is false
+  REQUIRE(!r.replace(result));
+
+  const auto &result_let = to_let_expr(result);
+  // the value expression (y) is replaced
+  REQUIRE(result_let.value() == replacement);
+  // in the body, x is bound and must NOT be replaced
+  const auto &result_body = result_let.where();
+  REQUIRE(result_body.operands().size() == 2);
+  REQUIRE(result_body.operands()[0] == x);
+  // y is not bound, so it IS replaced in the body
+  REQUIRE(result_body.operands()[1] == replacement);
+}
+
+TEST_CASE(
+  "Forall expression hides bound variable",
+  "[core][util][replace_symbol]")
+{
+  const typet t{"some_type"};
+  const symbol_exprt x{"x", t};
+  const symbol_exprt y{"y", t};
+  const constant_exprt replacement{"val", t};
+
+  // forall x. x == y
+  const equal_exprt body{x, y};
+  const forall_exprt forall{x, body};
+
+  replace_symbolt r;
+  r.insert(x, replacement);
+  r.insert(y, replacement);
+
+  exprt result = forall;
+  REQUIRE(!r.replace(result));
+
+  const auto &result_forall = to_quantifier_expr(result);
+  // x is bound and must NOT be replaced in the body
+  REQUIRE(result_forall.where().operands()[0] == x);
+  // y is free and IS replaced
+  REQUIRE(result_forall.where().operands()[1] == replacement);
+}
+
+TEST_CASE(
+  "Let expression returns true when nothing replaced",
+  "[core][util][replace_symbol]")
+{
+  const typet t{"some_type"};
+  const symbol_exprt x{"x", t};
+  const symbol_exprt y{"y", t};
+  const constant_exprt replacement{"val", t};
+
+  // let x = x in x  -- only bound variable, no free occurrences of y
+  const let_exprt let{x, x, x};
+
+  replace_symbolt r;
+  r.insert(y, replacement);
+
+  exprt result = let;
+  // nothing to replace, so return value is true
+  REQUIRE(r.replace(result));
 }
