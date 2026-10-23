@@ -68,6 +68,10 @@ void _rw_set_loct::compute()
     if(target->call_lhs().is_not_nil())
       write(target->call_lhs());
   }
+  else if(target->is_set_return_value())
+  {
+    read(target->return_value());
+  }
 }
 
 void _rw_set_loct::assign(const exprt &lhs, const exprt &rhs)

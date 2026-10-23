@@ -1,0 +1,9 @@
+CORE
+pointer.c
+--race-check
+^EXIT=10$
+^SIGNAL=0$
+data race on x
+^VERIFICATION FAILED$
+--
+^warning: ignoring
