@@ -1406,7 +1406,16 @@ void goto_check_ct::pointer_overflow_check(
   if(object_type.id() != ID_empty)
   {
     auto size_of_expr_opt = size_of_expr(object_type, ns);
-    CHECK_RETURN(size_of_expr_opt.has_value());
+
+    // For incomplete array types (e.g. pointer arithmetic on int (*p)[]) the
+    // element size is unknown: we can neither check the offset multiplication
+    // for overflow nor compute object bounds, and the bit-vector encoding
+    // cannot represent arithmetic over such pointers. Skip the whole
+    // pointer-arithmetic check (as done for pointers of otherwise-unknown
+    // pointee size).
+    if(!size_of_expr_opt.has_value())
+      return;
+
     exprt object_size = size_of_expr_opt.value();
 
     const binary_exprt &binary_expr = to_binary_expr(expr);
@@ -1465,9 +1474,10 @@ void goto_check_ct::pointer_validity_check(
   }
   else
   {
-    auto size_of_expr_opt = size_of_expr(expr.type(), ns);
-    CHECK_RETURN(size_of_expr_opt.has_value());
-    size = size_of_expr_opt.value();
+    // For incomplete array types (e.g. dereferencing int (*p)[]) size_of_expr()
+    // returns an empty optional since the size is unknown; fall back to a
+    // minimal size of 1, as is done for void pointers above.
+    size = size_of_expr(expr.type(), ns).value_or(from_integer(1, size_type()));
   }
 
   auto conditions = get_pointer_dereferenceable_conditions(pointer, size);
