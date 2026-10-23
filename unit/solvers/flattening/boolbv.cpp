@@ -10,6 +10,7 @@ Author: Daniel Kroening
 /// Unit tests for boolbvt
 
 #include <util/arith_tools.h>
+#include <util/bitvector_expr.h>
 #include <util/bitvector_types.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
@@ -93,6 +94,88 @@ SCENARIO(
     {
       boolbv << let;
       REQUIRE(boolbv() == decision_proceduret::resultt::D_SATISFIABLE);
+    }
+  }
+}
+
+SCENARIO(
+  "boolbvt::convert_extractbits with non-constant index",
+  "[core][solvers][flattening][boolbvt]")
+{
+  // End-to-end SAT-based check that the non-constant-index lowering in
+  // boolbvt::convert_extractbits is correct: pin the index to a known
+  // value via an assumption and assert that the extracted bits equal
+  // the expected slice. Without the lowering, convert_extractbits used
+  // to call conversion_failed which returns fresh unconstrained
+  // variables, so the pinned-value check below would not be entailed
+  // and the corresponding UNSATISFIABLE assumption would be SAT instead.
+  console_message_handlert message_handler;
+  message_handler.set_verbosity(0);
+
+  GIVEN("A 16-bit source and an 8-bit non-constant index")
+  {
+    satcheckt satcheck(message_handler);
+    symbol_tablet symbol_table;
+    namespacet ns(symbol_table);
+    boolbvt boolbv(ns, satcheck, message_handler);
+
+    const unsignedbv_typet u8{8};
+    const unsignedbv_typet u16{16};
+    const unsignedbv_typet u4{4};
+    const symbol_exprt src{"src", u16};
+    const symbol_exprt idx{"idx", u8};
+
+    // src = 0xABCD = 1010101111001101, idx = 4
+    // extractbits(src, idx, u4) selects bits [idx+3 .. idx], i.e. for
+    // idx=4 the nibble at bits 7..4 of 0xABCD == 0xC.
+    boolbv << equal_exprt{src, from_integer(0xABCD, u16)};
+    boolbv << equal_exprt{idx, from_integer(4, u8)};
+
+    const extractbits_exprt extract{src, idx, u4};
+    const equal_exprt good{extract, from_integer(0xC, u4)};
+    const equal_exprt bad{extract, from_integer(0xA, u4)};
+
+    THEN("the encoding selects the nibble at bits idx..idx+3")
+    {
+      // good is entailed -> ~good is unsat
+      REQUIRE(
+        boolbv(not_exprt{good}) ==
+        decision_proceduret::resultt::D_UNSATISFIABLE);
+    }
+
+    THEN("the encoding does NOT pick a different nibble")
+    {
+      // bad is unsat under the same model
+      REQUIRE(boolbv(bad) == decision_proceduret::resultt::D_UNSATISFIABLE);
+    }
+  }
+
+  GIVEN("Index wider than source (truncation case)")
+  {
+    satcheckt satcheck(message_handler);
+    symbol_tablet symbol_table;
+    namespacet ns(symbol_table);
+    boolbvt boolbv(ns, satcheck, message_handler);
+
+    const unsignedbv_typet u16{16};
+    const unsignedbv_typet u32{32};
+    const unsignedbv_typet u4{4};
+    const symbol_exprt src{"src", u16};
+    const symbol_exprt idx{"idx", u32};
+
+    boolbv << equal_exprt{src, from_integer(0x1234, u16)};
+    boolbv << equal_exprt{idx, from_integer(8, u32)};
+
+    // For idx=8, extractbits(src, idx, u4) selects bits 11..8 of 0x1234,
+    // which is the nibble 0x2.
+    const extractbits_exprt extract{src, idx, u4};
+    const equal_exprt good{extract, from_integer(0x2, u4)};
+
+    THEN("the truncated index still selects the right nibble")
+    {
+      REQUIRE(
+        boolbv(not_exprt{good}) ==
+        decision_proceduret::resultt::D_UNSATISFIABLE);
     }
   }
 }

@@ -1125,13 +1125,40 @@ static smt_termt convert_expr_to_smt(
     convert_type_to_smt_sort(extract_bits.type()).cast<smt_bit_vector_sortt>();
   INVARIANT(
     bit_vector_sort, "Extract can only be applied to bit vector terms.");
+  const std::size_t result_width = bit_vector_sort->bit_width();
   const auto index_value = numeric_cast<std::size_t>(extract_bits.index());
-  if(index_value)
+  if(index_value.has_value())
     return smt_bit_vector_theoryt::extract(
-      *index_value + bit_vector_sort->bit_width() - 1, *index_value)(from);
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for extract bits expression: " +
-    extract_bits.pretty());
+      *index_value + result_width - 1, *index_value)(from);
+  // For non-constant indices, encode
+  //   extractbits(src, idx, T)
+  // as
+  //   ((_ extract result_width-1 0) (bvlshr src idx'))
+  // where idx' has been zero-extended (or, if idx is wider than src,
+  // truncated) to from_width. Truncation is sound because well-formed
+  // extractbits indices satisfy idx + result_width - 1 < from_width
+  // (per bitvector_expr.h's contract for extractbits_exprt), so
+  // idx < from_width and the upper bits of idx are guaranteed to be
+  // zero. We use zero_extend rather than sign_extend because indices
+  // are non-negative; this is correct even when idx has a signed type
+  // because the same width-bound applies.
+  const smt_termt &index_term = converted.at(extract_bits.index());
+  const auto from_sort = from.get_sort().cast<smt_bit_vector_sortt>();
+  const auto index_sort = index_term.get_sort().cast<smt_bit_vector_sortt>();
+  INVARIANT(
+    from_sort && index_sort,
+    "Extract bits operands are expected to have bit vector sorts.");
+  const std::size_t from_width = from_sort->bit_width();
+  const std::size_t index_width = index_sort->bit_width();
+  const smt_termt adjusted_index =
+    index_width < from_width ? smt_bit_vector_theoryt::zero_extend(
+                                 from_width - index_width)(index_term)
+    : index_width > from_width
+      ? smt_bit_vector_theoryt::extract(from_width - 1, 0)(index_term)
+      : index_term;
+  const smt_termt shifted =
+    smt_bit_vector_theoryt::logical_shift_right(from, adjusted_index);
+  return smt_bit_vector_theoryt::extract(result_width - 1, 0)(shifted);
 }
 
 static smt_termt convert_expr_to_smt(
