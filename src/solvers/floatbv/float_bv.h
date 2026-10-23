@@ -93,6 +93,27 @@ public:
     const ieee_float_spect &src_spec,
     const ieee_float_spect &dest_spec) const;
 
+  /// Round a floating-point value to integral, IEEE 754 semantics.
+  /// \param src: packed bit-vector encoding of an IEEE float of the given
+  ///   `spec`.
+  /// \param rm: rounding mode encoded as `ieee_floatt::rounding_modet`.
+  /// \param spec: target IEEE format.
+  /// \return Packed bit-vector encoding of `roundToIntegral(rm, src)`.
+  ///   Special values (NaN, ±Inf, ±0) and values whose unbiased exponent
+  ///   already meets or exceeds the fraction width short-circuit to `src`.
+  /// \note The encoding is a barrel-shifter pass: a constant-depth
+  ///   expression tree (a handful of variable-amount shifts plus a
+  ///   single adder, all at width `spec.width()`). The bit-blasting /
+  ///   SMT layer expands the variable-amount shifts into
+  ///   O(log f)-depth circuits.
+  ///   `float_utilst::round_to_integral` is the bvt-level mirror; keep
+  ///   the two implementations in lockstep when changing the rounding
+  ///   tables.
+  exprt round_to_integral(
+    const exprt &src,
+    const exprt &rm,
+    const ieee_float_spect &spec) const;
+
   // relations
   enum class relt { LT, LE, EQ, GT, GE };
   static exprt

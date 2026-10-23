@@ -1,0 +1,12 @@
+CORE smt-backend no-new-smt
+main.c
+--smt2 --z3
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Round-to-integral on the non-FPA SMT path. Without the rewrite,
+smt2_conv hits UNEXPECTEDCASE("TODO floatbv_round_to_integral without
+FPA"), so this test pins down the user-visible fix.
