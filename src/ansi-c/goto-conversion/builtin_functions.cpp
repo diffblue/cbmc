@@ -623,6 +623,21 @@ static exprt make_va_list(const exprt &expr, const namespacet &ns)
     result = index_exprt{result, from_integer(0, c_index_type())};
   }
 
+  // When the argument is a pointer to a va_list element (e.g., va_tag *args
+  // where va_tag is the element type of __builtin_va_list), dereference to
+  // obtain the element lvalue. Without this, the va_arg increment would
+  // advance the pointer itself rather than the underlying va_list position.
+  // We distinguish this from a plain va_list variable (which is also void**)
+  // by checking for a typedef annotation: va_list/va_list-derived types carry
+  // a #typedef tag, whereas a raw pointer-to-element does not.
+  if(
+    result.type().id() == ID_pointer &&
+    to_pointer_type(result.type()).base_type().id() != ID_empty &&
+    result.type().get(ID_C_typedef).empty())
+  {
+    result = dereference_exprt{result};
+  }
+
   return result;
 }
 
