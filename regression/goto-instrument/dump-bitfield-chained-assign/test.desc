@@ -1,0 +1,17 @@
+CORE
+main.c
+--dump-c
+VERIFICATION SUCCESSFUL
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+This test must verify successfully also for the output generated using dump-c.
+A chained assignment `outer = bf = expr;` through a signed bit-field previously
+produced dump-c output that lost sign-extension semantics: the temporary
+holding the assignment value was masked but not sign-extended, so `outer`
+ended up with the unsigned-truncated value rather than the value of the
+bit-field after the assignment (per C11 6.5.16.1p3). The cases cover the
+1-bit boundary, a width wider than two bits, a negative right-hand side, the
+unchanged unsigned branch, and a full-width (non-narrowing) signed field.
