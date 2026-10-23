@@ -129,6 +129,17 @@ public:
   const smt_bit_vector_sortt &get_sort() const;
 };
 
+class smt_int_constant_termt : public smt_termt
+{
+public:
+  explicit smt_int_constant_termt(const mp_integer &value);
+  mp_integer value() const;
+
+  // This deliberately hides smt_termt::get_sort, because int terms
+  // always have int sorts.
+  const smt_int_sortt &get_sort() const;
+};
+
 class smt_function_application_termt : public smt_termt
 {
 private:

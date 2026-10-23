@@ -135,6 +135,7 @@ SRC += analyses/ai/ai.cpp \
        solvers/smt2_incremental/theories/smt_array_theory.cpp \
        solvers/smt2_incremental/theories/smt_bit_vector_theory.cpp \
        solvers/smt2_incremental/theories/smt_core_theory.cpp \
+       solvers/smt2_incremental/theories/smt_integer_theory.cpp \
        solvers/strings/array_pool/array_pool.cpp \
        solvers/strings/string_constraint_generator_valueof/calculate_max_string_length.cpp \
        solvers/strings/string_constraint_generator_valueof/get_numeric_value_from_character.cpp \
