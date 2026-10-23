@@ -71,6 +71,15 @@ public:
   bool use_lambda_for_array = false;
   bool emit_set_logic = true;
 
+  /// Whether to use the SMT-LIB FloatingPoint theory for the given type.
+  /// Returns `use_FPA_theory` for ordinary IEEE 754 binary FP types.
+  /// Returns `false` for x86 80-bit extended `long double`: that format has
+  /// an explicit integer (J) bit and is stored in a 96- or 128-bit container
+  /// with high-bit storage padding, so it does not correspond to any
+  /// SMT-LIB FloatingPoint sort.  Such values are always emitted as bit
+  /// vectors and operations on them are lowered through `convert_floatbv`.
+  bool use_FPA_for_type(const typet &type) const;
+
   exprt handle(const exprt &expr) override;
   void set_to(const exprt &expr, bool value) override;
   exprt get(const exprt &expr) const override;
