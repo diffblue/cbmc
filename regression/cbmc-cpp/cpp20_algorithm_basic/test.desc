@@ -1,12 +1,14 @@
 CORE
 main.cpp
---cpp17 --unwind 3 --no-unwinding-assertions --depth 200
-^EXIT=(0|10)$
+--cpp17 --unwind 6 --no-unwinding-assertions
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
 ^SIGNAL=0$
-^VERIFICATION
 --
 ^CONVERSION ERROR$
 ^PARSING ERROR$
 dropped the body
 --
 std::sort in C++17 mode. May report "no body" on some GCC versions.
+--unwind 6 (was 3) and no --depth: every path was cut before the end of
+main.
