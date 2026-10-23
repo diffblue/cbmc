@@ -12,14 +12,17 @@ Author: Georg Weissenbacher, georg@weissenbacher.name
 #ifndef CPROVER_ANALYSES_CFG_DOMINATORS_H
 #define CPROVER_ANALYSES_CFG_DOMINATORS_H
 
-#include <set>
-#include <list>
-#include <map>
-#include <iosfwd>
+#include <util/sharing_map.h>
 
+#include <goto-programs/cfg.h>
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/goto_program.h>
-#include <goto-programs/cfg.h>
+
+#include <algorithm>
+#include <iosfwd>
+#include <list>
+#include <map>
+#include <vector>
 
 /// Dominator graph. This computes a control-flow graph (see \ref cfgt) and
 /// decorates it with dominator sets per program point, following
@@ -36,7 +39,97 @@ template <class P, class T, bool post_dom>
 class cfg_dominators_templatet
 {
 public:
-  typedef std::set<T, typename P::target_less_than> target_sett;
+  /// Set of program points, backed by a copy-on-write sharing map so that
+  /// similar sets share most of their representation. Dominator sets of
+  /// adjacent program points typically differ in just a single element, so
+  /// the sharing keeps the total memory linear-ish in the program size, where
+  /// explicit per-node `std::set`s are worst-case quadratic (a straight-line
+  /// program of N instructions has dominator sets of total size N^2/2, which
+  /// for machine-generated functions with ~100k instructions exhausts tens of
+  /// gigabytes of memory).
+  class target_sett
+  {
+  public:
+    bool empty() const
+    {
+      return map.empty();
+    }
+
+    std::size_t size() const
+    {
+      return map.size();
+    }
+
+    std::size_t count(const T &t) const
+    {
+      return map.has_key(t) ? 1 : 0;
+    }
+
+    void insert(const T &t)
+    {
+      if(!map.has_key(t))
+        map.insert(t, unitt{});
+    }
+
+    /// Invoke \p f for each element of the set, in no particular order.
+    void for_each(std::function<void(const T &)> f) const
+    {
+      map.iterate([&f](const T &k, const unitt &) { f(k); });
+    }
+
+    /// Remove all elements that are not also contained in \p other, except
+    /// that \p keep is always retained. Return true if any element was
+    /// removed. The delta view used here only visits elements in subtrees
+    /// that are not shared between the two maps, so intersecting largely
+    /// overlapping sets is much cheaper than element-wise iteration.
+    bool intersect_with(const target_sett &other, const T &keep)
+    {
+      typename mapt::delta_viewt delta_view;
+      map.get_delta_view(other.map, delta_view, false);
+
+      std::vector<T> to_erase;
+      for(const auto &delta_item : delta_view)
+      {
+        if(!delta_item.is_in_both_maps() && !(delta_item.k == keep))
+          to_erase.push_back(delta_item.k);
+      }
+
+      for(const auto &item : to_erase)
+        map.erase(item);
+
+      return !to_erase.empty();
+    }
+
+  protected:
+    struct unitt
+    {
+    };
+
+    struct target_hasht
+    {
+      /// Program-point hash: program points are either integral (e.g. Java
+      /// bytecode offsets) or iterator-like (e.g. goto-program targets), so
+      /// hash the value itself or the address of the object it refers to,
+      /// respectively.
+      template <typename U = T>
+      typename std::enable_if<std::is_integral<U>::value, std::size_t>::type
+      operator()(const U &t) const
+      {
+        return std::hash<U>{}(t);
+      }
+
+      template <typename U = T>
+      typename std::enable_if<!std::is_integral<U>::value, std::size_t>::type
+      operator()(const U &t) const
+      {
+        return std::hash<const void *>{}(&*t);
+      }
+    };
+
+    typedef sharing_mapt<T, unitt, false, target_hasht> mapt;
+
+    mapt map;
+  };
 
   struct nodet
   {
@@ -210,38 +303,7 @@ void cfg_dominators_templatet<P, T, post_dom>::fixedpoint(P &program)
       if(other.empty())
         continue;
 
-      typename target_sett::const_iterator n_it=node.dominators.begin();
-      typename target_sett::const_iterator o_it=other.begin();
-
-      // in-place intersection. not safe to use set_intersect
-      while(n_it!=node.dominators.end() && o_it!=other.end())
-      {
-        if(*n_it==current)
-          ++n_it;
-        else if(typename P::target_less_than()(*n_it, *o_it))
-        {
-          changed=true;
-          node.dominators.erase(n_it++);
-        }
-        else if(typename P::target_less_than()(*o_it, *n_it))
-          ++o_it;
-        else
-        {
-          ++n_it;
-          ++o_it;
-        }
-      }
-
-      while(n_it!=node.dominators.end())
-      {
-        if(*n_it==current)
-          ++n_it;
-        else
-        {
-          changed=true;
-          node.dominators.erase(n_it++);
-        }
-      }
+      changed |= node.dominators.intersect_with(other, current);
     }
 
     if(changed) // fixed point for node reached?
@@ -284,8 +346,17 @@ void cfg_dominators_templatet<P, T, post_dom>::output(std::ostream &out) const
       out << " post-dominated by ";
     else
       out << " dominated by ";
+
+    std::vector<T> sorted_dominators;
+    cfg[node.second].dominators.for_each([&sorted_dominators](const T &d)
+                                         { sorted_dominators.push_back(d); });
+    std::sort(
+      sorted_dominators.begin(),
+      sorted_dominators.end(),
+      typename P::target_less_than{});
+
     bool first=true;
-    for(const auto &d : cfg[node.second].dominators)
+    for(const auto &d : sorted_dominators)
     {
       if(!first)
         out << ", ";

@@ -146,10 +146,21 @@ void sese_region_analysist::compute_sese_regions(
     // but our current dominator analysis doesn't make it easy to determine an
     // immediate dominator.
 
+    // Iterate in a deterministic (location-number) order, since ties on the
+    // dominator-set size below are broken by iteration order.
+    std::vector<goto_programt::const_targett> sorted_postdoms;
+    instruction_postdoms.for_each(
+      [&sorted_postdoms](const goto_programt::const_targett &d)
+      { sorted_postdoms.push_back(d); });
+    std::sort(
+      sorted_postdoms.begin(),
+      sorted_postdoms.end(),
+      goto_programt::target_less_than{});
+
     // Ideally I would use `std::optional<std::size_t>` here, but it triggers a
     // GCC-5 bug.
     std::size_t closest_exit_index = dominators.cfg.size();
-    for(const auto &possible_exit : instruction_postdoms)
+    for(const auto &possible_exit : sorted_postdoms)
     {
       const auto possible_exit_index = dominators.get_node_index(possible_exit);
       const auto &possible_exit_node = dominators.cfg[possible_exit_index];
