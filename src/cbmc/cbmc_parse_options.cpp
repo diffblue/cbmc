@@ -485,6 +485,8 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   // Options for process_goto_program
   options.set_option("rewrite-rw-ok", true);
   options.set_option("rewrite-union", true);
+  options.set_option(
+    "lift-nested-dereferences", cmdline.isset("lift-nested-dereferences"));
 
   if(cmdline.isset("smt1"))
   {
@@ -1063,6 +1065,8 @@ void cbmc_parse_optionst::help()
     " {y--full-slice} \t run full slicer (experimental)\n"
     " {y--drop-unused-functions} \t drop functions trivially unreachable from"
     " main function\n"
+    " {y--lift-nested-dereferences} \t rewrite nested pointer"
+    " dereferences into intermediate temporaries\n"
     "\n"
     "Semantic transformations:\n"
     " {y--nondet-static} \t add nondeterministic initialization of variables"

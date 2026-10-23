@@ -236,8 +236,6 @@ At present, both primitives are equivalent as all memory in CBMC is considered
 both readable and writeable. The primitives return true if `p` points to a live
 object and the object that `p` points into extends to at least `size` more
 bytes. Else, an assertion encompassing the primitive will be reported to fail.
-Do not use these primitives in assumptions when `p` can be not valid as such use
-can yield spurious verification results.
 
 ```C
 char *p = malloc(10);
@@ -246,6 +244,176 @@ p += 5;
 assert(__CPROVER_r_ok(p, 3));  // valid
 assert(__CPROVER_r_ok(p, 10)); // fails
 ```
+
+### Modeling valid memory with `rw_ok` assumptions
+
+A common pattern in verification harnesses is to assume that a pointer argument
+points to valid memory, without explicitly calling `malloc`. This is done by
+combining `__CPROVER_assume` with `__CPROVER_rw_ok` (or `__CPROVER_r_ok` /
+`__CPROVER_w_ok`).
+
+**Important:** This feature only activates when `rw_ok` appears inside
+`__CPROVER_assume`. Using `rw_ok` in assertions or other contexts does not
+create backing objects. Pointers that are not explicitly assumed valid via
+`rw_ok` will still correctly fail pointer checks when dereferenced — the
+feature does not suppress any genuine memory-safety errors.
+
+#### Arrays
+
+When the size argument is a compile-time constant (or can be resolved to one
+through constant propagation) and is larger than a single element, CBMC creates
+a backing array object of the appropriate size. The pointer then behaves like
+one returned by `malloc`: array indexing, `memcpy`, `__CPROVER_array_copy`, and
+other operations all work correctly.
+
+```C
+unsigned int *a;
+size_t n = 3;
+__CPROVER_assume(__CPROVER_rw_ok(a, n * sizeof(*a)));
+// a now behaves like a pointer to an array of 3 unsigned ints
+a[0] = 10;
+a[1] = 20;
+a[2] = 30;
+assert(a[0] == 10 && a[1] == 20 && a[2] == 30); // succeeds
+```
+
+Run with: `cbmc --pointer-check --no-pointer-primitive-check example.c`
+
+#### Pointer aliases
+
+Pointer aliases created before or after the `rw_ok` assumption work correctly:
+
+```C
+unsigned int *a;
+unsigned int *b = a;                                // alias before assume
+__CPROVER_assume(__CPROVER_rw_ok(a, sizeof(*a)));
+unsigned int *c = a;                                // alias after assume
+*a = 1;
+assert(*b == 1 && *c == 1);                         // succeeds
+```
+
+#### Inductive data structures (linked lists, trees)
+
+When `rw_ok` is used on a pointer to a struct that contains pointer members,
+CBMC automatically creates a chain of valid objects. Each pointer member in the
+struct is nondeterministically set to either NULL or a pointer to a fresh valid
+object of the same type. When that fresh object is later dereferenced, its
+pointer members are initialized in the same way, creating a lazy chain.
+
+The maximum depth of this chain is bounded by the `--unwind` option: with
+`--unwind N`, the chain can have at most N-1 nodes.
+
+```C
+struct node {
+  int data;
+  struct node *next;
+};
+
+int list_length(struct node *head) {
+  int count = 0;
+  struct node *curr = head;
+  while(curr != 0) {
+    count++;
+    curr = curr->next;
+  }
+  return count;
+}
+
+int main() {
+  struct node *head;
+  __CPROVER_assume(__CPROVER_rw_ok(head, sizeof(*head)));
+  __CPROVER_assume(head != 0);
+
+  int len = list_length(head);
+  assert(len >= 1);  // succeeds: head is non-null, so at least 1 node
+}
+```
+
+Run with: `cbmc --pointer-check --no-pointer-primitive-check --unwind 4 example.c`
+
+With `--unwind 4`, the list has at most 3 nodes. Increasing `--unwind` allows
+verification of longer lists.
+
+This also works for trees and other recursive data structures:
+
+```C
+struct tree_node {
+  int value;
+  struct tree_node *left;
+  struct tree_node *right;
+};
+```
+
+Using `__CPROVER_assume(__CPROVER_rw_ok(root, sizeof(*root)))` on a
+`struct tree_node *root` creates a nondeterministic tree bounded by `--unwind`.
+
+Chained dereferences such as `head->next->data` or `root->left->right` can be
+used directly: CBMC lifts the intermediate pointers into temporaries (see
+`--no-lift-nested-dereferences`), so a guarded access like
+`if(head->next) head->next->data` reads the intermediate pointer once and
+verifies.
+
+#### Soundness guarantees
+
+The `rw_ok`-in-assumptions feature is designed to not suppress genuine
+memory-safety errors:
+
+- **Only explicit `rw_ok` assumptions create objects.** A nondet pointer that is
+  dereferenced without a prior `rw_ok` assumption will still fail all pointer
+  checks (`pointer NULL`, `pointer invalid`, etc.). The auto-object mechanism
+  does not fire for such pointers.
+
+- **Pointer checks are still performed.** Even with `rw_ok`, CBMC checks that
+  each dereference is within the bounds of the created object. For example,
+  accessing `a[3]` when `rw_ok(a, 3 * sizeof(*a))` was assumed will correctly
+  report an out-of-bounds error.
+
+- **NULL is still possible.** For inductive data structures, each pointer member
+  is nondeterministically NULL or valid. CBMC explores both possibilities. If
+  the code dereferences a pointer without checking for NULL, the NULL case will
+  be reported as a failure.
+
+#### Limitations
+
+- **Non-constant sizes:** When the size argument to `rw_ok` cannot be resolved
+  to a compile-time constant (e.g., it depends on a nondet variable), the array
+  optimization does not apply. The pointer will behave as a single-element
+  pointer. Array indexing beyond element 0 may produce incorrect results.
+
+- **Sizes smaller than one element:** When the constant size passed to `rw_ok`
+  is smaller than `sizeof(*ptr)`, no backing object can be created. CBMC emits a
+  warning and the assumption has no effect; a subsequent dereference will fail
+  pointer checks as if no `rw_ok` had been written.
+
+- **Aliases and multi-element `rw_ok`:** For a single-element `rw_ok`
+  (`size == sizeof(*ptr)`) the pointer is constrained via an assumption, so an
+  alias established *before* the assume (e.g. `b = a;` followed by
+  `__CPROVER_assume(__CPROVER_rw_ok(a, sizeof(*a)))`) continues to refer to the
+  same object. For a multi-element `rw_ok` the pointer is instead strongly
+  assigned to the new array object, so that whole-array operations (such as
+  `__CPROVER_array_copy` / `__CPROVER_array_equal`) resolve to a single target;
+  this breaks such pre-existing aliases, and `b` keeps its old (nondet) value.
+
+- **Pointer primitive checks:** The `--pointer-primitive-check` option may
+  report failures for the `rw_ok` call itself when the pointer is
+  uninitialized. Use `--no-pointer-primitive-check` to suppress these when the
+  `rw_ok` assumption is intentional.
+
+- **Not a substitute for contracts.** For modular verification with function
+  contracts, use `__CPROVER_is_fresh` in `__CPROVER_requires` /
+  `__CPROVER_ensures` clauses instead. The `rw_ok`-in-assumptions feature is
+  intended for lightweight harness writing without contracts.
+
+#### Comparison with `malloc` and `__CPROVER_is_fresh`
+
+| Feature | `malloc` | `rw_ok` in assume | `is_fresh` in contract |
+|---------|----------|-------------------|----------------------|
+| Creates backing object | Yes | Yes (constant size) | Yes |
+| Array support | Yes | Yes (constant size) | Yes |
+| Linked list support | Manual | Automatic (lazy) | Via recursive predicates |
+| Pointer aliases | Work | Work | Work |
+| Modular verification | No | No | Yes |
+| Requires `--no-pointer-primitive-check` | No | Yes | No |
 
 ## Detecting potential misuses of memory primitives
 

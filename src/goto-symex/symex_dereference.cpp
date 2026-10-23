@@ -321,6 +321,9 @@ void goto_symext::dereference_rec(
 
     tmp1 = state.field_sensitivity.apply(ns, state, std::move(tmp1), false);
 
+    // this may yield a new auto-object
+    trigger_auto_object(tmp1, state);
+
     // we need to set up some elaborate call-backs
     symex_dereference_statet symex_dereference_state(state, ns);
 
@@ -337,8 +340,8 @@ void goto_symext::dereference_rec(
       dereference.dereference(tmp1, symex_config.show_points_to_sets);
     // std::cout << "**** " << format(tmp2) << '\n';
 
-
-    // this may yield a new auto-object
+    // After dereference, the resolved expression may contain auto-objects
+    // that need initialization (e.g., nodes in a linked list chain).
     trigger_auto_object(tmp2, state);
 
     // Check various conditions for when we should try to cache the expression.

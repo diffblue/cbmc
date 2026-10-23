@@ -1,0 +1,12 @@
+CORE broken-cprover-smt-backend no-new-smt
+main.c
+--pointer-check --no-pointer-primitive-check --unwind 3 --no-unwinding-assertions --lift-nested-dereferences
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+With nested-dereference lifting (on by default) the intermediate pointer
+head->next is hoisted into a single temporary, so the chained dereference
+head->next->data verifies. See GitHub issue diffblue/cbmc#7829.
