@@ -1,0 +1,13 @@
+CORE
+--xml-interface
+--verbosity 8 < malformed_pi.xml
+^EXIT=6$
+^SIGNAL=0$
+<text>syntax error before .processing.</text>
+--
+double free
+--
+Regression test for the XML-parser double-free on error recovery: a
+malformed processing instruction must make the parser report a syntax
+error and exit cleanly, rather than double-freeing the STARTPI/NAME token
+values during Bison error recovery (which aborted with SIGABRT).
