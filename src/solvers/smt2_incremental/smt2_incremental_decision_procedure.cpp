@@ -6,6 +6,7 @@
 #include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
+#include <util/mathematical_expr.h>
 #include <util/range.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
@@ -24,6 +25,7 @@
 #include <solvers/smt2_incremental/theories/smt_core_theory.h>
 #include <solvers/smt2_incremental/type_size_mapping.h>
 
+#include <memory>
 #include <stack>
 #include <unordered_set>
 
@@ -75,32 +77,63 @@ static std::vector<exprt> gather_dependent_expressions(const exprt &root_expr)
 {
   std::vector<exprt> dependent_expressions;
 
-  std::stack<const exprt *> stack;
-  stack.push(&root_expr);
+  // Each frame carries the node to visit together with the set of identifiers
+  // bound by the enclosing quantifiers. The bound set is shared between frames
+  // and only extended when entering a quantifier, so a nested quantifier
+  // correctly sees the variables bound by all of its enclosing quantifiers (and
+  // those variables are not emitted as top-level dependencies).
+  using bound_sett = std::unordered_set<irep_idt>;
+  struct framet
+  {
+    const exprt *node;
+    std::shared_ptr<const bound_sett> bound;
+  };
+
+  std::stack<framet> stack;
+  stack.push({&root_expr, std::make_shared<const bound_sett>()});
 
   while(!stack.empty())
   {
-    const exprt &expr_node = *stack.top();
+    const framet frame = stack.top();
     stack.pop();
-    if(
-      can_cast_expr<symbol_exprt>(expr_node) ||
-      can_cast_expr<array_exprt>(expr_node) ||
-      can_cast_expr<array_of_exprt>(expr_node) ||
-      can_cast_expr<nondet_symbol_exprt>(expr_node) ||
-      can_cast_expr<string_constantt>(expr_node))
+    const exprt &node = *frame.node;
+
+    // A quantifier binds its variables within its body. Extend the bound set
+    // and descend into the body only; the bound-variable tuple itself is not a
+    // dependency.
+    if(can_cast_expr<quantifier_exprt>(node))
     {
-      dependent_expressions.push_back(expr_node);
+      const quantifier_exprt &quantifier = to_quantifier_expr(node);
+      auto extended_bound = std::make_shared<bound_sett>(*frame.bound);
+      for(const auto &var : quantifier.variables())
+        extended_bound->insert(var.get_identifier());
+      stack.push({&quantifier.where(), std::move(extended_bound)});
+      continue;
+    }
+
+    if(
+      can_cast_expr<symbol_exprt>(node) || can_cast_expr<array_exprt>(node) ||
+      can_cast_expr<array_of_exprt>(node) ||
+      can_cast_expr<nondet_symbol_exprt>(node) ||
+      can_cast_expr<string_constantt>(node))
+    {
+      // A symbol bound by an enclosing quantifier is declared by the SMT-LIB
+      // quantifier rather than as a top-level dependency.
+      const auto symbol = expr_try_dynamic_cast<symbol_exprt>(node);
+      if(!(symbol && frame.bound->count(symbol->get_identifier())))
+        dependent_expressions.push_back(node);
     }
     // The decision procedure does not depend on the values inside address of
     // code typed expressions. We can build the address without knowing the
     // value at that memory location. In this case the hypothetical compiled
     // machine instructions at the address are not relevant to solving, only
     // representing *which* function a pointer points to is needed.
-    const auto address_of = expr_try_dynamic_cast<address_of_exprt>(expr_node);
+    const auto address_of = expr_try_dynamic_cast<address_of_exprt>(node);
     if(address_of && can_cast_type<code_typet>(address_of->object().type()))
       continue;
-    for(auto &operand : expr_node.operands())
-      stack.push(&operand);
+
+    for(auto &operand : node.operands())
+      stack.push({&operand, frame.bound});
   }
   return dependent_expressions;
 }
