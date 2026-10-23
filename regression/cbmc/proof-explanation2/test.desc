@@ -1,0 +1,10 @@
+CORE paths-lifo-expected-failure
+main.c
+--proof-explanation
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+Proof explanation:
+\[core\] \[assignment\].*main.c:3
+--
+^warning: ignoring

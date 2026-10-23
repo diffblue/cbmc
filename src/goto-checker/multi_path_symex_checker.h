@@ -51,6 +51,21 @@ public:
   void output_error_witness(const goto_tracet &) override;
   void output_proof() override;
 
+  /// Get a word-level proof explanation for proved properties.
+  /// Must be called after the solver returns UNSATISFIABLE.
+  /// \return a vector of proof explanation steps with core annotations
+  std::vector<proof_explanation_stept> get_proof_explanation();
+
+  /// Get per-property proof explanations.
+  std::map<irep_idt, std::vector<proof_explanation_stept>>
+  get_per_property_proof_explanations();
+
+  /// Get word-level invariants from the proof explanation.
+  /// Groups core steps by the variables they constrain.
+  /// Must be called after the solver returns UNSATISFIABLE.
+  /// \return a vector of proof invariants
+  std::vector<proof_invariantt> get_proof_invariants();
+
   fault_location_infot
   localize_fault(const irep_idt &property_id) const override;
 

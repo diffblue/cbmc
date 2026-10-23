@@ -1,0 +1,10 @@
+CORE paths-lifo-expected-failure broken-cprover-smt-backend
+main.c
+--proof-explanation
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+Proof explanation:
+Proof invariants:
+--
+^warning: ignoring
