@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.8)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -90,6 +90,11 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     # This would be the place to enable warnings for Windows builds, although
     # config.inc doesn't seem to do that currently
+
+    # C++20 removes the ability to stream u8 string literals; plain string
+    # literals with \uXXXX escapes are used instead, which requires the
+    # source and execution character sets to be UTF-8.
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /utf-8")
 
     # Include Git Bash Environment (rqeuired for download_project (patch))
     find_package(Git)
