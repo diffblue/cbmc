@@ -1462,6 +1462,34 @@ TEST_CASE("expr to smt conversion for type casts", "[core][smt2_incremental]")
 }
 
 TEST_CASE(
+  "Array to array typecast in convert_expr_to_smt",
+  "[core][smt2_incremental]")
+{
+  auto test =
+    expr_to_smt_conversion_test_environmentt::make(test_archt::x86_64);
+  const auto source_type =
+    array_typet{signedbv_typet{32}, from_integer(4, c_index_type())};
+  const auto target_type =
+    array_typet{signedbv_typet{64}, from_integer(2, c_index_type())};
+  const symbol_exprt source_array{"src_array", source_type};
+  const typecast_exprt cast{source_array, target_type};
+  const cbmc_invariants_should_throwt invariants_throw;
+  SECTION("Array to array typecast is not handled directly")
+  {
+    CHECK_THROWS(test.convert(cast));
+  }
+  SECTION("Sort conversion for array types")
+  {
+    CHECK(
+      convert_type_to_smt_sort(source_type) ==
+      smt_array_sortt{smt_bit_vector_sortt{64}, smt_bit_vector_sortt{32}});
+    CHECK(
+      convert_type_to_smt_sort(target_type) ==
+      smt_array_sortt{smt_bit_vector_sortt{64}, smt_bit_vector_sortt{64}});
+  }
+}
+
+TEST_CASE(
   "expr to smt conversion for address of operator",
   "[core][smt2_incremental]")
 {
