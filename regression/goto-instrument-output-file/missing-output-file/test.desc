@@ -1,0 +1,8 @@
+CORE
+main.c
+--full-slice
+^missing output file name; usage: goto-instrument input.gb output.gb \[options\]$
+^EXIT=1$
+^SIGNAL=0$
+--
+^Writing GOTO program
