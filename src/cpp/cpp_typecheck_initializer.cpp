@@ -772,6 +772,11 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
       symbol.value = std::move(val);
     }
 
+    // a constant-initialized variable's value (see
+    // discard_constant_comma_operands)
+    if(constexpr_init_guard.has_value())
+      discard_constant_comma_operands(symbol.value);
+
     // the class of a pointer-to-member initializer completes a declared type
     // without one (`auto'); a declared `int B::*' keeps its class, the value
     // is converted to it ([conv.mem]/2)
