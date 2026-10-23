@@ -272,8 +272,8 @@ public:
   /// `__CPROVER_object_whole`, `__CPROVER_object_from`, `__CPROVER_object_upto`
   std::optional<dfcc_funt> get_havoc_hook(const irep_idt &function_id) const;
 
-  /// \brief Returns the "__dfcc_instrumented_functions" symbol or creates it if
-  /// it does not exist already.
+  /// \brief Returns the \ref INSTRUMENTED_FUNCTIONS_MAP_NAME symbol or
+  /// creates it if it does not exist already.
   /// This symbol is an unbounded map of booleans indexed
   /// by function pointer ID, meant to have value true for instrumented
   /// functions and false for non-instrumented functions.
