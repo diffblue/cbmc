@@ -274,6 +274,12 @@ void sat_path_enumeratort::build_fixed()
       // header we're happy & redirect it to our end-of-body sentinel.
       // If it jumps somewhere else, it's part of a nested loop and we
       // kill it.
+      //
+      // We handle all targets at once to avoid invalidating the fixed
+      // copy's target list while iterating over the original's targets.
+      goto_programt::targetst new_targets;
+      bool dominated_by_kill = false;
+
       for(const auto &target : t->targets)
       {
         if(target->location_number > t->location_number)
@@ -281,34 +287,37 @@ void sat_path_enumeratort::build_fixed()
           // A forward jump...
           if(!loop.contains(target))
           {
-            // Case 1: a forward jump within the loop.  Do nothing.
-            continue;
+            // A forward jump out of the loop.  Kill.
+            dominated_by_kill = true;
           }
-          else
-          {
-            // Case 2: a forward jump out of the loop.  Kill.
-            fixedt->targets.clear();
-            fixedt->targets.push_back(kill);
-          }
+          // else: a forward jump within the loop.  Keep original target.
         }
         else
         {
           // A backwards jump...
-          if(target==loop_header)
+          if(target == loop_header)
           {
-            // Case 3: a backwards jump to the loop header.  Redirect
-            // to sentinel.
-            fixedt->targets.clear();
-            fixedt->targets.push_back(end);
+            // A backwards jump to the loop header.  Redirect to sentinel.
+            new_targets.push_back(end);
           }
           else
           {
-            // Case 4: a nested loop.  Kill.
-            fixedt->targets.clear();
-            fixedt->targets.push_back(kill);
+            // A nested loop.  Kill.
+            dominated_by_kill = true;
           }
         }
       }
+
+      if(dominated_by_kill)
+      {
+        fixedt->targets.clear();
+        fixedt->targets.push_back(kill);
+      }
+      else if(!new_targets.empty())
+      {
+        fixedt->targets = new_targets;
+      }
+      // else: all targets are forward jumps within the loop, keep as-is
     }
   }
 

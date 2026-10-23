@@ -1209,7 +1209,10 @@ void acceleration_utilst::extract_polynomial(
     constant_exprt concrete_term=to_constant_expr(program.eval(coefficient));
     std::map<exprt, int> degrees;
 
-    mp_integer mp=binary2integer(concrete_term.get_value().c_str(), true);
+    mp_integer mp = bvrep2integer(
+      concrete_term.get_value(),
+      to_bitvector_type(concrete_term.type()).get_width(),
+      true);
     monomial.coeff = numeric_cast_v<int>(mp);
 
     if(monomial.coeff==0)
