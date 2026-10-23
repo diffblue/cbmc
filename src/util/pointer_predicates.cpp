@@ -20,6 +20,19 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "std_expr.h"
 #include "symbol.h"
 
+bool is_symex_dynamic_object(const exprt &obj)
+{
+  if(obj.id() == ID_dynamic_object)
+    return true;
+  const exprt &root = obj.id() == ID_index ? to_index_expr(obj).array() : obj;
+  if(root.id() == ID_symbol)
+  {
+    return id2string(to_symbol_expr(root).get_identifier())
+             .find(SYMEX_DYNAMIC_PREFIX) != std::string::npos;
+  }
+  return false;
+}
+
 exprt pointer_object(const exprt &p)
 {
   return pointer_object_exprt(p, size_type());

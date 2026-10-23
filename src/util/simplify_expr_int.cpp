@@ -1504,6 +1504,14 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_both_constant(
         // is and therefore cannot simplify
         return unchanged(expr);
       }
+      // malloc may return the same address after free — don't
+      // conclude inequality for non-null pointer constants
+      if(
+        config.bv_encoding.malloc_may_alias && !(tmp0_const == 0) &&
+        !(tmp1_const == 0))
+      {
+        return unchanged(expr);
+      }
       equal = tmp0_const == 0 && tmp1_const == 0;
     }
     return make_boolean_expr(expr.id() == ID_equal ? equal : !equal);

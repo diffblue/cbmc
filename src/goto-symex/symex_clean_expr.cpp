@@ -129,7 +129,8 @@ void goto_symext::process_array_expr(statet &state, exprt &expr)
     symex_dereference_state,
     language_mode,
     false,
-    log.get_message_handler());
+    log.get_message_handler(),
+    symex_config.wide_pointer_encoding);
 
   expr = dereference.dereference(expr, symex_config.show_points_to_sets);
   lift_lets(state, expr);

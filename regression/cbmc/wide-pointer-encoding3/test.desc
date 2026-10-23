@@ -1,0 +1,13 @@
+CORE no-new-smt broken-smt-backend wide-pointer-encoding
+main.c
+--wide-pointer-encoding --no-standard-checks
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.assertion\.1\] .* I2P dereference reads correct value: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Issue #8103: with wide pointer encoding, (void*)addr where addr is
+constrained to be within a known object correctly reads from that
+object via address-based dereference dispatch.
