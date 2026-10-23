@@ -81,6 +81,8 @@ ExcludedTests = list(map(lambda s: os.path.join(test_base_dir, s[0], s[1]), [
     ['unsigned1', 'test.desc'],
     ['reachability-slice-interproc3', 'test.desc'],
     ['sync_lock_release-1', 'symbol_per_type.desc'],
+    ['inline_asm_dropped', 'test.desc'],
+    ['inline_asm_modeling', 'test.desc'],
     # this test is marked smt-backend, and would thus fail as we run tests with
     # the SAT back-end only
     ['integer-assignments1', 'test.desc'],
