@@ -48,6 +48,14 @@ jobs:
           MERGE_BRANCH: ${{ github.ref }}
         run: ./.github/workflows/pull-request-check-cpplint.sh
 
+  # This job takes a few seconds
+  check-c11-ub-table:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Check C11 undefined-behavior table status cells
+        run: ./scripts/check_c11_ub_statuses.py
+
   # This job should take about a minute (est)
   check-rustfmt:
     runs-on: ubuntu-latest
