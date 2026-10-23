@@ -1,0 +1,10 @@
+KNOWNBUG
+exists1.c
+--text --solve
+^EXIT=0$
+^SIGNAL=0$
+^\(\d+\) ∀ ς : state \. S19\(ς\) ⇒ ∃ main::1::1::i : signedbv\[32\] \. main::1::1::i = 100$
+^\(\d+\) ∀ ς : state \. S20\(ς\) ⇒ ∃ main::1::2::i : signedbv\[32] \. 0 ≠ 0$
+^\[main\.assertion\.1\] line \d+ 100 exists: REFUTED$
+^\[main\.assertion\.2\] line \d+ 'false' does not exist: REFUTED$
+--

@@ -1,0 +1,6 @@
+#!/bin/sh
+
+git clone https://github.com/awslabs/aws-c-common -b v0.6.13
+
+echo "/* nothing */" > aws-c-common/include/aws/common/config.h
+

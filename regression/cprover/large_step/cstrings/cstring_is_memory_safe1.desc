@@ -1,0 +1,8 @@
+CORE
+cstring_is_memory_safe1.c
+--safety
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.pointer\.1\] line \d+ pointer p safe: SUCCESS$
+^\[main\.pointer\.2\] line \d+ pointer .* safe: REFUTED$
+--

@@ -1,0 +1,7 @@
+CORE
+realloc2.c
+--safety
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.realloc\.1\] line \d+ realloc argument must be valid dynamic object: REFUTED$
+--
