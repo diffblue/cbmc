@@ -1429,6 +1429,7 @@ protected:
   void typecheck_expr_typecast(exprt &) override;
   void typecheck_expr_index(exprt &) override;
   void typecheck_expr_rel(binary_relation_exprt &) override;
+  void discard_constant_comma_operands(exprt &value);
   void typecheck_expr_comma(exprt &) override;
   void typecheck_expr_unary_arithmetic(exprt &) override;
 

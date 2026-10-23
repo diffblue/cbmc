@@ -2232,6 +2232,9 @@ void cpp_typecheckt::typecheck_compound_declarator(
                 typecheck_expr(new_symbol->value);
               }
               force_elaborate = saved_force;
+              // a constexpr or const static member's value, constant-
+              // initialized (see discard_constant_comma_operands)
+              discard_constant_comma_operands(new_symbol->value);
               // A braced initializer of an aggregate goes through the
               // shared do_initializer, which handles nested braces and the
               // GNU `[i] = v' / `.m = v' designators; an implicit typecast

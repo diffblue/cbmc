@@ -12126,23 +12126,28 @@ void cpp_typecheckt::typecheck_expr_comma(exprt &expr)
   }
 
   c_typecheck_baset::typecheck_expr_comma(expr);
+}
 
-  // N5008 [expr.comma]/1: the left operand is a discarded-value expression,
-  // and the type and value of the result are those of the right operand.
-  // In a constant expression a left operand without side effects has no
-  // effect, so the comma is its right operand: the value of
-  // `static constexpr type value = (_DecOnly, _S_make_table());' in
-  // libstdc++'s __from_chars_alnum_to_val_table is the folded table, not a
-  // comma expression a constant read through `value.__data[c]' cannot see.
-  if(constant_expression_context != 0)
+/// N5008 [expr.comma]/1: the left operand of a comma is a discarded-value
+/// expression, and the type and value of the result are those of the right
+/// operand.  The value of a constant-initialized variable whose initializer
+/// is a comma with a constant left operand is therefore that of the right
+/// operand: `static constexpr type value = (_DecOnly, _S_make_table());' in
+/// libstdc++'s __from_chars_alnum_to_val_table is the folded table, not a
+/// comma expression that reads of `value.__data[c]' cannot fold.  (Done on
+/// the finished initializer only: typecheck_expr_comma also sees the
+/// parenthesized argument list of `(f)(a, b)' before it becomes the call's
+/// arguments.)
+void cpp_typecheckt::discard_constant_comma_operands(exprt &value)
+{
+  while(value.id() == ID_comma && value.operands().size() == 2)
   {
-    exprt left = to_binary_expr(expr).op0();
+    exprt left = to_binary_expr(value).op0();
     simplify(left, *this);
-    if(left.is_constant())
-    {
-      exprt result = to_binary_expr(expr).op1();
-      expr.swap(result);
-    }
+    if(!left.is_constant())
+      return;
+    exprt result = to_binary_expr(value).op1();
+    value.swap(result);
   }
 }
 
