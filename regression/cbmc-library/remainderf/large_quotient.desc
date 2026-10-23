@@ -1,0 +1,13 @@
+CORE
+large_quotient.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+fmod/remainder where floor(x/y) overflows the old fixed-width quotient
+truncation in float_bvt. Verified here on the default boolbv path
+(always correct); the float_bvt (bit-vector SMT) path that exhibited the
+bug is checked via cbmc --z3 in large_quotient-z3.desc.

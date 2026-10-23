@@ -1,0 +1,11 @@
+; Z3#6553: fp.rem can be zero for non-zero inputs
+(set-logic QF_FP)
+(declare-const a (_ FloatingPoint 11 53))
+(declare-const b (_ FloatingPoint 11 53))
+(assert (not (fp.isNaN a)))
+(assert (not (fp.isNaN b)))
+(assert (not (fp.isZero b)))
+(assert (not (fp.isInfinite b)))
+(assert (fp.isZero (fp.rem a b)))
+(assert (not (fp.isZero a)))
+(check-sat)
