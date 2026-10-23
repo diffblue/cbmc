@@ -263,6 +263,8 @@ simplify_exprt::simplify_member(const member_exprt &expr)
     // structures we otherwise know how to analyse, such as
     // (let x = 1 in ({x, x})).field1 --> let x = 1 in ({x, x}.field1) -->
     // let x = 1 in x
+    if(op.operands().size() != 2 || op.operands()[0].operands().size() != 2)
+      return unchanged(expr);
     member_exprt pushed_in_member = to_member_expr(expr);
     pushed_in_member.op() = to_let_expr(op).where();
     auto new_expr = op;

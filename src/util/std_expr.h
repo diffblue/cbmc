@@ -3372,6 +3372,10 @@ inline bool can_cast_expr<let_exprt>(const exprt &base)
 inline void validate_expr(const let_exprt &let_expr)
 {
   validate_operands(let_expr, 2, "Let must have two operands");
+  validate_operands(
+    static_cast<const exprt &>(let_expr.op0()),
+    2,
+    "Let binding must have two operands");
 }
 
 /// \brief Cast an exprt to a \ref let_exprt
