@@ -120,6 +120,52 @@ void convert(
 
   for(const auto &step : goto_trace.steps)
   {
+    // With --compact-trace, apply the same filtering as
+    // show_compact_goto_trace: skip hidden steps, actual-parameter
+    // assignments, and everything but assignments, declarations, function
+    // calls/returns and violated assertions. This in particular drops the
+    // values of internal instrumentation steps, which can shrink the trace
+    // by orders of magnitude on instrumentation-heavy programs.
+    if(trace_options.compact_trace)
+    {
+      if(step.hidden)
+        continue;
+
+      switch(step.type)
+      {
+      case goto_trace_stept::typet::ASSERT:
+      case goto_trace_stept::typet::DECL:
+      case goto_trace_stept::typet::FUNCTION_CALL:
+      case goto_trace_stept::typet::FUNCTION_RETURN:
+        break;
+
+      case goto_trace_stept::typet::ASSIGNMENT:
+        if(
+          step.assignment_type ==
+          goto_trace_stept::assignment_typet::ACTUAL_PARAMETER)
+        {
+          continue;
+        }
+        break;
+
+      case goto_trace_stept::typet::OUTPUT:
+      case goto_trace_stept::typet::INPUT:
+      case goto_trace_stept::typet::ATOMIC_BEGIN:
+      case goto_trace_stept::typet::ATOMIC_END:
+      case goto_trace_stept::typet::DEAD:
+      case goto_trace_stept::typet::LOCATION:
+      case goto_trace_stept::typet::GOTO:
+      case goto_trace_stept::typet::ASSUME:
+      case goto_trace_stept::typet::MEMORY_BARRIER:
+      case goto_trace_stept::typet::SPAWN:
+      case goto_trace_stept::typet::SHARED_READ:
+      case goto_trace_stept::typet::SHARED_WRITE:
+      case goto_trace_stept::typet::CONSTRAINT:
+      case goto_trace_stept::typet::NONE:
+        continue;
+      }
+    }
+
     const source_locationt &source_location = step.pc->source_location();
 
     jsont json_location;

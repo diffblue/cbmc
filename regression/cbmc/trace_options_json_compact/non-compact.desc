@@ -1,0 +1,10 @@
+CORE
+test.c
+--trace --json-ui
+^EXIT=10$
+^SIGNAL=0$
+"assignmentType": "actual-parameter"
+--
+--
+Without --compact-trace, the JSON trace contains actual-parameter
+assignments (baseline for the compact.desc sibling test).
