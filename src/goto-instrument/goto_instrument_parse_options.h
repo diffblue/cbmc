@@ -54,7 +54,6 @@ Author: Daniel Kroening, kroening@kroening.com
   OPT_GOTO_CHECK \
   OPT_REMOVE_POINTERS \
   "(no-simplify)" \
-  OPT_UNINITIALIZED_CHECK \
   OPT_WMM \
   "(race-check)" \
   OPT_UNWINDSET \

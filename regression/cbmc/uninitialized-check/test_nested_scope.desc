@@ -1,0 +1,11 @@
+CORE
+main.c
+--function test_nested_scope --uninitialized-check
+^EXIT=10$
+^SIGNAL=0$
+reading uninitialized local
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Edge case: shadowed variable in nested scope.

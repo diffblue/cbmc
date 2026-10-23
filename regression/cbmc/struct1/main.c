@@ -16,7 +16,7 @@ struct y {
 
 int main()
 {
-  struct y Y;
+  struct y Y = {0};
 
   {
     struct x tmp;

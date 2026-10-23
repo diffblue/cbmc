@@ -4,8 +4,8 @@
 
 int main()
 {
-  size_t x;
-  size_t y;
+  size_t x = __VERIFIER_nondet_size_t();
+  size_t y = __VERIFIER_nondet_size_t();
   uint8_t *a;
 
   __CPROVER_assume(x > 0);

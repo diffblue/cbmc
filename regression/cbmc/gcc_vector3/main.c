@@ -18,7 +18,7 @@ void test_shuffle()
   v4si mask1 = {0, 1, 5, 3};
   v4si mask2 = {0, 4, 2, 5};
 
-  vector_u res;
+  vector_u res = {0};
 
   res.v = __builtin_shuffle(a, mask1);
   assert(res.members[0] == 1);
@@ -40,7 +40,7 @@ void test_shufflevector(void)
   v4si a = {1, 2, 3, 4};
   v4si b = {5, 6, 7, 8};
 
-  vector_u res;
+  vector_u res = {0};
 
 #  if defined(__clang__)
   // None of the indices refers to the second vector, so we can safely make it

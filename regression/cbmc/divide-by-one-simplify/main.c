@@ -1,7 +1,7 @@
 #include <assert.h>
 
 int main (void) {
-  float f;
+  float f = __VERIFIER_nondet_float();
   float g;
   int i;
 

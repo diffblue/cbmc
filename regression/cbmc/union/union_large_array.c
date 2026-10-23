@@ -9,7 +9,7 @@ union U
 
 int main()
 {
-  union U u;
+  union U u = {0};
   u.something_else = 1234;
   __CPROVER_assert(0, "should fail");
 }

@@ -1,6 +1,6 @@
 unsigned char* init1()
 {
-  unsigned long size;
+  unsigned long size = __VERIFIER_nondet_long();
   if (size!=1) return 0;
 
   assert(sizeof(unsigned char)==1);
@@ -14,7 +14,7 @@ unsigned char* init1()
 
 unsigned char* init2()
 {
-  unsigned long size;
+  unsigned long size = __VERIFIER_nondet_long();
   if (size!=1) return 0;
 
   assert(sizeof(unsigned char)==1);
@@ -28,7 +28,7 @@ unsigned char* init2()
 
 unsigned char* init3()
 {
-  unsigned long size;
+  unsigned long size = __VERIFIER_nondet_long();
   if (size!=1) return 0;
 
   assert(sizeof(unsigned char)==1);

@@ -2,7 +2,7 @@ int main()
 {
   const void *p;
   int *q;
-  int c;
+  int c = __VERIFIER_nondet_int();
 
   p = (c ? p : 0);
 

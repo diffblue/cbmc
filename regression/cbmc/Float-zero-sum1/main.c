@@ -8,7 +8,7 @@ union mix {
 
 int f00 (float a, float b) {
   float sum = a + b;
-  union mix m;
+  union mix m = {0};
   m.f = sum;
   assert(m.i != 0x80000000);
 

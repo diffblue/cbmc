@@ -1,0 +1,11 @@
+CORE
+main.c
+--function test_comma_operator --uninitialized-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+\[test_comma_operator.uninitialized.*FAILURE
+--
+Comma operator initializes x before reading it.

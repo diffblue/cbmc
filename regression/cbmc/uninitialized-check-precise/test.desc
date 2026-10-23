@@ -1,0 +1,13 @@
+CORE
+main.c
+--uninitialized-check --pointer-check
+^EXIT=10$
+^SIGNAL=0$
+reading uninitialized local 'z': FAILURE
+reading uninitialized local 'x': SUCCESS
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Precise uninit check: interprocedural init via pointer parameter.
+do_init writes through pointer (x initialized), do_nothing does not (z uninit).

@@ -2,7 +2,7 @@
 
 int main()
 {
-  size_t s;
+  size_t s = __VERIFIER_nondet_size_t();
   char *p = malloc(s);
   // at __CPROVER_max_malloc_size p + s would overflow; all larger values of s
   // make malloc return NULL when using --malloc-fail-null

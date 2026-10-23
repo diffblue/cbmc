@@ -1,0 +1,10 @@
+CORE
+main.c
+--function test_heap_alias_write --uninitialized-check --pointer-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Heap aliasing: write through alias pointer initializes shared memory.

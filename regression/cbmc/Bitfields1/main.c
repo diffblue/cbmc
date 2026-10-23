@@ -30,7 +30,7 @@ struct bft {
 };
 
 int main() {
-  struct bft bf;
+  struct bft bf = {0};
 
   assert(bf.a<=7);
   assert(bf.b<=1);

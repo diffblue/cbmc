@@ -1,0 +1,10 @@
+CORE
+main.c
+--function test_dirty_interprocedural_no_init --uninitialized-check --pointer-check
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Dirty var NOT initialized by callee (no write).
