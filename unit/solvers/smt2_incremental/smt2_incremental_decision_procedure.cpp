@@ -480,22 +480,12 @@ TEST_CASE(
     std::vector<smt_commandt> expected_commands{
       smt_declare_function_commandt{foo_term, {}},
       smt_assert_commandt{smt_core_theoryt::equal(foo_term, term_42)},
-      invalid_pointer_object_size_definition,
       null_object_size_definition,
       null_object_dynamic_definition,
+      invalid_pointer_object_size_definition,
       invalid_pointer_object_dynamic_definition,
       smt_check_sat_commandt{}};
-    REQUIRE(
-      (test.sent_commands.size() == expected_commands.size() &&
-       std::all_of(
-         expected_commands.begin(),
-         expected_commands.end(),
-         [&](const smt_commandt &command) -> bool {
-           return std::find(
-                    test.sent_commands.begin(),
-                    test.sent_commands.end(),
-                    command) != test.sent_commands.end();
-         })));
+    REQUIRE(test.sent_commands == expected_commands);
     SECTION("Get \"foo\" value back")
     {
       test.sent_commands.clear();
