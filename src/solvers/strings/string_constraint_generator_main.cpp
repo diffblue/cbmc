@@ -279,7 +279,7 @@ string_constraint_generatort::add_axioms_for_function_application(
   else if(id == ID_cprover_string_of_double_func)
     return add_axioms_from_double(expr);
   else if(id == ID_cprover_string_of_long_func)
-    return add_axioms_from_long(expr);
+    return add_axioms_for_string_of_long(expr);
   else if(id == ID_cprover_string_set_length_func)
     return add_axioms_for_set_length(expr);
   else if(id == ID_cprover_string_delete_func)
