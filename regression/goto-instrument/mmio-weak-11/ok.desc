@@ -1,0 +1,12 @@
+CORE
+test.c
+--nondet-volatile-write-model reg:observe --mmio-weak --mmio-weak-depth 3
+^EXIT=0$
+^SIGNAL=0$
+MMIO write burst exceeds the modelled reorder depth.*: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+With a buffer deep enough for the burst (--mmio-weak-depth 3), the burst
+assertion holds, so the whole three-write burst is represented and verification
+succeeds soundly.

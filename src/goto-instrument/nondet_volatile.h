@@ -23,11 +23,24 @@ class optionst;
 #define NONDET_VOLATILE_OPT "nondet-volatile"
 #define NONDET_VOLATILE_VARIABLE_OPT "nondet-volatile-variable"
 #define NONDET_VOLATILE_MODEL_OPT "nondet-volatile-model"
+#define NONDET_VOLATILE_WRITE_MODEL_OPT "nondet-volatile-write-model"
+
+// The weak memory-mapped I/O model (--mmio-weak, --mmio-weak-variable) is
+// processed together with the volatile models because it builds on the volatile
+// write models. --mmio-weak marks all write-modelled registers as weakly
+// ordered; --mmio-weak-variable marks specific registers (the rest stay
+// strongly ordered).
+#define MMIO_WEAK_OPT "mmio-weak"
+#define MMIO_WEAK_VARIABLE_OPT "mmio-weak-variable"
+#define MMIO_WEAK_DEPTH_OPT "mmio-weak-depth"
+#define MMIO_GATHER_OPT "mmio-gather"
+#define MMIO_EARLY_ACK_OPT "mmio-early-ack"
 
 #define OPT_NONDET_VOLATILE \
   "(" NONDET_VOLATILE_OPT ")" \
   "(" NONDET_VOLATILE_VARIABLE_OPT "):" \
-  "(" NONDET_VOLATILE_MODEL_OPT "):"
+  "(" NONDET_VOLATILE_MODEL_OPT "):" \
+  "(" NONDET_VOLATILE_WRITE_MODEL_OPT "):"
 
 #define HELP_NONDET_VOLATILE \
   " {y--" NONDET_VOLATILE_OPT "} \t " \
@@ -36,7 +49,9 @@ class optionst;
   "makes reads from given volatile variable non-deterministic\n" \
   " {y--" NONDET_VOLATILE_MODEL_OPT "} {uvariable}:{umodel} \t " \
   "models reads from given volatile variable by a call to the given model\n" \
-// clang-format on
+  " {y--" NONDET_VOLATILE_WRITE_MODEL_OPT "} {uvariable}:{umodel} \t " \
+  "models writes to given volatile variable by a call to the given model, " \
+  "which must be a void function taking the written value\n" // clang-format on
 
 void parse_nondet_volatile_options(const cmdlinet &cmdline, optionst &options);
 
@@ -53,8 +68,7 @@ void nondet_volatile(goto_modelt &goto_model, const optionst &options);
 ///   should be havocked
 void nondet_volatile(
   goto_modelt &goto_model,
-  std::function<bool(const exprt &)> should_havoc = [](const exprt &) {
-    return true;
-  });
+  std::function<bool(const exprt &)> should_havoc = [](const exprt &)
+  { return true; });
 
 #endif // CPROVER_GOTO_INSTRUMENT_NONDET_VOLATILE_H

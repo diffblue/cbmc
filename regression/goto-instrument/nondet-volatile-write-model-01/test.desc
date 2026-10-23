@@ -1,0 +1,14 @@
+CORE
+test.c
+--nondet-volatile-write-model reg:observe
+^EXIT=0$
+^SIGNAL=0$
+CALL observe
+^VERIFICATION SUCCESSFUL$
+--
+--
+A volatile write model observes the written value: the write is routed to a
+call of the model, which can assert on the value. Verification succeeds because
+the model is called with the value written in main; it is not invoked for the
+zero-initialisation of the global (INITIALIZE_FUNCTION writes are not treated as
+device actions), which would otherwise fail the assertion.

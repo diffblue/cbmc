@@ -1,0 +1,14 @@
+CORE
+test.c
+--nondet-volatile-write-model reg:observe --mmio-weak --mmio-early-ack
+^EXIT=10$
+^SIGNAL=0$
+the write has completed after the barrier: FAILURE$
+^VERIFICATION FAILED$
+--
+--
+An inline-assembly ARM DMB (data memory barrier) is lowered to an ordering-only
+fence, so under --mmio-early-ack it does not complete posted writes: the write
+to reg may still be in flight after it and the completion assertion fails.
+Compare dsb.desc. This demonstrates deriving the barrier semantics from source
+(inline assembly) rather than a command-line flag.

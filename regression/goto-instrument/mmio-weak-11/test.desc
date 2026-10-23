@@ -1,0 +1,13 @@
+CORE
+test.c
+--nondet-volatile-write-model reg:observe --mmio-weak --mmio-weak-depth 2
+^EXIT=10$
+^SIGNAL=0$
+MMIO write burst exceeds the modelled reorder depth
+^VERIFICATION FAILED$
+--
+--
+Three consecutive writes to reg with no barrier form a burst longer than the
+depth-2 reorder buffer. Rather than silently under-approximating the reordering,
+the model reports the burst and tells the user to raise --mmio-weak-depth.
+Compare ok.desc, which uses a deep enough buffer.
