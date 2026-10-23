@@ -1,7 +1,7 @@
 \page release-process Release Process
 
 **Date**: 2020-10-08
-**Updated**: 2023-03-29
+**Updated**: 2026-06-10
 **Author**: Fotis Koutoulakis, fotis.koutoulakis@diffblue.com
 **Domain**: Release & Packaging
 
@@ -56,6 +56,28 @@ anything more, but the process is described below for reference:
    It also makes a PR to the homebrew repository that updates the version
    of CBMC in homebrew. That's then approved and merged by the maintainers
    of homebrew.
+
+## CHANGELOG structure
+
+The top-level [`CHANGELOG`](../../CHANGELOG) file records one entry per release,
+newest first. To keep the file consistent and readable, each release entry
+follows the same structure:
+
+1. A single-`#` release heading of the form `# CBMC X.Y.Z`. All releases use the
+   same heading level; using a deeper level (e.g. `##`) nests the release under
+   the preceding one when the file is rendered as Markdown.
+2. A blank line, followed by a short summary paragraph that highlights the most
+   user-visible changes of the release, referencing the relevant pull requests
+   (e.g. `via #1234`).
+3. The change listings, each introduced by a `##` subheading: `## What's
+   Changed`, optionally `## Major Changes`, and `## Bug Fixes`, enumerating the
+   merged pull requests.
+4. A closing `**Full Changelog**:` link comparing the previous tag to this one.
+
+When cutting a release, the summary paragraph (item 2) is written by hand; the
+remaining sections are produced by GitHub's release-notes generation. Keeping
+the heading levels uniform and the blank line after each release heading in
+place avoids structural drift between entries.
 
 ## Versioning
 
