@@ -168,6 +168,7 @@ public:
   [[nodiscard]] resultt<>
   simplify_floatbv_typecast(const floatbv_typecast_exprt &);
   [[nodiscard]] resultt<> simplify_shifts(const shift_exprt &);
+  [[nodiscard]] resultt<> simplify_shift_of_concatenation(const shift_exprt &);
   [[nodiscard]] resultt<> simplify_power(const power_exprt &);
   [[nodiscard]] resultt<> simplify_bitwise(const multi_ary_exprt &);
   [[nodiscard]] resultt<> simplify_if_preorder(const if_exprt &expr);
