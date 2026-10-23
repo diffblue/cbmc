@@ -1,0 +1,10 @@
+CORE
+s2_p_const_p_int.c
+--generate-function-body havoc_p_const_p_int --generate-function-body-options havoc,params:.*
+^EXIT=0$
+^SIGNAL=0$
+^\[main.assertion.1\] .* assertion b == 2: SUCCESS$
+^\[main.assertion.2\] .* assertion \*\*pp == 2: SUCCESS$
+^\[main.assertion.3\] .* assertion b == 2: SUCCESS$
+^\[main.assertion.4\] .* assertion \*\*pp == 2: SUCCESS$
+--

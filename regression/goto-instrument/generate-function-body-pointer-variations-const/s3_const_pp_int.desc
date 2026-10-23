@@ -1,0 +1,10 @@
+CORE
+s3_const_pp_int.c
+--generate-function-body havoc_const_pp_int --generate-function-body-options havoc,params:.*
+^EXIT=10$
+^SIGNAL=0$
+^\[main.assertion.1\] .* assertion c == 3: SUCCESS$
+^\[main.assertion.2\] .* assertion \*\*pp == 3: SUCCESS$
+^\[main.assertion.3\] .* assertion c == 3: SUCCESS$
+^\[main.assertion.4\] .* assertion \*\*pp == 3: FAILURE$
+--
