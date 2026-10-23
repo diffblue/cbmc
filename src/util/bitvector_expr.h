@@ -418,6 +418,8 @@ inline bitnand_exprt &to_bitnand_expr(exprt &expr)
 }
 
 /// \brief A base class for shift and rotate operators
+/// In contrast to SMT-LIB, the width of the shift operand
+/// and the width of the distance are not required to be equal.
 class shift_exprt : public binary_exprt
 {
 public:
@@ -483,6 +485,8 @@ inline shift_exprt &to_shift_expr(exprt &expr)
 }
 
 /// \brief Left shift
+/// Shift distances may exceed the width of the shifted operand.
+/// Shifts with negative shift distance do not have meaning.
 class shl_exprt : public shift_exprt
 {
 public:
@@ -527,6 +531,8 @@ inline shl_exprt &to_shl_expr(exprt &expr)
 }
 
 /// \brief Arithmetic right shift
+/// Shift distances may exceed the width of the shifted operand.
+/// Shifts with negative shift distance do not have meaning.
 class ashr_exprt : public shift_exprt
 {
 public:
@@ -548,6 +554,8 @@ inline bool can_cast_expr<ashr_exprt>(const exprt &base)
 }
 
 /// \brief Logical right shift
+/// Shift distances may exceed the width of the shifted operand.
+/// Shifts with negative shift distance do not have meaning.
 class lshr_exprt : public shift_exprt
 {
 public:
