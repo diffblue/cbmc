@@ -6,5 +6,9 @@ main.c
 ^VERIFICATION FAILED$
 line 10 dereference failure: pointer outside object bounds in \*i.*: FAILURE
 line 13 dereference failure: pointer outside object bounds in \(&a\).*: FAILURE
-line 14 dereference failure: pointer outside object bounds in \*i.*: FAILURE
 --
+--
+The line 14 dereference of `i` is the same out-of-bounds access as the one at
+line 10; goto_check_c deduplicates the repeated check against the line 10 one
+on some platforms (e.g. Visual Studio), so it is not pinned here. The line 10
+failure and the overall VERIFICATION FAILED still cover it.

@@ -1,0 +1,15 @@
+CORE
+main.c
+--pointer-check
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.pointer_dereference\.\d+\] line 22 .*pointer NULL in \*p: FAILURE$
+^VERIFICATION FAILED$
+--
+^\[main\.pointer_dereference\.\d+\] line 22 .*pointer NULL in \*p: SUCCESS$
+--
+At a control-flow merge a pointer may have been reassigned differently on each
+incoming path (here NULL on one, a valid object on the other). Cached
+pointer-validity assertions established on one path must be cleared at the
+merge. Without that, the dereference at line 22 is deduplicated against the
+cached check from the else branch and the NULL path is never asserted.
