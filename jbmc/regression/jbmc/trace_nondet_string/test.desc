@@ -1,0 +1,13 @@
+CORE
+JbmcTraceReproducer
+--function JbmcTraceReproducer.verify --property 'java::JbmcTraceReproducer.verify:()V.assertion.1' --trace --validate-trace -cp target/classes
+^EXIT=10$
+^SIGNAL=0$
+ARRAY_OF\('\?'\)
+\.length=[1-9][0-9]{6,}
+Trace validation successful
+^VERIFICATION FAILED$
+--
+\{ '\?', '\?', '\?'
+--
+Unknown string contents should stay compact even for a multi-megabyte string.
