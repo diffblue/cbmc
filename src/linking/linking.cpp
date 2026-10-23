@@ -215,9 +215,18 @@ void linkingt::duplicate_code_symbol(
           n_it!=new_t.parameters().end();
           ++o_it, ++n_it)
       {
-        if(o_it->type() != n_it->type())
+        if(o_it->type() == n_it->type())
+          continue;
+
+        adjust_type_infot info(old_symbol, new_symbol);
+        bool failed = adjust_object_type_rec(o_it->type(), n_it->type(), info);
+        replace |= info.set_to_new;
+
+        if(failed)
+        {
           conflicts.push_back(
             std::make_pair(o_it->type(), n_it->type()));
+        }
       }
       if(o_it!=old_t.parameters().end())
       {
@@ -490,22 +499,20 @@ bool linkingt::adjust_object_type_rec(
   if(t1.id()==ID_pointer)
   {
     linking_diagnosticst diag{message_handler, ns};
-#if 0
-    bool s=info.set_to_new;
-    if(adjust_object_type_rec(t1.subtype(), t2.subtype(), info))
+    if(info.old_symbol.type.id() == ID_code)
+    {
+      diag.warning(
+        info.old_symbol,
+        info.new_symbol,
+        "pointer parameter types differ between declaration and definition");
+    }
+    else
     {
       diag.warning(
         info.old_symbol,
         info.new_symbol,
         "conflicting pointer types for variable");
-      info.set_to_new=s;
     }
-#else
-    diag.warning(
-      info.old_symbol,
-      info.new_symbol,
-      "conflicting pointer types for variable");
-#endif
 
     if(info.old_symbol.is_extern && !info.new_symbol.is_extern)
     {
@@ -743,9 +750,18 @@ void linkingt::duplicate_non_type_symbol(
   old_symbol.is_extern=old_symbol.is_extern && new_symbol.is_extern;
 }
 
+// Forward declaration; defined after duplicate_type_symbol.
+static bool structurally_equivalent(
+  const typet &t1,
+  const typet &t2,
+  const namespacet &main_ns,
+  const namespacet &src_ns,
+  std::unordered_set<std::string> &visited);
+
 void linkingt::duplicate_type_symbol(
   symbolt &old_symbol,
-  const symbolt &new_symbol)
+  const symbolt &new_symbol,
+  const namespacet &src_ns)
 {
   PRECONDITION(new_symbol.is_type);
 
@@ -824,6 +840,21 @@ void linkingt::duplicate_type_symbol(
     }
   }
 
+  // Final permissive check: two complete struct/union types may differ at
+  // the irept level only because nested anonymous tags carry synthetic
+  // identifiers that depend on per-translation-unit completion state of
+  // sub-types.  Run a recursive structural-equivalence check that follows
+  // tag references through both namespaces; if they describe the same C
+  // type, keep the main-table version.
+  {
+    std::unordered_set<std::string> visited;
+    if(structurally_equivalent(
+         old_symbol.type, new_symbol.type, ns, src_ns, visited))
+    {
+      return;
+    }
+  }
+
   linking_diagnosticst diag{message_handler, ns};
 
   diag.detailed_conflict_report(
@@ -833,9 +864,169 @@ void linkingt::duplicate_type_symbol(
     old_symbol, new_symbol, "unexpected difference between type symbols");
 }
 
+/// Recursive structural equivalence under tag canonicalization.
+///
+/// Two types are equivalent when:
+///  - Their `id()` matches, the recursion can drill into them, and at the
+///    leaves they compare byte-equal; OR
+///  - They are tag references whose lookup in the respective namespaces
+///    resolves to equivalent types; OR
+///  - One is an incomplete struct/union with the same source tag as the other
+///    complete struct/union (the linker keeps the complete one).
+///
+/// `main_ns` resolves tag references on the `t1` (old / main symbol-table)
+/// side; `src_ns` resolves tag references on the `t2` (new / src
+/// symbol-table) side.  This lets two complete structs whose bodies refer to
+/// inner anonymous types whose synthetic identifiers differ only because of
+/// nested complete-vs-incomplete state still be recognised as the same C type.
+static bool structurally_equivalent(
+  const typet &t1,
+  const typet &t2,
+  const namespacet &main_ns,
+  const namespacet &src_ns,
+  std::unordered_set<std::string> &visited)
+{
+  if(t1 == t2)
+    return true;
+
+  // Both are tag references of the same kind: follow into their definitions.
+  if(
+    t1.id() == t2.id() && (t1.id() == ID_struct_tag ||
+                           t1.id() == ID_union_tag || t1.id() == ID_c_enum_tag))
+  {
+    const irep_idt &id1 = to_tag_type(t1).get_identifier();
+    const irep_idt &id2 = to_tag_type(t2).get_identifier();
+
+    // Cycle guard: once we have started comparing this pair, treat them as
+    // equivalent at any deeper occurrence to avoid infinite recursion on
+    // mutually-recursive struct definitions like list_head.
+    std::string key = id2string(id1) + "\x01" + id2string(id2);
+    if(!visited.insert(key).second)
+      return true;
+
+    return structurally_equivalent(
+      follow_tags_symbols(main_ns, t1),
+      follow_tags_symbols(src_ns, t2),
+      main_ns,
+      src_ns,
+      visited);
+  }
+
+  // One side is a tag reference, the other an inline struct/union/enum.
+  // Follow the tag side and retry.
+  if(
+    t1.id() == ID_struct_tag || t1.id() == ID_union_tag ||
+    t1.id() == ID_c_enum_tag)
+  {
+    return structurally_equivalent(
+      follow_tags_symbols(main_ns, t1), t2, main_ns, src_ns, visited);
+  }
+  if(
+    t2.id() == ID_struct_tag || t2.id() == ID_union_tag ||
+    t2.id() == ID_c_enum_tag)
+  {
+    return structurally_equivalent(
+      t1, follow_tags_symbols(src_ns, t2), main_ns, src_ns, visited);
+  }
+
+  // Different ids and neither is a tag reference: not structurally equivalent.
+  if(t1.id() != t2.id())
+    return false;
+
+  // Two struct or union types.
+  if(t1.id() == ID_struct || t1.id() == ID_union)
+  {
+    const auto &s1 = to_struct_union_type(t1);
+    const auto &s2 = to_struct_union_type(t2);
+
+    bool inc1 = s1.is_incomplete();
+    bool inc2 = s2.is_incomplete();
+
+    // If either side is incomplete, accept the pair: linking will keep the
+    // complete one.  We do not require the C source tag to match here because
+    // anonymous inner types may carry differing synthetic identifiers across
+    // translation units.
+    if(inc1 || inc2)
+      return true;
+
+    // Both complete: same component count and components must match
+    // pairwise by name (and recursively by type).  We do NOT require the C
+    // source tag attribute to match: at the outer call site this function is
+    // invoked because the symbol-table keys already agree, and recursive
+    // calls via tag references may compare anonymous structs whose synthetic
+    // tags legitimately differ.
+    const auto &c1 = s1.components();
+    const auto &c2 = s2.components();
+    if(c1.size() != c2.size())
+      return false;
+
+    for(std::size_t i = 0; i < c1.size(); ++i)
+    {
+      if(c1[i].get_name() != c2[i].get_name())
+        return false;
+      if(!structurally_equivalent(
+           c1[i].type(), c2[i].type(), main_ns, src_ns, visited))
+        return false;
+    }
+    return true;
+  }
+
+  // Pointer types: follow base type.
+  if(t1.id() == ID_pointer)
+  {
+    return structurally_equivalent(
+      to_pointer_type(t1).base_type(),
+      to_pointer_type(t2).base_type(),
+      main_ns,
+      src_ns,
+      visited);
+  }
+
+  // Array types: same element type and same size expression.
+  if(t1.id() == ID_array)
+  {
+    const auto &a1 = to_array_type(t1);
+    const auto &a2 = to_array_type(t2);
+    if(a1.size() != a2.size())
+      return false;
+    return structurally_equivalent(
+      a1.element_type(), a2.element_type(), main_ns, src_ns, visited);
+  }
+
+  // Code (function) types.
+  if(t1.id() == ID_code)
+  {
+    const auto &k1 = to_code_type(t1);
+    const auto &k2 = to_code_type(t2);
+    if(k1.has_ellipsis() != k2.has_ellipsis())
+      return false;
+    if(k1.parameters().size() != k2.parameters().size())
+      return false;
+    if(!structurally_equivalent(
+         k1.return_type(), k2.return_type(), main_ns, src_ns, visited))
+      return false;
+    for(std::size_t i = 0; i < k1.parameters().size(); ++i)
+    {
+      if(!structurally_equivalent(
+           k1.parameters()[i].type(),
+           k2.parameters()[i].type(),
+           main_ns,
+           src_ns,
+           visited))
+        return false;
+    }
+    return true;
+  }
+
+  // Fall-back: byte-equality already failed at the top of this function and
+  // we do not have a more permissive notion for this type class.
+  return false;
+}
+
 linkingt::renamingt linkingt::needs_renaming_type(
   const symbolt &old_symbol,
-  const symbolt &new_symbol)
+  const symbolt &new_symbol,
+  const namespacet &src_ns)
 {
   PRECONDITION(new_symbol.is_type);
 
@@ -896,6 +1087,22 @@ linkingt::renamingt linkingt::needs_renaming_type(
        to_array_type(old_symbol.type).size().is_not_nil())
     {
       return renamingt::NO_RENAMING; // not different
+    }
+  }
+
+  // Last chance: types that look different at the irept level may still
+  // describe the same C type when nested anonymous tags carry synthetic
+  // identifiers that depend on the per-translation-unit completion state of
+  // sub-types.  Run a recursive structural-equivalence check that follows
+  // tag references through their respective namespaces.  If it accepts the
+  // pair, no rename is needed -- linking will keep the main-table version
+  // and the new-side reference is recognised as semantically the same type.
+  {
+    std::unordered_set<std::string> visited;
+    if(structurally_equivalent(
+         old_symbol.type, new_symbol.type, ns, src_ns, visited))
+    {
+      return renamingt::NO_RENAMING;
     }
   }
 
@@ -1006,7 +1213,7 @@ void linkingt::copy_symbols(
   }
 
   // Move over all the non-colliding ones
-  std::unordered_set<irep_idt> collisions;
+  std::unordered_set<irep_idt> type_collisions, non_type_collisions;
 
   for(const auto &named_symbol : src_symbols)
   {
@@ -1023,21 +1230,32 @@ void linkingt::copy_symbols(
         // new
         main_symbol_table.add(named_symbol.second);
       }
+      else if(named_symbol.second.is_type)
+        type_collisions.insert(named_symbol.first);
       else
-        collisions.insert(named_symbol.first);
+        non_type_collisions.insert(named_symbol.first);
     }
   }
 
   // Now do the collisions
-  for(const irep_idt &collision : collisions)
+  // Construct a namespace over the src symbol table so that tag references
+  // appearing on the new side can be resolved.  This is needed for the
+  // structural-equivalence pre-checks below.
+  namespacet src_ns(src_symbol_table);
+
+  for(const irep_idt &collision : type_collisions)
   {
     symbolt &old_symbol = main_symbol_table.get_writeable_ref(collision);
     symbolt &new_symbol=src_symbols.at(collision);
 
-    if(new_symbol.is_type)
-      duplicate_type_symbol(old_symbol, new_symbol);
-    else
-      duplicate_non_type_symbol(old_symbol, new_symbol);
+    duplicate_type_symbol(old_symbol, new_symbol, src_ns);
+  }
+  for(const irep_idt &collision : non_type_collisions)
+  {
+    symbolt &old_symbol = main_symbol_table.get_writeable_ref(collision);
+    symbolt &new_symbol = src_symbols.at(collision);
+
+    duplicate_non_type_symbol(old_symbol, new_symbol);
   }
 
   // Apply type updates to initializers
@@ -1057,6 +1275,8 @@ bool linkingt::link(const symbol_table_baset &src_symbol_table)
   const unsigned errors_before =
     message_handler.get_message_count(messaget::M_ERROR);
 
+  namespacet src_ns(src_symbol_table);
+
   // We do this in three phases. We first figure out which symbols need to
   // be renamed, and then build the renaming, and finally apply this
   // renaming in the second pass over the symbol table.
@@ -1073,7 +1293,7 @@ bool linkingt::link(const symbol_table_baset &src_symbol_table)
     if(m_it != main_symbol_table.symbols.end())
     {
       // duplicate
-      switch(needs_renaming(m_it->second, symbol_pair.second))
+      switch(needs_renaming(m_it->second, symbol_pair.second, src_ns))
       {
       case renamingt::NO_RENAMING:
         break;

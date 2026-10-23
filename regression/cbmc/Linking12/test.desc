@@ -1,0 +1,21 @@
+CORE
+main.c
+module.c --validate-goto-model --validate-ssa-equation
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^.*conflicting (function|pointer parameter types|return types).*$
+^.*unexpected difference between type symbols.*$
+--
+Two translation units describe the same C type `struct S`, but the
+byte-level irept encoding differs because the inner type `struct Inner`
+is COMPLETE in main.c and INCOMPLETE in module.c.  Type-name
+canonicalisation propagates the completion state into anonymous-tag
+identifiers nested inside `struct S`, so the linker used to see the
+types as different and flag the function declaration as conflicting.
+
+The structural-equivalence-aware linker recognises the two types as
+the same C type, allows the link to succeed silently, and produces a
+goto model that passes --validate-goto-model.
