@@ -12126,6 +12126,24 @@ void cpp_typecheckt::typecheck_expr_comma(exprt &expr)
   }
 
   c_typecheck_baset::typecheck_expr_comma(expr);
+
+  // N5008 [expr.comma]/1: the left operand is a discarded-value expression,
+  // and the type and value of the result are those of the right operand.
+  // In a constant expression a left operand without side effects has no
+  // effect, so the comma is its right operand: the value of
+  // `static constexpr type value = (_DecOnly, _S_make_table());' in
+  // libstdc++'s __from_chars_alnum_to_val_table is the folded table, not a
+  // comma expression a constant read through `value.__data[c]' cannot see.
+  if(constant_expression_context != 0)
+  {
+    exprt left = to_binary_expr(expr).op0();
+    simplify(left, *this);
+    if(left.is_constant())
+    {
+      exprt result = to_binary_expr(expr).op1();
+      expr.swap(result);
+    }
+  }
 }
 
 void cpp_typecheckt::typecheck_expr_rel(binary_relation_exprt &expr)
