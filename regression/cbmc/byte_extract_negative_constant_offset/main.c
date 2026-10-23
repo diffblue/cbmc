@@ -1,4 +1,6 @@
-#include <stdlib.h>
+// no <stdlib.h>: test-32.desc runs with --32, for which neither CI runners
+// nor Visual Studio have headers
+void *malloc(__CPROVER_size_t);
 // A path symbolic execution has not ruled out reads a size_t 8 bytes before
 // a dynamically allocated array of symbolic size: a byte_extract with a
 // negative constant offset, which lowering must not reject.  The bytes
