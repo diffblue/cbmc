@@ -16,6 +16,23 @@ DWARF_STACK_SIZE = 16384
 _perf_event_cache = None
 
 
+def _limit_address_space(memory_mb):
+    """Limit the virtual address space of the current process; used as
+    preexec_fn in the perf-record subprocess.
+
+    Only the soft limit is set. The hard limit is left untouched: raising it
+    requires privilege, so attempting to set it to RLIM_INFINITY raises
+    ValueError whenever the calling shell already imposed a finite hard limit
+    (e.g. via `ulimit -v`). The soft limit is clamped to the existing hard
+    limit for the same reason. Exceptions in preexec_fn abort the child, so
+    err on the permissive side."""
+    soft = memory_mb * 1024 * 1024
+    hard = resource.getrlimit(resource.RLIMIT_AS)[1]
+    if hard != resource.RLIM_INFINITY:
+        soft = min(soft, hard)
+    resource.setrlimit(resource.RLIMIT_AS, (soft, hard))
+
+
 def _detect_perf_event():
     """Detect whether hardware cycles counter is available, fall back to
     cpu-clock software event (for CI containers/VMs without PMU access).
@@ -100,8 +117,7 @@ def run_benchmark(cbmc, bench, output_dir, timeout, memory_mb, skip_solver):
     try:
         result = subprocess.run(
             perf_cmd, capture_output=True, text=True, timeout=timeout,
-            preexec_fn=lambda: resource.setrlimit(
-                resource.RLIMIT_AS, (memory_mb * 1024 * 1024, -1)))
+            preexec_fn=lambda: _limit_address_space(memory_mb))
         cbmc_stdout = result.stdout + result.stderr
         elapsed = time.monotonic() - start
     except subprocess.TimeoutExpired:
