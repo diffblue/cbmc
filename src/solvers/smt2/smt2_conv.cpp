@@ -3430,11 +3430,17 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
         convert_expr(src);
       else if(from_width<to_width)
       {
-        out << "((_ sign_extend "
-            << (to_width-from_width)
-            << ") ";
+        // Extend according to the signedness of the source type (GCC
+        // semantics for implementation-defined integer-to-pointer
+        // conversion).
+        if(src_type.id() == ID_signedbv)
+          out << "((_ sign_extend ";
+        else
+          out << "((_ zero_extend ";
+
+        out << (to_width - from_width) << ") ";
         convert_expr(src);
-        out << ")"; // sign_extend
+        out << ")";
       }
       else // from_width>to_width
       {
