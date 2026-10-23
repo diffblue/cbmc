@@ -120,13 +120,12 @@ private:
   type_constructor_namest type_constructor_names;
   std::vector<std::optional<exprt>> common_arguments_origins;
 
-  bool should_be_treated_as_array(const irep_idt &pointer_name) const;
-  std::optional<equal_cluster_idt>
-  find_equal_cluster(const irep_idt &name) const;
-  bool is_array_size_parameter(const irep_idt &cmdline_arg) const;
+  bool should_be_treated_as_array(irep_idt pointer_name) const;
+  std::optional<equal_cluster_idt> find_equal_cluster(irep_idt name) const;
+  bool is_array_size_parameter(irep_idt cmdline_arg) const;
   std::optional<irep_idt>
-  get_associated_size_variable(const irep_idt &array_name) const;
-  bool should_be_treated_as_cstring(const irep_idt &pointer_name) const;
+  get_associated_size_variable(irep_idt array_name) const;
+  bool should_be_treated_as_cstring(irep_idt pointer_name) const;
 
   /// Construct a new global symbol of type `int` and set it's value to \p
   ///   initial_value.
@@ -174,7 +173,7 @@ private:
   /// Recover the symbol expression from symbol table.
   /// \param symbol_name: the name of the symbol to get
   /// \return symbol expression of the symbol with given name
-  symbol_exprt get_symbol_expr(const irep_idt &symbol_name) const;
+  symbol_exprt get_symbol_expr(irep_idt symbol_name) const;
 
   /// Simple pretty-printer for \ref typet. Produces strings that can decorate
   ///   variable names in C.

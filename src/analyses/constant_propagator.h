@@ -34,9 +34,9 @@ class constant_propagator_domaint:public ai_domain_baset
 {
 public:
   virtual void transform(
-    const irep_idt &function_from,
+    irep_idt function_from,
     trace_ptrt trace_from,
-    const irep_idt &function_to,
+    irep_idt function_to,
     trace_ptrt trace_to,
     ai_baset &ai_base,
     const namespacet &ns) final override;
@@ -120,7 +120,7 @@ public:
 
     bool is_constant(const exprt &expr, const namespacet &ns) const;
 
-    bool is_constant(const irep_idt &id, const namespacet &ns) const;
+    bool is_constant(irep_idt id, const namespacet &ns) const;
 
     bool is_empty() const
     {
@@ -201,7 +201,7 @@ public:
   }
 
   constant_propagator_ait(
-    const irep_idt &function_identifier,
+    irep_idt function_identifier,
     goto_functionst::goto_functiont &goto_function,
     const namespacet &ns,
     should_track_valuet should_track_value = track_all_values)

@@ -41,8 +41,7 @@ public:
     std::size_t offset, width;
   };
 
-  const membert &
-  get_member(const struct_typet &type, const irep_idt &member) const;
+  const membert &get_member(const struct_typet &type, irep_idt member) const;
 
 protected:
   const namespacet &ns;

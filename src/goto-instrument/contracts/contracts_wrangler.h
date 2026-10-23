@@ -81,9 +81,8 @@ protected:
   /// @brief Mangle `loop_contracts` in the function with `function_id`
   /// @param loop_contracts The contracts mangled in the function.
   /// @param function_id The function containing the loop we mangle to.
-  void mangle(
-    const loop_contracts_clauset &loop_contracts,
-    const irep_idt &function_id);
+  void
+  mangle(const loop_contracts_clauset &loop_contracts, irep_idt function_id);
 
   /// @brief Add builtin function symbol with `function_name` into symbol table.
   /// @param function_name Name of the function to add.

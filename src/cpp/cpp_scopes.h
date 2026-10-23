@@ -34,9 +34,7 @@ public:
     return *current_scope_ptr;
   }
 
-  cpp_scopet &new_scope(
-    const irep_idt &new_scope_name,
-    cpp_idt::id_classt id_class)
+  cpp_scopet &new_scope(irep_idt new_scope_name, cpp_idt::id_classt id_class)
   {
     PRECONDITION(!new_scope_name.empty());
     cpp_scopet &n=current_scope_ptr->new_scope(new_scope_name);
@@ -46,7 +44,7 @@ public:
     return n;
   }
 
-  cpp_scopet &new_namespace(const irep_idt &new_scope_name)
+  cpp_scopet &new_namespace(irep_idt new_scope_name)
   {
     return new_scope(new_scope_name, cpp_idt::id_classt::NAMESPACE);
   }
@@ -69,7 +67,7 @@ public:
 
   cpp_scopet *current_scope_ptr;
 
-  cpp_idt &get_id(const irep_idt &identifier)
+  cpp_idt &get_id(irep_idt identifier)
   {
     id_mapt::const_iterator it=id_map.find(identifier);
     if(it==id_map.end())
@@ -77,14 +75,14 @@ public:
     return *(it->second);
   }
 
-  cpp_scopet &get_scope(const irep_idt &identifier)
+  cpp_scopet &get_scope(irep_idt identifier)
   {
     cpp_idt &n=get_id(identifier);
     CHECK_RETURN(n.is_scope);
     return (cpp_scopet &)n;
   }
 
-  cpp_scopet &set_scope(const irep_idt &identifier)
+  cpp_scopet &set_scope(irep_idt identifier)
   {
     current_scope_ptr=&get_scope(identifier);
     return current_scope();

@@ -128,8 +128,10 @@ protected:
   const typet &build_abstraction_type_rec(const typet &type,
       const abstraction_types_mapt &known);
   bool build_pointer(const exprt &object, exprt &dest, bool write);
-  void build_new_symbol(const symbolt &symbol,
-      const irep_idt &identifier, const typet &type);
+  void build_new_symbol(
+    const symbolt &symbol,
+    irep_idt identifier,
+    const typet &type);
 
   exprt member(const exprt &a, whatt what);
 
@@ -149,10 +151,13 @@ protected:
   code_typet::parametert add_parameter(
     const symbolt &fct_symbol,
     const typet &type,
-    const irep_idt &identifier);
+    irep_idt identifier);
 
-  void make_decl_and_def(goto_programt &dest, goto_programt::targett ref_instr,
-    const irep_idt &identifier, const irep_idt &source_sym);
+  void make_decl_and_def(
+    goto_programt &dest,
+    goto_programt::targett ref_instr,
+    irep_idt identifier,
+    irep_idt source_sym);
 
   exprt make_val_or_dummy_rec(goto_programt &dest,
       goto_programt::targett ref_instr,
@@ -162,7 +167,7 @@ protected:
     goto_programt &dest,
     goto_programt::targett ref_instr,
     const symbolt &symbol,
-    const irep_idt &component_name,
+    irep_idt component_name,
     const typet &type,
     const typet &source_type);
 

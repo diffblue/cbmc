@@ -52,7 +52,7 @@ bool local_bitvector_analysist::merge(points_tot &a, points_tot &b)
 }
 
 /// \return return 'true' iff we track the object with given identifier
-bool local_bitvector_analysist::is_tracked(const irep_idt &identifier)
+bool local_bitvector_analysist::is_tracked(irep_idt identifier)
 {
   localst::locals_sett::const_iterator it = locals.locals.find(identifier);
   return it != locals.locals.end() && ns.lookup(*it).type.id() == ID_pointer &&

@@ -168,15 +168,12 @@ bool is_power_of_two(const mp_integer &);
 void mp_min(mp_integer &a, const mp_integer &b);
 void mp_max(mp_integer &a, const mp_integer &b);
 
-bool get_bvrep_bit(
-  const irep_idt &src,
-  std::size_t width,
-  std::size_t bit_index);
+bool get_bvrep_bit(irep_idt src, std::size_t width, std::size_t bit_index);
 
 irep_idt
 make_bvrep(const std::size_t width, const std::function<bool(std::size_t)> f);
 
 irep_idt integer2bvrep(const mp_integer &, std::size_t width);
-mp_integer bvrep2integer(const irep_idt &, std::size_t width, bool is_signed);
+mp_integer bvrep2integer(irep_idt, std::size_t width, bool is_signed);
 
 #endif // CPROVER_UTIL_ARITH_TOOLS_H

@@ -81,7 +81,7 @@ void goto_symex_property_decidert::convert_goals()
 }
 
 void goto_symex_property_decidert::add_constraint_from_goals(
-  std::function<bool(const irep_idt &)> select_property)
+  std::function<bool(irep_idt)> select_property)
 {
   exprt::operandst disjuncts;
   decision_proceduret &decision_procedure = solver->decision_procedure();

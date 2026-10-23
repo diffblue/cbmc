@@ -72,14 +72,14 @@ void statement_list_parse_treet::networkt::add_instruction(
 }
 
 statement_list_parse_treet::tia_modulet::tia_modulet(
-  const irep_idt &name,
+  irep_idt name,
   const std::string &version)
   : name(name), version(version)
 {
 }
 
 statement_list_parse_treet::function_blockt::function_blockt(
-  const irep_idt &name,
+  irep_idt name,
   const std::string &version)
   : tia_modulet(name, version)
 {
@@ -110,7 +110,7 @@ void statement_list_parse_treet::swap(statement_list_parse_treet &other)
 }
 
 statement_list_parse_treet::functiont::functiont(
-  const irep_idt &name,
+  irep_idt name,
   const std::string &version,
   const typet &return_type)
   : tia_modulet(name, version), return_type(return_type)

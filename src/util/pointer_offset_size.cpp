@@ -22,10 +22,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ssa_expr.h"
 #include "std_expr.h"
 
-std::optional<mp_integer> member_offset(
-  const struct_typet &type,
-  const irep_idt &member,
-  const namespacet &ns)
+std::optional<mp_integer>
+member_offset(const struct_typet &type, irep_idt member, const namespacet &ns)
 {
   mp_integer result = 0;
   std::size_t bit_field_bits = 0;
@@ -65,7 +63,7 @@ std::optional<mp_integer> member_offset(
 
 std::optional<mp_integer> member_offset_bits(
   const struct_typet &type,
-  const irep_idt &member,
+  irep_idt member,
   const namespacet &ns)
 {
   mp_integer offset=0;
@@ -240,7 +238,7 @@ member_offset_expr(const member_exprt &member_expr, const namespacet &ns)
 
 std::optional<exprt> member_offset_expr(
   const struct_typet &type,
-  const irep_idt &member,
+  irep_idt member,
   const namespacet &ns)
 {
   PRECONDITION(size_type().get_width() != 0);

@@ -26,15 +26,13 @@ class symbolt;
 struct dfcc_utilst
 {
   /// Returns true iff the given symbol exists and satisfies requirements.
+  static bool function_symbol_exists(const goto_modelt &, irep_idt function_id);
   static bool
-  function_symbol_exists(const goto_modelt &, const irep_idt &function_id);
-  static bool function_symbol_with_body_exists(
-    const goto_modelt &,
-    const irep_idt &function_id);
+  function_symbol_with_body_exists(const goto_modelt &, irep_idt function_id);
 
   /// Returns the `symbolt` for `function_id`.
   static symbolt &
-  get_function_symbol(symbol_table_baset &, const irep_idt &function_id);
+  get_function_symbol(symbol_table_baset &, irep_idt function_id);
 
   /// Adds a new symbol named `function_id::base_name` of type `type`
   /// with given attributes in the symbol table, and returns a symbol expression
@@ -44,7 +42,7 @@ struct dfcc_utilst
   static symbol_exprt create_symbol(
     symbol_table_baset &,
     const typet &type,
-    const irep_idt &function_id,
+    irep_idt function_id,
     const std::string &base_name,
     const source_locationt &source_location);
 
@@ -65,8 +63,8 @@ struct dfcc_utilst
     const std::string &prefix,
     const std::string &base_name,
     const source_locationt &source_location,
-    const irep_idt &mode,
-    const irep_idt &module,
+    irep_idt mode,
+    irep_idt module,
     const exprt &initial_value,
     const bool no_nondet_initialization = true);
 
@@ -77,23 +75,21 @@ struct dfcc_utilst
   static const symbolt &
   create_new_parameter_symbol(
     symbol_table_baset &,
-    const irep_idt &function_id,
+    irep_idt function_id,
     const std::string &base_name,
     const typet &type);
 
   /// \brief Adds the given symbol as parameter to the function symbol's
   /// code_type. Also adds the corresponding parameter to its goto_function if
   /// it exists in the function map of the goto model.
-  static void add_parameter(
-    goto_modelt &,
-    const symbolt &symbol,
-    const irep_idt &function_id);
+  static void
+  add_parameter(goto_modelt &, const symbolt &symbol, irep_idt function_id);
 
   /// \brief Adds a parameter with given `base_name` and `type` to the given
   /// `function_id`. Both the symbol and the goto_function are updated.
   static const symbolt &add_parameter(
     goto_modelt &,
-    const irep_idt &function_id,
+    irep_idt function_id,
     const std::string &base_name,
     const typet &type);
 
@@ -109,8 +105,8 @@ struct dfcc_utilst
   static const symbolt &
   clone_and_rename_function(
     goto_modelt &goto_model,
-    const irep_idt &function_id,
-    const irep_idt &new_function_id,
+    irep_idt function_id,
+    irep_idt new_function_id,
     std::optional<typet> new_return_type);
 
   /// Given a function to wrap `foo` and a new name `wrapped_foo`
@@ -143,8 +139,8 @@ struct dfcc_utilst
   /// checking logic, contract replacement logic, etc.
   static void wrap_function(
     goto_modelt &goto_model,
-    const irep_idt &function_id,
-    const irep_idt &wrapped_function_id);
+    irep_idt function_id,
+    irep_idt wrapped_function_id);
 
   /// \brief Returns the expression `expr == NULL`.
   static const exprt make_null_check_expr(const exprt &ptr);
@@ -156,14 +152,14 @@ struct dfcc_utilst
   /// inlining.
   static void inline_function(
     goto_modelt &goto_model,
-    const irep_idt &function_id,
+    irep_idt function_id,
     message_handlert &message_handler);
 
   /// \brief Inlines the given function, and returns function symbols that
   /// caused warnings.
   static void inline_function(
     goto_modelt &goto_model,
-    const irep_idt &function_id,
+    irep_idt function_id,
     std::set<irep_idt> &no_body,
     std::set<irep_idt> &recursive_call,
     std::set<irep_idt> &missing_function,

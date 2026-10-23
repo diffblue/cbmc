@@ -118,7 +118,7 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
 
 void cpp_typecheckt::add_base_components(
   const struct_typet &from,
-  const irep_idt &access,
+  irep_idt access,
   struct_typet &to,
   std::set<irep_idt> &bases,
   std::set<irep_idt> &vbases,

@@ -69,7 +69,7 @@ static const std::vector<irep_idt> logic_sequence_terminators = {
 /// \return Parameter of the data block.
 static code_typet::parametert create_data_block_parameter(
   const struct_typet &data_block_type,
-  const irep_idt &function_block_name)
+  irep_idt function_block_name)
 {
   const pointer_typet db_ptr{data_block_type, STATEMENT_LIST_PTR_WIDTH};
   code_typet::parametert param{db_ptr};
@@ -264,7 +264,7 @@ struct_typet statement_list_typecheckt::create_instance_data_block_type(
 void statement_list_typecheckt::typecheck_function_block_var_decls(
   const statement_list_parse_treet::var_declarationst &var_decls,
   struct_union_typet::componentst &components,
-  const irep_idt &var_property)
+  irep_idt var_property)
 {
   for(const statement_list_parse_treet::var_declarationt &declaration :
       var_decls)
@@ -280,8 +280,8 @@ void statement_list_typecheckt::typecheck_function_block_var_decls(
 void statement_list_typecheckt::typecheck_function_var_decls(
   const statement_list_parse_treet::var_declarationst &var_decls,
   code_typet::parameterst &params,
-  const irep_idt &function_name,
-  const irep_idt &var_property)
+  irep_idt function_name,
+  irep_idt var_property)
 {
   for(const statement_list_parse_treet::var_declarationt &declaration :
       var_decls)
@@ -1401,7 +1401,7 @@ void statement_list_typecheckt::typecheck_statement_list_accu_real_arith(
 }
 
 void statement_list_typecheckt::typecheck_accumulator_compare_instruction(
-  const irep_idt &comparison)
+  irep_idt comparison)
 {
   const exprt &accu1{accumulator.back()};
   const exprt &accu2{accumulator.at(accumulator.size() - 2)};
@@ -1411,7 +1411,7 @@ void statement_list_typecheckt::typecheck_accumulator_compare_instruction(
 }
 
 void statement_list_typecheckt::typecheck_label_reference(
-  const irep_idt &label,
+  irep_idt label,
   bool sets_fc_false)
 {
   // If the label is already present in the list, check if it matches the
@@ -1520,7 +1520,7 @@ exprt statement_list_typecheckt::typecheck_simple_boolean_instruction_operand(
 
 exprt statement_list_typecheckt::typecheck_identifier(
   const symbolt &tia_element,
-  const irep_idt &identifier)
+  irep_idt identifier)
 {
   const code_typet &element_type{to_code_type(tia_element.type)};
 

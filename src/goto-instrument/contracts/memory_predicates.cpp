@@ -242,7 +242,7 @@ void is_fresh_baset::update_fn_call(
 is_fresh_enforcet::is_fresh_enforcet(
   goto_modelt &goto_model,
   message_handlert &message_handler,
-  const irep_idt &_fun_id)
+  irep_idt _fun_id)
   : is_fresh_baset(goto_model, message_handler, _fun_id)
 {
   std::stringstream ssreq, ssensure, ssmemmap;
@@ -321,7 +321,7 @@ void is_fresh_enforcet::create_ensures_fn_call(goto_programt::targett &ins)
 is_fresh_replacet::is_fresh_replacet(
   goto_modelt &goto_model,
   message_handlert &message_handler,
-  const irep_idt &_fun_id)
+  irep_idt _fun_id)
   : is_fresh_baset(goto_model, message_handler, _fun_id)
 {
   std::stringstream ssreq, ssensure, ssmemmap;

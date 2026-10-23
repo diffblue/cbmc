@@ -132,9 +132,9 @@ public:
   /// \param ai: the abstract interpreter
   /// \param ns: the namespace
   void transform(
-    const irep_idt &function_from,
+    irep_idt function_from,
     trace_ptrt trace_from,
-    const irep_idt &function_to,
+    irep_idt function_to,
     trace_ptrt trace_to,
     ai_baset &ai,
     const namespacet &ns) override;
@@ -238,7 +238,7 @@ private:
   /// \param function_id: the name of the function being called
   ///
   /// \return Returns true if the function should be ignored
-  bool ignore_function_call_transform(const irep_idt &function_id) const;
+  bool ignore_function_call_transform(irep_idt function_id) const;
 
   void assume(exprt expr, namespacet ns);
 

@@ -276,11 +276,11 @@ int linker_script_merget::pointerize_linker_defined_symbols(
 }
 
 int linker_script_merget::replace_expr(
-    exprt &old_expr,
-    const linker_valuest &linker_values,
-    const symbol_exprt &old_symbol,
-    const irep_idt &ident,
-    const std::string &shape)
+  exprt &old_expr,
+  const linker_valuest &linker_values,
+  const symbol_exprt &old_symbol,
+  irep_idt ident,
+  const std::string &shape)
 {
   auto it=linker_values.find(ident);
   if(it==linker_values.end())

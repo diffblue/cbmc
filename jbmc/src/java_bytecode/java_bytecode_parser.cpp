@@ -1817,7 +1817,7 @@ void java_bytecode_parsert::rmethod()
 
 std::optional<java_bytecode_parse_treet> java_bytecode_parse(
   std::istream &istream,
-  const irep_idt &class_name,
+  irep_idt class_name,
   message_handlert &message_handler,
   bool skip_instructions)
 {
@@ -1839,7 +1839,7 @@ std::optional<java_bytecode_parse_treet> java_bytecode_parse(
 
 std::optional<java_bytecode_parse_treet> java_bytecode_parse(
   const std::string &file,
-  const irep_idt &class_name,
+  irep_idt class_name,
   message_handlert &message_handler,
   bool skip_instructions)
 {

@@ -51,7 +51,7 @@ require_parse_tree::require_lambda_entry_for_descriptor(
 /// \return The methodt structure with the corresponding name
 const require_parse_tree::methodt require_parse_tree::require_method(
   const java_bytecode_parse_treet::classt &parsed_class,
-  const irep_idt &method_name)
+  irep_idt method_name)
 {
   const auto method = std::find_if(
     parsed_class.methods.begin(),

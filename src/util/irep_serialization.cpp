@@ -208,9 +208,7 @@ irep_idt irep_serializationt::read_gb_string(std::istream &in)
 /// Output a string and maintain a reference to it
 /// \param out: output stream
 /// \param s: string to output
-void irep_serializationt::write_string_ref(
-  std::ostream &out,
-  const irep_idt &s)
+void irep_serializationt::write_string_ref(std::ostream &out, irep_idt s)
 {
   size_t id = s.get_no();
   if(id>=ireps_container.string_map.size())

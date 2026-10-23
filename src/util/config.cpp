@@ -240,7 +240,7 @@ void configt::ansi_ct::set_arch_spec_x86_64()
   }
 }
 
-void configt::ansi_ct::set_arch_spec_power(const irep_idt &subarch)
+void configt::ansi_ct::set_arch_spec_power(irep_idt subarch)
 {
   arch_is_x86_family = false;
   set_argument_evaluation_order();
@@ -303,7 +303,7 @@ void configt::ansi_ct::set_arch_spec_power(const irep_idt &subarch)
   }
 }
 
-void configt::ansi_ct::set_arch_spec_arm(const irep_idt &subarch)
+void configt::ansi_ct::set_arch_spec_arm(irep_idt subarch)
 {
   arch_is_x86_family = false;
   set_argument_evaluation_order();
@@ -382,7 +382,7 @@ void configt::ansi_ct::set_arch_spec_alpha()
   }
 }
 
-void configt::ansi_ct::set_arch_spec_mips(const irep_idt &subarch)
+void configt::ansi_ct::set_arch_spec_mips(irep_idt subarch)
 {
   arch_is_x86_family = false;
   set_argument_evaluation_order();
@@ -523,7 +523,7 @@ void configt::ansi_ct::set_arch_spec_s390x()
   }
 }
 
-void configt::ansi_ct::set_arch_spec_sparc(const irep_idt &subarch)
+void configt::ansi_ct::set_arch_spec_sparc(irep_idt subarch)
 {
   arch_is_x86_family = false;
   set_argument_evaluation_order();
@@ -813,7 +813,7 @@ configt::cppt::cpp_standardt configt::cppt::default_cpp_standard()
   #endif
 }
 
-void configt::set_arch(const irep_idt &arch)
+void configt::set_arch(irep_idt arch)
 {
   ansi_c.arch=arch;
 

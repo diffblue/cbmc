@@ -72,7 +72,7 @@ Precedences are as follows. Higher values mean higher precedence.
 
 */
 
-irep_idt expr2ct::id_shorthand(const irep_idt &identifier) const
+irep_idt expr2ct::id_shorthand(irep_idt identifier) const
 {
   const symbolt *symbol;
 
@@ -90,7 +90,7 @@ irep_idt expr2ct::id_shorthand(const irep_idt &identifier) const
   return sh;
 }
 
-static std::string clean_identifier(const irep_idt &id)
+static std::string clean_identifier(irep_idt id)
 {
   std::string dest=id2string(id);
 

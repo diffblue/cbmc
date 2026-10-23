@@ -212,7 +212,7 @@ void goto_symext::symex_allocate(
 /// we need to put immediate values or pointers in there, depending on the size
 /// of the parameter.
 static exprt va_list_entry(
-  const irep_idt &parameter,
+  irep_idt parameter,
   const pointer_typet &lhs_type,
   const namespacet &ns)
 {
@@ -336,7 +336,7 @@ static irep_idt get_string_argument_rec(const exprt &src)
 static irep_idt get_string_argument(
   const exprt &src,
   const value_sett &value_set,
-  const irep_idt &language_mode,
+  irep_idt language_mode,
   const namespacet &ns)
 {
   exprt tmp=src;

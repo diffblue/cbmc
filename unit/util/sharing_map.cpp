@@ -534,16 +534,17 @@ TEST_CASE("Sharing map views and iteration", "[core][util]")
   {
     sharing_map_standardt sm;
 
-    sm.iterate([](const irep_idt &key, const std::string &value) {});
+    sm.iterate([](irep_idt key, const std::string &value) {});
 
     fill(sm);
 
     typedef std::pair<std::string, std::string> pt;
     std::vector<pt> pairs;
 
-    sm.iterate([&pairs](const irep_idt &key, const std::string &value) {
-      pairs.push_back({id2string(key), value});
-    });
+    sm.iterate(
+      [&pairs](irep_idt key, const std::string &value) {
+        pairs.push_back({id2string(key), value});
+      });
 
     std::sort(pairs.begin(), pairs.end());
     REQUIRE(pairs.size() == 3);

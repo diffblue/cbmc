@@ -40,9 +40,9 @@ public:
     expr_map.swap(template_map.expr_map);
   }
 
-  exprt lookup(const irep_idt &identifier) const;
-  typet lookup_type(const irep_idt &identifier) const;
-  exprt lookup_expr(const irep_idt &identifier) const;
+  exprt lookup(irep_idt identifier) const;
+  typet lookup_type(irep_idt identifier) const;
+  exprt lookup_expr(irep_idt identifier) const;
 
   void print(std::ostream &out) const;
 

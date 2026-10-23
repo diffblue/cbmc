@@ -665,10 +665,7 @@ class field_address_exprt : public unary_exprt
 public:
   /// constructor for field addresses.
   /// The base address must be a pointer to a compound type.
-  field_address_exprt(
-    exprt base,
-    const irep_idt &component_name,
-    pointer_typet type);
+  field_address_exprt(exprt base, irep_idt component_name, pointer_typet type);
 
   exprt &base()
   {
@@ -1209,9 +1206,7 @@ inline const prophecy_w_ok_exprt &to_prophecy_w_ok_expr(const exprt &expr)
 class annotated_pointer_constant_exprt : public unary_exprt
 {
 public:
-  annotated_pointer_constant_exprt(
-    const irep_idt &_value,
-    const exprt &_pointer)
+  annotated_pointer_constant_exprt(irep_idt _value, const exprt &_pointer)
     : unary_exprt(ID_annotated_pointer_constant, _pointer, _pointer.type())
   {
     set_value(_value);
@@ -1222,7 +1217,7 @@ public:
     return get(ID_value);
   }
 
-  void set_value(const irep_idt &value)
+  void set_value(irep_idt value)
   {
     set(ID_value, value);
   }

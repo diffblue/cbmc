@@ -41,7 +41,7 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 static bool is_main_symbol_invalid(
   const symbol_table_baset &symbol_table,
   message_handlert &message_handler,
-  const irep_idt &main_symbol_name)
+  irep_idt main_symbol_name)
 {
   bool found = false;
 

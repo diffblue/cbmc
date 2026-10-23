@@ -19,10 +19,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <memory>
 
-std::string from_expr_using_mode(
-  const namespacet &ns,
-  const irep_idt &mode,
-  const exprt &expr)
+std::string
+from_expr_using_mode(const namespacet &ns, irep_idt mode, const exprt &expr)
 {
   std::unique_ptr<languaget> language = (mode == ID_unknown)
                                           ? get_default_language()
@@ -36,10 +34,8 @@ std::string from_expr_using_mode(
   return result;
 }
 
-std::string from_expr(
-  const namespacet &ns,
-  const irep_idt &identifier,
-  const exprt &expr)
+std::string
+from_expr(const namespacet &ns, irep_idt identifier, const exprt &expr)
 {
   std::unique_ptr<languaget> p(get_language_from_identifier(ns, identifier));
 
@@ -49,10 +45,8 @@ std::string from_expr(
   return result;
 }
 
-std::string from_type(
-  const namespacet &ns,
-  const irep_idt &identifier,
-  const typet &type)
+std::string
+from_type(const namespacet &ns, irep_idt identifier, const typet &type)
 {
   std::unique_ptr<languaget> p(get_language_from_identifier(ns, identifier));
 
@@ -62,10 +56,8 @@ std::string from_type(
   return result;
 }
 
-std::string type_to_name(
-  const namespacet &ns,
-  const irep_idt &identifier,
-  const typet &type)
+std::string
+type_to_name(const namespacet &ns, irep_idt identifier, const typet &type)
 {
   std::unique_ptr<languaget> p(get_language_from_identifier(ns, identifier));
 
@@ -87,10 +79,7 @@ std::string from_type(const typet &type)
   return from_type(namespacet(symbol_table), irep_idt(), type);
 }
 
-exprt to_expr(
-  const namespacet &ns,
-  const irep_idt &identifier,
-  const std::string &src)
+exprt to_expr(const namespacet &ns, irep_idt identifier, const std::string &src)
 {
   std::unique_ptr<languaget> p(get_language_from_identifier(ns, identifier));
 

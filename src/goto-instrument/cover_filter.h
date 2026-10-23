@@ -142,7 +142,7 @@ public:
 class file_filtert : public function_filter_baset
 {
 public:
-  explicit file_filtert(const irep_idt &file_id) : file_id(file_id)
+  explicit file_filtert(irep_idt file_id) : file_id(file_id)
   {
   }
 
@@ -157,7 +157,7 @@ private:
 class single_function_filtert : public function_filter_baset
 {
 public:
-  explicit single_function_filtert(const irep_idt &function_id)
+  explicit single_function_filtert(irep_idt function_id)
     : function_id(function_id)
   {
   }

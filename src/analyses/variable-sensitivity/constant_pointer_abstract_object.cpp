@@ -321,7 +321,7 @@ static exprt to_bool_expr(bool v)
 }
 
 exprt struct_member_ptr_comparison_expr(
-  irep_idt const &id,
+  irep_idt id,
   exprt const &lhs,
   exprt const &rhs)
 {
@@ -336,7 +336,7 @@ exprt struct_member_ptr_comparison_expr(
 }
 
 exprt symbol_ptr_comparison_expr(
-  irep_idt const &id,
+  irep_idt id,
   exprt const &lhs,
   exprt const &rhs)
 {

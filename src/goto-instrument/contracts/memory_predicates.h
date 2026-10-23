@@ -28,7 +28,7 @@ public:
   is_fresh_baset(
     goto_modelt &goto_model,
     message_handlert &message_handler,
-    const irep_idt &_fun_id)
+    irep_idt _fun_id)
     : goto_model(goto_model), message_handler(message_handler), fun_id(_fun_id)
   {
   }
@@ -53,7 +53,7 @@ protected:
 
   goto_modelt &goto_model;
   message_handlert &message_handler;
-  const irep_idt &fun_id;
+  irep_idt fun_id;
 
   // written by the child classes.
   std::string memmap_name;
@@ -70,7 +70,7 @@ public:
   is_fresh_enforcet(
     goto_modelt &goto_model,
     message_handlert &message_handler,
-    const irep_idt &_fun_id);
+    irep_idt _fun_id);
 
   virtual void create_declarations();
 
@@ -85,7 +85,7 @@ public:
   is_fresh_replacet(
     goto_modelt &goto_model,
     message_handlert &message_handler,
-    const irep_idt &_fun_id);
+    irep_idt _fun_id);
 
   virtual void create_declarations();
 

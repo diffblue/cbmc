@@ -25,8 +25,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 /// Notes `method_symbol_name` is referenced from some reachable function, and
 /// should therefore be elaborated.
 /// \param method_symbol_name: method name; must exist in symbol table.
-void ci_lazy_methods_neededt::add_needed_method(
-  const irep_idt &method_symbol_name)
+void ci_lazy_methods_neededt::add_needed_method(irep_idt method_symbol_name)
 {
   callable_methods.insert(method_symbol_name);
 }
@@ -39,7 +38,7 @@ void ci_lazy_methods_neededt::add_needed_method(
 /// __CPROVER_start in its initial setup, and because return values of opaque
 /// methods need to be considered in ci_lazy_methods too.
 /// \param class_id: The given class id
-void ci_lazy_methods_neededt::add_clinit_call(const irep_idt &class_id)
+void ci_lazy_methods_neededt::add_clinit_call(irep_idt class_id)
 {
   const irep_idt &clinit_wrapper = clinit_wrapper_name(class_id);
   if(symbol_table.symbols.count(clinit_wrapper))
@@ -50,7 +49,7 @@ void ci_lazy_methods_neededt::add_clinit_call(const irep_idt &class_id)
 /// ancestors then note that it is needed.
 /// \param class_id: The given class id
 void ci_lazy_methods_neededt::add_cprover_nondet_initialize_if_it_exists(
-  const irep_idt &class_id)
+  irep_idt class_id)
 {
   resolve_inherited_componentt resolve_inherited_component{symbol_table};
   std::optional<resolve_inherited_componentt::inherited_componentt>
@@ -69,8 +68,7 @@ void ci_lazy_methods_neededt::add_cprover_nondet_initialize_if_it_exists(
 /// therefore reachable.
 /// \param class_symbol_name: class name; must exist in symbol table.
 /// \return Returns true if `class_symbol_name` is new (not seen before).
-bool ci_lazy_methods_neededt::add_needed_class(
-  const irep_idt &class_symbol_name)
+bool ci_lazy_methods_neededt::add_needed_class(irep_idt class_symbol_name)
 {
   if(!instantiated_classes.insert(class_symbol_name).second)
     return false;

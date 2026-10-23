@@ -85,7 +85,7 @@ class remove_exceptionst
   typedef std::vector<catch_handlerst> stack_catcht;
 
 public:
-  typedef std::function<bool(const irep_idt &)> function_may_throwt;
+  typedef std::function<bool(irep_idt)> function_may_throwt;
 
   explicit remove_exceptionst(
     symbol_table_baset &_symbol_table,
@@ -109,8 +109,7 @@ public:
   }
 
   void operator()(goto_functionst &goto_functions);
-  void
-  operator()(const irep_idt &function_identifier, goto_programt &goto_program);
+  void operator()(irep_idt function_identifier, goto_programt &goto_program);
 
 protected:
   symbol_table_baset &symbol_table;
@@ -142,28 +141,28 @@ protected:
     std::size_t &universal_catch);
 
   void add_exception_dispatch_sequence(
-    const irep_idt &function_identifier,
+    irep_idt function_identifier,
     goto_programt &goto_program,
     const goto_programt::targett &instr_it,
     const stack_catcht &stack_catch,
     const std::vector<symbol_exprt> &locals);
 
   bool instrument_throw(
-    const irep_idt &function_identifier,
+    irep_idt function_identifier,
     goto_programt &goto_program,
     const goto_programt::targett &,
     const stack_catcht &,
     const std::vector<symbol_exprt> &);
 
   instrumentation_resultt instrument_function_call(
-    const irep_idt &function_identifier,
+    irep_idt function_identifier,
     goto_programt &goto_program,
     const goto_programt::targett &,
     const stack_catcht &,
     const std::vector<symbol_exprt> &);
 
   void instrument_exceptions(
-    const irep_idt &function_identifier,
+    irep_idt function_identifier,
     goto_programt &goto_program);
 };
 
@@ -318,7 +317,7 @@ goto_programt::targett remove_exceptionst::find_universal_exception(
 /// \param stack_catch: exception handlers currently registered
 /// \param locals: local variables to kill on a function-exit edge
 void remove_exceptionst::add_exception_dispatch_sequence(
-  const irep_idt &function_identifier,
+  irep_idt function_identifier,
   goto_programt &goto_program,
   const goto_programt::targett &instr_it,
   const remove_exceptionst::stack_catcht &stack_catch,
@@ -394,7 +393,7 @@ void remove_exceptionst::add_exception_dispatch_sequence(
 /// instruments each throw with conditional GOTOS to the corresponding
 /// exception handlers
 bool remove_exceptionst::instrument_throw(
-  const irep_idt &function_identifier,
+  irep_idt function_identifier,
   goto_programt &goto_program,
   const goto_programt::targett &instr_it,
   const remove_exceptionst::stack_catcht &stack_catch,
@@ -425,7 +424,7 @@ bool remove_exceptionst::instrument_throw(
 /// GOTOS to the corresponding exception handlers
 remove_exceptionst::instrumentation_resultt
 remove_exceptionst::instrument_function_call(
-  const irep_idt &function_identifier,
+  irep_idt function_identifier,
   goto_programt &goto_program,
   const goto_programt::targett &instr_it,
   const stack_catcht &stack_catch,
@@ -483,7 +482,7 @@ remove_exceptionst::instrument_function_call(
 /// handlers. Additionally, it re-computes the live-range of local variables in
 /// order to add DEAD instructions.
 void remove_exceptionst::instrument_exceptions(
-  const irep_idt &function_identifier,
+  irep_idt function_identifier,
   goto_programt &goto_program)
 {
   stack_catcht stack_catch; // stack of try-catch blocks
@@ -613,8 +612,9 @@ void remove_exceptionst::operator()(goto_functionst &goto_functions)
     instrument_exceptions(gf_entry.first, gf_entry.second.body);
 }
 
-void remove_exceptionst::
-operator()(const irep_idt &function_identifier, goto_programt &goto_program)
+void remove_exceptionst::operator()(
+  irep_idt function_identifier,
+  goto_programt &goto_program)
 {
   instrument_exceptions(function_identifier, goto_program);
 }
@@ -631,9 +631,7 @@ void remove_exceptions_using_instanceof(
   uncaught_exceptions(goto_functions, ns, exceptions_map);
 
   remove_exceptionst::function_may_throwt function_may_throw =
-    [&exceptions_map](const irep_idt &id) {
-      return !exceptions_map[id].empty();
-    };
+    [&exceptions_map](irep_idt id) { return !exceptions_map[id].empty(); };
 
   remove_exceptionst remove_exceptions(
     symbol_table, nullptr, function_may_throw, false, message_handler);
@@ -654,13 +652,13 @@ void remove_exceptions_using_instanceof(
 ///   the caller's responsibility.
 /// \param message_handler: logging output
 void remove_exceptions_using_instanceof(
-  const irep_idt &function_identifier,
+  irep_idt function_identifier,
   goto_programt &goto_program,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler)
 {
-  remove_exceptionst::function_may_throwt any_function_may_throw =
-    [](const irep_idt &) { return true; };
+  remove_exceptionst::function_may_throwt any_function_may_throw = [](irep_idt)
+  { return true; };
 
   remove_exceptionst remove_exceptions(
     symbol_table, nullptr, any_function_may_throw, false, message_handler);
@@ -696,9 +694,7 @@ void remove_exceptions(
   uncaught_exceptions(goto_functions, ns, exceptions_map);
 
   remove_exceptionst::function_may_throwt function_may_throw =
-    [&exceptions_map](const irep_idt &id) {
-      return !exceptions_map[id].empty();
-    };
+    [&exceptions_map](irep_idt id) { return !exceptions_map[id].empty(); };
 
   remove_exceptionst remove_exceptions(
     symbol_table, &class_hierarchy, function_may_throw, true, message_handler);
@@ -721,14 +717,14 @@ void remove_exceptions(
 ///   Only needed if type == REMOVE_ADDED_INSTANCEOF; otherwise may be null.
 /// \param message_handler: logging output
 void remove_exceptions(
-  const irep_idt &function_identifier,
+  irep_idt function_identifier,
   goto_programt &goto_program,
   symbol_table_baset &symbol_table,
   const class_hierarchyt &class_hierarchy,
   message_handlert &message_handler)
 {
-  remove_exceptionst::function_may_throwt any_function_may_throw =
-    [](const irep_idt &) { return true; };
+  remove_exceptionst::function_may_throwt any_function_may_throw = [](irep_idt)
+  { return true; };
 
   remove_exceptionst remove_exceptions(
     symbol_table,

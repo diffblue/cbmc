@@ -29,7 +29,7 @@ public:
     id = symbol_expr.identifier();
   }
 
-  explicit object_idt(const irep_idt &identifier)
+  explicit object_idt(irep_idt identifier)
   {
     id=identifier;
   }

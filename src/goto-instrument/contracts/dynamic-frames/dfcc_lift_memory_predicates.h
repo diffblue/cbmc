@@ -79,11 +79,11 @@ protected:
     const std::set<irep_idt> &predicates);
 
   void lift_predicate(
-    const irep_idt &function_id,
+    irep_idt function_id,
     std::set<irep_idt> &discovered_function_pointer_contracts);
 
   void lift_parameters_and_update_body(
-    const irep_idt &function_id,
+    irep_idt function_id,
     std::set<irep_idt> &discovered_function_pointer_contracts);
 
   /// \brief adds a pointer_type to the parameter of a function
@@ -93,16 +93,16 @@ protected:
   /// The parameter symbol gets updated in the symbol table and the function
   /// signature gets updated with the new type.
   void add_pointer_type(
-    const irep_idt &function_id,
+    irep_idt function_id,
     const std::size_t parameter_rank,
     replace_symbolt &replace_lifted_param);
 
   /// \brief Computes the subset of function parameters of function_id
   /// that are passed directly to core predicates and must be lifted.
-  void collect_parameters_to_lift(const irep_idt &function_id);
+  void collect_parameters_to_lift(irep_idt function_id);
 
   /// \brief True if a function at least had one of its parameters lifted
-  bool is_lifted_function(const irep_idt &function_id);
+  bool is_lifted_function(irep_idt function_id);
 };
 
 #endif

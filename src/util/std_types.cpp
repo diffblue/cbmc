@@ -44,8 +44,7 @@ typet array_typet::index_type() const
 }
 
 /// Return the sequence number of the component with given name.
-std::size_t struct_union_typet::component_number(
-  const irep_idt &component_name) const
+std::size_t struct_union_typet::component_number(irep_idt component_name) const
 {
   std::size_t number=0;
 
@@ -61,8 +60,8 @@ std::size_t struct_union_typet::component_number(
 }
 
 /// Get the reference to a component with given name.
-const struct_union_typet::componentt &struct_union_typet::get_component(
-  const irep_idt &component_name) const
+const struct_union_typet::componentt &
+struct_union_typet::get_component(irep_idt component_name) const
 {
   for(const auto &c : components())
   {
@@ -73,8 +72,7 @@ const struct_union_typet::componentt &struct_union_typet::get_component(
   return static_cast<const componentt &>(get_nil_irep());
 }
 
-const typet &
-struct_union_typet::component_type(const irep_idt &component_name) const
+const typet &struct_union_typet::component_type(irep_idt component_name) const
 {
   const auto &c = get_component(component_name);
   CHECK_RETURN(c.is_not_nil());
@@ -101,8 +99,7 @@ void struct_typet::add_base(const struct_tag_typet &base)
   bases().push_back(baset(base));
 }
 
-std::optional<struct_typet::baset>
-struct_typet::get_base(const irep_idt &id) const
+std::optional<struct_typet::baset> struct_typet::get_base(irep_idt id) const
 {
   for(const auto &b : bases())
   {

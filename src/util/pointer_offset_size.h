@@ -23,14 +23,12 @@ class struct_typet;
 class typet;
 class member_exprt;
 
-std::optional<mp_integer> member_offset(
-  const struct_typet &type,
-  const irep_idt &member,
-  const namespacet &ns);
+std::optional<mp_integer>
+member_offset(const struct_typet &type, irep_idt member, const namespacet &ns);
 
 std::optional<mp_integer> member_offset_bits(
   const struct_typet &type,
-  const irep_idt &member,
+  irep_idt member,
   const namespacet &ns);
 
 std::optional<mp_integer>
@@ -57,7 +55,7 @@ member_offset_expr(const member_exprt &, const namespacet &ns);
 
 std::optional<exprt> member_offset_expr(
   const struct_typet &type,
-  const irep_idt &member,
+  irep_idt member,
   const namespacet &ns);
 
 std::optional<exprt> size_of_expr(const typet &type, const namespacet &ns);

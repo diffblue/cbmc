@@ -29,8 +29,8 @@ public:
     return (*this)[l].invariant_set;
   }
 
-  void initialize(const irep_idt &function, const goto_programt &goto_program)
-    override;
+  void
+  initialize(irep_idt function, const goto_programt &goto_program) override;
 
   void make_all_true();
   void make_all_false();

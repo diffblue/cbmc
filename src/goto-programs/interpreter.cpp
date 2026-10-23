@@ -445,7 +445,7 @@ interpretert::get_component(const typet &object_type, const mp_integer &offset)
 }
 
 /// returns the type object corresponding to id
-typet interpretert::get_type(const irep_idt &id) const
+typet interpretert::get_type(irep_idt id) const
 {
   dynamic_typest::const_iterator it=dynamic_types.find(id);
   if(it==dynamic_types.end())
@@ -1022,7 +1022,7 @@ mp_integer interpretert::get_size(const typet &type)
   return 1;
 }
 
-exprt interpretert::get_value(const irep_idt &id)
+exprt interpretert::get_value(irep_idt id)
 {
   // The dynamic type and the static symbol type may differ for VLAs,
   // where the symbol carries a size expression and the dynamic type

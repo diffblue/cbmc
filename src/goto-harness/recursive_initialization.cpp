@@ -373,14 +373,14 @@ irep_idt recursive_initializationt::build_constructor(const exprt &expr)
 }
 
 bool recursive_initializationt::should_be_treated_as_array(
-  const irep_idt &array_name) const
+  irep_idt array_name) const
 {
   return initialization_config.pointers_to_treat_as_arrays.find(array_name) !=
          initialization_config.pointers_to_treat_as_arrays.end();
 }
 
 std::optional<recursive_initializationt::equal_cluster_idt>
-recursive_initializationt::find_equal_cluster(const irep_idt &name) const
+recursive_initializationt::find_equal_cluster(irep_idt name) const
 {
   for(equal_cluster_idt index = 0;
       index != initialization_config.pointers_to_treat_equal.size();
@@ -393,7 +393,7 @@ recursive_initializationt::find_equal_cluster(const irep_idt &name) const
 }
 
 bool recursive_initializationt::is_array_size_parameter(
-  const irep_idt &cmdline_arg) const
+  irep_idt cmdline_arg) const
 {
   return initialization_config.variables_that_hold_array_sizes.find(
            cmdline_arg) !=
@@ -401,7 +401,7 @@ bool recursive_initializationt::is_array_size_parameter(
 }
 
 std::optional<irep_idt> recursive_initializationt::get_associated_size_variable(
-  const irep_idt &array_name) const
+  irep_idt array_name) const
 {
   return optional_lookup(
     initialization_config.array_name_to_associated_array_size_variable,
@@ -409,7 +409,7 @@ std::optional<irep_idt> recursive_initializationt::get_associated_size_variable(
 }
 
 bool recursive_initializationt::should_be_treated_as_cstring(
-  const irep_idt &pointer_name) const
+  irep_idt pointer_name) const
 {
   return initialization_config.pointers_to_treat_as_cstrings.count(
            pointer_name) != 0;
@@ -578,7 +578,7 @@ symbolt &recursive_initializationt::get_fresh_param_symbol(
 }
 
 symbol_exprt
-recursive_initializationt::get_symbol_expr(const irep_idt &symbol_name) const
+recursive_initializationt::get_symbol_expr(irep_idt symbol_name) const
 {
   auto maybe_symbol = goto_model.symbol_table.lookup(symbol_name);
   CHECK_RETURN(maybe_symbol != nullptr);

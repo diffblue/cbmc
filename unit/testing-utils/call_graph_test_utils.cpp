@@ -10,8 +10,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 #include <util/std_code_base.h>
 
-symbolt
-create_void_function_symbol(const irep_idt &name, const codet &code)
+symbolt create_void_function_symbol(irep_idt name, const codet &code)
 {
   const code_typet void_function_type({}, empty_typet());
   symbolt function{name, void_function_type, ID_java};
@@ -21,7 +20,7 @@ create_void_function_symbol(const irep_idt &name, const codet &code)
 
 bool multimap_key_matches(
   const std::multimap<irep_idt, irep_idt> &map,
-  const irep_idt &key,
+  irep_idt key,
   const std::set<irep_idt> &values)
 {
   auto matching_values = map.equal_range(key);

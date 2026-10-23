@@ -21,11 +21,11 @@ class codet;
 class symbol_table_baset;
 
 irep_idt lambda_synthetic_class_name(
-  const irep_idt &method_identifier,
+  irep_idt method_identifier,
   std::size_t instruction_address);
 
 void create_invokedynamic_synthetic_classes(
-  const irep_idt &method_identifier,
+  irep_idt method_identifier,
   const java_bytecode_parse_treet::methodt::instructionst &instructions,
   symbol_table_baset &symbol_table,
   synthetic_methods_mapt &synthetic_methods,
@@ -33,13 +33,13 @@ void create_invokedynamic_synthetic_classes(
 
 /// Create invokedynamic synthetic constructor
 codet invokedynamic_synthetic_constructor(
-  const irep_idt &function_id,
+  irep_idt function_id,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler);
 
 /// Create invokedynamic synthetic method
 codet invokedynamic_synthetic_method(
-  const irep_idt &function_id,
+  irep_idt function_id,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler);
 

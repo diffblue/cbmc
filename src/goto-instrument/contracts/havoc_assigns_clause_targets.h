@@ -52,7 +52,7 @@ public:
   /// \param _message_handler handler used to log translation warnings/errors
   ///
   havoc_assigns_clause_targetst(
-    const irep_idt &_function_id,
+    irep_idt _function_id,
     const std::vector<exprt> &_targets,
     const goto_functionst &_functions,
     cfg_infot &_cfg_info,

@@ -10,8 +10,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include <util/pointer_expr.h>
 
-symbol_exprt symbol_generatort::
-operator()(const irep_idt &prefix, const typet &type)
+symbol_exprt symbol_generatort::operator()(irep_idt prefix, const typet &type)
 {
   std::ostringstream buf;
   buf << "string_refinement#" << prefix << "#" << ++symbol_count;

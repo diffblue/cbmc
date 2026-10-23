@@ -45,7 +45,7 @@ public:
   typedef std::list<std::pair<goto_programt::const_targett, differencet>>
     goto_program_difft;
 
-  goto_program_difft get_diff(const irep_idt &function) const;
+  goto_program_difft get_diff(irep_idt function) const;
 
 private:
   const goto_functionst &old_goto_functions;
@@ -57,7 +57,7 @@ private:
   typedef std::map<irep_idt, differencest> differences_mapt;
 
   void unified_diff(
-    const irep_idt &identifier,
+    irep_idt identifier,
     const goto_programt &old_goto_program,
     const goto_programt &new_goto_program);
 
@@ -71,7 +71,7 @@ private:
     const differencest &differences);
 
   void output_diff(
-    const irep_idt &identifier,
+    irep_idt identifier,
     const goto_programt &old_goto_program,
     const goto_programt &new_goto_program,
     const differencest &differences,

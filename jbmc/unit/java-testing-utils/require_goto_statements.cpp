@@ -70,9 +70,9 @@ require_goto_statements::require_entry_point_statements(
 require_goto_statements::pointer_assignment_locationt
 require_goto_statements::find_struct_component_assignments(
   const std::vector<codet> &statements,
-  const irep_idt &structure_name,
+  irep_idt structure_name,
   const std::optional<irep_idt> &superclass_name,
-  const irep_idt &component_name,
+  irep_idt component_name,
   const symbol_table_baset &symbol_table)
 {
   pointer_assignment_locationt locations{};
@@ -167,7 +167,7 @@ require_goto_statements::find_struct_component_assignments(
 require_goto_statements::pointer_assignment_locationt
 require_goto_statements::find_this_component_assignment(
   const std::vector<codet> &statements,
-  const irep_idt &component_name)
+  irep_idt component_name)
 {
   pointer_assignment_locationt locations;
 
@@ -217,7 +217,7 @@ require_goto_statements::find_this_component_assignment(
 ///   vector of all other assignments
 require_goto_statements::pointer_assignment_locationt
 require_goto_statements::find_pointer_assignments(
-  const irep_idt &pointer_name,
+  irep_idt pointer_name,
   const std::vector<codet> &instructions)
 {
   INFO("Looking for symbol: " << pointer_name);
@@ -283,7 +283,7 @@ require_goto_statements::find_pointer_assignments(
 /// \throws no_decl_found_exceptiont if no declaration of the specific
 /// variable is found
 const code_declt &require_goto_statements::require_declaration_of_name(
-  const irep_idt &variable_name,
+  irep_idt variable_name,
   const std::vector<codet> &entry_point_instructions)
 {
   for(const auto &statement : entry_point_instructions)
@@ -306,33 +306,39 @@ const code_declt &require_goto_statements::require_declaration_of_name(
 /// \param entry_point_instructions: A vector of instructions
 /// \param symbol_identifier: The identifier of the symbol we are considering
 /// \return The unique non-null expression assigned to the symbol
-const exprt &get_unique_non_null_expression_assigned_to_symbol(
+exprt get_unique_non_null_expression_assigned_to_symbol(
   const std::vector<codet> &entry_point_instructions,
-  const irep_idt &symbol_identifier)
+  irep_idt symbol_identifier)
 {
-  const auto &assignments = require_goto_statements::find_pointer_assignments(
-                              symbol_identifier, entry_point_instructions)
-                              .non_null_assignments;
+  const auto assignments = require_goto_statements::find_pointer_assignments(
+                             symbol_identifier, entry_point_instructions)
+                             .non_null_assignments;
   REQUIRE(assignments.size() == 1);
   return assignments[0].rhs();
 }
 
-/// Get the unique symbol assigned to a symbol, if one exists. There must be
-/// a unique non-null assignment to the symbol, and it is either another symbol,
-/// in which case we return that symbol expression, or something else, which
-/// case we return a null pointer.
+/// Get the identifier of the unique symbol assigned to a symbol, if such a
+/// symbol exists. There must be a unique non-null assignment to the symbol,
+/// and it is either another symbol (in which case we return that symbol's
+/// identifier) or something else (in which case we return std::nullopt).
 /// \param entry_point_instructions: A vector of instructions
 /// \param symbol_identifier: The identifier of the symbol
-/// \return The unique symbol assigned to \p input_symbol_identifier, or a null
-///   pointer if no symbols are assigned to it
-const symbol_exprt *try_get_unique_symbol_assigned_to_symbol(
+/// \return The identifier of the unique symbol assigned to
+///   \p symbol_identifier, or std::nullopt if no symbol is assigned to it.
+std::optional<irep_idt> try_get_unique_symbol_assigned_to_symbol(
   const std::vector<codet> &entry_point_instructions,
-  const irep_idt &symbol_identifier)
+  irep_idt symbol_identifier)
 {
-  const auto &expr = get_unique_non_null_expression_assigned_to_symbol(
+  const exprt expr = get_unique_non_null_expression_assigned_to_symbol(
     entry_point_instructions, symbol_identifier);
 
-  return expr_try_dynamic_cast<symbol_exprt>(skip_typecast(expr));
+  if(
+    const symbol_exprt *symbol_expr =
+      expr_try_dynamic_cast<symbol_exprt>(skip_typecast(expr)))
+  {
+    return symbol_expr->get_identifier();
+  }
+  return std::nullopt;
 }
 
 /// Follow the chain of non-null assignments until we find a symbol that
@@ -349,20 +355,18 @@ const symbol_exprt *try_get_unique_symbol_assigned_to_symbol(
 /// \return The identifier of the symbol which is (possibly indirectly) assigned
 ///   to \p input_symbol_identifier and which does not have any symbol assigned
 ///   to it
-static const irep_idt &
-get_ultimate_source_symbol(
+static irep_idt get_ultimate_source_symbol(
   const std::vector<codet> &entry_point_instructions,
-  const irep_idt &input_symbol_identifier)
+  irep_idt input_symbol_identifier)
 {
-  const symbol_exprt *symbol_assigned_to_input_symbol =
+  const std::optional<irep_idt> symbol_assigned_to_input_symbol =
     try_get_unique_symbol_assigned_to_symbol(
       entry_point_instructions, input_symbol_identifier);
 
   if(symbol_assigned_to_input_symbol)
   {
     return get_ultimate_source_symbol(
-      entry_point_instructions,
-      symbol_assigned_to_input_symbol->get_identifier());
+      entry_point_instructions, *symbol_assigned_to_input_symbol);
   }
 
   return input_symbol_identifier;
@@ -382,10 +386,10 @@ get_ultimate_source_symbol(
 ///   which will be used for future calls to
 ///   `require_struct_component_assignment`.
 irep_idt require_goto_statements::require_struct_component_assignment(
-  const irep_idt &structure_name,
+  irep_idt structure_name,
   const std::optional<irep_idt> &superclass_name,
-  const irep_idt &component_name,
-  const irep_idt &component_type_name,
+  irep_idt component_name,
+  irep_idt component_type_name,
   const std::optional<irep_idt> &typecast_name,
   const std::vector<codet> &entry_point_instructions,
   const symbol_table_baset &symbol_table)
@@ -420,7 +424,7 @@ irep_idt require_goto_statements::require_struct_component_assignment(
   // right hand side, then we want to identify that the type
   // is the one we expect, e.g.:
   // struct java.lang.Integer *malloc_site$0;
-  const auto &component_declaration =
+  const auto component_declaration =
     require_goto_statements::require_declaration_of_name(
       symbol_identifier, entry_point_instructions);
   const typet &component_type =
@@ -444,10 +448,10 @@ irep_idt require_goto_statements::require_struct_component_assignment(
 /// \return The identifier of the variable assigned to the field
 const irep_idt &
 require_goto_statements::require_struct_array_component_assignment(
-  const irep_idt &structure_name,
+  irep_idt structure_name,
   const std::optional<irep_idt> &superclass_name,
-  const irep_idt &array_component_name,
-  const irep_idt &array_type_name,
+  irep_idt array_component_name,
+  irep_idt array_type_name,
   const std::vector<codet> &entry_point_instructions,
   const symbol_table_baset &symbol_table)
 {
@@ -515,7 +519,7 @@ require_goto_statements::require_struct_array_component_assignment(
 /// \param entry_point_statements: The statements to look through
 /// \return The identifier of the variable assigned to the input argument
 irep_idt require_goto_statements::require_entry_point_argument_assignment(
-  const irep_idt &argument_name,
+  irep_idt argument_name,
   const std::vector<codet> &entry_point_statements)
 {
   // Trace the creation of the object that is being supplied as the input
@@ -548,7 +552,7 @@ irep_idt require_goto_statements::require_entry_point_argument_assignment(
 /// \return All calls to the matching function inside the statements
 std::vector<code_function_callt> require_goto_statements::find_function_calls(
   const std::vector<codet> &statements,
-  const irep_idt &function_call_identifier)
+  irep_idt function_call_identifier)
 {
   std::vector<code_function_callt> function_calls;
   for(const codet &statement : statements)

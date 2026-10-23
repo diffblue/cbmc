@@ -47,7 +47,7 @@ public:
     bool should_simplify,
     const irep_idt language_mode,
     guard_managert &manager,
-    std::function<std::size_t(const irep_idt &)> fresh_l2_name_provider);
+    std::function<std::size_t(irep_idt)> fresh_l2_name_provider);
   ~goto_symex_statet();
 
   /// \brief Fake "copy constructor" that initializes the `symex_target` member
@@ -106,7 +106,7 @@ public:
   rename_ssa(ssa_exprt ssa, const namespacet &ns);
 
   template <levelt level = L2>
-  void rename(typet &type, const irep_idt &l1_identifier, const namespacet &ns);
+  void rename(typet &type, irep_idt l1_identifier, const namespacet &ns);
 
   [[nodiscard]] exprt l2_rename_rvalues(exprt lvalue, const namespacet &ns);
 
@@ -164,7 +164,7 @@ public:
   /// \return L1-renamed SSA expression
   ssa_exprt add_object(
     const symbol_exprt &expr,
-    std::function<std::size_t(const irep_idt &)> index_generator,
+    std::function<std::size_t(irep_idt)> index_generator,
     const namespacet &ns);
 
   /// Add `invalid` (or a failed symbol) to the value_set if ssa is a pointer,
@@ -230,18 +230,18 @@ public:
   unsigned remaining_vccs = 0;
 
   /// Drops an L1 name from the local L2 map
-  void drop_existing_l1_name(const irep_idt &l1_identifier)
+  void drop_existing_l1_name(irep_idt l1_identifier)
   {
     level2.current_names.erase(l1_identifier);
   }
 
   /// Drops an L1 name from the local L2 map
-  void drop_l1_name(const irep_idt &l1_identifier)
+  void drop_l1_name(irep_idt l1_identifier)
   {
     level2.current_names.erase_if_exists(l1_identifier);
   }
 
-  std::function<std::size_t(const irep_idt &)> get_l2_name_provider() const
+  std::function<std::size_t(irep_idt)> get_l2_name_provider() const
   {
     return fresh_l2_name_provider;
   }
@@ -260,7 +260,7 @@ public:
 
 private:
   const irep_idt language_mode;
-  std::function<std::size_t(const irep_idt &)> fresh_l2_name_provider;
+  std::function<std::size_t(irep_idt)> fresh_l2_name_provider;
 
   /// \brief Dangerous, do not use
   ///

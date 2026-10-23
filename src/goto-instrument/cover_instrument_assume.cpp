@@ -14,7 +14,7 @@
 /// \param i_it The current instruction (instruction under instrumentation).
 /// \param make_assertion The assertion generator function.
 void cover_assume_instrumentert::instrument(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt &goto_program,
   goto_programt::targett &i_it,
   const cover_blocks_baset &,

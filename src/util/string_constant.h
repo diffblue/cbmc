@@ -14,9 +14,9 @@ Author: Daniel Kroening, kroening@kroening.com
 class string_constantt : public nullary_exprt
 {
 public:
-  explicit string_constantt(const irep_idt &);
+  explicit string_constantt(irep_idt);
 
-  void value(const irep_idt &);
+  void value(irep_idt);
 
   const irep_idt &value() const
   {

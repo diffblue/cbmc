@@ -41,14 +41,12 @@ public:
     // is in its program sequence
     goto_programt::const_targett pc;
 
-    sourcet(const irep_idt &_function_id, goto_programt::const_targett _pc)
+    sourcet(irep_idt _function_id, goto_programt::const_targett _pc)
       : thread_nr(0), function_id(_function_id), pc(_pc)
     {
     }
 
-    explicit sourcet(
-      const irep_idt &_function_id,
-      const goto_programt &_goto_program)
+    explicit sourcet(irep_idt _function_id, const goto_programt &_goto_program)
       : thread_nr(0),
         function_id(_function_id),
         pc(_goto_program.instructions.begin())
@@ -157,7 +155,7 @@ public:
   ///  function call
   virtual void function_call(
     const exprt &guard,
-    const irep_idt &function_id,
+    irep_idt function_id,
     const std::vector<renamedt<exprt, L2>> &ssa_function_arguments,
     const sourcet &source,
     bool hidden) = 0;
@@ -170,7 +168,7 @@ public:
   ///  function return
   virtual void function_return(
     const exprt &guard,
-    const irep_idt &function_id,
+    irep_idt function_id,
     const sourcet &source,
     bool hidden) = 0;
 
@@ -191,7 +189,7 @@ public:
   virtual void output(
     const exprt &guard,
     const sourcet &source,
-    const irep_idt &output_id,
+    irep_idt output_id,
     const std::list<renamedt<exprt, L2>> &args) = 0;
 
   /// Record formatted output.
@@ -204,9 +202,9 @@ public:
   virtual void output_fmt(
     const exprt &guard,
     const sourcet &source,
-    const irep_idt &output_id,
-    const irep_idt &fmt,
-    const std::list<exprt> &args)=0;
+    irep_idt output_id,
+    irep_idt fmt,
+    const std::list<exprt> &args) = 0;
 
   /// Record an input.
   /// \param guard: Precondition for reading from the input
@@ -217,8 +215,8 @@ public:
   virtual void input(
     const exprt &guard,
     const sourcet &source,
-    const irep_idt &input_id,
-    const std::list<exprt> &args)=0;
+    irep_idt input_id,
+    const std::list<exprt> &args) = 0;
 
   /// Record an assumption.
   /// \param guard: Precondition for reaching this assumption
@@ -240,7 +238,7 @@ public:
   virtual void assertion(
     const exprt &guard,
     const exprt &cond,
-    const irep_idt &property_id,
+    irep_idt property_id,
     const std::string &msg,
     const sourcet &source) = 0;
 

@@ -17,17 +17,11 @@ Author: Daniel Kroening, kroening@kroening.com
 class goto_modelt;
 class symbol_table_baset;
 
-class code_function_callt function_to_call(
-  symbol_table_baset &,
-  const irep_idt &id,
-  const irep_idt &argument);
+class code_function_callt
+function_to_call(symbol_table_baset &, irep_idt id, irep_idt argument);
 
-void function_enter(
-  goto_modelt &,
-  const irep_idt &id);
+void function_enter(goto_modelt &, irep_idt id);
 
-void function_exit(
-  goto_modelt &,
-  const irep_idt &id);
+void function_exit(goto_modelt &, irep_idt id);
 
 #endif // CPROVER_GOTO_INSTRUMENT_FUNCTION_H

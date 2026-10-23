@@ -17,7 +17,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 /// \param forwards: if true, get callees; otherwise get callers.
 static std::set<irep_idt> get_neighbours(
   const call_grapht::directed_grapht &graph,
-  const irep_idt &function,
+  irep_idt function,
   bool forwards)
 {
   std::set<irep_idt> result;
@@ -28,14 +28,14 @@ static std::set<irep_idt> get_neighbours(
   return result;
 }
 
-std::set<irep_idt> get_callees(
-  const call_grapht::directed_grapht &graph, const irep_idt &function)
+std::set<irep_idt>
+get_callees(const call_grapht::directed_grapht &graph, irep_idt function)
 {
   return get_neighbours(graph, function, true);
 }
 
-std::set<irep_idt> get_callers(
-  const call_grapht::directed_grapht &graph, const irep_idt &function)
+std::set<irep_idt>
+get_callers(const call_grapht::directed_grapht &graph, irep_idt function)
 {
   return get_neighbours(graph, function, false);
 }
@@ -48,7 +48,7 @@ std::set<irep_idt> get_callers(
 ///   that can reach the given function.
 static std::set<irep_idt> get_connected_functions(
   const call_grapht::directed_grapht &graph,
-  const irep_idt &function,
+  irep_idt function,
   bool forwards)
 {
   std::vector<call_grapht::directed_grapht::node_indext> connected_nodes =
@@ -60,13 +60,15 @@ static std::set<irep_idt> get_connected_functions(
 }
 
 std::set<irep_idt> get_reachable_functions(
-  const call_grapht::directed_grapht &graph, const irep_idt &function)
+  const call_grapht::directed_grapht &graph,
+  irep_idt function)
 {
   return get_connected_functions(graph, function, true);
 }
 
 std::set<irep_idt> get_reaching_functions(
-  const call_grapht::directed_grapht &graph, const irep_idt &function)
+  const call_grapht::directed_grapht &graph,
+  irep_idt function)
 {
   return get_connected_functions(graph, function, false);
 }
@@ -90,7 +92,7 @@ std::set<irep_idt> get_functions_reachable_within_n_steps(
 
 std::set<irep_idt> get_functions_reachable_within_n_steps(
   const call_grapht::directed_grapht &graph,
-  const irep_idt &start_function,
+  irep_idt start_function,
   std::size_t n)
 {
   std::set<irep_idt> start_functions({start_function});
@@ -99,15 +101,15 @@ std::set<irep_idt> get_functions_reachable_within_n_steps(
 
 void disconnect_unreachable_functions(
   call_grapht::directed_grapht &graph,
-  const irep_idt &function)
+  irep_idt function)
 {
   graph.disconnect_unreachable(*(graph.get_node_index(function)));
 }
 
 std::list<irep_idt> get_shortest_function_path(
   const call_grapht::directed_grapht &graph,
-  const irep_idt &src,
-  const irep_idt &dest)
+  irep_idt src,
+  irep_idt dest)
 {
   std::list<irep_idt> result;
   std::list<std::size_t> path;

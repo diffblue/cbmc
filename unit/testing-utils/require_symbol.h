@@ -26,7 +26,7 @@ namespace require_symbol
 const symbolt &
 require_symbol_exists(
   const symbol_tablet &symbol_table,
-  const irep_idt &symbol_identifier);
+  irep_idt symbol_identifier);
 }
 
 #endif // CPROVER_TESTING_UTILS_REQUIRE_SYMBOL_H

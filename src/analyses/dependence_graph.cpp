@@ -50,7 +50,7 @@ bool dep_graph_domaint::merge(
 }
 
 void dep_graph_domaint::control_dependencies(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt::const_targett from,
   goto_programt::const_targett to,
   dependence_grapht &dep_graph)
@@ -153,7 +153,7 @@ static bool may_be_def_use_pair(
 
 void dep_graph_domaint::data_dependencies(
   goto_programt::const_targett,
-  const irep_idt &function_to,
+  irep_idt function_to,
   goto_programt::const_targett to,
   dependence_grapht &dep_graph,
   const namespacet &ns)
@@ -215,9 +215,9 @@ void dep_graph_domaint::data_dependencies(
 }
 
 void dep_graph_domaint::transform(
-  const irep_idt &function_from,
+  irep_idt function_from,
   trace_ptrt trace_from,
-  const irep_idt &function_to,
+  irep_idt function_to,
   trace_ptrt trace_to,
   ai_baset &ai,
   const namespacet &ns)
