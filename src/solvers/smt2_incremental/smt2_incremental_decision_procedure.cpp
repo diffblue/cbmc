@@ -6,7 +6,6 @@
 #include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
-#include <util/range.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/string_constant.h>
@@ -185,18 +184,23 @@ void send_function_definition(
 void smt2_incremental_decision_proceduret::define_dependent_functions(
   const exprt &expr)
 {
-  std::unordered_set<exprt, irep_hash> seen_expressions =
-    make_range(expression_identifiers)
-      .map([](const std::pair<exprt, smt_identifier_termt> &expr_identifier) {
-        return expr_identifier.first;
-      });
+  // A dependency needs defining only if it is not already defined (present in
+  // expression_identifiers) and has not already been queued by this traversal.
+  // Querying expression_identifiers directly avoids copying all of its keys
+  // into a fresh "seen" set on every call: convert_expr_to_smt -- and hence
+  // this function -- is invoked once per array element by
+  // initialize_array_elements, so rebuilding such a snapshot would make
+  // defining an N-element array O(N * |expression_identifiers|).
+  std::unordered_set<exprt, irep_hash> queued;
   std::stack<exprt> to_be_defined;
   const auto push_dependencies_needed = [&](const exprt &expr) {
     bool result = false;
     for(const auto &dependency : gather_dependent_expressions(expr))
     {
-      if(!seen_expressions.insert(dependency).second)
-        continue;
+      if(expression_identifiers.count(dependency) != 0)
+        continue; // already defined
+      if(!queued.insert(dependency).second)
+        continue; // already queued by this traversal
       result = true;
       to_be_defined.push(dependency);
     }
@@ -357,7 +361,6 @@ void smt2_incremental_decision_proceduret::ensure_handle_for_expr_defined(
 
   const exprt lowered_expr = lower(in_expr);
 
-  define_dependent_functions(lowered_expr);
   smt_define_function_commandt function{
     "B" + std::to_string(handle_sequence()),
     {},
@@ -414,6 +417,14 @@ smt_termt
 smt2_incremental_decision_proceduret::convert_expr_to_smt(const exprt &expr)
 {
   define_index_identifiers(expr);
+  // Canonical place to define (and then substitute out) any array/string/symbol
+  // dependencies, so that every conversion path has them defined -- including
+  // the internal, re-entrant calls made from define_index_identifiers above and
+  // from initialize_array_elements. The free ::convert_expr_to_smt overloads
+  // for array_exprt/array_of_exprt/string constants are UNHANDLED_CASE, so such
+  // nodes must be turned into function definitions and substituted before
+  // conversion (see issue #8080).
+  define_dependent_functions(expr);
   const exprt substituted = substitute_defined_padding(
     substitute_identifiers(expr, expression_identifiers));
   track_expression_objects(substituted, ns, object_map);
@@ -655,6 +666,9 @@ void smt2_incremental_decision_proceduret::set_to(
   const exprt lowered_expr = lower(in_expr);
   PRECONDITION(can_cast_type<bool_typet>(lowered_expr.type()));
 
+  // Retained in addition to convert_expr_to_smt's own call because the
+  // cached-handle branch below can return without ever reaching
+  // convert_expr_to_smt.
   define_dependent_functions(lowered_expr);
   auto converted_term = [&]() -> smt_termt {
     const auto expression_handle_identifier =
@@ -713,7 +727,6 @@ void smt2_incremental_decision_proceduret::define_object_properties()
       continue;
     else
       object_properties_defined[object.unique_id] = true;
-    define_dependent_functions(object.size);
     solver_process->send(object_size_function.make_definition(
       object.unique_id, convert_expr_to_smt(object.size)));
     solver_process->send(is_dynamic_object_function.make_definition(
