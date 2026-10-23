@@ -1,0 +1,12 @@
+CORE
+prune_loop.c
+--paths lifo --unwind 6
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Tests that branch pruning interacts correctly with loop unwinding.
+The loop counter is concrete after unrolling, so branch pruning should
+determine each iteration's guard.

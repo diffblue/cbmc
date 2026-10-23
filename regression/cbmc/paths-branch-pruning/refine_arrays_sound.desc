@@ -1,0 +1,13 @@
+CORE
+refine_arrays_sound.c
+--paths lifo --refine-arrays --arrays-uf-always --no-standard-checks
+^\[main\.assertion\.1\] .* a\[0\] is 42: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+With --refine-arrays, branch pruning must be disabled to avoid unsound
+results from the initial over-approximation. The assertion a[0]==42
+should fail because i may not be 0.
