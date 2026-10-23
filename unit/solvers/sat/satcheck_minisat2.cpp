@@ -82,6 +82,45 @@ SCENARIO("satcheck_minisat2", "[core][solvers][sat][satcheck_minisat2]")
         satcheck.prop_solve(assumptions) == propt::resultt::P_SATISFIABLE);
     }
   }
+
+  GIVEN("A simplifying solver with incremental simplification limited")
+  {
+    satcheck_minisat_simplifiert satcheck(message_handler);
+    satcheck.set_limit_incremental_simplification();
+
+    literalt a = satcheck.new_variable();
+    // freeze so the simplifier does not eliminate the variable we assume on
+    satcheck.set_frozen(a);
+    satcheck.l_set_to_true(a);
+
+    THEN("incremental solves remain correct after the first (simplifying) call")
+    {
+      // first solve runs the simplifier; subsequent solves run with the
+      // simplifier disabled (do_simp == false)
+      REQUIRE(satcheck.prop_solve() == propt::resultt::P_SATISFIABLE);
+      bvt assumptions;
+      assumptions.push_back(!a);
+      REQUIRE(
+        satcheck.prop_solve(assumptions) == propt::resultt::P_UNSATISFIABLE);
+      REQUIRE(satcheck.prop_solve() == propt::resultt::P_SATISFIABLE);
+    }
+  }
+
+  GIVEN("A non-simplifying solver")
+  {
+    satcheck_minisat_no_simplifiert satcheck(message_handler);
+
+    THEN("set_limit_incremental_simplification is a no-op and solving works")
+    {
+      // the propt default is a no-op for non-simplifying back-ends
+      propt &prop = satcheck;
+      prop.set_limit_incremental_simplification();
+
+      literalt f = satcheck.new_variable();
+      satcheck.l_set_to_true(f);
+      REQUIRE(satcheck.prop_solve() == propt::resultt::P_SATISFIABLE);
+    }
+  }
 }
 
 #endif
