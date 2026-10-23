@@ -1,0 +1,9 @@
+CORE
+rotate.c
+
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Tests rotate left and rotate right builtins via incremental SMT2.
