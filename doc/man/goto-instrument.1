@@ -856,7 +856,8 @@ empty the function pointer is removed using the standard
 .SS "Loop information and transformations:"
 .TP
 \fB\-\-show\-loops\fR
-show the loops in the program
+show the loops in the program, including hash\-based loop identifiers
+that are stable across unrelated code changes
 .TP
 \fB\-\-unwind\fR \fInr\fR
 unwind all loops \fInr\fR times
@@ -864,7 +865,9 @@ unwind all loops \fInr\fR times
 \fB\-\-unwindset\fR [\fIT\fR:]\fIL\fR:\fIB\fR,...
 unwind loop \fIL\fR with a bound of \fIB\fR
 (optionally restricted to thread \fIT\fR)
-(use \fB\-\-show\-loops\fR to get the loop IDs)
+(use \fB\-\-show\-loops\fR to get the loop IDs).
+\fIL\fR may be an ordinal loop ID (e.g., \fBmain.0\fR) or a hash\-based
+identifier (e.g., \fBmain.hash_706061793765627172\fR)
 .TP
 \fB\-\-unwindset\-file\fR \fIfile\fR
 read unwindset from file

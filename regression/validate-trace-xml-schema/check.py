@@ -81,6 +81,11 @@ ExcludedTests = list(map(lambda s: os.path.join(test_base_dir, s[0], s[1]), [
     ['unsigned1', 'test.desc'],
     ['reachability-slice-interproc3', 'test.desc'],
     ['sync_lock_release-1', 'symbol_per_type.desc'],
+    # uses --show-loops
+    ['loop-hash-nested', 'test.desc'],
+    ['loop-hash-stability', 'test.desc'],
+    ['loop-hash-stability', 'test_modified.desc'],
+    ['loop-hash-types', 'test.desc'],
     # this test is marked smt-backend, and would thus fail as we run tests with
     # the SAT back-end only
     ['integer-assignments1', 'test.desc'],

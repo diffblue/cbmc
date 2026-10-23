@@ -1,0 +1,7 @@
+CORE
+original.c shifted.c
+--chain chain.sh
+^EXIT=0$
+^SIGNAL=0$
+^STABLE: Hashes match$
+^[0-9]+$

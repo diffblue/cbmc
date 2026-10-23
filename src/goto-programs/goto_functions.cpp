@@ -61,6 +61,14 @@ void goto_functionst::compute_loop_numbers()
   }
 }
 
+void goto_functionst::compute_loop_hashes()
+{
+  for(auto &func : function_map)
+  {
+    func.second.body.compute_loop_hashes();
+  }
+}
+
 /// returns a vector of the iterators in alphabetical order
 std::vector<goto_functionst::function_mapt::const_iterator>
 goto_functionst::sorted() const
