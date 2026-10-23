@@ -22,8 +22,8 @@ function doit {
       echo "    <ClCompile Include=\"src\\${dir}\\${s}\"/>" >> $dest/$1.vcxproj
     done
   done
-  echo "    <ClCompile Include=\"minisat-2.2.1\\minisat\\core\\Solver.cc\"/>" >> $dest/$1.vcxproj
-  echo "    <ClCompile Include=\"minisat-2.2.1\\minisat\\simp\\SimpSolver.cc\"/>" >> $dest/$1.vcxproj
+  echo "    <ClCompile Include=\"3p\\minisat-2.2.1-patched\\minisat\\core\\Solver.cc\"/>" >> $dest/$1.vcxproj
+  echo "    <ClCompile Include=\"3p\\minisat-2.2.1-patched\\minisat\\simp\\SimpSolver.cc\"/>" >> $dest/$1.vcxproj
   echo "  </ItemGroup>" >> $dest/$1.vcxproj
 
   cat vcxproj.2 >> $dest/$1.vcxproj
@@ -42,8 +42,8 @@ function doit {
       echo "    <ClCompile Include=\"src\\${dir}\\${s}\"><Filter>${dir}</Filter></ClCompile>" >> $dest/$1.vcxproj.filters
     done
   done
-  echo "    <ClCompile Include=\"minisat-2.2.1\\minisat\\core\\Solver.cc\"><Filter>minisat2</Filter></ClCompile>" >> $dest/$1.vcxproj.filters
-  echo "    <ClCompile Include=\"minisat-2.2.1\\minisat\\simp\\SimpSolver.cc\"><Filter>minisat2</Filter></ClCompile>" >> $dest/$1.vcxproj.filters
+  echo "    <ClCompile Include=\"3p\\minisat-2.2.1-patched\\minisat\\core\\Solver.cc\"><Filter>minisat2</Filter></ClCompile>" >> $dest/$1.vcxproj.filters
+  echo "    <ClCompile Include=\"3p\\minisat-2.2.1-patched\\minisat\\simp\\SimpSolver.cc\"><Filter>minisat2</Filter></ClCompile>" >> $dest/$1.vcxproj.filters
   echo "  </ItemGroup>" >> $dest/$1.vcxproj.filters
 
   for dir in $dirs minisat2 ; do
