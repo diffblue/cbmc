@@ -10,7 +10,9 @@ tests.log: ../test.pl
 
 else
 ifeq ($(BUILD_ENV_),OSX)
-  not_gnu_ld = -X gnu-ld-only
+  # On macOS goto-gcc wraps clang, which does not support gcc-only compiler
+  # flags (e.g. -fsingle-precision-constant), so exclude gcc-only tests too.
+  not_gnu_ld = -X gnu-ld-only -X gcc-only
 endif
 test: ../../src/goto-cc/goto-gcc
 	@PATH=../../../scripts:$$PATH \
