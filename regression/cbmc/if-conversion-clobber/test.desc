@@ -1,0 +1,13 @@
+CORE
+main.c
+--paths lifo
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+If-conversion must snapshot the branch condition before linearising a region,
+so that a guarded assignment does not re-read a variable that an earlier
+assignment in the same region has clobbered. Without the snapshot this test
+reports a spurious VERIFICATION FAILED under --paths.
