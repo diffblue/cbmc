@@ -1,0 +1,13 @@
+CORE
+main.c
+final-link
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+is called but has no linked body
+--
+A bodiless external call (ext_only) with no __CPROVER_file_local_..._ext_only
+twin must not produce the file-local-stub warning, even though the program does contain
+a file-local body (local_helper).  This locks in that the warning is specific
+to file-local-shadowed symbols rather than every bodiless call.

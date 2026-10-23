@@ -1,0 +1,14 @@
+CORE
+main.c
+final-link
+^EXIT=0$
+^SIGNAL=0$
+symbol '_recv' is called but has no linked body, while a file-local definition exists as '__CPROVER_file_local_impl_c__recv'
+--
+^warning: ignoring
+--
+A `static` function (_recv) is defined in one translation unit but called via
+an unmangled `extern` declaration in another.  With --export-file-local-symbols
+its body lives under __CPROVER_file_local_impl_c__recv, so the unmangled call
+has no body and becomes a nondet-return stub.  goto-cc warns about this
+failure mode at executable link time.
