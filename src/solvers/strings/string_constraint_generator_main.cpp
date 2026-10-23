@@ -300,6 +300,39 @@ string_constraint_generatort::add_axioms_for_function_application(
   UNREACHABLE;
 }
 
+/// Add axioms enforcing that the second string argument is a suffix of
+/// the first (or vice versa, depending on `swap_arguments`).
+///
+/// The suffix matches iff it occurs as a prefix of `str` starting at
+/// index `|str| - |suffix|`; this is encoded via
+/// `add_axioms_for_is_prefix(suffix, str, |str| - |suffix|)`. Reusing
+/// the prefix encoding here keeps the suffix axioms consistent with
+/// the well-tested prefix path; the deprecation notice on the previous
+/// `add_axioms_for_is_suffix` recommended exactly this rewrite.
+/// \param f: function application with two string arguments
+/// \param swap_arguments: if true, args[0] is the string and args[1] is
+///   the suffix; otherwise args[0] is the suffix and args[1] is the
+///   string
+/// \return boolean expression indicating whether the suffix matches
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_is_suffix(
+  const function_application_exprt &f,
+  bool swap_arguments)
+{
+  const auto &args = f.arguments();
+  PRECONDITION(args.size() == 2);
+  PRECONDITION(f.type() == bool_typet() || f.type().id() == ID_c_bool);
+  const array_string_exprt &suffix =
+    get_string_expr(array_pool, args[swap_arguments ? 1 : 0]);
+  const array_string_exprt &str =
+    get_string_expr(array_pool, args[swap_arguments ? 0 : 1]);
+  const exprt offset = minus_exprt(
+    array_pool.get_or_create_length(str),
+    array_pool.get_or_create_length(suffix));
+  auto pair = add_axioms_for_is_prefix(suffix, str, offset);
+  return {typecast_exprt(pair.first, f.type()), std::move(pair.second)};
+}
+
 /// add axioms to say that the returned string expression is equal to the
 /// argument of the function application
 /// \deprecated should use substring instead
