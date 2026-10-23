@@ -4,6 +4,11 @@ main.c
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
+// Marked THOROUGH because this test is slow on macOS and Windows. Per-PR CI
+// (PR #8869) measured 64-72s on macOS-14 (ARM) and up to 22s on macOS-15
+// (Intel), and 85s (VS-2022) / 136s (VS-2026) on Windows, versus 4-8s on
+// Linux. An earlier estimate of 4-7s held only on Linux. See PR #8868 for the
+// full investigation.
 --
 --
 Checks that assigns clause checking explicitly checks assignments to locally
