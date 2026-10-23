@@ -15331,3 +15331,58 @@ fails.  ~locale drops a reference count to zero and deletes a ctype<char>
 facet through a garbage locale pointer, after std::swap of
 ios_base::_Ploc in basic_ofstream's move constructor through a virtual
 base.  Hand-written reproducers of the virtual-base swap pass; not reduced.
+
+## Round 199
+
+- KNOWNBUG cpp11_ofstream_from_string_msvc_stl (7d58553256): the CI
+  artifact with memdefs, --unwind 10; 9 GB and 370 s when run fully, 21 s
+  under CI's 2.5 GB limit (out of memory, counted as the known failure).
+  With --unwind 5 the strlen of "out.txt" is cut and main is unreachable.
+  cvise (/tmp/r199/cv, gate: `pointer invalid' of ~locale's _Decref with a
+  trace through std::ios_base::swap, --slice-formula, 22 s per check)
+  reduced it from 2.2 MB to 31 KB so far.
+- C preprocessing (01377b3ffe): data-model options (-m64, -m32, -mabi=)
+  only for gcc of the target's family, probed from `gcc's predefined
+  macros; for another family the family's macros are undefined
+  (`__aarch64__' selects stdio.c's AArch64 va_list).  Checked with
+  aarch64-linux-gnu-gcc as `gcc': the six --winx64 tests pass; the
+  x86-preprocessing tag is gone.
+- Conditional temporaries (8917a213fa): the destructors of a branch's
+  temporaries ran on every path ([class.temporary]/4); found through the
+  __std_exception_destroy model (a never-constructed bad_cast was
+  destroyed).
+- Models: __std_exception_copy/_destroy, __std_fs_code_page, libc++
+  ctype<char>::do_widen/do_narrow.
+- Constant evaluation: writes through references/pointers to subobjects
+  (range-for, [stmt.ranged]/1); a deferred constexpr member is instantiated
+  when a constant expression calls it ([temp.inst]/5); a comma's constant
+  left operand is discarded ([expr.comma]/1).  libstdc++'s
+  __from_chars_alnum_to_val_table<false>::value is now a constant.
+- That made unit-proofs/string2optional non-vacuous: 10 GB, 270 s, all
+  assertions hold; it was 156 symex steps (main unreachable) before.
+  THOROUGH now.
+- Vacuity CI step (scripts/check_vacuity.py, check-ubuntu-24_04-cmake-gcc):
+  CORE tests expecting VERIFICATION SUCCESSFUL or EXIT=0; 1141 of cbmc-cpp
+  and systemc reach the end of main.  Seven more tests were vacuous (looser
+  expectations), fixed; four iostream conversion checks tagged
+  no-vacuity-check with the reason.  C tests unreached (not in the CI step,
+  upstream): cbmc/String_Abstraction16, coverage_report2, gcc_c99-bool-1,
+  self_loops_to_assumptions1, cbmc-library/abort.
+
+Rebase onto origin/develop 8fcda33365 (the branch had three develop
+merges).  Done in four passes (/tmp/r199/seg_rebase.py), each replaying the
+already-rebased commits plus the next segment onto the develop commit of
+the next original merge, resolving each conflict from that merge's tree
+(verbatim side, develop-only renames, line- or word-disjoint changes, both
+additions kept; two recorded resolutions, one override), so that each
+pass's tip could be compared with the original merge.  Results: pass 1
+identical to merge 1; passes 2-4 identical to merges 2, 3 and a fresh
+merge of the branch with develop, except one CI step that merge 2 had
+dropped by mistake (windows-msi-package's `Save ccache', present in
+develop) and which the rebase keeps.  Two commits became empty (develop
+#9024 made the same gcc 16 fixes) and were dropped.  The 3233 remaining
+commits keep author, date, message and order; 32 have adapted patches
+(develop's symbol_exprt::identifier(), quote_begin/end, string_view, CI
+packages).  Builds of 40 commits (the adapted ones and the segment
+boundaries) succeed, except five early ones and one library_check, which
+fail identically in the original history.

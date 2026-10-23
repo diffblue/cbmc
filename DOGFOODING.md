@@ -2157,3 +2157,8 @@ use-after-free on macOS, aarch64 preprocessing, a 32-bit byte-extract
 bound), a vacuity check over the cbmc-cpp suite and the CI artifacts, and
 the initializer_list backing-array fix it led to; see
 .kiro/decltype_tuple_apply_findings.md, "Round 198".
+
+## Round 199 2026-10-23
+
+No dog-food change.  The branch is rebased onto origin/develop; see
+.kiro/decltype_tuple_apply_findings.md, "Round 199".
