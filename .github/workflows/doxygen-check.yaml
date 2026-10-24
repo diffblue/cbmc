@@ -6,6 +6,7 @@ on:
 jobs:
   # This job takes approximately 2 minutes
   check-doxygen:
+    if: false  # TEMPORARY: Windows CI investigation
     # Note that the versions used for this `check-doxygen` job should be kept in
     # sync with the `publish` job.
     runs-on: ubuntu-latest

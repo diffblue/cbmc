@@ -12,6 +12,7 @@ env:
 jobs:
   # This job takes approximately 22 to 75 minutes
   Linux:
+    if: false  # TEMPORARY: Windows CI investigation
     runs-on: ubuntu-24.04
     steps:
       - name: Clone repository
