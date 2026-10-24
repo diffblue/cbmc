@@ -29,6 +29,13 @@ function Run-Cbmc($Dir, $Arguments, $File) {
   Pop-Location
 }
 
+# standard output only (a preprocessed source)
+function Run-Cbmc-Stdout($Dir, $Arguments, $File) {
+  Push-Location $Dir
+  & $Cbmc @Arguments 2>$null | Out-File -Encoding utf8 $File
+  Pop-Location
+}
+
 function Collect($Test, $Desc, $ExtraFlags) {
   $dir = Join-Path $root "regression\cbmc-cpp\$Test"
   $lines = Get-Content (Join-Path $dir $Desc)
@@ -37,7 +44,7 @@ function Collect($Test, $Desc, $ExtraFlags) {
   $out = Join-Path $OutDir "$Test-$Desc"
   New-Item -ItemType Directory -Force -Path (Join-Path $out "library") | Out-Null
   Copy-Item (Join-Path $dir $Desc) $out
-  Run-Cbmc $dir ($flags + @("--preprocess", $src)) (Join-Path $out "main.ii")
+  Run-Cbmc-Stdout $dir ($flags + @("--preprocess", $src)) (Join-Path $out "main.ii")
   $env:CBMC_DUMP_PREPROCESSED_DIR = Join-Path $out "library"
   Run-Cbmc $dir ($flags + $ExtraFlags + @("--verbosity", "9", "--trace", $src)) `
     (Join-Path $out "run.txt")
@@ -46,54 +53,10 @@ function Collect($Test, $Desc, $ExtraFlags) {
   Run-Cbmc $dir ($flags + @("--show-symbol-table", $src)) (Join-Path $out "symbols.txt")
 }
 
-# memcpy source region readable: FAILURE in _Impl_copy_memmeow_tail
+# memcpy source region readable: FAILURE in _Impl_copy_memmeow_tail (fixed?)
 Collect "cpp11_vector_probe" "test.desc" @()
-Collect "cpp20_erase_if" "test.desc" @()
-# invariant: fgetc type inconsistency (goto_program.cpp, __msvc_filebuf.hpp)
-Collect "cpp11_out_of_line_defaulted_member_of_class_template" "test_libstdcxx.desc" @()
-# parse error before 'alignas ( _Loop_vals_v3_t <' in <regex>
-Collect "cpp11_default_member_initializer_array_of_class_from_nested_braces" "test_libstdcxx.desc" @()
-
-# Probes of the C library models (memcpy's preconditions; fgetc's type)
-$probes = Join-Path $OutDir "probes"
-New-Item -ItemType Directory -Force -Path (Join-Path $probes "library") | Out-Null
-@'
-#include <string.h>
-int main()
-{
-  char a[4] = {1, 2, 3, 4};
-  char b[4];
-  memcpy(b, a, 4);
-  __CPROVER_assert(b[3] == 4, "copied");
-  __CPROVER_assert(b[3] == 5, "WRONG (must FAIL)");
-  return 0;
-}
-'@ | Set-Content (Join-Path $probes "memcpy.c")
-@'
-#include <stdio.h>
-int main()
-{
-  int c = fgetc(stdin);
-  __CPROVER_assert(c >= -1, "fgetc");
-  return 0;
-}
-'@ | Set-Content (Join-Path $probes "fgetc.c")
-@'
-#include <cstring>
-int main()
-{
-  char a[4] = {1, 2, 3, 4};
-  char b[4];
-  std::memcpy(b, a, 4);
-  __CPROVER_assert(b[3] == 4, "copied");
-  return 0;
-}
-'@ | Set-Content (Join-Path $probes "memcpy.cpp")
-$env:CBMC_DUMP_PREPROCESSED_DIR = Join-Path $probes "library"
-foreach ($p in @("memcpy.c", "fgetc.c", "memcpy.cpp")) {
-  Run-Cbmc $probes @("--pointer-check", "--verbosity", "9", "--trace", $p) `
-    (Join-Path $probes "$p.run.txt")
-  Run-Cbmc $probes @("--show-goto-functions", $p) (Join-Path $probes "$p.goto.txt")
-}
-Remove-Item Env:\CBMC_DUMP_PREPROCESSED_DIR
+# invariant: fgetc type inconsistency (goto_program.cpp, __msvc_filebuf.hpp),
+# only with --validate-goto-model (as in CI)
+Collect "cpp11_out_of_line_defaulted_member_of_class_template" "test_libstdcxx.desc" `
+  @("--validate-goto-model")
 exit 0
