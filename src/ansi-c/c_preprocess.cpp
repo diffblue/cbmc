@@ -321,8 +321,10 @@ bool c_preprocess_visual_studio(
     // N5008 [cpp.predefined]/1: __cplusplus identifies the standard (each
     // revision's own value, 202302L for C++23); cl reports 199711L for every
     // standard unless asked, so `#if __cplusplus >= 201103L' was false for
-    // --cpp11 on Windows only
-    command_file << "/Zc:__cplusplus" << '\n';
+    // --cpp11 on Windows only.  cl has no C++98/03 mode: for those, its
+    // default 199711L is the right value.
+    if(config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP11)
+      command_file << "/Zc:__cplusplus" << '\n';
 
     command_file << "/D__CPROVER__" << "\n";
     command_file << "/D__WORDSIZE=" << config.ansi_c.pointer_width << "\n";
