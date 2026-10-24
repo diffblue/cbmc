@@ -20,7 +20,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "gcc_version.h"
 
 #include <algorithm>
+#include <cstdlib>
 #include <fstream>
+#include <sstream>
 
 static void error_parse_line(
   const std::string &line,
@@ -173,6 +175,26 @@ bool c_preprocess(
   tmp << instream.rdbuf(); // copy
 
   tmp.close(); // flush
+
+  // TEMPORARY DEBUG (Windows CI investigation): with
+  // CBMC_DUMP_PREPROCESSED_DIR set, save the input and the output of the
+  // preprocessing of a text (the C library models) to that directory
+  if(const char *dir = std::getenv("CBMC_DUMP_PREPROCESSED_DIR"))
+  {
+    static unsigned counter = 0;
+    const std::string base =
+      std::string{dir} + "/pp" + std::to_string(counter++);
+    {
+      std::ifstream in(tmp_file());
+      std::ofstream copy(base + ".in.c");
+      copy << in.rdbuf();
+    }
+    std::ostringstream preprocessed;
+    bool result = c_preprocess(tmp_file(), preprocessed, message_handler);
+    std::ofstream(base + ".out.c") << preprocessed.str();
+    outstream << preprocessed.str();
+    return result;
+  }
 
   bool result=c_preprocess(tmp_file(), outstream, message_handler);
 
