@@ -4286,6 +4286,24 @@ void c_typecheck_baset::typecheck_expr_binary_arithmetic(exprt &expr)
   throw 0;
 }
 
+/// Turn a right shift of a vector into a logical or an arithmetic shift,
+/// depending on the vector's element type, as is done for scalar shifts.
+/// remove_vector and the back-ends only support ID_lshr and ID_ashr.
+/// \param [in,out] expr: shift whose first operand has vector type; left
+///   unchanged unless it is an ID_shr with integer elements
+static void resolve_vector_shr(shift_exprt &expr)
+{
+  if(expr.id() != ID_shr)
+    return;
+
+  const typet &element_type = to_vector_type(expr.op0().type()).element_type();
+
+  if(element_type.id() == ID_unsignedbv)
+    expr.id(ID_lshr);
+  else if(element_type.id() == ID_signedbv)
+    expr.id(ID_ashr);
+}
+
 void c_typecheck_baset::typecheck_expr_shifts(shift_exprt &expr)
 {
   PRECONDITION(expr.id() == ID_shl || expr.id() == ID_shr);
@@ -4308,6 +4326,7 @@ void c_typecheck_baset::typecheck_expr_shifts(shift_exprt &expr)
       // {a0 >> b0, a1 >> b1, ..., an >> bn}
       // Fairly strict typing rules, no promotion
       expr.type()=op0.type();
+      resolve_vector_shr(expr);
       return;
     }
   }
@@ -4319,6 +4338,7 @@ void c_typecheck_baset::typecheck_expr_shifts(shift_exprt &expr)
     // {a0, a1, ..., an} >> b == {a0 >> b, a1 >> b, ..., an >> b}
     op1 = typecast_exprt(op1, o_type0);
     expr.type()=op0.type();
+    resolve_vector_shr(expr);
     return;
   }
 

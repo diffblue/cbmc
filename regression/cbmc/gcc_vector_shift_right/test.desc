@@ -1,0 +1,12 @@
+CORE gcc-only
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Right shifts of vectors must be logical shifts for unsigned elements and
+arithmetic shifts for signed elements, without any part of the result being
+ignored by the back-end.
