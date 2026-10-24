@@ -6,6 +6,7 @@ on:
 jobs:
   # This job takes approximately 1 minute
   check-clang-format:
+    if: false  # TEMPORARY: Windows CI investigation
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -28,6 +29,7 @@ jobs:
 
   # This job takes approximately 1 minute
   check-cpplint:
+    if: false  # TEMPORARY: Windows CI investigation
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -50,6 +52,7 @@ jobs:
 
   # This job should take about a minute (est)
   check-rustfmt:
+    if: false  # TEMPORARY: Windows CI investigation
     runs-on: ubuntu-latest
     steps:
       - name: Checkout CBMC repository 

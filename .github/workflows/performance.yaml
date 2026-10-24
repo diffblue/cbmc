@@ -8,6 +8,7 @@ on:
 
 jobs:
   perf-benchcomp:
+    if: false  # TEMPORARY: Windows CI investigation
     runs-on: ubuntu-24.04
     steps:
       - name: Save push event HEAD and HEAD~ to environment variables

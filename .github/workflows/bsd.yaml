@@ -8,6 +8,7 @@ on:
 jobs:
   # This job takes approximately 6 to 26 minutes
   FreeBSD:
+    if: false  # TEMPORARY: Windows CI investigation
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -79,6 +80,7 @@ jobs:
           key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 7 to 34 minutes
   OpenBSD:
+    if: false  # TEMPORARY: Windows CI investigation
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -147,6 +149,7 @@ jobs:
           key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 6 to 29 minutes
   NetBSD:
+    if: false  # TEMPORARY: Windows CI investigation
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7

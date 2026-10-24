@@ -25,6 +25,7 @@ env:
 jobs:
   # This job takes approximately 15 to 40 minutes
   check-ubuntu-24_04-make-gcc:
+    if: false  # TEMPORARY: Windows CI investigation
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
@@ -111,6 +112,7 @@ jobs:
           key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 25 to 34 minutes
   check-ubuntu-24_04-make-clang:
+    if: false  # TEMPORARY: Windows CI investigation
     runs-on: ubuntu-24.04
     env:
       CC: "ccache /usr/bin/clang"
@@ -189,6 +191,7 @@ jobs:
   # jobs increases the job runtime to unacceptable levels (over 2hrs).
   # This job takes approximately 3 to 18 minutes
   check-ubuntu-24_04-make-clang-smt-z3:
+    if: false  # TEMPORARY: Windows CI investigation
     runs-on: ubuntu-24.04
     env:
       CC: "ccache /usr/bin/clang"
@@ -237,6 +240,7 @@ jobs:
           key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 17 to 42 minutes
   check-ubuntu-24_04-cmake-gcc:
+    if: false  # TEMPORARY: Windows CI investigation
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
@@ -322,6 +326,7 @@ jobs:
           key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 20 to 38 minutes
   check-ubuntu-22_04-make-clang:
+    if: false  # TEMPORARY: Windows CI investigation
     runs-on: ubuntu-22.04
     env:
       CC: "ccache /usr/bin/clang"
@@ -398,6 +403,7 @@ jobs:
           key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 17 to 41 minutes
   check-ubuntu-22_04-cmake-gcc:
+    if: false  # TEMPORARY: Windows CI investigation
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v7
@@ -456,6 +462,7 @@ jobs:
           key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 14 to 46 minutes
   check-ubuntu-24_04-cmake-gcc-14:
+    if: false  # TEMPORARY: Windows CI investigation
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
@@ -518,6 +525,7 @@ jobs:
   # whole C++ corpus is type-checked against the newest headers.  Sequenced
   # after check-ubuntu-24_04-cmake-gcc-14 to share its ccache.
   check-ubuntu-24_04-cmake-gcc-16-cbmc-cpp:
+    if: false  # TEMPORARY: Windows CI investigation
     runs-on: ubuntu-24.04
     needs: check-ubuntu-24_04-cmake-gcc-14
     steps:
@@ -578,6 +586,7 @@ jobs:
       # check-ubuntu-24_04-cmake-gcc-14, which this job depends on.
   # This job takes approximately 17 to 41 minutes
   check-ubuntu-24_04-arm-cmake-gcc:
+    if: false  # TEMPORARY: Windows CI investigation
     runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v7
@@ -636,6 +645,7 @@ jobs:
           key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 14 to 60 minutes
   check-ubuntu-22_04-cmake-gcc-32bit:
+    if: false  # TEMPORARY: Windows CI investigation
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v7
@@ -687,6 +697,7 @@ jobs:
           key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 2 to 24 minutes
   check-ubuntu-24_04-cmake-gcc-KNOWNBUG:
+    if: false  # TEMPORARY: Windows CI investigation
     runs-on: ubuntu-24.04
     # Sequenced after check-ubuntu-24_04-cmake-gcc so that this job benefits
     # from the matching ccache produced in the same workflow run. The cmake
@@ -740,6 +751,7 @@ jobs:
       # check-ubuntu-24_04-cmake-gcc, which this job depends on.
   # This job takes approximately 7 to 30 minutes
   check-ubuntu-24_04-cmake-gcc-THOROUGH:
+    if: false  # TEMPORARY: Windows CI investigation
     runs-on: ubuntu-24.04
     # Sequenced after check-ubuntu-24_04-cmake-gcc so that this job benefits
     # from the matching ccache produced in the same workflow run. The cmake
@@ -785,6 +797,7 @@ jobs:
       # check-ubuntu-24_04-cmake-gcc, which this job depends on.
   # This job takes approximately 39 to 69 minutes
   check-macos-15-intel-make-clang:
+    if: false  # TEMPORARY: Windows CI investigation
     runs-on: macos-15-intel
     steps:
       - uses: actions/checkout@v7
@@ -857,6 +870,7 @@ jobs:
           key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 36 to 85 minutes
   check-macos-14-cmake-clang:
+    if: false  # TEMPORARY: Windows CI investigation
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v7
@@ -1008,10 +1022,22 @@ jobs:
         run: clcache -s
       - uses: ilammy/msvc-dev-cmd@v1
       - name: Run tests
+        # TEMPORARY: Windows CI investigation -- only the cbmc-cpp tests
         run: |
           Set-Location build
           $env:CBMC_TEST_MEMLIMIT = "3000000"
-          ctest -V -L CORE -C Release . -j${{env.windows-vcpus}} --timeout 600
+          ctest -V -L CORE -R "^cbmc-cpp-" -C Release . -j${{env.windows-vcpus}} --timeout 600
+      - name: Collect Windows debugging information
+        # TEMPORARY: Windows CI investigation (scripts/windows_debug.ps1)
+        if: always()
+        run: pwsh -ExecutionPolicy Bypass -File scripts/windows_debug.ps1 build\bin\Release\cbmc.exe windows-debug
+      - name: Upload Windows debugging information
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-debug
+          path: windows-debug/
+          retention-days: 7
       - name: Preprocess the failing cbmc-cpp tests for debugging
         if: always()
         # the failed tests and env.cpp-preprocess-tests
@@ -1032,6 +1058,7 @@ jobs:
           key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 65 to 84 minutes
   check-vs-2022-make-build-and-test:
+    if: false  # TEMPORARY: Windows CI investigation
     runs-on: windows-2022
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -1171,6 +1198,7 @@ jobs:
           key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 7 to 32 minutes
   windows-msi-package:
+    if: false  # TEMPORARY: Windows CI investigation
     runs-on: windows-2025
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -1261,6 +1289,7 @@ jobs:
 
   # This job takes approximately 10 to 15 minutes
   check-dogfood-goto-cc:
+    if: false  # TEMPORARY: Windows CI investigation
     # Compile a curated sample of CBMC's own .cpp files with
     # goto-cc itself ("dog-fooding"): the baseline is expected to
     # produce clean goto binaries.  New entries are added to the
@@ -1313,6 +1342,7 @@ jobs:
 
   # This job takes approximately 2 to 3 minutes
   check-string-table:
+    if: false  # TEMPORARY: Windows CI investigation
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -1321,6 +1351,7 @@ jobs:
 
   # This job takes approximately 23 to 29 minutes
   check-docker-image:
+    if: false  # TEMPORARY: Windows CI investigation
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -1372,6 +1403,7 @@ jobs:
 
   # This job takes approximately 22 to 41 minutes
   include-what-you-use:
+    if: false  # TEMPORARY: Windows CI investigation
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
