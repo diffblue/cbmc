@@ -1,6 +1,6 @@
 CORE
 main.cpp
---cpp17 --64
+--cpp17 --LP64
 ^\[main\.assertion\.1\] line \d+ guide forced Box<long>: value not truncated: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$

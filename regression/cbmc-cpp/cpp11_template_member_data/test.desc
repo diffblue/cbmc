@@ -1,6 +1,6 @@
 CORE
 main.cpp
---cpp11 --64
+--cpp11 --LP64
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main\.assertion\.1\].*deep-template member exchange prev: SUCCESS$
