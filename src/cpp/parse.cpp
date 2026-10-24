@@ -294,6 +294,7 @@ protected:
   bool optStorageSpec(cpp_storage_spect &);
   bool optCvQualify(typet &);
   bool optAlignas(typet &);
+  bool optAlignasOne(typet &);
   bool rGCCAttribute(typet &);
   bool optAttribute(typet &);
   bool optIntegralTypeOrClassSpec(typet &);
@@ -3566,6 +3567,40 @@ bool Parser::optCvQualify(typet &cv)
   C++11 [dcl.align] (A.6)
 */
 bool Parser::optAlignas(typet &cv)
+{
+  // N5008 [dcl.attr.grammar]/1: an attribute-specifier-seq is a sequence of
+  // attribute-specifiers, each of which may be an alignment-specifier; and
+  // [dcl.align]/4: the strictest of them applies (`alignas(A) alignas(B)
+  // unsigned char _Stackbuf[4096];' in the MSVC STL's <regex>)
+  if(lex.LookAhead(0) != TOK_ALIGNAS)
+    return true;
+  typet combined;
+  combined.make_nil();
+  while(lex.LookAhead(0) == TOK_ALIGNAS)
+  {
+    typet one;
+    one.make_nil();
+    if(!optAlignasOne(one) || one.id() != ID_aligned)
+      return false;
+    if(combined.is_nil())
+      combined = std::move(one);
+    else
+    {
+      // the larger of the two alignments
+      const exprt &a = static_cast<const exprt &>(combined.find(ID_size));
+      const exprt &b = static_cast<const exprt &>(one.find(ID_size));
+      exprt greater{ID_gt};
+      greater.add_to_operands(exprt{a}, exprt{b});
+      exprt larger{ID_if};
+      larger.add_to_operands(std::move(greater), exprt{a}, exprt{b});
+      combined.add(ID_size) = std::move(larger);
+    }
+  }
+  merge_types(combined, cv);
+  return true;
+}
+
+bool Parser::optAlignasOne(typet &cv)
 {
   if(lex.LookAhead(0)!=TOK_ALIGNAS)
     return true;
