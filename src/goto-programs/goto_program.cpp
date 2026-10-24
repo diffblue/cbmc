@@ -864,7 +864,11 @@ void goto_programt::instructiont::validate(
             symbol_expr_type_matches_symbol_table,
             id2string(goto_id) + " type inconsistency\n" +
               "goto program type: " + goto_symbol_expr.type().id_string() +
-              "\n" + "symbol table type: " + table_symbol->type.id_string(),
+              "\n" + "symbol table type: " + table_symbol->type.id_string() +
+              // TEMPORARY DEBUG (Windows CI investigation)
+              "\ngoto program type in full:\n" +
+              goto_symbol_expr.type().pretty() +
+              "\nsymbol table type in full:\n" + table_symbol->type.pretty(),
             current_source_location);
         }
       }
