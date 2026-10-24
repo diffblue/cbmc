@@ -1,0 +1,11 @@
+CORE gcc-only
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+A cast from a vector to a scalar of the same size must be a bit-wise
+reinterpretation of the vector, without the back-end ignoring it.
