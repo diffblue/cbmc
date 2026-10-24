@@ -78,11 +78,17 @@ bool cpp_parsert::parse()
     // identifiers followed by '(' (checked: gcc-13 libstdc++, llvm-18
     // libc++ -- all occurrences are builtin USES; longer names such as
     // __add_rvalue_reference_helper are unaffected by the scanner's
-    // trailing-context rule).  Enable them for GCC and CLANG
-    // preprocessor flavors alike.
+    // trailing-context rule).  Enable them for the GCC, CLANG and
+    // VISUAL_STUDIO preprocessor flavors alike: the MSVC STL uses the same
+    // reserved names only as builtins, too, and a test using the builtins
+    // directly is the same program on every host (the Windows default,
+    // VISUAL_STUDIO, made `__is_function(void())' a parse error there and
+    // only there).
     token_buffer.ansi_c_parser.gcc14_builtins =
       config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::GCC ||
-      config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::CLANG;
+      config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::CLANG ||
+      config.ansi_c.preprocessor ==
+        configt::ansi_ct::preprocessort::VISUAL_STUDIO;
   }
   token_buffer.ansi_c_parser.in = in;
   token_buffer.ansi_c_parser.mode = mode;
