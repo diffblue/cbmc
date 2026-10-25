@@ -1,4 +1,4 @@
-CORE
+CORE broken-msvc-stl
 main.cpp
 --cpp11 --object-bits 12 --unwind 10 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ ofstream from string converts: SUCCESS$
@@ -16,3 +16,5 @@ Round 163h: --unwind 10 (was 5).  With basic_streambuf's out-of-line
 defaulted copy constructor no longer dropped, the stream set-up runs
 further, and --unwind 5 cut every path short (a WRONG assertion added to
 the same program passed vacuously).
+broken-msvc-stl: with the MSVC STL the SAT solver runs out of memory (CI
+run 40172972722); see KNOWNBUG cpp11_ofstream_from_string_msvc_stl.
