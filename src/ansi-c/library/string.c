@@ -676,21 +676,22 @@ __CPROVER_HIDE:;
       ((const unsigned char *)src >= (const unsigned char *)dst + n) ||
       ((const unsigned char *)dst >= (const unsigned char *)src + n),
     "memcpy src/dst overlap");
-#  ifdef _MSC_VER
   // The Microsoft runtime's memcpy accepts a null pointer with a zero length,
   // as C2y does (N3322), and the MSVC STL relies on it: copying an empty
   // vector calls memcpy(dest, nullptr, 0) (_Impl_copy_memmeow_tail).  C17
   // 7.24.1/2 leaves the call undefined, which the other runtimes keep.
-  __CPROVER_precondition(
-    n == 0 || __CPROVER_r_ok(src, n), "memcpy source region readable");
-  __CPROVER_precondition(
-    n == 0 || __CPROVER_w_ok(dst, n), "memcpy destination region writeable");
+#  ifdef _MSC_VER
+#    define __CPROVER_MEMCPY_EMPTY_OK (n == 0)
 #  else
-  __CPROVER_precondition(
-    __CPROVER_r_ok(src, n), "memcpy source region readable");
-  __CPROVER_precondition(
-    __CPROVER_w_ok(dst, n), "memcpy destination region writeable");
+#    define __CPROVER_MEMCPY_EMPTY_OK 0
 #  endif
+  __CPROVER_precondition(
+    __CPROVER_MEMCPY_EMPTY_OK || __CPROVER_r_ok(src, n),
+    "memcpy source region readable");
+  __CPROVER_precondition(
+    __CPROVER_MEMCPY_EMPTY_OK || __CPROVER_w_ok(dst, n),
+    "memcpy destination region writeable");
+#  undef __CPROVER_MEMCPY_EMPTY_OK
 
   if(n > 0)
   {
@@ -924,32 +925,33 @@ __CPROVER_HIDE:;
 
 void *memmove(void *dest, const void *src, size_t n)
 {
-  __CPROVER_HIDE:;
-  #ifdef __CPROVER_STRING_ABSTRACTION
-  __CPROVER_precondition(__CPROVER_buffer_size(src)>=n,
-                         "memmove buffer overflow");
+__CPROVER_HIDE:;
+#ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_precondition(
+    __CPROVER_buffer_size(src) >= n, "memmove buffer overflow");
   // dst = src (with overlap allowed)
-  if(__CPROVER_is_zero_string(src) &&
-     n > __CPROVER_zero_string_length(src))
+  if(__CPROVER_is_zero_string(src) && n > __CPROVER_zero_string_length(src))
   {
-    __CPROVER_is_zero_string(src)=1;
-    __CPROVER_zero_string_length(dest)=__CPROVER_zero_string_length(src);
+    __CPROVER_is_zero_string(src) = 1;
+    __CPROVER_zero_string_length(dest) = __CPROVER_zero_string_length(src);
   }
   else
-    __CPROVER_is_zero_string(dest)=0;
-  #else
+    __CPROVER_is_zero_string(dest) = 0;
+#else
+// with the Microsoft runtime, a null pointer with a zero length is
+// accepted, as for memcpy
 #  ifdef _MSC_VER
-  // a null pointer with a zero length is accepted, as for memcpy
-  __CPROVER_precondition(
-    n == 0 || __CPROVER_r_ok(src, n), "memmove source region readable");
-  __CPROVER_precondition(
-    n == 0 || __CPROVER_w_ok(dest, n), "memmove destination region writeable");
+#    define __CPROVER_MEMMOVE_EMPTY_OK (n == 0)
 #  else
-  __CPROVER_precondition(__CPROVER_r_ok(src, n),
-                         "memmove source region readable");
-  __CPROVER_precondition(__CPROVER_w_ok(dest, n),
-                         "memmove destination region writeable");
+#    define __CPROVER_MEMMOVE_EMPTY_OK 0
 #  endif
+  __CPROVER_precondition(
+    __CPROVER_MEMMOVE_EMPTY_OK || __CPROVER_r_ok(src, n),
+    "memmove source region readable");
+  __CPROVER_precondition(
+    __CPROVER_MEMMOVE_EMPTY_OK || __CPROVER_w_ok(dest, n),
+    "memmove destination region writeable");
+#  undef __CPROVER_MEMMOVE_EMPTY_OK
 
   if(n > 0)
   {
