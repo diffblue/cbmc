@@ -15392,3 +15392,31 @@ commits keep author, date, message and order; 32 have adapted patches
 packages).  Builds of 40 commits (the adapted ones and the segment
 boundaries) succeed, except five early ones and one library_check, which
 fail identically in the original history.
+
+## Round 200 (Windows-only cbmc-cpp failures)
+
+VS 2026 cbmc-cpp CORE failures: 36 (run 39986460423) -> 19 -> 3 -> 3 known
+ofstream tests, now tagged broken-msvc-stl.  Method: emulating a Windows
+host on Linux (preprocessor setting VISUAL_STUDIO for --winx64, LLP64 for
+--64) with the CI artifacts, then temporary instrumentation in CI (only the
+VS 2026 job; scripts/windows_debug.ps1: cl-preprocessed sources, traces,
+symbol tables, the cl-preprocessed C library models; the full types of a
+symbol type inconsistency), reverted afterwards.  Causes and fixes:
+- The type-trait builtins were identifiers with cl as preprocessor (12
+  tests; 8d13972684).
+- cl's __cplusplus is 199711L without /Zc:__cplusplus (206978d140, not for
+  C++98/03: 17fe68eefb).
+- Four tests assumed a 64-bit long under --64 (LLP64 on Windows); one used
+  GNU line markers (97dd7e473e).
+- The MSVC STL copies an empty vector with memcpy(dest, nullptr, 0), which
+  the Microsoft runtime allows (14 tests; 98c047f56e, 24dae4dbdc).
+- A sequence of alignas was a parse error (<regex>; 9d5d9c479c).
+- Linking a C++ program with the C library models preprocessed by cl failed
+  for the Windows SDK's inline stdio functions, whose struct members the two
+  front ends name differently ("fgetc type inconsistency"; 2767eec260).
+  Reproduced on Linux by replaying the library preprocessed on Windows.
+- Then the three std::ofstream tests run out of SAT memory with the MSVC
+  STL (KNOWNBUG cpp11_ofstream_from_string_msvc_stl): broken-msvc-stl
+  (269efdf936).
+Not yet seen on Windows with the final commits: the VS 2022 make job, and a
+full CI run.

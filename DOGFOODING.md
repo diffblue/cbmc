@@ -2162,3 +2162,8 @@ the initializer_list backing-array fix it led to; see
 
 No dog-food change.  The branch is rebased onto origin/develop; see
 .kiro/decltype_tuple_apply_findings.md, "Round 199".
+
+## Round 200 2026-10-25
+
+No dog-food change.  Windows-only cbmc-cpp failures fixed; see
+.kiro/decltype_tuple_apply_findings.md, "Round 200".
