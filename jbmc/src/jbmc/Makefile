@@ -43,7 +43,7 @@ OBJ += ../$(CPROVER_DIR)/src/ansi-c/ansi-c$(LIBEXT) \
 
 INCLUDES= -I .. -I ../$(CPROVER_DIR)/src
 
-LIBS =
+LIBS = -lpthread
 
 include ../config.inc
 include ../$(CPROVER_DIR)/src/config.inc

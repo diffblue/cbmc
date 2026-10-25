@@ -328,6 +328,8 @@ memory-analyzer/test.inc: memory-analyzer/test.c
 
 memory-analyzer/gdb_api$(OBJEXT): memory-analyzer/input.inc memory-analyzer/test.inc
 
+LIBS = -lpthread
+
 CLEANFILES = $(CATCH_TEST) testing-utils/testing-utils$(LIBEXT) \
              memory-analyzer/input.inc memory-analyzer/test.inc gdb.txt
 

@@ -413,3 +413,33 @@ void run_property_decider(
     result.progress = incremental_goto_checkert::resultt::progresst::FOUND_FAIL;
   }
 }
+
+std::chrono::duration<double> prepare_property_decider_incremental(
+  propertiest &properties,
+  symex_target_equationt &equation,
+  goto_symex_property_decidert &property_decider,
+  ui_message_handlert &ui_message_handler)
+{
+  auto solver_start = std::chrono::steady_clock::now();
+
+  messaget log(ui_message_handler);
+  log.status()
+    << "Passing problem to "
+    << property_decider.get_decision_procedure().decision_procedure_text()
+    << messaget::eom;
+
+  // Pop previous incremental assumptions if any
+  property_decider.pop_incremental_assumptions();
+
+  log.status() << "converting SSA" << messaget::eom;
+  equation.convert_without_assertions(
+    property_decider.get_decision_procedure());
+
+  property_decider.update_properties_goals_from_symex_target_equation(
+    properties);
+  property_decider.convert_goals_incremental();
+  property_decider.convert_goals();
+
+  auto solver_stop = std::chrono::steady_clock::now();
+  return std::chrono::duration<double>(solver_stop - solver_start);
+}
