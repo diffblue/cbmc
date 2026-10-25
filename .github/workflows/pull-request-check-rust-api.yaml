@@ -14,7 +14,6 @@ env:
 # API with CMake (due to dependencies on CMake plugins).
 jobs:
   check-ubuntu-22_04-cmake-clang-rust:
-    if: false  # TEMPORARY: Windows CI investigation
     runs-on: ubuntu-22.04
     env:
       CC: "ccache /usr/bin/clang-13"
@@ -77,7 +76,6 @@ jobs:
           path: .ccache
           key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   check-macos-15-intel-cmake-clang-rust:
-    if: false  # TEMPORARY: Windows CI investigation
     runs-on: macos-15-intel
     steps:
       - uses: actions/checkout@v7

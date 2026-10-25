@@ -8,7 +8,6 @@ on:
 jobs:
   # This job takes approximately 18 minutes
   CompileLinux:
-    if: false  # TEMPORARY: Windows CI investigation
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7

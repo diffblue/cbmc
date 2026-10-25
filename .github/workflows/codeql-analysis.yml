@@ -9,7 +9,6 @@ on:
 jobs:
   # This job takes approximately 82 minutes
   analyze:
-    if: false  # TEMPORARY: Windows CI investigation
     name: Analyze
     runs-on: ubuntu-latest
     permissions:

@@ -4,7 +4,6 @@ on: [push, pull_request]
 jobs:
   # This job takes approximately 3 minutes
   publish:
-    if: false  # TEMPORARY: Windows CI investigation
     # Note that the versions used for this `publish` job should be kept in sync
     # with the `check-doxygen` job.
     runs-on: ubuntu-latest
