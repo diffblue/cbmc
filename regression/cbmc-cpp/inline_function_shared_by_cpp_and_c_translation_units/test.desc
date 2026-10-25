@@ -1,0 +1,14 @@
+CORE
+main.cpp
+other.c
+^\[main\.assertion\.1\] line \d+ C\+\+ caller: SUCCESS$
+^\[main\.assertion\.2\] line \d+ C caller: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+conflicting function declarations
+--
+Linking rejected the two definitions of stream_position.
