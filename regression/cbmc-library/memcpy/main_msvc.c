@@ -1,4 +1,6 @@
-#include <string.h>
+// no <string.h>: with macOS SDK headers memcpy is __builtin___memcpy_chk
+void *memcpy(void *, const void *, __CPROVER_size_t);
+void *memmove(void *, const void *, __CPROVER_size_t);
 
 int main()
 {
