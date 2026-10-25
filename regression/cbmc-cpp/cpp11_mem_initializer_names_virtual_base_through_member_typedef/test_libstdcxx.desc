@@ -1,4 +1,4 @@
-CORE
+CORE broken-msvc-stl
 libstdcxx.cpp
 --cpp11 --object-bits 12 --unwind 10 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ ofstream constructed: SUCCESS$
@@ -15,3 +15,5 @@ the program.
 --unwind 10: with the copy constructor no longer dropped, --unwind 5 cut
 every path of the stream set-up short and the WRONG assertion passed
 vacuously.
+broken-msvc-stl: with the MSVC STL the SAT solver runs out of memory (CI
+run 40172972722); see KNOWNBUG cpp11_ofstream_from_string_msvc_stl.

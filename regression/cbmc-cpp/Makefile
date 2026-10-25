@@ -4,7 +4,7 @@ include ../../src/config.inc
 include ../../src/common
 
 ifeq ($(BUILD_ENV_),MSVC)
-  excluded_tests = -X gcc-only -X gnu-extensions -X itanium-abi
+  excluded_tests = -X gcc-only -X gnu-extensions -X itanium-abi -X broken-msvc-stl
 else ifneq ($(shell ../../../src/goto-cc/goto-cc --version 2>&1 | grep -c 'gcc:'),0)
   excluded_tests =
 else

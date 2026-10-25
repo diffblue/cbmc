@@ -41,6 +41,11 @@ This folder contains the CProver regression test-suite.
   later.  This is temporary: each such test has a KNOWNBUG, reduced to its
   root cause and named in the test's desc, and the tag is removed when that
   KNOWNBUG is fixed.
+- `broken-msvc-stl`:
+  A CORE test known to fail with the MSVC STL (cbmc preprocesses with cl);
+  excluded with MSVC.  As for `broken-libstdcxx16`, each such test names a
+  KNOWNBUG reduced to its root cause in its desc, and the tag is removed
+  when that KNOWNBUG is fixed.
 - `gcc16`:
   Tests motivated by the libstdc++ 16 header shapes; a grouping tag only (the
   test may pass with older headers too).  Combine with `libstdcxx16` when the
