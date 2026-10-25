@@ -1,9 +1,9 @@
 CORE gcc-only
 main_msvc.c
 -D_MSC_VER=1950
-^\[main\.precondition_instance\.2\] line 8 memcpy source region readable: SUCCESS$
-^\[main\.precondition_instance\.4\] line 9 memmove source region readable: SUCCESS$
-^\[main\.precondition_instance\.7\] line 13 memcpy source region readable: FAILURE$
+^\[main\.precondition_instance\.2\] line 10 memcpy source region readable: SUCCESS$
+^\[main\.precondition_instance\.4\] line 11 memmove source region readable: SUCCESS$
+^\[main\.precondition_instance\.7\] line 15 memcpy source region readable: FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
