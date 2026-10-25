@@ -31,7 +31,7 @@ on:
 jobs:
   # ── PR job: differential profiling (base vs PR) ──────────────────────
   profile-pr:
-    if: false  # TEMPORARY: Windows CI investigation
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-24.04
     steps:
       - name: Check out repository
@@ -161,7 +161,7 @@ jobs:
 
   # ── Develop job: profile and publish flamegraphs to GitHub Pages ─────
   profile-develop:
-    if: false  # TEMPORARY: Windows CI investigation
+    if: github.event_name == 'push'
     runs-on: ubuntu-24.04
     steps:
       - name: Check out repository
