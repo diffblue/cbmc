@@ -18,3 +18,7 @@ library, and the model of ios_base::Init has an empty body, so cbmc gives
 them nondeterministic contents, vtable pointers included: every assertion
 fails, and output through them reports dereference failures (the cause of
 the iostream tests tagged no-vacuity-check).
+It is also why their symbolic execution with bounds that reach the end of
+main takes more than 900 s: with a nondeterministic tie(), cerr may be
+tied to itself, and sentry -> tie()->flush() -> sentry recurses up to
+the unwinding bound.
