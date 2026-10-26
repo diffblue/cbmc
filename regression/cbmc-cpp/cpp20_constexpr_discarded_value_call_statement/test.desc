@@ -1,0 +1,20 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ constant initializer: SUCCESS$
+^\[main\.assertion\.2\] line \d+ case label: SUCCESS$
+^\[main\.assertion\.3\] line \d+ default: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+expected constant expression
+^CONVERSION ERROR$
+--
+cbmc's constant evaluator (cpp_constexpr_eval.cpp, apply_side_effect)
+gives up on an expression statement that is a function call, so
+operator[] is not evaluated: "expected constant expression, but got
+'(signed int)operator[](...)'" for the case label, a conversion error.
+Without the `check(i);' statement the program verifies.
