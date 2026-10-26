@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ constant evaluation: SUCCESS$
+^\[main\.assertion\.2\] line \d+ run time: SUCCESS$
+^\[main\.assertion\.3\] line \d+ case label: SUCCESS$
+^\[main\.assertion\.4\] line \d+ default: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+expected constant expression
+--
+A constexpr function returning __builtin_is_constant_evaluated() (type
+_Bool) gave an unfolded `(_Bool)true' during constant evaluation, which is
+not a constant: the constexpr variable was initialized at run time (2) and
+the case label was rejected, dropping should_escape's body.
