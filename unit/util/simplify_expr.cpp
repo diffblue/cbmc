@@ -287,6 +287,39 @@ TEST_CASE("Simplify cast from bool", "[core][util]")
   }
 }
 
+TEST_CASE("Simplify cast of a pointer constant to an integer", "[core][util]")
+{
+  config.ansi_c.set_LP64();
+  const namespacet &ns = empty_namespace;
+  const pointer_typet pointer = pointer_type(char_type());
+  const std::size_t width = pointer.get_width();
+  // A pointer constant that holds an integer address, as goto-symex's shadow
+  // memory builds when it replicates a byte over a pointer-typed object.
+  const mp_integer value = 0x0303030303030303;
+  const constant_exprt constant{integer2bvrep(value, width), pointer};
+
+  SECTION("To an integer of the same width")
+  {
+    for(const typet &type :
+        {typet{unsignedbv_typet{width}},
+         typet{signedbv_typet{width}},
+         typet{bv_typet{width}}})
+    {
+      const exprt simp = simplify_expr(typecast_exprt{constant, type}, ns);
+      REQUIRE(simp.is_constant());
+      REQUIRE(simp.type() == type);
+      REQUIRE(to_constant_expr(simp).get_value() == constant.get_value());
+    }
+  }
+
+  SECTION("The address of an object is not a constant")
+  {
+    const symbol_exprt x{"x", char_type()};
+    const typecast_exprt cast{address_of_exprt{x}, unsignedbv_typet{width}};
+    REQUIRE(simplify_expr(cast, ns) == cast);
+  }
+}
+
 TEST_CASE("simplify_expr boolean expressions", "[core][util]")
 {
   const namespacet &ns = empty_namespace;

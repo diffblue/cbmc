@@ -778,6 +778,22 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
     return from_integer(0, expr_type);
   }
 
+  // casts from a constant pointer that holds an integer address to an integer
+  // of the same width: the integer with the same bits, which is how the
+  // back-ends encode both (bv_pointerst::convert_pointer_type and
+  // smt2_convt::convert_constant); shadow memory of pointer-typed objects
+  // yields such casts
+  if(
+    op_type.id() == ID_pointer && expr.op().is_constant() &&
+    !to_constant_expr(expr.op()).is_null_pointer() &&
+    (expr_type.id() == ID_unsignedbv || expr_type.id() == ID_signedbv ||
+     expr_type.id() == ID_bv) &&
+    to_bitvector_type(expr_type).get_width() ==
+      to_pointer_type(op_type).get_width())
+  {
+    return constant_exprt(to_constant_expr(expr.op()).get_value(), expr_type);
+  }
+
   // casts from pointer to integer
   // where width of integer >= width of pointer
   // (void*)(intX)expr -> (void*)expr

@@ -1,0 +1,13 @@
+CORE
+main.c
+--program-only
+^EXIT=0$
+^SIGNAL=0$
+--
+nondet_int
+^warning: ignoring
+--
+The shadow memory of a pointer-typed object holds pointer constants. Reading
+it must simplify to a constant during symbolic execution, so that the branch
+that tests it and is never taken is pruned: its calls to nondet_int must not
+appear in the equation.
