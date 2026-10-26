@@ -6,3 +6,8 @@ ptr-arith.c
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+--
+The buffer is allocated with the size that the assumption states: with
+malloc(10) the assumption __CPROVER_buffer_size(name) == 20 contradicted
+the allocation, no path reached the assertion, and the test passed
+whatever __CPROVER_is_zero_string(name) was.
