@@ -9,7 +9,7 @@ endif()
 # and layouts of the Itanium C++ ABI (bit fields), which MSVC's ABI does not
 # share
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-  list(APPEND gcc_only -X gnu-extensions -X itanium-abi -X broken-msvc-stl)
+  list(APPEND gcc_only -X gnu-extensions -X itanium-abi)
 endif()
 
 # Tests tagged `libstdcxxNN' need the libstdc++ headers of GCC >= NN (13:
