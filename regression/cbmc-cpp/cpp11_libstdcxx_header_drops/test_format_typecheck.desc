@@ -12,6 +12,8 @@ could not fully type-check
 libstdc++ 13 <format>: std::format("{}", 42) is converted without dropping a
 system-header body.  The verification (test_format.desc) is THOROUGH.
 broken-libstdcxx16: with libstdc++ 16 (16-20260315), _M_reserve and _M_span
-of _Seq_sink (no match for span's constructor and for _M_reset),
-__should_escape_ascii (a read of _S_bslash()[0] is not folded to a
-constant) and __write_escaped_char lose their bodies; not yet reduced.
+of _Seq_sink lose their bodies: std::string::iterator is not
+random_access_iterator, so span<char> cannot be made from the string
+(KNOWNBUG cpp20_hidden_friend_spaceship_template_alias_return_type).
+The drops of __should_escape_ascii and __write_escaped_char are fixed
+(cpp20_is_constant_evaluated_forwarded_through_constexpr_function).

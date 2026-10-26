@@ -1,0 +1,23 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ a < b: SUCCESS$
+^\[main\.assertion\.2\] line \d+ !\(b < a\): SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+no comparison operator
+--
+cbmc reports "no comparison operator for an operand of class type 'struct
+iter'": the hidden friend operator<=> template is not a rewritten candidate
+when its return type names T; with std::strong_ordering, or with the
+alias template applied to non-dependent arguments, the program verifies.
+With libstdc++ 16, std::string::iterator is not random_access_iterator
+because of this, span<char> cannot be made from a string, and
+_Seq_sink::_M_reserve and _M_span of <format> lose their bodies
+(cpp11_libstdcxx_header_drops/test_format.desc, broken-libstdcxx16).
+Reduced from that with cvise (g++ 16 as the validity check).
