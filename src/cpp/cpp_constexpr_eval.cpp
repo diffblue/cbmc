@@ -1103,7 +1103,12 @@ public:
           id2string(to_symbol_expr(callee).get_identifier()),
           "__builtin_is_constant_evaluated"))
       {
-        return typecast_exprt::conditional_cast(true_exprt{}, e.type());
+        // the built-in's declared type is _Bool (c_bool): fold the
+        // conversion, so that `return __builtin_is_constant_evaluated();'
+        // (std::__is_constant_evaluated) yields a constant
+        exprt result = typecast_exprt::conditional_cast(true_exprt{}, e.type());
+        simplify(result, ns);
+        return result;
       }
       // Recursively evaluate nested function calls (their ARGUMENTS
       // evaluated first, so a call on tracked variables folds too)
