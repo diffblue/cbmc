@@ -1,0 +1,20 @@
+KNOWNBUG
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ A under construction: SUCCESS$
+^\[main\.assertion\.2\] line \d+ M under construction: SUCCESS$
+^\[main\.assertion\.3\] line \d+ after construction: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Assertion 1 fails: during A's constructor the call reaches M::id.  Only the
+complete object's direct bases with virtual bases get construction vtables
+(Itanium C++ ABI 2.6.2); a base-object constructor (M's) leaves the tables
+its caller installed instead of installing those of its own bases, for which
+the ABI passes a VTT (see cpp_typecheck_constructor.cpp).  With A a direct
+base of D, or with V a non-virtual base, the call reaches A::id.
