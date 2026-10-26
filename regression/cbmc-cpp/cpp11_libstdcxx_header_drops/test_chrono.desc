@@ -19,7 +19,8 @@ and default_delete<time_zone::_Impl>::operator() (bits/unique_ptr.h:93),
 instantiated for the incomplete _Impl by time_zone's unused defaulted special
 members (cpp98_implicit_default_constructor_defined_only_when_odr_used).
 g++ 13 accepts this program, and it fails only its WRONG assertion.
-broken-libstdcxx16: with libstdc++ 16, __do_vformat_to loses its body
-(cpp17_constexpr_lambda_call_in_constant_expression); __get_leap_second_info
-loses its body and --validate-goto-model fails "lhs and rhs of assignment
-must have same type", neither reduced yet.
+broken-libstdcxx16: with libstdc++ 16 (16-20260315), _M_reserve and _M_span
+of <format>'s _Seq_sink lose their bodies (KNOWNBUG
+cpp20_hidden_friend_spaceship_template_alias_return_type).  The earlier
+drops of __do_vformat_to and __get_leap_second_info and the
+--validate-goto-model type mismatch no longer occur (checked 2026-10-26).
