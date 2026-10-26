@@ -2061,6 +2061,37 @@ void cpp_typecheckt::provide_stdlib_bodies()
     }
   }
 
+  // Static data members that the MSVC runtime defines (stl/src/locale0.cpp
+  // and ios.cpp of the MSVC STL) and its headers only declare: with no
+  // definition in the program they were nondeterministic, and `++_Id_cnt'
+  // in locale::id::_Get_index could overflow.  The runtime's definitions:
+  // the counter of the facet ids handed out ([locale.id]/1: an id is used
+  // as an index for lookup) starts at 0; so does `index' of [ios.base]/3.1
+  // (initialized to an unspecified value; xalloc returns index++,
+  // [ios.base.storage]/1); and the streams start synchronized with the C
+  // streams, so that the first sync_with_stdio returns true
+  // ([ios.members.static]/2).
+  for(const auto &defined :
+      {std::pair<const char *, bool>{"std::locale::id::_Id_cnt", false},
+       std::pair<const char *, bool>{"std::ios_base::_Index", false},
+       std::pair<const char *, bool>{"std::ios_base::_Sync", true}})
+  {
+    symbolt *symbol = symbol_table.get_writeable(defined.first);
+    if(
+      symbol == nullptr || !symbol->is_static_lifetime ||
+      symbol->value.is_not_nil())
+    {
+      continue;
+    }
+    if(symbol->type.id() == ID_bool || symbol->type.id() == ID_c_bool)
+      symbol->value = from_integer(defined.second ? 1 : 0, symbol->type);
+    else if(symbol->type.id() == ID_signedbv)
+      symbol->value = from_integer(0, symbol->type);
+    else
+      continue;
+    symbol->is_extern = false;
+  }
+
   // The models below add parameter symbols (ensure_parameter_symbols) while
   // the functions are visited; an insertion may rehash the symbol table's
   // unordered_map and invalidate the iteration (functions get skipped -- the
