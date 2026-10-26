@@ -14,4 +14,6 @@ and the tie()/flush() and locale code behind it are executed; the loop and
 recursion bound keeps symbolic execution within the time limit.
 no-vacuity-check: a conversion check (any verdict); with --unwind 6 the end
 of main is reached and dereference failures of this->__rdstate_ in the
-libc++ stream code are reported (not yet investigated).
+libc++ stream code are reported (see the root cause below).
+Root cause: std::cerr is nondeterministic, being defined in the compiled
+library (KNOWNBUG cpp11_standard_stream_objects_initialized).
