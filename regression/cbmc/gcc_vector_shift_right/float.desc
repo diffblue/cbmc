@@ -1,0 +1,13 @@
+CORE gcc-only
+float.c
+
+^EXIT=6$
+^SIGNAL=0$
+^file float.c line \d+ function main: operator 'shr' not defined for vectors of type 'float'$
+^CONVERSION ERROR$
+--
+^warning: ignoring
+Invariant check failed
+--
+As with GCC and Clang, shifts of vectors with floating-point elements are
+rejected, as the back-ends do not support them.

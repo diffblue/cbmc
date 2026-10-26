@@ -4286,6 +4286,25 @@ void c_typecheck_baset::typecheck_expr_binary_arithmetic(exprt &expr)
   throw 0;
 }
 
+/// Turn a right shift of a vector into a logical or an arithmetic shift,
+/// depending on the vector's element type, as is done for scalar shifts.
+/// remove_vector and the back-ends only support ID_lshr and ID_ashr.
+/// \param [in,out] expr: shift whose first operand is a vector of signed or
+///   unsigned bit-vectors; left unchanged unless it is an ID_shr
+static void resolve_vector_shr(shift_exprt &expr)
+{
+  if(expr.id() != ID_shr)
+    return;
+
+  const typet &element_type = to_vector_type(expr.op0().type()).element_type();
+  PRECONDITION(is_signed_or_unsigned_bitvector(element_type));
+
+  if(element_type.id() == ID_unsignedbv)
+    expr.id(ID_lshr);
+  else
+    expr.id(ID_ashr);
+}
+
 void c_typecheck_baset::typecheck_expr_shifts(shift_exprt &expr)
 {
   PRECONDITION(expr.id() == ID_shl || expr.id() == ID_shr);
@@ -4295,6 +4314,18 @@ void c_typecheck_baset::typecheck_expr_shifts(shift_exprt &expr)
 
   const typet o_type0 = op0.type();
   const typet o_type1 = op1.type();
+
+  // Like GCC and Clang, only permit shifts of vectors of integers. Vectors
+  // cannot have _Bool or enum elements, but they can have floating-point or
+  // fixed-point elements, for which the back-ends do not support shifts.
+  if(
+    o_type0.id() == ID_vector &&
+    !is_signed_or_unsigned_bitvector(to_vector_type(o_type0).element_type()))
+  {
+    throw errort().with_location(expr.source_location())
+      << "operator '" << expr.id() << "' not defined for vectors of type '"
+      << to_string(to_vector_type(o_type0).element_type()) << "'";
+  }
 
   if(o_type0.id()==ID_vector &&
      o_type1.id()==ID_vector)
@@ -4308,6 +4339,7 @@ void c_typecheck_baset::typecheck_expr_shifts(shift_exprt &expr)
       // {a0 >> b0, a1 >> b1, ..., an >> bn}
       // Fairly strict typing rules, no promotion
       expr.type()=op0.type();
+      resolve_vector_shr(expr);
       return;
     }
   }
@@ -4319,6 +4351,7 @@ void c_typecheck_baset::typecheck_expr_shifts(shift_exprt &expr)
     // {a0, a1, ..., an} >> b == {a0 >> b, a1 >> b, ..., an >> b}
     op1 = typecast_exprt(op1, o_type0);
     expr.type()=op0.type();
+    resolve_vector_shr(expr);
     return;
   }
 
