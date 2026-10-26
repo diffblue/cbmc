@@ -2,10 +2,13 @@
 #include <stdint.h>
 #include <string.h>
 
+#ifdef __GNUC__
 typedef uint16_t u16x4 __attribute__((vector_size(8)));
+#endif
 
 int main(void)
 {
+#ifdef __GNUC__
   uint16_t a;
   u16x4 u = {a, 1, 2, 3};
 
@@ -14,6 +17,7 @@ int main(void)
   uint64_t y;
   memcpy(&y, &u, sizeof(y));
   assert(x == y);
+#endif
 
   return 0;
 }
