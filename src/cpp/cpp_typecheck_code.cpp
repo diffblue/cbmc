@@ -3042,11 +3042,27 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
     // `@most_derived' parameter of a class with virtual bases, so that it
     // neither constructs the virtual bases ([class.base.init]/13: the most
     // derived class does) nor installs complete-object virtual pointers.
+    // N5008 [class.base.init]/6-7: the target of a DELEGATING constructor
+    // initializes the complete class object, not a subobject: it gets the
+    // delegating constructor's own `@most_derived', so that it constructs
+    // the virtual bases exactly when the delegating constructor would have.
     for(const auto &parameter : code_type.parameters())
     {
       if(parameter.get_base_name() == "@most_derived")
       {
-        function_call.arguments().push_back(false_exprt());
+        const typet &target_class =
+          to_pointer_type(code_type.parameters().front().type()).base_type();
+        const exprt &own_this = cpp_scopes.current_scope().this_expr;
+        if(
+          own_this.is_not_nil() && own_this.type().id() == ID_pointer &&
+          to_pointer_type(own_this.type()).base_type() == target_class)
+        {
+          exprt own_flag = cpp_namet{"@most_derived"}.as_expr();
+          typecheck_expr(own_flag);
+          function_call.arguments().push_back(std::move(own_flag));
+        }
+        else
+          function_call.arguments().push_back(false_exprt());
         break;
       }
     }
