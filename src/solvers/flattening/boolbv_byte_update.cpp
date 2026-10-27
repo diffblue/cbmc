@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/byte_operators.h>
 #include <util/invariant.h>
 
+#include <algorithm>
+
 bvt boolbvt::convert_byte_update(const byte_update_exprt &expr)
 {
   // if we update (from) an unbounded array, lower the expression as the array
@@ -38,9 +40,6 @@ bvt boolbvt::convert_byte_update(const byte_update_exprt &expr)
   std::size_t update_width=value_bv.size();
   std::size_t byte_width = expr.get_bits_per_byte();
 
-  if(update_width>bv.size())
-    update_width=bv.size();
-
   // see if the byte number is constant
 
   const auto index = numeric_cast<mp_integer>(offset_expr);
@@ -49,21 +48,25 @@ bvt boolbvt::convert_byte_update(const byte_update_exprt &expr)
     // yes!
     const mp_integer offset = *index * byte_width;
 
-    if(offset+update_width>mp_integer(bv.size()) || offset<0)
-    {
-      // out of bounds
-    }
-    else
+    // only the bits of the update that overlap op take effect
+    const mp_integer lower = std::max(offset, mp_integer{0});
+    const mp_integer upper =
+      std::min(offset + update_width, mp_integer{bv.size()});
+
+    if(lower < upper)
     {
       endianness_mapt map_op = endianness_map(op.type(), little_endian);
       endianness_mapt map_value = endianness_map(value.type(), little_endian);
 
-      const std::size_t offset_i = numeric_cast_v<std::size_t>(offset);
+      const std::size_t op_lower = numeric_cast_v<std::size_t>(lower);
+      const std::size_t value_lower =
+        numeric_cast_v<std::size_t>(lower - offset);
+      const std::size_t width = numeric_cast_v<std::size_t>(upper - lower);
 
-      for(std::size_t i = 0; i < update_width; i++)
+      for(std::size_t i = 0; i < width; i++)
       {
-        size_t index_op = map_op.map_bit(offset_i + i);
-        size_t index_value = map_value.map_bit(i);
+        size_t index_op = map_op.map_bit(op_lower + i);
+        size_t index_value = map_value.map_bit(value_lower + i);
 
         INVARIANT(
           index_op < bv.size(), "bit vector index shall be within bounds");
