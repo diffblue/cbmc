@@ -1,4 +1,4 @@
-// N5008 [class.access.general]/5: access to a name is checked in the context
+// N5008 [class.access.general]/6: access to a name is checked in the context
 // in which the name appears.  The elements of a braced-init-list argument
 // `And a({this->expr})' are expressions of the calling member function,
 // where the private member is accessible.  When the braced list went to an
