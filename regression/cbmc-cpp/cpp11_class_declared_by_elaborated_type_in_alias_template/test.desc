@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] .* elaborated type in alias template: SUCCESS$
@@ -11,4 +11,7 @@ main.cpp
 ^CONVERSION ERROR$
 --
 g++ 13 (-fsanitize=address,undefined) and clang++ 18 accept this program,
-and it fails only its WRONG assertion.  Currently "found no match".
+and it fails only its WRONG assertion.  Fixed: the alias template's
+type-id is kept unevaluated until instantiation, so tag_t was not declared
+and the defaulted template argument `= tag_t' failed ("found no match for
+symbol 'box'"); the alias declaration now declares it.

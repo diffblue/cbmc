@@ -498,6 +498,54 @@ void cpp_typecheckt::typecheck_template_alias(cpp_declarationt &declaration)
   typet alias_type = declarator.merge_type(declaration.type());
   cpp_convert_plain_type(alias_type, get_message_handler());
 
+  // N5008 [dcl.type.elab]/3: an elaborated-type-specifier `class-key
+  // identifier' whose identifier unqualified lookup does not find declares
+  // that identifier as a class-name of the nearest enclosing namespace (or
+  // block) scope -- at the alias template's declaration, not when the alias
+  // is first used (`template<bool> using pick = struct tag_t;' makes tag_t
+  // usable right after it).  The type-id itself is kept unevaluated until
+  // the alias is instantiated, so declare such classes here.  A name that is
+  // one of the alias's template parameters is found by that lookup, so it
+  // declares nothing.
+  {
+    std::set<irep_idt> parameter_names;
+    for(const auto &parameter : template_type.template_parameters())
+    {
+      const irep_idt id = parameter.id() == ID_type
+                            ? parameter.type().get(ID_identifier)
+                            : parameter.get(ID_identifier);
+      const std::string name = id2string(id);
+      const auto sep = name.rfind("::");
+      parameter_names.insert(
+        sep == std::string::npos ? name : name.substr(sep + 2));
+    }
+    std::vector<typet> elaborated;
+    std::function<void(const irept &)> collect = [&](const irept &node)
+    {
+      if(
+        (node.id() == ID_struct || node.id() == ID_union) &&
+        node.find(ID_body).is_nil() &&
+        !node.get_bool(ID_C_tag_only_declaration) &&
+        node.find(ID_tag).id() == ID_cpp_name &&
+        to_cpp_name(static_cast<const exprt &>(node.find(ID_tag)))
+          .is_simple_name() &&
+        parameter_names.count(
+          to_cpp_name(static_cast<const exprt &>(node.find(ID_tag)))
+            .get_base_name()) == 0)
+      {
+        elaborated.push_back(static_cast<const typet &>(node));
+        return;
+      }
+      for(const auto &sub : node.get_sub())
+        collect(sub);
+      for(const auto &named : node.get_named_sub())
+        collect(named.second);
+    };
+    collect(alias_type);
+    for(typet &type : elaborated)
+      typecheck_type(type);
+  }
+
   // Use class_template_identifier for template aliases.
   // function_template_identifier appends the alias body (via
   // cpp_type2name) which creates garbled identifiers that can't

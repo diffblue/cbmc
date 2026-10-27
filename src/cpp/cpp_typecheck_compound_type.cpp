@@ -147,10 +147,17 @@ cpp_scopet &cpp_typecheckt::tag_scope(
     return static_cast<cpp_scopet &>(id->get_parent());
   }
 
-  // Tags without body that we don't have already
-  // and that are not a tag-only declaration go into
-  // the global scope of the namespace.
-  return cpp_scopes.get_global_scope();
+  // N5008 [dcl.type.elab]/3: a tag without body that lookup does not find,
+  // and that is not a tag-only declaration, declares a class whose target
+  // scope is the nearest enclosing namespace or block scope (not a class,
+  // template parameter or function parameter scope).
+  cpp_scopet *scope = &cpp_scopes.current_scope();
+  while(!scope->is_global_scope() &&
+        scope->id_class != cpp_idt::id_classt::BLOCK_SCOPE)
+  {
+    scope = &scope->get_parent();
+  }
+  return *scope;
 }
 
 void cpp_typecheckt::typecheck_compound_type(struct_union_typet &type)
