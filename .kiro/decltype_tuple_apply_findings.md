@@ -15457,3 +15457,41 @@ with one thread the locks have no observable effect.
 Process notes: run ASan harness binaries with timeout only (ASan reserves
 ~20 TB virtual); a cvise checker must also require termination.  cvise test
 scripts left 25 cbmc processes sleeping for ~16 h (killed by PID).
+
+## Round 202 (2026-10-27): KNOWNBUGs to CORE
+
+Fixed (KNOWNBUG -> CORE unless noted):
+- cpp98_array_delete_after_malloc: malloc/calloc/alloca/contracts fresh
+  objects record __CPROVER_new_object with the is_new_array flag
+  ([expr.delete]/2; regression from 113bcddf01; DFCC treats
+  __CPROVER_new_object as a CPROVER static) -- cf8a92b641.
+- cpp11_class_declared_by_elaborated_type_in_alias_template, plus target
+  scope of elaborated-type-specifiers ([dcl.type.elab]/3) -- e044bb03bc.
+- cpp11_covariant_return_override: thunks of the overridden function's type
+  that convert the result ([class.virtual]/8-9) -- fac4dd4891.
+- cpp11_friend_of_derived_accesses_private_base_member_through_more_derived:
+  [class.access.base]/5.4 at every base level -- 5511a064e5.
+- cpp11_protected_member_in_braced_functional_cast: elements of T{...}
+  marked as typechecked at the call site -- 900e9473d3; citations of
+  [class.access.general]/5 corrected to /6 (and /4) -- 4be246acdc.
+- cpp14_deduced_return_member_template_in_static_member_initializer: the
+  call gets the deduced type after an on-demand conversion -- 9fdd4373d2.
+- cpp17_libstdcxx_explicit_specializations_without_header_body: library
+  explicit specializations declared without a definition are not recorded;
+  uses instantiate the primary template; library source models provided
+  again after the method bodies -- 25906cf0cd.
+- cpp20_constexpr_discarded_value_call_statement -- 4fd5709d87.
+- cpp20_hidden_friend_spaceship_template_alias_return_type: hidden friend
+  declarator types substitute enclosing parameters -- fb0d12d0f0.  With
+  g++ 16 in the gcc16-test container, test_format, test_format_typecheck,
+  test_chrono and the namespace-reopened libstdcxx desc pass: tags removed;
+  std::format("{}", 42) with GCC 16 verifies (40 s, 0.8 GB).
+Open: cpp20_range_adaptor_closure_invoked_through_invoke_impl (diagnosis
+in its desc), cpp11_initializer_list_elements_destroyed_with_the_array
+(needs lifetime of the backing array), cpp11_standard_stream_objects_
+initialized, cpp11_virtual_call_in_constructor_of_indirect_base (VTT),
+cpp11_ostream_integer_insertion_libcxx (vsnprintf model),
+cpp20_ctad_for_alias_template, cpp20_no_unique_address_layout,
+cpp20_coroutine_generator_semantics.
+GCC 16 cbmc-cpp in the container: 4 failures, all needing libc++ (absent
+there), same with W181.
