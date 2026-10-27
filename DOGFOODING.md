@@ -2171,3 +2171,7 @@ No dog-food change.  Windows-only cbmc-cpp failures fixed; see
 ## Round 201 2026-10-27
 
 No dog-food change.  See .kiro/decltype_tuple_apply_findings.md, "Round 201".
+
+## Round 202 2026-10-27
+
+No dog-food change.  See .kiro/decltype_tuple_apply_findings.md, "Round 202".
