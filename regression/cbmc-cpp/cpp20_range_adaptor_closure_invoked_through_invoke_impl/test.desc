@@ -17,3 +17,11 @@ hand-written partial specialization called the same way works, so the cause
 is in the remaining <ranges> context; not reduced further (cvise stopped at
 its 2 h limit).  With libstdc++ 16 this is the drop of
 cpp20_ranges_views_iota_transform_filter_drop (broken-libstdcxx16).
+Findings 2026-10-27: with the GCC 16 headers, invoke_result_t<const
+_Transform &, int (&)[4], const L &> computed directly in main is the
+type of the two-argument call (transform_view), and views::transform(a,
+f) works; only the call made from _Binder::_S_call in _Partial::operator()
+gets _Partial as __invoke's result type, the type of the adaptor's
+one-argument operator().  The reduced program's __invoke_result names
+`declval<_Args>...' without calling it (a cvise artifact), so it may not
+show the same cause.
