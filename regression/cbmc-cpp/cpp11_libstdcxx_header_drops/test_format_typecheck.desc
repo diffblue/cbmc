@@ -1,4 +1,4 @@
-CORE libstdcxx13 broken-libstdcxx16 libstdcxx
+CORE libstdcxx13 libstdcxx
 format.cpp
 --cpp20 --show-goto-functions
 ^EXIT=0$
@@ -11,9 +11,7 @@ could not fully type-check
 --
 libstdc++ 13 <format>: std::format("{}", 42) is converted without dropping a
 system-header body.  The verification (test_format.desc) is THOROUGH.
-broken-libstdcxx16: with libstdc++ 16 (16-20260315), _M_reserve and _M_span
-of _Seq_sink lose their bodies: std::string::iterator is not
-random_access_iterator, so span<char> cannot be made from the string
-(KNOWNBUG cpp20_hidden_friend_spaceship_template_alias_return_type).
-The drops of __should_escape_ascii and __write_escaped_char are fixed
-(cpp20_is_constant_evaluated_forwarded_through_constexpr_function).
+With libstdc++ 16 (16-20260315) the test passes: the drops of
+<format>'s _Seq_sink::_M_reserve and _M_span were fixed with
+cpp20_hidden_friend_spaceship_template_alias_return_type (it was tagged
+broken-libstdcxx16).

@@ -1,4 +1,4 @@
-CORE libstdcxx13 broken-libstdcxx16
+CORE libstdcxx13
 libstdcxx.cpp
 --cpp20 --object-bits 12
 ^\[main\.assertion\.1\] line \d+ the translation unit converts: SUCCESS$
@@ -20,7 +20,7 @@ fixed too: format:1422 and format:3124 _M_visit
 (cpp11_member_template_argument_converted_to_non_deduced_parameter); bin53
 dropped more than ten bodies.  g++ 13 accepts this program, and it fails
 only its WRONG assertion.
-broken-libstdcxx16: with libstdc++ 16 (16-20260315), _M_reserve and _M_span
-of <format>'s _Seq_sink lose their bodies (KNOWNBUG
-cpp20_hidden_friend_spaceship_template_alias_return_type); the earlier drop
-of __do_vformat_to no longer occurs (checked 2026-10-26).
+With libstdc++ 16 (16-20260315) the test passes: the drops of
+<format>'s _Seq_sink::_M_reserve and _M_span were fixed with
+cpp20_hidden_friend_spaceship_template_alias_return_type (it was tagged
+broken-libstdcxx16).
