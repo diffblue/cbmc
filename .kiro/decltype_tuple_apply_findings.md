@@ -15420,3 +15420,40 @@ symbol type inconsistency), reverted afterwards.  Causes and fixes:
   (269efdf936).
 Not yet seen on Windows with the final commits: the VS 2022 make job, and a
 full CI run.
+
+## Round 201 (2026-10-26/27)
+
+Fixes:
+- Delegating constructor's target gets the delegating constructor's
+  `@most_derived' ([class.base.init]/6-7; 3f09856ca0).  Cause of 352 of 353
+  failures of the MSVC std::ofstream(string) test; libstdc++/libc++
+  fstream(string), *stringstream(..., Allocator), osyncstream use the same
+  shape (15ea29ca80).
+- MSVC runtime statics _Id_cnt, _Index, _Sync get the runtime's values
+  (1ebcda3c0b).  cpp11_ofstream_from_string_msvc_stl: 7 min / 8.9 GB / 353
+  failed -> 7 s / 263 MB, CORE; broken-msvc-stl removed again (70df445164).
+- Constexpr evaluator folds `(_Bool)true' of __builtin_is_constant_evaluated
+  (1895262695): constexpr variables initialized through
+  std::__is_constant_evaluated had the run-time value; GCC 16 <format>
+  escape functions lost their bodies.
+- String_Abstraction16 was vacuous (malloc(10) vs assume(size == 20));
+  four C tests tagged no-vacuity-check by design (28aae9a251, 2cc5422276).
+- doc/architectural/reproducing-windows-only-failures.md (c030f3fefc).
+New KNOWNBUGs (each fails now for the stated reason; g++ 13 / clang++ 18
+accept and fail only WRONG):
+- cpp20_hidden_friend_spaceship_template_alias_return_type (GCC 16
+  string::iterator a < b; <format> _M_reserve/_M_span).
+- cpp20_range_adaptor_closure_invoked_through_invoke_impl (GCC 16 ranges).
+- cpp20_constexpr_discarded_value_call_statement.
+- cpp11_virtual_call_in_constructor_of_indirect_base_with_virtual_base
+  (construction vtables only for direct bases; no VTT).
+- cpp11_standard_stream_objects_initialized (cerr/cout nondet; also the
+  >900 s of the iostream tests: tie() may be cerr itself).
+- cpp98_array_delete_after_malloc (C library malloc and the new[] flag;
+  develop too; libc++ ~basic_filebuf).
+Not written: MSVC single-thread locale/lock models -- a two-thread program
+stops symex with "pointer handling for concurrency is unsound" (#305), and
+with one thread the locks have no observable effect.
+Process notes: run ASan harness binaries with timeout only (ASan reserves
+~20 TB virtual); a cvise checker must also require termination.  cvise test
+scripts left 25 cbmc processes sleeping for ~16 h (killed by PID).
