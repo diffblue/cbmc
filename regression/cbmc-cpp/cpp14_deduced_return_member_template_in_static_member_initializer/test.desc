@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ called: SUCCESS$
@@ -11,9 +11,9 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-decltype(invoke()) in a static data member's initializer, where invoke
-calls a member template with a deduced return type, is not int while the
-class is instantiated ("template 'element' not found"; assertion 2 fails).
-GCC 11's std::visit (cpp17_visit_libstdcxx) has this shape (_S_apply's
-decltype(__visit_invoke(...)) in __gen_vtable's static _S_vtable) and drops
-declval<decltype()>; not confirmed to be the same cause.
+Fixed: decltype(invoke()) in a static data member's initializer, where
+invoke calls a member template with a deduced return type, was not int
+while the class was instantiated: element<2>'s deferred definition was
+converted on demand, but the call kept the placeholder type, so invoke's
+return type was not deduced (the "template 'element' not found" was a
+later probe of element<N>(1) as a functional cast).
