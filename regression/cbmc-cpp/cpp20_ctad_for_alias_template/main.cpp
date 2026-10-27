@@ -1,7 +1,6 @@
 // N5008 [over.match.class.deduct]/3 (C++20): class template argument
 // deduction for an alias template -- `Q q{3, 4}' with `template <class T>
-// using Q = P<T, int>' deduces T = int from the guides of P.  The front
-// end does not implement it: "found no match for symbol 'Q'".  g++ 13
+// using Q = P<T, int>' deduces T = int from the guides of P.  g++ 13
 // accepts the program; clang++ implements this from version 19.
 extern "C" void __CPROVER_assert(bool, const char *);
 template <class T, class U>

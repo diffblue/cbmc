@@ -1365,6 +1365,12 @@ protected:
     const cpp_namet &class_template_name,
     const std::vector<exprt> &args,
     bool copy_initialization = false);
+  /// Class template argument deduction for an alias template among
+  /// \p id_set (N5008 [over.match.class.deduct]/3-4): see the definition.
+  std::optional<typet> deduce_alias_template_arguments(
+    const cpp_scopet::id_sett &id_set,
+    const std::vector<exprt> &args,
+    bool copy_initialization);
   void typecheck_expr_address_of(exprt &) override;
   /// Phase 1B target-typet overload of \ref typecheck_expr_address_of;
   /// the target is currently discarded.  Phase 2 of the target-type-
