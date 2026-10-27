@@ -7210,6 +7210,24 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
       e.operands().front().id() == ID_initializer_list &&
       !e.operands().front().operands().empty())
     {
+      // N5008 [class.access.general]/6: access to a name is judged where it
+      // appears.  The elements of `T{...}' are expressions of this context,
+      // typechecked here; kept as one initializer_list argument they were
+      // typechecked again during T's constructor selection, in T's scope
+      // (`V{bias, 3}' in a member of the class declaring the protected
+      // `bias': "not accessible").  Mark them as typechecked at the call
+      // site, as typecheck_braced_argument_elements does for a braced
+      // function argument.
+      typecheck_braced_argument_elements(e.operands().front());
+      for(auto &element : e.operands().front().operands())
+      {
+        if(
+          element.id() != ID_initializer_list && !element.type().id().empty() &&
+          element.type().is_not_nil())
+        {
+          element.set(ID_C_braced_element_typechecked, true);
+        }
+      }
       if(!has_viable_init_list_constructor(e.type(), e.operands().front()))
       {
         exprt::operandst expanded = std::move(e.operands().front().operands());

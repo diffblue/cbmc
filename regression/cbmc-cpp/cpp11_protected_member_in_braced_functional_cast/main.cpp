@@ -1,9 +1,6 @@
-// N5008 [class.access.general]/5, [expr.type.conv]: in `V{bias, 3}', inside
+// N5008 [class.access.general]/6, [expr.type.conv]/2: in `V{bias, 3}', inside
 // a member function of dec, the element `bias' names dec's protected member
-// where it appears, which is accessible.  The front end reports "member
-// 'dec::bias' is not accessible (protected)" -- the check runs while V's
-// constructor body is converted, in V's context.  The declaration form
-// `V v{bias, 3}' works.  (CBMC's own smt2_dec.cpp,
+// where it appears, which is accessible.  (CBMC's own smt2_dec.cpp,
 // `argv = {solver_binary_or_empty, temp_file_problem()}' with a
 // std::vector<std::string>, dog-fooding.)
 extern "C" void __CPROVER_assert(bool, const char *);
