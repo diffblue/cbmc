@@ -14,7 +14,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [class.temporary]/6, /8: `const D &r = D(3)' extends the
+N5008 [class.temporary]/6: `const D &r = D(3)' extends the
 temporary's lifetime to that of r, and the temporary is destroyed (its
 destructor runs) when r's lifetime ends.  Goto conversion kept every
 temporary of a reference's initializer alive until the end of the scope
