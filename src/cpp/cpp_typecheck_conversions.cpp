@@ -4379,7 +4379,7 @@ bool cpp_typecheckt::implicit_conversion_sequence(
   exprt e = expr;
 
   // A braced-init-list element pre-typechecked at its call site (see
-  // typecheck_side_effect_function_call, [class.access.general]/5) is
+  // typecheck_side_effect_function_call, [class.access.general]/6) is
   // wrapped as already-typechecked; the conversion machinery operates
   // on the real expression inside.
   while(e.id() == ID_already_typechecked)

@@ -4401,7 +4401,7 @@ std::optional<typet> cpp_typecheckt::builtin_common_type(
   return {};
 }
 
-/// N5008 [class.access.general]/5: access control for a name is judged in
+/// N5008 [class.access.general]/6: access control for a name is judged in
 /// the context in which the name APPEARS.  The elements of a braced-init-list
 /// argument (`wrapt w({this->member})') are expressions of the call site;
 /// typecheck them in the calling member's scope and mark them done.  Deferred
@@ -6757,7 +6757,7 @@ bool cpp_typecheckt::has_viable_init_list_constructor(
       try
       {
         // an element typechecked at the call site (a member access
-        // `this->m' judged accessible there, [class.access.general]/5) is
+        // `this->m' judged accessible there, [class.access.general]/6) is
         // not resolved again here, in the callee class's scope; it is
         // marked by typecheck_braced_argument_elements (a parsed element
         // may carry a type without being typechecked, `E{2}')
@@ -8952,7 +8952,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   // explicit template arguments (e.g., duration_cast<seconds>(d)).
   for(auto &arg : expr.arguments())
   {
-    // N5008 [class.access.general]/5: access control for a name is
+    // N5008 [class.access.general]/6: access control for a name is
     // judged in the context in which the name APPEARS.  The elements of
     // a braced-init-list argument (`wrapt w({this->member})`) are
     // expressions of the call site; typecheck them HERE, in the calling

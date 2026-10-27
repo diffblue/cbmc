@@ -1,6 +1,6 @@
 extern "C" void __CPROVER_assert(bool, const char *);
 
-// N5008 [class.access.general]/5: access control is applied uniformly;
+// N5008 [class.access.general]/4: access control is applied uniformly;
 // a member function of guardt may name its own private member
 // wherever an expression may appear -- including inside a
 // braced-init-list ARGUMENT to a constructor call.  CBMC used to
