@@ -544,6 +544,25 @@ public:
     if(e.id() != ID_side_effect)
       return true; // no effect to apply (e.g. a plain expression)
     const irep_idt &st = e.get(ID_statement);
+    // N5008 [stmt.expr]/1: the expression of an expression statement is a
+    // discarded-value expression ([expr.context]/2), evaluated all the same
+    // ([expr.const]/10 does not exclude it).  A call whose arguments are all
+    // passed by value cannot modify an object of the caller ([expr.call]/6:
+    // each parameter is initialized from its argument), and the evaluation
+    // of its body is independent of the tracked variables: when it yields a
+    // constant, discarding that constant has no effect.  A call that may
+    // write through a pointer or reference argument (or `this') is not
+    // modelled.
+    if(st == ID_function_call)
+    {
+      for(const auto &argument :
+          to_side_effect_expr_function_call(e).arguments())
+      {
+        if(argument.type().id() == ID_pointer)
+          return false;
+      }
+      return is_constant_value(eval(e), symbol_table);
+    }
     // N5008 [expr.const]/5 (C++14 relaxed constexpr), [expr.ass]: an
     // assignment to an element of an array member of the object under
     // construction or of a local array, also of a multidimensional one
