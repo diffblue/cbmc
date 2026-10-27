@@ -3,22 +3,15 @@
 // std::__invoke and __invoke_impl (INVOKE of the _Partial closure object,
 // whose operator() is a member template).  This program is the libstdc++ 16
 // <ranges> machinery for it, reduced with cvise (g++ 16 compiling and
-// running each candidate) and with the compiler built-ins replaced by plain
-// templates; g++ 13 and clang++ 18 compile and run it.
+// running each candidate, then g++ 13 and clang++ 18 doing the same, the
+// compiler built-ins replaced by plain templates).
 extern "C" void __CPROVER_assert(bool, const char *);
 namespace std
 {
-template <int __v>
-struct integral_constant
-{
-  static constexpr int value = __v;
-};
-template <bool __v>
-using __bool_constant = integral_constant<__v>;
 struct __conditional
 {
-  template <typename _Tp, typename>
-  using type = _Tp;
+  template <typename, typename _Up>
+  using type = _Up;
 };
 template <bool, typename _If, typename _Else>
 using __conditional_t = __conditional::type<_If, _Else>;
@@ -26,18 +19,10 @@ template <typename _Tp, typename _Up = _Tp>
 _Up __declval(int);
 template <typename _Tp>
 auto declval() -> decltype(__declval<_Tp>(0));
-template <typename _Tp>
-struct remove_reference
-{
-  using type = _Tp;
-};
+template <typename>
+struct remove_reference;
 template <typename _Tp>
 struct remove_reference<_Tp &>
-{
-  using type = _Tp;
-};
-template <typename _Tp>
-struct remove_reference<_Tp &&>
 {
   using type = _Tp;
 };
@@ -64,15 +49,15 @@ struct __invoke_result
   : __result_of_impl<false, false, _Functor, _ArgTypes...>::type
 {
 };
-template <typename _Tp>
+template <typename>
 constexpr bool is_array_v = false;
-template <typename _Tp, decltype(sizeof(0)) _N>
+template <typename _Tp, decltype(0) _N>
 constexpr bool is_array_v<_Tp[_N]> = true;
 template <typename>
 bool is_lvalue_reference_v;
 template <typename _Tp>
 constexpr bool is_lvalue_reference_v<_Tp &> = true;
-template <typename _Tp, typename _Up>
+template <typename, typename>
 constexpr bool is_same_v = false;
 template <typename _Tp>
 constexpr bool is_same_v<_Tp, _Tp> = true;
@@ -96,27 +81,17 @@ concept convertible_to = requires
   _From();
 };
 template <typename _Tp>
-concept move_constructible = convertible_to<_Tp, _Tp>;
-template <typename _Tp>
-concept copy_constructible = move_constructible<_Tp>;
+concept copy_constructible = convertible_to<_Tp, _Tp>;
 template <typename>
 void forward()
 {
 }
-template <typename _Iter>
-concept input_or_output_iterator = requires(_Iter __i)
-{
-  __i;
-};
-template <typename _Iter>
-concept input_iterator = input_or_output_iterator<_Iter>;
 namespace ranges::__access
 {
 template <typename _Tp>
 concept __member_begin = requires(_Tp __t)
 {
   __decay_t<decltype(__t.begin())>();
-  __decay_t<decltype(0)>();
 };
 template <typename _Tp>
 auto __begin(_Tp &__t)
@@ -134,13 +109,14 @@ using __range_iter_t = decltype(ranges::__access::__begin(declval<_Tp &>()));
 }
 namespace ranges
 {
-inline namespace __detail
+namespace __detail
 {
 template <typename _Tp>
 concept __maybe_borrowed_range = is_lvalue_reference_v<_Tp>;
 }
 namespace __access
 {
+using __detail::__maybe_borrowed_range;
 struct _Begin
 {
   template <__maybe_borrowed_range _Tp>
@@ -153,7 +129,6 @@ template <typename _Tp>
 concept __member_end = requires(_Tp __t)
 {
   __decay_t<decltype(__t.end())>();
-  __decay_t<decltype(0)>();
 };
 struct _End
 {
@@ -167,11 +142,8 @@ struct _End
   }
 };
 } // namespace __access
-namespace
-{
 __access::_Begin begin;
 __access::_End end;
-} // namespace
 template <typename>
 concept range = requires
 {
@@ -181,7 +153,7 @@ template <typename _Tp>
 using iterator_t = std::__detail::__range_iter_t<_Tp>;
 template <range _Range>
 using sentinel_t = decltype(end(declval<_Range &>()));
-namespace
+namespace __detail
 {
 template <typename>
 void __is_derived_from_view_interface_fn();
@@ -190,15 +162,15 @@ concept __is_derived_from_view_interface = requires
 {
   __is_derived_from_view_interface_fn;
 };
-} // namespace
+} // namespace __detail
 template <typename _Tp>
-constexpr bool enable_view = __is_derived_from_view_interface<_Tp>;
+constexpr bool enable_view = __detail::__is_derived_from_view_interface<_Tp>;
 template <typename _Tp>
 concept view = enable_view<_Tp>;
 template <typename _Tp>
-concept input_range = input_iterator<_Tp>;
+concept input_range = same_as<iterator_t<_Tp>, sentinel_t<_Tp>>;
 template <typename _Tp>
-concept viewable_range = (!view<_Tp>);
+concept viewable_range = !view<_Tp>;
 } // namespace ranges
 template <typename _Res, typename _Fn, typename... _Args>
 _Res __invoke_impl(_Fn __f, _Args &&...__args)
@@ -214,7 +186,7 @@ __invoke(_Callable __fn, _Args &&...__args)
 }
 namespace ranges
 {
-namespace
+namespace __detail
 {
 using std::__detail::__different_from;
 }
@@ -229,8 +201,7 @@ struct _Binder
   template <typename _Tp, typename... _CallArgs>
   static auto _S_call(_Tp, _CallArgs &&...__call_args)
   {
-    _Tp __trans_tmp_1 = forward<_Tp>;
-    _Tp __trans_tmp_2 = forward<_Tp>;
+    _Tp __trans_tmp_1 = forward<_Tp>, __trans_tmp_2 = forward<_Tp>;
     return __invoke(
       __trans_tmp_1._M_fd, __call_args..., __trans_tmp_2._M_bound_args);
   }
@@ -241,7 +212,7 @@ template <typename _Fn, typename... _Args>
 using _Bind_back_t = _Binder<0, _Fn, _Args...>;
 namespace ranges
 {
-namespace
+namespace __detail
 {
 struct _ViaPointer
 {
@@ -259,8 +230,7 @@ template <typename, typename... _Iters>
 using __func_handle_t = decltype(__select<_Iters...>());
 template <bool _Const, typename _Tp>
 using __maybe_const_t = __conditional_t<_Const, _Tp, _Tp>;
-;
-}; // namespace
+} // namespace __detail
 template <typename, typename... _Args>
 concept __adaptor_partial_app_viable = sizeof...(_Args) == 1;
 template <typename...>
@@ -299,7 +269,7 @@ template <range _Range>
 struct ref_view
 {
   _Range *_M_r;
-  template <__different_from<ref_view> _Tp>
+  template <__detail::__different_from<ref_view> _Tp>
   ref_view(_Tp)
   {
   }
@@ -316,14 +286,6 @@ template <typename _Range>
 ref_view(_Range &) -> ref_view<_Range>;
 namespace views
 {
-namespace __detail
-{
-template <typename _Range>
-concept __can_ref_view = requires
-{
-  declval<_Range>;
-};
-} // namespace __detail
 struct
 {
   template <viewable_range _Range>
@@ -339,17 +301,17 @@ template <input_range _Vp, copy_constructible _Fp>
 struct transform_view
 {
   template <bool _Const>
-  using _Base = __maybe_const_t<_Const, _Vp>;
+  using _Base = __detail::__maybe_const_t<_Const, _Vp>;
   template <int _Const>
   struct _Iterator
   {
     using _Base = _Base<_Const>;
     using _Base_iter = iterator_t<_Base>;
-    using _Func_handle =
-      __func_handle_t<__maybe_const_t<_Const, _Fp>, _Base_iter>;
+    using _Func_handle = __detail::
+      __func_handle_t<__detail::__maybe_const_t<_Const, _Fp>, _Base_iter>;
     _Base_iter _M_current;
     _Func_handle _M_fun;
-    _Iterator(__maybe_const_t<_Const, transform_view> *, _Base_iter)
+    _Iterator(__detail::__maybe_const_t<_Const, transform_view> *, _Base_iter)
     {
     }
     auto operator*()
@@ -365,7 +327,6 @@ struct transform_view
     }
   };
   _Vp _M_base;
-
   transform_view(_Vp, _Fp __fun) : _M_base(__fun)
   {
   }
@@ -395,12 +356,13 @@ struct _Transform : _RangeAdaptor<_Transform>
 } // namespace ranges
 namespace views = ranges::views;
 } // namespace std
-// The reduced range types are not usable at run time (the views keep no
-// range), so the range-for is only instantiated, never executed.
+// The reduced iterator does not advance: the range-for is instantiated but
+// never executed.
 void transform_loop()
 {
   int a[1] = {5};
-  for(int x : a | std::views::transform([] {}))
+  auto lam = [] {};
+  for(int x : a | std::views::transform(lam))
     (void)x;
 }
 
