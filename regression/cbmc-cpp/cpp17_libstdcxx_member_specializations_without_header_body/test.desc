@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17 --object-bits 12 --unwind 6
+^\[main\.assertion\.1\] line \d+ ignore then extract: SUCCESS$
+^\[main\.assertion\.2\] line \d+ getline with delimiter: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+no body for callee
+--
+The specializations were selected and had no body: their results were
+nondeterministic.

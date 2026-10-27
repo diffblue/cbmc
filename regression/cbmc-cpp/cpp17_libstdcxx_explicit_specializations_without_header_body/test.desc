@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17 --object-bits 12 --unwind 5
 ^\[main\.assertion\.1\] .* extract a string: SUCCESS$
@@ -12,5 +12,7 @@ main.cpp
 ^CONVERSION ERROR$
 no-body
 --
-Currently both assertions fail: the char specializations have no body
-(main.no-body.std::operator>>, __copy_streambufs.no-body).
+Fixed: both assertions failed, the char specializations having no body
+(main.no-body.std::operator>>, __copy_streambufs.no-body); a library
+specialization declared without a definition is no longer recorded, so
+uses instantiate the primary template.

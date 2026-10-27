@@ -2618,6 +2618,26 @@ void cpp_typecheckt::convert_template_function_or_member_specialization(
   cpp_declaratort declarator = declaration.declarators().front();
   cpp_namet &cpp_name = declarator.name();
 
+  // A standard library header may declare an explicit specialization of a
+  // function template, or of a member function of a class template, whose
+  // definition is in the compiled library only (libstdc++'s
+  // `template<> basic_istream<char> &operator>>(basic_istream<char> &,
+  // basic_string<char> &)', defined in libstdc++.so).  N5008 [temp.expl.spec]
+  // makes uses refer to that specialization, but its definition is not
+  // available to the analysis, and calls to it would return nondeterministic
+  // results.  The standard specifies such a function's behaviour once, for
+  // the template ([string.io]/1 for this operator>>), and the header's
+  // definition of the primary template implements it; so a library
+  // specialization declared without a definition is not recorded, and uses
+  // instantiate the primary template's definition instead.  A deleted
+  // specialization (`= delete') is kept.
+  if(
+    declarator.value().is_nil() &&
+    is_library_body_file(id2string(cpp_name.source_location().get_file())))
+  {
+    return;
+  }
+
   // There is specialization (instantiation with template arguments)
   // but also function overloading (no template arguments)
 
