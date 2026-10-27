@@ -141,6 +141,7 @@ __CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
 #ifndef __GNUC__
 _Bool __builtin_mul_overflow();
 #endif
+const void *__CPROVER_new_object;
 __CPROVER_bool __CPROVER_malloc_is_new_array;
 
 void *calloc(__CPROVER_size_t nmemb, __CPROVER_size_t size)
@@ -180,8 +181,10 @@ __CPROVER_HIDE:;
   // and __CPROVER_allocate doesn't, but no one cares
   malloc_res = __CPROVER_allocate(alloc_size, 1);
 
-  // record the object size for non-determistic bounds checking
+  // non-deterministically record the object for delete/delete[] and free
+  // checking: it was not allocated by new[]
   __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
+  __CPROVER_new_object = record_malloc ? malloc_res : __CPROVER_new_object;
   __CPROVER_malloc_is_new_array =
     record_malloc ? 0 : __CPROVER_malloc_is_new_array;
 
@@ -204,6 +207,7 @@ __CPROVER_HIDE:;
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
 #ifndef LIBRARY_CHECK
+const void *__CPROVER_new_object;
 __CPROVER_bool __CPROVER_malloc_is_new_array;
 #endif
 
@@ -243,8 +247,10 @@ __CPROVER_HIDE:;
   void *malloc_res;
   malloc_res = __CPROVER_allocate(malloc_size, 0);
 
-  // record the object size for non-determistic bounds checking
+  // non-deterministically record the object for delete/delete[] and free
+  // checking: it was not allocated by new[]
   __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
+  __CPROVER_new_object = record_malloc ? malloc_res : __CPROVER_new_object;
   __CPROVER_malloc_is_new_array =
     record_malloc ? 0 : __CPROVER_malloc_is_new_array;
 
@@ -264,6 +270,7 @@ __CPROVER_HIDE:;
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
 const void *__CPROVER_alloca_object;
 #ifndef LIBRARY_CHECK
+const void *__CPROVER_new_object;
 __CPROVER_bool __CPROVER_malloc_is_new_array;
 #endif
 
@@ -273,9 +280,12 @@ void *__builtin_alloca(__CPROVER_size_t alloca_size)
   void *res;
   res = __CPROVER_allocate(alloca_size, 0);
 
-  // record the object size for non-determistic bounds checking
-  __CPROVER_bool record_malloc=__VERIFIER_nondet___CPROVER_bool();
-  __CPROVER_malloc_is_new_array=record_malloc?0:__CPROVER_malloc_is_new_array;
+  // non-deterministically record the object for delete/delete[] and free
+  // checking: it was not allocated by new[]
+  __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
+  __CPROVER_new_object = record_malloc ? res : __CPROVER_new_object;
+  __CPROVER_malloc_is_new_array =
+    record_malloc ? 0 : __CPROVER_malloc_is_new_array;
 
   // record alloca to detect invalid free
   __CPROVER_bool record_alloca = __VERIFIER_nondet___CPROVER_bool();
