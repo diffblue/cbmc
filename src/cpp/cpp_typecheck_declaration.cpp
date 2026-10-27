@@ -13,11 +13,187 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/symbol.h>
 #include <util/symbol_table_base.h>
 
+#include "cpp_convert_type.h"
 #include "cpp_declarator_converter.h"
 #include "cpp_template_type.h"
 #include "cpp_typecheck.h"
 #include "cpp_typecheck_fargs.h"
 #include "cpp_util.h"
+
+/// N5008 [over.match.class.deduct]/3: class template argument deduction for
+/// an alias template A whose defining-type-id is a simple-template-id
+/// `C<args>' uses guides derived from those of C, restricted by the
+/// constraint that A's arguments are deducible from the guide's result
+/// ([over.match.class.deduct]/4).  Implemented as: deduce C's arguments
+/// from \p args, then deduce A's template parameters by matching `C<args>'
+/// against the result, and accept the result only when A<those arguments>
+/// denotes it.  A guide of C whose result does not have the form of A's
+/// defining-type-id is thereby rejected, as by the constraint; a guide that
+/// C's own deduction ranks below another but whose substituted form would
+/// be viable for A is not considered (deduction then fails where a full
+/// implementation of /3 could succeed, it never deduces a different type).
+std::optional<typet> cpp_typecheckt::deduce_alias_template_arguments(
+  const cpp_scopet::id_sett &id_set,
+  const std::vector<exprt> &args,
+  bool copy_initialization)
+{
+  for(const auto *id : id_set)
+  {
+    if(id->id_class != cpp_idt::id_classt::TEMPLATE)
+      continue;
+    const symbolt *alias_symbol = symbol_table.lookup(id->identifier);
+    if(
+      alias_symbol == nullptr ||
+      alias_symbol->type.id() != ID_cpp_declaration ||
+      !to_cpp_declaration(alias_symbol->type).is_template_alias())
+    {
+      continue;
+    }
+    const cpp_declarationt &alias = to_cpp_declaration(alias_symbol->type);
+    if(alias.declarators().size() != 1)
+      continue;
+    typet defining_type = alias.declarators().front().merge_type(alias.type());
+    cpp_convert_plain_type(defining_type, get_message_handler());
+    if(defining_type.id() != ID_cpp_name)
+      continue;
+    const cpp_namet &pattern = to_cpp_name(defining_type);
+    if(
+      pattern.get_sub().empty() ||
+      pattern.get_sub().back().id() != ID_template_args)
+    {
+      continue;
+    }
+    const irept::subt &pattern_args =
+      pattern.get_sub().back().find(ID_arguments).get_sub();
+
+    // the alias's type template parameters (a pack or a non-type parameter
+    // is not handled)
+    std::vector<irep_idt> parameters;
+    bool supported = true;
+    for(const auto &parameter : alias.template_type().template_parameters())
+    {
+      if(parameter.id() != ID_type || parameter.get_bool(ID_ellipsis))
+      {
+        supported = false;
+        break;
+      }
+      const std::string name = id2string(parameter.type().get(ID_identifier));
+      const auto sep = name.rfind("::");
+      parameters.push_back(
+        sep == std::string::npos ? name : name.substr(sep + 2));
+    }
+    if(!supported || parameters.empty())
+      continue;
+
+    // the arguments are expressions of this context
+    std::vector<exprt> typed_args;
+    for(const auto &a : args)
+    {
+      exprt arg = a;
+      if(arg.type().is_nil() || arg.type().id().empty())
+        typecheck_expr(arg);
+      typed_args.push_back(arg);
+    }
+
+    // deduce C's arguments in the alias's scope
+    std::optional<typet> deduced;
+    {
+      cpp_save_scopet save_scope(cpp_scopes);
+      const auto scope_it = cpp_scopes.id_map.find(id->identifier);
+      if(scope_it != cpp_scopes.id_map.end() && scope_it->second != nullptr)
+        cpp_scopes.go_to(scope_it->second->get_parent());
+      cpp_namet class_name = pattern;
+      class_name.get_sub().pop_back();
+      try
+      {
+        deduced = deduce_class_template_arguments(
+          class_name, typed_args, copy_initialization);
+      }
+      catch(...)
+      {
+        deduced.reset();
+      }
+    }
+    if(!deduced.has_value() || deduced->id() != ID_struct_tag)
+      continue;
+
+    // [over.match.class.deduct]/4: deduce A's arguments from the result --
+    // a pattern argument that is one of A's parameters takes the result's
+    // corresponding argument
+    const symbolt *class_symbol =
+      symbol_table.lookup(to_struct_tag_type(*deduced).get_identifier());
+    if(class_symbol == nullptr)
+      continue;
+    const irept &result_args_irep =
+      class_symbol->type.find(ID_C_template_arguments);
+    if(result_args_irep.is_nil())
+      continue;
+    const auto &result_args =
+      static_cast<const cpp_template_args_tct &>(result_args_irep).arguments();
+    if(result_args.size() < pattern_args.size())
+      continue;
+    std::map<irep_idt, typet> bound;
+    for(std::size_t i = 0; i < pattern_args.size(); ++i)
+    {
+      const irept &pa = pattern_args[i];
+      // a parsed template argument that may be a type or an expression is
+      // `ambiguous'; its type is the candidate type-id
+      const irept &pa_name =
+        pa.id() == ID_type || pa.id() == ID_ambiguous ? pa.find(ID_type) : pa;
+      if(
+        pa_name.id() == ID_cpp_name && pa_name.get_sub().size() == 1 &&
+        pa_name.get_sub().front().id() == ID_name &&
+        result_args[i].id() == ID_type)
+      {
+        const irep_idt n = pa_name.get_sub().front().get(ID_identifier);
+        if(
+          std::find(parameters.begin(), parameters.end(), n) !=
+          parameters.end())
+        {
+          const auto it = bound.find(n);
+          if(it != bound.end() && it->second != result_args[i].type())
+          {
+            supported = false;
+            break;
+          }
+          bound[n] = result_args[i].type();
+        }
+      }
+    }
+    if(!supported || bound.size() != parameters.size())
+      continue;
+
+    // A<deduced arguments> must denote the result (the non-parameter parts
+    // of the pattern must match)
+    cpp_namet alias_id = cpp_namet{alias_symbol->base_name};
+    irept template_args{ID_template_args};
+    irept &arguments = template_args.add(ID_arguments);
+    for(const auto &p : parameters)
+    {
+      exprt type_argument{ID_type};
+      type_argument.type() = bound.at(p);
+      arguments.get_sub().push_back(type_argument);
+    }
+    alias_id.get_sub().push_back(template_args);
+    typet alias_type =
+      static_cast<const typet &>(static_cast<const irept &>(alias_id));
+    try
+    {
+      cpp_save_scopet save_scope(cpp_scopes);
+      const auto scope_it = cpp_scopes.id_map.find(id->identifier);
+      if(scope_it != cpp_scopes.id_map.end() && scope_it->second != nullptr)
+        cpp_scopes.go_to(scope_it->second->get_parent());
+      typecheck_type(alias_type);
+    }
+    catch(...)
+    {
+      continue;
+    }
+    if(alias_type == *deduced)
+      return deduced;
+  }
+  return {};
+}
 
 std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
   const cpp_namet &class_template_name,
@@ -85,7 +261,7 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
     }
   }
   if(template_id == nullptr)
-    return {};
+    return deduce_alias_template_arguments(id_set, args, copy_initialization);
 
   // The template's type parameters, noting a trailing parameter pack.
   std::vector<bool> param_is_pack;
