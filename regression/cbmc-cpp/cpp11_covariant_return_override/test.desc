@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] .* direct call: SUCCESS$
@@ -12,4 +12,7 @@ main.cpp
 ^\[.*pointer_dereference.*: FAILURE$
 --
 g++ 13 (-fsanitize=address,undefined) and clang++ 18 accept this program,
-and it fails only its WRONG assertion.  Currently both assertions fail.
+and it fails only its WRONG assertion.  Fixed: the thunk for B's vtable
+slot kept D::self's return type D *, which did not fit the slot, and D's
+virtual table object was not created at all (both assertions failed with
+dereference failures).

@@ -1932,6 +1932,41 @@ void cpp_typecheckt::typecheck_compound_declarator(
           .base_type()
           .set(ID_identifier, virtual_base);
 
+        // N5008 [class.virtual]/8-9: the overrider's return type may be
+        // covariant with the overridden function's (D * for B *); called as
+        // the final overrider of the base's function, its result is
+        // converted to the base function's return type.  The thunk has the
+        // base's signature, so that it fits the base's vtable slot, and its
+        // body converts the result (build_this_adjusting_thunk_body).
+        for(const auto &comp : components)
+        {
+          if(
+            !comp.get_bool(ID_is_virtual) ||
+            comp.get(ID_virtual_name) != virtual_name ||
+            comp.type().id() != ID_code)
+          {
+            continue;
+          }
+          const code_typet &base_code = to_code_type(comp.type());
+          if(
+            base_code.parameters().empty() ||
+            base_code.parameters()[0].type().id() != ID_pointer ||
+            to_pointer_type(base_code.parameters()[0].type())
+                .base_type()
+                .get(ID_identifier) != virtual_base)
+          {
+            continue;
+          }
+          if(
+            base_code.return_type().id() == ID_pointer &&
+            code_type.return_type().id() == ID_pointer &&
+            base_code.return_type() != code_type.return_type())
+          {
+            code_type.return_type() = base_code.return_type();
+          }
+          break;
+        }
+
         // The thunk has the base's signature: a virtual destructor of a
         // class with virtual bases takes the hidden `@most_derived'
         // parameter (see add_this_to_method_type), which a call through
