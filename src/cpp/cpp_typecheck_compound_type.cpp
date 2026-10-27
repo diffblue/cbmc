@@ -2976,6 +2976,31 @@ void cpp_typecheckt::typecheck_friend_declaration(
             subst_self(d.type());
           subst_self(declaration.type());
         }
+
+        // N5008 [temp.local]/1, [temp.friend]/1: the friend's declared types
+        // -- its return type and parameter types -- are looked up in the
+        // class, too; an enclosing template parameter they name (libstdc++
+        // 16's __normal_iterator: `friend __synth3way_t<_Iterator, _Iter>
+        // operator<=>(...)' with _Iterator the class's parameter) is
+        // substituted now, as for the defaults and the requires-clause
+        // above.  Declarator names are not types and are left alone.
+        {
+          std::function<void(irept &)> subst_in_types = [&](irept &node)
+          {
+            if(subst_enclosing(node))
+              return;
+            for(auto &child : node.get_sub())
+              subst_in_types(child);
+            for(auto &named : node.get_named_sub())
+            {
+              if(named.first != ID_name)
+                subst_in_types(named.second);
+            }
+          };
+          for(auto &d : declaration.declarators())
+            subst_in_types(d.type());
+          subst_in_types(declaration.type());
+        }
       }
       cpp_scopes.go_to(*scope);
       // N5008 [class.friend]/1 + [temp.local]/1: the class scope stays
