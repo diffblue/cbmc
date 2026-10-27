@@ -1,0 +1,14 @@
+CORE
+main.c
+--apply-loop-contracts _ --no-standard-checks
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+The assigns clause of the inner loop is inferred. The write p->f in w aliases
+s.f, so the inferred write set gets the target (&s)->f, which is built from
+the may-alias information. Such targets must carry a source location: the
+instrumentation of the outer loop visits the checks generated for the inner
+loop, and a check without a source location failed a precondition in
+instrument_spec_assigns.h.
