@@ -15,6 +15,6 @@ main.cpp
 --
 g++ 13 (-fsanitize=address,undefined) and clang++ 18 accept this program,
 and it fails only its WRONG assertion.
-broken-libstdcxx16: with libstdc++ 16, std::__invoke of the
-views::transform and views::filter range adaptor closures loses its body;
-not reduced yet.
+broken-libstdcxx16: with libstdc++ 16, std::__invoke and __invoke_impl of
+the views::transform and views::filter range adaptor closures lose their
+bodies (KNOWNBUG cpp20_range_adaptor_closure_invoked_through_invoke_impl).

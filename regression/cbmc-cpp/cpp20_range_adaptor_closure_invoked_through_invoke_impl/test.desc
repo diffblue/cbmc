@@ -1,0 +1,19 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ converted: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+dropped the body
+--
+__invoke_impl<_Partial<_Transform, ...>> and __invoke lose their bodies:
+the call __f(__args...) of the _Partial closure object finds "no match for
+symbol '_Partial'" (CBMC_CPP_SHOW_SUPPRESSED=1), as if the call named the
+class's constructor rather than its member operator() template.  A
+hand-written partial specialization called the same way works, so the cause
+is in the remaining <ranges> context; not reduced further (cvise stopped at
+its 2 h limit).  With libstdc++ 16 this is the drop of
+cpp20_ranges_views_iota_transform_filter_drop (broken-libstdcxx16).
