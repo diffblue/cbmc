@@ -9880,7 +9880,9 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
         deferred_method_bodies.count(callee_symbol->name) != 0 &&
         convert_deferred_method_now(callee_symbol->name))
       {
+        // the call's type is the deduced return type, too, as below
         expr.function().type() = callee_symbol->type;
+        expr.type() = to_code_type(callee_symbol->type).return_type();
       }
       if(
         callee_symbol != nullptr && callee_symbol->value.is_not_nil() &&
