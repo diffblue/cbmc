@@ -126,7 +126,53 @@ void cpp_typecheckt::build_this_adjusting_thunk_body(
     code_type.return_type().id() != ID_empty &&
     code_type.return_type().id() != ID_destructor)
   {
-    expr_call.type() = to_code_type(target_type).return_type();
+    const typet &target_return = to_code_type(target_type).return_type();
+    expr_call.type() = target_return;
+    const typet &thunk_return = code_type.return_type();
+    if(
+      thunk_return != target_return && thunk_return.id() == ID_pointer &&
+      target_return.id() == ID_pointer &&
+      to_pointer_type(thunk_return).base_type().id() == ID_struct_tag &&
+      to_pointer_type(target_return).base_type().id() == ID_struct_tag)
+    {
+      // N5008 [class.virtual]/9: a covariant overrider's result converted to
+      // the overridden function's return type -- derived-to-base
+      // ([conv.ptr]/3; [dcl.init.ref]/5 for a reference), a null pointer
+      // staying null
+      if(is_reference(thunk_return) || is_rvalue_reference(thunk_return))
+      {
+        exprt converted = std::move(expr_call);
+        make_ptr_typecast(converted, to_pointer_type(thunk_return));
+        thunk.value = code_blockt{{code_frontend_returnt(converted)}};
+      }
+      else
+      {
+        const irep_idt result_id = id2string(thunk.name) + "::$result";
+        if(!symbol_table.has_symbol(result_id))
+        {
+          symbolt result{result_id, target_return, thunk.mode};
+          result.base_name = "$result";
+          result.is_lvalue = true;
+          result.is_file_local = true;
+          result.is_thread_local = true;
+          result.location = thunk.location;
+          symbol_table.insert(std::move(result));
+        }
+        const symbol_exprt result_expr{result_id, target_return};
+        exprt converted = result_expr;
+        make_ptr_typecast(converted, to_pointer_type(thunk_return));
+        code_blockt body;
+        body.add(code_frontend_declt{result_expr});
+        body.add(code_frontend_assignt{result_expr, std::move(expr_call)});
+        body.add(code_frontend_returnt{if_exprt{
+          equal_exprt{
+            result_expr, null_pointer_exprt{to_pointer_type(target_return)}},
+          null_pointer_exprt{to_pointer_type(thunk_return)},
+          converted}});
+        thunk.value = std::move(body);
+      }
+      return;
+    }
     thunk.value = code_blockt{{code_frontend_returnt(std::move(expr_call))}};
   }
   else
