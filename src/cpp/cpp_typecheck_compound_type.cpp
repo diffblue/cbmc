@@ -6602,6 +6602,92 @@ bool cpp_typecheckt::check_component_access(
     return false; // ok
   }
 
+  // N5008 [class.access.base]/5.4, applied at every level: m named in N is
+  // accessible at R if a base class B of N is accessible at R ([class.access
+  // .base]/4) and m is accessible at R when named in B, by /5.1-5.3 or
+  // again by /5.4.  The case above covers B = the declaring class; an
+  // intermediate base may grant it too: `struct D : private A { friend
+  // struct B; }; struct E : D {};' -- in B, e.m names A::m in E, where it is
+  // inaccessible, but D is a public base of E and m is a private member of D,
+  // accessible to D's friend B.
+  if(struct_union_type.id() == ID_struct)
+  {
+    const irep_idt &component_name = component.get_name();
+    // R occurs in a direct member or friend of class X ([class.access.nest]/1:
+    // a nested class's members count as members)
+    const auto in_member_or_friend = [&](const struct_typet &x)
+    {
+      for(cpp_scopet *pscope = &(cpp_scopes.current_scope());
+          !(pscope->is_root_scope());
+          pscope = &(pscope->get_parent()))
+      {
+        if(pscope->is_class() && pscope->identifier == x.get(ID_name))
+          return true;
+      }
+      return befriended_here(x);
+    };
+    std::function<bool(const struct_typet &, std::size_t)> named_accessible =
+      [&](const struct_typet &x, std::size_t depth) -> bool
+    {
+      if(depth > 32)
+        return false;
+      const irep_idt *access_in_x = nullptr;
+      for(const auto &c : x.components())
+      {
+        if(c.get_name() == component_name)
+        {
+          access_in_x = &c.get(ID_access);
+          break;
+        }
+      }
+      if(access_in_x == nullptr)
+        return false;
+      // [class.access.base]/5.1-5.3 (the derived-class case of /5.3 is
+      // handled above, for the naming class's hierarchy)
+      if(*access_in_x == ID_public)
+        return true;
+      if(
+        (*access_in_x == ID_private || *access_in_x == ID_protected) &&
+        in_member_or_friend(x))
+      {
+        return true;
+      }
+      // /5.4: through a direct base B of X that is accessible at R -- a
+      // public base (/4.1), or any base when R is in a member or friend of
+      // X (/4.2); the recursion covers /4.4's chains
+      for(const auto &b : x.bases())
+      {
+        if(static_cast<const exprt &>(b).type().id() != ID_struct_tag)
+          continue;
+        const symbolt &base_symbol = lookup(b.type());
+        if(base_symbol.type.id() != ID_struct)
+          continue;
+        const irep_idt &base_access = b.get(ID_access);
+        if(base_access != ID_public && !in_member_or_friend(x))
+          continue;
+        if(named_accessible(to_struct_type(base_symbol.type), depth + 1))
+          return true;
+      }
+      return false;
+    };
+    for(const auto &b : to_struct_type(struct_union_type).bases())
+    {
+      if(static_cast<const exprt &>(b).type().id() != ID_struct_tag)
+        continue;
+      const symbolt &base_symbol = lookup(b.type());
+      if(base_symbol.type.id() != ID_struct)
+        continue;
+      if(
+        b.get(ID_access) != ID_public &&
+        !in_member_or_friend(to_struct_type(struct_union_type)))
+      {
+        continue;
+      }
+      if(named_accessible(to_struct_type(base_symbol.type), 0))
+        return false; // ok
+    }
+  }
+
   return true; // not ok
 }
 

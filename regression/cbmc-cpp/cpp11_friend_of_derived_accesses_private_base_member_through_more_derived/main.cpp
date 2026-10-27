@@ -1,9 +1,7 @@
 // N5008 [class.access.base]/5.4: `e.m' names m in class E.  D is a public
 // base of E, accessible in B, and m named in D is a private member of D (A
 // is a private base of D) -- accessible in B, a friend of D.  So the access
-// is valid; g++ and clang++ accept it.  The front end flattens A's members
-// into E as inaccessible ("noaccess") and rejects it: "member 'A::m' is not
-// accessible (noaccess)".
+// is valid; g++ and clang++ accept it.
 extern "C" void __CPROVER_assert(bool, const char *);
 struct A
 {

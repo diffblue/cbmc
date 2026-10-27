@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ friend of D, two levels down: SUCCESS$
+^\[main\.assertion\.2\] line \d+ member of D: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+check_component_access applied [class.access.base]/5.4 only with the
+declaring class A as B; D, an intermediate base, granted nothing.

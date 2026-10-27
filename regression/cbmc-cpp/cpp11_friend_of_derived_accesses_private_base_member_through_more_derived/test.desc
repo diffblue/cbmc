@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] .* access through the friend of D: SUCCESS$
@@ -10,4 +10,5 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-Currently rejected: "member 'A::m' is not accessible (noaccess)".
+Fixed: rejected with "member 'A::m' is not accessible (noaccess)";
+[class.access.base]/5.4 is now applied at every base level.
