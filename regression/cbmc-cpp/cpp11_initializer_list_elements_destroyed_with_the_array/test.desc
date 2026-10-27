@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] .* size: SUCCESS$
@@ -13,12 +13,9 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-The backing array (initializer_list_backing_array, cpp_typecheck_
-conversions.cpp) is a static-lifetime symbol; its class-type elements are
-copied into it by its static initializer and never destroyed ("destroyed
-with the variable" fails).  Giving the array the lifetime of the list
-object -- a block-scope temporary whose elements are copy-constructed and
-destroyed -- needs the lifetime machinery of [class.temporary]/6 for the
-array, as for a temporary bound to a reference.  g++ 13
-(-fsanitize=address,undefined) and clang++ 18 accept this program, and it
-fails only its WRONG assertion.
+Fixed: the backing array (initializer_list_backing_array, cpp_typecheck_
+conversions.cpp) is a static-lifetime symbol whose elements are constructed
+in place where the list is evaluated; goto conversion now destroys them
+when the initializer_list object it initializes goes out of scope.
+g++ 13 (-fsanitize=address,undefined) and clang++ 18 accept this program,
+and it fails only its WRONG assertion.

@@ -2,8 +2,7 @@
 // one element copy-initialized from each element of the braced list;
 // [dcl.init.list]/6: the array has the lifetime of a temporary bound to
 // the initializer_list object -- here the variable `kept', so its elements
-// are destroyed at the end of the block.  The front end holds the elements
-// in a static array that is never destroyed: the destructor count stays 0.
+// are destroyed at the end of the block.
 extern "C" void __CPROVER_assert(bool, const char *);
 #include <initializer_list>
 int dtors = 0;

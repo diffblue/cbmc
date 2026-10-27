@@ -1,4 +1,4 @@
-// N5008 [class.temporary]/6, /8: a temporary bound to a reference persists
+// N5008 [class.temporary]/6: a temporary bound to a reference persists
 // for the lifetime of the reference and is then destroyed; a temporary
 // bound to a reference parameter of a call is destroyed at the end of the
 // full-expression (/6.10)
