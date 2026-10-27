@@ -2,10 +2,8 @@
 //   operator>>(basic_istream<char> &, basic_string<char> &)
 //   __copy_streambufs_eof(basic_streambuf<char> *, ...)  (`out << sb')
 // (bits/basic_string.h, <streambuf>) and defines them only in libstdc++.so.
-// The front end selects the declared specialization ([temp.expl.spec]),
-// which has no body, so `in >> s' and `out << in.rdbuf()' leave their
-// results nondeterministic and the correct assertions below fail.  A model
-// (or the primary template's definition) is needed for these functions.
+// Uses instantiate the primary templates' definitions in the headers,
+// which implement the behaviour N5008 specifies ([string.io]/1).
 extern "C" void __CPROVER_assert(bool, const char *);
 #include <sstream>
 #include <string>

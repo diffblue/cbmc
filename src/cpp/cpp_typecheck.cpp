@@ -264,6 +264,13 @@ void cpp_typecheckt::typecheck()
 
   typecheck_method_bodies();
 
+  // Classes elaborated while the method bodies were converted (a facet first
+  // named in a function body, std::ctype<char> in use_facet<ctype<char>>)
+  // declare members of the compiled library, too: give them their models,
+  // and convert what their models' conversion queued.
+  provide_library_source_models();
+  typecheck_method_bodies();
+
   typecheck_contracts();
 
   do_not_typechecked();
