@@ -2167,3 +2167,7 @@ No dog-food change.  The branch is rebased onto origin/develop; see
 
 No dog-food change.  Windows-only cbmc-cpp failures fixed; see
 .kiro/decltype_tuple_apply_findings.md, "Round 200".
+
+## Round 201 2026-10-27
+
+No dog-food change.  See .kiro/decltype_tuple_apply_findings.md, "Round 201".
