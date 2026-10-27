@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ constant initializer: SUCCESS$
@@ -13,8 +13,8 @@ main.cpp
 expected constant expression
 ^CONVERSION ERROR$
 --
-cbmc's constant evaluator (cpp_constexpr_eval.cpp, apply_side_effect)
-gives up on an expression statement that is a function call, so
-operator[] is not evaluated: "expected constant expression, but got
-'(signed int)operator[](...)'" for the case label, a conversion error.
-Without the `check(i);' statement the program verifies.
+Fixed: cbmc's constant evaluator (cpp_constexpr_eval.cpp,
+apply_side_effect) gave up on an expression statement that is a function
+call, so operator[] was not evaluated: "expected constant expression" for
+the case label, a conversion error.  A call with no pointer or reference
+argument that evaluates to a constant is now evaluated and discarded.
