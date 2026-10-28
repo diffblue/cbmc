@@ -1,0 +1,9 @@
+CORE unix
+main_02.c
+--pointer-check
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+\[main\.assertion\.1\] line \d+ assertion p != MAP_FAILED: FAILURE
+--
+^warning: ignoring
