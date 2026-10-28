@@ -1,0 +1,20 @@
+KNOWNBUG libcxx
+main.cpp
+--cpp11 --stdlib libc++ --unwind 12 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ no read error: SUCCESS$
+^\[main\.assertion\.2\] line \d+ 0 stored on failure: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The num_get facet is not modelled.  With libstdc++, num_get::get reads a
+nondeterministic facet pointer (dereference failures) and __check_facet
+calls std::__throw_bad_cast, which has no body; with libc++,
+locale::use_facet has no body and get() dereferences a nondeterministic
+__shared_count.  On the remaining paths cin.fail() always holds (assertion
+3 holds) and i is not 0 (assertion 2 fails).  The facet of the "C" locale
+is needed, as for num_put.
