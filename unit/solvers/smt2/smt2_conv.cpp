@@ -794,3 +794,79 @@ TEST_CASE(
       std::string::npos);
   }
 }
+
+TEST_CASE(
+  "smt2_convt extractbit with non-constant index uses bit-vector widening",
+  "[core][solvers][smt2]")
+{
+  // extractbit(src, idx) shifts src right by idx and checks bit 0.
+  // The shift operands must have the same width, so the index needs to
+  // be widened/narrowed to the source width. The old code typecast the
+  // index to the source TYPE (e.g. fixedbv), applying semantic conversion
+  // instead of plain bit-vector widening. The fix uses zero_extend or
+  // extract directly.
+
+  SECTION("narrow unsignedbv index zero-extended for wider source")
+  {
+    // src: 16-bit unsignedbv symbol, idx: 8-bit unsignedbv symbol.
+    // The index should be zero-extended from 8 to 16 bits.
+    const unsignedbv_typet u16{16};
+    const unsignedbv_typet u8{8};
+    const symbol_exprt src{"src", u16};
+    const symbol_exprt idx{"idx", u8};
+    const extractbit_exprt eb{src, idx};
+
+    const std::string smt = get_assert(eb);
+    // Must contain zero_extend of 8 bits (16-8=8).
+    CHECK(smt.find("zero_extend 8") != std::string::npos);
+    // Must NOT contain a typecast to the source type (no bvmul for
+    // fixed-point scaling, no conversion of c_bool values, etc.).
+  }
+
+  SECTION("fixedbv source with narrow index uses zero_extend, not typecast")
+  {
+    // src: 16-bit fixedbv (8 integer + 8 fraction), idx: 8-bit unsignedbv.
+    // Old code: typecast idx to fixedbv, which scales by 2^8 (the
+    // fraction bits), changing the bit pattern. New code: zero_extend
+    // from 8 to 16 bits, preserving the bit pattern.
+    fixedbv_typet fxtype;
+    fxtype.set_width(16);
+    fxtype.set_integer_bits(8);
+
+    const symbol_exprt src{"src", fxtype};
+    const symbol_exprt idx{"idx", unsignedbv_typet{8}};
+    const extractbit_exprt eb{src, idx};
+
+    const std::string smt = get_assert(eb);
+    // Must contain zero_extend of 8 bits.
+    CHECK(smt.find("zero_extend 8") != std::string::npos);
+    // Must NOT contain bvmul (which fixedbv typecast produces for
+    // fraction scaling).
+    CHECK(smt.find("bvmul") == std::string::npos);
+  }
+
+  SECTION("out-of-range index yields false")
+  {
+    // src: 8-bit, idx: 32-bit. Truncating the index to 8 bits would turn
+    // index 256 into index 0.
+    symbol_tablet symbol_table;
+    namespacet ns{symbol_table};
+    null_message_handlert message_handler;
+    smt2_dect smt2_dec(
+      ns,
+      "unit test",
+      "",
+      "QF_AUFBV",
+      smt2_dect::solvert::Z3,
+      "",
+      message_handler);
+
+    const symbol_exprt src{"src", unsignedbv_typet{8}};
+    const symbol_exprt idx{"idx", unsignedbv_typet{32}};
+    smt2_dec << equal_exprt{src, from_integer(255, src.type())};
+    smt2_dec << equal_exprt{idx, from_integer(256, idx.type())};
+    smt2_dec << extractbit_exprt{src, idx};
+
+    REQUIRE(smt2_dec() == decision_proceduret::resultt::D_UNSATISFIABLE);
+  }
+}
