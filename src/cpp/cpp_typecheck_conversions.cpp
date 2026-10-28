@@ -1236,6 +1236,34 @@ bool cpp_typecheckt::conversion_template_at_least_as_specialised(
 /// parameters can be used directly as inert "transformed" types and we only
 /// mark G's parameters deducible.  /5 (drop reference) and /7 (drop
 /// top-level cv) are applied to each P/A pair.
+/// Whether the function template declared by \p declaration has a
+/// trailing function parameter pack (N5008 [temp.deduct.partial]/11).
+bool cpp_typecheckt::has_trailing_function_parameter_pack(
+  const cpp_declarationt &declaration)
+{
+  if(declaration.declarators().empty())
+    return false;
+  const typet function_type =
+    declaration.declarators().front().merge_type(declaration.type());
+  const auto &parameters = function_type.find(ID_parameters).get_sub();
+  if(parameters.empty())
+    return false;
+  const irept &last = parameters.back();
+  if(last.get_bool(ID_ellipsis))
+    return true;
+  if(last.id() != ID_cpp_declaration)
+    return false;
+  const auto &parameter = to_cpp_declaration(static_cast<const exprt &>(last));
+  if(parameter.type().get_bool(ID_ellipsis))
+    return true;
+  for(const auto &d : parameter.declarators())
+  {
+    if(d.get_bool(ID_ellipsis) || d.type().get_bool(ID_ellipsis))
+      return true;
+  }
+  return false;
+}
+
 bool cpp_typecheckt::function_template_at_least_as_specialised(
   const cpp_declarationt &F,
   const cpp_declarationt &G,
@@ -1248,6 +1276,29 @@ bool cpp_typecheckt::function_template_at_least_as_specialised(
   // [temp.deduct.partial]/3.1: use the function parameter-type-lists.
   typet F_ft = F.declarators().front().merge_type(F.type());
   typet G_ft = G.declarators().front().merge_type(G.type());
+  // which parameters are function parameter packs: the `...' of a
+  // parameter's declarator, which the conversion below does not keep
+  const auto pack_flags = [](const typet &frontend_function_type)
+  {
+    std::vector<bool> flags;
+    for(const auto &p : frontend_function_type.find(ID_parameters).get_sub())
+    {
+      bool pack = p.get_bool(ID_ellipsis);
+      if(p.id() == ID_cpp_declaration)
+      {
+        const auto &declaration =
+          to_cpp_declaration(static_cast<const exprt &>(p));
+        for(const auto &d : declaration.declarators())
+          pack =
+            pack || d.get_bool(ID_ellipsis) || d.type().get_bool(ID_ellipsis);
+        pack = pack || declaration.type().get_bool(ID_ellipsis);
+      }
+      flags.push_back(pack);
+    }
+    return flags;
+  };
+  const std::vector<bool> F_packs = pack_flags(F_ft);
+  const std::vector<bool> G_packs = pack_flags(G_ft);
   // merge_type yields a frontend ID_function_type; convert to a proper
   // code type so the parameter list and (frontend) pointer/reference forms
   // are in the shape guess_template_args and the strippers expect.  This is
@@ -1268,20 +1319,72 @@ bool cpp_typecheckt::function_template_at_least_as_specialised(
   // __invoke(_Args&&...)' against `__invoke(_Fp&&, _Args&&...)': every F is
   // at least as specialized as it, and it as no F with a non-pack
   // parameter.
-  const auto is_pack = [](const code_typet::parametert &p)
-  { return p.get_bool(ID_ellipsis) || p.type().get_bool(ID_ellipsis); };
-  const auto only_pack = [&](const code_typet::parameterst &ps)
-  { return ps.size() == 1 && is_pack(ps.front()); };
-  if(F_params.size() != G_params.size() || F_params.empty())
+  const auto only_pack =
+    [&](const code_typet::parameterst &ps, const std::vector<bool> &packs)
   {
-    if(only_pack(G_params) && !only_pack(F_params))
-      return true;
-    // Partial ordering across other differing arities (default arguments,
-    // packs in other positions) is out of scope here; such candidates are
-    // left to the other tie-breakers / reported as ambiguous, never wrongly
-    // ordered.
-    return false;
+    return ps.size() == 1 && (ps.front().get_bool(ID_ellipsis) ||
+                              ps.front().type().get_bool(ID_ellipsis) ||
+                              (packs.size() == 1 && packs.front()));
+  };
+  if(only_pack(G_params, G_packs) && !only_pack(F_params, F_packs))
+    return true;
+
+  // The pairs of (A from F, P from G) parameter types.  N5008
+  // [temp.deduct.partial]/8: a function parameter pack of G is compared
+  // with each remaining parameter type of F (and with F's pack pattern, if
+  // F's remaining parameter is a pack).  [temp.deduct.type]/10: a pack of F
+  // with no corresponding parameter in G is ignored (10.1); one
+  // corresponding to a parameter of G that is not a pack makes deduction
+  // fail (10.2).  A parameter of G without a corresponding one in F
+  // (other than a trailing pack, which then deduces empty) is out of
+  // scope: default arguments are not compared here, so the pair is left
+  // unordered, never wrongly ordered.
+  const auto is_pack_at = [](
+                            const code_typet::parameterst &params,
+                            const std::vector<bool> &packs,
+                            std::size_t i)
+  {
+    return params[i].get_bool(ID_ellipsis) ||
+           params[i].type().get_bool(ID_ellipsis) ||
+           (packs.size() == params.size() && packs[i]);
+  };
+  std::vector<std::pair<std::size_t, std::size_t>> pairs;
+  {
+    std::size_t i = 0;
+    std::size_t j = 0;
+    while(i < F_params.size())
+    {
+      const bool a_pack = is_pack_at(F_params, F_packs, i);
+      if(j >= G_params.size())
+      {
+        if(!a_pack)
+          return false;
+        ++i; // 10.1
+        continue;
+      }
+      if(is_pack_at(G_params, G_packs, j))
+      {
+        pairs.emplace_back(i, j);
+        ++i; // the pack of G takes every remaining type of F
+        continue;
+      }
+      if(a_pack)
+        return false; // 10.2
+      pairs.emplace_back(i, j);
+      ++i;
+      ++j;
+    }
+    for(; j < G_params.size(); ++j)
+    {
+      const bool deduced_by_pack = !pairs.empty() && pairs.back().second == j &&
+                                   is_pack_at(G_params, G_packs, j);
+      if(!deduced_by_pack && !is_pack_at(G_params, G_packs, j))
+        return false;
+    }
   }
+  if(pairs.empty() && (F_params.empty() || G_params.empty()))
+    return F_params.empty() && G_params.size() <= 1 &&
+           (G_params.empty() || is_pack_at(G_params, G_packs, 0));
 
   auto strip_top_reference = [](typet &t)
   {
@@ -1367,10 +1470,10 @@ bool cpp_typecheckt::function_template_at_least_as_specialised(
         cv |= 2;
       return cv;
     };
-    for(std::size_t i = 0; i < G_params.size(); ++i)
+    for(const auto &[a_index, p_index] : pairs)
     {
-      typet A = F_params[i].type();
-      typet P = G_params[i].type();
+      typet A = F_params[a_index].type();
+      typet P = G_params[p_index].type();
       // N5008 [temp.deduct.partial]/9: when both types were reference
       // types and are identical after the transformations (the deduction
       // in the other direction, P from F's type and A from G's, succeeds),
@@ -1484,8 +1587,10 @@ bool cpp_typecheckt::function_template_at_least_as_specialised(
       for(const auto &named : node.get_named_sub())
         collect_names(named.second);
     };
-    for(const auto &gp : G_params)
-      collect_names(gp.type());
+    // [temp.deduct.partial]/3.1, /12: only the compared types count; a
+    // trailing pack of G with no corresponding type in F is not compared
+    for(const auto &pair : pairs)
+      collect_names(G_params[pair.second].type());
 
     const auto &g_params_decl = G.template_type().template_parameters();
     const auto &guessed_args = guessed.arguments();

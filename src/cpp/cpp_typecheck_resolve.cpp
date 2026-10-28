@@ -3268,6 +3268,16 @@ void cpp_typecheck_resolvet::disambiguate_functions(
             Di, Dj, ti, tj);
         if(j_aas_i && !i_aas_j)
           dominated[i] = true;
+        // N5008 [temp.deduct.partial]/11: of two templates each at least as
+        // specialized as the other, one without a trailing function
+        // parameter pack is more specialized than one with
+        else if(
+          j_aas_i && i_aas_j &&
+          cpp_typecheck.has_trailing_function_parameter_pack(Di) &&
+          !cpp_typecheck.has_trailing_function_parameter_pack(Dj))
+        {
+          dominated[i] = true;
+        }
         // N5008 [temp.func.order]/6.4: of two templates that are equally
         // specialized, the more constrained one ([temp.constr.order]) is
         // more specialized -- libc++'s CPO fallback `void operator()(auto

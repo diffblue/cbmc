@@ -1679,6 +1679,8 @@ public:
   /// pair first.  F's template parameters are inert during the deduction
   /// because their identifiers carry F's scope prefix and are not in the
   /// template_map (the "transformed type" device).
+  bool
+  has_trailing_function_parameter_pack(const cpp_declarationt &declaration);
   bool function_template_at_least_as_specialised(
     const cpp_declarationt &F,
     const cpp_declarationt &G,
