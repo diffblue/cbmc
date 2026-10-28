@@ -1,0 +1,9 @@
+CORE
+main2.c
+--pointer-check --bounds-check
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+\[main\.assertion\.1\] line \d+ assertion g != NULL: FAILURE
+--
+^warning: ignoring
