@@ -13,7 +13,6 @@ and the tie()/flush() and locale code behind it are executed; the lower --depth
 no-vacuity-check: a conversion check (any verdict); with bounds that reach
 the end of main, symbolic execution of the stream output exceeds 300 s.
 Root cause: `std::cerr << std::endl' resolves to operator<<(bool) with
-the address of endl<wchar_t> (the conversion of an overload set to bool
-is not possible, [over.over]/1), and only when the source file is named
-main.cpp or a.cpp; the resulting narrow() loop in ctype<char> runs to its
-bound.
+the address of endl<wchar_t> (KNOWNBUG
+cpp11_manipulator_overload_for_each_stream_specialization); the narrow()
+loop in ctype<char> behind it runs to its bound.
