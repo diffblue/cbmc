@@ -5927,15 +5927,22 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
   // N5008 [expr.unary.op]/3 with [class.static.data]/4: the address of a
   // constexpr variable is the address of the object, not of its value
   // (which the resolver substitutes for a constexpr scalar)
-  if(op.is_constant() && !op.get(ID_C_constexpr_object).empty())
+  if(!op.get(ID_C_constexpr_object).empty())
   {
     symbolt *object = symbol_table.get_writeable(op.get(ID_C_constexpr_object));
     if(object != nullptr)
     {
       // [basic.def.odr]/4: taking the address odr-uses the variable, so it
       // is an object with static storage duration, initialized with its
-      // value ([basic.start.static]/2) -- no longer a mere named constant
+      // value ([basic.start.static]/2) -- no longer a mere named constant.
+      // [basic.stc.static]/1: one declared at namespace or class scope (no
+      // enclosing function) has static storage duration.
       object->is_macro = false;
+      if(object->location.get_function().empty())
+      {
+        object->is_static_lifetime = true;
+        object->is_thread_local = false;
+      }
       exprt symbol = cpp_symbol_expr(*object);
       symbol.add_source_location() = op.source_location();
       op = std::move(symbol);
