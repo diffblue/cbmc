@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 #include <util/expr_initializer.h>
 #include <util/expr_util.h>
+#include <util/floatbv_expr.h>
 #include <util/fresh_symbol.h>
 #include <util/mathematical_expr.h>
 #include <util/mathematical_types.h>
@@ -1442,8 +1443,7 @@ void goto_convertt::do_function_call_symbol(
     identifier == "__builtin_islessgreater" ||
     identifier == "__builtin_isunordered")
   {
-    // these support two double or two float arguments; we call the
-    // appropriate internal version
+    // these support two double or two float arguments
     if(
       arguments.size() != 2 ||
       (arguments[0].type() != double_type() &&
@@ -1459,10 +1459,9 @@ void goto_convertt::do_function_call_symbol(
 
     exprt::operandst new_arguments = arguments;
 
-    bool use_double = arguments[0].type() == double_type();
     if(arguments[0].type() != arguments[1].type())
     {
-      if(use_double)
+      if(arguments[0].type() == double_type())
       {
         new_arguments[1] =
           typecast_exprt(new_arguments[1], arguments[0].type());
@@ -1471,33 +1470,38 @@ void goto_convertt::do_function_call_symbol(
       {
         new_arguments[0] =
           typecast_exprt(new_arguments[0], arguments[1].type());
-        use_double = true;
       }
     }
 
-    code_typet f_type = to_code_type(function.type());
-    f_type.remove_ellipsis();
-    const typet &a_t = new_arguments[0].type();
-    f_type.parameters() =
-      code_typet::parameterst(2, code_typet::parametert(a_t));
+    if(lhs.is_nil())
+      return;
 
-    // replace __builtin_ by CPROVER_PREFIX
-    std::string name = CPROVER_PREFIX + id2string(identifier).substr(10);
-    // append d or f for double/float
-    name += use_double ? 'd' : 'f';
+    // C99 7.12.14: these are the relational operators, except that they do
+    // not raise the "invalid" floating-point exception for unordered
+    // operands, which CBMC does not model.
+    const exprt &op0 = new_arguments[0];
+    const exprt &op1 = new_arguments[1];
+    exprt result;
+    if(identifier == "__builtin_isgreater")
+      result = binary_relation_exprt{op0, ID_gt, op1};
+    else if(identifier == "__builtin_isgreaterequal")
+      result = binary_relation_exprt{op0, ID_ge, op1};
+    else if(identifier == "__builtin_isless")
+      result = binary_relation_exprt{op0, ID_lt, op1};
+    else if(identifier == "__builtin_islessequal")
+      result = binary_relation_exprt{op0, ID_le, op1};
+    else if(identifier == "__builtin_islessgreater")
+    {
+      result = or_exprt{
+        binary_relation_exprt{op0, ID_lt, op1},
+        binary_relation_exprt{op0, ID_gt, op1}};
+    }
+    else
+      result = or_exprt{isnan_exprt{op0}, isnan_exprt{op1}};
 
-    DATA_INVARIANT(
-      ns.lookup(name).type == f_type,
-      "builtin declaration should match constructed type");
-
-    symbol_exprt new_function = function;
-    new_function.identifier(name);
-    new_function.type() = f_type;
-
-    code_function_callt function_call(lhs, new_function, new_arguments);
-    function_call.add_source_location() = function.source_location();
-
-    copy(function_call, FUNCTION_CALL, dest);
+    code_assignt assignment{lhs, typecast_exprt{result, lhs.type()}};
+    assignment.add_source_location() = function.source_location();
+    copy(assignment, ASSIGN, dest);
   }
   else if(identifier == "alloca" || identifier == "__builtin_alloca")
   {

@@ -1,0 +1,12 @@
+CORE gcc-only no-new-smt
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+The C99 comparison macros expand to __builtin_isgreater and similar, which
+goto conversion maps to __CPROVER_isgreaterd and similar. These must be
+declared even if the program does not use them directly.
