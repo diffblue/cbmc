@@ -128,6 +128,19 @@ protected:
     (void)handler;
   }
 
+  /// Called for a destructor call at \p instr_it on an exceptional unwind
+  /// path (marked "#unwind_path" by the goto conversion), to which no
+  /// dispatch is added.  Default: nothing.
+  virtual void instrument_unwind_call(
+    const irep_idt &function_identifier,
+    goto_programt &goto_program,
+    const goto_programt::targett &instr_it)
+  {
+    (void)function_identifier;
+    (void)goto_program;
+    (void)instr_it;
+  }
+
   // -- shared implementation --
 
   bool function_or_callees_may_throw(const goto_programt &) const;
