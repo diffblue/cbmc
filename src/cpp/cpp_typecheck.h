@@ -1360,6 +1360,9 @@ protected:
   /// Mark destructors and deallocation functions of the class \p symbol
   /// whose implicit exception specification is non-throwing.
   void implicit_exception_specifications(symbolt &symbol);
+  /// Evaluate the noexcept-specifier's expression kept on a function type.
+  void
+  evaluate_noexcept_expression(typet &code_type, bool keep_on_failure = false);
   /// The prefixes of the block scopes of try-blocks
   /// ([expr.prim.id.unqual]/15.3).
   std::set<std::string> try_block_scopes;

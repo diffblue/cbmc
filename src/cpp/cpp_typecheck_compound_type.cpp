@@ -3736,6 +3736,40 @@ void cpp_typecheckt::implicit_exception_specifications(symbolt &symbol)
   if(symbol.type.id() == ID_struct)
     get_virtual_bases(to_struct_type(symbol.type), virtual_bases);
 
+  // [except.spec]/2 with [class.mem.general]/9.4: the noexcept-specifier
+  // of a member function is a complete-class context; evaluate the kept
+  // expressions now that the members are declared
+  {
+    cpp_save_scopet saved_scope{cpp_scopes};
+    cpp_scopes.set_scope(symbol.name);
+    for(auto &c : class_type.components())
+    {
+      if(c.type().id() != ID_code)
+        continue;
+      symbolt *function = symbol_table.get_writeable(c.get_name());
+      const bool on_component =
+        c.type().find("#C_noexcept_expression").is_not_nil();
+      const bool on_symbol =
+        function != nullptr && function->type.id() == ID_code &&
+        function->type.find("#C_noexcept_expression").is_not_nil();
+      if(!on_component && !on_symbol)
+        continue;
+      typet &evaluated = on_component ? c.type() : function->type;
+      evaluate_noexcept_expression(evaluated);
+      for(typet *t :
+          {&c.type(), function != nullptr ? &function->type : nullptr})
+      {
+        if(t == nullptr || t->id() != ID_code)
+          continue;
+        t->remove("#C_noexcept_expression");
+        t->set("#C_noexcept", evaluated.get_bool("#C_noexcept"));
+        t->set(
+          "#C_noexcept_unevaluated",
+          evaluated.get_bool("#C_noexcept_unevaluated"));
+      }
+    }
+  }
+
   for(auto &c : class_type.components())
   {
     if(
@@ -3776,7 +3810,8 @@ void cpp_typecheckt::implicit_exception_specifications(symbolt &symbol)
         {
           if(
             !b.get_bool(ID_virtual) &&
-            destructor_is_potentially_throwing(b.type(), ns))
+            destructor_is_potentially_throwing(
+              static_cast<const typet &>(b.find(ID_type)), ns))
           {
             potentially_throwing = true;
           }
