@@ -794,3 +794,60 @@ TEST_CASE(
       std::string::npos);
   }
 }
+
+TEST_CASE(
+  "smt2_convt range-to-range typecast with offset",
+  "[core][solvers][smt2]")
+{
+  // Range values are stored as (value - from). A typecast between range
+  // types with different lower bounds must adjust by (src_from - dest_from).
+  // Without the fix, the offset is ignored.
+  symbol_tablet symbol_table;
+  namespacet ns{symbol_table};
+  null_message_handlert message_handler;
+  smt2_dect smt2_dec(
+    ns,
+    "unit test",
+    "",
+    "QF_AUFBV",
+    smt2_dect::solvert::Z3,
+    "",
+    message_handler);
+
+  SECTION("typecast preserves abstract value across different lower bounds")
+  {
+    // range[5,7] has 3 elements stored as {0,1,2} for values {5,6,7}.
+    // range[3,5] has 3 elements stored as {0,1,2} for values {3,4,5}.
+    // Casting value 5 from range[5,7] (stored as 0) to range[3,5] must
+    // yield stored representation 2 (= 5-3), not 0.
+    const integer_range_typet src_type{5, 7};
+    const integer_range_typet dest_type{3, 5};
+
+    const symbol_exprt a{"a", src_type};
+    smt2_dec << equal_exprt{a, from_integer(5, src_type)};
+
+    const symbol_exprt b{"b", dest_type};
+    smt2_dec << equal_exprt{b, typecast_exprt{a, dest_type}};
+
+    // b must equal 5 in dest_type. Assert b != 5 and expect UNSAT.
+    smt2_dec << notequal_exprt{b, from_integer(5, dest_type)};
+
+    REQUIRE(smt2_dec() == decision_proceduret::resultt::D_UNSATISFIABLE);
+  }
+
+  SECTION("typecast from higher-offset to zero-based range")
+  {
+    const integer_range_typet src_type{10, 12};
+    const integer_range_typet dest_type{0, 15};
+
+    const symbol_exprt a{"a", src_type};
+    smt2_dec << equal_exprt{a, from_integer(11, src_type)};
+
+    const symbol_exprt b{"b", dest_type};
+    smt2_dec << equal_exprt{b, typecast_exprt{a, dest_type}};
+
+    smt2_dec << notequal_exprt{b, from_integer(11, dest_type)};
+
+    REQUIRE(smt2_dec() == decision_proceduret::resultt::D_UNSATISFIABLE);
+  }
+}
