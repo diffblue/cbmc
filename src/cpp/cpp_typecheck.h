@@ -1347,6 +1347,15 @@ protected:
   void typecheck_expr_member(exprt &) override;
   void typecheck_expr_ptrmember(exprt &) override;
   void typecheck_expr_throw(exprt &);
+  /// Whether \p operand, the operand of a throw-expression, is
+  /// move-eligible (N5008 [expr.prim.id.unqual]/15).
+  bool throw_operand_is_move_eligible(const exprt &operand);
+  /// The prefixes of the block scopes of try-blocks
+  /// ([expr.prim.id.unqual]/15.3).
+  std::set<std::string> try_block_scopes;
+  /// Set while a try-block's compound statement is type-checked, until its
+  /// block scope is created.
+  bool next_block_scope_is_try = false;
   void typecheck_function_expr(exprt &, const cpp_typecheck_fargst &);
   void typecheck_expr_cpp_name(exprt &, const cpp_typecheck_fargst &);
   void typecheck_expr_member(exprt &, const cpp_typecheck_fargst &);

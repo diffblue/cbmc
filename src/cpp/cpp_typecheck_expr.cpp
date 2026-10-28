@@ -6128,7 +6128,85 @@ void cpp_typecheckt::typecheck_expr_throw(exprt &expr)
 
     // annotate the relevant exception IDs
     expr.set(ID_exception_list, cpp_exception_list(exception_type, *this));
+
+    // N5008 [expr.throw]/2: the exception object, of the operand's type
+    // without top-level cv-qualifiers, is copy-initialized from the operand:
+    // for a class type through the constructor that initialization selects
+    // (a prvalue of that type initializes it directly in C++17,
+    // [dcl.init.general]/16.6.1).  [class.copy.elision]/3: a move-eligible
+    // operand ([expr.prim.id.unqual]/15) is treated as an rvalue.
+    exprt &operand = to_unary_expr(expr).op();
+    typet object_type = operand.type();
+    object_type.remove(ID_C_constant);
+    object_type.remove(ID_C_volatile);
+    if(object_type.id() == ID_struct_tag || object_type.id() == ID_union_tag)
+    {
+      exprt argument = operand;
+      if(throw_operand_is_move_eligible(operand))
+      {
+        // an xvalue denoting the object, as for a return statement
+        // (typecheck_return)
+        pointer_typet rvalue_reference = pointer_type(operand.type());
+        rvalue_reference.set(ID_C_reference, true);
+        rvalue_reference.set(ID_C_rvalue_reference, true);
+        exprt address = address_of_exprt{operand};
+        address.type() = rvalue_reference;
+        dereference_exprt xvalue{address, operand.type()};
+        xvalue.set(ID_C_implicit, true);
+        xvalue.set(ID_C_lvalue, true);
+        argument = std::move(xvalue);
+      }
+      exprt temporary;
+      new_temporary(
+        operand.source_location(),
+        object_type,
+        already_typechecked_exprt{argument},
+        temporary);
+      operand.swap(temporary);
+    }
   }
+}
+
+/// N5008 [expr.prim.id.unqual]/15: the operand names a variable with
+/// automatic storage duration (a non-volatile object), and each scope
+/// between its declaration and the throw-expression is a block scope other
+/// than that of a try-block.
+bool cpp_typecheckt::throw_operand_is_move_eligible(const exprt &operand)
+{
+  if(operand.id() != ID_symbol || operand.type().get_bool(ID_C_volatile))
+    return false;
+  const symbolt *symbol =
+    symbol_table.lookup(to_symbol_expr(operand).get_identifier());
+  if(
+    symbol == nullptr || symbol->is_static_lifetime || !symbol->is_lvalue ||
+    symbol->is_type || symbol->type.id() == ID_code ||
+    is_reference(symbol->type))
+  {
+    return false;
+  }
+  const std::string name = id2string(symbol->name);
+  const std::string base = id2string(symbol->base_name);
+  if(
+    name.size() <= base.size() ||
+    name.compare(name.size() - base.size(), base.size(), base) != 0)
+  {
+    return false;
+  }
+  const std::string declaring_prefix =
+    name.substr(0, name.size() - base.size());
+  const cpp_scopet *scope = &cpp_scopes.current_scope();
+  while(scope->prefix != declaring_prefix)
+  {
+    if(
+      scope->is_root_scope() ||
+      scope->id_class != cpp_idt::id_classt::BLOCK_SCOPE ||
+      try_block_scopes.count(scope->prefix) != 0)
+    {
+      return false;
+    }
+    scope = &scope->get_parent();
+  }
+  return true;
 }
 
 void cpp_typecheckt::typecheck_expr_new(exprt &expr)
