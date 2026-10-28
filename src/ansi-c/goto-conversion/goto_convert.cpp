@@ -800,8 +800,8 @@ void goto_convertt::convert_expression(
     // the destructors of the automatic objects constructed since entering the
     // innermost enclosing try block (or, if there is none in this function, all
     // of the function's automatic objects) ([except.ctor], [except.throw]/4).
-    // The exception object has already been constructed by the throw's own
-    // side-effects, which run first; then the destructors; then the THROW.
+    // The throw's own side-effects run first; then its operand is copied
+    // (see below); then the destructors; then the THROW.
     // Not for Java: a Java `athrow' throws a local REFERENCE that the
     // exception lowering reads when it replaces the THROW ([except.throw] is
     // C++'s exception-object model, Java's is JLS 14.18); unwinding the scope
@@ -817,6 +817,20 @@ void goto_convertt::convert_expression(
         side_effects.side_effects.instructions.back();
       side_effects.side_effects.instructions.pop_back();
       dest.destructive_append(side_effects.side_effects);
+
+      // [expr.throw]/2: the exception object is copy-initialized from the
+      // operand, and only then does stack unwinding destroy the automatic
+      // objects ([except.ctor]/1-2), which the operand may name (`throw d;',
+      // `throw d.v;').  The THROW reads its operand when it is lowered, after
+      // the destructors below: evaluate the operand into a temporary first.
+      exprt &thrown = throw_instruction.code_nonconst().op0();
+      if(
+        thrown.id() == ID_side_effect && thrown.operands().size() == 1 &&
+        thrown.operands().front().type().id() != ID_empty)
+      {
+        (void)make_temp_symbol(
+          thrown.operands().front(), "exception", dest, mode);
+      }
 
       const node_indext end_node = targets.cpp_try_scope_nodes.empty()
                                      ? node_indext{0}

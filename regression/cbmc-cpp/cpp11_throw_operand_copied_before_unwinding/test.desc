@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ member of a local thrown: SUCCESS$
+^\[main\.assertion\.2\] line \d+ local object thrown: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The THROW read its operand when lowered, after the destructors of the
+try block had run, so it copied a destroyed object.  goto conversion now
+copies the operand into a temporary before the destructors.
