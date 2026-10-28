@@ -107,6 +107,13 @@ void *mmap64(
   (void)fd;
   (void)offset;
 
+  // POSIX.1-2017 mmap: "Upon successful completion [...] mmap() shall
+  // return a pointer [...]; otherwise, it shall return a value of
+  // MAP_FAILED and set errno to indicate the error."
+  __CPROVER_bool error = __VERIFIER_nondet___CPROVER_bool();
+  if(error)
+    return MAP_FAILED;
+
   if(
     addr == 0 ||
     (__VERIFIER_nondet___CPROVER_bool() && (flags & MAP_FIXED) == 0))
@@ -133,6 +140,12 @@ int munmap(void *addr, __CPROVER_size_t length)
 {
   (void)length;
 
+  // POSIX.1-2017 munmap: "Upon successful completion, munmap() shall
+  // return 0; otherwise, it shall return -1."
+  __CPROVER_bool error = __VERIFIER_nondet___CPROVER_bool();
+  if(error)
+    return -1;
+
   __CPROVER_deallocate(addr);
 
   return 0;
@@ -145,6 +158,10 @@ __CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
 int _munmap(void *addr, __CPROVER_size_t length)
 {
   (void)length;
+
+  __CPROVER_bool error = __VERIFIER_nondet___CPROVER_bool();
+  if(error)
+    return -1;
 
   __CPROVER_deallocate(addr);
 
