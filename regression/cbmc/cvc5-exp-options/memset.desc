@@ -1,0 +1,11 @@
+CORE smt-backend no-new-smt
+memset.c
+--cvc5
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^VERIFICATION ERROR$
+--
+cvc5 requires --arrays-exp for the (as const ...) array constructor emitted for
+memset.
