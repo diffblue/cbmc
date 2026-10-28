@@ -1,0 +1,16 @@
+KNOWNBUG libcxx
+main.cpp
+--cpp11 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ a write to stdout always succeeds: FAILURE$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 2 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Soundness: the stream buffers of provide_standard_stream_objects accept
+every character (overflow returns not_eof, xsputn returns the count), so
+a write never fails and assertion 1 is reported as holding.  The buffer
+has to fail nondeterministically, as the C library model of fwrite can.
