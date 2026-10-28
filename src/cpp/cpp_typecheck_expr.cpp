@@ -2930,8 +2930,11 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       // [expr.unary.noexcept]/3 + [except.spec]/6: the operand is
       // potentially-throwing if it contains, at any depth, a call to a
       // function that is not non-throwing, a throw-expression, or a
-      // dynamic_cast / typeid that can throw.  A destructor is
-      // non-throwing unless declared otherwise ([except.spec]/8).
+      // dynamic_cast / typeid that can throw.  A destructor has the
+      // exception specification of [except.spec]/7 (#C_noexcept, see
+      // implicit_exception_specifications); the destruction of a temporary
+      // at the end of the full-expression is an implicit call of its
+      // destructor ([except.spec]/5.2).
       // Previously only a top-level call was examined, so `noexcept(p < q)'
       // rewritten to `(p <=> q) < 0' read only the category's noexcept
       // operator< and ignored the potentially-throwing operator<=> inside.
@@ -2943,6 +2946,12 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
           const irep_idt &statement = e.get(ID_statement);
           if(statement == ID_throw)
             return true;
+          if(
+            statement == ID_temporary_object &&
+            destructor_is_potentially_throwing(e.type(), *this))
+          {
+            return true;
+          }
           if(statement == ID_function_call)
           {
             const auto &fn = to_side_effect_expr_function_call(e).function();
@@ -2955,18 +2964,21 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
               {
                 const auto &code_type = to_code_type(sym->type);
                 non_throwing = code_type.get_bool("#C_noexcept") ||
-                               code_type.get_bool(ID_noexcept) ||
-                               code_type.return_type().id() == ID_destructor;
+                               code_type.get_bool(ID_noexcept);
               }
             }
             else if(
               fn.id() == ID_member &&
               fn.find(ID_component_cpp_name).is_not_nil())
             {
-              // a destructor call spelled `x.~T()'
+              // a destructor call spelled `x.~T()': that of the object's
+              // class
               const auto &name = to_cpp_name(fn.find(ID_component_cpp_name));
               const irep_idt &bn = name.get_base_name();
-              non_throwing = !bn.empty() && id2string(bn)[0] == '~';
+              const exprt &object = to_member_expr(fn).compound();
+              non_throwing =
+                !bn.empty() && id2string(bn)[0] == '~' &&
+                !destructor_is_potentially_throwing(object.type(), *this);
             }
             else if(fn.type().id() == ID_code)
             {

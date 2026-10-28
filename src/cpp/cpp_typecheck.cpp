@@ -227,6 +227,23 @@ void cpp_typecheckt::typecheck()
     }
   }
 
+  // N5008 [except.spec]/9: a deallocation function without an explicit
+  // noexcept-specifier is non-throwing (class members:
+  // implicit_exception_specifications)
+  for(auto it = symbol_table.begin(); it != symbol_table.end(); ++it)
+  {
+    const symbolt &function = it->second;
+    if(
+      function.type.id() == ID_code && !function.is_type &&
+      (function.base_name == "operator" + id2string(ID_cpp_delete) ||
+       function.base_name == "operator" + id2string(ID_cpp_delete_array)) &&
+      !function.type.get_bool("#C_explicit_exception_specification") &&
+      !function.type.get_bool("#C_noexcept"))
+    {
+      it.get_writeable_symbol().type.set("#C_noexcept", true);
+    }
+  }
+
   provide_standard_stream_objects();
   static_and_dynamic_initialization();
 
