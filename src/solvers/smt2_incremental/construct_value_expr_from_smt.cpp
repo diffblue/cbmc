@@ -2,6 +2,7 @@
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/ieee_float.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/std_expr.h>
@@ -62,6 +63,18 @@ private:
           integer2bvrep(bit_vector_constant.value(), sort_width),
           *pointer_type};
       }
+      return;
+    }
+    if(
+      const auto floatbv_type =
+        type_try_dynamic_cast<floatbv_typet>(type_to_construct))
+    {
+      INVARIANT(
+        floatbv_type->get_width() == sort_width,
+        "Width of smt bit vector term must match the width of "
+        "floating-point type.");
+      result = constant_exprt{
+        integer2bvrep(bit_vector_constant.value(), sort_width), *floatbv_type};
       return;
     }
     if(
