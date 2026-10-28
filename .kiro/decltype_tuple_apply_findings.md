@@ -15577,3 +15577,36 @@ never destroyed, reference handler bound to a copy (096b1848ae).
 Checks on W184 (096b1848ae): 13 suites, profiles, unit, lint, format,
 doxygen, platform, vacuity 1144/3, per-commit compile, MSVC .ii (2 known
 timeouts).
+
+## Round 205 (2026-10-28): ranges diagnosis, exception specifications
+
+Ranges KNOWNBUG (still KNOWNBUG, diagnosis narrowed in its desc): inside
+the instantiated body of __invoke, decltype(_S_test<_Callable,
+_Args...>(0)) gives the one-argument operator()'s result, while the same
+with explicit types, and decltype(_Callable()(declval<_Args>()...)), give
+the two-argument one.  Header-free reconstructions do not fail.
+Found and fixed on the way:
+- ce6cf4a620 partial ordering with function parameter packs
+  ([temp.deduct.partial]/8, /11, [temp.deduct.type]/10).
+- 37762b428d variable template specializations are lvalues
+  ([expr.prim.id.unqual]/12).
+- 9906f445dd address of a constexpr variable (static storage).
+- KNOWNBUG 07c1503706: auto variable template with a parenthesized
+  initializer, instantiated twice.
+Exception specifications:
+- a692d9abd2 catch(...) handler clears the in-flight exception before its
+  first statement (else a noexcept call there called std::terminate).
+- 8039b5cca5 implicit destructor / deallocation specifications
+  ([except.spec]/7, /9); in-class constructor/destructor noexcept recorded;
+  noexcept operator uses destructor specifications.
+- cb2f25b1bd noexcept(expression) evaluated; noexcept operator sees the
+  constructor of a temporary.  4774f169c6: member noexcept-specifiers are
+  a complete-class context (fixes an ADL invariant violation found by
+  unit-proofs/trim_from_last_delimiter); KNOWNBUG for a member naming a
+  later member.
+- KNOWNBUGs: is_nothrow_constructible with arguments (c48a447189),
+  implicit constructors' exception specification (a979d2e87f).
+Checks on W186: 13 suites, profiles, unit, lint, format, doxygen,
+platform, vacuity 1144/3, per-commit compile, MSVC .ii (2 known).
+Next (order agreed with the user): N3 (exception object lifetime), #5
+(manipulator overload), #6 (cin >> i), VTT, MSVC streams.
