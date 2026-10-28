@@ -1856,8 +1856,16 @@ long long int llroundl(long double x)
 
 double modf(double x, double *iptr)
 {
+  // C11 F.10.3.12: modf(+-inf, iptr) returns +-0 and stores +-inf in *iptr
+  if(__CPROVER_isinfd(x))
+  {
+    *iptr = x;
+    return __CPROVER_signd(x) ? -0.0 : +0.0;
+  }
   *iptr = __CPROVER_round_to_integrald(x, 3); // FE_TOWARDZERO
-  return (x - *iptr);
+  // C11 7.12.6.12p2: both parts have the same sign as x, also when the
+  // fractional part is zero
+  return copysign(x - *iptr, x);
 }
 
 /* FUNCTION: modff */
@@ -1874,8 +1882,16 @@ double modf(double x, double *iptr)
 
 float modff(float x, float *iptr)
 {
+  // C11 F.10.3.12: modf(+-inf, iptr) returns +-0 and stores +-inf in *iptr
+  if(__CPROVER_isinff(x))
+  {
+    *iptr = x;
+    return __CPROVER_signf(x) ? -0.0f : +0.0f;
+  }
   *iptr = __CPROVER_round_to_integralf(x, 3); // FE_TOWARDZERO
-  return (x - *iptr);
+  // C11 7.12.6.12p2: both parts have the same sign as x, also when the
+  // fractional part is zero
+  return copysignf(x - *iptr, x);
 }
 
 
@@ -1893,8 +1909,16 @@ float modff(float x, float *iptr)
 
 long double modfl(long double x, long double *iptr)
 {
+  // C11 F.10.3.12: modf(+-inf, iptr) returns +-0 and stores +-inf in *iptr
+  if(__CPROVER_isinfld(x))
+  {
+    *iptr = x;
+    return __CPROVER_signld(x) ? -0.0l : +0.0l;
+  }
   *iptr = __CPROVER_round_to_integralld(x, 3); // FE_TOWARDZERO
-  return (x - *iptr);
+  // C11 7.12.6.12p2: both parts have the same sign as x, also when the
+  // fractional part is zero
+  return copysignl(x - *iptr, x);
 }
 
 
