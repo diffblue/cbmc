@@ -1,0 +1,11 @@
+CORE no-new-smt
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Typecasts from _Bool and enum types to fixedbv, and from fixedbv types
+without fraction bits to integers, must be supported by the SMT2 back end.
