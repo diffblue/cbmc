@@ -2410,16 +2410,6 @@ void cpp_typecheckt::provide_stdlib_bodies()
           }
         }
       }
-      else if(
-        name.find("std::_Destroy<") != std::string::npos &&
-        name.find("_Destroy_aux") == std::string::npos)
-      {
-        // Override: std::_Destroy(first, last) — no-op for scalars
-        ensure_parameter_symbols(symbol, symbol_table);
-        symbol.value = code_blockt();
-        symbol.value.type() = symbol.type;
-        deferred_typechecking.erase(symbol.name);
-      }
 
       continue;
     }
@@ -3314,17 +3304,6 @@ void cpp_typecheckt::provide_stdlib_bodies()
       deferred_typechecking.erase(symbol.name);
     }
 
-    else if(
-      base == "__destroy" && name.find("_Destroy_aux") != std::string::npos)
-    {
-      // _Destroy_aux<false>::__destroy(first, last) — no-op for
-      // trivially destructible types
-      ensure_parameter_symbols(symbol, symbol_table);
-      code_blockt block;
-      symbol.value = std::move(block);
-      symbol.value.type() = symbol.type;
-      deferred_typechecking.erase(symbol.name);
-    }
     else if(
       base == "construct" &&
       (name.find("allocator_traits") != std::string::npos ||
