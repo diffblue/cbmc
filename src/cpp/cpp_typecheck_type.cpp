@@ -657,32 +657,11 @@ void cpp_typecheckt::typecheck_type(typet &type)
     code_typet::parameterst &parameters=code_type.parameters();
 
     // N5008 [except.spec]/2: in noexcept(constant-expression) the value of
-    // the expression is the exception specification
-    if(code_type.find("#C_noexcept_expression").is_not_nil())
-    {
-      exprt expression =
-        static_cast<const exprt &>(code_type.find("#C_noexcept_expression"));
-      code_type.remove("#C_noexcept_expression");
-      try
-      {
-        sfinae_contextt sfinae_guard{*this};
-        typecheck_expr(expression);
-        implicit_typecast_bool(expression);
-        expression = simplify_expr(expression, *this);
-        if(expression.is_true())
-          code_type.remove("#C_noexcept_unevaluated");
-        else if(expression.is_false())
-        {
-          code_type.remove("#C_noexcept");
-          code_type.remove("#C_noexcept_unevaluated");
-        }
-      }
-      catch(...)
-      {
-        // dependent, or not a constant: left as before (non-throwing for the
-        // noexcept operator, #C_noexcept_unevaluated)
-      }
-    }
+    // the expression is the exception specification.  [class.mem.general]
+    // /9.4: in a member declaration it is a complete-class context, so it is
+    // evaluated with the class's members (implicit_exception_specifications)
+    evaluate_noexcept_expression(
+      code_type, cpp_scopes.current_scope().is_class());
 
     // N5008 [basic.scope.param]/1: a parameter's scope begins at its
     // declaration and includes the rest of the parameter-declaration-clause,
@@ -1586,6 +1565,47 @@ void cpp_typecheckt::typecheck_type(typet &type)
   }
 
   CHECK_RETURN(type.is_not_nil());
+}
+
+/// N5008 [except.spec]/2: evaluate the constant-expression of the
+/// noexcept-specifier kept on \p code_type (\#C_noexcept_expression) and set
+/// \#C_noexcept accordingly; if it cannot be evaluated (it is dependent, or
+/// not a constant), the function stays non-throwing and
+/// \#C_noexcept_unevaluated, and with \p keep_on_failure the expression is
+/// kept for another attempt.
+void cpp_typecheckt::evaluate_noexcept_expression(
+  typet &code_type,
+  bool keep_on_failure)
+{
+  if(code_type.find("#C_noexcept_expression").is_nil())
+    return;
+  const irept kept = code_type.find("#C_noexcept_expression");
+  exprt expression = static_cast<const exprt &>(kept);
+  code_type.remove("#C_noexcept_expression");
+  try
+  {
+    sfinae_contextt sfinae_guard{*this};
+    typecheck_expr(expression);
+    implicit_typecast_bool(expression);
+    expression = simplify_expr(expression, *this);
+    if(expression.is_true())
+      code_type.remove("#C_noexcept_unevaluated");
+    else if(expression.is_false())
+    {
+      code_type.remove("#C_noexcept");
+      code_type.remove("#C_noexcept_unevaluated");
+    }
+    else if(keep_on_failure)
+      code_type.add("#C_noexcept_expression") = kept;
+  }
+  catch(...)
+  {
+    // in a member declaration the expression may name members declared
+    // later ([class.mem.general]/9.4): try again when the class's members
+    // are declared
+    if(keep_on_failure)
+      code_type.add("#C_noexcept_expression") = kept;
+  }
 }
 
 /// N5008 [dcl.typedef]/2: an alias-declaration `using F = void(int);' has

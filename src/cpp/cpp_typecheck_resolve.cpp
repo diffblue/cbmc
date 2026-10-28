@@ -13679,7 +13679,7 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   }
 
   return template_function_instance;
-}
+} // NOLINT(readability/fn_size)
 
 /// N5008 [temp.arg.explicit]/2, [temp.deduct.general]/2: bind the explicitly
 /// specified template arguments \p stored_args of \p declaration in the
@@ -14701,7 +14701,13 @@ void cpp_typecheck_resolvet::resolve_with_arguments(
     if(final_type.id() == ID_struct)
     {
       for(const auto &b : to_struct_type(final_type).bases())
-        add_associated_class(b.type());
+      {
+        // a base of a class still being defined (or dependent) may not be a
+        // struct tag yet; baset::type() requires one
+        const typet &base_type = static_cast<const typet &>(b.find(ID_type));
+        if(base_type.id() == ID_struct_tag)
+          add_associated_class(base_type);
+      }
     }
 
     auto scope_it = cpp_typecheck.cpp_scopes.id_map.find(struct_name);
