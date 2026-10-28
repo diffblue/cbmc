@@ -13,14 +13,15 @@ struct logger
   logger()
   {
     std::cout << "starting\n";
-    ok = std::cout.good();
+    // a write can fail ([iostream.objects.overview]/2), which sets badbit
+    ok = std::cout.rdbuf() != nullptr && (std::cout.good() || std::cout.bad());
   }
 };
 logger early;
 
 int main()
 {
-  __CPROVER_assert(early.ok, "output before main succeeds");
+  __CPROVER_assert(early.ok, "output before main reaches the buffer");
   __CPROVER_assert(std::cin.tie() == &std::cout, "cin tied to cout");
   __CPROVER_assert(std::clog.tie() == nullptr, "clog not tied");
   __CPROVER_assert(std::wcin.tie() == &std::wcout, "wcin tied to wcout");
@@ -28,7 +29,8 @@ int main()
   __CPROVER_assert(
     (std::wcerr.flags() & std::ios_base::unitbuf) != 0, "wcerr unitbuf");
   std::cerr << "message";
-  __CPROVER_assert(std::cerr.good(), "cerr good after output");
+  __CPROVER_assert(
+    std::cerr.good() || std::cerr.bad(), "cerr good or bad after output");
   int c = std::cin.get();
   __CPROVER_assert(c == EOF || (c >= 0 && c <= 255), "cin.get in range");
   __CPROVER_assert(c != EOF, "WRONG (must FAIL)");

@@ -2095,10 +2095,10 @@ void cpp_typecheckt::provide_standard_stream_objects()
   // not destroyed during program execution.  libstdc++ (globals_io.cc,
   // ios_init.cc) and libc++ (iostream.cpp) define and construct them in their
   // compiled libraries, so the program only sees `extern' declarations.
-  // Define those that are declared: stream buffers whose output is accepted
-  // and discarded (a write to the standard C streams is not observable by the
-  // program; write errors are not modelled), and whose input is an unknown
-  // sequence of characters ending at an unknown point.
+  // Define those that are declared: stream buffers whose output is discarded
+  // (the written characters are not observable by the program) and may fail,
+  // and whose input is an unknown sequence of characters ending at an unknown
+  // point.
   // Not for the MSVC STL: constructing a stream there initializes its
   // locale through runtime functions (std::_Locinfo::_Locinfo_ctor,
   // _Getctype, _Getcvt) that have no model.
@@ -2150,10 +2150,20 @@ void cpp_typecheckt::provide_standard_stream_objects()
     << "  typedef basic_streambuf<_C> __base;\n"
     << "  _C __c;\n"
     << "protected:\n"
-    // the put area is empty: every character goes to overflow
+    // The put area is empty: every character goes to overflow.  A write to
+    // the C stream can fail ([iostream.objects.overview]/2: the buffer
+    // behaves as a basic_filebuf; a full device, a closed stdout), so
+    // overflow may fail ([streambuf.virt.put]/5: eof()), and xsputn writes
+    // any initial part of the characters ([streambuf.virt.put]/1-2: as if
+    // by repeated sputc, stopping at the first failure).
     << "  typename __base::int_type overflow(typename __base::int_type __i)\n"
-    << "  { return __base::traits_type::not_eof(__i); }\n"
-    << "  streamsize xsputn(const _C *, streamsize __n) { return __n; }\n"
+    << "  { if(__VERIFIER_nondet_int() == 0)\n"
+    << "      return __base::traits_type::eof();\n"
+    << "    return __base::traits_type::not_eof(__i); }\n"
+    << "  streamsize xsputn(const _C *, streamsize __n) {\n"
+    << "    streamsize __k = __VERIFIER_nondet_int();\n"
+    << "    if(__k < 0 || __k > __n) __k = __n;\n"
+    << "    return __k; }\n"
     // [streambuf.virt.get]/16: underflow makes the next character
     // available in the get area, or returns eof()
     << "  typename __base::int_type underflow() {\n"

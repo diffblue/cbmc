@@ -1,4 +1,4 @@
-KNOWNBUG libstdcxx
+CORE libstdcxx
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ a write to stdout always succeeds: FAILURE$
@@ -10,7 +10,7 @@ main.cpp
 --
 ^warning: ignoring
 --
-Soundness: the stream buffers of provide_standard_stream_objects accept
-every character (overflow returns not_eof, xsputn returns the count), so
-a write never fails and assertion 1 is reported as holding.  The buffer
-has to fail nondeterministically, as the C library model of fwrite can.
+Fixed (soundness): the stream buffers of provide_standard_stream_objects
+accepted every character, so a write never failed and assertion 1 was
+reported to hold.  overflow may now return eof() and xsputn may write
+any initial part of the characters.
