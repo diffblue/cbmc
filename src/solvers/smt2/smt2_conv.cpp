@@ -3438,7 +3438,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       }
       else // from_width>to_width
       {
-        out << "((_ extract " << to_width << " 0) ";
+        out << "((_ extract " << to_width - 1 << " 0) ";
         convert_expr(src);
         out << ")"; // extract
       }
