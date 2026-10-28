@@ -3139,8 +3139,13 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       out << " (ite (and ";
 
       // some fraction bit is not zero
-      out << "(not (= ((_ extract " << (from_fraction_bits-1) << " 0) ?tcop) "
-             "(_ bv0 " << from_fraction_bits << ")))";
+      if(from_fraction_bits == 0)
+        out << "false";
+      else
+      {
+        out << "(not (= ((_ extract " << (from_fraction_bits - 1)
+            << " 0) ?tcop) (_ bv0 " << from_fraction_bits << ")))";
+      }
 
       // number negative
       out << " (= ((_ extract " << (from_width-1) << " " << (from_width-1)
@@ -3292,13 +3297,13 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     std::size_t to_fraction_bits=fixedbv_type.get_fraction_bits();
     std::size_t to_integer_bits=fixedbv_type.get_integer_bits();
 
-    if(src_type.id()==ID_unsignedbv ||
-       src_type.id()==ID_signedbv ||
-       src_type.id()==ID_c_enum)
+    if(
+      src_type.id() == ID_unsignedbv || src_type.id() == ID_signedbv ||
+      src_type.id() == ID_c_enum || src_type.id() == ID_c_bool)
     {
       // integer to fixedbv
 
-      std::size_t from_width=to_bitvector_type(src_type).get_width();
+      std::size_t from_width = boolbv_width(src_type);
       out << "(concat ";
 
       if(from_width==to_integer_bits)
@@ -3318,7 +3323,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
           "from_width should be smaller than to_integer_bits as other case "
           "have been handled above");
         if(
-          src_type.id() == ID_unsignedbv ||
+          src_type.id() == ID_unsignedbv || src_type.id() == ID_c_bool ||
           (src_type.id() == ID_c_enum &&
            to_c_enum_type(src_type).underlying_type().id() == ID_unsignedbv))
         {
