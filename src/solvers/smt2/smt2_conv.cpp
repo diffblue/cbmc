@@ -3452,23 +3452,47 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     const auto dest_width = address_bits(dest_range_type.size());
     if(src_type.id() == ID_range)
     {
+      // Range values are stored as (value - from). A cast between range
+      // types must add (src_from - dest_from) to adjust the offset,
+      // matching the SAT backend (boolbv_typecast.cpp).
       auto &src_range_type = to_integer_range_type(src_type);
       const auto src_width = address_bits(src_range_type.size());
-      if(src_width < dest_width)
+      const mp_integer offset = src_range_type.from() - dest_range_type.from();
+
+      // First, bring the source to dest_width.
+      const bool need_extend = src_width < dest_width;
+      const bool need_extract = src_width > dest_width;
+      const bool need_offset = offset != 0;
+
+      if(need_offset)
+        out << "(bvadd ";
+
+      if(need_extend)
       {
         out << "((_ zero_extend " << dest_width - src_width << ") ";
         convert_expr(src);
         out << ')'; // zero_extend
       }
-      else if(src_width > dest_width)
+      else if(need_extract)
       {
         out << "((_ extract " << dest_width - 1 << " 0) ";
         convert_expr(src);
         out << ')'; // extract
       }
-      else // src_width == dest_width
+      else
       {
         convert_expr(src);
+      }
+
+      if(need_offset)
+      {
+        // the offset may exceed the bit width, reduce it modulo 2^dest_width
+        const mp_integer modulus = power(2, dest_width);
+        mp_integer offset_bits = offset % modulus;
+        if(offset_bits < 0)
+          offset_bits += modulus;
+        out << " (_ bv" << integer2string(offset_bits) << " " << dest_width
+            << "))"; // bvadd
       }
     }
     else
