@@ -42,10 +42,8 @@ bvt float_utilst::from_signed_integer(const bvt &src)
   result.fraction=bv_utils.absolute_value(src);
 
   // build an exponent (unbiased) -- this is signed!
-  result.exponent=
-    bv_utils.build_constant(
-      src.size()-1,
-      address_bits(src.size() - 1) + 1);
+  result.exponent =
+    bv_utils.build_constant(src.size() - 1, address_bits(src.size()) + 1);
 
   return round_and_pack(result);
 }
@@ -57,10 +55,8 @@ bvt float_utilst::from_unsigned_integer(const bvt &src)
   result.fraction=src;
 
   // build an exponent (unbiased) -- this is signed!
-  result.exponent=
-    bv_utils.build_constant(
-      src.size()-1,
-      address_bits(src.size() - 1) + 1);
+  result.exponent =
+    bv_utils.build_constant(src.size() - 1, address_bits(src.size()) + 1);
 
   result.sign=const_literal(false);
 
@@ -964,7 +960,10 @@ void float_utilst::normalization_shift(bvt &fraction, bvt &exponent)
   // The worst-case shift is the number of fraction
   // bits minus one, in case the fraction is one exactly.
   PRECONDITION(!fraction.empty());
-  std::size_t depth = address_bits(fraction.size() - 1);
+  // address_bits(fraction.size() - 1) would be one bit short when
+  // fraction.size() is 2^k + 1: then the worst-case shift is 2^k, which
+  // needs k + 1 bits.
+  std::size_t depth = address_bits(fraction.size());
 
   // sign-extend to ensure the arithmetic below cannot result in overflow/underflow
   exponent =
