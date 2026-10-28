@@ -865,41 +865,38 @@ float sqrtf(float f)
     return f;
   else if (__CPROVER_isnormalf(f))
   {
-    float lower=__VERIFIER_nondet_float();
+    // Find the largest positive normal float lower whose (exact) square does
+    // not exceed f, i.e., lower <= sqrt(f) < upper, where upper is the
+    // next float. The squares are computed in double, which represents
+    // them exactly, as any rounding of these squares results in picking the
+    // wrong neighbour for some inputs.
+    float lower = __VERIFIER_nondet_float();
     __CPROVER_assume(lower > 0.0f);
     __CPROVER_assume(__CPROVER_isnormalf(lower));
-    // Tighter bounds can be given but are dependent on the
-    // number of exponent and significand bits.  Thus they are
-    // given implicitly...
-
-#pragma CPROVER check push
-#pragma CPROVER check disable "float-overflow"
-    float lowerSquare = lower * lower;
-    __CPROVER_assume(__CPROVER_isnormalf(lowerSquare));
-
     float upper = nextUpf(lower);
-    float upperSquare = upper * upper;  // Might be +Inf
-#pragma CPROVER check pop
 
-    // Restrict these to bound f and thus compute the possible
-    // values for the square root.  Note that the lower bound
-    // can be equal, this is important to catch edge cases such as
-    // 0x1.fffffep+127f and relies on the smallest normal number
-    // being a perfect square (which it will be for any sensible
-    // bit width).
-    __CPROVER_assume(lowerSquare <= f);
-    __CPROVER_assume(f < upperSquare);
+    double lower_w = lower;
+    double upper_w = upper;
+    double x_w = f;
+    __CPROVER_assume(lower_w * lower_w <= x_w);
+    __CPROVER_assume(x_w < upper_w * upper_w);
 
     // Select between them to work out which to return
     switch(fegetround())
     {
-    case FE_TONEAREST :
-      return (f - lowerSquare < upperSquare - f) ? lower : upper; break;
-    case FE_UPWARD :
-      return (f - lowerSquare == 0.0f) ? lower : upper; break;
-    case FE_DOWNWARD : // Fall through
-    case FE_TOWARDZERO :
-      return (f - lowerSquare == 0.0f) ? lower : upper; break;
+    case FE_TONEAREST:
+    {
+      // The exact square root is never the midpoint between two floats
+      // (the square of the midpoint needs more bits than float has), so there
+      // are no ties.
+      double midpoint = (lower_w + upper_w) / 2;
+      return x_w < midpoint * midpoint ? lower : upper;
+    }
+    case FE_UPWARD:
+      return lower_w * lower_w == x_w ? lower : upper;
+    case FE_DOWNWARD: // Fall through
+    case FE_TOWARDZERO:
+      return lower;
     default:;
       return __VERIFIER_nondet_float();
     }
@@ -943,6 +940,16 @@ double nextUp(double d);
 
 double __VERIFIER_nondet_double(void);
 
+#ifdef LIBRARY_CHECK
+// only used to check the syntax of the library with a C compiler
+typedef long double __CPROVER_sqrt_double_wide;
+#else
+// 1 sign bit, 15 exponent bits, 112 fraction bits: the squares of 54-bit
+// significands are exact, and the exponent range covers the squares of all
+// doubles
+typedef __CPROVER_floatbv[128][112] __CPROVER_sqrt_double_wide;
+#endif
+
 double sqrt(double d)
 {
  __CPROVER_hide:;
@@ -958,31 +965,38 @@ double sqrt(double d)
     return d;
   else if (__CPROVER_isnormald(d))
   {
-    double lower=__VERIFIER_nondet_double();
+    // Find the largest positive normal double lower whose (exact) square does
+    // not exceed d, i.e., lower <= sqrt(d) < upper, where upper is the
+    // next double. The squares are computed in a floating-point type with a 112-bit fraction, which represents
+    // them exactly, as any rounding of these squares results in picking the
+    // wrong neighbour for some inputs.
+    double lower = __VERIFIER_nondet_double();
     __CPROVER_assume(lower > 0.0);
     __CPROVER_assume(__CPROVER_isnormald(lower));
-
-#pragma CPROVER check push
-#pragma CPROVER check disable "float-overflow"
-    double lowerSquare = lower * lower;
-    __CPROVER_assume(__CPROVER_isnormald(lowerSquare));
-
     double upper = nextUp(lower);
-    double upperSquare = upper * upper;  // Might be +Inf
-#pragma CPROVER check pop
 
-    __CPROVER_assume(lowerSquare <= d);
-    __CPROVER_assume(d < upperSquare);
+    __CPROVER_sqrt_double_wide lower_w = lower;
+    __CPROVER_sqrt_double_wide upper_w = upper;
+    __CPROVER_sqrt_double_wide x_w = d;
+    __CPROVER_assume(lower_w * lower_w <= x_w);
+    __CPROVER_assume(x_w < upper_w * upper_w);
 
+    // Select between them to work out which to return
     switch(fegetround())
     {
     case FE_TONEAREST:
-      return (d - lowerSquare < upperSquare - d) ? lower : upper; break;
+    {
+      // The exact square root is never the midpoint between two doubles
+      // (the square of the midpoint needs more bits than double has), so there
+      // are no ties.
+      __CPROVER_sqrt_double_wide midpoint = (lower_w + upper_w) / 2;
+      return x_w < midpoint * midpoint ? lower : upper;
+    }
     case FE_UPWARD:
-      return (d - lowerSquare == 0.0f) ? lower : upper; break;
+      return lower_w * lower_w == x_w ? lower : upper;
     case FE_DOWNWARD: // Fall through
     case FE_TOWARDZERO:
-      return (d - lowerSquare == 0.0) ? lower : upper; break;
+      return lower;
     default:;
       return __VERIFIER_nondet_double();
     }
@@ -1020,6 +1034,24 @@ long double nextUpl(long double d);
 
 long double __VERIFIER_nondet_long_double(void);
 
+#ifndef __CPROVER_FLOAT_H_INCLUDED
+#  include <float.h>
+#  define __CPROVER_FLOAT_H_INCLUDED
+#endif
+
+#ifdef LIBRARY_CHECK
+// only used to check the syntax of the library with a C compiler
+typedef long double __CPROVER_sqrt_long_double_wide;
+#elif LDBL_MANT_DIG > 64
+// 1 sign bit, 17 exponent bits, 230 fraction bits: covers 113-bit
+// significands
+typedef __CPROVER_floatbv[248][230] __CPROVER_sqrt_long_double_wide;
+#else
+// 1 sign bit, 17 exponent bits, 144 fraction bits: covers significands of up
+// to 64 bits
+typedef __CPROVER_floatbv[162][144] __CPROVER_sqrt_long_double_wide;
+#endif
+
 long double sqrtl(long double d)
 {
  __CPROVER_hide:;
@@ -1035,31 +1067,38 @@ long double sqrtl(long double d)
     return d;
   else if (__CPROVER_isnormalld(d))
   {
-    long double lower=__VERIFIER_nondet_long_double();
+    // Find the largest positive normal long double lower whose (exact) square does
+    // not exceed d, i.e., lower <= sqrt(d) < upper, where upper is the
+    // next long double. The squares are computed in a floating-point type with more than twice the precision, which represents
+    // them exactly, as any rounding of these squares results in picking the
+    // wrong neighbour for some inputs.
+    long double lower = __VERIFIER_nondet_long_double();
     __CPROVER_assume(lower > 0.0l);
     __CPROVER_assume(__CPROVER_isnormalld(lower));
-
-#pragma CPROVER check push
-#pragma CPROVER check disable "float-overflow"
-    long double lowerSquare = lower * lower;
-    __CPROVER_assume(__CPROVER_isnormalld(lowerSquare));
-
     long double upper = nextUpl(lower);
-    long double upperSquare = upper * upper;  // Might be +Inf
-#pragma CPROVER check pop
 
-    __CPROVER_assume(lowerSquare <= d);
-    __CPROVER_assume(d < upperSquare);
+    __CPROVER_sqrt_long_double_wide lower_w = lower;
+    __CPROVER_sqrt_long_double_wide upper_w = upper;
+    __CPROVER_sqrt_long_double_wide x_w = d;
+    __CPROVER_assume(lower_w * lower_w <= x_w);
+    __CPROVER_assume(x_w < upper_w * upper_w);
 
+    // Select between them to work out which to return
     switch(fegetround())
     {
     case FE_TONEAREST:
-      return (d - lowerSquare < upperSquare - d) ? lower : upper; break;
+    {
+      // The exact square root is never the midpoint between two long doubles
+      // (the square of the midpoint needs more bits than long double has), so there
+      // are no ties.
+      __CPROVER_sqrt_long_double_wide midpoint = (lower_w + upper_w) / 2;
+      return x_w < midpoint * midpoint ? lower : upper;
+    }
     case FE_UPWARD:
-      return (d - lowerSquare == 0.0l) ? lower : upper; break;
+      return lower_w * lower_w == x_w ? lower : upper;
     case FE_DOWNWARD: // Fall through
     case FE_TOWARDZERO:
-      return (d - lowerSquare == 0.0l) ? lower : upper; break;
+      return lower;
     default:;
       return __VERIFIER_nondet_long_double();
     }

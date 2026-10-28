@@ -1,0 +1,11 @@
+CORE
+main2.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+The model must return the correctly rounded square root in all rounding
+modes.
