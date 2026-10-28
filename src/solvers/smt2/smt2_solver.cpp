@@ -35,8 +35,13 @@ protected:
   void setup_commands();
   void define_constants();
   void expand_function_applications(exprt &);
+  void report_result(decision_proceduret::resultt);
 
   std::set<irep_idt> constants_done;
+
+  /// Set when the input asked for assertions to be retracted, which we do
+  /// not support.
+  bool assertions_may_be_stale = false;
 
   enum
   {
@@ -68,6 +73,37 @@ void smt2_solvert::define_constants()
     expand_function_applications(def);
     solver.set_to_true(
       equal_exprt(symbol_exprt(identifier, id.second.type), def));
+  }
+}
+
+/// Print the result of a satisfiability check and record it in `status`.
+/// Reports "unknown" instead of "unsat" when assertions that should have
+/// been retracted are still present.
+void smt2_solvert::report_result(decision_proceduret::resultt result)
+{
+  switch(result)
+  {
+  case decision_proceduret::resultt::D_SATISFIABLE:
+    std::cout << "sat\n";
+    status = SAT;
+    break;
+
+  case decision_proceduret::resultt::D_UNSATISFIABLE:
+    if(assertions_may_be_stale)
+    {
+      std::cout << "unknown\n";
+      status = NOT_SOLVED;
+    }
+    else
+    {
+      std::cout << "unsat\n";
+      status = UNSAT;
+    }
+    break;
+
+  case decision_proceduret::resultt::D_ERROR:
+    std::cout << "error\n";
+    status = NOT_SOLVED;
   }
 }
 
@@ -132,22 +168,7 @@ void smt2_solvert::setup_commands()
       // add constant definitions as constraints
       define_constants();
 
-      switch(solver())
-      {
-      case decision_proceduret::resultt::D_SATISFIABLE:
-        std::cout << "sat\n";
-        status = SAT;
-        break;
-
-      case decision_proceduret::resultt::D_UNSATISFIABLE:
-        std::cout << "unsat\n";
-        status = UNSAT;
-        break;
-
-      case decision_proceduret::resultt::D_ERROR:
-        std::cout << "error\n";
-        status = NOT_SOLVED;
-      }
+      report_result(solver());
     };
 
     commands["check-sat-assuming"] = [this]() {
@@ -173,22 +194,7 @@ void smt2_solvert::setup_commands()
       // add the assumptions
       solver.push(assumptions);
 
-      switch(solver())
-      {
-      case decision_proceduret::resultt::D_SATISFIABLE:
-        std::cout << "sat\n";
-        status = SAT;
-        break;
-
-      case decision_proceduret::resultt::D_UNSATISFIABLE:
-        std::cout << "unsat\n";
-        status = UNSAT;
-        break;
-
-      case decision_proceduret::resultt::D_ERROR:
-        std::cout << "error\n";
-        status = NOT_SOLVED;
-      }
+      report_result(solver());
 
       // remove the assumptions again
       solver.pop();
@@ -347,6 +353,30 @@ void smt2_solvert::setup_commands()
         exprt e_simplified = simplify_expr(e, ns);
         std::cout << smt2_format(e_simplified) << '\n';
       }
+    };
+    // push, pop, reset and reset-assertions are not supported: we cannot
+    // retract assertions. Report an error, and do not report "unsat" after
+    // any assertions should have been retracted, as the unsatisfiability may
+    // be caused by such an assertion. A "sat" answer remains valid, as any
+    // model of a superset of the assertions is also a model of the subset.
+    commands["push"] = [this]() { throw error("push is not supported"); };
+
+    commands["pop"] = [this]()
+    {
+      assertions_may_be_stale = true;
+      throw error("pop is not supported");
+    };
+
+    commands["reset"] = [this]()
+    {
+      assertions_may_be_stale = true;
+      throw error("reset is not supported");
+    };
+
+    commands["reset-assertions"] = [this]()
+    {
+      assertions_may_be_stale = true;
+      throw error("reset-assertions is not supported");
     };
   }
 

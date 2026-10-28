@@ -1,0 +1,13 @@
+CORE
+push-pop1.smt2
+
+^EXIT=20$
+^SIGNAL=0$
+^\(error "line 3: push is not supported"\)$
+^\(error "line 5: pop is not supported"\)$
+^unknown$
+--
+^unsat$
+--
+push and pop must be explicitly rejected, and as the popped assertion cannot be
+retracted, the solver must not report unsat.

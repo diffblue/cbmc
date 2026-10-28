@@ -1,0 +1,14 @@
+CORE
+push-pop2.smt2
+
+^EXIT=20$
+^SIGNAL=0$
+^\(error "line 4: push is not supported"\)$
+^\(error "line 6: pop is not supported"\)$
+^sat$
+--
+^unknown$
+^unsat$
+--
+Any model of a superset of the assertions is a model of the assertions, hence
+sat must still be reported.
