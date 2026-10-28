@@ -344,6 +344,15 @@ static exprt bv_to_expr(
       typecast_exprt::conditional_cast(bv_expr, target_type), ns);
   }
   else if(
+    target_type.id() == ID_c_bool &&
+    to_bitvector_type(bitvector_expr.type()).get_width() ==
+      to_c_bool_type(target_type).get_width())
+  {
+    // A typecast to c_bool would map any non-zero value to 1, but byte
+    // operators re-interpret the bits. Extracting all bits preserves them.
+    return simplify_expr(extractbits_exprt{bitvector_expr, 0, target_type}, ns);
+  }
+  else if(
     can_cast_type<bitvector_typet>(target_type) ||
     target_type.id() == ID_c_enum || target_type.id() == ID_c_enum_tag ||
     target_type.id() == ID_string ||
@@ -1489,11 +1498,12 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
       result_type.id() == ID_struct || result_type.id() == ID_struct_tag ||
       result_type.id() == ID_union || result_type.id() == ID_union_tag ||
       result_type.id() == ID_array || result_type.id() == ID_vector ||
-      result_type.id() == ID_complex)
+      result_type.id() == ID_complex || result_type.id() == ID_c_bool)
     {
       // A composite result type cannot be produced by a plain typecast (the
       // SMT2 back-end has no bit-vector -> struct/union/array typecast); build
-      // the aggregate from the single byte instead.
+      // the aggregate from the single byte instead. A typecast to c_bool
+      // would not preserve the bits of the byte.
       endianness_mapt map{op.front().type(), little_endian, ns};
       return bv_to_expr(op.front(), result_type, map, ns);
     }
