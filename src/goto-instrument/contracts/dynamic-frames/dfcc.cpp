@@ -40,7 +40,7 @@ std::string invalid_function_contract_pair_exceptiont::what() const
   std::string res;
 
   res += "Invalid function-contract mapping";
-  res += "\nReason: " + reason;
+  res += "\nReason: " + reason();
 
   if(!correct_format.empty())
   {
