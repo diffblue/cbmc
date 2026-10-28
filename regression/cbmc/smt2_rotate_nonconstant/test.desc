@@ -1,0 +1,12 @@
+CORE no-new-smt
+main.c
+--no-standard-checks
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^VERIFICATION ERROR$
+--
+Verify that rotate with a non-constant distance works on all backends.
+The incremental SMT2 backend does not support non-constant rotate distances
+(pre-existing issue).
