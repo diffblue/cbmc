@@ -864,7 +864,6 @@ void goto_convertt::convert_frontend_decl(
     return; // this is a SKIP!
 
   std::list<irep_idt> ref_bound_temporaries;
-  std::list<codet> backing_array_destructors;
 
   const goto_programt::targett declaration_iterator = [&]()
   {
@@ -934,31 +933,6 @@ void goto_convertt::convert_frontend_decl(
           others.push_back(id);
       }
       destruct_locals(others, dest, ns);
-
-      // N5008 [dcl.init.list]/6: initializing an initializer_list object from
-      // its backing array extends the array's lifetime exactly like binding
-      // a reference to a temporary.  The C++ front end holds the array in a
-      // static-lifetime symbol (initializer_list_backing_array,
-      // cpp_typecheck_conversions.cpp, named `__init_list_arr$N'); when the
-      // elements are constructed in place where the list is evaluated (the
-      // symbol then has no static initializer) they are destroyed, in
-      // reverse order ([class.dtor]/13), at the end of the object's lifetime.
-      for(const auto &id : bound)
-      {
-        if(id2string(id).rfind("__init_list_arr$", 0) != 0)
-          continue;
-        const symbolt *array_symbol = ns.get_symbol_table().lookup(id);
-        if(
-          array_symbol == nullptr || array_symbol->value.is_not_nil() ||
-          array_symbol->type.id() != ID_array)
-        {
-          continue;
-        }
-        const auto element_destructors =
-          array_destructor(ns, array_symbol->symbol_expr());
-        if(element_destructors.has_value())
-          backing_array_destructors.push_back(*element_destructors);
-      }
     }
     else
       destruct_locals(side_effects.temporaries, dest, ns);
@@ -984,6 +958,16 @@ void goto_convertt::convert_frontend_decl(
   for(const auto &id : ref_bound_temporaries)
   {
     const symbolt &tmp_sym = ns.lookup(id);
+    // N5008 [dcl.init.list]/6: the backing array an initializer_list object
+    // is initialized from (a temporary of clean_expr held in a
+    // static-lifetime symbol, see there) lives as long as the object; its
+    // elements are destroyed in reverse order ([class.dtor]/13)
+    if(tmp_sym.type.id() == ID_array)
+    {
+      if(const auto elements = array_destructor(ns, tmp_sym.symbol_expr()))
+        targets.scope_stack.add(*elements, {});
+      continue;
+    }
     targets.scope_stack.add(
       code_deadt(tmp_sym.symbol_expr()), {declaration_iterator});
     code_function_callt tmp_destructor = get_destructor(ns, tmp_sym.type);
@@ -995,11 +979,6 @@ void goto_convertt::convert_frontend_decl(
       targets.scope_stack.add(tmp_destructor, {});
     }
   }
-
-  // the backing arrays of initializer_list objects (see above): destroyed
-  // after the object itself, which was initialized after them
-  for(const auto &element_destructors : backing_array_destructors)
-    targets.scope_stack.add(element_destructors, {});
 
   {
     code_deadt code_dead(symbol_expr);

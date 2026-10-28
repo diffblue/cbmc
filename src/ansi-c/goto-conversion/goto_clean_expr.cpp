@@ -652,6 +652,56 @@ goto_convertt::clean_expr_resultt goto_convertt::clean_expr(
   {
     clean_expr_resultt side_effects;
 
+    // N5008 [dcl.init.list]/5-6: the C++ front end constructs the elements
+    // of an initializer_list's backing array in place, as the leading
+    // operands of a comma expression whose result is the list
+    // (initializer_list_backing_array, cpp_typecheck_conversions.cpp; the
+    // array is a static-lifetime symbol `__init_list_arr$N' without a
+    // static initializer).  The array is a temporary object of this
+    // full-expression ([class.temporary]/1, /4), unless an initializer_list
+    // variable is initialized from it (lifetime extension, handled by the
+    // declaration): record it among the temporaries so that its elements
+    // are destroyed.
+    for(const auto &op : expr.operands())
+    {
+      if(
+        op.id() != ID_side_effect ||
+        to_side_effect_expr(op).get_statement() != ID_function_call)
+      {
+        continue;
+      }
+      const auto &arguments = to_side_effect_expr_function_call(op).arguments();
+      if(
+        arguments.empty() || arguments.front().id() != ID_address_of ||
+        to_address_of_expr(arguments.front()).object().id() != ID_index)
+      {
+        continue;
+      }
+      const exprt &array =
+        to_index_expr(to_address_of_expr(arguments.front()).object()).array();
+      if(array.id() != ID_symbol)
+        continue;
+      const irep_idt &id = to_symbol_expr(array).get_identifier();
+      if(id2string(id).rfind("__init_list_arr$", 0) != 0)
+        continue;
+      const symbolt *array_symbol = ns.get_symbol_table().lookup(id);
+      if(
+        array_symbol == nullptr || array_symbol->value.is_not_nil() ||
+        array_symbol->type.id() != ID_array ||
+        !array_destructor(ns, array_symbol->symbol_expr()).has_value())
+      {
+        continue;
+      }
+      if(
+        std::find(
+          side_effects.temporaries.begin(),
+          side_effects.temporaries.end(),
+          id) == side_effects.temporaries.end())
+      {
+        side_effects.temporaries.push_back(id);
+      }
+    }
+
     if(result_is_used)
     {
       exprt result;

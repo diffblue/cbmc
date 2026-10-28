@@ -22,6 +22,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_program.h>
 
+#include <functional>
+
 code_function_callt get_destructor(const namespacet &ns, const typet &type)
 {
   if(type.id() == ID_struct_tag)
@@ -119,6 +121,34 @@ void destruct_locals(
   for(const auto &id : vars)
   {
     const symbolt &symbol = ns.lookup(id);
+
+    // the backing array of an initializer_list (see clean_expr): its
+    // elements are destroyed in reverse order ([class.dtor]/13); the
+    // static-lifetime symbol that holds it gets no DEAD
+    if(symbol.type.id() == ID_array)
+    {
+      if(const auto elements = array_destructor(ns, symbol.symbol_expr()))
+      {
+        std::function<void(const codet &)> add_calls = [&](const codet &c)
+        {
+          if(c.get_statement() == ID_function_call)
+          {
+            const code_function_callt &call = to_code_function_call(c);
+            dest.add(goto_programt::make_function_call(call, symbol.location));
+          }
+          else
+          {
+            for(const auto &op : c.operands())
+              add_calls(to_code(op));
+          }
+        };
+        add_calls(*elements);
+      }
+      if(!symbol.is_static_lifetime)
+        dest.add(
+          goto_programt::make_dead(symbol.symbol_expr(), symbol.location));
+      continue;
+    }
 
     // do destructor
     code_function_callt destructor = get_destructor(ns, symbol.type);
