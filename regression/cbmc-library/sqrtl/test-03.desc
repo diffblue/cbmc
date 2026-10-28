@@ -1,0 +1,11 @@
+CORE
+main3.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Exact square roots, also of a subnormal argument where long double is
+binary128, and rounding upward; the models restore the rounding mode.
