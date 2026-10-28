@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11 --object-bits 12 --unwind 5 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ argument array destroyed: SUCCESS$
@@ -11,8 +11,10 @@ main.cpp
 --
 ^warning: ignoring
 --
-The backing array is a static-lifetime symbol (initializer_list_backing_
-array); its elements are destroyed only when it initializes an
-initializer_list variable (cpp11_initializer_list_elements_destroyed_with_
-the_array).  An array of a full-expression is never destroyed: assertions
-1-3 fail.  Needs the array to be a temporary of that full-expression.
+Fixed: the backing array, held in a static-lifetime symbol
+(initializer_list_backing_array) whose elements are constructed in place,
+is now a temporary of its full-expression in goto conversion (clean_expr)
+and destroyed at its end, unless an initializer_list variable is
+initialized from it (cpp11_initializer_list_elements_destroyed_with_the_
+array).  Assertion 3 also needed std::_Destroy's header body
+(cpp11_vector_destroys_its_elements).
