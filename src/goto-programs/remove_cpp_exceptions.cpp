@@ -561,7 +561,17 @@ void remove_cpp_exceptionst::prepare_handler(
 
   // catch(...) or no bindable parameter: preserve the exception being handled
   // (for a potential rethrow) and clear the in-flight exception on entry.
-  // Inserted after the handler's first instruction, in reverse order.
+  // Inserted after the handler's first instruction, in reverse order; that
+  // instruction becomes a SKIP so that it is not one of the handler's
+  // statements (a destructor call, in the handlers of
+  // add_constructor_unwinding), which ran with the exception still in
+  // flight ([except.handle]/9: the handler is active once entered).
+  if(!handler->is_skip())
+  {
+    goto_programt::instructiont original = *handler;
+    goto_program.insert_after(handler, std::move(original));
+    *handler = goto_programt::make_skip(handler->source_location());
+  }
   goto_program.insert_after(
     handler,
     goto_programt::make_assignment(inflight_ptr, clear_inflight(), loc));
