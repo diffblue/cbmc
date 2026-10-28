@@ -1,0 +1,9 @@
+CORE
+get-model-quoted1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+\|a b\|
+--
+get-model must quote non-simple symbols.
