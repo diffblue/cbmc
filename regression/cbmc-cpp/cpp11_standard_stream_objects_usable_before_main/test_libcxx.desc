@@ -1,13 +1,13 @@
 CORE libcxx
 main.cpp
 --cpp11 --stdlib libc++
-^\[main\.assertion\.1\] line \d+ output before main succeeds: SUCCESS$
+^\[main\.assertion\.1\] line \d+ output before main reaches the buffer: SUCCESS$
 ^\[main\.assertion\.2\] line \d+ cin tied to cout: SUCCESS$
 ^\[main\.assertion\.3\] line \d+ clog not tied: SUCCESS$
 ^\[main\.assertion\.4\] line \d+ wcin tied to wcout: SUCCESS$
 ^\[main\.assertion\.5\] line \d+ wcerr tied to wcout: SUCCESS$
 ^\[main\.assertion\.6\] line \d+ wcerr unitbuf: SUCCESS$
-^\[main\.assertion\.7\] line \d+ cerr good after output: SUCCESS$
+^\[main\.assertion\.7\] line \d+ cerr good or bad after output: SUCCESS$
 ^\[main\.assertion\.8\] line \d+ cin.get in range: SUCCESS$
 ^\[main\.assertion\.9\] line \d+ WRONG \(must FAIL\): FAILURE$
 ^\*\* 1 of \d+ failed
