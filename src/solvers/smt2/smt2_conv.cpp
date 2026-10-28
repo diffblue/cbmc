@@ -1889,29 +1889,84 @@ void smt2_convt::convert_expr(const exprt &expr)
     {
       // SMT-LIB offers rotate_left and rotate_right, but these require a
       // constant distance.
-      if(shift_expr.id() == ID_rol)
-        out << "((_ rotate_left";
-      else if(shift_expr.id() == ID_ror)
-        out << "((_ rotate_right";
-      else
-        UNREACHABLE;
-
-      out << ' ';
-
       auto distance_int_op = numeric_cast<mp_integer>(shift_expr.distance());
 
       if(distance_int_op.has_value())
       {
-        out << distance_int_op.value();
+        if(shift_expr.id() == ID_rol)
+          out << "((_ rotate_left";
+        else if(shift_expr.id() == ID_ror)
+          out << "((_ rotate_right";
+        else
+          UNREACHABLE;
+
+        out << ' ' << distance_int_op.value() << ") ";
+        convert_expr(shift_expr.op());
+        out << ")"; // rotate_*
       }
       else
-        UNEXPECTEDCASE(
-          "distance type for " + shift_expr.id_string() + "must be constant");
+      {
+        // Non-constant distance: lower to shifts.
+        // rol(x, s) = (x << s') | (x >> (w - s'))
+        // ror(x, s) = (x >> s') | (x << (w - s'))
+        // where s' = s mod w and w = bit-width.
+        // bvlshr by w gives 0, so s'=0 (no rotation) is handled correctly.
+        const std::size_t width = boolbv_width(type);
+        const auto &distance = shift_expr.distance();
+        const auto &distance_type = distance.type();
 
-      out << ") ";
-      convert_expr(shift_expr.op());
+        // s mod w is computed in the wider of the two widths, as truncating
+        // the distance first would yield the wrong result when w is not a
+        // power of two.
+        if(
+          distance_type.id() != ID_signedbv &&
+          distance_type.id() != ID_unsignedbv &&
+          distance_type.id() != ID_c_enum && distance_type.id() != ID_c_bool)
+        {
+          UNEXPECTEDCASE(
+            "unsupported distance type for " + shift_expr.id_string() + ": " +
+            distance_type.id_string());
+        }
+        const std::size_t dist_width = boolbv_width(distance_type);
+        const std::size_t mod_width = std::max(width, dist_width);
 
-      out << ")"; // rotate_*
+        // (let ((?rot_d <(distance mod width) as bit vector of width bits>))
+        //   (bvor (bvshl x ?rot_d)
+        //         (bvlshr x (bvsub width_bv ?rot_d))))
+        out << "(let ((?rot_d ";
+        if(mod_width > width)
+          out << "((_ extract " << width - 1 << " 0) ";
+        out << "(bvurem ";
+        if(dist_width < mod_width)
+        {
+          out << "((_ zero_extend " << mod_width - dist_width << ") ";
+          convert_expr(distance);
+          out << ")";
+        }
+        else
+          convert_expr(distance);
+        out << " (_ bv" << width << " " << mod_width << "))";
+        if(mod_width > width)
+          out << ")"; // extract
+        out << ")) "; // binding, bindings
+
+        out << "(bvor ";
+        if(shift_expr.id() == ID_rol)
+          out << "(bvshl ";
+        else
+          out << "(bvlshr ";
+        convert_expr(shift_expr.op());
+        out << " ?rot_d) ";
+
+        if(shift_expr.id() == ID_rol)
+          out << "(bvlshr ";
+        else
+          out << "(bvshl ";
+        convert_expr(shift_expr.op());
+        out << " (bvsub (_ bv" << width << " " << width << ") ?rot_d))";
+
+        out << "))"; // bvor, let
+      }
     }
     else
       UNEXPECTEDCASE(
