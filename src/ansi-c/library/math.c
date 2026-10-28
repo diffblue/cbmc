@@ -1189,8 +1189,13 @@ long double fminl(long double f, long double g) { return ((f <= g) || isnan(g)) 
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-double fdim(double f, double g) { return ((f > g) ? f - g : +0.0); }
-
+double fdim(double f, double g)
+{
+  // C11 F.10p11: a NaN argument yields a NaN result
+  if(__CPROVER_isnand(f) || __CPROVER_isnand(g))
+    return f + g;
+  return ((f > g) ? f - g : +0.0);
+}
 
 /* FUNCTION: fdimf */
 
@@ -1199,8 +1204,13 @@ double fdim(double f, double g) { return ((f > g) ? f - g : +0.0); }
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-float fdimf(float f, float g) { return ((f > g) ? f - g : +0.0f); }
-
+float fdimf(float f, float g)
+{
+  // C11 F.10p11: a NaN argument yields a NaN result
+  if(__CPROVER_isnanf(f) || __CPROVER_isnanf(g))
+    return f + g;
+  return ((f > g) ? f - g : +0.0f);
+}
 
 /* FUNCTION: fdiml */
 
@@ -1209,7 +1219,13 @@ float fdimf(float f, float g) { return ((f > g) ? f - g : +0.0f); }
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-long double fdiml(long double f, long double g) { return ((f > g) ? f - g : +0.0); }
+long double fdiml(long double f, long double g)
+{
+  // C11 F.10p11: a NaN argument yields a NaN result
+  if(__CPROVER_isnanld(f) || __CPROVER_isnanld(g))
+    return f + g;
+  return ((f > g) ? f - g : +0.0);
+}
 
 /* ISO 9899:2011
  *
