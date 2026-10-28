@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[handler\.assertion\.1\] line \d+ terminate called from the unwinding: SUCCESS$
@@ -10,9 +10,7 @@ main.cpp
 --
 ^warning: ignoring
 --
-Soundness: remove_cpp_exceptions (instrument_unwind_call) assumes that a
-destructor called during stack unwinding does not exit via an exception,
-so the path on which std::terminate runs the handler is removed: both
-assertions of the handler hold.  The exit has to call std::terminate,
-which calls the handler installed by std::set_terminate; std::set_terminate
-and std::terminate also have no body (libsupc++, libc++abi).
+Fixed (soundness): the exception lowering assumed that a destructor
+called during stack unwinding does not exit via an exception, so the path
+on which std::terminate calls the handler was removed.  It now calls
+std::terminate there; std::set_terminate and std::terminate have models.

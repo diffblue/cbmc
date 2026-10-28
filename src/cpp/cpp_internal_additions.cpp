@@ -82,6 +82,10 @@ void cpp_internal_additions(std::ostream &out)
   // so that library models can read them
   out << "void *" CPROVER_PREFIX "cpp_inflight_exception = 0;" << '\n';
   out << "int " CPROVER_PREFIX "cpp_unwinding_exceptions = 0;" << '\n';
+  // the terminate handler of std::set_terminate; null designates the
+  // default handler, which calls abort() ([set.terminate]/3,
+  // [terminate.handler]/3)
+  out << "void (*" CPROVER_PREFIX "cpp_terminate_handler)() = 0;" << '\n';
 
   // auxiliaries for new/delete
   out << "void *__new(__CPROVER::size_t);" << '\n';

@@ -1,0 +1,21 @@
+CORE libcxx
+main.cpp
+--cpp11 --stdlib libc++
+^\[handler\.assertion\.1\] line \d+ handler only on these paths: SUCCESS$
+^\[handler\.assertion\.2\] line \d+ terminate: exception leaves main: FAILURE$
+^\[handler\.assertion\.3\] line \d+ terminate: exception leaves noexcept: FAILURE$
+^\[handler\.assertion\.4\] line \d+ terminate: called directly: FAILURE$
+^\[handler\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\[main\.assertion\.1\] line \d+ handler installed: SUCCESS$
+^\[main\.assertion\.2\] line \d+ throw\(\) is non-throwing: SUCCESS$
+^\*\* 4 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+std::set_terminate, std::get_terminate and std::terminate had no body,
+an exception leaving main or a noexcept function ended the program
+silently, and every noexcept(...) was taken as noexcept(true).  Assertions
+2 to 4 fail on one path each (handler on paths 1 to 3, and nowhere else).
