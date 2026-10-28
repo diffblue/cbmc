@@ -2067,13 +2067,29 @@ void smt2_convt::convert_expr(const exprt &expr)
     }
     else
     {
+      // Shift the source right by the index, then check bit 0. The index is
+      // a bit position: zero-extend both operands to the wider of the two
+      // widths rather than using a typecast to the type of the source, which
+      // would convert the value (e.g., scale for fixedbv, or map any non-zero
+      // value to 1 for c_bool). Out-of-range indices then yield false.
+      const std::size_t src_width = boolbv_width(extractbit_expr.src().type());
+      const std::size_t idx_width =
+        boolbv_width(extractbit_expr.index().type());
+      const std::size_t width = std::max(src_width, idx_width);
+
       out << "(= ((_ extract 0 0) ";
-      // the arguments of the shift need to have the same width
       out << "(bvlshr ";
+      if(src_width < width)
+        out << "((_ zero_extend " << width - src_width << ") ";
       flatten2bv(extractbit_expr.src());
+      if(src_width < width)
+        out << ')';
       out << ' ';
-      typecast_exprt tmp(extractbit_expr.index(), extractbit_expr.src().type());
-      convert_expr(tmp);
+      if(idx_width < width)
+        out << "((_ zero_extend " << width - idx_width << ") ";
+      convert_expr(extractbit_expr.index());
+      if(idx_width < width)
+        out << ')';
       out << ")) #b1)"; // bvlshr, extract, =
     }
   }
