@@ -5691,6 +5691,35 @@ exprt smt2_convt::prepare_for_convert_expr(const exprt &expr)
       it.mutate() = lowered;
       it.next_sibling_or_parent();
     }
+    else if(
+      it->id() == ID_floatbv_typecast &&
+      (it->type().id() == ID_c_enum_tag || it->type().id() == ID_c_enum ||
+       to_floatbv_typecast_expr(*it).op().type().id() == ID_c_enum_tag ||
+       to_floatbv_typecast_expr(*it).op().type().id() == ID_c_enum))
+    {
+      // Conversions between enums and floating-point values are done via the
+      // underlying type of the enum, which has the same representation.
+      floatbv_typecast_exprt typecast = to_floatbv_typecast_expr(*it);
+      auto underlying_type = [this](const typet &type) -> const typet &
+      {
+        return type.id() == ID_c_enum_tag
+                 ? ns.follow_tag(to_c_enum_tag_type(type)).underlying_type()
+                 : to_c_enum_type(type).underlying_type();
+      };
+      const typet &src_type = typecast.op().type();
+      if(src_type.id() == ID_c_enum_tag || src_type.id() == ID_c_enum)
+        typecast.op() =
+          typecast_exprt{typecast.op(), underlying_type(src_type)};
+      const typet dest_type = typecast.type();
+      if(dest_type.id() == ID_c_enum_tag || dest_type.id() == ID_c_enum)
+      {
+        typecast.type() = underlying_type(dest_type);
+        it.mutate() = typecast_exprt{std::move(typecast), dest_type};
+      }
+      else
+        it.mutate() = std::move(typecast);
+      ++it;
+    }
     else
       ++it;
   }
