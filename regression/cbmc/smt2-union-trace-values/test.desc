@@ -1,0 +1,9 @@
+CORE smt-backend no-new-smt broken-cprover-smt-backend
+main.c
+--z3 --trace
+^EXIT=10$
+^SIGNAL=0$
+^  a=\{ \.f=1\.0f \}
+^VERIFICATION FAILED$
+--
+^warning: ignoring

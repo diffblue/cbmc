@@ -179,6 +179,7 @@ protected:
   // Parsing solver responses
   constant_exprt parse_literal(const irept &, const typet &type);
   struct_exprt parse_struct(const irept &s, const struct_typet &type);
+  struct_exprt parse_flattened_struct(const irept &s, const struct_typet &type);
   exprt parse_union(const irept &s, const union_typet &type);
   /// This function is for parsing array output from SMT solvers
   /// when "(get-value |???|)" returns an array object.
