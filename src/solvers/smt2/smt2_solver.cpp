@@ -20,11 +20,55 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fstream> // IWYU pragma: keep
 #include <iostream>
 
+class smt2_message_handlert : public message_handlert
+{
+public:
+  /// Set to true once a term has been ignored by the bit-blaster, or an
+  /// assertion has been dropped because of an error. This remains set, as
+  /// the solver state then no longer reflects the input.
+  bool constraints_dropped = false;
+
+  void print(unsigned level, const std::string &message) override
+  {
+    message_handlert::print(level, message);
+
+    if(level < 4) // errors and warnings
+    {
+      std::cout << "(error \"" << message << "\")\n";
+      // prop_conv_solvert::ignoring emits "warning: ignoring ..." when a
+      // term cannot be converted.
+      if(message.find("warning: ignoring") != std::string::npos)
+        constraints_dropped = true;
+    }
+    else
+      std::cout << "; " << message << '\n';
+  }
+
+  void print(unsigned, const xmlt &) override
+  {
+  }
+
+  void print(unsigned, const jsont &) override
+  {
+  }
+
+  void flush(unsigned) override
+  {
+    std::cout << std::flush;
+  }
+};
+
 class smt2_solvert:public smt2_parsert
 {
 public:
-  smt2_solvert(std::istream &_in, stack_decision_proceduret &_solver)
-    : smt2_parsert(_in), solver(_solver), status(NOT_SOLVED)
+  smt2_solvert(
+    std::istream &_in,
+    stack_decision_proceduret &_solver,
+    smt2_message_handlert &_message_handler)
+    : smt2_parsert(_in),
+      solver(_solver),
+      status(NOT_SOLVED),
+      smt2_msg_handler{_message_handler}
   {
     setup_commands();
   }
@@ -44,6 +88,8 @@ protected:
     SAT,
     UNSAT
   } status;
+
+  smt2_message_handlert &smt2_msg_handler;
 };
 
 void smt2_solvert::define_constants()
@@ -128,11 +174,26 @@ void smt2_solvert::setup_commands()
       }
     };
 
-    commands["check-sat"] = [this]() {
+    commands["check-sat"] = [this]()
+    {
       // add constant definitions as constraints
       define_constants();
 
-      switch(solver())
+      auto result = solver();
+
+      // If any term could not be converted, the solver replaced it by
+      // unconstrained bits, and assertions that caused an error were dropped.
+      // A satisfying assignment then need not satisfy the input.
+      if(
+        result == decision_proceduret::resultt::D_SATISFIABLE &&
+        smt2_msg_handler.constraints_dropped)
+      {
+        std::cout << "unknown\n";
+        status = NOT_SOLVED;
+        return;
+      }
+
+      switch(result)
       {
       case decision_proceduret::resultt::D_SATISFIABLE:
         std::cout << "sat\n";
@@ -376,33 +437,6 @@ void smt2_solvert::setup_commands()
 #endif
 }
 
-class smt2_message_handlert : public message_handlert
-{
-public:
-  void print(unsigned level, const std::string &message) override
-  {
-    message_handlert::print(level, message);
-
-    if(level < 4) // errors
-      std::cout << "(error \"" << message << "\")\n";
-    else
-      std::cout << "; " << message << '\n';
-  }
-
-  void print(unsigned, const xmlt &) override
-  {
-  }
-
-  void print(unsigned, const jsont &) override
-  {
-  }
-
-  void flush(unsigned) override
-  {
-    std::cout << std::flush;
-  }
-};
-
 int solver(std::istream &in)
 {
   symbol_tablet symbol_table;
@@ -417,7 +451,7 @@ int solver(std::istream &in)
   satcheckt satcheck{message_handler};
   boolbvt boolbv{ns, satcheck, message_handler};
 
-  smt2_solvert smt2_solver{in, boolbv};
+  smt2_solvert smt2_solver{in, boolbv, message_handler};
   bool error_found = false;
 
   while(!smt2_solver.exit)
@@ -429,6 +463,7 @@ int solver(std::istream &in)
     catch(const smt2_tokenizert::smt2_errort &error)
     {
       smt2_solver.skip_to_end_of_list();
+      message_handler.constraints_dropped = true;
       error_found = true;
       message.error().source_location.set_line(error.get_line_no());
       message.error() << error.what() << messaget::eom;
@@ -436,6 +471,7 @@ int solver(std::istream &in)
     catch(const analysis_exceptiont &error)
     {
       smt2_solver.skip_to_end_of_list();
+      message_handler.constraints_dropped = true;
       error_found = true;
       message.error() << error.what() << messaget::eom;
     }
