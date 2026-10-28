@@ -771,6 +771,10 @@ protected:
   /// functions that libc++ declares in its headers but defines only in its
   /// compiled library.
   void provide_library_source_models();
+  /// Define the standard stream objects (std::cout, std::cin, ...) that
+  /// the header `<iostream>` declares and the compiled library defines,
+  /// constructing them before any other dynamic initialization.
+  void provide_standard_stream_objects();
   exprt classic_num_put(const symbolt &accessor);
 
   /// Lay out the class's virtual bases after its non-virtual part (Itanium
