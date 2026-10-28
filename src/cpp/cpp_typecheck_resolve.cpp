@@ -7923,6 +7923,21 @@ resolved_after_strip:
               identifiers.push_back(object);
               handled_variable_template = true;
             }
+            // N5008 [expr.prim.id.unqual]/12: an instance of a variable
+            // template is a variable, an lvalue.  Only one usable in constant
+            // expressions ([expr.const]/3: constexpr, or const with a constant
+            // initializer) has its value substituted, as convert_identifier
+            // does for such variables; `template <class> int v = 0;' is an
+            // object that can be assigned and whose address can be taken.
+            else if(
+              inst_sym.value.is_not_nil() && !inst_sym.is_macro &&
+              !inst_type.get_bool(ID_C_constant))
+            {
+              exprt object = cpp_symbol_expr(inst_sym);
+              object.add_source_location() = source_location;
+              identifiers.push_back(object);
+              handled_variable_template = true;
+            }
             // The instantiated symbol is a constexpr variable.
             // Return its value, evaluating any remaining constexpr
             // function calls.
@@ -7971,6 +7986,8 @@ resolved_after_strip:
                 };
                 eval_calls(val);
               }
+              if(!val.is_constant())
+                simplify(val, cpp_typecheck);
               // Store the evaluated constant back in the symbol table
               // so subsequent lookups get the constant directly.
               if(val.is_constant())
@@ -7981,6 +7998,10 @@ resolved_after_strip:
                   writable->value = val;
               }
               val.add_source_location() = source_location;
+              // still an object ([expr.prim.id.unqual]/12): taking its
+              // address uses it (see convert_identifier)
+              if(val.is_constant())
+                val.set(ID_C_constexpr_object, inst_sym.name);
               identifiers.push_back(val);
               handled_variable_template = true;
             }

@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp14
+^\[main\.assertion\.1\] line \d+ initialized: SUCCESS$
+^\[main\.assertion\.2\] line \d+ assigned and incremented: SUCCESS$
+^\[main\.assertion\.3\] line \d+ through its address: SUCCESS$
+^\[main\.assertion\.4\] line \d+ lvalue: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The resolver substituted the initializer of every variable template
+specialization, so counter<char> was the prvalue 3 ("assignment error: '3'
+not an lvalue").  Only specializations usable in constant expressions
+(constexpr or const) are substituted now.  Found while diagnosing
+cpp20_range_adaptor_closure_invoked_through_invoke_impl.
