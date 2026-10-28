@@ -77,9 +77,11 @@ void cpp_internal_additions(std::ostream &out)
   out << "void *" CPROVER_PREFIX "allocate("
       << CPROVER_PREFIX "size_t size, " CPROVER_PREFIX "bool zero);" << '\n';
 
-  // the in-flight exception of remove_cpp_exceptions (null when none), here
-  // so that library models can read it
+  // the in-flight exception of remove_cpp_exceptions (null when none) and
+  // the number of exceptions whose stack unwinding runs a destructor, here
+  // so that library models can read them
   out << "void *" CPROVER_PREFIX "cpp_inflight_exception = 0;" << '\n';
+  out << "int " CPROVER_PREFIX "cpp_unwinding_exceptions = 0;" << '\n';
 
   // auxiliaries for new/delete
   out << "void *__new(__CPROVER::size_t);" << '\n';

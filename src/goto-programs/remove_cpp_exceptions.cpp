@@ -25,6 +25,7 @@ Author: Kiro
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/cprover_prefix.h>
+#include <util/fresh_symbol.h>
 #include <util/pointer_expr.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
@@ -91,6 +92,8 @@ protected:
   // re-propagate on a rethrow (`throw;`)
   symbol_exprt current_exc_ptr{irep_idt{}, typet{}};
   symbol_exprt current_exc_type{irep_idt{}, typet{}};
+  // the number of exceptions whose stack unwinding is running a destructor
+  symbol_exprt unwinding_count{irep_idt{}, typet{}};
 
   // Per-handler current-exception slots, keyed by the handler's catch-variable
   // identifier.  A handler writes its own slot on entry, so a nested/sibling
@@ -155,6 +158,11 @@ protected:
   void prepare_handler(
     goto_programt &goto_program,
     const goto_programt::targett &handler) override;
+
+  void instrument_unwind_call(
+    const irep_idt &function_identifier,
+    goto_programt &goto_program,
+    const goto_programt::targett &instr_it) override;
 
   symbol_exprt make_global(
     const irep_idt &name,
@@ -278,6 +286,10 @@ bool remove_cpp_exceptionst::prepare(goto_functionst &goto_functions)
     CPROVER_PREFIX "cpp_current_exception_type",
     signed_int_type(),
     from_integer(0, signed_int_type()));
+  unwinding_count = make_global(
+    CPROVER_PREFIX "cpp_unwinding_exceptions",
+    signed_int_type(),
+    from_integer(0, signed_int_type()));
   return true;
 }
 
@@ -366,6 +378,70 @@ void remove_cpp_exceptionst::set_inflight_exception(
     instr_it,
     goto_programt::make_assignment(
       inflight_type, from_integer(tag, inflight_type.type()), loc));
+}
+
+/// A destructor called during stack unwinding ([except.ctor]/1-2) runs
+/// while its exception is uncaught ([except.throw]/6, Note 4), but its own
+/// body is ordinary code: the dispatch after each call in it must see the
+/// in-flight state of exceptions thrown inside it only.  Save and clear the
+/// in-flight exception around the call, and count the exception being
+/// unwound (std::uncaught_exceptions reads the count).  A destructor that
+/// exits via an exception here calls std::terminate ([except.terminate]/1.4):
+/// assume it does not, as for a call of a must-not-throw function.
+void remove_cpp_exceptionst::instrument_unwind_call(
+  const irep_idt &function_identifier,
+  goto_programt &goto_program,
+  const goto_programt::targett &instr_it)
+{
+  const source_locationt loc = instr_it->source_location();
+  const symbol_exprt saved_ptr = get_fresh_aux_symbol(
+                                   inflight_ptr.type(),
+                                   id2string(function_identifier),
+                                   "unwound_exception",
+                                   loc,
+                                   ID_cpp,
+                                   symbol_table)
+                                   .symbol_expr();
+  const symbol_exprt saved_type = get_fresh_aux_symbol(
+                                    inflight_type.type(),
+                                    id2string(function_identifier),
+                                    "unwound_exception_type",
+                                    loc,
+                                    ID_cpp,
+                                    symbol_table)
+                                    .symbol_expr();
+  const exprt one = from_integer(1, unwinding_count.type());
+
+  goto_program.insert_before(
+    instr_it, goto_programt::make_decl(saved_ptr, loc));
+  goto_program.insert_before(
+    instr_it, goto_programt::make_decl(saved_type, loc));
+  goto_program.insert_before(
+    instr_it, goto_programt::make_assignment(saved_ptr, inflight_ptr, loc));
+  goto_program.insert_before(
+    instr_it, goto_programt::make_assignment(saved_type, inflight_type, loc));
+  goto_program.insert_before(
+    instr_it,
+    goto_programt::make_assignment(inflight_ptr, clear_inflight(), loc));
+  goto_program.insert_before(
+    instr_it,
+    goto_programt::make_assignment(
+      unwinding_count, plus_exprt{unwinding_count, one}, loc));
+
+  // inserted after the call in reverse order
+  goto_program.insert_after(
+    instr_it, goto_programt::make_dead(saved_type, loc));
+  goto_program.insert_after(instr_it, goto_programt::make_dead(saved_ptr, loc));
+  goto_program.insert_after(
+    instr_it,
+    goto_programt::make_assignment(
+      unwinding_count, minus_exprt{unwinding_count, one}, loc));
+  goto_program.insert_after(
+    instr_it, goto_programt::make_assignment(inflight_type, saved_type, loc));
+  goto_program.insert_after(
+    instr_it, goto_programt::make_assignment(inflight_ptr, saved_ptr, loc));
+  goto_program.insert_after(
+    instr_it, goto_programt::make_assumption(no_inflight_exception(), loc));
 }
 
 void remove_cpp_exceptionst::prepare_handler(

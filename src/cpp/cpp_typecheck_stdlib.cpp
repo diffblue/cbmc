@@ -1903,14 +1903,17 @@ static const std::map<std::string, std::string> &library_source_models()
     {"std::exception::what", "{ return \"std::exception\"; }"},
     // libsupc++ eh_catch.cc, libc++abi: N5008 [except.throw]/6-7, an
     // exception is uncaught from the initialization of the exception object
-    // (or a rethrow) until the activation of a handler.  The exception
-    // lowering's in-flight pointer is non-null from the THROW instruction
-    // until a handler is entered; it holds one exception, so
-    // uncaught_exceptions() ([uncaught.exceptions]/1) is at most 1.
+    // (or a rethrow) until the activation of a handler, which includes the
+    // stack unwinding.  The exception lowering's in-flight pointer is
+    // non-null from the THROW instruction until a handler is entered; while
+    // a destructor runs during stack unwinding, the exception is counted in
+    // cpp_unwinding_exceptions instead.  [uncaught.exceptions]/1.
     {"std::uncaught_exception",
-     "{ return " CPROVER_PREFIX "cpp_inflight_exception != 0; }"},
+     "{ return " CPROVER_PREFIX "cpp_inflight_exception != 0 ||"
+     " " CPROVER_PREFIX "cpp_unwinding_exceptions != 0; }"},
     {"std::uncaught_exceptions",
-     "{ return " CPROVER_PREFIX "cpp_inflight_exception != 0 ? 1 : 0; }"},
+     "{ return " CPROVER_PREFIX "cpp_unwinding_exceptions +"
+     " (" CPROVER_PREFIX "cpp_inflight_exception != 0 ? 1 : 0); }"},
     // libc++ src/new.cpp, N5008 [bad.alloc], [new.badlength]
     {"std::bad_alloc::bad_alloc", "{ }"},
     {"std::bad_alloc::~bad_alloc", "{ }"},

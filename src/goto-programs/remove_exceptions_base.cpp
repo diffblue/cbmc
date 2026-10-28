@@ -251,7 +251,10 @@ remove_exceptions_baset::instrument_function_call(
   // destructors.  A destructor that throws during unwinding terminates
   // ([except.terminate]).
   if(instr_it->code().get_bool("#unwind_path"))
-    return instrumentation_resultt::DID_NOTHING;
+  {
+    instrument_unwind_call(function_identifier, goto_program, instr_it);
+    return instrumentation_resultt::ADDED_CODE_WITHOUT_MAY_THROW;
+  }
 
   // save the address of the next instruction
   goto_programt::targett next_it = instr_it;
