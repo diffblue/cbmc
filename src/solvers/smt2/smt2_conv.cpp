@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/format_expr.h>
 #include <util/ieee_float.h>
 #include <util/invariant.h>
+#include <util/magic.h>
 #include <util/mathematical_expr.h>
 #include <util/namespace.h>
 #include <util/pointer_offset_size.h>
@@ -1637,6 +1638,44 @@ void smt2_convt::convert_expr(const exprt &expr)
     if(is_zero_width(equal_expr.lhs().type(), ns))
     {
       convert_expr(true_exprt());
+    }
+    else if(
+      equal_expr.lhs().type().id() == ID_array &&
+      use_array_theory(equal_expr.lhs()) &&
+      use_array_theory(equal_expr.rhs()) &&
+      to_array_type(equal_expr.lhs().type()).size().is_constant() &&
+      numeric_cast_v<mp_integer>(
+        to_constant_expr(to_array_type(equal_expr.lhs().type()).size())) <=
+        MAX_FLATTENED_ARRAY_SIZE)
+    {
+      // SMT-LIB (= a b) on arrays compares the entire index domain, but only
+      // the indices 0..size-1 of a C array are meaningful: elements beyond
+      // the bounds are unconstrained and may differ, which yields spurious
+      // failures. Compare element by element instead, as the propositional
+      // back-end does for the arrays it flattens.
+      const array_typet &array_type = to_array_type(equal_expr.lhs().type());
+      const mp_integer size =
+        numeric_cast_v<mp_integer>(to_constant_expr(array_type.size()));
+
+      if(size == 0)
+        convert_expr(true_exprt{});
+      else
+      {
+        out << "(let ((?eqa ";
+        convert_expr(equal_expr.lhs());
+        out << ") (?eqb ";
+        convert_expr(equal_expr.rhs());
+        out << ")) (and true";
+        for(mp_integer i = 0; i < size; ++i)
+        {
+          out << " (= (select ?eqa ";
+          convert_expr(from_integer(i, array_type.index_type()));
+          out << ") (select ?eqb ";
+          convert_expr(from_integer(i, array_type.index_type()));
+          out << "))";
+        }
+        out << "))"; // and, let
+      }
     }
     else
     {
