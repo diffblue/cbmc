@@ -24,6 +24,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_convert_type.h"
 #include "cpp_declaration.h"
+#include "cpp_sfinae_context.h"
 #include "cpp_typecheck.h"
 #include "cpp_typecheck_fargs.h"
 
@@ -654,6 +655,34 @@ void cpp_typecheckt::typecheck_type(typet &type)
   {
     code_typet &code_type = to_code_type(type);
     code_typet::parameterst &parameters=code_type.parameters();
+
+    // N5008 [except.spec]/2: in noexcept(constant-expression) the value of
+    // the expression is the exception specification
+    if(code_type.find("#C_noexcept_expression").is_not_nil())
+    {
+      exprt expression =
+        static_cast<const exprt &>(code_type.find("#C_noexcept_expression"));
+      code_type.remove("#C_noexcept_expression");
+      try
+      {
+        sfinae_contextt sfinae_guard{*this};
+        typecheck_expr(expression);
+        implicit_typecast_bool(expression);
+        expression = simplify_expr(expression, *this);
+        if(expression.is_true())
+          code_type.remove("#C_noexcept_unevaluated");
+        else if(expression.is_false())
+        {
+          code_type.remove("#C_noexcept");
+          code_type.remove("#C_noexcept_unevaluated");
+        }
+      }
+      catch(...)
+      {
+        // dependent, or not a constant: left as before (non-throwing for the
+        // noexcept operator, #C_noexcept_unevaluated)
+      }
+    }
 
     // N5008 [basic.scope.param]/1: a parameter's scope begins at its
     // declaration and includes the rest of the parameter-declaration-clause,

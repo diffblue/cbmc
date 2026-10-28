@@ -2952,6 +2952,18 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
           {
             return true;
           }
+          // the constructor call that initializes a temporary (or the object
+          // of a new-expression) is held as its initializer, not an operand
+          // ([except.spec]/5.2: a constructor invoked implicitly)
+          const irept &initializer = e.find(ID_initializer);
+          if(
+            (statement == ID_temporary_object || statement == ID_cpp_new ||
+             statement == ID_cpp_new_array) &&
+            initializer.is_not_nil() &&
+            potentially_throwing(static_cast<const exprt &>(initializer)))
+          {
+            return true;
+          }
           if(statement == ID_function_call)
           {
             const auto &fn = to_side_effect_expr_function_call(e).function();
@@ -2963,8 +2975,17 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
               if(sym != nullptr && sym->type.id() == ID_code)
               {
                 const auto &code_type = to_code_type(sym->type);
+                // the exception specification of an implicitly-declared or
+                // defaulted constructor ([except.spec]/6) is not computed;
+                // such constructors are taken as non-throwing
+                const bool implicit_constructor =
+                  code_type.return_type().id() == ID_constructor &&
+                  (code_type.get_bool("#is_implicit_ctor") ||
+                   sym->value.is_nil() ||
+                   sym->value.get_bool("#defaulted_function"));
                 non_throwing = code_type.get_bool("#C_noexcept") ||
-                               code_type.get_bool(ID_noexcept);
+                               code_type.get_bool(ID_noexcept) ||
+                               implicit_constructor;
               }
             }
             else if(

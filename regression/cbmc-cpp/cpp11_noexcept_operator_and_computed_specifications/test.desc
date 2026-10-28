@@ -1,0 +1,23 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ constructor of a temporary: SUCCESS$
+^\[main\.assertion\.2\] line \d+ non-throwing constructor: SUCCESS$
+^\[main\.assertion\.3\] line \d+ noexcept\(noexcept\(int\(\)\)\): SUCCESS$
+^\[main\.assertion\.4\] line \d+ dependent: Throwing: SUCCESS$
+^\[main\.assertion\.5\] line \d+ dependent: NoThrow: SUCCESS$
+^\[main\.assertion\.6\] line \d+ constexpr function: SUCCESS$
+^\[main\.assertion\.7\] line \d+ noexcept\(noexcept\(may_throw\(\)\)\): SUCCESS$
+^\[main\.assertion\.8\] line \d+ noexcept\(noexcept\(wont_throw\(\)\)\): SUCCESS$
+^\[main\.assertion\.9\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+noexcept(expression) was not evaluated (taken as non-throwing), and the
+noexcept operator did not look at the constructor call held in a
+temporary's initializer.  g++ 13 and clang++ 18 accept all assertions but
+the last as static_asserts.

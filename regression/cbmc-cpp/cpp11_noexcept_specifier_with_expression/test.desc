@@ -1,4 +1,4 @@
-KNOWNBUG libstdcxx
+CORE libstdcxx
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ noexcept\(false expression\): SUCCESS$
@@ -10,9 +10,7 @@ main.cpp
 --
 ^warning: ignoring
 --
-optThrowDecl (parse.cpp) records noexcept(true) and noexcept(false) only;
-any other expression is skipped and marked #C_noexcept_unevaluated.  The
-noexcept operator takes such a function as non-throwing (assertion 1
-fails), and the exception lowering does not call std::terminate when an
-exception leaves it (the handler is not reached).  The expression has to
-be kept, and evaluated when the function type is formed or instantiated.
+Fixed: optThrowDecl skipped the expression of noexcept(...); it is now
+kept and evaluated when the function type is type-checked (with the
+arguments of an instantiation), falling back to non-throwing if it
+cannot be evaluated.
