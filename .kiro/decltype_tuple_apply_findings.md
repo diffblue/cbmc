@@ -15550,3 +15550,30 @@ cpp20_coroutine_generator_semantics.
 Checks on W183 (587b840fcd): 13 suites, profiles, unit, lint, format,
 doxygen, platform (gcc11, m32, arm64), vacuity 1144 REACHED / 3 SKIPPED,
 per-commit compile; MSVC .ii tests unchanged (2 known timeouts).
+
+## Round 204 (2026-10-28): KNOWNBUG inventory, soundness fixes
+
+New KNOWNBUGs (dc48b324d1 and before): exception object copy, cin integer
+extraction, terminate from an unwinding destructor, stream writes that
+cannot fail, MSVC stream objects.
+Fixed:
+- a2439be986: std::terminate is called (and the handler of
+  std::set_terminate) for a destructor exiting during unwinding, an
+  exception leaving the entry point, and one leaving a non-throwing
+  function ([except.terminate]/1.2-1.4); models of set_terminate,
+  get_terminate, terminate; the parser records noexcept(false) and throw()
+  (noexcept(false) was taken as noexcept(true)).
+  cpp11_terminate_when_destructor_throws_during_unwinding -> CORE; new
+  cpp11_terminate_handler_called_when_exception_handling_is_abandoned.
+- b7ae9585e5: standard stream writes may fail (overflow eof, partial
+  xsputn).  cpp11_standard_output_write_may_fail -> CORE.
+- 90b61ba055: the exception object is initialized through its constructor,
+  moving a move-eligible operand ([expr.prim.id.unqual]/15; try-block
+  scopes recorded).  cpp11_exception_object_copy_constructed -> CORE; new
+  cpp11_throw_moves_a_move_eligible_operand.
+New KNOWNBUGs found on the way: implicit destructor exception
+specification and noexcept(expression) (5ca42bb85e); exception object
+never destroyed, reference handler bound to a copy (096b1848ae).
+Checks on W184 (096b1848ae): 13 suites, profiles, unit, lint, format,
+doxygen, platform, vacuity 1144/3, per-commit compile, MSVC .ii (2 known
+timeouts).
