@@ -227,6 +227,7 @@ void cpp_typecheckt::typecheck()
     }
   }
 
+  provide_standard_stream_objects();
   static_and_dynamic_initialization();
 
   // Provide models for constexpr functions that are evaluated during

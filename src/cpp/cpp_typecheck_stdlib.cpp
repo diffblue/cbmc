@@ -26,6 +26,7 @@
 #include "cpp_typecheck.h"
 #include "itanium_abi_cpp_zero_initializer.h"
 
+#include <set>
 #include <sstream>
 
 /// Synthesize a body for _List_node_base::_M_hook.
@@ -2010,6 +2011,161 @@ void cpp_typecheckt::provide_library_source_models()
   }
 }
 
+void cpp_typecheckt::provide_standard_stream_objects()
+{
+  // N5008 [iostream.objects.overview]/2-3: <iostream> declares the standard
+  // stream objects; they are constructed before the body of main begins, and
+  // not destroyed during program execution.  libstdc++ (globals_io.cc,
+  // ios_init.cc) and libc++ (iostream.cpp) define and construct them in their
+  // compiled libraries, so the program only sees `extern' declarations.
+  // Define those that are declared: stream buffers whose output is accepted
+  // and discarded (a write to the standard C streams is not observable by the
+  // program; write errors are not modelled), and whose input is an unknown
+  // sequence of characters ending at an unknown point.
+  // Not for the MSVC STL: constructing a stream there initializes its
+  // locale through runtime functions (std::_Locinfo::_Locinfo_ctor,
+  // _Getctype, _Getcvt) that have no model.
+  if(config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
+    return;
+
+  const std::string ns_prefix = symbol_table.has_symbol("std::__1::cout") ||
+                                    symbol_table.has_symbol("std::__1::cin")
+                                  ? "std::__1::"
+                                  : "std::";
+  struct stream_objectt
+  {
+    const char *name;
+    const char *type;
+    const char *buffer;
+  };
+  static const stream_objectt stream_objects[] = {
+    {"cout", "ostream", "stdout_buf"},
+    {"cerr", "ostream", "stderr_buf"},
+    {"clog", "ostream", "stderr_buf"},
+    {"cin", "istream", "stdin_buf"},
+    {"wcout", "wostream", "wstdout_buf"},
+    {"wcerr", "wostream", "wstderr_buf"},
+    {"wclog", "wostream", "wstderr_buf"},
+    {"wcin", "wistream", "wstdin_buf"}};
+
+  std::set<std::string> declared;
+  for(const auto &object : stream_objects)
+  {
+    const symbolt *symbol = symbol_table.lookup(ns_prefix + object.name);
+    if(
+      symbol != nullptr && !symbol->is_type && symbol->is_extern &&
+      symbol->value.is_nil() && symbol->type.id() == ID_struct_tag)
+    {
+      declared.insert(object.name);
+    }
+  }
+  if(declared.empty())
+    return;
+
+  std::ostringstream source;
+  source << "extern \"C\" int __VERIFIER_nondet_int();\n"
+         << "namespace std {\n";
+  if(ns_prefix == "std::__1::")
+    source << "inline namespace __1 {\n";
+  source
+    << "template <class _C> class " CPROVER_PREFIX "stdio_buf\n"
+    << "  : public basic_streambuf<_C> {\n"
+    << "  typedef basic_streambuf<_C> __base;\n"
+    << "  _C __c;\n"
+    << "protected:\n"
+    // the put area is empty: every character goes to overflow
+    << "  typename __base::int_type overflow(typename __base::int_type __i)\n"
+    << "  { return __base::traits_type::not_eof(__i); }\n"
+    << "  streamsize xsputn(const _C *, streamsize __n) { return __n; }\n"
+    // [streambuf.virt.get]/16: underflow makes the next character
+    // available in the get area, or returns eof()
+    << "  typename __base::int_type underflow() {\n"
+    << "    int __v = __VERIFIER_nondet_int();\n"
+    << "    if(__v < 0) return __base::traits_type::eof();\n"
+    << "    __c = static_cast<_C>(__v);\n"
+    << "    this->setg(&__c, &__c, &__c + 1);\n"
+    << "    return __base::traits_type::to_int_type(__c); }\n"
+    << "};\n";
+  std::set<std::string> buffers;
+  for(const auto &object : stream_objects)
+  {
+    if(declared.count(object.name) == 0)
+      continue;
+    if(buffers.insert(object.buffer).second)
+    {
+      source << "static " CPROVER_PREFIX "stdio_buf<"
+             << (object.name[0] == 'w' ? "wchar_t" : "char") << "> "
+             << CPROVER_PREFIX << object.buffer << ";\n";
+    }
+    source << object.type << ' ' << object.name << "(&" CPROVER_PREFIX
+           << object.buffer << ");\n";
+  }
+  // [narrow.stream.objects]/2, /5, [wide.stream.objects]/2, /5: cin and
+  // cerr are tied to cout, and cerr has unitbuf set (likewise for the wide
+  // objects)
+  source << "static int " CPROVER_PREFIX "stdio_init = (";
+  for(const char *w : {"", "w"})
+  {
+    const std::string out = std::string{w} + "cout";
+    const std::string err = std::string{w} + "cerr";
+    const std::string in = std::string{w} + "cin";
+    if(declared.count(err) != 0)
+      source << err << ".setf(ios_base::unitbuf), ";
+    if(declared.count(out) != 0)
+    {
+      if(declared.count(err) != 0)
+        source << err << ".tie(&" << out << "), ";
+      if(declared.count(in) != 0)
+        source << in << ".tie(&" << out << "), ";
+    }
+  }
+  source << "0);\n";
+  source << (ns_prefix == "std::__1::" ? "}}\n" : "}\n");
+
+  std::istringstream in{source.str()};
+  cpp_parsert parser{get_message_handler()};
+  parser.set_file(ID_built_in);
+  parser.in = &in;
+  parser.mode = config.ansi_c.mode;
+  if(parser.parse())
+    return;
+
+  // [iostream.objects.overview]/3, /5: constructed no later than an
+  // ios_base::Init object defined where <iostream> is included, hence before
+  // the program's objects of static storage duration defined after it
+  const std::size_t previous = dynamic_initializations.size();
+  for(auto &item : parser.parse_tree.items)
+  {
+    try
+    {
+      sfinae_contextt sfinae_guard{*this};
+      convert(item);
+    }
+    catch(...)
+    {
+      report_dropped_system_item(item);
+    }
+  }
+  // the new entries are the buffers and the setup of ties and flags, last;
+  // the stream objects keep the entries of their `extern' declarations
+  dynamic_initializationst first{
+    std::next(dynamic_initializations.begin(), previous),
+    dynamic_initializations.end()};
+  dynamic_initializations.resize(previous);
+  if(first.empty())
+    return;
+  auto setup = std::prev(first.end());
+  for(const auto &object : stream_objects)
+  {
+    if(declared.count(object.name) == 0)
+      continue;
+    const irep_idt id = ns_prefix + object.name;
+    dynamic_initializations.remove(id);
+    first.insert(setup, id);
+  }
+  dynamic_initializations.splice(dynamic_initializations.begin(), first);
+}
+
 void cpp_typecheckt::provide_stdlib_bodies()
 {
   namespacet ns(symbol_table);
@@ -2784,7 +2940,9 @@ void cpp_typecheckt::provide_stdlib_bodies()
     }
     if(base == "Init" && name.find("ios_base") != std::string::npos)
     {
-      // ios_base::Init constructor — provide empty body.
+      // ios_base::Init constructor: the standard stream objects it
+      // initializes in libstdc++ are defined and constructed by
+      // provide_standard_stream_objects instead
       ensure_parameter_symbols(symbol, symbol_table);
       symbol.value = code_blockt();
       symbol.value.type() = symbol.type;
