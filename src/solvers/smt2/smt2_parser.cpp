@@ -1008,26 +1008,34 @@ exprt smt2_parsert::bv_division(
   if(operands.size() != 2)
     throw error() << "bitvector division expects two operands";
 
-  // SMT-LIB2 defines the result of division by 0 to be 1....1
-  auto divisor = symbol_exprt("divisor", operands[1].type());
-  auto divisor_is_zero = equal_exprt(divisor, from_integer(0, divisor.type()));
-  auto all_ones = to_unsignedbv_type(operands[0].type()).largest_expr();
+  // SMT-LIB 2.6 FixedSizeBitVectors theory:
+  //   bvudiv(s, 0) = ~0
+  //   bvsdiv is defined through bvudiv on magnitudes, so
+  //   bvsdiv(s, 0) = ite(bvslt(s, 0), 1, ~0)
+  auto divisor_is_zero =
+    equal_exprt(operands[1], from_integer(0, operands[1].type()));
 
   exprt division_result;
+  exprt zero_result;
 
   if(is_signed)
   {
-    auto signed_operands = cast_bv_to_signed({operands[0], divisor});
+    auto signed_operands = cast_bv_to_signed(operands);
     division_result =
       cast_bv_to_unsigned(div_exprt(signed_operands[0], signed_operands[1]));
+    auto all_ones = to_unsignedbv_type(operands[0].type()).largest_expr();
+    auto one = from_integer(1, operands[0].type());
+    auto dividend_is_negative = binary_relation_exprt(
+      signed_operands[0], ID_lt, from_integer(0, signed_operands[0].type()));
+    zero_result = if_exprt{dividend_is_negative, one, all_ones};
   }
   else
-    division_result = div_exprt(operands[0], divisor);
+  {
+    division_result = div_exprt(operands[0], operands[1]);
+    zero_result = to_unsignedbv_type(operands[0].type()).largest_expr();
+  }
 
-  return let_exprt(
-    {divisor},
-    operands[1],
-    if_exprt(divisor_is_zero, all_ones, division_result));
+  return if_exprt{divisor_is_zero, zero_result, division_result};
 }
 
 exprt smt2_parsert::bv_mod(const exprt::operandst &operands, bool is_signed)
