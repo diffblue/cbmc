@@ -1,0 +1,24 @@
+KNOWNBUG
+main.cpp
+--cpp11 --unwind 5
+^\[main\.assertion\.1\] line \d+ the exception object is a copy: SUCCESS$
+^\[main\.assertion\.2\] line \d+ the rethrown exception is the same object: SUCCESS$
+^\[main\.assertion\.3\] line \d+ e and the exception object: SUCCESS$
+^\[main\.assertion\.4\] line \d+ each object destroyed exactly once: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+typecheck_try_catch turns a handler parameter of reference type into one
+of the referenced type, which remove_cpp_exceptions (prepare_handler)
+binds by a bitwise copy of the exception object and the end of the
+handler destroys.  The exception object itself is never destroyed, but
+each handler destroys a copy of it: with the rethrow, destroyed[1] is 2.
+A reference parameter has to bind to the exception object, a parameter
+of class type has to be copy-initialized from it ([except.handle]/15),
+and the end of the last active handler has to destroy it unless it was
+rethrown or an exception_ptr refers to it.
