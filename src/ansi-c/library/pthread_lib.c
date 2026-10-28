@@ -300,7 +300,7 @@ __CPROVER_thread_local const void
   *__CPROVER_thread_keys[__CPROVER_constant_infinity_uint];
 __CPROVER_thread_local void (
   *__CPROVER_thread_key_dtors[__CPROVER_constant_infinity_uint])(void *);
-__CPROVER_thread_local unsigned long __CPROVER_next_thread_key = 0;
+unsigned long __CPROVER_next_thread_key = 0;
 #endif
 
 void pthread_exit(void *value_ptr)
@@ -556,7 +556,7 @@ __CPROVER_thread_local const void
 __CPROVER_thread_local void (
   *__CPROVER_thread_key_dtors[__CPROVER_constant_infinity_uint])(void *);
 #endif
-__CPROVER_thread_local unsigned long __CPROVER_next_thread_key = 0;
+unsigned long __CPROVER_next_thread_key = 0;
 
 void __spawned_thread(
   unsigned long this_thread_id,
@@ -571,7 +571,9 @@ void __spawned_thread(
 {
 __CPROVER_HIDE:;
   __CPROVER_thread_id = this_thread_id;
-  __CPROVER_next_thread_key = next_thread_key;
+  // next_thread_key is no longer copied: __CPROVER_next_thread_key is
+  // now a shared (not thread-local) variable.
+  (void)next_thread_key;
 #if 0
   // Destructor support is disabled as it is too expensive due to its extensive
   // use of shared variables.
@@ -620,7 +622,7 @@ unsigned long __CPROVER_next_thread_id;
 __CPROVER_thread_local void (
   *__CPROVER_thread_key_dtors[__CPROVER_constant_infinity_uint])(void *);
 #  endif
-__CPROVER_thread_local unsigned long __CPROVER_next_thread_key = 0;
+unsigned long __CPROVER_next_thread_key = 0;
 #endif
 
 void __spawned_thread(
@@ -959,21 +961,24 @@ __CPROVER_thread_local const void
 __CPROVER_thread_local void (
   *__CPROVER_thread_key_dtors[__CPROVER_constant_infinity_uint])(void *);
 #  endif
-__CPROVER_thread_local unsigned long __CPROVER_next_thread_key = 0;
+unsigned long __CPROVER_next_thread_key = 0;
 #endif
 
 int pthread_key_create(pthread_key_t *key, void (*destructor)(void *))
 {
 __CPROVER_HIDE:;
+  __CPROVER_precondition(destructor == 0, "destructors are not yet supported");
+  // POSIX.1-2017 pthread_key_create(): keys must be process-wide unique.
+  // Atomically allocate the next key to avoid duplicates across threads.
+  __CPROVER_atomic_begin();
   __CPROVER_thread_keys[__CPROVER_next_thread_key] = 0;
 #if 0
   // Destructor support is disabled as it is too expensive due to its extensive
   // use of shared variables.
   __CPROVER_thread_key_dtors[__CPROVER_next_thread_key] = destructor;
-#else
-  __CPROVER_precondition(destructor == 0, "destructors are not yet supported");
 #endif
   *key = __CPROVER_next_thread_key++;
+  __CPROVER_atomic_end();
   return 0;
 }
 
