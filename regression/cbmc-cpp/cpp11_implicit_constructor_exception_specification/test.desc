@@ -1,0 +1,20 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ implicit default constructor: SUCCESS$
+^\[main\.assertion\.2\] line \d+ implicit copy constructor: SUCCESS$
+^\[main\.assertion\.3\] line \d+ trivial copy constructor: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The exception specification of implicitly-declared and defaulted
+constructors ([except.spec]/6) is not computed: the noexcept operator
+takes them as non-throwing (cpp_typecheck_expr.cpp, ID_noexcept), so
+assertions 1 and 2 fail.  As for destructors
+(implicit_exception_specifications), the specification has to be derived
+from the constructors invoked for the subobjects.
