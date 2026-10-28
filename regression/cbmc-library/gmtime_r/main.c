@@ -1,9 +1,15 @@
 #include <assert.h>
 #include <time.h>
 
-int main()
+int main(void)
 {
-  gmtime_r();
-  assert(0);
+  time_t t = 0;
+  struct tm buf;
+  struct tm *p = gmtime_r(&t, &buf);
+  assert(p == &buf);
+  // tm_mon must be in [0,11].
+  assert(buf.tm_mon >= 0 && buf.tm_mon <= 11);
+  // tm_mday must be in [1,31].
+  assert(buf.tm_mday >= 1 && buf.tm_mday <= 31);
   return 0;
 }

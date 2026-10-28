@@ -1,8 +1,9 @@
-KNOWNBUG
+CORE
 main.c
---pointer-check --bounds-check
-^EXIT=0$
+
+^EXIT=10$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
+^VERIFICATION FAILED$
+\[main\.assertion\.1\] line \d+ assertion p != 0: FAILURE
 --
 ^warning: ignoring
