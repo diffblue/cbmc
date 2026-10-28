@@ -1797,7 +1797,9 @@ void cpp_typecheckt::typecheck_try_catch(codet &code)
     if(first)
     {
       // this is the 'try'
+      next_block_scope_is_try = to_code(op).get_statement() == ID_block;
       typecheck_code(to_code(op));
+      next_block_scope_is_try = false;
       first = false;
     }
     else
@@ -4114,7 +4116,12 @@ void cpp_typecheckt::record_constexpr_object_value(
 void cpp_typecheckt::typecheck_block(code_blockt &code)
 {
   cpp_save_scopet saved_scope(cpp_scopes);
-  cpp_scopes.new_block_scope();
+  cpp_scopet &scope = cpp_scopes.new_block_scope();
+  if(next_block_scope_is_try)
+  {
+    try_block_scopes.insert(scope.prefix);
+    next_block_scope_is_try = false;
+  }
 
   c_typecheck_baset::typecheck_block(code);
 }

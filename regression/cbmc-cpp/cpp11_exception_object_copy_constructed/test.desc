@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ copy constructor ran once: SUCCESS$
@@ -11,8 +11,7 @@ main.cpp
 --
 ^warning: ignoring
 --
-remove_cpp_exceptions (set_inflight_exception) lowers a THROW to an
-assignment of the operand to a per-throw-site static object, a bitwise copy:
-the copy constructor never runs, so copies stays 0 and x.copied is false.
-The exception object has to be initialized by the constructor that
-copy-initialization selects ([dcl.init.general]/16.6.2).
+Fixed: the THROW was lowered to a bitwise copy of the operand, so the
+copy constructor never ran.  The front end now initializes a temporary
+of the exception type from the operand through the selected constructor
+(typecheck_expr_throw).
