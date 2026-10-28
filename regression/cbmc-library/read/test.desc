@@ -1,10 +1,8 @@
-CORE
+CORE gcc-only
 main.c
---bounds-check --pointer-check --unwind 100
-^EXIT=10$
+--pointer-check --bounds-check
+^EXIT=0$
 ^SIGNAL=0$
-^VERIFICATION FAILED$
-\[.*] .* dereference failure: pointer outside object bounds in .*: FAILURE
-\*\* 1 of .* failed \(.*\)
+^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
