@@ -1,0 +1,11 @@
+CORE
+main2.c
+--pointer-check --bounds-check --unwind 20 --unwinding-assertions
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Concatenating to a part of the same array that does not overlap the source
+is defined behaviour.
