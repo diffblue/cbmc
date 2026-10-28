@@ -127,7 +127,33 @@ std::ostream &smt2_format_rec(std::ostream &out, const exprt &expr)
   else if(expr.id() == ID_symbol)
   {
     const auto &identifier = to_symbol_expr(expr).identifier();
-    if(expr.get_bool("#quoted"))
+
+    // SMT-LIB simple symbols are non-empty sequences of letters, digits, and
+    // ~ ! @ $ % ^ & * _ - + = < > . ? / that do not start with a digit.
+    // Quote any identifier that is not a simple symbol, regardless of
+    // whether the parser flagged it, so that get-model output is always
+    // parseable.
+    // A simple symbol must not start with a digit.
+    bool needs_quoting =
+      identifier.empty() || (identifier[0] >= '0' && identifier[0] <= '9');
+    if(!needs_quoting)
+    {
+      for(const char c : id2string(identifier))
+      {
+        if(
+          !(c >= 'a' && c <= 'z') && !(c >= 'A' && c <= 'Z') &&
+          !(c >= '0' && c <= '9') && c != '~' && c != '!' && c != '@' &&
+          c != '$' && c != '%' && c != '^' && c != '&' && c != '*' &&
+          c != '_' && c != '-' && c != '+' && c != '=' && c != '<' &&
+          c != '>' && c != '.' && c != '?' && c != '/')
+        {
+          needs_quoting = true;
+          break;
+        }
+      }
+    }
+
+    if(needs_quoting)
     {
       out << '|';
       out << identifier;
