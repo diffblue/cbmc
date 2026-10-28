@@ -4334,8 +4334,9 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
 /// when there is one (N5008 [except.spec]/3, /7, /9 make the specification
 /// of destructors and deallocation functions implicit otherwise), and
 /// \#C_noexcept when it is non-throwing ([except.spec]/2); an expression
-/// other than the literals true and false is not evaluated and is taken as
-/// non-throwing, marked \#C_noexcept_unevaluated.
+/// other than the literals true and false is kept for typecheck_type to
+/// evaluate, and until then the function is taken as non-throwing, marked
+/// \#C_noexcept_unevaluated.
 static void
 record_exception_specification(const irept &throw_decl, typet &function_type)
 {
@@ -4350,6 +4351,14 @@ record_exception_specification(const irept &throw_decl, typet &function_type)
   function_type.set("#C_noexcept", true);
   if(throw_decl.get_bool("#unevaluated"))
     function_type.set("#C_noexcept_unevaluated", true);
+  // evaluated by typecheck_type; until then (and if that fails) taken as
+  // non-throwing, as before
+  if(throw_decl.find("#expression").is_not_nil())
+  {
+    function_type.set("#C_noexcept_unevaluated", true);
+    function_type.add("#C_noexcept_expression") =
+      throw_decl.find("#expression");
+  }
 }
 
 /*
@@ -4749,6 +4758,25 @@ bool Parser::optThrowDecl(irept &throw_decl)
       // other expression is not evaluated (#unevaluated).
       cpp_tokent op;
       lex.get_token(op);
+
+      // keep the expression, to be evaluated when the function type is
+      // type-checked (with the template arguments of an instantiation)
+      {
+        cpp_token_buffert::post pos = lex.Save();
+        exprt expression;
+        if(rExpression(expression, false) && lex.LookAhead(0) == ')')
+        {
+          lex.get_token(op);
+          p = irept(ID_noexcept);
+          if(expression.is_true() || expression.is_false())
+            p.add(ID_value) = expression;
+          else
+            p.add("#expression") = expression;
+          throw_decl = p;
+          return true;
+        }
+        lex.Restore(pos);
+      }
 
       int depth = 1;
       std::size_t tokens = 0;
