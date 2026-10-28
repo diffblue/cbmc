@@ -3683,6 +3683,127 @@ bool cpp_typecheckt::has_subobject_without_default_constructor(
   return false;
 }
 
+/// Whether the destructor of the class \p type (an array: of its element
+/// class) has a potentially-throwing exception specification (N5008
+/// [except.spec]/1); a class without a declared destructor has a trivial,
+/// non-throwing one.
+bool destructor_is_potentially_throwing(const typet &type, const namespacet &ns)
+{
+  const typet *t = &type;
+  while(t->id() == ID_array)
+    t = &to_array_type(*t).element_type();
+  if(t->id() != ID_struct_tag && t->id() != ID_union_tag)
+    return false;
+  const symbolt *class_symbol =
+    ns.get_symbol_table().lookup(to_tag_type(*t).get_identifier());
+  if(
+    class_symbol == nullptr || (class_symbol->type.id() != ID_struct &&
+                                class_symbol->type.id() != ID_union))
+  {
+    return false;
+  }
+  for(const auto &c : to_struct_union_type(class_symbol->type).components())
+  {
+    if(
+      c.type().id() == ID_code && !c.get_bool(ID_from_base) &&
+      to_code_type(c.type()).return_type().id() == ID_destructor)
+    {
+      return !c.type().get_bool("#C_noexcept");
+    }
+  }
+  return false;
+}
+
+/// N5008 [except.spec]/7: a destructor without a noexcept-specifier (or an
+/// implicitly-declared one) is potentially-throwing if and only if the
+/// destructor of a potentially constructed subobject ([special]/7: the
+/// non-static data members, the non-virtual direct bases and, unless the
+/// class is abstract, the virtual bases) is, or it is virtual and the
+/// destructor of a virtual base is.  [except.spec]/9: a deallocation
+/// function without one is non-throwing.  Mark the non-throwing ones
+/// (\#C_noexcept, as an explicit noexcept does).
+void cpp_typecheckt::implicit_exception_specifications(symbolt &symbol)
+{
+  if(symbol.type.id() != ID_struct && symbol.type.id() != ID_union)
+    return;
+  struct_union_typet &class_type = to_struct_union_type(symbol.type);
+  const namespacet ns{symbol_table};
+
+  bool is_abstract = false;
+  for(const auto &c : class_type.components())
+    is_abstract = is_abstract || c.get_bool(ID_is_pure_virtual);
+  std::list<irep_idt> virtual_bases;
+  if(symbol.type.id() == ID_struct)
+    get_virtual_bases(to_struct_type(symbol.type), virtual_bases);
+
+  for(auto &c : class_type.components())
+  {
+    if(
+      c.type().id() != ID_code || c.get_bool(ID_from_base) ||
+      c.type().get_bool("#C_explicit_exception_specification") ||
+      c.type().get_bool("#C_noexcept"))
+    {
+      continue;
+    }
+    const irep_idt &base_name = c.get_base_name();
+    const bool is_destructor =
+      to_code_type(c.type()).return_type().id() == ID_destructor;
+    // the front end names them after the operators' ids
+    // (ID_cpp_delete, ID_cpp_delete_array)
+    const bool is_deallocation =
+      base_name == "operator" + id2string(ID_cpp_delete) ||
+      base_name == "operator" + id2string(ID_cpp_delete_array);
+    if(!is_destructor && !is_deallocation)
+      continue;
+
+    bool potentially_throwing = false;
+    if(is_destructor)
+    {
+      for(const auto &m : class_type.components())
+      {
+        if(
+          m.type().id() != ID_code && !m.get_bool(ID_is_static) &&
+          !m.get_bool(ID_is_type) && !m.get_bool(ID_from_base) &&
+          !m.get_is_padding() &&
+          destructor_is_potentially_throwing(m.type(), ns))
+        {
+          potentially_throwing = true;
+        }
+      }
+      if(symbol.type.id() == ID_struct)
+      {
+        for(const auto &b : to_struct_type(symbol.type).bases())
+        {
+          if(
+            !b.get_bool(ID_virtual) &&
+            destructor_is_potentially_throwing(b.type(), ns))
+          {
+            potentially_throwing = true;
+          }
+        }
+      }
+      const bool is_virtual = c.get_bool(ID_is_virtual);
+      if(!is_abstract || is_virtual)
+      {
+        for(const auto &vb : virtual_bases)
+        {
+          if(destructor_is_potentially_throwing(struct_tag_typet{vb}, ns))
+            potentially_throwing = true;
+        }
+      }
+    }
+    if(potentially_throwing)
+      continue;
+
+    c.type().set("#C_noexcept", true);
+    if(symbolt *function = symbol_table.get_writeable(c.get_name()))
+    {
+      if(function->type.id() == ID_code)
+        function->type.set("#C_noexcept", true);
+    }
+  }
+}
+
 void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
 {
   // A typedef/alias declaration defers the elaboration of the class template
@@ -5022,6 +5143,8 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
       false,
       false);
   }
+
+  implicit_exception_specifications(symbol);
 
   // set up virtual tables before doing the constructors
   if(symbol.type.id() == ID_struct)

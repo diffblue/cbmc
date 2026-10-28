@@ -76,6 +76,13 @@ typet cpp_bool_type(const typet &type);
 /// qualified names (template arguments and declarators ignored).
 bool same_name_spelling(const irept &a, const irept &b);
 
+/// Whether the destructor of the class \p type (an array: of its element
+/// class) has a potentially-throwing exception specification (N5008
+/// [except.spec]/1, /7).
+bool destructor_is_potentially_throwing(
+  const typet &type,
+  const namespacet &ns);
+
 class cpp_typecheckt:public c_typecheck_baset
 {
 public:
@@ -1350,6 +1357,9 @@ protected:
   /// Whether \p operand, the operand of a throw-expression, is
   /// move-eligible (N5008 [expr.prim.id.unqual]/15).
   bool throw_operand_is_move_eligible(const exprt &operand);
+  /// Mark destructors and deallocation functions of the class \p symbol
+  /// whose implicit exception specification is non-throwing.
+  void implicit_exception_specifications(symbolt &symbol);
   /// The prefixes of the block scopes of try-blocks
   /// ([expr.prim.id.unqual]/15.3).
   std::set<std::string> try_block_scopes;

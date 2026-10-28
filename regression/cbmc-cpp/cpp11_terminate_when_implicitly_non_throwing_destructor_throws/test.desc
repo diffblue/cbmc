@@ -1,4 +1,4 @@
-KNOWNBUG libstdcxx
+CORE libstdcxx
 main.cpp
 --cpp11
 ^\[handler\.assertion\.1\] line \d+ WRONG \(must FAIL\): FAILURE$
@@ -9,9 +9,6 @@ main.cpp
 --
 ^warning: ignoring
 --
-Soundness: only an explicit noexcept, noexcept(true) or throw() marks a
-function non-throwing (#C_noexcept); a destructor without a
-noexcept-specifier is taken as potentially-throwing, so the exception
-reaches the handler of main and std::terminate is not called.  The
-implicit exception specification of destructors ([except.spec]/7) and of
-deallocation functions (/9) has to be computed.
+Fixed (soundness): a destructor without a noexcept-specifier was taken
+as potentially-throwing, so the exception reached the handler of main.
+implicit_exception_specifications now computes [except.spec]/7.

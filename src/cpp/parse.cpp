@@ -4329,6 +4329,29 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
   }
 }
 
+/// Record the exception specification \p throw_decl (see optThrowDecl) on
+/// the function type \p function_type: \#C_explicit_exception_specification
+/// when there is one (N5008 [except.spec]/3, /7, /9 make the specification
+/// of destructors and deallocation functions implicit otherwise), and
+/// \#C_noexcept when it is non-throwing ([except.spec]/2); an expression
+/// other than the literals true and false is not evaluated and is taken as
+/// non-throwing, marked \#C_noexcept_unevaluated.
+static void
+record_exception_specification(const irept &throw_decl, typet &function_type)
+{
+  if(throw_decl.is_nil() || function_type.id() != ID_function_type)
+    return;
+  function_type.set("#C_explicit_exception_specification", true);
+  if(throw_decl.id() != ID_noexcept)
+    return;
+  const exprt &value = static_cast<const exprt &>(throw_decl.find(ID_value));
+  if(value.is_false())
+    return;
+  function_type.set("#C_noexcept", true);
+  if(throw_decl.get_bool("#unevaluated"))
+    function_type.set("#C_noexcept_unevaluated", true);
+}
+
 /*
   parameters.and.qualifiers                           [dcl.fct]
   : '(' parameter.declaration.clause ')' cv.qualifier.seq?
@@ -4398,6 +4421,7 @@ bool Parser::rConstructorDecl(
   }
 
   optThrowDecl(constructor.throw_decl());
+  record_exception_specification(constructor.throw_decl(), constructor.type());
 
   // GCC __attribute__ after noexcept
   if(lex.LookAhead(0) == TOK_GCC_ATTRIBUTE)
@@ -4709,6 +4733,9 @@ bool Parser::optThrowDecl(irept &throw_decl)
       return false;
 
     // p=Ptree::Snoc(p, new Leaf(tk));
+    // a dynamic exception specification with types (C++11 to C++14):
+    // potentially-throwing, but explicit
+    p = irept(ID_throw);
   }
   else if(lex.LookAhead(0)==TOK_NOEXCEPT)
   {
@@ -5227,43 +5254,12 @@ bool Parser::rDeclarator(
       // Uses #C_noexcept (comment prefix) so it doesn't affect type
       // equality but is used by cpp_type2name for template specialization
       // naming.
-      if(throw_decl.id() == ID_noexcept)
+      if(throw_decl.is_not_nil())
       {
-        // Check if noexcept(false)
-        bool is_noexcept = true;
-        if(throw_decl.find(ID_value).is_not_nil())
-        {
-          const exprt &val =
-            static_cast<const exprt &>(throw_decl.find(ID_value));
-          if(val.id() == ID_typecast && val.has_operands())
-          {
-            const auto &inner = val.operands().front();
-            if(inner.id() == ID_constant && inner.get(ID_value) == ID_false)
-                is_noexcept = false;
-          }
-          else if(
-            val.id() == ID_constant &&
-            (val.get(ID_value) == ID_false || val.get(ID_value) == "0"))
-          {
-            is_noexcept = false;
-          }
-        }
-
-        if(is_noexcept)
-        {
-          typet *p = &d_outer;
-          while(p->is_not_nil() && p->id() != ID_function_type)
-            p = &p->add_subtype();
-          if(p->id() == ID_function_type)
-          {
-            p->set("#C_noexcept", true);
-            // noexcept(expression) other than a literal: taken as
-            // non-throwing for the noexcept operator, as before, but the
-            // exception lowering does not terminate on it
-            if(throw_decl.get_bool("#unevaluated"))
-                p->set("#C_noexcept_unevaluated", true);
-          }
-        }
+        typet *p = &d_outer;
+        while(p->id() != ID_function_type && p->has_subtype())
+          p = &p->add_subtype();
+        record_exception_specification(throw_decl, *p);
       }
 
       // GCC __attribute__ after noexcept
