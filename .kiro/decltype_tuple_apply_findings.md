@@ -15495,3 +15495,58 @@ cpp20_ctad_for_alias_template, cpp20_no_unique_address_layout,
 cpp20_coroutine_generator_semantics.
 GCC 16 cbmc-cpp in the container: 4 failures, all needing libc++ (absent
 there), same with W181.
+
+## Round 203 (2026-10-28): KNOWNBUGs to CORE, exception lowering
+
+Fixed (KNOWNBUG -> CORE unless noted):
+- cpp20_ctad_for_alias_template: alias-template CTAD
+  ([over.match.class.deduct]/3-4; no packs or non-type parameters) --
+  b245486603.
+- cpp11_initializer_list_elements_destroyed_with_the_array: the backing
+  array of an initializer_list variable is destroyed with it
+  ([dcl.init.list]/6) -- 4e34423a42.
+- cpp20_range_adaptor_closure_invoked_through_invoke_impl: faithful
+  header-free reduction (still KNOWNBUG) -- 49efd32a34.
+- New CORE test cpp11_vector_destroys_its_elements: std::_Destroy and
+  _Destroy_aux<false>::__destroy had empty models, so no container element
+  of class type was destroyed ([container.reqmts]/25) -- 5fb2689f02.
+- cpp11_initializer_list_array_of_full_expression_destroyed: the backing
+  array is a temporary of its full-expression ([class.temporary]/4) unless
+  an initializer_list variable is initialized from it; replaces the
+  separate destructor list of 4e34423a42 -- c04a188237.
+- New CORE test cpp11_uncaught_exception_outside_unwinding:
+  std::uncaught_exception(s) read __CPROVER_cpp_inflight_exception
+  ([except.throw]/6-7), defined (null) by the C++ internal additions --
+  7154edf4df.
+- cpp11_standard_stream_objects_initialized (both descs): the standard
+  stream objects are defined and constructed first
+  ([iostream.objects.overview]/3, /5), with ties and unitbuf
+  ([narrow.stream.objects], [wide.stream.objects]); output discarded,
+  input unknown; not for the MSVC STL (runtime locale functions without
+  model, checked on MSVC 14.51 headers) -- 6e1e09af95.
+  cpp11_iostream_cerr and cpp11_libcxx20_iostream verify without bounds in
+  about 6 s and lose no-vacuity-check.
+- New CORE test cpp11_throw_operand_copied_before_unwinding: the THROW
+  operand is copied into a temporary before stack unwinding destroys
+  locals ([expr.throw]/2, [except.ctor]/1-2) -- a7cc06b6ed.
+- New KNOWNBUG cpp11_manipulator_overload_for_each_stream_specialization:
+  `o << endl' deduces endl from the first stream specialization in the
+  symbol table (deduce_without_call_arguments), not from each candidate's
+  parameter type; with libc++, `std::cerr << std::endl' in main.cpp chose
+  operator<<(bool) -- 4e861570d1.  Making the heuristic reject ambiguous
+  results gave "found no match for symbol 'endl'": the operator path has
+  no per-candidate deduction yet.
+- New CORE test cpp17_destructor_runs_fully_during_stack_unwinding: a
+  destructor called during unwinding saw the in-flight exception after
+  each call in its body and returned early; the lowering now saves and
+  clears it around the call and counts it in
+  __CPROVER_cpp_unwinding_exceptions -- 587b840fcd.
+Open: cpp11_manipulator_overload_for_each_stream_specialization,
+cpp11_virtual_call_in_constructor_of_indirect_base_with_virtual_base (VTT),
+cpp11_ostream_integer_insertion_libcxx (vsnprintf model),
+cpp20_range_adaptor_closure_invoked_through_invoke_impl,
+cpp20_no_unique_address_layout (needs a design decision),
+cpp20_coroutine_generator_semantics.
+Checks on W183 (587b840fcd): 13 suites, profiles, unit, lint, format,
+doxygen, platform (gcc11, m32, arm64), vacuity 1144 REACHED / 3 SKIPPED,
+per-commit compile; MSVC .ii tests unchanged (2 known timeouts).
