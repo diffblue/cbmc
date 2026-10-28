@@ -377,7 +377,20 @@ c_typecastt::c_typet c_typecastt::get_c_type(
   }
   else if(type.id() == ID_c_enum || type.id() == ID_c_enum_tag)
   {
-    return INT;
+    // C23 6.7.2.2p15: an enumeration with a fixed underlying type
+    // "behaves the same as the value with the underlying type, in
+    // particular with all aspects of promotion, conversion, and
+    // arithmetic". Without a fixed underlying type, the enumerated type is
+    // compatible with an implementation-defined integer type (C11
+    // 6.7.2.2p4), which is the underlying type that the type checker chose,
+    // e.g., unsigned int for an enumeration without negative enumerators as
+    // with GCC and Clang.
+    typet underlying;
+    if(type.id() == ID_c_enum_tag)
+      underlying = ns.follow_tag(to_c_enum_tag_type(type)).underlying_type();
+    else
+      underlying = to_c_enum_type(type).underlying_type();
+    return get_c_type(underlying);
   }
   else if(type.id()==ID_rational)
     return RATIONAL;
