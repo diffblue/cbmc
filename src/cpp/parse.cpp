@@ -4665,6 +4665,16 @@ bool Parser::optThrowDecl(irept &throw_decl)
     if(lex.get_token(tk)!='(')
       return false;
 
+    // C++11 [except.spec]/15 (C++17 [except.spec]/1): `throw()' is a
+    // non-throwing exception specification, equivalent to noexcept(true)
+    if(lex.LookAhead(0) == ')')
+    {
+      lex.get_token(tk);
+      throw_decl = irept(ID_noexcept);
+      throw_decl.add(ID_value) = true_exprt();
+      return true;
+    }
+
     // p=Ptree::Snoc(p, new Leaf(tk));
 
     for(;;)
@@ -4706,11 +4716,16 @@ bool Parser::optThrowDecl(irept &throw_decl)
 
     if(lex.LookAhead(0) == '(')
     {
-      // noexcept(constant-expression): depth-count to handle template-ids
+      // noexcept(constant-expression): depth-count to handle template-ids.
+      // N5008 [except.spec]/2: the constant expression is the exception
+      // specification.  The literals true and false are recorded; any
+      // other expression is not evaluated (#unevaluated).
       cpp_tokent op;
       lex.get_token(op);
 
       int depth = 1;
+      std::size_t tokens = 0;
+      int first = 0;
       while(depth > 0)
       {
         int t = lex.get_token(op);
@@ -4720,9 +4735,21 @@ bool Parser::optThrowDecl(irept &throw_decl)
           --depth;
         else if(t == 0)
           return false;
+        if(depth > 0)
+        {
+          if(tokens == 0)
+            first = t;
+          ++tokens;
+        }
       }
 
       p = irept(ID_noexcept);
+      if(tokens == 1 && first == TOK_FALSE)
+        p.add(ID_value) = false_exprt();
+      else if(tokens == 1 && first == TOK_TRUE)
+        p.add(ID_value) = true_exprt();
+      else
+        p.set("#unevaluated", true);
     }
     else
     {
@@ -5228,7 +5255,14 @@ bool Parser::rDeclarator(
           while(p->is_not_nil() && p->id() != ID_function_type)
             p = &p->add_subtype();
           if(p->id() == ID_function_type)
+          {
             p->set("#C_noexcept", true);
+            // noexcept(expression) other than a literal: taken as
+            // non-throwing for the noexcept operator, as before, but the
+            // exception lowering does not terminate on it
+            if(throw_decl.get_bool("#unevaluated"))
+                p->set("#C_noexcept_unevaluated", true);
+          }
         }
       }
 

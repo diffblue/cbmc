@@ -1914,6 +1914,22 @@ static const std::map<std::string, std::string> &library_source_models()
     {"std::uncaught_exceptions",
      "{ return " CPROVER_PREFIX "cpp_unwinding_exceptions +"
      " (" CPROVER_PREFIX "cpp_inflight_exception != 0 ? 1 : 0); }"},
+    // libsupc++ eh_terminate.cc, libc++abi cxa_handlers.cpp: N5008
+    // [terminate]/1, std::terminate calls the current terminate handler;
+    // [terminate.handler]/2-3, a handler does not return, and the default
+    // one calls abort() (CBMC's abort: __CPROVER_assume(0)).
+    // [get.terminate]/1: the current handler, which can be null (the
+    // default).  std::set_terminate is provided by
+    // provide_set_terminate_model (its parameter is unnamed in libstdc++).
+    // The handler must neither return nor throw ([terminate.handler]/2):
+    // the exception being handled is no longer dispatched once it runs.
+    {"std::terminate",
+     "{ if(" CPROVER_PREFIX "cpp_terminate_handler != 0) {"
+     " " CPROVER_PREFIX "cpp_inflight_exception = 0;"
+     " " CPROVER_PREFIX "cpp_terminate_handler(); }"
+     " " CPROVER_PREFIX "assume(0); }"},
+    {"std::get_terminate",
+     "{ return " CPROVER_PREFIX "cpp_terminate_handler; }"},
     // libc++ src/new.cpp, N5008 [bad.alloc], [new.badlength]
     {"std::bad_alloc::bad_alloc", "{ }"},
     {"std::bad_alloc::~bad_alloc", "{ }"},
@@ -1923,6 +1939,64 @@ static const std::map<std::string, std::string> &library_source_models()
     {"std::bad_array_new_length::what", "{ return \"bad_array_new_length\"; }"},
   };
   return models;
+}
+
+/// N5008 [set.terminate]/1-2: std::set_terminate(f) establishes f as the
+/// current terminate handler and returns the previous one.  The handler is
+/// kept in __CPROVER_cpp_terminate_handler (cpp_internal_additions.cpp).
+static void provide_set_terminate_model(symbol_table_baset &symbol_table)
+{
+  const symbolt *handler =
+    symbol_table.lookup(CPROVER_PREFIX "cpp_terminate_handler");
+  if(handler == nullptr)
+    return;
+  for(const auto &entry : symbol_table.symbols)
+  {
+    const symbolt &candidate = entry.second;
+    if(
+      candidate.type.id() != ID_code || candidate.value.is_not_nil() ||
+      candidate.is_type ||
+      id2string(candidate.name).rfind("std::set_terminate(", 0) != 0)
+    {
+      continue;
+    }
+    const code_typet &code_type = to_code_type(candidate.type);
+    if(
+      code_type.parameters().size() != 1 ||
+      code_type.return_type().id() != ID_pointer)
+    {
+      continue;
+    }
+    symbolt &symbol = symbol_table.get_writeable_ref(entry.first);
+    ensure_parameter_symbols(symbol, symbol_table);
+    const code_typet::parametert &parameter =
+      to_code_type(symbol.type).parameters().front();
+    const typet &return_type = to_code_type(symbol.type).return_type();
+    const symbol_exprt current = handler->symbol_expr();
+    code_blockt body;
+    // the previous handler, returned after the new one is installed
+    symbolt previous{
+      id2string(symbol.name) + "::previous", return_type, symbol.mode};
+    previous.base_name = "previous";
+    previous.is_lvalue = true;
+    previous.is_thread_local = true;
+    previous.is_file_local = true;
+    previous.location = symbol.location;
+    symbol_table.insert(previous);
+    const symbol_exprt previous_expr{previous.name, return_type};
+    body.add(code_frontend_declt{previous_expr});
+    body.add(code_frontend_assignt{
+      previous_expr, typecast_exprt::conditional_cast(current, return_type)});
+    body.add(code_frontend_assignt{
+      current,
+      typecast_exprt::conditional_cast(
+        symbol_exprt{parameter.get_identifier(), parameter.type()},
+        current.type())});
+    body.add(code_frontend_returnt{previous_expr});
+    symbol.value = std::move(body);
+    symbol.value.type() = symbol.type;
+    break;
+  }
 }
 
 void cpp_typecheckt::provide_library_source_models()
@@ -2172,6 +2246,9 @@ void cpp_typecheckt::provide_standard_stream_objects()
 void cpp_typecheckt::provide_stdlib_bodies()
 {
   namespacet ns(symbol_table);
+
+  // after type checking: the body is built in its final form
+  provide_set_terminate_model(symbol_table);
 
   // Constant-fold __numeric_traits_integer static members to avoid
   // spurious overflow/shift failures from alphabetical init ordering.

@@ -122,6 +122,12 @@ public:
   /// __CPROVER_initialize (no-op if that function is not in the model).
   void initialize_globals(goto_functionst &goto_functions);
 
+  /// Call std::terminate where an exception leaves a function through which
+  /// it must not propagate: the entry point (no handler was found,
+  /// [except.handle]/9) and a function with a non-throwing exception
+  /// specification ([except.spec]/5 of C++17, [except.terminate]/1.3).
+  void terminate_on_escape(goto_functionst &goto_functions);
+
 protected:
   symbol_exprt get_inflight_exception_global() override
   {
@@ -192,6 +198,64 @@ symbol_exprt remove_cpp_exceptionst::make_global(
   if(initial_value.is_not_nil())
     created_globals.emplace_back(result, initial_value);
   return result;
+}
+
+/// The instructions that call std::terminate, which does not return
+/// ([terminate.handler]/2): its model calls the handler, then assumes false;
+/// without a declaration of std::terminate the default handler applies,
+/// which calls abort() ([terminate.handler]/3), an assumption of false in
+/// CBMC.
+static void add_terminate(
+  const symbol_table_baset &symbol_table,
+  goto_programt &dest,
+  const source_locationt &loc)
+{
+  if(const symbolt *terminate = symbol_table.lookup("std::terminate()"))
+  {
+    if(
+      terminate->type.id() == ID_code &&
+      to_code_type(terminate->type).parameters().empty())
+    {
+      dest.add(goto_programt::make_function_call(
+        code_function_callt{terminate->symbol_expr()}, loc));
+    }
+  }
+  dest.add(goto_programt::make_assumption(false_exprt{}, loc));
+}
+
+void remove_cpp_exceptionst::terminate_on_escape(
+  goto_functionst &goto_functions)
+{
+  for(auto &[name, function] : goto_functions.function_map)
+  {
+    goto_programt &body = function.body;
+    if(body.instructions.empty() || !body.instructions.back().is_end_function())
+      continue;
+    const symbolt *symbol = symbol_table.lookup(name);
+    const bool entry_point = name == goto_functionst::entry_point();
+    // N5008 [except.spec]/2: noexcept, noexcept(true) and throw() (C++17)
+    // are non-throwing; noexcept(expression) is not evaluated
+    // (#C_noexcept_unevaluated) and is left alone
+    const bool non_throwing = symbol != nullptr &&
+                              symbol->type.id() == ID_code &&
+                              symbol->type.get_bool("#C_noexcept") &&
+                              !symbol->type.get_bool("#C_noexcept_unevaluated");
+    // std::terminate's model ends in an assumption of false
+    if((!entry_point && !non_throwing) || name == "std::terminate()")
+      continue;
+
+    // The dispatch of an exception that no handler of this function
+    // catches jumps to END_FUNCTION.  Turn END_FUNCTION into the check (the
+    // jumps keep their target) and append the call and a new END_FUNCTION.
+    goto_programt::targett end = std::prev(body.instructions.end());
+    const source_locationt loc = end->source_location();
+    goto_programt tail;
+    add_terminate(symbol_table, tail, loc);
+    goto_programt::targett new_end =
+      tail.add(goto_programt::make_end_function(loc));
+    *end = goto_programt::make_goto(new_end, no_inflight_exception(), loc);
+    body.destructive_append(tail);
+  }
 }
 
 void remove_cpp_exceptionst::initialize_globals(goto_functionst &goto_functions)
@@ -386,8 +450,8 @@ void remove_cpp_exceptionst::set_inflight_exception(
 /// in-flight state of exceptions thrown inside it only.  Save and clear the
 /// in-flight exception around the call, and count the exception being
 /// unwound (std::uncaught_exceptions reads the count).  A destructor that
-/// exits via an exception here calls std::terminate ([except.terminate]/1.4):
-/// assume it does not, as for a call of a must-not-throw function.
+/// exits via an exception here calls std::terminate ([except.terminate]/1.4),
+/// which does not return ([terminate.handler]/2).
 void remove_cpp_exceptionst::instrument_unwind_call(
   const irep_idt &function_identifier,
   goto_programt &goto_program,
@@ -440,8 +504,13 @@ void remove_cpp_exceptionst::instrument_unwind_call(
     instr_it, goto_programt::make_assignment(inflight_type, saved_type, loc));
   goto_program.insert_after(
     instr_it, goto_programt::make_assignment(inflight_ptr, saved_ptr, loc));
-  goto_program.insert_after(
-    instr_it, goto_programt::make_assumption(no_inflight_exception(), loc));
+  // if the destructor exited via an exception: std::terminate(), which does
+  // not return; inserted after the call in reverse order
+  goto_programt::targett next = std::next(instr_it);
+  goto_programt terminate;
+  terminate.add(goto_programt::make_goto(next, no_inflight_exception(), loc));
+  add_terminate(symbol_table, terminate, loc);
+  goto_program.destructive_insert(next, terminate);
 }
 
 void remove_cpp_exceptionst::prepare_handler(
@@ -522,6 +591,7 @@ void remove_cpp_exceptions(goto_modelt &goto_model, message_handlert &msg)
   if(!pass.prepare(goto_model.goto_functions))
     return; // no exceptions: nothing to do
   pass(goto_model.goto_functions);
+  pass.terminate_on_escape(goto_model.goto_functions);
   pass.initialize_globals(goto_model.goto_functions);
   goto_model.goto_functions.update();
 }
