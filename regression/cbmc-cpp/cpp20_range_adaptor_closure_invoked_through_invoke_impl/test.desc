@@ -25,3 +25,12 @@ gets _Partial as __invoke's result type, the type of the adaptor's
 one-argument operator().  The program was reduced again (2026-10-27)
 with a checker requiring declval<...>() calls and complete runs under
 g++ 16, 13 and clang++ 18.
+Findings 2026-10-28: inside the instantiated body of __invoke<_Transform,
+int (&)[1], int &>, `typename decltype(_S_test<_Callable, _Args...>(0))
+::type' is _Partial (the one-argument operator()), while the same with the
+types spelled out, and `decltype(_Callable()(declval<_Args>()...))', are
+the two-argument result; the declared return type of __invoke is right.
+Header-free reconstructions of this shape do not fail.  Found on the way
+and fixed: partial ordering with function parameter packs (ce6cf4a620),
+variable template specializations as lvalues (37762b428d), the address of
+a constexpr variable (9906f445dd).
