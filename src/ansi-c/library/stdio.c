@@ -23,7 +23,7 @@ int putchar(int c)
   __CPROVER_HIDE:;
   __CPROVER_bool error=__VERIFIER_nondet___CPROVER_bool();
   __CPROVER_printf("%c", c);
-  return (error?-1:c);
+  return (error ? -1 : (unsigned char)c);
 }
 
 /* FUNCTION: puts */
