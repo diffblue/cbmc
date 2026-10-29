@@ -15647,3 +15647,41 @@ Checks on W188: 13 suites, profiles, unit, lint, format, doxygen,
 platform, vacuity 1146/3, per-commit compile, MSVC .ii (2 known).
 Next: item 3 (pack expansion caller), then item 4 (implicit constructor
 exception specifications, is_nothrow_constructible with arguments).
+
+## Round 208 (2026-10-30): pack expansions, implicit constructors, VTT
+
+- b73cf5b7a0 (item 3): the single-element pack substitution of a function
+  template body dropped every ellipsis, so `count_args<C, Args...>' with a
+  two-element `Args' got one argument when the caller's one-element pack
+  was still in the template map ([temp.variadic]/8-9).  The ranges
+  KNOWNBUG and its reduction -> CORE; cpp20_ranges_views_iota_transform_
+  filter_drop passes with g++ 16.2.0 headers and loses broken-libstdcxx16.
+- 51e5beca3b (item 4): exception specifications of implicit and defaulted
+  constructors ([except.spec]/6: bases, virtual bases, members, array
+  elements, default member initializers); __is_nothrow_constructible(T,
+  Args...) selects the initialization ([meta.unary.prop] Table 54).  Both
+  KNOWNBUGs -> CORE.  KNOWNBUG 8703c23700: the implicit move constructor
+  is declared only for move-only subobjects ([class.copy.ctor]/8).
+- 7a45dcc6cf (VTT): a base-object constructor gives a direct base with
+  virtual bases copies of the base's tables with the offsets read from
+  the pointers in place, saves and restores the pointers (also around a
+  dynamic base without virtual bases); the base-object destructor does
+  the same ([class.cdtor]/4).  Also: construction tables skipped while
+  inserting during iteration; pointers of a repeated base matched by
+  subobject path.  KNOWNBUGs 16bc1ae965: dispatch through the second A of
+  `D : B, C' with a shared virtual base; E : D rejected (ambiguous A).
+- 626a3b1e80: a variable template specialization instantiated again keeps
+  the deduced type and value ([temp.spec.general]/5).  KNOWNBUG -> CORE.
+- f92ccff152: variables instantiated in function bodies (variable
+  templates, static members of class templates) get dynamic
+  initialization ([basic.start.dynamic]/1); block-scope statics are no
+  longer registered ([stmt.dcl]/3).
+- 1c1db658da: member noexcept-specifiers naming later members are kept
+  and re-evaluated with `this' ([class.mem.general]/9.4,
+  [expr.prim.this]/4); not for class template specializations
+  ([except.spec]/12), KNOWNBUG 250331db61.
+Checks on W189 (250331db61): 13 suites, profiles, unit, lint, format overall
+and per commit, doxygen, per-commit compile, platform (gcc11, m32, arm64),
+vacuity 1146/3 (the new tests end in a failing assertion and are not
+selected), MSVC .ii (2 known timeouts).
+Next: libc++ locale::use_facet, then MSVC streams.
