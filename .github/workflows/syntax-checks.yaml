@@ -6,7 +6,7 @@ on:
 jobs:
   # This job takes approximately 1 minute
   check-clang-format:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v7
         with:
