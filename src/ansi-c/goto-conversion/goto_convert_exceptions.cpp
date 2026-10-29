@@ -153,7 +153,25 @@ void goto_convertt::convert_try_catch(
       code_push_catcht::exception_list_entryt(block.get(ID_exception_id)));
 
     goto_programt tmp;
-    convert(block, tmp, mode);
+    const irep_idt &handler = block.get("#cpp_handler");
+    if(handler.empty())
+      convert(block, tmp, mode);
+    else
+    {
+      // N5008 [except.throw]/5: the exception object is destroyed when the
+      // handler exits by any means other than rethrowing -- at the end of
+      // its block, by a jump out of it, or by another exception.  Register
+      // that as a destructor of the handler's scope; remove_cpp_exceptions
+      // lowers it, skipping it for an exception being rethrown.
+      const node_indext handler_node = targets.scope_stack.get_current_node();
+      codet end_catch{"cpp_end_catch"};
+      end_catch.set("#cpp_handler", handler);
+      end_catch.add_source_location() = block.source_location();
+      targets.scope_stack.add(end_catch, {});
+      convert(block, tmp, mode);
+      unwind_destructor_stack(block.source_location(), tmp, mode, handler_node);
+      targets.scope_stack.set_current_node(handler_node);
+    }
     catch_push_instruction->targets.push_back(tmp.instructions.begin());
     dest.destructive_append(tmp);
 

@@ -1814,13 +1814,13 @@ void cpp_typecheckt::typecheck_try_catch(codet &code)
       if(statements.front().get_statement() == ID_ellipsis)
       {
         statements.erase(statements.begin());
+        op.set("#cpp_handler", ID_ellipsis);
 
         // do body
         typecheck_code(catch_block);
       }
       else
       {
-        // turn references into non-references
         {
           codet &decl_stmt = to_code(statements.front());
           if(
@@ -1843,18 +1843,9 @@ void cpp_typecheckt::typecheck_try_catch(codet &code)
           }
           cpp_declaratort &declarator = cpp_declaration.declarators().front();
 
-          if(
-            declarator.type().id() == ID_frontend_pointer &&
-            declarator.type().get_bool(ID_C_reference))
-          {
-            declarator.type() =
-              to_type_with_subtype(declarator.type()).subtype();
-          }
-          else if(is_reference(declarator.type()))
-          {
-            declarator.type() =
-              to_reference_type(declarator.type()).base_type();
-          }
+          // N5008 [except.handle]/15: a parameter of reference type binds
+          // to the exception object (remove_cpp_exceptions, prepare_handler);
+          // it stays a reference
 
           // The catch variable's value is supplied by the exception object at
           // runtime ([except.handle]); the front-end only needs to declare it.
@@ -1898,6 +1889,9 @@ void cpp_typecheckt::typecheck_try_catch(codet &code)
         // /8).  Keyed by the catch variable's identifier, which is also how
         // remove_cpp_exceptions identifies the handler.
         tag_rethrow_handler(catch_block, code_decl.symbol().get_identifier());
+        // the end of the handler destroys the exception object unless it is
+        // rethrown ([except.throw]/5; goto conversion, remove_cpp_exceptions)
+        op.set("#cpp_handler", code_decl.symbol().get_identifier());
       }
     }
   }
