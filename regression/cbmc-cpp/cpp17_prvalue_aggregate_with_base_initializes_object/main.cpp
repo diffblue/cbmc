@@ -12,6 +12,17 @@ struct D : E
 {
   int w;
 };
+struct Empty
+{
+};
+struct F
+{
+  int f;
+};
+struct M : Empty, E, F
+{
+  int m;
+};
 
 int main()
 {
@@ -19,6 +30,9 @@ int main()
   __CPROVER_assert(d.v == 6 && d.w == 7, "direct-list-initialization");
   D t = D{{6}, 7};
   __CPROVER_assert(t.v == 6 && t.w == 7, "from the prvalue");
+  M u = M{{}, {1}, {2}, 3};
+  __CPROVER_assert(
+    u.v == 1 && u.f == 2 && u.m == 3, "empty and non-empty bases");
   __CPROVER_assert(t.w == 0, "WRONG (must FAIL)");
   return 0;
 }
