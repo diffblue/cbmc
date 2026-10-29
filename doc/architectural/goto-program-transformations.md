@@ -1,5 +1,3 @@
-\ingroup module_hidden
-
 \page goto-program-transformations Goto Program Transformations
 
 \section required-transforms Core Transformation Passes

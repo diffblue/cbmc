@@ -1,5 +1,3 @@
-\ingroup module_hidden
-
 \page central-data-structures Central Data Structures
 
 # Central Data Structures

@@ -1,5 +1,3 @@
-\ingroup module_hidden 
-
 \page compilation-and-development Compilation and Development
 
 \author Martin Brain, Peter Schrammel, Owen Jones
