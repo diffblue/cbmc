@@ -824,17 +824,49 @@ void goto_convertt::convert_expression(
       // `throw d.v;').  The THROW reads its operand when it is lowered, after
       // the destructors below: evaluate the operand into a temporary first.
       exprt &thrown = throw_instruction.code_nonconst().op0();
+      irep_idt exception_object;
       if(
         thrown.id() == ID_side_effect && thrown.operands().size() == 1 &&
         thrown.operands().front().type().id() != ID_empty)
       {
+        if(thrown.operands().front().id() == ID_symbol)
+        {
+          exception_object =
+            to_symbol_expr(thrown.operands().front()).get_identifier();
+        }
         (void)make_temp_symbol(
           thrown.operands().front(), "exception", dest, mode);
+      }
+      // [class.temporary]/4: the other temporaries of the throw-expression
+      // (`E()' copied into the exception object without C++17's elision)
+      // are destroyed once the exception object is initialized; the one
+      // that is the operand becomes the exception object (destroyed by the
+      // handler, [except.throw]/5)
+      {
+        std::list<irep_idt> others;
+        for(const auto &id : side_effects.temporaries)
+        {
+          if(id != exception_object)
+            others.push_back(id);
+        }
+        destruct_locals(others, dest, ns);
       }
 
       const node_indext end_node = targets.cpp_try_scope_nodes.empty()
                                      ? node_indext{0}
                                      : targets.cpp_try_scope_nodes.back();
+      // a rethrow (`throw;'): the handlers it leaves do not destroy the
+      // exception object ([except.throw]/5, see convert_try_catch)
+      if(
+        thrown.id() == ID_side_effect && thrown.operands().empty() &&
+        mode != ID_java)
+      {
+        codet note{"cpp_note_rethrow"};
+        note.set("#cpp_handler", thrown.get("#rethrow_handler"));
+        note.add_source_location() = expr.source_location();
+        dest.add(goto_programt::instructiont(
+          std::move(note), expr.source_location(), OTHER, nil_exprt(), {}));
+      }
       emit_exceptional_unwind(expr.source_location(), dest, mode, end_node);
 
       dest.add(std::move(throw_instruction));

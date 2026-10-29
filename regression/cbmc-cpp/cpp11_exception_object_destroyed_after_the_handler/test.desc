@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11 --unwind 5
 ^\[main\.assertion\.1\] line \d+ the exception object is a copy: SUCCESS$
@@ -13,12 +13,8 @@ main.cpp
 --
 ^warning: ignoring
 --
-typecheck_try_catch turns a handler parameter of reference type into one
-of the referenced type, which remove_cpp_exceptions (prepare_handler)
-binds by a bitwise copy of the exception object and the end of the
-handler destroys.  The exception object itself is never destroyed, but
-each handler destroys a copy of it: with the rethrow, destroyed[1] is 2.
-A reference parameter has to bind to the exception object, a parameter
-of class type has to be copy-initialized from it ([except.handle]/15),
-and the end of the last active handler has to destroy it unless it was
-rethrown or an exception_ptr refers to it.
+Fixed: a handler parameter of reference type became one of the referenced
+type, bound by a bitwise copy that the end of the handler destroyed, and
+the exception object was never destroyed (with the rethrow, destroyed[1]
+was 2).  The reference now binds to the exception object, and the exit of
+the last active handler destroys it unless it is rethrown.

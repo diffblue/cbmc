@@ -1,6 +1,6 @@
 CORE
 main.cpp
---cpp11 --unwind 2 --depth 30 --no-unwinding-assertions
+--cpp11 --unwind 2 --depth 40 --no-unwinding-assertions
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
@@ -8,3 +8,6 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
+The --depth bound counts every instruction on a path, including those of
+__CPROVER_initialize; 40 (was 30) reaches the end of main since the
+exception lowering initializes one more global.
