@@ -1,0 +1,7 @@
+CORE
+main.c
+--mmio-region 0x1000:0
+^EXIT=1$
+^SIGNAL=0$
+MMIO region size must be positive
+--

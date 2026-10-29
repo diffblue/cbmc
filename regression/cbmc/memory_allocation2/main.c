@@ -1,3 +1,7 @@
+#ifdef CMDLINE
+#  include <assert.h>
+#endif
+
 #define _cbmc_printf2(str, var)                                                \
   {                                                                            \
     unsigned int ValueOf_##str = (unsigned int)var;                            \
@@ -24,10 +28,12 @@ static buffert(*const buffers[4]) = {BUF0, BUF1, BUF2, BUF3};
 
 main()
 {
+#ifndef CMDLINE
   __CPROVER_allocated_memory(BUF0_BASE, sizeof(buffert));
   __CPROVER_allocated_memory(BUF1_BASE, sizeof(buffert));
   __CPROVER_allocated_memory(BUF2_BASE, sizeof(buffert));
   __CPROVER_allocated_memory(BUF3_BASE, sizeof(buffert));
+#endif
 
   _cbmc_printf2(sizeof_buffers, sizeof(buffers));
   _cbmc_printf2(sizeof_buffers_0, sizeof(buffers[0]));
@@ -36,4 +42,13 @@ main()
   buffers[0]->buffer[0];
   buffers[0]->buffer[BUFFER_SIZE - 1];
   buffers[0]->buffer[BUFFER_SIZE]; // should be out-of-bounds
+
+#ifdef CMDLINE
+  // With --mmio-region, verify write-then-read round-trips through the
+  // byte-array-backed region.
+  buffers[0]->buffer[0] = 42;
+  assert(buffers[0]->buffer[0] == 42);
+  buffers[1]->buffer[BUFFER_SIZE - 1] = 99;
+  assert(buffers[1]->buffer[BUFFER_SIZE - 1] == 99);
+#endif
 }
