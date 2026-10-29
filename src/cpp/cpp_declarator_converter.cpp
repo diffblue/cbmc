@@ -950,8 +950,17 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
                            symbol.is_parameter;
   }
 
-  if(symbol.is_static_lifetime)
+  // N5008 [stmt.dcl]/3: a block-scope variable with static storage duration
+  // is initialized when control first passes through its declaration (the
+  // declaration statement does that), not by the dynamic initialization of
+  // non-block variables ([basic.start.dynamic])
+  if(
+    symbol.is_static_lifetime &&
+    cpp_typecheck.cpp_scopes.current_scope().id_class !=
+      cpp_idt::id_classt::BLOCK_SCOPE)
+  {
     cpp_typecheck.dynamic_initializations.push_back(symbol.name);
+  }
 
   // move early, it must be visible before doing any value
   symbolt *new_symbol;
