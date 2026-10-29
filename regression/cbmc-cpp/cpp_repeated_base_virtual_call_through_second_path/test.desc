@@ -1,0 +1,21 @@
+KNOWNBUG
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ through B: SUCCESS$
+^\[main\.assertion\.2\] line \d+ through C: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Assertion 2 fails, with pointer-outside-bounds failures: the virtual
+pointer of the second A subobject (`A@vtable_pointer@/tag-C/tag-A', at C's
+position in D) holds virtual_table::tag-A@tag-D@/tag-C/tag-A, a table of
+type virtual_table::A.  The conversion from C to V reads it as a
+virtual_table::C to get C's offset of V, which lies outside the smaller
+table, so the V address and V::g's dispatch are wrong.  The repeated
+subobject needs a table of the type of the class on its path (C).  Found
+while testing construction vtables; the W188 build fails it the same way.
