@@ -15628,3 +15628,22 @@ Next (order agreed with the user): N3 (exception object lifetime), #5
 Checks on W187: 13 suites, profiles, unit, lint, format, doxygen,
 platform, vacuity 1144/3, per-commit compile, MSVC .ii (2 known).
 Next: #5 (manipulator overload), #6 (cin >> i), VTT, MSVC streams.
+
+## Round 207 (2026-10-29): #5, prvalue aggregates, num_get, triage
+
+- 9c78d94270 (#5): a function template name as an operator operand is
+  deduced against the member operator@ functions taking a pointer to
+  function ([over.over]/1, [temp.deduct.funcaddr]/1).  KNOWNBUG -> CORE;
+  libc++ `cerr << endl' tests unbounded.
+- b6a4edb839: `D{{6}, 7}' with a base with data members takes the
+  constructor path ([dcl.init.aggr]/2).  KNOWNBUG -> CORE.
+- 25d89f3239: the "C" num_get facet for libstdc++ (classic_num_put builds
+  it); cin >> i has success paths.  libstdc++ desc CORE, libc++ KNOWNBUG.
+- Re-triage: the remaining level-KNOWNBUG descs are only those added in
+  rounds 202-207 (the older ones named in notes are CORE tests).
+- Item 3 narrowed (985ecf3b4a): the failure needs a caller expanding a
+  function parameter pack followed by another argument.
+Checks on W188: 13 suites, profiles, unit, lint, format, doxygen,
+platform, vacuity 1146/3, per-commit compile, MSVC .ii (2 known).
+Next: item 3 (pack expansion caller), then item 4 (implicit constructor
+exception specifications, is_nothrow_constructible with arguments).
