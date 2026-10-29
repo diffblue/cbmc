@@ -1,11 +1,11 @@
 var classgoto__convertt =
 [
+    [ "clean_expr_resultt", "structgoto__convertt_1_1clean__expr__resultt.html", "structgoto__convertt_1_1clean__expr__resultt" ],
+    [ "targetst", "structgoto__convertt_1_1targetst.html", "structgoto__convertt_1_1targetst" ],
     [ "break_continue_targetst", "structgoto__convertt_1_1break__continue__targetst.html", "structgoto__convertt_1_1break__continue__targetst" ],
     [ "break_switch_targetst", "structgoto__convertt_1_1break__switch__targetst.html", "structgoto__convertt_1_1break__switch__targetst" ],
-    [ "clean_expr_resultt", "structgoto__convertt_1_1clean__expr__resultt.html", "structgoto__convertt_1_1clean__expr__resultt" ],
-    [ "leave_targett", "structgoto__convertt_1_1leave__targett.html", "structgoto__convertt_1_1leave__targett" ],
-    [ "targetst", "structgoto__convertt_1_1targetst.html", "structgoto__convertt_1_1targetst" ],
     [ "throw_targett", "structgoto__convertt_1_1throw__targett.html", "structgoto__convertt_1_1throw__targett" ],
+    [ "leave_targett", "structgoto__convertt_1_1leave__targett.html", "structgoto__convertt_1_1leave__targett" ],
     [ "cases_mapt", "classgoto__convertt.html#af85585f9114f8eab469c192f969bd122", null ],
     [ "casest", "classgoto__convertt.html#afce1f417e3ee114bf5c1dc42d610e279", null ],
     [ "caset", "classgoto__convertt.html#ad11145b9ad3a4ac1fcf0cedfb27feac6", null ],

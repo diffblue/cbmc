@@ -1,4 +1,4 @@
 var numbering_8h =
 [
-    [ "numberingt< keyt, hasht >", "classnumberingt.html", "classnumberingt" ]
+    [ "numberingt&lt; keyt, hasht &gt;", "classnumberingt.html", "classnumberingt" ]
 ];

@@ -1,27 +1,27 @@
 <map id="stack_decision_proceduret" name="stack_decision_proceduret">
-<area shape="rect" id="Node000001" title=" " alt="" coords="192,79,387,104"/>
-<area shape="rect" id="Node000003" href="$classprop__convt.html" title=" " alt="" coords="111,159,206,185"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="260,113,179,161,177,157,257,109"/>
-<area shape="rect" id="Node000014" href="$classsmt2__convt.html" title=" " alt="" coords="240,159,339,185"/>
-<area shape="poly" id="edge9_Node000001_Node000014" title=" " alt="" coords="292,118,292,159,287,159,287,118"/>
-<area shape="rect" id="Node000017" href="$classsmt2__incremental__decision__proceduret.html" title=" " alt="" coords="363,152,565,192"/>
-<area shape="poly" id="edge12_Node000001_Node000017" title=" " alt="" coords="328,107,423,149,421,154,326,112"/>
-<area shape="rect" id="Node000002" href="$classdecision__proceduret.html" title="An interface for a decision procedure for satisfiability problems." alt="" coords="213,5,366,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="292,44,292,79,287,79,287,44"/>
-<area shape="rect" id="Node000004" href="$classprop__conv__solvert.html" title=" " alt="" coords="79,247,220,273"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="159,199,153,247,148,247,153,198"/>
-<area shape="rect" id="Node000005" href="$classequalityt.html" title=" " alt="" coords="109,328,189,353"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="152,286,152,328,147,328,147,286"/>
-<area shape="rect" id="Node000006" href="$classarrayst.html" title=" " alt="" coords="115,401,183,427"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="152,367,152,401,147,401,147,367"/>
-<area shape="rect" id="Node000007" href="$classboolbvt.html" title=" " alt="" coords="114,475,185,500"/>
-<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="152,440,152,475,147,475,147,440"/>
-<area shape="rect" id="Node000008" href="$classbv__pointers__widet.html" title=" " alt="" coords="5,548,147,573"/>
-<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="129,512,90,550,86,546,126,508"/>
-<area shape="rect" id="Node000009" href="$classbv__pointerst.html" title=" " alt="" coords="171,548,274,573"/>
-<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="173,508,213,546,209,550,169,512"/>
-<area shape="rect" id="Node000015" href="$classsmt2__dect.html" title="Decision procedure interface for various SMT 2.x solvers." alt="" coords="244,247,335,273"/>
-<area shape="poly" id="edge10_Node000014_Node000015" title=" " alt="" coords="292,199,292,247,287,247,287,199"/>
-<area shape="rect" id="Node000016" href="$classstate__encoding__smt2__convt.html" title=" " alt="" coords="359,240,521,280"/>
-<area shape="poly" id="edge11_Node000014_Node000016" title=" " alt="" coords="323,189,408,238,405,242,320,194"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="189,81,383,109"/>
+<area shape="rect" id="Node000003" href="$classprop__convt.html" title=" " alt="" coords="110,165,204,193"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="251,119,179,166,176,163,254,115"/>
+<area shape="rect" id="Node000014" href="$classsmt2__convt.html" title=" " alt="" coords="238,165,335,193"/>
+<area shape="poly" id="edge9_Node000001_Node000014" title=" " alt="" coords="287,122,289,166,284,164,285,127"/>
+<area shape="rect" id="Node000017" href="$classsmt2__incremental__decision__proceduret.html" title=" " alt="" coords="359,157,560,201"/>
+<area shape="poly" id="edge12_Node000001_Node000017" title=" " alt="" coords="328,113,416,155,411,157,328,118"/>
+<area shape="rect" id="Node000002" href="$classdecision__proceduret.html" title="An interface for a decision procedure for satisfiability problems." alt="" coords="210,5,362,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="287,46,289,81,284,80,285,51"/>
+<area shape="rect" id="Node000004" href="$classprop__conv__solvert.html" title=" " alt="" coords="77,258,218,286"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="155,206,151,258,146,257,153,211"/>
+<area shape="rect" id="Node000005" href="$classequalityt.html" title=" " alt="" coords="108,342,187,370"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="148,299,150,342,145,341,147,304"/>
+<area shape="rect" id="Node000006" href="$classarrayst.html" title=" " alt="" coords="114,418,181,445"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="148,383,150,418,145,417,147,388"/>
+<area shape="rect" id="Node000007" href="$classboolbvt.html" title=" " alt="" coords="112,493,183,521"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="149,459,150,494,145,492,146,463"/>
+<area shape="rect" id="Node000008" href="$classbv__pointers__widet.html" title=" " alt="" coords="5,569,146,597"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="127,531,90,571,87,566,122,533"/>
+<area shape="rect" id="Node000009" href="$classbv__pointerst.html" title=" " alt="" coords="170,569,272,597"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="172,530,210,569,205,568,170,535"/>
+<area shape="rect" id="Node000015" href="$classsmt2__dect.html" title="Decision procedure interface for various SMT 2.x solvers." alt="" coords="242,258,331,286"/>
+<area shape="poly" id="edge10_Node000014_Node000015" title=" " alt="" coords="287,206,289,258,284,257,285,211"/>
+<area shape="rect" id="Node000016" href="$classstate__encoding__smt2__convt.html" title=" " alt="" coords="355,249,516,294"/>
+<area shape="poly" id="edge11_Node000014_Node000016" title=" " alt="" coords="320,198,402,248,397,249,321,204"/>
 </map>

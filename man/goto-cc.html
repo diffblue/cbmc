@@ -21,19 +21,31 @@ is typically accomplished by using symbolic links.</p>
 <blockquote>
 <p><strong>goto-cc</strong>: invokes the default system compiler as
 preprocessor and just builds a GOTO binary.</p>
+</blockquote>
+<blockquote>
 <p><strong>goto-gcc</strong>: invokes <strong>gcc</strong>(1) as
 preprocessor and builds an <strong>elf</strong>(5) object file including
 an additional <em>goto-cc</em> section that holds the GOTO binary.</p>
+</blockquote>
+<blockquote>
 <p><strong>goto-ld</strong>: only performs linking, and also builds an
 <strong>elf</strong>(5) object as above.</p>
+</blockquote>
+<blockquote>
 <p><strong>goto-as</strong>: invokes the system assembler
 <strong>as</strong>(1) and includes the original assembly source as a
 string in the output file.</p>
+</blockquote>
+<blockquote>
 <p><strong>goto-bcc</strong>: invokes <strong>bcc</strong>(1) as
 preprocessor.</p>
+</blockquote>
+<blockquote>
 <p><strong>goto-armcc</strong>: invokes <strong>armcc</strong> as
 preprocessor and enables support for the ARM's C dialect and
 command-line options.</p>
+</blockquote>
+<blockquote>
 <p><strong>goto-cw</strong>: invokes <strong>mwcceppc</strong> as
 preprocessor and enables support for CodeWarrior's C dialect and
 command-line options.</p>
@@ -72,16 +84,14 @@ information.</p>
 functions. Name mangling prefixes each symbol name by
 <strong>__CPROVER_file_local</strong> and the basename of the file. For
 example,</p>
-</dd>
-</dl>
 <pre><code>// foo.c
 static int bar();</code></pre>
 <p>yields a globally visible <em>__CPROVER_file_local_foo_c_bar</em>
 function. Note that this approach mangles all functions contained in a
 translation unit. We recommend using <strong>crangler</strong>(1) as a
 more configurable alternative.</p>
-<dl>
-<dt><strong>--mangle-suffix </strong><em>suffix</em></dt>
+</dd>
+<dt><strong>--mangle-suffix</strong> <em>suffix</em></dt>
 <dd>
 <p>Append <em>suffix</em> to exported file-local symbols. Use this
 option together with <strong>--export-file-local-symbols</strong> when

@@ -1,3 +1,13 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$structfull__array__abstract__objectt_1_1mp__integer__hasht.html" title=" " alt="" coords="5,5,204,45"/>
+<area shape="rect" id="Node000000" href="$classfunction__filter__baset.html" title="Base class for filtering functions." alt="" coords="5,117,160,145"/>
+<area shape="rect" id="Node000001" href="$classfile__filtert.html" title=" " alt="" coords="250,5,334,33"/>
+<area shape="poly" id="edge230_Node000000_Node000001" title=" " alt="" coords="111,106,155,74,207,43,252,28,247,31,209,48,158,78,115,110"/>
+<area shape="rect" id="Node000002" href="$classinclude__pattern__filtert.html" title="Filters functions that match the provided pattern." alt="" coords="210,57,374,85"/>
+<area shape="poly" id="edge231_Node000000_Node000002" title=" " alt="" coords="147,110,243,84,239,87,149,115"/>
+<area shape="rect" id="Node000003" href="$classinternal__functions__filtert.html" title="Filters out CPROVER internal functions." alt="" coords="223,109,361,154"/>
+<area shape="poly" id="edge232_Node000000_Node000003" title=" " alt="" coords="175,129,225,130,220,132,176,134"/>
+<area shape="rect" id="Node000004" href="$classsingle__function__filtert.html" title=" " alt="" coords="211,177,373,205"/>
+<area shape="poly" id="edge233_Node000000_Node000004" title=" " alt="" coords="148,147,243,176,238,178,148,152"/>
+<area shape="rect" id="Node000005" href="$classtrivial__functions__filtert.html" title="Filters out trivial functions." alt="" coords="208,229,376,257"/>
+<area shape="poly" id="edge234_Node000000_Node000005" title=" " alt="" coords="113,152,158,184,209,214,241,229,235,229,206,219,155,188,112,157"/>
 </map>

@@ -1,53 +1,53 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/suffix.h" name="/home/runner/work/cbmc/cbmc/src/util/suffix.h">
-<area shape="rect" id="Node000001" title=" " alt="" coords="2947,5,3131,45"/>
-<area shape="rect" id="Node000002" href="$ci__lazy__methods_8cpp.html" title=" " alt="" coords="5,101,224,155"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="2933,30,2348,37,1507,50,704,70,410,82,236,96,200,103,199,98,236,91,410,77,704,64,1507,45,2348,32,2933,25"/>
-<area shape="rect" id="Node000003" href="$java__bytecode__language_8cpp.html" title=" " alt="" coords="248,101,467,155"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="2933,31,1628,52,902,71,636,83,479,96,443,103,442,98,478,91,636,78,902,66,1628,46,2933,25"/>
-<area shape="rect" id="Node000004" href="$java__class__loader_8cpp.html" title=" " alt="" coords="491,101,709,155"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="2933,29,2482,30,1843,38,1509,46,1195,58,925,74,722,96,685,103,684,98,721,91,925,69,1195,53,1508,41,1843,33,2482,25,2933,24"/>
-<area shape="rect" id="Node000005" href="$java__class__loader__base_8cpp.html" title=" " alt="" coords="733,101,952,155"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="2932,29,2524,32,1955,41,1659,50,1383,61,1144,76,964,96,928,103,927,98,964,91,1144,71,1382,56,1659,44,1955,36,2524,27,2932,24"/>
-<area shape="rect" id="Node000006" href="$java__entry__point_8cpp.html" title=" " alt="" coords="976,101,1195,155"/>
-<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="2933,30,2567,34,2069,45,1571,64,1364,78,1207,96,1171,103,1170,98,1206,91,1363,73,1570,59,2069,39,2567,29,2932,25"/>
-<area shape="rect" id="Node000007" href="$java__enum__static__init__unwind__handler_8cpp.html" title="Unwind loops in static initializers." alt="" coords="1219,93,1442,163"/>
-<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="2933,31,2612,37,2186,49,1763,68,1588,81,1455,96,1443,98,1442,93,1454,91,1587,75,1763,63,2186,43,2612,31,2932,25"/>
-<area shape="rect" id="Node000008" href="$java__static__initializers_8cpp.html" title=" " alt="" coords="1467,101,1685,155"/>
-<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="2933,32,2302,52,1952,71,1808,83,1698,96,1662,103,1661,98,1697,91,1807,77,1952,65,2301,47,2933,26"/>
-<area shape="rect" id="Node000009" href="$load__java__class_8cpp.html" title=" " alt="" coords="1709,101,1917,155"/>
-<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="2933,33,2413,55,2133,73,2018,84,1930,96,1896,103,1895,98,1929,91,2017,79,2133,68,2413,50,2933,27"/>
-<area shape="rect" id="Node000010" href="$require__goto__statements_8cpp.html" title=" " alt="" coords="1942,101,2191,155"/>
-<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="2933,32,2606,51,2405,69,2204,96,2166,103,2165,98,2204,91,2405,64,2606,45,2932,27"/>
-<area shape="rect" id="Node000011" href="$c__preprocess_8cpp.html" title=" " alt="" coords="2216,108,2459,148"/>
-<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="2933,38,2719,60,2595,76,2471,96,2406,111,2405,105,2470,91,2594,71,2719,54,2933,32"/>
-<area shape="rect" id="Node000012" href="$c__typecheck__expr_8cpp.html" title="ANSI&#45;C Language Type Checking." alt="" coords="2483,101,2695,155"/>
-<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="2934,48,2709,96,2680,103,2679,98,2707,91,2933,43"/>
-<area shape="rect" id="Node000013" href="$expr2c_8cpp.html" title=" " alt="" coords="2720,108,2923,148"/>
-<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="2987,54,2863,110,2861,106,2984,49"/>
-<area shape="rect" id="Node000014" href="$gcc__mode_8cpp.html" title="GCC Mode." alt="" coords="2947,101,3131,155"/>
-<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="3041,59,3041,100,3036,100,3036,59"/>
-<area shape="rect" id="Node000015" href="$hybrid__binary_8cpp.html" title="Create hybrid binary with goto&#45;binary section." alt="" coords="3155,101,3339,155"/>
-<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="3091,49,3194,98,3191,103,3089,54"/>
-<area shape="rect" id="Node000016" href="$goto__harness__parse__options_8cpp.html" title=" " alt="" coords="3363,101,3602,155"/>
-<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="3144,46,3351,91,3382,98,3381,103,3350,96,3143,51"/>
-<area shape="rect" id="Node000017" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="3627,93,3824,163"/>
-<area shape="poly" id="edge16_Node000001_Node000017" title=" " alt="" coords="3144,31,3362,51,3489,68,3615,91,3627,93,3626,99,3614,96,3489,74,3362,57,3144,36"/>
-<area shape="rect" id="Node000018" href="$dfcc__is__cprover__symbol_8cpp.html" title=" " alt="" coords="3849,93,4058,163"/>
-<area shape="poly" id="edge17_Node000001_Node000018" title=" " alt="" coords="3145,26,3283,32,3456,44,3646,62,3836,91,3849,93,3848,98,3836,96,3646,68,3456,49,3283,38,3144,32"/>
-<area shape="rect" id="Node000019" href="$dfcc__is__fresh_8cpp.html" title=" " alt="" coords="4083,93,4280,163"/>
-<area shape="poly" id="edge18_Node000001_Node000019" title=" " alt="" coords="3145,23,3322,25,3553,34,3812,55,3943,70,4071,91,4083,93,4082,98,4070,96,3942,76,3811,60,3553,39,3322,30,3145,28"/>
-<area shape="rect" id="Node000020" href="$dfcc__obeys__contract_8cpp.html" title=" " alt="" coords="4304,93,4501,163"/>
-<area shape="poly" id="edge19_Node000001_Node000020" title=" " alt="" coords="3144,26,3403,34,3734,47,4057,65,4191,77,4292,91,4304,93,4303,98,4292,96,4190,82,4057,71,3734,52,3403,39,3144,32"/>
-<area shape="rect" id="Node000021" href="$dfcc__pointer__equals_8cpp.html" title=" " alt="" coords="4525,93,4723,163"/>
-<area shape="poly" id="edge20_Node000001_Node000021" title=" " alt="" coords="3145,25,3445,31,3840,43,4230,62,4391,75,4514,91,4525,93,4524,98,4513,96,4391,80,4229,67,3840,48,3445,36,3145,31"/>
-<area shape="rect" id="Node000022" href="$dfcc__pointer__in__range_8cpp.html" title=" " alt="" coords="4747,93,4944,163"/>
-<area shape="poly" id="edge21_Node000001_Node000022" title=" " alt="" coords="3145,25,3485,29,3945,39,4402,59,4591,73,4735,91,4747,93,4746,98,4734,96,4591,78,4401,64,3945,45,3485,34,3145,30"/>
-<area shape="rect" id="Node000023" href="$remove__returns_8cpp.html" title="Replace function returns by assignments to global variables." alt="" coords="4968,101,5152,155"/>
-<area shape="poly" id="edge22_Node000001_Node000023" title=" " alt="" coords="3145,24,3525,26,4049,34,4320,43,4573,54,4792,70,4956,91,4988,98,4987,103,4956,96,4791,75,4573,60,4320,48,4049,40,3525,31,3144,29"/>
-<area shape="rect" id="Node000024" href="$system__library__symbols_8cpp.html" title="Goto Programs." alt="" coords="5177,101,5389,155"/>
-<area shape="poly" id="edge23_Node000001_Node000024" title=" " alt="" coords="3144,24,3561,26,4146,35,4449,43,4734,55,4979,70,5164,91,5200,98,5199,103,5164,96,4979,76,4734,60,4449,48,4145,40,3561,31,3144,29"/>
-<area shape="rect" id="Node000025" href="$expr2statement__list_8cpp.html" title=" " alt="" coords="5413,93,5616,163"/>
-<area shape="poly" id="edge24_Node000001_Node000025" title=" " alt="" coords="3144,23,3603,23,4256,30,4598,38,4918,50,5194,68,5402,91,5413,93,5413,98,5401,96,5193,73,4917,56,4597,43,4256,35,3603,29,3145,29"/>
-<area shape="rect" id="Node000026" href="$symbol_8cpp.html" title=" " alt="" coords="5641,108,5829,148"/>
-<area shape="poly" id="edge25_Node000001_Node000026" title=" " alt="" coords="3144,25,3690,31,4464,44,5200,64,5469,76,5628,91,5686,105,5684,111,5628,96,5469,82,5200,69,4464,49,3690,37,3144,30"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="2938,5,3121,50"/>
+<area shape="rect" id="Node000002" href="$ci__lazy__methods_8cpp.html" title=" " alt="" coords="5,106,224,168"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="2919,30,2337,39,1499,52,701,72,409,85,236,101,201,109,199,103,235,95,408,80,701,67,1499,46,2337,33,2924,30"/>
+<area shape="rect" id="Node000003" href="$java__bytecode__language_8cpp.html" title=" " alt="" coords="248,106,466,168"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="2919,30,2383,40,1621,53,899,74,635,86,479,101,444,108,443,103,478,95,634,81,899,68,1621,48,2383,35,2925,30"/>
+<area shape="rect" id="Node000004" href="$java__class__loader_8cpp.html" title=" " alt="" coords="491,106,709,168"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="2919,28,2472,31,1835,38,1503,46,1192,59,924,77,813,88,722,101,686,109,686,103,721,95,812,83,923,71,1191,54,1503,41,1835,33,2472,26,2925,28"/>
+<area shape="rect" id="Node000005" href="$java__class__loader__base_8cpp.html" title=" " alt="" coords="733,106,952,168"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="2919,29,2514,33,1948,42,1654,50,1379,62,1143,79,964,101,929,109,928,103,963,95,1142,74,1379,57,1654,45,1948,36,2514,28,2924,29"/>
+<area shape="rect" id="Node000006" href="$java__entry__point_8cpp.html" title=" " alt="" coords="976,106,1194,168"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="2919,29,2558,35,2062,45,1806,54,1568,66,1362,81,1207,101,1172,109,1171,103,1206,95,1362,76,1567,61,1806,49,2062,40,2558,30,2925,29"/>
+<area shape="rect" id="Node000007" href="$java__enum__static__init__unwind__handler_8cpp.html" title="Unwind loops in static initializers." alt="" coords="1218,98,1440,177"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="2919,30,2603,38,2178,50,1758,70,1584,84,1452,101,1441,103,1441,97,1451,95,1584,78,1758,64,2178,44,2602,33,2925,30"/>
+<area shape="rect" id="Node000008" href="$java__static__initializers_8cpp.html" title=" " alt="" coords="1464,106,1682,168"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="2920,31,2648,41,2294,54,1947,73,1804,86,1695,101,1660,109,1660,103,1694,95,1803,81,1947,68,2294,48,2648,35,2925,31"/>
+<area shape="rect" id="Node000009" href="$load__java__class_8cpp.html" title=" " alt="" coords="1707,106,1914,168"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="2919,32,2406,57,2128,76,2014,88,1927,101,1894,108,1894,103,1926,95,2013,82,2128,71,2405,52,2924,32"/>
+<area shape="rect" id="Node000010" href="$require__goto__statements_8cpp.html" title=" " alt="" coords="1938,106,2187,168"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="2919,32,2778,40,2597,52,2398,71,2199,101,2162,109,2162,103,2198,95,2397,66,2597,47,2778,35,2925,31"/>
+<area shape="rect" id="Node000011" href="$c__preprocess_8cpp.html" title=" " alt="" coords="2211,115,2453,160"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="2925,37,2710,62,2587,79,2466,101,2400,117,2399,112,2465,95,2586,74,2709,57,2919,37"/>
+<area shape="rect" id="Node000012" href="$c__typecheck__expr_8cpp.html" title="ANSI&#45;C Language Type Checking." alt="" coords="2477,106,2688,168"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="2925,48,2815,73,2701,101,2672,109,2671,103,2699,95,2814,68,2920,49"/>
+<area shape="rect" id="Node000013" href="$expr2c_8cpp.html" title=" " alt="" coords="2712,115,2914,160"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="2975,57,2857,117,2856,112,2970,58"/>
+<area shape="rect" id="Node000014" href="$gcc__mode_8cpp.html" title="GCC Mode." alt="" coords="2938,106,3121,168"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="3031,64,3031,108,3027,104,3027,68"/>
+<area shape="rect" id="Node000015" href="$hybrid__binary_8cpp.html" title="Create hybrid binary with goto&#45;binary section." alt="" coords="3146,106,3329,168"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="3086,55,3181,106,3176,105,3084,60"/>
+<area shape="rect" id="Node000016" href="$goto__harness__parse__options_8cpp.html" title=" " alt="" coords="3353,106,3590,168"/>
+<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="3137,48,3342,95,3373,106,3368,106,3341,101,3136,54"/>
+<area shape="rect" id="Node000017" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="3615,98,3811,177"/>
+<area shape="poly" id="edge16_Node000001_Node000017" title=" " alt="" coords="3136,32,3353,53,3479,71,3603,95,3617,101,3612,101,3602,101,3478,76,3353,59,3136,38"/>
+<area shape="rect" id="Node000018" href="$dfcc__is__cprover__symbol_8cpp.html" title=" " alt="" coords="3836,98,4044,177"/>
+<area shape="poly" id="edge17_Node000001_Node000018" title=" " alt="" coords="3136,28,3275,33,3447,44,3636,64,3824,95,3838,101,3833,100,3823,101,3635,70,3446,50,3274,38,3136,33"/>
+<area shape="rect" id="Node000019" href="$dfcc__is__fresh_8cpp.html" title=" " alt="" coords="4068,98,4265,177"/>
+<area shape="poly" id="edge18_Node000001_Node000019" title=" " alt="" coords="3136,30,3616,53,3871,72,3976,83,4056,95,4071,101,4065,100,4055,101,3975,88,3871,77,3616,58,3136,35"/>
+<area shape="rect" id="Node000020" href="$dfcc__obeys__contract_8cpp.html" title=" " alt="" coords="4288,98,4485,177"/>
+<area shape="poly" id="edge19_Node000001_Node000020" title=" " alt="" coords="3137,28,3395,35,3724,48,4044,68,4177,80,4278,95,4291,101,4285,100,4277,101,4176,86,4044,73,3723,53,3394,41,3137,34"/>
+<area shape="rect" id="Node000021" href="$dfcc__pointer__equals_8cpp.html" title=" " alt="" coords="4508,98,4705,177"/>
+<area shape="poly" id="edge20_Node000001_Node000021" title=" " alt="" coords="3137,27,3436,32,3829,44,4216,64,4376,78,4498,95,4511,101,4505,100,4497,101,4376,83,4216,69,3829,49,3436,38,3137,33"/>
+<area shape="rect" id="Node000022" href="$dfcc__pointer__in__range_8cpp.html" title=" " alt="" coords="4728,98,4925,177"/>
+<area shape="poly" id="edge21_Node000001_Node000022" title=" " alt="" coords="3137,27,3477,30,3933,40,4168,49,4387,60,4575,76,4718,95,4731,101,4725,100,4717,101,4575,81,4387,66,4168,54,3933,45,3477,35,3137,32"/>
+<area shape="rect" id="Node000023" href="$remove__returns_8cpp.html" title="Replace function returns by assignments to global variables." alt="" coords="4948,106,5132,168"/>
+<area shape="poly" id="edge22_Node000001_Node000023" title=" " alt="" coords="3136,26,3516,26,4037,34,4306,43,4558,55,4774,73,4938,95,4970,106,4965,106,4937,101,4774,78,4558,61,4306,48,4037,40,3516,32,3136,31"/>
+<area shape="rect" id="Node000024" href="$system__library__symbols_8cpp.html" title="Goto Programs." alt="" coords="5156,106,5367,168"/>
+<area shape="poly" id="edge23_Node000001_Node000024" title=" " alt="" coords="3136,26,3552,27,4133,35,4435,43,4717,55,4961,73,5144,95,5181,106,5175,106,5143,101,4960,78,4717,61,4435,48,4133,40,3552,32,3136,31"/>
+<area shape="rect" id="Node000025" href="$expr2statement__list_8cpp.html" title=" " alt="" coords="5391,98,5593,177"/>
+<area shape="poly" id="edge24_Node000001_Node000025" title=" " alt="" coords="3136,28,3637,35,4335,49,4995,69,5236,81,5379,95,5393,101,5388,100,5378,101,5236,87,4995,74,4335,54,3637,40,3136,33"/>
+<area shape="rect" id="Node000026" href="$symbol_8cpp.html" title=" " alt="" coords="5617,115,5804,160"/>
+<area shape="poly" id="edge25_Node000001_Node000026" title=" " alt="" coords="3136,27,3680,33,4450,45,5180,66,5448,79,5606,95,5664,115,5658,114,5605,101,5447,85,5180,71,4450,51,3680,38,3136,33"/>
 </map>

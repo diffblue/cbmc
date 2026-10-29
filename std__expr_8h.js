@@ -3,7 +3,7 @@ var std__expr_8h =
     [ "nullary_exprt", "classnullary__exprt.html", "classnullary__exprt" ],
     [ "ternary_exprt", "classternary__exprt.html", "classternary__exprt" ],
     [ "symbol_exprt", "classsymbol__exprt.html", "classsymbol__exprt" ],
-    [ "std::hash<::symbol_exprt >", "structstd_1_1hash_3_1_1symbol__exprt_01_4.html", "structstd_1_1hash_3_1_1symbol__exprt_01_4" ],
+    [ "std::hash&lt;::symbol_exprt &gt;", "structstd_1_1hash_3_1_1symbol__exprt_01_4.html", "structstd_1_1hash_3_1_1symbol__exprt_01_4" ],
     [ "decorated_symbol_exprt", "classdecorated__symbol__exprt.html", "classdecorated__symbol__exprt" ],
     [ "nondet_symbol_exprt", "classnondet__symbol__exprt.html", "classnondet__symbol__exprt" ],
     [ "unary_exprt", "classunary__exprt.html", "classunary__exprt" ],

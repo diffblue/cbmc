@@ -2,7 +2,7 @@ var classsmt2__tokenizert =
 [
     [ "smt2_errort", "classsmt2__tokenizert_1_1smt2__errort.html", "classsmt2__tokenizert_1_1smt2__errort" ],
     [ "tokent", "classsmt2__tokenizert_1_1tokent.html", "classsmt2__tokenizert_1_1tokent" ],
-    [ "token_kindt", "classsmt2__tokenizert.html#a426104002266ab3b902a361e5ffa9b80", null ],
+    [ "token_kindt", "classsmt2__tokenizert.html#a4dde2aac3a163e59a6243332f781e572", null ],
     [ "smt2_tokenizert", "classsmt2__tokenizert.html#a53bb19e9b825d18ea908e63d4b3d5d0c", null ],
     [ "current_line_no", "classsmt2__tokenizert.html#a3e2d00f76b07b759540db4e49eb89a6c", null ],
     [ "error", "classsmt2__tokenizert.html#a58f39c0316a4676d092519797539df16", null ],

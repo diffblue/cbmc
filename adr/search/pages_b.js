@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['tap_20instructions_0',['Homebrew tap instructions',['../homebrew-tap-instructions.html',1,'index']]]
+  ['notes_0',['Notes',['../homebrew-tap-instructions.html#autotoc_md5',1,'']]]
 ];

@@ -1,7 +1,7 @@
 var classboolbv__widtht =
 [
-    [ "defined_entryt", "structboolbv__widtht_1_1defined__entryt.html", "structboolbv__widtht_1_1defined__entryt" ],
     [ "membert", "structboolbv__widtht_1_1membert.html", "structboolbv__widtht_1_1membert" ],
+    [ "defined_entryt", "structboolbv__widtht_1_1defined__entryt.html", "structboolbv__widtht_1_1defined__entryt" ],
     [ "cachet", "classboolbv__widtht.html#ab3a2adf34afff32fcbbb2dba117f2011", null ],
     [ "entryt", "classboolbv__widtht.html#a768f615ad585c3ab477dc8f94435bdb9", null ],
     [ "boolbv_widtht", "classboolbv__widtht.html#a20c4e2f850be33fcb0dc170a9fda679e", null ],

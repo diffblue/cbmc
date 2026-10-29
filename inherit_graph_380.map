@@ -1,9 +1,15 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classgoto__symext.html" title="The main class for the forward symbolic simulator." alt="" coords="5,31,112,56"/>
-<area shape="rect" id="Node000001" href="$structscratch__program__symext.html" title=" " alt="" coords="160,5,347,31"/>
-<area shape="poly" id="edge247_Node000000_Node000001" title=" " alt="" coords="126,32,159,28,160,33,126,37"/>
-<area shape="rect" id="Node000002" href="$classsymex__bmct.html" title=" " alt="" coords="200,55,307,80"/>
-<area shape="poly" id="edge248_Node000000_Node000002" title=" " alt="" coords="126,49,200,58,199,63,126,54"/>
-<area shape="rect" id="Node000003" href="$classsymex__bmc__incremental__one__loopt.html" title=" " alt="" coords="395,47,581,87"/>
-<area shape="poly" id="edge249_Node000002_Node000003" title=" " alt="" coords="321,65,395,65,395,70,321,70"/>
+<area shape="rect" id="Node000000" href="$classgoto__verifiert.html" title="An implementation of goto_verifiert checks all properties in a goto model." alt="" coords="5,224,114,251"/>
+<area shape="rect" id="Node000001" href="$classall__properties__verifier__with__fault__localizationt.html" title="Requires an incremental goto checker that is a goto_trace_providert and fault_localization_providert." alt="" coords="162,5,392,67"/>
+<area shape="poly" id="edge256_Node000000_Node000001" title=" " alt="" coords="70,208,104,143,129,107,160,77,180,65,176,70,163,81,133,111,108,146,75,210"/>
+<area shape="rect" id="Node000002" href="$classall__properties__verifier__with__trace__storaget.html" title=" " alt="" coords="167,91,386,152"/>
+<area shape="poly" id="edge257_Node000000_Node000002" title=" " alt="" coords="87,212,121,186,160,162,187,151,183,155,163,166,124,191,91,216"/>
+<area shape="rect" id="Node000003" href="$classall__properties__verifiert.html" title=" " alt="" coords="162,176,392,221"/>
+<area shape="poly" id="edge258_Node000000_Node000003" title=" " alt="" coords="127,223,163,218,159,221,130,228"/>
+<area shape="rect" id="Node000004" href="$classcover__goals__verifier__with__trace__storaget.html" title=" " alt="" coords="162,245,392,307"/>
+<area shape="poly" id="edge259_Node000000_Node000004" title=" " alt="" coords="128,247,164,254,159,257,130,252"/>
+<area shape="rect" id="Node000005" href="$classstop__on__fail__verifier__with__fault__localizationt.html" title="Stops when the first failing property is found and localizes the fault Requires an incremental goto c..." alt="" coords="162,331,392,392"/>
+<area shape="poly" id="edge260_Node000000_Node000005" title=" " alt="" coords="86,259,122,289,163,317,186,330,181,331,160,321,119,293,86,265"/>
+<area shape="rect" id="Node000006" href="$classstop__on__fail__verifiert.html" title="Stops when the first failing property is found." alt="" coords="162,416,392,461"/>
+<area shape="poly" id="edge261_Node000000_Node000006" title=" " alt="" coords="72,264,106,334,132,371,163,402,183,416,178,416,160,406,128,374,102,337,70,269"/>
 </map>

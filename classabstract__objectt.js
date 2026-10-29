@@ -1,7 +1,7 @@
 var classabstract__objectt =
 [
-    [ "abstract_object_visitort", "structabstract__objectt_1_1abstract__object__visitort.html", "structabstract__objectt_1_1abstract__object__visitort" ],
     [ "combine_result", "structabstract__objectt_1_1combine__result.html", "structabstract__objectt_1_1combine__result" ],
+    [ "abstract_object_visitort", "structabstract__objectt_1_1abstract__object__visitort.html", "structabstract__objectt_1_1abstract__object__visitort" ],
     [ "internal_abstract_object_pointert", "classabstract__objectt.html#aca63fc66e39057a47a7b372ab07ffd28", null ],
     [ "internal_sharing_ptrt", "classabstract__objectt.html#a696949b8324e1870d62e79c6466439d4", null ],
     [ "locationt", "classabstract__objectt.html#a51e341e15ffc19500d8fa232424c2396", null ],

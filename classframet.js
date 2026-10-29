@@ -1,9 +1,9 @@
 var classframet =
 [
-    [ "active_loop_infot", "classframet_1_1active__loop__infot.html", "classframet_1_1active__loop__infot" ],
     [ "implicationt", "structframet_1_1implicationt.html", "structframet_1_1implicationt" ],
     [ "loop_infot", "structframet_1_1loop__infot.html", "structframet_1_1loop__infot" ],
-    [ "goto_state_listt", "classframet.html#a218286a29b4c57b199e7bb9c1098ba46", null ],
+    [ "active_loop_infot", "classframet_1_1active__loop__infot.html", "classframet_1_1active__loop__infot" ],
+    [ "goto_state_listt", "classframet.html#a1854fb1297a4630cbd5f9c201ac95e86", null ],
     [ "framet", "classframet.html#a850fbab3deca49ce06cebaf600859e13", null ],
     [ "framet", "classframet.html#ad89548a24619f0b207fdbbeb2706712e", null ],
     [ "add_auxiliary", "classframet.html#a707bad02be9196628a355d46164c9262", null ],

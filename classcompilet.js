@@ -26,7 +26,7 @@ var classcompilet =
     [ "libraries", "classcompilet.html#a67ce28bf8f6cdf9b2cec72e94e0f7e84", null ],
     [ "library_paths", "classcompilet.html#afd370f03ae9263f05fd719a7ce638d7c", null ],
     [ "log", "classcompilet.html#adf6f7dca6639c4e4d5b79c2786dd8346", null ],
-    [ "mode", "classcompilet.html#ad50713d6289034c8a54511bbeff9e17e", null ],
+    [ "mode", "classcompilet.html#aea2edf8995770f117abb58a8985f35ec", null ],
     [ "object_file_extension", "classcompilet.html#ab44370609088938fa52164790456cda2", null ],
     [ "object_files", "classcompilet.html#a9513433591e3c031a6eb865051c9fe0b", null ],
     [ "output_directory_object", "classcompilet.html#a817d68b9bd1943d67cbb5319b36e1d45", null ],

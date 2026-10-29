@@ -1,13 +1,13 @@
 var classsmt__core__theoryt =
 [
-    [ "andt", "structsmt__core__theoryt_1_1andt.html", "structsmt__core__theoryt_1_1andt" ],
-    [ "distinctt", "structsmt__core__theoryt_1_1distinctt.html", "structsmt__core__theoryt_1_1distinctt" ],
-    [ "equalt", "structsmt__core__theoryt_1_1equalt.html", "structsmt__core__theoryt_1_1equalt" ],
-    [ "if_then_elset", "structsmt__core__theoryt_1_1if__then__elset.html", "structsmt__core__theoryt_1_1if__then__elset" ],
-    [ "impliest", "structsmt__core__theoryt_1_1impliest.html", "structsmt__core__theoryt_1_1impliest" ],
     [ "nott", "structsmt__core__theoryt_1_1nott.html", "structsmt__core__theoryt_1_1nott" ],
+    [ "impliest", "structsmt__core__theoryt_1_1impliest.html", "structsmt__core__theoryt_1_1impliest" ],
+    [ "andt", "structsmt__core__theoryt_1_1andt.html", "structsmt__core__theoryt_1_1andt" ],
     [ "ort", "structsmt__core__theoryt_1_1ort.html", "structsmt__core__theoryt_1_1ort" ],
     [ "xort", "structsmt__core__theoryt_1_1xort.html", "structsmt__core__theoryt_1_1xort" ],
+    [ "equalt", "structsmt__core__theoryt_1_1equalt.html", "structsmt__core__theoryt_1_1equalt" ],
+    [ "distinctt", "structsmt__core__theoryt_1_1distinctt.html", "structsmt__core__theoryt_1_1distinctt" ],
+    [ "if_then_elset", "structsmt__core__theoryt_1_1if__then__elset.html", "structsmt__core__theoryt_1_1if__then__elset" ],
     [ "distinct", "classsmt__core__theoryt.html#a15f215304aba83973e2c7ba811b059b4", null ],
     [ "equal", "classsmt__core__theoryt.html#ad22cb1751a8fc5adf3b3cbe1ae229f15", null ],
     [ "if_then_else", "classsmt__core__theoryt.html#a3588693240920164f6bfcffcdd8a8bc6", null ],

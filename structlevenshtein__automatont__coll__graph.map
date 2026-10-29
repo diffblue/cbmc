@@ -1,33 +1,37 @@
 <map id="levenshtein_automatont" name="levenshtein_automatont">
-<area shape="rect" id="Node000001" title="Simple automaton that can detect whether a string can be transformed into another with a limited numb..." alt="" coords="2144,177,2325,202"/>
-<area shape="rect" id="Node000002" href="$structnfat.html" title=" " alt="" coords="1964,141,2071,166"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="2085,162,2158,174,2157,179,2084,167"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="1423,113,1563,153"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1576,134,1964,149,1964,154,1576,139"/>
-<area shape="rect" id="Node000012" href="$structnfat.html" title="Very simple NFA implementation Not super performant, but should be good enough for our purposes." alt="" coords="1749,89,1836,114"/>
-<area shape="poly" id="edge16_Node000012_Node000003" title=" " alt="" coords="1576,122,1749,103,1749,109,1577,127"/>
-<area shape="rect" id="Node000004" href="$structnfat_1_1transitiont.html" title=" " alt="" coords="1077,99,1239,125"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="1252,115,1423,126,1422,132,1252,121"/>
-<area shape="rect" id="Node000005" title=" " alt="" coords="474,5,617,45"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="631,23,711,26,795,33,893,48,990,69,1107,97,1106,102,989,75,892,54,794,39,710,32,631,29"/>
-<area shape="rect" id="Node000008" title=" " alt="" coords="819,85,989,139"/>
-<area shape="poly" id="edge9_Node000008_Node000005" title=" " alt="" coords="631,45,646,48,795,79,819,85,818,90,794,84,645,53,630,50"/>
-<area shape="rect" id="Node000006" title=" " alt="" coords="127,13,309,38"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="323,23,474,23,474,28,323,28"/>
-<area shape="rect" id="Node000007" title=" " alt="" coords="5,43,44,69"/>
-<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="58,48,137,35,138,41,58,53"/>
-<area shape="rect" id="Node000010" title=" " alt="" coords="469,77,621,117"/>
-<area shape="poly" id="edge11_Node000010_Node000007" title=" " alt="" coords="58,56,469,89,469,94,58,61"/>
-<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="1003,109,1077,109,1077,115,1003,115"/>
-<area shape="rect" id="Node000009" title=" " alt="" coords="199,143,237,169"/>
-<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="251,153,410,151,621,141,818,121,819,126,622,147,410,156,251,159"/>
-<area shape="poly" id="edge12_Node000010_Node000009" title=" " alt="" coords="251,148,469,108,470,113,252,153"/>
-<area shape="rect" id="Node000011" title=" " alt="" coords="1093,202,1223,227"/>
-<area shape="poly" id="edge14_Node000011_Node000009" title=" " alt="" coords="251,155,1093,208,1093,213,251,161"/>
-<area shape="poly" id="edge10_Node000008_Node000010" title=" " alt="" coords="635,107,645,108,735,112,819,112,819,117,735,117,645,113,635,112"/>
-<area shape="poly" id="edge13_Node000003_Node000011" title=" " alt="" coords="1224,196,1422,148,1423,153,1225,201"/>
-<area shape="rect" id="Node000013" title=" " alt="" coords="1587,195,1725,235"/>
-<area shape="poly" id="edge18_Node000013_Node000011" title=" " alt="" coords="1237,212,1586,212,1586,217,1237,217"/>
-<area shape="poly" id="edge15_Node000002_Node000012" title=" " alt="" coords="1850,111,1941,132,1965,138,1964,143,1939,137,1849,116"/>
-<area shape="poly" id="edge17_Node000001_Node000013" title=" " alt="" coords="1739,208,2144,191,2144,196,1740,214"/>
+<area shape="rect" id="Node000001" title="Simple automaton that can detect whether a string can be transformed into another with a limited numb..." alt="" coords="1695,104,1875,132"/>
+<area shape="rect" id="Node000002" href="$structnfat.html" title=" " alt="" coords="1092,126,1198,154"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1213,135,1564,125,1697,122,1692,123,1564,130,1213,141"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="476,159,615,203"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="624,151,639,148,747,126,833,116,920,115,1031,121,1095,130,1089,131,1030,126,920,120,834,121,748,131,640,153,626,156"/>
+<area shape="rect" id="Node000007" href="$structnfat.html" title="Very simple NFA implementation Not super performant, but should be good enough for our purposes." alt="" coords="755,167,841,195"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="630,178,757,180,752,182,631,184"/>
+<area shape="rect" id="Node000004" href="$structnfat_1_1transitiont.html" title=" " alt="" coords="1966,320,2126,348"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="2003,312,1961,295,1907,274,1847,258,1786,252,796,252,743,247,689,236,599,206,599,201,691,231,743,242,797,246,1786,246,1848,253,1909,269,1963,290,2009,313"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="1410,311,1552,355"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="1567,331,1968,334,1963,334,1567,336"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="1700,390,1870,452"/>
+<area shape="poly" id="edge12_Node000010_Node000005" title=" " alt="" coords="1545,359,1589,375,1702,406,1697,406,1587,381,1544,364"/>
+<area shape="rect" id="Node000006" href="$structnfat.html" title=" " alt="" coords="1067,184,1223,212"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="1167,222,1208,264,1233,285,1261,301,1297,315,1336,324,1412,334,1407,334,1335,329,1296,320,1259,306,1230,289,1205,268,1166,227"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="1412,45,1550,90"/>
+<area shape="poly" id="edge20_Node000014_Node000006" title=" " alt="" coords="1199,176,1235,163,1421,91,1426,90,1237,167,1200,181"/>
+<area shape="poly" id="edge18_Node000002_Node000007" title=" " alt="" coords="856,172,1095,145,1089,147,857,177"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="856,196,880,201,977,207,1069,206,1064,206,977,212,879,206,856,201"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="1054,330,1236,358"/>
+<area shape="poly" id="edge8_Node000005_Node000008" title=" " alt="" coords="1251,357,1312,360,1374,357,1407,353,1412,353,1375,362,1312,365,1251,362"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="779,335,817,363"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="833,346,1057,345,1051,345,833,351"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="1069,403,1221,447"/>
+<area shape="poly" id="edge14_Node000012_Node000009" title=" " alt="" coords="832,359,880,375,978,397,1072,415,1066,415,977,403,879,381,831,365"/>
+<area shape="poly" id="edge10_Node000004_Node000010" title=" " alt="" coords="1885,393,1941,375,2011,349,2016,348,1943,381,1885,398"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="5,411,44,439"/>
+<area shape="poly" id="edge11_Node000010_Node000011" title=" " alt="" coords="59,439,133,469,178,481,224,485,1482,485,1539,482,1596,473,1697,450,1702,450,1597,478,1540,487,1483,490,223,490,177,486,132,474,57,445"/>
+<area shape="poly" id="edge15_Node000012_Node000011" title=" " alt="" coords="59,422,224,422,799,422,1071,425,1066,425,799,428,224,428,59,428"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="161,167,289,195"/>
+<area shape="poly" id="edge17_Node000013_Node000011" title=" " alt="" coords="45,398,210,193,214,197,49,401"/>
+<area shape="poly" id="edge13_Node000010_Node000012" title=" " alt="" coords="1237,422,1702,421,1697,422,1237,427"/>
+<area shape="poly" id="edge16_Node000003_Node000013" title=" " alt="" coords="304,178,478,180,474,182,305,184"/>
+<area shape="poly" id="edge21_Node000014_Node000013" title=" " alt="" coords="253,155,304,117,374,75,414,57,457,42,500,31,544,28,1146,28,1218,30,1289,36,1414,55,1409,56,1288,42,1217,35,1146,33,545,33,501,37,458,47,416,62,377,80,307,121,256,159"/>
+<area shape="poly" id="edge19_Node000001_Node000014" title=" " alt="" coords="1566,79,1700,104,1695,104,1566,84"/>
 </map>

@@ -1,7 +1,6 @@
 var classdfcc__contract__functionst =
 [
     [ "dfcc_contract_functionst", "classdfcc__contract__functionst.html#a6914408115a56f140376e4ad14edae82", null ],
-    [ "gen_spec_assigns_function", "classdfcc__contract__functionst.html#ab3628a600c8e2572985a523031997218", null ],
     [ "gen_spec_frees_function", "classdfcc__contract__functionst.html#a03cf1476b1b5be9f6e89c81653081faf", null ],
     [ "get_nof_assigns_targets", "classdfcc__contract__functionst.html#a95d49490312711c43b55e8a4c451cf8c", null ],
     [ "get_nof_frees_targets", "classdfcc__contract__functionst.html#ae7c1748aa8476faf89f89cb0da9b2f8f", null ],

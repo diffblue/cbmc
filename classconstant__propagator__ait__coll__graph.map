@@ -1,51 +1,51 @@
 <map id="constant_propagator_ait" name="constant_propagator_ait">
-<area shape="rect" id="Node000001" title=" " alt="" coords="2293,322,2473,347"/>
-<area shape="rect" id="Node000002" href="$classait.html" title=" " alt="" coords="2023,279,2211,319"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="2224,310,2293,320,2293,325,2224,316"/>
-<area shape="rect" id="Node000003" href="$classai__recursive__interproceduralt.html" title=" " alt="" coords="1333,205,1545,230"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1559,208,1655,208,1766,212,1884,223,1999,244,2042,258,2080,276,2078,281,2040,263,1998,249,1883,228,1766,217,1655,213,1559,214"/>
-<area shape="rect" id="Node000017" href="$classait.html" title="ait supplies three of the four components needed: an abstract interpreter (in this case handling func..." alt="" coords="1687,262,1813,287"/>
-<area shape="poly" id="edge21_Node000017_Node000003" title=" " alt="" coords="1523,230,1687,260,1686,266,1522,235"/>
-<area shape="rect" id="Node000004" href="$classai__baset.html" title="This is the basic interface of the abstract interpreter with default implementations of the core func..." alt="" coords="1173,205,1251,230"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="1264,215,1333,215,1333,220,1264,220"/>
-<area shape="rect" id="Node000005" title=" " alt="" coords="818,65,1003,105"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="1017,104,1085,125,1151,156,1180,179,1202,202,1198,206,1177,183,1148,161,1083,130,1016,109"/>
-<area shape="rect" id="Node000006" href="$classai__history__factory__baset.html" title="As more detailed histories can get complex (for example, nested loops or deep, mutually recursive cal..." alt="" coords="460,5,599,45"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="612,29,699,38,792,52,840,63,838,68,792,57,699,43,612,34"/>
-<area shape="rect" id="Node000007" title=" " alt="" coords="451,141,608,166"/>
-<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="584,134,646,119,734,103,817,92,818,98,735,109,647,124,585,139"/>
-<area shape="rect" id="Node000009" title=" " alt="" coords="816,140,1005,180"/>
-<area shape="poly" id="edge10_Node000009_Node000007" title=" " alt="" coords="622,152,816,156,816,161,622,158"/>
-<area shape="rect" id="Node000011" title=" " alt="" coords="837,204,984,244"/>
-<area shape="poly" id="edge13_Node000011_Node000007" title=" " alt="" coords="600,166,647,176,838,210,837,215,646,181,599,172"/>
-<area shape="rect" id="Node000008" title=" " alt="" coords="5,179,44,205"/>
-<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="57,182,68,180,171,168,275,160,450,152,450,157,275,165,171,173,68,185,58,187"/>
-<area shape="rect" id="Node000015" title=" " alt="" coords="157,226,287,251"/>
-<area shape="poly" id="edge17_Node000015_Node000008" title=" " alt="" coords="58,197,168,223,167,229,57,202"/>
-<area shape="poly" id="edge8_Node000004_Node000009" title=" " alt="" coords="1020,173,1150,197,1174,203,1173,209,1149,203,1019,178"/>
-<area shape="rect" id="Node000010" href="$classai__domain__factory__baset.html" title=" " alt="" coords="436,219,623,245"/>
-<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="603,244,648,248,696,248,745,240,791,223,798,216,802,208,806,199,814,190,835,178,838,182,818,194,811,202,807,211,803,220,793,228,746,245,697,253,647,253,603,249"/>
-<area shape="poly" id="edge11_Node000004_Node000011" title=" " alt="" coords="998,219,1173,216,1173,221,998,225"/>
-<area shape="rect" id="Node000012" href="$classai__storage__baset.html" title="This is the basic interface for storing domains." alt="" coords="463,269,596,294"/>
-<area shape="poly" id="edge12_Node000011_Node000012" title=" " alt="" coords="610,287,698,289,745,285,791,277,837,262,876,242,879,246,839,267,793,283,746,290,698,294,610,292"/>
-<area shape="rect" id="Node000013" href="$classmessage__handlert.html" title=" " alt="" coords="839,307,982,333"/>
-<area shape="poly" id="edge14_Node000004_Node000013" title=" " alt="" coords="965,301,1148,239,1178,228,1180,233,1150,244,966,306"/>
-<area shape="rect" id="Node000016" href="$classnull__message__handlert.html" title=" " alt="" coords="1353,307,1526,333"/>
-<area shape="poly" id="edge19_Node000016_Node000013" title=" " alt="" coords="996,317,1352,317,1352,323,996,323"/>
-<area shape="rect" id="Node000014" title=" " alt="" coords="436,318,623,343"/>
-<area shape="poly" id="edge15_Node000013_Node000014" title=" " alt="" coords="637,326,792,323,839,321,839,326,792,328,637,332"/>
-<area shape="poly" id="edge16_Node000014_Node000015" title=" " alt="" coords="276,253,437,303,481,315,480,321,435,308,275,258"/>
-<area shape="poly" id="edge18_Node000002_Node000016" title=" " alt="" coords="1540,316,1821,311,2022,301,2022,307,1821,316,1540,322"/>
-<area shape="poly" id="edge22_Node000017_Node000016" title=" " alt="" coords="1539,303,1686,281,1687,286,1540,308"/>
-<area shape="poly" id="edge20_Node000002_Node000017" title=" " alt="" coords="1827,277,2023,290,2022,295,1827,282"/>
-<area shape="rect" id="Node000018" href="$classdirtyt.html" title="Dirty variables are ones which have their address taken so we can&#39;t reliably work out where they may ..." alt="" coords="2088,350,2145,375"/>
-<area shape="poly" id="edge23_Node000001_Node000018" title=" " alt="" coords="2159,356,2293,341,2293,347,2160,361"/>
-<area shape="rect" id="Node000019" title=" " alt="" coords="1679,375,1821,415"/>
-<area shape="poly" id="edge24_Node000018_Node000019" title=" " alt="" coords="1835,385,2088,362,2088,368,1835,390"/>
-<area shape="rect" id="Node000020" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="1403,369,1475,394"/>
-<area shape="poly" id="edge25_Node000019_Node000020" title=" " alt="" coords="1489,381,1679,389,1679,394,1489,386"/>
-<area shape="rect" id="Node000021" title=" " alt="" coords="1348,418,1531,443"/>
-<area shape="poly" id="edge26_Node000019_Node000021" title=" " alt="" coords="1544,419,1654,407,1678,403,1679,409,1655,412,1545,424"/>
-<area shape="rect" id="Node000022" title=" " alt="" coords="1193,418,1231,443"/>
-<area shape="poly" id="edge27_Node000021_Node000022" title=" " alt="" coords="1245,428,1348,428,1348,433,1245,433"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="2314,395,2493,423"/>
+<area shape="rect" id="Node000002" href="$classait.html" title=" " alt="" coords="2041,347,2228,391"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="2244,383,2316,396,2311,396,2244,388"/>
+<area shape="rect" id="Node000003" href="$classai__recursive__interproceduralt.html" title=" " alt="" coords="1346,267,1557,295"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1573,264,1671,258,1783,259,1902,270,1961,280,2018,294,2066,317,2108,347,2103,345,2064,321,2016,300,1959,285,1901,275,1783,264,1671,264,1574,269"/>
+<area shape="rect" id="Node000017" href="$classait.html" title="ait supplies three of the four components needed: an abstract interpreter (in this case handling func..." alt="" coords="1702,324,1827,352"/>
+<area shape="poly" id="edge21_Node000017_Node000003" title=" " alt="" coords="1546,295,1704,327,1699,327,1546,301"/>
+<area shape="rect" id="Node000004" href="$classai__baset.html" title="This is the basic interface of the abstract interpreter with default implementations of the core func..." alt="" coords="1184,267,1260,295"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="1275,278,1348,281,1343,281,1276,284"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="826,84,1011,129"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="1025,129,1096,156,1130,174,1161,195,1194,230,1216,267,1211,266,1190,234,1158,199,1127,178,1093,161,1025,134"/>
+<area shape="rect" id="Node000006" href="$classai__history__factory__baset.html" title="As more detailed histories can get complex (for example, nested loops or deep, mutually recursive cal..." alt="" coords="465,5,603,50"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="619,28,708,37,801,54,874,83,869,84,800,60,707,42,620,33"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="456,199,612,227"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="574,189,651,157,740,133,829,118,824,120,741,138,652,162,577,194"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="824,196,1013,241"/>
+<area shape="poly" id="edge10_Node000009_Node000007" title=" " alt="" coords="628,210,800,212,827,214,822,215,800,217,628,215"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="846,265,991,310"/>
+<area shape="poly" id="edge13_Node000011_Node000007" title=" " alt="" coords="598,229,652,242,848,276,843,278,651,247,599,234"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="5,272,44,300"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="57,274,67,272,172,253,277,237,458,218,454,221,278,242,173,258,68,277,61,278"/>
+<area shape="rect" id="Node000015" title=" " alt="" coords="161,316,289,344"/>
+<area shape="poly" id="edge17_Node000015_Node000008" title=" " alt="" coords="57,295,68,297,162,318,158,321,67,302,60,299"/>
+<area shape="poly" id="edge8_Node000004_Node000009" title=" " alt="" coords="1028,223,1094,233,1161,249,1198,267,1193,266,1159,254,1093,239,1028,229"/>
+<area shape="rect" id="Node000010" href="$classai__domain__factory__baset.html" title=" " alt="" coords="442,283,627,311"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="642,307,735,311,773,307,799,298,808,289,811,277,814,264,822,251,839,242,843,240,826,255,818,266,816,279,813,291,802,303,774,312,735,316,643,313"/>
+<area shape="poly" id="edge11_Node000004_Node000011" title=" " alt="" coords="1007,283,1186,281,1181,282,1007,288"/>
+<area shape="rect" id="Node000012" href="$classai__storage__baset.html" title="This is the basic interface for storing domains." alt="" coords="468,339,600,367"/>
+<area shape="poly" id="edge12_Node000011_Node000012" title=" " alt="" coords="616,360,705,362,753,358,800,349,845,331,883,311,888,309,847,336,801,354,754,363,706,367,616,365"/>
+<area shape="rect" id="Node000013" href="$classmessage__handlert.html" title=" " alt="" coords="848,384,989,412"/>
+<area shape="poly" id="edge14_Node000004_Node000013" title=" " alt="" coords="984,377,1068,349,1159,313,1195,296,1200,295,1161,318,1070,354,985,382"/>
+<area shape="rect" id="Node000016" href="$classnull__message__handlert.html" title=" " alt="" coords="1366,384,1538,412"/>
+<area shape="poly" id="edge19_Node000016_Node000013" title=" " alt="" coords="1005,396,1368,398,1362,399,1005,401"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="441,392,627,420"/>
+<area shape="poly" id="edge15_Node000013_Node000014" title=" " alt="" coords="643,405,651,405,800,405,850,404,845,405,800,410,651,410,643,410"/>
+<area shape="poly" id="edge16_Node000014_Node000015" title=" " alt="" coords="299,346,477,391,472,393,299,351"/>
+<area shape="poly" id="edge18_Node000002_Node000016" title=" " alt="" coords="1553,394,1836,386,2043,376,2038,376,1836,391,1553,400"/>
+<area shape="poly" id="edge22_Node000017_Node000016" title=" " alt="" coords="1542,378,1699,351,1704,350,1543,384"/>
+<area shape="poly" id="edge20_Node000002_Node000017" title=" " alt="" coords="1843,342,2043,361,2038,361,1843,347"/>
+<area shape="rect" id="Node000018" href="$classdirtyt.html" title="Dirty variables are ones which have their address taken so we can&#39;t reliably work out where they may ..." alt="" coords="2106,424,2163,452"/>
+<area shape="poly" id="edge23_Node000001_Node000018" title=" " alt="" coords="2178,433,2290,423,2311,423,2316,423,2290,429,2178,438"/>
+<area shape="rect" id="Node000019" title=" " alt="" coords="1693,449,1836,494"/>
+<area shape="poly" id="edge24_Node000018_Node000019" title=" " alt="" coords="1851,461,2103,441,2108,441,1851,467"/>
+<area shape="rect" id="Node000020" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="1416,447,1487,475"/>
+<area shape="poly" id="edge25_Node000019_Node000020" title=" " alt="" coords="1503,460,1696,469,1691,469,1503,465"/>
+<area shape="rect" id="Node000021" title=" " alt="" coords="1361,503,1542,531"/>
+<area shape="poly" id="edge26_Node000019_Node000021" title=" " alt="" coords="1558,509,1669,495,1690,493,1696,493,1670,501,1558,514"/>
+<area shape="rect" id="Node000022" title=" " alt="" coords="1203,503,1241,531"/>
+<area shape="poly" id="edge27_Node000021_Node000022" title=" " alt="" coords="1257,514,1363,517,1358,517,1257,520"/>
 </map>

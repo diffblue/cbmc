@@ -358,8 +358,6 @@ make reads from specific variables non-deterministic
 (<strong>--nondet-volatile-variable</strong>), or (3) model reads from
 specific variables by given models
 (<strong>--nondet-volatile-model</strong>).</p>
-</dd>
-</dl>
 <p>Below we give two usage examples for the options. Consider the
 following test, for function <em>get_celsius</em> and with harness
 <em>test_get_celsius</em>:</p>
@@ -397,15 +395,13 @@ goto-instrument --nondet-volatile-variable temperature \
 cbmc --function test_get_celsius get_celsius_test-mod.gb</code></pre>
 <p>Here the final invocation of <strong>cbmc</strong>(1) correctly
 reports a verification failure.</p>
-<dl>
+</dd>
 <dt><strong>--nondet-volatile-model</strong>
 <em>variable</em>:<em>model</em></dt>
 <dd>
 <p>Simply treating volatile variables as non-deterministic may for some
 use cases be too inaccurate. Consider the following test, for function
 <em>get_message</em> and with harness <em>test_get_message</em>:</p>
-</dd>
-</dl>
 <pre><code>#include &lt;assert.h&gt;
 #include &lt;stdint.h&gt;
 
@@ -454,7 +450,7 @@ goto-instrument --nondet-volatile-model clock:clock_read_model \
 cbmc --function get_message_test get_message_test-mod.gb</code></pre>
 <p>Now the final invocation of <strong>cbmc</strong>(1) reports
 verification success.</p>
-<dl>
+</dd>
 <dt><strong>--isr</strong> <em>function</em></dt>
 <dd>
 <p>instruments an interrupt service routine</p>
@@ -532,8 +528,6 @@ pointer-to-non-constant parameters matching the regular expression
 and then (in case of non-void function) returning as with
 <strong>nondet-return</strong>. The following example demonstrates the
 use:</p>
-</dd>
-</dl>
 <pre><code>// main.c
 int global;
 const int c_global;
@@ -562,7 +556,7 @@ first, fourth, and fifth parameter.</p>
 parameter number associated with a non-pointer parameter. Requesting to
 havoc a parameter with a number higher than the number of parameters a
 given function takes will also results in an error report.</p>
-<dl>
+</dd>
 <dt><strong>--generate-havocing-body</strong> <em>option</em>
 <em>fun_name</em>,<strong>params:</strong><em>p_n1</em>;<em>p_n2</em>;..<br />
 <strong>--generate-havocing-body</strong> <em>option</em>
@@ -572,8 +566,6 @@ given function takes will also results in an error report.</p>
 single function. The option <strong>--generate-havocing-body</strong>
 inserts new functions for selected call-sites and replaces the calls to
 the origin function with calls to the respective new functions.</p>
-</dd>
-</dl>
 <pre><code>// main.c
 int function(int *first, int *second, int *third);
 
@@ -605,7 +597,7 @@ int main() {
   function_1(&amp;a, &amp;b, &amp;c);
   function_2(&amp;a, &amp;b, &amp;c);
 }</code></pre>
-<dl>
+</dd>
 <dt><strong>--restrict-function-pointer</strong></dt>
 <dd>
 <p><em>pointer_name</em>/<em>target</em>[,<em>targets</em>]* Replace
@@ -616,8 +608,6 @@ of direct calls. Consider the example presented for
 will always receive pointers to either <em>f</em> or <em>g</em> during
 actual executions of the program, and symbolic execution for <em>h</em>
 is too expensive to simply ignore the cost of its branch.</p>
-</dd>
-</dl>
 <p>To facilitate the controlled replace, we will label the places in
 each function where function pointers are being called, to this
 pattern:</p>
@@ -694,7 +684,7 @@ recursion until its unwind limit.</p>
 which we know it will have:</p>
 <pre><code>goto-instrument --restrict-function-pointer \
   fs_open.function_pointer_call.1/nullfs_open in.gb out.gb</code></pre>
-<dl>
+</dd>
 <dt><strong>--function-pointer-restrictions-file</strong>
 <em>file_name</em></dt>
 <dd>
@@ -703,8 +693,6 @@ it'd be a nuisance to have to specify them all on the command line. In
 these cases, you can specify a file to load the restrictions from
 instead, which you can give the name of a JSON file with this
 format:</p>
-</dd>
-</dl>
 <pre><code>{
   &quot;function_call_site_name&quot;: [&quot;function1&quot;, &quot;function2&quot;, ...],
    ...
@@ -718,7 +706,7 @@ symbol table that have the correct type), the error message will refer
 to the command line option <strong>--restrict-function-pointer</strong>
 regardless of whether the restriction in question came from the command
 line or a file.</p>
-<dl>
+</dd>
 <dt><strong>--restrict-function-pointer-by-name</strong>
 <em>symbol_name</em>/<em>target</em>[,<em>targets</em>]*</dt>
 <dd>
@@ -768,8 +756,6 @@ unmangled name, before labeling function pointers.</p>
 <em>argv</em> and set <em>argc</em> accordingly. In absence of such
 modelling, <em>argv</em> is left uninitialized except for a terminating
 <strong>NULL</strong> pointer. Consider the following example:</p>
-</dd>
-</dl>
 <pre><code>// needs_argv.c
 #include &lt;assert.h&gt;
 
@@ -785,7 +771,7 @@ make the assertion succeed, as expected, use:</p>
 <pre><code>goto-cc needs_argv.c
 goto-instrument --model-argc-argv 2 a.out a.out
 cbmc a.out</code></pre>
-<dl>
+</dd>
 <dt><strong>--remove-function-body</strong> <em>f</em></dt>
 <dd>
 <p>remove the implementation of function <em>f</em> (may be
@@ -859,8 +845,6 @@ Candidate functions are chosen based on their signature and whether or
 not they have their address taken somewhere in the program The following
 example illustrates the approach taken. Given that there are functions
 with these signatures available in the program:</p>
-</dd>
-</dl>
 <pre><code>int f(int x);
 int g(int x);
 int h(int x);</code></pre>
@@ -892,7 +876,7 @@ signature, and some of them may be costly to a subsequently run
 analysis. Consider using <strong>--restrict-function-pointer</strong> to
 manually specify this set of functions, or
 <strong>--value-set-fi-fp-removal</strong>.</p>
-<dl>
+</dd>
 <dt><strong>--remove-const-function-pointers</strong></dt>
 <dd>
 <p>remove function pointers that are constant or constant part of an
@@ -1112,9 +1096,9 @@ start function and the function containing the property(s)</p>
 </dd>
 <dt><strong>--aggressive-slice-call-depth</strong> <em>n</em></dt>
 <dd>
-<p>used with <strong>--aggressive-slice, preserves all functions within
-</strong><em>n</em> function calls of the functions on the shortest
-path</p>
+<p>used with <strong>--aggressive-slice, preserves all functions
+within</strong> <em>n</em> function calls of the functions on the
+shortest path</p>
 </dd>
 <dt><strong>--aggressive-slice-preserve-function</strong>
 <em>f</em></dt>
@@ -1136,8 +1120,7 @@ containing <em>f</em></p>
 <dl>
 <dt><strong>--apply-loop-contracts</strong></dt>
 <dd>
-
-</dd>
+<dl>
 <dt><strong>-disable-loop-contracts-side-effect-check</strong></dt>
 <dd>
 <p>UNSOUND OPTION. Disable checking the absence of side effects in loop
@@ -1171,6 +1154,8 @@ recursive calls</p>
 <dd>
 <p>instrument dynamic frame condition checks method using <em>fun</em>
 as entry point</p>
+</dd>
+</dl>
 </dd>
 </dl>
 <h2>User-interface options:</h2>

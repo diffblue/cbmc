@@ -1,22 +1,21 @@
 <map id="function_cfg_infot" name="function_cfg_infot">
-<area shape="rect" id="Node000001" title=" " alt="" coords="107,372,246,397"/>
-<area shape="rect" id="Node000002" href="$classcfg__infot.html" title="Stores information about a goto function computed from its CFG." alt="" coords="5,284,84,309"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="72,316,115,346,156,370,154,374,113,350,69,320"/>
-<area shape="rect" id="Node000003" href="$classdirtyt.html" title="Dirty variables are ones which have their address taken so we can&#39;t reliably work out where they may ..." alt="" coords="237,284,295,309"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="246,321,191,373,187,370,242,317"/>
-<area shape="rect" id="Node000004" title=" " alt="" coords="93,181,236,221"/>
-<area shape="poly" id="edge11_Node000001_Node000004" title=" " alt="" coords="156,235,148,271,149,309,159,343,173,371,168,373,155,345,143,310,143,270,150,234"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="197,229,255,282,251,286,194,233"/>
-<area shape="rect" id="Node000005" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="121,93,193,119"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="135,131,128,143,129,157,144,180,140,183,123,158,123,142,130,128"/>
-<area shape="rect" id="Node000009" title=" " alt="" coords="280,181,423,221"/>
-<area shape="poly" id="edge9_Node000009_Node000005" title=" " alt="" coords="169,130,178,144,189,155,226,171,280,184,279,189,224,176,186,160,174,147,165,133"/>
-<area shape="rect" id="Node000006" title=" " alt="" coords="248,93,431,119"/>
-<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="296,126,254,145,192,183,189,179,251,140,294,121"/>
-<area shape="poly" id="edge10_Node000009_Node000006" title=" " alt="" coords="345,132,352,181,346,181,340,133"/>
-<area shape="rect" id="Node000007" title=" " alt="" coords="320,5,359,31"/>
-<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="342,45,342,93,337,93,337,45"/>
-<area shape="rect" id="Node000008" href="$classlocalst.html" title=" " alt="" coords="319,284,384,309"/>
-<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="330,321,286,350,224,374,222,369,283,346,327,316"/>
-<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="354,235,354,284,349,284,349,235"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="106,425,244,453"/>
+<area shape="rect" id="Node000002" href="$classcfg__infot.html" title="Stores information about a goto function computed from its CFG." alt="" coords="5,324,84,352"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="69,361,114,399,153,424,147,425,111,403,67,366"/>
+<area shape="rect" id="Node000003" href="$classdirtyt.html" title="Dirty variables are ones which have their address taken so we can&#39;t reliably work out where they may ..." alt="" coords="238,324,294,352"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="246,362,189,426,186,422,241,364"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="101,207,244,251"/>
+<area shape="poly" id="edge10_Node000001_Node000004" title=" " alt="" coords="157,263,146,307,144,330,145,352,157,391,171,425,166,424,152,393,140,352,139,329,141,306,154,268"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="202,261,257,324,252,324,201,266"/>
+<area shape="rect" id="Node000005" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="126,106,198,134"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="163,147,166,182,170,207,165,206,161,183,161,152"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="240,106,422,134"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="276,142,246,160,217,184,192,208,188,205,213,180,243,155,280,138"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="279,207,421,251"/>
+<area shape="poly" id="edge9_Node000009_Node000006" title=" " alt="" coords="337,146,349,207,343,205,335,151"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="312,5,350,33"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="332,46,334,106,329,105,330,51"/>
+<area shape="rect" id="Node000008" href="$classlocalst.html" title=" " alt="" coords="318,324,382,352"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="334,363,316,386,294,403,267,417,239,427,237,422,265,412,291,399,312,382,330,366"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="352,265,352,325,347,323,348,269"/>
 </map>

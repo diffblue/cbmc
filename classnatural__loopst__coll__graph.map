@@ -1,68 +1,52 @@
 <map id="natural_loopst" name="natural_loopst">
-<area shape="rect" id="Node000001" title="A concretized version of natural_loops_templatet&lt;const goto_programt, goto_programt::const_targett&gt;" alt="" coords="3364,207,3479,232"/>
-<area shape="rect" id="Node000002" href="$classnatural__loops__templatet.html" title=" " alt="" coords="3061,185,3315,254"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="3328,217,3364,217,3364,222,3328,222"/>
-<area shape="rect" id="Node000003" href="$classloop__analysist.html" title=" " alt="" coords="2479,95,2649,120"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="2663,106,2839,118,2940,132,3038,153,3079,166,3119,182,3117,187,3077,171,3037,158,2939,137,2839,124,2663,111"/>
-<area shape="rect" id="Node000004" title=" " alt="" coords="1843,80,2018,105"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="2032,92,2478,103,2478,108,2032,98"/>
-<area shape="rect" id="Node000034" href="$classloop__analysist.html" title=" " alt="" coords="2259,147,2430,172"/>
-<area shape="poly" id="edge35_Node000034_Node000004" title=" " alt="" coords="1974,108,2012,122,2053,134,2160,150,2259,156,2259,162,2159,155,2051,139,2010,128,1972,113"/>
-<area shape="rect" id="Node000005" title=" " alt="" coords="941,84,980,109"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="994,94,1843,90,1843,96,994,99"/>
-<area shape="rect" id="Node000007" title=" " alt="" coords="1163,117,1288,143"/>
-<area shape="poly" id="edge7_Node000007_Node000005" title=" " alt="" coords="994,100,1060,110,1163,122,1162,127,1060,115,993,105"/>
-<area shape="rect" id="Node000010" title=" " alt="" coords="1158,5,1293,31"/>
-<area shape="poly" id="edge12_Node000010_Node000005" title=" " alt="" coords="992,84,1059,62,1177,28,1178,33,1061,67,994,89"/>
-<area shape="rect" id="Node000035" href="$classcfg__dominators__templatet.html" title=" " alt="" coords="2247,211,2442,251"/>
-<area shape="poly" id="edge38_Node000035_Node000005" title=" " alt="" coords="994,111,1038,132,1094,155,1158,172,1224,179,1932,179,2016,182,2100,190,2248,211,2247,216,2099,195,2015,188,1932,185,1224,185,1157,177,1093,160,1036,137,991,116"/>
-<area shape="rect" id="Node000006" href="$classloop__templatet.html" title="A loop, specified as a set of instructions." alt="" coords="1533,117,1709,143"/>
-<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="1722,119,1809,110,1858,103,1859,108,1810,115,1723,125"/>
-<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="1302,127,1533,127,1533,133,1302,133"/>
-<area shape="rect" id="Node000008" title=" " alt="" coords="906,152,1015,177"/>
-<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="1029,153,1162,135,1163,141,1029,158"/>
-<area shape="rect" id="Node000009" title=" " alt="" coords="675,41,714,67"/>
-<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="727,64,930,149,928,154,725,69"/>
-<area shape="poly" id="edge11_Node000010_Node000009" title=" " alt="" coords="728,49,1060,25,1158,19,1158,24,1060,30,728,54"/>
-<area shape="poly" id="edge10_Node000004_Node000010" title=" " alt="" coords="1306,16,1533,27,1672,39,1810,58,1890,77,1889,83,1809,63,1671,45,1533,32,1306,22"/>
-<area shape="rect" id="Node000011" href="$classcfg__dominators__templatet.html" title=" " alt="" coords="2235,331,2455,401"/>
-<area shape="poly" id="edge13_Node000002_Node000011" title=" " alt="" coords="2468,342,3061,239,3061,244,2469,347"/>
-<area shape="rect" id="Node000012" href="$classprocedure__local__cfg__baset.html" title=" " alt="" coords="1521,413,1720,482"/>
-<area shape="poly" id="edge14_Node000011_Node000012" title=" " alt="" coords="1734,447,1874,444,2028,433,2119,417,2210,395,2234,390,2235,395,2211,401,2120,422,2028,438,1875,449,1734,452"/>
-<area shape="rect" id="Node000013" href="$classcfg__baset.html" title="A multi&#45;procedural control flow graph (CFG) whose nodes store references to instructions in a GOTO pr..." alt="" coords="885,439,1036,464"/>
-<area shape="poly" id="edge15_Node000012_Node000013" title=" " alt="" coords="1050,448,1521,445,1521,451,1050,453"/>
-<area shape="rect" id="Node000014" href="$classgrapht.html" title="A generic directed graph with a parametric node type." alt="" coords="643,429,747,455"/>
-<area shape="poly" id="edge16_Node000013_Node000014" title=" " alt="" coords="761,451,787,454,885,455,885,460,787,459,760,456"/>
-<area shape="rect" id="Node000029" href="$classcfg__baset.html" title="A multi&#45;procedural control flow graph (CFG) whose nodes store references to instructions in a GOTO pr..." alt="" coords="885,363,1036,388"/>
-<area shape="poly" id="edge24_Node000029_Node000014" title=" " alt="" coords="760,437,810,432,861,421,902,404,938,386,940,390,905,409,862,426,811,437,760,443"/>
-<area shape="rect" id="Node000032" href="$classcfg__baset.html" title="A multi&#45;procedural control flow graph (CFG) whose nodes store references to instructions in a GOTO pr..." alt="" coords="885,285,1036,311"/>
-<area shape="poly" id="edge30_Node000032_Node000014" title=" " alt="" coords="723,419,785,380,931,308,934,313,788,384,726,424"/>
-<area shape="rect" id="Node000015" title=" " alt="" coords="5,408,164,433"/>
-<area shape="poly" id="edge17_Node000014_Node000015" title=" " alt="" coords="178,423,256,426,642,438,642,443,256,431,178,428"/>
-<area shape="rect" id="Node000026" href="$classgrapht.html" title=" " alt="" coords="294,254,475,294"/>
-<area shape="poly" id="edge21_Node000026_Node000015" title=" " alt="" coords="110,397,173,350,213,325,255,304,293,290,295,295,257,308,216,330,176,355,113,401"/>
-<area shape="rect" id="Node000017" href="$classcfg__baset_1_1entry__mapt.html" title=" " alt="" coords="627,299,763,339"/>
-<area shape="poly" id="edge18_Node000013_Node000017" title=" " alt="" coords="740,344,788,372,863,408,929,436,927,441,861,413,785,376,737,349"/>
-<area shape="poly" id="edge25_Node000029_Node000017" title=" " alt="" coords="776,334,900,360,899,365,775,339"/>
-<area shape="poly" id="edge31_Node000032_Node000017" title=" " alt="" coords="776,302,786,301,885,295,885,301,787,306,776,307"/>
-<area shape="rect" id="Node000018" href="$classdense__integer__mapt.html" title=" " alt="" coords="256,319,513,403"/>
-<area shape="poly" id="edge19_Node000017_Node000018" title=" " alt="" coords="527,347,602,337,626,332,627,338,603,342,527,352"/>
-<area shape="poly" id="edge20_Node000017_Node000026" title=" " alt="" coords="489,287,627,307,626,312,489,292"/>
-<area shape="rect" id="Node000028" href="$classprocedure__local__cfg__baset.html" title=" " alt="" coords="1149,355,1301,395"/>
-<area shape="poly" id="edge22_Node000012_Node000028" title=" " alt="" coords="1299,397,1326,403,1426,422,1522,435,1521,440,1426,427,1325,409,1298,402"/>
-<area shape="rect" id="Node000031" href="$classprocedure__local__cfg__baset.html" title=" " alt="" coords="1539,279,1703,319"/>
-<area shape="poly" id="edge32_Node000031_Node000028" title=" " alt="" coords="1315,360,1497,329,1547,317,1548,322,1498,334,1316,366"/>
-<area shape="poly" id="edge23_Node000028_Node000029" title=" " alt="" coords="1050,373,1149,373,1149,378,1050,378"/>
-<area shape="rect" id="Node000022" title=" " alt="" coords="1855,369,2006,409"/>
-<area shape="poly" id="edge26_Node000011_Node000022" title=" " alt="" coords="2020,389,2112,389,2210,385,2234,382,2235,388,2211,390,2112,395,2020,394"/>
-<area shape="rect" id="Node000030" href="$classcfg__dominators__templatet.html" title="Dominator graph." alt="" coords="1833,282,2028,322"/>
-<area shape="poly" id="edge27_Node000011_Node000030" title=" " alt="" coords="1997,324,2053,339,2145,353,2235,361,2234,366,2145,359,2051,345,1995,329"/>
-<area shape="poly" id="edge39_Node000035_Node000030" title=" " alt="" coords="2042,289,2125,279,2210,265,2276,249,2277,254,2211,270,2125,284,2042,295"/>
-<area shape="poly" id="edge28_Node000030_Node000031" title=" " alt="" coords="1716,297,1833,299,1833,304,1716,303"/>
-<area shape="poly" id="edge37_Node000035_Node000031" title=" " alt="" coords="1716,282,1744,278,1880,262,2017,249,2247,233,2247,239,2017,254,1881,267,1744,283,1717,287"/>
-<area shape="poly" id="edge29_Node000031_Node000032" title=" " alt="" coords="1050,296,1538,297,1538,302,1050,301"/>
-<area shape="rect" id="Node000033" href="$classnatural__loops__templatet.html" title="Main driver for working out if a class (normally goto_programt) has any natural loops." alt="" coords="2673,199,2855,239"/>
-<area shape="poly" id="edge33_Node000002_Node000033" title=" " alt="" coords="2868,217,3061,217,3061,222,2868,222"/>
-<area shape="poly" id="edge34_Node000033_Node000034" title=" " alt="" coords="2444,171,2673,204,2673,209,2443,176"/>
-<area shape="poly" id="edge36_Node000033_Node000035" title=" " alt="" coords="2456,226,2673,219,2673,225,2456,231"/>
+<area shape="rect" id="Node000001" title="A concretized version of natural_loops_templatet&lt;const goto_programt, goto_programt::const_targett&gt;." alt="" coords="2924,165,3038,192"/>
+<area shape="rect" id="Node000002" href="$classnatural__loops__templatet.html" title=" " alt="" coords="2622,139,2875,218"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="2890,176,2926,178,2921,179,2891,181"/>
+<area shape="rect" id="Node000003" href="$classloop__analysist.html" title=" " alt="" coords="2151,238,2403,300"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="2418,240,2619,203,2624,203,2419,245"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="1692,298,1882,377"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="1897,326,2008,314,2127,298,2148,297,2153,297,2127,304,2009,320,1898,331"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="1242,380,1480,425"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="1496,394,1580,386,1666,373,1689,370,1694,369,1667,378,1581,392,1496,400"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="904,389,1011,416"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="1027,400,1244,403,1239,403,1027,405"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="626,361,664,388"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="679,383,745,398,828,404,906,406,901,406,828,409,744,404,679,388"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="891,298,1024,326"/>
+<area shape="poly" id="edge9_Node000008_Node000007" title=" " alt="" coords="679,366,851,332,888,327,893,326,852,337,680,371"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="1040,312,1695,334,1690,335,1040,317"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="1274,210,1448,238"/>
+<area shape="poly" id="edge12_Node000011_Node000008" title=" " alt="" coords="1039,292,1291,239,1297,238,1040,297"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="626,277,664,304"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="680,290,893,307,887,308,680,296"/>
+<area shape="rect" id="Node000010" href="$classloop__analysist.html" title=" " alt="" coords="1702,246,1872,274"/>
+<area shape="poly" id="edge10_Node000003_Node000010" title=" " alt="" coords="1887,265,1908,266,2153,271,2148,271,1908,271,1887,270"/>
+<area shape="poly" id="edge11_Node000010_Node000011" title=" " alt="" coords="1460,238,1505,244,1607,251,1704,258,1699,258,1607,257,1504,249,1460,243"/>
+<area shape="rect" id="Node000031" href="$classloop__analysist.html" title=" " alt="" coords="1702,186,1872,214"/>
+<area shape="poly" id="edge25_Node000031_Node000011" title=" " alt="" coords="1464,216,1704,204,1699,205,1464,221"/>
+<area shape="rect" id="Node000012" href="$classcfg__dominators__templatet.html" title=" " alt="" coords="1908,22,2127,101"/>
+<area shape="poly" id="edge13_Node000002_Node000012" title=" " alt="" coords="2142,45,2243,39,2358,41,2480,53,2541,64,2599,80,2654,105,2703,140,2698,138,2652,110,2597,85,2540,70,2480,58,2358,46,2243,45,2143,50"/>
+<area shape="rect" id="Node000013" href="$classcfg__dominators__templatet.html" title="Dominator graph." alt="" coords="1264,64,1458,109"/>
+<area shape="poly" id="edge14_Node000012_Node000013" title=" " alt="" coords="1473,80,1910,65,1905,66,1474,85"/>
+<area shape="rect" id="Node000032" href="$classcfg__dominators__templatet.html" title=" " alt="" coords="1690,114,1884,158"/>
+<area shape="poly" id="edge28_Node000032_Node000013" title=" " alt="" coords="1473,106,1505,110,1692,130,1687,131,1504,116,1473,111"/>
+<area shape="rect" id="Node000014" href="$classprocedure__local__cfg__baset.html" title=" " alt="" coords="876,108,1039,153"/>
+<area shape="poly" id="edge15_Node000013_Node000014" title=" " alt="" coords="1054,117,1267,97,1261,98,1055,123"/>
+<area shape="poly" id="edge27_Node000032_Node000014" title=" " alt="" coords="1054,135,1242,144,1484,144,1693,140,1687,141,1484,149,1242,149,1054,140"/>
+<area shape="rect" id="Node000015" href="$classcfg__baset.html" title="A multi&#45;procedural control flow graph (CFG) whose nodes store references to instructions in a GOTO pr..." alt="" coords="346,89,496,116"/>
+<area shape="poly" id="edge16_Node000014_Node000015" title=" " alt="" coords="512,103,852,120,878,124,872,125,852,125,512,109"/>
+<area shape="rect" id="Node000016" href="$classgrapht.html" title=" " alt="" coords="5,53,197,115"/>
+<area shape="poly" id="edge17_Node000015_Node000016" title=" " alt="" coords="211,82,299,85,348,91,343,94,298,91,213,87"/>
+<area shape="rect" id="Node000028" href="$classcfg__baset.html" title=" " alt="" coords="323,141,520,203"/>
+<area shape="poly" id="edge21_Node000028_Node000016" title=" " alt="" coords="173,119,221,137,272,150,325,161,320,163,271,155,220,142,174,124"/>
+<area shape="rect" id="Node000020" href="$classcfg__baset_1_1entry__mapt.html" title=" " alt="" coords="33,154,169,198"/>
+<area shape="poly" id="edge18_Node000015_Node000020" title=" " alt="" coords="183,155,359,115,356,119,185,159"/>
+<area shape="poly" id="edge22_Node000028_Node000020" title=" " alt="" coords="183,194,221,200,260,203,298,200,325,197,320,200,299,205,260,208,220,205,184,199"/>
+<area shape="rect" id="Node000027" href="$classprocedure__local__cfg__baset.html" title=" " alt="" coords="569,144,721,189"/>
+<area shape="poly" id="edge19_Node000014_Node000027" title=" " alt="" coords="736,157,851,145,878,144,873,145,852,150,737,162"/>
+<area shape="poly" id="edge20_Node000027_Node000028" title=" " alt="" coords="535,167,572,168,567,169,536,172"/>
+<area shape="rect" id="Node000030" href="$classnatural__loops__templatet.html" title="Main driver for working out if a class (normally goto_programt) has any natural loops." alt="" coords="2187,156,2367,201"/>
+<area shape="poly" id="edge23_Node000002_Node000030" title=" " alt="" coords="2383,176,2625,178,2619,179,2383,181"/>
+<area shape="poly" id="edge24_Node000030_Node000031" title=" " alt="" coords="1887,193,2189,182,2184,183,1888,198"/>
+<area shape="poly" id="edge26_Node000030_Node000032" title=" " alt="" coords="1899,143,2189,171,2184,171,1899,148"/>
 </map>

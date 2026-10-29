@@ -1,3 +1,27 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classsmt__function__application__termt_1_1factoryt.html" title=" " alt="" coords="5,5,215,60"/>
+<area shape="rect" id="Node000000" href="$classstring__builtin__functiont.html" title="Base class for string functions that are built in the solver." alt="" coords="5,187,177,215"/>
+<area shape="rect" id="Node000001" href="$classstring__builtin__function__with__no__evalt.html" title="Functions that are not yet supported in this class but are supported by string_constraint_generatort." alt="" coords="227,5,393,50"/>
+<area shape="poly" id="edge898_Node000000_Node000001" title=" " alt="" coords="110,173,158,117,189,87,223,60,247,48,243,52,226,65,193,91,162,121,114,176"/>
+<area shape="rect" id="Node000002" href="$classstring__creation__builtin__functiont.html" title="String creation from other types." alt="" coords="227,75,393,119"/>
+<area shape="poly" id="edge899_Node000000_Node000002" title=" " alt="" coords="129,178,224,129,253,118,249,122,226,134,133,182"/>
+<area shape="rect" id="Node000004" href="$classstring__format__builtin__functiont.html" title="Built&#45;in function for String.format()." alt="" coords="231,144,388,189"/>
+<area shape="poly" id="edge901_Node000000_Node000004" title=" " alt="" coords="191,183,233,177,229,180,194,187"/>
+<area shape="rect" id="Node000005" href="$classstring__insertion__builtin__functiont.html" title="String inserting a string into another one." alt="" coords="225,213,395,258"/>
+<area shape="poly" id="edge902_Node000000_Node000005" title=" " alt="" coords="191,215,227,221,222,223,193,220"/>
+<area shape="rect" id="Node000007" href="$classstring__test__builtin__functiont.html" title="String test." alt="" coords="241,283,379,327"/>
+<area shape="poly" id="edge904_Node000000_Node000007" title=" " alt="" coords="131,220,226,268,253,281,248,283,224,273,131,225"/>
+<area shape="rect" id="Node000008" href="$classstring__transformation__builtin__functiont.html" title="String builtin_function transforming one string into another." alt="" coords="229,352,391,397"/>
+<area shape="poly" id="edge905_Node000000_Node000008" title=" " alt="" coords="112,225,162,281,193,311,226,337,248,351,243,352,223,342,189,315,158,285,112,230"/>
+<area shape="rect" id="Node000003" href="$classstring__of__int__builtin__functiont.html" title="String creation from integer types." alt="" coords="452,75,602,119"/>
+<area shape="poly" id="edge900_Node000002_Node000003" title=" " alt="" coords="407,95,454,96,449,98,409,99"/>
+<area shape="rect" id="Node000006" href="$classstring__concatenation__builtin__functiont.html" title=" " alt="" coords="448,213,606,258"/>
+<area shape="poly" id="edge903_Node000005_Node000006" title=" " alt="" coords="410,233,451,235,446,237,411,238"/>
+<area shape="rect" id="Node000009" href="$classstring__concat__char__builtin__functiont.html" title="Adding a character at the end of a string." alt="" coords="456,283,599,327"/>
+<area shape="poly" id="edge906_Node000008_Node000009" title=" " alt="" coords="396,344,457,327,453,329,398,349"/>
+<area shape="rect" id="Node000010" href="$classstring__set__char__builtin__functiont.html" title="Setting a character at a particular position of a string." alt="" coords="443,352,611,397"/>
+<area shape="poly" id="edge907_Node000008_Node000010" title=" " alt="" coords="406,372,445,374,440,375,407,377"/>
+<area shape="rect" id="Node000011" href="$classstring__to__lower__case__builtin__functiont.html" title="Converting each uppercase character of Basic Latin and Latin&#45;1 supplement to the corresponding lowerc..." alt="" coords="448,421,606,466"/>
+<area shape="poly" id="edge908_Node000008_Node000011" title=" " alt="" coords="397,399,457,421,452,421,396,405"/>
+<area shape="rect" id="Node000012" href="$classstring__to__upper__case__builtin__functiont.html" title="Converting each lowercase character of Basic Latin and Latin&#45;1 supplement to the corresponding upperc..." alt="" coords="448,491,607,535"/>
+<area shape="poly" id="edge909_Node000008_Node000012" title=" " alt="" coords="348,405,393,441,444,476,468,491,463,490,442,481,390,446,346,410"/>
 </map>

@@ -1,7 +1,7 @@
 var classpropertyt =
 [
-    [ "trace_statet", "structpropertyt_1_1trace__statet.html", "structpropertyt_1_1trace__statet" ],
     [ "trace_updatet", "structpropertyt_1_1trace__updatet.html", "structpropertyt_1_1trace__updatet" ],
+    [ "trace_statet", "structpropertyt_1_1trace__statet.html", "structpropertyt_1_1trace__statet" ],
     [ "statust", "classpropertyt.html#a5c9b3ee1aa9e58badf3ea25884fe0571", null ],
     [ "tracet", "classpropertyt.html#a120a597202a0d62c2899c1e91d1919df", null ],
     [ "propertyt", "classpropertyt.html#a744d5184b160b2c49a77ff7bbc572e25", null ],

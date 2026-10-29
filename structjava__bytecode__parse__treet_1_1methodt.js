@@ -2,8 +2,8 @@ var structjava__bytecode__parse__treet_1_1methodt =
 [
     [ "exceptiont", "structjava__bytecode__parse__treet_1_1methodt_1_1exceptiont.html", "structjava__bytecode__parse__treet_1_1methodt_1_1exceptiont" ],
     [ "local_variablet", "structjava__bytecode__parse__treet_1_1methodt_1_1local__variablet.html", "structjava__bytecode__parse__treet_1_1methodt_1_1local__variablet" ],
-    [ "stack_map_table_entryt", "structjava__bytecode__parse__treet_1_1methodt_1_1stack__map__table__entryt.html", "structjava__bytecode__parse__treet_1_1methodt_1_1stack__map__table__entryt" ],
     [ "verification_type_infot", "structjava__bytecode__parse__treet_1_1methodt_1_1verification__type__infot.html", "structjava__bytecode__parse__treet_1_1methodt_1_1verification__type__infot" ],
+    [ "stack_map_table_entryt", "structjava__bytecode__parse__treet_1_1methodt_1_1stack__map__table__entryt.html", "structjava__bytecode__parse__treet_1_1methodt_1_1stack__map__table__entryt" ],
     [ "exception_tablet", "structjava__bytecode__parse__treet_1_1methodt.html#a39784a6008c481eaca231556197d7185", null ],
     [ "instructionst", "structjava__bytecode__parse__treet_1_1methodt.html#a8b0e2f8a9046118d7d6f0996d320012d", null ],
     [ "local_variable_tablet", "structjava__bytecode__parse__treet_1_1methodt.html#a5432d28aa9cf70c51a0080cb6df1ddc1", null ],

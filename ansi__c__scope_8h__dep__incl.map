@@ -1,31 +1,31 @@
 <map id="/home/runner/work/cbmc/cbmc/src/ansi&#45;c/ansi_c_scope.h" name="/home/runner/work/cbmc/cbmc/src/ansi&#45;c/ansi_c_scope.h">
-<area shape="rect" id="Node000001" title=" " alt="" coords="736,5,920,60"/>
-<area shape="rect" id="Node000002" href="$ansi__c__parser_8h.html" title=" " alt="" coords="632,108,816,163"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="793,72,753,110,749,106,789,68"/>
-<area shape="rect" id="Node000014" href="$ansi__c__scope_8cpp.html" title=" " alt="" coords="840,108,1024,163"/>
-<area shape="poly" id="edge15_Node000001_Node000014" title=" " alt="" coords="867,68,907,106,903,110,863,72"/>
-<area shape="rect" id="Node000003" href="$ansi__c__internal__additions_8cpp.html" title=" " alt="" coords="5,211,192,265"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="618,151,425,177,204,213,193,216,192,210,204,208,425,171,618,146"/>
-<area shape="rect" id="Node000004" href="$ansi__c__language_8cpp.html" title=" " alt="" coords="216,211,400,265"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="619,164,413,213,401,216,400,211,411,208,618,159"/>
-<area shape="rect" id="Node000005" href="$ansi__c__parser_8cpp.html" title=" " alt="" coords="424,211,608,265"/>
-<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="659,171,571,213,569,208,657,166"/>
-<area shape="rect" id="Node000006" href="$builtin__factory_8cpp.html" title=" " alt="" coords="632,211,816,265"/>
-<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="727,176,727,211,721,211,721,176"/>
-<area shape="rect" id="Node000007" href="$cpp__parser_8h.html" title="C++ Parser." alt="" coords="751,321,948,361"/>
-<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="790,168,812,187,830,209,843,238,850,268,853,320,848,320,845,269,838,239,826,212,808,191,786,172"/>
-<area shape="rect" id="Node000011" href="$cpp__token__buffer_8h.html" title="C++ Parser: Token Buffer." alt="" coords="891,211,1075,265"/>
-<area shape="poly" id="edge10_Node000002_Node000011" title=" " alt="" coords="805,165,916,208,914,213,803,170"/>
-<area shape="rect" id="Node000013" href="$contracts__wrangler_8cpp.html" title="Parse and annotate contracts." alt="" coords="1099,211,1339,265"/>
-<area shape="poly" id="edge14_Node000002_Node000013" title=" " alt="" coords="830,160,960,186,1087,208,1099,210,1098,216,1086,213,959,191,829,166"/>
-<area shape="rect" id="Node000008" href="$cpp__language_8cpp.html" title="C++ Language Module." alt="" coords="444,416,676,456"/>
-<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="779,367,619,418,618,413,777,362"/>
-<area shape="rect" id="Node000009" href="$cpp__parser_8cpp.html" title="C++ Parser." alt="" coords="701,416,913,456"/>
-<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="837,374,818,417,813,415,833,372"/>
-<area shape="rect" id="Node000010" href="$parse_8cpp.html" title="C++ Language Parsing." alt="" coords="937,416,1121,456"/>
-<area shape="poly" id="edge9_Node000007_Node000010" title=" " alt="" coords="899,365,994,414,992,418,896,369"/>
-<area shape="poly" id="edge11_Node000011_Node000007" title=" " alt="" coords="938,276,876,323,873,318,935,272"/>
-<area shape="poly" id="edge13_Node000011_Node000010" title=" " alt="" coords="993,278,1013,367,1026,415,1021,416,1008,369,988,279"/>
-<area shape="rect" id="Node000012" href="$cpp__token__buffer_8cpp.html" title="C++ Parser: Token Buffer." alt="" coords="1023,313,1207,368"/>
-<area shape="poly" id="edge12_Node000011_Node000012" title=" " alt="" coords="1029,271,1082,311,1078,315,1026,276"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="736,5,920,67"/>
+<area shape="rect" id="Node000002" href="$ansi__c__parser_8h.html" title=" " alt="" coords="632,115,816,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="791,77,755,117,751,112,786,80"/>
+<area shape="rect" id="Node000014" href="$ansi__c__scope_8cpp.html" title=" " alt="" coords="840,115,1024,177"/>
+<area shape="poly" id="edge15_Node000001_Node000014" title=" " alt="" coords="868,75,905,115,900,114,867,81"/>
+<area shape="rect" id="Node000003" href="$ansi__c__internal__additions_8cpp.html" title=" " alt="" coords="5,225,192,286"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="614,160,424,188,204,227,193,230,191,225,203,222,423,183,619,158"/>
+<area shape="rect" id="Node000004" href="$ansi__c__language_8cpp.html" title=" " alt="" coords="216,225,400,286"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="615,174,413,227,401,230,399,226,411,222,620,171"/>
+<area shape="rect" id="Node000005" href="$ansi__c__parser_8cpp.html" title=" " alt="" coords="424,225,608,286"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="654,183,575,227,573,222,650,185"/>
+<area shape="rect" id="Node000006" href="$builtin__factory_8cpp.html" title=" " alt="" coords="632,225,816,286"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="725,190,726,226,722,223,722,194"/>
+<area shape="rect" id="Node000007" href="$cpp__parser_8h.html" title="C++ Parser." alt="" coords="751,343,947,388"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="793,184,814,202,830,223,843,254,851,286,853,344,849,341,845,287,838,255,826,226,810,206,792,189"/>
+<area shape="rect" id="Node000011" href="$cpp__token__buffer_8h.html" title="C++ Parser: Token Buffer." alt="" coords="891,225,1074,286"/>
+<area shape="poly" id="edge10_Node000002_Node000011" title=" " alt="" coords="811,180,913,224,907,224,810,186"/>
+<area shape="rect" id="Node000013" href="$contracts__wrangler_8cpp.html" title="Parse and annotate contracts." alt="" coords="1099,225,1338,286"/>
+<area shape="poly" id="edge14_Node000002_Node000013" title=" " alt="" coords="831,175,960,200,1087,222,1101,227,1096,227,1086,227,959,205,831,180"/>
+<area shape="rect" id="Node000008" href="$cpp__language_8cpp.html" title="C++ Language Module." alt="" coords="446,444,677,489"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="775,392,625,446,624,441,769,393"/>
+<area shape="rect" id="Node000009" href="$cpp__parser_8cpp.html" title="C++ Parser." alt="" coords="701,444,912,489"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="836,400,817,446,814,442,832,403"/>
+<area shape="rect" id="Node000010" href="$parse_8cpp.html" title="C++ Language Parsing." alt="" coords="936,444,1120,489"/>
+<area shape="poly" id="edge9_Node000007_Node000010" title=" " alt="" coords="902,393,991,444,986,443,901,398"/>
+<area shape="poly" id="edge11_Node000011_Node000007" title=" " alt="" coords="936,295,877,345,875,340,931,297"/>
+<area shape="poly" id="edge13_Node000011_Node000010" title=" " alt="" coords="993,300,1013,395,1024,445,1020,442,1008,397,989,304"/>
+<area shape="rect" id="Node000012" href="$cpp__token__buffer_8cpp.html" title="C++ Parser: Token Buffer." alt="" coords="1023,334,1206,396"/>
+<area shape="poly" id="edge12_Node000011_Node000012" title=" " alt="" coords="1032,294,1080,335,1075,333,1031,299"/>
 </map>

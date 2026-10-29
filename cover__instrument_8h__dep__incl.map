@@ -1,50 +1,50 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/cover_instrument.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/cover_instrument.h">
-<area shape="rect" id="Node000001" title="Coverage Instrumentation." alt="" coords="1882,5,2075,60"/>
-<area shape="rect" id="Node000002" href="$cover_8h.html" title="Coverage Instrumentation." alt="" coords="1023,108,1217,163"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1868,43,1578,66,1403,85,1228,111,1217,113,1217,107,1228,105,1402,80,1577,61,1868,37"/>
-<area shape="rect" id="Node000017" href="$cover__instrument__assume_8cpp.html" title="Author: Diffblue Ltd." alt="" coords="1241,108,1466,163"/>
-<area shape="poly" id="edge19_Node000001_Node000017" title=" " alt="" coords="1869,51,1686,77,1479,111,1466,113,1466,108,1478,105,1685,72,1868,46"/>
-<area shape="rect" id="Node000018" href="$cover__instrument__branch_8cpp.html" title="Coverage Instrumentation for Branches." alt="" coords="1491,108,1709,163"/>
-<area shape="poly" id="edge20_Node000001_Node000018" title=" " alt="" coords="1869,66,1699,111,1698,105,1868,60"/>
-<area shape="rect" id="Node000019" href="$cover__instrument__condition_8cpp.html" title="Coverage Instrumentation for Conditions." alt="" coords="1733,108,1968,163"/>
-<area shape="poly" id="edge21_Node000001_Node000019" title=" " alt="" coords="1936,70,1886,110,1883,106,1933,66"/>
-<area shape="rect" id="Node000020" href="$cover__instrument__decision_8cpp.html" title="Coverage Instrumentation for Decisions." alt="" coords="1993,108,2221,163"/>
-<area shape="poly" id="edge22_Node000001_Node000020" title=" " alt="" coords="2024,66,2075,106,2071,110,2021,70"/>
-<area shape="rect" id="Node000021" href="$cover__instrument__location_8cpp.html" title="Coverage Instrumentation for Location, i.e." alt="" coords="2245,108,2472,163"/>
-<area shape="poly" id="edge23_Node000001_Node000021" title=" " alt="" coords="2089,60,2260,105,2259,110,2088,66"/>
-<area shape="rect" id="Node000022" href="$cover__instrument__mcdc_8cpp.html" title="Coverage Instrumentation for MC/DC." alt="" coords="2497,108,2706,163"/>
-<area shape="poly" id="edge24_Node000001_Node000022" title=" " alt="" coords="2089,45,2275,71,2484,105,2497,108,2496,113,2484,111,2274,76,2089,50"/>
-<area shape="rect" id="Node000023" href="$cover__instrument__other_8cpp.html" title="Further coverage instrumentations." alt="" coords="2730,108,2937,163"/>
-<area shape="poly" id="edge25_Node000001_Node000023" title=" " alt="" coords="2089,38,2375,62,2547,81,2719,105,2730,107,2729,113,2718,111,2547,86,2375,67,2089,43"/>
-<area shape="rect" id="Node000003" href="$jdiff__parse__options_8cpp.html" title="JDIFF Command Line Option Processing." alt="" coords="5,313,189,368"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1010,144,844,154,650,168,468,188,394,200,338,213,281,235,226,262,136,315,133,311,223,257,279,230,337,208,393,195,468,183,650,163,843,149,1009,139"/>
-<area shape="rect" id="Node000004" href="$jdiff__parse__options_8h.html" title="JDIFF Command Line Option Processing." alt="" coords="349,211,533,265"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="1010,156,534,226,533,220,1009,150"/>
-<area shape="rect" id="Node000007" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="629,313,835,368"/>
-<area shape="poly" id="edge7_Node000002_Node000007" title=" " alt="" coords="1059,172,784,315,781,311,1057,167"/>
-<area shape="rect" id="Node000008" href="$cbmc__parse__options_8h.html" title="CBMC Command Line Option Processing." alt="" coords="1017,211,1223,265"/>
-<area shape="poly" id="edge8_Node000002_Node000008" title=" " alt="" coords="1123,176,1123,211,1117,211,1117,176"/>
-<area shape="rect" id="Node000012" href="$goto__diff__parse__options_8cpp.html" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="1688,313,1872,368"/>
-<area shape="poly" id="edge13_Node000002_Node000012" title=" " alt="" coords="1219,164,1696,311,1694,316,1217,169"/>
-<area shape="rect" id="Node000013" href="$goto__diff__parse__options_8h.html" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="1688,211,1872,265"/>
-<area shape="poly" id="edge14_Node000002_Node000013" title=" " alt="" coords="1231,160,1482,200,1688,225,1687,230,1482,205,1230,166"/>
-<area shape="rect" id="Node000016" href="$cover_8cpp.html" title="Coverage Instrumentation." alt="" coords="1897,211,2090,265"/>
-<area shape="poly" id="edge18_Node000002_Node000016" title=" " alt="" coords="1231,160,1330,173,1415,180,1559,184,1703,188,1786,195,1884,208,1897,210,1896,215,1884,213,1786,200,1702,193,1559,189,1414,185,1330,178,1230,166"/>
-<area shape="poly" id="edge6_Node000004_Node000003" title=" " alt="" coords="339,272,188,316,186,311,338,267"/>
-<area shape="rect" id="Node000005" href="$jdiff__languages_8cpp.html" title="Language Registration." alt="" coords="213,313,397,368"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="396,276,343,315,339,311,393,271"/>
-<area shape="rect" id="Node000006" href="$jdiff__main_8cpp.html" title="JDIFF Main Module." alt="" coords="421,313,605,368"/>
-<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="470,275,497,312,492,315,466,278"/>
-<area shape="poly" id="edge11_Node000008_Node000007" title=" " alt="" coords="1007,271,834,316,832,311,1005,266"/>
-<area shape="rect" id="Node000009" href="$cbmc__languages_8cpp.html" title="Language Registration." alt="" coords="859,321,1122,361"/>
-<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="1077,276,1017,323,1014,318,1074,272"/>
-<area shape="rect" id="Node000010" href="$cbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="1147,321,1376,361"/>
-<area shape="poly" id="edge10_Node000008_Node000010" title=" " alt="" coords="1170,271,1236,318,1233,323,1166,275"/>
-<area shape="rect" id="Node000011" href="$goto__synthesizer__parse__options_8cpp.html" title="Main Module." alt="" coords="1401,313,1663,368"/>
-<area shape="poly" id="edge12_Node000008_Node000011" title=" " alt="" coords="1237,265,1425,311,1424,316,1235,270"/>
-<area shape="poly" id="edge17_Node000013_Node000012" title=" " alt="" coords="1783,279,1783,313,1777,313,1777,279"/>
-<area shape="rect" id="Node000014" href="$goto__diff__languages_8cpp.html" title="Language Registration." alt="" coords="1896,313,2080,368"/>
-<area shape="poly" id="edge15_Node000013_Node000014" title=" " alt="" coords="1847,269,1935,311,1933,316,1845,274"/>
-<area shape="rect" id="Node000015" href="$goto__diff__main_8cpp.html" title="GOTO&#45;DIFF Main Module." alt="" coords="2104,313,2288,368"/>
-<area shape="poly" id="edge16_Node000013_Node000015" title=" " alt="" coords="1886,263,2093,311,2104,314,2103,319,2091,316,1885,268"/>
+<area shape="rect" id="Node000001" title="Coverage Instrumentation." alt="" coords="1874,5,2066,67"/>
+<area shape="rect" id="Node000002" href="$cover_8h.html" title="Coverage Instrumentation." alt="" coords="1021,115,1213,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1856,44,1571,70,1398,90,1225,118,1214,120,1213,115,1225,112,1397,85,1570,64,1861,43"/>
+<area shape="rect" id="Node000017" href="$cover__instrument__assume_8cpp.html" title="Author: Diffblue Ltd." alt="" coords="1237,115,1461,177"/>
+<area shape="poly" id="edge19_Node000001_Node000017" title=" " alt="" coords="1856,53,1678,82,1475,118,1462,120,1461,115,1474,112,1678,77,1861,52"/>
+<area shape="rect" id="Node000018" href="$cover__instrument__branch_8cpp.html" title="Coverage Instrumentation for Branches." alt="" coords="1486,115,1703,177"/>
+<area shape="poly" id="edge20_Node000001_Node000018" title=" " alt="" coords="1862,69,1701,117,1699,112,1856,70"/>
+<area shape="rect" id="Node000019" href="$cover__instrument__condition_8cpp.html" title="Coverage Instrumentation for Conditions." alt="" coords="1727,115,1960,177"/>
+<area shape="poly" id="edge21_Node000001_Node000019" title=" " alt="" coords="1926,76,1880,117,1878,112,1921,78"/>
+<area shape="rect" id="Node000020" href="$cover__instrument__decision_8cpp.html" title="Coverage Instrumentation for Decisions." alt="" coords="1985,115,2212,177"/>
+<area shape="poly" id="edge22_Node000001_Node000020" title=" " alt="" coords="2019,75,2065,115,2060,114,2017,80"/>
+<area shape="rect" id="Node000021" href="$cover__instrument__location_8cpp.html" title="Coverage Instrumentation for Location, i.e." alt="" coords="2236,115,2462,177"/>
+<area shape="poly" id="edge23_Node000001_Node000021" title=" " alt="" coords="2082,66,2245,114,2240,114,2081,72"/>
+<area shape="rect" id="Node000022" href="$cover__instrument__mcdc_8cpp.html" title="Coverage Instrumentation for MC/DC." alt="" coords="2486,115,2694,177"/>
+<area shape="poly" id="edge24_Node000001_Node000022" title=" " alt="" coords="2082,49,2267,75,2475,112,2489,118,2483,117,2474,118,2266,81,2082,54"/>
+<area shape="rect" id="Node000023" href="$cover__instrument__other_8cpp.html" title="Further coverage instrumentations." alt="" coords="2719,115,2926,177"/>
+<area shape="poly" id="edge25_Node000001_Node000023" title=" " alt="" coords="2082,42,2366,66,2537,86,2707,112,2721,117,2716,117,2706,118,2536,91,2366,71,2082,47"/>
+<area shape="rect" id="Node000003" href="$jdiff__parse__options_8cpp.html" title="JDIFF Command Line Option Processing." alt="" coords="5,334,189,396"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1002,153,840,165,647,180,467,201,393,213,338,227,281,250,227,278,138,336,135,331,224,274,279,245,336,222,392,208,466,196,647,175,839,160,1008,152"/>
+<area shape="rect" id="Node000004" href="$jdiff__parse__options_8h.html" title="JDIFF Command Line Option Processing." alt="" coords="349,225,533,286"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="1003,166,533,242,532,237,1008,163"/>
+<area shape="rect" id="Node000007" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="628,334,832,396"/>
+<area shape="poly" id="edge7_Node000002_Node000007" title=" " alt="" coords="1053,184,785,336,783,331,1048,185"/>
+<area shape="rect" id="Node000008" href="$cbmc__parse__options_8h.html" title="CBMC Command Line Option Processing." alt="" coords="1015,225,1219,286"/>
+<area shape="poly" id="edge8_Node000002_Node000008" title=" " alt="" coords="1119,190,1119,226,1115,222,1115,194"/>
+<area shape="rect" id="Node000012" href="$goto__diff__parse__options_8cpp.html" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="1681,334,1865,396"/>
+<area shape="poly" id="edge13_Node000002_Node000012" title=" " alt="" coords="1223,179,1685,334,1679,334,1222,185"/>
+<area shape="rect" id="Node000013" href="$goto__diff__parse__options_8h.html" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="1681,225,1865,286"/>
+<area shape="poly" id="edge14_Node000002_Node000013" title=" " alt="" coords="1229,175,1355,198,1477,217,1683,245,1678,245,1477,222,1354,203,1228,180"/>
+<area shape="rect" id="Node000016" href="$cover_8cpp.html" title="Coverage Instrumentation." alt="" coords="1889,225,2081,286"/>
+<area shape="poly" id="edge18_Node000002_Node000016" title=" " alt="" coords="1228,174,1327,188,1411,195,1554,198,1697,201,1780,208,1877,222,1891,227,1886,227,1877,227,1780,213,1697,206,1554,203,1411,200,1327,193,1228,180"/>
+<area shape="poly" id="edge6_Node000004_Node000003" title=" " alt="" coords="332,291,190,338,188,333,337,289"/>
+<area shape="rect" id="Node000005" href="$jdiff__languages_8cpp.html" title="Language Registration." alt="" coords="213,334,397,396"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="393,295,344,336,342,332,388,297"/>
+<area shape="rect" id="Node000006" href="$jdiff__main_8cpp.html" title="JDIFF Main Module." alt="" coords="421,334,605,396"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="471,297,495,335,490,333,468,302"/>
+<area shape="poly" id="edge11_Node000008_Node000007" title=" " alt="" coords="1002,289,834,338,833,333,997,290"/>
+<area shape="rect" id="Node000009" href="$cbmc__languages_8cpp.html" title="Language Registration." alt="" coords="856,343,1119,388"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="1072,295,1015,345,1012,340,1067,297"/>
+<area shape="rect" id="Node000010" href="$cbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="1143,343,1371,388"/>
+<area shape="poly" id="edge10_Node000008_Node000010" title=" " alt="" coords="1169,293,1232,343,1226,342,1167,298"/>
+<area shape="rect" id="Node000011" href="$goto__synthesizer__parse__options_8cpp.html" title="Main Module." alt="" coords="1396,334,1657,396"/>
+<area shape="poly" id="edge12_Node000008_Node000011" title=" " alt="" coords="1235,285,1414,334,1409,334,1234,290"/>
+<area shape="poly" id="edge17_Node000013_Node000012" title=" " alt="" coords="1775,300,1775,336,1771,332,1771,304"/>
+<area shape="rect" id="Node000014" href="$goto__diff__languages_8cpp.html" title="Language Registration." alt="" coords="1889,334,2073,396"/>
+<area shape="poly" id="edge15_Node000013_Node000014" title=" " alt="" coords="1845,291,1925,334,1920,333,1844,296"/>
+<area shape="rect" id="Node000015" href="$goto__diff__main_8cpp.html" title="GOTO&#45;DIFF Main Module." alt="" coords="2097,334,2281,396"/>
+<area shape="poly" id="edge16_Node000013_Node000015" title=" " alt="" coords="1880,284,2086,332,2100,338,2095,337,2084,337,1879,290"/>
 </map>

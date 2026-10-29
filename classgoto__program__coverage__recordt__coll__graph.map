@@ -1,28 +1,26 @@
 <map id="goto_program_coverage_recordt" name="goto_program_coverage_recordt">
-<area shape="rect" id="Node000001" title=" " alt="" coords="65,489,245,529"/>
-<area shape="rect" id="Node000002" href="$classcoverage__recordt.html" title=" " alt="" coords="23,401,158,427"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="109,437,144,488,139,491,104,440"/>
-<area shape="rect" id="Node000003" href="$classxmlt.html" title=" " alt="" coords="179,313,231,339"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="174,348,148,365,104,403,100,399,145,361,171,344"/>
-<area shape="rect" id="Node000010" title=" " alt="" coords="279,401,409,427"/>
-<area shape="poly" id="edge11_Node000010_Node000003" title=" " alt="" coords="199,353,199,365,203,375,232,387,284,399,283,404,230,392,199,379,194,366,194,352"/>
-<area shape="rect" id="Node000004" title=" " alt="" coords="31,108,118,133"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="72,147,69,197,73,224,84,249,103,273,129,291,180,315,178,320,126,296,100,277,79,252,68,226,64,197,67,146"/>
-<area shape="rect" id="Node000006" title=" " alt="" coords="131,211,293,251"/>
-<area shape="poly" id="edge6_Node000006_Node000004" title=" " alt="" coords="94,142,138,185,175,208,172,213,134,189,90,146"/>
-<area shape="rect" id="Node000005" title=" " alt="" coords="5,5,144,45"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="77,59,77,108,72,108,72,59"/>
-<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="212,264,209,313,204,313,207,264"/>
-<area shape="rect" id="Node000007" title=" " alt="" coords="146,108,281,133"/>
-<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="212,147,211,157,212,210,207,210,205,157,206,147"/>
-<area shape="rect" id="Node000008" title=" " alt="" coords="194,13,233,38"/>
-<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="216,52,216,108,211,108,211,52"/>
-<area shape="rect" id="Node000009" title=" " alt="" coords="315,13,354,38"/>
-<area shape="poly" id="edge9_Node000007_Node000009" title=" " alt="" coords="310,49,230,110,227,106,307,44"/>
-<area shape="rect" id="Node000011" title=" " alt="" coords="333,159,441,185"/>
-<area shape="poly" id="edge13_Node000011_Node000009" title=" " alt="" coords="346,50,385,158,380,160,341,52"/>
-<area shape="poly" id="edge10_Node000003_Node000010" title=" " alt="" coords="316,395,271,365,227,341,230,336,273,360,319,391"/>
-<area shape="poly" id="edge12_Node000010_Node000011" title=" " alt="" coords="390,198,386,279,379,329,367,378,355,402,350,400,361,376,373,328,380,279,384,198"/>
-<area shape="rect" id="Node000012" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="183,401,255,427"/>
-<area shape="poly" id="edge14_Node000001_Node000012" title=" " alt="" coords="205,440,170,491,165,488,201,437"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="204,587,383,632"/>
+<area shape="rect" id="Node000002" href="$classcoverage__recordt.html" title=" " alt="" coords="163,487,298,514"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="247,526,283,587,278,586,244,530"/>
+<area shape="rect" id="Node000003" href="$classxmlt.html" title=" " alt="" coords="205,386,256,414"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="232,427,233,487,228,485,229,432"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="37,254,123,282"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="104,290,182,360,214,385,209,386,178,364,103,296"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="5,106,144,151"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="76,164,82,254,77,254,76,169"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="149,246,312,291"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="232,304,233,386,228,385,229,309"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="168,114,301,142"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="235,155,234,246,229,245,233,160"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="211,5,250,33"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="232,46,235,82,237,114,231,114,230,82,231,51"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="330,5,368,33"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="316,43,298,59,269,89,246,116,242,113,265,85,294,55,319,39"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="346,114,454,142"/>
+<area shape="poly" id="edge11_Node000011_Node000009" title=" " alt="" coords="365,44,373,56,398,114,392,114,368,58,365,49"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="335,254,464,282"/>
+<area shape="poly" id="edge9_Node000003_Node000010" title=" " alt="" coords="382,292,349,330,308,364,258,391,255,386,305,360,345,326,378,295"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="401,155,402,255,397,253,399,160"/>
+<area shape="rect" id="Node000012" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="322,487,393,514"/>
+<area shape="poly" id="edge12_Node000001_Node000012" title=" " alt="" coords="344,527,308,589,304,585,339,529"/>
 </map>

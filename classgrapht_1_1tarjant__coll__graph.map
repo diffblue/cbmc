@@ -1,20 +1,28 @@
 <map id="grapht&lt; N &gt;::tarjant" name="grapht&lt; N &gt;::tarjant">
-<area shape="rect" id="Node000001" title=" " alt="" coords="784,90,939,115"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="475,11,625,37"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="639,27,699,35,761,49,805,68,841,88,839,92,802,72,759,55,699,40,638,32"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="157,77,287,102"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="271,70,310,59,395,42,475,30,476,35,396,47,311,64,272,75"/>
-<area shape="rect" id="Node000005" title=" " alt="" coords="460,62,640,87"/>
-<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="300,83,459,76,460,81,301,89"/>
-<area shape="rect" id="Node000008" title=" " alt="" coords="449,111,651,137"/>
-<area shape="poly" id="edge10_Node000008_Node000003" title=" " alt="" coords="301,101,311,103,449,116,449,121,310,108,300,107"/>
-<area shape="rect" id="Node000004" title=" " alt="" coords="5,113,44,138"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="57,117,157,98,158,104,58,122"/>
-<area shape="rect" id="Node000007" title=" " alt="" coords="161,137,283,162"/>
-<area shape="poly" id="edge8_Node000007_Node000004" title=" " alt="" coords="57,139,69,143,115,150,161,151,160,156,115,155,67,148,56,144"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="654,81,784,93,784,98,654,87"/>
-<area shape="rect" id="Node000006" title=" " alt="" coords="453,161,647,186"/>
-<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="661,165,710,158,759,147,801,131,837,113,839,118,803,136,761,152,711,163,662,170"/>
-<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="294,162,311,164,383,170,452,172,452,177,382,175,310,169,293,167"/>
-<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="664,126,760,121,810,113,811,118,760,127,665,131"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="1811,144,1965,172"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="641,116,789,144"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="805,127,1043,125,1576,125,1700,131,1813,147,1808,147,1700,137,1576,130,1043,130,805,132"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="161,176,289,204"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="304,171,313,169,489,146,643,135,638,136,489,152,313,174,305,176"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="955,43,1134,71"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="250,163,278,141,312,123,397,95,485,74,574,59,663,50,825,44,957,50,952,51,825,49,663,56,575,65,486,79,398,100,314,127,281,145,253,168"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="459,234,617,261"/>
+<area shape="poly" id="edge10_Node000009_Node000003" title=" " alt="" coords="262,209,314,231,388,244,462,250,456,251,387,250,312,237,261,215"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="1475,175,1675,203"/>
+<area shape="poly" id="edge15_Node000011_Node000003" title=" " alt="" coords="305,188,1474,186,1474,192,305,193"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,246,44,273"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="57,246,183,202,182,207,59,251"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="313,300,435,328"/>
+<area shape="poly" id="edge12_Node000010_Node000004" title=" " alt="" coords="58,270,68,273,133,286,198,296,315,310,310,311,198,302,132,292,67,278,59,275"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="1149,49,1279,47,1440,53,1615,71,1703,86,1788,106,1830,123,1867,144,1861,143,1828,127,1786,112,1702,91,1614,76,1440,58,1279,52,1150,54"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="1478,276,1672,304"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="1632,268,1786,208,1858,173,1864,172,1788,212,1633,273"/>
+<area shape="rect" id="Node000007" href="$classgrapht.html" title=" " alt="" coords="1158,243,1358,271"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="1319,273,1382,286,1480,294,1474,294,1381,291,1319,278"/>
+<area shape="poly" id="edge14_Node000011_Node000007" title=" " alt="" coords="1373,244,1450,230,1537,204,1542,203,1451,235,1373,249"/>
+<area shape="rect" id="Node000008" href="$classgrapht.html" title="A generic directed graph with a parametric node type." alt="" coords="820,240,924,268"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="939,252,955,252,1161,256,1155,256,955,258,939,258"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="632,247,822,253,817,254,632,252"/>
+<area shape="poly" id="edge11_Node000006_Node000010" title=" " alt="" coords="451,319,574,327,714,332,1259,332,1326,329,1393,322,1506,305,1512,305,1393,327,1326,334,1259,337,714,337,574,333,451,324"/>
+<area shape="poly" id="edge13_Node000001_Node000011" title=" " alt="" coords="1690,178,1787,169,1808,169,1813,168,1787,174,1691,183"/>
 </map>

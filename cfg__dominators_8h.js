@@ -1,7 +1,7 @@
 var cfg__dominators_8h =
 [
-    [ "cfg_dominators_templatet< P, T, post_dom >", "classcfg__dominators__templatet.html", "classcfg__dominators__templatet" ],
-    [ "cfg_dominators_templatet< P, T, post_dom >::nodet", "structcfg__dominators__templatet_1_1nodet.html", "structcfg__dominators__templatet_1_1nodet" ],
+    [ "cfg_dominators_templatet&lt; P, T, post_dom &gt;", "classcfg__dominators__templatet.html", "classcfg__dominators__templatet" ],
+    [ "cfg_dominators_templatet&lt; P, T, post_dom &gt;::nodet", "structcfg__dominators__templatet_1_1nodet.html", "structcfg__dominators__templatet_1_1nodet" ],
     [ "cfg_dominatorst", "cfg__dominators_8h.html#a2f0744b155c4c2f67033c3a7df38e9b0", null ],
     [ "cfg_post_dominatorst", "cfg__dominators_8h.html#ae066834cc137bc58ca9435a35ead285b", null ],
     [ "dominators_pretty_print_node", "cfg__dominators_8h.html#af125bd9a969c2b4522cf860a9811b5d8", null ],

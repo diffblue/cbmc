@@ -1,29 +1,24 @@
 <map id="constant_propagator_domaint::valuest" name="constant_propagator_domaint::valuest">
-<area shape="rect" id="Node000001" title=" " alt="" coords="143,551,299,591"/>
-<area shape="rect" id="Node000002" href="$classaddress__of__aware__replace__symbolt.html" title="Replace symbols with constants while maintaining syntactically valid expressions." alt="" coords="124,448,319,488"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="224,502,224,551,219,551,219,502"/>
-<area shape="rect" id="Node000003" href="$classunchecked__replace__symbolt.html" title=" " alt="" coords="118,373,325,399"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="224,412,224,448,219,448,219,412"/>
-<area shape="rect" id="Node000004" href="$classreplace__symbolt.html" title="Replace a symbol expression by a given expression." alt="" coords="156,299,287,324"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="224,338,224,373,219,373,219,338"/>
-<area shape="rect" id="Node000005" title=" " alt="" coords="233,196,385,236"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="284,248,234,300,231,296,280,244"/>
-<area shape="rect" id="Node000006" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="139,101,211,126"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="202,132,286,194,282,198,199,136"/>
-<area shape="rect" id="Node000018" title=" " alt="" coords="58,203,209,229"/>
-<area shape="poly" id="edge12_Node000018_Node000006" title=" " alt="" coords="167,140,140,204,136,202,162,138"/>
-<area shape="rect" id="Node000007" href="$classexprt.html" title="Base class for all expressions." alt="" coords="437,101,493,126"/>
-<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="460,140,451,158,438,174,413,190,386,202,384,197,411,186,434,170,447,155,455,138"/>
-<area shape="rect" id="Node000008" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="439,5,491,31"/>
-<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="468,44,468,101,463,101,463,44"/>
-<area shape="rect" id="Node000016" title=" " alt="" coords="235,93,387,133"/>
-<area shape="poly" id="edge8_Node000005_Node000016" title=" " alt="" coords="313,147,312,196,307,196,308,147"/>
-<area shape="rect" id="Node000017" title=" " alt="" coords="165,5,203,31"/>
-<area shape="poly" id="edge9_Node000016_Node000017" title=" " alt="" coords="212,37,286,91,283,95,209,41"/>
-<area shape="rect" id="Node000019" title=" " alt="" coords="5,101,115,126"/>
-<area shape="poly" id="edge14_Node000019_Node000017" title=" " alt="" coords="160,41,77,103,74,98,156,37"/>
-<area shape="rect" id="Node000014" title=" " alt="" coords="291,5,330,31"/>
-<area shape="poly" id="edge10_Node000016_Node000014" title=" " alt="" coords="313,44,313,93,308,93,308,44"/>
-<area shape="poly" id="edge11_Node000004_Node000018" title=" " alt="" coords="155,237,212,297,209,300,152,240"/>
-<area shape="poly" id="edge13_Node000018_Node000019" title=" " alt="" coords="58,139,59,156,64,171,80,188,101,201,98,206,77,193,59,173,53,157,53,139"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="90,613,245,658"/>
+<area shape="rect" id="Node000002" href="$classaddress__of__aware__replace__symbolt.html" title="Replace symbols with constants while maintaining syntactically valid expressions." alt="" coords="70,495,265,540"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="170,554,170,614,165,611,166,558"/>
+<area shape="rect" id="Node000003" href="$classunchecked__replace__symbolt.html" title=" " alt="" coords="65,418,270,446"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="169,459,170,496,165,494,167,464"/>
+<area shape="rect" id="Node000004" href="$classreplace__symbolt.html" title="Replace a symbol expression by a given expression." alt="" coords="103,341,232,369"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="169,382,170,419,165,417,167,387"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="5,224,157,268"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="105,278,137,316,158,340,153,341,133,319,106,283"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="17,106,169,151"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="84,163,85,175,83,223,78,223,80,174,84,168"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="262,5,300,33"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="247,42,133,107,129,104,249,37"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="294,114,402,142"/>
+<area shape="poly" id="edge11_Node000011_Node000007" title=" " alt="" coords="297,44,342,114,337,114,297,49"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="74,5,112,33"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="93,46,96,106,90,105,93,51"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="181,232,330,260"/>
+<area shape="poly" id="edge8_Node000004_Node000009" title=" " alt="" coords="238,275,210,319,186,342,182,339,206,316,241,271"/>
+<area shape="rect" id="Node000010" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="199,114,270,142"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="240,155,256,232,251,231,239,160"/>
+<area shape="poly" id="edge10_Node000009_Node000011" title=" " alt="" coords="327,156,268,233,264,230,330,152"/>
 </map>

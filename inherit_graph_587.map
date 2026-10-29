@@ -1,3 +1,11 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classnondet__instruction__infot.html" title="Holds information about any discovered nondet methods, with extreme type&#45; safety." alt="" coords="5,5,148,45"/>
+<area shape="rect" id="Node000000" href="$classpartial__order__concurrencyt.html" title="Base class for implementing memory models via additional constraints for SSA equations." alt="" coords="5,5,201,33"/>
+<area shape="rect" id="Node000001" href="$classmemory__model__baset.html" title=" " alt="" coords="249,5,416,33"/>
+<area shape="poly" id="edge444_Node000000_Node000001" title=" " alt="" coords="216,17,251,19,245,19,216,22"/>
+<area shape="rect" id="Node000002" href="$classmemory__model__sct.html" title=" " alt="" coords="464,5,614,33"/>
+<area shape="poly" id="edge445_Node000001_Node000002" title=" " alt="" coords="431,17,466,19,461,19,431,22"/>
+<area shape="rect" id="Node000003" href="$classmemory__model__tsot.html" title=" " alt="" coords="662,5,819,33"/>
+<area shape="poly" id="edge446_Node000002_Node000003" title=" " alt="" coords="630,17,664,19,659,19,630,22"/>
+<area shape="rect" id="Node000004" href="$classmemory__model__psot.html" title=" " alt="" coords="867,5,1026,33"/>
+<area shape="poly" id="edge447_Node000003_Node000004" title=" " alt="" coords="835,17,869,19,863,19,835,22"/>
 </map>

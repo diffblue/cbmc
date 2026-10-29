@@ -2,7 +2,7 @@ var convert__expr__to__smt_8cpp =
 [
     [ "sort_based_cast_to_bit_vector_convertert", "structsort__based__cast__to__bit__vector__convertert.html", "structsort__based__cast__to__bit__vector__convertert" ],
     [ "sort_based_literal_convertert", "structsort__based__literal__convertert.html", "structsort__based__literal__convertert" ],
-    [ "at_scope_exitt< functiont >", "structat__scope__exitt.html", "structat__scope__exitt" ],
+    [ "at_scope_exitt&lt; functiont &gt;", "structat__scope__exitt.html", "structat__scope__exitt" ],
     [ "sub_expression_mapt", "convert__expr__to__smt_8cpp.html#a8e696bd2d5f8fd0fba993cf587399f20", null ],
     [ "at_scope_exit", "convert__expr__to__smt_8cpp.html#ad52f8c7c22f15a315a3349d0f1861ca6", null ],
     [ "convert_array_update_to_smt", "convert__expr__to__smt_8cpp.html#a69c80d94e891764911197b76e52dc56e", null ],

@@ -2,7 +2,7 @@ var searchData=
 [
   ['o_0',['Modeling Memory-mapped I/O',['../md_modeling-mmio.html#modeling-memory-mapped-io',1,'']]],
   ['object_1',['Retrieving the size of a memory object',['../md_memory-primitives.html#retrieving-the-size-of-a-memory-object',1,'']]],
-  ['objects_2',['objects',['../md_memory-primitives.html#memory-objects',1,'Memory Objects'],['../shadow-memory.html#working-with-compound-type-objects',1,'Working with Compound Type Objects']]],
+  ['objects_2',['Objects',['../md_memory-primitives.html#memory-objects',1,'Memory Objects'],['../shadow-memory.html#working-with-compound-type-objects',1,'Working with Compound Type Objects']]],
   ['objects_20and_20offsets_3',['Objects and Offsets',['../md_modeling-pointers.html#objects-and-offsets',1,'']]],
   ['of_20a_20memory_20object_4',['Retrieving the size of a memory object',['../md_memory-primitives.html#retrieving-the-size-of-a-memory-object',1,'']]],
   ['of_20goto_20cc_5',['Variants of goto-cc',['../md_goto-cc.html#variants-of-goto-cc',1,'']]],
@@ -14,7 +14,7 @@ var searchData=
   ['offsets_11',['Objects and Offsets',['../md_modeling-pointers.html#objects-and-offsets',1,'']]],
   ['only_12',['only',['../md_api.html#cproverfixedbvn-c-only',1,'__CPROVER::fixedbv&amp;lt;N&amp;gt; (C++ only)'],['../md_api.html#cproversignedbvn-c-only',1,'__CPROVER::signedbv&amp;lt;N&amp;gt; (C++ only)'],['../md_api.html#cproverunsignedbvn-c-only',1,'__CPROVER::unsignedbv&amp;lt;N&amp;gt; (C++ only)']]],
   ['open_20programs_13',['Pointers in Open Programs',['../md_modeling-pointers.html#pointers-in-open-programs',1,'']]],
-  ['options_14',['options',['../md_unsound__options.html#experimental-options',1,'Experimental Options'],['../md_goto-analyzer.html#other-options',1,'Other Options']]],
+  ['options_14',['Options',['../md_unsound__options.html#experimental-options',1,'Experimental Options'],['../md_goto-analyzer.html#other-options',1,'Other Options']]],
   ['options_20for_20various_20tools_15',['Unsound CLI options for various tools',['../md_unsound__options.html#unsound-cli-options-for-various-tools',1,'']]],
   ['options_20that_20may_20yield_20unsound_20results_16',['Examples of Options that may yield Unsound Results',['../md_unsound__options.html#examples-of-options-that-may-yield-unsound-results',1,'']]],
   ['other_20options_17',['Other Options',['../md_goto-analyzer.html#other-options',1,'']]],

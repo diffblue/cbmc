@@ -6,7 +6,6 @@ var classmulti__namespacet =
     [ "add", "classmulti__namespacet.html#a055958ac7cb0cb5b5fbde5e8765fd94c", null ],
     [ "lookup", "classmulti__namespacet.html#a339a3aff16c15e50c3b93500879d44f9", null ],
     [ "lookup", "classmulti__namespacet.html#a4adf485675aad92bb6137fecc3e640ff", null ],
-    [ "lookup", "classmulti__namespacet.html#a0ef987674384133f6f310c439133d3e0", null ],
     [ "lookup", "classmulti__namespacet.html#a754f0c7f49ee39c37cb3bbf4d29e2139", null ],
     [ "lookup", "classmulti__namespacet.html#a54e287c192852de79bef2d3f9ce70775", null ],
     [ "smallest_unused_suffix", "classmulti__namespacet.html#a6872c4d7b98067ba07abd32996ecf1da", null ],

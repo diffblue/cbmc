@@ -1,17 +1,17 @@
 var smt__terms_8h =
 [
     [ "smt_termt", "classsmt__termt.html", "classsmt__termt" ],
-    [ "smt_termt::storert< derivedt >", "classsmt__termt_1_1storert.html", "classsmt__termt_1_1storert" ],
+    [ "smt_termt::storert&lt; derivedt &gt;", "classsmt__termt_1_1storert.html", "classsmt__termt_1_1storert" ],
     [ "smt_bool_literal_termt", "classsmt__bool__literal__termt.html", "classsmt__bool__literal__termt" ],
     [ "smt_identifier_termt", "classsmt__identifier__termt.html", "classsmt__identifier__termt" ],
     [ "smt_bit_vector_constant_termt", "classsmt__bit__vector__constant__termt.html", "classsmt__bit__vector__constant__termt" ],
     [ "smt_function_application_termt", "classsmt__function__application__termt.html", "classsmt__function__application__termt" ],
-    [ "smt_function_application_termt::has_indicest< functiont, class >", "structsmt__function__application__termt_1_1has__indicest.html", null ],
-    [ "smt_function_application_termt::has_indicest< functiont, std::void_t< decltype(std::declval< functiont >().indices())> >", "structsmt__function__application__termt_1_1has__indicest_3_01functiont_00_01std_1_1void__t_3_01d3decc81de71c84a3e9ed33eb6a5b5091.html", null ],
-    [ "smt_function_application_termt::factoryt< functiont >", "classsmt__function__application__termt_1_1factoryt.html", "classsmt__function__application__termt_1_1factoryt" ],
+    [ "smt_function_application_termt::has_indicest&lt; functiont, class &gt;", "structsmt__function__application__termt_1_1has__indicest.html", null ],
+    [ "smt_function_application_termt::has_indicest&lt; functiont, std::void_t&lt; decltype(std::declval&lt; functiont &gt;().indices())&gt; &gt;", "structsmt__function__application__termt_1_1has__indicest_3_01functiont_00_01std_1_1void__t_3_01d3decc81de71c84a3e9ed33eb6a5b5091.html", null ],
+    [ "smt_function_application_termt::factoryt&lt; functiont &gt;", "classsmt__function__application__termt_1_1factoryt.html", "classsmt__function__application__termt_1_1factoryt" ],
     [ "smt_forall_termt", "classsmt__forall__termt.html", "classsmt__forall__termt" ],
     [ "smt_exists_termt", "classsmt__exists__termt.html", "classsmt__exists__termt" ],
-    [ "smt_term_const_downcast_visitort", "classsmt__term__const__downcast__visitort.html", null ],
+    [ "smt_term_const_downcast_visitort", "classsmt__term__const__downcast__visitort.html", "classsmt__term__const__downcast__visitort" ],
     [ "TERM_ID", "smt__terms_8h.html#a8243b0d0ba0d76b2d27bdd2232c9a8c8", null ],
     [ "mp_integer", "smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0", null ]
 ];

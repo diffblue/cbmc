@@ -1,13 +1,19 @@
 <map id="smt2_tokenizert::smt2_errort" name="smt2_tokenizert::smt2_errort">
-<area shape="rect" id="Node000001" title="Exception thrown by the tokenizer (and the parser built on top of it) to report a syntactic error at ..." alt="" coords="13,421,181,461"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="26,333,167,359"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="99,372,99,421,94,421,94,372"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="5,244,188,284"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="99,298,99,333,94,333,94,298"/>
-<area shape="rect" id="Node000004" title=" " alt="" coords="24,155,169,195"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="99,209,99,244,94,244,94,209"/>
-<area shape="rect" id="Node000005" title=" " alt="" coords="11,80,182,105"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="99,119,99,155,94,155,94,119"/>
-<area shape="rect" id="Node000006" title=" " alt="" coords="43,5,150,31"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="99,45,99,80,94,80,94,45"/>
+<area shape="rect" id="Node000001" title="Exception thrown by the tokenizer (and the parser built on top of it) to report a syntactic error at ..." alt="" coords="82,525,249,570"/>
+<area shape="rect" id="Node000002" href="$classcprover__exception__baset.html" title="Base class for exceptions thrown in the cprover project." alt="" coords="73,448,257,476"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="167,489,168,526,163,523,163,493"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="54,347,140,375"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="116,385,159,447,153,448,114,390"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,253,144,298"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="85,310,96,347,91,347,84,316"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="176,347,317,375"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="229,386,199,426,179,449,175,446,195,422,225,389"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="168,253,349,298"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="255,311,251,348,246,346,252,316"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="186,159,331,204"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="259,217,261,254,256,252,258,222"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="174,82,343,110"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="259,123,261,159,256,158,258,128"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="205,5,312,33"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="259,46,261,83,256,81,258,51"/>
 </map>

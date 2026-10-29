@@ -1,8 +1,8 @@
 var classbv__refinementt =
 [
-    [ "approximationt", "structbv__refinementt_1_1approximationt.html", "structbv__refinementt_1_1approximationt" ],
     [ "configt", "structbv__refinementt_1_1configt.html", "structbv__refinementt_1_1configt" ],
     [ "infot", "structbv__refinementt_1_1infot.html", "structbv__refinementt_1_1infot" ],
+    [ "approximationt", "structbv__refinementt_1_1approximationt.html", "structbv__refinementt_1_1approximationt" ],
     [ "bv_refinementt", "classbv__refinementt.html#a4ccf3dd5b1f844a9d996bd3d10c8a209", null ],
     [ "add_approximation", "classbv__refinementt.html#a5b1aabf4e79eafd798c83b081694f84d", null ],
     [ "arrays_overapproximated", "classbv__refinementt.html#ab2df522fc498d6bea072c8c6c40b9165", null ],

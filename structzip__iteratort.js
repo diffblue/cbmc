@@ -4,7 +4,7 @@ var structzip__iteratort =
     [ "iterator_category", "structzip__iteratort.html#ae3896ca6ff6a5cb7ff475cbd2d120add", null ],
     [ "pointer", "structzip__iteratort.html#ad35b46c5eac589d3794af0080515140f", null ],
     [ "reference", "structzip__iteratort.html#ae3c70629e0bfeac5b26a9f055412aed6", null ],
-    [ "value_type", "structzip__iteratort.html#af7e17e274a2d95a807f8a6392e4184fe", null ],
+    [ "value_type", "structzip__iteratort.html#a93df781d9f8d496935cbc5c2fccfd7ba", null ],
     [ "zip_iteratort", "structzip__iteratort.html#a021b12391aa101aebbce954fcfb458a4", null ],
     [ "end_reached", "structzip__iteratort.html#afd558b9fc504bc514fb3d1a04ac53a21", null ],
     [ "operator!=", "structzip__iteratort.html#a43177c50339ab5b64ed55a6dc964e318", null ],

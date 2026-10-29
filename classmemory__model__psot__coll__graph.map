@@ -1,41 +1,31 @@
 <map id="memory_model_psot" name="memory_model_psot">
-<area shape="rect" id="Node000001" title=" " alt="" coords="1672,297,1832,322"/>
-<area shape="rect" id="Node000002" href="$classmemory__model__tsot.html" title=" " alt="" coords="1465,297,1623,322"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1637,307,1672,307,1672,312,1637,312"/>
-<area shape="rect" id="Node000003" href="$classmemory__model__sct.html" title=" " alt="" coords="1265,297,1416,322"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1430,307,1465,307,1465,312,1430,312"/>
-<area shape="rect" id="Node000004" href="$classmemory__model__baset.html" title=" " alt="" coords="1048,297,1216,322"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="1230,307,1265,307,1265,312,1230,312"/>
-<area shape="rect" id="Node000005" href="$classpartial__order__concurrencyt.html" title="Base class for implementing memory models via additional constraints for SSA equations." alt="" coords="695,223,891,249"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="866,249,1073,294,1071,299,865,254"/>
-<area shape="rect" id="Node000006" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="428,59,531,85"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="518,89,768,221,766,226,516,93"/>
-<area shape="rect" id="Node000007" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="33,59,173,85"/>
-<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="187,69,427,69,427,75,187,75"/>
-<area shape="rect" id="Node000008" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="27,10,180,35"/>
-<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="194,28,380,51,428,59,427,64,380,56,193,33"/>
-<area shape="rect" id="Node000015" title=" " alt="" coords="406,159,553,199"/>
-<area shape="poly" id="edge8_Node000005_Node000015" title=" " alt="" coords="567,192,723,221,722,226,566,197"/>
-<area shape="rect" id="Node000013" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="67,174,139,199"/>
-<area shape="poly" id="edge9_Node000015_Node000013" title=" " alt="" coords="153,183,406,178,406,183,153,188"/>
-<area shape="rect" id="Node000016" href="$structpartial__order__concurrencyt_1_1a__rect.html" title=" " alt="" coords="5,109,201,149"/>
-<area shape="poly" id="edge10_Node000015_Node000016" title=" " alt="" coords="215,138,380,159,406,163,405,168,380,164,215,143"/>
-<area shape="rect" id="Node000020" title=" " alt="" coords="36,303,171,329"/>
-<area shape="poly" id="edge11_Node000015_Node000020" title=" " alt="" coords="151,296,422,196,424,201,153,301"/>
-<area shape="rect" id="Node000021" title=" " alt="" coords="404,273,555,313"/>
-<area shape="poly" id="edge14_Node000021_Node000020" title=" " alt="" coords="185,317,278,318,380,312,404,309,404,314,380,317,278,323,185,323"/>
-<area shape="rect" id="Node000029" title=" " alt="" coords="717,354,868,409"/>
-<area shape="poly" id="edge20_Node000029_Node000020" title=" " alt="" coords="175,329,283,349,404,367,572,377,717,380,717,385,572,383,404,372,282,355,174,334"/>
-<area shape="poly" id="edge12_Node000005_Node000021" title=" " alt="" coords="568,275,722,246,723,251,569,280"/>
-<area shape="rect" id="Node000018" title=" " alt="" coords="28,396,179,436"/>
-<area shape="poly" id="edge13_Node000021_Node000018" title=" " alt="" coords="191,393,283,369,379,338,438,311,441,316,381,342,284,374,193,399"/>
-<area shape="rect" id="Node000022" href="$classtypet.html" title="The type of an expression, extends irept." alt="" coords="451,223,507,249"/>
-<area shape="poly" id="edge15_Node000005_Node000022" title=" " alt="" coords="521,233,695,233,695,239,521,239"/>
-<area shape="rect" id="Node000023" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="77,223,129,249"/>
-<area shape="poly" id="edge16_Node000022_Node000023" title=" " alt="" coords="143,233,451,233,451,239,143,239"/>
-<area shape="poly" id="edge17_Node000004_Node000029" title=" " alt="" coords="881,360,1071,319,1072,325,882,365"/>
-<area shape="rect" id="Node000030" href="$classsymbol__exprt.html" title="Expression to hold a symbol (variable)" alt="" coords="424,445,535,470"/>
-<area shape="poly" id="edge18_Node000029_Node000030" title=" " alt="" coords="548,440,670,412,716,400,717,405,671,417,549,446"/>
-<area shape="rect" id="Node000031" href="$classnullary__exprt.html" title="An expression without operands." alt="" coords="49,461,157,486"/>
-<area shape="poly" id="edge19_Node000030_Node000031" title=" " alt="" coords="171,468,424,457,424,462,171,473"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="1585,229,1744,257"/>
+<area shape="rect" id="Node000002" href="$classmemory__model__tsot.html" title=" " alt="" coords="1379,229,1536,257"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1551,241,1587,243,1582,243,1551,246"/>
+<area shape="rect" id="Node000003" href="$classmemory__model__sct.html" title=" " alt="" coords="1180,229,1330,257"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1346,241,1382,243,1376,243,1346,246"/>
+<area shape="rect" id="Node000004" href="$classmemory__model__baset.html" title=" " alt="" coords="963,229,1130,257"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="1146,241,1182,243,1177,243,1146,246"/>
+<area shape="rect" id="Node000005" href="$classpartial__order__concurrencyt.html" title="Base class for implementing memory models via additional constraints for SSA equations." alt="" coords="718,160,914,188"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="879,190,1000,229,995,229,879,195"/>
+<area shape="rect" id="Node000006" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="394,100,496,128"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="511,118,695,143,761,159,755,160,694,148,511,123"/>
+<area shape="rect" id="Node000007" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="12,124,151,152"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="166,130,395,115,392,119,167,135"/>
+<area shape="rect" id="Node000008" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="5,72,158,100"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="173,90,396,108,392,112,173,95"/>
+<area shape="rect" id="Node000015" title=" " alt="" coords="372,152,518,196"/>
+<area shape="poly" id="edge8_Node000005_Node000015" title=" " alt="" coords="533,171,720,173,715,174,534,176"/>
+<area shape="rect" id="Node000016" title=" " alt="" coords="15,223,148,250"/>
+<area shape="poly" id="edge9_Node000015_Node000016" title=" " alt="" coords="145,216,181,207,280,190,374,180,369,182,281,196,182,212,147,221"/>
+<area shape="rect" id="Node000017" title=" " alt="" coords="370,221,520,266"/>
+<area shape="poly" id="edge11_Node000017_Node000016" title=" " alt="" coords="164,235,371,240,368,244,164,241"/>
+<area shape="rect" id="Node000030" title=" " alt="" coords="544,286,694,347"/>
+<area shape="poly" id="edge15_Node000030_Node000016" title=" " alt="" coords="105,259,140,290,161,304,183,314,229,328,277,337,375,343,466,339,541,331,546,331,467,344,375,348,276,342,228,333,181,319,158,309,137,294,104,264"/>
+<area shape="poly" id="edge10_Node000005_Node000017" title=" " alt="" coords="535,229,694,202,759,189,764,188,695,207,536,234"/>
+<area shape="rect" id="Node000018" href="$classtypet.html" title="The type of an expression, extends irept." alt="" coords="417,24,472,52"/>
+<area shape="poly" id="edge12_Node000005_Node000018" title=" " alt="" coords="488,40,585,57,641,72,695,91,754,124,800,160,795,159,751,129,693,96,639,77,584,62,488,45"/>
+<area shape="rect" id="Node000019" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="56,5,107,33"/>
+<area shape="poly" id="edge13_Node000018_Node000019" title=" " alt="" coords="122,19,418,34,415,39,123,24"/>
+<area shape="poly" id="edge14_Node000004_Node000030" title=" " alt="" coords="710,298,960,258,965,257,710,304"/>
 </map>

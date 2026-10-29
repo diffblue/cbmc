@@ -1,6 +1,6 @@
 var interval__template_8h =
 [
-    [ "interval_templatet< T >", "classinterval__templatet.html", "classinterval__templatet" ],
+    [ "interval_templatet&lt; T &gt;", "classinterval__templatet.html", "classinterval__templatet" ],
     [ "lower_interval", "interval__template_8h.html#a0b03b09d00ccadd5c94a22c3c1708ee3", null ],
     [ "operator!=", "interval__template_8h.html#a871dd827b4bff177197bb11905b46ab2", null ],
     [ "operator<", "interval__template_8h.html#a96bf70fd5bf540118f2d9cc2097f060f", null ],

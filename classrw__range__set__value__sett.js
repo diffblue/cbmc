@@ -3,8 +3,6 @@ var classrw__range__set__value__sett =
     [ "rw_range_set_value_sett", "classrw__range__set__value__sett.html#a5eb734f6c59ded0e7d652e8dbeb44587", null ],
     [ "get_array_objects", "classrw__range__set__value__sett.html#a4a6891ee382ee5fab98773adeb1c66ae", null ],
     [ "get_objects_dereference", "classrw__range__set__value__sett.html#a006daa6c082778cf086194a0e4a3cfe2", null ],
-    [ "get_objects_rec", "classrw__range__set__value__sett.html#a967f168338101ee5925177a651dce9bd", null ],
-    [ "get_objects_rec", "classrw__range__set__value__sett.html#acb06827c5669cd32aafbb25bd9513b52", null ],
     [ "get_objects_rec", "classrw__range__set__value__sett.html#a7991fb5906ad4fffec2bb5b2b5793086", null ],
     [ "get_objects_rec", "classrw__range__set__value__sett.html#ae07d9e4f9bdb88cf0aade8c88bc1e2bd", null ],
     [ "get_objects_rec", "classrw__range__set__value__sett.html#a93a939eeef2559d351d3dfac37e9836a", null ],

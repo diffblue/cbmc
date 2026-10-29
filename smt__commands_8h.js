@@ -11,7 +11,7 @@ var smt__commands_8h =
     [ "smt_pop_commandt", "classsmt__pop__commandt.html", "classsmt__pop__commandt" ],
     [ "smt_set_logic_commandt", "classsmt__set__logic__commandt.html", "classsmt__set__logic__commandt" ],
     [ "smt_set_option_commandt", "classsmt__set__option__commandt.html", "classsmt__set__option__commandt" ],
-    [ "smt_command_const_downcast_visitort", "classsmt__command__const__downcast__visitort.html", null ],
+    [ "smt_command_const_downcast_visitort", "classsmt__command__const__downcast__visitort.html", "classsmt__command__const__downcast__visitort" ],
     [ "smt_command_functiont", "classsmt__command__functiont.html", "classsmt__command__functiont" ],
     [ "COMMAND_ID", "smt__commands_8h.html#a0c210d1b94361689254547c86247c5d3", null ]
 ];

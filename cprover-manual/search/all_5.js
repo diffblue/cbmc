@@ -7,6 +7,6 @@ var searchData=
   ['detecting_20potential_20misuses_20of_20memory_20primitives_4',['Detecting potential misuses of memory primitives',['../md_memory-primitives.html#detecting-potential-misuses-of-memory-primitives',1,'']]],
   ['device_20behavior_5',['Device behavior',['../md_modeling-mmio.html#device-behavior',1,'']]],
   ['documentation_6',['Further documentation',['../md_jbmc-user-manual.html#further-documentation',1,'']]],
-  ['domain_7',['domain',['../md_goto-analyzer.html#configuration-of-the-variable-sensitivity-domain',1,'Configuration of the Variable Sensitivity Domain'],['../md_goto-analyzer.html#domain',1,'Domain']]],
+  ['domain_7',['Domain',['../md_goto-analyzer.html#configuration-of-the-variable-sensitivity-domain',1,'Configuration of the Variable Sensitivity Domain'],['../md_goto-analyzer.html#domain',1,'Domain']]],
   ['dynamic_20memory_8',['Checking if a pointer points to dynamic memory',['../md_memory-primitives.html#checking-if-a-pointer-points-to-dynamic-memory',1,'']]]
 ];

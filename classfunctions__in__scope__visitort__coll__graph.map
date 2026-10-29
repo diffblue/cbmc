@@ -1,42 +1,27 @@
 <map id="functions_in_scope_visitort" name="functions_in_scope_visitort">
-<area shape="rect" id="Node000001" title="Predicate to be used with the exprt::visit() function." alt="" coords="1979,149,2125,189"/>
-<area shape="rect" id="Node000002" href="$classgoto__functionst.html" title="A collection of goto functions." alt="" coords="1707,156,1829,181"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1843,166,1978,166,1978,171,1843,171"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="1419,149,1565,189"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1579,166,1707,166,1707,171,1579,171"/>
-<area shape="rect" id="Node000004" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="501,235,573,260"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="587,241,1418,172,1419,177,588,246"/>
-<area shape="rect" id="Node000011" title=" " alt="" coords="785,105,956,131"/>
-<area shape="poly" id="edge12_Node000011_Node000004" title=" " alt="" coords="586,233,630,219,749,171,842,128,844,133,752,176,632,225,588,238"/>
-<area shape="rect" id="Node000016" title=" " alt="" coords="795,285,946,311"/>
-<area shape="poly" id="edge21_Node000016_Node000004" title=" " alt="" coords="587,261,655,278,727,288,795,293,795,298,726,293,654,283,586,266"/>
-<area shape="rect" id="Node000005" href="$classgoto__functiont.html" title="A goto function, consisting of function body (see body) and parameter identifiers (see parameter_iden..." alt="" coords="1189,105,1305,131"/>
-<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="1319,130,1419,151,1418,156,1318,135"/>
-<area shape="rect" id="Node000006" href="$classgoto__programt.html" title="A generic container class for the GOTO intermediate representation of one function." alt="" coords="811,56,930,81"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="944,72,1049,82,1166,98,1191,103,1190,108,1165,103,1048,88,943,77"/>
-<area shape="rect" id="Node000007" title=" " alt="" coords="450,55,625,80"/>
-<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="638,65,811,66,811,71,638,70"/>
-<area shape="rect" id="Node000008" title=" " alt="" coords="157,73,287,99"/>
-<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="300,79,450,70,450,75,301,84"/>
-<area shape="poly" id="edge13_Node000011_Node000008" title=" " alt="" coords="301,92,444,103,627,111,785,114,785,120,626,116,444,109,300,97"/>
-<area shape="rect" id="Node000015" title=" " alt="" coords="444,5,631,31"/>
-<area shape="poly" id="edge19_Node000015_Node000008" title=" " alt="" coords="267,66,310,53,377,38,443,27,444,32,378,43,311,58,269,71"/>
-<area shape="rect" id="Node000009" title=" " alt="" coords="5,133,44,159"/>
-<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="56,128,67,123,161,96,162,101,69,129,58,133"/>
-<area shape="rect" id="Node000010" title=" " alt="" coords="168,133,276,159"/>
-<area shape="poly" id="edge10_Node000010_Node000009" title=" " alt="" coords="58,143,168,143,168,149,58,149"/>
-<area shape="rect" id="Node000012" title=" " alt="" coords="470,185,605,211"/>
-<area shape="poly" id="edge16_Node000012_Node000009" title=" " alt="" coords="58,155,105,170,158,182,241,192,326,197,470,198,470,203,326,203,241,198,157,187,103,175,56,160"/>
-<area shape="poly" id="edge9_Node000007_Node000010" title=" " alt="" coords="289,129,419,98,493,77,494,83,421,103,290,134"/>
-<area shape="poly" id="edge11_Node000005_Node000011" title=" " alt="" coords="970,115,1189,115,1189,121,970,121"/>
-<area shape="poly" id="edge14_Node000003_Node000012" title=" " alt="" coords="618,187,655,185,873,175,1088,169,1418,166,1419,171,1088,175,873,180,655,190,619,193"/>
-<area shape="rect" id="Node000013" title=" " alt="" coords="203,256,241,281"/>
-<area shape="poly" id="edge15_Node000012_Node000013" title=" " alt="" coords="255,262,330,249,419,229,443,219,482,208,484,213,445,225,421,234,331,255,255,267"/>
-<area shape="rect" id="Node000017" title=" " alt="" coords="483,299,592,324"/>
-<area shape="poly" id="edge23_Node000017_Node000013" title=" " alt="" coords="255,270,311,278,483,301,482,307,310,283,254,276"/>
-<area shape="rect" id="Node000014" href="$classmessage__handlert.html" title=" " alt="" coords="1001,15,1144,40"/>
-<area shape="poly" id="edge17_Node000001_Node000014" title=" " alt="" coords="1158,36,1255,46,1361,50,1769,50,1807,53,1845,60,1916,86,1978,117,2024,146,2021,151,1975,122,1914,91,1843,66,1806,58,1769,55,1361,55,1255,51,1158,41"/>
-<area shape="poly" id="edge18_Node000014_Node000015" title=" " alt="" coords="645,17,1001,23,1001,29,645,23"/>
-<area shape="poly" id="edge20_Node000001_Node000016" title=" " alt="" coords="960,295,1246,295,1769,295,1808,292,1846,284,1918,255,1979,219,2025,187,2028,191,1982,224,1920,259,1847,289,1808,297,1769,301,1246,301,960,301"/>
-<area shape="poly" id="edge22_Node000016_Node000017" title=" " alt="" coords="606,320,681,326,761,323,830,308,831,313,762,329,681,332,605,325"/>
+<area shape="rect" id="Node000001" title="Predicate to be used with the exprt::visit() function." alt="" coords="1188,112,1333,157"/>
+<area shape="rect" id="Node000002" href="$classgoto__functionst.html" title="A collection of goto functions." alt="" coords="885,121,1007,148"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1023,132,1190,134,1185,134,1023,137"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="551,111,697,155"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="713,131,887,134,882,134,713,136"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="161,121,294,148"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="310,131,553,132,548,134,310,137"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="5,37,44,64"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="57,66,69,72,185,118,181,122,67,76,58,72"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="173,9,282,36"/>
+<area shape="poly" id="edge13_Node000012_Node000005" title=" " alt="" coords="58,43,174,27,172,32,60,48"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="5,149,44,176"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="59,155,161,141,160,146,60,160"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="163,177,292,204"/>
+<area shape="poly" id="edge9_Node000009_Node000006" title=" " alt="" coords="58,180,68,183,116,192,165,195,160,196,115,197,67,189,57,185"/>
+<area shape="rect" id="Node000007" href="$classmessage__handlert.html" title=" " alt="" coords="875,178,1017,206"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1032,182,1096,174,1163,162,1190,158,1195,157,1164,167,1097,179,1032,187"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="531,179,717,207"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="733,190,878,192,872,192,733,195"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="307,188,533,192,528,193,307,194"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="550,59,699,87"/>
+<area shape="poly" id="edge10_Node000001_Node000010" title=" " alt="" coords="715,69,921,74,1043,84,1164,101,1198,112,1193,111,1163,106,1043,89,921,79,715,74"/>
+<area shape="rect" id="Node000011" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="192,65,263,92"/>
+<area shape="poly" id="edge11_Node000010_Node000011" title=" " alt="" coords="278,76,507,74,552,75,547,76,507,79,279,81"/>
+<area shape="poly" id="edge12_Node000010_Node000012" title=" " alt="" coords="297,25,507,49,552,58,547,59,507,54,297,31"/>
 </map>

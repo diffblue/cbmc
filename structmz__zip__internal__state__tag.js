@@ -6,7 +6,7 @@ var structmz__zip__internal__state__tag =
     [ "m_init_flags", "structmz__zip__internal__state__tag.html#a84de35546e672e87f0f8c98a8ed0c92b", null ],
     [ "m_mem_capacity", "structmz__zip__internal__state__tag.html#a71f011527805e3ac48f5f12cb73d2233", null ],
     [ "m_mem_size", "structmz__zip__internal__state__tag.html#a4511d7743e1a63fb78ed066f8de96466", null ],
-    [ "m_pFile", "structmz__zip__internal__state__tag.html#abd82e3ab03081af64315ee3dfb687a7c", null ],
+    [ "m_pFile", "structmz__zip__internal__state__tag.html#a983d6519b4721e4fff03f5c5d2908972", null ],
     [ "m_pMem", "structmz__zip__internal__state__tag.html#ac0f2149f384cffd332635b3a5323c377", null ],
     [ "m_sorted_central_dir_offsets", "structmz__zip__internal__state__tag.html#a1e3af54224b61cb20d6ceaeb5807bc33", null ],
     [ "m_zip64", "structmz__zip__internal__state__tag.html#a9d483ae9e65542742b3f81522c8fd077", null ],

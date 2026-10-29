@@ -11,5 +11,5 @@ var searchData=
   ['db_5fentry_5fpoint_5fpostfix_8',['DB_ENTRY_POINT_POSTFIX',['../statement__list__entry__point_8cpp.html#a9c659505179d006e9089f84a5dfc0d9c',1,'statement_list_entry_point.cpp']]],
   ['default_5fmax_5fnb_5frefinement_9',['DEFAULT_MAX_NB_REFINEMENT',['../string__refinement_8h.html#a9135d29d4eb9f527e80e67dcfdbd6001',1,'string_refinement.h']]],
   ['deprecated_10',['DEPRECATED',['../deprecate_8h.html#ad034ea058031ed95e52d3bac1743640a',1,'deprecate.h']]],
-  ['dotgraphsettings_11',['dotgraphsettings',['../compile_8cpp.html#a5b1c2ca69fb2572f85dbe78bb577fc8b',1,'DOTGRAPHSETTINGS:&#160;compile.cpp'],['../dot_8cpp.html#a5b1c2ca69fb2572f85dbe78bb577fc8b',1,'DOTGRAPHSETTINGS:&#160;dot.cpp']]]
+  ['dotgraphsettings_11',['DOTGRAPHSETTINGS',['../compile_8cpp.html#a5b1c2ca69fb2572f85dbe78bb577fc8b',1,'DOTGRAPHSETTINGS:&#160;compile.cpp'],['../dot_8cpp.html#a5b1c2ca69fb2572f85dbe78bb577fc8b',1,'DOTGRAPHSETTINGS:&#160;dot.cpp']]]
 ];

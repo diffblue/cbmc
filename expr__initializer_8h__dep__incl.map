@@ -1,43 +1,43 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/expr_initializer.h" name="/home/runner/work/cbmc/cbmc/src/util/expr_initializer.h">
-<area shape="rect" id="Node000001" title="Expression Initialization." alt="" coords="2419,5,2640,45"/>
-<area shape="rect" id="Node000002" href="$assignments__from__json_8cpp.html" title=" " alt="" coords="5,93,224,148"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="2405,30,1951,34,1325,45,696,64,434,79,236,96,225,98,224,92,236,91,434,73,696,59,1324,39,1951,29,2405,25"/>
-<area shape="rect" id="Node000003" href="$java__bytecode__convert__class_8cpp.html" title="JAVA Bytecode Language Conversion." alt="" coords="249,93,493,148"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="2405,31,1999,37,1451,50,905,69,678,81,506,96,493,98,492,92,505,91,678,76,905,64,1451,44,1999,32,2405,26"/>
-<area shape="rect" id="Node000004" href="$java__bytecode__convert__method_8cpp.html" title="JAVA Bytecode Language Conversion." alt="" coords="517,93,779,148"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="2405,32,1586,54,1127,72,936,84,791,96,779,97,779,92,790,91,936,78,1127,67,1586,48,2405,26"/>
-<area shape="rect" id="Node000005" href="$java__entry__point_8cpp.html" title=" " alt="" coords="803,93,1021,148"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="2405,32,1702,54,1316,73,1156,84,1034,96,1022,98,1021,92,1033,91,1155,79,1315,67,1702,49,2405,27"/>
-<area shape="rect" id="Node000006" href="$java__object__factory_8cpp.html" title=" " alt="" coords="1045,93,1264,148"/>
-<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="2405,29,2191,33,1910,43,1594,63,1434,78,1276,96,1265,98,1264,92,1276,91,1433,72,1594,57,1910,38,2191,28,2405,24"/>
-<area shape="rect" id="Node000007" href="$java__string__library__preprocess_8cpp.html" title="Java_string_libraries_preprocess, gives code for methods on strings of the java standard library." alt="" coords="1289,93,1541,148"/>
-<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="2405,33,2024,53,1789,71,1554,96,1541,98,1540,92,1553,91,1788,65,2023,47,2405,28"/>
-<area shape="rect" id="Node000008" href="$java__string__literals_8cpp.html" title=" " alt="" coords="1565,93,1784,148"/>
-<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="2405,36,2126,57,1961,74,1796,96,1785,98,1784,93,1796,91,1960,69,2125,52,2405,31"/>
-<area shape="rect" id="Node000009" href="$remove__java__new_8cpp.html" title="Remove Java New Operators." alt="" coords="1808,93,2027,148"/>
-<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="2405,44,2231,66,2039,96,2028,98,2027,93,2038,91,2230,61,2404,38"/>
-<area shape="rect" id="Node000010" href="$c__typecheck__initializer_8cpp.html" title="ANSI&#45;C Conversion / Type Checking." alt="" coords="2051,93,2263,148"/>
-<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="2442,51,2262,96,2261,91,2440,46"/>
-<area shape="rect" id="Node000011" href="$builtin__functions_8cpp.html" title="Program Transformation." alt="" coords="2287,93,2524,148"/>
-<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="2495,56,2442,95,2439,91,2492,51"/>
-<area shape="rect" id="Node000012" href="$cpp__typecheck__expr_8cpp.html" title="C++ Language Type Checking." alt="" coords="2547,93,2759,148"/>
-<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="2567,51,2620,91,2617,95,2564,56"/>
-<area shape="rect" id="Node000013" href="$cpp__typecheck__initializer_8cpp.html" title="C++ Language Type Checking." alt="" coords="2783,93,2995,148"/>
-<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="2616,46,2789,91,2788,96,2615,51"/>
-<area shape="rect" id="Node000014" href="$linker__script__merge_8cpp.html" title=" " alt="" coords="3020,93,3204,148"/>
-<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="2654,38,2823,60,3008,91,3020,93,3019,98,3008,96,2822,65,2653,43"/>
-<area shape="rect" id="Node000015" href="$dump__c_8cpp.html" title="Dump Goto&#45;Program as C/C++ Source." alt="" coords="3229,93,3422,148"/>
-<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="2654,31,2914,52,3066,69,3216,91,3229,93,3228,98,3216,96,3065,74,2913,57,2654,36"/>
-<area shape="rect" id="Node000016" href="$shadow__memory_8cpp.html" title="Symex Shadow Memory Instrumentation." alt="" coords="3446,93,3666,148"/>
-<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="2654,28,3006,47,3221,65,3435,91,3446,92,3445,98,3434,96,3220,70,3006,52,2654,33"/>
-<area shape="rect" id="Node000017" href="$symex__builtin__functions_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="3690,93,3905,148"/>
-<area shape="poly" id="edge16_Node000001_Node000017" title=" " alt="" coords="2654,25,2851,29,3107,40,3392,59,3679,91,3690,92,3689,98,3678,96,3392,65,3106,45,2851,34,2654,30"/>
-<area shape="rect" id="Node000018" href="$symex__start__thread_8cpp.html" title="Symbolic Execution." alt="" coords="3929,93,4143,148"/>
-<area shape="poly" id="edge17_Node000001_Node000018" title=" " alt="" coords="2654,23,2889,25,3203,34,3559,54,3740,70,3918,91,3929,92,3928,98,3917,96,3740,75,3558,59,3203,39,2889,30,2654,28"/>
-<area shape="rect" id="Node000019" href="$static__lifetime__init_8cpp.html" title=" " alt="" coords="4168,93,4352,148"/>
-<area shape="poly" id="edge18_Node000001_Node000019" title=" " alt="" coords="2654,26,2987,32,3420,45,3846,64,4022,76,4156,91,4168,93,4167,98,4156,96,4022,81,3845,69,3420,50,2986,38,2654,31"/>
-<area shape="rect" id="Node000020" href="$analyze__symbol_8cpp.html" title=" " alt="" coords="4377,93,4581,148"/>
-<area shape="poly" id="edge19_Node000001_Node000020" title=" " alt="" coords="2654,25,3025,32,3519,44,4007,63,4210,76,4364,91,4377,92,4376,98,4364,96,4210,81,4007,68,3518,49,3025,37,2654,31"/>
-<area shape="rect" id="Node000021" href="$expr__initializer_8cpp.html" title="Expression Initialization." alt="" coords="4605,101,4841,141"/>
-<area shape="poly" id="edge20_Node000001_Node000021" title=" " alt="" coords="2654,25,3067,31,3626,43,4185,63,4417,75,4594,91,4641,98,4640,103,4593,96,4417,81,4185,68,3626,49,3067,37,2654,31"/>
+<area shape="rect" id="Node000001" title="Expression Initialization." alt="" coords="2412,5,2633,50"/>
+<area shape="rect" id="Node000002" href="$assignments__from__json_8cpp.html" title=" " alt="" coords="5,98,224,160"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="2394,29,1944,35,1320,46,996,54,694,66,433,81,236,101,225,102,224,97,236,95,433,76,693,61,996,49,1319,40,1944,30,2400,29"/>
+<area shape="rect" id="Node000003" href="$java__bytecode__convert__class_8cpp.html" title="JAVA Bytecode Language Conversion." alt="" coords="248,98,491,160"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="2394,30,1992,39,1445,51,901,71,674,85,503,101,492,102,491,97,502,95,674,79,900,66,1445,46,1992,33,2400,30"/>
+<area shape="rect" id="Node000004" href="$java__bytecode__convert__method_8cpp.html" title="JAVA Bytecode Language Conversion." alt="" coords="515,98,775,160"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="2395,31,1581,56,1123,75,933,87,788,101,776,102,775,97,788,95,932,82,1122,70,1580,50,2400,31"/>
+<area shape="rect" id="Node000005" href="$java__entry__point_8cpp.html" title=" " alt="" coords="800,98,1018,160"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="2394,32,1696,56,1311,75,1152,87,1031,101,1019,103,1018,97,1030,95,1152,82,1311,70,1696,51,2399,32"/>
+<area shape="rect" id="Node000006" href="$java__object__factory_8cpp.html" title=" " alt="" coords="1043,98,1261,160"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="2394,28,2183,34,1903,43,1589,64,1430,80,1274,101,1262,103,1261,97,1273,95,1429,75,1589,59,1903,38,2183,28,2399,28"/>
+<area shape="rect" id="Node000007" href="$java__string__library__preprocess_8cpp.html" title="Java_string_libraries_preprocess, gives code for methods on strings of the java standard library." alt="" coords="1285,98,1536,160"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="2394,32,2228,42,2016,54,1782,73,1548,101,1537,102,1536,97,1547,95,1782,68,2016,49,2228,36,2399,32"/>
+<area shape="rect" id="Node000008" href="$java__string__literals_8cpp.html" title=" " alt="" coords="1560,98,1778,160"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="2400,35,2118,59,1954,77,1791,101,1779,103,1779,97,1790,95,1953,72,2118,54,2394,35"/>
+<area shape="rect" id="Node000009" href="$remove__java__new_8cpp.html" title="Remove Java New Operators." alt="" coords="1803,98,2021,160"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="2399,43,2224,69,2034,101,2022,103,2021,98,2033,95,2223,64,2394,43"/>
+<area shape="rect" id="Node000010" href="$c__typecheck__initializer_8cpp.html" title="ANSI&#45;C Conversion / Type Checking." alt="" coords="2045,98,2256,160"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="2429,54,2257,102,2256,97,2424,55"/>
+<area shape="rect" id="Node000011" href="$builtin__functions_8cpp.html" title="Program Transformation." alt="" coords="2280,98,2517,160"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="2486,59,2437,100,2435,95,2481,61"/>
+<area shape="rect" id="Node000012" href="$cpp__typecheck__expr_8cpp.html" title="C++ Language Type Checking." alt="" coords="2541,98,2752,160"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="2562,57,2611,98,2606,97,2560,62"/>
+<area shape="rect" id="Node000013" href="$cpp__typecheck__initializer_8cpp.html" title="C++ Language Type Checking." alt="" coords="2777,98,2988,160"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="2616,52,2779,99,2774,98,2615,57"/>
+<area shape="rect" id="Node000014" href="$linker__script__merge_8cpp.html" title=" " alt="" coords="3012,98,3196,160"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="2649,40,2816,63,3000,95,3014,101,3009,100,2999,101,2816,68,2648,45"/>
+<area shape="rect" id="Node000015" href="$dump__c_8cpp.html" title="Dump Goto&#45;Program as C/C++ Source." alt="" coords="3220,98,3412,160"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="2648,33,2908,54,3059,72,3208,95,3222,101,3217,100,3207,101,3058,77,2907,59,2648,38"/>
+<area shape="rect" id="Node000016" href="$shadow__memory_8cpp.html" title="Symex Shadow Memory Instrumentation." alt="" coords="3436,98,3655,160"/>
+<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="2648,30,2805,36,2999,48,3212,67,3424,95,3438,100,3432,100,3423,101,3211,73,2998,54,2804,41,2648,35"/>
+<area shape="rect" id="Node000017" href="$symex__builtin__functions_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="3678,98,3892,160"/>
+<area shape="poly" id="edge16_Node000001_Node000017" title=" " alt="" coords="2648,26,2845,30,3099,40,3382,61,3526,76,3667,95,3681,100,3675,100,3666,101,3526,82,3382,66,3099,46,2845,35,2648,32"/>
+<area shape="rect" id="Node000018" href="$symex__start__thread_8cpp.html" title="Symbolic Execution." alt="" coords="3916,98,4129,160"/>
+<area shape="poly" id="edge17_Node000001_Node000018" title=" " alt="" coords="2648,29,3296,52,3648,71,3793,83,3904,95,3918,100,3913,100,3903,101,3793,88,3647,77,3296,57,2648,35"/>
+<area shape="rect" id="Node000019" href="$static__lifetime__init_8cpp.html" title=" " alt="" coords="4154,98,4337,160"/>
+<area shape="poly" id="edge18_Node000001_Node000019" title=" " alt="" coords="2648,28,2980,34,3410,46,3833,66,4008,79,4142,95,4156,100,4150,100,4141,101,4008,85,3833,71,3410,51,2979,39,2648,33"/>
+<area shape="rect" id="Node000020" href="$analyze__symbol_8cpp.html" title=" " alt="" coords="4361,98,4564,160"/>
+<area shape="poly" id="edge19_Node000001_Node000020" title=" " alt="" coords="2648,28,3018,33,3509,45,3995,65,4196,79,4350,95,4363,100,4358,100,4349,101,4196,84,3995,70,3509,50,3018,38,2648,33"/>
+<area shape="rect" id="Node000021" href="$expr__initializer_8cpp.html" title="Expression Initialization." alt="" coords="4589,106,4824,151"/>
+<area shape="poly" id="edge20_Node000001_Node000021" title=" " alt="" coords="2648,27,3059,33,3616,45,4171,65,4401,79,4576,95,4624,106,4619,106,4575,101,4401,84,4170,70,3616,50,3059,38,2648,33"/>
 </map>

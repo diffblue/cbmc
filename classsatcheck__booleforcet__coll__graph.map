@@ -1,28 +1,26 @@
 <map id="satcheck_booleforcet" name="satcheck_booleforcet">
-<area shape="rect" id="Node000001" title=" " alt="" coords="1267,157,1428,183"/>
-<area shape="rect" id="Node000002" href="$classsatcheck__booleforce__baset.html" title=" " alt="" coords="1061,150,1217,190"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1231,167,1266,167,1266,173,1231,173"/>
-<area shape="rect" id="Node000003" href="$classcnf__solvert.html" title=" " alt="" coords="917,157,1012,183"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1026,167,1061,167,1061,173,1026,173"/>
-<area shape="rect" id="Node000004" href="$classcnft.html" title=" " alt="" coords="821,157,868,183"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="882,167,917,167,917,173,882,173"/>
-<area shape="rect" id="Node000005" href="$classpropt.html" title="TO_BE_DOCUMENTED." alt="" coords="665,157,721,183"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="734,167,821,167,821,173,734,173"/>
-<area shape="rect" id="Node000006" title=" " alt="" coords="337,55,501,80"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="468,82,665,157,664,162,466,87"/>
-<area shape="rect" id="Node000007" href="$classliteralt.html" title=" " alt="" coords="55,5,120,31"/>
-<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="134,20,314,45,355,52,354,57,313,50,133,26"/>
-<area shape="rect" id="Node000008" title=" " alt="" coords="23,55,152,80"/>
-<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="166,65,337,65,337,70,166,70"/>
-<area shape="rect" id="Node000010" href="$classmessaget.html" title="Class that provides messages with a built&#45;in verbosity &#39;level&#39;." alt="" coords="376,264,463,289"/>
-<area shape="poly" id="edge8_Node000005_Node000010" title=" " alt="" coords="465,256,664,178,666,183,467,261"/>
-<area shape="rect" id="Node000015" href="$classmessaget_1_1mstreamt.html" title=" " alt="" coords="613,264,772,289"/>
-<area shape="poly" id="edge13_Node000015_Node000010" title=" " alt="" coords="477,274,613,274,613,279,477,279"/>
-<area shape="rect" id="Node000011" href="$classmessaget_1_1eomt.html" title=" " alt="" coords="23,104,151,129"/>
-<area shape="poly" id="edge9_Node000010_Node000011" title=" " alt="" coords="166,110,240,118,279,128,315,144,350,171,379,204,414,263,410,265,374,207,346,174,312,148,277,133,239,123,165,115"/>
-<area shape="rect" id="Node000012" href="$classmessaget_1_1commandt.html" title=" " alt="" coords="5,296,169,321"/>
-<area shape="poly" id="edge10_Node000010_Node000012" title=" " alt="" coords="183,311,247,311,313,305,383,287,384,292,314,310,248,316,183,317"/>
-<area shape="rect" id="Node000013" href="$classmessage__handlert.html" title=" " alt="" coords="16,345,159,371"/>
-<area shape="poly" id="edge11_Node000010_Node000013" title=" " alt="" coords="172,354,242,347,313,331,360,311,399,287,401,292,363,315,314,337,242,352,173,360"/>
-<area shape="poly" id="edge12_Node000010_Node000015" title=" " alt="" coords="628,295,590,301,557,303,525,301,463,290,464,285,526,295,557,298,589,295,627,289"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="1267,90,1427,117"/>
+<area shape="rect" id="Node000002" href="$classsatcheck__booleforce__baset.html" title=" " alt="" coords="1062,81,1217,126"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1232,101,1269,103,1264,104,1233,106"/>
+<area shape="rect" id="Node000003" href="$classcnf__solvert.html" title=" " alt="" coords="919,90,1013,117"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1028,101,1064,103,1059,104,1029,106"/>
+<area shape="rect" id="Node000004" href="$classcnft.html" title=" " alt="" coords="825,90,870,117"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="885,101,922,103,916,104,886,106"/>
+<area shape="rect" id="Node000005" href="$classpropt.html" title="TO_BE_DOCUMENTED." alt="" coords="669,90,724,117"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="740,101,827,103,822,104,740,106"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="340,26,503,53"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="499,55,671,96,666,98,499,60"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="23,12,151,40"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="166,27,341,34,338,38,168,32"/>
+<area shape="rect" id="Node000009" href="$classmessaget.html" title="Class that provides messages with a built&#45;in verbosity &#39;level&#39;." alt="" coords="379,323,464,351"/>
+<area shape="poly" id="edge7_Node000005_Node000009" title=" " alt="" coords="449,310,676,118,681,117,452,315"/>
+<area shape="rect" id="Node000014" href="$classmessaget_1_1mstreamt.html" title=" " alt="" coords="618,323,775,351"/>
+<area shape="poly" id="edge12_Node000014_Node000009" title=" " alt="" coords="479,334,620,336,615,337,479,339"/>
+<area shape="rect" id="Node000010" href="$classmessaget_1_1eomt.html" title=" " alt="" coords="23,68,151,96"/>
+<area shape="poly" id="edge8_Node000009_Node000010" title=" " alt="" coords="165,72,204,73,243,78,282,90,317,109,343,132,364,160,394,221,412,279,421,324,416,321,407,281,390,223,359,163,339,136,314,114,280,95,242,83,203,78,167,77"/>
+<area shape="rect" id="Node000011" href="$classmessaget_1_1commandt.html" title=" " alt="" coords="5,347,169,375"/>
+<area shape="poly" id="edge9_Node000009_Node000011" title=" " alt="" coords="184,362,249,362,315,357,381,347,376,349,316,362,249,367,185,367"/>
+<area shape="rect" id="Node000012" href="$classmessage__handlert.html" title=" " alt="" coords="16,403,158,431"/>
+<area shape="poly" id="edge10_Node000009_Node000012" title=" " alt="" coords="173,414,243,408,315,392,361,372,398,352,403,350,364,377,316,398,244,413,173,420"/>
+<area shape="poly" id="edge11_Node000009_Node000014" title=" " alt="" coords="638,355,594,366,561,368,527,366,464,352,465,347,527,360,561,363,594,360,633,355"/>
 </map>

@@ -1,8 +1,8 @@
 var arith__tools_8h =
 [
-    [ "numeric_castt< Target, typename >", "structnumeric__castt.html", null ],
-    [ "numeric_castt< mp_integer >", "structnumeric__castt_3_01mp__integer_01_4.html", "structnumeric__castt_3_01mp__integer_01_4" ],
-    [ "numeric_castt< T, typename std::enable_if< std::is_integral< T >::value >::type >", "structnumeric__castt_3_01_t_00_01typename_01std_1_1enable__if_3_01std_1_1is__integral_3_01_t_01_4_1_1value_01_4_1_1type_01_4.html", "structnumeric__castt_3_01_t_00_01typename_01std_1_1enable__if_3_01std_1_1is__integral_3_01_t_01_4_1_1value_01_4_1_1type_01_4" ],
+    [ "numeric_castt&lt; Target, typename &gt;", "structnumeric__castt.html", null ],
+    [ "numeric_castt&lt; mp_integer &gt;", "structnumeric__castt_3_01mp__integer_01_4.html", "structnumeric__castt_3_01mp__integer_01_4" ],
+    [ "numeric_castt&lt; T, typename std::enable_if&lt; std::is_integral&lt; T &gt;::value &gt;::type &gt;", "structnumeric__castt_3_01_t_00_01typename_01std_1_1enable__if_3_01std_1_1is__integral_3_01_t_01_4_1_1value_01_4_1_1type_01_4.html", "structnumeric__castt_3_01_t_00_01typename_01std_1_1enable__if_3_01std_1_1is__integral_3_01_t_01_4_1_1value_01_4_1_1type_01_4" ],
     [ "address_bits", "arith__tools_8h.html#a5902666fb744db615dbf736ad4c19a26", null ],
     [ "bvrep2integer", "arith__tools_8h.html#ae092137df14934bb20a34b294f2c9eeb", null ],
     [ "from_integer", "arith__tools_8h.html#a31f0721a9ec3035332ed9ede9732fc9b", null ],

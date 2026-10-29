@@ -1,19 +1,19 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/rw_set.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/rw_set.h">
-<area shape="rect" id="Node000001" title="Race Detection for Threaded Goto Programs." alt="" coords="831,5,1025,60"/>
-<area shape="rect" id="Node000002" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="5,108,264,163"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="818,47,570,73,276,111,264,112,264,107,276,105,569,68,817,42"/>
-<area shape="rect" id="Node000003" href="$interrupt_8cpp.html" title="Interrupt Instrumentation." alt="" coords="289,108,482,163"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="818,53,664,79,494,111,483,113,482,108,493,105,663,73,817,48"/>
-<area shape="rect" id="Node000004" href="$mmio_8cpp.html" title="Memory&#45;mapped I/O Instrumentation for Goto Programs." alt="" coords="506,108,699,163"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="831,67,688,110,687,105,829,62"/>
-<area shape="rect" id="Node000005" href="$race__check_8cpp.html" title="Race Detection for Threaded Goto Programs." alt="" coords="723,108,917,163"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="891,72,850,110,846,106,888,68"/>
-<area shape="rect" id="Node000006" href="$rw__set_8cpp.html" title="Race Detection for Threaded Goto Programs." alt="" coords="941,108,1134,163"/>
-<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="969,68,1011,106,1007,110,965,72"/>
-<area shape="rect" id="Node000007" href="$goto2graph_8cpp.html" title="Turns a goto&#45;program into an abstract event graph." alt="" coords="1158,108,1351,163"/>
-<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1027,62,1170,105,1169,110,1025,67"/>
-<area shape="rect" id="Node000008" href="$shared__buffers_8cpp.html" title=" " alt="" coords="1375,108,1569,163"/>
-<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1039,48,1193,73,1365,105,1375,108,1374,113,1363,111,1192,79,1038,53"/>
-<area shape="rect" id="Node000009" href="$weak__memory_8cpp.html" title="Weak Memory Instrumentation for Threaded Goto Programs." alt="" coords="1593,108,1786,163"/>
-<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1039,40,1288,64,1435,83,1582,105,1593,107,1592,113,1581,111,1435,88,1287,69,1038,45"/>
+<area shape="rect" id="Node000001" title="Race Detection for Threaded Goto Programs." alt="" coords="827,5,1020,67"/>
+<area shape="rect" id="Node000002" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="5,115,263,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="809,48,566,77,276,118,264,120,263,114,275,112,565,72,815,47"/>
+<area shape="rect" id="Node000003" href="$interrupt_8cpp.html" title="Interrupt Instrumentation." alt="" coords="287,115,480,177"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="815,54,660,84,492,118,480,120,479,115,491,112,659,78,809,55"/>
+<area shape="rect" id="Node000004" href="$mmio_8cpp.html" title="Memory&#45;mapped I/O Instrumentation for Goto Programs." alt="" coords="503,115,696,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="821,72,691,117,690,112,815,73"/>
+<area shape="rect" id="Node000005" href="$race__check_8cpp.html" title="Race Detection for Threaded Goto Programs." alt="" coords="719,115,912,177"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="885,77,847,117,844,112,880,79"/>
+<area shape="rect" id="Node000006" href="$rw__set_8cpp.html" title="Race Detection for Threaded Goto Programs." alt="" coords="935,115,1128,177"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="965,76,1004,115,999,114,963,81"/>
+<area shape="rect" id="Node000007" href="$goto2graph_8cpp.html" title="Turns a goto&#45;program into an abstract event graph." alt="" coords="1151,115,1344,177"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1029,70,1159,115,1154,114,1028,75"/>
+<area shape="rect" id="Node000008" href="$shared__buffers_8cpp.html" title=" " alt="" coords="1367,115,1560,177"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1035,52,1188,78,1356,112,1370,118,1364,117,1355,118,1187,84,1035,57"/>
+<area shape="rect" id="Node000009" href="$weak__memory_8cpp.html" title="Weak Memory Instrumentation for Threaded Goto Programs." alt="" coords="1583,115,1776,177"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1035,43,1282,68,1428,88,1572,112,1586,118,1580,117,1571,118,1427,93,1282,73,1035,48"/>
 </map>

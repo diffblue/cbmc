@@ -1,99 +1,77 @@
 <map id="goto_inlinet" name="goto_inlinet">
-<area shape="rect" id="Node000001" title=" " alt="" coords="2457,500,2556,525"/>
-<area shape="rect" id="Node000002" href="$classmessaget.html" title="Class that provides messages with a built&#45;in verbosity &#39;level&#39;." alt="" coords="2152,753,2239,779"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="2251,748,2411,701,2430,681,2448,658,2474,608,2491,560,2500,525,2505,526,2496,562,2479,610,2452,661,2434,685,2413,706,2253,753"/>
-<area shape="rect" id="Node000009" href="$classmessaget_1_1mstreamt.html" title=" " alt="" coords="2732,715,2891,740"/>
-<area shape="poly" id="edge13_Node000009_Node000002" title=" " alt="" coords="2252,760,2731,730,2732,735,2253,765"/>
-<area shape="rect" id="Node000003" href="$classmessaget_1_1eomt.html" title=" " alt="" coords="1773,719,1901,744"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1915,736,2152,759,2152,765,1914,741"/>
-<area shape="rect" id="Node000004" href="$classmessaget_1_1commandt.html" title=" " alt="" coords="1755,951,1919,976"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="1898,976,1941,982,1988,983,2035,977,2079,960,2103,942,2124,919,2157,867,2178,816,2189,778,2194,779,2183,818,2162,870,2128,923,2107,946,2081,964,2036,982,1988,989,1940,987,1898,981"/>
-<area shape="rect" id="Node000005" href="$classmessage__handlert.html" title=" " alt="" coords="1109,769,1252,795"/>
-<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="1266,778,2152,764,2152,769,1266,783"/>
-<area shape="rect" id="Node000006" title=" " alt="" coords="651,769,837,795"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="851,779,1109,779,1109,785,851,785"/>
-<area shape="rect" id="Node000007" title=" " alt="" coords="157,661,287,687"/>
-<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="240,697,270,734,290,751,312,765,358,782,407,794,456,801,506,804,599,801,677,792,677,797,600,807,506,809,456,806,406,799,356,787,310,770,286,756,266,738,236,700"/>
-<area shape="rect" id="Node000027" title=" " alt="" coords="448,711,623,736"/>
-<area shape="poly" id="edge27_Node000027_Node000007" title=" " alt="" coords="248,694,277,716,312,733,356,742,401,743,445,740,483,733,484,739,445,745,401,749,355,747,310,738,274,720,245,698"/>
-<area shape="rect" id="Node000029" title=" " alt="" coords="881,596,1052,621"/>
-<area shape="poly" id="edge32_Node000029_Node000007" title=" " alt="" coords="253,652,280,638,310,627,409,620,573,617,837,615,881,613,881,618,837,621,573,622,409,625,311,633,282,643,256,656"/>
-<area shape="rect" id="Node000008" title=" " alt="" coords="5,421,44,447"/>
-<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="39,458,70,515,105,559,143,600,207,659,203,663,140,604,101,563,66,518,34,461"/>
-<area shape="rect" id="Node000028" title=" " alt="" coords="168,511,276,536"/>
-<area shape="poly" id="edge29_Node000028_Node000008" title=" " alt="" coords="52,453,69,465,123,490,175,508,174,513,121,495,67,470,49,458"/>
-<area shape="rect" id="Node000030" title=" " alt="" coords="899,352,1034,377"/>
-<area shape="poly" id="edge35_Node000030_Node000008" title=" " alt="" coords="58,429,899,367,899,372,58,434"/>
-<area shape="rect" id="Node000035" title=" " alt="" coords="459,189,611,229"/>
-<area shape="poly" id="edge41_Node000035_Node000008" title=" " alt="" coords="33,408,50,370,76,326,111,283,133,265,156,250,194,234,233,221,314,206,392,200,459,200,459,205,392,205,315,211,234,227,196,239,159,255,136,269,115,287,81,329,55,373,38,410"/>
-<area shape="rect" id="Node000037" title=" " alt="" coords="451,256,619,281"/>
-<area shape="poly" id="edge46_Node000037_Node000008" title=" " alt="" coords="46,410,94,366,156,322,230,285,265,274,310,265,341,261,365,261,420,265,451,265,451,270,420,270,365,267,341,266,311,270,266,279,232,290,159,327,98,370,50,414"/>
-<area shape="poly" id="edge8_Node000002_Node000009" title=" " alt="" coords="2770,748,2709,770,2634,789,2574,798,2513,799,2436,795,2329,786,2239,775,2239,769,2330,781,2436,790,2513,794,2574,793,2633,784,2707,765,2768,743"/>
-<area shape="rect" id="Node000010" title=" " alt="" coords="2436,197,2577,223"/>
-<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="2529,232,2580,301,2654,423,2722,546,2806,713,2801,716,2717,548,2650,426,2575,303,2525,235"/>
-<area shape="rect" id="Node000011" title=" " alt="" coords="2104,111,2287,151"/>
-<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="2289,152,2456,195,2455,200,2288,157"/>
-<area shape="rect" id="Node000012" title=" " alt="" coords="1764,27,1909,67"/>
-<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="1923,65,2109,109,2108,114,1922,70"/>
-<area shape="rect" id="Node000013" title=" " alt="" coords="1314,5,1485,31"/>
-<area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="1499,22,1764,40,1764,45,1498,27"/>
-<area shape="rect" id="Node000015" href="$classsource__locationt.html" title=" " alt="" coords="2442,315,2571,340"/>
-<area shape="poly" id="edge14_Node000009_Node000015" title=" " alt="" coords="2522,351,2580,486,2590,519,2604,549,2649,602,2701,649,2751,686,2790,712,2787,717,2748,690,2698,653,2645,606,2599,551,2585,521,2575,488,2517,353"/>
-<area shape="rect" id="Node000016" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="2169,179,2221,204"/>
-<area shape="poly" id="edge15_Node000015_Node000016" title=" " alt="" coords="2235,189,2320,197,2368,209,2413,228,2441,247,2466,270,2499,313,2495,316,2462,274,2438,251,2411,232,2366,214,2319,202,2235,194"/>
-<area shape="rect" id="Node000017" href="$classsharing__treet.html" title=" " alt="" coords="1753,121,1920,176"/>
-<area shape="poly" id="edge16_Node000016_Node000017" title=" " alt="" coords="1934,157,2170,186,2169,191,1933,163"/>
-<area shape="rect" id="Node000018" href="$classtree__nodet.html" title="A node with data in a tree, it contains:" alt="" coords="861,129,1072,169"/>
-<area shape="poly" id="edge17_Node000017_Node000018" title=" " alt="" coords="1086,146,1753,146,1753,151,1086,151"/>
-<area shape="rect" id="Node000022" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="1309,55,1490,95"/>
-<area shape="poly" id="edge20_Node000022_Node000018" title=" " alt="" coords="1085,126,1308,88,1309,93,1086,131"/>
-<area shape="rect" id="Node000020" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="499,487,571,512"/>
-<area shape="poly" id="edge18_Node000018_Node000020" title=" " alt="" coords="562,476,596,443,624,401,632,380,634,360,631,323,630,288,636,269,649,250,670,228,694,210,748,182,805,163,861,153,862,158,807,169,750,187,697,214,674,232,653,253,641,271,635,288,636,323,639,360,637,381,629,403,600,446,566,479"/>
-<area shape="rect" id="Node000024" title=" " alt="" coords="1763,533,1910,573"/>
-<area shape="poly" id="edge23_Node000024_Node000020" title=" " alt="" coords="585,503,710,517,862,530,1122,542,1378,549,1763,551,1763,556,1378,554,1121,548,861,535,710,522,585,508"/>
-<area shape="poly" id="edge31_Node000029_Node000020" title=" " alt="" coords="576,515,651,543,703,555,744,561,785,565,838,574,919,593,918,598,837,579,784,571,743,566,702,561,650,549,575,520"/>
-<area shape="rect" id="Node000036" title=" " alt="" coords="890,257,1043,297"/>
-<area shape="poly" id="edge43_Node000036_Node000020" title=" " alt="" coords="572,478,926,294,928,299,575,483"/>
-<area shape="rect" id="Node000041" href="$classgoto__inlinet_1_1goto__inline__logt_1_1goto__inline__log__infot.html" title=" " alt="" coords="878,401,1055,456"/>
-<area shape="poly" id="edge51_Node000041_Node000020" title=" " alt="" coords="585,494,700,485,837,465,882,453,884,459,838,470,701,490,585,500"/>
-<area shape="rect" id="Node000042" title=" " alt="" coords="895,646,1038,686"/>
-<area shape="poly" id="edge55_Node000042_Node000020" title=" " alt="" coords="560,520,600,557,652,592,696,608,760,624,896,651,894,656,758,629,695,613,649,596,597,562,556,524"/>
-<area shape="poly" id="edge19_Node000017_Node000022" title=" " alt="" coords="1504,90,1730,127,1754,131,1753,137,1729,133,1503,95"/>
-<area shape="rect" id="Node000023" href="$classgoto__functionst.html" title="A collection of goto functions." alt="" coords="2134,539,2257,564"/>
-<area shape="poly" id="edge21_Node000001_Node000023" title=" " alt="" coords="2270,539,2457,516,2457,521,2271,545"/>
-<area shape="poly" id="edge22_Node000023_Node000024" title=" " alt="" coords="1924,550,2134,549,2134,554,1924,555"/>
-<area shape="rect" id="Node000025" href="$classgoto__functiont.html" title="A goto function, consisting of function body (see body) and parameter identifiers (see parameter_iden..." alt="" coords="1341,596,1457,621"/>
-<area shape="poly" id="edge24_Node000024_Node000025" title=" " alt="" coords="1471,608,1593,605,1661,599,1729,589,1788,570,1790,575,1730,594,1662,605,1593,611,1472,614"/>
-<area shape="rect" id="Node000026" href="$classgoto__programt.html" title="A generic container class for the GOTO intermediate representation of one function." alt="" coords="907,711,1026,736"/>
-<area shape="poly" id="edge25_Node000025_Node000026" title=" " alt="" coords="1034,705,1071,695,1353,619,1354,624,1073,701,1035,710"/>
-<area shape="poly" id="edge26_Node000026_Node000027" title=" " alt="" coords="637,721,907,721,907,726,637,726"/>
-<area shape="poly" id="edge28_Node000027_Node000028" title=" " alt="" coords="238,547,312,688,335,698,368,706,448,716,447,721,367,711,333,703,309,692,234,550"/>
-<area shape="poly" id="edge30_Node000025_Node000029" title=" " alt="" coords="1066,606,1341,606,1341,611,1066,611"/>
-<area shape="poly" id="edge53_Node000001_Node000030" title=" " alt="" coords="1031,346,1096,334,1246,313,1398,307,2197,307,2249,314,2298,331,2345,356,2387,386,2456,450,2498,498,2494,502,2452,453,2384,390,2342,361,2296,336,2247,319,2197,313,1398,313,1247,318,1096,339,1032,352"/>
-<area shape="poly" id="edge33_Node000024_Node000030" title=" " alt="" coords="1048,355,1183,351,1267,353,1358,360,1453,372,1548,392,1642,419,1731,457,1757,473,1782,493,1820,531,1817,534,1778,497,1754,478,1728,462,1640,425,1547,397,1452,378,1357,365,1267,359,1183,357,1048,360"/>
-<area shape="rect" id="Node000039" title=" " alt="" coords="1289,442,1509,511"/>
-<area shape="poly" id="edge52_Node000039_Node000030" title=" " alt="" coords="1048,374,1074,386,1082,395,1086,404,1090,412,1097,418,1140,438,1177,443,1216,444,1266,449,1290,453,1289,458,1265,454,1216,449,1177,448,1139,443,1095,423,1086,415,1082,406,1078,398,1070,391,1046,379"/>
-<area shape="rect" id="Node000031" title=" " alt="" coords="203,337,241,363"/>
-<area shape="poly" id="edge34_Node000030_Node000031" title=" " alt="" coords="255,348,311,350,899,361,899,366,311,355,255,354"/>
-<area shape="poly" id="edge40_Node000035_Node000031" title=" " alt="" coords="253,332,338,290,443,241,478,226,480,231,445,246,340,294,255,337"/>
-<area shape="poly" id="edge45_Node000037_Node000031" title=" " alt="" coords="255,347,331,342,376,335,419,325,471,303,513,279,516,284,474,308,421,330,377,341,332,347,255,352"/>
-<area shape="rect" id="Node000043" title=" " alt="" coords="444,660,627,685"/>
-<area shape="poly" id="edge57_Node000043_Node000031" title=" " alt="" coords="238,374,268,428,313,500,374,574,408,609,445,638,484,658,482,662,443,643,405,613,370,578,309,503,263,431,233,376"/>
-<area shape="rect" id="Node000032" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="1785,236,1888,261"/>
-<area shape="poly" id="edge36_Node000001_Node000032" title=" " alt="" coords="1902,243,2026,239,2177,242,2251,247,2318,256,2374,270,2414,289,2426,303,2431,317,2439,351,2502,499,2497,501,2433,352,2426,318,2422,306,2410,293,2372,275,2317,261,2250,252,2176,247,2026,244,1902,248"/>
-<area shape="rect" id="Node000033" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="1329,247,1469,272"/>
-<area shape="poly" id="edge37_Node000032_Node000033" title=" " alt="" coords="1483,255,1785,247,1785,253,1483,260"/>
-<area shape="rect" id="Node000034" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="1323,197,1476,223"/>
-<area shape="poly" id="edge38_Node000032_Node000034" title=" " alt="" coords="1490,215,1785,242,1785,247,1489,221"/>
-<area shape="poly" id="edge39_Node000034_Node000035" title=" " alt="" coords="625,206,1323,207,1323,213,625,211"/>
-<area shape="poly" id="edge42_Node000034_Node000036" title=" " alt="" coords="1057,283,1106,284,1159,281,1213,271,1264,254,1276,244,1288,232,1321,219,1323,224,1291,236,1279,248,1267,259,1214,276,1160,286,1106,289,1057,289"/>
-<area shape="poly" id="edge44_Node000036_Node000037" title=" " alt="" coords="634,268,890,273,890,278,633,273"/>
-<area shape="rect" id="Node000038" href="$classgoto__inlinet_1_1goto__inline__logt.html" title=" " alt="" coords="1944,467,2080,507"/>
-<area shape="poly" id="edge47_Node000001_Node000038" title=" " alt="" coords="2094,488,2412,503,2457,506,2457,512,2412,509,2093,493"/>
-<area shape="poly" id="edge48_Node000038_Node000039" title=" " alt="" coords="1523,476,1944,483,1944,489,1523,481"/>
-<area shape="rect" id="Node000040" title=" " alt="" coords="891,481,1042,521"/>
-<area shape="poly" id="edge49_Node000039_Node000040" title=" " alt="" coords="1056,509,1157,514,1211,513,1265,509,1289,505,1290,510,1266,514,1211,519,1156,519,1056,514"/>
-<area shape="poly" id="edge50_Node000039_Node000041" title=" " alt="" coords="1064,457,1096,463,1195,474,1289,477,1289,482,1194,479,1096,469,1063,462"/>
-<area shape="poly" id="edge54_Node000001_Node000042" title=" " alt="" coords="1052,669,1096,671,1265,671,1554,662,1779,650,1887,640,2002,625,2286,573,2384,548,2467,523,2468,528,2386,553,2287,578,2003,630,1888,645,1780,656,1554,667,1265,677,1096,677,1052,675"/>
-<area shape="poly" id="edge56_Node000042_Node000043" title=" " alt="" coords="640,670,837,667,895,666,895,671,837,673,640,675"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="1899,742,1997,770"/>
+<area shape="rect" id="Node000002" href="$classmessaget.html" title="Class that provides messages with a built&#45;in verbosity &#39;level&#39;." alt="" coords="1598,478,1684,506"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1678,512,1758,568,1847,641,1899,694,1938,742,1933,741,1895,698,1844,645,1755,572,1677,517"/>
+<area shape="rect" id="Node000009" href="$classmessaget_1_1mstreamt.html" title=" " alt="" coords="1869,318,2027,346"/>
+<area shape="poly" id="edge13_Node000009_Node000002" title=" " alt="" coords="1699,495,1771,492,1809,483,1844,468,1878,441,1905,407,1925,373,1939,348,1943,345,1930,375,1910,410,1882,445,1847,473,1811,488,1772,497,1700,500"/>
+<area shape="rect" id="Node000003" href="$classmessaget_1_1eomt.html" title=" " alt="" coords="1233,482,1361,510"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1376,493,1547,492,1601,493,1596,494,1547,497,1377,498"/>
+<area shape="rect" id="Node000004" href="$classmessaget_1_1commandt.html" title=" " alt="" coords="1215,426,1379,454"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="1393,446,1547,467,1601,480,1595,481,1547,472,1394,451"/>
+<area shape="rect" id="Node000005" href="$classmessage__handlert.html" title=" " alt="" coords="1226,535,1368,563"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="1383,544,1463,538,1546,524,1605,507,1610,506,1548,529,1464,543,1384,550"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="751,534,938,562"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="952,546,1228,548,1223,550,953,551"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="336,534,464,562"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="479,545,753,547,749,549,481,551"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="80,619,118,647"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="131,617,216,584,338,557,334,560,217,589,134,621"/>
+<area shape="rect" id="Node000028" title=" " alt="" coords="554,843,687,871"/>
+<area shape="poly" id="edge24_Node000028_Node000008" title=" " alt="" coords="115,658,172,760,200,805,218,828,244,839,279,847,368,856,467,859,556,860,551,861,466,864,368,862,278,852,242,844,215,832,195,808,167,763,114,663"/>
+<area shape="rect" id="Node000034" title=" " alt="" coords="325,586,476,630"/>
+<area shape="poly" id="edge31_Node000034_Node000008" title=" " alt="" coords="133,628,326,612,323,616,135,633"/>
+<area shape="rect" id="Node000036" title=" " alt="" coords="317,663,484,691"/>
+<area shape="poly" id="edge35_Node000036_Node000008" title=" " alt="" coords="133,637,217,650,319,666,314,668,216,656,135,642"/>
+<area shape="poly" id="edge8_Node000002_Node000009" title=" " alt="" coords="1909,352,1671,480,1669,475,1904,354"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="1571,275,1711,303"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="1726,298,1872,321,1866,321,1727,304"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="1206,158,1388,202"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="1403,169,1476,174,1513,182,1548,195,1575,212,1599,233,1633,276,1628,274,1595,236,1572,216,1546,200,1512,187,1475,179,1404,174"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="772,168,917,213"/>
+<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="932,186,1208,181,1203,183,933,191"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="316,177,485,204"/>
+<area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="499,188,774,189,770,192,501,193"/>
+<area shape="rect" id="Node000015" href="$classsource__locationt.html" title=" " alt="" coords="1577,114,1705,142"/>
+<area shape="poly" id="edge14_Node000009_Node000015" title=" " alt="" coords="1677,148,1928,318,1923,318,1676,153"/>
+<area shape="rect" id="Node000016" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="1271,102,1323,130"/>
+<area shape="poly" id="edge15_Node000015_Node000016" title=" " alt="" coords="1337,115,1579,125,1574,127,1338,120"/>
+<area shape="rect" id="Node000017" href="$classsharing__treet.html" title=" " alt="" coords="762,82,927,144"/>
+<area shape="poly" id="edge16_Node000016_Node000017" title=" " alt="" coords="942,111,1273,115,1269,117,944,116"/>
+<area shape="rect" id="Node000018" href="$classtree__nodet.html" title=" " alt="" coords="5,64,193,109"/>
+<area shape="poly" id="edge17_Node000017_Node000018" title=" " alt="" coords="207,69,317,57,447,51,587,53,658,58,727,68,772,81,767,83,725,73,657,64,587,58,447,56,317,63,210,73"/>
+<area shape="rect" id="Node000025" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="310,100,490,145"/>
+<area shape="poly" id="edge19_Node000025_Node000018" title=" " alt="" coords="188,111,217,115,312,123,308,126,216,121,191,115"/>
+<area shape="poly" id="edge18_Node000017_Node000025" title=" " alt="" coords="505,119,726,115,764,116,759,118,726,121,507,124"/>
+<area shape="rect" id="Node000026" href="$classgoto__functionst.html" title="A collection of goto functions." alt="" coords="1580,702,1702,730"/>
+<area shape="poly" id="edge20_Node000001_Node000026" title=" " alt="" coords="1718,723,1901,750,1896,750,1718,729"/>
+<area shape="rect" id="Node000027" title=" " alt="" coords="1224,727,1370,772"/>
+<area shape="poly" id="edge39_Node000001_Node000027" title=" " alt="" coords="1386,753,1571,764,1711,764,1901,758,1896,759,1711,769,1571,769,1386,759"/>
+<area shape="poly" id="edge21_Node000026_Node000027" title=" " alt="" coords="1385,738,1582,722,1577,722,1386,743"/>
+<area shape="poly" id="edge22_Node000027_Node000028" title=" " alt="" coords="650,831,694,801,749,776,812,760,878,748,1008,736,1128,735,1226,742,1221,742,1128,740,1008,741,878,753,813,765,751,781,697,806,652,836"/>
+<area shape="rect" id="Node000038" title=" " alt="" coords="963,835,1182,914"/>
+<area shape="poly" id="edge38_Node000038_Node000028" title=" " alt="" coords="702,864,750,868,965,876,960,876,750,873,703,870"/>
+<area shape="rect" id="Node000029" title=" " alt="" coords="80,815,118,843"/>
+<area shape="poly" id="edge23_Node000028_Node000029" title=" " alt="" coords="132,846,172,866,217,881,263,889,309,893,402,891,488,882,561,871,556,872,489,887,403,897,309,898,262,894,216,886,170,871,132,851"/>
+<area shape="poly" id="edge30_Node000034_Node000029" title=" " alt="" coords="129,806,220,741,284,691,295,671,299,661,308,650,342,629,338,633,311,654,304,664,300,673,288,695,223,745,132,810"/>
+<area shape="poly" id="edge34_Node000036_Node000029" title=" " alt="" coords="132,821,204,802,245,788,284,769,342,729,384,693,388,690,345,733,287,774,247,792,206,807,134,826"/>
+<area shape="rect" id="Node000040" title=" " alt="" coords="310,935,491,963"/>
+<area shape="poly" id="edge42_Node000040_Node000029" title=" " alt="" coords="120,853,162,899,188,921,218,937,263,950,312,957,307,957,262,955,216,942,185,925,158,903,118,858"/>
+<area shape="rect" id="Node000030" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="1590,650,1692,678"/>
+<area shape="poly" id="edge25_Node000001_Node000030" title=" " alt="" coords="1707,667,1775,677,1846,696,1891,717,1929,742,1924,741,1888,722,1844,701,1774,682,1707,672"/>
+<area shape="rect" id="Node000031" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="1227,663,1367,691"/>
+<area shape="poly" id="edge26_Node000030_Node000031" title=" " alt="" coords="1382,671,1593,666,1587,666,1383,677"/>
+<area shape="rect" id="Node000032" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="1221,611,1373,639"/>
+<area shape="poly" id="edge27_Node000030_Node000032" title=" " alt="" coords="1389,633,1593,658,1587,659,1389,638"/>
+<area shape="rect" id="Node000033" title=" " alt="" coords="764,586,925,630"/>
+<area shape="poly" id="edge28_Node000032_Node000033" title=" " alt="" coords="941,609,1223,622,1218,623,941,614"/>
+<area shape="poly" id="edge29_Node000033_Node000034" title=" " alt="" coords="491,605,766,607,761,609,492,611"/>
+<area shape="rect" id="Node000035" title=" " alt="" coords="768,655,921,700"/>
+<area shape="poly" id="edge32_Node000032_Node000035" title=" " alt="" coords="936,691,993,696,1056,696,1120,689,1181,672,1193,662,1205,650,1232,641,1237,639,1208,654,1196,666,1184,676,1121,694,1056,701,993,701,936,696"/>
+<area shape="poly" id="edge33_Node000035_Node000036" title=" " alt="" coords="499,675,770,676,765,679,500,680"/>
+<area shape="rect" id="Node000037" href="$classgoto__inlinet_1_1goto__inline__logt.html" title=" " alt="" coords="1412,830,1547,874"/>
+<area shape="poly" id="edge36_Node000001_Node000037" title=" " alt="" coords="1562,846,1635,840,1711,830,1779,816,1844,795,1912,771,1917,770,1846,800,1780,821,1712,836,1635,846,1563,851"/>
+<area shape="poly" id="edge37_Node000037_Node000038" title=" " alt="" coords="1198,865,1414,856,1409,856,1198,870"/>
+<area shape="rect" id="Node000039" title=" " alt="" coords="1002,928,1144,973"/>
+<area shape="poly" id="edge40_Node000001_Node000039" title=" " alt="" coords="1159,959,1241,967,1339,970,1443,967,1547,954,1635,933,1701,909,1765,876,1844,831,1891,799,1928,771,1933,769,1895,803,1847,836,1767,881,1703,914,1636,938,1547,959,1444,973,1339,976,1241,972,1159,965"/>
+<area shape="poly" id="edge41_Node000039_Node000040" title=" " alt="" coords="507,947,1003,949,999,952,507,952"/>
 </map>

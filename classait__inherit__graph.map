@@ -1,46 +1,51 @@
 <map id="ait&lt; domainT &gt;" name="ait&lt; domainT &gt;">
-<area shape="rect" id="Node000001" title="ait supplies three of the four components needed: an abstract interpreter (in this case handling func..." alt="" coords="393,325,520,350"/>
-<area shape="rect" id="Node000004" href="$classconcurrency__aware__ait.html" title=" " alt="" coords="1165,56,1337,96"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="456,311,462,264,475,205,501,146,519,120,542,97,580,71,620,50,662,33,705,20,796,6,887,4,975,10,1058,23,1188,54,1187,59,1057,28,975,15,887,9,796,11,706,26,663,38,622,55,582,75,546,101,523,123,506,149,480,207,467,265,462,311"/>
-<area shape="rect" id="Node000006" href="$classconcurrency__aware__ait.html" title="Base class for concurrency&#45;aware abstract interpretation." alt="" coords="763,86,935,126"/>
-<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="459,311,466,272,482,224,506,177,523,156,542,138,567,123,594,111,652,96,709,90,763,91,763,97,710,96,652,101,596,116,570,127,546,143,527,160,511,180,486,226,472,273,464,312"/>
-<area shape="rect" id="Node000007" href="$classait.html" title=" " alt="" coords="755,150,943,190"/>
-<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="464,311,493,255,515,227,543,203,580,190,633,180,754,170,755,175,634,185,581,195,545,208,519,230,497,258,469,314"/>
-<area shape="rect" id="Node000009" href="$classait.html" title=" " alt="" coords="765,214,932,254"/>
-<area shape="poly" id="edge9_Node000001_Node000009" title=" " alt="" coords="482,314,510,294,543,277,599,259,657,246,765,233,765,239,658,251,601,264,545,282,513,298,485,318"/>
-<area shape="rect" id="Node000011" href="$classait.html" title=" " alt="" coords="749,278,948,304"/>
-<area shape="poly" id="edge11_Node000001_Node000011" title=" " alt="" coords="530,320,544,318,649,305,749,295,749,301,650,310,544,323,531,325"/>
-<area shape="rect" id="Node000013" href="$classait.html" title=" " alt="" coords="761,328,937,353"/>
-<area shape="poly" id="edge13_Node000001_Node000013" title=" " alt="" coords="534,336,760,337,760,343,534,341"/>
-<area shape="rect" id="Node000015" href="$classait.html" title=" " alt="" coords="765,378,933,418"/>
-<area shape="poly" id="edge15_Node000001_Node000015" title=" " alt="" coords="496,354,545,371,601,382,659,390,765,396,764,401,658,395,600,388,543,376,494,359"/>
-<area shape="rect" id="Node000017" href="$classait.html" title=" " alt="" coords="779,442,918,482"/>
-<area shape="poly" id="edge17_Node000001_Node000017" title=" " alt="" coords="479,359,508,389,545,414,604,436,666,450,726,457,779,460,779,465,726,463,665,455,603,441,543,419,505,393,475,363"/>
-<area shape="rect" id="Node000019" href="$classait.html" title=" " alt="" coords="755,506,942,532"/>
-<area shape="poly" id="edge19_Node000001_Node000019" title=" " alt="" coords="468,362,479,390,496,422,518,452,545,477,595,501,649,516,704,523,755,524,755,530,704,528,648,521,593,506,543,481,514,456,491,425,475,393,463,364"/>
-<area shape="rect" id="Node000020" href="$classait.html" title=" " alt="" coords="797,556,901,581"/>
-<area shape="poly" id="edge20_Node000001_Node000020" title=" " alt="" coords="463,364,470,405,484,455,509,504,525,526,546,544,575,561,606,573,640,580,674,584,740,584,796,577,797,582,740,589,673,590,639,586,605,578,572,566,542,548,522,529,504,507,479,457,465,407,458,365"/>
-<area shape="rect" id="Node000022" href="$classait.html" title=" " alt="" coords="781,606,916,646"/>
-<area shape="poly" id="edge22_Node000001_Node000022" title=" " alt="" coords="460,364,463,417,475,483,486,518,501,551,520,580,546,605,572,622,601,634,663,646,725,646,781,639,782,644,726,651,663,651,599,639,570,626,542,609,516,584,496,553,481,520,470,485,458,418,455,364"/>
-<area shape="rect" id="Node000002" href="$classai__recursive__interproceduralt.html" title=" " alt="" coords="132,325,344,350"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="358,335,393,335,393,340,358,340"/>
-<area shape="rect" id="Node000003" href="$classai__baset.html" title="This is the basic interface of the abstract interpreter with default implementations of the core func..." alt="" coords="5,325,83,350"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="96,335,132,335,132,340,96,340"/>
-<area shape="rect" id="Node000005" href="$classreaching__definitions__analysist.html" title=" " alt="" coords="1401,56,1555,96"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="1350,74,1401,74,1401,79,1350,79"/>
-<area shape="poly" id="edge6_Node000006_Node000004" title=" " alt="" coords="948,96,1164,80,1165,85,948,101"/>
-<area shape="rect" id="Node000008" href="$classconstant__propagator__ait.html" title=" " alt="" coords="1161,157,1341,182"/>
-<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="956,167,1161,167,1161,172,956,172"/>
-<area shape="rect" id="Node000010" href="$classcustom__bitvector__analysist.html" title=" " alt="" coords="1150,221,1351,246"/>
-<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="946,231,1150,231,1150,236,946,236"/>
-<area shape="rect" id="Node000012" href="$classdependence__grapht.html" title=" " alt="" coords="1175,278,1326,304"/>
-<area shape="poly" id="edge12_Node000011_Node000012" title=" " alt="" coords="962,288,1175,288,1175,294,962,294"/>
-<area shape="rect" id="Node000014" href="$classescape__analysist.html" title=" " alt="" coords="1183,328,1318,353"/>
-<area shape="poly" id="edge14_Node000013_Node000014" title=" " alt="" coords="951,338,1183,338,1183,343,951,343"/>
-<area shape="rect" id="Node000016" href="$classglobal__may__alias__analysist.html" title="This is a may analysis (i.e." alt="" coords="1149,385,1352,410"/>
-<area shape="poly" id="edge16_Node000015_Node000016" title=" " alt="" coords="946,395,1149,395,1149,400,946,400"/>
-<area shape="rect" id="Node000018" href="$classinvariant__propagationt.html" title=" " alt="" coords="1165,449,1336,474"/>
-<area shape="poly" id="edge18_Node000017_Node000018" title=" " alt="" coords="932,459,1165,459,1165,464,932,464"/>
-<area shape="rect" id="Node000021" href="$classvalue__set__analysis__templatet.html" title="This template class implements a data&#45;flow analysis which keeps track of what values different variab..." alt="" coords="1171,548,1330,588"/>
-<area shape="poly" id="edge21_Node000020_Node000021" title=" " alt="" coords="914,566,1171,566,1171,571,914,571"/>
+<area shape="rect" id="Node000001" title="ait supplies three of the four components needed: an abstract interpreter (in this case handling func..." alt="" coords="392,392,517,419"/>
+<area shape="rect" id="Node000004" href="$classvalue__set__analysis__templatet.html" title=" " alt="" coords="1600,282,1799,361"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="532,407,684,412,887,413,1118,408,1236,400,1351,390,1481,369,1602,346,1597,347,1482,375,1352,395,1236,406,1118,413,887,419,684,417,533,412"/>
+<area shape="rect" id="Node000005" href="$classconcurrency__aware__ait.html" title="Base class for concurrency&#45;aware abstract interpretation." alt="" coords="762,701,933,745"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="456,433,459,492,470,563,481,600,496,635,516,667,543,694,566,710,593,723,649,737,707,740,759,739,764,739,707,746,648,742,591,728,564,715,539,698,512,670,491,638,476,602,465,564,454,492,453,437"/>
+<area shape="rect" id="Node000008" href="$classait.html" title=" " alt="" coords="778,86,917,131"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="453,376,456,324,469,258,480,224,495,192,514,162,539,137,557,127,581,119,643,109,713,105,780,106,776,108,713,110,643,115,582,124,559,132,543,141,518,166,499,195,484,226,474,260,462,325,458,378"/>
+<area shape="rect" id="Node000010" href="$classait.html" title=" " alt="" coords="781,225,914,269"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="464,376,492,325,514,299,540,278,583,263,646,253,783,247,778,249,647,259,585,268,542,283,517,303,497,328,468,379"/>
+<area shape="rect" id="Node000011" href="$classait.html" title=" " alt="" coords="786,293,909,321"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="476,378,504,353,540,331,586,320,651,312,789,307,784,309,651,317,587,325,542,336,507,357,479,383"/>
+<area shape="rect" id="Node000012" href="$classait.html" title=" " alt="" coords="754,155,941,200"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="458,375,467,339,482,296,506,253,521,234,540,218,569,208,622,199,756,185,751,187,623,204,570,213,542,223,525,238,510,256,487,298,472,340,463,378"/>
+<area shape="rect" id="Node000014" href="$classait.html" title=" " alt="" coords="764,345,931,389"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="532,396,725,378,767,376,762,377,725,384,533,402"/>
+<area shape="rect" id="Node000016" href="$classait.html" title=" " alt="" coords="749,464,946,491"/>
+<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="480,428,509,451,542,468,593,482,647,488,699,490,751,490,746,491,699,495,646,494,592,487,540,473,506,455,479,433"/>
+<area shape="rect" id="Node000018" href="$classait.html" title=" " alt="" coords="760,516,935,543"/>
+<area shape="poly" id="edge17_Node000001_Node000018" title=" " alt="" coords="468,431,498,480,518,503,542,520,571,533,602,541,665,549,726,548,783,544,778,545,727,553,665,555,600,547,569,538,540,525,514,507,493,483,466,436"/>
+<area shape="rect" id="Node000020" href="$classait.html" title=" " alt="" coords="764,581,931,625"/>
+<area shape="poly" id="edge19_Node000001_Node000020" title=" " alt="" coords="460,432,468,474,483,522,507,567,523,587,542,603,558,610,580,615,636,618,701,616,766,613,761,614,701,622,636,624,579,620,557,615,540,607,519,590,502,570,478,524,463,476,457,437"/>
+<area shape="rect" id="Node000022" href="$classait.html" title=" " alt="" coords="754,649,941,677"/>
+<area shape="poly" id="edge21_Node000001_Node000022" title=" " alt="" coords="457,433,463,484,476,543,487,574,501,602,519,628,543,650,572,667,603,678,637,685,671,688,737,685,791,678,797,677,737,690,671,693,636,691,602,684,569,672,539,654,515,632,496,605,482,576,471,545,458,485,455,437"/>
+<area shape="rect" id="Node000023" href="$classait.html" title=" " alt="" coords="796,34,899,62"/>
+<area shape="poly" id="edge23_Node000001_Node000023" title=" " alt="" coords="457,375,467,304,484,215,508,132,523,100,539,78,568,58,600,44,635,35,670,29,738,29,798,37,793,39,738,34,670,35,636,40,602,49,571,63,543,82,527,103,513,134,489,216,472,305,462,377"/>
+<area shape="rect" id="Node000002" href="$classai__recursive__interproceduralt.html" title=" " alt="" coords="131,392,342,419"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="357,403,394,405,389,407,359,408"/>
+<area shape="rect" id="Node000003" href="$classai__baset.html" title="This is the basic interface of the abstract interpreter with default implementations of the core func..." alt="" coords="5,392,82,419"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="96,403,133,404,129,407,99,408"/>
+<area shape="rect" id="Node000006" href="$classconcurrency__aware__ait.html" title=" " alt="" coords="1165,671,1337,716"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="949,720,1126,711,1162,709,1168,708,1127,716,949,725"/>
+<area shape="rect" id="Node000007" href="$classreaching__definitions__analysist.html" title=" " alt="" coords="1623,671,1776,716"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="1352,691,1625,694,1620,694,1352,696"/>
+<area shape="rect" id="Node000009" href="$classinvariant__propagationt.html" title=" " alt="" coords="1166,94,1336,122"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="932,106,1168,107,1163,109,933,111"/>
+<area shape="rect" id="Node000013" href="$classconstant__propagator__ait.html" title=" " alt="" coords="1161,164,1341,191"/>
+<area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="956,175,1163,177,1158,178,957,180"/>
+<area shape="rect" id="Node000015" href="$classcustom__bitvector__analysist.html" title=" " alt="" coords="1151,353,1351,381"/>
+<area shape="poly" id="edge14_Node000014_Node000015" title=" " alt="" coords="946,364,1153,366,1148,368,947,370"/>
+<area shape="rect" id="Node000017" href="$classdependence__grapht.html" title=" " alt="" coords="1176,464,1326,491"/>
+<area shape="poly" id="edge16_Node000016_Node000017" title=" " alt="" coords="961,475,1178,477,1173,478,962,480"/>
+<area shape="rect" id="Node000019" href="$classescape__analysist.html" title=" " alt="" coords="1184,516,1318,543"/>
+<area shape="poly" id="edge18_Node000018_Node000019" title=" " alt="" coords="951,527,1187,529,1181,530,951,532"/>
+<area shape="rect" id="Node000021" href="$classglobal__may__alias__analysist.html" title="This is a may analysis (i.e." alt="" coords="1150,589,1352,617"/>
+<area shape="poly" id="edge20_Node000020_Node000021" title=" " alt="" coords="947,600,1153,603,1147,603,947,606"/>
+<area shape="poly" id="edge22_Node000022_Node000006" title=" " alt="" coords="956,668,1168,687,1162,687,956,674"/>
+<area shape="rect" id="Node000024" href="$classvalue__set__analysis__templatet.html" title="This template class implements a data&#45;flow analysis which keeps track of what values different variab..." alt="" coords="1172,26,1330,71"/>
+<area shape="poly" id="edge24_Node000023_Node000024" title=" " alt="" coords="914,46,1174,47,1169,49,916,51"/>
+<area shape="poly" id="edge25_Node000024_Node000004" title=" " alt="" coords="1339,74,1353,81,1438,129,1521,183,1652,282,1647,282,1517,187,1436,133,1350,85,1339,80"/>
 </map>

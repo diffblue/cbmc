@@ -1,7 +1,7 @@
 var expr__cast_8h =
 [
-    [ "detail::expr_try_dynamic_cast_return_typet< Ret, T >", "structdetail_1_1expr__try__dynamic__cast__return__typet.html", "structdetail_1_1expr__try__dynamic__cast__return__typet" ],
-    [ "detail::expr_dynamic_cast_return_typet< Ret, T >", "structdetail_1_1expr__dynamic__cast__return__typet.html", "structdetail_1_1expr__dynamic__cast__return__typet" ],
+    [ "detail::expr_try_dynamic_cast_return_typet&lt; Ret, T &gt;", "structdetail_1_1expr__try__dynamic__cast__return__typet.html", "structdetail_1_1expr__try__dynamic__cast__return__typet" ],
+    [ "detail::expr_dynamic_cast_return_typet&lt; Ret, T &gt;", "structdetail_1_1expr__dynamic__cast__return__typet.html", "structdetail_1_1expr__dynamic__cast__return__typet" ],
     [ "can_cast_expr", "expr__cast_8h.html#a42363d1890db7dd905e72b2db8e336e7", null ],
     [ "can_cast_type", "expr__cast_8h.html#ac7fb78eb80468dbaf7502996c29e3b10", null ],
     [ "expr_checked_cast", "expr__cast_8h.html#a3eb7494c8ffec32a7a4eeb4642077644", null ],

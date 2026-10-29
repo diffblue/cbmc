@@ -1,25 +1,25 @@
 <map id="/home/runner/work/cbmc/cbmc/src/solvers/smt2_incremental/smt_object_size.h" name="/home/runner/work/cbmc/cbmc/src/solvers/smt2_incremental/smt_object_size.h">
-<area shape="rect" id="Node000001" title=" " alt="" coords="375,5,603,60"/>
-<area shape="rect" id="Node000002" href="$convert__expr__to__smt_8h.html" title=" " alt="" coords="321,225,517,295"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="469,73,453,109,436,170,426,226,421,225,431,169,448,107,464,71"/>
-<area shape="rect" id="Node000005" href="$smt__object__size_8cpp.html" title=" " alt="" coords="5,343,189,412"/>
-<area shape="poly" id="edge9_Node000001_Node000005" title=" " alt="" coords="451,71,138,344,134,340,447,67"/>
-<area shape="rect" id="Node000007" href="$smt2__incremental__decision__procedure_8h.html" title="Decision procedure with incremental SMT2 solving." alt="" coords="643,225,872,295"/>
-<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="588,63,626,82,660,106,688,134,711,165,745,224,740,227,707,168,684,137,657,110,623,86,586,68"/>
-<area shape="rect" id="Node000009" href="$type__size__mapping_8h.html" title="Utilities for making a map of types to associated sizes." alt="" coords="463,108,647,177"/>
-<area shape="poly" id="edge10_Node000001_Node000009" title=" " alt="" coords="515,71,537,106,532,109,510,74"/>
-<area shape="rect" id="Node000003" href="$convert__expr__to__smt_8cpp.html" title=" " alt="" coords="214,343,410,412"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="380,307,345,344,341,341,376,303"/>
-<area shape="rect" id="Node000004" href="$smt2__incremental__decision__procedure_8cpp.html" title=" " alt="" coords="643,343,872,412"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="531,296,660,340,658,345,529,301"/>
-<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="313,302,190,346,189,341,311,297"/>
-<area shape="rect" id="Node000006" href="$type__size__mapping_8cpp.html" title=" " alt="" coords="435,343,619,412"/>
-<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="462,303,497,341,493,344,458,307"/>
-<area shape="poly" id="edge8_Node000007_Node000004" title=" " alt="" coords="760,309,760,342,755,342,755,309"/>
-<area shape="rect" id="Node000008" href="$solver__factory_8cpp.html" title="Solver Factory." alt="" coords="896,350,1080,405"/>
-<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="838,299,937,348,934,352,836,303"/>
-<area shape="poly" id="edge11_Node000009_Node000002" title=" " alt="" coords="506,188,460,227,457,223,503,184"/>
-<area shape="poly" id="edge12_Node000009_Node000004" title=" " alt="" coords="573,189,597,242,633,293,661,319,693,340,690,345,658,323,629,296,593,244,568,191"/>
-<area shape="poly" id="edge14_Node000009_Node000006" title=" " alt="" coords="552,192,533,343,528,342,546,191"/>
-<area shape="poly" id="edge13_Node000009_Node000007" title=" " alt="" coords="627,182,699,223,697,227,625,187"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="371,5,599,67"/>
+<area shape="rect" id="Node000002" href="$convert__expr__to__smt_8h.html" title=" " alt="" coords="318,242,513,320"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="462,79,449,116,432,182,422,243,417,240,427,181,444,114,459,83"/>
+<area shape="rect" id="Node000005" href="$smt__object__size_8cpp.html" title=" " alt="" coords="5,368,189,447"/>
+<area shape="poly" id="edge9_Node000001_Node000005" title=" " alt="" coords="445,79,139,370,136,366,441,76"/>
+<area shape="rect" id="Node000007" href="$smt2__incremental__decision__procedure_8h.html" title="Decision procedure with incremental SMT2 solving." alt="" coords="639,242,867,320"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="590,71,625,90,656,113,684,143,707,176,740,242,735,240,703,179,680,146,653,117,622,94,590,76"/>
+<area shape="rect" id="Node000009" href="$type__size__mapping_8h.html" title="Utilities for making a map of types to associated sizes." alt="" coords="459,115,642,194"/>
+<area shape="poly" id="edge10_Node000001_Node000009" title=" " alt="" coords="510,78,531,115,526,114,509,83"/>
+<area shape="rect" id="Node000003" href="$convert__expr__to__smt_8cpp.html" title=" " alt="" coords="213,368,408,447"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="375,331,345,370,342,366,371,334"/>
+<area shape="rect" id="Node000004" href="$smt2__incremental__decision__procedure_8cpp.html" title=" " alt="" coords="639,368,867,447"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="528,321,651,368,646,368,527,326"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="301,327,190,373,188,368,306,325"/>
+<area shape="rect" id="Node000006" href="$type__size__mapping_8cpp.html" title=" " alt="" coords="432,368,615,447"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="460,330,493,368,488,367,458,335"/>
+<area shape="poly" id="edge8_Node000007_Node000004" title=" " alt="" coords="755,334,755,370,751,366,751,338"/>
+<area shape="rect" id="Node000008" href="$solver__factory_8cpp.html" title="Solver Factory." alt="" coords="891,377,1074,438"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="838,326,929,377,924,376,837,331"/>
+<area shape="poly" id="edge11_Node000009_Node000002" title=" " alt="" coords="500,203,459,243,456,239,495,206"/>
+<area shape="poly" id="edge12_Node000009_Node000004" title=" " alt="" coords="568,206,593,264,609,292,628,319,654,344,684,368,679,367,651,348,624,322,605,295,588,266,565,211"/>
+<area shape="poly" id="edge14_Node000009_Node000006" title=" " alt="" coords="547,207,530,369,525,366,543,211"/>
+<area shape="poly" id="edge13_Node000009_Node000007" title=" " alt="" coords="627,199,693,241,687,241,626,205"/>
 </map>

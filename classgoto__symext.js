@@ -39,7 +39,6 @@ var classgoto__symext =
     [ "initialize_path_storage_from_entry_point_of", "classgoto__symext.html#afd59f0e1d7e492500e92ff2f94c33397", null ],
     [ "kill_instruction_local_symbols", "classgoto__symext.html#a974d709d44928fbeda58ff70ded77850", null ],
     [ "lift_let", "classgoto__symext.html#a3c156d7282c7c76388f2890ae068d219", null ],
-    [ "lift_lets", "classgoto__symext.html#a9641f303eff7a1c5e7c6a92180dcd41b", null ],
     [ "locality", "classgoto__symext.html#adc715333e61f75202bb996ea814a7eec", null ],
     [ "loop_bound_exceeded", "classgoto__symext.html#a7622181904c577b24a97b4f591373e6e", null ],
     [ "make_auto_object", "classgoto__symext.html#aae10d1a9173dd069eaa66c029c1ed5e5", null ],
