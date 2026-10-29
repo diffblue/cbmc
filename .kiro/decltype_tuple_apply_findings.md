@@ -15610,3 +15610,21 @@ Checks on W186: 13 suites, profiles, unit, lint, format, doxygen,
 platform, vacuity 1144/3, per-commit compile, MSVC .ii (2 known).
 Next (order agreed with the user): N3 (exception object lifetime), #5
 (manipulator overload), #6 (cin >> i), VTT, MSVC streams.
+
+## Round 206 (2026-10-29): exception object lifetime, ranges reduction
+
+- ae4f7da1aa (N3): handler reference parameters bind to the exception
+  object ([except.handle]/15); every handler exit other than a rethrow
+  destroys it ([except.throw]/5), dispatched on the thrown type tag, unless
+  another active handler holds it; other temporaries of a throw-expression
+  are destroyed ([class.temporary]/4).  std::exception_ptr not modelled.
+  cpp11_exception_object_destroyed_after_the_handler -> CORE; STL1's
+  --depth 30 -> 40 (one more global initialized).
+- c95de4a64a KNOWNBUG: `D t = D{{6}, 7};' (aggregate with a base) puts 6
+  into w.
+- 3941885609 KNOWNBUG cpp20_call_result_through_pack_in_static_member_
+  template: 103-line cvise reduction of the ranges KNOWNBUG (oracle: both
+  forms in one run, compilers accepting both as static_asserts).
+Checks on W187: 13 suites, profiles, unit, lint, format, doxygen,
+platform, vacuity 1144/3, per-commit compile, MSVC .ii (2 known).
+Next: #5 (manipulator overload), #6 (cin >> i), VTT, MSVC streams.
