@@ -1822,6 +1822,8 @@ int __builtin___snprintf_chk(
 #undef vsnprintf
 
 char __VERIFIER_nondet_char(void);
+int __VERIFIER_nondet_int(void);
+size_t __VERIFIER_nondet_size_t(void);
 
 int vsnprintf(char *str, size_t size, const char *fmt, va_list ap)
 {
@@ -1849,16 +1851,29 @@ int vsnprintf(char *str, size_t size, const char *fmt, va_list ap)
   }
 #endif
 
-  size_t i = 0;
-  for(; i < size; ++i)
+  // C11 7.21.6.12p3: the return value is the number of characters that
+  // would have been written had size been sufficiently large, not counting
+  // the terminating null character, or a negative value if an encoding
+  // error occurred. Thus the return value may be size or larger.
+  int retval = __VERIFIER_nondet_int();
+  __CPROVER_assume(retval >= -1);
+
+  // C11 7.21.6.12p2: if size is zero, nothing is written. Otherwise, output
+  // characters beyond the size-1st are discarded, and a null character is
+  // written at the end of the characters actually written into the array.
+  if(size > 0)
   {
-    char c = __VERIFIER_nondet_char();
-    str[i] = c;
-    if(c == '\0')
-      break;
+    size_t written = __VERIFIER_nondet_size_t();
+    __CPROVER_assume(written < size);
+    __CPROVER_assume(
+      retval < 0 ||
+      written == ((size_t)retval < size - 1 ? (size_t)retval : size - 1));
+    for(size_t i = 0; i < written; ++i)
+      str[i] = __VERIFIER_nondet_char();
+    str[written] = '\0';
   }
 
-  return i;
+  return retval;
 }
 
 /* FUNCTION: __builtin___vsnprintf_chk */
@@ -1874,6 +1889,8 @@ int vsnprintf(char *str, size_t size, const char *fmt, va_list ap)
 #endif
 
 char __VERIFIER_nondet_char(void);
+int __VERIFIER_nondet_int(void);
+size_t __VERIFIER_nondet_size_t(void);
 
 int __builtin___vsnprintf_chk(
   char *str,
@@ -1909,16 +1926,29 @@ int __builtin___vsnprintf_chk(
   }
 #endif
 
-  size_t i = 0;
-  for(; i < size; ++i)
+  // C11 7.21.6.12p3: the return value is the number of characters that
+  // would have been written had size been sufficiently large, not counting
+  // the terminating null character, or a negative value if an encoding
+  // error occurred. Thus the return value may be size or larger.
+  int retval = __VERIFIER_nondet_int();
+  __CPROVER_assume(retval >= -1);
+
+  // C11 7.21.6.12p2: if size is zero, nothing is written. Otherwise, output
+  // characters beyond the size-1st are discarded, and a null character is
+  // written at the end of the characters actually written into the array.
+  if(size > 0)
   {
-    char c = __VERIFIER_nondet_char();
-    str[i] = c;
-    if(c == '\0')
-      break;
+    size_t written = __VERIFIER_nondet_size_t();
+    __CPROVER_assume(written < size);
+    __CPROVER_assume(
+      retval < 0 ||
+      written == ((size_t)retval < size - 1 ? (size_t)retval : size - 1));
+    for(size_t i = 0; i < written; ++i)
+      str[i] = __VERIFIER_nondet_char();
+    str[written] = '\0';
   }
 
-  return i;
+  return retval;
 }
 
 /* FUNCTION: __acrt_iob_func */
@@ -1997,6 +2027,8 @@ int __stdio_common_vfprintf(
 #  endif
 
 char __VERIFIER_nondet_char(void);
+int __VERIFIER_nondet_int(void);
+size_t __VERIFIER_nondet_size_t(void);
 
 int __stdio_common_vsprintf(
   unsigned __int64 options,
@@ -2011,16 +2043,29 @@ int __stdio_common_vsprintf(
   (void)locale;
   (void)args;
 
-  size_t i = 0;
-  for(; i < size; ++i)
+  // C11 7.21.6.12p3: the return value is the number of characters that
+  // would have been written had size been sufficiently large, not counting
+  // the terminating null character, or a negative value if an encoding
+  // error occurred. Thus the return value may be size or larger.
+  int retval = __VERIFIER_nondet_int();
+  __CPROVER_assume(retval >= -1);
+
+  // C11 7.21.6.12p2: if size is zero, nothing is written. Otherwise, output
+  // characters beyond the size-1st are discarded, and a null character is
+  // written at the end of the characters actually written into the array.
+  if(size > 0)
   {
-    char c = __VERIFIER_nondet_char();
-    str[i] = c;
-    if(c == '\0')
-      break;
+    size_t written = __VERIFIER_nondet_size_t();
+    __CPROVER_assume(written < size);
+    __CPROVER_assume(
+      retval < 0 ||
+      written == ((size_t)retval < size - 1 ? (size_t)retval : size - 1));
+    for(size_t i = 0; i < written; ++i)
+      str[i] = __VERIFIER_nondet_char();
+    str[written] = '\0';
   }
 
-  return i;
+  return retval;
 }
 
 #endif
