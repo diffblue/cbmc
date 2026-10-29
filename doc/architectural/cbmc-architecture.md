@@ -1,5 +1,3 @@
-\ingroup module_hidden
-
 \page cbmc-architecture CBMC Architecture
 
 \author Martin Brain, Peter Schrammel
