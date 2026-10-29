@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ converted: SUCCESS$
@@ -9,30 +9,12 @@ main.cpp
 --
 dropped the body
 --
-__invoke_impl<_Partial<_Transform, ...>> and __invoke lose their bodies:
-the call __f(__args...) of the _Partial closure object finds "no match for
-symbol '_Partial'" (CBMC_CPP_SHOW_SUPPRESSED=1), as if the call named the
-class's constructor rather than its member operator() template.  A
-hand-written partial specialization called the same way works, so the cause
-is in the remaining <ranges> context; not reduced further (cvise stopped at
-its 2 h limit).  With libstdc++ 16 this is the drop of
-cpp20_ranges_views_iota_transform_filter_drop (broken-libstdcxx16).
-Findings 2026-10-27: with the GCC 16 headers, invoke_result_t<const
-_Transform &, int (&)[4], const L &> computed directly in main is the
-type of the two-argument call (transform_view), and views::transform(a,
-f) works; only the call made from _Binder::_S_call in _Partial::operator()
-gets _Partial as __invoke's result type, the type of the adaptor's
-one-argument operator().  The program was reduced again (2026-10-27)
-with a checker requiring declval<...>() calls and complete runs under
-g++ 16, 13 and clang++ 18.
-Findings 2026-10-28: inside the instantiated body of __invoke<_Transform,
-int (&)[1], int &>, `typename decltype(_S_test<_Callable, _Args...>(0))
-::type' is _Partial (the one-argument operator()), while the same with the
-types spelled out, and `decltype(_Callable()(declval<_Args>()...))', are
-the two-argument result; the declared return type of __invoke is right.
-Header-free reconstructions of this shape do not fail.  Found on the way
-and fixed: partial ordering with function parameter packs (ce6cf4a620),
-variable template specializations as lvalues (37762b428d), the address of
-a constexpr variable (9906f445dd).
-2026-10-29: reduced further to the header-free KNOWNBUG
-cpp20_call_result_through_pack_in_static_member_template.
+__invoke_impl<_Partial<_Transform, ...>> and __invoke kept their bodies
+only when the call of the _Partial closure object selected its
+two-parameter operator() template.  Inside __invoke, instantiated from
+_Binder::_S_call in _Partial::operator(), the pack expansion in
+`typename decltype(_S_test<_Callable, _Args...>(0))::type' kept one
+element: the single-element pack substitution of the body removed every
+ellipsis, including those of patterns naming only __invoke's own
+two-element pack.  N5008 [temp.variadic]/8-9.  The header-free reduction
+is cpp20_call_result_through_pack_in_static_member_template.

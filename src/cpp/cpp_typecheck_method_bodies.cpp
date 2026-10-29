@@ -1173,24 +1173,39 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
     }
     if(!pack_subst.empty())
     {
-      std::function<void(irept &)> subst = [&](irept &node)
+      // Returns whether `node` names one of the substituted packs.
+      std::function<bool(irept &)> subst = [&](irept &node) -> bool
       {
         // N5008 [expr.sizeof]/5 + [temp.variadic]/8: `sizeof...(P)` is
         // a pack-size QUERY; stamping the single element's tag rewrote
         // it into the element type's BYTE size (the tuple
         // converting-element silent constructor drop).
         if(node.get_bool("#sizeof_pack"))
-          return;
+          return false;
+        bool names_pack = false;
         if(
           node.id() == ID_name &&
           pack_subst.count(id2string(node.get(ID_identifier))))
+        {
           node.set(
             ID_identifier, pack_subst.at(id2string(node.get(ID_identifier))));
-        node.remove(ID_ellipsis);
+          names_pack = true;
+        }
         for(auto &s : node.get_sub())
-          subst(s);
+          names_pack |= subst(s);
         for(auto &ns : node.get_named_sub())
-          subst(ns.second);
+          names_pack |= subst(ns.second);
+        // N5008 [temp.variadic]/8-9: a pack expansion is expanded by the
+        // packs its pattern names, so only a pattern naming a substituted
+        // single-element pack becomes its one element.  Dropping every
+        // ellipsis of the body also collapsed expansions of OTHER packs:
+        // a one-element pack of the calling instantiation (`X` of
+        // `call(X... x)` calling `inv(F(), x..., 0)`) is still in the
+        // template map, and `cnt<C, Args...>` with two-element `Args`
+        // got one template argument.
+        if(names_pack)
+          node.remove(ID_ellipsis);
+        return names_pack;
       };
       subst(static_cast<irept &>(body));
     }
