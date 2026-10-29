@@ -1,0 +1,20 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[__invoke\.assertion\.1\] line \d+ two-parameter operator\(\) selected: SUCCESS$
+^\[main\.assertion\.1\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Inside __invoke<_Transform, void (*)(), int>, instantiated from
+_Binder::_S_call, decltype(_S_test<_Callable, _Args...>(0)) is the type of
+the variadic C-style operator() (_Partial): the constrained
+two-parameter template is not selected.  With the template arguments
+spelled out, and in main, it is.  Reduced from
+cpp20_range_adaptor_closure_invoked_through_invoke_impl (cvise, oracle:
+both forms in the same run, the compilers accepting both as
+static_asserts).
