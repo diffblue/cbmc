@@ -311,6 +311,17 @@ void cpp_typecheckt::typecheck()
       break;
   }
 
+  // N5008 [basic.start.dynamic]/1: the variables first instantiated in the
+  // bodies (variable template specializations, static data members of class
+  // template specializations) are dynamically initialized as well; their
+  // value is a constructor call, not an initial value
+  if(!dynamic_initializations.empty())
+  {
+    static_and_dynamic_initialization();
+    typecheck_method_bodies();
+    do_not_typechecked();
+  }
+
   // A function-template instance can be left HALF-converted: its eager
   // conversion (required for `auto` return-type deduction,
   // [dcl.spec.auto]/11) ran nested inside overload-candidate matching
@@ -418,6 +429,10 @@ void cpp_typecheckt::typecheck()
       !sym->value.get_bool("#cpp_converted"))
       sym->value.make_nil();
   }
+
+  // the variables instantiated by the bodies finished since
+  if(!dynamic_initializations.empty())
+    static_and_dynamic_initialization();
 
   // Final soundness sweep (N5008 [stmt.return]/3, [conv.ptr]/1): a body
   // may survive with a HALF-type-checked statement when an inner recovery
@@ -888,16 +903,25 @@ void cpp_typecheckt::static_and_dynamic_initialization()
 
   dynamic_initializations.clear();
 
-  // Create the dynamic initialization procedure
-  symbolt init_symbol{
-    "#cpp_dynamic_initialization#" + id2string(module),
-    code_typet({}, typet(ID_constructor)),
-    ID_cpp};
-  init_symbol.base_name = "#cpp_dynamic_initialization#" + id2string(module);
-  init_symbol.value.swap(init_block);
-  init_symbol.module = module;
+  // Create the dynamic initialization procedure, or, for the variables
+  // instantiated since (N5008 [basic.start.dynamic]/1: the initialization of
+  // an implicitly instantiated specialization is unordered), extend it
+  const irep_idt init_name = "#cpp_dynamic_initialization#" + id2string(module);
+  if(symbolt *existing = symbol_table.get_writeable(init_name))
+  {
+    for(auto &statement : init_block.statements())
+      to_code_block(to_code(existing->value)).add(std::move(statement));
+  }
+  else
+  {
+    symbolt init_symbol{
+      init_name, code_typet({}, typet(ID_constructor)), ID_cpp};
+    init_symbol.base_name = init_name;
+    init_symbol.value.swap(init_block);
+    init_symbol.module = module;
 
-  symbol_table.insert(std::move(init_symbol));
+    symbol_table.insert(std::move(init_symbol));
+  }
 
   disable_access_control = false;
 }
