@@ -18,3 +18,8 @@ spelled out, and in main, it is.  Reduced from
 cpp20_range_adaptor_closure_invoked_through_invoke_impl (cvise, oracle:
 both forms in the same run, the compilers accepting both as
 static_asserts).
+Variants (2026-10-29): calling __invoke(_Transform(), main_a, 0) from main
+passes; a caller template whose call is __invoke(_Fd(), a, 0) with a single
+named parameter passes; the failure needs the caller's pack expansion
+`__call_args..., 0' (a free function template fails as well, so the class
+template _Binder is not needed).  Renaming the packs changes nothing.
