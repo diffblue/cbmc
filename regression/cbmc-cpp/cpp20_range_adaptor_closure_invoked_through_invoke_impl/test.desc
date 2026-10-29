@@ -34,3 +34,5 @@ Header-free reconstructions of this shape do not fail.  Found on the way
 and fixed: partial ordering with function parameter packs (ce6cf4a620),
 variable template specializations as lvalues (37762b428d), the address of
 a constexpr variable (9906f445dd).
+2026-10-29: reduced further to the header-free KNOWNBUG
+cpp20_call_result_through_pack_in_static_member_template.
