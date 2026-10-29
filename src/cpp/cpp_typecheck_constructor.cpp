@@ -1309,12 +1309,55 @@ void cpp_typecheckt::full_member_initialization(
 
     // Subsequently, we need to call the non-POD parent constructors (the
     // direct virtual bases were dealt with above, with the indirect ones)
+    const std::vector<irep_idt> bases_with_virtual_bases =
+      construction_vtable_bases(struct_union_type.get(ID_name));
+    // the restore of the pointers saved for the previous base, which follows
+    // that base's construction (typecheck_base_construction_vtables)
+    std::optional<codet> pending_restore;
+    std::size_t base_index = 0;
     for(const auto &b : to_struct_type(struct_union_type).bases())
     {
       DATA_INVARIANT(b.id() == ID_base, "base class expression expected");
 
+      if(pending_restore.has_value())
+      {
+        final_initializers.move_to_sub(*pending_restore);
+        pending_restore.reset();
+      }
+
       if(b.get_bool(ID_virtual))
         continue;
+
+      // Itanium C++ ABI 2.6.2 / N5008 [class.cdtor]/4: a base subobject
+      // constructed by a base-object constructor of this class gets tables
+      // with its own overriders and the offsets of the complete object
+      // being constructed, built from the virtual pointers in place (the
+      // ABI passes a VTT); the complete-object case uses the construction
+      // tables installed below
+      // A dynamic base without virtual bases installs its own tables, which
+      // the pointers of this subobject share: they are saved and restored
+      // around its construction as well.
+      const irep_idt base_id = to_struct_tag_type(b.type()).get_identifier();
+      const bool base_has_virtual_bases =
+        std::find(
+          bases_with_virtual_bases.begin(),
+          bases_with_virtual_bases.end(),
+          base_id) != bases_with_virtual_bases.end();
+      if(
+        has_virtual_bases &&
+        (base_has_virtual_bases || !vtable_pointer_component(base_id).empty()))
+      {
+        codet before{"cpp_base_construction_vtables"};
+        before.set(ID_base, base_id);
+        before.set("#save_only", !base_has_virtual_bases);
+        before.set("#index", std::to_string(base_index));
+        before.add_source_location() = struct_union_type.source_location();
+        codet after = before;
+        after.set("#restore", true);
+        pending_restore = std::move(after);
+        final_initializers.move_to_sub(before);
+      }
+      ++base_index;
 
       const symbolt &ctorsymb = lookup(b.type());
 
@@ -1823,6 +1866,8 @@ void cpp_typecheckt::full_member_initialization(
         final_initializers.move_to_sub(mem_init);
       }
     }
+    if(pending_restore.has_value())
+      final_initializers.move_to_sub(*pending_restore);
   }
 
   // A base without virtual bases has installed its own vtables (it does

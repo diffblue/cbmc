@@ -831,6 +831,26 @@ protected:
   construction_vtable_installs(const symbolt &symbol, const irep_idt &base_id)
     const;
 
+  /// For the base subobject \p base_id of the class \p symbol: each virtual
+  /// pointer of the subobject with the address of the table the base's own
+  /// complete-object constructor installs (`virtual_table::X\@B'), which
+  /// has the base's overriders and the base's own virtual-base offsets.
+  std::vector<std::pair<struct_typet::componentt, exprt>>
+  base_subobject_vtable_pointers(const symbolt &symbol, const irep_idt &base_id)
+    const;
+
+  /// Itanium C++ ABI 2.6.2 without a VTT: expand the statement
+  /// \#cpp_base_construction_vtables that full_member_initialization places
+  /// before (and, with \#restore, after) the construction of a direct base
+  /// with virtual bases in a constructor of the class of `this'.  When the
+  /// constructor constructs a base subobject (`!\@most_derived'), the
+  /// complete object's offsets are known only from the virtual pointers
+  /// installed for this subobject: before the base's construction, declare a
+  /// copy of each of the base's own tables, set its virtual-base offsets from
+  /// those pointers, save the pointers and install the copies; after it,
+  /// restore the saved pointers.
+  void typecheck_base_construction_vtables(codet &code);
+
   /// Build (or rebuild) the body of the thunk \p thunk that a virtual
   /// function \p target (a component of \p derived) is entered through when
   /// called on the base subobject of class \p base_class: adjust `this' from

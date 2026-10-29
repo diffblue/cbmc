@@ -463,6 +463,8 @@ void cpp_typecheckt::typecheck_code(codet &code)
   {
     // type checked already
   }
+  else if(statement == "cpp_base_construction_vtables")
+    typecheck_base_construction_vtables(code);
   else if(statement == "cpp-using")
   {
     // using declaration in function body
