@@ -1,0 +1,12 @@
+CORE no-new-smt
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+The simplifier splits the store into per-member byte updates, yielding an
+8-byte update of member c at offset 4 that only partially overlaps c. The
+propositional back-end used to discard such partially-overlapping updates.
