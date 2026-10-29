@@ -16,6 +16,7 @@
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_LIVENESS_CONTEXT_H
 
 #include <analyses/variable-sensitivity/write_location_context.h>
+
 #include <iostream>
 
 /**
