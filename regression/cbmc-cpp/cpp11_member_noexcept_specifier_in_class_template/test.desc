@@ -1,0 +1,21 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ names a later non-throwing member: SUCCESS$
+^\[main\.assertion\.2\] line \d+ names a later throwing member: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Assertion 2 fails: W<int>::a() is taken as non-throwing.  The kept
+noexcept-specifier is evaluated again when the class is complete
+(implicit_exception_specifications), but for a class template
+specialization without `this', so `b()' does not call W<int>::b.
+Binding `this' there evaluated every member's specifier eagerly, which
+instantiated unused templates (view_interface<take_view<int *>> for
+`arr | views::take(3)') and broke cpp20_ranges_basic; [except.spec]/12
+instantiates such a specifier only when it is needed.
