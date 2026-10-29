@@ -66,7 +66,20 @@ mp_integer alignment(const typet &type, const namespacet &ns)
     // get the max
     // (should really be the smallest common denominator)
     for(const auto &c : to_struct_union_type(type).components())
+    {
+      // System V ABI: "Unnamed bit-fields' types do not affect the
+      // alignment of a structure or union." This does not apply to the
+      // Visual Studio ABI, where they do. Also skip padding members
+      // inserted by a prior add_padding pass.
+      if(
+        config.ansi_c.mode != configt::ansi_ct::flavourt::VISUAL_STUDIO &&
+        ((c.get_anonymous() && c.type().id() == ID_c_bit_field) ||
+         c.get_is_padding()))
+      {
+        continue;
+      }
       result = std::max(result, alignment(c.type(), ns));
+    }
   }
   else if(type.id()==ID_unsignedbv ||
           type.id()==ID_signedbv ||
@@ -354,9 +367,12 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
       else
       {
         // Otherwise, ANSI-C says that bit-fields do not get padded!
-        // We consider the type for max_alignment, however.
-        if(max_alignment<a)
-          max_alignment=a;
+        // We consider the type for max_alignment, however -- but only
+        // for named bit-fields.  System V ABI (AMD64 §3.1.2, i386
+        // §3.1.2): "Unnamed bit-fields' types do not affect the
+        // alignment of a structure or union."
+        if(max_alignment < a && !it->get_anonymous())
+          max_alignment = a;
 
         std::size_t w=to_c_bit_field_type(it_type).get_width();
         bit_field_bits += w;
@@ -395,8 +411,16 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
       a=config.ansi_c.alignment;
     }
 
-    if(max_alignment<a)
-      max_alignment=a;
+    // Do not let unnamed bit-fields (including zero-width ones that fall
+    // through here) raise the struct alignment.  System V ABI (AMD64
+    // and i386, both §3.1.2): "Unnamed bit-fields' types do not
+    // affect the alignment of a structure or union."
+    if(
+      max_alignment < a &&
+      !(it_type.id() == ID_c_bit_field && it->get_anonymous()))
+    {
+      max_alignment = a;
+    }
 
     if(
       a != 1 &&
