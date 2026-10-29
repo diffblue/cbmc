@@ -1,5 +1,3 @@
-\ingroup module_hidden
-
 \page memory-bounds-checking Memory Bounds Checking
 
 cbmc provides means to verify that pointers are within the bounds of (statically

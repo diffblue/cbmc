@@ -1,5 +1,3 @@
-\ingroup module_hidden
-
 \page tutorial Tutorials
 
 \section cbmc_tutorial CBMC Developer Tutorial
