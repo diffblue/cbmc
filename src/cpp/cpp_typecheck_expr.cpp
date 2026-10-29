@@ -1087,59 +1087,163 @@ bool cpp_typecheckt::is_trivially_copyable_type(
          (type.id() == ID_pointer && !is_reference(type));
 }
 
-/// N5008 [except.spec]/8: an implicitly-declared default constructor, or one
-/// defaulted on its first declaration, is non-throwing unless the
-/// initialization of a subobject (a base or member default-initialized by
-/// it) is potentially-throwing; a user-provided one is non-throwing only when
-/// declared so ([except.spec]/2, `noexcept').  Default member initializers
-/// are taken to be non-throwing (their expressions are not type-checked
-/// here).
-bool cpp_typecheckt::default_construction_is_nothrow(
+std::optional<bool> cpp_typecheckt::construction_is_potentially_throwing(
+  const source_locationt &source_location,
   const typet &type,
+  const exprt::operandst &arguments,
   int depth)
 {
   if(depth <= 0)
-    return false;
-  if(type.id() == ID_array)
+    return true;
+  const typet *object_type = &type;
+  while(object_type->id() == ID_array)
+    object_type = &to_array_type(*object_type).element_type();
+  if(object_type->id() == ID_struct_tag || object_type->id() == ID_union_tag)
+    elaborate_class_template(*object_type);
+
+  std::optional<codet> construction;
+  const std::size_t errors_before =
+    get_message_handler().get_message_count(messaget::M_ERROR);
+  bool well_formed = true;
+  try
   {
-    return default_construction_is_nothrow(
-      to_array_type(type).element_type(), depth - 1);
+    sfinae_contextt sfinae_guard{*this};
+    unevaluated_operandt unevaluated_guard{*this};
+    symbol_exprt object{irep_idt{}, *object_type};
+    object.set(ID_C_lvalue, true);
+    construction = cpp_constructor(source_location, object, arguments);
   }
-  if(type.id() != ID_struct_tag)
-    return true; // scalars, unions of trivial members, pointers
-  elaborate_class_template(type);
-  const struct_typet &st = follow_tag(to_struct_tag_type(type));
-  const struct_typet::componentt *ctor = nullptr;
-  for(const auto &c : st.components())
+  catch(...)
   {
-    if(c.type().id() != ID_code || c.get_bool(ID_from_base))
-      continue;
-    const code_typet &ct = to_code_type(c.type());
-    if(ct.return_type().id() == ID_constructor && ct.parameters().size() == 1)
+    well_formed = false;
+  }
+  get_message_handler().set_message_count(messaget::M_ERROR, errors_before);
+  if(!well_formed)
+    return {};
+  return construction.has_value() &&
+         expression_is_potentially_throwing(*construction, depth);
+}
+
+bool cpp_typecheckt::implicit_constructor_is_potentially_throwing(
+  const symbolt &constructor,
+  int depth)
+{
+  if(depth <= 0 || constructor.type.id() != ID_code)
+    return true;
+  const code_typet &code_type = to_code_type(constructor.type);
+  // the constructors of a class with virtual bases take a trailing
+  // `@most_derived' flag (whether to construct the virtual bases)
+  code_typet::parameterst parameters = code_type.parameters();
+  if(
+    !parameters.empty() && parameters.back().get_base_name() == "@most_derived")
+  {
+    parameters.pop_back();
+  }
+  if(parameters.empty() || parameters.front().type().id() != ID_pointer)
+    return false;
+  const typet &class_tag =
+    to_pointer_type(parameters.front().type()).base_type();
+  if(class_tag.id() != ID_struct_tag && class_tag.id() != ID_union_tag)
+    return false;
+
+  // the default constructor, or a copy (move) constructor whose parameter
+  // is an lvalue (rvalue) reference to the class ([class.copy.ctor]/1-2)
+  const bool is_default = parameters.size() == 1;
+  bool is_move = false;
+  typet source_qualifiers = typet{ID_nil};
+  if(!is_default)
+  {
+    if(parameters.size() != 2 || !is_reference(parameters[1].type()))
+      return false; // not a default, copy or move constructor: non-throwing
+    const typet &referenced =
+      to_reference_type(parameters[1].type()).base_type();
+    if(
+      referenced.id() != class_tag.id() ||
+      to_tag_type(referenced).get_identifier() !=
+        to_tag_type(class_tag).get_identifier())
     {
-      ctor = &c;
-      break;
+      return false;
+    }
+    is_move = is_rvalue_reference(parameters[1].type());
+    source_qualifiers = referenced;
+  }
+
+  const symbolt *class_symbol =
+    symbol_table.lookup(to_tag_type(class_tag).get_identifier());
+  if(
+    class_symbol == nullptr || (class_symbol->type.id() != ID_struct &&
+                                class_symbol->type.id() != ID_union))
+  {
+    return false;
+  }
+  const struct_union_typet &class_type =
+    to_struct_union_type(class_symbol->type);
+  const source_locationt &location = constructor.location;
+
+  // [except.spec]/6.1-6.2: the initialization of a potentially constructed
+  // subobject ([special]/7) of type `subobject': default-initialization,
+  // or from an lvalue (copy) or xvalue (move) of the source's subobject
+  auto initialization_throws = [&](const typet &subobject) -> bool
+  {
+    if(is_reference(subobject))
+      return false; // binding a reference (copy) calls no function
+    exprt::operandst arguments;
+    if(!is_default)
+    {
+      typet argument_type = subobject;
+      while(argument_type.id() == ID_array)
+        argument_type = to_array_type(argument_type).element_type();
+      if(source_qualifiers.get_bool(ID_C_constant))
+        argument_type.set(ID_C_constant, true);
+      if(source_qualifiers.get_bool(ID_C_volatile))
+        argument_type.set(ID_C_volatile, true);
+      symbol_exprt argument{irep_idt{}, argument_type};
+      argument.set(ID_C_temporary_avoided, true);
+      if(!is_move)
+        argument.set(ID_C_lvalue, true);
+      arguments.push_back(std::move(argument));
+    }
+    // an ill-formed initialization makes the constructor deleted, and a
+    // call of it ill-formed: nothing to contribute
+    return construction_is_potentially_throwing(
+             location, subobject, arguments, depth - 1)
+      .value_or(false);
+  };
+
+  // a union's implicit copy and move constructors copy its object
+  // representation ([class.copy.ctor]/15); its default constructor
+  // initializes no variant member except by a default member initializer
+  const bool is_union = class_symbol->type.id() == ID_union;
+  if(class_symbol->type.id() == ID_struct)
+  {
+    std::set<irep_idt> seen_bases;
+    // [special]/7: the non-virtual direct bases, and the virtual bases
+    // unless the class is abstract
+    for(const auto &base : to_struct_type(class_symbol->type).bases())
+    {
+      if(base.get_bool(ID_virtual))
+        continue;
+      seen_bases.insert(base.type().get_identifier());
+      if(initialization_throws(base.type()))
+        return true;
+    }
+    bool is_abstract = false;
+    for(const auto &c : class_type.components())
+      is_abstract = is_abstract || c.get_bool(ID_is_pure_virtual);
+    std::list<irep_idt> virtual_bases;
+    get_virtual_bases(to_struct_type(class_symbol->type), virtual_bases);
+    for(const auto &vb : virtual_bases)
+    {
+      if(
+        !is_abstract && seen_bases.insert(vb).second &&
+        initialization_throws(struct_tag_typet{vb}))
+      {
+        return true;
+      }
     }
   }
-  if(ctor != nullptr)
-  {
-    const code_typet &ct = to_code_type(ctor->type());
-    if(ct.get_bool("#C_noexcept") || ct.get_bool(ID_noexcept))
-      return true;
-    const symbolt *ctor_symbol = symbol_table.lookup(ctor->get_name());
-    const bool implicit_or_defaulted =
-      ct.get_bool("#is_implicit_ctor") ||
-      (ctor_symbol != nullptr &&
-       ctor_symbol->value.get_bool("#defaulted_function"));
-    if(!implicit_or_defaulted)
-      return false;
-  }
-  for(const auto &base : st.bases())
-  {
-    if(!default_construction_is_nothrow(base.type(), depth - 1))
-      return false;
-  }
-  for(const auto &c : st.components())
+
+  for(const auto &c : class_type.components())
   {
     if(
       c.type().id() == ID_code || c.get_bool(ID_is_static) ||
@@ -1148,12 +1252,123 @@ bool cpp_typecheckt::default_construction_is_nothrow(
     {
       continue;
     }
-    if(c.find(ID_C_default_value).is_not_nil())
-      continue; // initialized from its default member initializer
-    if(!default_construction_is_nothrow(c.type(), depth - 1))
-      return false;
+    if(is_default && c.find(ID_C_default_value).is_not_nil())
+    {
+      // [except.spec]/6.3: the default member initializer
+      std::optional<exprt> value;
+      const std::size_t errors_before =
+        get_message_handler().get_message_count(messaget::M_ERROR);
+      try
+      {
+        sfinae_contextt sfinae_guard{*this};
+        unevaluated_operandt unevaluated_guard{*this};
+        value = default_member_initializer_value(
+          to_struct_tag_type(class_tag), c, location, false);
+      }
+      catch(...)
+      {
+        // not type-checkable outside a constructor (it names another
+        // member): taken as non-throwing
+      }
+      get_message_handler().set_message_count(messaget::M_ERROR, errors_before);
+      if(
+        value.has_value() &&
+        expression_is_potentially_throwing(*value, depth - 1))
+      {
+        return true;
+      }
+      continue;
+    }
+    if(is_union)
+      continue;
+    if(initialization_throws(c.type()))
+      return true;
   }
-  return true;
+  return false;
+}
+
+bool cpp_typecheckt::expression_is_potentially_throwing(
+  const exprt &e,
+  int depth)
+{
+  if(e.id() == ID_side_effect)
+  {
+    const irep_idt &statement = e.get(ID_statement);
+    if(statement == ID_throw)
+      return true;
+    if(
+      statement == ID_temporary_object &&
+      destructor_is_potentially_throwing(e.type(), *this))
+    {
+      return true;
+    }
+    // the constructor call that initializes a temporary (or the object
+    // of a new-expression) is held as its initializer, not an operand
+    // ([except.spec]/5.2: a constructor invoked implicitly)
+    const irept &initializer = e.find(ID_initializer);
+    if(
+      (statement == ID_temporary_object || statement == ID_cpp_new ||
+       statement == ID_cpp_new_array) &&
+      initializer.is_not_nil() &&
+      expression_is_potentially_throwing(
+        static_cast<const exprt &>(initializer), depth))
+    {
+      return true;
+    }
+    if(statement == ID_function_call)
+    {
+      const auto &fn = to_side_effect_expr_function_call(e).function();
+      bool non_throwing = false;
+      if(fn.id() == ID_symbol)
+      {
+        const auto *sym =
+          symbol_table.lookup(to_symbol_expr(fn).get_identifier());
+        if(sym != nullptr && sym->type.id() == ID_code)
+        {
+          const auto &code_type = to_code_type(sym->type);
+          // [except.spec]/6: the exception specification of an
+          // implicitly-declared constructor, or one defaulted on its first
+          // declaration, follows from the initializations it performs
+          const bool implicit_constructor =
+            code_type.return_type().id() == ID_constructor &&
+            !code_type.get_bool("#C_explicit_exception_specification") &&
+            (code_type.get_bool("#is_implicit_ctor") ||
+             sym->value.get_bool("#defaulted_function"));
+          if(
+            code_type.get_bool("#C_noexcept") ||
+            code_type.get_bool(ID_noexcept))
+            non_throwing = true;
+          else if(implicit_constructor)
+            non_throwing =
+              !implicit_constructor_is_potentially_throwing(*sym, depth - 1);
+        }
+      }
+      else if(
+        fn.id() == ID_member && fn.find(ID_component_cpp_name).is_not_nil())
+      {
+        // a destructor call spelled `x.~T()': that of the object's
+        // class
+        const auto &name = to_cpp_name(fn.find(ID_component_cpp_name));
+        const irep_idt &bn = name.get_base_name();
+        const exprt &object = to_member_expr(fn).compound();
+        non_throwing =
+          !bn.empty() && id2string(bn)[0] == '~' &&
+          !destructor_is_potentially_throwing(object.type(), *this);
+      }
+      else if(fn.type().id() == ID_code)
+      {
+        const auto &code_type = to_code_type(fn.type());
+        non_throwing =
+          code_type.get_bool("#C_noexcept") || code_type.get_bool(ID_noexcept);
+      }
+      if(!non_throwing)
+        return true;
+    }
+  }
+  for(const auto &sub : e.operands())
+    if(expression_is_potentially_throwing(sub, depth))
+      return true;
+  return false;
 }
 
 bool cpp_typecheckt::compound_requirement_is_satisfied(const exprt &expr)
@@ -2348,33 +2563,42 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       class_t1.remove(ID_C_constant);
       class_t1.remove(ID_C_volatile);
       if(
-        t2.is_nil() && expr.id() == "__is_nothrow_constructible" &&
-        class_t1.id() == ID_struct_tag)
+        expr.id() == "__is_nothrow_constructible" &&
+        (class_t1.id() == ID_struct_tag || class_t1.id() == ID_union_tag ||
+         (!t2.is_nil() && !is_reference(t1))))
       {
-        // N5008 [meta.unary.prop]: is_nothrow_constructible<T> is
-        // is_constructible<T> and the definition `T t;' is known not to
-        // throw ([except.spec]/8 for the implicit or defaulted default
-        // constructor)
-        elaborate_class_template(class_t1);
-        bool constructible = true;
-        const std::size_t errors_before =
-          get_message_handler().get_message_count(messaget::M_ERROR);
-        try
+        // N5008 [meta.unary.prop] Table 54: is_nothrow_constructible<T,
+        // Args...> holds if is_constructible<T, Args...> does and the
+        // variable definition `T t(declval<Args>()...);' is known not to
+        // throw any exceptions ([expr.unary.noexcept]): the constructor
+        // selected for the arguments (or the conversion of a single one)
+        // and the initializations it implies are non-throwing
+        // ([except.spec]/6 for an implicit or defaulted constructor).  An
+        // empty pack expansion contributes no arguments.
+        const bool no_arguments =
+          t2.is_nil() ||
+          (t2.id() == ID_empty && expr.find("type_arg2").id() == ID_cpp_name);
+        exprt::operandst operands;
+        if(!no_arguments)
         {
-          sfinae_contextt sfinae_guard{*this};
-          symbol_exprt object{irep_idt{}, t1};
-          object.set(ID_C_lvalue, true);
-          cpp_constructor(expr.source_location(), object, {});
+          const std::vector<typet> trait_args = builtin_trait_type_args(expr);
+          for(std::size_t i = 1; i < trait_args.size(); ++i)
+          {
+            const typet &arg_type = trait_args[i];
+            symbol_exprt arg{
+              irep_idt{},
+              is_reference(arg_type) ? to_reference_type(arg_type).base_type()
+                                     : arg_type};
+            arg.set(ID_C_temporary_avoided, true);
+            if(is_reference(arg_type) && !is_rvalue_reference(arg_type))
+              arg.set(ID_C_lvalue, true);
+            operands.push_back(std::move(arg));
+          }
         }
-        catch(...)
-        {
-          constructible = false;
-        }
-        get_message_handler().set_message_count(
-          messaget::M_ERROR, errors_before);
-        expr = constructible && default_construction_is_nothrow(class_t1, 16)
-                 ? exprt(true_exprt())
-                 : exprt(false_exprt());
+        const std::optional<bool> throws = construction_is_potentially_throwing(
+          expr.source_location(), t1, operands, 16);
+        expr = throws.has_value() && !*throws ? exprt(true_exprt())
+                                              : exprt(false_exprt());
       }
       else if(t2.is_nil())
       {
@@ -2438,9 +2662,15 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       }
       else
       {
-        // __is_nothrow_constructible(T, U): nothrow is about exceptions,
-        // which are not modelled
-        expr = true_exprt();
+        // __is_nothrow_constructible(T &, U): binding a reference, which
+        // calls a function only through a conversion function; the
+        // construction check above does not take reference objects, so
+        // this is is_constructible<T &, U>
+        exprt constructible = expr;
+        constructible.id("__is_constructible");
+        typecheck_expr(constructible);
+        expr =
+          constructible.is_true() ? exprt(true_exprt()) : exprt(false_exprt());
       }
     }
     else if(expr.id() == "__is_nothrow_convertible")
@@ -2938,85 +3168,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       // Previously only a top-level call was examined, so `noexcept(p < q)'
       // rewritten to `(p <=> q) < 0' read only the category's noexcept
       // operator< and ignored the potentially-throwing operator<=> inside.
-      std::function<bool(const exprt &)> potentially_throwing =
-        [&](const exprt &e) -> bool
-      {
-        if(e.id() == ID_side_effect)
-        {
-          const irep_idt &statement = e.get(ID_statement);
-          if(statement == ID_throw)
-            return true;
-          if(
-            statement == ID_temporary_object &&
-            destructor_is_potentially_throwing(e.type(), *this))
-          {
-            return true;
-          }
-          // the constructor call that initializes a temporary (or the object
-          // of a new-expression) is held as its initializer, not an operand
-          // ([except.spec]/5.2: a constructor invoked implicitly)
-          const irept &initializer = e.find(ID_initializer);
-          if(
-            (statement == ID_temporary_object || statement == ID_cpp_new ||
-             statement == ID_cpp_new_array) &&
-            initializer.is_not_nil() &&
-            potentially_throwing(static_cast<const exprt &>(initializer)))
-          {
-            return true;
-          }
-          if(statement == ID_function_call)
-          {
-            const auto &fn = to_side_effect_expr_function_call(e).function();
-            bool non_throwing = false;
-            if(fn.id() == ID_symbol)
-            {
-              const auto *sym =
-                symbol_table.lookup(to_symbol_expr(fn).get_identifier());
-              if(sym != nullptr && sym->type.id() == ID_code)
-              {
-                const auto &code_type = to_code_type(sym->type);
-                // the exception specification of an implicitly-declared or
-                // defaulted constructor ([except.spec]/6) is not computed;
-                // such constructors are taken as non-throwing
-                const bool implicit_constructor =
-                  code_type.return_type().id() == ID_constructor &&
-                  (code_type.get_bool("#is_implicit_ctor") ||
-                   sym->value.is_nil() ||
-                   sym->value.get_bool("#defaulted_function"));
-                non_throwing = code_type.get_bool("#C_noexcept") ||
-                               code_type.get_bool(ID_noexcept) ||
-                               implicit_constructor;
-              }
-            }
-            else if(
-              fn.id() == ID_member &&
-              fn.find(ID_component_cpp_name).is_not_nil())
-            {
-              // a destructor call spelled `x.~T()': that of the object's
-              // class
-              const auto &name = to_cpp_name(fn.find(ID_component_cpp_name));
-              const irep_idt &bn = name.get_base_name();
-              const exprt &object = to_member_expr(fn).compound();
-              non_throwing =
-                !bn.empty() && id2string(bn)[0] == '~' &&
-                !destructor_is_potentially_throwing(object.type(), *this);
-            }
-            else if(fn.type().id() == ID_code)
-            {
-              const auto &code_type = to_code_type(fn.type());
-              non_throwing = code_type.get_bool("#C_noexcept") ||
-                             code_type.get_bool(ID_noexcept);
-            }
-            if(!non_throwing)
-              return true;
-          }
-        }
-        for(const auto &sub : e.operands())
-          if(potentially_throwing(sub))
-            return true;
-        return false;
-      };
-      result = !potentially_throwing(op);
+      result = !expression_is_potentially_throwing(op, 16);
     }
     catch(...)
     {

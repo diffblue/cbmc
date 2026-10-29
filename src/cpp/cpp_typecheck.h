@@ -1295,10 +1295,29 @@ protected:
   bool
   is_trivially_copyable_type(const typet &type, bool want_trivial, int depth);
 
-  /// N5008 [except.spec]/8: whether default-initializing an object of
-  /// \p type calls only non-throwing functions (the construction itself
-  /// is assumed to be valid).
-  bool default_construction_is_nothrow(const typet &type, int depth);
+  /// N5008 [except.spec]/5: whether the type-checked expression \p expr
+  /// is potentially-throwing: it contains a throw-expression, a call of a
+  /// function that is not non-throwing, or the destruction of a temporary
+  /// whose destructor is potentially-throwing.  \p depth bounds the
+  /// recursion into implicit constructors.
+  bool expression_is_potentially_throwing(const exprt &expr, int depth);
+
+  /// N5008 [except.spec]/6: whether the implicitly-declared or defaulted
+  /// constructor \p constructor (a default, copy or move constructor) is
+  /// potentially-throwing, from the initializations of the potentially
+  /// constructed subobjects it performs.
+  bool implicit_constructor_is_potentially_throwing(
+    const symbolt &constructor,
+    int depth);
+
+  /// Whether direct-initializing an object of \p type from \p arguments
+  /// is potentially-throwing; an empty optional when that initialization
+  /// is ill-formed.
+  std::optional<bool> construction_is_potentially_throwing(
+    const source_locationt &source_location,
+    const typet &type,
+    const exprt::operandst &arguments,
+    int depth);
 
   /// N5008 [class.prop], [class.virtual]/1, [class.dtor]/9,
   /// [dcl.init.aggr]/1: the class property named by the GCC/Clang type

@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ implicit default constructor: SUCCESS$
@@ -13,8 +13,6 @@ main.cpp
 ^warning: ignoring
 --
 The exception specification of implicitly-declared and defaulted
-constructors ([except.spec]/6) is not computed: the noexcept operator
-takes them as non-throwing (cpp_typecheck_expr.cpp, ID_noexcept), so
-assertions 1 and 2 fail.  As for destructors
-(implicit_exception_specifications), the specification has to be derived
-from the constructors invoked for the subobjects.
+constructors ([except.spec]/6) is now computed from the constructors they
+invoke for the subobjects; the noexcept operator took them as
+non-throwing.
