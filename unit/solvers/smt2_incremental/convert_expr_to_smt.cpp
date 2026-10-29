@@ -1765,3 +1765,89 @@ TEST_CASE(
     CHECK(test.convert(assignment) == expected);
   }
 }
+
+TEST_CASE(
+  "expr to smt conversion for \"saturating_plus\" operator",
+  "[core][smt2_incremental]")
+{
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
+  SECTION("signed")
+  {
+    const signedbv_typet type{8};
+    const symbol_exprt left{"a", type};
+    const symbol_exprt right{"b", type};
+    const auto extended = smt_bit_vector_theoryt::add(
+      smt_bit_vector_theoryt::sign_extend(1)(test.convert(left)),
+      smt_bit_vector_theoryt::sign_extend(1)(test.convert(right)));
+    const auto extension_bit = smt_bit_vector_theoryt::extract(8, 8)(extended);
+    const auto sign_bit = smt_bit_vector_theoryt::extract(7, 7)(extended);
+    const auto expected = smt_core_theoryt::if_then_else(
+      smt_core_theoryt::equal(extension_bit, sign_bit),
+      smt_bit_vector_theoryt::extract(7, 0)(extended),
+      smt_core_theoryt::if_then_else(
+        smt_core_theoryt::equal(
+          extension_bit, smt_bit_vector_constant_termt{0, 1}),
+        smt_bit_vector_constant_termt{127, 8},
+        smt_bit_vector_constant_termt{128, 8}));
+    CHECK(test.convert(saturating_plus_exprt{left, right}) == expected);
+  }
+  SECTION("unsigned")
+  {
+    const unsignedbv_typet type{8};
+    const symbol_exprt left{"a", type};
+    const symbol_exprt right{"b", type};
+    const auto extended = smt_bit_vector_theoryt::add(
+      smt_bit_vector_theoryt::zero_extend(1)(test.convert(left)),
+      smt_bit_vector_theoryt::zero_extend(1)(test.convert(right)));
+    const auto overflow_bit = smt_bit_vector_theoryt::extract(8, 8)(extended);
+    const auto expected = smt_core_theoryt::if_then_else(
+      smt_core_theoryt::equal(
+        overflow_bit, smt_bit_vector_constant_termt{0, 1}),
+      smt_bit_vector_theoryt::extract(7, 0)(extended),
+      smt_bit_vector_constant_termt{255, 8});
+    CHECK(test.convert(saturating_plus_exprt{left, right}) == expected);
+  }
+}
+
+TEST_CASE(
+  "expr to smt conversion for \"saturating_minus\" operator",
+  "[core][smt2_incremental]")
+{
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
+  SECTION("signed")
+  {
+    const signedbv_typet type{8};
+    const symbol_exprt left{"a", type};
+    const symbol_exprt right{"b", type};
+    const auto extended = smt_bit_vector_theoryt::subtract(
+      smt_bit_vector_theoryt::sign_extend(1)(test.convert(left)),
+      smt_bit_vector_theoryt::sign_extend(1)(test.convert(right)));
+    const auto extension_bit = smt_bit_vector_theoryt::extract(8, 8)(extended);
+    const auto sign_bit = smt_bit_vector_theoryt::extract(7, 7)(extended);
+    const auto expected = smt_core_theoryt::if_then_else(
+      smt_core_theoryt::equal(extension_bit, sign_bit),
+      smt_bit_vector_theoryt::extract(7, 0)(extended),
+      smt_core_theoryt::if_then_else(
+        smt_core_theoryt::equal(
+          extension_bit, smt_bit_vector_constant_termt{0, 1}),
+        smt_bit_vector_constant_termt{127, 8},
+        smt_bit_vector_constant_termt{128, 8}));
+    CHECK(test.convert(saturating_minus_exprt{left, right}) == expected);
+  }
+  SECTION("unsigned")
+  {
+    const unsignedbv_typet type{8};
+    const symbol_exprt left{"a", type};
+    const symbol_exprt right{"b", type};
+    const auto extended = smt_bit_vector_theoryt::subtract(
+      smt_bit_vector_theoryt::zero_extend(1)(test.convert(left)),
+      smt_bit_vector_theoryt::zero_extend(1)(test.convert(right)));
+    const auto underflow_bit = smt_bit_vector_theoryt::extract(8, 8)(extended);
+    const auto expected = smt_core_theoryt::if_then_else(
+      smt_core_theoryt::equal(
+        underflow_bit, smt_bit_vector_constant_termt{0, 1}),
+      smt_bit_vector_theoryt::extract(7, 0)(extended),
+      smt_bit_vector_constant_termt{0, 8});
+    CHECK(test.convert(saturating_minus_exprt{left, right}) == expected);
+  }
+}

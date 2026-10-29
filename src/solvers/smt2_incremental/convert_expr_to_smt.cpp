@@ -1330,6 +1330,111 @@ static smt_termt convert_expr_to_smt(
     mult_overflow.pretty());
 }
 
+/// Shared implementation of saturating addition and subtraction.  The two
+/// operations differ only in (a) whether the extended operands are added or
+/// subtracted and (b), for unsigned types, whether overflow saturates to the
+/// maximum or to zero; everything else is identical.  \p subtract selects
+/// subtraction.  This mirrors the parameterised handling of ID_saturating_plus
+/// / ID_saturating_minus in the non-incremental back-end (smt2_conv.cpp).
+static smt_termt convert_saturating_add_or_subtract(
+  const binary_exprt &expr,
+  const sub_expression_mapt &converted,
+  const bool subtract)
+{
+  PRECONDITION(expr.lhs().type() == expr.rhs().type());
+  const typet &op_type = expr.type();
+  const smt_termt &left = converted.at(expr.lhs());
+  const smt_termt &right = converted.at(expr.rhs());
+
+  if(const auto signed_type = type_try_dynamic_cast<signedbv_typet>(op_type))
+  {
+    const std::size_t width = signed_type->get_width();
+
+    // Compute the result in width + 1 bits using sign extension, so a genuine
+    // signed overflow shows up as a disagreement between the two top bits.
+    const auto extend = smt_bit_vector_theoryt::sign_extend(1);
+    const auto extended_result =
+      subtract ? smt_bit_vector_theoryt::subtract(extend(left), extend(right))
+               : smt_bit_vector_theoryt::add(extend(left), extend(right));
+
+    // The extension bit (bit `width`) and the would-be sign bit (bit
+    // `width - 1`) agree exactly when the result fits in `width` bits, i.e.
+    // when no overflow occurred.
+    const auto extension_bit =
+      smt_bit_vector_theoryt::extract(width, width)(extended_result);
+    const auto sign_bit =
+      smt_bit_vector_theoryt::extract(width - 1, width - 1)(extended_result);
+    const auto no_overflow = smt_core_theoryt::equal(extension_bit, sign_bit);
+
+    const auto result =
+      smt_bit_vector_theoryt::extract(width - 1, 0)(extended_result);
+
+    // On overflow, an extension bit of 0 means the result was too large
+    // (positive overflow) and we clamp to MAX, otherwise to MIN.  For an
+    // N-bit signed type MAX is 2^(N-1) - 1 and MIN has the unsigned bit
+    // pattern 2^(N-1).
+    const auto positive_overflow = smt_core_theoryt::equal(
+      extension_bit, smt_bit_vector_constant_termt{0, 1});
+    const auto signed_max =
+      smt_bit_vector_constant_termt{power(2, width - 1) - 1, width};
+    const auto signed_min =
+      smt_bit_vector_constant_termt{power(2, width - 1), width};
+
+    return smt_core_theoryt::if_then_else(
+      no_overflow,
+      result,
+      smt_core_theoryt::if_then_else(
+        positive_overflow, signed_max, signed_min));
+  }
+  if(
+    const auto unsigned_type = type_try_dynamic_cast<unsignedbv_typet>(op_type))
+  {
+    const std::size_t width = unsigned_type->get_width();
+
+    // Compute the result in width + 1 bits using zero extension; the extra top
+    // bit then captures the carry (addition) or borrow (subtraction).
+    const auto extend = smt_bit_vector_theoryt::zero_extend(1);
+    const auto extended_result =
+      subtract ? smt_bit_vector_theoryt::subtract(extend(left), extend(right))
+               : smt_bit_vector_theoryt::add(extend(left), extend(right));
+
+    const auto overflow_bit =
+      smt_bit_vector_theoryt::extract(width, width)(extended_result);
+    const auto no_overflow = smt_core_theoryt::equal(
+      overflow_bit, smt_bit_vector_constant_termt{0, 1});
+
+    const auto result =
+      smt_bit_vector_theoryt::extract(width - 1, 0)(extended_result);
+
+    // Saturate to 0 on subtraction underflow, to the unsigned MAX (2^N - 1)
+    // on addition overflow.
+    const auto saturation =
+      subtract ? smt_bit_vector_constant_termt{0, width}
+               : smt_bit_vector_constant_termt{power(2, width) - 1, width};
+
+    return smt_core_theoryt::if_then_else(no_overflow, result, saturation);
+  }
+  UNIMPLEMENTED_FEATURE(
+    "Generation of SMT formula for saturating " +
+    std::string{subtract ? "minus" : "plus"} + " expression: " + expr.pretty());
+}
+
+static smt_termt convert_expr_to_smt(
+  const saturating_plus_exprt &saturating_plus,
+  const sub_expression_mapt &converted)
+{
+  return convert_saturating_add_or_subtract(
+    saturating_plus, converted, /*subtract=*/false);
+}
+
+static smt_termt convert_expr_to_smt(
+  const saturating_minus_exprt &saturating_minus,
+  const sub_expression_mapt &converted)
+{
+  return convert_saturating_add_or_subtract(
+    saturating_minus, converted, /*subtract=*/true);
+}
+
 static smt_termt convert_expr_to_smt(
   const pointer_object_exprt &pointer_object,
   const sub_expression_mapt &converted)
@@ -1787,6 +1892,18 @@ static smt_termt dispatch_expr_to_smt_conversion(
   if(const auto shl_overflow = expr_try_dynamic_cast<shl_overflow_exprt>(expr))
   {
     return convert_expr_to_smt(*shl_overflow, converted);
+  }
+  if(
+    const auto saturating_plus =
+      expr_try_dynamic_cast<saturating_plus_exprt>(expr))
+  {
+    return convert_expr_to_smt(*saturating_plus, converted);
+  }
+  if(
+    const auto saturating_minus =
+      expr_try_dynamic_cast<saturating_minus_exprt>(expr))
+  {
+    return convert_expr_to_smt(*saturating_minus, converted);
   }
   if(const auto array_construction = expr_try_dynamic_cast<array_exprt>(expr))
   {
