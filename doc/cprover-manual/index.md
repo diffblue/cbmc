@@ -36,4 +36,5 @@
 10. Background Information on selected Command-line Options
 
    * [Incremental SMT solver](smt2-incr/)
+   * [SARIF output](sarif-output/)
    * [Unsound options](unsound_options/)

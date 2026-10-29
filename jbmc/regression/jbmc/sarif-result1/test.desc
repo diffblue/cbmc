@@ -1,0 +1,17 @@
+CORE
+SarifResultTest
+-cp target/classes --sarif-result -
+activate-multi-line-match
+^EXIT=10$
+^SIGNAL=0$
+"name": "jbmc"
+"informationUri": "https://www\.cprover\.org/jbmc/"
+"ruleId": "java::SarifResultTest\.main:\(\[Ljava/lang/String;\)V\.assertion\.1"
+"kind": "fail"
+"level": "error"
+--
+^warning: ignoring
+--
+JBMC --sarif-result writes a SARIF log with the jbmc driver metadata
+(name "jbmc", JBMC information URI) and an error-level result for the failing
+Java assertion. Guards against the option being advertised but inert.
