@@ -2435,14 +2435,17 @@ void cpp_typecheckt::provide_stdlib_bodies()
       }
       else if(
         (base.find("__try_use_facet") == 0 || base.find("use_facet") == 0) &&
-        name.find("<std::tag-num_put<") != std::string::npos &&
+        (name.find("<std::tag-num_put<") != std::string::npos ||
+         name.find("<std::tag-num_get<") != std::string::npos) &&
         to_code_type(symbol.type).return_type().id() == ID_pointer &&
         classic_num_put(symbol).is_not_nil())
       {
-        // N5008 [locale.general]/8: the "C" locale has a num_put<C, ...>
-        // facet; return such an object (classic_num_put), so that stream
-        // insertion of arithmetic values ([ostream.inserters.arithmetic])
-        // calls num_put's own do_put
+        // N5008 [locale.general]/8: the "C" locale has num_put<C, ...> and
+        // num_get<C, ...> facets; return such an object (classic_num_put,
+        // which builds one for either), so that stream insertion and
+        // extraction of arithmetic values ([ostream.inserters.arithmetic],
+        // [istream.formatted.arithmetic]) call the facet's own do_put and
+        // do_get
         const typet &ret_type = to_code_type(symbol.type).return_type();
         ensure_parameter_symbols(symbol, symbol_table);
         code_blockt block;
@@ -2524,7 +2527,8 @@ void cpp_typecheckt::provide_stdlib_bodies()
         // __throw_bad_cast)
         const bool present =
           name.find("<std::tag-ctype<char>>") != std::string::npos ||
-          name.find("<std::tag-num_put<") != std::string::npos;
+          name.find("<std::tag-num_put<") != std::string::npos ||
+          name.find("<std::tag-num_get<") != std::string::npos;
         block.add(
           code_frontend_returnt{from_integer(present ? 1 : 0, ret_type)});
         symbol.value = std::move(block);
