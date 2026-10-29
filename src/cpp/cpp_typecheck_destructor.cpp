@@ -264,6 +264,26 @@ codet cpp_typecheckt::dtor(
         block.add(code_ifthenelset(
           cpp_namet("@most_derived").as_expr(), std::move(installs)));
       }
+      // destroyed by a base-object destructor of this class: tables built
+      // from the pointers in place (see full_member_initialization); the
+      // pointers need not be restored, the base is this subobject's last
+      // part to use them
+      const std::vector<irep_idt> bases_with_virtual_bases =
+        construction_vtable_bases(symbol.name);
+      const irep_idt base_id = to_struct_tag_type(bit->type()).get_identifier();
+      if(
+        std::find(
+          bases_with_virtual_bases.begin(),
+          bases_with_virtual_bases.end(),
+          base_id) != bases_with_virtual_bases.end())
+      {
+        codet tables{"cpp_base_construction_vtables"};
+        tables.set(ID_base, base_id);
+        tables.set(
+          "#index", "dtor" + std::to_string(std::distance(bit, bases.rend())));
+        tables.add_source_location() = symbol.location;
+        block.add(std::move(tables));
+      }
     }
 
     auto dtor_code = destroy_base(bit->type());

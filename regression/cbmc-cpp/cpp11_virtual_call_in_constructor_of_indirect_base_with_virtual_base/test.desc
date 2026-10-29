@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 
 ^\[main\.assertion\.1\] line \d+ A under construction: SUCCESS$
@@ -12,9 +12,9 @@ main.cpp
 --
 ^warning: ignoring
 --
-Assertion 1 fails: during A's constructor the call reaches M::id.  Only the
-complete object's direct bases with virtual bases get construction vtables
-(Itanium C++ ABI 2.6.2); a base-object constructor (M's) leaves the tables
-its caller installed instead of installing those of its own bases, for which
-the ABI passes a VTT (see cpp_typecheck_constructor.cpp).  With A a direct
-base of D, or with V a non-virtual base, the call reaches A::id.
+During A's constructor the call reached M::id: only the complete object's
+direct bases with virtual bases got construction vtables (Itanium C++ ABI
+2.6.2), and M's base-object constructor left the tables its caller had
+installed.  M's base-object constructor now builds A's tables from the
+pointers in place: a copy of A's own tables with the virtual-base offsets
+of the complete object (the ABI passes a VTT for this).

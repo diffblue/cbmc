@@ -498,6 +498,10 @@ void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
   // table `virtual_table::X@B'; set_virtual_base_offsets fills in the
   // offsets.  A base without virtual bases needs none: its own tables
   // serve, and its constructor installs them itself.
+  // collected first: inserting into the symbol table (an unordered map)
+  // while iterating over it invalidates the iterator on a rehash, and
+  // tables were skipped
+  std::vector<symbolt> construction_tables;
   for(const irep_idt &base_id : construction_vtable_bases(symbol.name))
   {
     for(const auto &named : symbol_table.symbols)
@@ -519,12 +523,13 @@ void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
       construction.name = name + "@" + id2string(symbol.name);
       construction.base_name =
         id2string(named.second.base_name) + "@" + id2string(symbol.base_name);
-      if(!symbol_table.has_symbol(construction.name))
-      {
-        bool failed = !symbol_table.insert(std::move(construction)).second;
-        CHECK_RETURN(!failed);
-      }
+      construction_tables.push_back(std::move(construction));
     }
+  }
+  for(auto &construction : construction_tables)
+  {
+    if(!symbol_table.has_symbol(construction.name))
+      symbol_table.insert(std::move(construction));
   }
 }
 
@@ -557,6 +562,30 @@ cpp_typecheckt::construction_vtable_installs(
   const irep_idt &base_id) const
 {
   std::vector<std::pair<struct_typet::componentt, exprt>> result;
+  for(auto &pointer : base_subobject_vtable_pointers(symbol, base_id))
+  {
+    // the table the base's own constructor would install, renamed to the
+    // construction table of this complete object
+    exprt *object = &to_address_of_expr(pointer.second).object();
+    while(object->id() == ID_member)
+      object = &to_member_expr(*object).compound();
+    const irep_idt construction_name =
+      id2string(to_symbol_expr(*object).get_identifier()) + "@" +
+      id2string(symbol.name);
+    if(!symbol_table.has_symbol(construction_name))
+      continue;
+    to_symbol_expr(*object).set_identifier(construction_name);
+    result.push_back(std::move(pointer));
+  }
+  return result;
+}
+
+std::vector<std::pair<struct_typet::componentt, exprt>>
+cpp_typecheckt::base_subobject_vtable_pointers(
+  const symbolt &symbol,
+  const irep_idt &base_id) const
+{
+  std::vector<std::pair<struct_typet::componentt, exprt>> result;
   const symbolt *base_sym = symbol_table.lookup(base_id);
   if(symbol.type.id() != ID_struct || base_sym == nullptr)
     return result;
@@ -564,12 +593,42 @@ cpp_typecheckt::construction_vtable_installs(
   const struct_typet &base_struct = to_struct_type(base_sym->type);
 
   // the virtual pointers of the base subobject: those of its non-virtual
-  // part (same component names in the derived class) and those of its
-  // virtual bases (components marked with the virtual base)
-  std::set<irep_idt> base_component_names;
-  for(const auto &c : base_struct.components())
-    if(c.get(ID_C_virtual_base).empty())
-      base_component_names.insert(c.get_name());
+  // part (the derived class's components whose subobject path starts with
+  // the base, add_base_components; the rest of the path is the one in the
+  // base -- a base class occurring twice has renamed pointers in the
+  // derived class, [class.mi]/3) and those of its virtual bases
+  // (components marked with the virtual base, one of each)
+  auto base_component =
+    [&](const struct_typet::componentt &c) -> const struct_typet::componentt *
+  {
+    const irep_idt vb = c.get(ID_C_virtual_base);
+    const auto &path = c.find(ID_C_subobject_path).get_sub();
+    for(const auto &bc : base_struct.components())
+    {
+      if(!bc.get_bool(ID_is_vtptr) || bc.get(ID_C_virtual_base) != vb)
+        continue;
+      if(!vb.empty())
+      {
+        if(bc.get_name() == c.get_name())
+          return &bc;
+        continue;
+      }
+      if(path.empty() || path.front().id() != base_id)
+        return nullptr;
+      const auto &base_path = bc.find(ID_C_subobject_path).get_sub();
+      if(
+        base_path.size() + 1 == path.size() &&
+        std::equal(
+          base_path.begin(),
+          base_path.end(),
+          std::next(path.begin()),
+          [](const irept &x, const irept &y) { return x.id() == y.id(); }))
+      {
+        return &bc;
+      }
+    }
+    return nullptr;
+  };
   std::list<irep_idt> base_vbases;
   get_virtual_bases(base_struct, base_vbases);
 
@@ -584,31 +643,184 @@ cpp_typecheckt::construction_vtable_installs(
       const irep_idt vb = c.get(ID_C_virtual_base);
       if(vb.empty() != (pass == 1))
         continue;
-      const bool in_base =
-        vb.empty() ? base_component_names.count(c.get_name()) != 0
-                   : std::find(base_vbases.begin(), base_vbases.end(), vb) !=
-                       base_vbases.end();
-      if(!in_base)
+      if(
+        !vb.empty() && std::find(base_vbases.begin(), base_vbases.end(), vb) ==
+                         base_vbases.end())
+      {
         continue;
-      // the table the base's own constructor would install, renamed to the
-      // construction table of this complete object
-      exprt value = vtable_pointer_value(*base_sym, c);
+      }
+      const struct_typet::componentt *in_base = base_component(c);
+      if(in_base == nullptr)
+        continue;
+      // the table the base's own constructor would install
+      exprt value = vtable_pointer_value(*base_sym, *in_base);
       if(value.id() != ID_address_of)
         continue;
-      exprt *object = &to_address_of_expr(value).object();
+      const exprt *object = &to_address_of_expr(value).object();
       while(object->id() == ID_member)
         object = &to_member_expr(*object).compound();
       if(object->id() != ID_symbol)
         continue;
-      const irep_idt construction_name =
-        id2string(to_symbol_expr(*object).get_identifier()) + "@" +
-        id2string(symbol.name);
-      if(!symbol_table.has_symbol(construction_name))
-        continue;
-      to_symbol_expr(*object).set_identifier(construction_name);
       result.emplace_back(c, value);
     }
   return result;
+}
+
+void cpp_typecheckt::typecheck_base_construction_vtables(codet &code)
+{
+  const source_locationt source_location = code.source_location();
+  const irep_idt base_id = code.get(ID_base);
+  const bool restore = code.get_bool("#restore");
+  // a base without virtual bases installs its own tables: only save and
+  // restore the pointers around its construction
+  const bool save_only = code.get_bool("#save_only");
+  const std::string index = id2string(code.get("#index"));
+  code_blockt result;
+  result.set_statement(ID_decl_block);
+  result.add_source_location() = source_location;
+
+  const exprt this_expr = cpp_scopes.current_scope().this_expr;
+  const symbolt *class_symbol = nullptr;
+  if(
+    this_expr.type().id() == ID_pointer &&
+    to_pointer_type(this_expr.type()).base_type().id() == ID_struct_tag)
+  {
+    class_symbol = symbol_table.lookup(
+      to_struct_tag_type(to_pointer_type(this_expr.type()).base_type())
+        .get_identifier());
+  }
+  if(class_symbol == nullptr || class_symbol->type.id() != ID_struct)
+  {
+    code = std::move(result);
+    return;
+  }
+  exprt most_derived = cpp_namet{"@most_derived", source_location}.as_expr();
+  typecheck_expr(most_derived);
+
+  // a virtual pointer of the base subobject: its position depends on the
+  // complete object when it lies in a virtual base (reached through the
+  // virtual pointers in place, Itanium C++ ABI 2.5.2)
+  auto subobject_pointer = [&](const struct_typet::componentt &c) -> exprt
+  {
+    exprt pointer = this_expr;
+    const irep_idt virtual_base = c.get(ID_C_virtual_base);
+    if(!virtual_base.empty() && symbol_table.has_symbol(virtual_base))
+    {
+      make_ptr_typecast(pointer, pointer_type(struct_tag_typet{virtual_base}));
+      dereference_exprt object{pointer};
+      object.set(ID_C_lvalue, true);
+      return member_exprt{object, c.get_name(), c.type()};
+    }
+    dereference_exprt object{pointer};
+    object.set(ID_C_lvalue, true);
+    return member_exprt{object, c.get_name(), c.type()};
+  };
+
+  auto local = [&](const std::string &name, const typet &type) -> symbol_exprt
+  {
+    const irep_idt identifier =
+      cpp_scopes.current_scope().prefix + "@" + name + "#" + index;
+    if(const symbolt *existing = symbol_table.lookup(identifier))
+      return existing->symbol_expr();
+    symbolt symbol{identifier, type, ID_cpp};
+    symbol.base_name = "@" + name;
+    symbol.is_lvalue = true;
+    symbol.is_file_local = true;
+    symbol.is_thread_local = true;
+    symbol.location = source_location;
+    const symbol_exprt expr = symbol.symbol_expr();
+    symbol_table.insert(std::move(symbol));
+    return expr;
+  };
+
+  code_blockt guarded;
+  std::size_t k = 0;
+  for(const auto &pointer :
+      base_subobject_vtable_pointers(*class_symbol, base_id))
+  {
+    const struct_typet::componentt &c = pointer.first;
+    const std::string number = std::to_string(k++);
+    const exprt location = subobject_pointer(c);
+    if(restore)
+    {
+      const symbolt *saved = symbol_table.lookup(
+        cpp_scopes.current_scope().prefix + "@saved_vtable_pointer" + number +
+        "#" + index);
+      // in reverse order: the location of a virtual base's pointer is
+      // computed through the non-virtual part's pointer, which must hold
+      // this subobject's table again first
+      if(saved != nullptr)
+      {
+        guarded.statements().insert(
+          guarded.statements().begin(),
+          code_frontend_assignt{location, saved->symbol_expr()});
+      }
+      continue;
+    }
+    const auto saved = local("saved_vtable_pointer" + number, c.type());
+    // the declarations are not guarded (their scope is the constructor's
+    // body); reading the pointers is: when this is the complete object,
+    // a virtual base's pointer is located through tables that may not be
+    // this class's at this point
+    result.add(code_frontend_declt{saved});
+    guarded.add(code_frontend_assignt{saved, location});
+    if(save_only)
+      continue;
+
+    // the base's own table, and the path to the installed part of it
+    exprt value = pointer.second;
+    exprt *object = &to_address_of_expr(value).object();
+    while(object->id() == ID_member)
+      object = &to_member_expr(*object).compound();
+    const symbolt &table = lookup(to_symbol_expr(*object).get_identifier());
+    const auto copy = local("construction_vtable" + number, table.type);
+    *object = copy;
+
+    result.add(code_frontend_declt{copy});
+    guarded.add(code_frontend_assignt{copy, table.symbol_expr()});
+
+    // the offsets of the virtual bases from the subobject, at every
+    // embedding level of the table (set_virtual_base_offsets does the same
+    // for the complete object's tables)
+    const exprt subobject_start = typecast_exprt{
+      address_of_exprt{location}, pointer_type(unsigned_char_type())};
+    std::function<void(const exprt &)> patch = [&](const exprt &part)
+    {
+      if(part.type().id() != ID_struct_tag)
+        return;
+      const struct_typet &vt_type = follow_tag(to_struct_tag_type(part.type()));
+      for(const auto &field : vt_type.components())
+      {
+        const member_exprt member{part, field.get_name(), field.type()};
+        if(field.get_base_name() == "@base")
+        {
+          patch(member);
+          continue;
+        }
+        const irep_idt vb = field.get(ID_C_virtual_base);
+        if(vb.empty() || !symbol_table.has_symbol(vb))
+          continue;
+        exprt vbase_pointer = this_expr;
+        make_ptr_typecast(vbase_pointer, pointer_type(struct_tag_typet{vb}));
+        minus_exprt offset{
+          typecast_exprt{vbase_pointer, pointer_type(unsigned_char_type())},
+          subobject_start};
+        offset.type() = pointer_diff_type();
+        guarded.add(code_frontend_assignt{
+          member, typecast_exprt::conditional_cast(offset, field.type())});
+      }
+    };
+    patch(copy);
+    guarded.add(code_frontend_assignt{location, value});
+  }
+
+  if(!guarded.statements().empty())
+  {
+    result.add(code_ifthenelset{not_exprt{most_derived}, std::move(guarded)});
+  }
+  for(auto &op : result.operands())
+    op.add_source_location() = source_location;
+  code = std::move(result);
 }
 
 irep_idt cpp_typecheckt::primary_base(const irep_idt &class_id) const
