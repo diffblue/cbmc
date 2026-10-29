@@ -1,0 +1,9 @@
+CORE
+array_bounds1.c
+--safety
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.array_bounds\.1\] line \d+ array bounds in array\[.*10\]: SUCCESS$
+^\[main\.array_bounds\.2\] line \d+ array bounds in array\[.*100\]: REFUTED$
+^\[main\.array_bounds\.3\] line \d+ array bounds in array\[.*-1\]: REFUTED$
+--

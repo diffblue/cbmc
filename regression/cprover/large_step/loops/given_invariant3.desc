@@ -1,0 +1,9 @@
+CORE
+given_invariant3.c
+
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.invariant\.1\] line \d+ loop invariant: SUCCESS$
+^\[main\.assertion\.1\] line \d+ non-inductive property: SUCCESS$
+--
+--

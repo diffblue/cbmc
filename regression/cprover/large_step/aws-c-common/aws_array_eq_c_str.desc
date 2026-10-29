@@ -1,0 +1,6 @@
+KNOWNBUG
+aws_array_eq_c_str_contract.c
+-I aws-c-common/include aws-c-common/source/byte_buf.c
+^EXIT=0$
+^SIGNAL=0$
+--
