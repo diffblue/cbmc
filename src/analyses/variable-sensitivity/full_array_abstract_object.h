@@ -18,8 +18,6 @@
 
 #include <iosfwd>
 
-class ai_baset;
-
 class full_array_abstract_objectt : public abstract_aggregate_objectt<
                                       full_array_abstract_objectt,
                                       array_aggregate_typet>

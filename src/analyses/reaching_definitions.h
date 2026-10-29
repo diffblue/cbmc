@@ -30,9 +30,7 @@ Date: February 2013
 #include "ai.h"
 #include "goto_rw.h"
 
-class value_setst;
-class is_threadedt;
-class dirtyt;
+class dirtyt; // IWYU pragma: keep
 class reaching_definitions_analysist;
 
 /// An instance of this class provides an assignment of unique numeric `ID` to
