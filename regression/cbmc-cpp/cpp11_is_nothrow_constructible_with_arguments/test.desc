@@ -1,4 +1,4 @@
-KNOWNBUG libstdcxx
+CORE libstdcxx
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ copy throws: SUCCESS$
@@ -12,8 +12,7 @@ main.cpp
 --
 ^warning: ignoring
 --
-The built-in __is_nothrow_constructible(T, Args...) with arguments is true
-for every T (cpp_typecheck_expr.cpp: "nothrow is about exceptions, which
-are not modelled"), so assertions 1 and 3 fail.  It has to construct T
-from the arguments, as __is_constructible does, and check the exception
-specification of the selected constructor.
+The built-in __is_nothrow_constructible(T, Args...) with arguments was
+true for every T.  It now constructs T from the arguments, as
+__is_constructible does, and checks the exception specification of the
+selected constructor.
