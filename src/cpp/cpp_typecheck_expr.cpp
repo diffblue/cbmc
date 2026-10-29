@@ -11854,8 +11854,90 @@ void cpp_typecheckt::typecheck_expr(exprt &expr, const target_typet &target)
   typecheck_expr(expr);
 }
 
+/// N5008 [over.match.oper]/3, [over.over]/1, [temp.deduct.funcaddr]/1: in
+/// `a @ f' with a of class type and f naming a set of functions or function
+/// templates (`o << std::endl'), the target type that selects from the set
+/// is the parameter type of each candidate operator function.  Take it from
+/// the member operator@ functions of a's class: when the ones whose
+/// parameter is a pointer to function deduce the same function, f denotes
+/// it.  Without a target, the name was resolved on its own, from whatever
+/// specialization of the parameter's class came first in the symbol table.
+void cpp_typecheckt::resolve_overload_set_operand(exprt &expr)
+{
+  if(expr.operands().size() != 2)
+    return;
+  const char *op_name = nullptr;
+  for(const operator_entryt *e = operators; !e->id.empty(); e++)
+  {
+    if(expr.id() == e->id)
+    {
+      op_name = e->op_name;
+      break;
+    }
+  }
+  if(op_name == nullptr)
+    return;
+  exprt &function = to_binary_expr(expr).op1();
+  const exprt *name = &function;
+  if(name->id() == ID_address_of && name->operands().size() == 1)
+    name = &to_unary_expr(*name).op();
+  if(name->id() != ID_cpp_name)
+    return;
+
+  exprt &object = to_binary_expr(expr).op0();
+  typecheck_expr(object);
+  already_typechecked_exprt::make_already_typechecked(object);
+  typet object_type = to_already_typechecked_expr(object).get_expr().type();
+  if(object_type.id() != ID_struct_tag)
+    return;
+  elaborate_class_template(object_type);
+  const symbolt *class_symbol =
+    symbol_table.lookup(to_struct_tag_type(object_type).get_identifier());
+  if(class_symbol == nullptr || class_symbol->type.id() != ID_struct)
+    return;
+
+  const irep_idt member_name = std::string("operator") + op_name;
+  std::optional<exprt> selected;
+  for(const auto &c : to_struct_type(class_symbol->type).components())
+  {
+    if(c.type().id() != ID_code || c.get_base_name() != member_name)
+      continue;
+    const auto &parameters = to_code_type(c.type()).parameters();
+    if(parameters.size() != 2) // the object and the operand
+      continue;
+    const typet &target = parameters[1].type();
+    if(
+      target.id() != ID_pointer || target.get_bool(ID_C_reference) ||
+      to_pointer_type(target).base_type().id() != ID_code)
+    {
+      continue;
+    }
+    exprt deduced;
+    try
+    {
+      sfinae_contextt sfinae_guard{*this};
+      deduced = deduce_funcaddr_against_target(function, target);
+    }
+    catch(...)
+    {
+      continue;
+    }
+    if(deduced.is_nil())
+      continue;
+    if(selected.has_value() && *selected != deduced)
+      return; // different functions: left to overload resolution
+    selected = deduced;
+  }
+  if(!selected.has_value())
+    return;
+  function = *selected;
+  already_typechecked_exprt::make_already_typechecked(function);
+}
+
 void cpp_typecheckt::typecheck_expr(exprt &expr)
 {
+  resolve_overload_set_operand(expr);
+
   // N5008 [over.over]/1.3: the target of an explicit type conversion selects
   // the function of an overload set -- `static_cast<const symbol_exprt
   // &(*)(const exprt &)>(to_symbol_expr)' (CBMC's own

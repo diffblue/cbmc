@@ -1530,6 +1530,7 @@ protected:
   /// or an explicit `&cpp_name` `address_of`.  In either case the
   /// resulting expression is a typed `address_of` that the caller
   /// can substitute for the original.
+  void resolve_overload_set_operand(exprt &expr);
   exprt deduce_funcaddr_against_target(
     const exprt &name_or_addressof,
     const typet &target_fn_pointer_type);

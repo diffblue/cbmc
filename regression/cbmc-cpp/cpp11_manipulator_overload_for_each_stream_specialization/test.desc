@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 
 ^\[main\.assertion\.1\] line \d+ manipulator for os<char>: SUCCESS$
@@ -11,11 +11,8 @@ main.cpp
 --
 ^warning: ignoring
 --
-The operator call is resolved with the function template name as an
-untyped argument.  deduce_without_call_arguments (cpp_typecheck_resolve.cpp)
-then deduces endl's arguments from the first complete specialization of os
-in the symbol table, so one of the two calls gets endl<the other type>,
-which only converts to bool: operator<<(bool) is chosen.  Which one depends
-on the symbol table's order (with libc++, `std::cerr << std::endl' in a file
-named main.cpp, cpp11_iostream_cerr_libcxx).  Each candidate's parameter
-type has to drive the deduction instead ([temp.deduct.funcaddr]/1).
+Fixed: the function template name was resolved without a target, from
+the first complete specialization of os in the symbol table, so one of
+the two insertions called operator<<(bool).  resolve_overload_set_operand
+now deduces it from the member operator<< functions taking a pointer to
+function ([temp.deduct.funcaddr]/1).
