@@ -3172,6 +3172,10 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     }
     catch(...)
     {
+      // N5008 [class.mem.general]/9.4: in the noexcept-specifier of a
+      // member declaration the operand may name a member declared later;
+      // evaluate_noexcept_expression retries with the complete class
+      ++failed_noexcept_operands;
       // Substitution failure inside noexcept is a SFINAE failure
       // that in turn makes the noexcept-expr evaluate to `true`
       // (the operand can't throw because it can't even exist).

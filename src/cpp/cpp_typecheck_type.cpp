@@ -1582,13 +1582,19 @@ void cpp_typecheckt::evaluate_noexcept_expression(
   const irept kept = code_type.find("#C_noexcept_expression");
   exprt expression = static_cast<const exprt &>(kept);
   code_type.remove("#C_noexcept_expression");
+  // a noexcept operator in the expression whose operand cannot be
+  // type-checked yet (it names a later member) is taken as true; the
+  // expression is then evaluated again with the complete class
+  const std::size_t failed_before = failed_noexcept_operands;
   try
   {
     sfinae_contextt sfinae_guard{*this};
     typecheck_expr(expression);
     implicit_typecast_bool(expression);
     expression = simplify_expr(expression, *this);
-    if(expression.is_true())
+    if(keep_on_failure && failed_noexcept_operands != failed_before)
+      code_type.add("#C_noexcept_expression") = kept;
+    else if(expression.is_true())
       code_type.remove("#C_noexcept_unevaluated");
     else if(expression.is_false())
     {
