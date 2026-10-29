@@ -1,0 +1,9 @@
+CORE
+push-pop1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+unsupported: push
+unsupported: pop
+--
+push and pop must be explicitly rejected.

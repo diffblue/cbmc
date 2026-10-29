@@ -348,6 +348,28 @@ void smt2_solvert::setup_commands()
         std::cout << smt2_format(e_simplified) << '\n';
       }
     };
+    commands["push"] = [this]()
+    {
+      // consume the numeral argument
+      auto token = next_token();
+      if(token != smt2_tokenizert::NUMERAL)
+        throw error("push expects a numeral");
+      std::cout << "(error \"unsupported: push\")\n";
+    };
+
+    commands["pop"] = [this]()
+    {
+      auto token = next_token();
+      if(token != smt2_tokenizert::NUMERAL)
+        throw error("pop expects a numeral");
+      std::cout << "(error \"unsupported: pop\")\n";
+    };
+
+    commands["reset"] = [this]()
+    { std::cout << "(error \"unsupported: reset\")\n"; };
+
+    commands["reset-assertions"] = [this]()
+    { std::cout << "(error \"unsupported: reset-assertions\")\n"; };
   }
 
 #if 0

@@ -1,0 +1,8 @@
+CORE
+reset1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+unsupported: reset-assertions
+--
+reset-assertions must be explicitly rejected.
