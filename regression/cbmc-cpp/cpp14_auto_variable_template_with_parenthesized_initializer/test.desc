@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp14
 ^\[main\.assertion\.1\] line \d+ deduced type: SUCCESS$
@@ -12,11 +12,8 @@ main.cpp
 ^warning: ignoring
 --
 The second use of vb<char> instantiates the specialization again; the new
-declaration still has the placeholder type and is rejected ("symbol
+declaration still has the placeholder type, and was rejected ("symbol
 'vb<char>' already declared with different type: original: signed int,
-new: auto", cpp_declarator_converter.cpp combine_types).  Accepting it
-there is not enough: the specialization's value then stays the
-unconverted constructor-form initializer, and __CPROVER_initialize assigns
-it (a type-inconsistent assignment).  With `= 7' instead of `(7)' the
-program verifies.  Found while diagnosing
-cpp20_range_adaptor_closure_invoked_through_invoke_impl.
+new: auto", combine_types).  combine_types now keeps the deduced type,
+and the repeated initializer is dropped, since it would replace the
+converted value of the first instantiation.  N5008 [temp.spec.general]/5.

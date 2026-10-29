@@ -34,6 +34,20 @@ cpp_declarator_convertert::cpp_declarator_convertert(
 {
 }
 
+/// N5008 [dcl.spec.auto.general]/3: whether \p type is or contains, under
+/// pointer and reference declarators, an undeduced placeholder (`auto',
+/// `auto &&', `const auto *'); [dcl.spec.auto.general]/13: a redeclaration
+/// of a function with a deduced return type uses the placeholder, so its
+/// type does not conflict with the deduced one
+static bool placeholder_return_type(const typet &type)
+{
+  if(type.id() == ID_auto)
+    return true;
+  if(type.id() == ID_pointer)
+    return placeholder_return_type(to_pointer_type(type).base_type());
+  return false;
+}
+
 symbolt &cpp_declarator_convertert::convert(
   const typet &declaration_type,
   const cpp_storage_spect &storage_spec,
@@ -443,6 +457,17 @@ symbolt &cpp_declarator_convertert::convert(
     const irept hidden_friend_of = symbol.type.find(ID_C_hidden_friend_of);
     combine_types(declarator.name().source_location(), final_type, symbol);
     enforce_rules(symbol);
+    // N5008 [temp.spec.general]/5: a variable template specialization
+    // instantiated again (see combine_types) already has the type and the
+    // value its first instantiation deduced and converted; the repeated
+    // initializer would replace that value by an unconverted one
+    if(
+      !is_code && placeholder_return_type(final_type) &&
+      !placeholder_return_type(symbol.type) && symbol.value.is_not_nil())
+    {
+      declarator.remove(ID_init_args);
+      declarator.value().make_nil();
+    }
     // [dcl.meaning.general]/2.1: a namespace-scope declaration of a function
     // first declared as a friend binds its name; another friend declaration
     // does not
@@ -469,20 +494,6 @@ symbolt &cpp_declarator_convertert::convert(
 
     return symbol;
   }
-}
-
-/// N5008 [dcl.spec.auto.general]/3: whether \p type is or contains, under
-/// pointer and reference declarators, an undeduced placeholder (`auto',
-/// `auto &&', `const auto *'); [dcl.spec.auto.general]/13: a redeclaration
-/// of a function with a deduced return type uses the placeholder, so its
-/// type does not conflict with the deduced one
-static bool placeholder_return_type(const typet &type)
-{
-  if(type.id() == ID_auto)
-    return true;
-  if(type.id() == ID_pointer)
-    return placeholder_return_type(to_pointer_type(type).base_type());
-  return false;
 }
 
 void cpp_declarator_convertert::combine_types(
@@ -564,6 +575,17 @@ void cpp_declarator_convertert::combine_types(
   }
   else if(symbol.type == decl_type)
     return; // ok
+  // N5008 [temp.spec.general]/5: every use of a variable template
+  // specialization names the one variable; instantiating it again (the
+  // specialization named once more) redeclares it with the placeholder type
+  // its first instantiation deduced from the initializer
+  // ([dcl.type.auto.deduct]/2.2.3 for `auto v(init)')
+  else if(
+    symbol.type.id() != ID_code && placeholder_return_type(decl_type) &&
+    !placeholder_return_type(symbol.type) && symbol.value.is_not_nil())
+  {
+    return; // keep the deduced type
+  }
   else if(
     symbol.type.id() == ID_array &&
     to_array_type(symbol.type).size().is_nil() && decl_type.id() == ID_array &&
