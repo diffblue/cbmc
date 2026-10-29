@@ -7250,6 +7250,36 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
         {
           if(b.is_nil())
             continue;
+          // a base with data members is an element this reshape cannot
+          // initialize: its members are flattened into the class, so its
+          // clause would be paired with the class's own first member
+          // (`D{{6}, 7}' put 6 into D::w); leave it to the constructor path,
+          // which initializes the base subobject
+          const typet &base_type = static_cast<const typet &>(b.find(ID_type));
+          const symbolt *base_symbol =
+            base_type.id() == ID_struct_tag
+              ? symbol_table.lookup(
+                  to_struct_tag_type(base_type).get_identifier())
+              : nullptr;
+          bool base_has_data = base_symbol == nullptr;
+          if(base_symbol != nullptr && base_symbol->type.id() == ID_struct)
+          {
+            for(const auto &m : to_struct_type(base_symbol->type).components())
+            {
+              if(
+                m.type().id() != ID_code && !m.get_bool(ID_is_type) &&
+                !m.get_bool(ID_is_static) && !m.get_is_padding())
+              {
+                base_has_data = true;
+                break;
+              }
+            }
+          }
+          if(base_has_data)
+          {
+            aggregate = false;
+            break;
+          }
           if(
             idx < ops.size() && ops[idx].id() == ID_initializer_list &&
             ops[idx].operands().empty())
