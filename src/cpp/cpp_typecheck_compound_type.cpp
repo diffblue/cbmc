@@ -3755,7 +3755,26 @@ void cpp_typecheckt::implicit_exception_specifications(symbolt &symbol)
       if(!on_component && !on_symbol)
         continue;
       typet &evaluated = on_component ? c.type() : function->type;
+      // [expr.prim.this]/4: `this' may appear in the declarator of an
+      // implicit object member function (`noexcept(noexcept(b()))' calls
+      // `this->b()').  Not for a class template specialization:
+      // [except.spec]/12 instantiates the noexcept-specifier of its members
+      // only when needed, and evaluating it here instantiates templates the
+      // program does not use (view_interface<take_view<int *>> for
+      // `arr | views::take(3)', whose presence then misled overload
+      // resolution)
+      exprt &this_expr = cpp_scopes.current_scope().this_expr;
+      const exprt saved_this = this_expr;
+      const auto &parameters = to_code_type(evaluated).parameters();
+      if(
+        !symbol.type.get_bool(ID_template_class_instance) &&
+        !parameters.empty() && parameters.front().get_this())
+      {
+        this_expr = symbol_exprt{
+          parameters.front().get_identifier(), parameters.front().type()};
+      }
       evaluate_noexcept_expression(evaluated);
+      this_expr = saved_this;
       for(typet *t :
           {&c.type(), function != nullptr ? &function->type : nullptr})
       {

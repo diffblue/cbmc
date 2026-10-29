@@ -1315,6 +1315,13 @@ protected:
   bool
   is_trivially_copyable_type(const typet &type, bool want_trivial, int depth);
 
+  /// The number of noexcept operators whose operand could not be
+  /// type-checked (taken as true).  evaluate_noexcept_expression keeps the
+  /// noexcept-specifier of a member declaration for a retry with the complete
+  /// class when this count grew while evaluating it: the operand may name a
+  /// member declared later ([class.mem.general]/9.4).
+  std::size_t failed_noexcept_operands = 0;
+
   /// N5008 [except.spec]/5: whether the type-checked expression \p expr
   /// is potentially-throwing: it contains a throw-expression, a call of a
   /// function that is not non-throwing, or the destruction of a temporary
