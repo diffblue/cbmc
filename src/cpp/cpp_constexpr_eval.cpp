@@ -354,6 +354,56 @@ static std::optional<exprt> array_pointer_deref(
   return c;
 }
 
+/// `__builtin_memcmp(s1, s2, n)' over constant arrays, which GCC and clang
+/// evaluate in a constant expression: libstdc++ 11's
+/// char_traits<char>::compare calls it when __builtin_constant_p(__n),
+/// folded at its definition, is false.  The sign of the first differing
+/// pair of bytes, compared as unsigned char (C17 7.24.4/1); nil when \p call
+/// is not such a call or its (evaluated) arguments are not constant.
+static exprt evaluate_builtin_memcmp(
+  const exprt &call,
+  const symbol_table_baset &symbol_table,
+  const namespacet &ns)
+{
+  if(call.id() != ID_side_effect || call.get(ID_statement) != ID_function_call)
+  {
+    return nil_exprt{};
+  }
+  const auto &function_call = to_side_effect_expr_function_call(call);
+  if(
+    function_call.function().id() != ID_symbol ||
+    to_symbol_expr(function_call.function()).get_identifier() !=
+      "__builtin_memcmp" ||
+    function_call.arguments().size() != 3)
+  {
+    return nil_exprt{};
+  }
+  const auto &arguments = function_call.arguments();
+  auto p1 = array_pointer(arguments[0], symbol_table);
+  auto p2 = array_pointer(arguments[1], symbol_table);
+  exprt size = arguments[2];
+  simplify(size, ns);
+  const auto n = integer_constant(size);
+  if(!p1.has_value() || !p2.has_value() || !n.has_value())
+    return nil_exprt{};
+  int result = 0;
+  for(mp_integer i = 0; i < *n && result == 0; ++i, ++p1->index, ++p2->index)
+  {
+    const auto c1 = array_pointer_deref(*p1, symbol_table, ns);
+    const auto c2 = array_pointer_deref(*p2, symbol_table, ns);
+    if(!c1.has_value() || !c2.has_value())
+      return nil_exprt{};
+    const auto v1 = integer_constant(*c1);
+    const auto v2 = integer_constant(*c2);
+    if(!v1.has_value() || !v2.has_value())
+      return nil_exprt{};
+    const mp_integer u1 = *v1 < 0 ? *v1 + 256 : *v1;
+    const mp_integer u2 = *v2 < 0 ? *v2 + 256 : *v2;
+    result = u1 < u2 ? -1 : u2 < u1 ? 1 : 0;
+  }
+  return from_integer(result, call.type());
+}
+
 bool is_constexpr_call_argument(
   const exprt &e,
   const symbol_table_baset &symbol_table)
@@ -1242,6 +1292,19 @@ public:
         simplify(result, ns);
         return result;
       }
+      if(
+        callee.id() == ID_symbol &&
+        to_symbol_expr(callee).get_identifier() == "__builtin_memcmp")
+      {
+        exprt call_copy = e;
+        for(auto &op : to_side_effect_expr_function_call(call_copy).arguments())
+        {
+          op = eval(op);
+        }
+        exprt r = evaluate_builtin_memcmp(call_copy, symbol_table, ns);
+        if(r.is_not_nil())
+          return r;
+      }
       // a member function call on an object of this evaluation
       const irep_idt object_key = tracked_object_argument(e);
       if(!object_key.empty())
@@ -1591,6 +1654,9 @@ static exprt evaluate_constexpr_call(
     return evaluate_temporary_object(expr, symbol_table, ns, ensure_definition);
   if(expr.get(ID_statement) != ID_function_call)
     return nil_exprt();
+  exprt memcmp_result = evaluate_builtin_memcmp(expr, symbol_table, ns);
+  if(memcmp_result.is_not_nil())
+    return memcmp_result;
 
   const auto &call = to_side_effect_expr_function_call(expr);
   const auto &function = call.function();
