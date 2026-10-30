@@ -856,6 +856,44 @@ bool cpp_typecheckt::standard_conversion_sequence(
     curr_expr = typecast_exprt(
       curr_expr, to_c_bit_field_type(curr_expr.type()).underlying_type());
 
+  // N5008 [conv.fctptr]/1: a pointer to noexcept function converts to a
+  // pointer to function, not the other way round.  The exception
+  // specification is a comment of the function type (#C_noexcept), which
+  // type equality ignores, so check it here.  The function pointer
+  // conversion is in the Exact Match category ([over.ics.scs] Table 19) but
+  // worse than the identity ([over.ics.rank]/3.2.1: a proper subsequence):
+  // `h(&g)' with `h(void (*)() noexcept)' and `h(void (*)())' selects the
+  // former for a noexcept g, and only the latter is viable otherwise.
+  bool function_pointer_converted = false;
+  {
+    // the function type pointed to, whether the expression is a pointer to
+    // function or a function (decayed by function-to-pointer conversion)
+    auto pointee_code = [](const typet &t) -> const typet *
+    {
+      if(t.id() == ID_code)
+        return &t;
+      if(
+        t.id() == ID_pointer && !is_reference(t) &&
+        to_pointer_type(t).base_type().id() == ID_code)
+      {
+        return &to_pointer_type(t).base_type();
+      }
+      return nullptr;
+    };
+    const typet *from_code = pointee_code(curr_expr.type());
+    const typet *to_code =
+      type.id() == ID_pointer ? pointee_code(type) : nullptr;
+    if(from_code != nullptr && to_code != nullptr)
+    {
+      const auto is_noexcept = [](const typet &t)
+      { return t.get_bool("#C_noexcept") || t.get_bool(ID_noexcept); };
+      if(is_noexcept(*to_code) && !is_noexcept(*from_code))
+        return false;
+      function_pointer_converted =
+        is_noexcept(*from_code) && !is_noexcept(*to_code);
+    }
+  }
+
   // N5008 [conv.general]/1.1: the first conversion of a standard
   // conversion sequence may be array-to-pointer whatever the target type;
   // a later step then converts the pointer, e.g. the boolean conversion of
@@ -1076,6 +1114,9 @@ bool cpp_typecheckt::standard_conversion_sequence(
     new_expr = curr_expr;
     new_expr.type() = type;
   }
+
+  if(function_pointer_converted)
+    rank += 1;
 
   return true;
 }
