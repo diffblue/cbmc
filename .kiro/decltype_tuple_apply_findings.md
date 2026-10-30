@@ -15685,3 +15685,29 @@ and per commit, doxygen, per-commit compile, platform (gcc11, m32, arm64),
 vacuity 1146/3 (the new tests end in a failing assertion and are not
 selected), MSVC .ii (2 known timeouts).
 Next: libc++ locale::use_facet, then MSVC streams.
+
+## Round 209 (2026-10-30): the KNOWNBUGs of round 208
+
+- 366e0e9bb4: destructor thunks of bases are no overload candidates; E : D
+  with a repeated polymorphic A was rejected (ambiguous A).  -> CORE.
+- 8af076731d: the table of a repeated base subobject is a copy of the
+  direct base's whole table (C's for D's second A), also with virtual
+  bases and no overriders; one thunk per embedding level.  -> CORE.
+- 5611d225a2: noexcept-specifiers of class template members are evaluated
+  when needed ([except.spec]/12): by the noexcept operator, and for the
+  converted definitions at the end of type checking, with the class's
+  template arguments and `this'.  -> CORE.
+- b018b10e7d: implicit move constructor and move assignment declared for
+  a class with a base or member that has a move constructor
+  ([class.copy.ctor]/8).  -> CORE.  cbmc-cpp CORE time 1067 s -> 1077 s.
+- Found and fixed on the way: 8add331f32 dynamic_cast<void *> (aborted,
+  [expr.dynamic.cast]/8); 603028b355 delete through a non-primary
+  polymorphic base passes the most derived object's address to the
+  deallocation ([expr.delete]/6).
+- KNOWNBUG f7e86785dc: the thunk through which a virtual base's table
+  enters an overrider uses the complete-object offset; a derived class
+  with data members reads outside the object (needs vcall offsets).
+Checks on W190 (f7e86785dc): 13 suites, profiles, unit, lint, format
+overall and per commit, doxygen, per-commit compile, platform (gcc11,
+m32, arm64), vacuity 1146/3, MSVC .ii (2 known timeouts).
+Next: the vcall-offset KNOWNBUG, libc++ locale::use_facet, MSVC streams.
