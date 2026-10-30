@@ -64,6 +64,13 @@ foreach(dep ${LIBRARY_DEPENDENCIES})
         list(APPEND DEPENDENCY_TARGETS "$<TARGET_FILE:${dep}>")
     else()
         find_library(dep_path ${dep})
+        if(NOT dep_path)
+          message(FATAL_ERROR
+            "libcprover-cpp cannot be linked: dependency '${dep}' is neither a "
+            "visible CMake target nor a discoverable library. If '${dep}' is an "
+            "IMPORTED target, it must be declared with IMPORTED ... GLOBAL to be "
+            "visible in this (sibling) directory. See issue #8249.")
+        endif()
         string(REGEX REPLACE "[.]so$" ".a" dep_static_path ${dep_path})
         if (NOT EXISTS "${dep_static_path}")
           message(FATAL_ERROR "libcprover-cpp cannot be linked as dependency ${dep_path} does not have a static correspondent file (${dep_static_path})")
