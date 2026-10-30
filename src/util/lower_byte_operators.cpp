@@ -2419,20 +2419,27 @@ static exprt lower_byte_update(
         val_before,
         src.id() == ID_byte_update_little_endian,
         mp_integer{0},
-        mp_integer{update_bytes.size()},
+        std::nullopt,
         src.get_bits_per_byte(),
         ns);
       CHECK_RETURN(src_as_bytes.id() == ID_array);
-      CHECK_RETURN(src_as_bytes.operands().size() == update_bytes.size());
+      const typet index_type = to_array_type(src_as_bytes.type()).index_type();
       for(std::size_t i = 0; i < update_bytes.size(); ++i)
       {
+        // Update bytes beyond the bound retain the original byte at the
+        // position they are placed at. Positions outside src_as_bytes are
+        // shifted out below, so their value does not matter.
         update_bytes[i] = if_exprt{
           binary_predicate_exprt{
             from_integer(i, non_const_update_bound->type()),
             ID_lt,
             *non_const_update_bound},
           update_bytes[i],
-          src_as_bytes.operands()[i]};
+          index_exprt{
+            src_as_bytes,
+            typecast_exprt::conditional_cast(
+              plus_exprt{src.offset(), from_integer(i, src.offset().type())},
+              index_type)}};
       }
     }
 
