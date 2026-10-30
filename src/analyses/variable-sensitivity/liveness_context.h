@@ -16,8 +16,8 @@
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_LIVENESS_CONTEXT_H
 
 #include <analyses/variable-sensitivity/write_location_context.h>
+
 #include <iostream>
-#include <stack>
 
 /**
  * General implementation of an abstract_objectt which tracks the
