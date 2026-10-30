@@ -898,12 +898,10 @@ exprt cpp_typecheckt::vtable_pointer_value(
     is_repeated_subobject_vtable_pointer(vtptr))
   {
     // the most derived class's own table for the subobject, when it declares
-    // overriders (do_repeated_subobject_virtual_tables)
+    // overriders or has virtual bases (do_repeated_subobject_virtual_tables):
+    // a copy of the direct base's whole table, reached along the same members
     const symbolt *own = symbol_table.lookup(
       repeated_subobject_vtable_name(most_derived.name, vtptr));
-    if(own != nullptr)
-      return address_of_exprt(
-        own->symbol_expr(), to_pointer_type(vtptr.type()));
     const symbolt *direct_base = symbol_table.lookup(path.front().id());
     if(direct_base == nullptr || direct_base->type.id() != ID_struct)
       return nil_exprt{};
@@ -918,7 +916,16 @@ exprt cpp_typecheckt::vtable_pointer_value(
       {
         continue;
       }
-      return vtable_pointer_value(*direct_base, c);
+      exprt value = vtable_pointer_value(*direct_base, c);
+      if(own != nullptr && value.id() == ID_address_of)
+      {
+        exprt *object = &to_address_of_expr(value).object();
+        while(object->id() == ID_member)
+          object = &to_member_expr(*object).compound();
+        if(object->id() == ID_symbol && object->type() == own->type)
+          *object = own->symbol_expr();
+      }
+      return value;
     }
     return nil_exprt{};
   }
@@ -1012,7 +1019,12 @@ void cpp_typecheckt::do_repeated_subobject_virtual_tables(const symbolt &symbol)
       overriders[c.get(ID_virtual_name)] = &c;
     }
   }
-  if(overriders.empty())
+  // with virtual bases, the subobject's table also holds offsets that depend
+  // on this class (set_virtual_base_offsets): it cannot share the direct
+  // base's table
+  std::list<irep_idt> virtual_bases;
+  get_virtual_bases(struct_type, virtual_bases);
+  if(overriders.empty() && virtual_bases.empty())
     return;
 
   for(const auto &vtptr : struct_type.components())
@@ -1034,16 +1046,18 @@ void cpp_typecheckt::do_repeated_subobject_virtual_tables(const symbolt &symbol)
       // adjustments are rebuilt with the final subobject offset
       for(const auto &overrider : overriders)
       {
-        symbolt *thunk = symbol_table.get_writeable(
-          id2string(vt_name) +
-          "::" + id2string(overrider.second->get_base_name()));
-        if(thunk != nullptr)
+        for(const irep_idt &thunk_name :
+            repeated_subobject_thunks[vt_name][overrider.first])
         {
-          build_this_adjusting_thunk_body(
-            *thunk,
-            overrider.second->get_name(),
-            lookup(overrider.second->get_name()).type,
-            subobject_offset);
+          symbolt *thunk = symbol_table.get_writeable(thunk_name);
+          if(thunk != nullptr)
+          {
+            build_this_adjusting_thunk_body(
+              *thunk,
+              overrider.second->get_name(),
+              lookup(overrider.second->get_name()).type,
+              subobject_offset);
+          }
         }
       }
       continue;
@@ -1082,14 +1096,12 @@ void cpp_typecheckt::do_repeated_subobject_virtual_tables(const symbolt &symbol)
       symbol_table.lookup(to_symbol_expr(object).get_identifier());
     if(base_table == nullptr || base_table->value.id() != ID_struct)
       continue;
+    // the whole table, of the type of the direct base's vtable struct: code
+    // that sees the subobject as part of the direct base (C in `D : B, C'
+    // with B, C : A) reads its pointer as that struct (virtual-base offsets,
+    // the direct base's own virtual functions); vtable_pointer_value points
+    // into it along the same members
     exprt value = base_table->value;
-    for(auto it = members.rbegin(); it != members.rend(); ++it)
-    {
-      const struct_typet &t = ns.follow_tag(to_struct_tag_type(value.type()));
-      const auto index = t.component_number(*it);
-      exprt next = value.operands()[index];
-      value = std::move(next);
-    }
 
     // replace the slots the class overrides by thunks that adjust `this'
     // from this subobject to the class
@@ -1114,8 +1126,10 @@ void cpp_typecheckt::do_repeated_subobject_virtual_tables(const symbolt &symbol)
           continue;
         const struct_typet::componentt &overrider = *it->second;
         const typet &slot_type = to_pointer_type(comps[i].type()).base_type();
+        // one thunk per embedding level of the table: each level's slot has
+        // its own `this' type
         symbolt thunk{
-          id2string(vt_name) + "::" + id2string(overrider.get_base_name()),
+          id2string(vt_name) + "::" + id2string(comps[i].get_name()),
           slot_type,
           symbol.mode};
         thunk.base_name = overrider.get_base_name();
@@ -1141,6 +1155,7 @@ void cpp_typecheckt::do_repeated_subobject_virtual_tables(const symbolt &symbol)
           lookup(overrider.get_name()).type,
           subobject_offset);
         const irep_idt thunk_name = thunk.name;
+        repeated_subobject_thunks[vt_name][it->first].push_back(thunk_name);
         symbol_table.insert(std::move(thunk));
         table.operands()[i] = address_of_exprt{
           symbol_exprt{thunk_name, slot_type},

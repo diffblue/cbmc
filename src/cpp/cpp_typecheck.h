@@ -878,6 +878,10 @@ protected:
   /// base class subobject occurring more than once in the lattice (see
   /// add_base_components), with the final overriders of that subobject.
   void do_repeated_subobject_virtual_tables(const symbolt &symbol);
+  /// The thunks of each table do_repeated_subobject_virtual_tables built, by
+  /// the virtual name of their overrider (one per embedding level).
+  std::map<irep_idt, std::map<irep_idt, std::vector<irep_idt>>>
+    repeated_subobject_thunks;
 
   /// The name of the virtual table object of \p most_derived for the
   /// repeated base class subobject whose virtual pointer is \p vtptr.
