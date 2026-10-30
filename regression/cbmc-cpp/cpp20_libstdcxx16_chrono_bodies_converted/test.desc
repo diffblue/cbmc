@@ -1,0 +1,20 @@
+KNOWNBUG libstdcxx16 libstdcxx
+main.cpp
+--cpp20 --object-bits 12
+^\[main\.assertion\.1\] line \d+ duration: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+With the libstdc++ 16.2.0 headers (g++ 16.2.0), including <chrono> drops
+the body of `__get_leap_second_info' (chrono line 3230); the suppressed
+diagnostics are "template '_S_test' not found", "template '__declval' not
+found" and "template '_S_test_2' not found" in <type_traits> (lines 2622,
+2653, 2720).  With the 16-20260315 snapshot that the CI gcc-16 job installs
+the program converts.  The same program is
+cpp11_libstdcxx_header_drops/test_chrono.desc.
