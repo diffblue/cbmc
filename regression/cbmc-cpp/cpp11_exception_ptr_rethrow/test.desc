@@ -12,4 +12,9 @@ main.cpp
 --
 std::current_exception, std::rethrow_exception and exception_ptr's
 _M_addref/_M_release are defined in libstdc++'s compiled library and have
-no model ("no body for callee"), so the rethrow is not modelled.
+no model ("no body for callee"), so the rethrow is not modelled.  A model
+needs the exception's type tag as well as its object
+(__CPROVER_cpp_current_exception and _type in remove_cpp_exceptions), a
+reference count that keeps the object alive past its handler, whose exit
+now destroys it ([except.throw]/4, [propagation]/9), and a rethrow that
+installs the pair as the in-flight exception.
