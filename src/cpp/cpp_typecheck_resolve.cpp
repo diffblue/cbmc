@@ -14066,6 +14066,14 @@ bool cpp_typecheck_resolvet::disambiguate_functions(
   if(expr.type().id() != ID_code)
     return true;
 
+  // A thunk (an entry point of a virtual function for the vtable of a base,
+  // whose `this' is that base) is not a declaration of the program: it is
+  // not a candidate.  Matching its `this' converted the object to the base,
+  // which is ill-formed for a base occurring twice ([class.mi]/4: E's
+  // implicit destructor destroying `D : B, C' with B, C : A polymorphic).
+  if(!expr.type().get("#thunk_target").empty())
+    return false;
+
   // N5008 [over.match.viable]/3: a candidate whose associated constraints
   // are not satisfied is not viable -- decided before its argument
   // conversions are formed.
