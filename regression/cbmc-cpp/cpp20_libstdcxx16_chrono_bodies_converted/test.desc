@@ -1,4 +1,4 @@
-KNOWNBUG libstdcxx16 libstdcxx
+CORE libstdcxx16 libstdcxx
 main.cpp
 --cpp20 --object-bits 12
 ^\[main\.assertion\.1\] line \d+ duration: SUCCESS$
@@ -11,10 +11,9 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-With the libstdc++ 16.2.0 headers (g++ 16.2.0), including <chrono> drops
-the body of `__get_leap_second_info' (chrono line 3230); the suppressed
-diagnostics are "template '_S_test' not found", "template '__declval' not
-found" and "template '_S_test_2' not found" in <type_traits> (lines 2622,
-2653, 2720).  With the 16-20260315 snapshot that the CI gcc-16 job installs
-the program converts.  The same program is
-cpp11_libstdcxx_header_drops/test_chrono.desc.
+With the libstdc++ 16.2.0 headers (g++ 16.2.0), <chrono> lost the body of
+`__get_leap_second_info': its local `constexpr leap_second_info
+__after_last{.is_leap_second = false, .elapsed = seconds(...)}' passed
+the designated-initializer node to seconds' constructor.  Fixed with
+cpp20_designated_initializer_of_class_type_member.  Runs only with GCC 16
+headers (libstdcxx16).

@@ -275,6 +275,24 @@ void cpp_typecheckt::aggregate_member_initialization(
   const source_locationt &source_location,
   code_blockt &block)
 {
+  // N5008 [dcl.init.aggr]/3.1: a designated-initializer-list names the
+  // elements it initializes (`{.e = sec(3)}'); the others are initialized
+  // as elements without an initializer (/5)
+  std::map<irep_idt, exprt> designated;
+  for(const auto &op : ops)
+  {
+    const exprt &designated_op =
+      op.id() == ID_already_typechecked ? to_unary_expr(op).op() : op;
+    if(designated_op.id() != ID_designated_initializer)
+      continue;
+    const irept &designator = designated_op.find(ID_designator);
+    if(designator.get_sub().size() == 1 && designated_op.operands().size() == 1)
+    {
+      designated[designator.get_sub().front().get(ID_component_name)] =
+        designated_op.operands().front();
+    }
+  }
+
   std::size_t idx = 0;
   for(const auto &c : struct_type.components())
   {
@@ -291,7 +309,10 @@ void cpp_typecheckt::aggregate_member_initialization(
     already_typechecked_exprt::make_already_typechecked(checked_member);
 
     std::optional<exprt> initializer;
-    if(idx < ops.size())
+    const auto designated_it = designated.find(c.get_base_name());
+    if(designated_it != designated.end())
+      initializer = designated_it->second;
+    else if(designated.empty() && idx < ops.size())
       initializer = ops[idx++];
     else if(c.find(ID_C_default_value).is_not_nil())
       initializer = static_cast<const exprt &>(c.find(ID_C_default_value));
