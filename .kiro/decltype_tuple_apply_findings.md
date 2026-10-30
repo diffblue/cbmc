@@ -15711,3 +15711,25 @@ Checks on W190 (f7e86785dc): 13 suites, profiles, unit, lint, format
 overall and per commit, doxygen, per-commit compile, platform (gcc11,
 m32, arm64), vacuity 1146/3, MSVC .ii (2 known timeouts).
 Next: the vcall-offset KNOWNBUG, libc++ locale::use_facet, MSVC streams.
+
+Audit of known gaps against KNOWNBUGs (round 209, after f7e86785dc):
+- Regression found and fixed as a follow-up commit: a member whose move
+  constructor is deleted gave its class an implicit move constructor
+  ([class.copy.ctor]/10, note 4); the implicit move constructor commit
+  (reported) declared it; cpp11_implicit_move_constructor_with_deleted_
+  member_move.
+- New KNOWNBUGs: is_nothrow_constructible<T &, U> with a throwing
+  conversion function; delete of a call result through a non-primary
+  base; std::exception_ptr rethrow; the deferred noexcept of a class
+  template member converted to a function pointer.
+- libstdc++ 16.2.0 (released) drops __get_leap_second_info (<chrono>) and
+  __do_vformat_to<_Sink_iter<wchar_t>,...> (<format>); four CORE tests
+  fail there, while CI's 16-20260315 snapshot passes the whole suite
+  (2149 tests, the 4 failures there need libc++, absent in that image).
+- MSVC STL stream insertion hang: a KNOWNBUG now records it.
+- Checked and not gaps: a default member initializer naming another
+  member in a default constructor's exception specification; a throw
+  from a base constructor under construction tables.
+Checks on the final build: 13 suites, profiles, unit, lint, format
+overall and per commit, doxygen, per-commit compile, platform (gcc11,
+m32, arm64), vacuity 1146/3, MSVC .ii (2 known timeouts).
