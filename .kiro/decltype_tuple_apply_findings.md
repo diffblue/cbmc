@@ -15733,3 +15733,44 @@ Audit of known gaps against KNOWNBUGs (round 209, after f7e86785dc):
 Checks on the final build: 13 suites, profiles, unit, lint, format
 overall and per commit, doxygen, per-commit compile, platform (gcc11,
 m32, arm64), vacuity 1146/3, MSVC .ii (2 known timeouts).
+
+## Round 210 (2026-10-31): CI of d5afeb79ad, round 209's KNOWNBUGs
+
+CI of d5afeb79ad:
+- 945838a0a4: the contracts library's string literal had grown to 65563
+  bytes, over clang's 65536 (-Woverlength-strings, -Werror); it broke the
+  macOS, Ubuntu clang, BSD, Xen, CompileLinux and random-tests jobs.  Now
+  65458 bytes, 78 below the limit: a further comment in
+  cprover_contracts.c can break it again.
+- VS 2022 and VS 2026 failed the same 5 tests: set_terminate of the MSVC
+  runtime (cea0d80a3e) and 4 tests about libstdc++ or GNU extensions,
+  now tagged (204d884c3c, KNOWNBUG 605fef1b80 for the MSVC istringstream).
+- Not this PR: check-clang-format (no clang-format-15 package on the
+  ubuntu-latest image), check-doxygen (doxygen 1.15 against the 1.9.8
+  warning list), Linux (node24 missing on the runner), CodeQL (Maven
+  build of the java models); other branches fail the same way.
+
+Fixes:
+- 8295909be9 delete with an operand with side effects ([expr.delete]/6);
+  bf1a851139 is_nothrow_constructible<T &, U> ([meta.unary.prop]);
+  35026fd1ca function pointer conversions and noexcept ([conv.fctptr]).
+  Three of round 209's KNOWNBUGs -> CORE.
+- ad9b631e37 vcall offsets: thunks entered through a virtual base read
+  the offset from the table ([class.cdtor]/4).  KNOWNBUG -> CORE.  cbmc-cpp
+  CORE time unchanged (1091 s -> 1072 s on the common tests).
+- f0188a2080 constant evaluation of calls on local objects
+  ([expr.const]/10.16) and 4b82a7ed5e designated initializers of class
+  type members ([dcl.init.aggr]/4.2): the libstdc++ 16.2.0 <format> and
+  <chrono> drops.  Both libstdcxx16 KNOWNBUGs -> CORE; 29 libstdcxx16 and
+  related tests pass in the gcc16-gate image (g++ 16.2.0).
+- 321a7a818a __builtin_memcmp in constant evaluation: libstdc++ 11's
+  char_traits<char>::compare calls it (platform_check gcc11 found it).
+- Still open: std::exception_ptr (KNOWNBUG cpp11_exception_ptr_rethrow
+  now says what a model needs), libc++ use_facet, MSVC streams.
+- Wrong N5008 citations in reported code: 27 `[expr.const]/5' (relaxed
+  constexpr is /10.16 in N5008) and 12 `[except.throw]/5' (destruction of
+  the exception object is /4).  The new commits cite the right ones; the
+  old ones are not yet corrected.
+Checks on W192 (tree of 321a7a818a): 13 suites, profiles, unit, lint,
+format overall and per commit, doxygen, per-commit compile, platform
+(gcc11, m32, arm64), vacuity 1146/3, MSVC .ii (2 known timeouts).
