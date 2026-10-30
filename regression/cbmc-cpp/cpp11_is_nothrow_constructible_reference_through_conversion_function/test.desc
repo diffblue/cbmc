@@ -1,0 +1,16 @@
+KNOWNBUG libstdcxx
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ throwing conversion to a reference: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+__is_nothrow_constructible(T &, U) is evaluated as __is_constructible
+(cpp_typecheck_expr.cpp): binding a reference may call a conversion
+function, whose exception specification is not checked, so assertion 1
+fails.

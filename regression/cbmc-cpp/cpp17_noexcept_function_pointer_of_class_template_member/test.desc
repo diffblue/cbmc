@@ -1,0 +1,19 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ noexcept\(true\) member: SUCCESS$
+^\[main\.assertion\.2\] line \d+ noexcept\(false\) member: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Assertion 2 fails: W<int>::f, declared noexcept(sizeof(T) == 1), is taken
+as non-throwing when its address is converted to a function pointer.  Its
+deferred noexcept-specifier (needed_exception_specification) is evaluated
+for the noexcept operator and for definitions, not for function pointer
+conversions (cpp_typecheck_conversions.cpp, #C_noexcept).  The W189 build
+fails it the same way.
