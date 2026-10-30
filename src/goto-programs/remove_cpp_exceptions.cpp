@@ -321,15 +321,22 @@ static void add_terminate(
   goto_programt &dest,
   const source_locationt &loc)
 {
-  if(const symbolt *terminate = symbol_table.lookup("std::terminate()"))
+  // the MSVC runtime declares terminate extern "C" at global scope
+  // (<corecrt_terminate.h>), which the MSVC STL makes std::terminate by a
+  // using-declaration
+  const symbolt *terminate = symbol_table.lookup("std::terminate()");
+  if(terminate == nullptr)
   {
-    if(
-      terminate->type.id() == ID_code &&
-      to_code_type(terminate->type).parameters().empty())
-    {
-      dest.add(goto_programt::make_function_call(
-        code_function_callt{terminate->symbol_expr()}, loc));
-    }
+    terminate = symbol_table.lookup("terminate");
+    if(terminate != nullptr && terminate->mode != ID_C)
+      terminate = nullptr;
+  }
+  if(
+    terminate != nullptr && terminate->type.id() == ID_code &&
+    to_code_type(terminate->type).parameters().empty())
+  {
+    dest.add(goto_programt::make_function_call(
+      code_function_callt{terminate->symbol_expr()}, loc));
   }
   dest.add(goto_programt::make_assumption(false_exprt{}, loc));
 }
@@ -352,7 +359,9 @@ void remove_cpp_exceptionst::terminate_on_escape(
                               symbol->type.get_bool("#C_noexcept") &&
                               !symbol->type.get_bool("#C_noexcept_unevaluated");
     // std::terminate's model ends in an assumption of false
-    if((!entry_point && !non_throwing) || name == "std::terminate()")
+    if(
+      (!entry_point && !non_throwing) || name == "std::terminate()" ||
+      (name == "terminate" && symbol != nullptr && symbol->mode == ID_C))
       continue;
 
     // The dispatch of an exception that no handler of this function

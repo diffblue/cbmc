@@ -144,8 +144,12 @@ ensure_parameter_symbols(symbolt &fn_symbol, symbol_table_baset &symbol_table)
     irep_idt id = params[i].get_identifier();
     if(id.empty())
     {
-      // Create an identifier based on the function name and parameter index
-      id = id2string(fn_symbol.name) + "::" + std::to_string(i);
+      // Create an identifier based on the function name and the parameter's
+      // base name, or its index when it has none (a symbol's name ends with
+      // its base name, symbolt::is_well_formed, for an extern "C" function)
+      const irep_idt &base_name = params[i].get_base_name();
+      id = id2string(fn_symbol.name) + "::" +
+           (base_name.empty() ? std::to_string(i) : id2string(base_name));
       params[i].set_identifier(id);
     }
     else
@@ -1930,6 +1934,16 @@ static const std::map<std::string, std::string> &library_source_models()
      " " CPROVER_PREFIX "assume(0); }"},
     {"std::get_terminate",
      "{ return " CPROVER_PREFIX "cpp_terminate_handler; }"},
+    // the MSVC runtime (<corecrt_terminate.h>): terminate and set_terminate
+    // at global scope, which the MSVC STL's <exception> makes std::terminate
+    // and std::set_terminate by using-declarations, and _get_terminate,
+    // which its std::get_terminate calls
+    {"terminate",
+     "{ if(" CPROVER_PREFIX "cpp_terminate_handler != 0) {"
+     " " CPROVER_PREFIX "cpp_inflight_exception = 0;"
+     " " CPROVER_PREFIX "cpp_terminate_handler(); }"
+     " " CPROVER_PREFIX "assume(0); }"},
+    {"_get_terminate", "{ return " CPROVER_PREFIX "cpp_terminate_handler; }"},
     // libc++ src/new.cpp, N5008 [bad.alloc], [new.badlength]
     {"std::bad_alloc::bad_alloc", "{ }"},
     {"std::bad_alloc::~bad_alloc", "{ }"},
@@ -1956,7 +1970,11 @@ static void provide_set_terminate_model(symbol_table_baset &symbol_table)
     if(
       candidate.type.id() != ID_code || candidate.value.is_not_nil() ||
       candidate.is_type ||
-      id2string(candidate.name).rfind("std::set_terminate(", 0) != 0)
+      (id2string(candidate.name).rfind("std::set_terminate(", 0) != 0 &&
+       // the MSVC runtime declares it extern "C" at global scope
+       // (<corecrt_terminate.h>); the MSVC STL's <exception> makes it
+       // std::set_terminate by a using-declaration
+       candidate.name != "set_terminate"))
     {
       continue;
     }
@@ -2017,6 +2035,16 @@ void cpp_typecheckt::provide_library_source_models()
     auto model = library_source_models().find(name);
     if(model == library_source_models().end())
       model = library_source_models().find(name.substr(0, name.find('(')));
+    // the MSVC runtime's global terminate and _get_terminate: their models
+    // apply to the runtime's own declarations, not to a function of the
+    // program of the same name
+    if(
+      model != library_source_models().end() &&
+      (model->first == "terminate" || model->first == "_get_terminate") &&
+      !is_system_header_file(id2string(symbol.location.get_file())))
+    {
+      model = library_source_models().end();
+    }
     if(model != library_source_models().end())
       to_define.emplace_back(entry.first, &model->second);
   }
