@@ -5439,17 +5439,21 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
     // rvalue: the implicit COPY was selected and its member copy was
     // deleted ("member 'goto_programt::goto_programt(...)' is not
     // accessible"; CBMC's own clean_expr_resultt, dog-fooding).
-    // Declared here only for a class with a MOVE-ONLY base or member -- a
-    // class with a move constructor and a deleted copy constructor
-    // (std::unique_ptr, goto_programt): for all other classes the implicit
-    // copy constructor performs the memberwise copy that the memberwise
-    // move would (or a copy where a member's move would steal), and the
-    // existing overload resolution, constant evaluation and library
-    // constraints rely on that.
-    bool subobject_is_move_only = false;
+    // Declared here only for a class with a base or member of a class that
+    // has a move constructor (declared, or implicitly declared by this
+    // rule): for all other classes the memberwise move initializes each
+    // subobject exactly as the implicit copy constructor does (a scalar is
+    // copied, a class without a move constructor is copied by its copy
+    // constructor, [class.copy.ctor]/14 with [over.match.ctor]), so the
+    // implicit copy constructor serves for it, and the existing overload
+    // resolution, constant evaluation and library constraints rely on that.
+    // Previously only a MOVE-ONLY subobject counted: a member with a
+    // throwing copy and a non-throwing move constructor was copied by
+    // `Holder(std::move(a))' (cpp11_implicit_move_constructor_moves_members).
+    bool subobject_has_move_constructor = false;
     if(symbol.type.id() == ID_struct)
     {
-      const auto move_only = [this](const typet &t)
+      const auto has_move_constructor = [this](const typet &t)
       {
         typet element = t;
         while(element.id() == ID_array)
@@ -5458,51 +5462,25 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
           return false;
         const symbolt *s =
           symbol_table.lookup(to_struct_tag_type(element).get_identifier());
-        if(
-          s == nullptr || s->type.id() != ID_struct ||
-          to_struct_type(s->type).is_incomplete() || !find_mvctor(*s))
-        {
-          return false;
-        }
-        // a deleted copy constructor is a component without access
-        for(const auto &c : to_struct_type(s->type).components())
-        {
-          if(
-            c.type().id() != ID_code || c.get_bool(ID_from_base) ||
-            to_code_type(c.type()).return_type().id() != ID_constructor)
-          {
-            continue;
-          }
-          const auto &parameters = to_code_type(c.type()).parameters();
-          if(
-            parameters.size() == 2 && is_reference(parameters[1].type()) &&
-            !is_rvalue_reference(parameters[1].type()) &&
-            to_reference_type(parameters[1].type())
-                .base_type()
-                .get(ID_identifier) == s->name &&
-            c.get(ID_access) == ID_noaccess)
-          {
-            return true;
-          }
-        }
-        return false;
+        return s != nullptr && s->type.id() == ID_struct &&
+               !to_struct_type(s->type).is_incomplete() && find_mvctor(*s);
       };
       for(const auto &b : to_struct_type(symbol.type).bases())
-        if(move_only(b.type()))
-          subobject_is_move_only = true;
+        if(has_move_constructor(b.type()))
+          subobject_has_move_constructor = true;
       for(const auto &c : to_struct_type(symbol.type).components())
       {
         if(
           !c.get_bool(ID_from_base) && !c.get_bool(ID_is_static) &&
           !c.get_bool(ID_is_type) && c.type().id() != ID_code &&
-          move_only(c.type()))
+          has_move_constructor(c.type()))
         {
-          subobject_is_move_only = true;
+          subobject_has_move_constructor = true;
         }
       }
     }
     const bool declare_implicit_move =
-      subobject_is_move_only && !find_cpctor(symbol) &&
+      subobject_has_move_constructor && !find_cpctor(symbol) &&
       !find_assignop(symbol) && !find_mvctor(symbol) && !found_dtor;
 
     // Add the default copy constructor
