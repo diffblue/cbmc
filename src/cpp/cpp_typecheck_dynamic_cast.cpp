@@ -198,10 +198,30 @@ exprt cpp_typecheckt::runtime_dynamic_cast(const exprt &check)
 
 /// Replace every `cpp_runtime_dynamic_cast' in \p expr (see
 /// dynamic_typecast) by its run-time check.
+/// Whether \p expr contains a `cpp_runtime_dynamic_cast', also as the
+/// deallocated object of a delete-expression
+static bool has_runtime_dynamic_cast(const exprt &expr)
+{
+  if(expr.id() == ID_cpp_runtime_dynamic_cast)
+    return true;
+  const irept &deallocated = expr.find("#deallocated_object");
+  if(deallocated.is_not_nil())
+    return true;
+  for(const auto &op : expr.operands())
+    if(has_runtime_dynamic_cast(op))
+      return true;
+  return false;
+}
+
 void cpp_typecheckt::resolve_runtime_dynamic_casts(exprt &expr)
 {
   for(auto &op : expr.operands())
     resolve_runtime_dynamic_casts(op);
+  // a delete-expression's deallocated object (typecheck_expr_delete), a
+  // named sub-expression
+  if(expr.find("#deallocated_object").is_not_nil())
+    resolve_runtime_dynamic_casts(
+      static_cast<exprt &>(expr.add("#deallocated_object")));
   if(expr.id() != ID_cpp_runtime_dynamic_cast)
     return;
   exprt resolved = runtime_dynamic_cast(expr);
@@ -225,7 +245,7 @@ void cpp_typecheckt::resolve_runtime_dynamic_casts()
   {
     if(
       !entry.second.is_type && entry.second.value.is_not_nil() &&
-      has_subexpr(entry.second.value, ID_cpp_runtime_dynamic_cast))
+      has_runtime_dynamic_cast(entry.second.value))
     {
       names.push_back(entry.first);
     }
