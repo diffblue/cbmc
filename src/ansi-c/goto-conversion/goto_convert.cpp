@@ -1185,8 +1185,8 @@ void goto_convertt::convert_cpp_delete(const codet &code, goto_programt &dest)
 
   // N5008 [expr.delete]/6: the deallocation function gets the address of
   // the most derived object, which the C++ front end computes for an
-  // operand pointing to a polymorphic base (its operand has no side
-  // effects); read before the destructor runs
+  // operand pointing to a polymorphic base; read before the destructor
+  // runs
   exprt deallocated = tmp_op;
   const irept &most_derived = code.find("#deallocated_object");
   if(most_derived.is_not_nil())
@@ -1200,10 +1200,11 @@ void goto_convertt::convert_cpp_delete(const codet &code, goto_programt &dest)
       symbol_table);
     dest.add(
       goto_programt::make_decl(object.symbol_expr(), code.source_location()));
+    // the front end built it over a placeholder for the operand
+    exprt address = static_cast<const exprt &>(most_derived);
+    replace_new_object(tmp_op, address);
     dest.add(goto_programt::make_assignment(
-      object.symbol_expr(),
-      static_cast<const exprt &>(most_derived),
-      code.source_location()));
+      object.symbol_expr(), std::move(address), code.source_location()));
     deallocated = object.symbol_expr();
   }
 

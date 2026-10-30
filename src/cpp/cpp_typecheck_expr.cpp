@@ -7913,15 +7913,19 @@ void cpp_typecheckt::typecheck_expr_delete(exprt &expr)
   // deleted object is the most derived one, and the deallocation function
   // gets its address, the value the allocation returned: that of
   // dynamic_cast<void *> ([expr.dynamic.cast]/8)
+  // The check is built over a placeholder for the operand (`new_object'),
+  // which goto conversion replaces by the operand's value once its side
+  // effects are evaluated (`delete make()')
   const exprt &operand = to_unary_expr(expr).op();
   if(
     statement == ID_cpp_delete &&
-    to_pointer_type(operand.type()).base_type().id() == ID_struct_tag &&
-    !has_subexpr(operand, ID_side_effect))
+    to_pointer_type(operand.type()).base_type().id() == ID_struct_tag)
   {
+    exprt placeholder{ID_new_object, operand.type()};
     exprt deallocated;
     if(
-      dynamic_typecast(operand, ::pointer_type(empty_typet{}), deallocated) &&
+      dynamic_typecast(
+        placeholder, ::pointer_type(empty_typet{}), deallocated) &&
       deallocated.id() == ID_cpp_runtime_dynamic_cast)
     {
       expr.add("#deallocated_object") = std::move(deallocated);
