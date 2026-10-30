@@ -2671,8 +2671,39 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
         exprt constructible = expr;
         constructible.id("__is_constructible");
         typecheck_expr(constructible);
-        expr =
-          constructible.is_true() ? exprt(true_exprt()) : exprt(false_exprt());
+        bool result = constructible.is_true();
+        // [meta.unary.prop] Table 54: `T &t(declval<U>());' must be known
+        // not to throw: the binding may call a conversion function
+        // ([dcl.init.ref]/5.1.2, /5.3.2), whose exception specification
+        // decides ([except.spec]/5)
+        const std::vector<typet> trait_args = builtin_trait_type_args(expr);
+        if(result && trait_args.size() == 2)
+        {
+          const typet &arg_type = trait_args[1];
+          symbol_exprt arg{
+            irep_idt{},
+            is_reference(arg_type) ? to_reference_type(arg_type).base_type()
+                                   : arg_type};
+          arg.set(ID_C_temporary_avoided, true);
+          if(is_reference(arg_type) && !is_rvalue_reference(arg_type))
+            arg.set(ID_C_lvalue, true);
+          const std::size_t errors_before =
+            get_message_handler().get_message_count(messaget::M_ERROR);
+          try
+          {
+            sfinae_contextt sfinae_guard{*this};
+            unevaluated_operandt unevaluated_guard{*this};
+            exprt converted = arg;
+            implicit_typecast(converted, t1);
+            result = !expression_is_potentially_throwing(converted, 16);
+          }
+          catch(...)
+          {
+          }
+          get_message_handler().set_message_count(
+            messaget::M_ERROR, errors_before);
+        }
+        expr = result ? exprt(true_exprt()) : exprt(false_exprt());
       }
     }
     else if(expr.id() == "__is_nothrow_convertible")

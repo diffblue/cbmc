@@ -4,18 +4,52 @@
 #include <type_traits>
 extern "C" void __CPROVER_assert(bool, const char *);
 int g;
-struct C
+struct Throws
 {
   operator int &()
   {
     return g;
   }
 };
+struct Quiet
+{
+  operator int &() noexcept
+  {
+    return g;
+  }
+};
+struct ToCRef
+{
+  operator long()
+  {
+    return 1;
+  }
+};
+struct B
+{
+};
+struct D : B
+{
+};
 int main()
 {
   __CPROVER_assert(
-    !std::is_nothrow_constructible<int &, C>::value,
-    "throwing conversion to a reference");
+    !std::is_nothrow_constructible<int &, Throws>::value,
+    "throwing conversion");
   __CPROVER_assert(
-    std::is_nothrow_constructible<int &, C>::value, "WRONG (must FAIL)");
+    std::is_nothrow_constructible<int &, Quiet>::value, "noexcept conversion");
+  __CPROVER_assert(
+    std::is_nothrow_constructible<int &, int &>::value, "direct binding");
+  __CPROVER_assert(
+    std::is_nothrow_constructible<const int &, long>::value,
+    "temporary of scalar");
+  __CPROVER_assert(
+    !std::is_nothrow_constructible<const int &, ToCRef>::value,
+    "temporary through throwing conversion");
+  __CPROVER_assert(
+    std::is_nothrow_constructible<B &, D &>::value, "derived to base");
+  __CPROVER_assert(
+    !std::is_nothrow_constructible<int &, long>::value, "not constructible");
+  __CPROVER_assert(
+    std::is_nothrow_constructible<int &, Throws>::value, "WRONG (must FAIL)");
 }
