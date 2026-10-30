@@ -6174,9 +6174,32 @@ bool cpp_typecheckt::dynamic_typecast(
 
     if(to_pointer_type(type).base_type().id() == ID_empty)
     {
-      if(!e.get_bool(ID_C_lvalue))
+      // N5008 [expr.dynamic.cast]/8: for a pointer to a polymorphic class,
+      // `dynamic_cast<cv void *>(v)' is a pointer to the most derived
+      // object v points into; a null v yields null ([expr.dynamic.cast]/6).
+      // The run-time check (runtime_dynamic_cast) finds the offset of v's
+      // subobject in each candidate most derived class.
+      if(
+        e.type().id() != ID_pointer ||
+        to_pointer_type(e.type()).base_type().id() != ID_struct_tag ||
+        has_subexpr(e, ID_side_effect))
+      {
         return false;
-      UNREACHABLE; // currently not supported
+      }
+      bool polymorphic = false;
+      for(const auto &c :
+          follow_tag(to_struct_tag_type(to_pointer_type(e.type()).base_type()))
+            .components())
+      {
+        polymorphic = polymorphic || c.get_bool(ID_is_vtptr);
+      }
+      if(!polymorphic)
+        return false;
+      exprt check{ID_cpp_runtime_dynamic_cast, type};
+      check.add_to_operands(e);
+      check.add_source_location() = e.source_location();
+      new_expr = std::move(check);
+      return true;
     }
     else if(to_pointer_type(type).base_type().id() == ID_struct_tag)
     {

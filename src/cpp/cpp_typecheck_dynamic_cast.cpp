@@ -59,8 +59,12 @@ exprt cpp_typecheckt::runtime_dynamic_cast(const exprt &check)
   const pointer_typet &result_type = to_pointer_type(check.type());
   const irep_idt a_tag =
     to_struct_tag_type(to_pointer_type(v.type()).base_type()).get_identifier();
+  // [expr.dynamic.cast]/8: to `void *', the most derived object itself
+  const bool to_most_derived = result_type.base_type().id() == ID_empty;
   const irep_idt c_tag =
-    to_struct_tag_type(result_type.base_type()).get_identifier();
+    to_most_derived
+      ? irep_idt{}
+      : to_struct_tag_type(result_type.base_type()).get_identifier();
   const namespacet ns{symbol_table};
 
   const symbolt &a_symbol = lookup(a_tag);
@@ -103,13 +107,16 @@ exprt cpp_typecheckt::runtime_dynamic_cast(const exprt &check)
     const auto a_subobjects = base_subobjects(d_struct, a_tag);
     if(a_subobjects.empty())
       continue;
-    // [expr.dynamic.cast]/9: v must point to a public base subobject
-    if(!base_publicly_accessible(d_struct, a_struct))
+    // [expr.dynamic.cast]/9: v must point to a public base subobject (not
+    // for the cast to `void *', /8)
+    if(!to_most_derived && !base_publicly_accessible(d_struct, a_struct))
       continue;
-    const auto c_subobjects = base_subobjects(d_struct, c_tag);
-    const symbolt &c_symbol = lookup(c_tag);
+    const auto c_subobjects = to_most_derived
+                                ? std::vector<base_subobjectt>{}
+                                : base_subobjects(d_struct, c_tag);
     const bool c_public =
-      base_publicly_accessible(d_struct, to_struct_type(c_symbol.type));
+      to_most_derived ||
+      base_publicly_accessible(d_struct, to_struct_type(lookup(c_tag).type));
     // In a complete D object every subobject, also one within a virtual
     // base, is at a fixed offset (base_subobjects gives the offsets in D's
     // complete layout), so each A subobject is a case of its own,
@@ -153,7 +160,9 @@ exprt cpp_typecheckt::runtime_dynamic_cast(const exprt &check)
           derived_from_a.push_back(c_subobject.offset);
       }
       std::optional<mp_integer> c_offset;
-      if(derived_from_a.size() == 1 && c_public)
+      if(to_most_derived)
+        c_offset = 0;
+      else if(derived_from_a.size() == 1 && c_public)
         c_offset = derived_from_a.front();
       else if(derived_from_a.empty() && c_subobjects.size() == 1 && c_public)
         c_offset = c_subobjects.front().offset;
