@@ -52,6 +52,36 @@ void cpp_typecheckt::build_virtual_thunk_body(
   std::optional<bytest> base_off;
   if(!is_primary_base && !base_vtptr.empty())
     base_off = member_offset(derived, base_vtptr, *this);
+
+  // Itanium C++ ABI 2.5.3 virtual thunk: when the base subobject lies in a
+  // virtual base of `derived', its offset from the overrider's class
+  // depends on the most derived object; read the vcall offset from the
+  // table the call came through (set_virtual_base_offsets fills it in)
+  bool through_virtual_base = false;
+  for(const auto &c : derived.components())
+  {
+    if(c.get_bool(ID_is_vtptr) && c.get_name() == base_vtptr)
+      through_virtual_base = !c.get(ID_C_virtual_base).empty();
+  }
+  const irep_idt &virtual_name = thunk.type.get("#thunk_virtual_name");
+  if(through_virtual_base && !virtual_name.empty())
+  {
+    // the vtable struct of the chain from base_class that holds the slot
+    for(const irep_idt &vt : vtable_chain(base_class))
+    {
+      const symbolt *vt_symbol = symbol_table.lookup(vt);
+      const irep_idt field =
+        id2string(vt) + "::@vcall_offset::" + id2string(virtual_name);
+      if(
+        vt_symbol != nullptr && vt_symbol->type.id() == ID_struct &&
+        to_struct_type(vt_symbol->type).has_component(field))
+      {
+        build_this_adjusting_thunk_body(
+          thunk, target, target_type, base_off, vt, field);
+        return;
+      }
+    }
+  }
   build_this_adjusting_thunk_body(thunk, target, target_type, base_off);
 }
 
@@ -59,7 +89,9 @@ void cpp_typecheckt::build_this_adjusting_thunk_body(
   symbolt &thunk,
   const irep_idt &target,
   const typet &target_type,
-  const std::optional<bytest> &base_off)
+  const std::optional<bytest> &base_off,
+  const irep_idt &vcall_table,
+  const irep_idt &vcall_field)
 {
   const code_typet &code_type = to_code_type(thunk.type);
   const code_typet::parameterst &args = code_type.parameters();
@@ -69,8 +101,46 @@ void cpp_typecheckt::build_this_adjusting_thunk_body(
   const typet &this_target_type =
     to_code_type(target_type).parameters()[0].type();
 
+  // the vtable pointer of the subobject `this' points to
+  std::optional<exprt> vcall_offset;
+  if(!vcall_field.empty() && this_expr.type().id() == ID_pointer)
+  {
+    const typet &this_class = to_pointer_type(this_expr.type()).base_type();
+    const irep_idt vtptr =
+      this_class.id() == ID_struct_tag
+        ? vtable_pointer_component(
+            to_struct_tag_type(this_class).get_identifier())
+        : irep_idt{};
+    const symbolt *class_symbol =
+      this_class.id() == ID_struct_tag
+        ? symbol_table.lookup(to_struct_tag_type(this_class).get_identifier())
+        : nullptr;
+    if(!vtptr.empty() && class_symbol != nullptr)
+    {
+      for(const auto &c : to_struct_type(class_symbol->type).components())
+      {
+        if(c.get_name() != vtptr)
+          continue;
+        const member_exprt pointer{
+          dereference_exprt{this_expr, this_class}, vtptr, c.type()};
+        const dereference_exprt table{
+          typecast_exprt{
+            pointer, ::pointer_type(struct_tag_typet{vcall_table})},
+          struct_tag_typet{vcall_table}};
+        vcall_offset = member_exprt{table, vcall_field, pointer_diff_type()};
+      }
+    }
+  }
+
   exprt late_cast;
-  if(base_off.has_value() && *base_off > bytest{0})
+  if(vcall_offset.has_value())
+  {
+    const auto char_ptr =
+      typecast_exprt(this_expr, ::pointer_type(unsigned_char_type()));
+    late_cast =
+      typecast_exprt(plus_exprt(char_ptr, *vcall_offset), this_target_type);
+  }
+  else if(base_off.has_value() && *base_off > bytest{0})
   {
     auto char_ptr =
       typecast_exprt(this_expr, pointer_type(unsigned_char_type()));
@@ -205,6 +275,55 @@ void cpp_typecheckt::finalize_virtual_thunks(const symbolt &symbol)
   }
 }
 
+std::optional<bytest> cpp_typecheckt::vcall_target_offset(
+  const struct_typet &complete,
+  const exprt &table,
+  const struct_typet::componentst &table_components,
+  const struct_typet &table_type,
+  const irep_idt &virtual_name)
+{
+  // the slot of the virtual function and the thunk it holds
+  const irep_idt slot =
+    id2string(table_type.get(ID_name)) + "::" + id2string(virtual_name);
+  const exprt *value = nullptr;
+  for(std::size_t j = 0; j < table_components.size(); ++j)
+  {
+    if(table_components[j].get_name() == slot && j < table.operands().size())
+      value = &table.operands()[j];
+  }
+  if(value == nullptr || value->id() != ID_address_of)
+    return {};
+  const exprt &function = to_address_of_expr(*value).object();
+  if(function.id() != ID_symbol)
+    return {};
+  const symbolt *thunk =
+    symbol_table.lookup(to_symbol_expr(function).get_identifier());
+  if(thunk == nullptr || thunk->type.get("#thunk_target").empty())
+    return {};
+  const symbolt *target = symbol_table.lookup(thunk->type.get("#thunk_target"));
+  if(
+    target == nullptr || target->type.id() != ID_code ||
+    to_code_type(target->type).parameters().empty())
+  {
+    return {};
+  }
+  const typet &this_type = to_code_type(target->type).parameters()[0].type();
+  if(
+    this_type.id() != ID_pointer ||
+    to_pointer_type(this_type).base_type().id() != ID_struct_tag)
+  {
+    return {};
+  }
+  const irep_idt target_class =
+    to_struct_tag_type(to_pointer_type(this_type).base_type()).get_identifier();
+  if(target_class == complete.get(ID_name))
+    return bytest{0};
+  const auto subobjects = base_subobjects(complete, target_class);
+  if(subobjects.empty())
+    return {};
+  return subobjects.front().offset;
+}
+
 void cpp_typecheckt::set_virtual_base_offsets(const symbolt &symbol)
 {
   PRECONDITION(symbol.type.id() == ID_struct);
@@ -280,6 +399,17 @@ void cpp_typecheckt::set_virtual_base_offsets(const symbolt &symbol)
         if(comps[i].get_base_name() == "@base")
         {
           patch(ops[i]);
+          continue;
+        }
+        const irep_idt vcall = comps[i].get("#vcall_offset");
+        if(!vcall.empty())
+        {
+          // the offset from the subobject to the class of the final
+          // overrider the slot's thunk calls (Itanium C++ ABI 2.5.3)
+          const auto target =
+            vcall_target_offset(struct_type, value, comps, vt_type, vcall);
+          if(target.has_value())
+            ops[i] = from_integer(*target - *subobject_offset, comps[i].type());
           continue;
         }
         const irep_idt vb = comps[i].get(ID_C_virtual_base);
@@ -408,6 +538,12 @@ void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
         if(base_value.is_nil())
           return nil_exprt{};
         values.operands().push_back(std::move(base_value));
+        continue;
+      }
+      if(!compo.get("#vcall_offset").empty())
+      {
+        // `@vcall_offset::<f>': filled in by set_virtual_base_offsets
+        values.operands().push_back(from_integer(0, compo.type()));
         continue;
       }
       if(!compo.get(ID_C_virtual_base).empty())
@@ -784,17 +920,51 @@ void cpp_typecheckt::typecheck_base_construction_vtables(codet &code)
     // for the complete object's tables)
     const exprt subobject_start = typecast_exprt{
       address_of_exprt{location}, pointer_type(unsigned_char_type())};
-    std::function<void(const exprt &)> patch = [&](const exprt &part)
+    // the base subobject: the vcall offsets are those of its own table,
+    // with the overriders' classes located in it
+    const symbolt *base_symbol = symbol_table.lookup(base_id);
+    std::function<void(const exprt &, const exprt &)> patch =
+      [&](const exprt &part, const exprt &part_value)
     {
       if(part.type().id() != ID_struct_tag)
         return;
       const struct_typet &vt_type = follow_tag(to_struct_tag_type(part.type()));
-      for(const auto &field : vt_type.components())
+      const auto &fields = vt_type.components();
+      for(std::size_t i = 0; i < fields.size(); ++i)
       {
+        const auto &field = fields[i];
         const member_exprt member{part, field.get_name(), field.type()};
         if(field.get_base_name() == "@base")
         {
-          patch(member);
+          if(i < part_value.operands().size())
+            patch(member, part_value.operands()[i]);
+          continue;
+        }
+        const irep_idt vcall = field.get("#vcall_offset");
+        if(!vcall.empty())
+        {
+          // Itanium C++ ABI 2.5.3: from the subobject to the class of the
+          // final overrider in the base being constructed
+          if(base_symbol == nullptr || base_symbol->type.id() != ID_struct)
+            continue;
+          const auto target = vcall_target_offset(
+            to_struct_type(base_symbol->type),
+            part_value,
+            fields,
+            vt_type,
+            vcall);
+          if(!target.has_value())
+            continue;
+          exprt base_pointer = this_expr;
+          make_ptr_typecast(
+            base_pointer, pointer_type(struct_tag_typet{base_id}));
+          const plus_exprt target_start{
+            typecast_exprt{base_pointer, pointer_type(unsigned_char_type())},
+            from_integer(*target, pointer_diff_type())};
+          minus_exprt offset{target_start, subobject_start};
+          offset.type() = pointer_diff_type();
+          guarded.add(code_frontend_assignt{
+            member, typecast_exprt::conditional_cast(offset, field.type())});
           continue;
         }
         const irep_idt vb = field.get(ID_C_virtual_base);
@@ -810,7 +980,7 @@ void cpp_typecheckt::typecheck_base_construction_vtables(codet &code)
           member, typecast_exprt::conditional_cast(offset, field.type())});
       }
     };
-    patch(copy);
+    patch(copy, table.value);
     guarded.add(code_frontend_assignt{location, value});
   }
 

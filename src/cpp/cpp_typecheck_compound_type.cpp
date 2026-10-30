@@ -1910,6 +1910,21 @@ void cpp_typecheckt::typecheck_compound_declarator(
       vt_entry.add_source_location() = symbol.location;
       virtual_table.components().push_back(vt_entry);
 
+      // Itanium C++ ABI 2.5.3 (vcall offset): when the slot is entered
+      // through a virtual base's table, the offset from that base subobject
+      // to the class of the final overrider depends on the most derived
+      // object; the thunk reads it from this field of the table it was
+      // called through (set_virtual_base_offsets fills it in)
+      struct_typet::componentt vcall_offset(
+        id2string(vt_name) + "::@vcall_offset::" + virtual_name,
+        pointer_diff_type());
+      vcall_offset.set_base_name("@vcall_offset::" + virtual_name);
+      vcall_offset.set_pretty_name("@vcall_offset::" + virtual_name);
+      vcall_offset.set("#vcall_offset", virtual_name);
+      vcall_offset.set(ID_access, ID_public);
+      vcall_offset.add_source_location() = symbol.location;
+      virtual_table.components().push_back(vcall_offset);
+
       // take care of overloading
       while(!virtual_bases.empty())
       {
@@ -2025,6 +2040,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
         // is built here from the current layout and rebuilt with the final
         // one in do_virtual_table.  Record what it needs.
         func_symb.type.set("#thunk_target", component.get_name());
+        func_symb.type.set("#thunk_virtual_name", virtual_name);
         func_symb.type.set("#thunk_base", virtual_base);
         build_virtual_thunk_body(
           func_symb,

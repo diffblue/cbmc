@@ -818,6 +818,17 @@ protected:
   /// the final layout, so runs after padding.
   void set_virtual_base_offsets(const symbolt &symbol);
 
+  /// The offset, in the complete object \p complete, of the class of the
+  /// final overrider that the slot \p virtual_name of the vtable value
+  /// \p table (of struct \p table_type) enters through a thunk; empty when
+  /// the slot holds no thunk.
+  std::optional<bytest> vcall_target_offset(
+    const struct_typet &complete,
+    const exprt &table,
+    const struct_typet::componentst &table_components,
+    const struct_typet &table_type,
+    const irep_idt &virtual_name);
+
   /// The direct non-virtual bases of the class that have virtual bases: the
   /// ones with construction vtables (Itanium C++ ABI 2.6.2).
   std::vector<irep_idt>
@@ -868,11 +879,16 @@ protected:
   /// The body of the thunk \p thunk: subtract \p base_off (the offset of
   /// the base subobject the thunk is called on) from `this' and call
   /// \p target directly.
+  /// With \p vcall_field, the adjustment is read instead from that field of
+  /// the table (of struct \p vcall_table) the subobject's vtable pointer
+  /// points to (Itanium C++ ABI 2.5.3 virtual thunk).
   void build_this_adjusting_thunk_body(
     symbolt &thunk,
     const irep_idt &target,
     const typet &target_type,
-    const std::optional<bytest> &base_off);
+    const std::optional<bytest> &base_off,
+    const irep_idt &vcall_table = irep_idt{},
+    const irep_idt &vcall_field = irep_idt{});
 
   /// N5008 [class.mi]/4, [class.virtual]/2: a virtual table object for each
   /// base class subobject occurring more than once in the lattice (see
