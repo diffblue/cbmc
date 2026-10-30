@@ -1,0 +1,12 @@
+CORE broken-cprover-smt-backend no-new-smt
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+memcpy with a symbolic size into an array of non-byte elements yields a byte
+update whose value has non-constant size. Byte-operator lowering used to leave
+elements unchanged when the update ended at an element boundary.
