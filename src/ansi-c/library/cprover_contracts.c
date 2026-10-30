@@ -1345,8 +1345,7 @@ __CPROVER_HIDE:;
         ? __CPROVER_contracts_car_create(ptr, size)
         : write_set->linked_ptr_pred_ctx->fresh_car;
 
-    // non-deterministically record the object for delete/delete[] and free
-    // checking: it was not allocated by new[]
+    // record the object (not new[]-allocated) for delete/free checks
     __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
     __CPROVER_new_object = record_malloc ? ptr : __CPROVER_new_object;
     __CPROVER_malloc_is_new_array =
@@ -1405,8 +1404,7 @@ __CPROVER_HIDE:;
         ? __CPROVER_contracts_car_create(ptr, size)
         : write_set->linked_ptr_pred_ctx->fresh_car;
 
-    // non-deterministically record the object for delete/delete[] and free
-    // checking: it was not allocated by new[]
+    // record the object (not new[]-allocated) for delete/free checks
     __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
     __CPROVER_new_object = record_malloc ? ptr : __CPROVER_new_object;
     __CPROVER_malloc_is_new_array =
