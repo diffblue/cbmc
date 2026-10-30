@@ -1,0 +1,20 @@
+KNOWNBUG
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ B under construction: SUCCESS$
+^\[main\.assertion\.2\] line \d+ after construction: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Both assertions fail, with out-of-bounds reads: the thunk through which
+V's table enters B::g subtracts V's offset in a complete B (32) from
+`this', also when the table (virtual_table::V@D, or the construction table
+copied from virtual_table::V@B) is installed in a D, where V lies further
+from B.  The Itanium C++ ABI uses virtual thunks that read a vcall offset
+from V's table; the front end's thunks for virtual bases use a static
+offset (build_virtual_thunk_body).  The W189 build fails it the same way.
