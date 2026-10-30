@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 
 ^\[main\.assertion\.1\] line \d+ both A subobjects destroyed: SUCCESS$
@@ -10,11 +10,8 @@ main.cpp
 --
 ^warning: ignoring
 --
-The program is rejected: "function E::~E(): conversion between 'struct D
-&' and 'struct A &' through the ambiguous base class 'A'"
-(cpp_typecheck_compound_type.cpp).  E's implicit destructor converts to
-the repeated base A, which [class.mi]/3 makes ambiguous; it should only
-call D's destructor.  With V a non-virtual base the conversion to V fails
-the same way; without virtual functions the program verifies.  D itself,
-as a complete object, works.  Found while testing construction vtables;
-the W188 build rejects it as well.
+E's implicit destructor was rejected ("conversion between 'struct D &' and
+'struct A &' through the ambiguous base class 'A'"): resolving `~D' for
+the object considered the destructor thunks of D's bases as candidates,
+and matching a thunk's `this' (an A *) converted D to the ambiguous base.
+Thunks are not declarations of the program and are no longer candidates.
