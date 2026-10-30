@@ -476,6 +476,8 @@ goto_convertt::remove_cpp_delete(side_effect_exprt &expr)
   tmp.add_source_location() = expr.source_location();
   tmp.copy_to_operands(to_unary_expr(expr).op());
   tmp.set(ID_destructor, expr.find(ID_destructor));
+  if(expr.find("#deallocated_object").is_not_nil())
+    tmp.add("#deallocated_object") = expr.find("#deallocated_object");
 
   clean_expr_resultt side_effects;
   convert_cpp_delete(tmp, side_effects.side_effects);

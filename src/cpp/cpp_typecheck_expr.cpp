@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/bitvector_types.h>
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/expr_util.h>
 #include <util/floatbv_expr.h>
 #include <util/mathematical_types.h>
 #include <util/pointer_expr.h>
@@ -7906,6 +7907,25 @@ void cpp_typecheckt::typecheck_expr_delete(exprt &expr)
   }
   else
     expr.set(ID_destructor, nil_exprt());
+
+  // N5008 [expr.delete]/3, /6: through a pointer to a polymorphic base the
+  // deleted object is the most derived one, and the deallocation function
+  // gets its address, the value the allocation returned: that of
+  // dynamic_cast<void *> ([expr.dynamic.cast]/8)
+  const exprt &operand = to_unary_expr(expr).op();
+  if(
+    statement == ID_cpp_delete &&
+    to_pointer_type(operand.type()).base_type().id() == ID_struct_tag &&
+    !has_subexpr(operand, ID_side_effect))
+  {
+    exprt deallocated;
+    if(
+      dynamic_typecast(operand, ::pointer_type(empty_typet{}), deallocated) &&
+      deallocated.id() == ID_cpp_runtime_dynamic_cast)
+    {
+      expr.add("#deallocated_object") = std::move(deallocated);
+    }
+  }
 }
 
 void cpp_typecheckt::typecheck_expr_typecast(exprt &)

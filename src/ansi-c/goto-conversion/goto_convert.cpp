@@ -1183,6 +1183,30 @@ void goto_convertt::convert_cpp_delete(const codet &code, goto_programt &dest)
   clean_expr_resultt side_effects = clean_expr(tmp_op, ID_cpp);
   dest.destructive_append(side_effects.side_effects);
 
+  // N5008 [expr.delete]/6: the deallocation function gets the address of
+  // the most derived object, which the C++ front end computes for an
+  // operand pointing to a polymorphic base (its operand has no side
+  // effects); read before the destructor runs
+  exprt deallocated = tmp_op;
+  const irept &most_derived = code.find("#deallocated_object");
+  if(most_derived.is_not_nil())
+  {
+    const symbolt &object = get_fresh_aux_symbol(
+      pointer_type(empty_typet{}),
+      tmp_symbol_prefix,
+      "deallocated_object",
+      code.source_location(),
+      ID_cpp,
+      symbol_table);
+    dest.add(
+      goto_programt::make_decl(object.symbol_expr(), code.source_location()));
+    dest.add(goto_programt::make_assignment(
+      object.symbol_expr(),
+      static_cast<const exprt &>(most_derived),
+      code.source_location()));
+    deallocated = object.symbol_expr();
+  }
+
   // we call the destructor, and then free
   const exprt &destructor =
     static_cast<const exprt &>(code.find(ID_destructor));
@@ -1311,7 +1335,7 @@ void goto_convertt::convert_cpp_delete(const codet &code, goto_programt &dest)
     to_code_type(delete_symbol.type()).parameters().front().type();
 
   code_function_callt delete_call(
-    delete_symbol, {typecast_exprt(tmp_op, arg_type)});
+    delete_symbol, {typecast_exprt::conditional_cast(deallocated, arg_type)});
   delete_call.add_source_location() = code.source_location();
 
   convert(delete_call, dest, ID_cpp);
