@@ -1,4 +1,4 @@
-KNOWNBUG libstdcxx16 libstdcxx
+CORE libstdcxx16 libstdcxx
 main.cpp
 --cpp20 --show-goto-functions
 ^EXIT=0$
@@ -9,14 +9,9 @@ main.cpp
 dropped the body of system-header function
 could not fully type-check
 --
-With the libstdc++ 16.2.0 headers (g++ 16.2.0), including <format> drops
-the body of `__do_vformat_to<_Sink_iter<wchar_t>, wchar_t, ...>' (format
-line 5347).  The suppressed diagnostics include "template '__make' not
-found" (<compare> lines 208, 304, 308) and the rejection of
-error_code's and error_condition's constructor templates for a
-partial_ordering argument, and "symbol 'operator==' is unknown" in is_neq.
-With the 16-20260315 snapshot that the CI gcc-16 job installs the program
-converts.  The same drop fails cpp11_libstdcxx_header_drops/
-test_format.desc and test_format_typecheck.desc and
-cpp11_namespace_reopened_after_qualified_member_template_definition/
-test_libstdcxx.desc.
+With the libstdc++ 16.2.0 headers (g++ 16.2.0), <format> lost the body of
+`__do_vformat_to<_Sink_iter<wchar_t>, wchar_t, ...>': its default
+template argument __literal_encoding_is_unicode<wchar_t>() builds a
+string_view in a constexpr function, which the constant evaluator gave up
+on.  Fixed with cpp14_constexpr_local_objects_of_class_type.  Runs only
+with GCC 16 headers (libstdcxx16).

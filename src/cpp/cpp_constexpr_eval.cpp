@@ -372,6 +372,17 @@ bool is_constexpr_call_argument(
   return true;
 }
 
+/// A constexpr call; with \p this_value, `this' denotes an object of the
+/// calling evaluation with that value (a constructor constructs it over its
+/// zero-initialization), and \p final_this receives its value at the end.
+static exprt evaluate_constexpr_call(
+  const exprt &expr,
+  const symbol_table_baset &symbol_table,
+  const namespacet &ns,
+  const std::function<bool(const irep_idt &)> &ensure_definition,
+  const exprt *this_value,
+  exprt *final_this);
+
 /// The state of one constexpr function evaluation: the tracked variables and
 /// the interpreter over the function body (bounded loops, the statement and
 /// expression forms a constexpr function may contain).
@@ -539,6 +550,82 @@ public:
     return &array->operands()[numeric_cast_v<std::size_t>(*i)];
   }
 
+  /// N5008 [expr.const]/10.16 (C++14 relaxed constexpr): a call of a member
+  /// function or constructor on an object of this evaluation (a local
+  /// variable, or the object `this' denotes): the key of its tracked value,
+  /// or empty
+  irep_idt tracked_object_argument(const exprt &call) const
+  {
+    if(
+      call.id() != ID_side_effect || call.get(ID_statement) != ID_function_call)
+      return irep_idt{};
+    const auto &f = to_side_effect_expr_function_call(call);
+    if(
+      f.function().id() != ID_symbol || f.function().type().id() != ID_code ||
+      f.arguments().empty())
+    {
+      return irep_idt{};
+    }
+    const auto &parameters = to_code_type(f.function().type()).parameters();
+    if(parameters.empty() || !parameters.front().get_this())
+      return irep_idt{};
+    const exprt *object = &f.arguments().front();
+    while(object->id() == ID_typecast)
+      object = &to_typecast_expr(*object).op();
+    irep_idt key;
+    if(object->id() == ID_symbol)
+      key = to_symbol_expr(*object).get_identifier(); // `this'
+    else if(object->id() == ID_address_of)
+    {
+      const exprt &pointee = to_address_of_expr(*object).object();
+      if(pointee.id() == ID_symbol)
+        key = to_symbol_expr(pointee).get_identifier();
+      else if(
+        pointee.id() == ID_dereference &&
+        to_dereference_expr(pointee).pointer().id() == ID_symbol)
+      {
+        key = to_symbol_expr(to_dereference_expr(pointee).pointer())
+                .get_identifier();
+      }
+    }
+    if(key.empty())
+      return irep_idt{};
+    const auto it = vars.find(key);
+    if(it == vars.end() || it->second.type().id() != ID_struct_tag)
+      return irep_idt{};
+    // `this' must denote the object itself, not a pointer to it
+    if(object->id() == ID_symbol && key != this_id)
+      return irep_idt{};
+    return key;
+  }
+
+  /// Evaluate \p call on the tracked object \p key (see
+  /// tracked_object_argument), updating it; nil when not evaluable
+  exprt call_on_tracked_object(const exprt &call, const irep_idt &key)
+  {
+    exprt call_copy = call;
+    auto &args = to_side_effect_expr_function_call(call_copy).arguments();
+    for(std::size_t i = 1; i < args.size(); ++i)
+    {
+      if(!array_pointer(args[i], symbol_table).has_value())
+        args[i] = eval(args[i]);
+    }
+    exprt object_value = vars.at(key);
+    exprt final_value;
+    exprt result = evaluate_constexpr_call(
+      call_copy,
+      symbol_table,
+      ns,
+      ensure_definition,
+      &object_value,
+      &final_value);
+    if(final_value.is_nil() || final_value.id() != ID_struct)
+      return nil_exprt{};
+    vars[key] = final_value;
+    // a constructor or a function returning void: the call has no value
+    return result.is_nil() ? static_cast<exprt>(true_exprt{}) : result;
+  }
+
   bool apply_side_effect(const exprt &e)
   {
     if(e.id() != ID_side_effect)
@@ -555,6 +642,9 @@ public:
     // modelled.
     if(st == ID_function_call)
     {
+      const irep_idt object_key = tracked_object_argument(e);
+      if(!object_key.empty())
+        return call_on_tracked_object(e, object_key).is_not_nil();
       for(const auto &argument :
           to_side_effect_expr_function_call(e).arguments())
       {
@@ -601,6 +691,29 @@ public:
           typecast_exprt::conditional_cast(rhs, obj.operands()[*idx].type());
         simplify(obj.operands()[*idx], ns);
         return true;
+      }
+    }
+    // a compound assignment or increment of a member of the object `this'
+    // denotes (`n -= k', `++n' in a constexpr member function or
+    // constructor): applied through a scratch variable
+    if(st != ID_assign && !e.operands().empty())
+    {
+      if(const auto idx = this_member_index(e.operands()[0]))
+      {
+        exprt &obj = vars.at(this_id);
+        if(*idx >= obj.operands().size())
+          return false;
+        const irep_idt scratch{"#constexpr_this_member"};
+        vars[scratch] = obj.operands()[*idx];
+        exprt on_scratch = e;
+        on_scratch.operands()[0] =
+          symbol_exprt{scratch, obj.operands()[*idx].type()};
+        const bool applied = apply_side_effect(on_scratch);
+        exprt result = vars.at(scratch);
+        vars.erase(scratch);
+        if(applied)
+          vars.at(this_id).operands()[*idx] = std::move(result);
+        return applied;
       }
     }
     // N5008 [expr.const]/5 (C++14 relaxed constexpr): an assignment or
@@ -1129,6 +1242,14 @@ public:
         simplify(result, ns);
         return result;
       }
+      // a member function call on an object of this evaluation
+      const irep_idt object_key = tracked_object_argument(e);
+      if(!object_key.empty())
+      {
+        exprt r = call_on_tracked_object(e, object_key);
+        if(r.is_not_nil() && e.type().id() != ID_empty)
+          return r;
+      }
       // Recursively evaluate nested function calls (their ARGUMENTS
       // evaluated first, so a call on tracked variables folds too)
       exprt call_copy = e;
@@ -1447,6 +1568,18 @@ exprt try_evaluate_constexpr(
   const namespacet &ns,
   const std::function<bool(const irep_idt &)> &ensure_definition)
 {
+  return evaluate_constexpr_call(
+    expr, symbol_table, ns, ensure_definition, nullptr, nullptr);
+}
+
+static exprt evaluate_constexpr_call(
+  const exprt &expr,
+  const symbol_table_baset &symbol_table,
+  const namespacet &ns,
+  const std::function<bool(const irep_idt &)> &ensure_definition,
+  const exprt *this_value,
+  exprt *final_this)
+{
   if(expr.id() != ID_side_effect)
     return nil_exprt();
   // N5008 [expr.const]/5, [class.temporary]: a temporary of literal class
@@ -1488,11 +1621,20 @@ exprt try_evaluate_constexpr(
   {
     if(
       arguments.empty() || arguments.front().id() != ID_address_of ||
-      to_address_of_expr(arguments.front()).object().id() != ID_new_object)
+      (to_address_of_expr(arguments.front()).object().id() != ID_new_object &&
+       this_value == nullptr))
     {
       return nil_exprt();
     }
     constructed_type = to_address_of_expr(arguments.front()).object().type();
+    if(constructed_type.id() != ID_struct_tag)
+      return nil_exprt();
+  }
+  else if(this_value != nullptr)
+  {
+    // a member function call on an object of the calling evaluation
+    this_object_value = *this_value;
+    constructed_type = this_object_value.type();
     if(constructed_type.id() != ID_struct_tag)
       return nil_exprt();
   }
@@ -1633,6 +1775,13 @@ exprt try_evaluate_constexpr(
   auto result = interpreter.execute(to_code(body), 0);
   if(interpreter.failed)
     return nil_exprt();
+  if(final_this != nullptr && !this_id.empty())
+  {
+    const exprt &obj = interpreter.vars.at(this_id);
+    if(!constexpr_interpretert::is_constant_value(obj, symbol_table))
+      return nil_exprt();
+    *final_this = obj;
+  }
   if(is_constructor)
   {
     // the constructor's result is the constructed object; a `return;` (or
