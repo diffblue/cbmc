@@ -1321,6 +1321,7 @@ bool cpp_typecheckt::expression_is_potentially_throwing(
       bool non_throwing = false;
       if(fn.id() == ID_symbol)
       {
+        needed_exception_specification(to_symbol_expr(fn).get_identifier());
         const auto *sym =
           symbol_table.lookup(to_symbol_expr(fn).get_identifier());
         if(sym != nullptr && sym->type.id() == ID_code)
