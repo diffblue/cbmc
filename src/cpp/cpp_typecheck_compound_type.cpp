@@ -5462,8 +5462,38 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
           return false;
         const symbolt *s =
           symbol_table.lookup(to_struct_tag_type(element).get_identifier());
-        return s != nullptr && s->type.id() == ID_struct &&
-               !to_struct_type(s->type).is_incomplete() && find_mvctor(*s);
+        if(
+          s == nullptr || s->type.id() != ID_struct ||
+          to_struct_type(s->type).is_incomplete())
+        {
+          return false;
+        }
+        // a move constructor that is not deleted (a deleted function is a
+        // component without access): with a deleted one, the defaulted move
+        // constructor would be defined as deleted and ignored by overload
+        // resolution ([class.copy.ctor]/10 and note 4), so the copy
+        // constructor serves
+        for(const auto &c : to_struct_type(s->type).components())
+        {
+          if(
+            c.type().id() != ID_code || c.get_bool(ID_from_base) ||
+            to_code_type(c.type()).return_type().id() != ID_constructor ||
+            c.get(ID_access) == ID_noaccess)
+          {
+            continue;
+          }
+          const auto &parameters = to_code_type(c.type()).parameters();
+          if(
+            parameters.size() >= 2 &&
+            is_rvalue_reference(parameters[1].type()) &&
+            to_reference_type(parameters[1].type())
+                .base_type()
+                .get(ID_identifier) == s->name)
+          {
+            return true;
+          }
+        }
+        return false;
       };
       for(const auto &b : to_struct_type(symbol.type).bases())
         if(has_move_constructor(b.type()))
