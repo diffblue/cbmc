@@ -1,4 +1,4 @@
-CORE
+CORE libstdcxx
 main.cpp
 --cpp20 --object-bits 12 --unwind 10 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ virtual base constructed: SUCCESS$
@@ -14,3 +14,5 @@ N5008 [class.base.init]/6-7: the target of istringstream's delegating
 constructor constructs the virtual base basic_ios.  It used to be called
 as for a base subobject and constructed none, with 42 (libstdc++) or 36
 (libc++) failed properties.
+libstdcxx: with the MSVC STL (VS 2022) assertion 1 fails
+(cpp20_istringstream_string_allocator_delegation_msvc).

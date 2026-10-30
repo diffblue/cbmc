@@ -1,4 +1,4 @@
-CORE
+CORE gnu-extensions
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ constant evaluation: SUCCESS$
@@ -18,3 +18,5 @@ A constexpr function returning __builtin_is_constant_evaluated() (type
 _Bool) gave an unfolded `(_Bool)true' during constant evaluation, which is
 not a constant: the constexpr variable was initialized at run time (2) and
 the case label was rejected, dropping should_escape's body.
+gnu-extensions: the program calls __builtin_unreachable, which Visual
+Studio mode does not declare.

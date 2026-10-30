@@ -1,4 +1,4 @@
-CORE
+CORE libstdcxx
 main.cpp
 --cpp17 --object-bits 12 --unwind 6
 ^\[main\.assertion\.1\] line \d+ ignore then extract: SUCCESS$
@@ -14,3 +14,5 @@ no body for callee
 --
 The specializations were selected and had no body: their results were
 nondeterministic.
+libstdcxx: the program checks libstdc++'s explicit specializations; with
+the MSVC STL (VS 2022) it fails other properties (its stream buffers).
