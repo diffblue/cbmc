@@ -761,8 +761,8 @@ jobs:
           path: .ccache
           key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 36 to 85 minutes
-  check-macos-14-cmake-clang:
-    runs-on: macos-14
+  check-macos-26-cmake-clang:
+    runs-on: macos-26
     steps:
       - uses: actions/checkout@v7
         with:
