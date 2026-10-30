@@ -1,0 +1,12 @@
+CORE
+main.c
+--32 --no-standard-checks
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^VERIFICATION ERROR$
+--
+Verify that casting a wider integer to a pointer does not emit an ill-sorted
+extract.  The old code emitted ((_ extract to_width 0) ...) instead of
+((_ extract (to_width-1) 0) ...), which kept one bit too many.
