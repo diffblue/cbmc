@@ -3755,20 +3755,33 @@ void cpp_typecheckt::implicit_exception_specifications(symbolt &symbol)
       if(!on_component && !on_symbol)
         continue;
       typet &evaluated = on_component ? c.type() : function->type;
+      // [except.spec]/12: the noexcept-specifier of a member of a class
+      // template specialization is instantiated only when needed;
+      // evaluating it here instantiated templates the program does not use
+      // (view_interface<take_view<int *>> for `arr | views::take(3)', whose
+      // presence then misled overload resolution).  Keep it, with the
+      // template arguments, for needed_exception_specification.
+      if(symbol.type.get_bool(ID_template_class_instance))
+      {
+        if(on_symbol && !on_component)
+          c.type().add("#C_noexcept_expression") =
+            function->type.find("#C_noexcept_expression");
+        if(
+          on_component && function != nullptr && function->type.id() == ID_code)
+          function->type.add("#C_noexcept_expression") =
+            c.type().find("#C_noexcept_expression");
+        deferred_exception_specifications.emplace(
+          c.get_name(),
+          deferred_exception_specificationt{symbol.name, template_map});
+        continue;
+      }
       // [expr.prim.this]/4: `this' may appear in the declarator of an
       // implicit object member function (`noexcept(noexcept(b()))' calls
-      // `this->b()').  Not for a class template specialization:
-      // [except.spec]/12 instantiates the noexcept-specifier of its members
-      // only when needed, and evaluating it here instantiates templates the
-      // program does not use (view_interface<take_view<int *>> for
-      // `arr | views::take(3)', whose presence then misled overload
-      // resolution)
+      // `this->b()')
       exprt &this_expr = cpp_scopes.current_scope().this_expr;
       const exprt saved_this = this_expr;
       const auto &parameters = to_code_type(evaluated).parameters();
-      if(
-        !symbol.type.get_bool(ID_template_class_instance) &&
-        !parameters.empty() && parameters.front().get_this())
+      if(!parameters.empty() && parameters.front().get_this())
       {
         this_expr = symbol_exprt{
           parameters.front().get_identifier(), parameters.front().type()};
@@ -3856,6 +3869,55 @@ void cpp_typecheckt::implicit_exception_specifications(symbolt &symbol)
         function->type.set("#C_noexcept", true);
     }
   }
+}
+
+void cpp_typecheckt::needed_exception_specification(const irep_idt &function)
+{
+  const auto entry = deferred_exception_specifications.find(function);
+  if(entry == deferred_exception_specifications.end())
+    return;
+  const deferred_exception_specificationt deferred = entry->second;
+  deferred_exception_specifications.erase(entry);
+  symbolt *function_symbol = symbol_table.get_writeable(function);
+  symbolt *class_symbol = symbol_table.get_writeable(deferred.class_name);
+  if(
+    function_symbol == nullptr || function_symbol->type.id() != ID_code ||
+    class_symbol == nullptr ||
+    (class_symbol->type.id() != ID_struct &&
+     class_symbol->type.id() != ID_union))
+  {
+    return;
+  }
+
+  // in the class's scope, with its template arguments and with `this'
+  // ([class.mem.general]/9.4, [expr.prim.this]/4)
+  cpp_saved_template_mapt saved_map{template_map};
+  template_map = deferred.template_map;
+  cpp_save_scopet saved_scope{cpp_scopes};
+  cpp_scopes.set_scope(deferred.class_name);
+  exprt &this_expr = cpp_scopes.current_scope().this_expr;
+  const exprt saved_this = this_expr;
+  const auto &parameters = to_code_type(function_symbol->type).parameters();
+  if(!parameters.empty() && parameters.front().get_this())
+  {
+    this_expr = symbol_exprt{
+      parameters.front().get_identifier(), parameters.front().type()};
+  }
+  typet evaluated = function_symbol->type;
+  evaluate_noexcept_expression(evaluated, false);
+  this_expr = saved_this;
+
+  auto apply = [&](typet &type)
+  {
+    type.remove("#C_noexcept_expression");
+    type.set("#C_noexcept", evaluated.get_bool("#C_noexcept"));
+    type.set(
+      "#C_noexcept_unevaluated", evaluated.get_bool("#C_noexcept_unevaluated"));
+  };
+  apply(function_symbol->type);
+  for(auto &c : to_struct_union_type(class_symbol->type).components())
+    if(c.get_name() == function && c.type().id() == ID_code)
+      apply(c.type());
 }
 
 void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)

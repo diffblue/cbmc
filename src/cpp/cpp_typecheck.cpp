@@ -311,6 +311,33 @@ void cpp_typecheckt::typecheck()
       break;
   }
 
+  // N5008 [except.spec]/12.4: the exception specification of a defined
+  // function is needed (goto conversion makes a non-throwing one call
+  // std::terminate when an exception escapes it)
+  {
+    std::vector<irep_idt> needed;
+    for(const auto &entry : deferred_exception_specifications)
+    {
+      // an instantiated definition: one whose body was converted (a member
+      // of a class template specialization that is never odr-used is not
+      // instantiated, [temp.inst]/11)
+      const symbolt *function = symbol_table.lookup(entry.first);
+      if(function != nullptr && function->value.get_bool("#cpp_converted"))
+      {
+        needed.push_back(entry.first);
+      }
+    }
+    for(const auto &function : needed)
+    {
+      needed_exception_specification(function);
+    }
+    if(!needed.empty())
+    {
+      typecheck_method_bodies();
+      do_not_typechecked();
+    }
+  }
+
   // N5008 [basic.start.dynamic]/1: the variables first instantiated in the
   // bodies (variable template specializations, static data members of class
   // template specializations) are dynamically initialized as well; their

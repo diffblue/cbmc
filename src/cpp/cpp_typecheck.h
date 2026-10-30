@@ -1319,6 +1319,21 @@ protected:
   bool
   is_trivially_copyable_type(const typet &type, bool want_trivial, int depth);
 
+  /// A noexcept-specifier of a member of a class template specialization,
+  /// kept for when it is needed ([except.spec]/12): the class and the
+  /// template arguments it is evaluated with.
+  struct deferred_exception_specificationt
+  {
+    irep_idt class_name;
+    template_mapt template_map;
+  };
+  std::map<irep_idt, deferred_exception_specificationt>
+    deferred_exception_specifications;
+
+  /// N5008 [except.spec]/12: evaluate the deferred noexcept-specifier of
+  /// the member function \p function, if any, now that it is needed.
+  void needed_exception_specification(const irep_idt &function);
+
   /// The number of noexcept operators whose operand could not be
   /// type-checked (taken as true).  evaluate_noexcept_expression keeps the
   /// noexcept-specifier of a member declaration for a retry with the complete
