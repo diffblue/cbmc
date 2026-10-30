@@ -1656,13 +1656,10 @@ static exprt lower_byte_update_byte_array_vector(
 /// Apply a byte update \p src to an array/vector typed operand, using the byte
 /// array \p value_as_byte_array as update value, which has non-constant size.
 /// \param src: Original byte-update expression
-/// \param subtype: Array/vector element type
-/// \param subtype_size: Size (in bytes) of \p subtype
+/// \param subtype_size: Size (in bytes) of an array/vector element
 /// \param value_as_byte_array: Update value as an array of bytes
 /// \param non_const_update_bound: Constrain updates such
 ///   as to at most update \p non_const_update_bound elements
-/// \param initial_bytes: Number of bytes from \p value_as_byte_array to use to
-///   update the array/vector element at \p first_index
 /// \param first_index: Lowest index into the target array/vector of the update
 /// \param first_update_value: Combined value of partially old and updated bytes
 ///   to use at \p first_index
@@ -1670,11 +1667,9 @@ static exprt lower_byte_update_byte_array_vector(
 /// \return Array comprehension reflecting all updates.
 static exprt lower_byte_update_array_vector_unbounded(
   const byte_update_exprt &src,
-  const typet &subtype,
   const exprt &subtype_size,
   const exprt &value_as_byte_array,
   const exprt &non_const_update_bound,
-  const exprt &initial_bytes,
   const exprt &first_index,
   const exprt &first_update_value,
   const namespacet &ns)
@@ -1695,100 +1690,58 @@ static exprt lower_byte_update_array_vector_unbounded(
   // all arithmetic uses offset/index types
   PRECONDITION(array_comprehension_index.type() == src.offset().type());
   PRECONDITION(subtype_size.type() == src.offset().type());
-  PRECONDITION(initial_bytes.type() == src.offset().type());
   PRECONDITION(first_index.type() == src.offset().type());
 
   // the bound from where updates start
   binary_predicate_exprt lower_bound{
-    typecast_exprt::conditional_cast(
-      array_comprehension_index, first_index.type()),
-    ID_lt,
-    first_index};
+    array_comprehension_index, ID_lt, first_index};
 
-  // The actual value of updates other than at the start or end
-  plus_exprt offset_expr{
-    initial_bytes,
-    mult_exprt{
-      subtype_size,
-      minus_exprt{
-        typecast_exprt::conditional_cast(
-          array_comprehension_index, first_index.type()),
-        plus_exprt{first_index, from_integer(1, first_index.type())}}}};
-  exprt update_value = lower_byte_extract(
+  // Every element past first_index takes subtype_size bytes from the update
+  // value, starting at the position that maps to the start of the element, but
+  // only as many as are left in the update value (possibly none).
+
+  // The position in the update value of the first byte of element i, which is
+  // i * subtype_size - offset.
+  const minus_exprt value_offset{
+    mult_exprt{subtype_size, array_comprehension_index}, src.offset()};
+  // The number of update bytes left from that position on. This is zero or
+  // negative (signed offset type) for elements past the end of the update,
+  // which then remain unchanged.
+  const minus_exprt remaining_bytes{
+    typecast_exprt::conditional_cast(
+      non_const_update_bound, value_offset.type()),
+    value_offset};
+  // The subtype_size bytes of the update value that cover element i.
+  const exprt element_bytes = lower_byte_extract(
     byte_extract_exprt{
       extract_opcode,
       value_as_byte_array,
-      std::move(offset_expr),
+      value_offset,
       src.get_bits_per_byte(),
-      subtype},
+      array_typet{bv_typet{src.get_bits_per_byte()}, subtype_size}},
     ns);
-
-  // The number of target array/vector elements being replaced, not including
-  // a possible partial update at the end of the updated range, which is handled
-  // below: (non_const_update_bound + (subtype_size - 1)) / subtype_size to
-  // round up to the nearest multiple of subtype_size.
-  div_exprt updated_elements{
-    plus_exprt{
-      typecast_exprt::conditional_cast(
-        non_const_update_bound, subtype_size.type()),
-      minus_exprt{subtype_size, from_integer(1, subtype_size.type())}},
-    subtype_size};
-
-  // The last element to be updated: first_index + updated_elements - 1
-  plus_exprt last_index{
-    first_index,
-    minus_exprt{
-      std::move(updated_elements), from_integer(1, first_index.type())}};
-
-  // The size of a partial update at the end of the updated range, may be zero.
-  mod_exprt tail_size{
-    typecast_exprt::conditional_cast(
-      minus_exprt{
-        typecast_exprt::conditional_cast(
-          non_const_update_bound, initial_bytes.type()),
-        initial_bytes},
-      subtype_size.type()),
-    subtype_size};
-
-  // The bound where updates end, which is conditional on the partial update
-  // being empty.
-  binary_predicate_exprt upper_bound{
-    typecast_exprt::conditional_cast(
-      array_comprehension_index, last_index.type()),
-    ID_ge,
-    if_exprt{
-      equal_exprt{tail_size, from_integer(0, tail_size.type())},
-      last_index,
-      plus_exprt{last_index, from_integer(1, last_index.type())}}};
-
-  // The actual value of a partial update at the end.
-  exprt last_update_value = lower_byte_update(
+  // Element i with (at most) its first remaining_bytes bytes replaced.
+  exprt update_value = lower_byte_update(
     byte_update_exprt{
       src.id(),
-      index_exprt{src.op(), last_index},
-      unary_minus_exprt{mult_exprt{
-        typecast_exprt::conditional_cast(last_index, subtype_size.type()),
-        subtype_size}},
-      value_as_byte_array,
+      index_exprt{src.op(), array_comprehension_index},
+      from_integer(0, src.offset().type()),
+      element_bytes,
       src.get_bits_per_byte()},
+    element_bytes,
+    remaining_bytes,
     ns);
 
+  // Elements before first_index are unchanged. The update of the element at
+  // first_index may start at a non-zero offset, which first_update_value
+  // accounts for.
   if_exprt array_comprehension_body{
-    or_exprt{std::move(lower_bound), std::move(upper_bound)},
+    std::move(lower_bound),
     index_exprt{src.op(), array_comprehension_index},
     if_exprt{
-      equal_exprt{
-        typecast_exprt::conditional_cast(
-          array_comprehension_index, first_index.type()),
-        first_index},
+      equal_exprt{array_comprehension_index, first_index},
       first_update_value,
-      if_exprt{
-        equal_exprt{
-          typecast_exprt::conditional_cast(
-            array_comprehension_index, last_index.type()),
-          last_index},
-        std::move(last_update_value),
-        std::move(update_value)}}};
+      std::move(update_value)}};
 
   return simplify_expr(
     array_comprehension_exprt{
@@ -1835,6 +1788,33 @@ static exprt lower_byte_update_array_vector_non_const(
   // compute the offset within that first element
   const exprt update_offset = mod_exprt{src.offset(), subtype_size};
 
+  // encode the first update: update the original element at first_index (the
+  // actual update will only use the bytes from value_as_byte_array that fall
+  // into this element)
+  exprt first_update_value = lower_byte_update(
+    byte_update_exprt{
+      src.id(),
+      index_exprt{src.op(), first_index},
+      update_offset,
+      value_as_byte_array,
+      src.get_bits_per_byte()},
+    ns);
+
+  if(value_as_byte_array.id() != ID_array)
+  {
+    DATA_INVARIANT(
+      non_const_update_bound.has_value(),
+      "value should be an array expression if the update bound is constant");
+    return lower_byte_update_array_vector_unbounded(
+      src,
+      subtype_size,
+      value_as_byte_array,
+      *non_const_update_bound,
+      first_index,
+      first_update_value,
+      ns);
+  }
+
   // compute the number of bytes (from the update value) that are going to be
   // consumed for updating the first element
   const exprt update_size =
@@ -1847,43 +1827,12 @@ static exprt lower_byte_update_array_vector_non_const(
       *non_const_update_bound, subtype_size.type());
   }
   else
-  {
-    DATA_INVARIANT(
-      value_as_byte_array.id() == ID_array,
-      "value should be an array expression if the update bound is constant");
     update_bound = update_size;
-  }
   initial_bytes = if_exprt{
     binary_predicate_exprt{initial_bytes, ID_lt, update_bound},
     initial_bytes,
     update_bound};
   simplify(initial_bytes, ns);
-
-  // encode the first update: update the original element at first_index (the
-  // actual update will only be initial_bytes-many bytes from
-  // value_as_byte_array)
-  exprt first_update_value = lower_byte_update(
-    byte_update_exprt{
-      src.id(),
-      index_exprt{src.op(), first_index},
-      update_offset,
-      value_as_byte_array,
-      src.get_bits_per_byte()},
-    ns);
-
-  if(value_as_byte_array.id() != ID_array)
-  {
-    return lower_byte_update_array_vector_unbounded(
-      src,
-      subtype,
-      subtype_size,
-      value_as_byte_array,
-      *non_const_update_bound,
-      initial_bytes,
-      first_index,
-      first_update_value,
-      ns);
-  }
 
   // We will update one array/vector element at a time - compute the number of
   // update values that will be consumed in each step. If we cannot determine a
@@ -2470,20 +2419,27 @@ static exprt lower_byte_update(
         val_before,
         src.id() == ID_byte_update_little_endian,
         mp_integer{0},
-        mp_integer{update_bytes.size()},
+        std::nullopt,
         src.get_bits_per_byte(),
         ns);
       CHECK_RETURN(src_as_bytes.id() == ID_array);
-      CHECK_RETURN(src_as_bytes.operands().size() == update_bytes.size());
+      const typet index_type = to_array_type(src_as_bytes.type()).index_type();
       for(std::size_t i = 0; i < update_bytes.size(); ++i)
       {
+        // Update bytes beyond the bound retain the original byte at the
+        // position they are placed at. Positions outside src_as_bytes are
+        // shifted out below, so their value does not matter.
         update_bytes[i] = if_exprt{
           binary_predicate_exprt{
             from_integer(i, non_const_update_bound->type()),
             ID_lt,
             *non_const_update_bound},
           update_bytes[i],
-          src_as_bytes.operands()[i]};
+          index_exprt{
+            src_as_bytes,
+            typecast_exprt::conditional_cast(
+              plus_exprt{src.offset(), from_integer(i, src.offset().type())},
+              index_type)}};
       }
     }
 
