@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] .* no copy: SUCCESS$
+^\[main\.assertion\.2\] .* non-movable prvalue: SUCCESS$
+^\[main\.assertion\.3\] .* an lvalue is copied: SUCCESS$
+^\[main\.assertion\.4\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [expr.type.conv]/2, [expr.static.cast]/4, [dcl.init.general]/16.6.1:
+`T(prvalue of T)' initializes the object from the prvalue without a copy or
+move.

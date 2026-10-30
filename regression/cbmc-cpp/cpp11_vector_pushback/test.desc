@@ -1,0 +1,10 @@
+CORE
+main.cpp
+--cpp11 --unwind 2 --no-unwinding-assertions
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+dropped the body
+--

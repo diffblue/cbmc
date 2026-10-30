@@ -1345,8 +1345,10 @@ __CPROVER_HIDE:;
         ? __CPROVER_contracts_car_create(ptr, size)
         : write_set->linked_ptr_pred_ctx->fresh_car;
 
-    // record the object size for non-determistic bounds checking
+    // non-deterministically record the object for delete/delete[] and free
+    // checking: it was not allocated by new[]
     __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
+    __CPROVER_new_object = record_malloc ? ptr : __CPROVER_new_object;
     __CPROVER_malloc_is_new_array =
       record_malloc ? 0 : __CPROVER_malloc_is_new_array;
     // do not detect memory leaks when assuming a precondition of a contract
@@ -1403,8 +1405,10 @@ __CPROVER_HIDE:;
         ? __CPROVER_contracts_car_create(ptr, size)
         : write_set->linked_ptr_pred_ctx->fresh_car;
 
-    // record the object size for non-determistic bounds checking
+    // non-deterministically record the object for delete/delete[] and free
+    // checking: it was not allocated by new[]
     __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
+    __CPROVER_new_object = record_malloc ? ptr : __CPROVER_new_object;
     __CPROVER_malloc_is_new_array =
       record_malloc ? 0 : __CPROVER_malloc_is_new_array;
 

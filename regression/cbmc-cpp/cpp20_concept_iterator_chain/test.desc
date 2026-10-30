@@ -1,0 +1,33 @@
+CORE
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+dropped the body
+--
+C++20 iterator concepts evaluated over a user-defined *class* iterator: the deep
+concept chain random_access_iterator -> bidirectional -> forward -> input ->
+input_or_output_iterator, which descends through semiregular -> copyable ->
+movable -> swappable -> assignable_from and totally_ordered /
+sized_sentinel_for.  Depends on requirement-parameter binding for conjoined
+requires-expressions ([expr.prim.req.general]/2).  Includes the negative case
+(a non-incrementable type is not an iterator).  See
+doc/architectural/cpp-requires-expression-support.md.
+
+Was KNOWNBUG since round 152 (main() partially type-checked).  Fixed
+2026-09-23 in layers: requirement-parameter binding (a function template's
+parameters leaked into namespace std as a secondary lookup scope);
+common_reference over differing references (conditional operator
+cv/value-category rules, a private member typedef as nested-name-specifier,
+[temp.deduct.type]/5.1 non-deduced contexts during partial-specialization
+matching, inherited-member lookup after on-demand completion);
+same-pattern constrained partial specializations kept distinct
+(__iter_concept_impl); is_base_of over indirect bases (the iterator tag
+hierarchy); and cv-unqualified pointer-arithmetic prvalues
+(`{ __j + __n } -> same_as<_Iter>`).  The source's `p <=> o.p` had been
+reformatted to `p <= > o.p`; it is guarded by clang-format off/on now.
+contiguous_iterator<int*> holds too once __is_base_of completes its Derived
+operand (ITER_TRAITS(int*) selected the wrong __iter_traits_impl before).

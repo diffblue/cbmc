@@ -1,0 +1,15 @@
+CORE
+main.ii
+--winx64 --cpp11
+^\[main\.assertion\.1\] line \d+ int member: SUCCESS$
+^\[main\.assertion\.2\] line \d+ double member: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+__builtin_offsetof was a keyword in GCC, clang and ARM modes only; in Visual
+Studio mode it was an unknown symbol.

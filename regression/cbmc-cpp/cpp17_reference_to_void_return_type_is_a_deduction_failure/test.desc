@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] .* declval<void>: SUCCESS$
+^\[main\.assertion\.2\] .* declval<S> is S&&: SUCCESS$
+^\[main\.assertion\.3\] .* declval<S&>: SUCCESS$
+^\[main\.assertion\.4\] .* member call on declval: SUCCESS$
+^\[main\.assertion\.5\] .* reference to void is a substitution failure: SUCCESS$
+^\[main\.assertion\.6\] .* int picks the int overload: SUCCESS$
+^\[main\.assertion\.7\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+g++ 13 (-fsanitize=address,undefined) and clang++ 18 accept this program,
+and it fails only its WRONG assertion.

@@ -1,0 +1,27 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ pointer variable: SUCCESS$
+^\[main\.assertion\.2\] line \d+ pointer member: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+^Invariant check failed$
+--
+N5008 [dcl.typedef]/2: `using F = void(int);' declares the same type as
+`typedef void F(int);'.  With the alias, `F *p = &cb;' violated the
+invariant "symbol type must match" (cpp_typecheck_initializer.cpp), and
+assigning &cb to a member of type F * was a conversion error (bin53): the
+parser keeps the type-id's parameters in parsed form (cpp_declaration) and
+records its noexcept as `noexcept' rather than `#C_noexcept'.  The typedef
+symbol's function type is now converted like a declarator's.
+test_member.desc: member alias-declarations (libc++'s
+__stop_callback_base declares `using __callback_fn_t =
+void(__stop_callback_base*) noexcept;', and the body of
+__stop_callback_base::__invoke was dropped, __stop_token/stop_state.h:33).
+g++ 13 and clang++ 18 accept this program, and it fails only its WRONG
+assertion.

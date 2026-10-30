@@ -1,0 +1,35 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ cooked integer: SUCCESS$
+^\[main\.assertion\.2\] line \d+ cooked floating: SUCCESS$
+^\[main\.assertion\.3\] line \d+ raw integer: SUCCESS$
+^\[main\.assertion\.4\] line \d+ raw floating: SUCCESS$
+^\[main\.assertion\.5\] line \d+ template integer: SUCCESS$
+^\[main\.assertion\.6\] line \d+ template floating: SUCCESS$
+^\[main\.assertion\.7\] line \d+ digit separator in the spelling: SUCCESS$
+^\[main\.assertion\.8\] line \d+ template characters: SUCCESS$
+^\[main\.assertion\.9\] line \d+ suffix beginning with u: SUCCESS$
+^\[main\.assertion\.10\] line \d+ through a using-directive: SUCCESS$
+^\[main\.assertion\.11\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [lex.ext]/3-4: a user-defined integer (floating-point) literal nX is
+`operator ""X(n ULL)' (`(f L)') if a literal operator with that parameter
+type is found, else `operator ""X("n")' for a raw literal operator, else
+`operator ""X<'c1', ..., 'ck'>()' for a numeric literal operator template
+([over.literal]/5).  The front end always called `operator ""X(n)': the
+cooked overloads were ambiguous, raw operators got a number, and templates
+were not viable ("found no match", bin53).  Literal operator template
+specializations also shared one symbol (no function parameters tell them
+apart), and `64us' became `64u' with ud-suffix `s' ([lex.ext]/1: a
+user-defined-integer-literal has no integer-suffix).  Reduced from
+libstdc++'s `12h' and `64us' (chrono_literals;
+cpp11_libstdcxx_header_drops/test_chrono.desc, test_stop_token.desc).  g++
+13 and clang++ 18 accept this program (they warn about the reserved
+suffix `us'), and it fails only its WRONG assertion.

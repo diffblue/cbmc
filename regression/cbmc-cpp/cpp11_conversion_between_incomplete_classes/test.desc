@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] .* no conversion to B \*: SUCCESS$
+^\[main\.assertion\.2\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+static assertion failed
+--
+N5008 [conv.ptr]/3: pointers to distinct incomplete classes do not convert.

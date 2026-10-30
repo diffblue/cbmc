@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17 --unwind 8 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ variable template: SUCCESS$
+^\[main\.assertion\.2\] line \d+ variable: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The constant evaluator could not assign to an element of a member array,
+so the constexpr objects were initialized at startup; --unwind 8 cut the
+100-iteration loop and made main unreachable (every assertion vacuous).

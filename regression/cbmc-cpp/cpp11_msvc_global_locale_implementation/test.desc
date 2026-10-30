@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--winx64 --cpp17
+^\[main\.assertion\.1\] line \d+ copies share the implementation: SUCCESS$
+^\[main\.assertion\.2\] line \d+ no facets of its own: SUCCESS$
+^\[main\.assertion\.3\] line \d+ the global locale: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+locale::_Init returned a null implementation (round 196), which the
+locale copy constructor, ~locale and _Getfacet dereference.

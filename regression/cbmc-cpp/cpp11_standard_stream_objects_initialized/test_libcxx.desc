@@ -1,0 +1,20 @@
+CORE libcxx
+main.cpp
+--cpp11 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ cerr good: SUCCESS$
+^\[main\.assertion\.2\] line \d+ cerr precision: SUCCESS$
+^\[main\.assertion\.3\] line \d+ cerr unitbuf: SUCCESS$
+^\[main\.assertion\.4\] line \d+ cerr tied to cout: SUCCESS$
+^\[main\.assertion\.5\] line \d+ cout precision: SUCCESS$
+^\[main\.assertion\.6\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Fixed: the compiled library defines and constructs the standard stream
+objects; provide_standard_stream_objects now defines them, with stream
+buffers that discard output and read unknown input, and sets the ties
+and unitbuf, before the program's dynamic initialization.

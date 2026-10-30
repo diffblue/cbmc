@@ -1,0 +1,16 @@
+extern "C" void __CPROVER_assert(bool, const char *);
+// MSVC provides __builtin_offsetof; vcruntime.h's offsetof expands to it in
+// C++ (N5008 [support.types.layout]/1)
+struct S
+{
+  char c;
+  int i;
+  double d;
+};
+int main()
+{
+  __CPROVER_assert(__builtin_offsetof(S, i) == 4, "int member");
+  __CPROVER_assert(__builtin_offsetof(S, d) == 8, "double member");
+  __CPROVER_assert(__builtin_offsetof(S, c) == 1, "WRONG (must FAIL)");
+  return 0;
+}

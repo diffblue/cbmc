@@ -1,5 +1,4 @@
-// #include <assert.h>
-// #include <iostream>
+#include <cassert>
 struct A
 {
   virtual int f()

@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ empty pack: SUCCESS$
+^\[main\.assertion\.2\] line \d+ first: SUCCESS$
+^\[main\.assertion\.3\] line \d+ second value-initialized: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+A trailing non-type template parameter pack that occurs only in the type
+of a parameter whose argument is a braced-init-list was left as its
+unassigned placeholder instead of being deduced empty, so the substituted
+parameter type could not be formed and the candidate was dropped ("found
+no match").

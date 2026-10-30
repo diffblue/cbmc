@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ assignment from a lambda: SUCCESS$
+^\[main\.assertion\.2\] line \d+ assignment from nullptr: SUCCESS$
+^\[main\.assertion\.3\] line \d+ copy assignment: SUCCESS$
+^\[main\.assertion\.4\] line \d+ move assignment: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The parameter type `const function &' of an out-of-class definition did
+not type-check (the injected-class-name), and an unchecked type matched
+any member: the copy assignment's definition was attached to
+`operator=(nullptr_t)' too.  libc++'s std::function defines its
+assignment operators this way.

@@ -1,0 +1,25 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ constructed separately: SUCCESS$
+^\[main\.assertion\.2\] line \d+ member function through each base: SUCCESS$
+^\[main\.assertion\.3\] line \d+ qualified calls: SUCCESS$
+^\[main\.assertion\.4\] line \d+ copied separately: SUCCESS$
+^\[main\.assertion\.5\] line \d+ static member: SUCCESS$
+^\[main\.assertion\.6\] line \d+ assigned separately: SUCCESS$
+^\[main\.assertion\.7\] line \d+ two A subobjects: SUCCESS$
+^\[main\.assertion\.8\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [class.mi]/4: each A subobject is constructed by its own class's
+constructor ([class.base.init]/13), copied and assigned separately by the
+implicit copy constructor and copy assignment operator ([class.copy.ctor]/14,
+[class.copy.assign]/12); a static member is one entity and is not ambiguous
+([class.mi]/3 Note 3, [class.member.lookup]/5).  The front end rejected the
+class.  g++ 13 and clang++ 18 accept this program, and it fails only its
+WRONG assertion.

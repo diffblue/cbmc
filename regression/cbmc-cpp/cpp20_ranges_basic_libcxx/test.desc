@@ -1,0 +1,78 @@
+CORE libcxx
+main.cpp
+--cpp20 --unwind 8 --unwinding-assertions --stdlib libc++
+^\[main\.assertion\.1\] line \d+ ranges take: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Range-pipe over an array with std::views::take.  Two eras of failure:
+originally a hard "conversion from 'signed int [5l]' to
+'<<type:auto>>'" CONVERSION ERROR (silent all-templates deduction
+failure, resolve with nargs=0, at forward@bind_back.h) -- that root
+cause was the `= default` copy-constructor skeleton demanding a
+DELETED default constructor of a base/member, fixed per N5008
+[class.copy.ctor]/14 with the goto-symex family.  NOW the front end
+recovers instead but SILENTLY DROPS the range-for loop and the
+assertion from main() (wrong-code: goto-functions show arr/sum decls
+then straight SET RETURN VALUE 0), so verification succeeds vacuously.
+The desc requires the real assertion to be present and SUCCESS.
+
+2026-09-24: the desc never passed `--stdlib libc++`, so it exercised the
+libstdc++ headers -- where the same program (cpp20_ranges_basic) is CORE
+now; the flag is added so this test is the libc++ variant it is tagged as.
+Under libc++ 18 it still fails: `std::views::take(3)` is
+`__range_adaptor_closure_t(std::__bind_back(*this, ...))`, and
+`__bind_back`'s trailing `-> decltype(__bind_back_t<...>(...))` /
+`__perfect_forward` chain is not resolved (the closure's type stays `auto`,
+"function call expects function or function pointer as argument, but got
+'<<type:auto>>'"; reduced: `std::__bind_back(fn{}, 3)` alone fails with an
+enable_if_t<false> instantiation in <__compare/ordering.h>).
+
+2026-10-05 (round 163w): __bind_back's trailing return type resolves
+(cpp20_views_take_bind_back_forward_not_found, CORE); the program now
+drops tuple:469/488 __tuple_impl and tuple:713 constructors, the
+std::forward<_Up>(__u) pack-expansion failure of
+cpp20_libcxx_header_drops/test_functional.desc.
+
+2026-10-09 (round 170): fixed on the way -- const/ref-qualified member
+templates (cpp11_const_and_non_const_member_function_templates,
+cpp11_ref_qualified_member_functions), inherited constructor templates'
+default arguments, __is_constructible with several arguments, folds in
+base-specifiers.  Still a CONVERSION ERROR: tuple<int>'s converting
+constructor from tuple<int &&> drops its body because
+__tuple_sfinae_base::__do_test's `_Trait<_LArgs, _RArgs>::value...'
+fails (cpp11_template_template_parameter_in_lockstep_pack_expansion).
+
+2026-10-09 (round 171): __tuple_sfinae_base::__do_test resolves
+(cpp11_template_template_parameter_in_lockstep_pack_expansion, CORE), as do
+folds over __perfect_forward_impl's _Idx pack and its operator()'s
+trailing return types.  std::__bind_back(f, 2)(arr) now computes the right
+value, but `arr | take(3)' is still a CONVERSION ERROR: in the
+operator| constraint, is_invocable_v<__bind_back_op<1>, _Fn &,
+tuple<int> &, int (&)[5]> is false (it is true when asserted directly),
+and two tuple:488 __tuple_impl bodies are dropped.
+
+2026-10-10 (round 172): with the nested-instantiation bound raised
+(cpp11_nested_instantiations_of_one_class_template), checking
+is_invocable on a __bind_back closure no longer breaks the later call,
+and `arr | c' through a user-written closure base works.  The real
+`arr | std::views::take(3)' is still a CONVERSION ERROR, as is
+`invoke_result_t<__bind_back_t<...> &, int (&)[5]>' alone.
+
+2026-10-11 (round 174): `arr | std::views::take(3)' now selects the
+range | closure operator (cpp20_constrained_hidden_friend_per_
+specialization) and invoke_result_t of the closure resolves.  The range-for
+now fails comparing take_view's begin() (int *) with its end(), which CBMC
+types as a __sentinel: end() const takes the unsized branch after the view
+was built through operator| (reduction in progress).
+
+2026-10-12 (round 176): CORE.  The last layer was take_view::size()'s
+ranges::min call: its constraint's invoke_result_t needed a fourth nested
+instance of __invokable_r, which the recursion guard skipped
+(cpp11_four_nested_instantiations_of_one_class_template).  Two __tuple_impl
+bodies are still dropped (cpp20_libcxx_header_drops/test_bind_back), on
+code the verification does not reach.

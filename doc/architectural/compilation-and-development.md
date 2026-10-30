@@ -53,6 +53,19 @@ If the macro `DEBUG` is defined during compilation of CBMC (for example by
 using a compiler flag) then extra debug code will be included. This includes
 print statements and code checking that data structures are as expected.
 
+\subsubsection compilation-and-development-subsubsection-cpp-suppressed C++ front end: suppressed diagnostics
+
+The C++ front end discards the diagnostics of substitution failures (SFINAE,
+[temp.deduct]/8) and of system-header declarations it cannot type-check.
+To see them while debugging the front end, set the environment variable
+`CBMC_CPP_SHOW_SUPPRESSED` to a non-empty value other than `0`, e.g.
+
+    CBMC_CPP_SHOW_SUPPRESSED=1 cbmc --cpp20 main.cpp
+
+This only affects which messages are printed: verification results are
+unchanged. Expect many messages, as substitution failures are routine in
+library code.
+
 
 \section compilation-and-development-section-running-tests Running tests
 

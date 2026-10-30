@@ -1,0 +1,12 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] .* protected base via member of derived: SUCCESS$
+^\[main\.assertion\.2\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Only public base edges were accepted outside the members of N.

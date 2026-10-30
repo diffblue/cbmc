@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ matching: SUCCESS$
+^\[main\.assertion\.2\] line \d+ mismatching: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+A partial specialization of a variable template whose argument list ends in
+a pack expansion, constructible_v0<true, tup<Dests...>, Srcs...>, matched
+only when the number of arguments equalled the written ones.  The MSVC
+STL's _Tuple_constructible_v0 has this shape, and std::tuple<int, int> t(1,
+2) found no constructor.

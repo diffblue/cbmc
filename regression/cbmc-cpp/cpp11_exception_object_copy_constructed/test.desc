@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ copy constructor ran once: SUCCESS$
+^\[main\.assertion\.2\] line \d+ handler binds to the copy: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Fixed: the THROW was lowered to a bitwise copy of the operand, so the
+copy constructor never ran.  The front end now initializes a temporary
+of the exception type from the operand through the selected constructor
+(typecheck_expr_throw).

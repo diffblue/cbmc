@@ -154,6 +154,15 @@ bitvector_typet wchar_t_type()
   }
 }
 
+unsignedbv_typet char8_t_type()
+{
+  // C++20 [basic.fundamental]/9: char8_t is a distinct type whose
+  // underlying type is unsigned char.
+  unsignedbv_typet result(config.ansi_c.char_width);
+  result.set(ID_C_c_type, ID_char8_t);
+  return result;
+}
+
 unsignedbv_typet char16_t_type()
 {
   // Types char16_t and char32_t denote distinct types with the same size,
@@ -276,6 +285,8 @@ std::string c_type_as_string(const irep_idt &c_type)
     return "signed char";
   else if(c_type==ID_wchar_t)
     return "wchar_t";
+  else if(c_type == ID_char8_t)
+    return "char8_t";
   else if(c_type==ID_char16_t)
     return "char16_t";
   else if(c_type==ID_char32_t)
@@ -307,6 +318,15 @@ union_typet::find_widest_union_component(const namespacet &ns) const
 
   for(const auto &comp : comps)
   {
+    // member typedefs, static members and methods of a C++ union occupy no
+    // storage
+    if(
+      comp.get_bool(ID_is_type) || comp.get_bool(ID_is_static) ||
+      comp.type().id() == ID_code)
+    {
+      continue;
+    }
+
     auto element_width = pointer_offset_bits(comp.type(), ns);
 
     if(!element_width.has_value())

@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp11 --object-bits 12 --unwind 4 --no-unwinding-assertions
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+^found no match
+--
+brace_init_to_init_list_is_viable (cpp_typecheck_fargs.cpp) now treats a
+nested braced-init-list element as list-initialization of the element type.
+Found by dog-fooding src/goto-programs (json_objectt({{...}, {...}})).
+The map keys are one character long: `--unwind 4' cut the strlen of longer
+ones, and the map assertions were not reached.

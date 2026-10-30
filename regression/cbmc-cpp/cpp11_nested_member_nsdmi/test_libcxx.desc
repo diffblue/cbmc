@@ -1,0 +1,21 @@
+CORE libcxx
+main.cpp
+--cpp17 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ nested member NSDMI \(local\): SUCCESS$
+^\[main\.assertion\.2\] line \d+ nested member NSDMI \(global\): SUCCESS$
+^\[main\.assertion\.3\] line \d+ two-level nested NSDMI: SUCCESS$
+^\[main\.assertion\.4\] line \d+ array-of-NSDMI element: SUCCESS$
+^\[main\.assertion\.5\] line \d+ member array-of-NSDMI element: SUCCESS$
+^\[main\.assertion\.6\] line \d+ aggregate list element preserved: SUCCESS$
+^\[main\.assertion\.7\] line \d+ aggregate NSDMI for unlisted member preserved: SUCCESS$
+^\[main\.assertion\.8\] line \d+ WRONG: must fail: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+Header-free counterpart of test.desc under libc++; recursive application of a
+subobject's default member initializer during default construction is a
+front-end property independent of the standard library.  See test.desc for the
+N5008 rationale.

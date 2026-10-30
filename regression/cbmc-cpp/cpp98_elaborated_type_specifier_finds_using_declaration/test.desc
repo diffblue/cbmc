@@ -1,0 +1,24 @@
+CORE
+main.cpp
+--cpp98
+^\[main\.assertion\.1\] line \d+ namespace function: SUCCESS$
+^\[main\.assertion\.2\] line \d+ member function: SUCCESS$
+^\[main\.assertion\.3\] line \d+ global scope: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [basic.lookup.elab]/1, [namespace.udecl]/1: an elaborated-type-
+specifier `struct timespec' in namespace n finds ::timespec through the
+using-declaration.  tag_scope took the scope of the using-declaration (n)
+as the class's scope and declared a new, incomplete n::timespec ("type
+'struct timespec' is still incomplete -- cannot initialize", bin53); it
+now uses the scope the class is declared in.  Found from libstdc++'s
+__platform_semaphore::_M_try_acquire_until_impl
+(cpp11_libstdcxx_header_drops/test_stop_token.desc, through <ctime>).  g++
+13 and clang++ 18 accept this program, and it fails only its WRONG
+assertion.

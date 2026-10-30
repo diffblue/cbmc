@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ pipe through the closure: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+does not uniquely resolve
+--
+The parameters were already in scope (put there to check the deduced
+return type) when the trailing requires-clause bound them again; `l' did
+not uniquely resolve and the candidate was dropped.

@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] .* 6.3 subscript of array prvalue: SUCCESS$
+^\[main\.assertion\.2\] .* const subscript: SUCCESS$
+^\[main\.assertion\.3\] .* 6.4 member then subscript: SUCCESS$
+^\[main\.assertion\.4\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+g++ 13 and clang++ 18 accept this program, and it fails only its WRONG
+assertion.

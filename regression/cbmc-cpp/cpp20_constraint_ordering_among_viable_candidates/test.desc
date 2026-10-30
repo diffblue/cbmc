@@ -1,0 +1,26 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ more constrained viable: SUCCESS$
+^\[main\.assertion\.2\] line \d+ more constrained not viable: SUCCESS$
+^\[main\.assertion\.3\] line \d+ different parameter list: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [over.match.best]/2.5, [temp.func.order]/8: constraints order two
+function templates only when both specializations are viable and the
+templates' function parameter lists are equivalent; the more constrained
+one ([temp.constr.order]/1) is then better.  The front end removed the
+less constrained candidate before deduction: f(1.0) lost `template <C1 T>
+f(T)' because `template <CC T> f(T)' is more constrained, although CC<double>
+is false; g(1, 2) lost `template <C1 I> g(I, I)' to the unrelated
+`template <CC R> g()' (by constraint names alone).  The second shape is
+libstdc++'s std::ranges::copy(first, last, out), whose iterator overload
+was dropped for the range overload ("found no match for symbol
+'operator()'", ranges_algobase.h:311).  bin53: CONVERSION ERROR.  g++ 13
+and clang++ 18 accept this program, and it fails only its WRONG assertion.

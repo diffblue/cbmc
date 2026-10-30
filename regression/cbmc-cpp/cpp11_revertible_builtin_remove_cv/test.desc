@@ -1,0 +1,22 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+^PARSING ERROR$
+dropped the body
+--
+__remove_cv, __remove_reference and __remove_cvref (and
+__is_nothrow_convertible, __is_pointer_interconvertible_base_of) are
+scanned as builtins when followed by '(' -- regardless of the HOST gcc's
+version, which used to gate them (gcc >= 13): a preprocessed translation
+unit from a newer gcc failed on a gcc-11 host (gcc16_optional_transform on
+the 22.04 CI runners).  Sibling cpp11_revertible_builtin_remove_cv_alias
+covers libstdc++ 11's alias templates of the same names.
+Also: __remove_cvref(const int &) stripped the cv-qualifiers BEFORE the
+reference (leaving `const int'); N5008 [meta.trans.other]/3 defines it as
+remove_cv_t<remove_reference_t<T>>.

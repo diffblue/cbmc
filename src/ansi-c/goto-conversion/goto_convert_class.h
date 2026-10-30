@@ -24,6 +24,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "scope_tree.h"
 
 #include <list>
+#include <map>
+#include <set>
 #include <unordered_set>
 #include <vector>
 
@@ -61,12 +63,23 @@ protected:
   std::string tmp_symbol_prefix;
   lifetimet lifetime = lifetimet::STATIC_GLOBAL;
 
+  /// While a function call that is a subexpression of a larger expression is
+  /// converted (remove_function_call, the initializer of a temporary object),
+  /// the temporaries of its operands are collected here rather than destroyed
+  /// after the call: C++ [class.temporary]/4 destroys temporary objects at the
+  /// end of the full-expression that contains the point of their creation.
+  std::list<irep_idt> *nested_call_temporaries = nullptr;
+
   struct clean_expr_resultt
   {
     /// Identifiers of temporaries introduced while cleaning an expression. The
     /// caller needs to add destructors for these (via `destruct_locals`) on all
     /// control-flow paths as soon as the temporaries are no longer needed.
     std::list<irep_idt> temporaries;
+    /// Temporaries whose address a temporary of `temporaries` holds (a
+    /// reference member initialized by another temporary, N5008
+    /// [class.temporary]/6 Note 5): they live as long as that temporary.
+    std::map<irep_idt, std::list<irep_idt>> dependents;
     /// Statements implementing side effects of the expression that was subject
     /// to cleaning. The caller needs to merge (typically via
     /// `destructive_append`) these statements into the destination GOTO
@@ -78,7 +91,32 @@ protected:
     void add(clean_expr_resultt &&other)
     {
       temporaries.splice(temporaries.begin(), other.temporaries);
+      for(auto &d : other.dependents)
+        dependents[d.first].splice(dependents[d.first].begin(), d.second);
       side_effects.destructive_append(other.side_effects);
+    }
+
+    /// The temporaries of `temporaries` that \p bound names, together with
+    /// the temporaries that live as long as those (`dependents`),
+    /// transitively.
+    std::set<irep_idt> extended_by(const std::set<irep_idt> &bound) const
+    {
+      std::set<irep_idt> result;
+      std::list<irep_idt> work;
+      for(const auto &id : temporaries)
+        if(bound.count(id) != 0)
+          work.push_back(id);
+      while(!work.empty())
+      {
+        const irep_idt id = work.front();
+        work.pop_front();
+        if(!result.insert(id).second)
+          continue;
+        const auto d = dependents.find(id);
+        if(d != dependents.end())
+          work.insert(work.end(), d->second.begin(), d->second.end());
+      }
+      return result;
     }
 
     void add_temporary(const irep_idt &id)
@@ -379,6 +417,42 @@ protected:
     std::optional<node_indext> destructor_end_point = {},
     std::optional<node_indext> destructor_start_point = {});
 
+  /// If the last instruction of \p dest is a C++ function call and there are
+  /// automatic objects with destructors between the current scope and the
+  /// innermost enclosing try block (or the function base), emit a guarded
+  /// cleanup after the call: when an exception is in flight after the call,
+  /// run those destructors ([except.ctor]) and re-dispatch via a
+  /// propagate-marker THROW.  The guard is initially `true` (always skip) and
+  /// carries "#cpp_unwind_guard"; the exception-lowering pass rewrites it to
+  /// "no exception in flight".
+  void emit_cpp_call_unwind_cleanup(goto_programt &dest, const irep_idt &mode);
+
+  /// Like unwind_destructor_stack, but for an *exceptional* unwind path: the
+  /// emitted destructor calls are marked "#unwind_path" so the exception
+  /// lowering does not add in-flight dispatches after them (a destructor that
+  /// throws during unwinding terminates, [except.terminate]).
+  void emit_exceptional_unwind(
+    const source_locationt &source_location,
+    goto_programt &dest,
+    const irep_idt &mode,
+    std::optional<node_indext> end_node = {},
+    std::optional<node_indext> start_node = {});
+
+  /// Set while converting destructor calls emitted by unwind_destructor_stack:
+  /// destructors are implicitly noexcept in C++ ([class.dtor]), so no
+  /// call-site unwind cleanup is emitted for them.
+  bool suppress_cpp_unwind_cleanup = false;
+
+  /// While an object's construction is pending -- between its DECL (where the
+  /// C++ front-end registers the destructor) and the completion of its
+  /// constructor-call statement -- call-site unwind cleanups must not destroy
+  /// it ([except.ctor]/2: only objects whose constructor has completed are
+  /// destroyed during unwinding).  Holds the scope-tree node from before the
+  /// pending object's registration; cleanups unwind from here instead of the
+  /// current node.
+  std::optional<node_indext> pending_construction_start;
+  irep_idt pending_construction_symbol;
+
   typedef std::list<
     std::pair<goto_programt::targett, goto_programt::instructiont>>
     declaration_hop_instrumentationt;
@@ -428,6 +502,11 @@ protected:
 
     node_indext break_stack_node, continue_stack_node, throw_stack_node,
       leave_stack_node;
+
+    // Stack of scope-tree nodes at entry to each enclosing C++ try block, used
+    // to unwind (run destructors of) automatic objects when a `throw`
+    // propagates to a handler ([except.ctor], [except.throw]/4).
+    std::vector<node_indext> cpp_try_scope_nodes;
 
     targetst()
       : return_set(false),

@@ -1,0 +1,15 @@
+CORE
+main.c
+--32 --no-standard-checks
+^\[main\.assertion\.1\] line \d+ read before the object: FAILURE$
+^\[main\.assertion\.2\] line \d+ in bounds: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+Invariant check failed
+--
+With a 32-bit size_t, the bound of the bytes to unpack (offset plus size,
+computed in size_t) was 4294967292, and the lowering ran out of memory.

@@ -1,0 +1,17 @@
+KNOWNBUG libcxx
+main.cpp
+--cpp11 --object-bits 12 --stdlib libc++ --unwind 12 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ no read error: SUCCESS$
+^\[main\.assertion\.2\] line \d+ failed: 0, a limit, or nothing extracted: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+libc++: locale::use_facet is defined in libc++'s compiled library and
+has no model, so get() dereferences a nondeterministic __shared_count
+and cin.fail() always holds (the WRONG assertion holds).  The same
+gap as cpp11_ostream_integer_insertion_libcxx.

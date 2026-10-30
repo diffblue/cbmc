@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp14
+^\[main\.assertion\.1\] line \d+ deduced type: SUCCESS$
+^\[main\.assertion\.2\] line \d+ value: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The second use of vb<char> instantiates the specialization again; the new
+declaration still has the placeholder type, and was rejected ("symbol
+'vb<char>' already declared with different type: original: signed int,
+new: auto", combine_types).  combine_types now keeps the deduced type,
+and the repeated initializer is dropped, since it would replace the
+converted value of the first instantiation.  N5008 [temp.spec.general]/5.

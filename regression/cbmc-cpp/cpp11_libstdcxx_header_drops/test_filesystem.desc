@@ -1,0 +1,26 @@
+CORE libstdcxx
+filesystem.cpp
+--cpp20 --object-bits 12
+^\[main\.assertion\.1\] line \d+ path: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body of system-header function
+could not fully type-check
+--
+libstdc++ 13 <filesystem>: the bodies of _Sp_counted_ptr::_M_dispose and
+the __shared_count(_Ptr) constructor were dropped: they were instantiated
+with a non-pointer _Ptr when overload resolution for `partial_ordering !=
+0' ranked operator==(__shared_count, __shared_count) best
+(cpp_user_defined_conversions_through_different_constructors_indistinguishable).
+With the libstdc++ 16 headers the front end crashed instead
+(cpp11_partial_specialization_const_T_matching_const_array).  bin53:
+dropped bodies.  g++ 13 accepts this program, and it fails only its WRONG
+assertion.
+With GCC 11's headers path(const Source &) was dropped (CTAD with a
+defaulted template parameter, cpp20_ctad_aggregate_with_defaulted_
+template_parameter).

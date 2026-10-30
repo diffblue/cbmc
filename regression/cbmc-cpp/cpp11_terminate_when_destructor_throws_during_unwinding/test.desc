@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp11
+^\[handler\.assertion\.1\] line \d+ terminate called from the unwinding: SUCCESS$
+^\[handler\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Fixed (soundness): the exception lowering assumed that a destructor
+called during stack unwinding does not exit via an exception, so the path
+on which std::terminate calls the handler was removed.  It now calls
+std::terminate there; std::set_terminate and std::terminate have models.

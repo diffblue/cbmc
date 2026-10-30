@@ -1,0 +1,20 @@
+CORE libcxx
+sort.cpp
+--cpp17 --stdlib libc++ --unwind 8 --object-bits 12
+^\[main\.assertion\.1\] line \d+ sorted: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+no body for callee
+--
+libc++ (LLVM 18) <algorithm>: std::sort on int called
+std::__sort<__less<int, int> &, int *>, which libc++ declares `extern
+template' (sort.h:905) and defines only in libc++.so (src/algorithm.cpp;
+the header has only the declaration, sort.h:892), so it had no body.
+Fixed (round 163w): provide_stdlib_bodies models it (test_sort_types.desc).
+clang++ 18 -stdlib=libc++ accepts this program, and it fails only its
+WRONG assertion.

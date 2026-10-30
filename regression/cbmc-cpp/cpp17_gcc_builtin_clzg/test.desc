@@ -1,0 +1,22 @@
+CORE gcc16 gnu-extensions
+main.cpp
+--cpp17
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ clz: SUCCESS$
+^\[main\.assertion\.2\] line \d+ clzg unsigned: SUCCESS$
+^\[main\.assertion\.3\] line \d+ clzg unsigned long long: SUCCESS$
+^\[main\.assertion\.4\] line \d+ clzg unsigned __int128: SUCCESS$
+^\[main\.assertion\.5\] line \d+ clzg zero with fallback: SUCCESS$
+^\[main\.assertion\.6\] line \d+ ctzg: SUCCESS$
+^\[main\.assertion\.7\] line \d+ ctzg zero with fallback: SUCCESS$
+^\[main\.assertion\.8\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+GCC 14 __builtin_clzg / __builtin_ctzg (type-generic, optional zero-value
+argument).  Non-vacuous: the last assertion is deliberately wrong and must
+FAIL.  Verified against g++ 16.0.1.  Before the fix: CONVERSION ERROR.

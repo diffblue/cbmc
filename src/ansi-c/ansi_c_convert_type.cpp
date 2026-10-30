@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ansi_c_convert_type.h"
 
+#include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/message.h>
@@ -23,8 +24,28 @@ void ansi_c_convert_typet::read_rec(const typet &type)
 {
   if(type.id()==ID_merged_type)
   {
+    // Per [dcl.spec]/1: cv-qualifiers in a decl-specifier-seq apply
+    // to the type. When template substitution places cv-qualifier
+    // attributes on struct_tag/union_tag subtypes within a merged_type
+    // (instead of inserting ID_const/ID_volatile sub-nodes), we must
+    // still recognize those as cv-qualifiers on the final declaration.
     for(const typet &subtype : to_type_with_subtypes(type).subtypes())
+    {
+      if(subtype.get_bool(ID_C_constant))
+        c_qualifiers.is_constant = true;
+      if(subtype.get_bool(ID_C_volatile))
+        c_qualifiers.is_volatile = true;
+      // A subtype that is an already converted plain type (the C++ front
+      // end merges a declarator's attributes onto a declaration type it
+      // has typechecked once for all declarators) may carry a `#pragma
+      // pack' cap; it is COUNTED below (c_bool, char, ...) and rebuilt
+      // fresh by write(), so the cap must be carried explicitly.  (An
+      // alignment on it is merged by the caller, see set_attributes.)
+      if(pragma_pack.is_nil() && subtype.find(ID_C_pragma_pack).is_not_nil())
+        pragma_pack =
+          static_cast<const exprt &>(subtype.find(ID_C_pragma_pack));
       read_rec(subtype);
+    }
   }
   else if(type.id()==ID_signed)
     signed_cnt++;
@@ -180,13 +201,21 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     packed=true;
   else if(type.id()==ID_aligned)
   {
-    aligned=true;
-
-    // may come with size or not
-    if(type.find(ID_size).is_nil())
-      alignment=exprt(ID_default);
+    if(type.get_bool(ID_C_pragma_pack))
+    {
+      // the #pragma pack(n) cap synthesised by the parser for a member
+      pragma_pack = static_cast<const exprt &>(type.find(ID_size));
+    }
     else
-      alignment=static_cast<const exprt &>(type.find(ID_size));
+    {
+      aligned = true;
+
+      // may come with size or not
+      if(type.find(ID_size).is_nil())
+        alignment = exprt(ID_default);
+      else
+        alignment = static_cast<const exprt &>(type.find(ID_size));
+    }
   }
   else if(type.id()==ID_transparent_union)
   {
@@ -249,6 +278,9 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     const irep_idt typedef_identifier=type.get(ID_C_typedef);
     if(!typedef_identifier.empty())
       tmp.set(ID_C_typedef, typedef_identifier);
+    // Preserve pointer-to-member attribute (C++)
+    if(type.find(ID_to_member).is_not_nil())
+      tmp.add(ID_to_member, type.find(ID_to_member));
     other.push_back(tmp);
   }
   else if(type.id()==ID_pointer)
@@ -284,7 +316,9 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     c_ensures.push_back(to_unary_expr(as_expr).op());
   }
   else
+  {
     other.push_back(type);
+  }
 }
 
 void ansi_c_convert_typet::write(typet &type)
@@ -688,5 +722,41 @@ void ansi_c_convert_typet::set_attributes(typet &type) const
     type.set(ID_C_packed, true);
 
   if(aligned)
-    type.set(ID_C_alignment, alignment);
+  {
+    // GCC: an `aligned(k)' attribute on a declaration only INCREASES the
+    // alignment; when the (already converted) type carries the alignment of
+    // a typedef -- `typedef S __attribute__((aligned(16))) T; T m
+    // __attribute__((aligned(4)));' -- the larger of the two applies
+    // (16 here; the typedef's, which may be below the natural alignment,
+    // keeps its typedef marking).
+    const exprt &existing =
+      static_cast<const exprt &>(type.find(ID_C_alignment));
+    const auto existing_value = existing.is_nil()
+                                  ? std::optional<mp_integer>{}
+                                  : numeric_cast<mp_integer>(existing);
+    const auto new_value = numeric_cast<mp_integer>(alignment);
+    // (with `packed' the attribute sets the alignment exactly)
+    if(
+      packed || !(existing_value.has_value() && new_value.has_value() &&
+                  *existing_value >= *new_value))
+    {
+      // replacing a typedef's (exact) alignment: the result is exact too
+      const bool exact = !packed && existing.get_bool(ID_C_typedef_alignment);
+      type.set(ID_C_alignment, alignment);
+      if(exact)
+      {
+        static_cast<exprt &>(type.add(ID_C_alignment))
+          .set(ID_C_typedef_alignment, true);
+        type.set(ID_C_member_alignment, alignment);
+      }
+    }
+    else
+    {
+      // kept for a packed struct, where the type's alignment is ignored
+      type.set(ID_C_member_alignment, alignment);
+    }
+  }
+
+  if(pragma_pack.is_not_nil())
+    type.set(ID_C_pragma_pack, pragma_pack);
 }

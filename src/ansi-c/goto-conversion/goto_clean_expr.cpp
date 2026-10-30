@@ -561,6 +561,46 @@ goto_convertt::clean_expr_resultt goto_convertt::clean_expr(
       expr = nil_exprt();
     }
 
+    // N5008 [class.temporary]/4: a temporary is destroyed only if it was
+    // created, i.e., one created in a single branch only on the path through
+    // that branch.  Record which branch ran in a flag (as compilers do) when
+    // a branch has temporaries; destroying them unconditionally ran the
+    // destructor of an object never constructed (`~bad_cast' on the
+    // non-throwing path of a reference dynamic_cast).
+    // Only a temporary with a destructor needs this: destroying one without
+    // is just its DEAD, which is harmless on a path that did not create it
+    // (the result of a C function call), and the flag would cost a branch.
+    const auto has_destructor = [this](const std::list<irep_idt> &temporaries)
+    {
+      for(const auto &id : temporaries)
+      {
+        if(get_destructor(ns, ns.lookup(id).type).is_not_nil())
+          return true;
+      }
+      return false;
+    };
+    std::optional<symbol_exprt> took_true_branch;
+    if(
+      has_destructor(tmp_true.temporaries) ||
+      has_destructor(tmp_false.temporaries))
+    {
+      took_true_branch = new_tmp_symbol(
+                           bool_typet{},
+                           "if_branch",
+                           side_effects.side_effects,
+                           source_location,
+                           mode)
+                           .symbol_expr();
+      tmp_true.side_effects.insert_before(
+        tmp_true.side_effects.instructions.begin(),
+        goto_programt::make_assignment(
+          *took_true_branch, true_exprt{}, source_location));
+      tmp_false.side_effects.insert_before(
+        tmp_false.side_effects.instructions.begin(),
+        goto_programt::make_assignment(
+          *took_true_branch, false_exprt{}, source_location));
+    }
+
     // generate guard for argument side-effects
     generate_ifthenelse(
       if_expr.cond(),
@@ -572,8 +612,34 @@ goto_convertt::clean_expr_resultt goto_convertt::clean_expr(
       side_effects.side_effects,
       mode);
 
-    destruct_locals(tmp_false.temporaries, side_effects.side_effects, ns);
-    destruct_locals(tmp_true.temporaries, side_effects.side_effects, ns);
+    // the destructors of one branch's temporaries, run if it was taken
+    auto destruct_branch =
+      [&](const std::list<irep_idt> &temporaries, const exprt &taken)
+    {
+      if(temporaries.empty())
+        return;
+      goto_programt destructors;
+      destruct_locals(temporaries, destructors, ns);
+      goto_programt skip;
+      goto_programt::targett skip_target =
+        skip.add(goto_programt::make_skip(source_location));
+      side_effects.side_effects.add(goto_programt::make_goto(
+        skip_target, boolean_negate(taken), source_location));
+      side_effects.side_effects.destructive_append(destructors);
+      side_effects.side_effects.destructive_append(skip);
+    };
+    if(took_true_branch.has_value())
+    {
+      destruct_branch(tmp_false.temporaries, not_exprt{*took_true_branch});
+      destruct_branch(tmp_true.temporaries, *took_true_branch);
+      side_effects.side_effects.add(
+        goto_programt::make_dead(*took_true_branch, source_location));
+    }
+    else
+    {
+      destruct_locals(tmp_false.temporaries, side_effects.side_effects, ns);
+      destruct_locals(tmp_true.temporaries, side_effects.side_effects, ns);
+    }
     destruct_locals(side_effects.temporaries, side_effects.side_effects, ns);
     side_effects.temporaries.clear();
 
@@ -585,6 +651,56 @@ goto_convertt::clean_expr_resultt goto_convertt::clean_expr(
   else if(expr.id() == ID_comma)
   {
     clean_expr_resultt side_effects;
+
+    // N5008 [dcl.init.list]/5-6: the C++ front end constructs the elements
+    // of an initializer_list's backing array in place, as the leading
+    // operands of a comma expression whose result is the list
+    // (initializer_list_backing_array, cpp_typecheck_conversions.cpp; the
+    // array is a static-lifetime symbol `__init_list_arr$N' without a
+    // static initializer).  The array is a temporary object of this
+    // full-expression ([class.temporary]/1, /4), unless an initializer_list
+    // variable is initialized from it (lifetime extension, handled by the
+    // declaration): record it among the temporaries so that its elements
+    // are destroyed.
+    for(const auto &op : expr.operands())
+    {
+      if(
+        op.id() != ID_side_effect ||
+        to_side_effect_expr(op).get_statement() != ID_function_call)
+      {
+        continue;
+      }
+      const auto &arguments = to_side_effect_expr_function_call(op).arguments();
+      if(
+        arguments.empty() || arguments.front().id() != ID_address_of ||
+        to_address_of_expr(arguments.front()).object().id() != ID_index)
+      {
+        continue;
+      }
+      const exprt &array =
+        to_index_expr(to_address_of_expr(arguments.front()).object()).array();
+      if(array.id() != ID_symbol)
+        continue;
+      const irep_idt &id = to_symbol_expr(array).get_identifier();
+      if(id2string(id).rfind("__init_list_arr$", 0) != 0)
+        continue;
+      const symbolt *array_symbol = ns.get_symbol_table().lookup(id);
+      if(
+        array_symbol == nullptr || array_symbol->value.is_not_nil() ||
+        array_symbol->type.id() != ID_array ||
+        !array_destructor(ns, array_symbol->symbol_expr()).has_value())
+      {
+        continue;
+      }
+      if(
+        std::find(
+          side_effects.temporaries.begin(),
+          side_effects.temporaries.end(),
+          id) == side_effects.temporaries.end())
+      {
+        side_effects.temporaries.push_back(id);
+      }
+    }
 
     if(result_is_used)
     {
@@ -827,6 +943,26 @@ goto_convertt::clean_expr_address_of(exprt &expr, const irep_idt &mode)
   }
   else if(expr.id() == ID_side_effect)
   {
+    // C++ ([expr.assign]/1, [expr.pre.incr]/1): an assignment or prefix
+    // increment/decrement is an lvalue designating its (first) operand, whose
+    // address may be taken (`&(x += 1)', a reference bound to `(x += a) +=
+    // c').  As in clean_expr, the operands' side effects come first: the
+    // first operand is itself used as an lvalue, the others as values.
+    // Without this an assignment nested in the first operand was both
+    // converted and left in the resulting lvalue expression.
+    const irep_idt &statement = to_side_effect_expr(expr).get_statement();
+    if(
+      statement != ID_function_call && statement != ID_temporary_object &&
+      statement != ID_statement_expression && !expr.operands().empty())
+    {
+      side_effects.add(clean_expr_address_of(expr.operands().front(), mode));
+      for(auto it = std::next(expr.operands().begin());
+          it != expr.operands().end();
+          ++it)
+      {
+        side_effects.add(clean_expr(*it, mode));
+      }
+    }
     side_effects.add(
       remove_side_effect(to_side_effect_expr(expr), mode, true, true));
   }

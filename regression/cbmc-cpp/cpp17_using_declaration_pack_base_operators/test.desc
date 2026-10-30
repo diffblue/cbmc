@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ pack using: int: SUCCESS$
+^\[main\.assertion\.2\] line \d+ pack using: double: SUCCESS$
+^\[main\.assertion\.3\] line \d+ pack using: const char \*: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+static_assert condition could not be evaluated
+dropped the body
+--
+N5008 [namespace.udecl]/1: `using Bases::operator()...;' names each base's
+operator(); the pack expansion's name element must denote the base class type,
+not the (unexpanded) pack name.

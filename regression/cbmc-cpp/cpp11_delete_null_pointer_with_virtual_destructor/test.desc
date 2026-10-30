@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ deleted: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^\[main\.pointer_dereference\.\d+\] .*: FAILURE$
+--
+The destructor of a delete-expression was called unconditionally, so for a
+null pointer to a class with a virtual destructor its vtable pointer was
+read through the null pointer.

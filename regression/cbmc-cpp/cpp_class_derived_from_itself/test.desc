@@ -1,0 +1,18 @@
+CORE
+main.cpp
+
+^CONVERSION ERROR$
+^EXIT=6$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+N5008 [class.derived.general]/2: "A class-or-decltype shall denote a
+(possibly cv-qualified) class type that is not an incompletely defined
+class"; X is incompletely defined in its own base-specifier-list.  The
+front end crashed (SIGSEGV, unbounded recursion, bin53) instead of
+reporting the error; it now reports "base class 'struct X' is incomplete".
+test_class_template.desc and test_partial_specialization.desc: the same for
+a class template instance.  g++ 13
+("invalid use of incomplete type", "recursive type undefined") and
+clang++ 18 ("circular inheritance") reject these programs.

@@ -11,7 +11,11 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_typecheck_fargs.h"
 
+#include <util/arith_tools.h>
+#include <util/pointer_expr.h>
 #include <util/std_types.h>
+
+#include <ansi-c/c_qualifiers.h>
 
 #include "cpp_typecheck.h"
 
@@ -29,46 +33,516 @@ bool cpp_typecheck_fargst::has_class_type() const
 void cpp_typecheck_fargst::build(
   const side_effect_expr_function_callt &function_call)
 {
-  in_use=true;
+  in_use = true;
   operands = function_call.arguments();
+}
+
+/// Structural viability check per [over.match.list] for binding a
+/// brace-init-list operand to a class-typed parameter.
+///
+/// The viability rules implemented here:
+///
+///   * For empty `{}`: viable iff the destination class type has an
+///     accessible default constructor (i.e., a constructor whose
+///     non-`this` parameters all have default values), OR the type
+///     is an aggregate with no user-declared constructors.
+///
+///   * For non-empty `{x_1, ..., x_n}`: viable iff
+///       (a) the class has an accessible (non-explicit) constructor
+///           taking `std::initializer_list<U>` (with any extra
+///           parameters defaulted), in which case we trust the
+///           downstream conversion in
+///           `cpp_typecheckt::implicit_typecast` to typecheck each
+///           operand against `U` and surface failures there; or
+///       (b) the class is an aggregate (no user-declared ctors) with
+///           the same number of non-static data members as operands.
+///
+/// We intentionally skip recursive `implicit_conversion_sequence`
+/// calls during viability — that pathway both blew up the stack on
+/// `\<chrono\>`/`\<future\>` template machinery and isn't necessary for
+/// viability per [over.match.list]: viability is about the *kind*
+/// of conversion (default-init / init_list-ctor / aggregate-init),
+/// the actual conversion is the typecheck step's job.
+///
+/// N5008 [over.ics.list]/7: the empty `{}' is viable for a class with a
+/// default constructor whatever its name; the former exclusion of
+/// std::chrono, std::ratio and std::__detail classes (a guard against an
+/// elaboration-depth problem in \<chrono\> / \<future\> that the chrono, future
+/// and thread regression tests no longer show) dropped libstdc++'s
+/// __atomic_futex_unsigned::_M_load_and_test (`_M_load_and_test_until({})').
+/// N5008 [over.best.ics]/4.5: \p operand is the only element, itself a
+/// braced-init-list, of a list in the second phase of [over.match.list] for
+/// class X (recorded as ID_C_no_user_defined_conversion_to); a parameter of
+/// type X or reference to cv X is then not reached by a user-defined
+/// conversion.
+static bool
+excluded_by_over_best_ics_4_5(const exprt &operand, const typet &type)
+{
+  const irep_idt &excluded = operand.get(ID_C_no_user_defined_conversion_to);
+  if(excluded.empty())
+    return false;
+  const typet &target =
+    is_reference(type) ? to_reference_type(type).base_type() : type;
+  return target.id() == ID_struct_tag &&
+         to_struct_tag_type(target).get_identifier() == excluded;
+}
+
+static bool brace_init_is_viable(
+  const exprt &operand,
+  const typet &target_type,
+  cpp_typecheckt &cpp_typecheck)
+{
+  // Only brace-init operands.
+  if(operand.id() != ID_initializer_list)
+    return false;
+
+  // Strip reference qualifier from target.
+  typet base = target_type;
+  if(is_reference(base))
+    base = to_reference_type(base).base_type();
+
+  if(base.id() != ID_struct_tag && base.id() != ID_struct)
+    return false;
+
+  // Defer std::initializer_list<T> targets to the existing
+  // dedicated handler in match() and implicit_typecast.
+  if(base.id() == ID_struct_tag)
+  {
+    const std::string id_str =
+      id2string(to_struct_tag_type(base).get_identifier());
+    if(id_str.find("tag-initializer_list<") != std::string::npos)
+      return false;
+    // N5008 [temp.inst]/2: list-initialization of the class depends on its
+    // constructors and members, so the specialization is instantiated --
+    // it may be named only through a member typedef so far (map's
+    // `typedef pair<const K, V> value_type;', [temp.inst]/1)
+    cpp_typecheck.require_complete_type(base);
+  }
+
+  const struct_typet &class_type =
+    base.id() == ID_struct_tag
+      ? cpp_typecheck.follow_tag(to_struct_tag_type(base))
+      : to_struct_type(base);
+
+  // Locate components.
+  bool has_user_ctor = false;
+  std::size_t data_field_count = 0;
+  bool has_default_ctor = false;
+  bool has_init_list_ctor = false;
+  for(const auto &c : class_type.components())
+  {
+    // layout padding (including the byte of an empty class) is not an
+    // aggregate element ([dcl.init.aggr]/2)
+    if(c.get_is_padding())
+      continue;
+    if(c.get_bool(ID_is_type) || c.get_bool(ID_is_static))
+      continue;
+    if(c.type().id() == ID_code)
+    {
+      if(to_code_type(c.type()).return_type().id() != ID_constructor)
+        continue;
+      // a base's constructors (copied into the class as from_base
+      // components) are not constructors of the class ([class.ctor],
+      // [namespace.udecl]/13 for inherited ones); counting a base's
+      // default constructor made `{}' viable for `sym &&' when sym has none
+      // (std::optional<symbol_exprt>'s `o = {}', CBMC's own interpreter.cpp,
+      // dog-fooding)
+      if(c.get_bool(ID_from_base))
+        continue;
+      // N5008 [dcl.init.aggr]/1: only USER-declared constructors
+      // disqualify the aggregate; the compiler-synthesized ones (a
+      // non-POD member triggers their synthesis, e.g. cache keys with a
+      // dstringt field) are implicitly declared and marked
+      // #is_implicit_ctor.  They still contribute a default
+      // constructor for the empty-{} case below.
+      if(!c.type().get_bool("#is_implicit_ctor"))
+        has_user_ctor = true;
+      const auto &params = to_code_type(c.type()).parameters();
+      // Default ctor: only `this` parameter, or all extras
+      // defaulted.
+      bool all_extras_default = true;
+      for(std::size_t i = 1; i < params.size(); ++i)
+      {
+        if(!params[i].has_default_value())
+        {
+          all_extras_default = false;
+          break;
+        }
+      }
+      if(all_extras_default)
+        has_default_ctor = true;
+      // initializer_list<U> ctor (non-explicit, params[1] is
+      // tag-initializer_list<...>, optionally by reference).
+      if(!c.get_bool(ID_is_explicit) && params.size() >= 2)
+      {
+        typet p1 = params[1].type();
+        if(is_reference(p1))
+          p1 = to_reference_type(p1).base_type();
+        if(p1.id() == ID_struct_tag)
+        {
+          const std::string p1_id =
+            id2string(to_struct_tag_type(p1).get_identifier());
+          if(p1_id.find("tag-initializer_list<") != std::string::npos)
+          {
+            bool extras_default = true;
+            for(std::size_t i = 2; i < params.size(); ++i)
+            {
+              if(!params[i].has_default_value())
+              {
+                extras_default = false;
+                break;
+              }
+            }
+            if(extras_default)
+              has_init_list_ctor = true;
+          }
+        }
+      }
+      continue;
+    }
+    ++data_field_count;
+  }
+
+  // N5008 [dcl.init.aggr]/1.1: a class with a user-declared or inherited
+  // constructor is not an aggregate -- also when the only such constructor
+  // is a constructor TEMPLATE, which is no component of the class.
+  // Counted as an aggregate, `struct holder { chk value; int which;
+  // template <class U = chk> holder(U); }' accepted `{b, e}' for its copy
+  // constructor's `const holder &' parameter.
+  if(
+    class_type.get_bool("has_template_constructor") ||
+    class_type.get_bool("has_inherited_constructor"))
+  {
+    has_user_ctor = true;
+  }
+
+  if(operand.operands().empty())
+  {
+    // Empty `{}`: default-init or aggregate-with-no-fields.
+    return has_default_ctor || (!has_user_ctor);
+  }
+  // Non-empty: accept if there's an init_list ctor, or aggregate
+  // with enough elements.  N5008 [dcl.init.aggr]/5: the list may have
+  // FEWER initializers than the aggregate has elements -- the remaining
+  // elements are value-initialized (the shape of `cache[{this, name}]`
+  // with a trailing defaulted field).
+  // N5008 [over.match.list]/1.1, [over.ics.list]/7: the initializer-list
+  // constructor takes the list only when every element converts to the
+  // element type -- `pick({e})' for overloads taking std::vector<E> and
+  // std::vector<S> (S not constructible from an E) is not ambiguous
+  // (CBMC's own propagate.cpp, lambda_exprt::instantiate, dog-fooding)
+  if(
+    has_init_list_ctor && base.id() == ID_struct_tag &&
+    cpp_typecheck.has_viable_init_list_constructor(base, operand))
+  {
+    return true;
+  }
+  if(!has_user_ctor && data_field_count >= operand.operands().size())
+    return true;
+  // [over.match.list]/2.2 fallback: when no initializer-list ctor
+  // is viable, the brace-init-list is treated as the argument list
+  // for a regular constructor of T.  Declare the candidate viable
+  // if T has a non-explicit constructor whose required-argument
+  // count matches the size of the brace-init-list (extras may have
+  // defaults) AND each brace-init-list element has an
+  // implicit-conversion sequence to the corresponding parameter
+  // type.  The actual element-by-element conversion is performed
+  // in `cpp_typecheck_conversionst::implicit_typecast`'s
+  // brace-init-to-class branch, which materialises the result as
+  // a member-wise struct expression.
+  //
+  // [over.match.list]/3: in copy-list-initialization, if an
+  // explicit constructor is chosen, the program is ill-formed.
+  // `cpp_typecheck_fargst::match` is invoked when matching arguments
+  // to function parameters, which is copy-list-initialization;
+  // accordingly, explicit ctors are excluded here.  The standard
+  // technically requires explicit ctors to be in the candidate set
+  // (and the ill-formedness emerges only when one is selected), but
+  // CBMC's overload-resolution machinery does not distinguish
+  // "selected but ill-formed" from "selected".  Excluding explicit
+  // ctors here matches the practical outcome of the standard rule.
+  {
+    const std::size_t n_args = operand.operands().size();
+    for(const auto &c : class_type.components())
+    {
+      if(c.type().id() != ID_code)
+        continue;
+      if(to_code_type(c.type()).return_type().id() != ID_constructor)
+        continue;
+      // N5008 [over.match.ctor]/1 + [namespace.udecl]/3: the candidate
+      // constructors of a class are its own constructors, not those of its
+      // base classes.  A base constructor becomes a candidate only when it is
+      // inherited with a using-declaration -- and CBMC materialises such an
+      // inheriting constructor as a fresh derived-class component with
+      // `from_base` cleared (see cpp_typecheckt::typecheck_compound_declarator,
+      // "Import base class constructors as derived class constructors").  A
+      // component that is still flagged `from_base` is therefore an
+      // un-inherited base constructor merged only for member layout / access;
+      // it must not make a brace-init-list viable.  Without this guard a
+      // class deriving from `irept` (e.g. `source_locationt`) would appear
+      // constructible from any other `irept`-derived value via the inherited
+      // `irept(const sharing_treet &)` copy constructor -- making
+      // `codet(dstringt, source_locationt)` spuriously viable for
+      // `codet(ID_assume, {std::move(expr)})` and tying with the intended
+      // `codet(dstringt, std::vector<exprt>)`.
+      if(c.get_bool(ID_from_base))
+        continue;
+      if(c.get_bool(ID_is_explicit))
+        continue;
+      const auto &params = to_code_type(c.type()).parameters();
+      if(params.size() < 2)
+        continue; // only `this`, would be the default ctor
+      const std::size_t formal_count = params.size() - 1;
+      if(n_args > formal_count)
+        continue;
+      // count required (non-defaulted) parameters from the front
+      std::size_t required = formal_count;
+      for(std::size_t i = params.size() - 1; i >= 1 && required > 0; --i)
+      {
+        if(params[i].has_default_value())
+          --required;
+        else
+          break;
+      }
+      if(n_args < required || n_args > formal_count)
+        continue;
+      // Check element-by-element ICS to parameter types.
+      bool args_compatible = true;
+      for(std::size_t i = 0; i < n_args; ++i)
+      {
+        exprt new_expr;
+        unsigned rank = 0;
+        exprt op_copy = operand.operands()[i];
+        if(!cpp_typecheck.implicit_conversion_sequence(
+             op_copy, params[i + 1].type(), new_expr, rank))
+        {
+          args_compatible = false;
+          break;
+        }
+      }
+      if(args_compatible)
+        return true;
+    }
+  }
+  // N5008 [over.match.list]/2.2 + [temp.deduct]: a constructor template
+  // participates in overload resolution against a brace-init-list as well.
+  // Constructor templates are not stored as ordinary `ID_code` constructor
+  // components (the class carries the `has_template_constructor` flag
+  // instead -- see cpp_typecheck_compound_type.cpp), so the component scan
+  // above cannot see them.  When the class has such a constructor template,
+  // declare a non-empty brace-init-list viable and defer the actual
+  // template-argument deduction / substitution to the conversion step:
+  // `cpp_typecheck_conversionst::implicit_typecast`'s brace-init-to-class
+  // branch already resolves template constructors under an SFINAE guard.
+  // Without this, constructing e.g. a `std::pair` (whose element-wise
+  // constructor is a template) from `{a, b}` -- as in `map.insert({k, v})`
+  // -- is wrongly rejected with "found no match for symbol '...'".
+  if(class_type.get_bool("has_template_constructor"))
+  {
+    // N5008 [over.match.list]/1.2 with [over.match.viable]/2: the elements
+    // are the arguments, so only a constructor template that takes that
+    // many arguments can make the list viable.  A single element with only
+    // the iterator-pair constructors of std::vector: `pick({e})' with
+    // overloads for std::vector<E> and std::vector<S> was ambiguous (CBMC's
+    // own propagate.cpp, dog-fooding).  Two elements with only a one-
+    // parameter constructor template (`template <class U = chk> holder(U)'
+    // for a `const holder &' parameter, from `holder h({b, e})') made the
+    // copy constructor viable, and it was chosen.
+    if(base.id() != ID_struct_tag)
+      return true;
+    return cpp_typecheck.has_constructor_template_for_arguments(
+      to_struct_tag_type(base), operand.operands().size());
+  }
+  return false;
+}
+
+/// [over.ics.list]/4: a brace-init-list `{e1, ..., en}` has a viable
+/// implicit conversion sequence to `std::initializer_list<X>` iff
+/// every element `ei` has an implicit conversion sequence to `X`.
+/// The empty brace `{}` is always viable (yields an empty
+/// initializer-list).
+///
+/// This check is intentionally limited to standard ICS via
+/// `implicit_conversion_sequence`; it does not recurse into nested
+/// list-initializations of `X`.  That mirrors the conversion
+/// performed at the call site
+/// (`cpp_typecheck_conversionst::implicit_typecast`'s
+/// brace-to-initializer_list branch), which calls
+/// `implicit_typecast(val, elem_type)` per element.
+/// N5008 [over.ics.list]/10: for a parameter of REFERENCE type the
+/// list-initialization rules apply to the referenced type, so
+/// `std::initializer_list<X> &&' (libstdc++'s shape for several
+/// constructors) and `const std::initializer_list<X> &' accept a
+/// brace-init-list like `std::initializer_list<X>' does.
+static const typet &init_list_referent(const typet &type)
+{
+  if(is_reference(type) || is_rvalue_reference(type))
+    return to_pointer_type(type).base_type();
+  return type;
+}
+
+/// N5008 [over.ics.list]/6, [dcl.init.aggr]/6: a braced-init-list
+/// initializes an array of known bound when it has at most that many
+/// elements and each converts to the element type.
+static bool brace_init_to_array_is_viable(
+  const exprt &operand,
+  const array_typet &array_type,
+  cpp_typecheckt &cpp_typecheck)
+{
+  const auto bound = numeric_cast<mp_integer>(array_type.size());
+  if(!bound.has_value() || mp_integer(operand.operands().size()) > *bound)
+    return false;
+  for(const auto &op : operand.operands())
+  {
+    if(op.id() == ID_initializer_list)
+      return false; // nested aggregate elements: not modelled here
+    exprt new_expr;
+    unsigned rank = 0;
+    if(!cpp_typecheck.implicit_conversion_sequence(
+         op, array_type.element_type(), new_expr, rank))
+      return false;
+  }
+  return true;
+}
+
+static bool brace_init_to_init_list_is_viable(
+  const exprt &operand,
+  const typet &target_type,
+  cpp_typecheckt &cpp_typecheck)
+{
+  if(operand.id() != ID_initializer_list)
+    return false;
+  if(target_type.id() != ID_struct_tag)
+    return false;
+  const std::string id_str =
+    id2string(to_struct_tag_type(target_type).get_identifier());
+  if(id_str.find("tag-initializer_list<") == std::string::npos)
+    return false;
+
+  // Empty brace is always viable.
+  if(operand.operands().empty())
+    return true;
+
+  // the element type, from the layout's pointer member (libstdc++ _M_array,
+  // libc++ __begin_, MSVC _begin -- by position, not name)
+  typet elem_type = cpp_typecheck.initializer_list_element_type(
+    to_struct_tag_type(target_type));
+  if(elem_type.is_nil())
+    return false;
+
+  // Each element must have an ICS to `elem_type` -- N5008
+  // [over.ics.list]/4-7: an element that is itself a braced-init-list is
+  // list-initialization of the element type (an aggregate, a class with a
+  // matching constructor: `{{"k", v}, ...}' to initializer_list<pair<K,
+  // V>>, std::map's and json_objectt's shapes), or, for a scalar element
+  // type, the conversion of its single member.
+  for(const auto &op : operand.operands())
+  {
+    exprt new_expr;
+    unsigned rank = 0;
+    exprt op_copy = op;
+    if(op.id() == ID_initializer_list)
+    {
+      if(brace_init_is_viable(op, elem_type, cpp_typecheck))
+        continue;
+      if(
+        op.operands().size() == 1 &&
+        cpp_typecheck.implicit_conversion_sequence(
+          to_unary_expr(op).op(), elem_type, new_expr, rank))
+      {
+        continue;
+      }
+      if(
+        op.operands().empty() && (cpp_typecheck.cpp_is_pod(elem_type) ||
+                                  elem_type.id() == ID_struct_tag))
+      {
+        continue; // value-initialization ([dcl.init.list]/3.5)
+      }
+      return false;
+    }
+    if(!cpp_typecheck.implicit_conversion_sequence(
+         op_copy, elem_type, new_expr, rank))
+      return false;
+  }
+  return true;
 }
 
 bool cpp_typecheck_fargst::match(
   const code_typet &code_type,
   unsigned &distance,
-  cpp_typecheckt &cpp_typecheck) const
+  cpp_typecheckt &cpp_typecheck,
+  unsigned *cv_distance,
+  std::vector<unsigned> *cv_per_argument) const
 {
-  distance=0;
+  distance = 0;
+  unsigned local_cv_distance = 0;
+  if(cv_distance == nullptr && cv_per_argument != nullptr)
+    cv_distance = &local_cv_distance;
+  if(cv_distance != nullptr)
+    *cv_distance = 0;
+  if(cv_per_argument != nullptr)
+    cv_per_argument->clear();
 
-  exprt::operandst ops=operands;
-  const code_typet::parameterst &parameters=code_type.parameters();
+  exprt::operandst ops = operands;
+  // The trailing `@most_derived' flag of a constructor or destructor of a
+  // class with virtual bases (Itanium C++ ABI 5.1.4: complete- vs
+  // base-object constructor) is not a parameter of the C++ function
+  // ([over.match.viable]/2 counts the parameters of the declaration); the
+  // front end supplies it after overload resolution.  Matching user
+  // arguments against it made `os()' viable for `os(&s)' (pointer to
+  // bool).  Only an argument the front end supplies itself (marked
+  // #most_derived_argument, cpp_destructor) binds to it.
+  code_typet::parameterst parameters = code_type.parameters();
+  if(
+    !parameters.empty() &&
+    parameters.back().get_base_name() == "@most_derived" &&
+    (ops.size() < parameters.size() ||
+     !ops[parameters.size() - 1].get_bool(ID_C_most_derived_argument)))
+  {
+    parameters.pop_back();
+  }
 
-  if(parameters.size()>ops.size())
+  if(parameters.size() > ops.size())
   {
     // Check for default values.
-    ops.reserve(parameters.size());
-
-    for(std::size_t i=ops.size(); i<parameters.size(); i++)
+    // Don't push the actual default value expressions into ops —
+    // they may contain unresolved template parameters. Just verify
+    // that default values exist for the extra parameters.
+    for(std::size_t i = ops.size(); i < parameters.size(); i++)
     {
-      const exprt &default_value=
-        parameters[i].default_value();
+      const exprt &default_value = parameters[i].default_value();
 
-      if(default_value.is_nil())
+      // [over.match.viable]/2.2: a candidate function with more
+      // parameters than there are arguments is viable only if each
+      // parameter without a corresponding argument has a default
+      // argument.  A genuine default argument is a proper expression;
+      // a nil or empty-id expression is not a default argument.  The
+      // latter can appear on the parameters of a function type that is
+      // synthesised during template argument deduction
+      // (`guess_function_template_args`), where a parameter with no
+      // default ends up carrying an empty `exprt` rather than a
+      // `nil_exprt`.  Treating that as a default argument would make,
+      // e.g., the four-parameter tag-dispatch overload
+      // `__find_if(_It, _It, _Pred, random_access_iterator_tag)`
+      // wrongly viable for the three-argument call
+      // `__find_if(first, last, pred)`, leaving the call ambiguous with
+      // the genuine three-parameter overload.
+      if(default_value.is_nil() || default_value.id().empty())
         return false;
-
-      ops.push_back(default_value);
     }
   }
-  else if(parameters.size()<ops.size())
+  else if(parameters.size() < ops.size())
   {
     // check for ellipsis
     if(!code_type.has_ellipsis())
       return false;
   }
 
-  exprt::operandst::iterator it=ops.begin();
+  exprt::operandst::iterator it = ops.begin();
   for(const auto &parameter : parameters)
   {
+    if(it == ops.end())
+      break; // remaining parameters have default values
     // read
     // http://publib.boulder.ibm.com/infocenter/comphelp/v8v101/topic/
     //   com.ibm.xlcpp8a.doc/language/ref/implicit_conversion_sequences.htm
@@ -79,17 +553,29 @@ bool cpp_typecheck_fargst::match(
     // * User-defined conversion sequences
     // * Ellipsis conversion sequences
 
-    DATA_INVARIANT(it != ops.end(), "arguments and parameters must match");
-    const exprt &operand=*it;
-    typet type=parameter.type();
+    const exprt &operand = *it;
+    typet type = parameter.type();
+    const unsigned cv_before = cv_distance != nullptr ? *cv_distance : 0;
+    // record this argument's tie-breaker share however the loop body ends
+    struct cv_recordert
+    {
+      std::vector<unsigned> *out;
+      const unsigned *cv;
+      unsigned before;
+      ~cv_recordert()
+      {
+        if(out != nullptr && cv != nullptr)
+          out->push_back(*cv - before);
+      }
+    } cv_recorder{cv_per_argument, cv_distance, cv_before};
 
-    #if 0
+#if 0
     // unclear, todo
     if(is_reference(operand.type()))
       std::cout << "O: " << operand.pretty() << '\n';
 
     assert(!is_reference(operand.type()));
-    #endif
+#endif
 
     // "this" is a special case -- we turn the pointer type
     // into a reference type to do the type matching
@@ -97,40 +583,193 @@ bool cpp_typecheck_fargst::match(
     {
       type.set(ID_C_reference, true);
       type.set(ID_C_this, true);
+
+      // N5008 [over.match.funcs.general]/4: with a ref-qualifier, the
+      // implicit object parameter is an lvalue reference (`&') or an
+      // rvalue reference (`&&') to cv X, bound by the usual rules; /5's
+      // licence to bind an rvalue object applies only without one.
+      const irep_idt &ref_qualifier = code_type.get(ID_C_ref_qualifier);
+      if(!ref_qualifier.empty())
+      {
+        const bool object_is_lvalue =
+          cpp_typecheck.is_lvalue_expression(operand);
+        const bool object_parameter_is_const =
+          to_pointer_type(parameter.type()).base_type().get_bool(ID_C_constant);
+        if(ref_qualifier == "&&" && object_is_lvalue)
+          return false;
+        if(ref_qualifier == "&" && !object_is_lvalue)
+        {
+          if(!object_parameter_is_const)
+            return false;
+          // [over.ics.rank]/3.2.3: binding the rvalue object to an rvalue
+          // reference (an `&&' overload) is better
+          if(cv_distance != nullptr)
+            ++*cv_distance;
+        }
+      }
     }
 
-    unsigned rank=0;
+    unsigned rank = 0;
     exprt new_expr;
 
-    #if 0
+#if 0
     std::cout << "C: " << cpp_typecheck.to_string(operand.type())
               << " -> " << cpp_typecheck.to_string(parameter.type())
               << '\n';
-    #endif
+#endif
 
     // can we do the standard conversion sequence?
     if(cpp_typecheck.implicit_conversion_sequence(
-        operand, type, new_expr, rank))
+         operand, type, new_expr, rank, cv_distance))
     {
       // ok
-      distance+=rank;
-      #if 0
+      distance += rank;
+      // N5008 [over.ics.rank]/4.1: a conversion that does not convert a
+      // pointer to bool is better than one that does; /4.4.2: converting
+      // a pointer to a class to a pointer to its base is better than to
+      // `void *'.  These tie-break conversions of the same rank, in the
+      // lowest-order key: `out << sb' with operator<<(bool), (const void
+      // *) and (basic_streambuf *) for a basic_stringbuf * argument
+      // (CBMC's own goto-cc compile.cpp, `out << in.rdbuf()', dog-fooding)
+      // was ambiguous.
+      if(
+        cv_distance != nullptr && operand.type().id() == ID_pointer &&
+        !is_reference(operand.type()) &&
+        to_pointer_type(operand.type()).base_type().id() != ID_code)
+      {
+        const typet &target =
+          is_reference(type) ? to_reference_type(type).base_type() : type;
+        // (the keys: to a base pointer 0, to `void *' 1 -- plus 1 for
+        // added qualification, [over.ics.rank]/3.2.5 -- to bool 3)
+        if(target.id() == ID_bool || target.id() == ID_c_bool)
+          *cv_distance += 3;
+        else if(
+          target.id() == ID_pointer && !is_reference(target) &&
+          to_pointer_type(target).base_type().id() == ID_empty &&
+          to_pointer_type(operand.type()).base_type().id() != ID_empty)
+        {
+          *cv_distance += 1;
+          c_qualifierst q_from, q_to;
+          q_from.read(to_pointer_type(operand.type()).base_type());
+          q_to.read(to_pointer_type(target).base_type());
+          if(q_from != q_to)
+            *cv_distance += 1;
+        }
+      }
+#if 0
       std::cout << "OK " << rank << '\n';
-      #endif
+#endif
+    }
+    else if(
+      operand.id() == ID_initializer_list && operand.operands().empty() &&
+      (type.id() == ID_signedbv || type.id() == ID_unsignedbv ||
+       type.id() == ID_bool || type.id() == ID_c_bool ||
+       type.id() == ID_c_enum_tag || type.id() == ID_floatbv ||
+       type.id() == ID_fixedbv ||
+       (type.id() == ID_pointer && !is_reference(type) &&
+        !is_rvalue_reference(type))))
+    {
+      // N5008 [over.ics.list]/10.2: for a parameter of non-class type, an
+      // empty initializer list is the identity conversion (the parameter
+      // is value-initialized, [dcl.init.list]/3.11; implicit_typecast
+      // converts it).
     }
     else if(
       operand.id() == ID_initializer_list && cpp_typecheck.cpp_is_pod(type) &&
       operand.operands().size() == 1 &&
       cpp_typecheck.implicit_conversion_sequence(
-        to_unary_expr(operand).op(), type, new_expr, rank))
+        to_unary_expr(operand).op(), type, new_expr, rank, cv_distance))
     {
       distance += rank;
     }
+    else if(
+      operand.id() == ID_initializer_list && is_reference(type) &&
+      operand.operands().size() == 1 &&
+      cpp_typecheck.implicit_conversion_sequence(
+        to_unary_expr(operand).op(), type, new_expr, rank, cv_distance))
+    {
+      // N5008 [over.ics.list]/8: for a REFERENCE parameter initialized
+      // from a braced-init-list with a single element, the implicit
+      // conversion sequence is the one converting the element to the
+      // referenced type ([dcl.init.list]/3.10); the reference binding is
+      // computed by implicit_conversion_sequence via reference_binding.
+      // The shape of `wrapt w({this->member})` with
+      // `explicit wrapt(const int &)`.
+      distance += rank;
+    }
+    else if(
+      !is_reference(type) &&
+      cpp_typecheck.aggregate_list_initialization_is_viable(operand, type))
+    {
+      // N5008 [over.ics.list]/8: a braced-init-list that can
+      // aggregate-initialize the (non-reference) aggregate parameter type,
+      // with brace elision ([dcl.init.aggr]/16), converts by a user-defined
+      // conversion sequence (rank 4, as for brace_init_is_viable below).
+      distance += 4;
+    }
+    else if(
+      operand.id() == ID_initializer_list && is_reference(type) &&
+      to_pointer_type(type).base_type().id() == ID_array &&
+      brace_init_to_array_is_viable(
+        operand,
+        to_array_type(to_pointer_type(type).base_type()),
+        cpp_typecheck))
+    {
+      // N5008 [over.ics.list]/6 + [dcl.init.list]/3.4: a braced-init-list
+      // for a reference to an array aggregate-initializes a temporary array
+      // -- viable when the list fits the bound and every element converts
+      // to the element type (`_Dest (&&)[1]' with `{declval<_Source>()}',
+      // libc++ variant's narrowing check).
+      distance += 1;
+    }
+    else if(
+      operand.id() == ID_initializer_list &&
+      init_list_referent(type).id() == ID_struct_tag &&
+      id2string(to_struct_tag_type(init_list_referent(type)).get_identifier())
+          .find("tag-initializer_list<") != std::string::npos &&
+      brace_init_to_init_list_is_viable(
+        operand, init_list_referent(type), cpp_typecheck))
+    {
+      // [over.ics.list]/4: brace-init-list to `std::initializer_list<X>`
+      // is a viable conversion only if every element of the list has
+      // an implicit-conversion sequence to `X`.  Without that
+      // element-by-element check, the overload appears viable for
+      // any 2+ -element list and beats more specific overloads
+      // such as `insert(const value_type&)` on a class type:
+      // for example `unordered_map<K,V>::insert({k, idx})` would
+      // pick `insert(initializer_list<pair<const K,V>>)` and fail
+      // because `k` is a `K`, not a `pair<const K, V>`.
+      distance += 1;
+    }
+    else if(
+      operand.id() == ID_initializer_list &&
+      !excluded_by_over_best_ics_4_5(operand, type) &&
+      brace_init_is_viable(operand, type, cpp_typecheck))
+    {
+      // C++11 [over.match.list] list-initialization: brace-init
+      // initialising a class-typed parameter (or reference to one)
+      // via either a default constructor (empty `{}`), an
+      // accessible `initializer_list<U>` constructor (non-empty
+      // brace), or aggregate initialisation.  See
+      // `brace_init_is_viable` for the full set of conditions and
+      // the design notes on chrono/ratio/__detail narrowing.
+      //
+      // Use distance 4 (worse than a standard conversion but
+      // better than ellipsis).  For prvalue source (a temporary
+      // materialised from the brace-init-list), [over.ics.rank]/
+      // 3.3.4 prefers an rvalue-reference target over a (const)
+      // lvalue-reference target.  Bias the rank by -1 for an
+      // rvalue-ref target so that, when the same `brace_init_is_viable`
+      // candidate is otherwise equally viable, the rvalue-ref
+      // overload wins (otherwise CBMC reports
+      // `symbol 'X' does not uniquely resolve` between
+      // `f(const T&)` and `f(T&&)`).
+      distance += 4;
+      if(is_rvalue_reference(type))
+        distance -= 1;
+    }
     else
     {
-      #if 0
-      std::cout << "NOT OK\n";
-      #endif
       return false; // no conversion possible
     }
 
@@ -138,9 +777,9 @@ bool cpp_typecheck_fargst::match(
   }
 
   // we may not have used all operands
-  for( ; it!=ops.end(); ++it)
+  for(; it != ops.end(); ++it)
     // Ellipsis is the 'worst' of the conversion sequences
-    distance+=1000;
+    distance += 1000;
 
   return true;
 }

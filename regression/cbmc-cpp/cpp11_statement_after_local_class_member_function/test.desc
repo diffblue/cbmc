@@ -1,0 +1,13 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line 16 after local class: SUCCESS$
+^\[main\.assertion\.2\] line 17 WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Property names come from the source locations the parser records.  g++ 13
+and clang++ 18 accept this program, and it fails only its WRONG assertion.

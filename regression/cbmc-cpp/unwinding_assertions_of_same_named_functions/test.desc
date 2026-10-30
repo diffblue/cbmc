@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--unwind 2 --unwinding-assertions
+^\[a::fill\(signed_int\)\.unwind\.0\] line 12 unwinding assertion loop 0: FAILURE$
+^\[b::fill\(signed_int\)\.unwind\.0\] line 22 unwinding assertion loop 0: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+goto_symext::loop_bound_exceeded named the unwinding property after the
+source location's function, the display name `fill' of both functions; it
+now uses the goto function identifier.  C function identifiers are their
+names, so C property ids are unchanged.

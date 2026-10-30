@@ -9,117 +9,391 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
+#include <util/arith_tools.h>
 #include <util/base_exceptions.h> // IWYU pragma: keep
 #include <util/simplify_expr.h>
+#include <util/std_code.h>
 #include <util/symbol_table_base.h>
 
+#include "cpp_constexpr_eval.h"
 #include "cpp_convert_type.h"
 #include "cpp_declarator_converter.h"
+#include "cpp_sfinae_context.h"
 #include "cpp_template_args.h"
 #include "cpp_template_type.h"
 #include "cpp_type2name.h"
 #include "cpp_typecheck.h"
+#include "cpp_typecheck_fargs.h"
+#include "cpp_typecheck_resolve.h"
+
+#include <algorithm>
+#include <functional>
+#include <map>
+#include <set>
+
+/// \return the name of template parameter \p parameter (`C' of
+///   `template\::3\::C', or `anon\#1' for an unnamed one)
+static irep_idt template_parameter_base_name(const template_parametert &p)
+{
+  const irep_idt &identifier =
+    p.id() == ID_type ? p.type().get(ID_identifier) : p.get(ID_identifier);
+  const std::string &id = id2string(identifier);
+  const auto pos = id.rfind("::");
+  return pos == std::string::npos ? identifier : irep_idt{id.substr(pos + 2)};
+}
+
+/// Rename, in the not yet type-checked default argument \p n, each name
+/// that is the first component of a name (`C', `C::type', `X<C>') and a key
+/// of \p renaming.
+static void rename_template_parameters(
+  irept &n,
+  const std::map<irep_idt, irep_idt> &renaming)
+{
+  if(n.id() == ID_cpp_name && !n.get_sub().empty())
+  {
+    irept &first = n.get_sub().front();
+    if(first.id() == ID_name)
+    {
+      const auto it = renaming.find(first.get(ID_identifier));
+      if(it != renaming.end())
+        first.set(ID_identifier, it->second);
+    }
+  }
+  for(auto &sub : n.get_sub())
+    rename_template_parameters(sub, renaming);
+  for(auto &named : n.get_named_sub())
+    rename_template_parameters(named.second, renaming);
+}
 
 void cpp_typecheckt::salvage_default_arguments(
   const template_typet &old_type,
   template_typet &new_type)
 {
-  const template_typet::template_parameterst &old_parameters=
+  const template_typet::template_parameterst &old_parameters =
     old_type.template_parameters();
-  template_typet::template_parameterst &new_parameters=
+  template_typet::template_parameterst &new_parameters =
     new_type.template_parameters();
 
-  for(std::size_t i=0; i<new_parameters.size(); i++)
+  // N5008 [temp.param]/17: the default arguments of all declarations are
+  // merged.  A default argument may name earlier parameters (`template
+  // <class C, class = C> struct S;'); taken over by a declaration whose
+  // parameters are named differently or not at all (`template <class,
+  // class> struct S {...}'), it must name that declaration's parameters.
+  std::map<irep_idt, irep_idt> renaming;
+  for(std::size_t i = 0; i < new_parameters.size() && i < old_parameters.size();
+      i++)
   {
-    if(i<old_parameters.size() &&
-       old_parameters[i].has_default_argument() &&
-       !new_parameters[i].has_default_argument())
+    const irep_idt old_name = template_parameter_base_name(old_parameters[i]);
+    const irep_idt new_name = template_parameter_base_name(new_parameters[i]);
+    if(!old_name.empty() && !new_name.empty() && old_name != new_name)
+      renaming[old_name] = new_name;
+  }
+
+  for(std::size_t i = 0; i < new_parameters.size(); i++)
+  {
+    if(
+      i < old_parameters.size() && old_parameters[i].has_default_argument() &&
+      !new_parameters[i].has_default_argument())
     {
-      // TODO The default may depend on previous parameters!!
-      new_parameters[i].default_argument()=old_parameters[i].default_argument();
+      new_parameters[i].default_argument() =
+        old_parameters[i].default_argument();
+      if(!renaming.empty())
+      {
+        rename_template_parameters(
+          new_parameters[i].default_argument(), renaming);
+      }
     }
   }
 }
 
-void cpp_typecheckt::typecheck_class_template(
-  cpp_declarationt &declaration)
+/// Typecheck a class template declaration.
+///
+/// Implements [temp.class.general]: "A class template defines the layout
+/// and operations for an unbounded set of related types."
+///
+/// Also handles partial specializations per [temp.spec.partial.general]
+/// and explicit specializations per [temp.expl.spec].
+/// N5008 [temp.mem.class]/1, [temp.inst]/3: a member class of a class
+/// template defined outside it, `template \<class C> struct S<C>::N { ... };',
+/// is instantiated for a specialization S<X> when the completeness of
+/// S<X>::N is required, from the definition reachable at that point.  The
+/// definition is grafted into the class template's parse tree, which covers
+/// the specializations instantiated later; an S<X> instantiated BEFORE the
+/// definition (libstdc++ \<istream\> explicitly instantiates
+/// basic_istream<char>::ignore before istream.tcc defines
+/// basic_istream::sentry) still has S<X>::N incomplete.  Instantiate the
+/// definition, \p member_type, for each such S<X> of \p outer_template now:
+/// its uses are type-checked later than this point (method bodies are
+/// deferred).
+void cpp_typecheckt::complete_member_class_of_instances(
+  const cpp_idt &outer_template,
+  const irep_idt &member_name,
+  const typet &member_type)
 {
-  // Do template parameters. This also sets up the template scope.
-  cpp_scopet &template_scope=
-    typecheck_template_parameters(declaration.template_type());
+  const irep_idt &template_parent = outer_template.get_parent().identifier;
+  std::vector<irep_idt> instances;
+  for(const auto &entry : symbol_table.symbols)
+  {
+    const symbolt &instance = entry.second;
+    if(
+      !instance.is_type || instance.base_name != outer_template.base_name ||
+      !instance.type.get_bool(ID_template_class_instance) ||
+      instance.type.get_bool(ID_incomplete))
+    {
+      continue;
+    }
+    const auto scope_it = cpp_scopes.id_map.find(entry.first);
+    if(scope_it == cpp_scopes.id_map.end() || !scope_it->second->is_scope)
+      continue;
+    // the instance's scope is nested in its template-parameter scope
+    const cpp_idt *parent = &scope_it->second->get_parent();
+    while(parent->is_template_scope())
+      parent = &parent->get_parent();
+    if(parent->identifier != template_parent)
+      continue;
+    // the instance's own member class, if it has been created: skip it once
+    // complete
+    bool complete = false;
+    for(const auto *id :
+        static_cast<cpp_scopet &>(*scope_it->second)
+          .lookup(
+            member_name, cpp_scopet::QUALIFIED, cpp_idt::id_classt::CLASS))
+    {
+      const symbolt *member = symbol_table.lookup(id->identifier);
+      if(member != nullptr && !member->type.get_bool(ID_incomplete))
+        complete = true;
+    }
+    if(!complete)
+      instances.push_back(entry.first);
+  }
+  for(const auto &instance_id : instances)
+  {
+    cpp_save_scopet saved_scope(cpp_scopes);
+    cpp_saved_template_mapt saved_map(template_map);
+    cpp_scopes.go_to(*cpp_scopes.id_map[instance_id]);
+    bind_class_instance_parameters(
+      *symbol_table.lookup(instance_id), template_map);
+    typet type = member_type;
+    try
+    {
+      typecheck_type(type);
+    }
+    catch(...)
+    {
+      // an ill-formed member class: S<X>::N stays incomplete, as when the
+      // definition is not reachable
+    }
+  }
+}
 
-  typet &type=declaration.type();
-  template_typet &template_type=declaration.template_type();
+void cpp_typecheckt::typecheck_class_template(cpp_declarationt &declaration)
+{
+  // N5008 [namespace.memdef]/2, [class.pre]/3: a class template defined
+  // by a qualified name (`template <...> class ns::X { ... };') is
+  // defined in the nominated namespace, which is entered below to declare
+  // it; the declaration does not move the enclosing scope.  Without
+  // restoring it, the next `namespace ns { }' at namespace scope was
+  // processed inside ns and created ns::ns, so `ns::' became ambiguous
+  // (libstdc++'s <format>: `__format::_Arg_store').
+  cpp_save_scopet saved_scope(cpp_scopes);
 
-  bool has_body=type.find(ID_body).is_not_nil();
+  typet &type = declaration.type();
 
-  const cpp_namet &cpp_name=
-    static_cast<const cpp_namet &>(type.find(ID_tag));
+  // N5008 [dcl.attr.grammar]/5 + [dcl.type.class.deduct]: GNU attributes
+  // written after the class body -- `template <class T> struct G { ... }
+  // __attribute__((packed, aligned(16)));` (user-reported) -- are merged
+  // around the class-specifier by the parser (a merged_type of attribute
+  // nodes and the struct), exactly as for a non-template class, where the
+  // type-converter later folds them.  A class TEMPLATE's declaration is
+  // stored as parsed, so the merged node had no tag ("class templates must
+  // not be anonymous") and every use of `G` failed.  Fold the recognised
+  // attributes onto the struct as the flags the layout code reads.
+  if(type.id() == ID_merged_type)
+  {
+    std::vector<typet> flat;
+    std::function<void(const typet &)> flatten = [&](const typet &t)
+    {
+      if(t.id() == ID_merged_type)
+      {
+        for(const auto &sub : to_type_with_subtypes(t).subtypes())
+          flatten(sub);
+      }
+      else
+        flat.push_back(t);
+    };
+    flatten(type);
+    typet unwrapped;
+    bool have_class = false, packed = false, all_known = true;
+    bool have_alignment = false;
+    irept alignment;
+    for(const auto &sub : flat)
+    {
+      if(sub.id() == ID_struct || sub.id() == ID_union)
+      {
+        if(have_class)
+          all_known = false; // two classes: not the shape we fold
+        have_class = true;
+        unwrapped = sub;
+      }
+      else if(sub.id() == ID_packed)
+        packed = true;
+      else if(sub.id() == ID_aligned)
+      {
+        have_alignment = true;
+        alignment = sub.find(ID_size);
+      }
+      else
+        all_known = false;
+    }
+    if(have_class && all_known)
+    {
+      unwrapped.add_source_location() = type.source_location();
+      if(packed)
+        unwrapped.set(ID_C_packed, true);
+      if(have_alignment)
+        unwrapped.set(ID_C_alignment, alignment);
+      type = unwrapped;
+    }
+  }
+
+  const cpp_namet &cpp_name = static_cast<const cpp_namet &>(type.find(ID_tag));
 
   if(cpp_name.is_nil())
   {
-    error().source_location=type.source_location();
+    error().source_location = type.source_location();
     error() << "class templates must not be anonymous" << eom;
     throw 0;
   }
 
+  irep_idt base_name;
+
+  // For qualified names (e.g., __cxx11::collate), resolve the scope prefix
+  // and enter it BEFORE creating the template scope, so that the template
+  // scope becomes a child of the correct namespace scope.
   if(!cpp_name.is_simple_name())
   {
-    error().source_location=cpp_name.source_location();
-    error() << "simple name expected as class template tag" << eom;
-    throw 0;
+    cpp_typecheck_resolvet resolver(*this);
+    cpp_template_args_non_tct t_args;
+    resolver.resolve_scope(cpp_name, base_name, t_args);
+
+    // Replace the qualified tag with a simple name so that when the
+    // template is instantiated, typecheck_compound_type uses the
+    // current scope (the template sub-scope) rather than re-resolving
+    // the qualifier and placing the class in the wrong scope.
+    cpp_namet simple_name(base_name, cpp_name.source_location());
+    type.add(ID_tag) = simple_name;
   }
 
-  irep_idt base_name=cpp_name.get_base_name();
+  // Do template parameters. This also sets up the template scope.
+  cpp_scopet &template_scope =
+    typecheck_template_parameters(declaration.template_type());
 
-  const cpp_template_args_non_tct &partial_specialization_args=
+  template_typet &template_type = declaration.template_type();
+
+  bool has_body = type.find(ID_body).is_not_nil();
+
+  if(cpp_name.is_simple_name())
+    base_name = cpp_name.get_base_name();
+
+  const cpp_template_args_non_tct &partial_specialization_args =
     declaration.partial_specialization_args();
 
-  const irep_idt symbol_name=
-    class_template_identifier(
-      base_name, template_type, partial_specialization_args);
+  const irep_idt symbol_name = class_template_identifier(
+    base_name, template_type, partial_specialization_args);
 
-  #if 0
+  // N5008 [temp.inst]/1, [temp.point]: record that a *definition* (a class
+  // body) has been seen for this class template (primary template or partial
+  // specialization), so elaborate_class_template only instantiates a
+  // specialization of a template that has actually been defined.  Recorded once
+  // a body is seen and never removed; a genuinely empty defined template
+  // `template<class> struct E {};` still has a (possibly empty) ID_body, so it
+  // is recorded and elaborates normally.
+  if(has_body)
+    defined_class_templates.insert(symbol_name);
+
   // Check if the name is already used by a different template
-  // in the same scope.
+  // in the same scope (only for primary templates, not partial or full
+  // specializations).
+  if(
+    partial_specialization_args.arguments().empty() &&
+    !template_type.template_parameters().empty())
   {
-    const auto id_set=
-      cpp_scopes.current_scope().lookup(
-        base_name,
-        cpp_scopet::SCOPE_ONLY,
-        cpp_scopet::TEMPLATE);
+    const auto id_set = cpp_scopes.current_scope().lookup(
+      base_name, cpp_scopet::SCOPE_ONLY, cpp_idt::id_classt::TEMPLATE);
 
     if(!id_set.empty())
     {
-      const symbolt &previous=lookup((*id_set.begin())->identifier);
-      if(previous.name!=symbol_name || id_set.size()>1)
+      bool found_match = false;
+      for(const auto *id_ptr : id_set)
       {
-        error().source_location=cpp_name.source_location();
-        str << "template declaration of '" << base_name.c_str()
-            << " does not match previous declaration\n";
-        str << "location of previous definition: " << previous.location;
+        if(lookup(id_ptr->identifier).name == symbol_name)
+        {
+          found_match = true;
+          break;
+        }
+      }
+
+      if(!found_match)
+      {
+        error().source_location = cpp_name.source_location();
+        error() << "template declaration of '" << base_name
+                << "' does not match previous declaration\n"
+                << "location of previous definition: "
+                << lookup((*id_set.begin())->identifier).location << eom;
         throw 0;
       }
     }
   }
-  #endif
 
   // check if we have it already
 
-  if(const auto maybe_symbol=symbol_table.get_writeable(symbol_name))
+  if(const auto maybe_symbol = symbol_table.get_writeable(symbol_name))
   {
     // there already
-    symbolt &previous_symbol=*maybe_symbol;
-    cpp_declarationt &previous_declaration=
+    symbolt &previous_symbol = *maybe_symbol;
+    cpp_declarationt &previous_declaration =
       to_cpp_declaration(previous_symbol.type);
 
-    bool previous_has_body=
+    bool previous_has_body =
       previous_declaration.type().find(ID_body).is_not_nil();
 
     // check if we have 2 bodies
     if(has_body && previous_has_body)
     {
-      error().source_location=cpp_name.source_location();
+      // MSVC's STL headers contain partial specializations of templates
+      // like _Is_memfunptr that differ only in calling convention
+      // (__cdecl, __stdcall, __fastcall, __vectorcall). CBMC's scanner
+      // strips calling conventions (they are irrelevant for verification),
+      // which causes these distinct C++ specializations to produce
+      // identical types and thus the same mangled symbol name.
+      //
+      // It is safe to silently keep the first definition when the two
+      // declarations have structurally identical types: the only
+      // difference was in an attribute that CBMC already discarded
+      // during scanning, so both definitions would produce the same
+      // verification semantics.
+      //
+      // If the types actually differ, this is a genuine ODR violation
+      // or a bug in CBMC's name mangling, and we report an error.
+      // C++20 constrained partial specializations: two specializations
+      // may have identical template parameters but differ in requires
+      // clauses (which CBMC skips during parsing) and/or body content.
+      // Since CBMC doesn't evaluate requires clauses, keep the later
+      // (more constrained) definition which is typically the one with
+      // the actual implementation.
+      //
+      // Also handles MSVC STL patterns where calling conventions
+      // produce identical mangled names.
+      previous_symbol.type.swap(declaration);
+      // The replacing declaration's template parameters belong to the
+      // template scope created for it, as for any replacement below: with
+      // the old scope kept, `R' and `A' of a second `_Get_function_impl<_Ret
+      // __vectorcall(_Types...)>' were unbound and the specialization never
+      // matched (MSVC std::function: "no match for symbol 'function'").
+      cpp_scopes.id_map[symbol_name] = &template_scope;
+      return;
+
+      error().source_location = cpp_name.source_location();
       error() << "template struct '" << base_name << "' defined previously\n"
               << "location of previous definition: " << previous_symbol.location
               << eom;
@@ -131,20 +405,19 @@ void cpp_typecheckt::typecheck_class_template(
       // We replace the template!
       // We have to retain any default parameters from the previous declaration.
       salvage_default_arguments(
-        previous_declaration.template_type(),
-        declaration.template_type());
+        previous_declaration.template_type(), declaration.template_type());
 
       previous_symbol.type.swap(declaration);
 
-      #if 0
+#if 0
       std::cout << "*****\n";
       std::cout << *cpp_scopes.id_map[symbol_name];
       std::cout << "*****\n";
       std::cout << "II: " << symbol_name << '\n';
-      #endif
+#endif
 
       // We also replace the template scope (the old one could be deleted).
-      cpp_scopes.id_map[symbol_name]=&template_scope;
+      cpp_scopes.id_map[symbol_name] = &template_scope;
 
       // We also fix the parent scope in order to see the new
       // template arguments
@@ -153,8 +426,7 @@ void cpp_typecheckt::typecheck_class_template(
     {
       // just update any default arguments
       salvage_default_arguments(
-        declaration.template_type(),
-        previous_declaration.template_type());
+        declaration.template_type(), previous_declaration.template_type());
     }
 
     INVARIANT(
@@ -167,80 +439,440 @@ void cpp_typecheckt::typecheck_class_template(
   // it's not there yet
 
   symbolt symbol{symbol_name, typet{}, ID_cpp};
-  symbol.base_name=base_name;
-  symbol.location=cpp_name.source_location();
-  symbol.module=module;
-  symbol.type.swap(declaration);
+  symbol.base_name = base_name;
+  symbol.location = cpp_name.source_location();
+  symbol.module = module;
+  // copy, not swap -- see the has_value comment above
+  static_cast<irept &>(symbol.type) = static_cast<const irept &>(declaration);
   symbol.value = exprt(ID_template_decls);
 
-  symbol.pretty_name=
-    cpp_scopes.current_scope().prefix+id2string(symbol.base_name);
+  symbol.pretty_name =
+    cpp_scopes.current_scope().prefix + id2string(symbol.base_name);
 
   symbolt *new_symbol;
   if(symbol_table.move(symbol, new_symbol))
   {
-    error().source_location=symbol.location;
+    error().source_location = symbol.location;
     error() << "cpp_typecheckt::typecheck_compound_type: "
-            << "symbol_table.move() failed"
-            << eom;
+            << "symbol_table.move() failed" << eom;
     throw 0;
   }
 
   // put into current scope
-  cpp_idt &id=cpp_scopes.put_into_scope(*new_symbol);
-  id.id_class=cpp_idt::id_classt::TEMPLATE;
-  id.prefix=cpp_scopes.current_scope().prefix+
-            id2string(new_symbol->base_name);
+  cpp_idt &id = cpp_scopes.put_into_scope(*new_symbol);
+  id.id_class = cpp_idt::id_classt::TEMPLATE;
+  id.prefix =
+    cpp_scopes.current_scope().prefix + id2string(new_symbol->base_name);
 
   // link the template symbol with the template scope
-  cpp_scopes.id_map[symbol_name]=&template_scope;
+  cpp_scopes.id_map[symbol_name] = &template_scope;
 
   INVARIANT(
     cpp_scopes.id_map[symbol_name]->is_template_scope(),
     "symbol should be in template scope");
 }
 
-/// typecheck function templates
-void cpp_typecheckt::typecheck_function_template(
-  cpp_declarationt &declaration)
+/// typecheck template alias declarations (C++11 [temp.alias])
+void cpp_typecheckt::typecheck_template_alias(cpp_declarationt &declaration)
 {
   PRECONDITION(declaration.declarators().size() == 1);
 
-  cpp_declaratort &declarator=declaration.declarators()[0];
+  cpp_declaratort &declarator = declaration.declarators()[0];
   const cpp_namet &cpp_name = declarator.name();
 
-  // do template arguments
-  // this also sets up the template scope
-  cpp_scopet &template_scope=
+  // do template parameters — also sets up the template scope
+  cpp_scopet &template_scope =
     typecheck_template_parameters(declaration.template_type());
 
   if(!cpp_name.is_simple_name())
   {
-    error().source_location=declaration.source_location();
+    error().source_location = declaration.source_location();
+    error() << "template alias must have simple name" << eom;
+    throw 0;
+  }
+
+  irep_idt base_name = cpp_name.get_base_name();
+
+  template_typet &template_type = declaration.template_type();
+
+  typet alias_type = declarator.merge_type(declaration.type());
+  cpp_convert_plain_type(alias_type, get_message_handler());
+
+  // N5008 [dcl.type.elab]/3: an elaborated-type-specifier `class-key
+  // identifier' whose identifier unqualified lookup does not find declares
+  // that identifier as a class-name of the nearest enclosing namespace (or
+  // block) scope -- at the alias template's declaration, not when the alias
+  // is first used (`template<bool> using pick = struct tag_t;' makes tag_t
+  // usable right after it).  The type-id itself is kept unevaluated until
+  // the alias is instantiated, so declare such classes here.  A name that is
+  // one of the alias's template parameters is found by that lookup, so it
+  // declares nothing.
+  {
+    std::set<irep_idt> parameter_names;
+    for(const auto &parameter : template_type.template_parameters())
+    {
+      const irep_idt id = parameter.id() == ID_type
+                            ? parameter.type().get(ID_identifier)
+                            : parameter.get(ID_identifier);
+      const std::string name = id2string(id);
+      const auto sep = name.rfind("::");
+      parameter_names.insert(
+        sep == std::string::npos ? name : name.substr(sep + 2));
+    }
+    std::vector<typet> elaborated;
+    std::function<void(const irept &)> collect = [&](const irept &node)
+    {
+      if(
+        (node.id() == ID_struct || node.id() == ID_union) &&
+        node.find(ID_body).is_nil() &&
+        !node.get_bool(ID_C_tag_only_declaration) &&
+        node.find(ID_tag).id() == ID_cpp_name &&
+        to_cpp_name(static_cast<const exprt &>(node.find(ID_tag)))
+          .is_simple_name() &&
+        parameter_names.count(
+          to_cpp_name(static_cast<const exprt &>(node.find(ID_tag)))
+            .get_base_name()) == 0)
+      {
+        elaborated.push_back(static_cast<const typet &>(node));
+        return;
+      }
+      for(const auto &sub : node.get_sub())
+        collect(sub);
+      for(const auto &named : node.get_named_sub())
+        collect(named.second);
+    };
+    collect(alias_type);
+    for(typet &type : elaborated)
+      typecheck_type(type);
+  }
+
+  // Use class_template_identifier for template aliases.
+  // function_template_identifier appends the alias body (via
+  // cpp_type2name) which creates garbled identifiers that can't
+  // be used as symbol names for template template parameters.
+  cpp_template_args_non_tct no_spec_args;
+  irep_idt symbol_name =
+    class_template_identifier(base_name, template_type, no_spec_args);
+
+  // check if we have it already
+  if(symbol_table.has_symbol(symbol_name))
+    return;
+
+  symbolt symbol{symbol_name, typet{}, ID_cpp};
+  symbol.base_name = base_name;
+  symbol.location = cpp_name.source_location();
+  symbol.module = module;
+  symbol.type.swap(declaration);
+  symbol.pretty_name =
+    cpp_scopes.current_scope().prefix + id2string(symbol.base_name);
+
+  symbolt *new_symbol;
+  if(symbol_table.move(symbol, new_symbol))
+  {
+    error().source_location = symbol.location;
+    error() << "typecheck_template_alias: symbol_table.move() failed" << eom;
+    throw 0;
+  }
+
+  // put into scope
+  cpp_idt &id = cpp_scopes.put_into_scope(*new_symbol);
+  id.id_class = cpp_idt::id_classt::TEMPLATE;
+  id.prefix =
+    cpp_scopes.current_scope().prefix + id2string(new_symbol->base_name);
+
+  // link the template symbol with the template scope
+  cpp_scopes.id_map[symbol_name] = &template_scope;
+}
+
+/// N5008 [temp.param]/17: the default template arguments available for a
+/// template are obtained by merging those of all its declarations -- a
+/// definition that follows a declaration with `typename = ...' does not
+/// repeat it.  Copy each default of \p declared (the earlier declaration's
+/// template parameters) to the corresponding parameter of \p defined that
+/// has none, renaming the earlier declaration's parameter names to the
+/// definition's (a redeclaration may name them differently).
+static void carry_over_default_template_arguments(
+  const template_typet &declared,
+  template_typet &defined)
+{
+  const auto &old_params = declared.template_parameters();
+  auto &new_params = defined.template_parameters();
+  if(old_params.size() != new_params.size())
+    return;
+  const auto short_name = [](const template_parametert &param)
+  {
+    const irep_idt id = param.id() == ID_type ? param.type().get(ID_identifier)
+                                              : param.get(ID_identifier);
+    std::string name = id2string(id);
+    const auto sep = name.rfind("::");
+    return sep == std::string::npos ? name : name.substr(sep + 2);
+  };
+  std::map<irep_idt, irep_idt> renaming;
+  for(std::size_t i = 0; i < old_params.size(); ++i)
+  {
+    const std::string from = short_name(old_params[i]);
+    const std::string to = short_name(new_params[i]);
+    if(!from.empty() && !to.empty() && from != to)
+      renaming[from] = to;
+  }
+  std::function<void(irept &)> rename = [&](irept &node)
+  {
+    if(node.id() == ID_cpp_name)
+    {
+      auto &subs = node.get_sub();
+      for(std::size_t k = 0; k < subs.size(); ++k)
+      {
+        if(subs[k].id() != ID_name || (k != 0 && subs[k - 1].id() == "::"))
+          continue;
+        const auto it = renaming.find(subs[k].get(ID_identifier));
+        if(it != renaming.end())
+          subs[k].set(ID_identifier, it->second);
+      }
+    }
+    for(auto &sub : node.get_sub())
+      rename(sub);
+    for(auto &named : node.get_named_sub())
+      rename(named.second);
+  };
+  for(std::size_t i = 0; i < old_params.size(); ++i)
+  {
+    if(
+      old_params[i].has_default_argument() &&
+      !new_params[i].has_default_argument() &&
+      old_params[i].get_bool(ID_ellipsis) ==
+        new_params[i].get_bool(ID_ellipsis))
+    {
+      exprt value = old_params[i].default_argument();
+      rename(value);
+      new_params[i].default_argument() = value;
+    }
+  }
+}
+
+/// Typecheck a function template declaration.
+///
+/// Implements [temp.fct.general]: "A function template defines an unbounded
+/// set of related functions."  Also handles function template overloading
+/// per [temp.over.link].
+/// N5008 [dcl.fct.default]/4: a function template's default arguments are
+/// given on one declaration and apply to all later uses; a definition that
+/// follows a declaration does not repeat them.  Copy each default argument
+/// of \p declared_parameters (the earlier declaration's parameter list) to
+/// the corresponding parameter of \p defined_parameters that has none.
+static void carry_over_default_arguments(
+  const irept &declared_parameters,
+  irept &defined_parameters)
+{
+  const auto &old_params = declared_parameters.get_sub();
+  auto &new_params = defined_parameters.get_sub();
+  for(std::size_t i = 0; i < old_params.size() && i < new_params.size(); ++i)
+  {
+    if(
+      old_params[i].id() != ID_cpp_declaration ||
+      new_params[i].id() != ID_cpp_declaration)
+    {
+      continue;
+    }
+    const auto &old_param =
+      static_cast<const cpp_declarationt &>(old_params[i]);
+    auto &new_param = static_cast<cpp_declarationt &>(new_params[i]);
+    if(
+      old_param.declarators().size() == 1 &&
+      new_param.declarators().size() == 1 &&
+      old_param.declarators()[0].value().is_not_nil() &&
+      new_param.declarators()[0].value().is_nil())
+    {
+      new_param.declarators()[0].value() = old_param.declarators()[0].value();
+    }
+  }
+}
+
+void cpp_typecheckt::typecheck_function_template(cpp_declarationt &declaration)
+{
+  PRECONDITION(declaration.declarators().size() == 1);
+
+  cpp_declaratort &declarator = declaration.declarators()[0];
+  const cpp_namet &cpp_name = declarator.name();
+
+  // do template arguments
+  // this also sets up the template scope
+  cpp_scopet &template_scope =
+    typecheck_template_parameters(declaration.template_type());
+
+  // Per [temp.variadic]/5: set pack_size_map for variadic
+  // parameters so that add_method_body captures it.
+  // N5008 [basic.scope.temp]/1: the binding belongs to this template's
+  // declaration only; left in the map it outlived the declaration, and a
+  // same-named function parameter pack of another template (`args' in
+  // `-> decltype(c(args...))') was expanded as this empty pack.
+  struct pack_size_scopet
+  {
+    template_mapt &map;
+    std::vector<irep_idt> added;
+    ~pack_size_scopet()
+    {
+      for(const auto &pid : added)
+      {
+        map.pack_size_map.erase(pid);
+        map.generation_map.erase(pid);
+      }
+    }
+  } pack_size_scope{template_map, {}};
+  for(const auto &p : declaration.template_type().template_parameters())
+  {
+    if(p.get_bool(ID_ellipsis))
+    {
+      irep_idt pid = p.type().get(ID_identifier);
+      if(!pid.empty())
+      {
+        if(
+          template_map.pack_size_map.find(pid) ==
+          template_map.pack_size_map.end())
+        {
+          pack_size_scope.added.push_back(pid);
+        }
+        template_map.set_pack_size(pid, 0);
+      }
+    }
+  }
+
+  if(!cpp_name.is_simple_name())
+  {
+    error().source_location = declaration.source_location();
     error() << "function template must have simple name" << eom;
     throw 0;
   }
 
-  irep_idt base_name=cpp_name.get_base_name();
+  // N5008 [dcl.fct]/6 + [temp.variadic]/1: a parameter written `P...`
+  // (no comma) is a FUNCTION PARAMETER PACK only when P contains an
+  // unexpanded parameter pack; when P names an ordinary (non-pack)
+  // template parameter it means `P, ...` -- one deducible parameter
+  // followed by C varargs.  The parser cannot decide this (it marks
+  // every `cpp_name...` declarator as a pack); normalize here, where
+  // this template's parameter list is known: strip the declarator's
+  // pack marker and append the C-varargs entry.  Downstream deduction,
+  // candidate matching and instantiation then all see the standard
+  // form (libc++'s reduced `__bind_back(_Fn...)`, whose calls lost
+  // every candidate to a conflicted _Fn deduction).
+  {
+    std::set<std::string> non_pack_short_names;
+    for(const auto &tp : declaration.template_type().template_parameters())
+    {
+      if(tp.get_bool(ID_ellipsis))
+        continue;
+      const irep_idt pid = tp.id() == ID_type ? tp.type().get(ID_identifier)
+                                              : tp.get(ID_identifier);
+      const std::string pids = id2string(pid);
+      const auto pos = pids.rfind("::");
+      non_pack_short_names.insert(
+        pos != std::string::npos ? pids.substr(pos + 2) : pids);
+    }
+    typet &dtor_type = declarator.type();
+    if(dtor_type.id() == ID_function_type && !non_pack_short_names.empty())
+    {
+      irept::subt &params = dtor_type.add(ID_parameters).get_sub();
+      for(std::size_t i = 0; i < params.size(); ++i)
+      {
+        if(params[i].id() != ID_cpp_declaration)
+          continue;
+        auto &pdecl = static_cast<cpp_declarationt &>(params[i]);
+        if(pdecl.declarators().size() != 1)
+          continue;
+        auto &pdtor = pdecl.declarators().front();
+        if(!pdtor.get_has_ellipsis())
+          continue;
+        const irept &tn = pdecl.type();
+        if(
+          tn.id() != ID_cpp_name || tn.get_sub().size() != 1 ||
+          tn.get_sub().front().id() != ID_name)
+          continue;
+        if(
+          non_pack_short_names.count(
+            id2string(tn.get_sub().front().get(ID_identifier))) == 0)
+          continue;
+        // `P...` with non-pack P: parameter P, then C varargs
+        pdtor.remove(ID_ellipsis);
+        pdtor.type().remove(ID_ellipsis);
+        params.insert(params.begin() + i + 1, irept(ID_ellipsis));
+        ++i;
+      }
+    }
+  }
 
-  template_typet &template_type=declaration.template_type();
+  irep_idt base_name = cpp_name.get_base_name();
 
-  typet function_type=
-    declarator.merge_type(declaration.type());
+  template_typet &template_type = declaration.template_type();
 
-  cpp_convert_plain_type(function_type, get_message_handler());
+  typet function_type = declarator.merge_type(declaration.type());
 
-  irep_idt symbol_name=
-    function_template_identifier(
-      base_name,
-      template_type,
-      function_type);
+  // Per [temp.res]/8: function template parameter types may
+  // reference other template parameters not yet in the template
+  // map.  If conversion fails, use the unconverted type — it
+  // will be resolved when the function template is instantiated.
+  try
+  {
+    cpp_convert_plain_type(function_type, get_message_handler());
+  }
+  catch(...)
+  {
+    function_type = declarator.merge_type(declaration.type());
+  }
 
-  bool has_value=declarator.find(ID_value).is_not_nil();
+  // N5008 [defns.signature.member.templ]: a member function template's
+  // signature includes its cv-qualifiers.  They are not part of
+  // function_type (the method qualifier stays on the declarator), so
+  // `template <class A> int f(A)' and `template <class A> int f(A) const'
+  // got the same identifier; the second was kept only as a SFINAE
+  // alternative of the first, and a call on a const object found no match.
+  std::string template_identifier =
+    function_template_identifier(base_name, template_type, function_type);
+  if(has_const(static_cast<const typet &>(declarator.method_qualifier())))
+    template_identifier += "$const";
+  if(has_volatile(static_cast<const typet &>(declarator.method_qualifier())))
+    template_identifier += "$volatile";
+  irep_idt symbol_name = template_identifier;
+
+  bool has_value = declarator.find(ID_value).is_not_nil();
 
   // check if we have it already
 
   symbolt *previous_symbol = symbol_table.get_writeable(symbol_name);
+
+  // N5008 [temp.over.link]/6: two function templates whose signatures
+  // are EQUIVALENT (identical up to renaming of their template
+  // parameters) declare the SAME entity.  The identifier above embeds
+  // the parse-level parameter SPELLING, so an in-class friend
+  // declaration (libc++ <tuple>'s
+  //   template <size_t _Jp, class... _Up> friend ... get(tuple<_Up...>&);
+  // ) and the namespace-scope definition
+  //   template <size_t _Ip, class... _Tp> ... get(tuple<_Tp...>&) {...}
+  // land in DIFFERENT symbols: calls resolve to the friend's bodiless
+  // one ("no body for callee"), and the definition's body -- reached
+  // through the instantiation-side redirect -- fails the access check
+  // because THAT symbol is not the declared friend.  Unify: scan the
+  // scope's same-base-name templates for a signature-equivalent symbol
+  // and use it as the previous declaration.
+  if(previous_symbol == nullptr)
+  {
+    const auto id_set =
+      cpp_scopes.current_scope().lookup(base_name, cpp_scopet::SCOPE_ONLY);
+    for(const auto *id_ptr : id_set)
+    {
+      symbolt *cand = symbol_table.get_writeable(id_ptr->identifier);
+      if(
+        cand == nullptr || !cand->type.get_bool(ID_is_template) ||
+        cand->type.id() != ID_cpp_declaration)
+        continue;
+      const cpp_declarationt &cand_decl = to_cpp_declaration(cand->type);
+      if(cand_decl.declarators().size() != 1)
+        continue;
+      if(!function_template_signatures_equivalent(declaration, cand_decl))
+        continue;
+      previous_symbol = cand;
+      symbol_name = cand->name;
+      break;
+    }
+  }
 
   if(previous_symbol)
   {
@@ -251,7 +883,43 @@ void cpp_typecheckt::typecheck_function_template(
 
     if(has_value && previous_has_value)
     {
-      error().source_location=cpp_name.source_location();
+      // When two function templates differ only in their SFINAE constraints
+      // (e.g., enable_if default template arguments), they get the same
+      // identifier. Store the alternative as a separate symbol (not in
+      // scope) and record its name on the primary so it can be tried
+      // when the primary fails SFINAE.
+      if(
+        template_type.template_parameters().size() ==
+        to_cpp_declaration(previous_symbol->type)
+          .template_type()
+          .template_parameters()
+          .size())
+      {
+        const irep_idt alt_name = id2string(symbol_name) + "#sfinae_alt";
+        symbolt alt_symbol;
+        alt_symbol.name = alt_name;
+        alt_symbol.base_name = previous_symbol->base_name;
+        static_cast<irept &>(alt_symbol.type) =
+          static_cast<const irept &>(declaration);
+        alt_symbol.mode = previous_symbol->mode;
+        alt_symbol.module = previous_symbol->module;
+        alt_symbol.location = declarator.source_location();
+        sfinae_alternatives[symbol_name] = std::move(alt_symbol);
+
+        // Register the alternative in its own template scope.
+        cpp_scopes.id_map[alt_name] = &template_scope;
+
+        // Add the template scope as a secondary scope of the
+        // current (class) scope so the second pass of
+        // typecheck_compound_body can resolve the template
+        // parameters (e.g. _Up) during constructor processing.
+        if(cpp_scopes.current_scope().is_class())
+          cpp_scopes.current_scope().add_secondary_scope(template_scope);
+
+        return;
+      }
+
+      error().source_location = cpp_name.source_location();
       error() << "function template symbol '" << base_name
               << "' declared previously\n"
               << "location of previous definition: "
@@ -261,9 +929,110 @@ void cpp_typecheckt::typecheck_function_template(
 
     if(has_value)
     {
-      previous_symbol->type.swap(declaration);
-      cpp_scopes.id_map[symbol_name]=&template_scope;
+      // N5008 [temp.over.link]/6: this DEFINITION and the previous
+      // bodiless DECLARATION declare the same entity, but each got its
+      // own template scope, and typecheck_function_template seeded
+      // pack_size_map[<old-scope>::<pack>] = 0 for the declaration's
+      // packs.  Once the definition supersedes it, that stale zero is
+      // indistinguishable from a genuinely-empty pack: downstream
+      // pack-size decisions (template_mapt::apply's call-argument
+      // expansion, the instantiation-time empty-pack strip) then
+      // treat the pack as empty and strip pack-expansion arguments
+      // from the stored trailing-return decltype -- libc++'s
+      // __bind_back declaration+definition pair lost
+      // `std::forward<_Args>(__args)...` and every range pipe died
+      // with "conversion ... to '<<type:auto>>'".  Erase the
+      // superseded scope's seeds.
+      for(const auto &op : to_cpp_declaration(previous_symbol->type)
+                             .template_type()
+                             .template_parameters())
+      {
+        if(!op.get_bool(ID_ellipsis))
+          continue;
+        const irep_idt opid = op.type().get(ID_identifier);
+        if(opid.empty())
+          continue;
+        auto ps_it = template_map.pack_size_map.find(opid);
+        if(ps_it != template_map.pack_size_map.end() && ps_it->second == 0)
+          template_map.pack_size_map.erase(ps_it);
+      }
+
+      // The declaration's template scope was also attached as a
+      // SECONDARY lookup scope of the enclosing scope (see the tail
+      // of this function); with the definition's scope attached too,
+      // the function parameters (`__args`) of the two scopes make
+      // every unqualified reference ambiguous ("symbol '__args' does
+      // not uniquely resolve").  Detach the superseded scope.
+      {
+        auto old_scope_it = cpp_scopes.id_map.find(symbol_name);
+        if(
+          old_scope_it != cpp_scopes.id_map.end() &&
+          old_scope_it->second != nullptr &&
+          old_scope_it->second->id_class == cpp_idt::id_classt::TEMPLATE_SCOPE)
+        {
+          cpp_scopes.current_scope().remove_secondary_scope(
+            *old_scope_it->second);
+        }
+      }
+
+      // N5008 [dcl.fct.default]/4: a default argument of a function
+      // template is given on one declaration and applies to every later
+      // use; the definition must not repeat it.  It lives on the
+      // parameter declarators of the declaration being superseded, so
+      // carry it over to the definition's parameters (libstdc++ 13's
+      // __format::__do_vformat_to(..., const locale * = nullptr), defined
+      // later without the default and called with three arguments).
+      cpp_declarationt definition = declaration;
+      carry_over_default_arguments(
+        to_cpp_declaration(previous_symbol->type)
+          .declarators()[0]
+          .type()
+          .find(ID_parameters),
+        definition.declarators()[0].type().add(ID_parameters));
+      carry_over_default_template_arguments(
+        to_cpp_declaration(previous_symbol->type).template_type(),
+        definition.template_type());
+
+      // COPY rather than swap: `declaration` may live in a
+      // class-template INSTANCE's stored body, which later member
+      // instantiations re-read ([temp.mem]); swapping gutted the
+      // stored declaration (vector<pair<T,U>>'s emplace_back lost its
+      // `_Args&&...` parameter and every call failed "found no
+      // match").  irep sharing makes the copy cheap.
+      static_cast<irept &>(previous_symbol->type) =
+        static_cast<const irept &>(definition);
+      cpp_scopes.id_map[symbol_name] = &template_scope;
     }
+
+    // Unlike the normal path below (which SWAPS the declaration into
+    // the new symbol, gutting the copy in the enclosing class body),
+    // every same-identifier branch leaves `declaration` intact, so the
+    // constructor pass of typecheck_compound_body will process it
+    // again and typecheck its template-parameter types.  Those may
+    // reference the function template's own parameters (e.g. libc++
+    // <optional>'s enable-if constructor pair
+    //   template<class _Up, enable_if_t<...> = 0> optional(_Up&&);
+    // where the second template parameter's type names _Up) -- per
+    // N5008 [temp.inst]/2 such dependent constructs stay dependent in
+    // the instantiated class's member-template DECLARATION, so `_Up`
+    // must still be resolvable as a template parameter.  Make this
+    // template's scope a secondary scope of the current (class) scope,
+    // exactly as the #sfinae_alt branch above does; otherwise the
+    // lookup of `_Up` fails ("symbol '_Up' is unknown") and the whole
+    // class instantiation is abandoned, silently dropping the user's
+    // statements ([temp.local] name visibility; the placeholder map in
+    // the constructor pass then supplies the parameter's type).
+    //
+    // Class scopes only: for a NAMESPACE-scope declaration/definition
+    // pair (libstdc++'s iterator operations, `f(_Iter __i)`) the
+    // attachment made the template's FUNCTION PARAMETERS visible to every
+    // unqualified lookup in the namespace -- a requires-expression's
+    // parameter `__i` bound in an instantiation scope under std then
+    // resolved ambiguously against that stale `__i` and the requirement
+    // read as unsatisfied ([basic.scope.scope]: a function parameter's
+    // scope is its declaration, not the enclosing namespace).
+    if(cpp_scopes.current_scope().is_class())
+      cpp_scopes.current_scope().add_secondary_scope(template_scope);
 
     // todo: the old template scope now is useless,
     // and thus, we could delete it
@@ -271,28 +1040,27 @@ void cpp_typecheckt::typecheck_function_template(
   }
 
   symbolt symbol{symbol_name, typet{}, ID_cpp};
-  symbol.base_name=base_name;
-  symbol.location=cpp_name.source_location();
-  symbol.module=module;
+  symbol.base_name = base_name;
+  symbol.location = cpp_name.source_location();
+  symbol.module = module;
   symbol.type.swap(declaration);
-  symbol.pretty_name=
-    cpp_scopes.current_scope().prefix+id2string(symbol.base_name);
+  symbol.pretty_name =
+    cpp_scopes.current_scope().prefix + id2string(symbol.base_name);
 
   symbolt *new_symbol;
   if(symbol_table.move(symbol, new_symbol))
   {
-    error().source_location=symbol.location;
+    error().source_location = symbol.location;
     error() << "cpp_typecheckt::typecheck_compound_type: "
-            << "symbol_table.move() failed"
-            << eom;
+            << "symbol_table.move() failed" << eom;
     throw 0;
   }
 
   // put into scope
-  cpp_idt &id=cpp_scopes.put_into_scope(*new_symbol);
-  id.id_class=cpp_idt::id_classt::TEMPLATE;
-  id.prefix=cpp_scopes.current_scope().prefix+
-            id2string(new_symbol->base_name);
+  cpp_idt &id = cpp_scopes.put_into_scope(*new_symbol);
+  id.id_class = cpp_idt::id_classt::TEMPLATE;
+  id.prefix =
+    cpp_scopes.current_scope().prefix + id2string(new_symbol->base_name);
 
   // link the template symbol with the template scope
   cpp_scopes.id_map[symbol_name] = &template_scope;
@@ -300,32 +1068,538 @@ void cpp_typecheckt::typecheck_function_template(
     template_scope.is_template_scope(), "symbol should be in template scope");
 }
 
+void cpp_typecheckt::convert_variable_template_specialization(
+  cpp_declarationt &declaration)
+{
+  PRECONDITION(declaration.declarators().size() == 1);
+
+  cpp_declaratort &declarator = declaration.declarators()[0];
+  cpp_namet &cpp_name = declarator.name();
+
+  PRECONDITION(cpp_name.has_template_args());
+
+  // Extract base name and template args from the declarator name.
+  // Name has the form: name<template_args>
+  irep_idt base_name;
+  cpp_template_args_non_tct template_args_non_tc;
+
+  for(const auto &sub : cpp_name.get_sub())
+  {
+    if(sub.id() == ID_name)
+      base_name = sub.get(ID_identifier);
+    else if(sub.id() == ID_template_args)
+      template_args_non_tc = to_cpp_template_args_non_tc(sub);
+  }
+
+  // Remove template args from the declarator name so it becomes simple.
+  auto &subs = cpp_name.get_sub();
+  subs.erase(
+    std::remove_if(
+      subs.begin(),
+      subs.end(),
+      [](const irept &s) { return s.id() == ID_template_args; }),
+    subs.end());
+
+  // Find the primary variable template.
+  auto id_set = cpp_scopes.current_scope().lookup(
+    base_name, cpp_scopet::SCOPE_ONLY, cpp_idt::id_classt::TEMPLATE);
+
+  for(auto it = id_set.begin(); it != id_set.end();)
+  {
+    auto next = std::next(it);
+    if(lookup((*it)->identifier).type.find(ID_specialization_of).is_not_nil())
+      id_set.erase(it);
+    it = next;
+  }
+
+  if(id_set.empty())
+  {
+    error().source_location = declaration.source_location();
+    error() << "variable template '" << base_name << "' not found" << eom;
+    throw 0;
+  }
+
+  const symbolt &template_symbol = lookup((*id_set.begin())->identifier);
+
+  // Register as partial specialization.
+  declaration.partial_specialization_args() = template_args_non_tc;
+  declaration.set_specialization_of(template_symbol.name);
+
+  typecheck_variable_template(declaration);
+}
+
+void cpp_typecheckt::typecheck_variable_template(cpp_declarationt &declaration)
+{
+  PRECONDITION(declaration.declarators().size() == 1);
+
+  cpp_declaratort &declarator = declaration.declarators()[0];
+  const cpp_namet &cpp_name = declarator.name();
+
+  cpp_scopet &template_scope =
+    typecheck_template_parameters(declaration.template_type());
+
+  if(!cpp_name.is_simple_name())
+  {
+    error().source_location = declaration.source_location();
+    error() << "variable template must have simple name" << eom;
+    throw 0;
+  }
+
+  irep_idt base_name = cpp_name.get_base_name();
+
+  const cpp_template_args_non_tct &partial_specialization_args =
+    declaration.partial_specialization_args();
+  std::string symbol_name = class_template_identifier(
+    base_name, declaration.template_type(), partial_specialization_args);
+
+  // check if we have it already
+  if(symbol_table.has_symbol(symbol_name))
+    return;
+
+  symbolt symbol{symbol_name, typet{}, ID_cpp};
+  symbol.base_name = base_name;
+  symbol.location = cpp_name.source_location();
+  symbol.module = module;
+  symbol.type.swap(declaration);
+  symbol.pretty_name =
+    cpp_scopes.current_scope().prefix + id2string(symbol.base_name);
+
+  symbolt *new_symbol;
+  if(symbol_table.move(symbol, new_symbol))
+  {
+    error().source_location = symbol.location;
+    error() << "typecheck_variable_template: symbol_table.move() failed" << eom;
+    throw 0;
+  }
+
+  cpp_idt &id = cpp_scopes.put_into_scope(*new_symbol);
+  id.id_class = cpp_idt::id_classt::TEMPLATE;
+  id.prefix =
+    cpp_scopes.current_scope().prefix + id2string(new_symbol->base_name);
+
+  cpp_scopes.id_map[symbol_name] = &template_scope;
+}
+
+/// Whether the parsed types \p a and \p b are spelled with the same
+/// qualified names (template arguments and declarators ignored).
+bool same_name_spelling(const irept &a, const irept &b)
+{
+  const auto names = [](const irept &t)
+  {
+    std::string result = t.id_string();
+    if(t.id() == ID_cpp_name)
+    {
+      for(const auto &sub : t.get_sub())
+      {
+        if(sub.id() == ID_name)
+          result += "::" + id2string(sub.get(ID_identifier));
+      }
+    }
+    return result;
+  };
+  return names(a) == names(b);
+}
+
+/// N5008 [temp.over.link]/3, [defns.signature.member.templ]: the signature
+/// of a member function template includes its return type, so the
+/// out-of-line definition \p def (whose template-head is \p def_head, with
+/// the enclosing class template's parameters \p class_tt first) belongs to
+/// the in-class declaration \p decl only if the return types agree, the
+/// template parameters compared by position.
+bool cpp_typecheckt::member_template_return_types_match(
+  const cpp_declarationt &decl,
+  const template_typet &class_tt,
+  const cpp_declarationt &def,
+  const cpp_declarationt &def_head)
+{
+  if(decl.declarators().empty() || def.declarators().empty())
+    return true;
+  // a trailing return type is the function type's subtype, otherwise the
+  // return type is the decl-specifier type
+  const auto return_type = [](const cpp_declarationt &d) -> irept
+  {
+    const typet &f = d.declarators().front().type();
+    if(
+      f.id() == ID_function_type && f.has_subtype() &&
+      to_type_with_subtype(f).subtype().is_not_nil())
+    {
+      return to_type_with_subtype(f).subtype();
+    }
+    return d.type();
+  };
+  // A return type naming an alias template is the type it denotes
+  // ([temp.alias]/2): `_Require<...>' and `typename enable_if<...>::type'
+  // may be the same type (libstdc++'s std::swap is declared with one and
+  // defined with the other).  Without expanding aliases, only return types
+  // spelled with the same names, differing in their template arguments,
+  // are told apart.
+  if(!same_name_spelling(return_type(decl), return_type(def)))
+    return true;
+  irept decl_ret{ID_parameters};
+  decl_ret.get_sub().push_back(return_type(decl));
+  irept def_ret{ID_parameters};
+  def_ret.get_sub().push_back(return_type(def));
+  return member_template_parameters_match(
+    decl_ret,
+    decl.template_type(),
+    class_tt,
+    def_ret,
+    def_head.template_type());
+}
+
 /// typecheck class template members; these can be methods or static members
+/// N5008 [temp.mem]/1, [class.mfct]/1: an out-of-line definition of a member
+/// function template of a non-template class (`template \<class E> auto
+/// path::_S_convert(const E *__f, const E *__l) { ... }') completes the
+/// in-class declaration with the same signature ([temp.over.link]/6, the
+/// template parameters compared by position).  The body uses the
+/// DEFINITION's parameter names ([dcl.fct]/3 -- names are not part of the
+/// type) and the definition's template parameter names; both are grafted
+/// onto the declaration.  Previously the body went to the first bodiless
+/// same-named template and kept the declaration's parameter names, so the
+/// instantiated body found `__f' unknown (or a wrong overload got the body).
+void cpp_typecheckt::define_member_template_of_class(
+  cpp_declarationt &declaration)
+{
+  PRECONDITION(declaration.declarators().size() == 1);
+  cpp_declaratort &declarator = declaration.declarators()[0];
+  const cpp_namet &cpp_name = declarator.name();
+  const auto &subs = cpp_name.get_sub();
+
+  // resolve the qualifying class scope, component by component
+  cpp_scopet *scope = &cpp_scopes.current_scope();
+  bool only_namespaces = true;
+  for(std::size_t i = 0; i + 2 < subs.size(); ++i)
+  {
+    if(subs[i].id() == ID_scope_resolution)
+      continue;
+    if(subs[i].id() != ID_name)
+      return;
+    const auto lookup_kind =
+      i == 0 ? cpp_scopet::RECURSIVE : cpp_scopet::QUALIFIED;
+    auto ids = scope->lookup(
+      subs[i].get(ID_identifier), lookup_kind, cpp_idt::id_classt::CLASS);
+    if(ids.empty() && only_namespaces)
+    {
+      ids = scope->lookup(
+        subs[i].get(ID_identifier), lookup_kind, cpp_idt::id_classt::NAMESPACE);
+    }
+    else
+      only_namespaces = false;
+    if(ids.size() != 1)
+      return;
+    scope = &cpp_scopes.get_scope((*ids.begin())->identifier);
+  }
+
+  // N5008 [dcl.meaning.general]/3.1: `template <class T> int n::f(T) {...}'
+  // with n a namespace defines the function template f of n declared there
+  // ([namespace.memdef]); its target scope is n.  Type-check it as a
+  // declaration of f in n, which merges it with the earlier declaration
+  // (body, parameter names and default arguments).
+  if(only_namespaces)
+  {
+    cpp_save_scopet saved_scope(cpp_scopes);
+    cpp_scopes.go_to(*scope);
+    cpp_declarationt in_namespace = declaration;
+    cpp_namet terminal;
+    terminal.get_sub().push_back(subs.back());
+    terminal.set(ID_C_source_location, cpp_name.source_location());
+    in_namespace.declarators()[0].name() = terminal;
+    typecheck_function_template(in_namespace);
+    return;
+  }
+
+  const irep_idt method_name = subs.back().get(ID_identifier);
+  const auto tmpl_ids = scope->lookup(
+    method_name, cpp_scopet::QUALIFIED, cpp_idt::id_classt::TEMPLATE);
+
+  const typet &def_ftype = declarator.type();
+  if(def_ftype.id() != ID_function_type)
+    return;
+  const template_typet class_tt; // the class is not a template
+
+  for(const auto *tmpl_id : tmpl_ids)
+  {
+    symbolt *tmpl_sym = symbol_table.get_writeable(tmpl_id->identifier);
+    if(tmpl_sym == nullptr || tmpl_sym->type.id() != ID_cpp_declaration)
+      continue;
+    cpp_declarationt &tmpl_decl = to_cpp_declaration(tmpl_sym->type);
+    if(
+      tmpl_decl.declarators().size() != 1 ||
+      tmpl_decl.declarators()[0].find(ID_value).is_not_nil() ||
+      declarator.find(ID_value).is_nil())
+    {
+      continue;
+    }
+    cpp_declaratort &decl_dtor = tmpl_decl.declarators()[0];
+    if(decl_dtor.type().id() != ID_function_type)
+      continue;
+    if(!member_template_parameters_match(
+         decl_dtor.type().find(ID_parameters),
+         tmpl_decl.template_type(),
+         class_tt,
+         def_ftype.find(ID_parameters),
+         declaration.template_type()))
+    {
+      continue;
+    }
+    // N5008 [temp.over.link]/3, [defns.signature.member.templ]: the
+    // signature of a member function template includes its return type;
+    // `enable_if_t<!fwd<I>::value> put(I, I)' and `enable_if_t<fwd<I>::value>
+    // put(I, I)' are different templates (libc++'s
+    // __split_buffer::__construct_at_end)
+    if(!member_template_return_types_match(
+         tmpl_decl, class_tt, declaration, declaration))
+    {
+      continue;
+    }
+
+    // the definition, spelled with the declaration's template parameter
+    // names
+    cpp_declaratort def_copy = declarator;
+    rename_template_parameters_to_declaration(
+      def_copy,
+      declaration.template_type(),
+      class_tt,
+      tmpl_decl.template_type());
+
+    // graft: parameter list (its names), body, mem-initializers; the
+    // default arguments stay those of the declaration
+    // ([dcl.fct.default]/4)
+    carry_over_default_arguments(
+      decl_dtor.type().find(ID_parameters), def_copy.type().add(ID_parameters));
+    decl_dtor.type() = def_copy.type();
+    decl_dtor.add(ID_value) = def_copy.find(ID_value);
+    const irept &m_inits = def_copy.find(ID_member_initializers);
+    if(m_inits.is_not_nil())
+      decl_dtor.member_initializers() = m_inits;
+    return;
+  }
+}
+
 void cpp_typecheckt::typecheck_class_template_member(
   cpp_declarationt &declaration)
 {
   PRECONDITION(declaration.declarators().size() == 1);
 
-  cpp_declaratort &declarator=declaration.declarators()[0];
+  cpp_declaratort &declarator = declaration.declarators()[0];
+
+  // N5008 [dcl.meaning.general]/2.3: a declarator-id qualified by a
+  // nested-name-specifier that nominates a namespace declares a member of
+  // that namespace, and the definition may appear outside it (`template
+  // <class C> int a::b::S<C>::f() {...}').  Strip the leading namespace
+  // components and look the class template up in the namespace they
+  // nominate.
+  cpp_scopet *qualifier_namespace = nullptr;
+  {
+    irept::subt &sub = declarator.name().get_sub();
+    std::size_t first = 0;
+    cpp_scopet *scope = &cpp_scopes.current_scope();
+    cpp_scopet::lookup_kindt kind = cpp_scopet::RECURSIVE;
+    while(sub.size() >= first + 6 && sub[first].id() == ID_name &&
+          sub[first + 1].id() == ID_scope_resolution)
+    {
+      const auto ns_ids = scope->lookup(
+        sub[first].get(ID_identifier), kind, cpp_idt::id_classt::NAMESPACE);
+      if(ns_ids.size() != 1)
+        break;
+      scope = static_cast<cpp_scopet *>(*ns_ids.begin());
+      kind = cpp_scopet::QUALIFIED;
+      first += 2;
+    }
+    // only in front of a class template's template-id
+    if(
+      first > 0 && sub[first].id() == ID_name &&
+      sub[first + 1].id() == ID_template_args)
+    {
+      sub.erase(sub.begin(), sub.begin() + first);
+      qualifier_namespace = scope;
+    }
+  }
   const cpp_namet &cpp_name = declarator.name();
 
   PRECONDITION(cpp_name.is_qualified() || cpp_name.has_template_args());
 
   // must be of the form: name1<template_args>::name2
   // or:                  name1<template_args>::operator X
-  if(cpp_name.get_sub().size()==4 &&
-     cpp_name.get_sub()[0].id()==ID_name &&
-     cpp_name.get_sub()[1].id()==ID_template_args &&
-     cpp_name.get_sub()[2].id()=="::" &&
-     cpp_name.get_sub()[3].id()==ID_name)
+  // or:                  name1<template_args>::~name2
+  // or:                  name1::name2 (non-template class)
+  if(
+    cpp_name.get_sub().size() == 4 && cpp_name.get_sub()[0].id() == ID_name &&
+    cpp_name.get_sub()[1].id() == ID_template_args &&
+    cpp_name.get_sub()[2].id() == ID_scope_resolution &&
+    cpp_name.get_sub()[3].id() == ID_name)
   {
   }
-  else if(cpp_name.get_sub().size()==5 &&
-          cpp_name.get_sub()[0].id()==ID_name &&
-          cpp_name.get_sub()[1].id()==ID_template_args &&
-          cpp_name.get_sub()[2].id()=="::" &&
-          cpp_name.get_sub()[3].id()==ID_operator)
+  else if(
+    cpp_name.get_sub().size() == 5 && cpp_name.get_sub()[0].id() == ID_name &&
+    cpp_name.get_sub()[1].id() == ID_template_args &&
+    cpp_name.get_sub()[2].id() == ID_scope_resolution &&
+    cpp_name.get_sub()[3].id() == ID_operator)
   {
+  }
+  else if(
+    cpp_name.get_sub().size() == 5 && cpp_name.get_sub()[0].id() == ID_name &&
+    cpp_name.get_sub()[1].id() == ID_template_args &&
+    cpp_name.get_sub()[2].id() == ID_scope_resolution &&
+    cpp_name.get_sub()[3].id() == "~" && cpp_name.get_sub()[4].id() == ID_name)
+  {
+  }
+  else if(
+    cpp_name.get_sub().size() >= 3 &&
+    cpp_name.get_sub().back().id() == ID_name && !cpp_name.has_template_args())
+  {
+    // A member function template of a NON-template class, defined outside
+    // the class body: `A::f', `ns::A::f' or `A::Nested::f'.
+    define_member_template_of_class(declaration);
+    return;
+  }
+  else if(
+    cpp_name.get_sub().size() == 6 && cpp_name.get_sub()[0].id() == ID_name &&
+    cpp_name.get_sub()[1].id() == ID_scope_resolution &&
+    cpp_name.get_sub()[2].id() == ID_name &&
+    cpp_name.get_sub()[3].id() == ID_template_args &&
+    cpp_name.get_sub()[4].id() == ID_scope_resolution &&
+    cpp_name.get_sub()[5].id() == ID_name)
+  {
+    // Out-of-line definition of a member of a NESTED class template:
+    //   Outer::Inner<args>::method
+    // (e.g. std::any::_Manager_internal<_Tp>::_S_manage).  Validated
+    // here; the nested class template Inner is resolved below so this
+    // definition is recorded in Inner's template_methods.  Per [temp.mem]
+    // an out-of-line definition defines the member of the class template;
+    // without recording it the member's body would exist nowhere and the
+    // member would be uninstantiable when ODR-used ([temp.inst]/4).
+  }
+  else if(
+    cpp_name.get_sub().size() == 6 && cpp_name.get_sub()[0].id() == ID_name &&
+    cpp_name.get_sub()[1].id() == ID_template_args &&
+    cpp_name.get_sub()[2].id() == ID_scope_resolution &&
+    cpp_name.get_sub()[3].id() == ID_name &&
+    cpp_name.get_sub()[4].id() == ID_scope_resolution &&
+    cpp_name.get_sub()[5].id() == ID_name)
+  {
+    // Out-of-line definition of a member of a nested (non-template) class
+    // of a class template:  Outer<args>::Nested::member
+    // (e.g. basic_ostream<C,T>::sentry::sentry, [ostream.sentry]).
+    // N5008 [temp.mem]/[class.nest]: this defines the member of the nested
+    // class of the class template; record it in the OUTER class template's
+    // template_methods below so each instantiation converts it.  Previously
+    // this shape fell into the silent-return branch and the definition was
+    // dropped ("no body for callee sentry::sentry").
+  }
+  else if(
+    cpp_name.get_sub().size() == 7 && cpp_name.get_sub()[0].id() == ID_name &&
+    cpp_name.get_sub()[1].id() == ID_template_args &&
+    cpp_name.get_sub()[2].id() == ID_scope_resolution &&
+    cpp_name.get_sub()[3].id() == ID_name &&
+    cpp_name.get_sub()[4].id() == ID_template_args &&
+    cpp_name.get_sub()[5].id() == ID_scope_resolution &&
+    cpp_name.get_sub()[6].id() == ID_name)
+  {
+    // N5008 [temp.mem]/1 + [class.nest]/1: out-of-line definition of a
+    // member of a member CLASS TEMPLATE of a class template, written with
+    // a two-level template header:
+    //   template <typename T, uint8_t N, bool W>
+    //   template <bool E>
+    //   void Outer<T, N, W>::reference<E>::on_write() { ... }
+    // (user-reported).  The definition completes the in-class
+    // declaration; graft its body (and parameter list, whose NAMES the
+    // body uses) onto the member's declaration inside the nested class
+    // template's parse tree in the OUTER class template, so every
+    // instantiation of Outer<...>::reference<...> carries the complete
+    // member ([temp.inst]/1).  Previously this shape fell into the
+    // silent-return branch: "no body for callee ...::on_write".  The
+    // inner template parameters must keep the declaration's names
+    // (they are not renamed here); a mismatch leaves the member
+    // bodiless as before.
+    const irep_idt outer_name = cpp_name.get_sub()[0].get(ID_identifier);
+    const irep_idt inner_name = cpp_name.get_sub()[3].get(ID_identifier);
+    const irep_idt member_name = cpp_name.get_sub()[6].get(ID_identifier);
+    const auto outer_ids = cpp_scopes.current_scope().lookup(
+      outer_name, cpp_scopet::RECURSIVE, cpp_idt::id_classt::TEMPLATE);
+    for(const auto *outer_id : outer_ids)
+    {
+      symbolt *outer_sym = symbol_table.get_writeable(outer_id->identifier);
+      if(
+        outer_sym == nullptr || !outer_sym->type.get_bool(ID_is_template) ||
+        outer_sym->type.find(ID_specialization_of).is_not_nil())
+        continue;
+      cpp_declarationt &outer_decl = to_cpp_declaration(outer_sym->type);
+      if(!outer_decl.is_class_template())
+        continue;
+      const std::size_t n_outer_params =
+        outer_decl.template_type().template_parameters().size();
+      irept &outer_body = outer_decl.type().add(ID_body);
+      for(auto &member : outer_body.get_sub())
+      {
+        if(member.id() != ID_cpp_declaration)
+          continue;
+        cpp_declarationt &mdecl = static_cast<cpp_declarationt &>(member);
+        if(!mdecl.get_bool(ID_is_template) || !mdecl.is_class_template())
+          continue;
+        const cpp_namet &mtag =
+          static_cast<const cpp_namet &>(mdecl.type().find(ID_tag));
+        if(mtag.get_base_name() != inner_name)
+          continue;
+        // the inner template parameters are the trailing ones of the
+        // definition's flattened list; their names must agree
+        {
+          const auto &flat = declaration.template_type().template_parameters();
+          const auto &inner = mdecl.template_type().template_parameters();
+          if(flat.size() != n_outer_params + inner.size())
+            return;
+          for(std::size_t pi = 0; pi < inner.size(); ++pi)
+          {
+            const auto name_of = [](const template_parametert &tp)
+            {
+              const irep_idt id = tp.id() == ID_type
+                                    ? tp.type().get(ID_identifier)
+                                    : tp.get(ID_identifier);
+              const std::string ids = id2string(id);
+              const auto pos = ids.rfind("::");
+              return pos == std::string::npos ? ids : ids.substr(pos + 2);
+            };
+            if(
+              name_of(static_cast<const template_parametert &>(
+                flat[n_outer_params + pi])) !=
+              name_of(static_cast<const template_parametert &>(inner[pi])))
+              return;
+          }
+        }
+        irept &inner_body = mdecl.type().add(ID_body);
+        const std::size_t n_def_params =
+          declarator.type().find(ID_parameters).get_sub().size();
+        for(auto &inner_member : inner_body.get_sub())
+        {
+          if(inner_member.id() != ID_cpp_declaration)
+            continue;
+          cpp_declarationt &idecl =
+            static_cast<cpp_declarationt &>(inner_member);
+          if(idecl.get_bool(ID_is_template))
+            continue;
+          for(auto &idtor : idecl.declarators())
+          {
+            if(
+              idtor.name().get_base_name() != member_name ||
+              idtor.type().id() != ID_function_type ||
+              idtor.type().find(ID_parameters).get_sub().size() !=
+                n_def_params ||
+              idtor.find(ID_value).is_not_nil())
+              continue;
+            // graft: parameter list (names), body, mem-initializers
+            idtor.type() = declarator.type();
+            idtor.add(ID_value) = declarator.find(ID_value);
+            const irept &m_inits = declarator.find(ID_member_initializers);
+            if(m_inits.is_not_nil())
+              idtor.member_initializers() = m_inits;
+            return;
+          }
+        }
+        return;
+      }
+    }
+    return;
   }
   else
   {
@@ -339,45 +1613,114 @@ void cpp_typecheckt::typecheck_class_template_member(
   }
 
   // let's find the class template this function template belongs to.
-  const auto id_set = cpp_scopes.current_scope().lookup(
-    cpp_name.get_sub().front().get(ID_identifier),
-    cpp_scopet::SCOPE_ONLY,           // look only in current scope
+  // For a nested out-of-line definition `Outer::Inner<args>::method`, the
+  // class template is the NESTED `Inner`, looked up in `Outer`'s scope; for
+  // the single-qualification forms it is the leading name in the current
+  // scope.
+  cpp_scopet *lookup_scope = qualifier_namespace != nullptr
+                               ? qualifier_namespace
+                               : &cpp_scopes.current_scope();
+  irep_idt class_tmpl_base_name = cpp_name.get_sub().front().get(ID_identifier);
+  if(
+    cpp_name.get_sub().size() == 6 &&
+    cpp_name.get_sub()[1].id() == ID_scope_resolution &&
+    cpp_name.get_sub()[3].id() == ID_template_args)
+  {
+    const irep_idt &outer_name = cpp_name.get_sub()[0].get(ID_identifier);
+    const auto outer_ids = cpp_scopes.current_scope().lookup(
+      outer_name, cpp_scopet::QUALIFIED, cpp_scopet::id_classt::CLASS);
+    if(!outer_ids.empty())
+    {
+      lookup_scope = &cpp_scopes.get_scope((*outer_ids.begin())->identifier);
+      class_tmpl_base_name = cpp_name.get_sub()[2].get(ID_identifier);
+    }
+    else
+    {
+      // N5008 [class.mfct]/1 + [namespace.qual]: the same syntactic
+      // shape `A::B<args>::member` also covers a NAMESPACE-qualified
+      // out-of-line member definition -- e.g. libstdc++'s
+      //   template <typename _Traits>
+      //   std::basic_streambuf<_Traits>::basic_streambuf(...) = default;
+      // written INSIDE namespace std with a redundant qualifier
+      // ([namespace.qual] allows it).  Resolve the leading component as
+      // a namespace and look the class template up there; previously
+      // the leading component was looked up as a class TEMPLATE and the
+      // whole definition failed ("class template 'std' not found").
+      const auto ns_ids = cpp_scopes.current_scope().lookup(
+        outer_name, cpp_scopet::RECURSIVE, cpp_idt::id_classt::NAMESPACE);
+      if(!ns_ids.empty())
+      {
+        lookup_scope = &cpp_scopes.get_scope((*ns_ids.begin())->identifier);
+        class_tmpl_base_name = cpp_name.get_sub()[2].get(ID_identifier);
+      }
+    }
+  }
+  auto id_set = lookup_scope->lookup(
+    class_tmpl_base_name,
+    cpp_scopet::QUALIFIED,            // search using-scopes (inline namespaces)
     cpp_scopet::id_classt::TEMPLATE); // must be template
+
+  // remove any specializations and non-class templates (e.g., constructor
+  // templates that share the class name)
+  for(auto it = id_set.begin(); it != id_set.end();)
+  {
+    auto next = it;
+    ++next;
+    const symbolt &sym = lookup((*it)->identifier);
+    if(
+      sym.type.find(ID_specialization_of).is_not_nil() ||
+      !to_cpp_declaration(sym.type).is_class_template())
+    {
+      id_set.erase(it);
+    }
+    it = next;
+  }
 
   if(id_set.empty())
   {
+    // For system headers, suppress the error and skip the member
+    // definition. This handles cases where a class template failed
+    // to register due to unsupported constructs.
+    const std::string file = id2string(cpp_name.source_location().get_file());
+    if(is_system_header_file(file))
+      return;
     error() << cpp_scopes.current_scope();
-    error().source_location=cpp_name.source_location();
+    error().source_location = cpp_name.source_location();
     error() << "class template '"
             << cpp_name.get_sub().front().get(ID_identifier) << "' not found"
             << eom;
     throw 0;
   }
-  else if(id_set.size()>1)
+  else if(id_set.size() > 1)
   {
-    error().source_location=cpp_name.source_location();
+    error().source_location = cpp_name.source_location();
     error() << "class template '"
             << cpp_name.get_sub().front().get(ID_identifier) << "' is ambiguous"
             << eom;
     throw 0;
   }
-  else if((*(id_set.begin()))->id_class!=cpp_idt::id_classt::TEMPLATE)
+  else if((*(id_set.begin()))->id_class != cpp_idt::id_classt::TEMPLATE)
   {
     // std::cerr << *(*id_set.begin()) << '\n';
-    error().source_location=cpp_name.source_location();
+    error().source_location = cpp_name.source_location();
     error() << "class template '"
             << cpp_name.get_sub().front().get(ID_identifier)
             << "' is not a template" << eom;
     throw 0;
   }
 
-  const cpp_idt &cpp_id=**(id_set.begin());
+  const cpp_idt &cpp_id = **(id_set.begin());
   symbolt &template_symbol = symbol_table.get_writeable_ref(cpp_id.identifier);
 
   exprt &template_methods =
     static_cast<exprt &>(template_symbol.value.add(ID_template_methods));
 
   template_methods.copy_to_operands(declaration);
+  if(templates_with_out_of_class_members_set.insert(template_symbol.name)
+       .second)
+  {
+    templates_with_out_of_class_members.push_back(template_symbol.name);
+  }
 
   // save current scope
   cpp_save_scopet cpp_saved_scope(cpp_scopes);
@@ -385,17 +1728,366 @@ void cpp_typecheckt::typecheck_class_template_member(
   const irept &instantiated_with =
     template_symbol.value.add(ID_instantiated_with);
 
-  for(std::size_t i=0; i<instantiated_with.get_sub().size(); i++)
+  for(std::size_t i = 0; i < instantiated_with.get_sub().size(); i++)
   {
-    const cpp_template_args_tct &tc_template_args=
+    const cpp_template_args_tct &tc_template_args =
       static_cast<const cpp_template_args_tct &>(
         instantiated_with.get_sub()[i]);
 
-    cpp_declarationt decl_tmp=declaration;
+    cpp_declarationt decl_tmp = declaration;
+
+    template_typet method_type = decl_tmp.template_type();
+    const std::size_t n_class_params = tc_template_args.arguments().size();
+    const std::size_t n_method_params =
+      method_type.template_parameters().size();
+
+    // Skip member function templates — they have more template
+    // parameters than the class template args.
+    if(n_method_params > n_class_params)
+    {
+      // Partially instantiate: substitute class template params,
+      // keep method-only params, register as function template
+      // in the instantiated class scope.
+      cpp_declarationt mcopy = decl_tmp;
+
+      // Build template map for class params
+      cpp_saved_template_mapt saved_map(template_map);
+      template_map.build(method_type, tc_template_args);
+
+      // Keep only method-own template params
+      template_typet method_only_tt;
+      for(std::size_t j = n_class_params; j < n_method_params; j++)
+        method_only_tt.template_parameters().push_back(
+          method_type.template_parameters()[j]);
+      mcopy.set(ID_template_type, method_only_tt);
+      mcopy.set(ID_is_template, true);
+      // Ensure access specifier is set (needed by instantiate_template)
+      if(mcopy.get(ID_C_access).empty())
+        mcopy.set(ID_C_access, ID_public);
+
+      // Simplify qualified name to base name
+      if(!mcopy.declarators().empty())
+      {
+        irep_idt base = mcopy.declarators().front().name().get_base_name();
+        if(!base.empty())
+          mcopy.declarators().front().name() = cpp_namet(base);
+      }
+
+      // Apply class template substitution to type and body
+      if(!mcopy.declarators().empty())
+      {
+        typet mtype = mcopy.declarators().front().merge_type(mcopy.type());
+        template_map.apply(mtype);
+        // Keep the function type on the declarator (not the declaration)
+        // because guess_function_template_args checks declarator.type().
+        mcopy.declarators().front().type() = mtype;
+        mcopy.type().make_nil();
+
+        if(mcopy.declarators().front().find(ID_value).is_not_nil())
+        {
+          exprt &body_val =
+            static_cast<exprt &>(mcopy.declarators().front().add(ID_value));
+          template_map.apply(body_val);
+
+          // Strip local struct definitions (e.g., _Guard RAII
+          // structs) and references to them. These contain
+          // cpp_name types that cannot be resolved during partial
+          // instantiation, and CBMC does not model exceptions.
+          if(
+            body_val.id() == ID_code &&
+            to_code(body_val).get_statement() == ID_block)
+          {
+            std::set<irep_idt> local_structs;
+            for(const auto &op : body_val.operands())
+            {
+              if(op.id() != ID_cpp_declaration)
+                continue;
+              const auto &cd = static_cast<const cpp_declarationt &>(
+                static_cast<const irept &>(op));
+              if(cd.type().id() != ID_struct)
+                continue;
+              const irept &tag = cd.type().find(ID_tag);
+              if(tag.is_nil())
+                continue;
+              const auto &tsub = tag.get_sub();
+              if(!tsub.empty() && tsub.front().id() == ID_name)
+                local_structs.insert(tsub.front().get(ID_identifier));
+            }
+            if(!local_structs.empty())
+            {
+              auto refs = [&](const exprt &e)
+              {
+                bool found = false;
+                e.visit_pre(
+                  [&](const exprt &sub)
+                  {
+                    auto chk = [&](const irept &n)
+                    {
+                      const auto &s = n.get_sub();
+                      if(
+                        !s.empty() && s.front().id() == ID_name &&
+                        local_structs.count(s.front().get(ID_identifier)))
+                        found = true;
+                    };
+                    if(sub.id() == ID_cpp_name)
+                      chk(sub);
+                    if(sub.type().id() == ID_cpp_name)
+                      chk(sub.type());
+                  });
+                return found;
+              };
+              auto &ops = body_val.operands();
+              ops.erase(
+                std::remove_if(
+                  ops.begin(),
+                  ops.end(),
+                  [&](const exprt &op)
+                  {
+                    if(op.id() == ID_cpp_declaration)
+                    {
+                      const auto &cd = static_cast<const cpp_declarationt &>(
+                        static_cast<const irept &>(op));
+                      if(cd.type().id() == ID_struct)
+                        return true;
+                    }
+                    return refs(op);
+                  }),
+                ops.end());
+            }
+          }
+        }
+      }
+
+      // Find the instantiated class scope
+      std::string inst_suffix = template_suffix(tc_template_args);
+      // Use the template symbol's scope (not the current scope) to
+      // construct the class identifier, since the class may be in a
+      // nested namespace (e.g., std::__cxx11::basic_string).
+      std::string tmpl_prefix;
+      {
+        const std::string tname = id2string(template_symbol.name);
+        auto tpos = tname.rfind("template.");
+        if(tpos != std::string::npos)
+          tmpl_prefix = tname.substr(0, tpos);
+      }
+      irep_idt inst_id = tmpl_prefix + "tag-" +
+                         id2string(template_symbol.base_name) + inst_suffix;
+      auto scope_it = cpp_scopes.id_map.find(inst_id);
+      if(scope_it != cpp_scopes.id_map.end())
+      {
+        cpp_save_scopet ss(cpp_scopes);
+        cpp_scopes.go_to(static_cast<cpp_scopet &>(*scope_it->second));
+
+        // Find existing function template and update its body.
+        // Do NOT create a new template (that would cause duplicates).
+        irep_idt mbase = mcopy.declarators().empty()
+                           ? irep_idt()
+                           : mcopy.declarators().front().name().get_base_name();
+        if(!mbase.empty())
+        {
+          auto ids = cpp_scopes.current_scope().lookup(
+            mbase, cpp_scopet::SCOPE_ONLY, cpp_idt::id_classt::TEMPLATE);
+          for(const auto *idp : ids)
+          {
+            auto *ts = symbol_table.get_writeable(idp->identifier);
+            if(!ts || !ts->type.get_bool(ID_is_template))
+              continue;
+            cpp_declarationt &td = to_cpp_declaration(ts->type);
+            if(
+              !td.declarators().empty() &&
+              td.declarators()[0].find(ID_value).is_nil() &&
+              !mcopy.declarators().empty() &&
+              mcopy.declarators()[0].find(ID_value).is_not_nil())
+            {
+              // N5008 [dcl.fct]/3,5 + [temp.over.link]: among same-named
+              // member templates (libstdc++ basic_string's two
+              // `_M_construct(_It, _It, tag)' and its `<bool>
+              // _M_construct(const _CharT *, size_type)') the definition
+              // belongs to the declaration with the same parameter types,
+              // the template parameters compared by position.
+              {
+                const template_typet &class_tt =
+                  static_cast<const template_typet &>(
+                    to_cpp_declaration(template_symbol.type)
+                      .find(ID_template_type));
+                const typet &td_ftype = td.declarators()[0].type();
+                const typet &def_ftype = decl_tmp.declarators()[0].type();
+                if(
+                  td_ftype.id() == ID_function_type &&
+                  def_ftype.id() == ID_function_type &&
+                  !member_template_parameters_match(
+                    td_ftype.find(ID_parameters),
+                    td.template_type(),
+                    class_tt,
+                    def_ftype.find(ID_parameters),
+                    decl_tmp.template_type()))
+                {
+                  continue;
+                }
+                // [temp.over.link]/3: so do the return types
+                if(!member_template_return_types_match(
+                     td, class_tt, decl_tmp, decl_tmp))
+                {
+                  continue;
+                }
+              }
+              // Verify signature match: concrete type names in the
+              // .tcc definition must appear in the template symbol
+              // name to prevent swapping overload bodies.
+              {
+                std::set<std::string> tpnames;
+                for(const auto &tp :
+                    decl_tmp.template_type().template_parameters())
+                {
+                  irep_idt bn = tp.get(ID_base_name);
+                  if(!bn.empty())
+                    tpnames.insert(id2string(bn));
+                }
+                typet mc_ft =
+                  decl_tmp.declarators()[0].merge_type(decl_tmp.type());
+                std::string ts_name = id2string(ts->name);
+                bool sig_ok = true;
+                if(mc_ft.id() == ID_code || mc_ft.id() == ID_function_type)
+                {
+                  for(const auto &sub : mc_ft.find(ID_parameters).get_sub())
+                  {
+                    const typet &pt =
+                      static_cast<const typet &>(sub.find(ID_type));
+                    if(pt.id() != ID_cpp_name)
+                      continue;
+                    for(const auto &s : pt.get_sub())
+                    {
+                      if(s.id() != ID_name)
+                        continue;
+                      std::string nm = id2string(s.get(ID_identifier));
+                      if(tpnames.count(nm) || nm == "std")
+                        continue;
+                      // Skip names that look like template params
+                      // (_Uppercase convention in libstdc++)
+                      if(
+                        nm.size() > 1 && nm[0] == '_' &&
+                        std::isupper(static_cast<unsigned char>(nm[1])))
+                        continue;
+                      if(ts_name.find(nm) == std::string::npos)
+                      {
+                        sig_ok = false;
+                        break;
+                      }
+                    }
+                    if(!sig_ok)
+                      break;
+                  }
+                }
+                if(!sig_ok)
+                  continue;
+              }
+              td.declarators()[0].add(ID_value) =
+                mcopy.declarators()[0].find(ID_value);
+              // [dcl.fct]/3: the body refers to the DEFINITION's parameter
+              // names (`__str'); the declaration's (`__c') are not part of
+              // the type -- adopt the definition's
+              {
+                typet &td_ftype = td.declarators()[0].type();
+                const typet &def_ftype = mcopy.declarators()[0].type();
+                if(
+                  td_ftype.id() == ID_function_type &&
+                  def_ftype.id() == ID_function_type)
+                {
+                  auto &tp = td_ftype.add(ID_parameters).get_sub();
+                  const auto &dp = def_ftype.find(ID_parameters).get_sub();
+                  std::size_t j = 0;
+                  for(auto &pi : tp)
+                  {
+                    if(pi.id() != ID_cpp_declaration)
+                      continue;
+                    while(j < dp.size() && dp[j].id() != ID_cpp_declaration)
+                      ++j;
+                    if(j >= dp.size())
+                      break;
+                    auto &ipd = static_cast<cpp_declarationt &>(pi);
+                    const auto &dpd =
+                      static_cast<const cpp_declarationt &>(dp[j]);
+                    ++j;
+                    if(!ipd.declarators().empty() && !dpd.declarators().empty())
+                    {
+                      ipd.declarators().front().name() =
+                        dpd.declarators().front().name();
+                    }
+                  }
+                }
+              }
+              // N5008 [class.base.init]/1: the ctor-initializer is part of
+              // the constructor's DEFINITION; an out-of-line delegating
+              // constructor template (std::pair's piecewise constructor)
+              // keeps it on the definition's declarator.  Copy it along
+              // with the body, otherwise the instantiated member converts
+              // with NO initializer and the delegation never happens.
+              {
+                const irept &m_inits =
+                  mcopy.declarators()[0].find(ID_member_initializers);
+                if(m_inits.is_not_nil())
+                  td.declarators()[0].member_initializers() = m_inits;
+              }
+
+              // Update existing concrete symbols that have nil body
+              // with the now-available body from the .tcc definition.
+              irep_idt mbase2 = td.declarators()[0].name().get_base_name();
+              // Build class prefix from inst_id
+              std::string cls_pfx = id2string(inst_id);
+              {
+                auto p =
+                  cls_pfx.find("tag-" + id2string(template_symbol.base_name));
+                if(p != std::string::npos)
+                  cls_pfx.erase(p, 4);
+              }
+              cls_pfx += "::";
+              for(auto &sp : symbol_table)
+              {
+                // N5008 [temp.mem]/1, [temp.spec.general]/2: the definition
+                // of a member TEMPLATE defines its specializations
+                // (`find<T>(...)'), not a non-template member of the same
+                // name and arity -- libc++'s basic_string, instantiated by
+                // `extern template ... basic_string<char>::npos' before its
+                // members' definitions, gave `find(value_type, size_type)'
+                // the body of `template <class _Tp, ...> find(const _Tp &,
+                // size_type)'
+                const auto is_specialization = [&](const irep_idt &id)
+                {
+                  const std::string &n = id2string(id);
+                  return n.compare(
+                           cls_pfx.size(),
+                           id2string(mbase2).size() + 1,
+                           id2string(mbase2) + "<") == 0;
+                };
+                if(
+                  sp.second.base_name == mbase2 &&
+                  sp.second.type.id() == ID_code && sp.second.value.is_nil() &&
+                  id2string(sp.first).find(cls_pfx) == 0 &&
+                  is_specialization(sp.first) &&
+                  out_of_line_definition_matches(sp.second, mcopy, nullptr))
+                {
+                  symbolt &csym = symbol_table.get_writeable_ref(sp.first);
+                  csym.value = static_cast<const exprt &>(
+                    mcopy.declarators()[0].find(ID_value));
+                  adopt_definition_parameter_names(csym, mcopy);
+                  add_method_body(&csym);
+                }
+              }
+
+              break;
+            }
+          }
+        }
+      }
+
+      cpp_saved_scope.restore();
+      continue;
+    }
 
     // do template arguments
     // this also sets up the template scope of the method
-    cpp_scopet &method_scope=
+    cpp_saved_template_mapt saved_map(template_map);
+    cpp_scopet &method_scope =
       typecheck_template_parameters(decl_tmp.template_type());
 
     cpp_scopes.go_to(method_scope);
@@ -416,26 +2108,28 @@ std::string cpp_typecheckt::class_template_identifier(
   const template_typet &template_type,
   const cpp_template_args_non_tct &partial_specialization_args)
 {
-  std::string identifier=
-    cpp_scopes.current_scope().prefix+
-    "template."+id2string(base_name) + "<";
+  std::string identifier = cpp_scopes.current_scope().prefix + "template." +
+                           id2string(base_name) + "<";
 
-  int counter=0;
+  int counter = 0;
 
   // these are probably not needed -- templates
   // should be unique in a namespace
-  for(template_typet::template_parameterst::const_iterator
-      it=template_type.template_parameters().begin();
-      it!=template_type.template_parameters().end();
+  for(template_typet::template_parameterst::const_iterator it =
+        template_type.template_parameters().begin();
+      it != template_type.template_parameters().end();
       it++)
   {
-    if(counter!=0)
-      identifier+=',';
+    if(counter != 0)
+      identifier += ',';
 
-    if(it->id()==ID_type)
-      identifier+="Type"+std::to_string(counter);
+    if(it->id() == ID_type)
+      identifier += "Type" + std::to_string(counter);
     else
-      identifier+="Non_Type"+std::to_string(counter);
+      identifier += "Non_Type" + std::to_string(counter);
+    // a template parameter pack ([temp.param]/17) differs from a parameter
+    if(it->get_bool(ID_ellipsis))
+      identifier += "...";
 
     counter++;
   }
@@ -444,27 +2138,162 @@ std::string cpp_typecheckt::class_template_identifier(
 
   if(!partial_specialization_args.arguments().empty())
   {
-    identifier+="_specialized_to_<";
+    identifier += "_specialized_to_<";
 
-    counter=0;
-    for(cpp_template_args_non_tct::argumentst::const_iterator
-        it=partial_specialization_args.arguments().begin();
-        it!=partial_specialization_args.arguments().end();
+    counter = 0;
+    for(cpp_template_args_non_tct::argumentst::const_iterator it =
+          partial_specialization_args.arguments().begin();
+        it != partial_specialization_args.arguments().end();
         it++, counter++)
     {
-      if(counter!=0)
-        identifier+=',';
+      if(counter != 0)
+        identifier += ',';
 
       // These are not yet typechecked, as they may depend
       // on unassigned template parameters.
 
       if(it->id() == ID_type || it->id() == ID_ambiguous)
-        identifier+=cpp_type2name(it->type());
+        identifier += cpp_type2name(it->type());
       else
-        identifier+=cpp_expr2name(*it);
+        identifier += cpp_expr2name(*it);
+      // N5008 [temp.variadic]/5: `const U &...' (a pack expansion) and
+      // `const U &' are different arguments; without the marker the
+      // partial specializations S<T, const U &...> and S<T, const U &> got
+      // one identifier, and the later one replaced the earlier
+      if(
+        it->get_bool(ID_ellipsis) || it->type().get_bool(ID_ellipsis) ||
+        it->find(ID_type).get_bool(ID_ellipsis))
+      {
+        identifier += "...";
+      }
     }
 
-    identifier+='>';
+    identifier += '>';
+  }
+
+  // N5008 [temp.spec.partial.general]/1 + [temp.constr.decl]: partial
+  // specializations with the same argument pattern but different
+  // requires-clauses are distinct (libstdc++'s three
+  // `__iter_concept_impl<_Iter>` specializations differ only in their
+  // constraints).  Render the whole constraint-expression -- including
+  // negations and the requirements' TYPE operands, which live in named
+  // sub-nodes -- into the identifier, so that no two constraints collide.
+  {
+    const auto &req_expr = template_type.find(ID_C_requires_clause);
+    if(req_expr.is_not_nil() && req_expr.id() != ID_nil)
+    {
+      // The rendering must be stable across the constraint's life: its
+      // expression is type-checked in place when the constraint is
+      // evaluated (names become symbols and constants), and the identifier
+      // is recomputed at every redeclaration lookup.  Render the tree's
+      // node ids and identifiers only -- the structure, the operators and
+      // the names -- never types or values.
+      std::string rendering;
+      std::function<void(const irept &)> render = [&](const irept &node)
+      {
+        rendering += id2string(node.id());
+        const irep_idt &nm = node.get(ID_identifier);
+        if(!nm.empty())
+          rendering += "=" + id2string(nm);
+        rendering += '(';
+        // N5008 [temp.over.link]/5, [basic.lookup]: a name denotes the
+        // same entity however it is qualified; a redeclaration may spell
+        // the concept `__char' and the definition `__format::__char'
+        // (libstdc++ 16's <format>, `__formatter_ptr').  Render a
+        // qualified name by its last component and template arguments.
+        if(node.id() == ID_cpp_name)
+        {
+          const auto &subs = node.get_sub();
+          std::size_t last_name = subs.size();
+          for(std::size_t i = 0; i < subs.size(); ++i)
+            if(subs[i].id() == ID_name)
+              last_name = i;
+          for(std::size_t i = 0; i < subs.size(); ++i)
+          {
+            if(i < last_name && subs[i].id() != ID_template_args)
+              continue;
+            render(subs[i]);
+            rendering += ',';
+          }
+          rendering += ')';
+          return;
+        }
+        for(const auto &sub : node.get_sub())
+        {
+          render(sub);
+          rendering += ',';
+        }
+        for(const auto &ns : node.get_named_sub())
+        {
+          const std::string key = id2string(ns.first);
+          // N5008 [temp.friend]/9: a friend template whose constraint
+          // depends on an enclosing template's parameter is a distinct
+          // template in each specialization of the enclosing class.  The
+          // enclosing argument is substituted into the clause as a tag type
+          // (cpp_typecheck_compound_type) in a template argument's `type';
+          // render it, it is stable.
+          if(
+            ns.first == ID_type &&
+            (ns.second.id() == ID_struct_tag ||
+             ns.second.id() == ID_union_tag || ns.second.id() == ID_c_enum_tag))
+          {
+            rendering += "type:" + id2string(ns.second.id()) + "=" +
+                         id2string(ns.second.get(ID_identifier)) + ",";
+            continue;
+          }
+          if(key.empty() || key[0] == '#' || ns.first == ID_type)
+            continue;
+          rendering += key + ':';
+          render(ns.second);
+          rendering += ',';
+        }
+        rendering += ')';
+      };
+      render(req_expr);
+      // Identifiers are parsed downstream (scope prefixes, `tag-` insertion,
+      // signature suffixes); keep the structural rendering out of them and
+      // append its hash, prefixed by the constraint's leading names for
+      // readability.
+      std::string names;
+      std::function<void(const irept &)> leading_names = [&](const irept &n)
+      {
+        if(names.size() > 60)
+          return;
+        const irep_idt &nm = n.get(ID_identifier);
+        if(n.id() == ID_name && !nm.empty())
+          names += (names.empty() ? "" : "&&") + id2string(nm);
+        for(const auto &sub : n.get_sub())
+          leading_names(sub);
+      };
+      leading_names(req_expr);
+      identifier += "#req_" + names + "_" +
+                    std::to_string(std::hash<std::string>{}(rendering));
+    }
+    // Also check constraint count string for type-trait-based requires
+    const irep_idt &req_str = template_type.get(ID_C_requires_clause);
+    if(!req_str.empty() && isdigit(id2string(req_str)[0]))
+    {
+      identifier += "#req_count_" + id2string(req_str);
+    }
+    // Include concept constraint names from template parameters
+    // so that specializations with the same argument pattern but
+    // different concept constraints get distinct identifiers.
+    for(const auto &p : template_type.template_parameters())
+    {
+      const irep_idt &cc = p.get("#C_concept_constraint");
+      if(!cc.empty())
+      {
+        // by the concept's unqualified name (see the rendering above);
+        // #C_concept_constraint_name is the name as written
+        std::string short_name = id2string(p.get("#C_concept_constraint_name"));
+        if(short_name.empty())
+          short_name = id2string(cc);
+        const auto sep = short_name.rfind("::");
+        if(sep != std::string::npos)
+          short_name = short_name.substr(sep + 2);
+        identifier += "#concept_" + short_name;
+      }
+    }
   }
 
   return identifier;
@@ -477,12 +2306,56 @@ std::string cpp_typecheckt::function_template_identifier(
 {
   // we first build something without function arguments
   cpp_template_args_non_tct partial_specialization_args;
-  std::string identifier=
-    class_template_identifier(base_name, template_type,
-                              partial_specialization_args);
+  std::string identifier = class_template_identifier(
+    base_name, template_type, partial_specialization_args);
 
   // we must also add the signature of the function to the identifier
-  identifier+=cpp_type2name(function_type);
+  identifier += cpp_type2name(function_type);
+
+  // C++20: include concept constraints in the identifier so that
+  // overloads differing only in concept constraints get distinct symbols.
+  for(const auto &p : template_type.template_parameters())
+  {
+    const irep_idt &constraint = p.get("#C_concept_constraint");
+    if(!constraint.empty())
+      identifier += "#" + id2string(constraint);
+  }
+
+  // C++20: include requires clause concept names in the identifier
+  // so that overloads differing only in requires clauses get distinct
+  // symbols.
+  {
+    const auto &req_expr = template_type.find(ID_C_requires_clause);
+    if(req_expr.is_not_nil() && req_expr.id() != ID_nil)
+    {
+      std::string concepts;
+      std::function<void(const irept &)> visit = [&](const irept &node)
+      {
+        const std::string &nid = id2string(node.id());
+        if(nid.find("__is_") == 0 || nid.find("__has_") == 0)
+        {
+          if(!concepts.empty())
+            concepts += "&&";
+          concepts += nid;
+        }
+        if(node.id() == ID_name)
+        {
+          const irep_idt &nm = node.get(ID_identifier);
+          if(!nm.empty())
+          {
+            if(!concepts.empty())
+              concepts += "&&";
+            concepts += id2string(nm);
+          }
+        }
+        for(const auto &sub : node.get_sub())
+          visit(sub);
+      };
+      visit(req_expr);
+      if(!concepts.empty())
+        identifier += "#req_" + concepts;
+    }
+  }
 
   return identifier;
 }
@@ -492,71 +2365,131 @@ void cpp_typecheckt::convert_class_template_specialization(
 {
   cpp_save_scopet saved_scope(cpp_scopes);
 
-  typet &type=declaration.type();
+  typet &type = declaration.type();
 
-  PRECONDITION(type.id() == ID_struct);
+  PRECONDITION(type.id() == ID_struct || type.id() == ID_union);
 
-  cpp_namet &cpp_name=
-    static_cast<cpp_namet &>(type.add(ID_tag));
+  cpp_namet &cpp_name = static_cast<cpp_namet &>(type.add(ID_tag));
+
+  irep_idt base_name;
+  cpp_template_args_non_tct template_args_non_tc;
 
   if(cpp_name.is_qualified())
   {
-    error().source_location=cpp_name.source_location();
-    error() << "qualifiers not expected here" << eom;
-    throw 0;
-  }
+    // N5008 [temp.expl.spec]/2: an explicit specialization may be named with a
+    // qualified-id, e.g. `template <> struct ns::G<char> { ... };`.  This is
+    // how std::hash (and similar library templates) are specialized for a
+    // user-defined type from outside namespace std.  Resolve the qualifier --
+    // entering the named scope so the primary template is found there -- and
+    // extract the base name and the template arguments of the final component.
+    cpp_typecheck_resolvet resolver(*this);
+    resolver.resolve_scope(cpp_name, base_name, template_args_non_tc);
 
-  if(cpp_name.get_sub().size()!=2 ||
-     cpp_name.get_sub()[0].id()!=ID_name ||
-     cpp_name.get_sub()[1].id()!=ID_template_args)
+    if(template_args_non_tc.is_nil())
+    {
+      error().source_location = cpp_name.source_location();
+      error() << "bad template-class-specialization name" << eom;
+      throw 0;
+    }
+
+    // Replace the qualified, template-arg-bearing tag with a simple name so
+    // the remaining typechecking uses the resolved scope and base name.
+    cpp_name = cpp_namet(base_name, cpp_name.source_location());
+  }
+  else
   {
-    // currently we are more restrictive
-    // than the standard
-    error().source_location=cpp_name.source_location();
-    error() << "bad template-class-specialization name" << eom;
-    throw 0;
+    if(
+      cpp_name.get_sub().size() != 2 || cpp_name.get_sub()[0].id() != ID_name ||
+      cpp_name.get_sub()[1].id() != ID_template_args)
+    {
+      // currently we are more restrictive
+      // than the standard
+      error().source_location = cpp_name.source_location();
+      error() << "bad template-class-specialization name" << eom;
+      throw 0;
+    }
+
+    base_name = cpp_name.get_sub()[0].get(ID_identifier);
+
+    // copy the template arguments
+    template_args_non_tc = to_cpp_template_args_non_tc(cpp_name.get_sub()[1]);
+
+    // Remove the template arguments from the name.
+    cpp_name.get_sub().pop_back();
   }
-
-  irep_idt base_name=
-    cpp_name.get_sub()[0].get(ID_identifier);
-
-  // copy the template arguments
-  const cpp_template_args_non_tct template_args_non_tc=
-    to_cpp_template_args_non_tc(cpp_name.get_sub()[1]);
-
-  // Remove the template arguments from the name.
-  cpp_name.get_sub().pop_back();
 
   // get the template symbol
 
-  auto id_set = cpp_scopes.current_scope().lookup(
-    base_name, cpp_scopet::SCOPE_ONLY, cpp_idt::id_classt::TEMPLATE);
-
-  // remove any specializations
-  for(cpp_scopest::id_sett::iterator
-      it=id_set.begin();
-      it!=id_set.end();
-      ) // no it++
+  // remove any specializations and non-class templates (e.g., constructor
+  // templates that share the class name)
+  const auto primary_class_templates = [&](cpp_scopet &scope)
   {
-    cpp_scopest::id_sett::iterator next=it;
-    next++;
+    auto id_set = scope.lookup(
+      base_name, cpp_scopet::SCOPE_ONLY, cpp_idt::id_classt::TEMPLATE);
+    for(cpp_scopest::id_sett::iterator it = id_set.begin();
+        it != id_set.end();) // no it++
+    {
+      cpp_scopest::id_sett::iterator next = it;
+      next++;
 
-    if(lookup((*it)->identifier).type.find(ID_specialization_of).is_not_nil())
-      id_set.erase(it);
+      const symbolt &sym = lookup((*it)->identifier);
+      if(
+        sym.type.find(ID_specialization_of).is_not_nil() ||
+        !to_cpp_declaration(sym.type).is_class_template())
+      {
+        id_set.erase(it);
+      }
 
-    it=next;
+      it = next;
+    }
+    return id_set;
+  };
+
+  auto id_set = primary_class_templates(cpp_scopes.current_scope());
+
+  // N5008 [namespace.def.general]/7: a member of an inline namespace (and,
+  // transitively, of an inline namespace of that) can be explicitly
+  // specialized as though it were a member of the enclosing namespace --
+  // `namespace std { template <> struct hash<K> ... }' for libc++'s
+  // std::__1::hash.
+  // The specialization is then declared in that inline namespace, next to
+  // its primary template, so that naming the template through either
+  // namespace finds it.
+  if(id_set.empty())
+  {
+    std::vector<cpp_scopet *> pending =
+      cpp_scopes.current_scope().inline_namespaces();
+    cpp_scopet *found_in = nullptr;
+    while(!pending.empty() && found_in == nullptr)
+    {
+      std::vector<cpp_scopet *> next_level;
+      for(cpp_scopet *scope : pending)
+      {
+        const auto found = primary_class_templates(*scope);
+        if(!found.empty() && found_in == nullptr)
+        {
+          id_set = found;
+          found_in = scope;
+        }
+        for(cpp_scopet *inner : scope->inline_namespaces())
+          next_level.push_back(inner);
+      }
+      pending.swap(next_level);
+    }
+    if(found_in != nullptr)
+      cpp_scopes.go_to(*found_in);
   }
 
   // only one should be left
   if(id_set.empty())
   {
-    error().source_location=type.source_location();
+    error().source_location = type.source_location();
     error() << "class template '" << base_name << "' not found" << eom;
     throw 0;
   }
-  else if(id_set.size()>1)
+  else if(id_set.size() > 1)
   {
-    error().source_location=type.source_location();
+    error().source_location = type.source_location();
     error() << "class template '" << base_name << "' is ambiguous" << eom;
     throw 0;
   }
@@ -566,15 +2499,15 @@ void cpp_typecheckt::convert_class_template_specialization(
 
   CHECK_RETURN(s_it != symbol_table.symbols.end());
 
-  const symbolt &template_symbol=s_it->second;
+  const symbolt &template_symbol = s_it->second;
 
   if(!template_symbol.type.get_bool(ID_is_template))
   {
-    error().source_location=type.source_location();
+    error().source_location = type.source_location();
     error() << "expected a template" << eom;
   }
 
-  #if 0
+#if 0
   // is this partial specialization?
   if(declaration.template_type().parameters().empty())
   {
@@ -594,11 +2527,11 @@ void cpp_typecheckt::convert_class_template_specialization(
       type);
   }
   else // NOLINT(readability/braces)
-  #endif
+#endif
 
   {
     // partial specialization -- we typecheck
-    declaration.partial_specialization_args()=template_args_non_tc;
+    declaration.partial_specialization_args() = template_args_non_tc;
     declaration.set_specialization_of(template_symbol.name);
 
     typecheck_class_template(declaration);
@@ -610,64 +2543,172 @@ void cpp_typecheckt::convert_template_function_or_member_specialization(
 {
   cpp_save_scopet saved_scope(cpp_scopes);
 
-  if(declaration.declarators().size()!=1 ||
-     declaration.declarators().front().type().id()!=ID_function_type)
+  if(
+    declaration.declarators().size() != 1 ||
+    declaration.declarators().front().type().id() != ID_function_type)
   {
-    error().source_location=declaration.type().source_location();
-    error() << "expected function template specialization" << eom;
-    throw 0;
+    // Variable template full specialization (template<> const int v<0,0> = 1)
+    if(
+      declaration.declarators().size() == 1 &&
+      declaration.declarators().front().type().id() != ID_function_type &&
+      declaration.declarators().front().name().has_template_args())
+    {
+      cpp_declaratort &declarator = declaration.declarators().front();
+      cpp_namet &cpp_name = declarator.name();
+
+      irep_idt base_name;
+      cpp_template_args_non_tct template_args_non_tc;
+      for(const auto &sub : cpp_name.get_sub())
+      {
+        if(sub.id() == ID_name)
+          base_name = sub.get(ID_identifier);
+        else if(sub.id() == ID_template_args)
+          template_args_non_tc = to_cpp_template_args_non_tc(sub);
+      }
+
+      // Remove template args from name.
+      auto &subs = cpp_name.get_sub();
+      subs.erase(
+        std::remove_if(
+          subs.begin(),
+          subs.end(),
+          [](const irept &s) { return s.id() == ID_template_args; }),
+        subs.end());
+
+      auto id_set = cpp_scopes.current_scope().lookup(
+        base_name, cpp_scopet::SCOPE_ONLY, cpp_idt::id_classt::TEMPLATE);
+
+      for(auto it = id_set.begin(); it != id_set.end();)
+      {
+        auto next = std::next(it);
+        if(lookup((*it)->identifier)
+             .type.find(ID_specialization_of)
+             .is_not_nil())
+          id_set.erase(it);
+        it = next;
+      }
+
+      if(!id_set.empty())
+      {
+        const symbolt &template_symbol = lookup((*id_set.begin())->identifier);
+
+        cpp_template_args_tct template_args = typecheck_template_args(
+          declaration.source_location(), template_symbol, template_args_non_tc);
+
+        typet specialization;
+        specialization.swap(declarator);
+
+        instantiate_template(
+          cpp_name.source_location(),
+          template_symbol,
+          template_args,
+          template_args,
+          specialization);
+      }
+      return;
+    }
+
+    // Not a function template specialization — could be a static data
+    // member specialization (e.g., template<> const char*
+    // Cache<char>::data[14]). Silently skip for now.
+    return;
   }
 
   PRECONDITION(declaration.declarators().size() == 1);
-  cpp_declaratort declarator=declaration.declarators().front();
-  cpp_namet &cpp_name=declarator.name();
+  cpp_declaratort declarator = declaration.declarators().front();
+  cpp_namet &cpp_name = declarator.name();
+
+  // A standard library header may declare an explicit specialization of a
+  // function template, or of a member function of a class template, whose
+  // definition is in the compiled library only (libstdc++'s
+  // `template<> basic_istream<char> &operator>>(basic_istream<char> &,
+  // basic_string<char> &)', defined in libstdc++.so).  N5008 [temp.expl.spec]
+  // makes uses refer to that specialization, but its definition is not
+  // available to the analysis, and calls to it would return nondeterministic
+  // results.  The standard specifies such a function's behaviour once, for
+  // the template ([string.io]/1 for this operator>>), and the header's
+  // definition of the primary template implements it; so a library
+  // specialization declared without a definition is not recorded, and uses
+  // instantiate the primary template's definition instead.  A deleted
+  // specialization (`= delete') is kept.
+  if(
+    declarator.value().is_nil() &&
+    is_library_body_file(id2string(cpp_name.source_location().get_file())))
+  {
+    return;
+  }
 
   // There is specialization (instantiation with template arguments)
   // but also function overloading (no template arguments)
 
   PRECONDITION(!cpp_name.get_sub().empty());
 
-  if(cpp_name.get_sub().back().id()==ID_template_args)
+  if(cpp_name.get_sub().back().id() == ID_template_args)
   {
     // proper specialization with arguments
-    if(cpp_name.get_sub().size()!=2 ||
-       cpp_name.get_sub()[0].id()!=ID_name ||
-       cpp_name.get_sub()[1].id()!=ID_template_args)
+    // N5008 [temp.expl.spec]/2-3: an explicit specialization may be declared
+    // in any scope in which the template could be defined -- for a MEMBER
+    // template of a class, at namespace scope with a qualified name
+    // (`template <> renamedt<ssa_exprt, L1> goto_symex_statet::
+    // set_indices<L1>(...)').  Resolve the nested-name-specifier to its
+    // scope and look the template up there; the unqualified case keeps the
+    // current scope.
+    std::string base_name;
+    cpp_scopest::id_sett id_set;
+    if(
+      cpp_name.get_sub().size() == 2 && cpp_name.get_sub()[0].id() == ID_name &&
+      cpp_name.get_sub()[1].id() == ID_template_args)
     {
-      // currently we are more restrictive
-      // than the standard
-      error().source_location=cpp_name.source_location();
+      base_name = cpp_name.get_sub()[0].get(ID_identifier).c_str();
+      id_set =
+        cpp_scopes.current_scope().lookup(base_name, cpp_scopet::SCOPE_ONLY);
+    }
+    else if(
+      cpp_name.get_sub().size() >= 4 &&
+      cpp_name.get_sub()[cpp_name.get_sub().size() - 2].id() == ID_name)
+    {
+      irep_idt scoped_base_name;
+      cpp_template_args_non_tct scoped_template_args;
+      cpp_typecheck_resolvet resolver(*this);
+      cpp_scopet &target_scope = resolver.resolve_scope(
+        cpp_name, scoped_base_name, scoped_template_args);
+      base_name = id2string(scoped_base_name);
+      id_set = target_scope.lookup(base_name, cpp_scopet::SCOPE_ONLY);
+      // the specialization is a member of that class: define it there, with
+      // the now-unqualified name (as an in-class definition would be)
+      cpp_scopes.go_to(target_scope);
+      irept template_args_node = cpp_name.get_sub().back();
+      cpp_name.get_sub().clear();
+      cpp_name.get_sub().push_back(irept{ID_name});
+      cpp_name.get_sub().back().set(ID_identifier, base_name);
+      cpp_name.get_sub().push_back(template_args_node);
+    }
+    else
+    {
+      error().source_location = cpp_name.source_location();
       error() << "bad template-function-specialization name" << eom;
       throw 0;
     }
 
-    std::string base_name=
-      cpp_name.get_sub()[0].get(ID_identifier).c_str();
-
-    const auto id_set =
-      cpp_scopes.current_scope().lookup(base_name, cpp_scopet::SCOPE_ONLY);
-
     if(id_set.empty())
     {
-      error().source_location=cpp_name.source_location();
+      error().source_location = cpp_name.source_location();
       error() << "template function '" << base_name << "' not found" << eom;
       throw 0;
     }
-    else if(id_set.size()>1)
+    else if(id_set.size() > 1)
     {
-      error().source_location=cpp_name.source_location();
+      error().source_location = cpp_name.source_location();
       error() << "template function '" << base_name << "' is ambiguous" << eom;
       throw 0;
     }
 
-    const symbolt &template_symbol=
-      lookup((*id_set.begin())->identifier);
+    const symbolt &template_symbol = lookup((*id_set.begin())->identifier);
 
-    cpp_template_args_tct template_args=
-      typecheck_template_args(
-        declaration.source_location(),
-        template_symbol,
-        to_cpp_template_args_non_tc(cpp_name.get_sub()[1]));
+    cpp_template_args_tct template_args = typecheck_template_args(
+      declaration.source_location(),
+      template_symbol,
+      to_cpp_template_args_non_tc(cpp_name.get_sub().back()));
 
     cpp_name.get_sub().pop_back();
 
@@ -686,7 +2727,7 @@ void cpp_typecheckt::convert_template_function_or_member_specialization(
     // Just overloading, but this is still a template
     // for disambiguation purposes!
     // http://www.gotw.ca/publications/mill17.htm
-    cpp_declarationt new_declaration=declaration;
+    cpp_declarationt new_declaration = declaration;
 
     new_declaration.remove(ID_template_type);
     new_declaration.remove(ID_is_template);
@@ -696,33 +2737,144 @@ void cpp_typecheckt::convert_template_function_or_member_specialization(
   }
 }
 
-cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
-  template_typet &type)
+/// Whether \p name names a concept ([temp.concept]) visible from the current
+/// scope: the parser records a concept as a template `constexpr bool C = ...'
+/// whose declarator carries `\#concept'.  A qualified name is looked up from
+/// its scope.
+bool cpp_typecheckt::is_concept_name(const cpp_namet &name)
+{
+  cpp_scopet *scope = &cpp_scopes.current_scope();
+  const auto &subs = name.get_sub();
+  for(std::size_t i = 0; i < subs.size(); ++i)
+  {
+    if(subs[i].id() != ID_name)
+      continue;
+    const irep_idt &base_name = subs[i].get(ID_identifier);
+    const bool last = i + 1 >= subs.size() ||
+                      std::none_of(
+                        subs.begin() + i + 1,
+                        subs.end(),
+                        [](const irept &s) { return s.id() == ID_name; });
+    const auto ids = scope->lookup(
+      base_name, i == 0 ? cpp_scopet::RECURSIVE : cpp_scopet::QUALIFIED);
+    if(last)
+    {
+      for(const auto *idp : ids)
+      {
+        const symbolt *sym = symbol_table.lookup(idp->identifier);
+        if(
+          sym != nullptr && sym->type.get_bool(ID_is_template) &&
+          sym->type.id() == ID_cpp_declaration)
+        {
+          const auto &decl = to_cpp_declaration(sym->type);
+          if(
+            !decl.declarators().empty() &&
+            decl.declarators()[0].get_bool("#concept"))
+            return true;
+        }
+      }
+      return false;
+    }
+    // a namespace (or class) qualifier: descend into it
+    cpp_scopet *next = nullptr;
+    for(auto *idp : ids)
+    {
+      if(idp->is_scope)
+      {
+        next = static_cast<cpp_scopet *>(idp);
+        break;
+      }
+    }
+    if(next == nullptr)
+      return false;
+    scope = next;
+  }
+  return false;
+}
+
+/// N5008 [temp.param]/4: a type-constraint `C T' (or `ns::C T', or
+/// `C<A1, ..., An> T') on a type template parameter introduces the
+/// constraint-expression `C<T>' (`C<T, A1, ..., An>') into the
+/// template's associated constraints ([temp.constr.decl]/3, conjoined with
+/// a requires-clause).  Build that expression and record it on the
+/// parameter (`\#C_type_constraint'), so that function overload resolution
+/// decides satisfaction with the same evaluator as a requires-clause --
+/// `template<Integral T> int g(T)' vs `template<Floating T> int g(T)' picked
+/// the first declared for every call.  (Class template partial
+/// specializations keep ordering by the recorded concept NAME.)
+void cpp_typecheckt::add_type_constraint(
+  exprt &parameter,
+  const irep_idt &concept_name,
+  const cpp_namet &parameter_name,
+  const irept &constraint_args)
+{
+  if(concept_name.empty() || parameter_name.is_nil())
+    return;
+  // `ns::C' -> name components
+  cpp_namet concept_id;
+  const std::string name_str = id2string(concept_name);
+  std::string::size_type start = 0;
+  for(;;)
+  {
+    const auto sep = name_str.find("::", start);
+    const std::string component = name_str.substr(
+      start, sep == std::string::npos ? std::string::npos : sep - start);
+    if(!component.empty())
+    {
+      irept name(ID_name);
+      name.set(ID_identifier, component);
+      concept_id.get_sub().push_back(name);
+    }
+    if(sep == std::string::npos)
+      break;
+    concept_id.get_sub().push_back(irept(ID_scope_resolution));
+    start = sep + 2;
+  }
+  // `<T, A1, ..., An>': the parameter first, then the type-constraint's
+  // own arguments, if any
+  exprt type_argument(ID_type);
+  type_argument.type() =
+    static_cast<const typet &>(static_cast<const irept &>(parameter_name));
+  irept template_args(ID_template_args);
+  irept &arguments = template_args.add(ID_arguments);
+  arguments.get_sub().push_back(type_argument);
+  if(constraint_args.is_not_nil())
+  {
+    for(const auto &arg : constraint_args.get_sub())
+      arguments.get_sub().push_back(arg);
+  }
+  concept_id.get_sub().push_back(template_args);
+  exprt constraint_expression =
+    static_cast<const exprt &>(static_cast<const irept &>(concept_id));
+  constraint_expression.add_source_location() =
+    parameter_name.source_location();
+  parameter.add("#C_type_constraint") = std::move(constraint_expression);
+}
+
+cpp_scopet &cpp_typecheckt::typecheck_template_parameters(template_typet &type)
 {
   cpp_save_scopet cpp_saved_scope(cpp_scopes);
 
   PRECONDITION(type.id() == ID_template);
 
-  std::string id_suffix="template::"+std::to_string(template_counter++);
+  std::string id_suffix = "template::" + std::to_string(template_counter++);
 
   // produce a new scope for the template parameters
   cpp_scopet &template_scope = cpp_scopes.current_scope().new_scope(id_suffix);
-  template_scope.id_class=cpp_idt::id_classt::TEMPLATE_SCOPE;
+  template_scope.id_class = cpp_idt::id_classt::TEMPLATE_SCOPE;
 
   cpp_scopes.go_to(template_scope);
 
   // put template parameters into this scope
-  template_typet::template_parameterst &parameters=
-    type.template_parameters();
+  template_typet::template_parameterst &parameters = type.template_parameters();
 
-  unsigned anon_count=0;
+  unsigned anon_count = 0;
 
-  for(template_typet::template_parameterst::iterator
-      it=parameters.begin();
-      it!=parameters.end();
+  for(template_typet::template_parameterst::iterator it = parameters.begin();
+      it != parameters.end();
       it++)
   {
-    exprt &parameter=*it;
+    exprt &parameter = *it;
 
     cpp_declarationt declaration;
     declaration.swap(static_cast<cpp_declarationt &>(parameter));
@@ -732,252 +2884,2223 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
     // there must be _one_ declarator
     PRECONDITION(declaration.declarators().size() == 1);
 
-    cpp_declaratort &declarator=declaration.declarators().front();
+    cpp_declaratort &declarator = declaration.declarators().front();
 
     // it may be anonymous
     if(declarator.name().is_nil())
       declarator.name() = cpp_namet("anon#" + std::to_string(++anon_count));
 
-    #if 1
+#if 1
     // The declarator needs to be just a name
-    if(declarator.name().get_sub().size()!=1 ||
-       declarator.name().get_sub().front().id()!=ID_name)
+    if(
+      declarator.name().get_sub().size() != 1 ||
+      declarator.name().get_sub().front().id() != ID_name)
     {
-      error().source_location=declaration.source_location();
+      error().source_location = declaration.source_location();
       error() << "template parameter must be simple name" << eom;
       throw 0;
     }
 
-    cpp_scopet &scope=cpp_scopes.current_scope();
+    cpp_scopet &scope = cpp_scopes.current_scope();
 
-    irep_idt base_name=declarator.name().get_sub().front().get(ID_identifier);
-    irep_idt identifier=scope.prefix+id2string(base_name);
+    irep_idt base_name = declarator.name().get_sub().front().get(ID_identifier);
+    irep_idt identifier = scope.prefix + id2string(base_name);
 
     // add to scope
-    cpp_idt &id=scope.insert(base_name);
-    id.identifier=identifier;
-    id.id_class=cpp_idt::id_classt::TEMPLATE_PARAMETER;
+    cpp_idt &id = scope.insert(base_name);
+    id.identifier = identifier;
+    id.id_class = cpp_idt::id_classt::TEMPLATE_PARAMETER;
 
     // is it a type or not?
     if(declaration.get_bool(ID_is_type))
     {
       parameter = type_exprt(template_parameter_symbol_typet(identifier));
-      parameter.type().add_source_location()=declaration.find_source_location();
+      parameter.type().add_source_location() =
+        declaration.find_source_location();
+      // Mark template template parameters so that argument typechecking
+      // can resolve the argument as a template name rather than a type.
+      if(declaration.type().id() == ID_template)
+        parameter.set(ID_is_template, true);
+      // Preserve concept constraint for C++20 concept subsumption
+      const irep_idt &constraint = declaration.get("#C_concept_constraint");
+      if(!constraint.empty())
+      {
+        parameter.set("#C_concept_constraint", constraint);
+        parameter.set(
+          "#C_concept_constraint_name",
+          declaration.get("#C_concept_constraint_name"));
+        add_type_constraint(
+          parameter,
+          declaration.get("#C_concept_constraint_name"),
+          declarator.name(),
+          declaration.find("#C_concept_constraint_args"));
+      }
     }
     else
     {
-      // The type is not checked, as it might depend
-      // on earlier parameters.
-      parameter = symbol_exprt(identifier, declaration.type());
+      // C++20: check if this non-type parameter's type is actually
+      // a concept (parsed as constexpr bool). If so, convert to a
+      // type parameter with concept constraint.
+      bool converted_to_concept = false;
+      if(declaration.type().id() == ID_cpp_name)
+      {
+        // N5008 [temp.param]/1, /4: a type-constraint `C T` (or `ns::C T`)
+        // names a concept.  Look the name up in the enclosing scopes and
+        // test for a concept template (the parser records one as a template
+        // `constexpr bool C = ...' whose declarator carries `#concept').
+        // This used to scan the WHOLE symbol table for a constexpr bool whose
+        // name contained the text -- 11% of a libc++ <span> run, and a
+        // substring match (`Integral' matched `is_integral_v<int>').
+        std::string cname;
+        for(const auto &s : declaration.type().get_sub())
+        {
+          if(s.id() == ID_name)
+          {
+            if(!cname.empty())
+              cname += "::";
+            cname += id2string(s.get(ID_identifier));
+          }
+        }
+        if(is_concept_name(to_cpp_name(declaration.type())))
+        {
+          // It's a concept -- convert to type parameter
+          parameter = type_exprt(template_parameter_symbol_typet(identifier));
+          parameter.type().add_source_location() =
+            declaration.find_source_location();
+          add_type_constraint(
+            parameter, cname, declarator.name(), irept(ID_nil));
+          // Sanitize :: for identifier generation
+          std::string::size_type p;
+          while((p = cname.find("::")) != std::string::npos)
+            cname.replace(p, 2, "__");
+          parameter.set("#C_concept_constraint", cname);
+          converted_to_concept = true;
+        }
+      }
+      if(!converted_to_concept)
+      {
+        // The type is not checked, as it might depend
+        // on earlier parameters.
+        //
+        // N5008 [temp.param]/6 + [dcl.meaning]/1: pointer/reference operators
+        // belong to the declarator, not to the decl-specifier
+        // `declaration.type()`.  A reference non-type parameter such as the
+        // `const T &empty` of util/reference_counting.h's
+        // `template <typename T, const T &empty = T::blank>` therefore has its
+        // `&` in the declarator.  Merge the declarator so the parameter keeps
+        // its reference (or pointer) type; otherwise it is wrongly treated as a
+        // value parameter and a reference argument (an object such as
+        // `T::blank`) is valuified, breaking instantiation.
+        parameter =
+          symbol_exprt(identifier, declarator.merge_type(declaration.type()));
+      }
     }
 
     // There might be a default type or default value.
     // We store it for later, as it can't be typechecked now
     // because of possible dependencies on earlier parameters!
     if(declarator.value().is_not_nil())
-      parameter.add(ID_C_default_value)=declarator.value();
+      parameter.add(ID_C_default_value) = declarator.value();
 
-    #else
+    // Preserve parameter pack (ellipsis) information
+    if(declarator.get_has_ellipsis())
+      parameter.set(ID_ellipsis, true);
+
+#else
     // is it a type or not?
-    cpp_declarator_converter.is_typedef=declaration.get_bool(ID_is_type);
+    cpp_declarator_converter.is_typedef = declaration.get_bool(ID_is_type);
 
     // say it a template parameter
-    cpp_declarator_converter.is_template_parameter=true;
+    cpp_declarator_converter.is_template_parameter = true;
 
     // There might be a default type or default value.
     // We store it for later, as it can't be typechecked now
     // because of possible dependencies on earlier parameters!
-    exprt default_value=declarator.value();
+    exprt default_value = declarator.value();
     declarator.value().make_nil();
 
-    const symbolt &symbol=
+    const symbolt &symbol =
       cpp_declarator_converter.convert(declaration, declarator);
 
     if(cpp_declarator_converter.is_typedef)
     {
       parameter = exprt(ID_type, struct_tag_typet(symbol.name));
-      parameter.type().add_source_location()=declaration.find_location();
+      parameter.type().add_source_location() = declaration.find_location();
     }
     else
-      parameter=symbol.symbol_expr();
+      parameter = symbol.symbol_expr();
 
     // set (non-typechecked) default value
     if(default_value.is_not_nil())
-      parameter.add(ID_C_default_value)=default_value;
+      parameter.add(ID_C_default_value) = default_value;
 
-    parameter.add_source_location()=declaration.find_location();
-    #endif
+    parameter.add_source_location() = declaration.find_location();
+#endif
   }
 
   return template_scope;
 }
 
-/// \par parameters: location, non-typechecked template arguments
+/// N5008 [dcl.fct]/3 + [temp.type]: parameter names are not part of a
+/// function type, so `fn<void(hard &hardness)>` and `fn<void(hard &)>`
+/// denote the same specialization.  A function-type template argument may
+/// arrive with its parameters still as unconverted cpp_declarations (as
+/// `code` or, straight from the parser, `function_type`) carrying the
+/// names; strip them so both spellings are identical (the named one used
+/// to become a distinct, never-elaborated instance: "member operator got
+/// incomplete type", goto-symex's with_solver_hardness).
+static void strip_function_type_parameter_names(typet &type)
+{
+  if(type.id() != ID_code && type.id() != ID_function_type)
+    return;
+  irept &params = type.add(ID_parameters);
+  for(auto &param : params.get_sub())
+  {
+    if(param.id() != ID_cpp_declaration)
+      continue;
+    for(auto &d : param.get_sub())
+    {
+      if(d.id() == ID_cpp_declarator)
+        d.add(ID_name).make_nil();
+    }
+  }
+}
+
+/// \param source_location: location for diagnostics
+/// \param template_symbol: the template whose parameters are bound
+/// \param template_args: the non-typechecked template arguments
 /// \return typechecked template arguments
 cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
   const source_locationt &source_location,
   const symbolt &template_symbol,
-  const cpp_template_args_non_tct &template_args)
+  const cpp_template_args_non_tct &template_args,
+  bool explicit_only)
 {
   // old stuff
   PRECONDITION(template_args.id() != ID_already_typechecked);
 
   PRECONDITION(template_symbol.type.get_bool(ID_is_template));
 
-  const template_typet &template_type=
+  const template_typet &template_type =
     to_cpp_declaration(template_symbol.type).template_type();
 
+  // N5008 [temp.arg.explicit]/6, [temp.param]/18: explicitly specified
+  // template arguments are matched to the parameters in declaration order,
+  // and from the FIRST template parameter pack on every remaining argument
+  // belongs to that pack.  A function template's pack may be followed by
+  // further packs, deduced from the call ([temp.deduct.call]/1;
+  // `template <class... Vs, unsigned long... Is> g(seq<Is...>)' called as
+  // `g<char>(seq<4>{})', libc++'s __make_fmatrix_impl).  The flat argument
+  // list cannot tell the packs apart, so check the arguments against the
+  // parameters up to and including the first pack, record how many fell
+  // into it (#explicit_pack_size, read by guess_function_template_args),
+  // and leave the later parameters unassigned for deduction.
+  {
+    const auto &params = template_type.template_parameters();
+    const cpp_declarationt &declaration =
+      to_cpp_declaration(template_symbol.type);
+    std::size_t pack_index = params.size();
+    for(std::size_t i = 0; i < params.size(); ++i)
+    {
+      if(params[i].get_bool(ID_ellipsis))
+      {
+        pack_index = i;
+        break;
+      }
+    }
+    bool later_pack = false;
+    for(std::size_t i = pack_index + 1; i < params.size(); ++i)
+    {
+      if(params[i].get_bool(ID_ellipsis))
+        later_pack = true;
+    }
+    if(
+      later_pack && !declaration.is_class_template() &&
+      !declaration.is_template_alias() &&
+      template_args.arguments().size() > pack_index)
+    {
+      symbolt leading = template_symbol;
+      auto &leading_params =
+        to_cpp_declaration(leading.type).template_type().template_parameters();
+      leading_params.resize(pack_index + 1);
+      cpp_template_args_tct result = typecheck_template_args(
+        source_location, leading, template_args, explicit_only);
+      auto &args = result.arguments();
+      const std::size_t n_in_pack =
+        args.size() > pack_index ? args.size() - pack_index : 0;
+      for(std::size_t i = pack_index + 1; i < params.size(); ++i)
+      {
+        if(params[i].id() == ID_type)
+          args.push_back(exprt(ID_type, typet(ID_unassigned)));
+        else
+          args.push_back(exprt(ID_unassigned));
+      }
+      result.set("#explicit_pack_size", n_in_pack);
+      return result;
+    }
+  }
+
+  // N5008 [temp.param]/18: a template parameter pack of a FUNCTION template
+  // may be followed by further template parameters that have a default
+  // argument (or are deducible) -- libc++'s `template <class... _Ts, bool
+  // _False = false> constexpr auto __get_comp_type()'.  [temp.variadic]/1: the
+  // pack accepts zero or more template arguments, so every explicitly
+  // specified argument from the pack's position on belongs to the pack
+  // ([temp.arg.explicit]/9), and the parameters after it take their default
+  // arguments.  The positional processing below assumes a pack is the last
+  // parameter; for this shape, check the arguments against the parameter
+  // list ending in the pack, then append the defaults of the parameters that
+  // follow it -- the order template_mapt::build expects for a non-trailing
+  // pack.
+  {
+    const auto &params = template_type.template_parameters();
+    const cpp_declarationt &declaration =
+      to_cpp_declaration(template_symbol.type);
+    std::size_t pack_index = params.size();
+    for(std::size_t i = 0; i + 1 < params.size(); ++i)
+    {
+      if(params[i].get_bool(ID_ellipsis))
+      {
+        pack_index = i;
+        break;
+      }
+    }
+    bool trailing_defaults = pack_index < params.size();
+    for(std::size_t i = pack_index + 1; trailing_defaults && i < params.size();
+        ++i)
+    {
+      if(!params[i].has_default_argument() || params[i].get_bool(ID_ellipsis))
+        trailing_defaults = false;
+    }
+    if(
+      trailing_defaults && !declaration.is_class_template() &&
+      !declaration.is_template_alias() &&
+      template_args.arguments().size() > pack_index)
+    {
+      symbolt leading = template_symbol;
+      auto &leading_params =
+        to_cpp_declaration(leading.type).template_type().template_parameters();
+      leading_params.resize(pack_index + 1);
+      cpp_template_args_tct result = typecheck_template_args(
+        source_location, leading, template_args, explicit_only);
+      cpp_save_scopet saved_scope(cpp_scopes);
+      cpp_idt *scope = cpp_scopes.id_map[template_symbol.name];
+      if(scope != nullptr)
+        cpp_scopes.go_to(*scope);
+      for(std::size_t i = pack_index + 1; i < params.size(); ++i)
+      {
+        exprt def = params[i].default_argument();
+        if(params[i].id() == ID_type)
+        {
+          if(def.id() != ID_type)
+            def = exprt(ID_type, def.type());
+          typecheck_type(def.type());
+        }
+        else
+        {
+          constant_expression_contextt constant_expression_guard{*this};
+          typecheck_expr(def);
+          simplify(def, *this);
+        }
+        result.arguments().push_back(std::move(def));
+      }
+      return result;
+    }
+  }
+
   // bad re-cast, but better than copying the args one by one
-  cpp_template_args_tct result=
-    (const cpp_template_args_tct &)(template_args);
+  cpp_template_args_tct result = (const cpp_template_args_tct &)(template_args);
 
-  cpp_template_args_tct::argumentst &args=
-    result.arguments();
+  cpp_template_args_tct::argumentst &args = result.arguments();
+  // GCC `__integer_pack(N)` builtin: in a pack-expansion template argument
+  // `__integer_pack(N)...`, expand to N non-type arguments 0, 1, ..., N-1 (of
+  // the argument's type).  This is the GCC extension backing [intseq.make]:
+  // libstdc++'s std::make_index_sequence is
+  // `integer_sequence<T, __integer_pack(N)...>` on GCC.  It is not an ordinary
+  // callable, so it must be expanded away here -- before the per-argument
+  // type-check below tries (and fails) to resolve the `__integer_pack` name.
+  // The count `N` is a (possibly dependent) constant expression evaluated in
+  // the current instantiation context (template_map active).
+  {
+    cpp_template_args_tct::argumentst expanded;
+    bool changed = false;
+    for(auto &arg : args)
+    {
+      // Extract the count expression and (optional) explicit element type of a
+      // `__integer_pack(...)...` pack-expansion argument, if this arg is one.
+      // Two shapes occur:
+      //  * a plain call `__integer_pack(N)...` -- a side_effect/function_call
+      //    with ellipsis (the argument N is dependent, e.g. a bare parameter);
+      //  * a `__integer_pack(T(N))...` whose `T(N)` cast is parsed as a
+      //    function type (the vexing parse): an `ambiguous` node with ellipsis
+      //    whose type is a `code` returning `__integer_pack` and taking a
+      //    single parameter `T N` -- here the count is the parameter's name `N`
+      //    and the element type is the parameter's type `T` (this is the shape
+      //    of libstdc++'s make_integer_sequence, `__integer_pack(_Tp(_Num))`).
+      exprt count = nil_exprt{};
+      typet explicit_elem_type;
+      bool has_explicit_elem = false;
+      if(
+        arg.id() == ID_side_effect &&
+        arg.get(ID_statement) == ID_function_call &&
+        arg.get_bool(ID_ellipsis) && arg.operands().size() == 2 &&
+        arg.operands()[0].id() == ID_cpp_name &&
+        to_cpp_name(arg.operands()[0]).get_base_name() == "__integer_pack" &&
+        arg.operands()[1].operands().size() == 1)
+      {
+        count = arg.operands()[1].operands()[0];
+      }
+      else if(
+        arg.id() == ID_ambiguous && arg.get_bool(ID_ellipsis) &&
+        arg.type().id() == ID_code)
+      {
+        const typet &code_t = arg.type();
+        const irept &ret = code_t.find(ID_return_type);
+        const irept::subt &params = code_t.find(ID_parameters).get_sub();
+        if(
+          ret.id() == ID_cpp_name &&
+          to_cpp_name(static_cast<const typet &>(ret)).get_base_name() ==
+            "__integer_pack" &&
+          params.size() == 1 && params[0].id() == ID_cpp_declaration)
+        {
+          const irept &decl = params[0];
+          explicit_elem_type = static_cast<const typet &>(decl.find(ID_type));
+          has_explicit_elem = true;
+          for(const auto &d : decl.get_sub())
+          {
+            if(d.id() == ID_cpp_declarator)
+            {
+              const irept &nm = d.find(ID_name);
+              if(nm.id() == ID_cpp_name)
+                count = static_cast<const exprt &>(nm);
+              break;
+            }
+          }
+        }
+      }
 
-  const template_typet::template_parameterst &parameters=
+      if(count.is_not_nil())
+      {
+        bool ok = false;
+        mp_integer n_val;
+        typet elem_type;
+        try
+        {
+          typecheck_expr(count);
+          simplify(count, *this);
+          if(has_explicit_elem)
+          {
+            elem_type = explicit_elem_type;
+            typecheck_type(elem_type);
+          }
+          else
+            elem_type = count.type();
+          ok =
+            count.is_constant() && !to_integer(to_constant_expr(count), n_val);
+        }
+        catch(...)
+        {
+        }
+        if(ok && n_val >= 0)
+        {
+          for(mp_integer k = 0; k < n_val; ++k)
+            expanded.push_back(from_integer(k, elem_type));
+          changed = true;
+          continue;
+        }
+      }
+      expanded.push_back(arg);
+    }
+    if(changed)
+      args.swap(expanded);
+  }
+
+  // [temp.variadic]/4-5: expand pack-expansion template arguments using the
+  // active template_map before matching arguments to parameters.  When a
+  // function-template body is type-checked during instantiation, a class
+  // template-id such as `Tup<E...>` (or one nesting the pack, e.g.
+  // `tuple<typename __decay_and_strip<E>::__type...>`) arrives here with the
+  // pack expansion UNEXPANDED.  Without expanding it here, the pack is later
+  // resolved as its (scalar) type_map binding and collapses to a single
+  // element.  Such an argument may be tagged either `ambiguous` (the parser's
+  // could-be-type-or-expression form) or `type` (already resolved to a type),
+  // and its pattern type need not be a bare `cpp_name`: a pack expansion
+  // `const _Elements&...` (the shape of std::tuple's constructor arguments)
+  // arrives with the ellipsis on a pointer/reference (`frontend_pointer`) or
+  // cv-qualified pattern.  The actual packs are found by walking the whole
+  // pattern below, so the only gate here is the ellipsis: expand whenever the
+  // argument is a (top-level) pack expansion.  Previously requiring the
+  // pattern to be a bare `cpp_name` left such qualified patterns unexpanded,
+  // collapsing the pack to a single element so the surrounding constexpr trait
+  // could not be folded for two or more elements.
+  // The gate must also open when the only pack state is a ZERO size
+  // (pack_size_map): an empty pack has no pack_args_map/pack_expr_map
+  // entry at all, yet its zero-length expansion ([temp.variadic]/7)
+  // must still REMOVE the pattern before the per-argument typecheck
+  // below resolves it (an alias pattern like `__enable_if_t<_Bn::value>`
+  // would otherwise substitute `_Bn::value` with no binding and fail
+  // the whole SFINAE chain, libstdc++'s __and_/__detected_or shapes).
+  if(
+    (!template_map.pack_args_map.empty() ||
+     !template_map.pack_expr_map.empty() ||
+     !template_map.pack_size_map.empty()) &&
+    !disable_template_arg_pack_expansion)
+  {
+    cpp_template_args_tct::argumentst expanded;
+    expanded.reserve(args.size());
+    for(auto &arg : args)
+    {
+      bool did_expand = false;
+      // A type pattern carries its ellipsis on the arg's type (a `cpp_name`,
+      // pointer/reference or cv-qualified type); a value pattern -- e.g. the
+      // comma-expression `((void)Pred, true)...` of libc++'s __all/__is_same --
+      // is not a type and carries the ellipsis on the arg node itself.
+      const bool type_pattern =
+        (arg.id() == ID_ambiguous || arg.id() == ID_type);
+      const bool is_expansion =
+        (type_pattern && arg.type().get_bool(ID_ellipsis)) ||
+        arg.get_bool(ID_ellipsis);
+      if(is_expansion)
+      {
+        // Collect the parameter packs referenced anywhere in the pattern
+        // (suffix match against the active type and non-type packs).
+        std::set<irep_idt> referenced_packs;
+        std::set<irep_idt> empty_pack_refs;
+        // Set when a pattern name was mapped to its parameter by SCOPE
+        // LOOKUP (not spelling): the classification is then exact and
+        // the suffix-ambiguity veto below must not second-guess it.
+        bool any_exact_match = false;
+        // N5008 [temp.variadic]/5: a pack whose name appears within the
+        // pattern of a NESTED pack-expansion is expanded by that
+        // innermost expansion, not by this one -- do not descend into
+        // ellipsis-marked subtrees (`_Types` in
+        // `type_pack_element<_Idx, _Types...>...` is the nested
+        // expansion's pack; only `_Idx` governs the outer expansion).
+        std::function<void(const irept &)> collect = [&](const irept &n)
+        {
+          const irept &root = type_pattern
+                                ? static_cast<const irept &>(arg.type())
+                                : static_cast<const irept &>(arg);
+          if(&n != &root && n.get_bool(ID_ellipsis))
+            return;
+          const irep_idt id = n.get(ID_identifier);
+          if(!id.empty())
+          {
+            // N5008 [basic.scope.temp]: the NAME denotes the template
+            // parameter found by lookup from the point of use -- when
+            // several flat-map entries share this spelling (an outer
+            // instantiation's `_Idx` beside the current one), lookup
+            // gives the exact parameter identifier.  Only fall back to
+            // spelling (suffix) matching when lookup finds no template
+            // parameter of that name (patterns re-typechecked outside
+            // their original scope).
+            std::set<irep_idt> exact_params;
+            for(cpp_idt *cid :
+                cpp_scopes.current_scope().lookup(id, cpp_scopet::RECURSIVE))
+            {
+              if(cid->id_class == cpp_idt::id_classt::TEMPLATE_PARAMETER)
+                exact_params.insert(cid->identifier);
+            }
+            // The exact filter only applies when the in-scope parameter
+            // is among the map entries: patterns are sometimes
+            // re-typechecked from a scope whose same-spelled parameter
+            // is NOT the one the map was built for (the map key then
+            // legitimately differs), so an empty intersection falls
+            // back to spelling.
+            bool exact_applicable = false;
+            if(!exact_params.empty())
+            {
+              for(const auto &pe : template_map.pack_args_map)
+                if(exact_params.count(pe.first) != 0)
+                  exact_applicable = true;
+              for(const auto &pe : template_map.pack_expr_map)
+                if(exact_params.count(pe.first) != 0)
+                  exact_applicable = true;
+              for(const auto &ps : template_map.pack_size_map)
+                if(exact_params.count(ps.first) != 0)
+                  exact_applicable = true;
+            }
+            if(exact_applicable)
+              any_exact_match = true;
+            auto matches = [&](const irep_idt &key_id) -> bool
+            {
+              if(exact_applicable)
+                return exact_params.count(key_id) != 0;
+              const std::string &key = id2string(key_id);
+              auto p = key.rfind("::");
+              const std::string suffix =
+                p != std::string::npos ? key.substr(p + 2) : key;
+              return suffix == id2string(id);
+            };
+            // N5008 [temp.variadic]/7 + [basic.scope.temp]: the pack
+            // SIZE recorded for the CURRENT instantiation is
+            // authoritative.  Sequential instantiations of one template
+            // share the parameter identifier, and deduction only
+            // OVERWRITES pack_size_map (an empty pack records no
+            // element entries), so a zero size beside a stale non-empty
+            // pack_args/pack_expr entry means THIS instantiation's pack
+            // is empty -- classify it as such rather than replicating
+            // the stale elements (libc++ __make_tuple_types_flat's
+            // `_Idx` = {0,1,2} beside the empty-range
+            // flat<tuple<box>, __tuple_indices<>>; the raw
+            // __type_pack_element evaluation then threw and the
+            // enclosing instance was half-elaborated -- the silent
+            // constructor-body drop, cpp20_tuple_converting_element).
+            auto current_size_is_zero = [&](const irep_idt &pid) -> bool
+            {
+              auto ps = template_map.pack_size_map.find(pid);
+              return ps != template_map.pack_size_map.end() && ps->second == 0;
+            };
+            for(const auto &pe : template_map.pack_args_map)
+            {
+              if(!matches(pe.first))
+                continue;
+              if(current_size_is_zero(pe.first))
+                empty_pack_refs.insert(pe.first);
+              else
+                referenced_packs.insert(pe.first);
+            }
+            for(const auto &pe : template_map.pack_expr_map)
+            {
+              if(!matches(pe.first))
+                continue;
+              if(current_size_is_zero(pe.first))
+                empty_pack_refs.insert(pe.first);
+              else
+                referenced_packs.insert(pe.first);
+            }
+            // N5008 [temp.variadic]/7: an EMPTY pack has no
+            // pack_args_map/pack_expr_map entry, only a zero
+            // pack_size_map entry.  Record it SEPARATELY: it only
+            // drives the expansion as a fallback when no non-empty
+            // pack is referenced (all packs of one expansion share a
+            // length per [temp.variadic]/5, so alongside a live pack a
+            // zero-size suffix match is stale cross-scope state, not
+            // this expansion's pack).
+            for(const auto &ps : template_map.pack_size_map)
+            {
+              if(ps.second == 0 && matches(ps.first))
+                empty_pack_refs.insert(ps.first);
+            }
+          }
+          for(const auto &c : n.get_named_sub())
+            collect(c.second);
+          for(const auto &c : n.get_sub())
+            collect(c);
+        };
+        if(type_pattern)
+          collect(arg.type());
+        else
+          collect(arg);
+
+        // N5008 [temp.variadic]/5 + [basic.scope.temp]: a NAME in the
+        // pattern denotes exactly ONE template parameter.  The flat
+        // template_map can hold entries for SEVERAL parameters with the
+        // same source spelling (an outer instantiation's `_Idx` beside
+        // the current one -- __make_tuple_types_flat's `_Idx` under
+        // __perfect_forward_impl's `_Idx...` in libc++'s tuple).  When
+        // one same-spelling group mixes a live (non-empty) binding with
+        // stale empty ones, the empty entries are cross-scope leftovers:
+        // drop them, otherwise the length-consistency check below sees
+        // 0 vs n and refuses to expand, and the un-expanded scalar
+        // reference later resolves to the empty-pack sentinel (POD
+        // constructors of `void` -- "'_Idx' does not uniquely resolve").
+        {
+          std::map<std::string, std::vector<irep_idt>> by_suffix;
+          for(const auto &pid : referenced_packs)
+          {
+            const std::string key = id2string(pid);
+            const auto q = key.rfind("::");
+            by_suffix[q != std::string::npos ? key.substr(q + 2) : key]
+              .push_back(pid);
+          }
+          for(const auto &grp : by_suffix)
+          {
+            if(grp.second.size() < 2)
+              continue;
+            std::vector<irep_idt> live;
+            for(const auto &pid : grp.second)
+            {
+              auto a = template_map.pack_args_map.find(pid);
+              if(a != template_map.pack_args_map.end() && !a->second.empty())
+              {
+                live.push_back(pid);
+                continue;
+              }
+              auto e = template_map.pack_expr_map.find(pid);
+              if(e != template_map.pack_expr_map.end() && !e->second.empty())
+                live.push_back(pid);
+            }
+            if(!live.empty() && live.size() < grp.second.size())
+            {
+              for(const auto &pid : grp.second)
+                if(std::find(live.begin(), live.end(), pid) == live.end())
+                  referenced_packs.erase(pid);
+            }
+          }
+        }
+
+        // A referenced pack is a type pack (pack_args_map) or a non-type pack
+        // (pack_expr_map); this gives its element count.
+        auto pack_len = [&](const irep_idt &pid) -> std::size_t
+        {
+          auto a = template_map.pack_args_map.find(pid);
+          if(a != template_map.pack_args_map.end())
+            return a->second.size();
+          auto e = template_map.pack_expr_map.find(pid);
+          if(e != template_map.pack_expr_map.end())
+            return e->second.size();
+          return 0;
+        };
+
+        // Fallback: pattern references only EMPTY packs -- a zero-length
+        // expansion ([temp.variadic]/7): contribute no arguments.  The
+        // flat template_map's stale zero-size entries can suffix-match
+        // unrelated pattern names (make_tuple regressed when this fired
+        // for them), so ALSO require that no LIVE binding (scalar type or
+        // value) exists for any of the names: a name with a live binding
+        // is an in-scope parameter of some active instantiation, not a
+        // zero-length pack of this expansion.
+        if(referenced_packs.empty() && !empty_pack_refs.empty())
+        {
+          // N5008 [basic.scope.temp]: scope-exact classification is
+          // authoritative -- the veto below guards only the SUFFIX
+          // fallback (where a stale zero-size entry of an unrelated
+          // same-spelled parameter could hijack the expansion).
+          // A same-spelled LIVE scalar binding of another template vetoes
+          // the zero-length expansion only when it is the more recent
+          // (innermost) binding.  Instantiations nest and different
+          // templates reuse parameter names: while std::pair's converting
+          // constructor was being checked, `__is_constructible_impl<T,
+          // _Args...>` had bound `_Args` to one type, and std::function's
+          // `__result_of_other_impl::_S_test<_Fn, _Args...>` -- reached from
+          // there with an EMPTY `_Args` -- was vetoed by that outer binding:
+          // `declval<_Args>()...` kept one element, the call had one
+          // argument too many, `_Callable<F>` came out false and
+          // pair<int, std::function<int()>>'s constructor lost its body.
+          // The parameter's OWN scalar convenience entry never counts:
+          // pack_size_map == 0 is THIS instantiation's authoritative binding
+          // ([temp.variadic]/7); type_map/expr_map entries are only
+          // overwritten, never erased.
+          bool any_live_binding = false;
+          if(!any_exact_match)
+          {
+            for(const auto &pid : empty_pack_refs)
+            {
+              const std::size_t own_generation =
+                template_map.generation_of(pid);
+              const std::string key = id2string(pid);
+              const auto pos = key.rfind("::");
+              const std::string suffix =
+                pos != std::string::npos ? key.substr(pos + 2) : key;
+              auto same_suffix = [&](const irep_idt &other) -> bool
+              {
+                if(other == pid)
+                  return false;
+                const std::string ok = id2string(other);
+                const auto op = ok.rfind("::");
+                return (op != std::string::npos ? ok.substr(op + 2) : ok) ==
+                       suffix;
+              };
+              for(const auto &te : template_map.type_map)
+              {
+                if(
+                  same_suffix(te.first) && te.second.id() != ID_unassigned &&
+                  te.second.id() != ID_nil &&
+                  template_map.generation_of(te.first) > own_generation)
+                {
+                  any_live_binding = true;
+                  break;
+                }
+              }
+              if(any_live_binding)
+                break;
+              for(const auto &ee : template_map.expr_map)
+              {
+                if(
+                  same_suffix(ee.first) && ee.second.id() != ID_unassigned &&
+                  ee.second.id() != ID_nil &&
+                  template_map.generation_of(ee.first) > own_generation)
+                {
+                  any_live_binding = true;
+                  break;
+                }
+              }
+              if(any_live_binding)
+                break;
+            }
+          }
+          if(!any_live_binding)
+            did_expand = true;
+        }
+        else if(!referenced_packs.empty())
+        {
+          const std::size_t n = pack_len(*referenced_packs.begin());
+          bool consistent = true;
+          for(const auto &pid : referenced_packs)
+            if(pack_len(pid) != n)
+              consistent = false;
+          if(consistent)
+          {
+            for(std::size_t i = 0; i < n; i++)
+            {
+              // Bind each referenced pack to its i-th element and substitute
+              // it inside a copy of the pattern.
+              template_mapt element_map = template_map;
+              for(const auto &pid : referenced_packs)
+              {
+                auto a = template_map.pack_args_map.find(pid);
+                if(a != template_map.pack_args_map.end())
+                  element_map.type_map[pid] = a->second[i];
+                else
+                {
+                  auto e = template_map.pack_expr_map.find(pid);
+                  if(e != template_map.pack_expr_map.end())
+                    element_map.expr_map[pid] = e->second[i];
+                }
+                element_map.pack_args_map.erase(pid);
+                element_map.pack_expr_map.erase(pid);
+                element_map.pack_size_map.erase(pid);
+              }
+              if(type_pattern)
+              {
+                typet pattern = static_cast<const typet &>(arg.type());
+                pattern.remove(ID_ellipsis);
+                // N5008 [temp.variadic]/5: when the pattern is a bare
+                // reference to a NON-TYPE parameter pack (`_Ip...` in
+                // `integer_sequence<unsigned long, _Ip...>`, libc++'s
+                // __bind_back_op partial specialization), the i-th
+                // argument is the pack's i-th VALUE.  `apply` below only
+                // substitutes TYPE names; the un-substituted `_Ip` then
+                // resolved through the scalar convenience entry -- the
+                // FIRST element -- for every i (deduction compared
+                // `<0,0>` against `<0,1>` and the specialization was
+                // never selected).
+                bool emitted_value = false;
+                if(
+                  pattern.id() == ID_cpp_name &&
+                  pattern.get_sub().size() == 1 &&
+                  pattern.get_sub().front().id() == ID_name)
+                {
+                  const std::string nm =
+                    id2string(pattern.get_sub().front().get(ID_identifier));
+                  for(const auto &pid : referenced_packs)
+                  {
+                    const auto e = template_map.pack_expr_map.find(pid);
+                    if(e == template_map.pack_expr_map.end())
+                      continue;
+                    const std::string key = id2string(pid);
+                    const auto q = key.rfind("::");
+                    if((q != std::string::npos ? key.substr(q + 2) : key) == nm)
+                    {
+                      expanded.push_back(e->second[i]);
+                      emitted_value = true;
+                      break;
+                    }
+                  }
+                }
+                if(!emitted_value)
+                {
+                  // N5008 [temp.variadic]/5: substitute each referenced TYPE
+                  // pack's i-th ELEMENT for its (suffix-matched) cpp_name
+                  // references in the pattern.  template_mapt::apply does not
+                  // substitute bare cpp_names from type_map, so without this
+                  // the emitted argument still names `_Tp` textually and the
+                  // later per-argument typecheck resolves it against whatever
+                  // same-named parameter is live in the enclosing scope --
+                  // for libc++'s tuple_size (primary `class _Tp`, partial
+                  // specialization `class... _Tp`, SAME name) that is the
+                  // PRIMARY's binding, i.e. the whole tuple type, so
+                  // `tuple_size<tuple<_Tp...>>` re-typechecked as
+                  // `tuple_size<tuple<tuple<int,int>, tuple<int,int>>>` and
+                  // the specialization never matched (get/tuple_size and the
+                  // tuple constructor all fell back to bodiless primaries).
+                  for(const auto &pid : referenced_packs)
+                  {
+                    const auto a = template_map.pack_args_map.find(pid);
+                    if(a == template_map.pack_args_map.end())
+                      continue;
+                    const std::string key = id2string(pid);
+                    const auto q = key.rfind("::");
+                    const std::string short_name =
+                      q != std::string::npos ? key.substr(q + 2) : key;
+                    // The pattern may BE the bare pack reference itself
+                    // (`_Tp...`); replace_type_pack_ref only substitutes
+                    // sub-nodes, so handle the top level here.
+                    if(
+                      pattern.id() == ID_cpp_name &&
+                      pattern.get_sub().size() == 1 &&
+                      pattern.get_sub().front().id() == ID_name &&
+                      id2string(pattern.get_sub().front().get(ID_identifier)) ==
+                        short_name)
+                    {
+                      pattern = a->second[i];
+                    }
+                    else
+                      replace_type_pack_ref(pattern, short_name, a->second[i]);
+                  }
+                  // ... and the same for NON-TYPE packs referenced inside
+                  // the type pattern ([temp.variadic]/5): `_Idx` in
+                  // `tuple_types<__type_pack_element<_Idx, _Types...>...>`
+                  // (libc++ __make_tuple_types) must become the i-th VALUE;
+                  // apply() substitutes neither bare cpp_names nor value
+                  // packs, and the un-substituted name would later resolve
+                  // through the scalar convenience entry to the FIRST
+                  // element for every i.
+                  for(const auto &pid : referenced_packs)
+                  {
+                    const auto e = template_map.pack_expr_map.find(pid);
+                    if(e == template_map.pack_expr_map.end())
+                      continue;
+                    const std::string key = id2string(pid);
+                    const auto q = key.rfind("::");
+                    const std::string short_name =
+                      q != std::string::npos ? key.substr(q + 2) : key;
+                    replace_value_pack_ref(pattern, short_name, e->second[i]);
+                  }
+                  element_map.apply(pattern);
+                  exprt type_arg(ID_type);
+                  type_arg.type() = pattern;
+                  type_arg.add_source_location() = arg.source_location();
+                  expanded.push_back(type_arg);
+                }
+              }
+              else
+              {
+                // Value pattern (e.g. comma-expression): substitute each
+                // referenced non-type pack's i-th VALUE for its bare cpp_name
+                // references, then let apply() finish any type/template-arg
+                // substitution.  The comma is folded to its right operand
+                // later in this function ([expr.comma]); binding the discarded
+                // operand's pack reference keeps it well-formed.
+                std::map<std::string, exprt> repl_map;
+                for(const auto &pid : referenced_packs)
+                {
+                  auto e = template_map.pack_expr_map.find(pid);
+                  if(e == template_map.pack_expr_map.end())
+                    continue;
+                  const std::string &key = id2string(pid);
+                  auto p = key.rfind("::");
+                  const std::string suffix =
+                    p != std::string::npos ? key.substr(p + 2) : key;
+                  repl_map[suffix] = e->second[i];
+                }
+                std::function<void(exprt &)> repl = [&](exprt &node)
+                {
+                  if(
+                    node.id() == ID_cpp_name && node.get_sub().size() == 1 &&
+                    node.get_sub()[0].id() == ID_name)
+                  {
+                    auto it = repl_map.find(
+                      id2string(node.get_sub()[0].get(ID_identifier)));
+                    if(it != repl_map.end())
+                    {
+                      node = it->second;
+                      return;
+                    }
+                  }
+                  for(auto &op : node.operands())
+                    repl(op);
+                };
+                exprt pattern = arg;
+                pattern.remove(ID_ellipsis);
+                repl(pattern);
+                element_map.apply(pattern);
+                // [expr.comma]: a comma-expression pattern yields its right
+                // operand.  Fold it here so the expanded element is a plain
+                // value argument (the discarded left operand, whose pack
+                // reference is now bound, keeps it well-formed).
+                if(pattern.id() == ID_comma && pattern.operands().size() == 2)
+                  pattern = to_binary_expr(pattern).op1();
+                expanded.push_back(pattern);
+              }
+            }
+            did_expand = true;
+          }
+        }
+      }
+      if(!did_expand)
+        expanded.push_back(arg);
+    }
+    args.swap(expanded);
+  }
+
+  const template_typet::template_parameterst &parameters =
     template_type.template_parameters();
 
-  if(parameters.size()<args.size())
+  // N5008 [temp.variadic]/7: a pack that matched zero elements
+  // contributes NO arguments.  CBMC records such a pack inside a class
+  // instance's template-argument list as a trailing ID_type argument of
+  // type ID_empty (the zero-length-pack sentinel).  When those recorded
+  // arguments are re-used to name another template -- e.g. libc++-23's
+  // `__split_buffer<_Tp, _Allocator, _Layout>` naming `vector<_Tp,
+  // _Allocator>` back through a layout alias, with an enclosing pack
+  // empty -- the sentinel must not count against a template WITHOUT a
+  // trailing pack ("too many template arguments (expected 2, but got
+  // 3)", the libc++-23 vector/__split_buffer layout recursion).  Strip
+  // trailing sentinels when this template cannot absorb them.
+  if(
+    parameters.size() < args.size() && !parameters.empty() &&
+    !parameters.back().get_bool(ID_ellipsis))
   {
-    error().source_location=source_location;
-    error() << "too many template arguments (expected "
-            << parameters.size() << ", but got "
-            << args.size() << ")" << eom;
-    throw 0;
+    while(args.size() > parameters.size() && !args.empty() &&
+          (args.back().id() == ID_type || args.back().id() == ID_ambiguous) &&
+          args.back().type().id() == ID_empty)
+    {
+      args.pop_back();
+    }
+  }
+
+  if(parameters.size() < args.size())
+  {
+    // Check if the last parameter is a parameter pack (ellipsis)
+    bool has_pack =
+      !parameters.empty() && parameters.back().get_bool(ID_ellipsis);
+    // For partial specializations, the specialization's own parameters
+    // may not include the pack. Check the primary template.
+    if(!has_pack)
+    {
+      const irep_idt &primary_id =
+        template_symbol.type.get(ID_specialization_of);
+      if(!primary_id.empty())
+      {
+        const symbolt *primary = symbol_table.lookup(primary_id);
+        if(primary != nullptr && primary->type.get_bool(ID_is_template))
+        {
+          const auto &primary_params = to_cpp_declaration(primary->type)
+                                         .template_type()
+                                         .template_parameters();
+          has_pack = !primary_params.empty() &&
+                     primary_params.back().get_bool(ID_ellipsis);
+        }
+      }
+    }
+    if(!has_pack)
+    {
+      // N5008 [temp.arg.explicit]/3 + [temp.deduct]/2: while matching an
+      // OVERLOADED candidate, an explicit template-argument list that is
+      // too long for this candidate's parameter list is a deduction
+      // failure -- the candidate is removed from the overload set, not a
+      // hard error (`valid<int, double>()` must simply skip the
+      // single-parameter `valid<U>` overload and select the viable one).
+      if(template_arg_candidate_matching > 0)
+        throw template_arg_kind_mismatch_exceptiont{};
+      error().source_location = source_location;
+      error() << "too many template arguments (expected " << parameters.size()
+              << ", but got " << args.size() << ")" << eom;
+      throw 0;
+    }
   }
 
   // we will modify the template map
   template_mapt old_template_map;
-  old_template_map=template_map;
+  old_template_map = template_map;
 
   // check for default arguments
-  for(std::size_t i=0; i<parameters.size(); i++)
+  std::size_t first_default = parameters.size();
+  cpp_scopet *instantiation_scope_ptr = &cpp_scopes.current_scope();
+  for(std::size_t i = 0; i < parameters.size(); i++)
   {
-    const template_parametert &parameter=parameters[i];
+    const template_parametert &parameter = parameters[i];
     cpp_save_scopet cpp_saved_scope(cpp_scopes);
 
-    if(i>=args.size())
+    if(i >= args.size())
     {
+      // A variadic parameter pack can accept zero arguments.
+      if(parameter.get_bool(ID_ellipsis))
+        break;
+
+      // the caller supplies the defaults itself (resolve_template_alias)
+      if(explicit_only)
+        break;
+
       // Check for default argument for the parameter.
       // These may depend on previous arguments.
       if(!parameter.has_default_argument())
       {
-        error().source_location=source_location;
+        // For function templates, remaining parameters can be deduced
+        // from the function call arguments, so partial explicit
+        // template arguments are allowed.
+        const cpp_declarationt &cpp_declaration =
+          to_cpp_declaration(template_symbol.type);
+        if(
+          !cpp_declaration.is_class_template() &&
+          !cpp_declaration.is_template_alias())
+        {
+          break;
+        }
+
+        error().source_location = source_location;
         error() << "not enough template arguments (expected "
-                << parameters.size() << ", but got " << args.size()
-                << ")" << eom;
+                << parameters.size() << ", but got " << args.size() << ")"
+                << eom;
         throw 0;
       }
 
-      args.push_back(parameter.default_argument());
+      {
+        if(first_default > i)
+          first_default = i;
+        // N5008 [temp.param]/14 + [temp.arg.general]: a default
+        // template-argument may reference PRECEDING template
+        // parameters; when used, it is evaluated with those bound to
+        // the preceding arguments.  TYPE parameters are already bound
+        // eagerly at the end of each iteration, but non-type
+        // (expression) parameters are deferred to the end of the
+        // whole loop -- so a default like libc++ <__functional>'s
+        //   template <size_t _NBound,
+        //             class = make_index_sequence<_NBound>>
+        //   struct __bind_back_op;
+        // threw on the unbound _NBound while resolving the alias and
+        // silently dropped the caller's body.  Bind the preceding
+        // expression parameters now (their args are final).
+        for(std::size_t j = 0; j < i && j < args.size(); ++j)
+        {
+          if(parameters[j].id() != ID_type)
+            template_map.set(parameters[j], args[j]);
+        }
+        // N5008 [temp.param]/12-14 + [temp.arg.general]/1: the default
+        // argument is substituted with THIS template's preceding
+        // parameters bound to the preceding arguments -- and with
+        // nothing else.  It is a raw cpp_name (`istreambuf_iterator<
+        // _CharT>`, salvaged from localefwd.h's forward declaration),
+        // so applying the FULL map let its short-name bridge bind
+        // `_CharT` to whichever same-named parameter of an ENCLOSING
+        // instantiation sorted first: `num_get<wchar_t>` named inside
+        // `__try_use_facet<numpunct<char>>` became the hybrid
+        // `num_get<wchar_t, istreambuf_iterator<char>>` (libstdc++'s
+        // _GLIBCXX_STD_FACET table; ~130 bogus facet instantiations per
+        // <regex> translation unit, and which ones existed depended on
+        // candidate order).  Substitute through a map holding only the
+        // preceding parameters of this template.
+        template_mapt default_map;
+        for(std::size_t j = 0; j < i && j < args.size(); ++j)
+          default_map.set(parameters[j], args[j]);
+        exprt def = parameter.default_argument();
+        default_map.apply(def);
+        if(def.id() == ID_type)
+          default_map.apply(def.type());
+        args.push_back(def);
+      }
 
       // these need to be typechecked in the scope of the template,
       // not in the current scope!
-      cpp_idt *template_scope=cpp_scopes.id_map[template_symbol.name];
+      cpp_idt *template_scope = cpp_scopes.id_map[template_symbol.name];
       INVARIANT_STRUCTURED(
-        template_scope!=nullptr, nullptr_exceptiont, "template_scope is null");
+        template_scope != nullptr,
+        nullptr_exceptiont,
+        "template_scope is null");
       cpp_scopes.go_to(*template_scope);
     }
 
     DATA_INVARIANT(i < args.size(), "i must be in bounds");
 
-    exprt &arg=args[i];
+    exprt &arg = args[i];
 
-    if(parameter.id()==ID_type)
+    if(parameter.id() == ID_type)
     {
-      if(arg.id()==ID_type)
+      // Template template parameter: resolve argument as a template name
+      // and store the template symbol identifier.
+      if(parameter.get_bool(ID_is_template))
       {
-        typecheck_type(arg.type());
+        // Forward an already-resolved template-template-parameter
+        // binding through this layer.  When the outer template's
+        // own TT-parameter is being passed as the inner template's
+        // TT-parameter (e.g. `__detected_or_t<D, _Op, As...>`
+        // forwarding `_Op` to `__detected_or<D, _Op, As...>`),
+        // the argument arrives here as a type_expr / ambiguous
+        // node whose type is already a `template_parameter_symbol_type`.
+        // Skip the cpp_name-based lookup and use it directly:
+        // `template_map.set` wires it up the same way as if we
+        // had just looked up the template in scope.
+        if(
+          (arg.id() == ID_ambiguous || arg.id() == ID_type) &&
+          arg.type().id() == ID_template_parameter_symbol_type)
+        {
+          exprt fwd = type_exprt(to_template_parameter_symbol_type(arg.type()));
+          fwd.type().add_source_location() = parameter.source_location();
+          template_map.set(parameter, fwd);
+          // Replace the original `ambiguous` arg in the args list
+          // with the normalised `type_exprt` so downstream
+          // `template_suffix` (which has a strict
+          // `expr.id() != ID_ambiguous` invariant) doesn't trip
+          // on the unconverted ambiguity node.
+          arg = std::move(fwd);
+          continue;
+        }
+
+        irep_idt template_name;
+        if(arg.id() == ID_ambiguous && arg.type().id() == ID_cpp_name)
+          template_name = to_cpp_name(arg.type()).get_base_name();
+        else if(arg.id() == ID_type && arg.type().id() == ID_cpp_name)
+          template_name = to_cpp_name(arg.type()).get_base_name();
+
+        if(!template_name.empty())
+        {
+          auto id_set = cpp_scopes.current_scope().lookup(
+            template_name, cpp_scopet::RECURSIVE, cpp_idt::id_classt::TEMPLATE);
+          // If the found template is actually a template template
+          // PARAMETER (has a numeric scope ID), resolve it via the
+          // template_map to get the actual template.
+          if(!id_set.empty())
+          {
+            const cpp_idt &found_id = **id_set.begin();
+            std::string found_str = id2string(found_id.identifier);
+            auto last_sep = found_str.rfind("::");
+            std::string suffix = last_sep != std::string::npos
+                                   ? found_str.substr(last_sep + 2)
+                                   : found_str;
+            // Numeric suffix indicates a template parameter scope ID
+            if(!suffix.empty() && std::isdigit(suffix[0]))
+              id_set.clear();
+          }
+          // Set when the template-template-parameter argument was resolved
+          // directly from its deduced template_map binding (see below).
+          bool tt_resolved_from_map = false;
+          if(id_set.empty())
+          {
+            const auto param_set = cpp_scopes.current_scope().lookup(
+              template_name,
+              cpp_scopet::RECURSIVE,
+              cpp_idt::id_classt::TEMPLATE_PARAMETER);
+            for(const auto *param_ptr : param_set)
+            {
+              // Look up the parameter's mapped value in template_map
+              exprt e = template_map.lookup(param_ptr->identifier);
+              if(
+                e.id() == ID_type &&
+                e.type().id() == ID_template_parameter_symbol_type)
+              {
+                // N5008 [temp.arg.template], [temp.class.spec.match]: the
+                // deduced binding already NAMES the resolved template (e.g. a
+                // partial specialization argument that is a
+                // template-template-parameter forwarded from the enclosing
+                // template, as in the detection idiom's
+                // `has<Op, Arg, void_t<Op<Arg>>>`).  Wire the argument directly
+                // to that template.  Relying on cpp_scopes.id_map.find(tmpl_id)
+                // can fail because the template's scope-id key differs from its
+                // symbol identifier; the empty id_set then falls through to the
+                // global-name fallback, which re-selects the
+                // template-template-PARAMETER itself, leaving the partial-spec
+                // argument unsubstituted and the specialization wrongly
+                // unmatched.
+                arg = type_exprt(to_template_parameter_symbol_type(e.type()));
+                arg.type().add_source_location() = parameter.source_location();
+                template_map.set(parameter, arg);
+                tt_resolved_from_map = true;
+                break;
+                // (id_map lookup retained below for the non-deduced case)
+              }
+            }
+          }
+          if(tt_resolved_from_map)
+            continue;
+          // Fallback: search global id_map for the template name.
+          if(id_set.empty())
+          {
+            for(auto &entry : cpp_scopes.id_map)
+            {
+              if(
+                entry.second->base_name == template_name &&
+                entry.second->id_class == cpp_idt::id_classt::TEMPLATE)
+              {
+                id_set.insert(entry.second);
+                break;
+              }
+            }
+          }
+          // Fallback for qualified names (e.g., Tester::_Apply):
+          // resolve the scope prefix, then look up the template
+          // in that scope.
+          if(id_set.empty())
+          {
+            const cpp_namet *cn = nullptr;
+            if(arg.id() == ID_ambiguous && arg.type().id() == ID_cpp_name)
+              cn = &to_cpp_name(arg.type());
+            else if(arg.id() == ID_type && arg.type().id() == ID_cpp_name)
+              cn = &to_cpp_name(arg.type());
+            if(cn != nullptr && cn->get_sub().size() >= 3)
+            {
+              // Build the scope prefix (everything before the last
+              // ::name)
+              cpp_namet scope_name;
+              for(std::size_t si = 0; si + 2 < cn->get_sub().size(); si++)
+                scope_name.get_sub().push_back(cn->get_sub()[si]);
+              // Resolve the scope prefix as a type.  The prefix may be a
+              // NAMESPACE (`user<outer::box>`, `Holds<int, ns::is_ptr>`),
+              // for which the TYPE resolution emits "found no match" and
+              // throws; that is a speculative attempt -- the resolve_scope
+              // fallback below handles a namespace -- so silence it
+              // (sfinae_contextt: no diagnostic, error count restored).
+              cpp_typecheck_resolvet resolver{*this};
+              try
+              {
+                sfinae_contextt sfinae_guard{*this};
+                exprt scope_expr = resolver.resolve(
+                  scope_name,
+                  cpp_typecheck_resolvet::wantt::TYPE,
+                  cpp_typecheck_fargst{});
+                if(scope_expr.id() == ID_type)
+                {
+                  irep_idt scope_id;
+                  if(scope_expr.type().id() == ID_struct_tag)
+                    scope_id =
+                      to_struct_tag_type(scope_expr.type()).get_identifier();
+                  if(!scope_id.empty())
+                  {
+                    auto it = cpp_scopes.id_map.find(scope_id);
+                    if(it != cpp_scopes.id_map.end())
+                    {
+                      id_set = static_cast<cpp_scopet &>(*it->second)
+                                 .lookup(template_name, cpp_scopet::SCOPE_ONLY);
+                    }
+                  }
+                }
+              }
+              catch(...)
+              {
+              }
+            }
+            // N5008 [temp.arg.template]/1: the template-argument names
+            // an accessible class template -- as an id-expression that
+            // may be QUALIFIED, including by a NAMESPACE
+            // (`user<outer::box>`).  The type-prefix fallback above
+            // cannot resolve a namespace prefix; walk the full scope
+            // chain with resolve_scope, which handles namespace and
+            // class qualifiers alike (cpp11_qualified_tt_argument).
+            if(id_set.empty() && cn != nullptr && cn->get_sub().size() >= 3)
+            {
+              cpp_save_scopet save_scope{cpp_scopes};
+              cpp_typecheck_resolvet resolver{*this};
+              try
+              {
+                irep_idt last_base_name;
+                cpp_template_args_non_tct last_args;
+                cpp_scopet &qual_scope =
+                  resolver.resolve_scope(*cn, last_base_name, last_args);
+                if(last_args.is_nil() && !last_base_name.empty())
+                {
+                  id_set = qual_scope.lookup(
+                    last_base_name,
+                    cpp_scopet::QUALIFIED,
+                    cpp_idt::id_classt::TEMPLATE);
+                }
+              }
+              catch(...)
+              {
+              }
+            }
+          }
+          if(!id_set.empty())
+          {
+            const cpp_idt &cpp_id = **id_set.begin();
+            // Use the symbol table identifier (full name) for the
+            // template template parameter, not the scope ID.
+            irep_idt tmpl_id = cpp_id.identifier;
+
+            const auto *tmpl_sym = symbol_table.lookup(tmpl_id);
+            if(tmpl_sym)
+              tmpl_id = tmpl_sym->name;
+            arg = type_exprt(template_parameter_symbol_typet(tmpl_id));
+            arg.type().add_source_location() = parameter.source_location();
+            template_map.set(parameter, arg);
+            continue;
+          }
+        }
+        error().source_location = arg.source_location();
+        error() << "expected template name for template template parameter"
+                << eom;
+        throw 0;
+      }
+
+      if(arg.id() == ID_type)
+      {
+        if(arg.type().is_nil() || arg.type().id().empty())
+        {
+          // [temp.deduct]/8: while matching an overloaded candidate, a
+          // template argument that failed to form (nil type -- e.g. a
+          // SFINAE'd-out __enable_if_t inside GCC 13's __and_fn chain,
+          // reached from std::optional's _Requires'd converting
+          // constructors) is a deduction failure that removes just this
+          // candidate, not a hard error.
+          if(template_arg_candidate_matching > 0)
+            throw template_arg_kind_mismatch_exceptiont{};
+          error().source_location = arg.source_location();
+          error() << "missing type in template argument" << eom;
+          throw 0;
+        }
+        // [temp.arg]/2 + [temp.deduct]/8: a VALUE in type position -- e.g. a
+        // constant produced by substituting a non-type template parameter,
+        // like the `I` of `std::get<I>(t)` when overload resolution also
+        // considers the by-TYPE `std::get<T>` overload -- supplied for a TYPE
+        // parameter is a kind mismatch.  While matching a candidate it
+        // silently removes just that candidate; otherwise it is a hard error.
+        // Without this, typecheck_type on the constant is a hard error that
+        // aborts resolution of the remaining (viable) by-index overload.
+        if(arg.type().id() == ID_constant)
+        {
+          if(template_arg_candidate_matching == 0)
+          {
+            error().source_location = arg.source_location();
+            error() << "expected type, but got expression" << eom;
+          }
+          throw template_arg_kind_mismatch_exceptiont{};
+        }
+        // [dcl.fct]/3 + [temp.type]: parameter names are not part of a
+        // function type, so a function type used as a template argument
+        // denotes the same type — and hence the same specialization —
+        // whether or not its parameters are named.  Such an argument may
+        // arrive with its parameters still as unconverted cpp_
+        // declarations carrying the parameter names (e.g.
+        // `std::function<void(const T &id)>`).  Strip those names so the
+        // argument is identical to the unnamed spelling
+        // (`std::function<void(const T&)>`) and therefore denotes the
+        // same, fully elaborated specialization rather than a distinct,
+        // never-elaborated one.
+        // (The argument arrives as `code' or, straight from the parser, as
+        // `function_type'; both carry the parameters as cpp_declarations.)
+        strip_function_type_parameter_names(arg.type());
+        // N5008 [temp.variadic]/5: likewise for a pointer or reference to
+        // a function type whose parameter list is a pack expansion (the
+        // pattern `R (&)(A...)' of a partial specialization): expand the
+        // pack in the pointee's parameter list first, or the deduced pack
+        // collapses to a single parameter when the pattern is substituted
+        // and the specialization never matches.
+        if(
+          arg.type().id() == ID_frontend_pointer &&
+          to_type_with_subtype(arg.type()).subtype().id() == ID_function_type)
+        {
+          template_map.expand_parameter_packs(
+            to_type_with_subtype(arg.type()).subtype());
+        }
+        // [temp.variadic]/5: if a function-type template argument
+        // contains a function parameter pack (e.g. `_Res(_ArgTypes...)`
+        // in a partial specialization pattern), expand the pack using
+        // the deduced arguments and substitute the remaining template
+        // parameters via the template map, keeping the result in the
+        // same (unconverted) frontend form as a concrete function-type
+        // argument so the reconstructed type compares equal during
+        // specialization matching.  This bypasses typecheck_type, which
+        // would convert e.g. a reference parameter carried on the
+        // declaration type to a pointer.  Gated on the presence of a
+        // pack-expansion parameter so non-variadic arguments are
+        // unaffected.
+        bool pack_expanded = false;
+        if(arg.type().id() == ID_code || arg.type().id() == ID_function_type)
+        {
+          const irept &params = arg.type().find(ID_parameters);
+          bool has_pack = false;
+          for(const auto &param : params.get_sub())
+          {
+            if(param.id() != ID_cpp_declaration)
+              continue;
+            for(const auto &d : param.get_sub())
+              if(d.id() == ID_cpp_declarator && d.get_bool(ID_ellipsis))
+                has_pack = true;
+          }
+          if(has_pack)
+          {
+            template_map.expand_parameter_packs(arg.type());
+            template_map.apply(arg.type());
+            pack_expanded = true;
+            // N5008 [temp.arg.type]/1: the argument is a type-id and is
+            // type-checked like any other; expansion of its parameter
+            // pack does not exempt it.  Left as parsed, `_Bind<__func_type(
+            // typename decay<_BoundArgs>::type...)>` (libstdc++'s
+            // _Bind_helper, the type of every std::bind result) named its
+            // specialization with the RAW return typedef and parameter
+            // patterns, the partial specialization `_Bind<F(A...)>` bound
+            // F to an unresolvable name, and every std::bind result was an
+            // incomplete placeholder ("member operator got incomplete
+            // type").  A type that still cannot be checked (a dependent
+            // context) keeps the expanded form, as before.
+            // Only when the expanded type still names something to resolve:
+            // an already-plain function type (`F(int&&, char&&)`) keeps its
+            // parsed form, which is what the partial-specialization matcher
+            // compares against.
+            std::function<bool(const irept &)> has_cpp_name =
+              [&](const irept &n) -> bool
+            {
+              if(n.id() == ID_cpp_name)
+                return true;
+              for(const auto &c : n.get_sub())
+                if(has_cpp_name(c))
+                  return true;
+              for(const auto &c : n.get_named_sub())
+                if(c.first != ID_C_source_location && has_cpp_name(c.second))
+                  return true;
+              return false;
+            };
+            if(has_cpp_name(arg.type()))
+            {
+              const std::size_t errors_before =
+                get_message_handler().get_message_count(messaget::M_ERROR);
+              typet checked = arg.type();
+              try
+              {
+                sfinae_contextt sfinae_guard{*this};
+                typecheck_type(checked);
+                arg.type() = checked;
+              }
+              catch(...)
+              {
+                get_message_handler().set_message_count(
+                  messaget::M_ERROR, errors_before);
+              }
+            }
+          }
+        }
+        // Skip typecheck_type for types that are already resolved
+        // (e.g., struct_tag from a previous instantiation).
+        // Re-typechecking can fail when the type references local
+        // scopes that are no longer accessible.
+        // Also try to resolve a simple cpp_name via template_map
+        // first, in case the name refers to a template parameter
+        // that's out of scope (e.g., a method template parameter
+        // referenced via a qualified member access when scope has
+        // been switched to the target class).
+        if(
+          !pack_expanded && arg.type().id() == ID_cpp_name &&
+          arg.type().get_sub().size() == 1 &&
+          arg.type().get_sub().front().id() == ID_name)
+        {
+          const irep_idt &nm = arg.type().get_sub().front().get(ID_identifier);
+          // Search template_map for a matching template parameter
+          for(const auto &tm : template_map.type_map)
+          {
+            const std::string full = id2string(tm.first);
+            auto p = full.rfind("::");
+            const std::string sn =
+              p != std::string::npos ? full.substr(p + 2) : full;
+            if(sn == id2string(nm) && tm.second.id() != ID_unassigned)
+            {
+              arg.type() = tm.second;
+              goto tm_resolved;
+            }
+          }
+        }
+        if(
+          !pack_expanded && arg.type().id() != ID_struct_tag &&
+          arg.type().id() != ID_union_tag)
+        {
+          // Per [temp.deduct]/7-8: substituting a default template
+          // argument is part of the deduction process; failures there
+          // must be treated as silent deduction failures.  For
+          // default type arguments, redirect diagnostics to a null
+          // message handler so substitution failures in e.g.
+          //   typename = decltype(swap(std::declval<_Tp&>(),
+          //                            std::declval<_Tp&>()))
+          // of libstdc++'s __do_is_swappable_impl::__test do not leak
+          // Per [temp.deduct]/3 and [temp.deduct]/8: substituting
+          // default template arguments is an immediate context —
+          // e.g. libstdc++ often makes default args SFINAE-guarded
+          // (`typename = _Require<...>`), and a failure here must
+          // be a silent deduction failure, not a user-visible
+          // "found no match for symbol 'swap'" diagnostic.
+          if(i >= first_default)
+          {
+            sfinae_contextt sfinae_guard{*this};
+            typecheck_type(arg.type());
+          }
+          else if(template_arg_candidate_matching > 0)
+          {
+            // N5008 [temp.deduct]/8: while matching an overloaded
+            // candidate, an invalid type or expression formed by the
+            // substituted template arguments is a DEDUCTION FAILURE
+            // that removes this candidate from the overload set -- not
+            // a hard error.  E.g. substituting the pack element `I1`
+            // (a constant) of an instantiated mem-initializer
+            // `first(get<I1>(t1)...)` into the by-TYPE `get<T>`
+            // overload's parameter: the constant is no type, the
+            // candidate must simply drop out so the by-index overload
+            // is selected.  The pre-substituted constant case is
+            // handled above; this covers arguments that reach the
+            // type-check still as unresolved names.
+            const std::size_t errors_before =
+              get_message_handler().get_message_count(messaget::M_ERROR);
+            try
+            {
+              sfinae_contextt sfinae_guard{*this};
+              typecheck_type(arg.type());
+            }
+            catch(...)
+            {
+              get_message_handler().set_message_count(
+                messaget::M_ERROR, errors_before);
+              throw template_arg_kind_mismatch_exceptiont{};
+            }
+          }
+          else
+          {
+            const std::size_t errors_before =
+              get_message_handler().get_message_count(messaget::M_ERROR);
+            try
+            {
+              typecheck_type(arg.type());
+            }
+            catch(const incomplete_dependency_exceptiont &)
+            {
+              // N5008 [temp.inst]/1: naming a class template specialization
+              // as a template ARGUMENT does not require it to be complete.
+              // Its instantiation was attempted on the way (the argument's
+              // type was resolved) and failed because a class it depends on
+              // is only declared so far; the specialization is left
+              // incomplete, to be instantiated where completeness is
+              // required (libstdc++'s `rebind<_Rb_tree_node<_Val>>::other'
+              // in a `std::set<X>' named before X is defined).
+              get_message_handler().set_message_count(
+                messaget::M_ERROR, errors_before);
+              const bool old_skip = skip_typechecking_elaborate;
+              skip_typechecking_elaborate = true;
+              try
+              {
+                typecheck_type(arg.type());
+              }
+              catch(...)
+              {
+                skip_typechecking_elaborate = old_skip;
+                throw;
+              }
+              skip_typechecking_elaborate = old_skip;
+            }
+          }
+        }
+      tm_resolved:
+        // Per [temp.arg]/2: resolve remaining template parameter
+        // references via template_map (e.g., forward<_Other1> where
+        // _Other1 is mapped to const less<int>).
+        if(arg.type().id() == ID_template_parameter_symbol_type)
+          template_map.apply(arg.type());
       }
       else if(arg.id() == ID_ambiguous)
       {
-        typecheck_type(arg.type());
-        typet t=arg.type();
-        arg=exprt(ID_type, t);
+        if(arg.type().is_nil() || arg.type().id().empty())
+        {
+          // [temp.deduct]/8 -- see the ID_type branch above.
+          if(template_arg_candidate_matching > 0)
+            throw template_arg_kind_mismatch_exceptiont{};
+          error().source_location = arg.source_location();
+          error() << "missing type in template argument" << eom;
+          throw 0;
+        }
+        // [temp.arg]/2 + [temp.deduct]/8: an ambiguous argument whose type
+        // interpretation is a VALUE (a constant produced by substituting a
+        // non-type template parameter, e.g. the `I` of `std::get<I>(t)` when
+        // the by-TYPE `std::get<T>` overload is also considered) supplied for
+        // a TYPE parameter is a kind mismatch: silently remove the candidate
+        // while matching, hard error otherwise (see the ID_type branch).
+        if(arg.type().id() == ID_constant)
+        {
+          if(template_arg_candidate_matching == 0)
+          {
+            error().source_location = arg.source_location();
+            error() << "expected type, but got expression" << eom;
+          }
+          throw template_arg_kind_mismatch_exceptiont{};
+        }
+        strip_function_type_parameter_names(arg.type());
+        // [temp.variadic]/5: expand a function parameter pack in a
+        // function-type argument (e.g. `_Res(_ArgTypes...)`) and
+        // substitute the remaining template parameters, keeping the
+        // result in unconverted frontend form (see the ID_type branch
+        // above) so it compares equal during specialization matching.
+        bool pack_expanded = false;
+        if(arg.type().id() == ID_code || arg.type().id() == ID_function_type)
+        {
+          const irept &params = arg.type().find(ID_parameters);
+          bool has_pack = false;
+          for(const auto &param : params.get_sub())
+          {
+            if(param.id() != ID_cpp_declaration)
+              continue;
+            for(const auto &d : param.get_sub())
+              if(d.id() == ID_cpp_declarator && d.get_bool(ID_ellipsis))
+                has_pack = true;
+          }
+          if(has_pack)
+          {
+            template_map.expand_parameter_packs(arg.type());
+            template_map.apply(arg.type());
+            pack_expanded = true;
+            // N5008 [temp.arg.type]/1: the argument is a type-id and is
+            // type-checked like any other; expansion of its parameter
+            // pack does not exempt it.  Left as parsed, `_Bind<__func_type(
+            // typename decay<_BoundArgs>::type...)>` (libstdc++'s
+            // _Bind_helper, the type of every std::bind result) named its
+            // specialization with the RAW return typedef and parameter
+            // patterns, the partial specialization `_Bind<F(A...)>` bound
+            // F to an unresolvable name, and every std::bind result was an
+            // incomplete placeholder ("member operator got incomplete
+            // type").  A type that still cannot be checked (a dependent
+            // context) keeps the expanded form, as before.
+            // Only when the expanded type still names something to resolve:
+            // an already-plain function type (`F(int&&, char&&)`) keeps its
+            // parsed form, which is what the partial-specialization matcher
+            // compares against.
+            std::function<bool(const irept &)> has_cpp_name =
+              [&](const irept &n) -> bool
+            {
+              if(n.id() == ID_cpp_name)
+                return true;
+              for(const auto &c : n.get_sub())
+                if(has_cpp_name(c))
+                  return true;
+              for(const auto &c : n.get_named_sub())
+                if(c.first != ID_C_source_location && has_cpp_name(c.second))
+                  return true;
+              return false;
+            };
+            if(has_cpp_name(arg.type()))
+            {
+              const std::size_t errors_before =
+                get_message_handler().get_message_count(messaget::M_ERROR);
+              typet checked = arg.type();
+              try
+              {
+                sfinae_contextt sfinae_guard{*this};
+                typecheck_type(checked);
+                arg.type() = checked;
+              }
+              catch(...)
+              {
+                get_message_handler().set_message_count(
+                  messaget::M_ERROR, errors_before);
+              }
+            }
+          }
+        }
+        if(!pack_expanded)
+        {
+          if(template_arg_candidate_matching > 0)
+          {
+            // [temp.deduct]/8 -- see the ID_type branch above: failure
+            // while matching a candidate removes the candidate.
+            const std::size_t errors_before =
+              get_message_handler().get_message_count(messaget::M_ERROR);
+            try
+            {
+              sfinae_contextt sfinae_guard{*this};
+              typecheck_type(arg.type());
+            }
+            catch(...)
+            {
+              get_message_handler().set_message_count(
+                messaget::M_ERROR, errors_before);
+              throw template_arg_kind_mismatch_exceptiont{};
+            }
+          }
+          else
+            typecheck_type(arg.type());
+        }
+        typet t = arg.type();
+        arg = exprt(ID_type, t);
       }
       else
       {
-        error().source_location=arg.source_location();
-        error() << "expected type, but got expression" << eom;
-        throw 0;
+        // [temp.arg]/2 + [temp.deduct]/8: a non-type argument supplied for a
+        // type parameter is a substitution failure.  While matching a
+        // candidate during overload resolution this removes only that
+        // candidate (silently); otherwise it is a hard error.
+        if(template_arg_candidate_matching == 0)
+        {
+          error().source_location = arg.source_location();
+          error() << "expected type, but got expression" << eom;
+        }
+        throw template_arg_kind_mismatch_exceptiont{};
       }
     }
     else // expression
     {
-      if(arg.id()==ID_type)
+      // [temp.arg.nontype]: a non-type template argument is a
+      // converted constant expression, so constexpr calls in it must
+      // be folded ([expr.const]).
+      constant_expression_contextt constant_expression_guard{*this};
+      // Ambiguous args in non-type parameter context: treat as expression.
+      // The parser stores noexcept(...) and other expressions as
+      // ambiguous nodes with a cpp_name type interpretation.
+      // For non-type parameters, use the expression interpretation.
+      if(arg.id() == ID_ambiguous && arg.type().id() == ID_cpp_name)
       {
-        error().source_location=arg.source_location();
-        error() << "expected expression, but got type" << eom;
-        throw 0;
+        // Check if the cpp_name contains a noexcept expression.
+        // noexcept(...) evaluates to true for noexcept operations.
+        bool has_noexcept = false;
+        for(const auto &sub : arg.type().get_sub())
+        {
+          if(sub.id() == ID_noexcept)
+          {
+            has_noexcept = true;
+            break;
+          }
+        }
+        if(has_noexcept)
+        {
+          // Evaluate noexcept as true (safe approximation).
+          // The noexcept expression contains destructor calls that
+          // can't be fully resolved during template instantiation.
+          arg = true_exprt();
+          template_map.set(parameter, arg);
+          continue;
+        }
+        exprt e{ID_cpp_name};
+        e.get_sub() = arg.type().get_sub();
+        e.add_source_location() = arg.source_location();
+        arg.swap(e);
+      }
+      // Type predicates as non-type template arguments
+      if(!arg.find(ID_type_arg).is_nil() || !arg.find("type_arg1").is_nil())
+      {
+        try
+        {
+          typecheck_expr(arg);
+        }
+        catch(int)
+        {
+          // Predicate evaluation failed — default to true for
+          // fundamental types
+          arg = exprt{ID_true, bool_typet{}};
+        }
+      }
+      else if(arg.id() == ID_type)
+      {
+        // The parser may have interpreted a variable template
+        // instantiation (e.g., is_floating_point_v<T>) as a type
+        // because it looks like a template-id. Convert it back to
+        // an expression so it can be resolved as a variable template.
+        if(arg.type().id() == ID_cpp_name)
+        {
+          exprt e = static_cast<exprt &>(static_cast<irept &>(arg.type()));
+          arg.swap(e);
+        }
+        else
+        {
+          // [temp.arg]/2 + [temp.deduct]/8: a TYPE supplied for a non-type
+          // parameter -- `std::get<double>(v)` also considered against the
+          // by-index `get<size_t N>(variant<T...>&)` overload -- is a kind
+          // mismatch that removes just that candidate while matching (the
+          // mirror of the value-for-type case above); a hard error
+          // otherwise.
+          if(template_arg_candidate_matching == 0)
+          {
+            error().source_location = arg.source_location();
+            error() << "expected expression, but got type" << eom;
+          }
+          throw template_arg_kind_mismatch_exceptiont{};
+        }
+      }
+      // Simplify comma expressions: (expr1, expr2) -> expr2
+      // This handles libc++ patterns like ((void)Pred, true)
+      else if(arg.id() == ID_comma)
+      {
+        typecheck_expr(arg);
+        // After type-checking, extract the right operand
+        if(arg.id() == ID_comma && arg.operands().size() == 2)
+          arg = to_binary_expr(arg).op1();
       }
       else if(arg.id() == ID_ambiguous)
       {
         exprt e;
         e.swap(arg.type());
-        arg.swap(e);
+        // The parser stores the type interpretation for ambiguous
+        // template arguments. When the parameter is an expression,
+        // a function-type parse like "f()" should become a function
+        // call expression "f()".
+        if(e.id() == ID_code)
+        {
+          const irept &return_type = e.find(ID_return_type);
+          const irept &params = e.find(ID_parameters);
+          if(return_type.id() == ID_cpp_name && params.get_sub().empty())
+          {
+            exprt func_name = static_cast<const exprt &>(
+              static_cast<const irept &>(return_type));
+            side_effect_exprt call(
+              ID_function_call, uninitialized_typet{}, arg.source_location());
+            call.add_to_operands(std::move(func_name));
+            call.add_to_operands(exprt(ID_arguments));
+            arg.swap(call);
+          }
+          else
+          {
+            arg.swap(e);
+          }
+        }
+        else
+        {
+          arg.swap(e);
+        }
       }
 
-      typet type=parameter.type();
+      typet type = parameter.type();
 
       // First check the parameter type (might have earlier
       // type parameters in it). Needs to be checked in scope
       // of template.
       {
         cpp_save_scopet cpp_saved_scope_before_parameter_typecheck(cpp_scopes);
-        cpp_idt *template_scope=cpp_scopes.id_map[template_symbol.name];
+        cpp_idt *template_scope = cpp_scopes.id_map[template_symbol.name];
         INVARIANT_STRUCTURED(
-          template_scope!=nullptr,
+          template_scope != nullptr,
           nullptr_exceptiont,
           "template_scope is null");
         cpp_scopes.go_to(*template_scope);
-        typecheck_type(type);
+        if(!type.id().empty())
+          typecheck_type(type);
       }
 
       // Now check the argument to match that.
-      typecheck_expr(arg);
+      // For default non-type arguments (e.g., SFINAE enable_if_t),
+      // the template scope may lack visibility of type aliases from
+      // enclosing inline namespaces. Per [temp.point] p1,7, retry
+      // in the instantiation scope which has full namespace visibility.
+      if(i >= first_default)
+      {
+        // Per [temp.deduct]/7-8: substitution failure in a default
+        // template argument is silently absorbed.  Suppress
+        // diagnostics emitted during the typecheck attempt; if both
+        // the primary and the instantiation-scope retry fail,
+        // re-throw.  Per [temp.deduct]/8 the whole block is a SFINAE
+        // immediate context (substitution of a default non-type
+        // template argument at use site).
+        bool succeeded = false;
+        {
+          sfinae_contextt sfinae_guard{*this};
+          try
+          {
+            typecheck_expr(arg);
+            succeeded = true;
+          }
+          catch(int)
+          {
+            try
+            {
+              cpp_scopes.go_to(*instantiation_scope_ptr);
+              typecheck_expr(arg);
+              succeeded = true;
+            }
+            catch(int)
+            {
+              // Rethrow below once the real message handler is
+              // restored.
+            }
+          }
+        }
+        if(!succeeded)
+          throw 0;
+      }
+      else if(template_arg_candidate_matching > 0)
+      {
+        // N5008 [temp.deduct]/8 -- see the type-argument branch above:
+        // while matching an overloaded candidate, an invalid
+        // expression formed by the substituted arguments is a
+        // deduction failure that removes this candidate, not a hard
+        // error (e.g. the `forward<_Args1>` of std::pair's expanded
+        // piecewise mem-initializer being tried against an unrelated
+        // same-name overload).
+        const std::size_t errors_before =
+          get_message_handler().get_message_count(messaget::M_ERROR);
+        try
+        {
+          sfinae_contextt sfinae_guard{*this};
+          typecheck_expr(arg);
+        }
+        catch(...)
+        {
+          get_message_handler().set_message_count(
+            messaget::M_ERROR, errors_before);
+          throw template_arg_kind_mismatch_exceptiont{};
+        }
+      }
+      else
+        typecheck_expr(arg);
       simplify(arg, *this);
-      implicit_typecast(arg, type);
+      // C++17 template<auto>: deduce type from argument
+      if(type.id() == ID_auto)
+        type = arg.type();
+      if(template_arg_candidate_matching > 0)
+      {
+        // [temp.deduct]/8: a non-type argument that cannot convert to the
+        // candidate's parameter type while MATCHING (e.g. deducing the
+        // WIDE std::stoll overload for a const char* argument converts
+        // against const wchar_t*) removes the candidate, silently.
+        const std::size_t errors_before =
+          get_message_handler().get_message_count(messaget::M_ERROR);
+        try
+        {
+          sfinae_contextt sfinae_guard{*this};
+          implicit_typecast(arg, type);
+        }
+        catch(...)
+        {
+          get_message_handler().set_message_count(
+            messaget::M_ERROR, errors_before);
+          throw template_arg_kind_mismatch_exceptiont{};
+        }
+      }
+      else
+        implicit_typecast(arg, type);
+      simplify(arg, *this);
+      // Resolve symbol references to their constant values.
+      // N5008 [temp.arg.nontype]/2: for a reference (or pointer) non-type
+      // parameter the argument designates the object itself, not its value, so
+      // it must NOT be replaced by the referenced object's value.
+      if(
+        arg.id() == ID_symbol && !type.get_bool(ID_C_reference) &&
+        type.id() != ID_pointer && type.id() != ID_frontend_pointer)
+      {
+        const auto *sym =
+          symbol_table.lookup(to_symbol_expr(arg).get_identifier());
+        if(sym && sym->value.is_not_nil())
+        {
+          if(sym->value.is_constant())
+            arg = sym->value;
+          else
+          {
+            arg = sym->value;
+            simplify(arg, *this);
+          }
+        }
+      }
+      // Try constexpr evaluation for remaining function calls
+      if(!arg.is_constant())
+      {
+        std::function<void(exprt &)> eval_calls;
+        eval_calls = [&](exprt &e)
+        {
+          // N5008 [temp.arg.nontype]/1 + [temp.param]/7: a temporary of a
+          // structural class type built by a constexpr constructor
+          // (`Fixed(42)`) is the converted constant expression the
+          // parameter binds to -- fold it to a struct constant, so the
+          // instance's use of `F.value` folds too.
+          if(
+            e.id() == ID_side_effect &&
+            e.get(ID_statement) == ID_temporary_object)
+          {
+            exprt r = try_evaluate_constexpr(e, symbol_table, *this);
+            if(r.is_not_nil())
+            {
+              e = r;
+              return;
+            }
+          }
+          for(auto &op : e.operands())
+            eval_calls(op);
+          if(
+            e.id() == ID_side_effect && e.get(ID_statement) == ID_function_call)
+          {
+            // N5008 [temp.inst]/5 + [expr.const]: the callee's definition
+            // may still sit in the deferred method-body queue (a constexpr
+            // helper like chrono duration's `_S_gcd`, called in a DEFAULT
+            // TEMPLATE ARGUMENT of a member alias such as `__divide`).
+            // Instantiate it now; without a body the evaluation below
+            // returns nil and the default argument silently degrades
+            // (`__divide` became ratio<1,0>, __is_harmonic false, and the
+            // duration converting constructor vanished -- mixed-period
+            // operator+ returned nondet).
+            {
+              const exprt &fn = to_side_effect_expr_function_call(e).function();
+              if(fn.id() == ID_symbol)
+              {
+                const irep_idt fid = to_symbol_expr(fn).get_identifier();
+                const symbolt *fsym = symbol_table.lookup(fid);
+                // a queued definition still carries its PARSED body (no code
+                // type yet); a converted one is typed with its code type
+                if(fsym != nullptr && fsym->value.type().id() != ID_code)
+                  convert_deferred_method_now(fid);
+              }
+            }
+            exprt r = try_evaluate_constexpr(e, symbol_table, *this);
+            if(r.is_not_nil())
+              e = r;
+          }
+          if(
+            e.id() == ID_dereference && e.operands().size() == 1 &&
+            e.operands()[0].id() == ID_side_effect &&
+            e.operands()[0].get(ID_statement) == ID_function_call)
+          {
+            exprt r =
+              try_evaluate_constexpr(e.operands()[0], symbol_table, *this);
+            if(r.is_not_nil())
+              e = r;
+          }
+          simplify(e, *this);
+          if(
+            e.id() == ID_dereference && e.operands().size() == 1 &&
+            e.operands()[0].is_constant())
+          {
+            e = e.operands()[0];
+          }
+        };
+        eval_calls(arg);
+      }
     }
 
     // Set right away -- this is for the benefit of default
     // arguments and later parameters whose type might
-    // depend on an earlier parameter.
+    // depend on an earlier parameter. Only set type parameters
+    // eagerly; defer expression parameters to avoid overwriting
+    // outer template map entries for recursive templates where
+    // inner and outer parameters share the same identifiers.
 
-    template_map.set(parameter, arg);
+    if(parameter.id() == ID_type)
+      template_map.set(parameter, arg);
+  }
+
+  // Now set expression parameters.
+  for(std::size_t i = 0; i < parameters.size() && i < args.size(); i++)
+  {
+    if(parameters[i].id() != ID_type)
+      template_map.set(parameters[i], args[i]);
+  }
+
+  // Typecheck any extra arguments for variadic parameter packs
+  if(
+    args.size() > parameters.size() && !parameters.empty() &&
+    parameters.back().get_bool(ID_ellipsis))
+  {
+    // N5008 [temp.arg.nontype] + [temp.variadic]/4-5: the arguments matched
+    // by a *non-type* parameter pack (e.g. `template<bool...>`) are non-type
+    // template arguments -- converted constant expressions -- NOT types.  The
+    // main parameter loop above already distinguishes a type parameter
+    // (`parameter.id() == ID_type`) from a non-type one and routes the latter
+    // through the expression branch; the extra-argument loop must make the
+    // same distinction.  Otherwise an `ambiguous` argument such as
+    // `is_trait<T>::value` (the parser cannot tell a type-id from an
+    // expression) is wrongly typechecked as a *type*, which resolves `value`
+    // as a type-name inside a freshly (and only partially) elaborated
+    // `is_trait<T>` and fails with "found no match for symbol 'value'" for the
+    // second and subsequent pack elements (the first element is handled by the
+    // main loop).  This is the shape of libstdc++'s `__and_<is_X<...>...>`
+    // constraint packs.
+    const bool nontype_pack = parameters.back().id() != ID_type;
+    for(std::size_t i = parameters.size(); i < args.size(); i++)
+    {
+      exprt &arg = args[i];
+      if(nontype_pack)
+      {
+        // Treat the argument as a non-type template argument (an
+        // expression), matching the non-type branch of the main loop.
+        if(
+          (arg.id() == ID_ambiguous || arg.id() == ID_type) &&
+          arg.type().id() == ID_cpp_name)
+        {
+          exprt e{ID_cpp_name};
+          e.get_sub() = arg.type().get_sub();
+          e.add_source_location() = arg.source_location();
+          arg.swap(e);
+        }
+        constant_expression_contextt constant_expression_guard{*this};
+        typecheck_expr(arg);
+        simplify(arg, *this);
+        continue;
+      }
+      if(arg.id() == ID_type || arg.id() == ID_ambiguous)
+      {
+        if(arg.id() == ID_ambiguous)
+        {
+          typet t = arg.type();
+          arg = exprt(ID_type, t);
+        }
+        if(!arg.type().id().empty())
+          typecheck_type(arg.type());
+      }
+      else
+      {
+        typecheck_expr(arg);
+        simplify(arg, *this);
+      }
+    }
+  }
+
+  // Typecheck remaining arguments beyond the parameter list.
+  // These correspond to variadic pack expansion arguments when the
+  // primary template has a parameter pack (class... Args).
+  for(std::size_t i = parameters.size(); i < args.size(); i++)
+  {
+    exprt &arg = args[i];
+    if(arg.id() == ID_type || arg.id() == ID_ambiguous)
+    {
+      if(arg.id() == ID_ambiguous)
+      {
+        arg.id(ID_type);
+        arg.type() = static_cast<const typet &>(arg.find(ID_type));
+      }
+      if(!arg.type().id().empty())
+        typecheck_type(arg.type());
+    }
+    else
+    {
+      typecheck_expr(arg);
+      simplify(arg, *this);
+    }
   }
 
   // restore template map
   template_map.swap(old_template_map);
 
-  // now the numbers should match
+  // For function templates with partial explicit arguments, pad with
+  // unassigned markers for the remaining parameters.
+  if(args.size() < parameters.size())
+  {
+    const cpp_declarationt &tmpl_decl =
+      to_cpp_declaration(template_symbol.type);
+    if(!tmpl_decl.is_class_template() && !tmpl_decl.is_template_alias())
+    {
+      for(std::size_t i = args.size(); i < parameters.size(); i++)
+      {
+        if(parameters[i].id() == ID_type)
+          args.push_back(exprt(ID_type, typet(ID_unassigned)));
+        else
+          args.push_back(exprt(ID_unassigned));
+      }
+    }
+  }
+
+  // now the numbers should match (or we have a variadic pack)
   DATA_INVARIANT(
-    args.size() == parameters.size(),
-    "argument and parameter numbers must match");
+    explicit_only || args.size() >= parameters.size() ||
+      (!parameters.empty() && parameters.back().get_bool(ID_ellipsis)),
+    "argument numbers must be at least parameter numbers");
+
+  // Remove trailing empty_typet arguments produced by empty parameter
+  // pack expansion.  These void arguments cause downstream template
+  // instantiations to map non-pack parameters to empty_typet.
+  // Only the arguments matched by the pack can be such sentinels: a
+  // genuine `void' for a parameter before the pack (`R' of libstdc++'s
+  // _Maybe_unary_or_binary_function<_Res, _ArgTypes...>, the base of
+  // std::function<void()>) is a template argument ([temp.arg.type]) and was
+  // popped too -- "'_Maybe_unary_or_binary_function' is a template; thus,
+  // expected template arguments" (CBMC's own contracts/utils.cpp,
+  // dog-fooding).
+  if(!parameters.empty() && parameters.back().get_bool(ID_ellipsis))
+  {
+    const std::size_t non_pack_parameters = parameters.size() - 1;
+    while(args.size() > non_pack_parameters && args.back().id() == ID_type &&
+          args.back().type().id() == ID_empty)
+    {
+      args.pop_back();
+    }
+  }
 
   return result;
+  // NOLINTNEXTLINE(readability/fn_size)
 }
 
-void cpp_typecheckt::convert_template_declaration(
-  cpp_declarationt &declaration)
+void cpp_typecheckt::convert_template_declaration(cpp_declarationt &declaration)
 {
   PRECONDITION(declaration.is_template());
 
   if(declaration.member_spec().is_virtual())
   {
-    error().source_location=declaration.source_location();
-    error() <<  "invalid use of 'virtual' in template declaration"
-            << eom;
+    error().source_location = declaration.source_location();
+    error() << "invalid use of 'virtual' in template declaration" << eom;
     throw 0;
   }
 
   if(declaration.is_typedef())
   {
-    error().source_location=declaration.source_location();
-    error() << "template declaration for typedef" << eom;
-    throw 0;
+    typecheck_template_alias(declaration);
+    return;
   }
 
-  typet &type=declaration.type();
+  typet &type = declaration.type();
 
   // there are
   // 1) function templates
@@ -987,28 +5110,173 @@ void cpp_typecheckt::convert_template_declaration(
 
   if(declaration.is_class_template())
   {
-    // there should not be declarators
-    if(!declaration.declarators().empty())
-    {
-      error().source_location=declaration.source_location();
-      error() << "class template not expected to have declarators"
-              << eom;
-      throw 0;
-    }
+    const cpp_namet &tag_name =
+      static_cast<const cpp_namet &>(type.find(ID_tag));
 
-    // it needs to be a class template
-    if(type.id()!=ID_struct)
+    if(tag_name.is_qualified() && tag_name.has_template_args())
     {
-      error().source_location=declaration.source_location();
-      error() << "expected class template" << eom;
-      throw 0;
+      // A qualified tag name whose FINAL component has no template arguments
+      // is an out-of-class nested/member class definition, e.g.
+      //   template<typename T> class Outer<T>::Inner { ... };
+      // which we do not support yet -- silently skip.
+      //
+      // But when the FINAL component DOES carry template arguments, e.g.
+      //   template<> struct ns::G<char> { ... };
+      // this is an explicit specialization named with a qualified-id
+      // (N5008 [temp.expl.spec]/2 -- the form used to specialize std::hash for
+      // a user type outside namespace std).  That must be handled as a
+      // specialization below, not skipped.
+      if(
+        tag_name.get_sub().empty() ||
+        tag_name.get_sub().back().id() != ID_template_args)
+      {
+        // N5008 [temp.mem]/1 + [class.nest]/1: a member class template of
+        // a class template may be defined out of line
+        // (`template<class V> template<bool C>
+        //  struct take_view<V>::__sentinel { ... };`, the libc++
+        // take_view sentinel).  The definition completes the in-class
+        // declaration; graft its body onto the member declaration inside
+        // the OUTER class template's parse tree, so instantiating the
+        // outer class carries the complete member ([temp.inst]/1).  The
+        // parser flattens both template-parameter levels into this
+        // declaration's template_type; the member's own parameters are
+        // the trailing ones after the outer template's.
+        do
+        {
+          // form: [::] {namespace ::} name <args> :: name.  N5008
+          // [class.nest]/3, [namespace.memdef]/2: the definition may be
+          // outside the namespace, naming it by a qualified name
+          // (`template <class C> struct ns::S<C>::N { ... };').
+          const irept::subt &all_sub = tag_name.get_sub();
+          std::size_t first = 0;
+          cpp_scopet *lookup_scope = &cpp_scopes.current_scope();
+          cpp_scopet::lookup_kindt lookup_kind = cpp_scopet::RECURSIVE;
+          if(!all_sub.empty() && all_sub[0].id() == ID_scope_resolution)
+          {
+            lookup_scope = &cpp_scopes.get_root_scope();
+            lookup_kind = cpp_scopet::QUALIFIED;
+            first = 1;
+          }
+          bool namespace_prefix_ok = true;
+          while(all_sub.size() >= first + 6 && all_sub[first].id() == ID_name &&
+                all_sub[first + 1].id() == ID_scope_resolution)
+          {
+            const auto ns_ids = lookup_scope->lookup(
+              all_sub[first].get(ID_identifier),
+              lookup_kind,
+              cpp_idt::id_classt::NAMESPACE);
+            if(ns_ids.size() != 1)
+            {
+              namespace_prefix_ok = false;
+              break;
+            }
+            lookup_scope = static_cast<cpp_scopet *>(*ns_ids.begin());
+            lookup_kind = cpp_scopet::QUALIFIED;
+            first += 2;
+          }
+          if(!namespace_prefix_ok)
+            break;
+          const irept::subt tsub(all_sub.begin() + first, all_sub.end());
+          if(
+            tsub.size() != 4 || tsub[0].id() != ID_name ||
+            tsub[1].id() != ID_template_args ||
+            tsub[2].id() != ID_scope_resolution || tsub[3].id() != ID_name)
+            break;
+          const irep_idt outer_name = tsub[0].get(ID_identifier);
+          const irep_idt member_name = tsub[3].get(ID_identifier);
+          const auto outer_ids = lookup_scope->lookup(
+            outer_name, lookup_kind, cpp_idt::id_classt::TEMPLATE);
+          if(outer_ids.empty())
+            break;
+          symbolt *outer_sym =
+            symbol_table.get_writeable((*outer_ids.begin())->identifier);
+          if(outer_sym == nullptr || !outer_sym->type.get_bool(ID_is_template))
+            break;
+          cpp_declarationt &outer_decl = to_cpp_declaration(outer_sym->type);
+          if(!outer_decl.is_class_template())
+            break;
+          const std::size_t n_outer_params =
+            outer_decl.template_type().template_parameters().size();
+          // find the body-less member class template declaration
+          typet &outer_class = outer_decl.type();
+          irept &body = outer_class.add(ID_body);
+          for(auto &member : body.get_sub())
+          {
+            if(member.id() != ID_cpp_declaration)
+              continue;
+            cpp_declarationt &mdecl = static_cast<cpp_declarationt &>(member);
+            // N5008 [temp.mem.class]/1: a member CLASS (not a template) of a
+            // class template may be declared in the class template and
+            // defined outside it (`template <class C> class
+            // basic_ostream<C>::sentry { ... };', libstdc++ and libc++
+            // iostreams); its template-head is exactly the outer one.
+            const bool plain_member_class =
+              !mdecl.get_bool(ID_is_template) &&
+              (mdecl.type().id() == ID_struct ||
+               mdecl.type().id() == ID_union) &&
+              mdecl.declarators().empty() &&
+              declaration.template_type().template_parameters().size() ==
+                n_outer_params;
+            if(
+              !plain_member_class &&
+              (!mdecl.get_bool(ID_is_template) || !mdecl.is_class_template()))
+            {
+              continue;
+            }
+            const cpp_namet &mtag =
+              static_cast<const cpp_namet &>(mdecl.type().find(ID_tag));
+            if(mtag.get_base_name() != member_name)
+              continue;
+            if(mdecl.type().find(ID_body).is_not_nil())
+              continue; // already defined
+            if(plain_member_class)
+            {
+              // graft the body (and the class-key, base-clause) under the
+              // member's own tag; the outer template's parameters are in
+              // scope when the outer class is instantiated
+              typet new_type = declaration.type();
+              new_type.add(ID_tag) = mtag;
+              new_type.remove(ID_C_tag_only_declaration);
+              mdecl.type() = new_type;
+              complete_member_class_of_instances(
+                **outer_ids.begin(), member_name, new_type);
+              return;
+            }
+            // graft: the out-of-line struct body under the member's tag
+            typet new_type = declaration.type();
+            irept new_tag(ID_cpp_name);
+            irept tag_part(ID_name);
+            tag_part.set(ID_identifier, member_name);
+            tag_part.add(ID_C_source_location) = declaration.source_location();
+            new_tag.get_sub().push_back(tag_part);
+            new_type.add(ID_tag) = new_tag;
+            mdecl.type() = new_type;
+            // the member's own template parameters are the ones after
+            // the outer level; keep the member's declared ones if the
+            // counts already match ([temp.mem]: the definition's inner
+            // list corresponds to the member's)
+            const auto &flat_params =
+              declaration.template_type().template_parameters();
+            if(flat_params.size() > n_outer_params)
+            {
+              template_typet member_tt;
+              member_tt.add_source_location() = declaration.source_location();
+              for(std::size_t pi = n_outer_params; pi < flat_params.size();
+                  ++pi)
+                member_tt.template_parameters().push_back(flat_params[pi]);
+              mdecl.add(ID_template_type) = member_tt;
+            }
+            return;
+          }
+        } while(false);
+        return;
+      }
     }
 
     // Is it class template specialization?
     // We can tell if there are template arguments in the class name,
     // like template<...> class tag<stuff> ...
-    if((static_cast<const cpp_namet &>(
-       type.find(ID_tag))).has_template_args())
+    if(tag_name.has_template_args())
     {
       convert_class_template_specialization(declaration);
       return;
@@ -1024,10 +5292,11 @@ void cpp_typecheckt::convert_template_declaration(
     // there should be declarators in either case
     if(declaration.declarators().empty())
     {
-      error().source_location=declaration.source_location();
-      error() << "non-class template is expected to have a declarator"
-              << eom;
-      throw 0;
+      // C++17: variable templates and alias templates may appear
+      // without declarators during instantiation. Skip silently.
+      warning().source_location = declaration.source_location();
+      warning() << "non-class template is expected to have a declarator" << eom;
+      return;
     }
 
     // Is it function template specialization?
@@ -1044,15 +5313,48 @@ void cpp_typecheckt::convert_template_declaration(
     DATA_INVARIANT(
       declaration.declarators().size() >= 1, "declarator required");
 
-    cpp_declaratort &declarator=declaration.declarators()[0];
+    cpp_declaratort &declarator = declaration.declarators()[0];
     const cpp_namet &cpp_name = declarator.name();
 
-    if(cpp_name.is_qualified() ||
-       cpp_name.has_template_args())
+    if(cpp_name.is_qualified() || cpp_name.has_template_args())
+    {
+      // Variable template partial specialization: unqualified name
+      // with template args and non-function declarator type.
+      if(
+        !cpp_name.is_qualified() && cpp_name.has_template_args() &&
+        declarator.type().id() != ID_function_type)
+      {
+        convert_variable_template_specialization(declaration);
+        return;
+      }
       return typecheck_class_template_member(declaration);
+    }
+
+    // Check if this is a variable template (C++14) rather than a
+    // function template. Variable templates have non-function-type
+    // declarators.
+    if(declarator.type().id() != ID_function_type)
+    {
+      typecheck_variable_template(declaration);
+      return;
+    }
 
     // must be function template
     typecheck_function_template(declaration);
     return;
   }
+}
+
+std::vector<cpp_typecheckt::template_with_members_entryt>
+cpp_typecheckt::templates_with_out_of_class_member_symbols() const
+{
+  std::vector<template_with_members_entryt> result;
+  result.reserve(templates_with_out_of_class_members.size());
+  for(const irep_idt &name : templates_with_out_of_class_members)
+  {
+    const auto it = symbol_table.symbols.find(name);
+    if(it != symbol_table.symbols.end())
+      result.push_back({it->first, it->second});
+  }
+  return result;
 }

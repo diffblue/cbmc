@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ narrow: SUCCESS$
+^\[main\.assertion\.2\] line \d+ wide: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+Invariant check failed
+--
+template_mapt::apply substituted an array CONSTANT (the wide string
+literal argument) as if it were an array type: "type must have one type
+parameter" (cpp11_libstdcxx_header_drops/test_chrono with GCC 16).

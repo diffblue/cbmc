@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ int has no tail: SUCCESS$
+^\[main\.assertion\.2\] line \d+ long long: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+expected constant expression
+--
+In a template, `[]() { ... }()' calls the function the lambda is lowered
+to, which was not treated as constexpr and whose body was not typed as a
+converted function body, so the call did not fold and `cond<tail, T>' had
+no constant argument.

@@ -1,0 +1,18 @@
+CORE gcc-only gcc16 libstdcxx16
+main.cpp
+--cpp11 --object-bits 12 --unwind 4 --no-unwinding-assertions
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ unordered_set insert: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+Was KNOWNBUG with the headers of libstdc++ 16 (gcc 16) only: _Hashtable::find's
+`__location_type (__trans_tmp_3);' (a parenthesised declarator of a nested
+class declared later, [stmt.ambig]) and `const_iterator(__loc)' through
+`explicit operator const_iterator()' ([over.match.copy]/1.2) dropped find(),
+and count() read nondet.  Fixed in round 161.  Runs where the host gcc is >=
+16 (tag libstdcxx16).

@@ -1,0 +1,15 @@
+KNOWNBUG libstdcxx
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ rethrown: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+std::current_exception, std::rethrow_exception and exception_ptr's
+_M_addref/_M_release are defined in libstdc++'s compiled library and have
+no model ("no body for callee"), so the rethrow is not modelled.

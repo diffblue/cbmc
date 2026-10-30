@@ -1,0 +1,17 @@
+extern "C" void __CPROVER_assert(bool, const char *);
+// The MSVC STL's char_traits<char> and char_traits<wchar_t> call these
+// compiler intrinsics for memchr, wcslen and wmemcmp
+// (C23 7.26.5.2, 7.31.4.6.1, 7.31.4.4.5)
+int main() {
+  const char s[] = "abcabc";
+  const wchar_t w[] = L"xyz";
+  const wchar_t v[] = L"xyw";
+  __CPROVER_assert(
+      __builtin_char_memchr(s, 'c', 6) == s + 2 &&
+          __builtin_char_memchr(s, 'd', 6) == 0 && __builtin_wcslen(w) == 3 &&
+          __builtin_wmemcmp(w, v, 2) == 0 && __builtin_wmemcmp(w, v, 3) > 0 &&
+          __builtin_copysign(2.0, -1.0) == -2.0,
+      "intrinsics");
+  __CPROVER_assert(__builtin_wcslen(w) == 2, "WRONG (must FAIL)");
+  return 0;
+}

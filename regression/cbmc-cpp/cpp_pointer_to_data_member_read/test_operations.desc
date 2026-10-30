@@ -1,0 +1,28 @@
+CORE
+operations.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ read: SUCCESS$
+^\[main\.assertion\.2\] line \d+ null member pointer: SUCCESS$
+^\[main\.assertion\.3\] line \d+ comparison: SUCCESS$
+^\[main\.assertion\.4\] line \d+ write, ->\*: SUCCESS$
+^\[main\.assertion\.5\] line \d+ derived object: SUCCESS$
+^\[main\.assertion\.6\] line \d+ converted comparisons: SUCCESS$
+^\[main\.assertion\.7\] line \d+ const object: SUCCESS$
+^\[main\.assertion\.8\] line \d+ template argument: SUCCESS$
+^\[main\.assertion\.9\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [expr.unary.op]/3.1, [expr.mptr.oper]/2-6, [conv.mem]/1-2: pointers
+to data members read and written through `.*' and `->*', on a const
+object, through a derived object (the member class is a non-first base),
+converted from a base's to a derived class's pointer to member, compared,
+null (also zero-initialized at namespace scope and a member at offset 0
+that is not null), and as a template argument.  Representation: the
+member's offset (Itanium C++ ABI section 2.3) plus one, so that the null
+member pointer value is the null pointer.  On bin53 the program did not
+convert.  g++ 13 and clang++ 18 accept the program.

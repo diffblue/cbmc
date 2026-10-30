@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_token_buffer.h"
 
+#include <util/arith_tools.h>
+
 int cpp_token_buffert::LookAhead(unsigned offset)
 {
   PRECONDITION(current_pos <= token_vector.size());
@@ -85,6 +87,23 @@ void cpp_token_buffert::read_token()
     tokens.back().filename=ansi_c_parser.get_file();
   }
 
+  // Propagate #pragma CPROVER annotations from the scanner's
+  // source location to the token, so that the C++ parser and
+  // goto conversion can see them.
+  {
+    const irept &pragmas = ansi_c_parser.source_location().find(ID_pragma);
+    if(pragmas.is_not_nil())
+      tokens.back().data.add_source_location().add(ID_pragma) = pragmas;
+  }
+
+  // the #pragma pack(n) state after the scanner consumed the pragmas that
+  // precede this token
+  if(!ansi_c_parser.pragma_pack.empty())
+  {
+    const auto n = numeric_cast<int>(ansi_c_parser.pragma_pack.back());
+    tokens.back().pragma_pack = n.has_value() ? *n : 0;
+  }
+
   // std::cout << "TOKEN: " << kind << " " << tokens.back().text << '\n';
 
   tokens.back().kind=kind;
@@ -101,6 +120,30 @@ cpp_token_buffert::post cpp_token_buffert::Save()
 void cpp_token_buffert::Restore(post pos)
 {
   current_pos=pos;
+  // undo the `>>' splits made at or after the restored position, latest
+  // first
+  while(!shift_right_splits.empty() && shift_right_splits.back().first >= pos)
+  {
+    const post at = shift_right_splits.back().first;
+    INVARIANT(at + 1 < token_vector.size(), "a split `>>' left two `>' tokens");
+    *token_vector[at] = shift_right_splits.back().second;
+    token_vector.erase(token_vector.begin() + at + 1);
+    shift_right_splits.pop_back();
+  }
+}
+
+void cpp_token_buffert::split_shift_right()
+{
+  PRECONDITION(current_pos <= token_vector.size());
+  if(token_vector.size() == current_pos)
+    read_token();
+  cpp_tokent original = *token_vector[current_pos];
+  cpp_tokent half = original;
+  half.kind = '>';
+  half.text = '>';
+  Replace(half);
+  Insert(half);
+  shift_right_splits.emplace_back(current_pos, std::move(original));
 }
 
 void cpp_token_buffert::Replace(const cpp_tokent &token)

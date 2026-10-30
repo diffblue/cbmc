@@ -1,0 +1,26 @@
+CORE libcxx
+functional.cpp
+--cpp20 --stdlib libc++ --object-bits 12
+^\[main\.assertion\.1\] line \d+ function: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body of system-header function
+could not fully type-check
+system-header declaration
+--
+libc++ (LLVM 18) <functional>: std::function<int(int)> holding a lambda
+returned a nondeterministic value.  Fixed: the virtual call of
+__func::operator() (cpp11_virtual_override_with_rvalue_reference_parameter),
+and the __tuple_impl constructor bodies dropped because overload resolution
+for __compressed_pair_elem's constructor also offered the specialization
+instantiated for the other __alloc_func constructor (tuple<int &&>) for a
+tuple<> argument, whose conversion trial instantiated tuple<int &&>'s
+constructor template with tuple<> ([temp.over]/1,
+cpp11_deduction_fails_for_mismatched_template_argument_count).  clang++ 18
+-stdlib=libc++ accepts this program, and it fails only its WRONG
+assertion.

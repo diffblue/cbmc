@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+dropped the body of function
+--
+N5008 [temp.inst]/11, [meta.unary.prop]/9: checking is_constructible
+selects tuple<int>'s constructor template without instantiating its
+definition (which is ill-formed for these arguments).  Reduced (cvise) from
+libc++'s tuple, the layer behind test_bind_back and test_views_filter.

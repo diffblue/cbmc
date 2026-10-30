@@ -1,0 +1,27 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ array: SUCCESS$
+^\[main\.assertion\.2\] line \d+ member begin: SUCCESS$
+^\[main\.assertion\.3\] line \d+ decay_copy on an lvalue: SUCCESS$
+^\[main\.assertion\.4\] line \d+ constrained by a range concept: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+is unknown$
+dropped the body
+--
+N5008 [temp.deduct.general]/8: type deduction fails when substituting the
+deduced arguments forms an invalid type, e.g. a reference to void.  The
+shape is libstdc++'s range-access customization points
+(bits/iterator_concepts.h): the poison pills `void begin(auto &) = delete'
+make `begin(t)' a void expression for a built-in array, and the
+`__adl_begin' concept's `__decay_copy(begin(__t))' must then fail to
+deduce `_Tp &&' rather than instantiate `_Decay_copy::operator()<void>',
+whose parameter cannot be declared ("symbol '__t' is unknown", the body
+dropped -- audit residue item 4, round 162: every std::ranges algorithm
+over an array).  Fixed in round 163.

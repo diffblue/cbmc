@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp14
+^\[main\.assertion\.1\] line \d+ one-element caller pack: two arguments: SUCCESS$
+^\[main\.assertion\.2\] line \d+ two-element caller pack: SUCCESS$
+^\[main\.assertion\.3\] line \d+ two-parameter operator\(\) selected: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+A pack expansion in a function template body (`count_args<C, Args...>`)
+kept one element when the template was instantiated from a caller whose
+own pack had one element: the single-element pack substitution of the
+body removed every ellipsis, not just those of patterns naming the
+substituted pack.  N5008 [temp.variadic]/8-9.

@@ -45,6 +45,38 @@ void goto_symext::symex_assign(
   exprt lhs = clean_expr(o_lhs, state, true);
   exprt rhs = clean_expr(o_rhs, state, false);
 
+  // Pointer-to-member types carry a to_member attribute that may
+  // differ between LHS and RHS. Reconcile by copying the attribute.
+  if(
+    lhs.type().id() == ID_pointer && rhs.type().id() == ID_pointer &&
+    lhs.type() != rhs.type())
+  {
+    typet rhs_type = rhs.type();
+    if(lhs.type().find(ID_to_member).is_not_nil())
+      rhs_type.add(ID_to_member) = lhs.type().find(ID_to_member);
+    else
+      rhs_type.remove(ID_to_member);
+    if(lhs.type() == rhs_type)
+      rhs.type() = lhs.type();
+  }
+
+  // C/C++ bool type mismatch: c_bool (C _Bool) vs bool (C++ bool)
+  // have the same width but different type IDs.
+  if(lhs.type() != rhs.type())
+  {
+    // C++ type-checker uses c_bool (C's _Bool) internally for boolean
+    // values, but C++ bool is a distinct type. Reconcile mismatches
+    // involving c_bool/bool and any other type by inserting a typecast.
+    // This is necessary because the C++ frontend doesn't consistently
+    // distinguish c_bool from bool throughout the type-checking pipeline.
+    if(
+      lhs.type().id() == ID_c_bool || lhs.type().id() == ID_bool ||
+      rhs.type().id() == ID_c_bool || rhs.type().id() == ID_bool)
+    {
+      rhs = typecast_exprt(rhs, lhs.type());
+    }
+  }
+
   DATA_INVARIANT_WITH_DIAGNOSTICS(
     lhs.type() == rhs.type(),
     "assignments must be type consistent, got",

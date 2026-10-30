@@ -1,0 +1,20 @@
+KNOWNBUG
+main.cpp
+--cpp11 --unwind 8
+^\[main\.assertion\.1\] line \d+ padded to the field width: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Meaningful only with the MSVC STL (Windows); elsewhere the #error makes it
+fail.  With the MSVC STL, symbolic execution of stream insertion does not
+end: cpp11_stream_setw and cpp11_ostream_integer_insertion_classic_locale
+time out on VS 2022 and VS 2026 and with --winx64 on MSVC 14.51 headers
+preprocessed by cl (5000+ steps through basic_string and the locale
+machinery in 60 s, also at --unwind 1).  Not reduced.  Related:
+cpp11_standard_stream_objects_initialized_msvc (the locale's runtime
+functions have no model).

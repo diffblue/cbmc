@@ -1,0 +1,26 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ equal pointers: SUCCESS$
+^\[main\.assertion\.2\] line \d+ distinct objects: SUCCESS$
+^\[main\.assertion\.3\] line \d+ array elements are ordered: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+static assertion failed
+--
+N5008 [expr.spaceship]/2, /6: for pointer operands `p <=> q' is a PRVALUE of
+type std::strong_ordering, which is std::strong_ordering::equal if p and q
+compare equal ([expr.eq]), otherwise less or greater according to [expr.rel]
+(unspecified for pointers to different complete objects, /6.3 -- but never
+equal).  The front end typed the result like the `static constexpr' member
+it yields (const std::strong_ordering), so libc++'s
+`__compares_as<decltype((a <=> b)), partial_ordering>' saw a const type,
+classified it as no comparison category and rejected
+std::compare_three_way()(p, q); and it tested `<' and `>' first, so two
+pointers to different objects (unordered in cbmc's model) came out equal.
+KNOWNBUG cpp20_compare_three_way_pointers_libcxx.  Fixed in round 163b.

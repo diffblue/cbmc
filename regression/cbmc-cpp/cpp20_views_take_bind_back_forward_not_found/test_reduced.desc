@@ -1,0 +1,27 @@
+CORE
+reduced.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ the closure converts: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+Header-free cvise reduction (/tmp/r163/red/kb_U6c, from libc++ 18's
+views::take(3), signature: the drop of take's operator()) of test.desc.
+Fixed in steps: round 163v (the trailing return type
+`decltype(__bind_back_t<...>(forward_as_tuple(__args...)))' resolves) and
+round 163w: N5008 [temp.inst]/4, [basic.def.odr]/5 -- that decltype
+selects the inherited constructor template of __perfect_forward_impl,
+whose specialization is not odr-used there; its body (ill-formed for the
+declared `tuple<> forward_as_tuple(int)' of the reduction) was
+instantiated and dropped ("found no match for symbol '__tuple_impl'").  A
+member function template specialization instantiated in an unevaluated
+operand during an instantiation is now held back (speculative_instances)
+like a function template's.  clang++ 18 accepts the program (it uses
+clang's __make_integer_seq and __type_pack_element builtins, which g++
+does not have).  Pre-existing (fails on bin53).

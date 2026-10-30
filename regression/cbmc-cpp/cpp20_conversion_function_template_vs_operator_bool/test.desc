@@ -1,0 +1,28 @@
+CORE gnu-extensions
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ explicit conversion to a satisfying type: SUCCESS$
+^\[main\.assertion\.2\] line \d+ explicit conversion to unsigned __int128: SUCCESS$
+^\[main\.assertion\.3\] line \d+ contextual conversion to bool: SUCCESS$
+^\[main\.assertion\.4\] line \d+ unrelated class type: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [over.match.best]/2 + [temp.deduct.conv]: `static_cast<int>(b)' on a
+class with `explicit operator bool()' and a constrained `template <class T>
+explicit operator T()' selects the template's `operator int()' (identity)
+over operator bool plus an integral conversion; the non-template is
+preferred only on a tie (/2.4).  The template was tried only when no
+non-template conversion function matched, so the cast produced 1 for a
+value of 5.  [temp.constr.decl]: the template's requires-clause
+(`integral<T> || is_int128<T>', a disjunction of concept-ids that the type
+checker leaves as `or(false, false)') is folded before it is tested, so the
+explicit conversion function template is not instantiated -- and its body
+`return val;' not dropped -- for an unrelated class type (libstdc++
+<bits/max_size_type.h>, 315 drops over the corpus).

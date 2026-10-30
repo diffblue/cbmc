@@ -1,0 +1,22 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ read through a pointer to data member: SUCCESS$
+^\[main\.assertion\.2\] line \d+ pointer to member as NSDMI: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [expr.mptr.oper]/3-4, [expr.unary.op]/3.1: `v.*pm' with `int s::*pm =
+&s::y' designates v.y.  The front end represented a pointer to data
+member as the member's default value cast to a pointer (`pm = (int *)7')
+or left it as `&this->y' with a placeholder `this', and `v.*pm' as `pm'
+itself, so reads were wrong; with a pointer-to-member default member
+initializer (`int s::*pm = &s::y;' in u) the declaration `u w;'
+disappeared from the goto program without a diagnostic.  A pointer to data
+member is now the member's offset plus one (test_operations.desc).  g++ 13
+and clang++ 18 accept the program.  Fails on bin53.

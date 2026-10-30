@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ a < b: SUCCESS$
+^\[main\.assertion\.2\] line \d+ !\(b < a\): SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+no comparison operator
+--
+Fixed: cbmc reported "no comparison operator for an operand of class type
+'struct iter'": the hidden friend's return type named T, the enclosing
+class template's parameter, which was unbound once the friend was hoisted
+to the namespace ("symbol 'T' is unknown").  With libstdc++ 16,
+std::string::iterator was not random_access_iterator because of this,
+and _Seq_sink::_M_reserve and _M_span of <format> lost their bodies.
+Reduced from that with cvise (g++ 16 as the validity check).

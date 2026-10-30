@@ -1,0 +1,23 @@
+CORE
+main.cpp
+--cpp14 --unwind 5 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ same char type: SUCCESS$
+^\[main\.assertion\.2\] line \d+ converted through the out-of-line auto member template: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+found no match for symbol
+dropped the body
+--
+N5008 [dcl.spec.auto.general]/11-13: a call to a function with a deduced
+return type needs the type deduced from the definition at the point of the
+call.  A STATIC member function template specialization named directly in a
+constructor template's mem-initializer (`m_pathname(_S_convert(source))',
+std::filesystem::path) reached the call with the placeholder still in its
+type, and `str(<<type:auto>>)' found no constructor: the constructor's body
+was dropped.  The callee's definition is now converted before the call is
+completed, as for namespace-scope and non-static member functions.

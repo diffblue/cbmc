@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp17 --object-bits 12 --unwind 5
+^\[main\.assertion\.1\] .* extract a string: SUCCESS$
+^\[main\.assertion\.2\] .* copy a stream buffer: SUCCESS$
+^\[main\.assertion\.3\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+no-body
+--
+Fixed: both assertions failed, the char specializations having no body
+(main.no-body.std::operator>>, __copy_streambufs.no-body); a library
+specialization declared without a definition is no longer recorded, so
+uses instantiate the primary template.

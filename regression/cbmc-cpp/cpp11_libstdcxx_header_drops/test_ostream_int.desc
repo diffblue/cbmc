@@ -1,0 +1,25 @@
+CORE gcc-only libstdcxx
+ostream_int.cpp
+--cpp17 --unwind 8 --object-bits 12
+^\[main\.assertion\.1\] line \d+ int inserted: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body of system-header function
+no body for callee
+--
+libstdc++ 13 <sstream>: `o << 4' left o.str() empty: the specializations of
+basic_ostream<char>::_M_insert are declared `extern template' in
+bits/ostream.tcc and were not instantiated.  Such member declarations are
+now discarded ([temp.explicit]/12,
+cpp98_explicit_instantiation_of_member_function_template/test_cpp11.desc),
+and the num_put and numpunct facets of the "C" locale, which libstdc++.so
+provides, are modelled ([locale.general]/8,
+cpp11_ostream_integer_insertion_classic_locale).  g++ 13 accepts this
+program, and it fails only its WRONG assertion.
+gcc-only: a libstdc++ test; with libc++ it needs 7.7 GB (macOS CI job:
+timed out).

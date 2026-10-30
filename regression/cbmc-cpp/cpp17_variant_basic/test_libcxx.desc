@@ -1,0 +1,19 @@
+CORE libcxx
+main.cpp
+--cpp17 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ holds int: SUCCESS$
+^\[main\.assertion\.2\] line \d+ get int: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^PARSING ERROR$
+^CONVERSION ERROR$
+dropped the body
+--
+KNOWNBUG since round 152: main() was only partially type-checked and the
+run reported SUCCESSFUL over the truncated body (user-reported Issue 13);
+an incomplete user function is an error now (see test.desc).  Passes since
+round 161 (libc++ std::variant: using-pack expansion, braced-init to an
+array-reference parameter, constexpr evaluator fixes); promoted to CORE in
+round 162.

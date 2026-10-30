@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ constant initializer: SUCCESS$
+^\[main\.assertion\.2\] line \d+ case label: SUCCESS$
+^\[main\.assertion\.3\] line \d+ default: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+expected constant expression
+^CONVERSION ERROR$
+--
+Fixed: cbmc's constant evaluator (cpp_constexpr_eval.cpp,
+apply_side_effect) gave up on an expression statement that is a function
+call, so operator[] was not evaluated: "expected constant expression" for
+the case label, a conversion error.  A call with no pointer or reference
+argument that evaluates to a constant is now evaluated and discarded.

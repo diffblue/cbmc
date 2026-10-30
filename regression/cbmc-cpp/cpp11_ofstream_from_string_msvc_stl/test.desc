@@ -1,0 +1,19 @@
+CORE
+main.ii
+--winx64 --cpp11 --object-bits 12 --unwind 10 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ ofstream from string converts: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+cpp11_ofstream_from_string preprocessed with the MSVC STL of VS 2022
+(14.44.35207, CI artifact), with definitions of memcpy, memmove, memcmp,
+memset and strlen inserted before main: on Linux, --winx64 has no bodies
+for them.  It used to need about 9 GB and 370 s and report 353 failed
+properties: the target of basic_ofstream(const string &)'s delegation did
+not construct the virtual base basic_ios ([class.base.init]/6-7), and the
+runtime's locale::id::_Id_cnt was nondeterministic.  Now 7 s and 263 MB.
+--unwind 10: with --unwind 5 the strlen of "out.txt" is cut and the end
+of main is unreachable.

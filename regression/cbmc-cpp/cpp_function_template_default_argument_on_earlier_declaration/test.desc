@@ -1,0 +1,27 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ direct call: SUCCESS$
+^\[main\.assertion\.2\] line \d+ call from a template: SUCCESS$
+^\[main\.assertion\.3\] line \d+ namespace member: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+no body for callee
+--
+N5008 [dcl.fct.default]/1,4: the default argument on the first declaration
+of a function template applies to calls that follow its definition, which
+redeclares it without the default.  The definition replaced the
+declaration and lost it ("found no match for symbol 'f'"; inside the
+template g the body was dropped).  A namespace member defined
+by a qualified name (`n::h', [dcl.meaning.general]/3.1) was never merged
+with its declaration at all, default or not.  test_member.desc
+covers a member function template defined outside its class.  libstdc++ 13's vformat_to
+calls __format::__do_vformat_to with three arguments, so its bodies
+(format:3759/3765) were dropped in every program including <format>.
+bin53: CONVERSION ERROR.  g++ 13 and clang++ 18 accept this program
+(-std=c++98), and it fails only its WRONG assertion.

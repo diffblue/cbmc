@@ -1,0 +1,14 @@
+CORE
+main.cpp
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+^.*' is not accessible$
+dropped the body
+--
+A global initialized with an accessible non-default constructor must be
+accepted even if the default constructor is private (class.access): the
+default constructor is not selected.

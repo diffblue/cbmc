@@ -1,0 +1,23 @@
+CORE
+main.cpp
+--cpp14
+^\[main\.assertion\.1\] line \d+ direct-initialization: SUCCESS$
+^\[main\.assertion\.2\] line \d+ copy-initialization: SUCCESS$
+^\[main\.assertion\.3\] line \d+ list-initialization: SUCCESS$
+^\[main\.assertion\.4\] line \d+ deduced type: SUCCESS$
+^\[main\.assertion\.5\] line \d+ same specialization: SUCCESS$
+^\[main\.assertion\.6\] line \d+ static data member: SUCCESS$
+^\[main\.assertion\.7\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+These variables are instantiated while function bodies are type-checked,
+after the dynamic initialization procedure was built.  Their value, a
+constructor call, stayed the initial value, and __CPROVER_initialize
+assigned that code to the object (a type-inconsistent assignment that
+failed --validate-goto-model).  The variables registered since are now
+added to the dynamic initialization.

@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ repeated parameter: SUCCESS$
+^\[main\.assertion\.2\] line \d+ constructor guide: SUCCESS$
+^\[main\.assertion\.3\] line \d+ functional cast: SUCCESS$
+^\[main\.assertion\.4\] line \d+ values: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Each alias's arguments are deduced from the result of the underlying class
+template's deduction ([over.match.class.deduct]/4).

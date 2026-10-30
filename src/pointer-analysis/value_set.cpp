@@ -502,6 +502,97 @@ std::optional<irep_idt> value_sett::get_index_of_symbol(
   return {};
 }
 
+/// Whether \p key_tail, the part of a value-set entry's key after the
+/// object's identifier, names the member or element path \p suffix: a
+/// member `.m' of the suffix may be a field-sensitive symbol `..m' in the key,
+/// and an element `[]' a field-sensitive element `[[i]]'.
+static bool field_sensitive_suffix_matches(
+  const std::string &key_tail,
+  const std::string &suffix)
+{
+  std::size_t k = 0, s = 0;
+  while(s < suffix.size())
+  {
+    if(suffix[s] == '.')
+    {
+      const std::size_t s_end = suffix.find_first_of(".[", s + 1);
+      const std::string member = suffix.substr(s + 1, s_end - s - 1);
+      if(key_tail.compare(k, 2, "..") == 0)
+        k += 2;
+      else if(k < key_tail.size() && key_tail[k] == '.')
+        k += 1;
+      else
+        return false;
+      if(key_tail.compare(k, member.size(), member) != 0)
+        return false;
+      k += member.size();
+      // the member name must end here
+      if(k < key_tail.size() && key_tail[k] != '.' && key_tail[k] != '[')
+        return false;
+      s = s_end == std::string::npos ? suffix.size() : s_end;
+    }
+    else if(suffix.compare(s, 2, "[]") == 0)
+    {
+      if(key_tail.compare(k, 2, "[[") == 0)
+      {
+        const std::size_t close = key_tail.find("]]", k);
+        if(close == std::string::npos)
+          return false;
+        k = close + 2;
+      }
+      else if(key_tail.compare(k, 2, "[]") == 0)
+        k += 2;
+      else
+        return false;
+      s += 2;
+    }
+    else
+      return false;
+  }
+  return k == key_tail.size();
+}
+
+bool value_sett::get_field_sensitive_value_set(
+  const irep_idt &identifier,
+  const std::string &suffix,
+  object_mapt &dest) const
+{
+  // Symbolic execution with field sensitivity keeps the members of a struct
+  // or union object, and the elements of a small array, as symbols of their
+  // own (`s..m', `a[[i]]', see field_sensitivityt), and records their values
+  // under those names.  A member expression built here (the union case of
+  // byte_extract, reading an object through a pointer of another type)
+  // refers to the member by the suffix `.m' instead: look the member up under
+  // its field-sensitive name, and an array's elements under theirs.  The
+  // object may be named without its level-1 tag (`x' for `x!0@1', the object
+  // recorded in a value set): then the fields of any of its instances.
+  if(suffix.size() < 2 || suffix[0] != '.')
+    return false;
+  const std::string &id = id2string(identifier);
+  const bool has_l1 = id.find('!') != std::string::npos;
+  bool found = false;
+  values.iterate(
+    [&](const irep_idt &key, const entryt &entry)
+    {
+      const std::string &k = id2string(key);
+      if(!has_prefix(k, id) || k.find("..", id.size()) == std::string::npos)
+        return;
+      std::size_t p = id.size();
+      if(!has_l1 && p < k.size() && k[p] == '!')
+      {
+        p = k.find("..", p);
+        if(k.find('.', id.size()) != p)
+          return;
+      }
+      if(field_sensitive_suffix_matches(k.substr(p), suffix))
+      {
+        make_union(dest, entry.object_map);
+        found = true;
+      }
+    });
+  return found;
+}
+
 void value_sett::get_value_set_rec(
   const exprt &expr,
   object_mapt &dest,
@@ -561,6 +652,16 @@ void value_sett::get_value_set_rec(
     const symbol_exprt expr_l1 = is_ssa_expr(expr)
                                    ? remove_level_2(to_ssa_expr(expr))
                                    : to_symbol_expr(expr);
+    // the member's field-sensitive name first: the fallbacks of
+    // get_index_of_symbol (the whole object without the suffix) find the
+    // object's own, unrelated, entry
+    if(
+      find_entry(id2string(expr_l1.identifier()) + suffix) == nullptr &&
+      get_field_sensitive_value_set(expr_l1.identifier(), suffix, dest))
+    {
+      return;
+    }
+
     auto entry_index =
       get_index_of_symbol(expr_l1.identifier(), expr.type(), suffix, ns);
 

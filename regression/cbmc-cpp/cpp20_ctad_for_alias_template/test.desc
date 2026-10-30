@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] .* alias template CTAD: SUCCESS$
+^\[main\.assertion\.2\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+g++ 13 (-fsanitize=address,undefined) accepts this program and it fails only
+its WRONG assertion; clang++ 18 lacks alias-template CTAD (added in 19).
+Fixed: "found no match for symbol 'Q'"; class template argument
+deduction now handles an alias template whose defining-type-id is a
+simple-template-id (deduce_alias_template_arguments).

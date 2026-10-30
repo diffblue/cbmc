@@ -28,13 +28,14 @@ public:
   // The following types exist in C11 and later, but are implemented as
   // typedefs. In C++, they are keywords and thus required explicit handling in
   // here.
-  std::size_t wchar_t_count, char16_t_count, char32_t_count;
+  std::size_t wchar_t_count, char8_t_count, char16_t_count, char32_t_count;
 
   void write(typet &type) override;
 
   cpp_convert_typet(message_handlert &message_handler, const typet &type)
     : ansi_c_convert_typet(message_handler),
       wchar_t_count(0),
+      char8_t_count(0),
       char16_t_count(0),
       char32_t_count(0)
   {
@@ -44,9 +45,28 @@ public:
 
 protected:
   void read_rec(const typet &type) override;
+  void set_attributes(typet &type) const override;
   void read_function_type(const typet &type);
   void read_template(const typet &type);
 };
+
+/// N5008 [basic.type.qualifier]/3 and Note 2: cv-qualifiers applied to an
+/// array type attach to its element type, so `const T' with T = char[3] (a
+/// substituted template parameter, an alias template's `const T &') is the
+/// array of const char, the same type as `const char[3]'.  Qualify the
+/// elements as well as the array.
+void cpp_convert_typet::set_attributes(typet &type) const
+{
+  ansi_c_convert_typet::set_attributes(type);
+  for(typet *element = &type; element->id() == ID_array;)
+  {
+    element = &to_array_type(*element).element_type();
+    if(c_qualifiers.is_constant)
+      element->set(ID_C_constant, true);
+    if(c_qualifiers.is_volatile)
+      element->set(ID_C_volatile, true);
+  }
+}
 
 void cpp_convert_typet::read_rec(const typet &type)
 {
@@ -59,12 +79,12 @@ void cpp_convert_typet::read_rec(const typet &type)
     ++gcc_float64x_cnt;
   else if(type.id()==ID_wchar_t)
     ++wchar_t_count;
+  else if(type.id() == ID_char8_t)
+    ++char8_t_count;
   else if(type.id()==ID_char16_t)
     ++char16_t_count;
   else if(type.id()==ID_char32_t)
     ++char32_t_count;
-  else if(type.id()==ID_constexpr)
-    c_qualifiers.is_constant = true;
   else if(type.id()==ID_function_type)
   {
     read_function_type(type);
@@ -101,15 +121,39 @@ void cpp_convert_typet::read_rec(const typet &type)
     const irep_idt typedef_identifier = type.get(ID_C_typedef);
     if(!typedef_identifier.empty())
       tmp.set(ID_C_typedef, typedef_identifier);
+    // Preserve pointer-to-member attribute
+    if(type.find(ID_to_member).is_not_nil())
+      tmp.add(ID_to_member, type.find(ID_to_member));
     other.push_back(tmp);
   }
   else if(type.id()==ID_pointer)
   {
-    // ignore, we unfortunately convert multiple times
+    // We unfortunately convert multiple times: an already-converted pointer
+    // type is re-read here.  Its own top-level cv-qualifiers (e.g. a const
+    // pointer `T* const`, as produced when a cv-qualified template parameter
+    // `const T` is substituted with a pointer type -- N5008 [dcl.ptr],
+    // [basic.type.qualifier]) live as attributes on the pointer node, not in
+    // `c_qualifiers`.  Recover them, otherwise the final `c_qualifiers.write`
+    // (with `is_constant`/`is_volatile` still false) would strip the const off
+    // the re-converted pointer -- which made a deduced `const _Functor&`
+    // parameter become a non-const reference, so a const-pointer argument
+    // could no longer bind it.
+    if(type.get_bool(ID_C_constant))
+      c_qualifiers.is_constant = true;
+    if(type.get_bool(ID_C_volatile))
+      c_qualifiers.is_volatile = true;
+    if(type.get_bool(ID_C_restricted))
+      c_qualifiers.is_restricted = true;
     other.push_back(type);
   }
   else if(type.id() == ID_frontend_vector)
     vector_size = static_cast<const exprt &>(type.find(ID_size));
+  else if(type.id() == ID_auto)
+  {
+    // In C++11, auto is a type specifier (not a storage class).
+    // Add to other so that cpp_convert_auto can find and replace it.
+    other.push_back(type);
+  }
   else
   {
     ansi_c_convert_typet::read_rec(type);
@@ -246,7 +290,7 @@ void cpp_convert_typet::write(typet &type)
 {
   if(!other.empty())
   {
-    if(wchar_t_count || char16_t_count || char32_t_count)
+    if(wchar_t_count || char8_t_count || char16_t_count || char32_t_count)
     {
       messaget log{message_handler};
       log.error().source_location = source_location;
@@ -283,6 +327,22 @@ void cpp_convert_typet::write(typet &type)
     }
 
     type=wchar_t_type();
+    ansi_c_convert_typet::build_type_with_subtype(type);
+    ansi_c_convert_typet::set_attributes(type);
+  }
+  else if(char8_t_count)
+  {
+    // [basic.fundamental]/9: a distinct type, not to be made signed or
+    // unsigned
+    if(
+      int_cnt || short_cnt || char_cnt || long_cnt || char16_t_count ||
+      char32_t_count || int8_cnt || int16_cnt || int32_cnt || int64_cnt ||
+      ptr32_cnt || ptr64_cnt || signed_cnt || unsigned_cnt)
+    {
+      throw "illegal type modifier for char8_t";
+    }
+
+    type = char8_t_type();
     ansi_c_convert_typet::build_type_with_subtype(type);
     ansi_c_convert_typet::set_attributes(type);
   }
@@ -330,8 +390,17 @@ void cpp_convert_plain_type(typet &type, message_handlert &message_handler)
     type.id() == ID_unsignedbv || type.id() == ID_signedbv ||
     type.id() == ID_bool || type.id() == ID_floatbv || type.id() == ID_empty ||
     type.id() == ID_constructor || type.id() == ID_destructor ||
-    type.id() == ID_c_enum)
+    type.id() == ID_c_enum || type.id() == ID_c_enum_tag ||
+    type.id() == ID_struct_tag || type.id() == ID_union_tag ||
+    type.id() == ID_complex)
   {
+    // N5008 [dcl.enum]/[basic.type.qualifier]: a `c_enum_tag` is a tag
+    // reference like `struct_tag`/`union_tag` and must be left untouched here,
+    // so a cv-qualifier carried on it (e.g. a `const E` deduced as the
+    // referent of a forwarding-reference parameter `T&&`) is preserved.
+    // Routing it through the general conversion path below would rebuild the
+    // type and drop the qualifier, so a `const E` lvalue could no longer bind
+    // to the deduced `const E&` parameter.
   }
   else if(type.id() == ID_c_bool)
   {
@@ -344,22 +413,106 @@ void cpp_convert_plain_type(typet &type, message_handlert &message_handler)
   }
 }
 
-void cpp_convert_auto(
+/// \p nested: the placeholder is reached through a ptr-operator of the
+/// declared type (`auto &`, `auto *`), so the deduced type keeps the
+/// qualifiers of the referred type; at the top level (`auto x = e`) they are
+/// dropped ([temp.deduct.call]/2: "the top-level cv-qualifiers of A's type
+/// are ignored for type deduction").
+static void cpp_convert_auto_rec(
   typet &dest,
   const typet &src,
+  bool nested,
   message_handlert &message_handler)
 {
+  // N5008 [class.bit] + [dcl.type.auto.deduct]: a bit-field has no distinct
+  // type of its own -- reading one yields a prvalue of its underlying type, and
+  // no object (hence no `auto`/`decltype(auto)` variable) can have bit-field
+  // type.  Deduce from the underlying type rather than the c_bit_field_typet,
+  // whose width is meaningless on a stand-alone object and is dropped when the
+  // deduced type is later re-typechecked (which otherwise trips "unexpected
+  // expression" on the empty bit-field width).
+  if(src.id() == ID_c_bit_field)
+  {
+    cpp_convert_auto_rec(
+      dest,
+      to_c_bit_field_type(src).underlying_type(),
+      nested,
+      message_handler);
+    return;
+  }
+
   if(dest.id() != ID_merged_type && dest.has_subtype())
   {
-    cpp_convert_auto(
-      to_type_with_subtype(dest).subtype(), src, message_handler);
+    // [temp.deduct]: the declared type is the deduction pattern P and
+    // \p src is the argument type A.  When the declarator contributes a
+    // pointer level (e.g. `auto *p`), the matching pointer must be
+    // peeled from A as well, so `auto *p = <T*>` deduces auto=T (giving
+    // p the type T*) rather than auto=T* (which would make p a T**).
+    // References are represented as pointers carrying #reference; they
+    // are deliberately NOT peeled, because for `auto &r = e` the
+    // placeholder must absorb the full type of e (e.g. `auto &r = p`
+    // with p of type T* deduces auto=T*).
+    // (The declarator may still be in its parsed form, a frontend_pointer
+    // -- the for-range-declaration `for(auto *n : range)' -- whose
+    // reference bit is the same attribute.)
+    const bool dest_is_plain_pointer =
+      (dest.id() == ID_pointer || dest.id() == ID_frontend_pointer) &&
+      !dest.get_bool(ID_C_reference);
+    if(dest_is_plain_pointer && src.id() == ID_pointer && !is_reference(src))
+    {
+      cpp_convert_auto_rec(
+        to_type_with_subtype(dest).subtype(),
+        to_pointer_type(src).base_type(),
+        true,
+        message_handler);
+    }
+    else
+    {
+      cpp_convert_auto_rec(
+        to_type_with_subtype(dest).subtype(), src, true, message_handler);
+    }
+    return;
+  }
+
+  // C++14: decltype(auto) — replace the entire type with src
+  if(dest.id() == ID_decltype && dest.get_bool("#auto"))
+  {
+    dest = src;
     return;
   }
 
   cpp_convert_typet cpp_convert_type(message_handler, dest);
   for(auto &t : cpp_convert_type.other)
+  {
     if(t.id() == ID_auto)
+    {
       t = src;
+      // N5008 [dcl.type.auto.deduct]/4 with [temp.deduct.call]: for
+      // `auto &` / `auto *` the placeholder is deduced from the referred
+      // type INCLUDING its qualifiers (`auto &r = ci` with `const int ci`
+      // gives `const int &`), while a top-level `auto x = ci` drops them.
+      // The qualifiers of a substituted type live as attributes on that
+      // type; write() rebuilds the type from c_qualifiers, so transfer
+      // them in the nested case (as read_rec does for a substituted
+      // cpp_name) -- otherwise `auto &f() { return ci; }` deduced `int &`
+      // and the return could not bind.
+      if(nested)
+      {
+        if(src.get_bool(ID_C_constant))
+          cpp_convert_type.c_qualifiers.is_constant = true;
+        if(src.get_bool(ID_C_volatile))
+          cpp_convert_type.c_qualifiers.is_volatile = true;
+      }
+    }
+  }
 
   cpp_convert_type.write(dest);
+}
+
+void cpp_convert_auto(
+  typet &dest,
+  const typet &src,
+  message_handlert &message_handler)
+{
+  cpp_convert_auto_rec(dest, src, false, message_handler);
 }

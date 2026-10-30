@@ -1,0 +1,15 @@
+CORE
+main.cpp
+
+conversion between 'struct D \*' and 'struct A \*' through the ambiguous base class 'A'$
+^CONVERSION ERROR$
+^EXIT=6$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+N5008 [conv.ptr]/3: a program that needs the conversion of `D *' to `A *'
+is ill-formed when A is an ambiguous base of D ([class.mi]/4: D has two A
+subobjects).  g++ 13 ("'A' is an ambiguous base of 'D'") and clang++ 18
+("ambiguous conversion from derived class 'D' to base class 'A'") reject
+this program.

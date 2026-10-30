@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] .* member of extended temporary: SUCCESS$
+^\[main\.assertion\.2\] .* aggregate with reference member, direct: SUCCESS$
+^\[main\.assertion\.3\] .* copy out: SUCCESS$
+^\[main\.assertion\.4\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+goto conversion keeps a temporary alive together with the temporary (or the
+declared object) whose value holds its address.  g++ 13 and clang++ 18
+accept this program, and it fails only its WRONG assertion.

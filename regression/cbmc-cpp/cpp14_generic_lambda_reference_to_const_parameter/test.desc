@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp14
+^\[main\.assertion\.1\] line \d+ lvalue: SUCCESS$
+^\[main\.assertion\.2\] line \d+ rvalue: SUCCESS$
+^\[main\.assertion\.3\] line \d+ class rvalue: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [dcl.spec.auto.general]/3, [expr.prim.lambda.closure]/7: the
+closure's operator() template takes `const T &' for `const auto &'.  The
+closure synthesis replaced the whole decl-specifier `const auto' by the
+invented parameter, dropping `const', so an rvalue argument did not bind
+("found no match for symbol 'operator()'", bin53).  g++ 13 and clang++ 18
+accept this program, and it fails only its WRONG assertion.

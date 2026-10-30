@@ -1,0 +1,17 @@
+CORE
+defaulted_parameter.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ satisfied: SUCCESS$
+^\[main\.assertion\.2\] line \d+ unsatisfied: SUCCESS$
+^\[main\.assertion\.3\] line \d+ primary: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [temp.spec.partial.match]/1, [temp.constr.decl]; see test.desc.
+Fails on bin53.  g++ 13 and clang++ 18 accept this program, and it fails
+only its WRONG assertion.

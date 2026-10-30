@@ -17,6 +17,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/tempfile.h>
 #include <util/unicode.h>
 
+#include "gcc_version.h"
+
+#include <algorithm>
 #include <fstream>
 
 static void error_parse_line(
@@ -231,6 +234,27 @@ bool c_preprocess(
   return true;
 }
 
+std::vector<std::string> cprover_cxx_preprocessor_macro_flags()
+{
+  std::vector<std::string> flags;
+
+  if(config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP17)
+  {
+    // CBMC doesn't support deduction guides ([over.match.class.deduct]);
+    // undefine the feature macro so standard library headers don't use
+    // them (the parser would otherwise misclassify a deduction guide as
+    // a constructor).
+    flags.push_back("-U__cpp_deduction_guides");
+    // Prevent PSTL (Parallel STL) execution policy headers from being
+    // included; they cause infinite template recursion in CBMC.
+    flags.push_back("-D_PSTL_GLUE_MEMORY_DEFS_H=1");
+    flags.push_back("-D_PSTL_GLUE_ALGORITHM_DEFS_H=1");
+    flags.push_back("-D_PSTL_GLUE_NUMERIC_DEFS_H=1");
+  }
+
+  return flags;
+}
+
 /// ANSI-C preprocessing
 bool c_preprocess_visual_studio(
   const std::string &file,
@@ -263,8 +287,39 @@ bool c_preprocess_visual_studio(
     // It only works on Visual Studio 2015 or newer.
     command_file << "/source-charset:utf-8" << '\n';
 
+    // Pass the C++ standard to cl.exe so that headers guarded by
+    // _HAS_CXX17 etc. are correctly included.
+    if(config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP23)
+      command_file << "/std:c++latest" << '\n';
+    else if(config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP20)
+      command_file << "/std:c++20" << '\n';
+    else if(config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP17)
+      command_file << "/std:c++17" << '\n';
+    // C++14 is the default for MSVC, no flag needed
+    // N5008 [cpp.predefined]/1: __cplusplus identifies the standard (each
+    // revision's own value, 202302L for C++23); cl reports 199711L for every
+    // standard unless asked, so `#if __cplusplus >= 201103L' was false for
+    // --cpp11 on Windows only.  cl has no C++98/03 mode: for those, its
+    // default 199711L is the right value.
+    if(config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP11)
+      command_file << "/Zc:__cplusplus" << '\n';
+
     command_file << "/D__CPROVER__" << "\n";
     command_file << "/D__WORDSIZE=" << config.ansi_c.pointer_width << "\n";
+
+    // The MSVC STL's vectorized algorithms (__std_find_trivial_4,
+    // __std_count_trivial_8, ...) are defined in the separately compiled
+    // runtime library, not in the headers, so their calls have no body.
+    // Select the headers' own loops instead, unless the user decides.
+    if(std::none_of(
+         config.ansi_c.defines.begin(),
+         config.ansi_c.defines.end(),
+         [](const std::string &define)
+         { return define.rfind("_USE_STD_VECTOR_ALGORITHMS", 0) == 0; }))
+    {
+      command_file << "/D_USE_STD_VECTOR_ALGORITHMS=0"
+                   << "\n";
+    }
 
     if(pointer_diff_type()==signed_long_long_int_type())
     {
@@ -425,6 +480,83 @@ bool c_preprocess_codewarrior(
   return false;
 }
 
+/// The architecture family of \p arch, as far as gcc's data-model options
+/// (-m32, -m64, -mabi=, ...) are concerned.
+static std::string architecture_family(const irep_idt &arch)
+{
+  if(arch == "i386" || arch == "x86_64" || arch == "x32")
+    return "x86";
+  if(arch.starts_with("mips"))
+    return "mips";
+  if(arch == "powerpc" || arch == "ppc64" || arch == "ppc64le")
+    return "powerpc";
+  if(arch == "s390" || arch == "s390x")
+    return "s390";
+  if(arch == "sparc" || arch == "sparc64")
+    return "sparc";
+  if(arch == "arm64" || arch == "arm" || arch == "armel" || arch == "armhf")
+    return "arm";
+  return id2string(arch);
+}
+
+/// The architecture family of the `gcc' that preprocesses, from its
+/// predefined macros (asked once); empty if unknown.
+static const std::string &host_gcc_architecture_family()
+{
+  static const std::string family = []() -> std::string
+  {
+    temporary_filet in_file("tmp.arch", ".c");
+    temporary_filet out_file("tmp.arch", ".out");
+    temporary_filet err_file("tmp.arch", ".err");
+    {
+      std::ofstream out(in_file());
+      out << "#if defined(__x86_64__) || defined(__i386__)\n"
+             "cprover_family x86\n"
+             "#elif defined(__aarch64__) || defined(__arm__)\n"
+             "cprover_family arm\n"
+             "#elif defined(__mips__)\n"
+             "cprover_family mips\n"
+             "#elif defined(__powerpc__) || defined(__powerpc64__)\n"
+             "cprover_family powerpc\n"
+             "#elif defined(__s390__)\n"
+             "cprover_family s390\n"
+             "#elif defined(__sparc__)\n"
+             "cprover_family sparc\n"
+             "#endif\n";
+    }
+    if(
+      run(
+        "gcc",
+        {"gcc", "-E", in_file(), "-o", out_file()},
+        "",
+        "",
+        err_file()) != 0)
+    {
+      return {};
+    }
+    std::ifstream in(out_file());
+    std::string line;
+    while(std::getline(in, line))
+    {
+      if(line.rfind("cprover_family ", 0) == 0)
+        return line.substr(std::string("cprover_family ").size());
+    }
+    return {};
+  }();
+  return family;
+}
+
+/// The architecture macros that gcc for \p family predefines and CBMC's
+/// library models test, to be undefined when preprocessing for another
+/// target (`__aarch64__' selects the AArch64 va_list in stdio.c).
+static std::vector<std::string>
+host_architecture_macros(const std::string &family)
+{
+  if(family == "arm")
+    return {"__aarch64__", "__arm__", "__ARM_PCS_VFP"};
+  return {};
+}
+
 /// ANSI-C preprocessing
 bool c_preprocess_gcc_clang(
   const std::string &file,
@@ -453,7 +585,33 @@ bool c_preprocess_gcc_clang(
 
   const irep_idt &arch = config.ansi_c.arch;
 
-  if(config.ansi_c.pointer_width == 16)
+  // GNU gcc accepts the options that select a data model only for its own
+  // architecture family; gcc for x86 accepts -m16/-m32/-m64/-mx32 whatever
+  // the target, and so does clang.  With gcc for another family (gcc for
+  // aarch64 rejects `-m64'), pass none and undefine that family's
+  // architecture macros; the target's own come from config.ansi_c.defines.
+  const std::string host_family =
+    preprocessor == configt::ansi_ct::preprocessort::GCC
+      ? host_gcc_architecture_family()
+      : std::string{};
+  if(
+    !host_family.empty() && host_family != "x86" &&
+    host_family != architecture_family(arch))
+  {
+    for(const auto &host_macro : host_architecture_macros(host_family))
+    {
+      // keep those the target defines itself
+      if(
+        std::find(
+          config.ansi_c.defines.begin(),
+          config.ansi_c.defines.end(),
+          host_macro) == config.ansi_c.defines.end())
+      {
+        argv.push_back("-U" + host_macro);
+      }
+    }
+  }
+  else if(config.ansi_c.pointer_width == 16)
   {
     if(arch == "i386" || arch == "x86_64" || arch == "x32")
       argv.push_back("-m16");
@@ -555,7 +713,79 @@ bool c_preprocess_gcc_clang(
 #endif
         argv.push_back("-std=gnu++17");
       break;
+
+    case configt::cppt::cpp_standardt::CPP20:
+#if defined(__OpenBSD__)
+      if(preprocessor == configt::ansi_ct::preprocessort::CLANG)
+        argv.push_back("-std=c++20");
+      else // NOLINT(readability/braces)
+#endif
+      {
+        // Use -std=gnu++2a for GCC compatibility (GCC 9 doesn't accept
+        // -std=gnu++20, but all GCC versions accept -std=gnu++2a).
+        if(preprocessor == configt::ansi_ct::preprocessort::GCC)
+        {
+          argv.push_back("-std=gnu++2a");
+        }
+        else
+        {
+          argv.push_back("-std=gnu++20");
+        }
+      }
+      break;
+
+    case configt::cppt::cpp_standardt::CPP23:
+#if defined(__OpenBSD__)
+      if(preprocessor == configt::ansi_ct::preprocessort::CLANG)
+        argv.push_back("-std=c++23");
+      else // NOLINT(readability/braces)
+#endif
+      {
+        if(preprocessor == configt::ansi_ct::preprocessort::CLANG)
+          argv.push_back("-std=c++2b");
+        else
+        {
+          // GCC 11+ supports -std=gnu++2b; older GCC only has -std=gnu++2a.
+          gcc_versiont gcc_ver;
+          gcc_ver.get("gcc");
+          if(gcc_ver.is_at_least(11u))
+            argv.push_back("-std=gnu++2b");
+          else
+            argv.push_back("-std=gnu++2a");
+        }
+      }
+      break;
+
+    case configt::cppt::cpp_standardt::CPP26:
+      // C++26 is not yet widely supported by preprocessors; use C++23
+      // for preprocessing and rely on CBMC's own parser for C++26 features.
+#if defined(__OpenBSD__)
+      if(preprocessor == configt::ansi_ct::preprocessort::CLANG)
+        argv.push_back("-std=c++23");
+      else // NOLINT(readability/braces)
+#endif
+      {
+        if(preprocessor == configt::ansi_ct::preprocessort::CLANG)
+          argv.push_back("-std=c++2b");
+        else
+        {
+          gcc_versiont gcc_ver;
+          gcc_ver.get("gcc");
+          if(gcc_ver.is_at_least(11u))
+            argv.push_back("-std=gnu++2b");
+          else
+            argv.push_back("-std=gnu++2a");
+        }
+      }
+      break;
     }
+
+    // Append CBMC-specific C++ feature-macro flags (deduction guides,
+    // char8_t, PSTL).  Shared with goto-cc's preprocessing pass via
+    // `cprover_cxx_preprocessor_macro_flags` so both produce identical
+    // preprocessed translation units.
+    for(const auto &flag : cprover_cxx_preprocessor_macro_flags())
+      argv.push_back(flag);
   }
   else
   {

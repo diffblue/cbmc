@@ -1,0 +1,24 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.6\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+static_assert condition could not be evaluated
+dropped the body
+--
+Two defects.  A constexpr object of class type was a fold-away macro without
+a value: at namespace scope it was never initialized (`constexpr S g;` with a
+default member initializer read 0 at run time -- wrong verdict), and no
+member read or member function call on it folded in a static_assert.  Such an
+object is now a const object ([dcl.constexpr]/1) whose constant value is
+computed by the constant evaluator (default member initializers, constexpr
+constructors, value-initialized temporaries) and recorded, and the evaluator
+binds `this` to that value for a member function call.  Note: a
+static_assert at namespace scope that cannot be evaluated is skipped silently;
+the block-scope ones are checked and warn.  Non-vacuous: the last assertion
+states a wrong value and must FAIL.

@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "designator.h"
 
 #include <map>
+#include <optional>
 
 class ansi_c_declarationt;
 class bitvector_typet;
@@ -101,11 +102,38 @@ protected:
     const typet &type,
     bool force_constant);
 
+  /// Whether the empty braced-init-list `{}` value-initializes a scalar
+  /// at the current language level.  Per C [dcl.init]/11 this requires
+  /// C23+; per C++ [dcl.init.list]/3.10 (C++11+) this is permitted.
+  /// Default implementation covers the C side; cpp_typecheckt overrides
+  /// for C++.
+  virtual bool empty_brace_value_initializes_scalar() const;
+
+  /// Whether sizeof applied to a class type is at least 1 at the
+  /// current language level.  Per N5008 [class]/4 + [expr.sizeof]/2 a
+  /// complete object of class type has nonzero size in C++; in C
+  /// (GNU mode) an empty struct is a zero-size extension.  Default
+  /// covers the C side; cpp_typecheckt overrides for C++.
+  virtual bool sizeof_yields_nonzero_for_class() const
+  {
+    return false;
+  }
+
   virtual exprt::operandst::const_iterator do_designated_initializer(
     exprt &result,
     designatort &designator,
     const exprt &initializer_list,
     exprt::operandst::const_iterator init_it,
+    bool force_constant);
+
+  /// The value a non-static data member \p component of aggregate
+  /// \p struct_tag_type takes when an initializer list does not explicitly
+  /// initialize it (C++ default member initializer, N5008 [dcl.init.aggr]/5.1).
+  /// Returns nothing when the member has no such initializer.
+  virtual std::optional<exprt> default_member_initializer_value(
+    const struct_tag_typet &struct_tag_type,
+    const struct_union_typet::componentt &component,
+    const source_locationt &source_location,
     bool force_constant);
 
   designatort make_designator(const typet &type, const exprt &src);
@@ -237,10 +265,18 @@ protected:
   virtual code_blockt instantiate_gcc_polymorphic_builtin(
     const irep_idt &identifier,
     const symbol_exprt &function_symbol);
+  /// Give the polymorphic built-in \p gcc_polymorphic (as returned by
+  /// typecheck_gcc_polymorphic_builtin, naming the builtin selected) its
+  /// per-type identifier and, if not present yet, a symbol with parameters
+  /// and an implementation body.
+  void materialize_gcc_polymorphic_builtin(
+    symbol_exprt &gcc_polymorphic,
+    const source_locationt &source_location);
   virtual std::optional<symbol_exprt>
   typecheck_shadow_memory_builtin(const side_effect_expr_function_callt &expr);
   virtual exprt
   typecheck_shuffle_vector(const side_effect_expr_function_callt &expr);
+  exprt typecheck_vector_reduce(const side_effect_expr_function_callt &expr);
   void disallow_subexpr_by_id(
     const exprt &,
     const irep_idt &,
@@ -300,6 +336,9 @@ protected:
   void add_parameters_to_symbol_table(symbolt &symbol);
 
   virtual void do_initializer(symbolt &symbol);
+  virtual void elaborate_class_template(const typet &)
+  {
+  }
 
   static bool is_numeric_type(const typet &src)
   {

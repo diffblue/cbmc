@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ names a later non-throwing member: SUCCESS$
+^\[main\.assertion\.2\] line \d+ names a later throwing member: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+W<int>::a() was taken as non-throwing: the kept noexcept-specifier was
+evaluated again for the class template specialization without `this', so
+`b()' did not call W<int>::b.  Binding `this' there evaluated every
+member's specifier eagerly, which instantiated unused templates and broke
+cpp20_ranges_basic.  The specifier is now evaluated when it is needed
+([except.spec]/12): by the noexcept operator for a callee, and for the
+defined functions at the end of type checking, in the class's scope, with
+its template arguments and with `this'.

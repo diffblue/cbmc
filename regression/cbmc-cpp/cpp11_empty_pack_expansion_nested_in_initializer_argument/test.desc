@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ member initializer: SUCCESS$
+^\[main\.assertion\.2\] line \d+ delegating constructor: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+A mem-initializer argument that contains an expansion of an empty pack
+nested in a template argument list was itself dropped as an expansion of
+the empty pack: the member was value-initialized, and a delegating call
+lost an argument and found no constructor.  The MSVC STL's piecewise
+std::pair constructor delegates with `index_sequence_for<_Types2...>{}'.

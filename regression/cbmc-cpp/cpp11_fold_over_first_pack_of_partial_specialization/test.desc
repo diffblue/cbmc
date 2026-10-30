@@ -1,0 +1,18 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ sum of I: SUCCESS$
+^\[main\.assertion\.2\] line \d+ sizeof B: SUCCESS$
+^\[main\.assertion\.3\] line \d+ sizeof I: SUCCESS$
+^\[main\.assertion\.4\] line \d+ one B: SUCCESS$
+^\[main\.assertion\.5\] line \d+ trailing return type: SUCCESS$
+^\[main\.assertion\.6\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Class template instantiation expanded folds over the template's last
+parameter pack only.  g++ 13 and clang++ 18 accept this program, and it
+fails only its WRONG assertion.
