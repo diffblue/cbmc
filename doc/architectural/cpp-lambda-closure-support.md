@@ -79,14 +79,14 @@ per-object member *at capture time*.  Consequently:
     other than size/alignment/triviality.  This is the licence for our
     representation freedom — but observable behaviour (capture-by-copy
     semantics, per-object state) must match.
-  * **§7.5.6.2** — for a **non-generic lambda with no lambda-capture** the
+  * **[expr.prim.lambda.closure]/10** — for a **non-generic lambda with no lambda-capture** the
     closure type has a non-explicit **conversion function to pointer to
     function** with the same parameter and return types.  (Also for generic
     captureless lambdas, per template.)
   * **[expr.prim.lambda.closure]** — the closure type has a public inline
     **function call operator** (`operator()`); it is `const`-qualified unless
     the lambda is `mutable` (or `static`, C++23).
-  * **[expr.prim.lambda.capture] (≈/7)** — "For each entity captured by copy, an
+  * **[expr.prim.lambda.capture]/10, 11, 15 (≈/7)** — "For each entity captured by copy, an
     unnamed **non-static data member** is declared in the closure type"; within
     the body, each odr-use of such an entity is transformed into an access to
     the corresponding member of the closure object.  The member is

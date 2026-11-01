@@ -147,7 +147,7 @@ const irept &source = comp->find(ID_lazy_type_source);
 
 try
 {
-  sfinae_contextt guard{*this};  // [temp.deduct]/8-adjacent
+  sfinae_contextt guard{*this};  // [temp.deduct.general]/8-adjacent
   typet resolved = resolve_lazy_source(source, /*scope=*/struct_type);
   comp->type() = std::move(resolved);
   comp->remove(ID_C_lazy_member_type);
@@ -164,8 +164,7 @@ catch(...)
 ```
 
 The guard is important: completion is semantically a substitution
-step ([temp.inst]/4-5 defer to the deduction/substitution rules,
-and [temp.deduct]/8's "immediate context" applies).
+step ([temp.deduct.general]/8's "immediate context" applies).
 
 ### 4.2 New irep attributes
 
@@ -366,7 +365,7 @@ producer) and `41e614892c` (Phase 4 on-demand resolution):
        `cpp_scopes.go_to(class_scope)` so member-typedef
        lookups inside the placeholder work.
     3. Run `typecheck_type` on a scrubbed copy of the type,
-       under `sfinae_contextt` ([temp.deduct]/8), so failure
+       under `sfinae_contextt` ([temp.deduct.general]/8), so failure
        is silently absorbed.
     4. On success, replace `component.type()` with the
        resolved type — markers gone, component now normal.

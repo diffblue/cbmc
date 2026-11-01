@@ -25,7 +25,7 @@ subsystems.  They are, in decreasing order of structural impact:
 | # | Subsystem | Standard anchor | Current state | Evidence |
 |---|-----------|-----------------|---------------|----------|
 | 1 | **Class-body elaboration** | [temp.inst]/3 | Eager, all-or-nothing | 60% of recent fixes |
-| 2 | **Template resolve / SFINAE context tracking** | [temp.deduct]/8 | Implicit, via try/catch | 95 try/catch calls, 24 error-count save/restores |
+| 2 | **Template resolve / SFINAE context tracking** | [temp.deduct.general]/8 | Implicit, via try/catch | 95 try/catch calls, 24 error-count save/restores |
 | 3 | **Overload resolution / target-type threading** | [temp.deduct.funcaddr], [over.match] | Forward-only pipeline | P2 required a two-pass retrofit |
 
 Two more subsystems have smaller (but still meaningful) cleanup opportunities:
@@ -81,7 +81,7 @@ cpp_typecheck.set_message_handler(old);
 ```
 
 This appears **in at least three different places** in `src/cpp/` and is
-encoding, by hand, the "immediate context" rule of [temp.deduct]/8.
+encoding, by hand, the "immediate context" rule of [temp.deduct.general]/8.
 Each site chose its own boundary for the guarded region; none of them
 propagate the "this failure is a SFINAE failure, not a hard error" fact
 to the caller in a structured way.  The count:
@@ -196,7 +196,7 @@ for tests that relied on the eager behaviour.
 
 ### 3.2 SFINAE context is implicit, encoded by handler swaps and catches
 
-**Standard** ([temp.deduct]/8):
+**Standard** ([temp.deduct.general]/8):
 
 > If a substitution results in an invalid type or expression, type
 > deduction fails.  An invalid type or expression is one that would be
@@ -226,10 +226,10 @@ The standard-aligned architecture would be:
    thrown ints + counted error messages.
 3. **Hard errors** that escape SFINAE contexts propagate normally and
    are attributed to the use site, not to the probe.
-4. **[temp.deduct]/8's "immediate context" must be delineated at the
+4. **[temp.deduct.general]/8's "immediate context" must be delineated at the
    type-level**: certain recursive calls (e.g., instantiating a dependent
    class template) are *not* in the immediate context even if the outer
-   call is — see the [temp.deduct]/9 example with lambdas.  The RAII
+   call is — see the [temp.deduct.general]/9 example with lambdas.  The RAII
    guard needs to know when to lift (not just how to enter).
 
 This is the cleanest win in readability and correctness: it would
@@ -452,8 +452,8 @@ the OK rate from ~12% to ~50%+ with no additional one-off fixes.
   Retires ~20 hand-rolled `null_message_handlert` + error-count
   save/restore patterns across 8 files.  Every converted site
   carries a comment citing the standard clause the guard
-  implements ([temp.deduct]/8, [temp.constr.atomic]/3,
-  [expr.prim.req.*]/1, [over.ics.user], [expr.unary.noexcept]/3).
+  implements ([temp.deduct.general]/8, [temp.constr.atomic]/3,
+  [expr.prim.req.*]/1, [over.ics.user], [expr.unary.noexcept]/2).
 - 🟡 **Add a `template_alias_cachet` (§4.1).**  Attempted; regressed
   three CORE tests because CBMC's `irept` argument lists are not
   scope-agnostic and a thread-local cache keyed on
@@ -533,7 +533,7 @@ work below.
 
 Keep landing targeted fixes — but **every targeted fix must cite the
 standard section it implements** (as the last batch do, e.g.
-`[temp.deduct]/8`, `[temp.deduct.funcaddr]`, `[temp.inst]/11`).  When a
+`[temp.deduct.general]/8`, `[temp.deduct.funcaddr]`, `[temp.inst]/11`).  When a
 fix recurs in spirit (e.g. "catch and continue" guards) file it against
 this document so we know the debt is accumulating in one spot.  When the
 short-term consolidations above land, targeted fixes against the

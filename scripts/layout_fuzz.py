@@ -144,8 +144,8 @@ class Gen:
         members = []
         lines = []
         bases = []
-        # C++: base classes (including empty ones; [class.mem], Itanium ABI
-        # base-subobject layout).  Unions cannot have bases.
+        # C++: base classes (including empty ones; [class.derived.general]/7,
+        # Itanium ABI base-subobject layout).  Unions cannot have bases.
         dynamic = False
         if self.cxx and not is_union and self.rng.random() < 0.3:
             candidates = [b for b in self.structs if not b[2] and not b[3]
@@ -249,7 +249,7 @@ class Gen:
         # N5008 [class.mem]: member typedefs/alias-declarations, static data
         # members and member functions are members but not subobjects -- they
         # must not take part in the layout.  A user-declared constructor makes
-        # the class a non-POD (C++03 [class]/9), which changes the tail-padding
+        # the class a non-POD (C++03 [class]), which changes the tail-padding
         # rule for base subobjects and GCC's packed rule for members of that
         # type.  Insert them at random positions between the data members.
         extras = []

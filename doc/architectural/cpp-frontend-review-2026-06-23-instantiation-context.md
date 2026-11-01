@@ -8,9 +8,9 @@ C++ Front-End Review (2026-06-23): function-template instantiation context — a
 **Scope:** `src/cpp/` — *when and in what context* a function-template
 specialization is instantiated and *bound to a call* during body conversion.
 **Parent document:** `doc/architectural/cpp-frontend-review.md` §3.2
-([temp.deduct]/8 SFINAE context), §3.3 ([over.match] overload resolution /
+([temp.deduct.general]/8 SFINAE context), §3.3 ([over.match] overload resolution /
 target-type), §4.2 ([temp.point] POI).
-**Standard anchor:** N5008 [temp.point]/1, [temp.inst]/1/5, [temp.deduct.call]/4.3.
+**Standard anchor:** N5008 [temp.point]/1, [temp.inst]/10/5, [temp.deduct.call]/4.3.
 
 This addendum isolates a single root cause behind a cluster of recently
 investigated bugs that share the shape **"a templated construct degrades when
@@ -35,7 +35,7 @@ below).  It is a **parameter-list corruption during instantiation**:
 > `__b` was then "symbol is unknown", and the call `get_head(__d)` had no
 > parameter to bind to and was dropped (the function returned nondet).
 
-Per **N5008 [temp.variadic]/7** ("when N is zero, the instantiation of the
+Per **N5008 [temp.variadic]/16** ("when N is zero, the instantiation of the
 expansion produces an empty list") only a *function parameter pack* — a
 parameter declared with a top-level `...`, e.g. `_Tail... args` — expands to an
 empty parameter list and is removed.  A parameter whose type merely *contains*
@@ -145,7 +145,7 @@ other body's call binds.  The `main`-specific exemption is the key open clue.
 
 ## 2. What the standard requires (for orientation)
 
-* [temp.point]/1 / [temp.inst]/1: a *reference* needs only the *declaration*
+* [temp.point]/1 / [temp.inst]/10: a *reference* needs only the *declaration*
   instantiated; the *definition* is instantiated at the POI.
 * [temp.inst]/5: the definition is instantiated when referenced in a context
   requiring it.
@@ -192,11 +192,11 @@ a discardable probe rather than a committed call.
 
 | rule | status | site |
 |---|---|---|
-| [temp.point]/1, [temp.inst]/1/5 POI / deferred definition | **implemented** (approx.) for member **and** free fn templates | `typecheck_method_bodies`; `add_method_body` |
+| [temp.point]/1, [temp.inst]/10/5 POI / deferred definition | **implemented** (approx.) for member **and** free fn templates | `typecheck_method_bodies`; `add_method_body` |
 | inline definition only for `auto`/`constexpr` | implemented (with deferral fallback) | `cpp_declarator_converter.cpp:780`; `cpp_instantiate_template.cpp:4363` |
 | [temp.deduct.call]/4.3 derived-to-base deduction | **implemented** (deduction succeeds) | `cpp_typecheck_resolve.cpp:~4929` |
 | committing the *call* after a successful derived-to-base deduction during a (non-`main`) body drain | **violated** — call dropped / instance unbindable | call-resolution path under `typecheck_method_bodies` |
-| [temp.deduct]/8 immediate-context delineation during body drain | suspect — suppression state appears to leak across the call build (parent §3.2) | resolve / conversion paths |
+| [temp.deduct.general]/8 immediate-context delineation during body drain | suspect — suppression state appears to leak across the call build (parent §3.2) | resolve / conversion paths |
 
 ---
 

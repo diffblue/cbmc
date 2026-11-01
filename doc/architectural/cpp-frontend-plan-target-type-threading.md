@@ -138,7 +138,7 @@ Thread via an explicit parameter, but introduce a tiny wrapper to
 keep call-site ergonomics reasonable:
 
 ```cpp
-/// Target-type context per [over.ics.general]/5, [dcl.init]/16-17,
+/// Target-type context per [over.over]/1, [dcl.init.general]/16,
 /// [temp.deduct.funcaddr]/1, [temp.deduct.conv]/1.
 class target_typet
 {
@@ -254,7 +254,7 @@ This phase is **not yet implemented**.  Required pieces:
    deduction target P.  The instantiated specialisation is then
    evaluated as a normal cast operator via the existing path.
 
-3. **SFINAE wrapping**: per [temp.deduct]/8 and [over.ics.user],
+3. **SFINAE wrapping**: per [temp.deduct.general]/8 and [over.ics.user],
    substitution failure during this deduction means "no viable
    conversion sequence", not a compilation error.  Wrap the
    deduction attempt in `sfinae_contextt` like the existing
@@ -274,7 +274,7 @@ increase).
 - Commit J: in `typecheck_expr_initializer_list`, when the target is
   a class type with a constructor accepting `std::initializer_list<T>`,
   match the brace-init-list against `initializer_list<T>` directly
-  per [over.ics.list.ilist].  Retire the after-the-fact
+  per [over.ics.list]/5.  Retire the after-the-fact
   `implicit_typecast` path for this case.
 - Commit K: extend to aggregate initialization per [dcl.init.aggr].
 

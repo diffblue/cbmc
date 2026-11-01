@@ -58,7 +58,7 @@ entry lists the commits on the branch that it consists of (using the
 **PR A1 — `sfinae_contextt` primitive + consolidation**
 - Commits: `7160102bc3`, `2d0e466bd7`, `f38f2b67bc`, `a437aacd7d`
   (5 commits, ~400 LoC net).
-- Story: introduce an RAII guard for [temp.deduct]/8 immediate
+- Story: introduce an RAII guard for [temp.deduct.general]/8 immediate
   contexts, consolidate 12 hand-rolled `null_message_handlert` +
   error-count save/restore patterns, and generalise the P3a
   duration-specific guard.
@@ -116,8 +116,8 @@ tolerance + alias cycle-break**
   `b37b68b273`).
 - Story: three related front-end fixes: destructor-synthesis
   fall-back to components list, bare `enum class X;` forward
-  declarations per [dcl.enum]/5, silent-throw of template-only
-  no-match per [temp.deduct]/8.
+  declarations per [dcl.enum]/3, silent-throw of template-only
+  no-match per [temp.deduct.general]/8.
 - Tests: existing regressions + the updated KNOWNBUG test.desc
   patterns.
 - Risk: low–medium (touches the resolver's emission path).

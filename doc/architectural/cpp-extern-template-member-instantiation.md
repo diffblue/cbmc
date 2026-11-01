@@ -462,7 +462,7 @@ standard prescribes.
 - **[temp.inst]/4, /5** — a member or function definition is implicitly
   instantiated **when odr-used** (referenced in a context requiring the
   definition to exist).
-- **[temp.inst]/8 (example)** — `Z<int>::g()` and `Z<char>::f()` are
+- **[temp.inst]/6 (example)** — `Z<int>::g()` and `Z<char>::f()` are
   explicitly **not** instantiated merely because `Z<int>`/`Z<char>` are.
 - **[temp.inst]/11** — the decisive normative rule:
 
@@ -582,7 +582,7 @@ driven eagerly or lazily; build it first.
    `cpp17_lazy_inst_virtual` stays CORE.  Ordinary methods, operators and the
    special members (constructors, destructors, assignment) are all deferred and
    instantiated only on odr-use — see §13, including how destructor odr-use is
-   recovered from the constructed-class set ([class.dtor]/12).
+   recovered from the constructed-class set ([class.dtor]/14).
 6. **Retire the completion-site hook** (§9) once the lazy path subsumes it;
    re-confirm `cpp11_string_literal_char_access` via the lazy path.
    **Assessed and kept** — disabling the hook makes `std::string` construction
@@ -615,7 +615,7 @@ driven eagerly or lazily; build it first.
 | `cpp17_lazy_inst_unused_not_emitted` | KNOWNBUG → CORE | unused member body must not enter the goto program (precise lazy discriminator) |
 | `cpp17_lazy_inst_unused_operator` | CORE | unused non-virtual operator must not be instantiated (§13) |
 | `cpp17_lazy_inst_unused_ctor` | CORE | unused non-virtual constructor must not be instantiated (§13) |
-| `cpp17_lazy_inst_unused_dtor` | CORE | unused non-virtual destructor must not be instantiated; dtor odr-use recovered via [class.dtor]/12 (§13) |
+| `cpp17_lazy_inst_unused_dtor` | CORE | unused non-virtual destructor must not be instantiated; dtor odr-use recovered via [class.dtor]/14 (§13) |
 
 Plus the existing `cpp11_string_literal_char_access` (CORE) and
 `cpp11_string_fill_ctor` (now CORE — fixed independently of Option B, see §12).
@@ -646,7 +646,7 @@ when the currently-attached body came from a definition of a **different**
 arity (a genuine wrong-overload).  Adopt that definition's body and its
 parameter names ([dcl.fct]/3) and re-type-check in a fresh scope; any residual
 failure falls back to the previous no-body state.  Grounded in N5008
-[over.match] and [dcl.fct]/3.
+[basic.scope.scope]/4 and [dcl.fct]/3.
 
 Design points that proved necessary (each caught by the full `cbmc-cpp`
 suite during development):
@@ -693,7 +693,7 @@ end of `typecheck_method_bodies()`: after the on-demand worklist drained, an
 entry into `method_bodies` and converted it, justified by a comment that "we
 must still process them all because method body type-checking has side
 effects". That converted members the program never odr-uses, which is exactly
-what [temp.inst]/8 and /11 forbid, and is what admitted an unused member's
+what [temp.inst]/6 and /11 forbid, and is what admitted an unused member's
 assertion into the goto program (`cpp17_lazy_inst_unused_not_emitted`) and
 surfaced latent modelling gaps in unused library members (the earlier
 `unordered_map` / `regex` breakages).
@@ -765,7 +765,7 @@ the fix is confined to the one force-drain.
   left `~vector` body-less, which is what made BMC diverge.
 
   The fix recovers destructor odr-use from the type system rather than from
-  body references, grounded in **[class.dtor]/12** (a destructor is
+  body references, grounded in **[class.dtor]/14** (a destructor is
   *potentially invoked* when an object of its class is created): the
   reachability scan collects the set of classes whose **constructors** are
   referenced (`constructed_classes`) and instantiates the destructor of any

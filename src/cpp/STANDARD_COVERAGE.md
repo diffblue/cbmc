@@ -14,21 +14,21 @@ parser (`parse.cpp`) and the type-checker / code-generation files.
 
 ---
 
-## 4 General principles [basic]
+## 6 Basics [basic]
 
-### 4.4 Value categories [basic.lval]
+### 7.2.1 Value category [basic.lval]
 
 | Rule | Status | Location | Notes | Tests |
 |------|--------|----------|-------|-------|
 | [basic.lval]/1 lvalue/xvalue/prvalue | ✅ | cpp_typecheck_conversions.cpp | xvalue from derived-to-base preserves value category | cpp11_rvalue_ref_derived_to_base |
 
-## 6 Statements [stmt]
+## 8 Statements [stmt]
 
-### 6.1 Labeled statement [stmt.label]
+### 8.2 Label [stmt.label]
 
 | Rule | Status | Location | Notes | Tests |
 |------|--------|----------|-------|-------|
-| [stmt.stmt] statement grammar | ✅ | parse.cpp `rStatement` | | |
+| [stmt.pre] statement grammar | ✅ | parse.cpp `rStatement` | | |
 | [stmt.block] compound statement | ✅ | parse.cpp `rCompoundStatement` | | |
 | [stmt.expr] expression statement | ✅ | parse.cpp `rExprStatement` | | |
 | [stmt.select] selection statements | ✅ | parse.cpp `rIfStatement`, `rSwitchStatement` | | |
@@ -50,7 +50,7 @@ See section 4.4 above.
 
 | Rule | Status | Location | Notes | Tests |
 |------|--------|----------|-------|-------|
-| [expr.prim.general] primary expressions | ✅ | parse.cpp `rPrimaryExpr` | | |
+| [expr.prim.grammar] primary expressions | ✅ | parse.cpp `rPrimaryExpr` | | |
 | [expr.prim.lambda] lambda expressions | ⚠️ | parse.cpp `rLambdaExpr` | Parsed; limited type-checking | cpp11_lambda* |
 | [expr.prim.req.general] requires-expression | ✅ | parse.cpp `rRequiresExpr` | | |
 | [expr.prim.req.simple] simple requirement | ✅ | parse.cpp, cpp_instantiate_template.cpp | `expr;` form | |
@@ -69,7 +69,7 @@ See section 4.4 above.
 | [expr.unary.noexcept] noexcept operator | ✅ | parse.cpp `rNoexceptExpr`, cpp_typecheck_expr.cpp | Builtins/literals, `noexcept`-declared functions, destructors recognised as noexcept; non-`noexcept` calls and throw-expressions as potentially-throwing | cpp11_noexcept_operator |
 | [expr.sizeof] sizeof | ✅ | parse.cpp `rSizeofExpr` | sizeof... for packs | |
 | [expr.alignof] alignof | ✅ | parse.cpp `rAlignofExpr` | | |
-| [expr.new] new expression | ✅ | parse.cpp `rNewExpr`, builtin_functions.cpp `cpp_new_initializer`, goto_convert.cpp `convert_cpp_delete` | Non-array and array forms both call constructors/destructors per [expr.new]/24, [expr.delete]/6 | New*, cpp11_new_delete, cpp11_array_new_ctor_call |
+| [expr.new] new expression | ✅ | parse.cpp `rNewExpr`, builtin_functions.cpp `cpp_new_initializer`, goto_convert.cpp `convert_cpp_delete` | Non-array and array forms both call constructors/destructors per [expr.new]/24, [expr.delete]/5 | New*, cpp11_new_delete, cpp11_array_new_ctor_call |
 | [expr.delete] delete expression | ✅ | parse.cpp `rDeleteExpr` | | |
 | [expr.mul] multiplicative operators | ✅ | parse.cpp `rMultiplyExpr` | | |
 | [expr.add] additive operators | ✅ | parse.cpp `rAdditiveExpr` | | |
@@ -82,18 +82,18 @@ See section 4.4 above.
 | [expr.log.and] logical AND | ✅ | parse.cpp `rLogicalAndExpr` | | |
 | [expr.log.or] logical OR | ✅ | parse.cpp `rLogicalOrExpr` | | |
 | [expr.cond] conditional operator | ✅ | parse.cpp `rConditionalExpr` | | ConditionalExpression* |
-| [expr.ass] assignment | ✅ | parse.cpp `rAssignExpr` | | Assignment* |
+| [expr.assign] assignment | ✅ | parse.cpp `rAssignExpr` | | Assignment* |
 | [expr.comma] comma operator | ✅ | parse.cpp `rCommaExpr` | Overloaded comma not checked (TODO) | Comma_Operator* |
 | [expr.mptr.oper] pointer-to-member | ✅ | parse.cpp `rPmExpr` | .* and ->* | |
 | [expr.static.cast] static_cast | ✅ | cpp_typecheck_expr.cpp | | |
 
-## 8 Declarations [dcl.dcl]
+## 9 Declarations [dcl]
 
-### 8.1 Preamble [dcl.pre]
+### 9.1 Preamble [dcl.pre]
 
 | Rule | Status | Location | Notes | Tests |
 |------|--------|----------|-------|-------|
-| [dcl.dcl] declaration grammar | ✅ | parse.cpp `rDeclaration` | | |
+| [dcl.pre] declaration grammar | ✅ | parse.cpp `rDeclaration` | | |
 | [dcl.spec] declaration specifiers | ✅ | parse.cpp `rDeclSpecifiers` | | |
 | [dcl.stc] storage class specifiers | ✅ | parse.cpp `rStorageSpec` | static, extern, thread_local, mutable | |
 | [dcl.typedef] typedef/using declarations | ✅ | parse.cpp `rTypedefDecl`, `rUsingDecl` | C++11 alias declarations | |
@@ -110,37 +110,37 @@ See section 4.4 above.
 | [dcl.attr] scoped attributes | ✅ | parse.cpp `optAttribute` | `gnu::`, `clang::`, `_Clang::`, `msvc::` — consumed and discarded | |
 | [dcl.attr] on parameters | ✅ | parse.cpp `rArgDeclaration` | `[[_Clang::__lifetimebound__]]`, `[[gnu::unused]]` on function params | |
 
-### 8.4 Function definitions [dcl.fct.def]
+### 9.6 Function definitions [dcl.fct.def]
 
 | Rule | Status | Location | Notes | Tests |
 |------|--------|----------|-------|-------|
 | [dcl.fct] function declarators | ✅ | parse.cpp `rDeclarator` | Trailing return types | |
-| [dcl.fct]/5 parameter adjustment | ✅ | cpp_typecheck_type.cpp, cpp_typecheck_function.cpp | Array-to-pointer, function-to-pointer | |
+| [dcl.fct]/3 parameter adjustment | ✅ | cpp_typecheck_type.cpp, cpp_typecheck_function.cpp | Array-to-pointer, function-to-pointer | |
 | [dcl.fct.spec] function specifiers | ✅ | parse.cpp | virtual, explicit, inline | |
 | [dcl.fct.def.default] defaulted functions | ✅ | cpp_typecheck_compound_type.cpp `typecheck_compound_declarator` | = default | |
 
-### 8.5 Structured bindings [dcl.struct.bind]
+### 9.7 Structured binding declarations [dcl.struct.bind]
 
 | Rule | Status | Location | Notes | Tests |
 |------|--------|----------|-------|-------|
 | [dcl.struct.bind] structured bindings | ⚠️ | cpp_typecheck_code.cpp | C++17 auto [a,b] = expr | cpp17_structured_bindings* |
 
-### 8.6 Initializers [dcl.init]
+### 9.5 Initializers [dcl.init]
 
 | Rule | Status | Location | Notes | Tests |
 |------|--------|----------|-------|-------|
-| [dcl.init.list] initializer grammar | ✅ | parse.cpp `rInitializeExpr` | | |
-| [dcl.init.list]/3.6 non-aggregate brace-init | ✅ | cpp_typecheck_code.cpp `typecheck_return` | Unwrap single-element initializer_list for non-POD | cpp11_brace_init_nonaggregate |
-| [dcl.init.list]/3.10 empty brace-init for scalar | ✅ | c_typecheck_initializer.cpp `do_initializer_list` | T{} for scalar produces zero via zero_initializer | cpp11_value_init_scalar_brace |
+| [dcl.init.general]/1 initializer grammar | ✅ | parse.cpp `rInitializeExpr` | | |
+| [dcl.init.list]/3.7 non-aggregate brace-init | ✅ | cpp_typecheck_code.cpp `typecheck_return` | Unwrap single-element initializer_list for non-POD | cpp11_brace_init_nonaggregate |
+| [dcl.init.list]/3.11 empty brace-init for scalar | ✅ | c_typecheck_initializer.cpp `do_initializer_list` | T{} for scalar produces zero via zero_initializer | cpp11_value_init_scalar_brace |
 | [dcl.init.ref]/5 rvalue ref binding | ✅ | cpp_typecheck_expr.cpp, cpp_typecheck_conversions.cpp | Explicit calls + derived-to-base; to_member preserved through address_arithmetic (symex_dereference.cpp) | cpp11_rvalue_ref_derived_to_base, cpp11_addrof_member_compare |
 
-### 8.7 Linkage specifications [dcl.link]
+### 9.12 Linkage specifications [dcl.link]
 
 | Rule | Status | Location | Notes | Tests |
 |------|--------|----------|-------|-------|
 | [dcl.link] extern "C"/"C++" | ✅ | parse.cpp `rLinkageSpec` | | |
 
-### 8.8 Pointer-to-member [dcl.mptr]
+### 9.3.4.4 Pointers to members [dcl.mptr]
 
 | Rule | Status | Location | Notes | Tests |
 |------|--------|----------|-------|-------|
@@ -163,10 +163,10 @@ See section 4.4 above.
 | [class.mem] class members | ✅ | parse.cpp `rClassMember`, cpp_typecheck_compound_type.cpp | | Class_Members* |
 | [class.derived] derived classes | ✅ | parse.cpp `rBaseSpec` | | Inheritance* |
 | [class.base.init] base/member initializers | ✅ | parse.cpp `rMemberInit` | | Constructor* |
-| [class.access.dcl] access declarations | ✅ | parse.cpp `rAccessDecl` | | |
+| C++03 [class.access.dcl] access declarations | ✅ | parse.cpp `rAccessDecl` | | |
 | [class.conv.fct] conversion functions | ✅ | parse.cpp `rConversionDecl` | | Conversion_Operator* |
 
-### 11.4.4 Special member functions [class.special]
+### 11.4.4 Special member functions [special]
 
 | Rule | Status | Location | Notes | Tests |
 |------|--------|----------|-------|-------|
@@ -185,7 +185,7 @@ See section 4.4 above.
 | C++20 aggregate parenthesized init | ⚠️ | cpp_constructor.cpp | Basic support | |
 | C++11 inheriting constructors | ✅ | cpp_typecheck_compound_type.cpp | using Base::Base | |
 
-### 11.7 Virtual functions [class.virtual]
+### 11.7.3 Virtual functions [class.virtual]
 
 | Rule | Status | Location | Notes | Tests |
 |------|--------|----------|-------|-------|
@@ -195,7 +195,7 @@ See section 4.4 above.
 
 ## 12 Overloading [over]
 
-### 12.2 Implicit conversion sequences [over.ics]
+### 12.2.4.2 Implicit conversion sequences [over.best.ics]
 
 | Rule | Status | Location | Notes | Tests |
 |------|--------|----------|-------|-------|
@@ -214,11 +214,11 @@ See section 4.4 above.
 | [over.ics.scs] standard conversion sequence | ✅ | cpp_typecheck_conversions.cpp `standard_conversion_sequence` | Chains the above in order | |
 | [over.ics.user] user-defined conversion | ✅ | cpp_typecheck_conversions.cpp `user_defined_conversion_sequence` | Converting constructors, conversion operators | Conversion_Operator* |
 | [over.ics.ref] reference binding | ✅ | cpp_typecheck_conversions.cpp `reference_binding`, `reference_compatible`, `reference_related` | Lvalue and rvalue reference binding | |
-| [over.ics.implicit] implicit conversion | ✅ | cpp_typecheck_conversions.cpp `implicit_conversion_sequence` | Combines standard + user-defined + reference | |
+| [over.best.ics.general] implicit conversion | ✅ | cpp_typecheck_conversions.cpp `implicit_conversion_sequence` | Combines standard + user-defined + reference | |
 | Implicit typecast dispatch | ✅ | cpp_typecheck_conversions.cpp `implicit_typecast` | Entry point for all implicit conversions | |
 | Reference initializer | ✅ | cpp_typecheck_conversions.cpp `reference_initializer` | | |
 
-### 12.3 Explicit type conversions [over.cast]
+### 7.6.3 Explicit type conversion (cast notation) [expr.cast]
 
 | Rule | Status | Location | Notes | Tests |
 |------|--------|----------|-------|-------|
@@ -228,7 +228,7 @@ See section 4.4 above.
 | reinterpret_cast | ✅ | cpp_typecheck_conversions.cpp `reinterpret_typecast` | [expr.reinterpret.cast] | |
 | cast_away_constness | ✅ | cpp_typecheck_conversions.cpp `cast_away_constness` | Helper for const_cast/reinterpret_cast | |
 
-### 12.4 Overload resolution [over.match]
+### 12.2 Overload resolution [over.match]
 
 | Rule | Status | Location | Notes | Tests |
 |------|--------|----------|-------|-------|
@@ -244,9 +244,9 @@ See section 4.4 above.
 | Rule | Status | Location | Notes | Tests |
 |------|--------|----------|-------|-------|
 | [temp.pre]/1 template-declaration | ✅ | parse.cpp `rTemplateDecl` | | Template* |
-| [temp.pre]/2 template-head | ✅ | parse.cpp `rTemplateDecl` | | |
-| [temp.pre]/4 requires-clause | ⚠️ | parse.cpp `rTemplateDecl` | Parsed, partially evaluated | |
-| [temp.pre]/10 template-id | ✅ | parse.cpp `rTemplateArgs` | | |
+| [temp.pre]/1 template-head | ✅ | parse.cpp `rTemplateDecl` | | |
+| [temp.pre]/1 requires-clause | ⚠️ | parse.cpp `rTemplateDecl` | Parsed, partially evaluated | |
+| [temp.names]/1 template-id | ✅ | parse.cpp `rTemplateArgs` | | |
 
 ### 13.2 Template parameters [temp.param]
 
@@ -255,15 +255,15 @@ See section 4.4 above.
 | [temp.param]/1 type-parameter | ✅ | parse.cpp `rTempArgDeclaration` | class/typename | |
 | [temp.param]/2 non-type parameter | ✅ | parse.cpp `rTempArgDeclaration` | | |
 | [temp.param]/3 template template parameter | ⚠️ | parse.cpp `rTempArgDeclaration` | Basic support | |
-| [temp.param]/4 parameter pack | ⚠️ | parse.cpp, cpp_typecheck_resolve.cpp | Variadic templates partially supported | |
-| [temp.param]/14 default arguments | ✅ | parse.cpp `rTempArgDeclaration` | | |
+| [temp.param]/5 parameter pack | ⚠️ | parse.cpp, cpp_typecheck_resolve.cpp | Variadic templates partially supported | |
+| [temp.param]/16 default arguments | ✅ | parse.cpp `rTempArgDeclaration` | | |
 
 ### 13.3 Names of template specializations [temp.names]
 
 | Rule | Status | Location | Notes | Tests |
 |------|--------|----------|-------|-------|
 | [temp.names]/1 simple-template-id | ✅ | parse.cpp `rTemplateArgs` | | |
-| [temp.names]/4 `<` disambiguation | ✅ | parse.cpp `maybeTemplateArgs` | Backtracking parser | |
+| [temp.names]/3 `<` disambiguation | ✅ | parse.cpp `maybeTemplateArgs` | Backtracking parser | |
 
 ### 13.4 Template arguments [temp.arg]
 
@@ -277,7 +277,7 @@ See section 4.4 above.
 
 | Rule | Status | Location | Notes | Tests |
 |------|--------|----------|-------|-------|
-| [temp.constr.constr]/1 constraints | ⚠️ | cpp_instantiate_template.cpp | Concept constraints on specializations | |
+| [temp.constr.constr.general]/1 constraints | ⚠️ | cpp_instantiate_template.cpp | Concept constraints on specializations | |
 | [temp.constr.op] logical operations | ⚠️ | cpp_instantiate_template.cpp | Conjunction in requires-clauses | |
 | [temp.constr.atomic] atomic constraints | ⚠️ | cpp_instantiate_template.cpp | Via concept body evaluation | |
 | [temp.constr.decl] constrained declarations | ⚠️ | parse.cpp, cpp_instantiate_template.cpp | requires-clause parsing and evaluation | |
@@ -303,7 +303,7 @@ See section 4.4 above.
 | [temp.friend] friends | ⚠️ | cpp_typecheck_compound_type.cpp | | |
 | [temp.spec.partial.general] partial specialization | ✅ | cpp_typecheck_template.cpp | | |
 | [temp.spec.partial.match] matching | ✅ | cpp_instantiate_template.cpp `elaborate_class_template` | | |
-| [temp.spec.partial.order] ordering | ⚠️ | cpp_instantiate_template.cpp | [temp.class.order] referenced | |
+| [temp.spec.partial.order] ordering | ⚠️ | cpp_instantiate_template.cpp | [temp.spec.partial.order] referenced | |
 | [temp.fct.general] function templates | ✅ | cpp_typecheck_template.cpp | | |
 | [temp.over.link] overloading | ⚠️ | cpp_typecheck_resolve.cpp | | |
 | [temp.func.order] partial ordering | ⚠️ | cpp_typecheck_resolve.cpp | | |
@@ -320,12 +320,12 @@ See section 4.4 above.
 | [temp.dep.expr] type-dependent expressions | ⚠️ | cpp_typecheck_resolve.cpp | | |
 | [temp.point] point of instantiation | ✅ | cpp_typecheck_resolve.cpp, cpp_typecheck_template.cpp, cpp_instantiate_template.cpp | Instantiation scope for default args; prefer definition over forward declaration | cpp11_temp_point_definition, cpp20_sort_cpp20 |
 
-### 13.9 Template instantiation [temp.spec]
+### 13.9 Template instantiation and specialization [temp.spec]
 
 | Rule | Status | Location | Notes | Tests |
 |------|--------|----------|-------|-------|
-| [temp.inst]/1 implicit instantiation | ✅ | cpp_instantiate_template.cpp `elaborate_class_template` | | cpp11_temp_inst_implicit |
-| [temp.inst]/2 unless specialization needed | ✅ | cpp_instantiate_template.cpp | | |
+| [temp.inst]/2 implicit instantiation | ✅ | cpp_instantiate_template.cpp `elaborate_class_template` | | cpp11_temp_inst_implicit |
+| [temp.inst]/4 unless specialization needed | ✅ | cpp_instantiate_template.cpp | | |
 | [temp.explicit] explicit instantiation | ✅ | parse.cpp `rExplicitInstantiation` | | |
 | [temp.expl.spec] explicit specialization | ✅ | cpp_typecheck_template.cpp | | |
 
@@ -337,16 +337,16 @@ See section 4.4 above.
 | [temp.deduct.general] deduction general | ✅ | cpp_typecheck_resolve.cpp `guess_template_args` | | |
 | [temp.deduct.call]/1 P/A comparison | ✅ | cpp_typecheck_resolve.cpp `guess_function_template_args` | | |
 | [temp.deduct.call]/3 forwarding reference | ✅ | cpp_typecheck_resolve.cpp | T&& with lvalue → T& | cpp11_forwarding_ref_deduction |
-| [temp.deduct.call]/4 cv-qualification | ✅ | cpp_typecheck_resolve.cpp | cv-stripping, array decay | |
+| [temp.deduct.call]/2 cv-qualification | ✅ | cpp_typecheck_resolve.cpp | cv-stripping, array decay | |
 | [temp.deduct.funcaddr] address deduction | ⚠️ | cpp_typecheck_resolve.cpp | Works when target type is a class-template instantiation (e.g. std::endl passed to operator&lt;&lt;); plain function-pointer target types with scalar parameters not yet deduced | cpp11_deduct_funcaddr (KNOWNBUG) |
 | [temp.deduct.partial] partial ordering | ⚠️ | cpp_typecheck_resolve.cpp | | |
 | [temp.deduct.type]/1 P/A matching | ✅ | cpp_typecheck_resolve.cpp `guess_template_args` (type) | | |
 | [temp.deduct.type]/3.3 class specialization | ✅ | cpp_typecheck_resolve.cpp | cpp_name with template_args | |
 | [temp.deduct.type]/8 reference stripping | ✅ | cpp_typecheck_resolve.cpp | is_reference branch | |
-| [temp.deduct.type]/9 pointer matching | ✅ | cpp_typecheck_resolve.cpp | ID_pointer branch | |
-| [temp.deduct.type]/10 array matching | ✅ | cpp_typecheck_resolve.cpp | ID_array branch | |
-| [temp.deduct.type]/11 function type matching | ✅ | cpp_typecheck_resolve.cpp | ID_code/ID_function_type branch | |
-| [temp.deduct.type]/14 cv-qualified types | ✅ | cpp_typecheck_resolve.cpp | ID_merged_type branch | |
+| [temp.deduct.type]/8 pointer matching | ✅ | cpp_typecheck_resolve.cpp | ID_pointer branch | |
+| [temp.deduct.type]/8 array matching | ✅ | cpp_typecheck_resolve.cpp | ID_array branch | |
+| [temp.deduct.type]/10 function type matching | ✅ | cpp_typecheck_resolve.cpp | ID_code/ID_function_type branch | |
+| [temp.deduct.type]/8 cv-qualified types | ✅ | cpp_typecheck_resolve.cpp | ID_merged_type branch | |
 | [temp.over] overload resolution | ✅ | cpp_typecheck_resolve.cpp `resolve` | | |
 
 ## 14 Exception handling [except]
@@ -367,7 +367,7 @@ See section 4.4 above.
 | Deduction guides (CTAD) | [temp.deduct.guide] | ❌ | C++17 |
 | Coroutines | [dcl.fct.def.coroutine] | ❌ | Stubs for type-checking only |
 | Modules | [module] | ❌ | C++20 |
-| consteval | [dcl.consteval] | ❌ | C++20 |
+| consteval | [dcl.constexpr] | ❌ | C++20 |
 | constinit | [dcl.constinit] | ❌ | C++20 |
 | Three-way comparison (<=> full) | [expr.spaceship] | ⚠️ | Parsed; partial type support |
 | Virtual inheritance (full) | [class.mi] | ⚠️ | Basic support; diamond issues |
@@ -441,10 +441,10 @@ T::N; }` needs the same eager-conversion machinery.
 | `cpp_typecheck_virtual_table.cpp` | [class.virtual], vtable generation |
 | `cpp_declarator_converter.cpp` | [over.oper], symbol creation |
 | `cpp_typecheck_initializer.cpp` | [over.match.list], initializer_list |
-| `cpp_typecheck_function.cpp` | [dcl.fct]/5, parameter adjustment |
-| `cpp_typecheck_type.cpp` | [dcl.fct]/5, array-to-pointer |
+| `cpp_typecheck_function.cpp` | [dcl.fct]/3, parameter adjustment |
+| `cpp_typecheck_type.cpp` | [dcl.fct]/3, array-to-pointer |
 | `cpp_typecheck_bases.cpp` | [class.derived], base class scope |
-| `template_map.cpp` | [temp.deduct.type] substitution |
+| `template_map.cpp` | [temp.deduct.general]/6 substitution |
 
 ---
 

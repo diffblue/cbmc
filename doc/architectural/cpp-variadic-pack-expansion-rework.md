@@ -17,23 +17,23 @@ the rework does not regress them.
 
 ## 1. Standard background ([temp.variadic])
 
-* **[temp.variadic]/3** — a *parameter pack* is a template/function parameter
+* **[temp.variadic]/1-2** — a *parameter pack* is a template/function parameter
   that accepts zero or more arguments.
-* **[temp.variadic]/4** — a *pack expansion* is `pattern...`; it is allowed in a
+* **[temp.variadic]/6** — a *pack expansion* is `pattern...`; it is allowed in a
   fixed set of *expansion contexts*: function-call argument lists, template
   argument lists, brace-enclosed initializer lists, base-specifier lists,
   member-initializer lists, `sizeof...`, fold-expressions, and a few others.
-* **[temp.variadic]/5** — instantiating a pack expansion `pattern...` produces a
+* **[temp.variadic]/9** — instantiating a pack expansion `pattern...` produces a
   comma-separated list of `N` instantiations of `pattern`, where `N` is the
   common length of the packs mentioned in the pattern; in the i-th instantiation
   every such pack is replaced by its i-th element. `N` may be 0 (the list is
   then empty).
-* **[temp.variadic]/8** — `sizeof...(Pack)` is `N`.
+* **[temp.variadic]/10** — `sizeof...(Pack)` is `N`.
 
 The single correctness invariant the rework must establish: **at every
 expansion context, a pattern that mentions one or more packs of common length
 `N` is replaced by exactly `N` substituted copies (0 when empty), per
-[temp.variadic]/5.**
+[temp.variadic]/9.**
 
 ---
 
@@ -163,8 +163,8 @@ class-pack member expander in `template_map::apply`
 (`src/cpp/template_map.cpp` ~l.363) deliberately `continue`s past
 `ID_constructor`/`ID_destructor` and past template members, and no other site
 expands the pack inside a constructor's default-template-argument `decltype`
-operand. Grounded in N5008 [temp.variadic]/5 (pack expansion of `declval<A>()...`),
-[temp.deduct]/8 and [over.ics.user] (SFINAE on the constructor's `decltype`
+operand. Grounded in N5008 [temp.variadic]/9 (pack expansion of `declval<A>()...`),
+[temp.deduct.general]/8 and [over.ics.user] (SFINAE on the constructor's `decltype`
 operand selecting the user-defined conversion). Tracked by KNOWNBUG
 `cpp11_decltype_pack_sfinae_ctor`; flip to CORE once the constructor path
 expands the class pack in its default-template-argument `decltype`. Belongs with
@@ -185,7 +185,7 @@ Fixed in two parts (commit: "expand function-call argument packs in decltype
 operands"):
 
 * `rFunctionArguments` now records the ellipsis as `ID_ellipsis` on the
-  argument ([temp.variadic]/5).
+  argument ([temp.variadic]/6).
 * `template_mapt::apply`, when substituting into a `decltype` operand, expands
   each `ID_ellipsis`-marked call argument into one argument per deduced element
   of the referenced type pack (zero for an empty pack); arguments not
@@ -347,14 +347,14 @@ reproduction; see `cpp20_vector_erase_if`, `cpp11_decltype_pack_in_class_templat
 ### 3.2 One expansion primitive
 
 Add a single routine (in `template_mapt`, the natural home) that realises
-[temp.variadic]/5 for an arbitrary pattern:
+[temp.variadic]/9 for an arbitrary pattern:
 
 ```
 // Returns the N expanded instantiations of `pattern` (a typet or exprt) under
 // this map, where N is the common length of the packs referenced in `pattern`
 // (0 if all referenced packs are empty). Each copy substitutes the i-th element
 // of every referenced pack. Throws iff the referenced packs have inconsistent
-// lengths ([temp.variadic]/5).
+// lengths ([temp.variadic]/8).
 std::vector<irept> expand_pack(const irept &pattern) const;
 ```
 
@@ -363,7 +363,7 @@ It reuses the existing "collect referenced packs by suffix-match against
 `typecheck_template_args`, the prototype call-arg expander, and
 `cpp_typecheck_method_bodies`. Those copies are replaced by calls to this one.
 
-### 3.3 Apply the primitive at every [temp.variadic]/4 context
+### 3.3 Apply the primitive at every [temp.variadic]/6 context
 
 * **Function-call argument lists** — when type-checking a call, replace each
   argument marked `ID_ellipsis` by `expand_pack(arg)`; an empty result yields no
@@ -425,7 +425,7 @@ Each phase is independently buildable and gated on **both** `regression/cbmc-cpp
   `pack_args_map` (built from the already-resolved element types, wrapping each
   in the parameter's reference/cv structure); (b) replace the single-element
   substitution in `cpp_typecheck_method_bodies` with `expand_pack`-driven
-  multi-element expansion at every [temp.variadic]/4 context reachable from a
+  multi-element expansion at every [temp.variadic]/6 context reachable from a
   member body, including member-initializer argument lists. Flip
   `cpp11_variadic_ctor_pack_multi`; this also unblocks 3+-element direct
   `std::tuple` construction (`get<2>` and beyond) and the multi-element half of
@@ -499,7 +499,7 @@ any of them.
      pack pattern, duplicating it to `sum(sum_of(rest$0), sum_of(rest$1))`.
      Restricted both to a *bare cpp_name* / explicit-`...` argument, so a
      nested expansion is expanded at its own inner level
-     (`sum(sum_of(rest$0, rest$1))`). Grounded in N5008 [temp.variadic]/5,7.
+     (`sum(sum_of(rest$0, rest$1))`). Grounded in N5008 [temp.variadic]/8.
   Commits: "expand value parameter packs in member-function-template bodies and
   function-call-expression member initializers" (src) + the CORE flip. Both
   suites green.
@@ -520,7 +520,7 @@ any of them.
   deduction and instantiation, the deduced return type now both elaborates and
   *propagates* to the call expression — so this was an expander-reach gap, not a
   separate propagation gap as previously thought. Grounded in N5008
-  [temp.variadic]/5,6, [dcl.fct]/2. Both suites green.
+  [temp.variadic]/8,9, [dcl.fct]/1. Both suites green.
 
 * **`cpp11_decltype_pack_variadic_invoke_ctor` — FIXED, now CORE.** The same
   enhancement makes the nested `invoke_result<F,A...>::type =
@@ -533,7 +533,7 @@ any of them.
   parameter pack `a` (no type pack), is now expanded too:
   `expand_call_argument_packs`, when a `...`-marked call argument matches no
   type pack, treats it as a value-pack expansion and replicates the pattern to
-  the common deduced pack length ([temp.variadic]/4,5) -- each copy referring
+  the common deduced pack length ([temp.variadic]/5,6) -- each copy referring
   to the single in-scope value parameter, whose deduced element type fixes the
   call-argument's type.  N is the unique non-zero deduced pack size; all-empty
   ⇒ drop, ambiguous ⇒ untouched.  Verified N = 1..3, plain and cast forms.
@@ -566,7 +566,7 @@ any of them.
      to elaborate.  Isolated header-free by `cpp11_partial_spec_pack_after_fixed`
      (now CORE).  FIXED: expand the deduced pack into positional arguments via
      `pack_args_map` in `disambiguate_template_classes`, mirroring
-     `elaborate_class_template` (N5008 [temp.variadic]/5).  Crucially the
+     `elaborate_class_template` (N5008 [temp.variadic]/9).  Crucially the
      expanded list is kept SEPARATE from `matcht::specialization_args` in a new
      `matcht::instantiation_args` field: `matcht::cost` is the specialization-
      argument count and partial ordering prefers fewer arguments, so expanding
@@ -589,7 +589,7 @@ any of them.
        `std::is_function<F>` (= `!is_const<const F>`) was false, because a
        cv-qualifier applied to a function-typed template parameter via
        substitution was wrongly written onto the function type.  N5008
-       [dcl.fct]/7 says such cv-qualifiers are ignored.  Fixed in
+       [dcl.fct]/9 says such cv-qualifiers are ignored.  Fixed in
        `typecheck_type` (drop top-level cv when the resolved type is a function
        type); CORE test `cpp11_cv_qualified_function_type`.  No regressions.
      - **2b. const/non-const member-function-template overload (KNOWNBUG).**
@@ -774,7 +774,7 @@ any of them.
        correctly-arity'd `&_Function_handler<_Res(A...),F>::_M_invoke` then could
        not be assigned, so the converting constructor body silently failed to
        elaborate (no body).  Fixed in `apply` (expand_parameter_packs on a
-       (frontend_)pointer pointee before substituting), N5008 [temp.variadic]/5.
+       (frontend_)pointer pointee before substituting), N5008 [temp.variadic]/9.
        CORE `cpp11_variadic_pack_in_member_funptr_type`.  (Letting the
        multi-argument invoker call proceed also surfaced a latent robustness bug
        -- `typecheck_function_call_arguments` dereferenced its argument iterator
@@ -794,7 +794,7 @@ any of them.
        the body-use expansion.  FIXED: `expand_parameter_packs` now names the
        replicated parameters of a multi-element pack `base$k`, and the
        method-body drain recovers the per-pack counts from those names when no
-       `#expanded_param_packs` record exists (N5008 [temp.variadic]/5).  CORE
+       `#expanded_param_packs` record exists (N5008 [temp.variadic]/9).  CORE
        `cpp11_variadic_pack_in_method_body_call`.
      - **3c. multi-argument `_M_invoke`/`__invoke_r` dispatch result (NEXT, root
        not yet pinned).**
@@ -849,7 +849,7 @@ any of them.
          (vacuous pass).  A single-element deduced pack worked.  FIXED by
          counting the non-pack *function* parameters (and the pack's position
          among them) directly from the function declarator (N5008
-         [temp.variadic]/4); `pack_size` still derives from the template
+         [temp.variadic]/6.1); `pack_size` still derives from the template
          arguments.  CORE `cpp11_explicit_targ_deduced_trailing_pack`.  Verified
          NOT a regression of the 3b `base$k` rename.
        This fix is the **root of multi-argument `std::function`**: with it,

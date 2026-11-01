@@ -49,7 +49,7 @@ explains the root cause.
 
 ## A. Class body abandoned because base-class elaboration throws
 
-**N5008 reference**: [class.derived]/2 — "A class-or-decltype
+**N5008 reference**: [class.derived.general]/2 — "A class-or-decltype
 shall denote a (possibly cv-qualified) class type that is not
 an incompletely defined class".
 
@@ -104,7 +104,7 @@ work):
 1. **Set `ID_name`/`ID_tag` to the resolved class name as the
    *first* thing `typecheck_compound_body` does**, before any
    sub-elaboration.  This is purely defensive and matches
-   [class.name]/1 (the class name is in scope from the
+   [class.pre]/2 (the class name is in scope from the
    declarative-region of its definition).
 2. **Track per-base-class failure separately from per-member
    failure.**  A throw from `typecheck_compound_bases` should
@@ -147,7 +147,7 @@ the substitution succeeds and the candidate is viable per
 list of 27 other constrained `swap` overloads — the unrestricted
 template is not in the viable set.
 
-**N5008 reference**: [temp.deduct]/8 ([temp.deduct.general]/8) —
+**N5008 reference**: [temp.deduct.general]/8 ([temp.deduct.general]/8) —
 "If a substitution results in an invalid type or expression,
 type deduction fails. […] Invalid types and expressions can
 result in a deduction failure only in the immediate context of
@@ -185,8 +185,8 @@ failure, and the candidate is silently dropped.
 <struct exprt>` → `_Optional_base` → `is_trivially_destructible_v`
 → `invalid implicit conversion from '<<type:>>' to 'bool'`.
 
-**N5008 reference**: [temp.variable] — variable templates were
-added in C++14 ([temp.variable]/1), and the standard-library
+**N5008 reference**: [temp.pre]/3 — variable templates were
+added in C++14 ([temp.pre]/3), and the standard-library
 `_v` traits ([meta.unary.cat], [meta.unary.prop]) are
 `constexpr bool` variable templates that expand to constant
 expressions of type `bool`.  The implicit conversion to `bool`
@@ -343,7 +343,7 @@ A single file (`src/util/memory_info.cpp`) fails with
 `mallinfo` (the deprecated one and `mallinfo2`) shadow each
 other.
 
-**N5008 reference**: [basic.lookup.unqual] — name lookup must
+**N5008 reference**: [basic.lookup.general]/1 — name lookup must
 resolve to a single declaration.
 
 **Class**: latent bug — preprocessor macro conflict between
@@ -711,7 +711,7 @@ after substitution has `id == ID_code` and
 `return_type().id() == ID_cpp_name`.  When `typecheck_type`
 processes that return type, evaluating the inherited `::value`
 through the `__and_<...>::type` chain throws.  The catch
-silently drops the candidate per [temp.deduct]/8 SFINAE.
+silently drops the candidate per [temp.deduct.general]/8 SFINAE.
 
 Trace from the dog-food repro (
 `exception_ptr` swap + `<string>` + `std::swap(unsigned int *, …)`):
@@ -997,7 +997,7 @@ dog-food unblocking — 66 of 80 failures (82%).
 investigation and are independently standard-conforming:
 
 1. **Use `to_struct_type` instead of `to_class_type`.**  Per
-   N5008 [class]/1, the `class` and `struct` keywords differ
+   N5008 [class.pre]/4, the `class` and `struct` keywords differ
    only in default member access — both produce class types
    for inheritance purposes.  CBMC stored `struct` declarations
    as `struct_typet` without `ID_C_class`; the
@@ -1119,7 +1119,7 @@ builtins, which are exactly the normative definition per
 * `is_move_assignable<T>::value`    == `__is_assignable(T&, T&&)`
 * `is_copy_assignable<T>::value`    == `__is_assignable(T&, const T&)`
 
-with proper [dcl.ref]/6 reference-collapsing applied so
+with proper [dcl.ref]/7 reference-collapsing applied so
 `is_move_constructible<T&>` doesn't pass `T&&&` into the
 builtin.
 
@@ -2445,7 +2445,7 @@ Test: `regression/cbmc-cpp/cpp17_tt_param_alias_forward`.
 
 `user_defined_conversion_sequence` skipped any component with
 `from_base=true` when scanning for cast operators.  Per
-[class.conv.fct]/1 + [class.member.lookup]/4 inherited
+[class.conv.fct]/6 + [class.member.lookup]/4 inherited
 conversion operators are valid candidates in derived-class
 lookup.
 
@@ -3275,7 +3275,7 @@ _Enable_default_constructor<__and_<is_default_constructible<_Equal>,
 ```
 The `__and_<...>{}` is a value-initialized literal-type temporary
 that derives from `integral_constant<bool, true>` (or false).  Per
-[expr.const]/2-5, evaluating
+[expr.const]/10, /22, evaluating
 `static_cast<bool>(__and_<...>{})` at compile time is a valid
 constant expression: value-initialization of a literal type is
 constant, and `integral_constant<bool, X>::operator bool()` is
@@ -3356,7 +3356,7 @@ alias TT-arg).**  Misframed.  The encoding via
 correct and currently round-trips via the cpp_name reshaping in
 `template_map.cpp`.  The "leak" in the trace is the partial-spec
 match falling back to the primary template, which is ALLOWED per
-[temp.class.spec.match]/3 when SFINAE on the partial-spec args
+[temp.spec.partial.match]/1.3 when SFINAE on the partial-spec args
 fails.  No new irep id needed.  Cost-benefit: medium effort, no
 benefit for the actual blocker.  **Reject.**
 
@@ -3367,7 +3367,7 @@ happens correctly (in template_map.cpp:194+).  The remaining
 `__detector<_Default, __void_t<_Op<_Args...>>, _Op, _Args...>`
 against actual args containing the placeholder.  Per
 [temp.alias]/2-3, alias substitution applies during dependent
-template-id resolution; per [temp.deduct]/8 substitution failure
+template-id resolution; per [temp.deduct.general]/8 substitution failure
 is SFINAE.  CBMC currently treats `__void_t<X>` as `void`
 unconditionally without trying to substitute X; the partial spec
 "matches" (because void↔void), then `using type = _Op<_Args...>`

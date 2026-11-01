@@ -28,7 +28,7 @@ re-triggered:
 * **Silent SFINAE for unassigned template args** — fixed in
   `368b07d6ea`.  `cpp_typecheck::instantiate_template` emitted
   `"internal error: template parameter without instance"` as a
-  hard error; per [temp.deduct]/8 it should be a silent
+  hard error; per [temp.deduct.general]/8 it should be a silent
   substitution failure.
 * **Per-member catch during template instantiation** — fixed in
   `97f5d81455`.  Per [temp.inst]/11, a failed type-check of one
@@ -51,7 +51,7 @@ re-triggered:
   `cpp_instantiate_template.cpp` collected pack parameter short
   names from the global `pack_size_map` (which accumulates across
   every template currently on the instantiation stack).  This
-  violated [basic.scope.temp] and [temp.variadic]/5 — a pack
+  violated [basic.scope.temp] and [temp.variadic]/8 — a pack
   parameter's short name in a template refers to THAT template's
   pack — and caused the inner template's non-empty `_Types` pack
   to be silently stripped when any outer template on the stack
@@ -59,7 +59,7 @@ re-triggered:
   manifestation was MSVC `_Construct_in_place` losing its `_Args`
   parameter during instantiation from `vector::_Emplace_*`.
 * **Multi-element braced return to non-POD class** — fixed in
-  `f070895af0`.  Per [stmt.return]/3, `return { a, b };` in a
+  `f070895af0`.  Per [stmt.return]/2, `return { a, b };` in a
   function whose return type is a class type must construct a
   temporary of the return type via list-initialization.  CBMC
   only handled the single-element case; multi-element fell
@@ -84,7 +84,7 @@ re-triggered:
   was FAIL) and macOS `cpp17_any_basic` (was HANG on the
   `__cxx_atomic_load` call chain).
 * **SFINAE substitution-failure leak on libstdc++ `swap`** — fixed
-  in `e7080a017e`.  Per [temp.deduct]/7-8, substitution failures
+  in `e7080a017e`.  Per [temp.deduct.general]/7-8, substitution failures
   during function-template overload resolution must be silently
   absorbed (no diagnostic, candidate discarded).  Two
   null_message_handlert wraps added:
@@ -333,7 +333,7 @@ MSVC's `_Invoker_*` templates), its short name polluted the
 inner `_Construct_in_place`'s pack removal, and `_Construct_in_
 place`'s `_Args` parameter (whose declared type references its
 LOCAL `_Types`) was wrongly stripped from the instantiated
-function.  Per [basic.scope.temp] and [temp.variadic]/5, a pack
+function.  Per [basic.scope.temp] and [temp.variadic]/8, a pack
 parameter's short name in a template definition refers to THAT
 template's pack, not to some other template's pack with the same
 short name — so restricting the short-name set to packs declared

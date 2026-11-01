@@ -42,7 +42,7 @@ standing on a conformance gap.
 
 The review confirmed CBMC is conforming for the surrounding machinery:
 
-- **[temp.inst]/1 lazy member-function definitions.** A member function with an
+- **[temp.inst]/3 lazy member-function definitions.** A member function with an
   ill-formed-if-instantiated body that is never ODR-used does not break the
   class. (probe P1)
 - **Member typedefs / member functions naming a class-template-id**
@@ -56,7 +56,7 @@ The review confirmed CBMC is conforming for the surrounding machinery:
   the specialization when well-formed and rejects it (falling back to the
   primary) otherwise, **including when the specialization is a member of a
   class template**. (probe P8/P9 → test `cpp_partial_spec_void_t_sfinae`)
-- **`requires`-expression containment** ([temp.deduct]/8): a requires-expression
+- **`requires`-expression containment** ([expr.prim.req.general]/5): a requires-expression
   whose body contains an ill-formed conditional evaluates the concept to
   `false` rather than erroring. (probe P6)
 - **Conditional-operator SFINAE in a function body**: a partial spec gated on
@@ -90,9 +90,9 @@ misclassification → `char[]`/`const char*` → `basic_string` CONVERSION ERROR
 
 ### Standard grounding (N5008)
 
-- **[expr.cond]/4**: `E1 ? E2 : E3` with no common type for `E2`/`E3` (and no
+- **[expr.cond]/4-7**: `E1 ? E2 : E3` with no common type for `E2`/`E3` (and no
   other applicable bullet) is ill-formed.
-- **[temp.deduct]/8**: an invalid type/expression in the *immediate context* of
+- **[temp.deduct.general]/8**: an invalid type/expression in the *immediate context* of
   the substitution is a deduction failure (SFINAE), not a hard error.  A
   `void_t<decltype(?: )>` partial-specialization argument is such an immediate
   context.
@@ -103,7 +103,7 @@ misclassification → `char[]`/`const char*` → `basic_string` CONVERSION ERROR
 So the conditional-operator failure must be a contained substitution failure in
 this context, and it must produce the *same* result regardless of whether the
 specialization is instantiated as a function-body local or as a class member
-([temp.point], one consistent instantiation per [temp.spec.general]/7).
+([temp.point], one consistent instantiation per [temp.point]/7).
 
 ## 4. Root, as far as localised by the review
 
@@ -140,7 +140,7 @@ Each step is independently testable; acceptance criteria reference the tests.
 1. **Make the conditional-operator substitution failure a clean, silent SFINAE
    signal.** *(DONE — commits `f661171ad8` + `f008f35e65`.)* A substitution
    failure while type-checking a candidate partial specialization's argument
-   list is a deduction failure, not a diagnosable error ([temp.deduct]/8).
+   list is a deduction failure, not a diagnosable error ([temp.deduct.general]/8).
    `disambiguate_template_classes`' verification previously used only an error
    *count* save/restore (which rolls back the count but does not unsend the
    emitted message), leaking `types are incompatible` for an ill-formed
@@ -184,7 +184,7 @@ Each step is independently testable; acceptance criteria reference the tests.
    `swappable` / `ranges::swap` CPO concept evaluation reached during
    namespace-scope qualified-name elaboration of a class-template instance, so a
    substitution failure there is an immediate-context SFINAE failure
-   ([temp.deduct]/8, [temp.constr.atomic]) rather than an escaping throw -- the
+   ([temp.deduct.general]/8, [temp.constr.atomic]) rather than an escaping throw -- the
    same containment that already holds in the function-body / variable contexts.
    Acceptance: `cpp20_vector_iterator_namespace_typedef` flips to CORE.
 
@@ -207,7 +207,7 @@ Each step is independently testable; acceptance criteria reference the tests.
    So the **goal-critical divergence is the class-member truncation**: a member
    typedef aliasing a class-template-id whose eager definition-instantiation
    throws (the `reverse_iterator`/iterator-concept chain) must not abort the
-   enclosing class's body ([temp.inst]/1-2: a member *declaration* does not
+   enclosing class's body ([temp.inst]/2-3: a member *declaration* does not
    require the aliased template's *definition*).  A prior member-elaboration
    containment attempt in `typecheck_compound_body` lifted basic_string from 13
    to 65 components but did not restore the constructors, because a
@@ -333,7 +333,7 @@ Each step is independently testable; acceptance criteria reference the tests.
       *sound* operational models for the allocator so reallocation does not mint
       a new object per call.
 
-   **(Historical) Conformant-AND-tractable approach considered.** Per [temp.inst]/2,
+   **(Historical) Conformant-AND-tractable approach considered.** Per [temp.inst]/3.1,
    implicitly instantiating a class template instantiates its member
    *declarations*, not the *definitions* of the entities they name (definitions
    are instantiated on ODR-use).  The conformant front end therefore needs the

@@ -62,15 +62,15 @@ review implied; the concept-overload selection defect (G3') is now resolved.
 
 | Clause (N5008) | Rule (paraphrase) | Code site | Status |
 |---|---|---|---|
-| `[temp.deduct]`/2 (13.10.3) | Deduction starts from a clean slate: parameters being deduced have no prior assignment. | `template_mapt::build_unassigned` (`template_map.cpp`) — sets each param `ID_unassigned` and erases `pack_args_map`/`pack_size_map`. | **IMPLEMENTED** (annotated) |
+| `[temp.deduct.general]`/1 (13.10.3.1) | Deduction starts from a clean slate: parameters being deduced have no prior assignment. | `template_mapt::build_unassigned` (`template_map.cpp`) — sets each param `ID_unassigned` and erases `pack_args_map`/`pack_size_map`. | **IMPLEMENTED** (annotated) |
 | `[temp.deduct.type]`/3,8–11,14 (13.10.3.6) | Structural deduction by decomposing `T&`, `T*`, `T[N]`, function types, `A<T>`, cv-qualified types. | `guess_template_args` (`cpp_typecheck_resolve.cpp` ~4684). | **IMPLEMENTED** (well-annotated, one decomposition case per branch) |
-| `[temp.arg]`/2 + `[temp.deduct]`/8 | A kind mismatch (value supplied for a type parameter, etc.) when applying explicit args to an unrelated overload is a SFINAE failure removing only that candidate. | `apply_template_args` (`cpp_typecheck_resolve.cpp` ~81), `template_arg_kind_mismatch_exceptiont`. | **IMPLEMENTED** (annotated) |
-| `[temp.deduct]`/3,8 | Substitution failure while deducing a candidate is SFINAE (discard candidate, no error). | `guess_function_template_args` per-candidate loop, `sfinae_contextt`. | **IMPLEMENTED** (annotated) |
+| `[temp.arg.general]`/1 + `[temp.deduct.general]`/2 | A kind mismatch (value supplied for a type parameter, etc.) when applying explicit args to an unrelated overload is a SFINAE failure removing only that candidate. | `apply_template_args` (`cpp_typecheck_resolve.cpp` ~81), `template_arg_kind_mismatch_exceptiont`. | **IMPLEMENTED** (annotated) |
+| `[temp.deduct.general]`/7,8 | Substitution failure while deducing a candidate is SFINAE (discard candidate, no error). | `guess_function_template_args` per-candidate loop, `sfinae_contextt`. | **IMPLEMENTED** (annotated) |
 | `[temp.func.order]` + `[temp.deduct.partial]` (13.7.7.3 / 13.10.3.5) | Partial ordering of function templates by deduction. | `cpp_typecheck_resolve.cpp` ~1304–1496. | **IMPLEMENTED** (annotated) |
-| `[temp.variadic]`/5,8 (13.7.4) | A type parameter pack binds an element *list*; `sizeof...` yields the element count. | `template_mapt::build` pack block (`template_map.cpp` ~1220–1265): `pack_args_map`/`pack_size_map`, plus a `type_map` convenience entry for 1-element packs. | **IMPLEMENTED** |
-| `[temp.variadic]`/10 (13.7.4) | When `N == 0`, instantiating a pack expansion produces an empty list and does not change the enclosing construct. | Base-specifier arg lists: `cpp_typecheck_bases.cpp` (empty-pack base drop); and the `variadic_pack_empty` truncation in `guess_function_template_args`. | **IMPLEMENTED** (revised) — clean reproducers of an empty pack expansion in a body qualified-id verify correctly; see Re-investigation update (was provisionally G2). |
+| `[temp.variadic]`/5,10 (13.7.4) | A type parameter pack binds an element *list*; `sizeof...` yields the element count. | `template_mapt::build` pack block (`template_map.cpp` ~1220–1265): `pack_args_map`/`pack_size_map`, plus a `type_map` convenience entry for 1-element packs. | **IMPLEMENTED** |
+| `[temp.variadic]`/9,16 (13.7.4) | When `N == 0`, instantiating a pack expansion produces an empty list and does not change the enclosing construct. | Base-specifier arg lists: `cpp_typecheck_bases.cpp` (empty-pack base drop); and the `variadic_pack_empty` truncation in `guess_function_template_args`. | **IMPLEMENTED** (revised) — clean reproducers of an empty pack expansion in a body qualified-id verify correctly; see Re-investigation update (was provisionally G2). |
 | `[temp.arg.explicit]`/4, Note 1 (13.10.2) | A **trailing** template parameter pack **not otherwise deduced** is deduced as an **empty sequence**. | `guess_function_template_args` (`variadic_pack_empty` truncation) + `build_unassigned` clean slate. | **IMPLEMENTED** (revised) — clean reproducers verify correctly; not an independent defect.  See Re-investigation update (was provisionally G1). |
-| `[temp.constr.order]` (13.5.4) / `[temp.constr.*]` | Constraint subsumption determines the more-constrained candidate. | `resolve`/`guess_function_template_args` concept filters; normal-form subsumption helpers in `cpp_typecheck_resolve.cpp`. | **IMPLEMENTED** (2026-06-24) — real DNF/CNF subsumption replaces the substring heuristic; same-signature-restricted with substring fallback.  See Gap G3' and `cpp11_concept_more_constrained_overload` (CORE). |
+| `[temp.constr.order]` (13.5.5) / `[temp.constr.*]` | Constraint subsumption determines the more-constrained candidate. | `resolve`/`guess_function_template_args` concept filters; normal-form subsumption helpers in `cpp_typecheck_resolve.cpp`. | **IMPLEMENTED** (2026-06-24) — real DNF/CNF subsumption replaces the substring heuristic; same-signature-restricted with substring fallback.  See Gap G3' and `cpp11_concept_more_constrained_overload` (CORE). |
 
 ## Gaps and deviations
 
@@ -133,7 +133,7 @@ __get_helper<0>`) and returns a nondet reference — an **unsound** vacuous pass
   *before* the argument count is taken, so an enclosing instantiation's pack
   cannot bleed in an extra element.
 
-### G2 — `[temp.variadic]`/10: empty pack expansion in a body qualified-id (REVISED: not an independent defect)
+### G2 — `[temp.variadic]`/16: empty pack expansion in a body qualified-id (REVISED: not an independent defect)
 
 > **Revised:** see the Re-investigation update above.  A clean, header-free
 > reproducer of an empty pack expansion in a body qualified-id
@@ -224,7 +224,7 @@ Both regression suites (`cbmc-cpp -X libcxx`, `cbmc`) pass with the change.
 
 - `guess_template_args` ([temp.deduct.type]) is the strongest-annotated area:
   each decomposition branch already names its sub-clause. No change needed.
-- `build_unassigned` correctly implements the [temp.deduct]/2 clean-slate rule
+- `build_unassigned` correctly implements the [temp.deduct.general]/1 clean-slate rule
   *including* clearing the pack maps, which is what prevents a recursive
   variadic partial specialization (`And<B1, Bn...> : ... && And<Bn...>`) from
   inheriting the enclosing instance's pack. This is load-bearing — do not
@@ -241,4 +241,4 @@ Both regression suites (`cbmc-cpp -X libcxx`, `cbmc`) pass with the change.
    [temp.arg.explicit]/4) over fixes that patch a single observed symptom.
 3. After the change, re-confirm the IMPLEMENTED rows still hold via the
    regression suite; a regression there usually means a load-bearing invariant
-   (like the [temp.deduct]/2 pack-map erase) was disturbed.
+   (like the [temp.deduct.general]/1 pack-map erase) was disturbed.

@@ -66,7 +66,7 @@ out in BMC (see §7). The correct fix is to actually evaluate the concepts.
   evaluates to `true` if the concept's normalized constraint-expression
   (13.5.3) is satisfied by the specified template arguments and `false`
   otherwise."
-- **[temp.constr.constr]** — conjunction (`/2`), disjunction (`/3`), atomic
+- **[temp.constr.op]** — conjunction (`/2`), disjunction (`/3`), atomic
   constraints (`/13.5.2.3`); satisfaction is checked left-to-right with
   short-circuiting.
 - **[temp.constr.atomic]/3** — substitution failure forming an atomic
@@ -426,7 +426,7 @@ Guarded by the CORE test `cpp20_concept_requires_eval`.
    on an inner node, but the instantiation-site materialisation only read the
    *top-level* value, so the parameters were never bound and the
    requires-expression evaluated to a spurious `false`
-   ([expr.prim.req.general]/2). Fix: materialise the parameter-list of *every*
+   ([expr.prim.req.general]/4). Fix: materialise the parameter-list of *every*
    requires-expression in the constraint-expression (visit the body), not just
    one at the top. With this, `assignable_from` / `movable` / `copyable`,
    `swappable`, and the full iterator hierarchy
@@ -495,7 +495,7 @@ template type-constraint"; CORE test `cpp20_concept_qualified_constraint`):
 
    Root cause: a **qualified** concept name used as a type-constraint
    (`__detail::__dereferenceable _Tp`, the libstdc++ `iter_reference_t` shape,
-   [temp.param]/4) was mis-parsed as a non-type parameter, because the parser
+   [temp.param]/1) was mis-parsed as a non-type parameter, because the parser
    only fell back to the type-constraint path via a fragile heuristic (parameter
    name reused as a type immediately after `>`), which fails for an alias
    template. Instantiating the alias then failed ("expected expression, but got
@@ -565,7 +565,7 @@ hand-minimised and bisected to a 7-line root cause (not cpp20-specific):
       specialization on `sfinae_failed` did not produce `cp`, so the failure is
       deeper than the verification gate alone (the instantiation of the matched
       specialization for a nested-template-id key is itself not completing).
-   This is grounded in [temp.class.spec.match]/2 (a partial specialization is
+   This is grounded in [temp.spec.partial.match]/2 (a partial specialization is
    used when its arguments can be deduced) — CBMC deduces but does not apply it.
 
    **Status: FIXED** (regression test
@@ -592,7 +592,7 @@ hand-minimised and bisected to a 7-line root cause (not cpp20-specific):
      verification re-typecheck threw), so `base<holder<int>>` fell back to the
      body-less primary template and was cached as an empty (complete) class, so
      `::cp` was unknown.  This violated [temp.spec.partial.match]/2 (deduction,
-     which succeeds, is the matching criterion) and [temp.spec.general]/7 (the
+     which succeeds, is the matching criterion) and [temp.point]/7 (the
      instantiation must be the same regardless of which context first required
      it).
 
@@ -605,7 +605,7 @@ hand-minimised and bisected to a 7-line root cause (not cpp20-specific):
    [temp.inst]/2 (the argument's completeness affects the semantics of selecting
    the specialization) at the point where the specialization is instantiated, so
    the result is identical no matter which context first required it
-   ([temp.spec.general]/7) — rather than patching the verification or the
+   ([temp.point]/7) — rather than patching the verification or the
    resolver.  Placing it *before* the matching loop (not inside the per-spec
    verification, where an earlier attempt mistakenly put it) is what makes the
    deduction-then-instantiation succeed.
@@ -707,13 +707,13 @@ Next step: find the containment present in the function-body / variable path but
 missing in the namespace-scope qualified-name resolution path (the typedef of a
 dependent qualified member type), and apply it there so the `swappable` /
 `ranges::swap` CPO concept evaluation is a contained immediate-context failure
-([temp.constr.atomic], [temp.deduct]/8) rather than an escaping throw.  Minimal
+([temp.constr.atomic], [temp.deduct.general]/8) rather than an escaping throw.  Minimal
 matrix above; probes `/tmp/cr/{it_only,vitfunc,vns,vfunc}.cpp`,
 `/tmp/df/{s_direct,v_ptr}.cpp`.
 
 ### Member-elaboration containment attempt (2026-06, sixth pass; reverted)
 
-Tried, grounded in [temp.inst]/1-2 (instantiating a class template instantiates
+Tried, grounded in [temp.inst]/2-3 (instantiating a class template instantiates
 member *declarations*, not the *definitions* of the entities they name): in
 `typecheck_compound_body`, when a member's elaboration throws during
 instantiation (`!instantiation_stack.empty()`), skip that member and continue
@@ -803,7 +803,7 @@ Instrumenting the ternary typecheck (`cpp_typecheck_expr.cpp`, the
 and `__normal_iterator` (the iterator itself).  So CBMC evaluates
 `common_reference<int, __normal_iterator>`, which **correctly** has no common
 reference -- `__common_ref_impl`'s `decltype(__cond_res<...>)` default template
-argument is a substitution failure ([temp.deduct]/8), and the `?:` raising
+argument is a substitution failure ([temp.deduct.general]/8), and the `?:` raising
 `throw 0` is the right SFINAE signal.
 
 The bug is *containment*: this substitution failure is tolerated in most

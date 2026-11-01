@@ -54,9 +54,9 @@ the same flat maps.
 | `[basic.scope.temp]`/2 | (as above) | `template_mapt::lookup(id)` — exact-key `std::map::find`. | **IMPLEMENTED** — exact identity. |
 | `[basic.scope.temp]`/2 | (as above) | `template_mapt::lookup_by_suffix(suffix)` and ~10 resolution sites in `apply()`/`build()` that match a parameter by its **short name** (`rfind("::")`, `substr(p+2)`) across the whole flat map (e.g. `template_map.cpp` lines 43, 55, 140, 448, 698, 736, 762, 809, 887; `lookup_by_suffix` at 1048). | **VIOLATED** — short-name matching conflates same-named parameters of unrelated templates. See Violation V1. |
 | `[temp.point]`/1 (13.8.4.1) | The point of instantiation of a specialization referenced from a dependent context is that of the enclosing specialization; instantiation happens in a definite context. | `cpp_saved_template_mapt` save/restore by copy; one shared flat map. | **PARTIAL** — bindings are not isolated per instantiation; outer/sibling entries coexist and are reachable by the short-name match of V1. See Violation V2. |
-| `[temp.variadic]`/5,8 (13.7.4) | A type parameter pack binds an element list; `sizeof...` is its count. | `build()` pack block; `apply()` pack expansion; `pack_args_map`/`pack_size_map`. | **IMPLEMENTED** for the in-scope pack; but the *which-pack* selection uses short-name match (V1). |
+| `[temp.variadic]`/5,10 (13.7.4) | A type parameter pack binds an element list; `sizeof...` is its count. | `build()` pack block; `apply()` pack expansion; `pack_args_map`/`pack_size_map`. | **IMPLEMENTED** for the in-scope pack; but the *which-pack* selection uses short-name match (V1). |
 | `[temp.arg.explicit]`/4 Note 1 (13.10.2) | A trailing parameter pack not otherwise deduced is the empty sequence. | `build()` `pack_count = nargs - non_pack`. | **PARTIAL** — `build()` is faithful to its input arg count; it is over-fed a spurious trailing argument by the assembly path when V1/V2 let another pack's element through.  (This is the proximate cause of the tuple-write KNOWNBUG.) |
-| `[temp.res]` (13.8.3) two-phase | A dependent name's referent is fixed by the parameter's identity, bound at the template's point of definition. | Parameter references in bodies are stored as bare `cpp_name`s and resolved late by short name. | **VIOLATED indirectly** — because references carry only the short name, resolution must guess the scope (V1). |
+| `[temp.res]` (13.8) two-phase | A dependent name's referent is fixed by the parameter's identity, bound at the template's point of definition. | Parameter references in bodies are stored as bare `cpp_name`s and resolved late by short name. | **VIOLATED indirectly** — because references carry only the short name, resolution must guess the scope (V1). |
 
 ## Violations
 
@@ -387,7 +387,7 @@ Rather than the frame stack of the original plan (step 3 above), a smaller
 mechanism gives `apply()` the missing scope information without touching the
 four flat maps: `template_mapt::parameter_scopes`, the stack of the template
 parameter scopes whose declarations or bodies are currently being substituted
-([basic.scope.temp]/2, [temp.local]/1), innermost last.
+([basic.scope.temp]/2, [temp.local]/7), innermost last.
 
 - `build()` / `build_unassigned()` push the template they bind; the
   `#deduced_packs` replay in `resolve()` pushes the specialization being
@@ -421,9 +421,9 @@ string to a name and reconstructed later by parsing strings.
 | Site | Mechanism | Standard rule |
 |---|---|---|
 | `template_suffix()` (`cpp_instantiate_template.cpp`) | renders the argument list to `<...>` text; the scope's `suffix` is appended to class/function/variable instance names | [temp.type]/1: same template + same arguments = same specialization.  The rendering must be canonical (the function already strips a numeric scope prefix from template-template arguments, folds non-type arguments, and prints `const ` for cv). |
-| `#member_fn_template_instance` → `typecheck_compound_declarator` appends `current_scope().suffix` to the member's symbol name; `#unsuffixed_name` records the pre-suffix name for the condition-3 fallback | [temp.spec]/4: each specialization is a distinct entity; the suffix is how two specializations with equal signatures get distinct symbols.  Static data member templates now use the same suffix (round 158 part 4). |
+| `#member_fn_template_instance` → `typecheck_compound_declarator` appends `current_scope().suffix` to the member's symbol name; `#unsuffixed_name` records the pre-suffix name for the condition-3 fallback | [temp.type]/1: each specialization is a distinct entity; the suffix is how two specializations with equal signatures get distinct symbols.  Static data member templates now use the same suffix (round 158 part 4). |
 | `#fn_template_type` / `#fn_template_args` / `#fn_template_packs` / `#spec_template_packs` / `#deduced_packs` | the instance carries its template parameters and arguments so the map can be *rebuilt* at body conversion | [temp.point]/1: the body is instantiated in the specialization's context.  These are records, not string parsing. |
-| `requires_param::<name>#<n>` (round 158 part 4) | one symbol per requirement-parameter binding | [expr.prim.req.general]/2-3: the parameters are local to the requires-expression. |
+| `requires_param::<name>#<n>` (round 158 part 4) | one symbol per requirement-parameter binding | [expr.prim.req.general]/4: the parameters are local to the requires-expression. |
 
 Assessment:
 
@@ -438,7 +438,7 @@ Assessment:
    structurally) with the text derived from it for symbol names only.
 2. The condition-3 fallback (`#unsuffixed_name`, `cpp_instantiate_template.cpp`
    ~6870) reconstructs "is there a same-signature non-template overload" from
-   the unsuffixed string.  That is a [temp.spec]/4 question about *signatures*
+   the unsuffixed string.  That is a [temp.fct.general]/2 question about *signatures*
    and would be better answered from the class's component list.
 3. Nothing here has a driving failing test; both structural fixes are moderate
    (identity keying) to small (condition 3).  They are deliberately not done in
