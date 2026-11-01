@@ -99,16 +99,16 @@ confidently test at that scale yet.
 | 2026-05-12 (using)     | all src/util/ | 1 | 7 | 109 | 0 | `9537b6bfc5` — class-member `using Base::X` with unresolved lookup silently dropped; eliminates 31 `using identifier 'remove' not found` errors (cascades, same count) |
 | 2026-05-12 (syshdr)    | all src/util/ | **7** | **1** | 109 | 0 | `a760f05e84` — null message handler around system-header function body + default template args; eliminates 27 `__stoa` leaks and moves 6 files from OK_NOISY to OK_CLEAN |
 | 2026-05-12 (destr)     | all src/util/ | 7 | 5 | 105 | 0 | `5e7efee580` + `7a9154a46e` + `56c27ea9d3` — destructor fallback + silent fallbacks for uninitialised constexpr + bare `enum class X;` forward declaration; eliminates 64 `'' is not static member of 'const struct basic_string'` errors |
-| 2026-05-12 (tmpl-no-match) | all src/util/ | **10** | **4** | 103 | 0 | `01507a3e6d` — resolve: silently discard template-only no-match per [temp.deduct]/8; eliminates the `invariant_violated_structured` cascade that had been emitted by 60+ files and moves 3 files to OK_CLEAN + 1 to OK_NOISY-to-OK_CLEAN |
+| 2026-05-12 (tmpl-no-match) | all src/util/ | **10** | **4** | 103 | 0 | `01507a3e6d` — resolve: silently discard template-only no-match per [temp.deduct.general]/8; eliminates the `invariant_violated_structured` cascade that had been emitted by 60+ files and moves 3 files to OK_CLEAN + 1 to OK_NOISY-to-OK_CLEAN |
 | 2026-05-12 (funcaddr+SIGSEGV) | all src/util/ | 10 | 4 | 103 | 0 | `d612fe6dac` (plain function-pointer target-type deduction per [temp.deduct.funcaddr]; promotes `cpp11_deduct_funcaddr` KNOWNBUG→CORE) + `df5f5d955e` (guard empty declarator-name sub on trailing-return-decltype path; eliminates MSVC `cpp11_future_header` SIGSEGV on preprocessed-header runs) |
 | 2026-05-13 (duration) | all src/util/ | 10 | 4 | 103 | 0 | `2e8e74f8ed` — skip self-referential `common_type_t<duration>` member during class elaboration; unlocks `_MyRep` + constructors + operators on `std::chrono::duration<...>`, MSVC `cpp14_chrono_basic` preprocessed-header run now VERIFIES SUCCESSFUL |
 | 2026-06-30 (variadic) | all src/util/ | **36** | **59** | **22** | 0 | cumulative variadic-pack-expansion + std::function rework (layers 1, 2a/2b/2c-i/2c-ii, 3a, 3b, 3c-i): multi-argument std::function now constructs AND invokes soundly; 95/117 files now produce a goto binary (was 14/117 on 2026-05-13) |
-| 2026-06-30 (adl) | all src/util/ | **38** | **60** | **19** | 0 | suppress ADL when ordinary lookup finds a class member (N5008 [basic.lookup.argdep]/3.1); unblocks the xml.h `find(element)` vs `std::basic_string::find` ambiguity (3 files) |
+| 2026-06-30 (adl) | all src/util/ | **38** | **60** | **19** | 0 | suppress ADL when ordinary lookup finds a class member (N5008 [basic.lookup.argdep]/1.1); unblocks the xml.h `find(element)` vs `std::basic_string::find` ambiguity (3 files) |
 
 ## Fixes that have landed (in order)
 
 1. `e7080a017e` — SFINAE substitution-failure leak absorbed per
-   [temp.deduct]/7-8.  (Pre-dog-food context; large front-end
+   [temp.deduct.general]/7-8.  (Pre-dog-food context; large front-end
    ripple effect.)
 2. `424da3ca32` — `alignment()` cycle guard for pathological
    type-graph cycles, removing one SIGSEGV class.
@@ -134,7 +134,7 @@ confidently test at that scale yet.
    (access-control-only, no goto-conversion effect).
 9. `a760f05e84` — null message handler around system-header
    function bodies (existing error-recovery already clears the
-   body) and default template args (per [temp.deduct]/7-8).
+   body) and default template args (per [temp.deduct.general]/7-8).
    Removes 27 leaked `__stoa` errors from dog-food output.
 10. `15ec1832dc` + `8dd999d43e` — reference/pointer **non-type
     template parameters**.  `template <typename T, const T &empty
@@ -145,7 +145,7 @@ confidently test at that scale yet.
     type `T`, the reference argument (`&T::blank`) was valuified,
     and `template_suffix` aborted in `to_constant_expr` while
     naming the instance.  Fixed in three cooperating parts, per
-    N5008 [temp.param]/6, [dcl.meaning]/1, [temp.arg.nontype]/2:
+    N5008 [temp.param]/11, [dcl.meaning.general]/5, [temp.arg.nontype]/2:
     (a) build the parameter symbol from
     `declarator.merge_type(declaration.type())` so it keeps its
     reference/pointer type; (b) do not valuify a reference/pointer
@@ -160,7 +160,7 @@ confidently test at that scale yet.
     `std::unordered_map<dstringt, …>` instantiation issue.)
 11. `37577e13b4` + `9132564dbe` — **explicit class template
     specialization named with a qualified-id** (N5008
-    [temp.expl.spec]/2).  `template <> struct ns::G<char> {...}`
+    [temp.expl.spec]/3).  `template <> struct ns::G<char> {...}`
     (and `template <> struct std::hash<T> {...}`, the standard way
     to make a user type an unordered-container key) was silently
     skipped by `convert_template_declaration` — mistaken for an
@@ -192,7 +192,7 @@ confidently test at that scale yet.
     distinct downstream errors: `depth_iterator_baset` instantiation
     and `std::unordered_map<dstringt, exprt>` respectively).
 13. `9a8e231654` — **function type with a pointer/reference return
-    and empty parameter list** (N5008 [dcl.decl]/4,
+    and empty parameter list** (N5008 [dcl.decl.general]/6,
     [dcl.ambig.res]).  `rDeclarator` only re-parsed an empty `()` as
     a function parameter-list when there was no leading ptr-operator,
     so `int*()` / `int&()` were mis-parsed as `int*` / `int&` (the
@@ -227,7 +227,7 @@ confidently test at that scale yet.
     `cpp11_brace_construct_reference_member`.  **`rename_symbol.cpp`
     now compiles to a goto binary.**
 15. `25f4b86590` — **reference direct-initialization with
-    parentheses/braces** (N5008 [dcl.init.ref], [dcl.init]/16).
+    parentheses/braces** (N5008 [dcl.init.ref], [dcl.init.general]/16.2).
     `T &r(init)` binds the reference like `T &r = init`, but the
     parser stores the initializer as init_args and a reference is not
     an object a constructor initializes, so it was reported "declared
@@ -238,7 +238,7 @@ confidently test at that scale yet.
     `cpp11_reference_paren_init`.  **`replace_symbol.cpp` now compiles
     to a goto binary.**
 16. `a02982c4e7` — **member template operators in operator overload
-    resolution** (N5008 [over.match.oper]/3.2, [over.match.best]/2).
+    resolution** (N5008 [over.match.oper]/3.1, [over.match.best.general]/2).
     operator_is_overloaded detected member operator candidates only
     among ID_code components, missing a member operator that is a
     function template (util/message.h's
@@ -247,7 +247,7 @@ confidently test at that scale yet.
     undefined).  Detect template members via a SCOPE_ONLY lookup, and
     prefer a free non-template operator over the member template only
     when the free operator's object parameter is an EXACT match (per
-    [over.match.best]/2) -- not when it needs a derived-to-base
+    [over.match.best.general]/2) -- not when it needs a derived-to-base
     conversion (so `mstreamt::operator<<`, exact object, wins over a
     free `operator<<(std::ostream&, …)`).  CORE test
     `cpp11_member_template_operator_overload`.  Clears the
@@ -274,7 +274,7 @@ clusters:
 | 1 | `std::unique_ptr<console_message_handlert>` instantiation | `parse_options.cpp` |
 
 17. `8e6dd4afc7` — **lambda parameter with a concrete class-name
-    type** (N5008 [expr.prim.lambda.general]/4).
+    type** (N5008 [expr.prim.lambda.general]/6).
     typecheck_expr_lambda treated any lambda parameter whose type is
     a bare name (cpp_name) as a generic `auto` parameter and replaced
     it with `signed int`.  An ordinary class-name parameter such as
@@ -291,7 +291,7 @@ clusters:
     which uses `std::stack<exprt*>`) is still dropped because CBMC
     *eagerly* instantiates an UNUSED allocator-extended `std::stack`
     constructor template (stl_stack.h:201) whose instantiation fails
-    and aborts visit_pre_template -- a [temp.inst]/2 non-conformance
+    and aborts visit_pre_template -- a [temp.inst]/3.1 non-conformance
     (member/ctor TEMPLATE definitions instantiated without odr-use).
     Full `exprt::visit` soundness needs the lazy-instantiation work.
 
@@ -300,7 +300,7 @@ clusters:
     exhausting the stack on a cyclic type graph (e.g. std::error_category
     reached during deduction).  Defensive; mirrors the alignment() cycle guard.
 19. `56643fec6b` — **__is_constructible with an empty argument pack**
-    (N5008 [meta.unary.prop], [temp.variadic]/5).  is_constructible<T> written
+    (N5008 [meta.unary.prop], [temp.variadic]/16).  is_constructible<T> written
     as the empty-pack form `bool_constant<__is_constructible(T, Args...)>` (how
     libstdc++ writes is_default_constructible<T> and std::stack's default-ctor
     SFINAE) was mis-evaluated: the empty pack became the empty type (not nil),
@@ -317,7 +317,7 @@ clusters:
     crashing, but deduction incomplete).
 
 20. `3077ecc7c0` — **constructor templates in braced-init-list overload
-    resolution** (N5008 [over.match.list]/2.2, [over.match.ctor], [temp.deduct]).
+    resolution** (N5008 [over.match.list]/1.2, [over.match.ctor], [temp.deduct]).
     `brace_init_is_viable` scanned only ordinary constructor components and
     missed constructor *templates* (a class stores those behind a
     `has_template_constructor` flag), so passing a braced-init-list whose
@@ -396,7 +396,7 @@ cause diagnosed (backtrace + probe): CBMC concretizes unique_ptr's =delete'd
 deleter constructor *template* during class-template instantiation -- the
 member function template loses its template-ness (is_template=0) and its
 enable_if_t<false> signature is eagerly evaluated -- violating N5008
-[temp.inst]/2 (member function templates stay dependent until odr-used).  This
+[temp.inst]/3.1 (member function templates stay dependent until odr-used).  This
 is a concrete instance of the deferred lazy member-function-template
 instantiation work; a partial fix leaves a malformed model.  Captured as
 KNOWNBUG `cpp11_unique_ptr_member_enable_if`; the proper fix (keep member
@@ -446,7 +446,7 @@ distinct root causes, both fixed:
   sequence sharing one `rank`, so a failed init-list->scalar attempt inflated
   the next viable single-element conversion's rank — mis-ranking a value
   constructor's identity element conversion (rank 0) as user-defined (4) and
-  tying it with the copy constructor, violating N5008 [over.ics.rank]/(3.1)
+  tying it with the copy constructor, violating N5008 [over.ics.rank]/2.1
   (standard beats user-defined).  CORE `cpp11_braced_init_overload_rank`
   (was KNOWNBUG).
 
@@ -458,7 +458,7 @@ distinct root causes, both fixed:
   constructors, and `exprt -> const irept&` is a derived-to-base binding — so
   `source_locationt` looked constructible from an `exprt`, tying
   `codet(dstringt, source_locationt)` with `codet(dstringt, operandst)`.  Per
-  N5008 [over.match.ctor]/1 + [namespace.udecl]/3 base ctors are not candidates
+  N5008 [over.match.ctor]/1 + [namespace.udecl]/2 base ctors are not candidates
   unless inherited via `using` (CBMC materialises those as non-`from_base`
   components).  Skip `from_base` ctors in the loop.  CORE
   `cpp11_braced_init_base_ctor` (reproduces pre-fix as ambiguous).
@@ -487,7 +487,7 @@ plus lookup noise in many files).
   components whose declaring class is the *derived* class, so they never trip
   the base-of test).  So `namespacet`'s `using namespace_baset::lookup;`
   one-argument `const symbolt &lookup(const irep_idt&)` was discarded and
-  `ns.lookup("x")` failed.  Per N5008 [namespace.udecl]/16 a using-declared
+  `ns.lookup("x")` failed.  Per N5008 [namespace.udecl]/11 a using-declared
   base member joins the derived class's overload set and is not hidden.  Fix:
   snapshot the ordinary-lookup candidate set before ADL augments it, and never
   hide a candidate that was in it.  CORE `cpp11_using_decl_overload`
@@ -594,7 +594,7 @@ Fixed the memory_info.cpp 'mallinfo' "does not uniquely resolve".
   `S()` was ambiguous between the function and the type's constructor.  This is
   the C-library struct-tag/function pattern: glibc `struct mallinfo`/`mallinfo()`
   (`struct mallinfo m = mallinfo();`), POSIX `struct stat`/`stat()`.  N5008
-  [basic.scope.hiding]/2: the function hides the type.  Fix: before building
+  [basic.lookup.general]/4: the function hides the type.  Fix: before building
   constructors, drop type candidates when a genuine same-named function is also
   present.  Care was taken to identify the *hiding* entity precisely -- an
   ID_code symbol whose return type is NOT ID_constructor -- so the type's own
@@ -685,7 +685,7 @@ defined with a member, then `g_in.read()` -> "unknown".  This mirrors <iosfwd>
 forward-declaring std::basic_istream before <istream> defines it.
 
 Root cause: CBMC eagerly elaborates `S<char>` at the early reference from the
-not-yet-defined primary template ([temp.inst]/1, [temp.point] are violated),
+not-yet-defined primary template ([temp.inst]/2, [temp.point] are violated),
 producing an empty-but-complete class and dropping the instance's template link,
 so the later definition's members are permanently masked.
 
@@ -710,7 +710,7 @@ Dog-food count unchanged (89/21/7/0).
 
 Landed the fix the previous entry deferred.  A class template specialization is
 implicitly instantiated -- and completed -- only from a *definition* of the
-template (N5008 [temp.inst]/1, [temp.point]).  The eager elaboration of a
+template (N5008 [temp.inst]/2, [temp.point]).  The eager elaboration of a
 specialization referenced while the template was only forward-declared is the
 root of the lispexpr.cpp / parser.cpp `symbol 'read' is unknown` failures
 (<iosfwd> forward-declares std::basic_istream before <istream> defines it).
@@ -755,7 +755,7 @@ separate pre-existing defect): a **sole** function-template candidate whose
 non-deduced, defaulted template parameter carries a false `enable_if` constraint
 (e.g. `template<class T, enable_if_t<always_false<T>::value,int> = 0> int f(T)`)
 is **wrongly accepted** by CBMC (`f(5)` compiles) though g++/clang++ reject it --
-[temp.deduct]/8: the substitution failure removes the only candidate, leaving no
+[temp.deduct.general]/5: the substitution failure removes the only candidate, leaving no
 viable function.  With a *competing* overload the constraint IS enforced (multi-
 candidate disambiguation instantiates and rejects it), so only the sole-candidate
 path is affected.
@@ -783,7 +783,7 @@ silent over-acceptance, not a FAIL).
 
 ### 2026-07-03 SFINAE enforcement fix: unrecovered no-viable-function is diagnosed
 
-Landed the fix the previous entry deferred.  N5008 [temp.deduct]/8: when
+Landed the fix the previous entry deferred.  N5008 [temp.over]/1.2, [over.match.general]/3: when
 deduction removes every candidate of a call and there is no non-template
 overload, the call has no viable function and the program is ill-formed.
 resolve() kept its silent `throw 0` for this case (so recoverable callers --
@@ -878,7 +878,7 @@ the bad figures).
 
 ### 2026-07-05 gap closed: decltype nested in a trailing return type (make_range)
 
-N5008 [dcl.fct]/[expr.type]: a function template whose trailing return type
+N5008 [dcl.fct]/[basic.scope.param]: a function template whose trailing return type
 nests a decltype in a template-id -- util/range.h's
 `template <typename C> auto make_range(C &c) -> ranget<decltype(c.begin())>` --
 was removed from the candidate set ("found no match for make_range").
@@ -1344,7 +1344,7 @@ yet registered when the base-class trait is evaluated.  Left for a follow-up.
 
 A defaulted move constructor now move-constructs each base and non-static data
 member from an xvalue (static_cast<T&&>) so the member's move constructor is
-selected ([class.copy.ctor]/14-15).  Previously default_cpctor emitted a
+selected ([class.copy.ctor]/14).  Previously default_cpctor emitted a
 memberwise *copy* initializer that was reused for the move constructor too, so
 a member whose copy constructor is deleted but whose move constructor is usable
 (e.g. a std::unique_ptr member) selected the deleted copy constructor -- "member
@@ -1358,7 +1358,7 @@ CBMC's own irep_serialization.cpp and ui_message.cpp (which hold std::unique_ptr
 members).  Dog-food unchanged at **94/20/3, 0 crash**: parse_options.cpp still
 FAILs, but on a *distinct* remaining bug -- CBMC constructs a thrown exception
 object with the class's copy constructor rather than moving/eliding from the
-prvalue operand ([except.throw]/3, [class.copy.elision]/3), so throwing a
+prvalue operand ([expr.throw]/2, [class.copy.elision]/3), so throwing a
 move-only exception (parse_options throws exceptions transitively holding a
 move-only, unique_ptr-backed ui_message_handlert) fails.  Captured header-free
 as KNOWNBUG cpp11_throw_move_only; throw/catch of a *copyable* class works, so
@@ -1468,7 +1468,7 @@ value into a per-site static object and sets ptr+tag; a possibly-throwing CALL
 is followed by a guarded dispatch; an unmatched throw falls to the function end
 (propagates to the caller); a handler copies the value into its parameter and
 clears the pointer.  Base-class matching (intra- and cross-function) uses the
-thrown types' cpp_exception_id lists ([except.throw]/4, [except.handle]/1-3).
+thrown types' cpp_exception_id lists ([except.throw]/2, [except.handle]/1-3).
 
 Verified: intra- and cross-function throw/catch deliver the value to the
 matching handler (by value/reference, base-class, catch(...), multi-level
@@ -1485,12 +1485,12 @@ goto-conversion now runs the destructors of automatic objects during C++ stack
 unwinding: on a `throw`, after the exception object is evaluated, the destructor
 stack is unwound up to the innermost enclosing try (or the whole function when
 there is none) before the THROW, so objects constructed in the try are destroyed
-in reverse order as the stack unwinds ([except.ctor], [except.throw]/4).
+in reverse order as the stack unwinds ([except.ctor], [except.throw]/2).
 Previously the destructor ran only on the normal scope-exit path.
 
 remove_cpp_exceptions now lowers rethrow (`throw;`): the in-flight exception is
 saved into "current exception" globals on handler entry and re-propagated to the
-enclosing handler on a rethrow ([except.throw]/8), instead of wrapping the empty
+enclosing handler on a rethrow ([expr.throw]/3), instead of wrapping the empty
 throw side-effect into an exception object (which symex rejected).
 
 A sound over-approximating function_may_throw (instrument only call sites of
@@ -1515,7 +1515,7 @@ Root-caused the src/util/simplify_utils.cpp dog-food FAIL (CONVERSION ERROR
 bound with a brace initializer, `T a[]{...}`, had its bound deduced only for
 scalar/trivial element types; when T has a user-provided constructor the
 initialization went through per-element construction with a nil (undeduced)
-array size ([dcl.array]/1, [dcl.init.aggr]/5).  The trigger is
+array size ([dcl.array]/7, [dcl.init.aggr]/10).  The trigger is
 std::optional<std::pair<componentt, mp_integer>> (c_types.h), whose libstdc++
 internals declare such an array.  Reduced with cvise (g++-validity guarded).
 
@@ -1595,7 +1595,7 @@ function-body scope, so the out-of-line member's method scope is created under
 that function-body scope (observed `f()::1::template::N`) instead of under the
 template's own scope (`det::template::M`); the namespace-scope typedef in the
 return type is then looked up in the wrong scope and not found.
-([temp.inst]/2, [basic.lookup.unqual], [dcl.meaning].)
+([temp.inst]/4, [basic.lookup.unqual], [dcl.meaning].)
 
 Recorded as KNOWNBUG cpp11_template_outofline_member_ns_return.  An unconditional
 fix (re-enter the template scope before instantiating each method) resolves the
@@ -1615,7 +1615,7 @@ reverted.  Dog-food remains 95 clean / 21 noisy / 1 FAIL / 0 crash.
 Follow-up to the KNOWNBUG above: the fix landed.  The correct scope for
 instantiating a class template's (out-of-line) members is the *instantiated
 class's* scope -- its parent chain reaches both the class's own members and,
-through the class's enclosing namespace, namespace-scope names ([temp.inst]/2,
+through the class's enclosing namespace, namespace-scope names ([temp.inst]/4,
 [basic.lookup.unqual], [dcl.meaning]).  cpp_instantiate_template now enters that
 scope before instantiating each method, instead of restoring the scope that
 first triggered the instantiation.
@@ -1646,7 +1646,7 @@ manipulator type `eomt`) a hard "shl" error was emitted even though the free
 `operator<<(mstreamt&, eomt)` should win.  Now, when the class has a template
 member operator@, the non-member operator@ is resolved first and, if it is a
 non-template that matches every operand exactly, preferred without instantiating
-the member template ([over.match.oper]/3, [over.match.best]/2, [temp.inst]/2).
+the member template ([over.match.oper]/3, [over.match.best.general]/2, [temp.inst]/5, 10).
 
 Cleared 5 of 7 files (message, parser, piped_process, ui_message, cout_message);
 dog-food noisy 21->16, clean 96->101, still 0 FAIL / 0 crash.  New CORE test
@@ -1678,11 +1678,11 @@ cause: inside mstreamt's member operator<< template body,
 `static_cast<std::ostream &>(*this) << x` has a reference-typed left operand, and
 CBMC's binary-operator resolution enters the member-operator candidate path only
 when the operand's type node is exactly ID_struct_tag -- so a reference-to-class
-operand never gathers member operator@ candidates ([over.match.oper]/3.2).
+operand never gathers member operator@ candidates ([over.match.oper]/3.1).
 `std::ostream << <int>` therefore misses std::basic_ostream's member
 operator<<(int) and falls back to the built-in shift.  The `<< <const char*>`
 variant additionally needs the combined member + non-member candidate set
-([over.match.oper]/3): the free operator<<(basic_ostream<C>&, const char*)
+([over.match.oper]/3, 7): the free operator<<(basic_ostream<C>&, const char*)
 competes with the member operator<<(const void*), which CBMC evaluates as
 separate member/non-member paths.
 
@@ -1712,16 +1712,16 @@ operator<<(basic_ostream<C> &, const char *) (for `<const char*>`), instead of
 falling back to the built-in shift.
 
 Four coordinated, standards-grounded changes:
-* [over.match.oper]/3.2 -- strip a leading reference from the first operand's
+* [over.match.oper]/3.1 -- strip a leading reference from the first operand's
   type before the member-operator gate (member candidates for a ref-to-class
   lvalue).
-* [over.match.oper]/3   -- member+non-member candidates are one set: catch
+* [over.match.oper]/7   -- member+non-member candidates are one set: catch
   resolve()'s throw when the member scope has same-named-but-non-viable
   candidates and fall through to the non-member path.
-* [over.match.oper]/3.3 -- exclude genuine member functions (cpp_idt::is_method)
+* [over.match.oper]/3.2 -- exclude genuine member functions (cpp_idt::is_method)
   from the non-member operator candidate set, but only when a non-member remains
   (friends kept).
-* [basic.lookup.argdep]/2 -- strip a leading reference from each operand type in
+* [basic.lookup.argdep]/3, [expr.type]/1 -- strip a leading reference from each operand type in
   resolve_with_arguments (ADL), so a reference-typed operand's class associated
   namespace (and any ADL-only operator hidden by an in-scope member operator) is
   found.
@@ -1742,7 +1742,7 @@ timeout/crash is gone (pack-expansion rework + char-literal fix landed):
 cpp17_tuple_basic now type-checks and runs symex, failing only because
 std::make_tuple returns a tuple whose element-storing CONSTRUCTORS have no body
 (get<0> reads an uninitialised member).  Root-caused, header-free, to a function
-template with a template parameter FOLLOWING a parameter pack ([temp.param]/11) --
+template with a template parameter FOLLOWING a parameter pack ([temp.param]/18) --
 the shape of std::_Tuple_impl's forwarding constructor
 `template<class _UHead, class... _UTail, class = enable_if_t<...>>`.  Minimal:
 `template<class U, class... W, class X = void> int first(U,W...); first(5,6,7);`
@@ -1755,11 +1755,11 @@ it, verified); (2) even then the deduced instance is rejected at
 disambiguation/instantiation -- STILL OPEN.  The (1) fix greens no end-to-end
 test alone, so it was not committed (per .kiro/decltype_tuple_apply_findings.md
 discipline).  Recorded as KNOWNBUG cpp11_template_param_after_pack with a precise
-[temp.param]/11 reproducer.  No source change; dog-food unchanged.
+[temp.param]/18 reproducer.  No source change; dog-food unchanged.
 
 *Updated: 2026-07-09*
 
-### 2026-07-09 template parameter after a parameter pack ([temp.param]/11) fixed
+### 2026-07-09 template parameter after a parameter pack ([temp.param]/18) fixed
 
 Fixed a family of front-end bugs that assumed a function-template parameter pack
 is the LAST template parameter, so a call like `first(5,6,7)` for

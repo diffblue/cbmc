@@ -49,7 +49,7 @@ pack (`E...`). I added a general branch: when an `ambiguous`/cpp_name arg with
 `ellipsis=true` references a pack NOT at top level, collect the referenced
 pack(s), and for each element i expand a copy of the pattern with that element
 bound (via a per-element copy of the template_mapt with the pack rebound as a
-scalar type_map entry), per [temp.variadic]/4-5.
+scalar type_map entry), per [temp.variadic]/5-6.
 
 Result: this DID fix the function-template return-type path (p1's return type
 became the correct `Tup<int,int>`), and was regression-free (full cpp14/17/20 -C
@@ -120,7 +120,7 @@ In template_mapt::apply (template_map.cpp), in the cpp_name template-arg
 expansion loop, AFTER the existing `ambiguous`+ellipsis (front-is-pack) case and
 BEFORE `if(!was_pack) expanded_args.push_back(arg);`, add:
 
-    // [temp.variadic]/4-5: pack expansion whose pattern is not the bare
+    // [temp.variadic]/5-6: pack expansion whose pattern is not the bare
     // pack (the pack is nested, e.g. `typename W<E>::type...`).
     if(!was_pack && arg.id() == "ambiguous" &&
        static_cast<const exprt &>(arg).type().id() == ID_cpp_name &&
@@ -190,7 +190,7 @@ The decay (35719a9b06), nested-member-capture (4b31e68642) and typeid
 
 Committed 009c1964ac: template_mapt::apply now expands a nested-pack pattern
 Container<typename Trait<E>::member...> per element in template-argument lists
-([temp.variadic]/4-5). Demonstrable + regression-free: new CORE test
+([temp.variadic]/5-6). Demonstrable + regression-free: new CORE test
 cpp11_variadic_member_alias_pack passes; cpp14/17/20 -C == baseline (5
 pre-existing), cpp11 excl libcxx 153 OK. The fix yields a single consistent
 instantiation (tag-Tup<int,double,char>, no spurious/versioned tags) for the
@@ -305,7 +305,7 @@ _Tuple_impl / _Head_base CONSTRUCTORS have NO bodies (only dtors, _M_head,
 _M_swap are emitted), so `make_tuple`'s `return tuple(...)` initialises nothing.
 
 Root-caused (minimal, header-free) to: **a function template whose template
-parameter list has a parameter FOLLOWING a parameter pack** ([temp.param]/11),
+parameter list has a parameter FOLLOWING a parameter pack** ([temp.param]/18),
 e.g. std::_Tuple_impl's forwarding constructor
 `template<class _UHead, class... _UTail, class = enable_if_t<...>>`.  Minimal
 reproducer (regression/cbmc-cpp/cpp11_template_param_after_pack):
@@ -394,7 +394,7 @@ assumption:
   trailing parameter's default is applied.
 - Layer 2d: pack_size_map recorded BEFORE that loop so a trailing parameter's
   `sizeof...(pack)` default (e.g. an enable_if) sees the deduced count
-  ([temp.variadic]/8).
+  ([temp.variadic]/10).
 - Layer 2b: guess-side per-element pack type assignment indexes the pack's
   arguments from the pack's POSITION in the template parameter list, not from
   non_pack_count (which is the pack start only when the pack is last).
@@ -678,7 +678,7 @@ non-dependent class-template-id"): rVarNameCore rejected
 `C<int>::al<char>::value` (no `template` keyword).  Two fixes: (1) accept a
 following `::` in the speculative template-arg check (a `name<...>::` is a
 nested-name-specifier -> template-id), (2) mirror rName so a concrete
-class-template-id qualifier is not treated as dependent ([temp.names]/5).
+class-template-id qualifier is not treated as dependent ([temp.dep.type]/10.11, [temp.names]/3.2).
 
 Bug B core (two-parallel-pack member-alias EXPANSION, FIXED, commit "defer a
 member alias template's own-pack expansion"): during class instantiation the
@@ -1064,7 +1064,7 @@ and (cascading) cpp17_tuple_get_two_pack_ctor_3elem should green.
 ## FIX LANDED: recursive partial spec with empty deduced trailing pack (2026-07-10)
 
 Root (localized last turn, fixed now): selecting a recursive class-template
-partial specialization re-type-checks its pattern args ([temp.class.spec.match]).
+partial specialization re-type-checks its pattern args ([temp.spec.partial.match]).
 For `sum_t<H,T...>` naming itself over the trailing pack, the nested `sum_t<3>`
 (where `T` deduces EMPTY) re-type-checked the pattern `<H,T...>` with the
 non-type `T...` still present; a non-type pack expansion over an empty pack is
@@ -1074,7 +1074,7 @@ unresolved inside `sum_t<2,3>` (failed at exactly two elements).
 
 FIX (dc02e33326): before the pattern re-type-check, trim trailing pack-expansion
 arguments corresponding to an empty deduced pack (pattern has more args than the
-actual), per [temp.arg.explicit]/4 note 1 + [temp.variadic]/4 (empty pack
+actual), per [temp.arg.explicit]/4 note 1 + [temp.variadic]/16 (empty pack
 expansion -> zero elements).  Local to specialization matching; mirrors the
 existing trailing-empty-pack trim of the type-checked result.  A first attempt
 that registered the empty pack as pack_size_map=0 and broadened the
@@ -1152,7 +1152,7 @@ the same pattern.  For `Base(static_cast<_U&&>(u)...)` / `Base(std::forward<_U>(
 Fix (2a7ff8e603): when replicating each member-init argument for element k, also
 replace a bare cpp_name naming a template type pack by that pack's k-th element
 type (from template_map.pack_args_map), in lock-step with the value-pack rename
-([temp.variadic]/4-5).  Verified: minimal wrap, static_cast and forward<U> forms,
+([temp.variadic]/8-9).  Verified: minimal wrap, static_cast and forward<U> forms,
 and the KNOWNBUG all green; whole cbmc-cpp suite green, no regressions.
 
 STILL KNOWNBUG: cpp17_tuple_basic (real libstdc++ make_tuple(1,2.0,'a'); get<0>
@@ -1239,7 +1239,7 @@ REMAINING for the DEDUCED case (cpp11_decltype_return_nontype_pack_call /
 cpp17_apply_basic, which deduce the pack from seq/index_sequence): build_template_
 args (template_map.cpp) emits ONE argument per template PARAMETER -- a single
 placeholder for a pack (lookup_expr(I) = the first value) -- and the
-post-deduction "[temp.variadic]/5 expand pack parameter to N copies" step in
+post-deduction "[temp.variadic]/9 expand pack parameter to N copies" step in
 guess_function_template_args expands only TYPE packs to full arity, not a
 NON-type pack's values.  So the deduced `<1,2>` collapses to `<1>` and impl is
 mis-instantiated ("no match").  NEXT: emit a non-type pack's full element values
@@ -1510,8 +1510,8 @@ matching the constant against the TYPE parameter hit typecheck_type's
 resolution (including the viable by-index overload) -> return type never
 deduced.  Fix: extend the existing template_arg_kind_mismatch machinery
 (apply_template_args candidate loop) to a VALUE in type position, in BOTH the
-ID_type and ID_ambiguous branches of typecheck_template_args ([temp.arg]/2 +
-[temp.deduct]/8: kind mismatch removes just the candidate).  NOTE: the arg came
+ID_type and ID_ambiguous branches of typecheck_template_args ([temp.arg.general]/1 +
+[temp.deduct.general]/2: kind mismatch removes just the candidate).  NOTE: the arg came
 through the AMBIGUOUS branch; guarding only ID_type was not enough.
 
 cpp17_apply_basic: MAJOR PROGRESS -- std::apply and __apply_impl now INSTANTIATE
@@ -1701,7 +1701,7 @@ Two KNOWNBUGs, both already minimal + header-free (only a local
 
 ### cpp11_throw_rethrow_nested  (root cause CONFIRMED in lowered goto)
 `throw;` inside an outer handler must rethrow the exception the *dynamically
-enclosing* handler is handling (N5008 [except.throw]/8, [except.handle]/1).
+enclosing* handler is handling (N5008 [expr.throw]/3, [except.handle]/10).
 Bug: src/goto-programs/remove_cpp_exceptions.cpp tracks the exception being
 handled in a SINGLE pair of globals `__CPROVER_cpp_current_exception{,_type}`,
 not a stack.  prepare_handler() at handler entry does
@@ -1785,7 +1785,7 @@ goto-convert outer-scope-unwinding issue, still KNOWNBUG).
 
 ## Cluster B dtor_unwinding_outer_scope — diagnosis (2026-07-13)
 
-N5008 [except.ctor]/1-3, [except.throw]/4: every automatic object whose scope is
+N5008 [except.ctor]/1-3, [except.throw]/2: every automatic object whose scope is
 exited during unwinding is destroyed before the catching handler runs.  cbmc
 misses destructors of objects in scopes exited *between the innermost enclosing
 try and the actual catching handler*.
@@ -1916,7 +1916,7 @@ failures.  Cluster B is now COMPLETE (rethrow + level-by-level + call-site).
 ## cpp11_unique_ptr_member_enable_if — re-diagnosed (2026-07-14)
 
 The KNOWNBUG has MORPHED: the documented enable_if_t<FALSE> hard error
-([temp.inst]/2 concretization of the =delete'd deleter ctor template) is FIXED
+([temp.inst]/3.1 concretization of the =delete'd deleter ctor template) is FIXED
 by this session's template work.  Remaining failure bisected to a single root:
 
   std::unique_ptr<C> p;  =>  p.get() != nullptr  (nondet!)
@@ -2000,7 +2000,7 @@ Continuation of the inheriting-default-ctor fix; three more defaulted-member
 gaps found by layer-wise bisection (reset/release worked; move-ctor and
 move-assign failed):
   1. default_cpctor base init always sliced source to `const Base&` -> base
-     COPY ctor selected for defaulted MOVE ctors ([class.copy.ctor]/15 wants
+     COPY ctor selected for defaulted MOVE ctors ([class.copy.ctor]/14 wants
      xvalue -> move ctor; __uniq_ptr_impl(&&) nulls source).  Fix: Base&& slice
      when is_move.
   2. Base mem-initializer named base by unqualified name -> "symbol '_Head_base'
@@ -2090,7 +2090,7 @@ Layered root-cause via probes (ALL removed):
     same-named zero entries (std::template::NNN::_Args=0 from unrelated
     earlier builds; flat-map V2 violation).
   * FIX (committed 408608ba8d): matches_empty_pack returns false for
-    deferred_own_pack_names members ([temp.alias]/2 + [temp.inst]/2).
+    deferred_own_pack_names members ([temp.alias]/2 + [temp.inst]/3.1).
     Constraints now fold with full args.  For tuple the VERDICT is unchanged
     (empty __and_<> vacuously true) so the test does not flip, but
     argument-dependent constraints would fold wrongly without it.
@@ -2140,7 +2140,7 @@ Root: at fn-template SFINAE default-argument evaluation
 parameter pack's ELEMENT TYPES were absent from the template map (only its
 SIZE was pre-recorded), so an explicit-arg pack expansion in the constraint
 (`ok<Us...>()`) collapsed to `ok<>()` -- folded over no args -> ctor rejected
--> "no match" -> swallowed -> caller bodyless (nondet).  [temp.deduct]/5.
+-> "no match" -> swallowed -> caller bodyless (nondet).  [temp.deduct.general]/5.
 
 ARCHITECTURE LESSON: binding the pack elements UNCONDITIONALLY before the
 defaults loop regressed cpp17_tuple_get_two_pack_ctor_3elem (a CORE test whose
@@ -2167,11 +2167,11 @@ fold nodes) is gated `pack_arguments.size() != 1`; for N==1 the fold node
 survives into the body and c_typecheck_expr.cpp's residual-fold fallback
 (`expr = true_exprt()`, line ~559) degrades it to TRUE.  Fix: N==1 pass
 rewriting unary folds to their pattern and binary folds to one op application
-([expr.prim.fold]/2).  Covers +, &&, comma, binary; g++/clang++ verified.
+([temp.variadic]/14).  Covers +, &&, comma, binary; g++/clang++ verified.
 
 Side-find: N==0 (empty pack) instantiation loses the whole BODY ("no body for
 callee empty_and<>()") -- pre-existing at HEAD, distinct path (pack-removal).
-Filed as cpp17_fold_empty_pack KNOWNBUG ([expr.prim.fold]/3 identities).
+Filed as cpp17_fold_empty_pack KNOWNBUG ([temp.variadic]/14 identities).
 Also note: the residual-fold fallback in c_typecheck_expr.cpp remains a
 silent-wrong-value trap; consider a warning or hard error there once the
 remaining fold paths are fixed.
@@ -2183,7 +2183,7 @@ instantiated declaration, so the body-expansion block (which rewrites fold
 nodes) never runs (pack_idx=-1) and residual folds degrade via the
 c_typecheck_expr fallback; the body conversion then loses the value (nondet).
 Fix: in the pack_sz==0 path, rewrite residual unary folds to their
-[expr.prim.fold]/3 identities (&&->true, ||->false, else 0 approximating
+[temp.variadic]/14 identities (&&->true, ||->false, else 0 approximating
 void()) and binary folds to their init operand; plus an empty-expanded_names
 guard in the general fold expander (OOB indexing hazard).  Safe scoping note:
 any fold left in the body at this point folds over THIS function's own empty
@@ -2334,14 +2334,14 @@ tests) and fixed per N5008:
    "#deduction_failed" at the nil->unassigned conversion; the empty-pack
    default-application branch rejects.  Test cpp11_pack_mismatch_not_empty.
 2. _Tuple_impl<0,int&&> ctor + _M_head dropped (s9-s12, 6 lines!):
-   [expr.ref]/6 -- member access naming a reference member is an LVALUE;
+   [expr.ref]/7 -- member access naming a reference member is an LVALUE;
    reference_binding treated implicit derefs of non-symbol rvalue refs as
-   xvalues (fix: exempt ID_member).  Plus [over.best.ics.general]/2 -- the
+   xvalues (fix: exempt ID_member).  Plus [over.match.viable]/4 -- the
    unguarded typecheck_side_effect_function_call at
    cpp_typecheck_conversions.cpp:~1777 hard-failed a non-viable concrete
    ctor candidate (fix: SFINAE-guard + continue, mirroring site 1871).
    Test cpp11_rvalue_ref_member_lvalue.
-3. _M_emplace_hint_unique bodyless (e1/e7, 50 lines): [temp.variadic]/5 --
+3. _M_emplace_hint_unique bodyless (e1/e7, 50 lines): [temp.variadic]/9 --
    the drain's pack expander renamed only the FN param pack (a->a$k) and
    left the TYPE pack whole in `forward<A>(a)...`, so per-element forward
    deduction failed.  Fix: subst_type_pack in prepare_deferred_method_body's
@@ -2355,7 +2355,7 @@ tests) and fixed per N5008:
    preserve ID_full_template_args across elaboration (compound_type swap
    save/restore) + prefer it in guess_template_args.
    Test cpp11_pack_deduction_explicit_spec.
-5. two-pack swap in instantiation (p1): [temp.param]/14 -- pair's
+5. two-pack swap in instantiation (p1): [temp.param]/18 -- pair's
    piecewise ctor has TWO deducible packs; the flat pseudo-instance arg
    list can't encode the split, and template_mapt::build's single-pack
    arithmetic SWAPPED them.  Fix: record "#deduced_packs" on the
@@ -2401,19 +2401,19 @@ each bisected to a header-free minimal (a-series in /tmp):
 1. PARSER (parse.cpp rAllocateInitializer): the `...` in a
    new-initializer's expression-list was consumed with a literal TODO --
    `::new(p) _Up(forward<_Args>(__args)...)` could never expand.
-   [temp.variadic]/5.  (a3 marker: PRE-body ellipsis count 0.)
+   [temp.variadic]/6.5.  (a3 marker: PRE-body ellipsis count 0.)
 2. template_mapt::expand_call_argument_packs recursed into NESTED member
    TEMPLATE declarations during class instantiation, consuming their pack
-   expansions against the enclosing map ([temp.inst]/2 gate added).
+   expansions against the enclosing map ([temp.inst]/3.1 gate added).
 3. Free-fn instantiation body expander (cpp_instantiate_template
    expand_pack) lacked a declarator-init_args branch; recursion corrupted
    `_Up tmp(forward<_Args>(__args)...)` into ONE
-   `forward<_Args>(__args$0, __args$1)` (a9).  [temp.variadic]/5.
+   `forward<_Args>(__args$0, __args$1)` (a9).  [temp.variadic]/9.
 4. guess_function_template_args' convertibility pre-filter paired the
    implicit OBJECT argument against the first REAL parameter (skipped the
    `this` param but not the object operand) -- member templates like
    `construct(_Up*, pc_t, tuple<int&&>)` rejected as not-convertible
-   (a15, 20 lines).  [over.match.funcs]/2.
+   (a15, 20 lines).  [over.match.funcs.general]/2-3.
 
 Tests: cpp11_member_template_object_arg (fix 4 isolated),
 cpp11_pack_expansion_new_init (full allocator chain, needs 1+2+4).
@@ -2450,7 +2450,7 @@ Six-part fix chain (each bisected header-free; commits in order):
 
 1. #deduced_packs machinery recorded only TYPE pack elements; NON-type
    index-pack VALUES (pack_expr_map) added to annotate+replay
-   ([temp.variadic]/8).  Minimal: e3/e7 (mixed type+non-type pack target
+   ([temp.variadic]/9).  Minimal: e3/e7 (mixed type+non-type pack target
    called from any instantiated body).
 2. Out-of-line definition adoption (3 sites: typecheck_class_template_member
    merges x2 at ~675/~1045, instantiate attach x2 at ~4300/~4560) copied the
@@ -2460,12 +2460,12 @@ Six-part fix chain (each bisected header-free; commits in order):
    attached by the THIRD site (search which one fires!).
 3. Same-named overloaded member-template definitions (pair's TWO piecewise
    ctors) confused by base-name-only matching in the attach blocks; added
-   param-count discrimination ([over.load], [dcl.fct]/3).  Minimal: z2
+   param-count discrimination ([basic.scope.scope]/4, [dcl.fct]/3).  Minimal: z2
    (BOTH ctors out-of-line).
 4. Empty-pack mem-init argument removal dropped `sizeof...(EMPTY)` mentions
    (breaking `_Build_index_tuple<sizeof...(_Args2)>::__type()`, shifting
    the delegation args); refined to drop only refs OUTSIDE #sizeof_pack
-   ([temp.variadic]/4 vs /8).  Minimal: d10 (build_index<sizeof...> args).
+   ([temp.variadic]/16 vs /8).  Minimal: d10 (build_index<sizeof...> args).
 5. Drain-side: #fn_template_packs persisted on the method symbol +
    replayed in prepare_deferred_method_body (flat #fn_template_args can't
    encode multi-pack splits); plus the same sizeof...-aware empty-pack
@@ -2517,7 +2517,7 @@ header-free).  Bisection path from the real map (--cpp20):
   construct_at" -- the instantiated body's conversion fails.
 * Likely locus: the FREE-fn-template body expander's cpp_new-initializer
   handling for multi-element packs (the member-template flavour was
-  fixed via the parser ellipsis + [temp.inst]/2 gate + init_args branch;
+  fixed via the parser ellipsis + [temp.inst]/3.1 gate + init_args branch;
   a4 from that session was never re-run and is this same gap).
 * SEPARATE bug found during bisection, not filed yet: a member template
   of a class template with a FOLD over its pack ('*p = (args + ...)')
@@ -2530,7 +2530,7 @@ links to the minimal.
 ## construct_at pack-args FIXED -> CORE (2026-07-15 night)
 
 Two fixes (commit: instantiate_template + 2 tests):
-1. [temp.variadic]/5 + [expr.new]: free-fn-template body pack-expander
+1. [temp.variadic]/9 + [expr.new]: free-fn-template body pack-expander
    (cpp_instantiate_template.cpp ~6280) had no cpp_new-initializer branch.
    Added one mirroring the function-call/init_args branches:
    `::new(p) T(forward<Args>(args)...)` now replicates per element.
@@ -2643,7 +2643,7 @@ full suite green (91 skipped, was 92).  Added <util/arith_tools.h> +
 ## make_tuple arity>=3 FIXED -> CORE (2026-07-15 late)
 
 cpp17_tuple_basic flipped to CORE.  Two root causes, both fixed:
-1. [temp.variadic]/8 CONST DROP: in-class pack replication
+1. [temp.variadic]/9 CONST DROP: in-class pack replication
    (cpp_typecheck_compound_type.cpp) replaced the whole pattern
    `merged_type[const, cpp_name(_Elements)]` of `const _Elements&...` with
    the raw pack element -> replicated params lost const -> couldn't bind
@@ -2687,7 +2687,7 @@ __cpp17_fwd_iterator / __cpp17_randacc_iterator chains) -- the
 count via stoi + #C_concept_constraint counting).  When those counts TIE,
 the winner is whichever candidate is seen first in
 `cpp_scopet::id_sett = std::set<cpp_idt *>` -- POINTER-ordered, hence
-ASLR-dependent.  N5008 [temp.class.spec.match]/2 + [temp.constr.order]
+ASLR-dependent.  N5008 [temp.spec.partial.match]/2 + [temp.constr.order]
 require selecting the most-constrained SATISFIED spec via constraint
 SUBSUMPTION -- and the proper machinery already exists:
 constraint_subsumes / constraint_strictly_subsumes in
@@ -2736,7 +2736,7 @@ cpp17_tuple_basic, cpp20_iterator_traits_category, cpp23_expected_basic.
 
 ## locale model + defect-hunt + dog-fooding round (2026-07-16)
 
-1. LOCALE ([locale.general]/8 + C99 7.4): modelled the classic ctype<char>
+1. LOCALE ([locale.statics]/5 + C99 7.4): modelled the classic ctype<char>
    facet (provide_classic_ctype_char_model in cpp_typecheck_stdlib.cpp);
    __try_use_facet<ctype<char>> override must live in the HAS-BODY section
    (header-inline body) and match base_name by PREFIX (template suffix is
@@ -2810,28 +2810,28 @@ Prerequisites / notes from the dog-fooding rounds so far:
 ## chrono + default_targ CORE; optional_string crash fixed (2026-07-16)
 
 1. cpp11_chrono_mixed_duration_add -> CORE.  THREE stacked fixes:
-   (a) [temp.deduct]/5+[basic.scope.temp]/2 deduction restricted to the
+   (a) [temp.deduct.general]/5+[basic.scope.temp]/2 deduction restricted to the
    deduced template's own parameters (current_deduction_parameters +
    template_map.deduction_parameters + V1 short-name-loop guard) and
-   exception-safe cpp_name swap-restore in typecheck_type ([temp.deduct]/8
-   no-lasting-effect); (b) [temp.inst]/5 convert_deferred_method_now:
+   exception-safe cpp_name swap-restore in typecheck_type ([temp.deduct.general]/8
+   no-lasting-effect); (b) [temp.inst]/4, /8 convert_deferred_method_now:
    on-demand conversion of deferred constexpr members needed by constant
    evaluation in default template args (chrono _S_gcd in __divide);
-   (c) constexpr evaluator gaps: do-while ([stmt.dowhile] body-first),
+   (c) constexpr evaluator gaps: do-while ([stmt.do] body-first),
    decl initializers ([dcl.init]), expression-statement assigns.  New
    header-free CORE test cpp11_fn_template_param_shadow.
    DEBUG-JOURNEY note: 'same call works in main, fails in fn-template
    body' = deferred-drain ordering/state; census of enable_if<0,...>
    instantiations via a typecheck_template_args result probe pinpointed
    the false conjunct (integral_constant<bool,0> from __is_harmonic).
-2. cpp17_default_targ_overload_select -> CORE.  (a) [temp.arg.explicit]/3:
+2. cpp17_default_targ_overload_select -> CORE.  (a) [temp.arg.explicit]/6:
    too-many-explicit-args is now a silent candidate-removal
    (template_arg_kind_mismatch_exceptiont) during overload matching;
-   (b) [temp.variadic]/5: member-body fold reducer recognises a
+   (b) [temp.variadic]/9.2: member-body fold reducer recognises a
    single-element pack by the method's own (un-replicated) parameter
    name, independent of how many packs are in the map.
 3. cpp17_optional_string: CRASH FIXED (still KNOWNBUG for values):
-   per-base recovery in typecheck_compound_bases ([class.derived]/2 --
+   per-base recovery in typecheck_compound_bases ([class.derived.general]/2 --
    one failing base no longer drops siblings) + make_ptr_typecast
    degrades to plain typecast on unrelated structs.  Dog-fooding of
    cmdline.cpp/simplify_expr.cpp UNBLOCKED (0 errors).  REMAINING ROOT:
@@ -2873,7 +2873,7 @@ violated).  Fix (cpp_typecheck_constructor.cpp): for a non-virtual POD
 base with has_default_member_initializer, emit member-initializers via
 the flattened from_base components (own #default_value -> initialize
 from it; type-with-transitive-NSDMIs -> default-construct through
-cpp_constructor's recursive NSDMI path).  [dcl.init]/8 subtlety probed
+cpp_constructor's recursive NSDMI path).  [dcl.init.general]/16.4, 9.1 subtlety probed
 and handled: an explicit EMPTY base initializer (`: B()`) still applies
 NSDMIs (value-init); only an initializer WITH arguments supersedes.
 Edge cases verified: two POD bases; mixed base+own NSDMIs.
@@ -2897,7 +2897,7 @@ base -> opt<S> loses base_ -> nondet members.  Works at user level.
 Reduction notes: (a) first cvise run with only the has_value anchor
 drifted to an EAGER-INSTANTIATION variant (kept at /tmp lost; shape: a
 template-id ARGUMENT `__and_<__is_destructible_safe<int>>` eagerly
-elaborated though never required to be complete per [temp.inst]/1 --
+elaborated though never required to be complete per [temp.inst]/2 --
 possibly a second latent defect worth revisiting); (b) precise oracle =
 temporary BASE-DROP fprintf probe in the per-base recovery catch +
 require BASE-DROP of BOTH the trait class and _Optional_base + FAILURE +
@@ -2909,10 +2909,10 @@ B1::value.  Probe reverted before commit.  Suite green 90 skipped.
 
 Both flipped to CORE.  THREE stacked destructor-resolution fixes
 (cpp_typecheck_expr.cpp, cpp_typecheck_resolve.cpp):
-1. [expr.prim.id.dtor]+[class.dtor]/1,6: `x.~X()` on a class with only an
+1. [expr.prim.id.dtor]+[class.dtor]/2,8,16: `x.~X()` on a class with only an
    implicit TRIVIAL dtor (no synthesized symbol, POD gate) now uses the
    scalar pseudo-destructor no-op dummy instead of failing resolution.
-2. [expr.prim.id.dtor]/2: ~_Tp substitution preferred an arbitrary
+2. [class.dtor]/16: ~_Tp substitution preferred an arbitrary
    same-short-name flat-map binding (allocator's _Tp!); now prefers the
    binding designating the CURRENT class scope.
 3. Angle-unaware rfind("::") in the dtor-name extraction landed inside
@@ -2996,14 +2996,14 @@ instance of that pattern!).  goto_program.cpp dog-foods clean.
 2. cpp11_self_pointer_move_return: THE BIG ONE.  Root cause: SET RETURN
 VALUE + return-value passing relocate returned objects BITWISE (3 hops)
 and dtor the temporary after copying out.  Fix = new goto pass
-elide_cpp_returned_temporaries ([stmt.return]/2, [class.copy.elis]):
+elide_cpp_returned_temporaries ([stmt.return]/2, [class.copy.elision]):
 hidden result-pointer param (Itanium sret), returned front-end
 temporary ($tmp::tmp_obj, instance-range-scoped -- identifiers are
 REUSED across unrelated temporaries, whole-body substitution corrupts
 them!) substituted by *#result; DECL/DEAD/dead_object/post-return dtor
 dropped (caller owns + destroys); call sites pass &lhs (ignored-result:
 fresh slot + dtor call).  Non-temporary returns: move ctor iff
-implicitly movable ([class.copy.elis]/3 -- REFERENCE-param returns must
+implicitly movable ([expr.prim.id.unqual]/15 -- REFERENCE-param returns must
 COPY; m1 mimic move-only, mv3 ident(const&) both green), else copy,
 else assign.  Gate: symbol-table scan for ctor/dtor symbols by this-
 param (goto-level struct components have NO method components!).
@@ -3148,7 +3148,7 @@ unbounded rfind("::") -- 5th instance of the angle-aware-scan pattern!
 conversion; new plumbing cpp_typecheckt::access_judgment_scope (RAII in
 cpp_constructor around its class-scope switch) since candidate matching
 runs with current scope = candidate's class; CORE test
-cpp98_friend_private_base_conversion.  (c) [stmt.pre]/6 if/while
+cpp98_friend_private_base_conversion.  (c) [basic.scope.block]/1 if/while
 condition-declaration name leaked into enclosing block; CORE test
 cpp98_condition_decl_scope.  Insert path now converts FULLY; residual =
 bucket-chain walk divergence (unwinding assertion in
@@ -3212,12 +3212,12 @@ _M_next_resize) + _M_need_rehash (load-factor-1 doubling) --
 erase on SUCCESSFUL body conversion (out-of-line members re-enter the
 set at declarator conversion; clean_up nil'd CONVERTED bodies --
 _M_deallocate_node_ptr); (c) [expr.prim.id.dtor]/1 +
-[basic.lookup.qual]/6 dtor-via-TYPEDEF-name (`__n->~__node_type()`):
+[basic.lookup.qual.general]/4.1 dtor-via-TYPEDEF-name (`__n->~__node_type()`):
 sub-resolver in object's class scope then postfix-expression context
 (access_judgment_scope, set by typecheck_expr_member).  DEBUG WIN: the
 blanket line-tagged throw-0 probe found the silent failure in minutes.
 2. cpp20_requires_class_param_atom FIXED -> CORE:
-[temp.constr.decl]/3 -- map the enclosing class instance's
+[temp.inst]/17 -- map the enclosing class instance's
 ID_C_template/ID_C_template_arguments into the satisfaction check's
 name substitution (member params shadow, [temp.local]).  libstdc++
 pair still KNOWNBUG: atoms are consteval static member CALLS -- fold
@@ -3252,10 +3252,10 @@ Suite green 92 skipped.
 
 1. cpp20_requires_static_call_atom + cpp20_pair_converting_ctor FIXED
 -> CORE.  Four-part fix in the satisfaction check's call-atom fold:
-manifestly-constant-evaluated context ([temp.constr.atomic]/1 --
+manifestly-constant-evaluated context ([temp.constr.atomic]/3, [expr.const]/28.4 --
 constexpr evaluator only folds under constant_expression_context);
 prepare_deferred_method_body for the eagerly-converted callee
-([temp.inst]/1 member map on top of class map); c_bool constant
+([temp.inst]/4 member map on top of class map); c_bool constant
 recognition (bool spelled c_bool -- is_true/is_false miss it!);
 foldable forms extended to ==/!= atoms BUT results only TRUSTED when
 type-check emitted no recovered diagnostics (unrestricted
@@ -3326,7 +3326,7 @@ never ran add_padding for explicitly-aligned structs (gate extended
 from bit-field-only).  cpp11_alignas_member_layout +
 cpp11_map_value_loss_reduced CORE; the encoder "ignoring typecast"
 disappeared too (constants fold with correct layout).
-2. **[temp.deduct]/2 clean-slate FIXED** -- the big one:
+2. **[temp.deduct.general]/1 clean-slate FIXED** -- the big one:
 convert_template_parameter's lookup_by_suffix fallback captured an
 ENCLOSING instantiation's same-short-name parameter for an explicitly
 UNASSIGNED deduction variable.  unordered_set<K>'s _Alloc=allocator<K>
@@ -3388,7 +3388,7 @@ for symbol") when the struct has a user-declared dtor -- untracked.
 ## residual capture sweep (2026-07-19 evening)
 
 1. NEW KNOWNBUG cpp11_aggregate_temporary_with_dtor: `itert{&g}`
-(braced functional cast, [expr.type.conv]/2 -> aggregate init per
+(braced functional cast, [expr.type.conv]/1.4 -> aggregate init per
 [dcl.init.aggr]/1) fails "found no match for symbol" as soon as ANY
 dtor is declared (user or =default) -- the front end routes braced
 temporaries of dtor-bearing classes to ctor overload resolution.
@@ -3465,7 +3465,7 @@ Suite green 88 skipped.
 The 8th and final layer: std::pair's piecewise delegation target
 `first(forward<_Args1>(get<_Indexes1>(__tuple1))...)` never converted.
 TWO defects:
-1. [temp.variadic]/5: mem-init pack expansion only rewrote one-element
+1. [temp.variadic]/9: mem-init pack expansion only rewrote one-element
 struct_tag TYPE packs by name; mixed reference-type + NON-TYPE index
 packs kept raw names + ellipsis.  New
 expand_member_initializer_packs_in_body (both whole-initializer and
@@ -3473,7 +3473,7 @@ per-ARGUMENT ellipsis; type+expr packs in lockstep) wired into
 prepare_deferred_method_body (after its #fn_template_packs replay) AND
 the eager constexpr-member conversion path.  NOT at instantiation time
 (packs not yet bound there; eager expansion broke fwdref ctors).
-2. [temp.deduct]/8: template-arg typecheck failures while
+2. [temp.deduct.general]/8: template-arg typecheck failures while
 candidate-matching now convert to template_arg_kind_mismatch_
 exceptiont (type/ambiguous/non-type branches) -- get<0> vs by-type
 get<T> overload aborted resolution before.
@@ -3601,12 +3601,12 @@ front-end fixes + strto* models: of the 148 fails, 91+ now pass; 57
 genuine fails remain.
 
 FIXES (each with header-free CORE test):
-1. [expr.dynamic.cast]/5-6 cross-casts accepted; runtime check =
+1. [expr.dynamic.cast]/5, /8-10 cross-casts accepted; runtime check =
    nondet(null | reinterpret) (56-file group, hardness_collectort).
 2. [dcl.type.elab]/[basic.scope.pdecl] ctor-parameter elaborated tags
    pre-registered before the member pass (19-file group,
    cpp_typecheck_resolve.h).  Root: ctors deferred to a SECOND pass.
-3. [temp.deduct]/8 nil-typed template args -> kind-mismatch while
+3. [temp.deduct.general]/8 nil-typed template args -> kind-mismatch while
    candidate matching (12-file group, optional:754 __and_fn chain).
 4. [dcl.init.aggr]/5 braced args: short lists pad with
    zero_initializer; #is_implicit_ctor exempted in brace_init_is_viable
@@ -3657,13 +3657,13 @@ kills the shell mid-commit; pgrep first, or use exact patterns.
 ## Sweep-KNOWNBUG fix round (2026-07-21 late morning)
 
 SEVEN of nine flipped to CORE (9 src commits):
-1. [dcl.init.list]/3.10 single-element list -> reference binding
+1. [dcl.init.list]/3.9 single-element list -> reference binding
    (reference_initializer unwrap).
 2. [lex.string] raw strings: pending-close flush must KEEP the longest
    suffix that can still start )delimiter" (`))"` and `)x)x"` shapes).
-3. [class.access.general]/5 braced-arg elements typechecked at the
+3. [class.access.general]/6 braced-arg elements typechecked at the
    CALL SITE (pre-typecheck + already_typechecked wrapper CARRYING the
-   element type for matching + icst unwrap) + [over.ics.list]/8
+   element type for matching + icst unwrap) + [over.ics.list]/9
    single-element list -> reference PARAMETER branch in fargs::match
    and implicit_typecast.
 4. [expr.static.cast]/2: judge lvalue-ness of the implicitly
@@ -3673,13 +3673,13 @@ SEVEN of nine flipped to CORE (9 src commits):
    base_publicly_accessible now walks access_judgment_scope too (the
    friend rule below it already did) -- killed the
    value_set_dereferencet group as a bonus.
-6. [basic.lookup.argdep]/2 ADL recurses over TEMPLATE ARGUMENTS of
+6. [basic.lookup.argdep]/3.2 ADL recurses over TEMPLATE ARGUMENTS of
    associated specializations (visited-set bounded).
 7. [conv.func]/1 free-function decay in the code-typed address-of
    (ID_symbol alongside ID_member).
 8. [expr.prim.id.unqual] constructed-object symbol exprs marked lvalue
    in convert_initializer (fixes @most_derived writes on braced route).
-9. [temp.deduct]/8 hardening: matching guard around candidate
+9. [temp.deduct.general]/8 hardening: matching guard around candidate
    deduction, unguarded #sfinae_alt retry, non-type implicit_typecast
    conversion gate.
 STILL KNOWNBUG: stoll("literal") (residual in alias-template
@@ -3725,13 +3725,13 @@ FOUR fixes (4 src commits):
    family: ctor writes through `this`, ofstream construction,
    build_object_descriptor_rec symex abort.  THE root behind weeks of
    'this->x outside bounds' symptoms.
-2. [expr.type.conv]/2: functional braced casts T{...} of class types
+2. [expr.type.conv]/1.4: functional braced casts T{...} of class types
    direct-list-initialize (aggregate -> il-ctor -> ctor args) instead
    of the C compound-literal path.  Elaborate BEFORE cpp_is_pod.
 3. [temp.deduct.call]/4.3 derived-to-base deduction is TRANSITIVE
    (BFS, visited set) -- iomanip inserters resolve through
    basic_iostream.
-4. [dcl.init]/16.6.2: auto-deduced non-POD from a materialized
+4. [dcl.init.general]/16.6.2: auto-deduced non-POD from a materialized
    temporary constructs via the MOVE ctor; the old bitwise
    assign + temporary destructor freed map tree nodes still
    referenced ("deallocated dynamic object" in at()).
@@ -3778,7 +3778,7 @@ THREE fixes:
    ENTIRELY (not just template-param-named ones!) --
    full_member_initialization's POD branch never consumed them.  Now
    lowered to slicing assignments ([class.base.init]/7); base matched
-   by name or resolved type ([class.base.init]/2).  HAZARD hit: the
+   by name or resolved type ([class.base.init]/3).  HAZARD hit: the
    speculative typecheck_type probe surfaced errors for MEMBER names
    (56 suite failures) -- must skip member names + sfinae_contextt +
    error-count restore.
@@ -3817,7 +3817,7 @@ typecheck under catch(...) MUST roll back the message count.
 Four new minimal KNOWNBUGs distilled from TU reproducers:
 - cpp17_incomplete_template_arg_decl: CBMC instantiates a
   specialization (converting its ctor!) for a mere function
-  DECLARATION ([temp.inst]/1 violation); THE goto_symex_state.h
+  DECLARATION ([temp.inst]/2 violation); THE goto_symex_state.h
   residual (renamed.h converts clean post-POD-base fix).
 - cpp17_umap_emplace_mixed_categories: 2nd emplace instantiation with
   const-lvalue args after an rvalue one -> "found no match"; needs
@@ -3864,7 +3864,7 @@ FOUR fixed, one sharpened:
    [over.match.list]/1 two-phase selection (block-scope path had it);
    raw untyped lists made ALL ctor candidates tie.
 4. Incomplete-arg instances: check_member_initializers now skips hard
-   errors for template instances ([temp.inst]/2 -- mem-inits belong to
+   errors for template instances ([temp.inst]/3.1 -- mem-inits belong to
    the ctor DEFINITION; conversion-time recheck still catches odr-used
    invalid ones).  SPLIT: completed-later stale-instance reuse is a
    separate pre-existing defect (new KNOWNBUG
@@ -3967,7 +3967,7 @@ FIVE src commits, FIFTEEN CORE flips (oldest-standard-first order).
 5. libc++ allocation models: __libcpp_operator_new -> ID_allocate;
    __builtin_operator_new -> __new at goto conversion; stdexcept
    ctors/dtors empty ([stdexcept]); vector::max_size constant
-   ([vector.capacity]/1, [allocator.traits.members]/6).  Chain-debug
+   ([container.reqmts]/57, [allocator.traits.members]/8).  Chain-debug
    technique: temporarily route sfinae_contextt messages to the real
    handler (CBMC_DBG) to read SWALLOWED errors -- exposed the whole
    cascade (remove_const -> atomics void/bool -> operator_new).
@@ -4038,7 +4038,7 @@ no-conversion failure.
 
 ## Emplace deep-dive round (2026-07-25)
 
-Two hardenings committed ([temp.variadic]/7 pack-empty guard;
+Two hardenings committed ([temp.variadic]/16 pack-empty guard;
 copy-not-swap in function-template registration preserving instance
 bodies per [temp.mem]).  Suite green.  Emplace family NOT fixed:
 - CONFIRMED mechanism pieces: (a) function-template registration
@@ -4092,10 +4092,10 @@ requires-clauses (rConditionalExpr / the fallback token whitelist).
 
 ### Fix 1 — __type_pack_element in return-type substitution (2473105b3b)
 Three gaps in the resolve() intercept: (a) count argument arrives
-`ambiguous`-wrapped during return-type substitution ([temp.deduct]/5) —
+`ambiguous`-wrapped during return-type substitution ([temp.deduct.general]/5) —
 unwrap + try/catch, unevaluable => substitution failure; (b) pack
 expansion `Ts...` must be spliced from pack_args_map before indexing
-([temp.variadic]/5); (c) nil-typed expression-flavoured selection =>
+([temp.variadic]/9); (c) nil-typed expression-flavoured selection =>
 throw 0, not invariant abort (libc++ <variant> core-dumped).
 
 ### Fix 2 — concretized pack patterns in member template instances
@@ -4114,7 +4114,7 @@ test.pl is the ONLY authority.
 
 ### Fix 3 — requires-clause concept template-ids (two commits)
 (a) parse.cpp: rConditionalExpr reads `<` in `same_as<T, int>` as
-less-than ([temp.names]/4), so multi-arg concept-ids lost the clause
+less-than ([temp.names]/3.2), so multi-arg concept-ids lost the clause
 (count-only fallback => wrong code). New rConstraintLogicalExpr
 parses the restricted [temp.pre] grammar (atoms via rName which
 consumes template-arg lists; !/()/bool-literals; &&/|| => ID_and/or
@@ -4191,11 +4191,11 @@ Five KNOWNBUGs flipped to CORE (6 src commits):
    null id_map deref.
 2. cpp20_views_take_call_crash — operator_is_overloaded's
    conversion-operator branch gated to single-operand, non-nil-typed
-   casts ([expr.type.conv]/2).  cpp20_ranges_basic_libcxx stops
+   casts ([expr.type.conv]/1.1).  cpp20_ranges_basic_libcxx stops
    crashing but goes VACUOUS (silent-drop family).
 3. cpp17_anon_struct_member_ctor_only — side effect of (1b).
 4. cpp17_hashtable_alias_default_arg — resolve()'s alias branch now
-   elaborates struct_tag results ([class.mem.general]/26 +
+   elaborates struct_tag results ([class.mem.general]/19 +
    [temp.inst]/2).  KEY INSIGHT: cpp_is_pod judged the enclosing
    class POD against the INCOMPLETE alias-named member class, so no
    implicit ctor was synthesized and the object stayed nondet.
@@ -4275,11 +4275,11 @@ Six KNOWNBUG->CORE flips (4 src commits):
    args-minus-non-pack-params, lumping MULTIPLE template packs
    together -> spurious extra parameter -> unbindable.  Fix: subtract
    leading packs' deduction-time arities (#deduced_packs replay);
-   unknown arity => skip.  [temp.variadic]/4-5.
+   unknown arity => skip.  [temp.variadic]/5-6.
 2. cpp17_nested_out_of_line_ctor: typecheck_class_template_member had
    no shape case for name<targs>::name::name (out-of-line member of a
    NESTED class of a class template) -- silent return dropped the
-   definition.  16-line shape branch.  [temp.mem]+[class.nest].
+   definition.  16-line shape branch.  [temp.mem.class]+[class.nest].
 3. cpp17_pack_cast_fn_type_spec (+4. cpp17_function_handler_dispatch):
    make_constructors now converts substituted parse-form types
    (frontend_pointer) before POD/reference classification, so the
@@ -4297,7 +4297,7 @@ Six KNOWNBUG->CORE flips (4 src commits):
    ctor-temporary path additionally hardened: get_component's result
    is now CHECKED (was: swap empty expr -> abort
    typecheck_method_application; now: recoverable diagnostic,
-   [temp.inst]/17).
+   [lex.phases]/1).
 
 BIG unblocking: the preprocessed-libc++ "masking crash" was the same
 mode artifact -- re-fed preprocessed source WITH --stdlib libc++
@@ -4316,13 +4316,13 @@ libc++ layers unchanged.  cbmc CORE green; cbmc-cpp green 23 skipped
 
 Src commit "cpp: empty pack lists in variable templates; drop
 nil-param artifacts":
-- [temp.variadic]/7: `__and_v<>` (explicit empty argument list for a
+- [temp.variadic]/1: `__and_v<>` (explicit empty argument list for a
   variadic variable template) left an `unassigned` placeholder that
   instantiate_template rejected; every _Requires<>-constrained
   constructor deduction failed, and with class-typed arguments the
   enclosing function was silently dropped.  Normalized to the
   empty_typet sentinel in the variable-template resolve branch.
-- [over.match.funcs]/1+[temp.deduct]/8: nil-param half-substituted
+- [over.match.funcs.general]/8+[temp.deduct.general]/8: nil-param half-substituted
   artifacts (`optionalish(? &&)`) are now rejected from candidacy.
 - The zero-length-expansion fallback is precision-gated (no live
   scalar binding for the matched names) instead of CLANG-mode-gated.
@@ -4350,7 +4350,7 @@ cvv2 harvest (73k -> 18 lines, ~20h with the valgrind-gated harness;
 dropping cbmc stability 2->1 tripled throughput in the token phase):
 the whole vector push_back semantic family reduced to a DECLARED-ONLY
 std::move.  clang's builtin std-move treatment makes the program
-link and behave as the [forward]/4 cast; CBMC modelled the bodyless
+link and behave as the [forward]/9 cast; CBMC modelled the bodyless
 instance as an unconstrained call (returned reference NULL,
 moved-through values nondet).  Fix: provide_stdlib_bodies synthesizes
 the return-cast body for declared-only std::move/std::forward
@@ -4380,7 +4380,7 @@ src commit + CORE test):
 2. decltype(*p) is T& ([dcl.type.decltype]/1.5): only implicit
    dereferences preserved the reference; libc++'s iter_reference_t
    collapsed to a value type ("'operator*' not an lvalue").
-3. explicit template args survive deduction ([temp.arg.explicit]/2):
+3. explicit template args survive deduction ([temp.arg.explicit]/7):
    gfl pre-populated the map but the per-arg deduction pass overwrote
    it (get<W>(1,2) re-deduced T=int); re-assert after deduction.
 4. C++20 parenthesized aggregate init + CTAD
@@ -4440,9 +4440,9 @@ Five source fixes, each suite-validated across ALL FIVE suites
 
 1. systemc param invariant (5 tests, one root): unconverted member
    instances keep parse-level parameter names; clean_up now qualifies
-   them ([dcl.fct]/5, [basic.scope.param]).  systemc suite green for
+   them ([dcl.fct]/17, [basic.scope.param]).  systemc suite green for
    the first time.
-2. Three-pack ctor deduction ([temp.deduct.call]/1, [temp.variadic]/4):
+2. Three-pack ctor deduction ([temp.deduct.call]/1, [temp.variadic]/5):
    trailing-pack elements now recorded into the LAST type pack's
    argument list -- gated to >=2 template packs after the single-pack
    overwrite regressed cpp17_tuple_get_two_pack_ctor_3elem.  New CORE
@@ -4453,7 +4453,7 @@ Five source fixes, each suite-validated across ALL FIVE suites
    points of instantiation -- three strategies failed identically;
    VACUITY CHECK caught a false "fixed" whose commit was soft-reset).
 4. Zero-length pack expansion with pack_size_map-only state
-   ([temp.variadic]/7): one-line gate fix; fixed BOTH
+   ([temp.variadic]/16): one-line gate fix; fixed BOTH
    cpp17_alias_default_pack_expansion and
    cpp17_optional_requires_ctor_pair.
 5. Recursive member aliases ([temp.alias]/2): the cycle-breaker now
@@ -4480,7 +4480,7 @@ Fixes (all five suites green after each):
 1. TWO literal parser `// TODO`s from the original grammar port
    discarded pack-expansion ellipses: base-specifiers
    ([class.derived.general]) and mem-initializers ([class.base.init]).
-   Base-specifier expansion implemented ([temp.variadic]/5.2,
+   Base-specifier expansion implemented ([temp.variadic]/6.6,
    template-id patterns, partial-spec trailing pack recovered from
    spec_bindings) -- cpp11_tuple_leaf_no_body CORE-libcxx.  The
    arity-2 lockstep ctor case remains (cpp11_two_leaf_base_pack_
@@ -4532,7 +4532,7 @@ runs (killed cvv7 mid-pass once; recovered from its state file).
    builtin) previously failed silently ("symbol unknown") whenever it
    was used instead of the bodyless-model path.  set_insert root #2.
    cpp11_builtin_operator_new_pack CORE-libcxx.
-3. Whole-mem-initializer lockstep pack expansion ([temp.variadic]/5):
+3. Whole-mem-initializer lockstep pack expansion ([temp.variadic]/9):
    round-7 block completed with the substitution-shape fix (raw TYPE
    where a type is expected, not an exprt wrapper).
    cpp11_two_leaf_base_pack_meminit CORE.
@@ -4560,7 +4560,7 @@ map_basic's next layer: map::operator[] no-body (15 failures).
    otherwise); the completion swap builds the template map from the
    instance's recorded arguments ([temp.inst]/2); base-specifier and
    mem-initializer-id resolution consult the map FIRST for bare
-   template parameters ([temp.names]/8).
+   template parameters ([temp.param]/7.1, [temp.dep.type]/3).
    cpp17_template_arg_completed_later CORE; the _ctor variant is
    non-vacuous and abort-free but its explicit ctor still converts
    empty at the rebuild (residual layer, desc'd).
@@ -4569,7 +4569,7 @@ map_basic's next layer: map::operator[] no-body (15 failures).
    handled): libc++'s range-adaptor hidden friend operator| never
    existed, so `arr | views::take(3)` fell into C-layer arithmetic
    conversion and main was dropped.  Now converted at the enclosing
-   namespace scope ([class.friend]/1, [namespace.memdef]/3).
+   namespace scope ([class.friend]/1, [dcl.meaning.general]/2.3).
    cpp20_hidden_friend_operator_template CORE; cvv7's 236-line
    reduction verifies; the real <ranges> header has a further layer
    (auto-conversion at the range expr), round-3 reduction running.
@@ -4606,7 +4606,7 @@ Fleet: cvv7 R3 (ranges), cvv9 R2 (set_insert, ~15KB), cvv11
    ([temp.spec.partial.match]/2 -- equal-count guard skipped the whole
    deduction, so the LEADING index pack was never recorded), and the
    base expander handles every bound pack including non-type VALUE
-   packs ([temp.variadic]/5.2).  The tuple library tests advance from
+   packs ([temp.variadic]/6.6).  The tuple library tests advance from
    silent wrong-code to a visible next layer (tuple_element/'get'
    resolution) -- re-reduce next.
 2. completed_later_ctor FIXED (CORE): the round-9 reset had TWO
@@ -4632,7 +4632,7 @@ Fleet: cvv7 R3 (ranges), cvv9 R2 (set_insert, ~15KB), cvv11
    scope as a secondary scope (only the #sfinae_alt twin branch did),
    so the ctor pass's typecheck of a dependent NTTP type
    (enable_if_t<_Up::...>) failed "symbol '_Up' is unknown" and the
-   whole instantiation was silently abandoned ([temp.inst]/2,
+   whole instantiation was silently abandoned ([temp.inst]/3.1,
    [temp.local]).  Also: __add_rvalue_reference et al. are
    CLANG/gcc14-gated in scanner.l -- builtin-alias tests need
    --stdlib libc++.
@@ -4663,12 +4663,12 @@ Fleet: cvv7 R3 (ranges), cvv9 R2 (set_insert, ~15KB), cvv11
 
 cpp20_nontype_pack_spec_multi CORE-libcxx -- three coordinated fixes
 for the ranges-pipe invoke chain's __bind_back_op shape:
-1. [temp.param]/14: preceding EXPRESSION parameters now bind before a
+1. [basic.scope.pdecl]/12: preceding EXPRESSION parameters now bind before a
    default template-argument is materialized (type params already did).
 2. [intseq.make]: bare (unqualified-use) __make_integer_seq intercepted
    at resolve() entry, expanding to Tpl<T, 0..N-1> (the resolve_scope
    intercept only covered qualified uses).
-3. [temp.variadic]/5: a template-argument pack expansion whose pattern
+3. [temp.variadic]/9: a template-argument pack expansion whose pattern
    is a BARE non-type pack reference now emits the pack's i-th VALUE
    (apply() only rewrites type names; the scalar convenience entry --
    the first value -- leaked into every element, `<ul,0,0>` vs
@@ -4683,7 +4683,7 @@ args during elaborate_class_template (fresh diagnosis needed).
 ## Round 11 addendum 2: get redirect, third shape (2026-08-04)
 
 same_template_signature now compares parameter TYPES with two
-normalizations ([dcl.fct]/5 names erased; own template params renamed
+normalizations ([dcl.fct]/3 names erased; own template params renamed
 positionally per [temp.over.link]/6).  CAUTION captured: comparing
 WITHOUT erasing names broke std::swap (unnamed decl vs named defn,
 bits/move.h) -- cpp11_require_swap caught it.  Tuple family now runs
@@ -4708,7 +4708,7 @@ and surfaces a chain of real front-end gaps:
    symbol expr), CORE cpp17_constexpr_array_element_addr.  First
    attempt kept the symbol but lost initialization -- assertion
    caught it (value was nondet).
-2. FIXED: ADL ignored ENUM arguments ([basic.lookup.argdep]/2.3) --
+2. FIXED: ADL ignored ENUM arguments ([basic.lookup.argdep]/3.3) --
    libc++ poison-pill make_error_code found only the deleted pill.
    CORE cpp20_adl_enum_poison_pill.
 3. Seed-local stubs (not bugs to fix now): pthread mutex/condvar
@@ -4758,7 +4758,7 @@ family as wrong-code anti-degeneracy gates.  Relaunched with
    guard, and the RAW parse tree became the member's value (malformed
    goto assign -> symex invariant).  Fix: record EMPTY packs too and
    REPLAY all spec_bindings into the active map before body conversion
-   ([temp.inst]/2, [temp.variadic]/7,/8).
+   ([temp.inst]/2, [temp.variadic]/16,/10).
 2. CRITICAL PROCESS BUG FOUND: regression/cpp, systemc and
    contracts-cpp-dfcc validations had been running a STALE goto-cc /
    goto-instrument for several rounds (only the cbmc target was
@@ -4819,7 +4819,7 @@ cpp11_tuple_get_return_type_body CORE-libcxx.  Two roots:
    STRICTLY gated to heads with >= 2 packs (single-pack double-binding
    regressed cpp11_variadic_ctor_pack_multi and
    cpp11_recursive_forwarding_tuple_ctor -- suite caught both).
-2. [temp.variadic]/5: the whole-mem-initializer lockstep expansion now
+2. [temp.variadic]/9: the whole-mem-initializer lockstep expansion now
    substitutes NON-TYPE pack element VALUES (elem_expr_by_short) --
    `__tuple_leaf<_Uf>(__u)...` previously sent every element to
    __tuple_leaf<0>.
@@ -4835,7 +4835,7 @@ Tuple family's remaining layer: the tuple CONSTRUCTOR no-body
 
 cvs1 (the __s anon-union criterion) converged on a SHALLOWER bug
 satisfying the same message: lambda parameters not in scope in their
-own trailing return type ([dcl.fct]/8), doubly broken (pre-scope
+own trailing return type ([basic.scope.param]/1.2), doubly broken (pre-scope
 typecheck + raw parse tree re-typechecked in the closure class).
 Fixed; CORE cpp11_lambda_param_trailing_decltype.  The anon-union __s
 layer itself remains unharvested -- reseed with a criterion EXCLUDING
@@ -4848,7 +4848,7 @@ Tuple ctor no-body root #1 FIXED (three defects, one commit):
 strict cv deduction in partial-spec matching ([temp.deduct.type]/8,
 opt-in flag set at the 3 matching sites); cv-qualified alias-argument
 substitution ([temp.alias]/2); pack ELEMENT substitution in
-template-arg expansion ([temp.variadic]/5 -- bare cpp_names were left
+template-arg expansion ([temp.variadic]/9 -- bare cpp_names were left
 textual and re-resolved against the PRIMARY's same-named param).
 tuple_size<tuple<int,int>> now correct and fast (was wrong + ~5min).
 CORE: cpp11_tuple_size_alias_spec (27-line header-free).
@@ -4883,7 +4883,7 @@ direct diagnosis); cw2/cw3 recipes recorded above for relaunch.
 ## Round 17 cont. (2026-08-06 evening): empty-pack pre-bind; next tuple layer
 
 FIXED: member-alias enclosing pre-bind skipped a trailing pack once
-the instance's args ran out ([temp.variadic]/7 -- empty pack is still
+the instance's args ran out ([temp.arg.explicit]/4 -- empty pack is still
 deduced).  __integer_sequence<size_t>::__to_tuple_indices<0> threw on
 unbound _Values; sequence-counter probes proved the <ul,0,1>/<ul,0>
 resolutions bound fine and only the EMPTY <ul> one threw.  CORE:
@@ -4939,7 +4939,7 @@ FIXED (2 commits):
    full throwing pattern re-typecheck each; 39k throws/400s -> 50
    throws/5.5s for tuple<int,int> ctor conversion).
 2. Multi-pack function templates (__tuple_impl's 5-pack ctor;
-   [temp.variadic]/5,7,8): gfta flat-args splice from per-pack
+   [temp.variadic]/5,8): gfta flat-args splice from per-pack
    bindings; build() keeps deduction-time bindings when all packs
    live (erasing >=2-element scalar residue -- the per-element
    deduction leaves the LAST element in type_map, which concretizes
@@ -4975,7 +4975,7 @@ parameter's throw gave the semantic context without gdb.
 
 std::tuple works end-to-end under libc++ (construction, get, make_tuple
 heterogeneous, apply).  Final layer had three defects
-([temp.variadic]/5,7):
+([temp.variadic]/8,9,16):
 1. mem-init pack expansion with NO function param pack
    (`leaf<Ul,Tl>()...`) — arity from template packs' common length;
    empty -> DROP the initializer (was: dangling `...` failed the ctor).
@@ -5024,10 +5024,10 @@ use data members, never sizeof(struct)>=1.
 
 ## Round 20 (2026-08-07): cx2 + cw2 roots fixed
 
-1. cx2 (regex divergence): [basic.lookup.unqual]/5 -- the
+1. cx2 (regex divergence): [basic.scope.class]/1 -- the
    [dcl.ambig.res]/1 re-disambiguation probed parameter names at
    namespace scope; out-of-line member decls need the member's class
-   scope (+ [dcl.fct]/6 cv-qualifier forces function interp).  CORE
+   scope (+ [dcl.fct]/1 cv-qualifier forces function interp).  CORE
    cpp11_expl_spec_member_decl_class_lookup.  GOTCHA: cpp_declaratort::
    method_qualifier() non-const accessor add()s an empty node -- gate
    via const read or id().empty(); the non-const read silently
@@ -5059,7 +5059,7 @@ use data members, never sizeof(struct)>=1.
 cx2 second harvest (252B, minutes to converge): out-of-line member
 definitions with a redundant NAMESPACE qualifier
 (`std::basic_streambuf<_T>::basic_streambuf(...) = default;` inside
-namespace std, [class.mfct]/1 + [namespace.qual]) fell through the
+namespace std, [class.mfct]/2 + [namespace.qual]) fell through the
 A::B<args>::member handler (class-only leading-component lookup) and
 killed the TU.  Fixed + CORE cpp11_ns_qualified_member_definition.
 cx2 relaunched on regex layer 3: "found no match for symbol
@@ -5081,7 +5081,7 @@ unknown (member typedef chain, likely SAME family as the fixed rebind
 -- worth a quick probe next round).  5 suites green.
 
 cy1 (umap) harvest was INVALID C++: partial spec with fewer args than
-primary = g++ extension, clang rejects ([temp.spec.partial.general]).
+primary = g++ extension, clang rejects ([temp.spec.partial.match]/4).
 Distillations chased a phantom; the REAL libstdc++ shape (explicit
 bool specs, uf4 control) verifies fine, so umap's root is elsewhere.
 LESSON: gcc-preprocessed seeds + g++-only gates allow extension
@@ -5210,7 +5210,7 @@ method_bodies' `a$k` lockstep for the ARG-level pack.
 
 ## Round 24b (2026-08-08 evening): N>=2 pack front-stamping fixed — 2 flips
 
-Root of the scoped_node/umap family: SIX unguarded "[temp.variadic]/7
+Root of the scoped_node/umap family: SIX unguarded "[temp.variadic]/9
 substitute pack names with actual types" blocks
 (cpp_instantiate_template.cpp x4 incl. the mem-init one at ~3924;
 cpp_typecheck_method_bodies.cpp x2 at ~743/784) stamped the FRONT
@@ -5219,7 +5219,7 @@ not-yet-expanded patterns (mem-init `forward_<Args>(a)...`), element 0
 was baked in before the per-element expander ran -> per-element call
 unresolvable -> ctor body dropped via implicit-deletion recovery ->
 uninitialized node -> umap duplicate-insert wrong-code.  Fix: guard
-all six to pa.second.size()==1 ([temp.variadic]/5 comments).  Flips:
+all six to pa.second.size()==1 ([temp.variadic]/9 comments).  Flips:
 cpp17_scoped_node_pack_ctor + cpp17_umap_emplace_mixed_categories ->
 CORE.  5 suites green; runtime g+++clang++ verified.  Diagnosis
 technique that cracked it: STAGE DUMPS (scan for the pack name /
@@ -5258,7 +5258,7 @@ not descend into namespaces; std::__1::allocator unfindable.  Fixed:
 when empty, look up in the GRANDPARENT of the instance's id_map entry
 (instance sits inside the template's param scope; its parent's parent
 is the namespace) — [namespace.qual].
-Fix 2 ([temp.local]/1): #tmpl_param_shadow marking extended from
+Fix 2 ([temp.local]/7): #tmpl_param_shadow marking extended from
 top-level bare refs to refs nested in pointer/array/merged_type
 declarators AND template-id arguments (+ ambiguous wrapper).  Root
 chain: pointer_traits<_Tp*>::rebind=_Up* and rebind_alloc=
@@ -5323,7 +5323,7 @@ unwind — desc flags work needed at flip time).
 
 ## Round 26 (2026-08-09): vector onion — two layers peeled, one left
 
-Layer 1 FIXED: alias-instance redecl first-wins ([temp.spec.general]/5;
+Layer 1 FIXED: alias-instance redecl first-wins ([temp.point]/7;
 _And<...> FALSE→TRUE flip under drain guard killed the drain).
 Layer 2 FIXED: deduction-path alias expansion skipped NON-TYPE args
 ([temp.alias]/2; `_Bp` dangled, both allocator_traits::construct
@@ -5421,7 +5421,7 @@ dependent-name candidates to declarations preceding the TEMPLATE
 DEFINITION POINT (store a decl sequence number on symbols?) — large;
 NARROW alternative: treat resolution failure of a pattern decltype
 as soft candidate rejection AND make member-initializer elaboration
-contain spec-matching throws (select primary, [temp.deduct]/8).
+contain spec-matching throws (select primary, [temp.deduct.general]/8).
 Background: rfp trace (prop 2775) running; libcxx20_vector probe
 running; da1 archived.
 
@@ -5543,7 +5543,7 @@ patch set, in git stash-able form in this entry's history).
 
 ## Round 31 (2026-08-10): __to_address chain COMPLETE — 3 flips
 
-THE fix ([basic.lookup.qual]/1): resolve()'s final-component lookup
+THE fix ([basic.lookup.qual.general]/3): resolve()'s final-component lookup
 used RECURSIVE unconditionally; qualified names now use QUALIFIED
 (scope+bases+using, no parent escape).  A nonexistent member
 (`pointer_traits<_P>::to_address`) fell back to the same-named
@@ -5610,7 +5610,7 @@ non-const member overload pair (iterator vs const_iterator returns,
 alias-typed params __node_pointer/__iter_pointer printed in the
 candidates UNRESOLVED: __conditional_t<1,...>, __rebind_pointer_t
 <...>) ties instead of the non-const winning on the implicit object
-parameter ([over.match.funcs]/4, [over.ics.rank]/3.2.6).
+parameter ([over.match.funcs.general]/4, [over.ics.rank]/3.2.6).
 Hand-repros lb1-lb3 (incl. alias-typed params + member template
 caller) ALL PASS — context-dependent again.  cvise ea1 RUNNING
 (criterion = 'does not uniquely resolve' + cf-catch find<signed_int>
@@ -5639,8 +5639,8 @@ the round-32 opening entry).  5 suites green.
 Root (match-fail probe in fargs.match printed operand shape):
 operator->'s implied object was `member` of `side_effect
 function_call` — reference_binding's this-gate only whitelisted
-DIRECT temporaries; member-of-temporary (xvalue, [expr.ref]/8,
-[over.match.funcs]/5.3) returned false → operator-> no-match →
+DIRECT temporaries; member-of-temporary (xvalue, [expr.ref]/7.2,
+[over.match.funcs.general]/5) returned false → operator-> no-match →
 operator[] body dropped → silent havoc.  Fix: walk the member chain;
 ultimate temporary compound ⇒ binding permitted
 (cpp_typecheck_conversions.cpp reference_binding ~2619).
@@ -5686,7 +5686,7 @@ in fd1 harvest = f4.cpp still failed WITHOUT it... recheck).  Artifacts:
 
 fg1 re-reduction found layer 4: `operator()(_Fn, _BoundArgs...)` — my
 round-34 empty-pack param removal deleted the VARARGS param
-([dcl.fct]/6: `B...` with B non-pack = B + C varargs, NOT a pack
+([dcl.fct]/24: `B...` with B non-pack = B + C varargs, NOT a pack
 declarator!) whenever an unrelated trailing template pack deduced
 empty.  Fix: own-pack name constraint in BOTH the in-declaration scan
 and the original-declarator recovery (commit above).  Kernels mp4
@@ -5708,13 +5708,13 @@ fh1 vs fg1 (E-edit method) then kernel.
 L5 (k4, 17 lines, plain cpp11!): bare `...` C-varargs param deleted by
 TWO empty-pack removals (instantiate refs_pack + gfta
 variadic_pack_empty) when an unrelated trailing template pack deduced
-empty — own-pack rule applied at both ([dcl.fct]/6).
+empty — own-pack rule applied at both ([dcl.fct]/2).
 L6 (ek8, wrong-code 4097≠1): apply(exprt) subst_params scalar-
 substituted the PACK name `_Idx` (in `get<_Idx>()...`'s template-args)
 with the convenience/unassigned entry — packs only substitute by
-EXPANSION ([temp.variadic]/5); skip pack names + unassigned there.
+EXPANSION ([temp.variadic]/8); skip pack names + unassigned there.
 Also: value-pack drop kept when pattern names an UNKNOWN template-arg
-(enclosing-class pack, [temp.variadic]/5 governing-pack rule);
+(enclosing-class pack, [temp.variadic]/8 governing-pack rule);
 prepare_deferred_method_body now replays #spec_template_packs.
 L7 (ek9, symex crash): `get<_Idx>...` — bare fn-template-id VALUE
 pattern parses with an ID-LESS template-args child (ambiguous-`<`
@@ -5922,9 +5922,9 @@ load-bearing).  2 KNOWNBUGs + regex-solver remain.
 ## Round 41 (2026-08-12): alias-qualified using B::B + placeholder hygiene
 
 FIXED: (1) inheriting-ctor detection now resolves the using-qualifier
-through ALIASES ([namespace.udecl]/1 + [class.qual]/2) — libc++'s
+through ALIASES ([namespace.udecl]/1 + [class.qual]/1) — libc++'s
 `using __perfect_forward<...>::__perfect_forward;` finally imports;
-the [class.qual]/2 terminal==qualifier-last-name gate keeps ordinary
+the [class.qual]/1 terminal==qualifier-last-name gate keeps ordinary
 member using-decls (std::list `using _Base::_M_impl;`) unaffected
 (list_basic regressed before the gate!).  (2) unassigned placeholders
 now get their TYPE typechecked at return (raw `long` leak into
@@ -5957,11 +5957,11 @@ REVERT-TEST HYGIENE LESSON: restore with `git checkout HEAD -- file`,
 NEVER the fix commit (an intermediate commit resurrected a stale file
 minus round-40 hardening; caught via git status before any damage).
 
-## Round 42 (2026-08-13): the _Idx layer — pack identification per [temp.variadic]/5
+## Round 42 (2026-08-13): the _Idx layer — pack identification per [temp.variadic]/8
 
 FIXED (3 sub-defects in typecheck_template_args' expansion collector):
 (1) nested-expansion skip — packs inside an ellipsis-marked subtree
-belong to the INNERMOST expansion ([temp.variadic]/5); (2) scope-precise
+belong to the INNERMOST expansion ([temp.variadic]/8); (2) scope-precise
 name→parameter mapping ([basic.scope.temp]) via RECURSIVE lookup,
 APPLIED ONLY when the looked-up parameter intersects the pack maps
 (unconditional exact matching regressed tuple/function/apply — patterns
@@ -5982,7 +5982,7 @@ matching with __tuple_indices/__tuple_types argument pairs.
 
 FIXED (commit "libc++ tuple constructor onion"):
 (1) replace_value_pack_ref — non-type pack in TYPE pattern gets i-th
-VALUE ([temp.variadic]/5); tuple_types collapsed to <char,char> before.
+VALUE ([temp.variadic]/9); tuple_types collapsed to <char,char> before.
 (2) late aggregate base-init lowering in typecheck_member_initializer
 ([class.base.init]/7 + [dcl.init.aggr]/1) — ctor-TEMPLATE instantiations
 never pass full_member_initialization; gate = no user ctor AND no vtptr
@@ -5990,12 +5990,12 @@ never pass full_member_initialization; gate = no user ctor AND no vtptr
 path's explicit-constructor-call assignment (cpp_constructor routing
 broke base-less single-operand aggregates — no paren-init path there).
 (3) #base_type-exact matching in full_member_initialization
-([class.base.init]/1-2) — synthesized copy-ctor initializers cross-wired
+([class.base.init]/3) — synthesized copy-ctor initializers cross-wired
 same-named __tuple_leaf bases; name shortcut KEPT for explicit inits
 (two_leaf lockstep test relies on positional consumption; ordinal
 variant also failed — dropped arguments).
 (4) #sizeof_pack guards in pack_subst stamping + replace_*_pack_ref +
-subst_elem ([expr.sizeof]/5) — sizeof...(_Tp) degraded to element BYTE
+subst_elem ([expr.sizeof]/4) — sizeof...(_Tp) degraded to element BYTE
 size under converting-element construction.
 CORE: cpp11_aggregate_base_pack_meminit (g++/clang), 
 cpp14_libcxx_tuple_ctor_kernel, cpp20_tuple_class_element (clang).
@@ -6010,7 +6010,7 @@ Kernels /tmp/tb6.cpp /tmp/tb7.cpp reproduce.
 gs3 (18-line, no templates): by-value slicing static_cast broke under
 the NEW aggregate lowering — the synthesized copy ctor's single sliced
 same-type initializer was element-wise-initialized instead of
-copy-initialized ([dcl.init.list]/3.2 + [dcl.init.general]/16.6.1).
+copy-initialized ([dcl.init.list]/3.2 + [dcl.init.general]/16.6.2).
 LATENT: all 5 suites were green with the bug present — only the
 kernel caught it.  Fixed (same/derived-type single-operand skip) +
 CORE cpp17_sliced_base_copy.  LESSON: after adding an interception
@@ -6032,7 +6032,7 @@ gaps found:
   cpp20_tuple_converting_element (clang-verified kernel; no-body +
   assertion FAILURE currently).
 - rejects-invalid gap noticed in round 43 (ti1 v1): kind-mismatched
-  non-type pack deduction ACCEPTED ([temp.deduct.type]/17; g++/clang
+  non-type pack deduction ACCEPTED ([temp.deduct.type]/20; g++/clang
   reject with "deduced non-type template argument does not have the
   same type") → NEW KNOWNBUG cpp11_deduced_nontype_kind_mismatch.
   (First ri1 draft was a most-vexing-parse false positive — verify the
@@ -6044,7 +6044,7 @@ ctor-drop + kind-mismatch.
 
 ## Round 44 (2026-08-14): ctor-drop arc — 2 layers peeled; /17 parked
 
-PARKED: [temp.deduct.type]/17 kind-mismatch rejection — enforcement at
+PARKED: [temp.deduct.type]/20 kind-mismatch rejection — enforcement at
 build_template_args broke VALID tuple kernels (CBMC parks deduced
 values with normalized kinds; internal value-typing must be fixed
 first).  Guidance in the KNOWNBUG desc.
@@ -6059,7 +6059,7 @@ assertion 3 caught the first attempt's gap).  (2) two more
 DIAGNOSIS TECHNIQUE: instrumented all 20 message-less `throw 0` sites
 (braced insertion — the un-braced-if probe hazard bit again, caught at
 build via -Werror=misleading-indentation); the escaping throw was the
-[temp.deduct]/8 qualified-::type SFINAE throw firing from the DRAIN
+[temp.deduct.general]/8 qualified-::type SFINAE throw firing from the DRAIN
 (no deduction in flight).  Half-elaborated instances stay CACHED — an
 instantiation whose member-alias elaboration throws recoverably leaves
 a poisoned symbol (future arc if it recurs).
@@ -6106,7 +6106,7 @@ All other knowns covered: ranges×2, regex-solver, kind-mismatch
 ## Round 46 (2026-08-16): out-of-line member class templates + ranges layer map
 
 FIXED: out-of-line member-class-template definitions ([temp.mem]/1 +
-[class.nest]/1) — previously silently skipped ("not supported yet",
+[class.nest]/2) — previously silently skipped ("not supported yet",
 convert_template_declaration ~3531); take_view::__sentinel<true>{}
 died "struct nil still incomplete" and killed the TU.  Graft: body
 onto the in-class member declaration in the OUTER template's parse
@@ -6119,7 +6119,7 @@ intact.  te3 (the pipe) → main dies in anon-take::operator() at
 throw is message-less and NOT any instrumented bare-throw site.
 SECOND wave (post-main): closure_t default-ctor synthesis chain
 resolves pf() → tuple::tuple<> — genuinely ill-formed instantiation
-contained by drain BUT [class.default.ctor]/4 says never define
+contained by drain BUT [dcl.fct.def.default]/5 says never define
 un-odr-used implicit default ctors — eager synthesis remains a latent
 hazard (contained; revisit if it surfaces).
 NEXT (round 47): the take_view CTAD layer at te3 line 234.
@@ -6146,7 +6146,7 @@ int(&)[1]; cd3 hand-kernel of that shape passes, so context-specific).
 
 ## Round 48 (2026-08-17): aggregate deduction candidate + decay
 
-FIXED: [over.match.class.deduct]/1.8 aggregate deduction candidate —
+FIXED: [over.match.class.deduct]/1.10 aggregate deduction candidate —
 deduce through data-member declared types with [temp.deduct.call]/2
 decay (array→pointer etc.); dependent-alias members are non-deduced
 contexts.  take_view<int[1]>→take_view<int*>.  Plus [dcl.init.aggr]/2.2
@@ -6163,7 +6163,7 @@ NEXT LAYER (te3, cvise cv49 → /tmp/iv1.cpp 164 lines; minimal probe
 over-pack in decltype trailing returns) substitutes the RAW ELEMENT
 TYPE for the whole cast expression; downstream expr typecheck chokes,
 __invokable_r::_Result never forms, main dies.  Root per
-[temp.variadic]/5: A→int in `A()` must yield the functional cast
+[temp.variadic]/9: A→int in `A()` must yield the functional cast
 `int()`.  Fix site to find: the walker that replaces cpp_name subs
 with element types inside CALL/cast expressions (likely
 replace_type_pack_ref's `s = elem` on expression subs, or the gfta
@@ -6171,7 +6171,7 @@ trailing-return expander).
 
 ## Round 49 (2026-08-18): functional-cast-over-pack + by-value decay
 
-FIXED: (1) [expr.type.conv]+[temp.variadic]/5 — raw-type CALLEE slots
+FIXED: (1) [expr.type.conv]+[temp.variadic]/9 — raw-type CALLEE slots
 (from expanding `A()...`) re-formed as explicit-constructor-call in
 typecheck_side_effect_function_call; iv3/iv4/iv5 kernels green, CORE
 cpp11_functional_cast_pack_alias (21-line, g++/clang).  (2)
@@ -6231,7 +6231,7 @@ Census: 6 KNOWNBUGs.
 
 ## Round 51 (2026-08-18): FLIP cpp20_ctad_braced_base_element → CORE
 
-FIXED (3 sub-defects): (1) [dcl.init.aggr]/4.1 whole-base copy in
+FIXED (3 sub-defects): (1) [dcl.init.aggr]/4.3 whole-base copy in
 cpp_constructor's aggregate-with-bases branch — member-wise splice left
 the base NONDET (wrong-code; iv3 assertion caught it — round 48 had
 validated conversion-only, the drop-check-vs-verify lesson AGAIN);
@@ -6305,7 +6305,7 @@ Checked the two candidates from rounds 46/53:
   VERIFIED interior to the committed KNOWNBUG cpp20_ranges_pipe_invoke_
   drop (its main.cpp emits exactly that error).  Desc updated to record
   it as that test's coverage.
-- [class.default.ctor]/4 eager implicit-default-ctor synthesis (round-46
+- [dcl.fct.def.default]/5 eager implicit-default-ctor synthesis (round-46
   note): latent hazard, still no reachable trigger (contained by the
   drain's recovery); same treatment as the round-38 lambda hazard —
   documented, no test, since no observable defect exists to pin.
@@ -6349,7 +6349,7 @@ UNIQUE pack_size_map entry; a fold over the ENCLOSING CLASS pack with
 the member's own pack live matched neither → unexpanded
 `cpp_binary_fold` → body dropped.  Now sized from the pack the PATTERN
 names, per-element VALUE substitution ([expr.prim.fold]/1-2 +
-[temp.variadic]/5, empty-pack identity /3).  g++/clang verified.
+[temp.variadic]/9, 14, empty-pack identity /3).  g++/clang verified.
 (b) NEW KNOWNBUG cpp20_pack_expansion_in_call_with_class_pack (bh3, 39
 lines, g++/clang): the CALL-ARGUMENT expansion form — `Op()(a...,
 get<Ip>(bound_)...)` with a tup<B...> member — mis-converts the
@@ -6362,7 +6362,7 @@ needs it).
 
 ## Round 56 (2026-08-20): mem-init pack expansion FIXED; member paren-aggregate next
 
-FIXED (committed): [temp.variadic]/5 bare pack-expansion mem-init args
+FIXED (committed): [temp.variadic]/9.2 bare pack-expansion mem-init args
 resolve against the materialised parameters (plain name for 1 element,
 `b$k` for N>=2).  Diagnosis chain: conv-fail probe showed from=NIL →
 mi-entry probe showed the operand is a bare cpp_name with ellipsis=1
@@ -6400,7 +6400,7 @@ Census 4: ranges pipe, ranges basic, regex, kind-mismatch.
 
 RED HERRING RETIRED: the `__tuple_impl` no-match now appears AFTER main's
 drop in the output (line 71 vs 16) — it is the POST-main wave (the
-never-odr-used empty-pack default construction, the [class.default.ctor]/4
+never-odr-used empty-pack default construction, the [dcl.fct.def.default]/5
 hazard from round 46), NOT main's killer.  LESSON: order the diagnostic
 output (grep -n) before attributing a failure to an error message.
 main dies SILENTLY inside the invoke_result_t/__invoke_of chain (only the
@@ -6424,7 +6424,7 @@ Census 4 unchanged; 5 suites green (round 57 validation current).
 
 ## Round 58b (2026-08-21): coverage audit #7
 
-STATUS CHANGE checked: the [class.default.ctor]/4 hazard (round 46,
+STATUS CHANGE checked: the [dcl.fct.def.default]/5 hazard (round 46,
 recorded then as "latent, no reachable trigger") is now KNOWN TO FIRE —
 round 58 showed the post-main wave instantiating a never-odr-used
 empty-pack construction and emitting `no match for symbol
@@ -6509,7 +6509,7 @@ passthrough its message reads:
      constructor struct ranges::take_view (struct ranges::take_view)"
 at sd1.cpp:159 — whose text is `take_view;` INSIDE a member function.
 cvise had rewritten the driver so that a bare class name appears as a
-statement.  That is an EMPTY DECLARATION ([dcl.dcl]/3: a
+statement.  That is an EMPTY DECLARATION ([dcl.pre]/6: a
 simple-declaration with no declarator is ill-formed unless it declares a
 class/enum): clang only WARNS (-Wmissing-declarations), g++ ERRORS
 (-fpermissive).  So CBMC's diagnosis is CONFORMING and the artifact is
@@ -6681,7 +6681,7 @@ corruption happens when the ARGUMENT LIST for
 `invokable_r<void, F, A...>` is formed inside
 `invoke_result_t<F, A...>`: expanding `A...` there emits the pack's
 SCALAR convenience binding (element 0, the pointer) TWICE instead of its
-two elements.  This is the [temp.variadic]/5 class-template-argument
+two elements.  This is the [temp.variadic]/9 class-template-argument
 expansion path (typecheck_template_args / apply's template_args handling)
 seen in rounds 42/45 — but for a pack referenced through an ALIAS
 template's argument list.
@@ -6763,12 +6763,12 @@ single deduced type" loop (cpp_typecheck_resolve.cpp ~9310-9340, which
 inserts copies of args[i] verbatim); the same-shaped duplication in
 typecheck_template_args; instantiate_template's argument splicing.
 Fix will be to substitute element k into each replica (top-level bare
-reference included), per [temp.variadic]/5.
+reference included), per [temp.variadic]/9.
 Census 5; tree clean (grep 0); suites green from round 57.
 
 ## Round 70 (2026-09-03): FLIP cpp20_invoke_chain_pack_forwarding → CORE
 
-FIXED ([temp.variadic]/5): apply()'s template-argument pack-expansion
+FIXED ([temp.variadic]/9): apply()'s template-argument pack-expansion
 replication now substitutes the i-th element into a pattern that IS the
 bare pack reference, instead of relying on apply()'s short-name bridge
 (which picked another live template's same-named `A`, left the replicas
@@ -6852,7 +6852,7 @@ NEXT (round 73): probe whether template_map holds a binding for the
 member template's own parameter while its members are converted (print
 type_map/expr_map keys + the id the friend's default argument refers to);
 if they differ, fix the graft to register the member's parameters under
-the identifiers its body uses ([temp.local]/1).
+the identifiers its body uses ([temp.local]/7).
 Census 5 (pipe, ranges basic, regex, kind-mismatch, member-friend);
 tree clean; suites green from round 70.
 
@@ -6878,8 +6878,8 @@ the member class template's own member ALIAS template used in the
 friend's parameter type (`_Iter<_OtherConst>` in libc++).
 CONCLUSION: substituting parameters is not enough.  The friend
 declaration is converted at NAMESPACE scope
-([namespace.memdef]/3 is right for its NAME), but per [class.friend]/1 +
-[temp.local]/1 its declaration must be LOOKED UP in the class scope --
+([dcl.meaning.general]/2.3 is right for its NAME), but per [class.friend]/1 + [basic.scope.class]/1 +
+[basic.scope.temp]/2, [basic.scope.class]/1 its declaration must be LOOKED UP in the class scope --
 member aliases and enclosing parameters included.  The durable fix is to
 type-check the friend's declaration IN the class scope and register the
 resulting symbol at namespace scope, rather than re-parsing it at
@@ -6896,11 +6896,11 @@ Census 5; tree clean (grep 0); suites green from round 70.
 FIX (commit "C++ front-end: look up a friend's declaration in the class
 scope", src/cpp/cpp_typecheck_compound_type.cpp,
 typecheck_friend_declaration's template branch), two parts:
-1. N5008 [class.friend]/1 + [temp.local]/1 -- attach the CLASS scope as a
+1. N5008 [class.friend]/1 + [basic.scope.class]/1 + [basic.scope.temp]/2, [basic.scope.class]/1 -- attach the CLASS scope as a
    SECONDARY LOOKUP scope while/after converting the friend template, so
    the class's member types (libc++ `_Iter`) and the enclosing member
    class template's parameters are visible.  Secondary scopes are lookup
-   only, so the friend keeps its namespace NAME ([namespace.memdef]/3).
+   only, so the friend keeps its namespace NAME ([dcl.meaning.general]/2.3).
 2. Substitute the enclosing template's BOUND arguments into a default
    template argument that names one of its parameters (stored as
    declarator.value(), a bare cpp_name), because the map is restored
@@ -6954,7 +6954,7 @@ aggregate with a reference member fell to ctor resolution (the
 FIX 2 (commit feb408b664): extend the paren-aggregate branch to
 bases-free aggregates (excluding classes with '@'-internal components,
 i.e. vtables, per [dcl.init.aggr]/1) and BIND reference elements via
-reference_initializer ([dcl.init.aggr]/4.2 + [dcl.init.ref]) instead of
+reference_initializer ([dcl.init.aggr]/4.3 + [dcl.init.ref]) instead of
 assigning through.  New CORE cpp20_aggregate_reference_member_paren_init
 (braced + paren, 2 assertions).
 Next layer (STANDALONE defect, new KNOWNBUG cpp11_reference_to_array):
@@ -6982,10 +6982,10 @@ FUNCTION postfix branch did.  `int (&r)[3]` parsed as plain `int r[3]`:
 - Template arguments of type int(&)[N] silently lost the reference
   (take_view<int(&)[1]> -> take_view<int[1]>): the round-75 layer.
 Fix: after the postfix loop, if d_inner is set and d_outer is an array,
-make_subtype(d_outer, d_inner) + swap ([dcl.meaning.general]/1,
+make_subtype(d_outer, d_inner) + swap ([dcl.meaning.general]/8,
 [dcl.array]).
 EXPOSED SECOND DEFECT: plain `auto` return deduction did not DECAY a
-deduced array ([dcl.type.auto.deduct]/4 -> [temp.deduct.call]/2): the
+deduced array ([dcl.type.auto.deduct]/3 -> [temp.deduct.call]/2): the
 goto program returned the array CONTENTS reinterpreted as a pointer
 (cpp20_undeduced_auto_overload_rank caught it -- suite regression, then
 kernel ra9).  Decayed at BOTH deduction sites (eager in
@@ -7023,7 +7023,7 @@ Question: KNOWNBUGs for every problem we are aware of?  VERIFIED:
   the trigger needs more of the driver (likely the __sentinel friend
   equality + counted_iterator interaction).  Next reduction should
   minimize the pipe driver under a "simplify invariant" gate.
-- Interior/hazard items re-checked, unchanged: [class.default.ctor]/4
+- Interior/hazard items re-checked, unchanged: [dcl.fct.def.default]/5
   post-main wave (round 58b: dc1/dc2 verify clean; interior to the pipe
   KNOWNBUG); ranges_basic atomic-noise + same_as layers (interior to
   its KNOWNBUG); round-38 lambda return_type hazard (no reachable
@@ -7079,7 +7079,7 @@ root causes; create further MINIMAL KNOWNBUGs.  Results:
      where _Tp is the ENCLOSING class template's parameter; the hoisted
      friend's requires-clause fails to resolve _Tp at namespace scope
      ("symbol 'Tp' is unknown") and the candidate is dropped
-     ([temp.local]/1).  Sibling of the FIXED round-74 case, but:
+     ([basic.scope.temp]/2).  Sibling of the FIXED round-74 case, but:
      TOP-LEVEL class template (round-74 gate = nested only) and the
      parameter sits in the CONSTRAINT (round-74 substitution = default
      arguments only).  Fix direction: extend the round-74 machinery --
@@ -7094,7 +7094,7 @@ root causes; create further MINIMAL KNOWNBUGs.  Results:
    minimal (30 lines).  What was unpinned was its BLOCKER's valid side:
    NEW CORE cpp14_make_integer_seq_value_types -- the exact
    __make_integer_seq shape the round-44 enforcement broke, committed
-   as the canary that must stay green when [temp.deduct.type]/17
+   as the canary that must stay green when [temp.deduct.type]/20
    enforcement flips the KNOWNBUG.  (km1, plain deduced packs +
    decltype: passes -- negative result, the normalization is only
    observable under enforcement or via the builtin.)
@@ -7166,7 +7166,7 @@ followed by '(' (gcc's revertible-identifier rule; the treatment
 __is_referenceable already had).  Verified in fedora:41: valarray1
 passes against gcc-14 headers.  In archlinux, 4 of 5 failures cured.
 FIX 2 (48204eeb6b): array elements of aggregates are initialized
-element-wise ([dcl.init.aggr]/4.2) with [dcl.init.aggr]/16 brace-elision
+element-wise ([dcl.init.aggr]/4.3) with [dcl.init.aggr]/14 brace-elision
 scalar consumption -- cures "direct assignments to arrays not
 permitted" for `vec v_{{7,8}};` DMIs.  Diagnosis detour recorded: the
 failing operands are NOT initializer_lists at the aggregate loops
@@ -7181,7 +7181,7 @@ FIX 4 (679e71827f): enclosing template parameters are substituted into
 a hoisted friend's REQUIRES-CLAUSE (extension of the round-74
 default-argument substitution; raw-typet splice matching the
 constraint-satisfaction walker's convention; friend's OWN parameters
-excluded per [temp.local]/1 shadowing).  Flips
+excluded per [temp.local]/7 shadowing).  Flips
 cpp20_friend_requires_enclosing_param -- the ranges_basic main killer.
 TWO development hazards caught by the full suite run and recorded:
 - irept::add(name) CREATES the entry: attaching an "empty"
@@ -7255,7 +7255,7 @@ runtime verified):
   (negative kernel k6).
 - cpp17_unique_ptr_derived_return (40 lines): switch-factory returning
   unique_ptr<const Derived> as unique_ptr<const Base>
-  ([unique.ptr.single.ctor]/26); if-based sibling PASSES (negative
+  ([unique.ptr.single.ctor]/19); if-based sibling PASSES (negative
   kernel k2 -- the switch/two-return shape is load-bearing).
 - cpp11_member_via_iterator_shadows_container (24 lines): container's
   clear() shadows element's clear(enum) in it-> classref lookup
@@ -7363,7 +7363,7 @@ The round-85 "ops=2" was pinned with one more probe (struct tags of
 both operands): ops = [SYNTHETIC anonymous itert symbol, this->b_
 ptrmember].  Root pair (commit in cpp_typecheck_resolve.cpp +
 cpp_typecheck_conversions.cpp):
-1. [over.match.funcs]/5: disambiguate's plain-symbol member branch
+1. [over.call.func]/3: disambiguate's plain-symbol member branch
    contrived a synthetic this WITHOUT checking fargs.has_object ->
    arity bail (FM2).  Guarded.
 2. After 1, the balanced match still failed: NOCONV probe showed the
@@ -7404,7 +7404,7 @@ FLIP 2 (e845445b28 + 1a00eb46d7) cpp17_overload_template_default_nontype
     `template <bool same_size = true, class C> zip(C&)`) was
     unorderable in BOTH directions.  Restrict the check to parameters
     occurring in the compared types.
-(b) [temp.deduct.type]/3: after (a) both directions SUCCEEDED (still
+(b) [temp.deduct.type]/8: after (a) both directions SUCCEEDED (still
     unordered) because a template-id pattern `ranget<OtherIt>` matched
     an unrelated bare cpp_name (the other template's parameter) and
     bound OtherIt to nothing meaningful.  Require the template names to
@@ -7417,7 +7417,7 @@ converting return fails identically; direct-init works).  Root:
 typecheck_return materialises through a constructor only when the
 return type has a DESTRUCTOR and skips already-temporary operands, so a
 converting temporary of a different class type reaches
-implicit_typecast ([stmt.return]/2 + [dcl.init.general]/16.6.1 require
+implicit_typecast ([stmt.return]/2 + [dcl.init.general]/16.6.3 require
 the converting constructors).  Routing such operands through
 new_temporary FIXES the conversion (kernel u2 verifies) but leaves a
 type-inconsistent assignment that trips goto-symex's symex_assign
@@ -7441,7 +7441,7 @@ the LAST dog-food CRASH: src/util/simplify_expr.cpp now compiles with
 goto-cc (dog-food src/util: 0 fail / 0 crash).
 FIX + NEW CORE (8ab4415d4a + a936bd841f)
 cpp17_converting_return_move_ctor: [stmt.return]/2 +
-[dcl.init.general]/16.6.1 -- the result object is copy-initialized from
+[dcl.init.general]/16.6.3 -- the result object is copy-initialized from
 the operand, considering CONVERTING constructors.  typecheck_return
 materialised through a constructor only when the return type had a
 DESTRUCTOR and skipped already-temporary operands, so a converting
@@ -7527,7 +7527,7 @@ even when it holds ([expr.prim.req.compound]/1).  This is a WRONG-VALUE
 concept bug, not a diagnostic, and the prime suspect for the remaining
 ranges_basic layer (difference_type/iterator_traits detection).
 TWO STACKED DEFECTS located inside compound_requirement_is_satisfied:
-1. [temp.constr.atomic]/1 contextual conversion: the concept body folds
+1. [temp.constr.atomic]/3 contextual conversion: the concept body folds
    to a c_bool constant and exprt::is_true() does not recognise it, so
    every SATISFIED return-type-requirement read false.  Fixing this made
    the builtin case (int) pass.
@@ -7588,7 +7588,7 @@ BISECTION (all against the frozen build-work binary, cv89 untouched):
   `auto (...) -> void` though declared `void`: the OUT-OF-LINE
   definition (layout.h:290) was never matched to the in-class
   declaration (layout.h:196), so an odr-used member has no body
-  ([temp.inst]/1).  No "no body for callee" property is emitted either,
+  ([temp.inst]/4).  No "no body for callee" property is emitted either,
   so the wrong answer is SILENT -- a second, separable soundness gap.
 NEGATIVE KERNELS (three, all verify clean): oo1 out-of-line member whose
 parameter type is a MEMBER ALIAS; oo2 the same plus constexpr and
@@ -7832,7 +7832,7 @@ accessible".  Root: a `class` (private by default) whose member's TYPE
 carries a default member initializer needs a synthesized default
 constructor, and the member initialization inside that synthesized body
 is access-checked in the CALLER's context instead of the class's
-([class.access.general]/4, [class.default.ctor]/4).  NEW KNOWNBUG
+([class.access.general]/1, [class.default.ctor]/4).  NEW KNOWNBUG
 cpp11_private_member_dmi_default_ctor (10 lines, g++/clang verified).
 This is the root of the goto-symex dog-food failures.
 FIX ATTEMPTS, both reverted, both recorded in the desc:
@@ -7956,7 +7956,7 @@ PARAMETER types.  CBMC is legitimately exploring user-defined
 conversions to each candidate constructor's parameter, but then
 INSTANTIATES THE OPERATOR'S BODY for those candidates, and
 `allocator<int>(begin(), end())` fails as a HARD error instead of
-discarding the candidate ([temp.inst]/1, [temp.deduct]/8: only the
+discarding the candidate ([temp.inst]/10, [temp.over]/1: only the
 declaration is needed to decide a candidate).  Two ordered fix
 candidates recorded in the desc.
 Census 10.
@@ -7987,7 +7987,7 @@ leaks.
 cv98 at 95026 lines and healthy.  Census 10; tree clean; five suites
 green on the committed tree (compound-requirement fix from round 100).
 
-## Round 102 (2026-09-09): the conversion-operator bug is a missing [over.best.ics]/4
+## Round 102 (2026-09-09): the conversion-operator bug is a missing [over.best.ics.general]/4
 
 Chased cpp17_functional_cast_deduced_param_vector to its actual root and
 had to CORRECT two earlier claims along the way.
@@ -8012,7 +8012,7 @@ in the catch branch only ever saw `main`.
 THE ROOT CAUSE: the FIRST error is `symbol 'vector' does not uniquely
 resolve` listing four vector constructors, all viable for one `ranget`
 argument via ranget's `template <class C> operator C()`.  g++ 13 and
-clang++ both accept the program, because N5008 [over.best.ics]/4
+clang++ both accept the program, because N5008 [over.best.ics.general]/4
 excludes USER-DEFINED CONVERSION SEQUENCES when the target is the first
 parameter of a constructor that is a candidate by [over.match.copy] --
 i.e. exactly copy-initialization of a class, which is what passing `r`
@@ -8028,7 +8028,7 @@ path, not leaking into nested initializations, and NOT set for
 direct-initialization) is recorded in the test's desc.
 Census 10; tree clean; cv98 healthy.
 
-## Round 103 (2026-09-09): [over.best.ics]/4 IMPLEMENTED -- functional-cast KNOWNBUG fixed and flipped
+## Round 103 (2026-09-09): [over.best.ics.general]/4 IMPLEMENTED -- functional-cast KNOWNBUG fixed and flipped
 
 Implemented the round-102 diagnosis (8c0891bf1f + flip). Two matched
 halves, BOTH necessary (each measured):
@@ -8470,7 +8470,7 @@ LANDED (each 5-suite validated, revert-tested, runtime-verified):
      the two earlier fix attempts were placed in dead code.  FLIPPED
      cpp11_empty_pack_new_initializer with a class-typed kernel.
   2. c3f5de6fab -- `new T()` VALUE-initializes, `new T`
-     default-initializes ([expr.new]/17 + [dcl.init.general]/9): new
+     default-initializes ([expr.new]/24 + [dcl.init.general]/9): new
      irep id #value_initialization set by the parser on parenthesised
      new-initializers; typecheck_expr_new prepends a zero-init
      side-effect assignment for POD types (DMI code follows, /9.2
@@ -8479,7 +8479,7 @@ LANDED (each 5-suite validated, revert-tested, runtime-verified):
      already_typechecked-wrapped object).  Negative shape measured:
      `new int` unchanged.  NEW test cpp11_placement_new_value_init
      filed AND flipped same round.
-PARKED with firmer evidence: [temp.deduct.type]/17 enforcement.  Three
+PARKED with firmer evidence: [temp.deduct.type]/20 enforcement.  Three
 measured variants (full compare / explicit-args excluded / equal-width
 only) break 7 / 5 / 3 VALID tests respectively -- recorded deduced-value
 types carry no reliable signal at any width (size_t indices recorded as
@@ -8500,7 +8500,7 @@ Census 6: deduced_nontype (parked, prerequisite defined),
 perfect_forward_struct_arity (NEW), regex x2 (perf),
 ranges_basic_libcxx (b2/b4 kernels), libcxx23_vector_pushback.
 
-## Round 116 (2026-09-11): cv116 launched; ranges mechanism FULLY localized ([dcl.fct]/6 varargs)
+## Round 116 (2026-09-11): cv116 launched; ranges mechanism FULLY localized ([dcl.fct]/24 varargs)
 
 Task 1: cv116 launched on libcxx23_vector_pushback with the mechanism
 gate (push_back definition text pinned via its _ConstructTransaction
@@ -8512,9 +8512,9 @@ Task 2 (ranges __bind_back): mechanism now FULLY localized by
 GNIL/RTHROW site tagging (numbered prints at every nil-return of
 guess_function_template_args and every throw of resolve):
   * deduction leaves _Fn UNASSIGNED (GNIL 7 has_unassigned) and
-    resolve's all-templates [temp.deduct]/8 throw (RTHROW 11) fires;
+    resolve's all-templates [temp.deduct.general]/8 throw (RTHROW 11) fires;
     b3 and b4 BOTH fail deduction -- the b3/b4 split is RECOVERY.
-  * ROOT: [dcl.fct]/6 + [temp.variadic]/1 -- `_Fn...` with non-pack _Fn
+  * ROOT: [dcl.fct]/24 + [temp.variadic]/1 -- `_Fn...` with non-pack _Fn
     is `_Fn, ...` (deducible parameter + C varargs); CBMC treats every
     ellipsis declarator as a pack and consumes ALL call arguments into
     _Fn.
@@ -8523,7 +8523,7 @@ guess_function_template_args and every throw of resolve):
     (2) + signature-side ellipsis on guess's function_type (marker on
     the ID_parameters node per code_typet::has_ellipsis) still fails --
     overload matching uses the signature built by the INSTANTIATION
-    path, so the same [dcl.fct]/6 conversion must be added in
+    path, so the same [dcl.fct]/24 conversion must be added in
     instantiate_template as well.  Three-site design recorded in the
     desc; a candidate for a dedicated round.
 PROBE-KIT: numbered exit-site tagging (RTHROW n / GNIL n) is now the
@@ -8539,7 +8539,7 @@ rethrow could ESCAPE cpp_typecheckt::typecheck() into typecheck_main's
 catch(int), whose UNCOMMITTED error() stream leaves the message count
 unchanged -- the front end reported SUCCESS over a half-processed
 symbol table (clean_up skipped; class types kept code-typed method
-components, violating [class.mem.general]/4's object model) and symex
+components, violating [class.mem.general]/5's object model) and symex
 crashed in assign_from_struct (cpp14_perfect_forward_struct_arity).
 The fix splits the rethrow by COMMITTED-DIAGNOSTIC state:
   * count moved -> propagate (CONVERSION ERROR; rejects-invalid tests).
@@ -8549,7 +8549,7 @@ tests; gate-before-template-tolerance broke 17 valid optional/variant/
 concepts tests (their recoveries commit diagnostics that enclosing
 contexts reset); diagnosed-rethrow AFTER the template tolerance breaks
 none.  Revert-tested (Invariant crash without, clean with); 5 suites
-green.  The KNOWNBUG stays (underlying [dcl.fct]/6 varargs root open);
+green.  The KNOWNBUG stays (underlying [dcl.fct]/24 varargs root open);
 its desc updated.  Also caught: `test.pl -c <bindir>` (not
 <bindir>/cbmc) makes every test fail -- check the -c argument before
 believing a mass failure.
@@ -8565,14 +8565,14 @@ cv117 relaunched with the hardened gate (push_back's own
 `{ emplace_back(__x); }` + `int main()` + goto-model main present).
 Census 5: deduced_nontype (parked), perfect_forward_struct_arity
 (crash gone, varargs root), regex x2, ranges_basic_libcxx (varargs
-root), libcxx23_vector_pushback (cv117).  The [dcl.fct]/6 three-site
+root), libcxx23_vector_pushback (cv117).  The [dcl.fct]/24 three-site
 varargs fix now blocks TWO census entries -- top candidate for a
 dedicated round.
 
-## Round 118 (2026-09-11): [dcl.fct]/6 varargs FIXED single-site; perfect_forward FLIPPED; two new datapoints
+## Round 118 (2026-09-11): [dcl.fct]/24 varargs FIXED single-site; perfect_forward FLIPPED; two new datapoints
 
 FIX (df138b3e87) + CORE test cpp11_nonpack_ellipsis_varargs: `P...`
-with a non-pack P is `P, ...` ([dcl.fct]/6 + [temp.variadic]/1),
+with a non-pack P is `P, ...` ([dcl.fct]/24 + [temp.variadic]/1),
 normalized ONCE at typecheck_function_template -- strip the
 declarator's pack marker, append the bare ID_ellipsis varargs entry
 (the exact parse form of a hand-written `P, ...`).  The parser
@@ -8584,7 +8584,7 @@ FLIPPED cpp14_perfect_forward_struct_arity (crash fixed R117 +
 resolution fixed R118; kernel's __bind_back given a body, assertion
 decoupled from empty-class sizeof).
 NEW KNOWNBUG cpp11_sizeof_empty_class: sizeof(empty class) == 0
-violates [class]/4 + [expr.sizeof]/2.  MEASURED: the one-line padding
+violates [class.pre]/7 + [expr.sizeof]/2.  MEASURED: the one-line padding
 fix breaks 46 tests (empty closures, decltype packs) -- CBMC models
 zero-sized empty classes self-consistently; a real fix is a coordinated
 layout project.  Parked with the measurement.
@@ -8617,7 +8617,7 @@ All fleets retired again.
 
 ## Round 119 (2026-09-11/12): sentinel-leak fix landed — vector_pushback's first visible error gone
 
-FIX (e1b15e7d97): trailing zero-length-pack sentinels ([temp.variadic]/7
+FIX (e1b15e7d97): trailing zero-length-pack sentinels ([temp.variadic]/1
 recording convention: `empty`-typed trailing argument, often
 AMBIGUOUS-wrapped) leaked into template-ids naming PACKLESS templates
 when a class instance's recorded arguments were re-used -- libc++-23's
@@ -8667,7 +8667,7 @@ Probing the 61-line reproducer directly (1s/run) paid off exactly as
 hoped — three root causes, all in the template-parameter substitution
 machinery, all N5008-grounded:
 1. 400b2bbddd apply()'s short-name bridge: a caller's TYPE-param
-   binding (struct_tag) acted as a template-name ([temp.names]/2
+   binding (struct_tag) acted as a template-name ([temp.param]/7
    violation).  New template_template_parameters set in template_mapt
    (from ID_is_template) gates the struct_tag-as-template-name rewrite;
    deduction_parameters-only gating was too tight (broke
@@ -8710,7 +8710,7 @@ checked struct COMPONENTS only; a member function TEMPLATE lives just
 in the class scope, so the `[&]` lambda's unqualified call to it
 (vector::emplace_back's slow-path lambda) resolved against the
 CLOSURE's own this and the body was silently dropped
-([class.mfct.non.static]/3, [expr.prim.lambda.capture]/8).  Now the
+([expr.prim.id.general]/2, [expr.prim.lambda.capture]/7).  Now the
 class scope's TEMPLATE ids are consulted and such lambdas take the
 function-pointer lowering.  47-line kernel lm1 = CORE test
 cpp17_lambda_calls_enclosing_member_template; control kernel lm2
@@ -8764,7 +8764,7 @@ the kernel (ab1 passes via the initializer path, ab2's return-expr
 goes through the explicit-ctor-call branch) -- gdb marker + bt was
 what located the right loop, not reading code.
 Fix 3 (98fcce4870): sizeof(class) >= 1 realised at sizeof evaluation
-([class]/4, [expr.sizeof]/2) via a new virtual hook following the
+([class.pre]/7, [expr.sizeof]/2) via a new virtual hook following the
 empty_brace_value_initializes_scalar idiom; C-mode GNU zero-size
 empty structs stay observable (asserted in a C-mode check).  FLIP
 cpp11_sizeof_empty_class.
@@ -8811,8 +8811,8 @@ Fix (0144460e20): fold-expressions in a trailing-return-type decltype
 were never reduced (the reducer runs only in the method-body pass,
 which doesn't touch the return type), so the declaration was dropped.
 Now reduced in typecheck_type's decltype branch when one pack is bound
-(pack_size_map): empty -> identity ([expr.prim.fold]/3), single ->
-plain param name ([temp.variadic]/5); binary-fold pack side detected
+(pack_size_map): empty -> identity ([temp.variadic]/14), single ->
+plain param name ([temp.variadic]/9.2); binary-fold pack side detected
 structurally.  Isolation ladder that pinned it precisely: fold in body
 (PASS), fixed-return fold (PASS), fold in LOCAL decltype (PASS), fold
 in TRAILING decltype (FAIL) -- only the trailing position, confirming
@@ -8864,7 +8864,7 @@ Fix-in-progress note: N>=2 typecheck_type placeholder expansion
 the k129 DECLARATION typecheck but is moot until layer 2 lands; the
 c6/variadic kernel N=2 case additionally needed the pack-on-LEFT
 binary-fold form in the free-function body expander
-([expr.prim.fold]/2), which DID land in round 125's follow-up commit
+([expr.prim.fold]/3), which DID land in round 125's follow-up commit
 (0144460e20 covered typecheck_type; the body-side pack-on-left gap
 was fixed this round inside cpp_instantiate_template.cpp -- wait, NO:
 that edit was REVERTED with the probe cleanup; re-verify c6 next
@@ -8892,7 +8892,7 @@ libcxx23_vector_pushback (semantic pointer layer).
 
 ## Round 127 (2026-09-14): layers 2+3 of the range-pipe chain fixed
 
-Fix A (7a2694d606): [dcl.fct]/8 trailing-return temporary parameter
+Fix A (7a2694d606): [basic.scope.param]/1.1 trailing-return temporary parameter
 symbols were put_into_scope'd into the CURRENT scope -- during a
 deduction-skeleton instantiation that is the enclosing NAMESPACE, and
 cpp_save_scopet restores only the scope POINTER, so `std::__args`
@@ -8927,7 +8927,7 @@ THE VECTOR CARRIER IS CORE.  The final layer (2b90dc6dc7):
 reference_related gated every derived-to-base reference binding on
 base_publicly_accessible, so a member USING-DECLARED (public) from a
 PRIVATE (class-default!) TT base rejected its implicit-object binding
-([namespace.udecl]/16,19 + [over.match.funcs]/5 vs
+([namespace.udecl]/12,16 + [over.match.funcs.general]/4 vs
 [class.access.base]/5) -- `class __split_buffer : _Layout<...>` with
 `public: using __base_type::__relocate;`.  __emplace_back_slow_path
 went bodiless via the tolerated-incomplete recovery, push_back left
@@ -9048,7 +9048,7 @@ layer), libcxx23_string_fill_ctor.
 ## Round 132 (2026-09-14/15): dog-food SEGV fixed (structured bindings) + range-for reference binding
 
 Fix (fcfeb83e6f), from the cv129 17-line reproducer:
- 1. [stmt.ranged]/1 allows a STRUCTURED-BINDING for-range-declaration;
+ 1. [stmt.iter.general]/1 allows a STRUCTURED-BINDING for-range-declaration;
     the parser mis-parsed `auto [a, b]` as an ARRAY declarator (comma
     size!), and typecheck dereferenced the empty declarator name --
     the irept::get SEGV on remove_cpp_exceptions.cpp.  New
@@ -9154,7 +9154,7 @@ proven unnecessary — reverted.
 **USER BUG REPORT (~/CBMC_ISSUES.md) FIXED `332cb4db74` + test `c177c3ca5a`**:
 packed enums ignored in C++ mode. Two defects: (1) enum_type.cpp never
 consulted ID_C_packed — now tracks enumerator range and re-types underlying +
-enumerator symbol values when packed && base defaulted ([dcl.enum]/8; scoped
+enumerator symbol values when packed && base defaulted ([dcl.enum]/7; scoped
 enums keep fixed int per [dcl.enum]/5); (2) rEnumSpec: attribute between
 enum-key and name merge_types'd the spec into merged_type → tag/body landed on
 wrapper → anonymous bodyless enum. Unwrapped like rClassSpec's struct unwrap.
@@ -9199,7 +9199,7 @@ message's throw site to get the underlying first error).
 init) + `id_sett = std::set<cpp_idt*, id_ordinal_lesst>`; cpp_scopest::id_sett
 unified. Verified: identical goto-functions md5 across argv/env-length shifts
 (regex_construct + regex_match). Same commit: `member_template_object_viable()`
-— [over.match.funcs]/5 non-const member template NOT viable on const object
+— [over.match.funcs.general]/4 non-const member template NOT viable on const object
 (template_function_instance has no `this` param → const/non-const pair tied →
 order). Fixed std::function `_M_get_pointer` no-body.
 
@@ -9221,7 +9221,7 @@ and reverse order is a latent bug. Found and fixed 3 more:
   group → primary "won" by id → chrono regressed; primary must be excluded.
   CORE cpp11_partial_spec_ordering_{cv_pointer,mixed}.
 - `d92bb8b276` QUALIFIED friend function template (`friend bool
-  __detail::__regex_algo_impl(...)`) — [namespace.memdef]/3 refers to existing
+  __detail::__regex_algo_impl(...)`) — [dcl.meaning.general]/2.2 refers to existing
   template; was converted in innermost namespace → no friend recorded →
   match_results private vector base binding "bad reference initializer" →
   regex_match havoc. Unique-arity acceptance (spelling differs by qualification).
@@ -9233,7 +9233,7 @@ and reverse order is a latent bug. Found and fixed 3 more:
 **Residual order-sensitivity noted (forward vs reverse diff, not fixed)**:
 (a) hybrid facet instantiations `num_get<wchar_t, istreambuf_iterator<char>>`
 etc. appear in forward order only — by-suffix template_map fallback capturing
-enclosing `_CharT` (the [temp.deduct]/2 family noted in convert_template_parameter);
+enclosing `_CharT` (the [temp.deduct.general]/1 family noted in convert_template_parameter);
 (b) `shared_ptr<const _NFA>(shared_ptr<_NFA>&&)` delegates to the CONST-LVALUE
 converting `__shared_ptr` ctor in forward order vs the rvalue one in reverse
 ([over.ics.rank]/3.2.3 should prefer &&); mv1/mv2 kernels pass — trigger has
@@ -9282,7 +9282,7 @@ print-only `enum memory_order` vs `std::memory_order` param spelling in
 shared_ptr/unique_ptr tests (typedef vs tag resolution order; harmless, noted).
 
 - `d0ab0d7671` default template args substituted with OWN preceding params only
-  ([temp.param]/12-14): raw forward-decl default `istreambuf_iterator<_CharT>`
+  ([temp.param]/16-17): raw forward-decl default `istreambuf_iterator<_CharT>`
   applied through FULL map → short-name bridge captured enclosing `_CharT` →
   ~130 hybrid facets/TU. Kernel needs enclosing template's scope to sort
   before the definition's (cpp11_default_template_arg_own_parameter).
@@ -9291,12 +9291,12 @@ shared_ptr/unique_ptr tests (typedef vs tag resolution order; harmless, noted).
   existing_function_template_instance(); template_suffix may THROW on
   class-NTTP ctor-call args → catch + restore error count, else
   cpp20_nttp_string/class_nttp_brace regress); instantiated specialisations
-  ranked as templates via symbol-table #fn_template_type ([over.match.best]/2.5);
+  ranked as templates via symbol-table #fn_template_type ([over.match.best.general]/2.4, 2.5);
   [over.ics.rank]/3.2.3 xvalue→&& beats const& (cv key); fixpoint drain also
   queues referenced deferred_typechecking members ([temp.inst]/4).
   Regex fwd/rev now IDENTICAL (3517). Gate extended in test_conversion.desc.
 - `8d8fa1e0fa` member template-id explicit args typechecked in fargs.naming_scope
-  ([basic.lookup.unqual]/1): `p->template is_derived<I>()` with caller's `I` had
+  ([basic.lookup.unqual]/4): `p->template is_derived<I>()` with caller's `I` had
   no candidates → small_shared_n_way_ptr.h → field_sensitivity/complexity_limiter
   dog-food. CORE cpp11_member_template_arg_caller_scope. KNOWNBUG filed:
   cpp11_std_bind_basic (std::bind unsupported even `bind(add,2,3)()`; dog-food
@@ -9376,7 +9376,7 @@ Suites ×5 green; revert-tests 5/5 fail on pre-round. Census unchanged (5).
   `result_of<_Fn&(_Mu_type<_BArgs,_CallArgs>&&...)>` reaches DTC via
   resolve_scope with the arg as an ID_code whose params are still
   cpp_declaration(type=int&& , declarator &&) — typecheck_type(ID_code)
-  ignores declarators, so no [dcl.ref]/6 collapsing → spec `F(A...)` fails →
+  ignores declarators, so no [dcl.ref]/7 collapsing → spec `F(A...)` fails →
   primary result_of (no ::type) → incomplete placeholder instance cached
   (class_template_symbol), poisoning later uses. Tried: (a) typecheck when a
   param needs collapsing (gate in typecheck_template_args) — never reached
@@ -9413,7 +9413,7 @@ dirs in regression/cbmc-cpp overall (`grep -l ^KNOWNBUG */test.desc`).
      `result_of<_Functor(_ArgTypes...)>` → one-param pattern → primary
      result_of cached (incomplete placeholder) → `is_invocable<_Bind&,int>`
      false, but ONLY if evaluated before a direct call (order-dependent).
-     Gate on deduction_parameters ([temp.deduct]/5) like apply() does.
+     Gate on deduction_parameters ([temp.deduct.general]/5) like apply() does.
   2. `0a62c8dcb3` typecheck_type(ID_code) with cpp_declaration params:
      declarator `&&` over a substituted reference type → collapse in place
      ([dcl.ref]/7 — N5008 numbering; /6 in older drafts), keep the node shape
@@ -9433,7 +9433,7 @@ dirs in regression/cbmc-cpp overall (`grep -l ^KNOWNBUG */test.desc`).
      (typecheck_member_function suffixing was gated on `value.is_not_nil()`)
      → every later `_S_test<F,A...>` probe returned the FIRST's type: a
      void-returning bind made all later binds void (pair5/bs4/mt5 kernels).
-     [temp.spec]/4.  20-line header-free kernel: mt5.cpp.
+     [temp.type]/1.  20-line header-free kernel: mt5.cpp.
   Tests `8832b2337b` (7 dirs). Revert-tested against a real HEAD build in a
   worktree (/tmp/r141/headtree) — 7/7 FAIL. Suites ×5 green.
   Exploratory but UNNEEDED (saved /tmp/r141/exploratory_scoping.patch, not
@@ -9446,9 +9446,9 @@ dirs in regression/cbmc-cpp overall (`grep -l ^KNOWNBUG */test.desc`).
   the method qualifier into the decl-specifier type (2017 hack to make libc++'s
   `_Rp (_Class::*)() const` vs `()` differ) → pointer to member of `const int`,
   return type lost. Now attached to the function_type and applied to the
-  implicit object parameter (`const S* this`, [dcl.fct]/6-7).
+  implicit object parameter (`const S* this`, [dcl.fct]/10, [over.match.funcs.general]/4).
   FOUND OPEN: (a) pointer-to-DATA-member `s.*pmd` unsupported (declaration
-  dropped, `s.*pd` → `pd`; typedef/alias/raw all) — [expr.mptr.oper]/4;
+  dropped, `s.*pd` → `pd`; typedef/alias/raw all) — [expr.mptr.oper]/2;
   (b) type identity ignores cv nested in parameter types (`void(*)(const int*)`
   == `void(*)(int*)` for is_same) — KNOWNBUG cpp11_type_identity_cv_in_parameter_types.
 - PITFALLS: `pkill -f <pattern>` matched my own shell TWICE this round (kill by
@@ -9465,7 +9465,7 @@ so rebuilding build-work cannot taint them; probes stripped before every
 snapshot.  `pkill -f` banned (kill by PID).
 - `bdf68aea55` non-member `operator@=` candidates ([over.match.oper]/3.2):
   ALL ten free compound assignments were "no match" (guard_exprt friend ops,
-  symex_atomic_section.cpp). `=` keeps member-only ([over.ass]/1).
+  symex_atomic_section.cpp). `=` keeps member-only ([over.assign]/1).
 - `33841b6bb3` do_not_typechecked() re-run after the half-converted-instance
   fixpoint; never-used placeholders cleared once at the very end
   (clear_not_typechecked).  Late odr-use of `less<int>::less(const less&)`
@@ -9493,7 +9493,7 @@ snapshot.  `pkill -f` banned (kill by PID).
   Plus: member TYPEDEF of a fn-pointer whose pointee expands the class pack
   wasn't expanded (data members were) — `using` alias took the other path,
   which is why libstdc++'s std::function<int(int,int)> worked.
-- `f79ced4347` [dcl.init.list]/3.4: memberwise "fast path" for braced init
+- `f79ced4347` [dcl.init.list]/3.7: memberwise "fast path" for braced init
   of a class WITH user-declared ctors bypassed constructors → nested
   `{"a",{"first",1}}` into pair<const string, pair<const string,int>> LOST
   the inner string (wrong result, no diagnostic). Now constructor path.
@@ -9617,14 +9617,14 @@ failures — the suite is goto-cc based).
   destroyed temporary), tuple-like bindings were COPIES (writes through
   `auto&&[r,s]` to a reference member lost).  Fixed: `__sb$N`, `__sb$obj`
   materialisation ([dcl.struct.bind]/1 + [class.temporary]/6), bindings as
-  references to get<i>(e) ([dcl.struct.bind]/4).
+  references to get<i>(e) ([dcl.struct.bind]/7).
 - Value category: new `cpp_typecheckt::is_lvalue_expression` — a
   temporary_object / compound_literal / struct / array literal is a prvalue
   although marked #lvalue (C semantics of compound literals!); used by
   reference_binding (non-const T& rejects prvalues, [over.ics.ref]/3: `f(S&)`
   vs `f(S)` with `S{1,2}` was AMBIGUOUS) and by forwarding-reference
   deduction (else `emplace(1, W{5})` deduced W& and then had no match).
-- ADL suppression ([basic.lookup.argdep]/3.1) missed member function
+- ADL suppression ([basic.lookup.argdep]/1.1) missed member function
   TEMPLATES (scope entry has no class_identifier) → `zip<b>(ranget<..>{..})`
   inside ranget<It>::zip pulled in ranget<J>::zip from the argument's class
   → "does not uniquely resolve" (util/range.h signature).  Now: parent scope
@@ -9646,7 +9646,7 @@ failures — the suite is goto-cc based).
 - Regression caught by suites before commit: is_lvalue_expression must
   exempt the implicit object parameter (`std::move(*this).with(...)`) and
   treat a dereference of a MEMBER of rvalue-reference type as an lvalue
-  ([expr.ref]/6; test cpp11_rvalue_ref_member_lvalue).
+  ([expr.ref]/7; test cpp11_rvalue_ref_member_lvalue).
 - Suites ×5 green on /tmp/r144/bin22 (= final HEAD of the C++ series);
   ansi-c (both goto-cc variants) green on bin14 (C series).
 - Sweep signatures status: solver_hardness.cpp COMPILES (rc=0); loop_ids.cpp
@@ -9771,7 +9771,7 @@ failures — the suite is goto-cc based).
   std::list element copied bitwise, `S &' gave a type-inconsistent
   assignment (symex invariant).  Tests cpp11_range_for_variable_scope,
   cpp11_range_for_reference_variable.
-- Rvalue references ([dcl.init.ref]/5.3): `W &&' from an expression of
+- Rvalue references ([dcl.init.ref]/5.4.1): `W &&' from an expression of
   unrelated type (int prvalue, string literal, const char* lvalue) now
   creates the temporary via the converting constructor (was rejected with
   non-const lvalue refs); /5.4 lvalue rejection only for reference-RELATED
@@ -9892,8 +9892,8 @@ failures — the suite is goto-cc based).
     in the BASE's layout only; re-applying it at the derived class's
     absolute offset moved the following members (seed 9095: base at an
     odd offset).  padding.cpp: from_base → a = 1 for width 0.
-- Empty-class object model (`2e7e4ad87e`), N5008 [class]/4 (complete
-  objects of class type have nonzero size), [intro.object]/9 (distinct
+- Empty-class object model (`2e7e4ad87e`), N5008 [class.pre]/7 (complete
+  objects of class type have nonzero size), [intro.object]/10 (distinct
   addresses), [class.derived]/... (a base class subobject may have zero
   size): a struct/union with no storage member gets a 1-byte `$empty'
   padding component before add_padding (zero-width bit-fields do not
@@ -9908,7 +9908,7 @@ failures — the suite is goto-cc based).
   `_List_impl::_M_node._M_next' in std::list -- the base's byte overlaps
   the derived's first member); cpp_typecheck_fargs brace-init viability
   skips padding components.  Test cpp_empty_class_object_size.
-- String literals (`working tree, this commit`): N5008 [lex.string]/6 --
+- String literals (`working tree, this commit`): N5008 [lex.string]/1 --
   `const char[n]', an lvalue.  The C front-end typed them `char[n]' (C's
   rule) and the C++ resolver then ranked `std::string s("...")' wrong:
   the string_view constructor template `basic_string(const _Tp &)'
@@ -9988,7 +9988,7 @@ failures — the suite is goto-cc based).
 - Found alongside (same code): `static constexpr std::array<int,3> a =
   {1,2,3}' lost the same way whenever a template map was active (any TU
   including <array>); class-type constexpr static members were extern
-  macros → `A::p.x' nondet ([class.static.data]/3: objects now, like
+  macros → `A::p.x' nondet ([class.static.data]/4: objects now, like
   arrays since f5b2d46446); the ctor call for a non-POD one used
   `symbol_exprt::typeless' → nil `this' type → solver invariant once the
   object was really initialised.  Scalars stay macros (round-137 pitfall).
@@ -10018,7 +10018,7 @@ Six distinct front-end bugs, all reproduced with kernels and fixed
   (ID_C_direct_list_init).  Root cause of `json_objectt o{{k, v}, ...}'
   (explicit `json_objectt(std::initializer_list<...> &&)') and thus the
   FAIL + 11 noisy files of the sweep.
-- [over.ics.list]/10: a parameter `std::initializer_list<X> &&' or `const
+- [over.ics.list]/9: a parameter `std::initializer_list<X> &&' or `const
   std::initializer_list<X> &' accepts a brace-init-list (fargs matching
   strips the reference; the conversion builds the initializer_list object as
   a static auxiliary symbol next to its backing array and binds the
@@ -10042,7 +10042,7 @@ Six distinct front-end bugs, all reproduced with kernels and fixed
   Lesson: the first version of the route also fired for `std::vector<int>
   v{1,2,3}' (source class initializer_list<int> ≠ vector) and broke it via
   the UDCS ctor path; hence the "no direct ctor" guard.
-- [expr.type.conv]/2 + [class.temporary]/2: `T()' for a class without
+- [expr.type.conv]/1.4 + [class.temporary]/2: `T()' for a class without
   user-declared constructors was a bare struct constant → `B().g()' had no
   object for `this' ("found no match for symbol 'g'").  Now a compound
   literal like `T{}' / `T(x)'.
@@ -10067,7 +10067,7 @@ converts to `loop_templatet' for a candidate's parameter (a pair / map
 value_type constructor).  The body `loop_instructions(std::forward<...>(x))'
 then fails (`std::set' from an iterator) and the failure is printed although
 the candidate is never selected.  A conforming compiler instantiates only the
-DECLARATION for viability ([temp.inst]/4: a function template specialization
+DECLARATION for viability ([temp.inst]/5, /10: a function template specialization
 is implicitly instantiated when referenced in a context that requires a
 definition to exist; overload resolution does not) and the body only if the
 candidate is chosen ([temp.inst]/11 forbids instantiating what is not
@@ -10082,7 +10082,7 @@ Fix options, in order of preference:
    (typecheck_method_bodies already handles bodies whose declaration is
    known).  Risk: places that read the instantiated body's type
    information during resolution (return type of `auto' functions; those
-   must still instantiate the body -- [dcl.spec.auto.general]/12 makes that
+   must still instantiate the body -- [dcl.spec.auto.general]/15 makes that
    legitimate).  This is the correct design and removes the ×115 signature
    and the libc++ `std::declval' static_assert warnings alike.
 2. Cheaper: mute diagnostics of candidate instantiations (a sfinae_contextt
@@ -10140,7 +10140,7 @@ forbid that phrase) so no existing test changes meaning.
 - Found on the way: a block-scope `static_assert' was never checked
   (turned into `skip' unconditionally, with a [temp.res.general]/6 comment
   meant for template bodies).  Now: constant false outside any template
-  instantiation → error ([dcl.pre]/10); inside an instantiation → warning
+  instantiation → error ([dcl.pre]/13); inside an instantiation → warning
   + skip; non-constant → warning ("not checked").  libc++'s std::declval
   body (`static_assert(!__is_same(_Tp,_Tp))') produces the instantiation
   warning 5× in libcxx23_string_fill_ctor -- a symptom of speculative body
@@ -10278,7 +10278,7 @@ forbid that phrase) so no existing test changes meaning.
   data]/3) so `static inline const V iv[2]' never initialised and the
   ctor-call code sat in the symbol value (symex type mismatch).
 - Issue 13a (`783571b701'): conversion function template with a defaulted
-  (SFINAE) parameter: [temp.deduct]/5 defaults were not applied after
+  (SFINAE) parameter: [temp.deduct.general]/5 defaults were not applied after
   [temp.deduct.conv] deduction; the default may name the ENCLOSING class's
   T, so the class instance's template args are bound first (as
   instantiate_template does).
@@ -10406,7 +10406,7 @@ forbid that phrase) so no existing test changes meaning.
     site.  All probes removed.
   * Still open on gcc 11 headers (harmless): `using string =
     basic_string<char>' in namespace pmr instantiates std::basic_string
-    with the still-incomplete polymorphic_allocator ([temp.inst]/1: an
+    with the still-incomplete polymorphic_allocator ([temp.inst]/2: an
     alias must not require completeness) -> "dropped 4 system-header
     declarations" warning.  `_Float32' typedef conflicts only when the
     HOST gcc (13, keyword) differs from the preprocessing gcc (11): a
@@ -10448,7 +10448,7 @@ forbid that phrase) so no existing test changes meaning.
   convert_non_template_declaration CLEARS skip_typechecking_elaborate on exit
   instead of restoring it, so after the nested conversion of the alias
   template's own declaration the outer resolver eagerly elaborates the class
-  the alias names ([temp.inst]/1 does not permit that).  Fixing it
+  the alias names ([temp.inst]/2 does not permit that).  Fixing it
   (b79b14f901) regressed cpp20_ranges_pipe_invoke_drop (libc++ ranges shape):
   a `tuple<int>' only named through `__apply_cv_t' stays unelaborated and the
   later `tuple(_Up... __u)' deduction from an object of that type produces an
@@ -10457,7 +10457,7 @@ forbid that phrase) so no existing test changes meaning.
   incomplete instances at guess_function_template_args entry did not reach
   it).  Reverted (115fdcff36); test cpp11_alias_template_defers_instantiation
   kept as KNOWNBUG.  Also tried: keep eager elaboration but roll it back on
-  failure (incomplete_member_exceptiont thrown at [class.mem.general]/14,
+  failure (incomplete_member_exceptiont thrown at [class.mem.general]/19,
   rethrown through the 13 member-recovery catch(...) blocks of
   typecheck_compound_body, reset_class_template_instance from the
   dropped-base path) -- the re-elaboration then hit dangling class-scope ids
@@ -11013,7 +11013,7 @@ second `--' record "Fixed 2026-09-23").
   --function, the file has no main).
 - cpp17_variant_basic -- the big one, eight front-end defects behind
   `std::variant<int, double> v = 42; get<int>(v)':
-  1. [temp.variadic]/5 braced-init-list pack expansion
+  1. [temp.variadic]/6.5 braced-init-list pack expansion
      (`{__is_same(_Tp, _Types)...}', __find_uniq_type_in_pack) and type-pack
      call arguments in function bodies (082cbf381d).  Gate: the drain and
      convert_function run expand_call_argument_packs in template-packs-only
@@ -11105,7 +11105,7 @@ the ground the other next steps stand on.
   suite, /tmp/r157/v1): 709 substitutions with >= 2 live same-short-name
   bindings of DIFFERENT values, 377 decided by alphabetical key order.
   Fix: `template_mapt::parameter_scopes`, the stack of active template
-  parameter scopes ([basic.scope.temp]/2, [temp.local]/1), pushed by
+  parameter scopes ([basic.scope.temp]/2, [temp.local]/7), pushed by
   build()/build_unassigned()/the #deduced_packs replay, and by apply() for a
   nested member template's own (unbound) parameters -- which replaces the
   `#tmpl_param_shadow` sentinel.  `innermost_parameter()` /
@@ -11198,7 +11198,7 @@ Turned CORE (five KNOWNBUGs) and the fixes behind them, in order:
    explicitly bound parameters skipped -- cpp11_tuple_get_write_reference
    needed the explicit-argument exemption).
 2. cpp20_class_nttp_brace, cpp20_nttp_string -- class-type NTTPs built by a
-   constexpr constructor ([temp.param]/7, [temp.arg.nontype]/1).  The
+   constexpr constructor ([temp.param]/12, [temp.arg.nontype]/1).  The
    constant evaluator learned constructor calls: `this` is tracked by
    VALUE (zero-initialised struct), mem-initializers and body assignments
    `this->m = v` update it, the result is the struct constant; a
@@ -11228,22 +11228,22 @@ Turned CORE (five KNOWNBUGs) and the fixes behind them, in order:
       owning_view(_Range&&) deduces int[5], not int(&)[5].  The forwarding
       deduction made `_Range _M_r = _Range()` value-initialise a
       reference, and cpp_constructor's invariant aborted the whole run
-      inside `__can_owning_view<int(&)[5]>`.  Plus [dcl.init.general]/9:
+      inside `__can_owning_view<int(&)[5]>`.  Plus [dcl.init.general]/10:
       reference value-initialisation is now an error (rg5).
-   d. [temp.constr.decl]/1: a requires-clause is looked up from the
+   d. [temp.res.general]/1: a requires-clause is looked up from the
       template's scope.  _RangeAdaptorClosure's hidden-friend operator|
       names its class unqualified; checked from main() the lookup failed
       and the candidate was mis-handled ("conversion from int[5] to
       _Partial").  Enter the template's scope before typechecking the
       clause (rg25).
-   e. [temp.variadic]/5: `Args...` in a requires-clause concept-id mapped
+   e. [temp.variadic]/9: `Args...` in a requires-clause concept-id mapped
       to the FIRST deduced element, so `__adaptor_partial_app_viable<_Take,
       int(&)[5], int>` (sizeof...(_Args) == _S_arity - 1) was TRUE for
       two arguments -> "operator() does not uniquely resolve" (rg44).
    f. [stmt.if]/2: return type deduction took the first `return` even in
       a discarded `if constexpr` branch: views::all returned `int*` for an
       array.  Deferred to after body typecheck when a return sits under
-      `if constexpr`; and [dcl.type.auto.deduct]/4 -- a plain `auto`
+      `if constexpr`; and [dcl.type.auto.deduct]/3 -- a plain `auto`
       drops references/top-level cv on all three deduction paths (the
       early one, the deferred one, typecheck_return's) via one helper
       (rg37, ar3).
@@ -11566,7 +11566,7 @@ audit in the main tree; integrated by cherry-pick; full sweep on bin39.
    T> g(T)' / `template<Floating T> g(T)', also std::integral /
    std::floating_point) resolved to whichever was declared FIRST -- the
    type-constraint was decided by a structural evaluator over the concept
-   body that only knew a few builtin traits.  [temp.param]/4: `C<A> T'
+   body that only knew a few builtin traits.  [temp.param]/9: `C<A> T'
    introduces `C<T, A>'; now built by add_type_constraint, recorded on the
    parameter, and evaluated with the requires-clause evaluator.  The
    structural evaluator (another whole-table scan per candidate) is gone.
@@ -11689,7 +11689,7 @@ all pre-existing:
   at run time) and not a constant-expression context (no folding).
 * __is_trivially_copyable / __is_trivial were unconditionally FALSE;
   __is_trivially_constructible(T, U) unconditionally TRUE.  Implemented per
-  [class.prop]/1-2.  Consequence: libc++'s vector relocation now takes its
+  [class.prop]/1, [depr.meta.types]/3.  Consequence: libc++'s vector relocation now takes its
   memcpy path, which exposed `__builtin_memcpy(new, nullptr, 0)' tripping the
   library model's r_ok precondition -> the builtin form now accepts a null
   pointer with zero length (C2y N3322; the C17 memcpy keeps its precondition).
@@ -11735,7 +11735,7 @@ The reductions (strict interestingness test) converged on root causes fast
 once they could not cheat; each turned out to be a small, standards-clear
 front-end gap, fixed the same day with a header-free CORE test:
 
-* `x.p <=> y.p' on POINTERS yields std::strong_ordering ([expr.spaceship]/8)
+* `x.p <=> y.p' on POINTERS yields std::strong_ordering ([expr.spaceship]/6)
   -- only arithmetic operands were lowered; libstdc++ 16's
   _Bit_iterator_base::operator<=> (every vector<bool>) failed.
 * GCC 14 `__builtin_clzg(x [, value])' / `__builtin_ctzg' (type-generic,
@@ -11775,7 +11775,7 @@ Five separate gaps, each with a header-free CORE test:
   substituted only the type element, the qualifying name stayed the pack
   name, so only the first base's operator() was introduced
   (cpp17_using_declaration_pack_base_operators).
-* [over.ics.list]/6 + [dcl.init.list]/3.4 + [dcl.init.ref]/5.4.2: a
+* [over.ics.list]/6 + [dcl.init.list]/3.4 + [dcl.init.list]/3.10: a
   braced-init-list argument for a REFERENCE-TO-ARRAY parameter (`_Dest
   (&&)[1]', the narrowing check `__test_impl<_Dest>({declval<_Source>()})')
   had no conversion at all: viability in cpp_typecheck_fargs, conversion via
@@ -11790,10 +11790,10 @@ Five separate gaps, each with a header-free CORE test:
   long)7') was bound unfolded so `return r' was not constant -- this last one
   broke EVERY constexpr call with a non-int parameter and a literal argument
   (cpp11_constexpr_array_reference_parameter).
-* [class.union.general]/3: check_component_access asked "does the enclosing
+* [class.union.general]/4: check_component_access asked "does the enclosing
   class derive from the UNION?" with to_struct_type on a union
   (cpp11_union_member_access_from_class).
-* [expr.ref]/6.3: `this->f<T>(...)' naming a static member template of a
+* [expr.ref]/7.3: `this->f<T>(...)' naming a static member template of a
   BASE (`__assignment::__emplace' -> `__ctor::__construct_alt') was "not a
   static member" because the specialization is a symbol of the base, not a
   component of the derived class
@@ -11821,13 +11821,13 @@ desc flags) and flipped to `CORE gcc-only gcc16 libstdcxx16'.  Root causes:
   and a bare-name nested declarator (`Known(kn);', `int (i) = k;', `int (*p)
   = &i;' -- the parenthesised declarator was also dropped when nothing
   followed).  For an unknown name (a nested class declared LATER in the
-  class, [class.mem.general]/7: `__location_type (__trans_tmp_3);' in
+  class, [class.mem.general]/9.1: `__location_type (__trans_tmp_3);' in
   _Hashtable::find) the type checker rewrites the call-shaped statement
   (expression_statement_is_declaration).  For a CLASS name only the
   bare-name form, because a same-named function may hide the class
-  ([basic.scope.hiding]/2, `foo(&x)' in regression/ansi-c C code)
+  ([basic.lookup.general]/4, `foo(&x)' in regression/ansi-c C code)
   (cpp11_parenthesized_declarator_statement).
-* explicit conversion functions ([class.conv.fct]/2): treated as implicit,
+* explicit conversion functions ([class.conv.fct]/4): treated as implicit,
   so `const_iterator(__loc)' with `explicit operator iterator()' AND
   `explicit operator const_iterator()' on __location_type made both
   const_iterator constructors viable.  Now: excluded from implicit
@@ -11851,12 +11851,12 @@ desc flags) and flipped to `CORE gcc-only gcc16 libstdcxx16'.  Root causes:
   `sizeof(late)' threw incomplete_dependency and NOTHING caught it ("Unknown
   exception type!").  Fixes: a declaration whose declarators are all
   function declarations does not elaborate its return type
-  ([dcl.fct]/12); try_resolve_lazy_typedef_symbol resolves a lazy alias
+  ([dcl.fct.def.general]/2); try_resolve_lazy_typedef_symbol resolves a lazy alias
   inside the class body WITHOUT elaboration (a member function's parameter
   type needs only the name); a member function declarator that hit the
   dependency is re-declared without elaboration
   (cpp11_class_template_of_class_completed_later).
-* [class.union.anon]/1 + [expr.ref]/6.2: an array in an anonymous union
+* [class.union.anon]/1 + [expr.ref]/7.2: an array in an anonymous union
   indexed on the left of `=' -- the intermediate anonymous subobject built
   by get_component lacked the lvalue mark
   (cpp11_anonymous_union_array_member_lvalue).
@@ -11869,12 +11869,12 @@ desc flags) and flipped to `CORE gcc-only gcc16 libstdcxx16'.  Root causes:
   out_of_line_definition_matches for instantiated members (arity + typed
   parameter types); adopt_definition_parameter_names /
   rename_template_parameters_to_declaration ([dcl.fct]/3).  Plus
-  [class.mfct]/1: the definition must belong to the member's OWN class
+  [class.mfct]/2: the definition must belong to the member's OWN class
   template -- basic_string::rfind had received basic_string_view's rfind
   (unit-proofs get_base_name; `rfind("b")' was already reading nondet)
   (cpp11_out_of_line_member_template_overloads).
 * C++20 std::pair assignment was a CONVERSION ERROR: `pair &operator=(const
-  pair &) = delete;' beside the constrained definition.  [over.match.best]
+  pair &) = delete;' beside the constrained definition.  [over.match.best.general]
   /2.6: the constrained twin wins; the deleted one is dropped from the
   components and the shared symbol gets the definition's body and
   parameter names.  The requires-clause parser now accepts `( expression )'
@@ -11965,7 +11965,7 @@ messages); nothing pushed.
 ### #5a: class template specializations instantiate in their own context
 
 * `elaborate_class_template` now runs under a fresh template map
-  ([temp.point]/1: the point of instantiation is not the naming context).
+  ([temp.point]/4: the point of instantiation is not the naming context).
   All cbmc-cpp tests pass, and the libc++ span/map tests got 21% faster
   (18.8 -> 14.8 s, 19.9 -> 15.4 s) because fewer stray bindings leak into
   the instantiation.
@@ -12013,7 +12013,7 @@ tests -- 230 `dropped the body' (44 of them libc++'s `__rewrap_range',
 callee' stubs (virtuals defined in the shared library).  Root causes fixed, each with a CORE test:
 
 * Default arguments in a class member-specification are complete-class
-  contexts ([class.mem.general]/7-8): `replace_extension(const path & =
+  contexts ([class.mem.general]/9.2): `replace_extension(const path & =
   path())' type-checked mid-class failed and abandoned the rest of
   std::filesystem::path's body (every later member unknown; ~60 drops).
   Kept as `cpp_deferred_default_argument' (declaring scope recorded) and
@@ -12044,7 +12044,7 @@ callee' stubs (virtuals defined in the shared library).  Root causes fixed, each
   unusable in C).  Regression tests in cbmc-cpp and cbmc.
 * construct_at with an empty pack: a new-initializer is a pack-expansion
   context for contains_call_argument_pack, and the instantiation-time
-  empty-pack strip finds a NON-trailing pack ([temp.param]/14).
+  empty-pack strip finds a NON-trailing pack ([temp.param]/18).
 * A template parameter's binding still in parsed form (frontend_pointer
   from `function<R(ArgTypes...)>' matched against `int(const int &)') is
   converted when resolved; std::forward<const int &> had "type mismatch on
@@ -12077,17 +12077,17 @@ gcc-16 headers); the three descs forbid every `dropped the body' now.
   reversed `0 @ (y <=> x)', `!(x == y)', `y == x') existed only for a
   member operator<=>.  rewritten_comparison_candidate builds them for
   member, friend and namespace-scope operators; noexcept looks at every
-  call in its operand ([except.spec]/6).  An n-ary `and' (a
+  call in its operand ([except.spec]/5).  An n-ary `and' (a
   requires-expression's satisfaction) reaching typecheck_expr is accepted.
 * <bits/max_size_type.h>: two overload-resolution defects.  A constructor
   template's earlier instantiations (int, unsigned __int128) competed as
   converting constructors and made a size_t argument ambiguous
-  ([over.match.funcs]/8); and the constrained conversion function
+  ([over.match.funcs.general]/8); and the constrained conversion function
   template `requires integral<_Tp> || __is_int128<_Tp>' was instantiated
   for every probed class type because `or(false,false)' was not folded
   before is_false() ([temp.constr.atomic]/3; 315 drops), and lost to
   `explicit operator bool()' + integral conversion for
-  `static_cast<int>(b)' ([over.match.best]/2: compare the conversion
+  `static_cast<int>(b)' ([over.match.best.general]/2: compare the conversion
   sequences; non-template wins only on a tie).
 
 ### Method notes
@@ -12147,7 +12147,7 @@ the bin51 snapshot and passes on bin52 (`/tmp/r157/bin52`).
 
 1. `e = {}' on a scalar (434c42eb2b).  implicit_typecast: an empty
    initializer_list to an integral / bool / enum / float type is
-   `zero_initializer' ([expr.ass]/8.1, [dcl.init.list]/3.11).  <charconv>'s
+   `zero_initializer' ([expr.assign]/8.1, [dcl.init.list]/3.11).  <charconv>'s
    `__to_chars*' drops gone (cpp17_from_chars_unsigned tightened).
 2. `if(float a = x)' / `while(T *p = f())' (4795424611).  The C++
    condition-declaration path no longer converts the declared object with
@@ -12172,7 +12172,7 @@ the bin51 snapshot and passes on bin52 (`/tmp/r157/bin52`).
    whose declarator is converted while the depth is non-zero and the
    instantiation stack is non-empty joins `speculative_instances' (held
    back like a conversion probe, converted only on a later odr-use,
-   [temp.inst]/4, [basic.def.odr]/5).  Deduced return types are still
+   [temp.inst]/4, [basic.def.odr]/3, 8).  Deduced return types are still
    converted eagerly ([dcl.spec.auto.general]/13).  Finding from the gdb
    session of round 162: the instance's body really was converted as a
    top-level item -- `add_method_body' from convert_new_symbol queues it
@@ -12295,19 +12295,19 @@ into A-T; every group now has a KNOWNBUG (0f245e5de3, bad4a79a17):
 | C | cpp11_parenthesized_member_dereference_in_member_function | [expr.cast]/2, [dcl.ambig.res] | header-free |
 | D | cpp11_pair_default_constructor_not_instantiated_for_vector | [temp.inst]/3 | header-free (cvise) + libstdc++ desc |
 | D | cpp11_map_of_move_only_mapped_type | [temp.inst]/3 | libstdc++, wrong verdict |
-| D (+G) | cpp11_hidden_friend_instantiated_only_when_used | [temp.inst]/4, [class.friend]/6 | header-free + libstdc++ desc |
+| D (+G) | cpp11_hidden_friend_instantiated_only_when_used | [temp.inst]/5, [class.friend]/6 | header-free + libstdc++ desc |
 | E (+O) | cpp11_member_class_of_class_template_defined_outside | [temp.mem.class]/1 | header-free, wrong verdict |
 | H | cpp17_shared_count_constructor_template_not_instantiated_tu | [temp.inst]/4 | CBMC TU, ~330 s |
-| I | cpp17_filesystem_path_from_string | [fs.path.construct]/5 | libstdc++, wrong verdict |
+| I | cpp17_filesystem_path_from_string | [fs.path.construct]/4 | libstdc++, wrong verdict |
 | J | cpp11_cv_qualified_member_overload_through_base | [over.ics.rank]/3.2.6 | header-free |
-| K | cpp11_namespace_reopened_after_qualified_member_template_definition | [namespace.memdef]/2 | header-free (cvise) + <format> desc |
-| M | cpp14_empty_pack_expansion_in_mem_initializer_list | [temp.variadic]/7 | header-free; symex invariant too |
+| K | cpp11_namespace_reopened_after_qualified_member_template_definition | [class.pre]/3 | header-free (cvise) + <format> desc |
+| M | cpp14_empty_pack_expansion_in_mem_initializer_list | [temp.variadic]/16 | header-free; symex invariant too |
 | N | cpp11_builtin_popcountg | clang builtin | header-free (cvise); ref. clang 23 |
 | P | cpp11_out_of_line_constructor_template_definition_matched_by_signature | [temp.mem]/1 | header-free, wrong verdict |
 | Q | cpp17_builtin_launder | [ptr.launder] | header-free |
 | R | cpp11_pack_deduced_from_declval_arguments_in_partial_specialization | [temp.deduct.call]/1 | header-free |
 | S | cpp11_alias_template_pointer_does_not_instantiate_pointee | [temp.inst]/2 | header-free (cvise) + libc++ desc |
-| T | cpp11_member_typedef_used_before_its_declaration_in_body | [class.mem.general]/7 | header-free |
+| T | cpp11_member_typedef_used_before_its_declaration_in_body | [class.mem.general]/9.1 | header-free |
 | - | cpp11_new_single_element_aggregate | [expr.new]/24 | header-free |
 | - | cpp17_pack_extended_by_deduction_after_explicit_arguments | [temp.arg.explicit]/9 | header-free |
 
@@ -12456,7 +12456,7 @@ each step, lint 0):
 - 282db5cf03 union ctor leaves undesignated variant members alone
   ([class.base.init]/9) -- group A; D1's libstdc++ desc now CORE.
 - cef3f93293 qualified class template definition restores the scope
-  ([namespace.memdef]/2) -- K.
+  ([class.pre]/3) -- K.
 - 1e2db1d71a no return type deduction from an undeduced operand
   ([dcl.spec.auto.general]/13) -- the <format> goto-conversion crash;
   <format> converts (new CORE desc test_libstdcxx_converts).
@@ -12484,7 +12484,7 @@ each step, lint 0):
 - 008362f823 typename-specifier terminal name opens template arguments
   ([temp.names]/3.4) -- the GCC-only `typename T::rebind<int>'.
 - 52ff4fa4b1 mem-initializer expansion over empty packs vanishes
-  ([temp.variadic]/7) -- M, and the libc++ tuple:320 drops.
+  ([temp.variadic]/16) -- M, and the libc++ tuple:320 drops.
 - 3c95918315 deduction extends a pack beyond explicit arguments
   ([temp.arg.explicit]/9).
 New KNOWNBUGs found on the way: cpp11_address_of_member_in_default_member_initializer
@@ -12505,7 +12505,7 @@ instantiates pointee; tuple_size interaction).
   braced constructor-template KNOWNBUG.
 - c2b4066549 hidden friends of class template specializations are
   deferred (deferred_method_bodies) and instantiated only when used
-  ([temp.inst]/4) -- the _Rb_tree operator< drops.
+  ([temp.inst]/5) -- the _Rb_tree operator< drops.
 - c1a5c3b1ce constructor templates are never also ordinary constructors
   (completes cf9e7f00b7; possible after f4b7b6ce52).
 - f101bf78ca D2 (map of move-only) and H (shared_count TU) pass as a
@@ -12551,11 +12551,11 @@ Commits (local, unpushed):
 - a1d18ffd81 `__is_trivially_copyable` of a class with a bit-field
   ([class.prop]/1, [class.bit]/1): judge c_bit_field by its underlying type.
 - 2a709ccd85 `__is_nothrow_constructible(T)` for implicit/defaulted default
-  constructors ([meta.unary.prop], [except.spec]/8):
+  constructors ([meta.unary.prop], [except.spec]/6):
   `default_construction_is_nothrow` walks bases and members; NSDMIs are
   assumed non-throwing.
 - a97b1e519b address of a constexpr/const static data member
-  ([expr.unary.op]/3, [basic.def.odr]/4): the substituted value carries
+  ([expr.unary.op]/3, [basic.def.odr]/5): the substituted value carries
   `#constexpr_object`; address-of uses the symbol and clears is_macro so
   static init gives it its value.  New test_read_through.desc.
 - 5ea486ea32 static_cast of a reference to an array to an element pointer
@@ -12595,21 +12595,21 @@ Suites at HEAD: cbmc-cpp all green (31 skipped), cpp green, lint 0.
 
 Commits (local, unpushed):
 - d780478698 virtual base named through a member typedef in a mem-initializer
-  ([class.base.init]/2): the matched initializer now names the base itself
+  ([class.base.init]/3): the matched initializer now names the base itself
   (it was resolved in the base's scope via #base_type).
-- ee82cb5efd array NSDMIs from braced lists ([dcl.init.aggr]/4,5,16): the NSDMI
+- ee82cb5efd array NSDMIs from braced lists ([dcl.init.aggr]/4,5,14): the NSDMI
   passes the list's clauses; cpp_constructor builds scalar/aggregate array
   values with do_initializer (nested lists, brace elision, value-initialized
   tail -- `int part[3] = {9}` left part[2] indeterminate before, also on
   bin53); helper array_elements_have_user_constructor.  The regex libstdc++
   desc is conversion-only now (verification > 900 s once the constructor
   converts).
-- e282e2fd65 NSDMI `&x` ([expr.prim.id.general]/4): POD path binds the class
+- e282e2fd65 NSDMI `&x` ([expr.prim.id.general]/2): POD path binds the class
   scope's this; `&C::m` ([expr.unary.op]/4) resolved without `this`
   (is_qualified_member_address).  New KNOWNBUG cpp_pointer_to_data_member_read:
   `v.*pm` for data members reads `pm` itself; a pointer-to-member NSDMI makes
   the object's DECL vanish silently.  No test covered data-member pointers.
-- e5a867f142 folds over a type pack ([expr.prim.fold]/2, [temp.variadic]/5):
+- e5a867f142 folds over a type pack ([expr.prim.fold]/2, [temp.variadic]/14):
   contains_type_pack / fold_element; parser gained binary `&&`/`||` folds.
 - ad37dd4104 volatile through alias templates ([dcl.type.cv]/1): typecheck_type
   merged only const; nested merged_type of `const volatile T` flattened in
@@ -12761,7 +12761,7 @@ Suites at e56e1600b3: cbmc-cpp green (17 skipped), cpp green, lint 0.
 
 - daa1ffaa2a classic "C" ctype<char> facet model fills _M_widen/_M_narrow with
   the identity and sets the _ok flags ([facet.ctype.char.virtuals]/1,
-  [facet.ctype.virtuals]/11).  With GCC 16 headers the three stream tests
+  [locale.ctype.virtuals]/11, 13).  With GCC 16 headers the three stream tests
   verify; gcc16_stream_ctype_facet_vtable CORE (libstdcxx16 tag kept; WRONG
   assertion added; other FAILUREs forbidden via a Perl lookahead line).
 - 374a486e2f KNOWNBUG cpp20_libstdcxx16_ranges_take_pipe_reduced: 540-line
@@ -12919,7 +12919,7 @@ Fixes (each with CORE tests; bin53 fails the positive ones):
   qualifiers_match_recursively pushes array-node cv down.  Fixes the
   incrementable_traits<const char[N]> self-base SIGSEGV (std::format("{}",
   42), and with GCC 16 headers filesystem::path{"a"}).
-- [dcl.init.list]/3.4, [dcl.init.aggr]/16, [over.ics.list]/8: brace elision
+- [dcl.init.list]/3.4, [dcl.init.aggr]/14, [over.ics.list]/8: brace elision
   in copy-list-initialization outside variable declarations (return
   statements, arguments) via do_initializer; aggregate_list_initialization_
   is_viable (warnings from do_initializer = leftover clauses = not viable).
@@ -12927,7 +12927,7 @@ Fixes (each with CORE tests; bin53 fails the positive ones):
 - [dcl.fct.default]/4: a definition superseding a function template
   declaration keeps the declaration's default arguments; a namespace member
   template defined by a qualified name (`n::h') is now merged with its
-  declaration ([dcl.meaning.general]/3.1).  vformat_to drops gone.
+  declaration ([dcl.meaning.general]/3.4).  vformat_to drops gone.
 - [temp.inst]/16: the depth-2 same-template guard now lets a converging
   type-argument recursion through (argument spelling a proper substring of
   every enclosing instance's).  F<W<W<W<int>>>>::value, libc++
@@ -12957,10 +12957,10 @@ Suites at 9176e8979a (binary S4): cbmc-cpp green (48 skipped), -K all
   pre-conversion function_type pattern (`R (&)(A...)') was deduced only for
   its first element and never recorded; and the pack was not expanded when
   a pointer/reference-to-function pattern was substituted
-  (typecheck_template_args).  [dcl.ref]/1: qualifiers_match_recursively now
+  (typecheck_template_args).  [dcl.ref]/1-2: qualifiers_match_recursively now
   distinguishes pointer / & / &&.  Re-enabled [temp.deduct.call]/2-3 for
   function lvalues (T& deduces the function type).
-- 93139becce [basic.lookup.unqual]/1: deduction for a partial specialization
+- 93139becce [basic.lookup.unqual]/4: deduction for a partial specialization
   selected while resolving a qualifier reused the resolver and overwrote
   original_scope (resolve_scope); `at<al<int>>::rebind_alloc<vt>' looked vt
   up in the specialization's template scope.  resolve_pattern_scope keeps
@@ -12969,7 +12969,7 @@ Suites at 9176e8979a (binary S4): cbmc-cpp green (48 skipped), -K all
 - 4a5a7c744a [expr.unary.op]/3.1 + [conv.mem]/2: &D::in with in from B is
   B::*; the declared-pointer-to-member initializer path (over.over target
   type) took the target's class and demanded identity.
-- e451d67e5a [dcl.fct]/5: default args ignored in
+- e451d67e5a [dcl.fct]/10: default args ignored in
   member_template_parameters_match, kept on graft.  Needed the two above
   for libstdc++'s path::generic_string / __str_codecvt_in.
 - 83de4ff82c [dcl.type.decltype]/1.3: decltype(f) was the pointer type.
@@ -12989,12 +12989,12 @@ cpp green, lint 0.
 
 ## Round 163s: remaining header drops
 
-- 2dcf567f1b [over.match.best]/2.5, [temp.func.order]/8: constraint ordering
+- 2dcf567f1b [over.match.best.general]/2.5, [temp.func.order]/8: constraint ordering
   only among VIABLE candidates with equivalent parameter lists.  Removed
   prefer_more_constrained_templates (pre-deduction, name-based); moved the
   same-signature subsumption filter into guess_function_template_args after
   deduction + constraint check.  Fixes ranges::copy(first, last, out).
-- a861439977 [basic.lookup.unqual]/1: template-name lookup stops at a block
+- a861439977 [basic.lookup.unqual]/2: template-name lookup stops at a block
   scope that declares the name (using d::is_mi;).  The full rule (stop at
   every scope) broke 9 tests (libc++ tuple, std::get, optional): constructor
   templates registered under the class name in base scopes, and other
@@ -13048,11 +13048,11 @@ bin53):
   explicit constructor.
 - 6fe87da27d [temp.deduct.type]/1: non-dependent built-in type arguments of
   P (`os<wchar_t, T>') must equal A's.  libc++ xsputn/xsgetn drops.
-- 3ffc4621ca [temp.mem.class]/1, [temp.inst]/3: an out-of-class member
+- 3ffc4621ca [temp.mem.class]/1, [temp.inst]/4: an out-of-class member
   class definition is also instantiated for earlier specializations
   (scope walk: instance scope -> template scope(s) -> namespace).
   istream::read.  `struct ns::S<C>::N {}' (qualified) is never grafted.
-- 7cd6646e42 [basic.lookup.unqual]/1: template-name lookup also stops at a
+- 7cd6646e42 [basic.lookup.unqual]/2: template-name lookup also stops at a
   namespace scope; class scopes still collect.  The tuple/get/optional set
   (118 tests) passes.
 - 95d30ba3a3 [dcl.typedef]/2: convert_parsed_parameters for typedef/alias
@@ -13117,9 +13117,9 @@ Fixes (one commit each, CORE, fail on bin53 unless noted):
   parameter declarator starts a parameter list (Parser::rDeclarator).
   First version broke `_Ret (_Tp::*__pf)()' (stl_function.h): ptr-to-member
   and qualified names excluded (isPtrToMember).
-- 184439918a [dcl.meaning.general]/2.3: namespace-qualified out-of-class
+- 184439918a [dcl.meaning.general]/3.4: namespace-qualified out-of-class
   member class graft and member function definitions (`a::b::S<C>::f').
-- 1199e1a3c9 [namespace.udecl]/19 for `using B::operator int;';
+- 1199e1a3c9 [namespace.udecl]/16 for `using B::operator int;';
   [class.access.general]/5: conversion search probes inaccessible
   candidates without access control, checks the selected one.
 - 8fac5e30be self-derived class template: class_derived_from_itself flag
@@ -13172,7 +13172,7 @@ Commits (on 4451be6540):
   clear ([iostate.flags]/4), getloc, locale(), locale(const locale &),
   ~locale.  cpp17_libcxx_ostringstream_state CORE (+ postconditions).
 - bd1ea85f3f class-template recursion bound counts the selected
-  constrained partial specialization ([temp.spec.partial.general]/1);
+  constrained partial specialization ([temp.spec.partial.general]/2);
   unsatisfied case instantiates the primary with full args.  Base-chain
   tests CORE; broken-libstdcxx16 tag gone (GCC 16.2.1 Docker passes).
 - b7e8a7d34f pin_constructor_parameter_class_names
@@ -13319,7 +13319,7 @@ Commits:
 - Compound requirements are unevaluated operands (concept evaluator and
   compound_requirement_is_satisfied).
 - Constexpr functions named in requirements are not instantiated
-  ([expr.const]/22, [temp.inst]/8): the declarator converter's eager
+  ([expr.const]/29.6, [temp.inst]/8): the declarator converter's eager
   constexpr conversion also ran in unevaluated operands.  With the
   previous fix, libstdc++ <memory_resource> converts without drops and is
   CORE.  Found by the kb_Y_memit2 reduction (29 lines:
@@ -13336,7 +13336,7 @@ Commits:
   ([namespace.udecl]/11); B's default arguments kept (deferred ones
   stay deferred).
 - goto-conversion destroys temporaries bound to references at the end of
-  the reference's lifetime ([class.temporary]/6, /8); other temporaries
+  the reference's lifetime ([class.temporary]/6, /4); other temporaries
   of the initializer die at the end of the full-expression.
 - KNOWNBUG cpp11_alias_template_pack_expansion_shadowed_parameter_name:
   `typename id<A>::type...' in an alias whose pack shares the using
@@ -13351,7 +13351,7 @@ Commits:
   libstdc++ <format> `_M_parse_format_spec' drop: `!__is_one_of<int, char,
   wchar_t, ...>' was false, so formatter<int, char> was the primary
   without parse().  qualifiers_match_recursively now also compares
-  #c_type (same_fundamental_type_name).  [conv.prom]/2 promotion of
+  #c_type (same_fundamental_type_name).  [conv.prom]/6 promotion of
   wchar_t/char32_t had to follow: c_typecast left `(char32_t << 11) |
   0x7ffu' typed char32_t, which broke libc++'s __get_property and
   __estimated_width once char32_t was distinct (W17 failures in
@@ -13421,27 +13421,27 @@ C++ support):
 
 Fixed (KNOWNBUG -> CORE unless noted):
 - Explicit instantiation of member function templates (`template int
-  box<char>::put(long);', [temp.explicit]/2, /10).
+  box<char>::put(long);', [temp.explicit]/1, /2).
 - One closure type per template specialization (lambda_closure_map key
   includes the scope, [expr.prim.lambda.closure]/1); libstdc++ <format>'s
   _M_visit and visitor operator() no longer dropped.
 - Merged default template arguments renamed to the new declaration's
   parameter names ([temp.param]/17).
 - Alias template expansions substitute nested pack references
-  ([temp.alias]/2, [temp.variadic]/5).
+  ([temp.alias]/2, [temp.variadic]/9).
 - Member typedefs and member function declarations do not instantiate
-  the classes they name ([temp.inst]/1-3; the function-declaration
+  the classes they name ([temp.inst]/2-3; the function-declaration
   exemption tested ID_code but the declarator is a function_type).  Uses
   that need the class instantiate it ([temp.inst]/2): derived-to-base
   pointer conversion, initializer_list element viability
   (require_complete_type).  Fixed the basic_ios/basic_ostream order
   problem (cpp11_class_instantiated_while_its_base_is_instantiated).
 - Empty base-specifier pack expansions produce no base
-  ([temp.variadic]/7; libc++ __tuple_impl<__tuple_indices<>>).
-- Braced non-POD members of aggregates with bases ([dcl.init.aggr]/4.2).
+  ([temp.variadic]/16; libc++ __tuple_impl<__tuple_indices<>>).
+- Braced non-POD members of aggregates with bases ([dcl.init.aggr]/4.3).
 - `new T[n](args)' in C++20 ([dcl.init.general]/16.5).
 - Calls with by-value parameters of incomplete class type are ill-formed
-  ([expr.call]/7) -- requirement unsatisfied.
+  ([expr.call]/6) -- requirement unsatisfied.
 - char8_t distinct, u8 literals typed char8_t in C++20, __cpp_char8_t no
   longer undefined.
 - New: decltype of wide string literals, __is_same of array types,
@@ -13480,9 +13480,9 @@ OOMPolicy=continue so an OOM-killed candidate does not end the reduction.
 Fixed (KNOWNBUG -> CORE):
 - Non-deduced class parameters are not poisoned in deduction
   (guess_template_args_template_id marked the enclosing class's C of
-  `sv<C>' as failed when the argument was not a class; [temp.deduct]/5,
+  `sv<C>' as failed when the argument was not a class; [temp.deduct.general]/5,
   [temp.arg.explicit]/7).  Was libstdc++ <format> format:1899.
-- dynamic_cast run-time check ([expr.dynamic.cast]/4, /9-10): a
+- dynamic_cast run-time check ([expr.dynamic.cast]/8, /9-10): a
   cpp_runtime_dynamic_cast placeholder, resolved after all bodies
   (cpp_typecheck_dynamic_cast.cpp) by comparing the A subobject's vtable
   pointer with the value each class D installs; result D's unique public
@@ -13517,7 +13517,7 @@ Fixed (new CORE tests, each failing on bin53 unless noted):
   ([expr.dynamic.cast]/9): each A subobject is a case identified by the vtable
   D installs; shared vtables fall back to the nondet model.
 - Composite pointer type for == and relational comparisons of derived and
-  base pointers ([expr.eq]/3, [expr.type]/4).
+  base pointers ([expr.eq]/3, [expr.type]/3).
 - SMT2: address_of an array constant (wide string literal); new
   regression/cbmc/wide_string_literal_object; cpp11_wide_string_literal_object
   loses broken-smt-backend.
@@ -13539,10 +13539,10 @@ Fixed (new CORE tests, each failing on bin53 unless noted):
 - Defaulted operator<=>: subobject list, `auto' deduces the common
   comparison type ([class.spaceship]/2-4).
 - Member and non-member operator candidates ranked together
-  ([over.match.oper]/3): `ostringstream << 'c'' chose the member
+  ([over.match.oper]/3, 7): `ostringstream << 'c'' chose the member
   operator<<(int).  nonmember_operator_is_better compares per-argument
   implicit_conversion_sequence ranks (derived-to-base distance is not
-  ranked, [over.ics.rank]/4.4).
+  ranked, [over.ics.rank]/4.5).
 - Alias cycle keys: `#map_fingerprint'/`#instantiation_ctx' were comments,
   ignored by irept::compare, so the third nested level of
   __parse_int::_Number_help resolved to empty (chrono __check_overflow).
@@ -13605,7 +13605,7 @@ Still KNOWNBUG:
   ([dcl.fct.def.delete]/2; regression/cpp/Protection1).  test_chrono and
   cpp98_implicit_default_constructor_defined_only_when_odr_used CORE.
 - 6d87f34a54: nonmember_operator_is_better compares derived-to-base targets
-  on equal ranks ([over.ics.rank]/4.4.2, /4.4.4).
+  on equal ranks ([over.ics.rank]/4.5.2, /4.5.4).
 - c16de7b2d2: --unwindset / --unwindset-file join comma-split pieces up to
   the one ending in `:<limit>' (C++ loop identifiers contain commas).
 - 8a9f7166bf: SMT2 typecast between array types of equal length and index
@@ -13646,7 +13646,7 @@ Leads for the remaining KNOWNBUGs:
   skipped it; surfaced by d397fbeb57 in cpp11_map_braced_pairs_at).
   cpp98_ignored_class_result_at_loop_head (fails on bin53 too).
 - 0be90d49d1: this-adjusting thunks pass rvalue-reference parameters as
-  static_cast<T &&>(a) ([class.virtual]/14); in a system header the thunk
+  static_cast<T &&>(a) ([expr.call]/2); in a system header the thunk
   was dropped (libc++ function.h:272).  test_functional's first assertion
   now holds.  cpp11_virtual_override_with_rvalue_reference_parameter.
 - Item 4 (deferral review): the 9 THOROUGH tests fail identically on W36
@@ -13714,7 +13714,7 @@ Suites W44/W45: cbmc-cpp 1759 exit 0, cpp 246, regression/cbmc 1203; lint
   (__compressed_pair_elem<_T2>'s constructor with the `tuple<>' argument of
   the OTHER base's initializer) whose user-defined conversion trial
   instantiates tuple<int &&>'s constructor template with U = tuple<>: a
-  conversion from tuple<> to tuple<int &&>, which [over.best.ics]/4 would
+  conversion from tuple<> to tuple<int &&>, which [over.best.ics.general]/4 would
   not even consider for that argument, explored by instantiating the
   candidate's definition rather than only its declaration ([temp.over]/1:
   deduction synthesizes a declaration).  Header-free shapes of this
@@ -13858,7 +13858,7 @@ goto-instrument 298, contracts 178; lint 0; -K: ranges_basic_libcxx OK.
   ansi-c suite unchanged (clang_target only, as on W43).
 - 68b4280ee8: per-argument cv_distance (cv_per_argument) so the
   [over.ics.rank]/3.2.3 vs 3.2.6 conflict is ambiguous
-  ([over.match.best.general]/2.1).
+  ([over.match.best.general]/2).
 - cvise of cpp20_ranges_basic_libcxx (kb_rng, 6 h, 2 jobs): 129 lines,
   clang-only builtins -> cpp20_ranges_pipe_reduced_clang.  Lesson: a
   "interesting" substring check matched "not interesting" in my dd script.
@@ -14079,7 +14079,7 @@ trivially_equality_comparable_class.  New CORE pin:
 cpp11_trivial_class_properties_per_n5008 (N5008 answers where g++/clang
 differ; natively four assertions fail, documented).
 CBMC_ELAB_ON_NAMING=0 (instantiating class template specializations only
-where completeness is required, [temp.inst]/1-2) is an experiment switch;
+where completeness is required, [temp.inst]/2) is an experiment switch;
 its 7 failures are visible only with the environment variable, which
 test.pl cannot set per test.  A probe for an observable difference in the
 default mode (naming X<int> * with an ill-formed X<int>) verifies, so no
@@ -14170,7 +14170,7 @@ compiles; -K all 7 cbmc-cpp KNOWNBUGs OK.
   type]/8): cpp98_partial_specialization_ordering_pointer_to_function CORE.
 - d0f3029126 members differing only in trailing requires-clauses get their
   own symbol (#requires_twin<k>, parameter-type-list decides, return types
-  may differ); prefer_more_constrained_members ([over.match.best]/2.6) after
+  may differ); prefer_more_constrained_members ([over.match.best.general]/2.6) after
   exact_match_functions and in disambiguate_functions.  cpp20_same_
   signature_members_differing_in_constraints and test_views_transform CORE.
 - 07c4cc0646 out-of-class definitions of constrained member templates are
@@ -14255,7 +14255,7 @@ test (all "failed before" on W100):
   MEMBER of a temporary/object lives as long as that object
   (clean_expr_resultt::dependents, extended_by; remove_temporary_object
   for aggregate values).  Guard test cpp11_temporary_destruction_points.
-- 7868a7a3f1 [expr.sub]/1 + [class.temporary]/6.3: `int &&a = arr3{1,2,3}
+- 7868a7a3f1 [expr.sub]/2 + [class.temporary]/6.3: `int &&a = arr3{1,2,3}
   [i]' (reference_binding: subscript of an array prvalue is an xvalue).
 - bcc46d2de2 [temp.deduct.partial]/5-9: strict cv below the top level in
   partial ordering (f(T *) vs f(const T *)), reference patterns /9.1-9.2.
@@ -14265,11 +14265,11 @@ test (all "failed before" on W100):
   58 ubuntu:26.04 (clang 21) cbmc-cpp failures.
 - a6d7edbb26 anonymous struct with a reference member (libc++ 21's
   _LIBCPP_COMPRESSED_PAIR in __split_buffer<T, Alloc &>): the
-  [class.union.general]/3 check is for unions only; several
+  [class.union.general]/4 check is for unions only; several
   mem-initializers naming members of one anonymous struct; reference
   member of the anonymous struct bound by name.
 - dc7dcdeec2 braced-init-list argument elements typechecked at the call
-  site also for constructor calls ([class.access.general]/5), and the
+  site also for constructor calls ([class.access.general]/6), and the
   initializer_list backing array is assigned where the list is evaluated
   when its elements are not constants ([dcl.init.list]/5; a static
   initializer read a local before it existed).  Found by dog-fooding
@@ -14283,7 +14283,7 @@ test (all "failed before" on W100):
 - 30514ae682 implicit_conversion_sequence elaborates the source
   expression's class ([temp.inst]/2; `auto n = later_member()' then
   `if(n)' read "struct nil").
-- b3e2908b6c pointers to virtual member functions ([expr.mptr.oper]/4):
+- b3e2908b6c pointers to virtual member functions ([expr.call]/2):
   `&C::vf' designates a thunk `C::vf@virtual' whose body is the virtual
   call (virtual_dispatch_thunk); formerly rejected outright.
 - d24dbe95b7 [temp.friend]/1 friend declaration naming a specialization
@@ -14292,9 +14292,9 @@ test (all "failed before" on W100):
 - 77b348f089 parser: a class template name without arguments is not a
   type for the [stmt.ambig] disambiguation (`set(o);' calls the member).
 - 2eb4ec2019 [temp.deduct.call]/1 braced-init-list argument is a
-  non-deduced context -> default template argument ([temp.deduct]/5);
+  non-deduced context -> default template argument ([temp.deduct.general]/5);
   `return {{b, e}}' into optional<chk> reaches the constructor path.
-- 4e86f1a897 [dcl.init.ref]/5.4.1: `E &&' does not bind to a `const E'
+- 4e86f1a897 [dcl.init.ref]/5.4: `E &&' does not bind to a `const E'
   prvalue (was ambiguous with `const E &'); `E{2}' (compound literal)
   binds `E &&' by the identity conversion ([over.ics.rank]/3.2.3).
 - 660eecfab8 the hidden @most_derived parameter made the DEFAULT
@@ -14303,7 +14303,7 @@ test (all "failed before" on W100):
 - 9d6ec5ef00/e400e883fa [temp.over.link]: a class template redeclared
   with its concept qualified differently (gcc 16 <format>'s
   __formatter_ptr) is the same template.
-- 574d5c1a0a [temp.deduct.general]/8.1: a reference to void in the RETURN
+- 574d5c1a0a [temp.deduct.general]/11.6: a reference to void in the RETURN
   type of a specialization is a deduction failure (libc++'s declval<void>).
 - 603c544224 [over.match.oper]/3: overloaded operator->*.
 - KNOWNBUG cpp11_initializer_list_elements_destroyed_with_the_array: the
@@ -14373,7 +14373,7 @@ the commit messages cite the N5008 clauses.
 - f020318cd0 braced-list viability against initializer_list element types.
 - b06fc60856 [expr.cond]/4.1 on base/derived lvalues.
 - 2932144178 functional cast of a reference-typed operand.
-- 312d6c7371 [over.ics.rank]/4.1, /4.4.2: pointer conversion to base beats
+- 312d6c7371 [over.ics.rank]/4.1, /4.4: pointer conversion to base beats
   `void *', which beats bool (`out << in.rdbuf()').
 - 86f177915d ADL instantiates an associated class template specialization
   ([temp.inst]/2).
@@ -14398,7 +14398,7 @@ the commit messages cite the N5008 clauses.
 - 9b55d68d33 `(obj)(arg)' with a class-type argument is a call.
 - 16ffe70efc unary + on a pointer ([expr.unary.op]/7; C's rule was used).
 - 74d53f4318 a qualified member call in a lambda uses the captured this.
-- f54b0be291 [over.best.ics]/4.5: `X{{a, b, c, d}}' does not reach the copy
+- f54b0be291 [over.best.ics.general]/4.5: `X{{a, b, c, d}}' does not reach the copy
   constructor through a user-defined conversion
   (instrument_spec_assigns.cpp's and_exprt).
 
@@ -14445,7 +14445,7 @@ Feature probes (/tmp/r186/feat) and dog-food re-checks, fixed:
   padding.
 - f57ba4792f explicit(false) constructors were explicit.
 - 27fdb57d65 derived-to-base class parameter has Conversion rank
-  ([over.best.ics]/7; simplify_expr*.cpp's resultt<>).
+  ([over.best.ics.general]/7; simplify_expr*.cpp's resultt<>).
 - 4fb9736014 [over.over]/1.1, /1.3: target type selects an overload
   (statement_list_parser.cpp).
 New KNOWNBUGs: libstdc++ char specializations defined only in the .so
@@ -14581,11 +14581,11 @@ CI run 3 (a1a1c3b9a7) failures and the fixes on top of it:
   which made `_Utf32_view<subrange<iterator>> __uv({__first, __last})'
   reachable; subrange's constructor `subrange(auto __first, _Sent __last)'
   is an abbreviated function template, and only namespace-scope ones were
-  recognized (5417270ab5, [dcl.fct]/22).  Reduced from GCC 13 headers too
+  recognized (5417270ab5, [dcl.fct]/20).  Reduced from GCC 13 headers too
   (cvise, /tmp/r186/cv_sr3).  That change exposed libc++'s CPO pattern
   `void operator()(auto &&) const = delete;' next to a constrained
   operator(): equally specialized templates were not ordered by their
-  constraints (d3f8f3f456, [temp.func.order]/6.4).
+  constraints (d3f8f3f456, [temp.func.order]/8.4).
 - macOS 14: no single hanging test, the cbmc-cpp suite takes about 4700 s
   serially; CORE now runs in four ctest shards (daacb15f9e).
 - VS 2026: Windows' timeout.exe in test.pl produced no output
@@ -14829,13 +14829,13 @@ Fixes, each with a test that fails on the old build:
   modelled, errno being a macro).
 - constexpr evaluation reads a const integral variable
   ([expr.const]/8-9, a093daf708).
-- Initializing an empty base subobject stores nothing ([intro.object]/9;
+- Initializing an empty base subobject stores nothing ([intro.object]/8;
   std::bind(&S::f, &s, _1) called through &s + 1, 6a61290b4e).
 - `template <int &...>' is a template parameter pack (libc++ pair's
   default constructor, f11a79d086).
 - A class with a constructor template is not an aggregate; constructor
   templates must take the list's element count (98d917ada6).
-- [over.best.ics]/4.5 for `return {{...}}' (libc++ optional, 8083a4af24).
+- [over.best.ics.general]/4.5 for `return {{...}}' (libc++ optional, 8083a4af24).
 - Type-constraint qualified from `::' (MSVC std::span guide, caf1abaacc).
 - Out-of-line member template definitions matched by signature before
   template-head length (libc++ std::function's converting constructor,
@@ -14885,12 +14885,12 @@ Fixes, each with a test that fails on the old build:
   after `extern template ... npos', found by bisecting the 112 extern
   templates, 4c72776d49).
 - Assignment operator templates of a POD class are candidates
-  ([over.match.oper]/1), and their specializations keep the class POD
+  ([over.match.oper]/3.1), and their specializations keep the class POD
   ([class.copy.assign]/1) (83db5f12e5).
 - A trailing non-type pack not otherwise deduced is empty
   ([temp.arg.explicit]/4; braced-init-list argument, dffee27dc1).
 - `auto &&' (placeholder under a declarator) in a redeclared deduced
-  return type ([dcl.spec.auto.general]/13): MSVC _Tuple_get, so pair's
+  return type ([dcl.spec.auto.general]/16): MSVC _Tuple_get, so pair's
   piecewise constructor and std::map::emplace (ea2b446b88).
 - No built-in comparison of class-type operands ([expr.eq]/2,
   [expr.rel]/2; libc++ equality_comparable held without operator==,
@@ -14923,7 +14923,7 @@ profiles pass; lint 0, clang-format 0, doxygen 0; every commit compiles.
 
 Fixes, each with a test that fails on the old build:
 - A friend function template first declared in a class is found only by
-  ADL with that class associated ([class.friend]/7,
+  ADL with that class associated ([dcl.meaning.general]/2,
   [basic.lookup.argdep]/4.2).  libc++'s unreachable_sentinel_t friend
   operator== made `a == b' valid for any iterator and cached a wrong
   __is_primary_template<iterator_traits<It>> (cpp20_concept_iterator_chain,
@@ -14971,7 +14971,7 @@ Fixes, each with a hand-written test that fails on an older binary
   namespace scope, `T x[]' vs `T x[N]' ([basic.link]/11), and no
   partial-specialization search for them (MSVC __DIGIT_TABLE and
   _Classify_category, so three_way_comparable; fc1a5005fa, 65f260bae1).
-- [over.match.best]/2.1 before /2.4: reference binding is compared before
+- [over.match.best.general]/2.1 before /2.4: reference binding is compared before
   the non-template preference (MSVC unique_ptr's move-assignment
   template vs the deleted copy assignment, ada851cd56).  An implicit copy
   constructor or assignment keeps the old precedence, because the
@@ -15096,7 +15096,7 @@ Open:
 Each fix has a hand-written test that fails on binW173, checked with g++ 13
 and clang++ 18 (the template-lambda and destructor tests with -std=c++20).
 - Partial ordering: a part of P naming none of G's parameters must equal A
-  ([temp.deduct.type]/1, [temp.deduct.partial]/10); `equal_to<>' is padded
+  ([temp.deduct.type]/1, [temp.deduct.partial]/8); `equal_to<>' is padded
   to `equal_to<void>' (2b0ffc265d, MSVC _Can_memcmp_elements_with_pred).
 - A stale parameter symbol no longer hides a function parameter pack
   (a8f3559cec, MSVC std::bind with a member pointer after another binder).
@@ -15104,14 +15104,14 @@ and clang++ 18 (the template-lambda and destructor tests with -std=c++20).
   ([dcl.init.ref]/5.3.1, 679e97ac09, MSVC std::list `exchange(_Ptr,
   pointer{})').
 - A top-level const parameter does not change a function template's
-  signature ([dcl.fct]/5, [temp.over.link]/6, 63b0fe43ff, _Destroy_range).
+  signature ([dcl.fct]/3, [temp.over.link]/6, 63b0fe43ff, _Destroy_range).
 - Pointer arithmetic instantiates the pointee class template ([expr.add]/1,
   [temp.inst]/2, fae90dc188, _Hash_vec / _Find_last).
 - A lambda's template-parameter-list is its call operator's
   ([expr.prim.lambda.closure]/4, 5b92cdea6b); the KNOWNBUG
   cpp20_template_lambda_reference_parameter is CORE.
 - The function a lambda is lowered to is evaluated in constant expressions
-  ([expr.prim.lambda.closure]/5, 10b94cc5bd), and the closure type of a
+  ([expr.prim.lambda.closure]/6, 10b94cc5bd), and the closure type of a
   lambda in a variable template specialization is found (bbff2ef16d);
   libc++ __fits_in_tail_padding.
 - Destructor selection among constrained prospective destructors
@@ -15158,7 +15158,7 @@ the fix), checked with g++ 13 and clang++ 18; MSVC- and Darwin-only shapes
 are hand-written headers run with --winx64 / --os macos --arch arm64.
 - Lookup in an instantiation scope finds a template parameter before the
   namespace the template's scope uses ([basic.scope.temp]/2,
-  [basic.lookup.unqual]/1, e99acef994); the round-195 KNOWNBUG is CORE.
+  [basic.lookup.unqual]/2, e99acef994); the round-195 KNOWNBUG is CORE.
 - A function type's trailing return type names its parameters when it is
   formed during deduction ([basic.scope.param]/1, 62824540f6, MSVC
   _Call_binder: std::function from std::bind verifies).
@@ -15175,7 +15175,7 @@ are hand-written headers run with --winx64 / --os macos --arch arm64.
   _Ctype_constants_base), and MSVC's locale::_Init returns the "C" locale
   ([locale.cons]/1, 5f8dfcf2d7).
 - Simplifier: bitwise operators merge all constant operands (c6c5eba0cb);
-  typeid's integer name on arm64 Darwin is marked unique ([type.info]/2,
+  typeid's integer name on arm64 Darwin is marked unique ([type.info]/3,
   a99fbc2e28): cpp17_typeid_basic no longer unwinds strcmp forever.
 - Member function templates differing only in the return type
   ([temp.over.link]/3, 5b52ac75fe, libc++ __split_buffer, macOS 14 deque).
@@ -15206,13 +15206,13 @@ and clang++ 18 where it is portable C++ (MSVC-runtime shapes are run with
 - Byte-operator lowering clamps a negative constant offset
   (96823f7108): the solver aborted in unpack_array_vector.
 - Constant evaluation assigns to elements of member arrays
-  ([basic.start.static]/2, [expr.const]/5, 0b291507dc).  The MSVC STL's
+  ([basic.start.static]/2, [expr.const]/10.16, 0b291507dc).  The MSVC STL's
   constexpr _Digit_pairs was initialized at startup instead, and its
   100-iteration loop was cut by --unwind 8/10: every VS 2026 artifact
   using <xutility> had an unreachable main, so W175's VS 2026 passes of
   cpp17_string_find and cpp11_ofstream_from_string were vacuous.
 - MSVC runtime models: __std_fs_convert_narrow_to_wide / _wide_to_narrow
-  ([fs.path.type.cvt]/1, ae870e6fb2); locale::_Init and _Getgloballocale
+  ([fs.path.type.cvt]/1-2, ae870e6fb2); locale::_Init and _Getgloballocale
   return one static _Locimp ([locale.cons]/1, 3f257a6971), replacing the
   null implementation of round 196.
 - A deduced pack is expanded outside constant expressions
@@ -15361,7 +15361,7 @@ base.  Hand-written reproducers of the virtual-base swap pass; not reduced.
   ctype<char>::do_widen/do_narrow.
 - Constant evaluation: writes through references/pointers to subobjects
   (range-for, [stmt.ranged]/1); a deferred constexpr member is instantiated
-  when a constant expression calls it ([temp.inst]/5); a comma's constant
+  when a constant expression calls it ([temp.inst]/4, /8); a comma's constant
   left operand is discarded ([expr.comma]/1).  libstdc++'s
   __from_chars_alnum_to_val_table<false>::value is now a constant.
 - That made unit-proofs/string2optional non-vacuous: 10 GB, 270 s, all
@@ -15615,7 +15615,7 @@ Next (order agreed with the user): N3 (exception object lifetime), #5
 
 - ae4f7da1aa (N3): handler reference parameters bind to the exception
   object ([except.handle]/15); every handler exit other than a rethrow
-  destroys it ([except.throw]/5), dispatched on the thrown type tag, unless
+  destroys it ([except.throw]/4), dispatched on the thrown type tag, unless
   another active handler holds it; other temporaries of a throw-expression
   are destroyed ([class.temporary]/4).  std::exception_ptr not modelled.
   cpp11_exception_object_destroyed_after_the_handler -> CORE; STL1's
@@ -15671,7 +15671,7 @@ exception specifications, is_nothrow_constructible with arguments).
   subobject path.  KNOWNBUGs 16bc1ae965: dispatch through the second A of
   `D : B, C' with a shared virtual base; E : D rejected (ambiguous A).
 - 626a3b1e80: a variable template specialization instantiated again keeps
-  the deduced type and value ([temp.spec.general]/5).  KNOWNBUG -> CORE.
+  the deduced type and value ([temp.type]/1).  KNOWNBUG -> CORE.
 - f92ccff152: variables instantiated in function bodies (variable
   templates, static members of class templates) get dynamic
   initialization ([basic.start.dynamic]/1); block-scope statics are no
