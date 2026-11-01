@@ -496,7 +496,7 @@ void c_typecastt::implicit_typecast_arithmetic(
     do_typecast(expr, new_type);
   else
   {
-    // C++ [conv.prom]/2: wchar_t, char16_t and char32_t are distinct types
+    // C++ [conv.prom]/6: wchar_t, char16_t and char32_t are distinct types
     // promoted to their underlying type even when it has the same
     // representation (char32_t to unsigned int); operator== ignores the
     // #c_type comment that tells them apart.
@@ -783,7 +783,7 @@ void c_typecastt::implicit_typecast_arithmetic(
   }
   else if(max_type == LONG || max_type == LONGLONG)
   {
-    // C11 6.3.1.8 and C++ [expr.arith.conv]/1.5.5: if the signed type of
+    // C11 6.3.1.8 and C++ [expr.arith.conv]/1.5.3.3: if the signed type of
     // higher rank cannot represent all values of the other, unsigned type,
     // both are converted to the unsigned type of the signed one (`1u + l'
     // is unsigned long where long and int have the same width)

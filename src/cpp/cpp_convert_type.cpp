@@ -487,7 +487,7 @@ static void cpp_convert_auto_rec(
     if(t.id() == ID_auto)
     {
       t = src;
-      // N5008 [dcl.type.auto.deduct]/4 with [temp.deduct.call]: for
+      // N5008 [dcl.type.auto.deduct]/3 with [temp.deduct.call]: for
       // `auto &` / `auto *` the placeholder is deduced from the referred
       // type INCLUDING its qualifiers (`auto &r = ci` with `const int ci`
       // gives `const int &`), while a top-level `auto x = ci` drops them.

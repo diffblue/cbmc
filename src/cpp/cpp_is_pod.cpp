@@ -24,7 +24,7 @@ bool cpp_typecheckt::cpp_is_pod(const typet &type) const
     // * private/protected, unless static
     // * overloading assignment operator
     //
-    // [class.union]/2: a union may have user-declared special member
+    // [class.union.general]/4: a union may have user-declared special member
     // functions (constructors, destructor) and other member functions, in
     // which case it is not a POD/trivial type and must be initialised via a
     // constructor rather than by conversion.  The same component checks apply

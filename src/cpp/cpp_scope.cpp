@@ -64,7 +64,7 @@ void cpp_scopet::lookup_rec(
   if(kind == SCOPE_ONLY)
     return;
 
-  // N5008 [basic.scope.temp]/2, [basic.lookup.unqual]/1: an instantiation
+  // N5008 [basic.scope.temp]/2, [basic.lookup.unqual]/2: an instantiation
   // scope of a template is nested in the template parameter scope, so an
   // unqualified name finds a template parameter before the declarations of
   // the namespace the template's scope uses (sub_scope_for_instantiation).
@@ -188,7 +188,7 @@ void cpp_scopet::lookup_rec(
   if(kind==QUALIFIED)
     return; // done
 
-  // N5008 [basic.lookup.general]/1, [basic.lookup.unqual]/1-2: the search
+  // N5008 [basic.lookup.general]/1, [basic.lookup.unqual]/2: the search
   // stops at the first scope in which a declaration of the name is found.
   // For template names the front end keeps collecting the templates of all
   // enclosing class and namespace scopes, but a declaration in a block scope

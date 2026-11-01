@@ -505,7 +505,7 @@ protected:
 
     // Stack of scope-tree nodes at entry to each enclosing C++ try block, used
     // to unwind (run destructors of) automatic objects when a `throw`
-    // propagates to a handler ([except.ctor], [except.throw]/4).
+    // propagates to a handler ([except.ctor], [except.throw]/2).
     std::vector<node_indext> cpp_try_scope_nodes;
 
     targetst()

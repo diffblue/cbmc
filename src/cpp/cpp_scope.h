@@ -151,7 +151,7 @@ public:
   }
 
   /// The inline namespaces directly enclosed by this namespace (N5008
-  /// [namespace.def.general]/3), which are among its using-scopes.
+  /// [namespace.def.general]/6), which are among its using-scopes.
   std::vector<cpp_scopet *> inline_namespaces() const
   {
     std::vector<cpp_scopet *> result;

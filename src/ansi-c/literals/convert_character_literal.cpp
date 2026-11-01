@@ -30,7 +30,7 @@ exprt convert_character_literal(
 
   if(src[0]=='L' || src[0]=='u' || src[0]=='U')
   {
-    // u8 prefix: char8_t in C++20 ([lex.ccon]/3), char in C++17, unsigned
+    // u8 prefix: char8_t in C++20 ([lex.ccon]/2), char in C++17, unsigned
     // char in C23
     if(src[0] == 'u' && src.size() >= 3 && src[1] == '8')
     {

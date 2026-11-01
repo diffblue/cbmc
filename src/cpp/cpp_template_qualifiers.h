@@ -28,15 +28,15 @@ inline bool same_fundamental_type_name(const typet &a, const typet &b)
 }
 
 /// Check that cv-qualifiers (C_constant, C_volatile) match recursively
-/// throughout the type tree. irept::operator== ignores #-prefixed
-/// attributes, so types like `const int*` and `int*` compare equal.
-/// It also distinguishes the fundamental types same_fundamental_type_name
-/// tells apart.
-/// This function catches such differences in nested subtypes -- including
-/// the return and parameter types of a function type (N5008 [dcl.fct]/6-7:
-/// `void (*)(const int *)` and `void (*)(int *)` are distinct types, and so
-/// are `int (S::*)(int) const` and `int (S::*)(int)`, whose
-/// cv-qualifier-seq is the cv of the implicit object parameter's pointee).
+/// throughout the type tree. irept::operator== ignores #-prefixed attributes,
+/// so types like `const int*` and `int*` compare equal.  It also distinguishes
+/// the fundamental types same_fundamental_type_name tells apart.  This function
+/// catches such differences in nested subtypes -- including the return and
+/// parameter types of a function type (N5008 [dcl.fct]/10,
+/// [over.match.funcs.general]/4: `void (*)(const int *)` and `void (*)(int *)`
+/// are distinct types, and so are `int (S::*)(int) const` and `int
+/// (S::*)(int)`, whose cv-qualifier-seq is the cv of the implicit object
+/// parameter's pointee).
 inline bool qualifiers_match_recursively(const typet &a, const typet &b)
 {
   // N5008 [basic.type.qualifier]/3: an array type whose elements are
@@ -69,7 +69,7 @@ inline bool qualifiers_match_recursively(const typet &a, const typet &b)
   if(!same_fundamental_type_name(a, b))
     return false;
 
-  // N5008 [dcl.ref]/1, [dcl.ptr]/1: a pointer, an lvalue reference and an
+  // N5008 [dcl.ref]/1-2, [dcl.ptr]/1: a pointer, an lvalue reference and an
   // rvalue reference to the same type are distinct types.  References are
   // pointers carrying #reference / #rvalue_reference here, attributes that
   // irept::operator== also ignores.

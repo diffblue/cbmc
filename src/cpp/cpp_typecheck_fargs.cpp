@@ -70,7 +70,7 @@ void cpp_typecheck_fargst::build(
 /// elaboration-depth problem in \<chrono\> / \<future\> that the chrono, future
 /// and thread regression tests no longer show) dropped libstdc++'s
 /// __atomic_futex_unsigned::_M_load_and_test (`_M_load_and_test_until({})').
-/// N5008 [over.best.ics]/4.5: \p operand is the only element, itself a
+/// N5008 [over.best.ics.general]/4.5: \p operand is the only element, itself a
 /// braced-init-list, of a list in the second phase of [over.match.list] for
 /// class X (recorded as ID_C_no_user_defined_conversion_to); a parameter of
 /// type X or reference to cv X is then not reached by a user-defined
@@ -115,7 +115,7 @@ static bool brace_init_is_viable(
     // N5008 [temp.inst]/2: list-initialization of the class depends on its
     // constructors and members, so the specialization is instantiated --
     // it may be named only through a member typedef so far (map's
-    // `typedef pair<const K, V> value_type;', [temp.inst]/1)
+    // `typedef pair<const K, V> value_type;', [temp.inst]/2)
     cpp_typecheck.require_complete_type(base);
   }
 
@@ -239,7 +239,7 @@ static bool brace_init_is_viable(
   }
   if(!has_user_ctor && data_field_count >= operand.operands().size())
     return true;
-  // [over.match.list]/2.2 fallback: when no initializer-list ctor
+  // [over.match.list]/1.2 fallback: when no initializer-list ctor
   // is viable, the brace-init-list is treated as the argument list
   // for a regular constructor of T.  Declare the candidate viable
   // if T has a non-explicit constructor whose required-argument
@@ -251,7 +251,7 @@ static bool brace_init_is_viable(
   // brace-init-to-class branch, which materialises the result as
   // a member-wise struct expression.
   //
-  // [over.match.list]/3: in copy-list-initialization, if an
+  // [over.match.list]/1: in copy-list-initialization, if an
   // explicit constructor is chosen, the program is ill-formed.
   // `cpp_typecheck_fargst::match` is invoked when matching arguments
   // to function parameters, which is copy-list-initialization;
@@ -269,7 +269,7 @@ static bool brace_init_is_viable(
         continue;
       if(to_code_type(c.type()).return_type().id() != ID_constructor)
         continue;
-      // N5008 [over.match.ctor]/1 + [namespace.udecl]/3: the candidate
+      // N5008 [over.match.ctor]/1 + [namespace.udecl]/2: the candidate
       // constructors of a class are its own constructors, not those of its
       // base classes.  A base constructor becomes a candidate only when it is
       // inherited with a using-declaration -- and CBMC materialises such an
@@ -324,7 +324,7 @@ static bool brace_init_is_viable(
         return true;
     }
   }
-  // N5008 [over.match.list]/2.2 + [temp.deduct]: a constructor template
+  // N5008 [over.match.list]/1.2 + [temp.deduct]: a constructor template
   // participates in overload resolution against a brace-init-list as well.
   // Constructor templates are not stored as ordinary `ID_code` constructor
   // components (the class carries the `has_template_constructor` flag
@@ -356,7 +356,7 @@ static bool brace_init_is_viable(
   return false;
 }
 
-/// [over.ics.list]/4: a brace-init-list `{e1, ..., en}` has a viable
+/// [over.ics.list]/5: a brace-init-list `{e1, ..., en}` has a viable
 /// implicit conversion sequence to `std::initializer_list<X>` iff
 /// every element `ei` has an implicit conversion sequence to `X`.
 /// The empty brace `{}` is always viable (yields an empty
@@ -369,7 +369,7 @@ static bool brace_init_is_viable(
 /// (`cpp_typecheck_conversionst::implicit_typecast`'s
 /// brace-to-initializer_list branch), which calls
 /// `implicit_typecast(val, elem_type)` per element.
-/// N5008 [over.ics.list]/10: for a parameter of REFERENCE type the
+/// N5008 [over.ics.list]/9: for a parameter of REFERENCE type the
 /// list-initialization rules apply to the referenced type, so
 /// `std::initializer_list<X> &&' (libstdc++'s shape for several
 /// constructors) and `const std::initializer_list<X> &' accept a
@@ -381,7 +381,7 @@ static const typet &init_list_referent(const typet &type)
   return type;
 }
 
-/// N5008 [over.ics.list]/6, [dcl.init.aggr]/6: a braced-init-list
+/// N5008 [over.ics.list]/6, [dcl.init.aggr]/14: a braced-init-list
 /// initializes an array of known bound when it has at most that many
 /// elements and each converts to the element type.
 static bool brace_init_to_array_is_viable(
@@ -431,7 +431,7 @@ static bool brace_init_to_init_list_is_viable(
     return false;
 
   // Each element must have an ICS to `elem_type` -- N5008
-  // [over.ics.list]/4-7: an element that is itself a braced-init-list is
+  // [over.ics.list]/5-8: an element that is itself a braced-init-list is
   // list-initialization of the element type (an aggregate, a class with a
   // matching constructor: `{{"k", v}, ...}' to initializer_list<pair<K,
   // V>>, std::map's and json_objectt's shapes), or, for a scalar element
@@ -512,7 +512,7 @@ bool cpp_typecheck_fargst::match(
     {
       const exprt &default_value = parameters[i].default_value();
 
-      // [over.match.viable]/2.2: a candidate function with more
+      // [over.match.viable]/2.3: a candidate function with more
       // parameters than there are arguments is viable only if each
       // parameter without a corresponding argument has a default
       // argument.  A genuine default argument is a proper expression;
@@ -688,7 +688,7 @@ bool cpp_typecheck_fargst::match(
       cpp_typecheck.implicit_conversion_sequence(
         to_unary_expr(operand).op(), type, new_expr, rank, cv_distance))
     {
-      // N5008 [over.ics.list]/8: for a REFERENCE parameter initialized
+      // N5008 [over.ics.list]/9: for a REFERENCE parameter initialized
       // from a braced-init-list with a single element, the implicit
       // conversion sequence is the one converting the element to the
       // referenced type ([dcl.init.list]/3.10); the reference binding is
@@ -703,7 +703,7 @@ bool cpp_typecheck_fargst::match(
     {
       // N5008 [over.ics.list]/8: a braced-init-list that can
       // aggregate-initialize the (non-reference) aggregate parameter type,
-      // with brace elision ([dcl.init.aggr]/16), converts by a user-defined
+      // with brace elision ([dcl.init.aggr]/14), converts by a user-defined
       // conversion sequence (rank 4, as for brace_init_is_viable below).
       distance += 4;
     }
@@ -730,7 +730,7 @@ bool cpp_typecheck_fargst::match(
       brace_init_to_init_list_is_viable(
         operand, init_list_referent(type), cpp_typecheck))
     {
-      // [over.ics.list]/4: brace-init-list to `std::initializer_list<X>`
+      // [over.ics.list]/5: brace-init-list to `std::initializer_list<X>`
       // is a viable conversion only if every element of the list has
       // an implicit-conversion sequence to `X`.  Without that
       // element-by-element check, the overload appears viable for
@@ -756,7 +756,7 @@ bool cpp_typecheck_fargst::match(
       //
       // Use distance 4 (worse than a standard conversion but
       // better than ellipsis).  For prvalue source (a temporary
-      // materialised from the brace-init-list), [over.ics.rank]/
+      // materialised from the brace-init-list), [over.ics.rank]/3.2.3/
       // 3.3.4 prefers an rvalue-reference target over a (const)
       // lvalue-reference target.  Bias the rank by -1 for an
       // rvalue-ref target so that, when the same `brace_init_is_viable`

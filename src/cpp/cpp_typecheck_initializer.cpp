@@ -97,7 +97,7 @@ typet cpp_typecheckt::initializer_list_element_type(
 }
 
 /// The second data member of a `std::initializer_list` over the \p n
-/// elements of \p array.  N5008 [support.initlist]/1 leaves the layout to
+/// elements of \p array.  N5008 [initializer.list.syn]/1 leaves the layout to
 /// the implementation: libstdc++ and libc++ store the size, the MSVC STL a
 /// pointer past the last element (`const _Elem *_First, *_Last;').
 exprt cpp_typecheckt::initializer_list_extent(
@@ -209,7 +209,7 @@ std::optional<exprt> cpp_typecheckt::default_member_initializer_value(
   if(default_value.is_nil())
     return {};
 
-  // N5008 [class.mem.general]/6, [basic.scope.class]: the default member
+  // N5008 [class.mem.general]/9.6, [basic.scope.class]: the default member
   // initializer is in the scope of the class -- resolve names there.
   cpp_save_scopet save_scope(cpp_scopes);
   cpp_scopes.set_scope(struct_tag_type.get_identifier());
@@ -341,7 +341,7 @@ void cpp_typecheckt::aggregate_member_initialization(
       }
       else
       {
-        // value-initialization of the element ([dcl.init.aggr]/5.3)
+        // value-initialization of the element ([dcl.init.aggr]/5.2)
         arguments.push_back(exprt{ID_initializer_list});
       }
       auto code = cpp_constructor(source_location, checked_member, arguments);
@@ -476,7 +476,7 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
   // manifestly constant-evaluated all the same ([dcl.constexpr]/6): `constexpr
   // _CCC __type_kinds[] = {_StrongOrd, __type_to_enum<_Ts>()...}' (libc++'s
   // __get_comp_type) must fold the constexpr calls to constants, so the array
-  // is usable in constant expressions ([expr.const]/4).
+  // is usable in constant expressions ([expr.const]/9).
   std::optional<constant_expression_contextt> constexpr_init_guard;
   if(
     (symbol.is_macro || constexpr_objects.count(symbol.name) != 0) &&
@@ -543,7 +543,7 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
       symbol.value = std::move(element);
     }
     // C++11: auto x = {1, 2, 3} deduces std::initializer_list<int>
-    // ([dcl.type.auto.deduct]/4: copy-list-initialization)
+    // ([dcl.type.auto.deduct]/3: copy-list-initialization)
     if(
       symbol.value.id() == ID_initializer_list &&
       !symbol.value.operands().empty())
@@ -602,7 +602,7 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
     if(symbol.type.id() != ID_struct_tag || cpp_is_pod(symbol.type))
       implicit_typecast(symbol.value, symbol.type);
 
-    // N5008 [dcl.init]/16.6.2 + [class.copy.elision]: when the deduced
+    // N5008 [dcl.init.general]/16.6.2 + [class.copy.elision]: when the deduced
     // type is a non-POD class, the destination is initialized by the
     // copy/move CONSTRUCTOR chosen by overload resolution (a prvalue of the
     // class type initializes the object directly) -- not by a bitwise
@@ -697,7 +697,7 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
         const symbolt &function_symbol =
           lookup(resolved_expr.get(ID_component_name));
         // a pointer to a VIRTUAL member function designates the thunk that
-        // dispatches through the virtual table ([expr.mptr.oper]/4, as in
+        // dispatches through the virtual table ([expr.call]/2, as in
         // typecheck_expr_address_of)
         if(function_symbol.type.get_bool(ID_C_is_virtual))
         {
@@ -919,7 +919,7 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
         if(params.size() <= 1)
           continue;
         // A copy/move constructor's sole parameter is a reference to the
-        // class's own type ([class.copy.ctor]/1).  Such a constructor does
+        // class's own type ([class.copy.ctor]/1-2).  Such a constructor does
         // not, by itself, make the class a non-aggregate for member-wise
         // initialization.  A two-parameter constructor whose parameter is a
         // reference to some *other* type (e.g. a converting constructor
@@ -1001,7 +1001,7 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
         bool has_base_init = struct_type.id() == ID_struct &&
                              !to_struct_type(struct_type).bases().empty();
 
-        // N5008 [dcl.init.aggr]/4.2: each element is copy-initialized
+        // N5008 [dcl.init.aggr]/4.3: each element is copy-initialized
         // from its initializer-clause -- an element of a class type with a
         // non-trivial copy constructor or destructor by that class's
         // constructor ([dcl.init.general]/16.6), not by copying the bits
@@ -1091,8 +1091,8 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
     }
 
     // Complete the bound of an array of unknown bound from its brace-enclosed
-    // initializer ([dcl.array]/1, [dcl.init.aggr]/5) before constructing it, so
-    // the symbol has a complete type (e.g. for sizeof) and per-element
+    // initializer ([dcl.array]/7, [dcl.init.aggr]/10) before constructing it,
+    // so the symbol has a complete type (e.g. for sizeof) and per-element
     // construction below has a definite element count.  (Scalar/POD element
     // types are handled on the POD initializer path above.)
     if(
@@ -1158,8 +1158,8 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
       }
       else
         ops = symbol.value.operands();
-      // N5008 [over.best.ics]/4.5: in this second phase, when the list's
-      // only element is itself a braced-init-list, a constructor's first
+      // N5008 [over.best.ics.general]/4.5: in this second phase, when the
+      // list's only element is itself a braced-init-list, a constructor's first
       // parameter of type X or reference to cv X (the copy and move
       // constructors) is not reached by a user-defined conversion -- `conj
       // c{{1, 2, 3, 4}}' selects conj(vec), not the copy constructor from a
@@ -1176,7 +1176,7 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
     }
     else
     {
-      // N5008 [dcl.init.general]/16.6.2: copy-initialization `T x = e' with
+      // N5008 [dcl.init.general]/16.6.3: copy-initialization `T x = e' with
       // e of another type converts e to T by a user-defined conversion
       // sequence; [over.match.copy]/1.1: only the CONVERTING (non-explicit)
       // constructors of T are candidates ([class.conv.ctor]/2).  Constructor

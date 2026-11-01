@@ -23,7 +23,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_typecheck.h"
 
-/// Per N5008 [temp.variadic]/7: the instantiation of a pack expansion whose
+/// Per N5008 [temp.variadic]/16: the instantiation of a pack expansion whose
 /// pack(s) expand to zero elements produces an empty list.  When a function
 /// (or member function) template is instantiated with an empty type pack, a
 /// pack expansion appearing as a template argument in the body -- e.g.
@@ -88,7 +88,7 @@ void cpp_typecheckt::remove_empty_pack_expansion_args(exprt &body)
     return is_expansion && refers_empty_pack(a);
   };
 
-  // [temp.variadic]/7 with [class.base.init]/1: a mem-initializer that is
+  // [temp.variadic]/16 with [class.base.init]/1: a mem-initializer that is
   // itself a pack expansion over empty packs (`leaf<Ul, Tl>()...' with Ul,
   // Tl empty, libc++'s __tuple_impl) expands to no mem-initializer at all
   const auto is_empty_mem_initializer_expansion = [&](const irept &a) -> bool
@@ -125,10 +125,10 @@ void cpp_typecheckt::remove_empty_pack_expansion_args(exprt &body)
 
 /// Drain the deferred method-body queue.
 ///
-/// Standard mapping (N5008 [temp.point]/1, [temp.point]/8, [temp.inst]/5):
+/// Standard mapping (N5008 [temp.point]/1, [temp.point]/7, [temp.inst]/5):
 /// this is CBMC's approximation of the *point of instantiation* model.  A
 /// referenced function-template specialization needs only its *declaration*
-/// instantiated at the reference ([temp.inst]/1); its *definition* is
+/// instantiated at the reference ([temp.inst]/10); its *definition* is
 /// instantiated at the POI that "immediately follows the namespace scope
 /// declaration or definition that refers to the specialization".  Running this
 /// drain *after* the namespace-scope `convert` loop (see
@@ -153,10 +153,10 @@ void cpp_typecheckt::remove_empty_pack_expansion_args(exprt &body)
 /// the key clue for the real fix.
 /// Shared preprocessing for a deferred method body about to be converted:
 /// restore an instantiated member function template's template map
-/// ([temp.inst]/1, from `\#fn_template_type` / `\#fn_template_args`), expand
+/// ([temp.inst]/4, from `\#fn_template_type` / `\#fn_template_args`), expand
 /// the
-/// body's uses of replicated function parameter packs ([temp.variadic]/5)
-/// and drop zero-length pack expansions ([temp.variadic]/7).  Used by BOTH
+/// body's uses of replicated function parameter packs ([temp.variadic]/9)
+/// and drop zero-length pack expansions ([temp.variadic]/16).  Used by BOTH
 /// the main typecheck_method_bodies drain and the deferred-member fixpoint
 /// drain; the latter previously skipped all of this, so a member function
 /// template instance drained there (e.g. via the odr-use requeue) failed to
@@ -173,7 +173,7 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
   // body -- e.g. the `get<_Idx>()...` call-argument expansion in libc++
   // __perfect_forward's `operator()` -- has no binding at drain time,
   // and the fn-param-driven expansion below drops the argument as an
-  // empty pack ([temp.variadic]/7 misapplied), silently truncating the
+  // empty pack ([temp.variadic]/16 misapplied), silently truncating the
   // call.
   {
     const irep_idt &class_id = method_symbol.type.get(ID_C_member_name);
@@ -226,7 +226,7 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
     }
   }
 
-  // Per [temp.inst]/1: restore function template map if this
+  // Per [temp.inst]/4: restore function template map if this
   // is an instantiated member function template.
   if(method_symbol.type.find(irep_idt{"#fn_template_type"}).is_not_nil())
   {
@@ -268,10 +268,10 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
         template_map.type_map[pid] = elems.front();
     }
 
-    // N5008 [temp.variadic]/7: an expansion over an EMPTY pack produces an
+    // N5008 [temp.variadic]/16: an expansion over an EMPTY pack produces an
     // empty list.  With the pack bindings replayed above, drop
     // member-initializer arguments that reference an empty pack outside
-    // `sizeof...` (which is just 0, [temp.variadic]/8) -- e.g.
+    // `sizeof...` (which is just 0, [temp.variadic]/10) -- e.g.
     // `second(std::forward<_Args2>(std::get<_Indexes2>(__tuple2))...)` in
     // std::pair's piecewise delegation target with _Args2/_Indexes2 empty
     // becomes `second()`.  Left in place, the unsubstitutable pack
@@ -338,7 +338,7 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
       }
     }
 
-    // N5008 [temp.variadic]/5: expand the remaining (non-empty)
+    // N5008 [temp.variadic]/9: expand the remaining (non-empty)
     // pack-expansion mem-initializer arguments with the replayed pack
     // bindings -- `first(std::forward<_Args1>(std::get<_Indexes1>(
     // __tuple1))...)` in std::pair's piecewise delegation target mixes
@@ -362,8 +362,8 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
   // becomes the right-associated tree `pat0 op (pat1 op ... op patN-1)`; a
   // unary left fold `(... op pat)` the left-associated tree
   // `((pat0 op pat1) op ...) op patN-1`; a binary fold `(init op ... op pat)`
-  // is a left fold seeded by `init` ([expr.prim.fold]/2).  An empty pack
-  // yields the operator identity ([expr.prim.fold]/3: && -> true,
+  // is a left fold seeded by `init` ([expr.prim.fold]/3).  An empty pack
+  // yields the operator identity ([temp.variadic]/14: && -> true,
   // || -> false, comma -> void(), approximated as 0); a single element
   // yields the sole substituted pattern.  Runs for every arity (0, 1, N),
   // independent of the pack-count-driven expansion below.
@@ -466,7 +466,7 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
 
     auto identity_for = [](const irep_idt &fold_op) -> exprt
     {
-      // [expr.prim.fold]/3: empty-pack unary fold values.  Only &&, ||, and
+      // [temp.variadic]/14: empty-pack unary fold values.  Only &&, ||, and
       // comma have a defined identity; comma yields void(), approximated
       // here (as in the free-function expander) by 0.
       if(fold_op == ID_and)
@@ -483,7 +483,7 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
       const bool is_binary = node.id() == irep_idt("cpp_binary_fold");
       const irept *pattern = nullptr;
       irept init_expr;
-      // N5008 [expr.prim.fold]/2: `(init op ... op pack)' is a binary LEFT
+      // N5008 [expr.prim.fold]/3: `(init op ... op pack)' is a binary LEFT
       // fold, `(pack op ... op init)' a binary RIGHT fold -- the pack may be
       // on either side.
       bool binary_pack_left = false;
@@ -611,7 +611,7 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
           }
           return;
         }
-        // N5008 [temp.variadic]/5: a SINGLE-element function parameter pack
+        // N5008 [temp.variadic]/9.2: a SINGLE-element function parameter pack
         // keeps its plain parameter name (no `base$k` replication), so a
         // fold whose pattern references exactly one of this method's own
         // parameters is a one-element fold regardless of how many OTHER
@@ -645,7 +645,7 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
             single_by_param = matches == 1;
           }
         }
-        // N5008 [expr.prim.fold]/1: the fold's pack is the one its PATTERN
+        // N5008 [temp.variadic]/8: the fold's pack is the one its PATTERN
         // names -- size it from that pack's own binding instead of
         // requiring a replicated function parameter or a unique
         // pack_size_map entry.  This covers a fold over the ENCLOSING
@@ -696,7 +696,7 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
         {
           // Build the associated tree, substituting the k-th VALUE of the
           // named non-type pack into each pattern copy
-          // ([temp.variadic]/5).
+          // ([temp.variadic]/9).
           auto elem = [&](std::size_t k) -> irept
           {
             irept c = pat;
@@ -817,7 +817,7 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
       reduce_folds(static_cast<irept &>(body));
     }
 
-    // N5008 [expr.sizeof]/5: `sizeof...(xs)' over this method's FUNCTION
+    // N5008 [expr.sizeof]/4: `sizeof...(xs)' over this method's FUNCTION
     // parameter pack.  The general handler looks the name up among template
     // parameters and pack-size keys, which name the TYPE pack
     // (`_lambda_tp_0'), not `xs'; an N>=2 pack is counted from its
@@ -869,7 +869,7 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
     }
   }
 
-  // N5008 [temp.variadic]/5: expand the body / member-initializer uses of a
+  // N5008 [temp.variadic]/9: expand the body / member-initializer uses of a
   // function parameter pack that typecheck_compound_declarator replicated
   // into N parameters `base$0..base$N-1`.  Each pack-expansion use `pat...`
   // (a list element carrying ID_ellipsis that mentions the pack `base`) is
@@ -889,7 +889,7 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
     }
     else if(method_symbol.type.id() == ID_code)
     {
-      // N5008 [temp.variadic]/5: when a member of a class template partial
+      // N5008 [temp.variadic]/9: when a member of a class template partial
       // specialization `C<R(A...)>` is instantiated, the member's parameter
       // pack `A... a` is expanded into distinct parameters `a$0..a$k` by
       // `template_mapt` during instantiation, which -- unlike the in-class
@@ -922,7 +922,7 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
     {
       // The recorded pack base (if any) that a pack-expansion pattern node
       // mentions.
-      // [temp.variadic]/5: a pack name is expanded by the innermost pack
+      // [temp.variadic]/8: a pack name is expanded by the innermost pack
       // expansion that contains it -- a nested pattern with its own `...'
       // (the `ls...' in `one(seq<Js>{}, ls...)...') is not searched
       std::function<irep_idt(const irept &, bool)> ref_base_rec =
@@ -989,7 +989,7 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
               irept copy = child;
               copy.remove(ID_ellipsis);
               rename(copy, base, id2string(base) + "$" + std::to_string(k));
-              // N5008 [temp.variadic]/5: the k-th element of the expansion
+              // N5008 [temp.variadic]/9: the k-th element of the expansion
               // substitutes the k-th element of EVERY pack the pattern
               // references.  Besides the function-parameter pack renamed
               // above, a bare reference to a deduced TEMPLATE type pack --
@@ -1101,7 +1101,7 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
     }
   }
 
-  // N5008 [temp.variadic]/5: expand a call-argument pack expansion in the
+  // N5008 [temp.variadic]/9: expand a call-argument pack expansion in the
   // body (e.g. `add(I...)` over a non-type parameter pack) to one argument
   // per element, substituting the pack's element value.  The in-class /
   // decltype paths use expand_call_argument_packs already; a function
@@ -1111,14 +1111,14 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
   // packs is already handled by the expansion above, and re-running the
   // call-argument expander over it would double-expand a function parameter
   // pack.  A deduced TYPE pack of two or more elements is expanded here too
-  // ([temp.variadic]/5: `g(sizeof(Ts)...)`, `{__is_same(T, Ts)...}`): the
+  // ([temp.variadic]/9: `g(sizeof(Ts)...)`, `{__is_same(T, Ts)...}`): the
   // pack's name otherwise resolves to its FIRST element only
   // (template_mapt::type_map keeps the pack resolvable as a single type),
   // silently collapsing the expansion to one copy.  In template-packs-only
   // mode, so that a function-parameter pack expansion `g(a...)` -- driven by
   // pack_size_map and expanded at instantiation -- is not expanded a second
   // time.
-  // N5008 [temp.variadic]/7: the instantiation of a pack expansion over an
+  // N5008 [temp.variadic]/16: the instantiation of a pack expansion over an
   // EMPTY pack produces an empty list -- `{_StrongOrd,
   // __type_to_enum<_Ts>()...}' with no `_Ts' is `{_StrongOrd}' (libc++'s
   // __get_comp_type for common_comparison_category_t<>).  An empty type
@@ -1145,14 +1145,14 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
     }
   }
 
-  // Per [temp.variadic]/7: substitute non-empty pack parameter
+  // Per [temp.variadic]/9: substitute non-empty pack parameter
   // names in the body with their actual types.
   if(!template_map.pack_args_map.empty())
   {
     std::map<std::string, irep_idt> pack_subst;
     for(const auto &pa : template_map.pack_args_map)
     {
-      // N5008 [temp.variadic]/5: single-element packs only -- a
+      // N5008 [temp.variadic]/9: single-element packs only -- a
       // >=2-element pack whose name still appears here is a pattern the
       // per-element expander above substitutes in lockstep; stamping the
       // front element would concretize every expansion copy to element 0
@@ -1176,7 +1176,7 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
       // Returns whether `node` names one of the substituted packs.
       std::function<bool(irept &)> subst = [&](irept &node) -> bool
       {
-        // N5008 [expr.sizeof]/5 + [temp.variadic]/8: `sizeof...(P)` is
+        // N5008 [expr.sizeof]/4 + [temp.variadic]/10: `sizeof...(P)` is
         // a pack-size QUERY; stamping the single element's tag rewrote
         // it into the element type's BYTE size (the tuple
         // converting-element silent constructor drop).
@@ -1211,14 +1211,14 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
     }
   }
 
-  // Per [temp.variadic]/7: substitute non-empty pack parameter
+  // Per [temp.variadic]/9: substitute non-empty pack parameter
   // names in the body with their actual types.
   if(!template_map.pack_args_map.empty())
   {
     std::map<std::string, irep_idt> pack_subst;
     for(const auto &pa : template_map.pack_args_map)
     {
-      // N5008 [temp.variadic]/5: single-element packs only -- a
+      // N5008 [temp.variadic]/9: single-element packs only -- a
       // >=2-element pack whose name still appears here is a pattern the
       // per-element expander above substitutes in lockstep; stamping the
       // front element would concretize every expansion copy to element 0
@@ -1242,7 +1242,7 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
       std::function<void(irept &)> subst = [&](irept &node)
       {
         // see above: keep `sizeof...(P)` operands intact
-        // ([expr.sizeof]/5)
+        // ([expr.sizeof]/4)
         if(node.get_bool("#sizeof_pack"))
           return;
         if(
@@ -1259,7 +1259,7 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
     }
   }
 
-  // Per [temp.variadic]/7: remove empty pack expansion
+  // Per [temp.variadic]/16: remove empty pack expansion
   // expressions from member initializers in the body.
   if(!template_map.pack_size_map.empty())
   {
@@ -1310,7 +1310,7 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
     }
   }
 
-  // N5008 [temp.variadic]/5,7: expand the body uses of a *function
+  // N5008 [temp.variadic]/5,9: expand the body uses of a *function
   // template's own* value parameter pack (e.g. the `ts` in
   // `template<class T, class... Ts> R f(T t, Ts... ts) { g(ts...); }`).
   // Unlike a class parameter pack -- whose body uses are expanded by the
@@ -1330,7 +1330,7 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
   //   * one whose referenced name matches replicated parameters `S$0..S$k`
   //     (N >= 2) expands to one argument per parameter, `S` renamed to `S$i`;
   //   * one whose referenced name matches *no* parameter is a pack that was
-  //     deduced empty (N == 0) -> drop the argument ([temp.variadic]/7).
+  //     deduced empty (N == 0) -> drop the argument ([temp.variadic]/16).
   // Acts only on function-template instances (a `#fn_template_type` whose
   // trailing template parameter is a pack), and only on arguments that still
   // carry `...` (class-pack and struct_tag uses had theirs removed above),
@@ -1383,7 +1383,7 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
 
       // The pack stem a pattern references: the first short name (matching
       // an exact or replicated parameter) found anywhere in the argument.
-      // [temp.variadic]/5: a pack is expanded by the innermost expansion
+      // [temp.variadic]/8: a pack is expanded by the innermost expansion
       // that contains it; a nested pattern with its own `...' is skipped
       std::function<std::string(const irept &, bool)> referenced_stem_rec =
         [&](const irept &n, bool root) -> std::string
@@ -1411,7 +1411,7 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
       {
         // A mem-initializer stores its arguments as positional subs of the
         // member_initializer code node (no ID_arguments child): the same
-        // [temp.variadic]/5 expansion applies -- the function parameter
+        // [temp.variadic]/9 expansion applies -- the function parameter
         // pack in `__bound_args_(__bound_args...)` (libc++
         // __perfect_forward's constructor) must replicate to
         // `__bound_args$0..$k`.  Only ellipsis-carrying arguments are
@@ -1432,7 +1432,7 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
               continue;
             }
             const std::string stem = referenced_stem(arg);
-            // [temp.variadic]/5: an expansion whose pattern names no
+            // [temp.variadic]/8: an expansion whose pattern names no
             // parameter outside its nested expansions (`one(seq<Js>{},
             // ls...)...', over the template pack Js) is left to the
             // template-pack expansion; only its nested expansions are this
@@ -1464,13 +1464,13 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
             {
               // No stem matches this instance's parameters.  Drop the
               // expansion ONLY when a known-EMPTY pack governs it
-              // ([temp.variadic]/7); an expansion whose pack is not
+              // ([temp.variadic]/16); an expansion whose pack is not
               // deducible from the parameter list HERE (e.g. `__u...` in
               // a delegating mem-initializer processed before the pack
               // parameters are replicated) must be left for the later
               // instantiation-time expansion -- dropping it truncated
               // the __tuple_impl delegation's argument list and the
-              // constructor stopped resolving ([temp.variadic]/5:
+              // constructor stopped resolving ([temp.variadic]/8:
               // lengths come from the packs expanded in the pattern).
               bool governed_by_empty = false;
               for(const auto &ps : template_map.pack_size_map)
@@ -1508,7 +1508,7 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
               // If the fn template's own trailing pack has a recorded
               // size k >= 1, replicate the argument by pack size,
               // renaming the value reference `name` -> `name$i`
-              // ([temp.variadic]/5: one element per pack element; the
+              // ([temp.variadic]/9: one element per pack element; the
               // replicated parameter naming matches
               // expand_parameter_packs' `base$k` convention).
               {
@@ -1601,7 +1601,7 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
     }
   }
 
-  // Per [temp.variadic]/7: drop zero-length pack expansions from the
+  // Per [temp.variadic]/16: drop zero-length pack expansions from the
   // template-argument lists in the body (e.g. `Tr<U...>` -> `Tr<>` for an
   // empty `U`).
   remove_empty_pack_expansion_args(body);
@@ -1880,13 +1880,13 @@ void cpp_typecheckt::typecheck_method_bodies()
         }
         catch(int)
         {
-          // N5008 [temp.deduct]/8: an UNRECOVERED "no viable function" failure
-          // in this ordinary body (a call whose only candidates were function
-          // templates all removed by substitution failures) must be diagnosed,
-          // not silently swallowed.  pending_no_viable_call is set iff such a
-          // failure's throw reached here without any intervening (recovering)
-          // resolution, so it takes precedence over the unsupported-STL
-          // leniency below.
+          // N5008 [temp.deduct.general]/8, [over.match.general]/3: an
+          // UNRECOVERED "no viable function" failure in this ordinary body (a
+          // call whose only candidates were function templates all removed by
+          // substitution failures) must be diagnosed, not silently swallowed.
+          // pending_no_viable_call is set iff such a failure's throw reached
+          // here without any intervening (recovering) resolution, so it takes
+          // precedence over the unsupported-STL leniency below.
           if(pending_no_viable_call)
           {
             pending_no_viable_call = false;
@@ -1920,7 +1920,7 @@ void cpp_typecheckt::typecheck_method_bodies()
           // A failure that already COMMITTED a diagnostic (the error
           // count moved) and did not come through a template
           // instantiation is a genuine rejection: let it propagate so
-          // the run ends with CONVERSION ERROR ([intro.compliance]/2.2
+          // the run ends with CONVERSION ERROR ([intro.compliance.general]/2.3
           // -- the rejects-invalid tests depend on it).
           if(
             get_message_handler().get_message_count(messaget::M_ERROR) !=
@@ -1934,7 +1934,7 @@ void cpp_typecheckt::typecheck_method_bodies()
           // typecheck_main's silent catch(int) -- reported as SUCCESS
           // over a HALF-CLEANED symbol table (clean_up never ran,
           // class types kept their code-typed method components,
-          // [class.mem.general]/4) and symbolic execution crashed
+          // [class.mem.general]/5) and symbolic execution crashed
           // pairing a 0-operand initializer against them
           // (cpp14_perfect_forward_struct_arity).  A warned,
           // structurally-sound recovery is strictly better than a
@@ -2006,10 +2006,10 @@ void cpp_typecheckt::typecheck_method_bodies()
   // draining transitively, and re-scan to a fixpoint.  Members that no
   // converted body references are left uninstantiated, as the standard
   // requires; this is exactly what lets an unused, ill-formed member of a
-  // specialization remain harmless ([temp.inst]/8, /11).
+  // specialization remain harmless ([temp.inst]/6, /11).
   // the classes of the objects named in converted bodies: an object
   // created by aggregate initialization (`transt tx{p, this}') calls no
-  // constructor, yet its destructor is potentially invoked ([class.dtor]/12)
+  // constructor, yet its destructor is potentially invoked ([class.dtor]/14)
   std::set<irep_idt> objects_of_class;
   std::function<void(const irept &, std::set<irep_idt> &)> gather_referenced =
     [&](const irept &n, std::set<irep_idt> &referenced)
@@ -2047,7 +2047,7 @@ void cpp_typecheckt::typecheck_method_bodies()
 
     std::vector<irep_idt> to_emit;
 
-    // [class.dtor]/12: a destructor is *potentially invoked* when an object of
+    // [class.dtor]/14: a destructor is *potentially invoked* when an object of
     // its class is created (e.g. at the end of a block or full-expression for
     // an automatic or temporary object).  Destructor calls for such objects
     // are synthesised later, during goto-conversion, so they are not visible
@@ -2088,7 +2088,7 @@ void cpp_typecheckt::typecheck_method_bodies()
       if(!required)
       {
         // A deferred destructor of a constructed class is potentially
-        // invoked and must be instantiated ([class.dtor]/12, [temp.inst]/4).
+        // invoked and must be instantiated ([class.dtor]/14, [temp.inst]/4).
         const symbolt *ds = symbol_table.lookup(d.first);
         if(
           ds != nullptr && ds->type.id() == ID_code &&
@@ -2191,7 +2191,7 @@ void cpp_typecheckt::typecheck_method_bodies()
       if(body.id() == ID_cpp_not_typechecked)
         continue;
 
-      // [temp.inst]/1 + [temp.variadic]/5,7: identical preprocessing to the
+      // [temp.inst]/4 + [temp.variadic]/9,16: identical preprocessing to the
       // main drain above -- restore the function-template map and expand the
       // replicated parameter-pack uses.  A member function template instance
       // drained here (e.g. requeued by the member-initializer odr-use
@@ -2369,7 +2369,7 @@ void cpp_typecheckt::drop_unreferenced_held_back_bodies()
   held_back_bodies.clear();
 }
 
-/// N5008 [temp.inst]/1, [temp.spec.partial.match]: bind the template
+/// N5008 [temp.inst]/4, [temp.spec.partial.match]: bind the template
 /// parameters of the class template instance \p class_sym in \p map -- the
 /// recorded arguments positionally, then the deduction-time pack bindings
 /// persisted on the instance (\#spec_template_packs; a partial
@@ -2487,7 +2487,7 @@ void cpp_typecheckt::add_method_body(symbolt *_method_symbol)
         {
           bind_class_instance_parameters(*class_sym, method_map);
         }
-        // N5008 [temp.dep.type]/1 + [temp.mem]: a member of a member class
+        // N5008 [basic.scope.temp]/2 + [temp.mem]: a member of a member class
         // template of a class template is in the scope of BOTH templates;
         // its body may name the ENCLOSING template's parameters
         // (`Outer<T, N>::Inner<U>::g() { return k + N; }`).  Only the
@@ -2574,7 +2574,7 @@ void cpp_typecheckt::add_method_body(symbolt *_method_symbol)
           // in only when odr-used.  Constructor odr-use is visible as a call
           // in the type-checked body; destructor odr-use for automatic and
           // temporary objects is recovered in typecheck_method_bodies() from
-          // the constructed-class set ([class.dtor]/12).
+          // the constructed-class set ([class.dtor]/14).
           bool is_virtual = _method_symbol->type.get_bool(ID_C_is_virtual);
           if(!is_virtual)
             defer = true;
@@ -2617,7 +2617,7 @@ void cpp_typecheckt::add_method_body(symbolt *_method_symbol)
       }
     }
 
-    // a hidden friend of a class template specialization, [temp.inst]/4
+    // a hidden friend of a class template specialization, [temp.inst]/5
     if(
       defining_friend_of_template_instance &&
       _method_symbol->type.get(ID_C_member_name).empty() &&
@@ -2627,7 +2627,7 @@ void cpp_typecheckt::add_method_body(symbolt *_method_symbol)
     }
 
     method_bodyt body{_method_symbol, method_map, instantiation_stack};
-    // N5008 [class.mem.general]/7, [basic.lookup.unqual]/4: the body of a
+    // N5008 [class.mem.general]/9.1, [basic.lookup.unqual]/4: the body of a
     // member function defined in a class that is not a template
     // (specialization) sees the namespace-scope declarations that precede
     // the class, not later ones (see lookup_source_limit); templates bind

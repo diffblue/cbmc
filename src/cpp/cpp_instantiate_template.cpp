@@ -189,7 +189,7 @@ cpp_typecheckt::template_suffix(const cpp_template_args_tct &template_args)
         continue;
       }
 
-      // N5008 [temp.param]/7 + [temp.arg.nontype]/1: a class-type non-type
+      // N5008 [temp.param]/12 + [temp.arg.nontype]/1: a class-type non-type
       // template argument is a converted constant expression of the
       // parameter's structural class type -- `Fixed{42}` / `Fixed(42)` with
       // a constexpr constructor is a temporary whose constructor call the
@@ -248,7 +248,7 @@ cpp_typecheckt::template_suffix(const cpp_template_args_tct &template_args)
         i = 0;
       else if(!e.is_constant())
       {
-        // N5008 [temp.arg.nontype]/1-2: a non-type template argument for a
+        // N5008 [temp.arg.nontype]/2, /4: a non-type template argument for a
         // parameter of reference, pointer, or (C++20) class type designates an
         // object/value rather than a scalar constant -- e.g.
         // reference_counting<T>'s `template<typename T, const T &empty =
@@ -356,7 +356,7 @@ cpp_scopet &cpp_typecheckt::sub_scope_for_instantiation(
   }
 }
 
-/// N5008 [temp.variadic]/5,7: expand pack-expansion mem-initializers of an
+/// N5008 [temp.variadic]/8,9: expand pack-expansion mem-initializers of an
 /// instantiated constructor into one initializer per pack element, with every
 /// referenced pack -- TYPE packs (\p pack_args_map) and NON-TYPE packs
 /// (\p pack_expr_map) alike -- substituted in lockstep.  libstdc++ pair's
@@ -420,7 +420,7 @@ static void expand_member_initializer_packs(
   std::function<void(irept &, std::size_t)> subst_elem =
     [&](irept &n, std::size_t k)
   {
-    // N5008 [expr.sizeof]/5 + [temp.variadic]/8: in `sizeof...(P)` the
+    // N5008 [expr.sizeof]/4 + [temp.variadic]/10: in `sizeof...(P)` the
     // pack name is the operand of a pack-size query, not a reference to
     // an element -- substituting element k here rewrote the name to the
     // element's TAG, the query could no longer resolve the pack, and the
@@ -480,7 +480,7 @@ static void expand_member_initializer_packs(
         subst_elem(copy, k);
         new_inits.push_back(std::move(copy));
       }
-      // arity 0: the initializer vanishes ([temp.variadic]/7)
+      // arity 0: the initializer vanishes ([temp.variadic]/16)
     }
     else
     {
@@ -541,7 +541,7 @@ void expand_member_initializer_packs_in_body(
 /// N5008 [expr.prim.fold]/1-3: expand the fold expressions in \p node that
 /// fold over the template parameter pack \p short_name, whose elements
 /// (types as `ID_type` expressions, or non-type values) are \p pack_args.
-/// N5008 [expr.prim.fold]/2: a fold over a one-element pack is its single
+/// N5008 [temp.variadic]/14: a fold over a one-element pack is its single
 /// pattern instance -- `(e op ...)' and `(... op e)' are `e', a binary fold
 /// applies op once with the init operand on its side.  Rewrites every fold
 /// node in \p node whose pack has already been substituted.
@@ -566,7 +566,7 @@ static void reduce_single_element_folds(irept &node)
   }
 }
 
-/// N5008 [expr.prim.fold]/1-3, [temp.variadic]/5: with SEVERAL template
+/// N5008 [expr.prim.fold]/1-3, [temp.variadic]/8: with SEVERAL template
 /// parameter packs, a fold in a function template's \p body may be over any
 /// of them -- `(100 + ... + Is)' in `template <class F, class... Vs,
 /// size_t... Is> f(seq<Is...>)'.  The function-parameter-pack expansion
@@ -621,8 +621,8 @@ void cpp_typecheckt::expand_folds_over_template_packs(
 /// A unary right fold `(pat op ...)` over N elements becomes the
 /// right-associated tree `pat0 op (pat1 op ... op patN-1)`, a unary left fold
 /// `(... op pat)` the left-associated tree; a binary fold is seeded by its
-/// init operand ([expr.prim.fold]/2).  An empty pack yields the operator's
-/// identity ([expr.prim.fold]/3: `&&' -> true, `||' -> false, otherwise 0);
+/// init operand ([temp.variadic]/14).  An empty pack yields the operator's
+/// identity ([temp.variadic]/14: `&&' -> true, `||' -> false, otherwise 0);
 /// a single element the sole substituted pattern.  Every bare reference to
 /// the pack inside the pattern (a type position such as `sizeof(Ts)` or
 /// `__is_same(T, Ts)`, or a value position) is replaced by the element.
@@ -662,7 +662,7 @@ void cpp_typecheckt::expand_folds_over_pack(
   substitute_arg = [&is_pack_ref, &substitute_arg, &short_name](
                      const irept &n, const exprt &arg) -> irept
   {
-    // N5008 [temp.variadic]/5: substitute the pack element INTO the
+    // N5008 [temp.variadic]/9: substitute the pack element INTO the
     // pattern.  A QUALIFIED pack reference (`Ts::v` -- fold over a
     // member of each pack element, e.g.
     // `static inline int value = (Ts::v + ...)`) must keep its
@@ -762,7 +762,7 @@ void cpp_typecheckt::expand_folds_over_pack(
       return;
     }
 
-    // N5008 [expr.prim.fold]/2: binary folds.  Parser layout:
+    // N5008 [expr.prim.fold]/3: binary folds.  Parser layout:
     // sub[0] = the operand left of `op ...`, sub[1] = the operand right
     // of `... op`.  `(init op ... op pack)` is a binary LEFT fold
     // (((init op e0) op e1) ...); `(pack op ... op init)` is a binary
@@ -778,7 +778,7 @@ void cpp_typecheckt::expand_folds_over_pack(
         const irept pattern =
           pack_on_right ? node.get_sub()[1] : node.get_sub()[0];
         expand_folds(init_expr);
-        // [expr.prim.fold]/3: over an empty pack a binary fold yields
+        // [temp.variadic]/14: over an empty pack a binary fold yields
         // its init operand.
         irept result = init_expr;
         if(pack_on_right)
@@ -818,7 +818,7 @@ void cpp_typecheckt::expand_folds_over_pack(
 
 /// Create or find the symbol for a class template instantiation.
 ///
-/// Per [temp.inst]/1, class template specializations are implicitly
+/// Per [temp.inst]/2, class template specializations are implicitly
 /// instantiated when referenced.  This function creates the incomplete
 /// type symbol (marked with template_class_instance) that will be
 /// elaborated later by elaborate_class_template.
@@ -1019,7 +1019,7 @@ const symbolt &cpp_typecheckt::class_template_symbol(
 
 /// Elaborate (instantiate) a class template instance.
 ///
-/// Implements [temp.inst]/1: "Unless a class template specialization has been
+/// Implements [temp.inst]/2: "Unless a class template specialization has been
 /// explicitly instantiated or explicitly specialized, the class template
 /// specialization is implicitly instantiated when the specialization is
 /// referenced in a context that requires a completely-defined object type."
@@ -1032,15 +1032,15 @@ struct_union_typet::componentt *cpp_typecheckt::ensure_member_complete(
   struct_union_typet &struct_type,
   const irep_idt &base_name)
 {
-  // Phase 3 narrow producer + Phase 4 on-demand resolution per
-  // N5008 [temp.inst]/3.1.  When a component carries the
+  // Phase 3 narrow producer + Phase 4 on-demand resolution (a front
+  // end strategy, not a rule of [temp.inst]).  When a component carries the
   // `ID_C_lazy_member_type` marker, its declared type is an
   // unresolved cpp_name placeholder kept by the producer in
   // `typecheck_compound_body`.  This entry point is the consumer
   // side: it locates the named component, and if it is lazy, makes
   // a single best-effort attempt to resolve the placeholder under
   // the original class scope and SFINAE protection
-  // ([temp.deduct]/8).  On success the component's type is
+  // ([temp.deduct.general]/8).  On success the component's type is
   // replaced with the resolved type and the marker cleared; on
   // failure the placeholder is left in place so subsequent calls
   // can retry (idempotent), and the marker remains visible to
@@ -1088,7 +1088,7 @@ void cpp_typecheckt::complete_all_components(struct_union_typet &struct_type)
 bool cpp_typecheckt::try_resolve_lazy_member(
   struct_union_typet::componentt &component)
 {
-  // Per N5008 [temp.inst]/3.1 with [temp.deduct]/8 protection: try
+  // With [temp.deduct.general]/8 (SFINAE) protection: try
   // to resolve a lazy component's placeholder type one more time.
   // The producer in `typecheck_compound_body` saved the class scope
   // identifier under `ID_lazy_type_source` so the retry can be
@@ -1184,7 +1184,7 @@ bool cpp_typecheckt::try_resolve_lazy_typedef_symbol(symbolt &sym)
   // prefix.
   const std::string &cur_prefix = cpp_scopes.current_scope().prefix;
   const std::string &cls_prefix = cls_scope_it->second->prefix;
-  // N5008 [temp.inst]/1: inside the class body the alias is at least
+  // N5008 [temp.inst]/2: inside the class body the alias is at least
   // NAMED without instantiating the aliased specialization -- enough for a
   // member function's parameter or return type (`static const _Key
   // &_S_key(const _Node &)' with `typedef _Rb_tree_node<_Val> _Node;'
@@ -1463,7 +1463,7 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
 
   const symbolt &symbol = lookup(to_tag_type(type));
 
-  // N5008 [temp.inst]/2, [temp.class.spec.match]: while the partial
+  // N5008 [temp.inst]/2, [temp.spec.partial.match]: while the partial
   // specializations of THIS specialization are being matched (below),
   // typechecking a candidate's requires-clause or argument pattern may
   // name the specialization again (`typename _Iter::difference_type' with
@@ -1483,7 +1483,7 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
     }
   } in_progress_guard{elaborations_in_progress, symbol.name};
 
-  // N5008 [temp.point]/1, [temp.inst]/2: the specialization is instantiated
+  // N5008 [temp.point]/4, [temp.inst]/2: the specialization is instantiated
   // in its own context, from its recorded template arguments -- not in the
   // union of the bindings of whatever instantiation happens to REQUIRE it
   // (the outer bindings leaked into pack sizes: `_ArgTypes...' of
@@ -1546,12 +1546,12 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
         if(!p.get("#C_concept_constraint").empty())
           has_concept_constraint = true;
       // A requires-clause on the partial specialization is an associated
-      // constraint ([temp.constr.decl]/1) just like a constrained
+      // constraint ([temp.constr.decl]/3) just like a constrained
       // template parameter.  When several partial specializations share
       // the same argument pattern and differ only by their
       // requires-clauses (e.g. libstdc++'s three __iterator_traits
       // specializations), the most-constrained *satisfied* one must be
-      // selected ([temp.class.spec.match]/2 with [temp.constr.order]).
+      // selected ([temp.spec.partial.match]/2 with [temp.constr.order]).
       // Re-running the specialization search from the primary template
       // (below) performs that constraint-aware selection, so trigger it
       // for requires-clause-constrained specializations too -- otherwise
@@ -1622,7 +1622,7 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
     // template that is instantiated here.  A constrained partial
     // specialization is re-matched from the primary (primary_template), but
     // it is the specialization that is instantiated (the instance is
-    // empty, below): N5008 [temp.spec.partial.general]/1 -- each partial
+    // empty, below): N5008 [temp.spec.partial.general]/2 -- each partial
     // specialization is a distinct template, so the primary recursing into
     // its specialization (`impl<T, B> : impl<T, B + 1>' ending in a
     // constrained `impl<T, 4>', libstdc++ 16's __common_reference_impl
@@ -1846,11 +1846,11 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
     // still incomplete.  Elaborate any incomplete class-template-instance
     // arguments up front so the specialization match (and the resulting
     // instantiation) is the same regardless of which context first
-    // required the specialization ([temp.spec.general]/7: at most one
+    // required the specialization ([temp.point]/7: at most one
     // point of instantiation per translation unit).
     //
     // Only when there ARE partial specializations to match: without any,
-    // the elaboration is not required by [temp.inst]/1 and would be
+    // the elaboration is not required by [temp.inst]/2 and would be
     // premature -- libstdc++'s `__alloc_traits<A>::rebind<_Rb_tree_node<X>>
     // ::other' in a `std::set<X>' named while X is still incomplete
     // instantiated the node (and its `unsigned char _M_storage[sizeof(X)]')
@@ -1968,7 +1968,7 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
         cpp_scopet::id_sett id_set =
           scope.lookup(primary_template.base_name, cpp_scopet::SCOPE_ONLY);
 
-        // [temp.deduct]/8 + [temp.class.spec.match]: specialization
+        // [temp.deduct.general]/8 + [temp.spec.partial.match]: specialization
         // matching iterates candidate partial specializations; per-
         // candidate substitution failure is SFINAE, not a compile
         // error.
@@ -2207,7 +2207,7 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
                 // reference in patterns (base-specifier / parameter
                 // replication is keyed by NAME), collapsing e.g.
                 // `__tuple_leaf<_Indx, _Tp>...` to the first element's
-                // type for every leaf ([temp.variadic]/5; the
+                // type for every leaf ([temp.variadic]/9; the
                 // heterogeneous tuple<int,double,char> shape).
                 if(!pack_exprs.empty())
                 {
@@ -2243,7 +2243,7 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
                  guessed_args.arguments()[i].type().id() == ID_unassigned))
               {
                 guessed_args.arguments()[i] = exprt(ID_type, empty_typet());
-                // N5008 [temp.deduct.type]/9, [temp.variadic]/5: record the
+                // N5008 [temp.deduct.type]/9, [temp.variadic]/16: record the
                 // pack as deduced EMPTY, so that the pattern check below
                 // expands `declval<Args>()...' to no arguments
                 // (`decltype(g(declval<Args>()...))' is `decltype(g())')
@@ -2264,7 +2264,7 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
           if(guessed_args.has_unassigned() || guessed_args.has_conflict())
             continue;
 
-          // [temp.variadic]/5: expand a deduced function parameter pack
+          // [temp.variadic]/9: expand a deduced function parameter pack
           // in the guessed arguments into one positional argument per
           // element, matching the layout that template_mapt::build
           // expects when the specialization is instantiated (extra
@@ -2289,7 +2289,7 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
                     expanded.push_back(exprt(ID_type, pt));
                   continue;
                 }
-                // [temp.variadic]/5 likewise for a NON-TYPE pack: its
+                // [temp.variadic]/9 likewise for a NON-TYPE pack: its
                 // deduced element VALUES live in pack_expr_map (e.g.
                 // `_Ip = {0, 1}` from matching
                 // `B<integer_sequence<unsigned long, _Ip...>>` against
@@ -2351,7 +2351,7 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
                   spec_params[pi].get("#C_concept_constraint");
                 if(cc.empty())
                   continue;
-                // N5008 [temp.param]/4: the type-constraint `C T' (`C<A...>
+                // N5008 [temp.param]/9: the type-constraint `C T' (`C<A...>
                 // T') introduces the constraint-expression `C<T>' (`C<T,
                 // A...>', add_type_constraint); [temp.spec.partial.match]/2:
                 // the specialization matches only if it is satisfied by the
@@ -2467,7 +2467,7 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
                     {
                       typet t = static_cast<const typet &>(e.find(ID_type_arg));
                       cmap.apply(t);
-                      // [expr.prim.req.type]/1 + [temp.deduct]/8:
+                      // [expr.prim.req.type]/1 + [temp.deduct.general]/8:
                       // a type requirement is satisfied iff the
                       // type-id is valid; substitution failure is
                       // a SFINAE failure.
@@ -2487,14 +2487,14 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
                     {
                       exprt expr_copy = to_unary_expr(e).op();
                       cmap.apply(expr_copy);
-                      // [expr.prim.req.simple]/1 + [temp.deduct]/8:
+                      // [expr.prim.req.simple]/1 + [temp.deduct.general]/8:
                       // a simple requirement is satisfied iff the
                       // expression is valid; substitution failure
                       // is SFINAE.
                       try
                       {
                         sfinae_contextt sfinae_guard{*this};
-                        // [expr.prim.req.general]/2: unevaluated operand
+                        // [expr.prim.req.simple]/1: unevaluated operand
                         unevaluated_operandt unevaluated_guard{*this};
                         typecheck_expr(expr_copy);
                         e = typecast_exprt{true_exprt(), c_bool_type()};
@@ -2510,7 +2510,7 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
                     {
                       exprt expr_copy = to_unary_expr(e).op();
                       cmap.apply(expr_copy);
-                      // [expr.prim.req.compound] + [temp.deduct]/8:
+                      // [expr.prim.req.compound] + [temp.deduct.general]/8:
                       // a compound requirement checks that the
                       // expression is valid AND (if a trailing
                       // return-type constraint is present) that the
@@ -2521,7 +2521,7 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
                       {
                         sfinae_contextt sfinae_guard{*this};
                         {
-                          // [expr.prim.req.general]/2: unevaluated operand
+                          // [expr.prim.req.compound]/1: unevaluated operand
                           unevaluated_operandt unevaluated_guard{*this};
                           typecheck_expr(expr_copy);
                         }
@@ -2637,14 +2637,14 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
           cpp_template_args_tct partial_specialization_args_tc;
           bool sfinae_failed = false;
           {
-            // Per [temp.inst]/1 + [temp.deduct]/8: partial
+            // Per [temp.inst]/2 + [temp.deduct.general]/8: partial
             // specialization matching uses template-argument
             // deduction, so substitution failure is SFINAE.
             // Suppress eager elaboration to avoid instantiating
             // unused branches (e.g. conditional_t's false branch).
             bool old_suppress = suppress_elaborate;
             suppress_elaborate = true;
-            // [temp.arg.explicit]/4 note 1 + [temp.variadic]/4: a trailing
+            // [temp.arg.explicit]/4 note 1 + [temp.variadic]/16: a trailing
             // parameter pack deduced to an empty sequence contributes zero
             // arguments.  When the specialization pattern has MORE arguments
             // than the actual (`<H, T...>` matched against `<3>`), the extra
@@ -2884,7 +2884,7 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
                 best_match = &s;
                 best_spec_args = guessed_args;
               }
-              // N5008 [temp.class.spec.match]/2 + [temp.constr.order]: when
+              // N5008 [temp.spec.partial.match]/2 + [temp.constr.order]: when
               // the argument patterns are equally specialized, the more
               // CONSTRAINED specialization is selected, determined by
               // constraint subsumption -- not by any counting heuristic.
@@ -3148,7 +3148,7 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
       }
     }
 
-    // N5008 [temp.inst]/1, [temp.point]: only a *defined* class template can be
+    // N5008 [temp.inst]/2, [temp.point]: only a *defined* class template can be
     // implicitly instantiated.  If the selected template (the primary template
     // or the partial specialization chosen above) has so far only been
     // forward-declared -- no class body has been seen for it, i.e. it is not in
@@ -3221,9 +3221,10 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
 /// class's) are handled; member function templates are left to their own
 /// instantiation path.
 ///
-/// Grounded in N5008 [temp.over]/[over.match]: the definition that belongs to
-/// a member is the one whose function signature matches it, independent of
-/// the parameter *names* used in the out-of-line definition ([dcl.fct]/3).
+/// Grounded in N5008 [temp.over]/[basic.scope.scope]/4: the definition that
+/// belongs to a member is the one whose function signature matches it,
+/// independent of the parameter *names* used in the out-of-line definition
+/// ([dcl.fct]/3).
 ///
 /// \param member: the realized instance member function symbol
 /// \param [out] param_names: on success, the out-of-line definition's
@@ -3263,7 +3264,7 @@ std::optional<exprt> cpp_typecheckt::instantiate_matching_member_body(
   // `std::__cxx11::tag-basic_string<char,...>`): a candidate definition
   // must belong to THIS class template.  Same-named members of other
   // templates (basic_string_view::rfind vs basic_string::rfind) are not
-  // this member's definition ([class.mfct]/1: the definition of a member
+  // this member's definition ([class.mfct]/2: the definition of a member
   // function is a member of the class it is declared in), and matching
   // them by base name attaches a body whose parameter names and
   // semantics belong elsewhere.
@@ -3474,7 +3475,7 @@ void cpp_typecheckt::queue_deferred_methods_of_instance(
 /// ([temp.mem.func], [temp.mem.class], [temp.static]).  For function
 /// templates, creates the function symbol with substituted types.
 ///
-/// Template argument substitution follows [temp.deduct.type]: the
+/// Template argument substitution follows [temp.deduct.general]/6: the
 /// template_map is used to replace template parameters with their
 /// deduced or explicitly specified values.
 ///
@@ -3487,7 +3488,7 @@ void cpp_typecheckt::queue_deferred_methods_of_instance(
 
 /// The parameter-list \p params of a function template spelled with the
 /// template's own parameters (\p ttype) normalised to their POSITION (`#0',
-/// `#1', ...), parameter names erased ([dcl.fct]/3,5) -- so the same
+/// `#1', ...), parameter names erased ([dcl.fct]/3) -- so the same
 /// signature written with differently named template parameters compares
 /// equal.  The first \p skip_first template parameters (an enclosing class
 /// template's, for an out-of-line member template definition) are not part
@@ -3521,7 +3522,7 @@ static std::string normalized_parameter_signature(
   // Erase the parameter NAMES first: the declaration may leave a
   // parameter unnamed where the definition names it (`swap(_Tp&,
   // _Tp&)` vs `swap(_Tp& __a, _Tp& __b)`, libstdc++ bits/move.h) --
-  // only the TYPES are signature ([dcl.fct]/5).
+  // only the TYPES are signature ([dcl.fct]/3).
   for(auto &pdecl : copy.get_sub())
   {
     if(pdecl.id() != ID_cpp_declaration)
@@ -3529,7 +3530,7 @@ static std::string normalized_parameter_signature(
     for(auto &d : static_cast<cpp_declarationt &>(pdecl).declarators())
     {
       d.name() = cpp_namet{};
-      // N5008 [dcl.fct]/3 + [temp.variadic]/4: a function parameter
+      // N5008 [dcl.fct]/3 + [temp.variadic]/2: a function parameter
       // pack is a parameter pack whether or not the declarator names
       // it.  The parser records the `...` of an UNNAMED pack
       // (`make_shared(_Args&&...)`, libstdc++'s in-class friend
@@ -3547,7 +3548,7 @@ static std::string normalized_parameter_signature(
         d.type().set(ID_ellipsis, true);
       }
     }
-    // N5008 [dcl.fct]/5: a cv-qualifier that applies to the parameter
+    // N5008 [dcl.fct]/3: a cv-qualifier that applies to the parameter
     // itself (`const _NoThrowSentinel _Last' in the MSVC STL's
     // _Destroy_range definition, declared earlier without it) is removed
     // when the parameter-type-list is formed.  It is a top-level const of
@@ -3605,7 +3606,7 @@ static std::string normalized_parameter_signature(
   return cpp_type2name(static_cast<const typet &>(copy));
 }
 
-/// N5008 [dcl.fct]/3,5, [temp.over.link]: does the out-of-line member
+/// N5008 [dcl.fct]/3, [temp.over.link]: does the out-of-line member
 /// template definition's parameter list \p def_params -- spelled with the
 /// definition's template parameters \p def_tt, the enclosing class
 /// template's first, then the member's own -- denote the same parameter
@@ -3666,7 +3667,7 @@ bool cpp_typecheckt::member_template_parameters_match(
   };
   walk(def_copy);
   // parameter names are not signature ([dcl.fct]/3), and neither are
-  // default arguments ([dcl.fct]/5: the parameter-type-list; only the
+  // default arguments ([dcl.fct]/10: the parameter-type-list; only the
   // declaration carries them, [dcl.fct.default]/4)
   const auto strip_names = [](irept &params)
   {
@@ -3688,7 +3689,7 @@ bool cpp_typecheckt::member_template_parameters_match(
          cpp_type2name(static_cast<const typet &>(def_copy));
 }
 
-/// N5008 [dcl.fct]/3,5: does the out-of-line definition \p def (parsed form)
+/// N5008 [dcl.fct]/3: does the out-of-line definition \p def (parsed form)
 /// have the signature of the instantiated member \p member?  The arity must
 /// agree; when \p class_args is given (a regular member of the class template
 /// instance, not a member template) the parameter types, with the class's
@@ -3733,7 +3734,7 @@ bool cpp_typecheckt::out_of_line_definition_matches(
     else
       ++def_arity;
   }
-  // `(void)' declares no parameters ([dcl.fct]/4)
+  // `(void)' declares no parameters ([dcl.fct]/2)
   if(
     def_arity == 1 &&
     static_cast<const cpp_declarationt &>(dparams.front()).type().id() ==
@@ -3743,8 +3744,8 @@ bool cpp_typecheckt::out_of_line_definition_matches(
   }
   if(def_has_pack ? member_arity < def_arity : def_arity != member_arity)
     return false;
-  // [over.load]/2.3: `f(const K &)' and `f(const K &) const' are different
-  // members; the definition's cv-qualifier must be the member's
+  // [basic.scope.scope]/4: `f(const K &)' and `f(const K &) const' are
+  // different members; the definition's cv-qualifier must be the member's
   if(first == 1 && mparams.front().type().id() == ID_pointer)
   {
     const bool member_const = to_pointer_type(mparams.front().type())
@@ -3831,7 +3832,7 @@ bool cpp_typecheckt::out_of_line_definition_matches(
     if(typechecked && i < mparams.size())
     {
       typet mtype = mparams[i].type();
-      // top-level cv-qualifiers are not part of the signature ([dcl.fct]/5)
+      // top-level cv-qualifiers are not part of the signature ([dcl.fct]/3)
       dtype.remove(ID_C_constant);
       dtype.remove(ID_C_volatile);
       mtype.remove(ID_C_constant);
@@ -3867,7 +3868,7 @@ void cpp_typecheckt::adopt_definition_parameter_names(
     const auto &dpd = static_cast<const cpp_declarationt &>(dp);
     if(i >= mparams.size())
       break;
-    // N5008 [temp.variadic]/5: a function parameter pack `_ArgTypes... __arg'
+    // N5008 [temp.variadic]/9.2: a function parameter pack `_ArgTypes... __arg'
     // names all remaining parameters; the instantiated body refers to them
     // as __arg$0, __arg$1, ... -- or as __arg for a single element
     // (template_mapt's pack expansion of the parameter list)
@@ -4075,7 +4076,7 @@ bool cpp_typecheckt::function_template_signatures_equivalent(
   const irept &c_params = c_type.find(ID_parameters);
   if(f_params.is_not_nil() || c_params.is_not_nil())
   {
-    // [dcl.fct]/4: a parameter list `(void)` declares NO parameters --
+    // [dcl.fct]/2: a parameter list `(void)` declares NO parameters --
     // count it as zero, or `get(int)` matches `get(void)` by "arity".
     const auto arity = [](const irept &params) -> std::size_t
     {
@@ -4186,7 +4187,7 @@ irep_idt cpp_typecheckt::existing_function_template_instance(
   return cpp_id.identifier;
 }
 
-/// N5008 [temp.variadic]/5,7: with an EMPTY function parameter pack
+/// N5008 [temp.variadic]/5,16: with an EMPTY function parameter pack
 /// \p pack_var_name, every pack expansion over it yields no arguments.
 /// Remove, in the parsed \p node, the pack's call-argument references
 /// (`f(a...)', `f(static_cast<A &&>(a)...)') and new-initializer references
@@ -4194,13 +4195,13 @@ irep_idt cpp_typecheckt::existing_function_template_instance(
 static void
 strip_empty_pack_references(const irep_idt &pack_var_name, irept &node)
 {
-  // N5008 [temp.variadic]/5: an empty pack expansion yields zero
+  // N5008 [temp.variadic]/16: an empty pack expansion yields zero
   // arguments.  Drop both a bare value-pack argument (`a`) and a
   // pattern argument that is a pack expansion referencing the pack
   // (e.g. `static_cast<A&&>(a)...`, marked with ID_ellipsis), so
   // `f(static_cast<A&&>(a)...)` with an empty pack becomes `f()`.
   // A pack is expanded by the innermost expansion containing it
-  // ([temp.variadic]/5): `f(g(x, a...)...)' over another pack x keeps its
+  // ([temp.variadic]/8): `f(g(x, a...)...)' over another pack x keeps its
   // elements, only the nested `a...' goes (when the strip recurses there).
   auto is_empty_expansion = [&pack_var_name](const irept &a) -> bool
   {
@@ -4240,7 +4241,7 @@ strip_empty_pack_references(const irep_idt &pack_var_name, irept &node)
       }
     }
   }
-  // N5008 [expr.new]/1 + [temp.variadic]/5: a new-initializer's
+  // N5008 [expr.new]/1 + [temp.variadic]/6.5, 16: a new-initializer's
   // expression-list is a pack-expansion context exactly like a call
   // argument list -- `::new(p) _Tp(static_cast<_Args&&>(__args)...)`
   // (std::construct_at) with an EMPTY _Args must become
@@ -4264,7 +4265,7 @@ strip_empty_pack_references(const irep_idt &pack_var_name, irept &node)
     strip_empty_pack_references(pack_var_name, named.second);
 }
 
-/// N5008 [temp.variadic]/7: in the instance \p new_decl of the function
+/// N5008 [temp.variadic]/16: in the instance \p new_decl of the function
 /// template \p template_symbol with two or more template parameter packs,
 /// remove the function parameter pack whose own template pack is bound to
 /// zero elements, together with the expansions of its name in the
@@ -4317,7 +4318,7 @@ void cpp_typecheckt::remove_empty_function_parameter_pack(
   if(pack_var.empty())
     return;
   // ... is its template pack bound to zero elements?  A pattern may expand a
-  // NON-type pack (`const char (&...s)[N]', [temp.variadic]/5) instead
+  // NON-type pack (`const char (&...s)[N]', [temp.variadic]/8) instead
   std::set<std::string> pattern_names;
   for(const auto &p : orig_type.find(ID_parameters).get_sub())
   {
@@ -4415,11 +4416,11 @@ const symbolt &cpp_typecheckt::instantiate_template(
   instantiation_stack.back().identifier = template_symbol.name;
   instantiation_stack.back().full_template_args = full_template_args;
 
-  // [temp.inst]: instantiating a template is not itself a constant
-  // evaluation.  Suspend any enclosing constant-expression context so
-  // the instantiated declarations/definitions (e.g. constructor SFINAE
-  // constraints) are not eagerly folded; constant-required
-  // sub-expressions re-establish the context via their own guards.
+  // Instantiating a template is not itself a constant evaluation.  Suspend any
+  // enclosing constant-expression context so the instantiated
+  // declarations/definitions (e.g. constructor SFINAE constraints) are not
+  // eagerly folded; constant-required sub-expressions re-establish the context
+  // via their own guards.
   non_constant_expression_contextt non_constant_guard{*this};
 
 #ifdef DEBUG
@@ -4762,7 +4763,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
           }
         }
         // an unmatched trailing pack pattern deduces the EMPTY pack
-        // ([temp.variadic]/7)
+        // ([temp.deduct.type]/9)
         if(
           pattern_args.arguments().size() ==
           full_template_args.arguments().size() + 1)
@@ -4831,7 +4832,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
           continue;
         }
         // A pack deduced EMPTY has no element entry at all, only a
-        // zero in pack_size_map ([temp.variadic]/7) -- record it, or
+        // zero in pack_size_map ([temp.variadic]/10) -- record it, or
         // sizeof...(EmptyPack) in a member initializer is unresolvable.
         auto ps = template_map.pack_size_map.find(pid);
         if(
@@ -4868,7 +4869,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
         elems.push_back(static_cast<const typet &>(t));
       template_map.set_pack_size(pid, elems.size());
       template_map.pack_args_map[pid] = elems;
-      // [temp.variadic]/7: the scalar entry is the convenience binding of
+      // [temp.variadic]/9: the scalar entry is the convenience binding of
       // a SINGLE-element pack only (as everywhere else); for a longer pack
       // it made apply() substitute the first element for the pack's name
       // before a pack expansion in a member's initializer was expanded
@@ -5017,7 +5018,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
     }
   }
 
-  // Per [temp.variadic]/7: for constructor templates with variadic packs,
+  // Per [temp.variadic]/9,16: for constructor templates with variadic packs,
   // remove empty pack parameters and substitute non-empty pack names.
   if(!template_map.pack_size_map.empty() && !new_decl.declarators().empty())
   {
@@ -5026,7 +5027,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
       if(p.get_bool(ID_ellipsis))
         has_variadic = true;
     // Apply pack removal to all function templates with variadic packs
-    // per [temp.variadic]/7.
+    // per [temp.variadic]/16.
     if(!has_variadic)
       goto skip_pack_removal;
 
@@ -5080,7 +5081,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
             {
               if(p.id() != ID_cpp_declaration)
                 return false;
-              // N5008 [temp.variadic]/7: only a *function parameter pack*
+              // N5008 [temp.variadic]/16: only a *function parameter pack*
               // -- a parameter declared with a top-level `...`, e.g.
               // `_T... args` -- expands to an empty parameter list when the
               // pack is empty and is therefore removed.  A parameter whose
@@ -5102,7 +5103,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
               // but `_Up` two-element), removing every ellipsis parameter
               // dropped the NON-empty `_Up&&... __u` too, leaving a
               // 4-parameter constructor no 6-argument call can match
-              // ([temp.variadic]/7 applies per pack, not per overload).
+              // ([temp.variadic]/16 applies per pack, not per overload).
               for(const auto &d : p.get_sub())
               {
                 if(
@@ -5125,10 +5126,10 @@ const symbolt &cpp_typecheckt::instantiate_template(
       }
       irept &mi = decl.add(ID_member_initializers);
       // A reference to the (empty) pack anywhere in an initializer argument
-      // marks it as a pack expansion to be dropped ([temp.variadic]/4: a
+      // marks it as a pack expansion to be dropped ([temp.variadic]/8: a
       // pack can only appear expanded; the parser may lose the `...`) --
       // EXCEPT under `sizeof...`, which is a complete expression whose
-      // value for an empty pack is simply 0 ([temp.variadic]/8), e.g.
+      // value for an empty pack is simply 0 ([temp.variadic]/10), e.g.
       // `typename _Build_index_tuple<sizeof...(_Args2)>::__type()` in
       // std::pair's delegating piecewise constructor: that argument must
       // be KEPT, or the delegation call's arguments shift and the target
@@ -5136,7 +5137,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
       // Likewise a pack expansion NESTED in the argument, in a template
       // argument list (`index_sequence_for<_Types2...>{}', std::pair's
       // piecewise constructor in the MSVC STL): it expands to an empty list
-      // there ([temp.variadic]/7), and the argument remains.
+      // there ([temp.variadic]/16), and the argument remains.
       std::function<bool(const irept &, bool)> refs_ep_outside_sizeof =
         [&](const irept &n, bool nested) -> bool
       {
@@ -5172,7 +5173,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
           subs.end());
       }
     }
-    // Per [temp.variadic]/7: for non-empty packs, substitute
+    // Per [temp.variadic]/9: for non-empty packs, substitute
     // pack parameter names with actual type base names and
     // remove ellipsis from expanded expressions.
     if(!template_map.pack_args_map.empty())
@@ -5180,7 +5181,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
       std::map<std::string, irep_idt> pack_subst;
       for(const auto &pa : template_map.pack_args_map)
       {
-        // N5008 [temp.variadic]/5: only a SINGLE-element pack may have its
+        // N5008 [temp.variadic]/9: only a SINGLE-element pack may have its
         // name textually replaced by "the" element -- for that arity the
         // front element IS the k-th element of every expansion.  A pack
         // with >= 2 elements referenced inside a not-yet-expanded pack
@@ -5193,7 +5194,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
         // unresolvable, and the constructor body was silently dropped
         // (the emplaced node stayed uninitialized -- the
         // unordered_map::emplace duplicate-insert wrong-code shape).
-        // N5008 [temp.variadic]/5: single-element packs only -- see the
+        // N5008 [temp.variadic]/9: single-element packs only -- see the
         // guarded mem-init substitution above for why a >=2-element pack
         // must keep its name (front-element stamping concretizes every
         // expansion copy to element 0).
@@ -5235,7 +5236,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
         };
         std::function<void(irept &)> subst = [&](irept &node)
         {
-          // N5008 [expr.sizeof]/5 + [temp.variadic]/8: in `sizeof...(P)`
+          // N5008 [expr.sizeof]/4 + [temp.variadic]/10: in `sizeof...(P)`
           // the pack name is the operand of a pack-size QUERY, not a
           // reference to an element.  Stamping the single element's tag
           // here rewrote the query into a plain sizeof of the element
@@ -5279,7 +5280,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
   }
 skip_pack_removal:
 
-  // Per [temp.variadic]/7: when a variadic pack is empty, remove
+  // Per [temp.variadic]/16: when a variadic pack is empty, remove
   // pack-expanded parameters from the function type and remove
   // member initializer expressions referencing the empty pack.
   // This must happen immediately after build() sets pack_size_map,
@@ -5346,7 +5347,7 @@ skip_pack_removal:
             {
               if(p.id() != ID_cpp_declaration)
                 return false;
-              // N5008 [temp.variadic]/7: remove only a genuine *function
+              // N5008 [temp.variadic]/16: remove only a genuine *function
               // parameter pack* (top-level `...`); keep a parameter whose
               // type merely contains a nested empty pack expansion (its
               // argument list collapses but the parameter remains).  And
@@ -5376,10 +5377,10 @@ skip_pack_removal:
       // Remove empty pack expressions from member initializers
       irept &mi = decl.add(ID_member_initializers);
       // A reference to the (empty) pack anywhere in an initializer argument
-      // marks it as a pack expansion to be dropped ([temp.variadic]/4: a
+      // marks it as a pack expansion to be dropped ([temp.variadic]/8: a
       // pack can only appear expanded; the parser may lose the `...`) --
       // EXCEPT under `sizeof...`, which is a complete expression whose
-      // value for an empty pack is simply 0 ([temp.variadic]/8), e.g.
+      // value for an empty pack is simply 0 ([temp.variadic]/10), e.g.
       // `typename _Build_index_tuple<sizeof...(_Args2)>::__type()` in
       // std::pair's delegating piecewise constructor: that argument must
       // be KEPT, or the delegation call's arguments shift and the target
@@ -5420,7 +5421,7 @@ skip_pack_removal:
           subs.end());
       }
     }
-    // Per [temp.variadic]/7: for non-empty packs, substitute
+    // Per [temp.variadic]/9: for non-empty packs, substitute
     // the pack parameter name in template_args with the actual
     // type from pack_args_map.
     if(!template_map.pack_args_map.empty())
@@ -5429,7 +5430,7 @@ skip_pack_removal:
       std::map<std::string, irep_idt> pack_subst;
       for(const auto &pa : template_map.pack_args_map)
       {
-        // N5008 [temp.variadic]/5: single-element packs only -- see the
+        // N5008 [temp.variadic]/9: single-element packs only -- see the
         // guarded mem-init substitution above for why a >=2-element pack
         // must keep its name (front-element stamping concretizes every
         // expansion copy to element 0).
@@ -5454,7 +5455,7 @@ skip_pack_removal:
         // Substitute in member initializers
         std::function<void(irept &)> subst = [&](irept &node)
         {
-          // N5008 [expr.sizeof]/5 + [temp.variadic]/8: in `sizeof...(P)`
+          // N5008 [expr.sizeof]/4 + [temp.variadic]/10: in `sizeof...(P)`
           // the pack name is the operand of a pack-size QUERY, not a
           // reference to an element.  Stamping the single element's tag
           // here rewrote the query into a plain sizeof of the element
@@ -5759,7 +5760,7 @@ skip_pack_removal_ft:
           }
         }
       }
-      // N5008 [class.derived.general]/1, [temp.variadic]/5: a base-specifier's
+      // N5008 [class.derived.general]/1, [temp.variadic]/14: a base-specifier's
       // template arguments may hold a fold over the pack as well
       // (`struct and_ : bool_constant<(P::value && ...)>'); left
       // unexpanded, the C type checker's placeholder made it `true'.
@@ -5769,14 +5770,14 @@ skip_pack_removal_ft:
         expand_folds_over_pack(bases, short_name, pack_args);
         // Over a one-element pack the bases already name the element in
         // place of the pack, so the expander no longer recognizes the fold;
-        // [expr.prim.fold]/2 makes it the pattern (with the init operand
+        // [temp.variadic]/14 makes it the pattern (with the init operand
         // for a binary fold).
         if(pack_args.size() == 1)
           reduce_single_element_folds(bases);
       }
     }
 
-    // N5008 [temp.variadic]/5, [temp.spec.partial.match]: a partial
+    // N5008 [temp.variadic]/8, [temp.spec.partial.match]: a partial
     // specialization may have several packs (`template <int... I,
     // class... B> struct S<seq<I...>, B...>'); the block above expands
     // folds over the last one only.  Expand folds over each earlier pack
@@ -5852,7 +5853,7 @@ skip_pack_removal_ft:
       // pack, keyed by its short name: the ellipsis'd base pattern may
       // reference not only the trailing pack but a LEADING one (libc++
       // __tuple_impl's `__tuple_leaf<_Indx>...` over the non-type index
-      // pack of the partial specialization, [temp.variadic]/5.2).
+      // pack of the partial specialization, [temp.variadic]/6.6).
       std::map<std::string, std::vector<typet>> pack_type_elems;
       std::map<std::string, std::vector<exprt>> pack_expr_elems;
       std::set<std::string> empty_pack_shorts;
@@ -5924,14 +5925,14 @@ skip_pack_removal_ft:
 
       for(auto &base : bases_sub)
       {
-        // N5008 [temp.variadic]/5.2: a base-specifier pack expansion
+        // N5008 [temp.variadic]/6.6,9: a base-specifier pack expansion
         // (`leaf<T>...`, recorded by the parser via ID_ellipsis)
         // expands to one base-specifier per pack element, with the
         // element substituted into the pattern.  This covers patterns
         // that merely REFERENCE the pack (a template-id); the bare
         // `Pack...` shape keeps its established path below.
         // Which bound packs does this ellipsis'd base reference?  Per
-        // N5008 [temp.variadic]/5 ALL packs named in the pattern expand
+        // N5008 [temp.variadic]/8 ALL packs named in the pattern expand
         // in LOCKSTEP (same length, /5 sentence 2); substituting only
         // the first-found pack left any parallel pack collapsed to its
         // scalar convenience element -- `__tuple_leaf<_Indx, _Tp>...`
@@ -5961,7 +5962,7 @@ skip_pack_removal_ft:
             if(refs_name(base.find(ID_name), pe.first))
               used_pack_shorts.push_back(pe.first);
         }
-        // N5008 [temp.variadic]/7: a base-specifier pack expansion over an
+        // N5008 [temp.variadic]/16: a base-specifier pack expansion over an
         // empty pack (`leaf<T>...' with T = <>) produces no base at all;
         // kept, the unexpanded `leaf<T>' was default-initialized by every
         // constructor ("found no match for symbol 'leaf'"), dropping them.
@@ -6031,7 +6032,7 @@ skip_pack_removal_ft:
             const std::size_t n_elems = !used_type_elems.empty()
                                           ? used_type_elems.size()
                                           : used_expr_elems.size();
-            // [temp.variadic]/5: all packs of one expansion have equal
+            // [temp.variadic]/8: all packs of one expansion have equal
             // length; substitute EVERY referenced pack's elem_i-th
             // element in one pass.
             bool lockstep_ok = true;
@@ -6154,7 +6155,7 @@ skip_pack_removal_ft:
       }
       bases_sub = expanded_bases;
 
-      // N5008 [temp.variadic]/5.4 + [namespace.udecl]/1: a using-declarator
+      // N5008 [temp.variadic]/6.2 + [namespace.udecl]/1: a using-declarator
       // pack expansion in the class body (`using _Build_FUN<_Ind, _Tp,
       // _Ti>::_S_fun...;`, libstdc++'s std::variant overload-set builder)
       // expands to one using-declaration per element, every referenced pack
@@ -6387,7 +6388,7 @@ skip_pack_removal_ft:
         }
       }
     }
-    // Per [temp.variadic]/5: remove empty pack expansions
+    // Per [temp.variadic]/16: remove empty pack expansions
     if(
       id2string(template_symbol.name).find("_Compressed_pair") !=
         std::string::npos &&
@@ -6430,7 +6431,7 @@ skip_pack_removal_ft:
                 }),
               params.get_sub().end());
           }
-          // Per [temp.variadic]/7: remove pack expansion expressions.
+          // Per [temp.variadic]/16: remove pack expansion expressions.
           // After template_map.apply(), pack params may appear as
           // template_parameter_symbol_typet or as ID_name nodes.
           std::function<bool(const irept &)> has_ep =
@@ -6475,7 +6476,7 @@ skip_pack_removal_ft:
           for(auto &init : mi.get_sub())
           {
             auto &subs = init.get_sub();
-            // N5008 [temp.variadic]/7: an argument that IS an expansion of
+            // N5008 [temp.variadic]/16: an argument that IS an expansion of
             // the empty pack is dropped; one that merely CONTAINS such an
             // expansion, in a template argument list or a nested call
             // (`sizes(list<T1...>{}, list<T2...>{}, 0)'), is kept: the
@@ -6577,7 +6578,7 @@ skip_pack_removal_ft:
 
       // A class template's members -- including those defined out of line --
       // are instantiated in the context of the (instantiated) class
-      // ([temp.inst]/2, [basic.lookup.unqual], [dcl.meaning]): unqualified name
+      // ([temp.inst]/4, [basic.lookup.unqual], [dcl.meaning]): unqualified name
       // lookup in a member must reach the class's own members and, through the
       // class's enclosing namespace, namespace-scope names.
       // typecheck_template_parameters below creates the method's template scope
@@ -6826,7 +6827,7 @@ skip_pack_removal_ft:
         // Search ALL template symbols, not just the current one.
         if(sym->value.is_nil() && sym->type.id() == ID_code)
         {
-          // N5008 [temp.mem]/1, [class.mfct]/1: prefer a definition of an
+          // N5008 [temp.mem]/1, [class.mfct]/2: prefer a definition of an
           // ordinary member (pass 0) over that of a member template with the
           // same name and arity (pass 1) -- libc++'s std::function defines
           // both its copy constructor and its converting constructor
@@ -6852,7 +6853,7 @@ skip_pack_removal_ft:
                 continue;
               if(md.declarators()[0].find(ID_value).is_nil())
                 continue;
-              // N5008 [class.mfct]/1: the definition of a member function
+              // N5008 [class.mfct]/2: the definition of a member function
               // is a member of the class it is declared in -- a same-named
               // definition of ANOTHER class template (basic_string_view's
               // rfind for basic_string's) is not this member's, however
@@ -6881,7 +6882,7 @@ skip_pack_removal_ft:
                 if(n_md > class_parameters)
                   n_cls = std::min(n_cls, class_parameters);
               }
-              // N5008 [dcl.fct]/3,5 + [class.mfct]/1: the definition that
+              // N5008 [dcl.fct]/3 + [class.mfct]/2: the definition that
               // belongs to this member is the one whose SIGNATURE matches
               // -- same-named overloads (libstdc++'s four `_M_construct'
               // of basic_string) differ in arity or parameter types, and
@@ -6936,7 +6937,7 @@ skip_pack_removal_ft:
                 cpp_saved_template_mapt sm(template_map);
                 template_map.build(md_tt, specialization_template_args);
                 template_map.apply(body);
-                // Per [temp.variadic]/7: remove empty pack
+                // Per [temp.variadic]/16: remove empty pack
                 // expansion expressions from the body.
                 if(!template_map.pack_size_map.empty())
                 {
@@ -7015,7 +7016,7 @@ skip_pack_removal_ft:
                 cpp_saved_template_mapt sm(template_map);
                 template_map.build(md_tt, full);
                 template_map.apply(body);
-                // Per [temp.variadic]/7: remove empty pack
+                // Per [temp.variadic]/16: remove empty pack
                 // expansion expressions from the body.
                 if(!template_map.pack_size_map.empty())
                 {
@@ -7068,7 +7069,7 @@ skip_pack_removal_ft:
                 }
                 // Also copy member initializers into the body
                 // so the method body pass can process them.
-                // Remove empty pack expressions per [temp.variadic]/7.
+                // Remove empty pack expressions per [temp.variadic]/16.
                 const irept &mi_src =
                   md.declarators()[0].find(ID_member_initializers);
                 if(mi_src.is_not_nil())
@@ -7177,7 +7178,7 @@ skip_pack_removal_ft:
       }
     } imft_guard{instantiating_member_function_template, saved_imft};
     symbolt &symb = symbol_table.get_writeable_ref(class_name);
-    // N5008 [temp.mem]/1 + [temp.inst]/2: a member template of a class
+    // N5008 [temp.mem]/1 + [temp.inst]/3.1, 4: a member template of a class
     // template specialization is instantiated with BOTH the enclosing
     // class's bindings and its own.  The map built above holds the member
     // template's parameters only; add the class instance's (non-overriding,
@@ -7282,14 +7283,14 @@ skip_pack_removal_ft:
               md_tt.template_parameters().size() <=
               specialization_template_args.arguments().size())
               continue;
-            // N5008 [over.load], [dcl.fct]/3: the definition belonging to
-            // this member is the one whose SIGNATURE matches; matching by
-            // base name alone confuses same-named overloaded member
+            // N5008 [basic.scope.scope]/4, [dcl.fct]/3: the definition
+            // belonging to this member is the one whose SIGNATURE matches;
+            // matching by base name alone confuses same-named overloaded member
             // templates (std::pair's two piecewise constructors: the
-            // 3-parameter delegating one and its 4-parameter target).
-            // Compare the function parameter count as a cheap faithful
-            // discriminator (the parameter TYPES are unsubstituted
-            // cpp_names on both sides and cannot be compared directly).
+            // 3-parameter delegating one and its 4-parameter target).  Compare
+            // the function parameter count as a cheap faithful discriminator
+            // (the parameter TYPES are unsubstituted cpp_names on both sides
+            // and cannot be compared directly).
             {
               const typet &d_ftype = new_decl.declarators()[0].type();
               const typet &m_ftype = md.declarators()[0].type();
@@ -7299,8 +7300,8 @@ skip_pack_removal_ft:
                 d_ftype.find(ID_parameters).get_sub().size() !=
                   m_ftype.find(ID_parameters).get_sub().size())
                 continue;
-              // ... and the cv-qualifier ([over.load]/2.3: `find(const K &)'
-              // and `find(const K &) const' are different members) ...
+              // ... and the cv-qualifier ([basic.scope.scope]/4: `find(const K
+              // &)' and `find(const K &) const' are different members) ...
               if(
                 has_const(static_cast<const typet &>(
                   new_decl.declarators()[0].find(ID_method_qualifier))) !=
@@ -7459,7 +7460,7 @@ skip_pack_removal_ft:
         if(p.get_bool(ID_ellipsis))
         {
           irep_idt pid = p.type().get(ID_identifier);
-          // N5008 [temp.variadic]/7: a pack is empty only when it is
+          // N5008 [temp.variadic]/5: a pack is empty only when it is
           // bound to zero elements.  A pack of TWO or more elements has
           // no scalar type_map entry (deliberately -- see build()), only
           // a pack_args_map binding; checking type_map alone declared
@@ -7514,7 +7515,7 @@ skip_pack_removal_ft:
                       (d.find(ID_type).get_bool(ID_ellipsis) ||
                        d.get_bool(ID_ellipsis)))
                     {
-                      // N5008 [temp.variadic]/7 applies per pack: with
+                      // N5008 [temp.variadic]/16 applies per pack: with
                       // MULTIPLE template parameter packs (libc++
                       // __tuple_impl's five-pack constructor), remove the
                       // function parameter pack only when ITS OWN pack is
@@ -7586,7 +7587,7 @@ skip_pack_removal_ft:
           for(auto &init : mi.get_sub())
           {
             auto &subs = init.get_sub();
-            // N5008 [temp.variadic]/7: an argument that IS an expansion of
+            // N5008 [temp.variadic]/16: an argument that IS an expansion of
             // the empty pack is dropped; one that merely CONTAINS such an
             // expansion, in a template argument list or a nested call
             // (`sizes(list<T1...>{}, list<T2...>{}, 0)'), is kept: the
@@ -7627,14 +7628,14 @@ skip_pack_removal_ft:
           }
         }
       }
-      // Per [temp.variadic]/7: for non-empty packs, substitute
+      // Per [temp.variadic]/9: for non-empty packs, substitute
       // pack parameter names with actual types.
       if(!template_map.pack_args_map.empty() && !new_decl.declarators().empty())
       {
         std::map<std::string, irep_idt> pack_subst;
         for(const auto &pa : template_map.pack_args_map)
         {
-          // N5008 [temp.variadic]/5: single-element packs only -- see the
+          // N5008 [temp.variadic]/9: single-element packs only -- see the
           // guarded mem-init substitution above.
           if(pa.second.size() != 1)
             continue;
@@ -7670,14 +7671,14 @@ skip_pack_removal_ft:
           subst(mi);
         }
       }
-      // Per [temp.variadic]/7: for non-empty packs, substitute
+      // Per [temp.variadic]/9: for non-empty packs, substitute
       // pack parameter names with actual types.
       if(!template_map.pack_args_map.empty() && !new_decl.declarators().empty())
       {
         std::map<std::string, irep_idt> pack_subst;
         for(const auto &pa : template_map.pack_args_map)
         {
-          // N5008 [temp.variadic]/5: single-element packs only -- see the
+          // N5008 [temp.variadic]/9: single-element packs only -- see the
           // guarded mem-init substitution above.
           if(pa.second.size() != 1)
             continue;
@@ -7714,7 +7715,7 @@ skip_pack_removal_ft:
       }
     }
 
-    // N5008 [temp.mem.func] + [temp.inst]/2: a member function template of a
+    // N5008 [temp.mem.func] + [temp.inst]/4: a member function template of a
     // class template may be defined OUT OF LINE; instantiating it uses that
     // definition.  The in-class declaration carries no body, and the
     // out-of-line definition is recorded only as a `template_methods` entry
@@ -7733,20 +7734,19 @@ skip_pack_removal_ft:
     {
       const irep_idt member_base_name =
         new_decl.declarators()[0].name().get_base_name();
-      // N5008 [temp.mem]/1: the out-of-class definition of a member
-      // TEMPLATE is introduced by the class template's parameter list and
-      // then the member template's own (the parser flattens both), so it has
-      // more template parameters than the definition of an ordinary member
-      // of the same class with the same name and arity -- libc++'s
-      // std::function copy constructor, `function(const function &)', whose
-      // definition precedes that of the converting constructor template
-      // `template <class F> function(F)'.  Among the candidate definitions
-      // prefer the one with the most template parameters.
-      // N5008 [over.load], [dcl.fct]/3: the definition belonging to this
-      // member is the one whose SIGNATURE matches; base-name matching
-      // alone confuses same-named overloaded member templates (std::
-      // pair's two piecewise constructors).  Compare the function
-      // parameter count as a cheap faithful discriminator.
+      // N5008 [temp.mem]/1: the out-of-class definition of a member TEMPLATE is
+      // introduced by the class template's parameter list and then the member
+      // template's own (the parser flattens both), so it has more template
+      // parameters than the definition of an ordinary member of the same class
+      // with the same name and arity -- libc++'s std::function copy
+      // constructor, `function(const function &)', whose definition precedes
+      // that of the converting constructor template `template <class F>
+      // function(F)'.  Among the candidate definitions prefer the one with the
+      // most template parameters.  N5008 [basic.scope.scope]/4, [dcl.fct]/3:
+      // the definition belonging to this member is the one whose SIGNATURE
+      // matches; base-name matching alone confuses same-named overloaded member
+      // templates (std:: pair's two piecewise constructors).  Compare the
+      // function parameter count as a cheap faithful discriminator.
       const auto signature_matches = [&](const cpp_declarationt &md) -> bool
       {
         const typet &d_ftype = new_decl.declarators()[0].type();
@@ -7781,7 +7781,7 @@ skip_pack_removal_ft:
             return false;
           }
         }
-        // [over.load]/2.3, [class.mfct.non.static]: `find(const K &)' and
+        // [basic.scope.scope]/4, [class.mfct.non.static]: `find(const K &)' and
         // `find(const K &) const' are different members
         if(
           has_const(static_cast<const typet &>(
@@ -7954,7 +7954,7 @@ skip_pack_removal_ft:
     // may fail when function template parameters are not in the
     // class template map.  Catch and return the template symbol.
     {
-      // [temp.spec]/4 + [temp.inst]/2: each specialization of a member
+      // [temp.type]/1 + [temp.inst]/5: each specialization of a member
       // function template is a distinct entity.  When the template
       // parameters do not appear in the parameter types, distinct
       // specializations share one function signature and would collide
@@ -7971,13 +7971,13 @@ skip_pack_removal_ft:
       // -- and reuses the body of -- a non-template overload, which is
       // how it works today.
       new_decl.declarators()[0].set("#member_fn_template_instance", true);
-      // [temp.inst]/2 + [temp.deduct]/8: substituting and type-
+      // [temp.inst]/10 + [temp.deduct.general]/8: substituting and type-
       // checking a compound member declaration during template
       // instantiation is a SFINAE immediate context — a failure
       // here doesn't invalidate the template specialization, it
       // just means we can't complete this member and bail out to
       // the caller with the template symbol.
-      // N5008 [temp.variadic]/7: when this member function template's own
+      // N5008 [temp.variadic]/16: when this member function template's own
       // trailing parameter pack deduced EMPTY (argument list shorter than
       // the parameter list, or the `empty_typet` zero-elements sentinel at
       // the pack's position), the pack parameter expands to nothing and
@@ -7987,7 +7987,7 @@ skip_pack_removal_ft:
       // (`symbol 'args' is unknown`, libc++ __perfect_forward's
       // `operator()(_Args&&... __args) -> decltype(_Op()(..., __args...))`
       // invoked with no arguments) and the member is dropped.
-      // N5008 [temp.param]/14: the pack need not be the LAST template
+      // N5008 [temp.param]/18: the pack need not be the LAST template
       // parameter -- it may be followed by parameters that are deducible
       // or defaulted (libstdc++ `_Bind::operator()<class... _Args,
       // class _Result = _Res_type<tuple<_Args...>>>`, invoked with no
@@ -8026,7 +8026,7 @@ skip_pack_removal_ft:
             m_pack_short = mp != std::string::npos ? mf.substr(mp + 2) : mf;
           }
           // the pack parameter's name (e.g. `args` in `Args... args`).
-          // N5008 [dcl.fct]/6: `B...` where B is NOT a pack is B followed
+          // N5008 [dcl.fct]/24: `B...` where B is NOT a pack is B followed
           // by C varargs, not a pack declarator -- only remove a parameter
           // whose type names THE empty pack (own-pack match, mirroring the
           // constructor-template removal above); removing a varargs
@@ -8090,7 +8090,7 @@ skip_pack_removal_ft:
                      !opd.declarators().front().type().get_bool(ID_ellipsis) &&
                      !opd.type().get_bool(ID_ellipsis)))
                     continue;
-                  // own-pack match only ([dcl.fct]/6: `B...` with B a
+                  // own-pack match only ([dcl.fct]/24: `B...` with B a
                   // non-pack is C varargs, not this pack's declarator)
                   const irept *ot = &opd.type();
                   while(ot->id() != ID_cpp_name && !ot->get_sub().empty())
@@ -8110,7 +8110,7 @@ skip_pack_removal_ft:
           }
           if(!m_pack_var.empty())
           {
-            // [temp.variadic]/5,7: the empty pack's expansions (call
+            // [temp.variadic]/5,16: the empty pack's expansions (call
             // arguments, new-initializers) yield nothing -- the same strip
             // the namespace-scope function template path applies
             strip_empty_pack_references(
@@ -8129,7 +8129,7 @@ skip_pack_removal_ft:
       // _Ls>(..., _Ls... __ls)' with _Ls empty): the function parameter
       // pack's own template pack is found through the template's
       // declaration, and when that pack is bound to zero elements
-      // ([temp.variadic]/7) the parameter and the expansions of its name
+      // ([temp.variadic]/16) the parameter and the expansions of its name
       // go.
       if(
         !new_decl.declarators().empty() &&
@@ -8137,7 +8137,7 @@ skip_pack_removal_ft:
       {
         remove_empty_function_parameter_pack(template_symbol, new_decl);
       }
-      // N5008 [temp.inst]/1: a static data member template specialization
+      // N5008 [temp.inst]/4: a static data member template specialization
       // is instantiated once; a second reference (`idx<T>` in two member
       // function bodies) finds the existing symbol -- its name carries the
       // instantiation suffix (typecheck_compound_declarator).  The
@@ -8196,7 +8196,7 @@ skip_pack_removal_ft:
     if(deferred_typechecking.erase(method_sym.name))
     {
       symbolt &ws = symbol_table.get_writeable_ref(method_sym.name);
-      // Per [temp.inst]/1: store function template parameters and
+      // Per [temp.inst]/4: store function template parameters and
       // arguments so method_bodies can restore the template_map.
       ws.type.add(irep_idt{"#fn_template_type"}) = template_type;
       ws.type.add(irep_idt{"#fn_template_args"}) = specialization_template_args;
@@ -8297,7 +8297,7 @@ skip_pack_removal_ft:
         // Pristine copy of the parsed body, restored if the eager conversion
         // below throws mid-way (see the catch).
         const exprt saved_body = ws.value;
-        // [temp.variadic]/5: if this member function template belongs to a
+        // [temp.variadic]/8: if this member function template belongs to a
         // class template instantiation, its body may expand the *class*
         // parameter pack alongside its own (e.g. the constexpr tuple-
         // constructor constraints `__and_<is_constructible<_Types,
@@ -8336,7 +8336,7 @@ skip_pack_removal_ft:
               }
             }
           }
-          // N5008 [temp.variadic]/7: a member function template instantiated
+          // N5008 [temp.variadic]/16: a member function template instantiated
           // with an empty type pack (e.g. std::tuple's
           // `__is_constructible<>()`) has zero-length pack expansions in its
           // body.  Record the empty packs and collapse those expansions
@@ -8366,7 +8366,7 @@ skip_pack_removal_ft:
           }
           if(ws.value.is_not_nil())
             remove_empty_pack_expansion_args(ws.value);
-          // N5008 [temp.variadic]/5: expand pack-expansion
+          // N5008 [temp.variadic]/9: expand pack-expansion
           // mem-initializers before the eager conversion (the deferred
           // drain does this in prepare_deferred_method_body; this
           // eager path previously left the ellipsis and raw pack names
@@ -8420,7 +8420,7 @@ skip_pack_removal_ft:
       }
       else
       {
-        // N5008 [temp.inst]/4 + [basic.def.odr]/5: a member function
+        // N5008 [temp.inst]/4 + [basic.def.odr]/3, 8: a member function
         // template specialization named only in an unevaluated operand (a
         // constructor template selected in `decltype(T(args))', libc++'s
         // __bind_back trailing return type) is not odr-used, so its
@@ -8433,7 +8433,7 @@ skip_pack_removal_ft:
       }
     }
 
-    // [temp.spec]/4 condition-3 fallback: a member function template
+    // [temp.fct.general]/2 condition-3 fallback: a member function template
     // specialization that shadows a same-signature non-template overload and
     // whose own definition did not survive instantiation (no body -- e.g.
     // std::_Any_data::_M_access<T>, whose reinterpret-cast body is dropped)
@@ -8530,7 +8530,7 @@ skip_pack_removal_ft:
         const symbolt *best_match = nullptr;
         cpp_template_args_tct best_spec_args;
 
-        // [temp.deduct]/8 + [temp.class.spec.match]: specialization
+        // [temp.deduct.general]/8 + [temp.spec.partial.match]: specialization
         // matching for the second search (after primary-template
         // substitution of explicit args).
         sfinae_contextt spec_sfinae_guard{*this};
@@ -8608,7 +8608,7 @@ skip_pack_removal_ft:
           if(guessed.has_unassigned() || guessed.has_conflict())
             continue;
 
-          // N5008 [temp.variadic]/5: build_template_args emits a single
+          // N5008 [temp.variadic]/9: build_template_args emits a single
           // scalar placeholder per template parameter PACK (the pack's first
           // element).  For the actual instantiation the pack must be expanded
           // to one argument per deduced element -- otherwise e.g. the `E` of a
@@ -8652,7 +8652,7 @@ skip_pack_removal_ft:
           cpp_template_args_tct partial_tc;
           bool sfinae_failed = false;
           {
-            // [temp.deduct]/8: substituting explicit template args
+            // [temp.deduct.general]/8: substituting explicit template args
             // into the partial specialization's parameter list may
             // fail; treat as SFINAE and skip this candidate.
             sfinae_contextt sfinae_guard{*this};
@@ -8697,7 +8697,7 @@ skip_pack_removal_ft:
             // makes it apply to variable templates): the specialization
             // matches only if its associated constraints -- the
             // requires-clause and the type-constraints of its parameters,
-            // [temp.constr.decl]/3, [temp.param]/4 -- are satisfied by the
+            // [temp.constr.decl]/3, [temp.param]/9 -- are satisfied by the
             // deduced arguments, bound in template_map.
             // A type-constraint decided here is not checked again below.
             std::vector<bool> type_constraint_decided;
@@ -8767,7 +8767,7 @@ skip_pack_removal_ft:
                 cargs.arguments().push_back(full_args_resolved.arguments()[pi]);
                 cmap.build(concept_decl.template_type(), cargs);
                 cmap.apply(body);
-                // [temp.constr.constr] + [temp.deduct]/8: concept
+                // [temp.constr.constr] + [temp.deduct.general]/8: concept
                 // body evaluation is SFINAE-guarded; failure to
                 // substitute or a `false` result means the concept
                 // is not satisfied, not an ill-formed program.
@@ -8991,8 +8991,8 @@ skip_pack_removal_ft:
   // the `empty_typet` zero-elements sentinel -- both encodings reach this
   // point; see template_map.cpp's single-pack binding), remove
   // pack-expanded parameters from the function declaration and its nested
-  // types.  N5008 [temp.variadic]/7.
-  // N5008 [temp.param]/14: a function template's parameter pack need not
+  // types.  N5008 [temp.variadic]/16.
+  // N5008 [temp.param]/18: a function template's parameter pack need not
   // be the last parameter -- `template <class T, class... Args, class =
   // decltype(...)> construct_at(T *, Args &&...)' (libc++) has a defaulted
   // parameter after it, and an empty pack then shows as the sentinel at
@@ -9023,7 +9023,7 @@ skip_pack_removal_ft:
       pos != std::string::npos ? full_id.substr(pos + 2) : full_id;
 
     // Helper: check if a parameter references the pack.
-    // N5008 [dcl.fct]/6: a bare `...` parameter is C VARARGS, not a pack
+    // N5008 [dcl.fct]/2: a bare `...` parameter is C VARARGS, not a pack
     // reference -- it must survive the empty-pack removal (an ellipsis
     // parameter of `decltype(F()()) invoke_(F, ...)` vanished whenever the
     // trailing template pack deduced empty, and the instantiated overload
@@ -9145,7 +9145,7 @@ skip_pack_removal_ft:
     // the same empty expansion, e.g. libc++ __perfect_forward's
     // `auto operator()(_Args&&... __args) const
     //    -> decltype(_Op()(..., __args...))` instantiated with an EMPTY
-    // _Args ([temp.variadic]/5: the expansion yields zero arguments; the
+    // _Args ([temp.variadic]/16: the expansion yields zero arguments; the
     // reference must vanish with it, or the instantiated return type names
     // an unknown symbol and the member is dropped).
     if(!pack_var_name.empty())
@@ -9156,7 +9156,7 @@ skip_pack_removal_ft:
     }
   }
 
-  // [temp.variadic]/5 + [temp.param]/11: expand the function parameter pack
+  // [temp.variadic]/9 + [temp.param]/18: expand the function parameter pack
   // into its N elements and expand pack references in the function body.  N is
   // the number of pack arguments excluding the empty-pack sentinel (an
   // `ID_type` argument whose type is `ID_empty`, used to encode a pack that
@@ -9167,7 +9167,7 @@ skip_pack_removal_ft:
   //
   // The template parameter pack need NOT be the last template parameter: a pack
   // may be followed by further template parameters that are deducible or have
-  // default arguments ([temp.param]/11), e.g. std::_Tuple_impl's forwarding
+  // default arguments ([temp.param]/18), e.g. std::_Tuple_impl's forwarding
   // constructor `template<class _UHead, class... _UTail, class = enable_if_t
   // <...>>`.  Locate the pack at whatever position it occupies and take its
   // arguments from the correspondingly-offset run of the flat template-argument
@@ -9247,7 +9247,7 @@ skip_pack_removal_ft:
         };
         collect(merged);
       }
-      // N5008 [temp.variadic]/5: a pattern without a type pack may expand a
+      // N5008 [temp.variadic]/8: a pattern without a type pack may expand a
       // NON-type pack (`const char (&...s)[N]'): its recorded elements
       if(fn_pack_short.empty())
       {
@@ -9288,7 +9288,7 @@ skip_pack_removal_ft:
             id2string(fn_pack_short))
             continue;
           const auto pa_it = template_map.pack_args_map.find(pid);
-          // [temp.variadic]/7: a pack deduced EMPTY is recorded by its size
+          // [temp.variadic]/5: a pack deduced EMPTY is recorded by its size
           // only
           const auto ps_it = template_map.pack_size_map.find(pid);
           if(
@@ -9327,7 +9327,7 @@ skip_pack_removal_ft:
       }
     }
   }
-  // N5008 [expr.prim.fold]/2: a fold over a ONE-element pack reduces to the
+  // N5008 [temp.variadic]/14: a fold over a ONE-element pack reduces to the
   // single instance of its pattern (for a binary fold, one application
   // against the init operand).  The general expansion below is skipped for
   // N == 1 (the parameter keeps its original name, so references need no
@@ -9390,7 +9390,7 @@ skip_pack_removal_ft:
   {
     const std::size_t pack_sz = pack_arguments.size();
 
-    // N5008 [expr.prim.fold]/3: with an EMPTY pack, a unary fold yields the
+    // N5008 [temp.variadic]/14: with an EMPTY pack, a unary fold yields the
     // operator's identity (true for &&, false for ||; the comma fold yields
     // void(), approximated as 0) and a binary fold (init op ... op pack)
     // yields its init operand.  The pack parameter has already been removed
@@ -9437,7 +9437,7 @@ skip_pack_removal_ft:
         };
         empty_folds(func_decl0.value());
 
-        // [temp.variadic]/7: an expansion of the (now removed) empty
+        // [temp.variadic]/16: an expansion of the (now removed) empty
         // function parameter pack is an empty list -- also where it is
         // nested in an expansion over another pack (`one(seq<Js>{},
         // ls...)...'), which the positional passes do not reach
@@ -9516,7 +9516,7 @@ skip_pack_removal_ft:
     irept::subt &fp_sub = func_params.get_sub();
 
     // Find the pack parameter (last param with ellipsis on declarator).
-    // N5008 [dcl.fct]/15: the parameter may be UNNAMED (`Args...` in
+    // N5008 [dcl.fct]/23: the parameter may be UNNAMED (`Args...` in
     // `constexpr int count(Args...) { return sizeof...(Args); }`); the
     // parser then marks the declarator itself.  Such a pack expands like a
     // named one -- it used to be skipped, leaving the instance with a single
@@ -9568,7 +9568,7 @@ skip_pack_removal_ft:
         d.declarators().front().remove(ID_ellipsis);
       }
 
-      // N5008 [temp.variadic]/5, [dcl.ref]: the name of the type parameter
+      // N5008 [temp.variadic]/9, [dcl.ref]: the name of the type parameter
       // pack (e.g. `A` in `A&&... a`) and the deduced element type for each
       // expansion, so a forwarding-reference pack pattern in the body such as
       // `f(static_cast<A&&>(a)...)` can substitute the k-th deduced type for
@@ -9602,7 +9602,7 @@ skip_pack_removal_ft:
         if(pack_arg.id() == ID_type)
         {
           auto &d = static_cast<cpp_declarationt &>(param_copy);
-          // N5008 [temp.variadic]/5: the element replaces the pack's name in
+          // N5008 [temp.variadic]/9: the element replaces the pack's name in
           // the pattern; the pattern's cv-qualifiers stay (`const T &...t'
           // with T = int is `const int &t$k')
           bool substituted = false;
@@ -9633,7 +9633,7 @@ skip_pack_removal_ft:
           if(!substituted)
             d.type() = pack_arg.type();
         }
-        // N5008 [temp.variadic]/5: a pattern naming a NON-type pack
+        // N5008 [temp.variadic]/9: a pattern naming a NON-type pack
         // (`const char (&...s)[N]') gets that pack's k-th value
         for(const auto &tp : all_template_params)
         {
@@ -9679,11 +9679,11 @@ skip_pack_removal_ft:
         expanded_params.begin(),
         expanded_params.end());
 
-      // Expand pack references in the function body, and in the
-      // declarator's type: N5008 [temp.variadic]/5, [dcl.fct]/8 -- a
-      // trailing return type may name the function parameter pack in an
-      // unevaluated operand (`-> decltype(forward_as_tuple(__args...))',
-      // libc++'s __bind_back), which is expanded as in the body.
+      // Expand pack references in the function body, and in the declarator's
+      // type: N5008 [temp.variadic]/9, [basic.scope.param]/1.1 -- a trailing
+      // return type may name the function parameter pack in an unevaluated
+      // operand (`-> decltype(forward_as_tuple(__args...))', libc++'s
+      // __bind_back), which is expanded as in the body.
       if(func_decl.value().is_not_nil() || new_decl.type().id() == ID_decltype)
       {
         // Helper: check if an irept is a cpp_name referencing pack_var
@@ -9731,7 +9731,7 @@ skip_pack_removal_ft:
               return true;
           return false;
         };
-        // N5008 [temp.variadic]/5: a pack name is expanded by the innermost
+        // N5008 [temp.variadic]/8: a pack name is expanded by the innermost
         // pack expansion that contains it -- whether the pattern \p n of an
         // expansion names the pack outside any nested expansion (the `ls...'
         // of `one(seq<Js>{}, ls...)...' belongs to the inner call)
@@ -9762,7 +9762,7 @@ skip_pack_removal_ft:
           irept result = n;
           for(auto &s : result.get_sub())
             s = substitute_pack(s, name);
-          // [expr.sizeof]/1 + [temp.variadic]/5: the operand of
+          // [expr.sizeof]/1 + [temp.variadic]/9: the operand of
           // `sizeof(xs)' is kept in the named `type_arg' (it parses as a
           // type-id until resolved), so each fold element must substitute
           // there as well
@@ -9775,7 +9775,7 @@ skip_pack_removal_ft:
         };
 
         std::function<void(irept &)> expand_pack;
-        // N5008 [temp.variadic]/5, [dcl.ref]: substitute the type parameter
+        // N5008 [temp.variadic]/9, [dcl.ref]: substitute the type parameter
         // pack name with a concrete element type wherever it appears as a type
         // `cpp_name` in a pattern (e.g. the `A` in `static_cast<A&&>(...)`),
         // used in lockstep with substitute_pack for a forwarding-reference
@@ -9813,7 +9813,7 @@ skip_pack_removal_ft:
               subst_type_pack(ns.second, elem);
           }
         };
-        // N5008 [expr.prim.fold]/2, [temp.variadic]/5: a fold's pattern may
+        // N5008 [expr.prim.fold]/3, [temp.variadic]/9: a fold's pattern may
         // name the TYPE parameter pack only (`(0 + ... + sizeof(Ts))'); its
         // k-th element substitutes both packs in lockstep
         std::function<bool(const irept &)> contains_type_pack;
@@ -9887,7 +9887,7 @@ skip_pack_removal_ft:
             node.get_sub().size() == 2 && is_pack_name(node.get_sub()[0]))
           {
             // the index may name the pack's size (`ts...[sizeof...(ts) - 1]`,
-            // [expr.sizeof]/5): substitute the arity, then fold
+            // [expr.sizeof]/4): substitute the arity, then fold
             exprt index_expr = static_cast<const exprt &>(node.get_sub()[1]);
             std::function<void(exprt &)> subst_sizeof = [&](exprt &e)
             {
@@ -9933,7 +9933,7 @@ skip_pack_removal_ft:
             const irept &pack_expr = node.get_sub().front();
             bool is_left = (node.id() == irep_idt("cpp_left_fold"));
 
-            // N5008 [expr.prim.fold]/3: a unary fold over an EMPTY pack
+            // N5008 [temp.variadic]/14: a unary fold over an EMPTY pack
             // yields the operator's identity -- true for &&, false for ||,
             // void() for the comma operator (otherwise ill-formed).  Without
             // this the expansion below reads expanded_names[0] out of
@@ -10009,7 +10009,7 @@ skip_pack_removal_ft:
             return;
           }
 
-          // N5008 [expr.prim.fold]/2: `(pack op ... op init)` -- the
+          // N5008 [expr.prim.fold]/3: `(pack op ... op init)` -- the
           // pack operand FIRST -- is a binary RIGHT fold,
           // e0 op (e1 op (... op init)).  Only the pack-on-the-right
           // form above was expanded; the pack-on-the-left form (the
@@ -10060,7 +10060,7 @@ skip_pack_removal_ft:
                 }
                 else if(a.get_bool(ID_ellipsis) && expands_pack_name(a, true))
                 {
-                  // N5008 [temp.variadic]/5: a pack-expansion call argument
+                  // N5008 [temp.variadic]/9: a pack-expansion call argument
                   // whose pattern CONTAINS (but is not exactly) the value pack
                   // -- e.g. a perfect-forwarding `static_cast<A&&>(a)...` (the
                   // body of variadic std::__invoke) -- expands to one argument
@@ -10088,9 +10088,9 @@ skip_pack_removal_ft:
             }
           }
 
-          // N5008 [temp.variadic]/5 + [dcl.init.aggr]/... : a pack expansion in
-          // a BRACED / aggregate initializer, e.g. `box{fwd(e)...}` (the shape
-          // of std::make_tuple / the tuple forwarding constructor,
+          // N5008 [temp.variadic]/6.5 + [dcl.init.aggr]/... : a pack expansion
+          // in a BRACED / aggregate initializer, e.g. `box{fwd(e)...}` (the
+          // shape of std::make_tuple / the tuple forwarding constructor,
           // `tuple<...>(std::forward<E>(a)...)`).  Mirror the function-call
           // argument branch above: replicate each pack-expansion element (a
           // bare pack name, or a `...`-carrying pattern that CONTAINS the pack
@@ -10297,7 +10297,7 @@ skip_pack_removal_ft:
             }
           }
 
-          // N5008 [temp.variadic]/5: a pack expansion in the expression-list
+          // N5008 [temp.variadic]/6.5: a pack expansion in the expression-list
           // of a declarator's direct-initializer, e.g.
           // `_Up tmp(forward<_Args>(__args)...)` (the allocator
           // `construct` body behind std::map's node construction).  Mirror
@@ -10309,7 +10309,7 @@ skip_pack_removal_ft:
           // place (a single `forward<_Args>(__args$0, __args$1)` that keeps
           // its `...`), so the enclosing body fails to convert and is
           // dropped.
-          // N5008 [temp.variadic]/5 + [expr.new]: a pack expansion in a
+          // N5008 [temp.variadic]/9 + [expr.new]: a pack expansion in a
           // new-initializer's expression-list inside this function-template
           // body -- `::new((void*)__location) _Tp(forward<_Args>(__args)...)`,
           // the C++20 std::construct_at body ([specialized.construct]) that
@@ -10413,7 +10413,7 @@ skip_pack_removal_ft:
           expand_pack(func_decl.value());
         // the return type: a trailing return type is the declaration's
         // type by now (the parameter list was replicated above)
-        // N5008 [temp.variadic]/5: the expansion `static_cast<A &&>(a)...'
+        // N5008 [temp.variadic]/9: the expansion `static_cast<A &&>(a)...'
         // substitutes A_k and a$k in lockstep; the substitution above had
         // already expanded A alone (each element naming `a'), so expand the
         // unsubstituted trailing return type, then substitute
@@ -10460,10 +10460,10 @@ skip_pack_removal_ft:
       new_decl.declarators()[0].value(), template_type);
   }
 
-  // Per [temp.variadic]/7: remove empty pack expansions
+  // Per [temp.variadic]/16: remove empty pack expansions
   if(!template_map.pack_size_map.empty() && !new_decl.declarators().empty())
   {
-    // Per [basic.scope.temp] and [temp.variadic]/5: a pack parameter's
+    // Per [basic.scope.temp] and [temp.variadic]/8: a pack parameter's
     // short name in this template refers to THIS template's pack
     // parameter, not a pack with the same short name declared by
     // some other template that happens to be in the pack_size_map.
@@ -10521,7 +10521,7 @@ skip_pack_removal_ft:
             {
               if(p.id() != ID_cpp_declaration)
                 return false;
-              // N5008 [temp.variadic]/7: only a *function parameter pack*
+              // N5008 [temp.variadic]/16: only a *function parameter pack*
               // -- a parameter declared with a top-level `...`, e.g.
               // `_T... args` -- expands to an empty parameter list when the
               // pack is empty and is therefore removed.  A parameter whose
@@ -10561,10 +10561,10 @@ skip_pack_removal_ft:
     }
   }
 
-  // N5008 [temp.point]/1, [temp.inst]/1/5: convert the instantiated free
+  // N5008 [temp.point]/1, [temp.inst]/10/5: convert the instantiated free
   // function-template specialization.  This registers its *declaration* (the
   // signature, which is all a reference and overload resolution need per
-  // [temp.inst]/1) and -- because the instance is a non-template, non-`auto`
+  // [temp.inst]/10) and -- because the instance is a non-template, non-`auto`
   // function -- DEFERS its *definition* (body) to the `method_bodies` queue via
   // `cpp_declarator_convertert` -> `add_method_body`.  The deferred drain in
   // `typecheck_method_bodies` is CBMC's point-of-instantiation approximation,
@@ -10573,7 +10573,7 @@ skip_pack_removal_ft:
   // `cpp11_derived_to_base_pack_call_in_body` defect was NOT here: it was the
   // empty-trailing-pack parameter being dropped from `new_decl` above, fixed by
   // restricting empty-pack parameter removal to genuine function parameter
-  // packs per [temp.variadic]/7.  See
+  // packs per [temp.variadic]/16.  See
   // doc/architectural/cpp-frontend-review-2026-06-23-instantiation-context.md.)
   convert_non_template_declaration(new_decl);
 
@@ -10626,7 +10626,7 @@ exprt cpp_typecheckt::constraint_satisfaction(const exprt &constraint)
 {
   // The parser represents a requires-expression ([expr.prim.req]) as a
   // left-nested `&&' chain of its requirements; it is one atomic constraint
-  // ([temp.constr.normal]/1.4), not a conjunction to split.
+  // ([temp.constr.normal]/1.6), not a conjunction to split.
   const auto is_requires_expression = [](const exprt &e)
   {
     for(const exprt *node = &e;

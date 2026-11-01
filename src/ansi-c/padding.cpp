@@ -37,7 +37,7 @@ Author: Daniel Kroening, kroening@kroening.com
 // `src/util/ref_expr_set.cpp` and `src/util/output_file.cpp`: a
 // front-end error cascade left `struct basic_string` with a
 // self-referential component, and `alignment` recursed until
-// SIGSEGV.  Per [basic.type]/1 a type is either complete or
+// SIGSEGV.  Per [basic.types.general]/5 a type is either complete or
 // incomplete; an incomplete type has no alignment, so returning 1
 // (the minimum alignment) for a cyclic tag is a safe
 // approximation.

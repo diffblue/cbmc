@@ -113,7 +113,7 @@ void cpp_typecheckt::salvage_default_arguments(
 ///
 /// Also handles partial specializations per [temp.spec.partial.general]
 /// and explicit specializations per [temp.expl.spec].
-/// N5008 [temp.mem.class]/1, [temp.inst]/3: a member class of a class
+/// N5008 [temp.mem.class]/1, [temp.inst]/4: a member class of a class
 /// template defined outside it, `template \<class C> struct S<C>::N { ... };',
 /// is instantiated for a specialization S<X> when the completeness of
 /// S<X>::N is required, from the definition reachable at that point.  The
@@ -188,7 +188,7 @@ void cpp_typecheckt::complete_member_class_of_instances(
 
 void cpp_typecheckt::typecheck_class_template(cpp_declarationt &declaration)
 {
-  // N5008 [namespace.memdef]/2, [class.pre]/3: a class template defined
+  // N5008 [class.pre]/3, [class.pre]/3: a class template defined
   // by a qualified name (`template <...> class ns::X { ... };') is
   // defined in the nominated namespace, which is entered below to declare
   // it; the declaration does not move the enclosing scope.  Without
@@ -199,7 +199,7 @@ void cpp_typecheckt::typecheck_class_template(cpp_declarationt &declaration)
 
   typet &type = declaration.type();
 
-  // N5008 [dcl.attr.grammar]/5 + [dcl.type.class.deduct]: GNU attributes
+  // N5008 [dcl.attr.grammar]/5 + [dcl.spec.general]/1: GNU attributes
   // written after the class body -- `template <class T> struct G { ... }
   // __attribute__((packed, aligned(16)));` (user-reported) -- are merged
   // around the class-specifier by the parser (a merged_type of attribute
@@ -301,7 +301,7 @@ void cpp_typecheckt::typecheck_class_template(cpp_declarationt &declaration)
   const irep_idt symbol_name = class_template_identifier(
     base_name, template_type, partial_specialization_args);
 
-  // N5008 [temp.inst]/1, [temp.point]: record that a *definition* (a class
+  // N5008 [temp.inst]/2, [temp.point]: record that a *definition* (a class
   // body) has been seen for this class template (primary template or partial
   // specialization), so elaborate_class_template only instantiates a
   // specialization of a template that has actually been defined.  Recorded once
@@ -701,7 +701,7 @@ void cpp_typecheckt::typecheck_function_template(cpp_declarationt &declaration)
 
   // Per [temp.variadic]/5: set pack_size_map for variadic
   // parameters so that add_method_body captures it.
-  // N5008 [basic.scope.temp]/1: the binding belongs to this template's
+  // N5008 [basic.scope.temp]/2: the binding belongs to this template's
   // declaration only; left in the map it outlived the declaration, and a
   // same-named function parameter pack of another template (`args' in
   // `-> decltype(c(args...))') was expanded as this empty pack.
@@ -743,7 +743,7 @@ void cpp_typecheckt::typecheck_function_template(cpp_declarationt &declaration)
     throw 0;
   }
 
-  // N5008 [dcl.fct]/6 + [temp.variadic]/1: a parameter written `P...`
+  // N5008 [dcl.fct]/24 + [temp.variadic]/1: a parameter written `P...`
   // (no comma) is a FUNCTION PARAMETER PACK only when P contains an
   // unexpanded parameter pack; when P names an ordinary (non-pack)
   // template parameter it means `P, ...` -- one deducible parameter
@@ -805,7 +805,7 @@ void cpp_typecheckt::typecheck_function_template(cpp_declarationt &declaration)
 
   typet function_type = declarator.merge_type(declaration.type());
 
-  // Per [temp.res]/8: function template parameter types may
+  // Per [temp.res.general]/1: function template parameter types may
   // reference other template parameters not yet in the template
   // map.  If conversion fails, use the unconverted type — it
   // will be resolved when the function template is instantiated.
@@ -1013,7 +1013,7 @@ void cpp_typecheckt::typecheck_function_template(cpp_declarationt &declaration)
     // <optional>'s enable-if constructor pair
     //   template<class _Up, enable_if_t<...> = 0> optional(_Up&&);
     // where the second template parameter's type names _Up) -- per
-    // N5008 [temp.inst]/2 such dependent constructs stay dependent in
+    // N5008 [temp.inst]/3.1 such dependent constructs stay dependent in
     // the instantiated class's member-template DECLARATION, so `_Up`
     // must still be resolvable as a template parameter.  Make this
     // template's scope a secondary scope of the current (class) scope,
@@ -1029,7 +1029,7 @@ void cpp_typecheckt::typecheck_function_template(cpp_declarationt &declaration)
     // unqualified lookup in the namespace -- a requires-expression's
     // parameter `__i` bound in an instantiation scope under std then
     // resolved ambiguously against that stale `__i` and the requirement
-    // read as unsatisfied ([basic.scope.scope]: a function parameter's
+    // read as unsatisfied ([basic.scope.param]/1: a function parameter's
     // scope is its declaration, not the enclosing namespace).
     if(cpp_scopes.current_scope().is_class())
       cpp_scopes.current_scope().add_secondary_scope(template_scope);
@@ -1248,7 +1248,7 @@ bool cpp_typecheckt::member_template_return_types_match(
 }
 
 /// typecheck class template members; these can be methods or static members
-/// N5008 [temp.mem]/1, [class.mfct]/1: an out-of-line definition of a member
+/// N5008 [temp.mem]/1, [class.mfct]/2: an out-of-line definition of a member
 /// function template of a non-template class (`template \<class E> auto
 /// path::_S_convert(const E *__f, const E *__l) { ... }') completes the
 /// in-class declaration with the same signature ([temp.over.link]/6, the
@@ -1291,9 +1291,9 @@ void cpp_typecheckt::define_member_template_of_class(
     scope = &cpp_scopes.get_scope((*ids.begin())->identifier);
   }
 
-  // N5008 [dcl.meaning.general]/3.1: `template <class T> int n::f(T) {...}'
+  // N5008 [dcl.meaning.general]/3.4: `template <class T> int n::f(T) {...}'
   // with n a namespace defines the function template f of n declared there
-  // ([namespace.memdef]); its target scope is n.  Type-check it as a
+  // ([dcl.meaning.general]/3.4); its target scope is n.  Type-check it as a
   // declaration of f in n, which merges it with the earlier declaration
   // (body, parameter names and default arguments).
   if(only_namespaces)
@@ -1384,7 +1384,7 @@ void cpp_typecheckt::typecheck_class_template_member(
 
   cpp_declaratort &declarator = declaration.declarators()[0];
 
-  // N5008 [dcl.meaning.general]/2.3: a declarator-id qualified by a
+  // N5008 [dcl.meaning.general]/3.4: a declarator-id qualified by a
   // nested-name-specifier that nominates a namespace declares a member of
   // that namespace, and the definition may appear outside it (`template
   // <class C> int a::b::S<C>::f() {...}').  Strip the leading namespace
@@ -1479,10 +1479,10 @@ void cpp_typecheckt::typecheck_class_template_member(
     cpp_name.get_sub()[4].id() == ID_scope_resolution &&
     cpp_name.get_sub()[5].id() == ID_name)
   {
-    // Out-of-line definition of a member of a nested (non-template) class
-    // of a class template:  Outer<args>::Nested::member
-    // (e.g. basic_ostream<C,T>::sentry::sentry, [ostream.sentry]).
-    // N5008 [temp.mem]/[class.nest]: this defines the member of the nested
+    // Out-of-line definition of a member of a nested (non-template) class of a
+    // class template:  Outer<args>::Nested::member (e.g.
+    // basic_ostream<C,T>::sentry::sentry, [ostream.sentry]).  N5008
+    // [temp.mem.class]/[class.nest]: this defines the member of the nested
     // class of the class template; record it in the OUTER class template's
     // template_methods below so each instantiation converts it.  Previously
     // this shape fell into the silent-return branch and the definition was
@@ -1497,7 +1497,7 @@ void cpp_typecheckt::typecheck_class_template_member(
     cpp_name.get_sub()[5].id() == ID_scope_resolution &&
     cpp_name.get_sub()[6].id() == ID_name)
   {
-    // N5008 [temp.mem]/1 + [class.nest]/1: out-of-line definition of a
+    // N5008 [temp.mem]/1 + [class.nest]/2: out-of-line definition of a
     // member of a member CLASS TEMPLATE of a class template, written with
     // a two-level template header:
     //   template <typename T, uint8_t N, bool W>
@@ -1508,7 +1508,7 @@ void cpp_typecheckt::typecheck_class_template_member(
     // body uses) onto the member's declaration inside the nested class
     // template's parse tree in the OUTER class template, so every
     // instantiation of Outer<...>::reference<...> carries the complete
-    // member ([temp.inst]/1).  Previously this shape fell into the
+    // member ([temp.inst]/4).  Previously this shape fell into the
     // silent-return branch: "no body for callee ...::on_write".  The
     // inner template parameters must keep the declaration's names
     // (they are not renamed here); a mismatch leaves the member
@@ -1636,7 +1636,7 @@ void cpp_typecheckt::typecheck_class_template_member(
     }
     else
     {
-      // N5008 [class.mfct]/1 + [namespace.qual]: the same syntactic
+      // N5008 [class.mfct]/2 + [namespace.qual]: the same syntactic
       // shape `A::B<args>::member` also covers a NAMESPACE-qualified
       // out-of-line member definition -- e.g. libstdc++'s
       //   template <typename _Traits>
@@ -1899,7 +1899,7 @@ void cpp_typecheckt::typecheck_class_template_member(
               !mcopy.declarators().empty() &&
               mcopy.declarators()[0].find(ID_value).is_not_nil())
             {
-              // N5008 [dcl.fct]/3,5 + [temp.over.link]: among same-named
+              // N5008 [dcl.fct]/3 + [temp.over.link]: among same-named
               // member templates (libstdc++ basic_string's two
               // `_M_construct(_It, _It, tag)' and its `<bool>
               // _M_construct(const _CharT *, size_type)') the definition
@@ -2127,7 +2127,7 @@ std::string cpp_typecheckt::class_template_identifier(
       identifier += "Type" + std::to_string(counter);
     else
       identifier += "Non_Type" + std::to_string(counter);
-    // a template parameter pack ([temp.param]/17) differs from a parameter
+    // a template parameter pack ([temp.param]/5) differs from a parameter
     if(it->get_bool(ID_ellipsis))
       identifier += "...";
 
@@ -2156,7 +2156,7 @@ std::string cpp_typecheckt::class_template_identifier(
         identifier += cpp_type2name(it->type());
       else
         identifier += cpp_expr2name(*it);
-      // N5008 [temp.variadic]/5: `const U &...' (a pack expansion) and
+      // N5008 [temp.variadic]/6: `const U &...' (a pack expansion) and
       // `const U &' are different arguments; without the marker the
       // partial specializations S<T, const U &...> and S<T, const U &> got
       // one identifier, and the later one replaced the earlier
@@ -2171,7 +2171,7 @@ std::string cpp_typecheckt::class_template_identifier(
     identifier += '>';
   }
 
-  // N5008 [temp.spec.partial.general]/1 + [temp.constr.decl]: partial
+  // N5008 [temp.spec.partial.general]/2 + [temp.constr.decl]: partial
   // specializations with the same argument pattern but different
   // requires-clauses are distinct (libstdc++'s three
   // `__iter_concept_impl<_Iter>` specializations differ only in their
@@ -2376,7 +2376,7 @@ void cpp_typecheckt::convert_class_template_specialization(
 
   if(cpp_name.is_qualified())
   {
-    // N5008 [temp.expl.spec]/2: an explicit specialization may be named with a
+    // N5008 [temp.expl.spec]/3: an explicit specialization may be named with a
     // qualified-id, e.g. `template <> struct ns::G<char> { ... };`.  This is
     // how std::hash (and similar library templates) are specialized for a
     // user-defined type from outside namespace std.  Resolve the qualifier --
@@ -2447,7 +2447,7 @@ void cpp_typecheckt::convert_class_template_specialization(
 
   auto id_set = primary_class_templates(cpp_scopes.current_scope());
 
-  // N5008 [namespace.def.general]/7: a member of an inline namespace (and,
+  // N5008 [namespace.def.general]/6-7: a member of an inline namespace (and,
   // transitively, of an inline namespace of that) can be explicitly
   // specialized as though it were a member of the enclosing namespace --
   // `namespace std { template <> struct hash<K> ... }' for libc++'s
@@ -2646,7 +2646,7 @@ void cpp_typecheckt::convert_template_function_or_member_specialization(
   if(cpp_name.get_sub().back().id() == ID_template_args)
   {
     // proper specialization with arguments
-    // N5008 [temp.expl.spec]/2-3: an explicit specialization may be declared
+    // N5008 [temp.expl.spec]/3: an explicit specialization may be declared
     // in any scope in which the template could be defined -- for a MEMBER
     // template of a class, at namespace scope with a qualified name
     // (`template <> renamedt<ssa_exprt, L1> goto_symex_statet::
@@ -2792,7 +2792,7 @@ bool cpp_typecheckt::is_concept_name(const cpp_namet &name)
   return false;
 }
 
-/// N5008 [temp.param]/4: a type-constraint `C T' (or `ns::C T', or
+/// N5008 [temp.param]/9: a type-constraint `C T' (or `ns::C T', or
 /// `C<A1, ..., An> T') on a type template parameter introduces the
 /// constraint-expression `C<T>' (`C<T, A1, ..., An>') into the
 /// template's associated constraints ([temp.constr.decl]/3, conjoined with
@@ -2944,7 +2944,7 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(template_typet &type)
       bool converted_to_concept = false;
       if(declaration.type().id() == ID_cpp_name)
       {
-        // N5008 [temp.param]/1, /4: a type-constraint `C T` (or `ns::C T`)
+        // N5008 [temp.param]/1, /8: a type-constraint `C T` (or `ns::C T`)
         // names a concept.  Look the name up in the enclosing scopes and
         // test for a concept template (the parser records one as a template
         // `constexpr bool C = ...' whose declarator carries `#concept').
@@ -2982,13 +2982,13 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(template_typet &type)
         // The type is not checked, as it might depend
         // on earlier parameters.
         //
-        // N5008 [temp.param]/6 + [dcl.meaning]/1: pointer/reference operators
-        // belong to the declarator, not to the decl-specifier
+        // N5008 [temp.param]/2.2 + [dcl.meaning.general]/5: pointer/reference
+        // operators belong to the declarator, not to the decl-specifier
         // `declaration.type()`.  A reference non-type parameter such as the
-        // `const T &empty` of util/reference_counting.h's
-        // `template <typename T, const T &empty = T::blank>` therefore has its
-        // `&` in the declarator.  Merge the declarator so the parameter keeps
-        // its reference (or pointer) type; otherwise it is wrongly treated as a
+        // `const T &empty` of util/reference_counting.h's `template <typename
+        // T, const T &empty = T::blank>` therefore has its `&` in the
+        // declarator.  Merge the declarator so the parameter keeps its
+        // reference (or pointer) type; otherwise it is wrongly treated as a
         // value parameter and a reference argument (an object such as
         // `T::blank`) is valuified, breaking instantiation.
         parameter =
@@ -3315,7 +3315,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       args.swap(expanded);
   }
 
-  // [temp.variadic]/4-5: expand pack-expansion template arguments using the
+  // [temp.variadic]/5-6: expand pack-expansion template arguments using the
   // active template_map before matching arguments to parameters.  When a
   // function-template body is type-checked during instantiation, a class
   // template-id such as `Tup<E...>` (or one nesting the pack, e.g.
@@ -3335,7 +3335,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
   // could not be folded for two or more elements.
   // The gate must also open when the only pack state is a ZERO size
   // (pack_size_map): an empty pack has no pack_args_map/pack_expr_map
-  // entry at all, yet its zero-length expansion ([temp.variadic]/7)
+  // entry at all, yet its zero-length expansion ([temp.variadic]/16)
   // must still REMOVE the pattern before the per-argument typecheck
   // below resolves it (an alias pattern like `__enable_if_t<_Bn::value>`
   // would otherwise substitute `_Bn::value` with no binding and fail
@@ -3370,7 +3370,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
         // LOOKUP (not spelling): the classification is then exact and
         // the suffix-ambiguity veto below must not second-guess it.
         bool any_exact_match = false;
-        // N5008 [temp.variadic]/5: a pack whose name appears within the
+        // N5008 [temp.variadic]/8: a pack whose name appears within the
         // pattern of a NESTED pack-expansion is expanded by that
         // innermost expansion, not by this one -- do not descend into
         // ellipsis-marked subtrees (`_Types` in
@@ -3432,7 +3432,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
                 p != std::string::npos ? key.substr(p + 2) : key;
               return suffix == id2string(id);
             };
-            // N5008 [temp.variadic]/7 + [basic.scope.temp]: the pack
+            // N5008 [temp.variadic]/5 + [basic.scope.temp]: the pack
             // SIZE recorded for the CURRENT instantiation is
             // authoritative.  Sequential instantiations of one template
             // share the parameter identifier, and deduction only
@@ -3469,12 +3469,12 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
               else
                 referenced_packs.insert(pe.first);
             }
-            // N5008 [temp.variadic]/7: an EMPTY pack has no
+            // N5008 [temp.variadic]/16: an EMPTY pack has no
             // pack_args_map/pack_expr_map entry, only a zero
             // pack_size_map entry.  Record it SEPARATELY: it only
             // drives the expansion as a fallback when no non-empty
             // pack is referenced (all packs of one expansion share a
-            // length per [temp.variadic]/5, so alongside a live pack a
+            // length per [temp.variadic]/8, so alongside a live pack a
             // zero-size suffix match is stale cross-scope state, not
             // this expansion's pack).
             for(const auto &ps : template_map.pack_size_map)
@@ -3493,7 +3493,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
         else
           collect(arg);
 
-        // N5008 [temp.variadic]/5 + [basic.scope.temp]: a NAME in the
+        // N5008 [temp.variadic]/8 + [basic.scope.temp]: a NAME in the
         // pattern denotes exactly ONE template parameter.  The flat
         // template_map can hold entries for SEVERAL parameters with the
         // same source spelling (an outer instantiation's `_Idx` beside
@@ -3554,7 +3554,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
         };
 
         // Fallback: pattern references only EMPTY packs -- a zero-length
-        // expansion ([temp.variadic]/7): contribute no arguments.  The
+        // expansion ([temp.variadic]/16): contribute no arguments.  The
         // flat template_map's stale zero-size entries can suffix-match
         // unrelated pattern names (make_tuple regressed when this fired
         // for them), so ALSO require that no LIVE binding (scalar type or
@@ -3580,7 +3580,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
           // pair<int, std::function<int()>>'s constructor lost its body.
           // The parameter's OWN scalar convenience entry never counts:
           // pack_size_map == 0 is THIS instantiation's authoritative binding
-          // ([temp.variadic]/7); type_map/expr_map entries are only
+          // ([temp.variadic]/5); type_map/expr_map entries are only
           // overwritten, never erased.
           bool any_live_binding = false;
           if(!any_exact_match)
@@ -3666,7 +3666,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
               {
                 typet pattern = static_cast<const typet &>(arg.type());
                 pattern.remove(ID_ellipsis);
-                // N5008 [temp.variadic]/5: when the pattern is a bare
+                // N5008 [temp.variadic]/9: when the pattern is a bare
                 // reference to a NON-TYPE parameter pack (`_Ip...` in
                 // `integer_sequence<unsigned long, _Ip...>`, libc++'s
                 // __bind_back_op partial specialization), the i-th
@@ -3701,7 +3701,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
                 }
                 if(!emitted_value)
                 {
-                  // N5008 [temp.variadic]/5: substitute each referenced TYPE
+                  // N5008 [temp.variadic]/9: substitute each referenced TYPE
                   // pack's i-th ELEMENT for its (suffix-matched) cpp_name
                   // references in the pattern.  template_mapt::apply does not
                   // substitute bare cpp_names from type_map, so without this
@@ -3740,7 +3740,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
                       replace_type_pack_ref(pattern, short_name, a->second[i]);
                   }
                   // ... and the same for NON-TYPE packs referenced inside
-                  // the type pattern ([temp.variadic]/5): `_Idx` in
+                  // the type pattern ([temp.variadic]/9): `_Idx` in
                   // `tuple_types<__type_pack_element<_Idx, _Types...>...>`
                   // (libc++ __make_tuple_types) must become the i-th VALUE;
                   // apply() substitutes neither bare cpp_names nor value
@@ -3828,7 +3828,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
   const template_typet::template_parameterst &parameters =
     template_type.template_parameters();
 
-  // N5008 [temp.variadic]/7: a pack that matched zero elements
+  // N5008 [temp.variadic]/16: a pack that matched zero elements
   // contributes NO arguments.  CBMC records such a pack inside a class
   // instance's template-argument list as a trailing ID_type argument of
   // type ID_empty (the zero-length-pack sentinel).  When those recorded
@@ -3877,12 +3877,12 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
     }
     if(!has_pack)
     {
-      // N5008 [temp.arg.explicit]/3 + [temp.deduct]/2: while matching an
-      // OVERLOADED candidate, an explicit template-argument list that is
-      // too long for this candidate's parameter list is a deduction
-      // failure -- the candidate is removed from the overload set, not a
-      // hard error (`valid<int, double>()` must simply skip the
-      // single-parameter `valid<U>` overload and select the viable one).
+      // N5008 [temp.arg.explicit]/6 + [temp.deduct.general]/2: while matching
+      // an OVERLOADED candidate, an explicit template-argument list that is too
+      // long for this candidate's parameter list is a deduction failure -- the
+      // candidate is removed from the overload set, not a hard error
+      // (`valid<int, double>()` must simply skip the single-parameter
+      // `valid<U>` overload and select the viable one).
       if(template_arg_candidate_matching > 0)
         throw template_arg_kind_mismatch_exceptiont{};
       error().source_location = source_location;
@@ -3940,7 +3940,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       {
         if(first_default > i)
           first_default = i;
-        // N5008 [temp.param]/14 + [temp.arg.general]: a default
+        // N5008 [basic.scope.pdecl]/12 + [temp.arg.general]: a default
         // template-argument may reference PRECEDING template
         // parameters; when used, it is evaluated with those bound to
         // the preceding arguments.  TYPE parameters are already bound
@@ -3958,7 +3958,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
           if(parameters[j].id() != ID_type)
             template_map.set(parameters[j], args[j]);
         }
-        // N5008 [temp.param]/12-14 + [temp.arg.general]/1: the default
+        // N5008 [temp.param]/16-17 + [temp.names]/7.4: the default
         // argument is substituted with THIS template's preceding
         // parameters bound to the preceding arguments -- and with
         // nothing else.  It is a raw cpp_name (`istreambuf_iterator<
@@ -4070,7 +4070,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
                 e.id() == ID_type &&
                 e.type().id() == ID_template_parameter_symbol_type)
               {
-                // N5008 [temp.arg.template], [temp.class.spec.match]: the
+                // N5008 [temp.arg.template], [temp.spec.partial.match]: the
                 // deduced binding already NAMES the resolved template (e.g. a
                 // partial specialization argument that is a
                 // template-template-parameter forwarded from the enclosing
@@ -4216,7 +4216,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       {
         if(arg.type().is_nil() || arg.type().id().empty())
         {
-          // [temp.deduct]/8: while matching an overloaded candidate, a
+          // [temp.deduct.general]/8: while matching an overloaded candidate, a
           // template argument that failed to form (nil type -- e.g. a
           // SFINAE'd-out __enable_if_t inside GCC 13's __and_fn chain,
           // reached from std::optional's _Requires'd converting
@@ -4228,14 +4228,15 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
           error() << "missing type in template argument" << eom;
           throw 0;
         }
-        // [temp.arg]/2 + [temp.deduct]/8: a VALUE in type position -- e.g. a
-        // constant produced by substituting a non-type template parameter,
-        // like the `I` of `std::get<I>(t)` when overload resolution also
-        // considers the by-TYPE `std::get<T>` overload -- supplied for a TYPE
-        // parameter is a kind mismatch.  While matching a candidate it
-        // silently removes just that candidate; otherwise it is a hard error.
-        // Without this, typecheck_type on the constant is a hard error that
-        // aborts resolution of the remaining (viable) by-index overload.
+        // [temp.arg.general]/1 + [temp.deduct.general]/2: a VALUE in type
+        // position -- e.g. a constant produced by substituting a non-type
+        // template parameter, like the `I` of `std::get<I>(t)` when overload
+        // resolution also considers the by-TYPE `std::get<T>` overload --
+        // supplied for a TYPE parameter is a kind mismatch.  While matching a
+        // candidate it silently removes just that candidate; otherwise it is a
+        // hard error.  Without this, typecheck_type on the constant is a hard
+        // error that aborts resolution of the remaining (viable) by-index
+        // overload.
         if(arg.type().id() == ID_constant)
         {
           if(template_arg_candidate_matching == 0)
@@ -4259,7 +4260,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
         // (The argument arrives as `code' or, straight from the parser, as
         // `function_type'; both carry the parameters as cpp_declarations.)
         strip_function_type_parameter_names(arg.type());
-        // N5008 [temp.variadic]/5: likewise for a pointer or reference to
+        // N5008 [temp.variadic]/9: likewise for a pointer or reference to
         // a function type whose parameter list is a pack expansion (the
         // pattern `R (&)(A...)' of a partial specialization): expand the
         // pack in the pointee's parameter list first, or the deduced pack
@@ -4272,7 +4273,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
           template_map.expand_parameter_packs(
             to_type_with_subtype(arg.type()).subtype());
         }
-        // [temp.variadic]/5: if a function-type template argument
+        // [temp.variadic]/9: if a function-type template argument
         // contains a function parameter pack (e.g. `_Res(_ArgTypes...)`
         // in a partial specialization pattern), expand the pack using
         // the deduced arguments and substitute the remaining template
@@ -4382,20 +4383,20 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
           !pack_expanded && arg.type().id() != ID_struct_tag &&
           arg.type().id() != ID_union_tag)
         {
-          // Per [temp.deduct]/7-8: substituting a default template
+          // Per [temp.deduct.general]/7-8: substituting a default template
           // argument is part of the deduction process; failures there
           // must be treated as silent deduction failures.  For
           // default type arguments, redirect diagnostics to a null
           // message handler so substitution failures in e.g.
           //   typename = decltype(swap(std::declval<_Tp&>(),
           //                            std::declval<_Tp&>()))
-          // of libstdc++'s __do_is_swappable_impl::__test do not leak
-          // Per [temp.deduct]/3 and [temp.deduct]/8: substituting
-          // default template arguments is an immediate context —
-          // e.g. libstdc++ often makes default args SFINAE-guarded
-          // (`typename = _Require<...>`), and a failure here must
-          // be a silent deduction failure, not a user-visible
-          // "found no match for symbol 'swap'" diagnostic.
+          // of libstdc++'s __do_is_swappable_impl::__test do not leak Per
+          // [temp.deduct.general]/7 and [temp.deduct.general]/8: substituting
+          // default template arguments is an immediate context — e.g. libstdc++
+          // often makes default args SFINAE-guarded (`typename =
+          // _Require<...>`), and a failure here must be a silent deduction
+          // failure, not a user-visible "found no match for symbol 'swap'"
+          // diagnostic.
           if(i >= first_default)
           {
             sfinae_contextt sfinae_guard{*this};
@@ -4403,7 +4404,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
           }
           else if(template_arg_candidate_matching > 0)
           {
-            // N5008 [temp.deduct]/8: while matching an overloaded
+            // N5008 [temp.deduct.general]/8: while matching an overloaded
             // candidate, an invalid type or expression formed by the
             // substituted template arguments is a DEDUCTION FAILURE
             // that removes this candidate from the overload set -- not
@@ -4439,7 +4440,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
             }
             catch(const incomplete_dependency_exceptiont &)
             {
-              // N5008 [temp.inst]/1: naming a class template specialization
+              // N5008 [temp.inst]/2: naming a class template specialization
               // as a template ARGUMENT does not require it to be complete.
               // Its instantiation was attempted on the way (the argument's
               // type was resolved) and failed because a class it depends on
@@ -4465,7 +4466,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
           }
         }
       tm_resolved:
-        // Per [temp.arg]/2: resolve remaining template parameter
+        // Per [temp.dep.general]/1: resolve remaining template parameter
         // references via template_map (e.g., forward<_Other1> where
         // _Other1 is mapped to const less<int>).
         if(arg.type().id() == ID_template_parameter_symbol_type)
@@ -4475,19 +4476,20 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       {
         if(arg.type().is_nil() || arg.type().id().empty())
         {
-          // [temp.deduct]/8 -- see the ID_type branch above.
+          // [temp.deduct.general]/8 -- see the ID_type branch above.
           if(template_arg_candidate_matching > 0)
             throw template_arg_kind_mismatch_exceptiont{};
           error().source_location = arg.source_location();
           error() << "missing type in template argument" << eom;
           throw 0;
         }
-        // [temp.arg]/2 + [temp.deduct]/8: an ambiguous argument whose type
-        // interpretation is a VALUE (a constant produced by substituting a
-        // non-type template parameter, e.g. the `I` of `std::get<I>(t)` when
-        // the by-TYPE `std::get<T>` overload is also considered) supplied for
-        // a TYPE parameter is a kind mismatch: silently remove the candidate
-        // while matching, hard error otherwise (see the ID_type branch).
+        // [temp.arg.general]/1 + [temp.deduct.general]/2: an ambiguous argument
+        // whose type interpretation is a VALUE (a constant produced by
+        // substituting a non-type template parameter, e.g. the `I` of
+        // `std::get<I>(t)` when the by-TYPE `std::get<T>` overload is also
+        // considered) supplied for a TYPE parameter is a kind mismatch:
+        // silently remove the candidate while matching, hard error otherwise
+        // (see the ID_type branch).
         if(arg.type().id() == ID_constant)
         {
           if(template_arg_candidate_matching == 0)
@@ -4498,7 +4500,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
           throw template_arg_kind_mismatch_exceptiont{};
         }
         strip_function_type_parameter_names(arg.type());
-        // [temp.variadic]/5: expand a function parameter pack in a
+        // [temp.variadic]/9: expand a function parameter pack in a
         // function-type argument (e.g. `_Res(_ArgTypes...)`) and
         // substitute the remaining template parameters, keeping the
         // result in unconverted frontend form (see the ID_type branch
@@ -4572,7 +4574,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
         {
           if(template_arg_candidate_matching > 0)
           {
-            // [temp.deduct]/8 -- see the ID_type branch above: failure
+            // [temp.deduct.general]/8 -- see the ID_type branch above: failure
             // while matching a candidate removes the candidate.
             const std::size_t errors_before =
               get_message_handler().get_message_count(messaget::M_ERROR);
@@ -4596,10 +4598,10 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       }
       else
       {
-        // [temp.arg]/2 + [temp.deduct]/8: a non-type argument supplied for a
-        // type parameter is a substitution failure.  While matching a
-        // candidate during overload resolution this removes only that
-        // candidate (silently); otherwise it is a hard error.
+        // [temp.arg.general]/1 + [temp.deduct.general]/2: a non-type argument
+        // supplied for a type parameter is a substitution failure.  While
+        // matching a candidate during overload resolution this removes only
+        // that candidate (silently); otherwise it is a hard error.
         if(template_arg_candidate_matching == 0)
         {
           error().source_location = arg.source_location();
@@ -4672,11 +4674,11 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
         }
         else
         {
-          // [temp.arg]/2 + [temp.deduct]/8: a TYPE supplied for a non-type
-          // parameter -- `std::get<double>(v)` also considered against the
-          // by-index `get<size_t N>(variant<T...>&)` overload -- is a kind
-          // mismatch that removes just that candidate while matching (the
-          // mirror of the value-for-type case above); a hard error
+          // [temp.arg.general]/1 + [temp.deduct.general]/2: a TYPE supplied for
+          // a non-type parameter -- `std::get<double>(v)` also considered
+          // against the by-index `get<size_t N>(variant<T...>&)` overload -- is
+          // a kind mismatch that removes just that candidate while matching
+          // (the mirror of the value-for-type case above); a hard error
           // otherwise.
           if(template_arg_candidate_matching == 0)
           {
@@ -4745,18 +4747,18 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
           typecheck_type(type);
       }
 
-      // Now check the argument to match that.
-      // For default non-type arguments (e.g., SFINAE enable_if_t),
-      // the template scope may lack visibility of type aliases from
-      // enclosing inline namespaces. Per [temp.point] p1,7, retry
-      // in the instantiation scope which has full namespace visibility.
+      // Now check the argument to match that.  For default non-type arguments
+      // (e.g., SFINAE enable_if_t), the template scope may lack visibility of
+      // type aliases from enclosing inline namespaces. Per
+      // [temp.dep.candidate]/1, [temp.point] p1,7, retry in the instantiation
+      // scope which has full namespace visibility.
       if(i >= first_default)
       {
-        // Per [temp.deduct]/7-8: substitution failure in a default
+        // Per [temp.deduct.general]/7-8: substitution failure in a default
         // template argument is silently absorbed.  Suppress
         // diagnostics emitted during the typecheck attempt; if both
         // the primary and the instantiation-scope retry fail,
-        // re-throw.  Per [temp.deduct]/8 the whole block is a SFINAE
+        // re-throw.  Per [temp.deduct.general]/8 the whole block is a SFINAE
         // immediate context (substitution of a default non-type
         // template argument at use site).
         bool succeeded = false;
@@ -4787,7 +4789,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       }
       else if(template_arg_candidate_matching > 0)
       {
-        // N5008 [temp.deduct]/8 -- see the type-argument branch above:
+        // N5008 [temp.deduct.general]/8 -- see the type-argument branch above:
         // while matching an overloaded candidate, an invalid
         // expression formed by the substituted arguments is a
         // deduction failure that removes this candidate, not a hard
@@ -4816,10 +4818,10 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
         type = arg.type();
       if(template_arg_candidate_matching > 0)
       {
-        // [temp.deduct]/8: a non-type argument that cannot convert to the
-        // candidate's parameter type while MATCHING (e.g. deducing the
-        // WIDE std::stoll overload for a const char* argument converts
-        // against const wchar_t*) removes the candidate, silently.
+        // [temp.deduct.general]/2: a non-type argument that cannot convert to
+        // the candidate's parameter type while MATCHING (e.g. deducing the WIDE
+        // std::stoll overload for a const char* argument converts against const
+        // wchar_t*) removes the candidate, silently.
         const std::size_t errors_before =
           get_message_handler().get_message_count(messaget::M_ERROR);
         try
@@ -4864,7 +4866,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
         std::function<void(exprt &)> eval_calls;
         eval_calls = [&](exprt &e)
         {
-          // N5008 [temp.arg.nontype]/1 + [temp.param]/7: a temporary of a
+          // N5008 [temp.arg.nontype]/1 + [temp.param]/12: a temporary of a
           // structural class type built by a constexpr constructor
           // (`Fixed(42)`) is the converted constant expression the
           // parameter binds to -- fold it to a struct constant, so the
@@ -4885,7 +4887,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
           if(
             e.id() == ID_side_effect && e.get(ID_statement) == ID_function_call)
           {
-            // N5008 [temp.inst]/5 + [expr.const]: the callee's definition
+            // N5008 [temp.inst]/4, /8 + [expr.const]: the callee's definition
             // may still sit in the deferred method-body queue (a constexpr
             // helper like chrono duration's `_S_gcd`, called in a DEFAULT
             // TEMPLATE ARGUMENT of a member alias such as `__divide`).
@@ -4955,7 +4957,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
     args.size() > parameters.size() && !parameters.empty() &&
     parameters.back().get_bool(ID_ellipsis))
   {
-    // N5008 [temp.arg.nontype] + [temp.variadic]/4-5: the arguments matched
+    // N5008 [temp.arg.nontype] + [temp.variadic]/5-6: the arguments matched
     // by a *non-type* parameter pack (e.g. `template<bool...>`) are non-type
     // template arguments -- converted constant expressions -- NOT types.  The
     // main parameter loop above already distinguishes a type parameter
@@ -5123,28 +5125,28 @@ void cpp_typecheckt::convert_template_declaration(cpp_declarationt &declaration)
       // But when the FINAL component DOES carry template arguments, e.g.
       //   template<> struct ns::G<char> { ... };
       // this is an explicit specialization named with a qualified-id
-      // (N5008 [temp.expl.spec]/2 -- the form used to specialize std::hash for
+      // (N5008 [temp.expl.spec]/3 -- the form used to specialize std::hash for
       // a user type outside namespace std).  That must be handled as a
       // specialization below, not skipped.
       if(
         tag_name.get_sub().empty() ||
         tag_name.get_sub().back().id() != ID_template_args)
       {
-        // N5008 [temp.mem]/1 + [class.nest]/1: a member class template of
+        // N5008 [temp.mem]/1 + [class.nest]/2: a member class template of
         // a class template may be defined out of line
         // (`template<class V> template<bool C>
         //  struct take_view<V>::__sentinel { ... };`, the libc++
         // take_view sentinel).  The definition completes the in-class
         // declaration; graft its body onto the member declaration inside
         // the OUTER class template's parse tree, so instantiating the
-        // outer class carries the complete member ([temp.inst]/1).  The
+        // outer class carries the complete member ([temp.inst]/4).  The
         // parser flattens both template-parameter levels into this
         // declaration's template_type; the member's own parameters are
         // the trailing ones after the outer template's.
         do
         {
           // form: [::] {namespace ::} name <args> :: name.  N5008
-          // [class.nest]/3, [namespace.memdef]/2: the definition may be
+          // [class.pre]/3, [class.pre]/3: the definition may be
           // outside the namespace, naming it by a qualified name
           // (`template <class C> struct ns::S<C>::N { ... };').
           const irept::subt &all_sub = tag_name.get_sub();

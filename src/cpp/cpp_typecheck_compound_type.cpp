@@ -341,7 +341,7 @@ void cpp_typecheckt::typecheck_compound_type(struct_union_typet &type)
         }
         catch(const incomplete_dependency_exceptiont &)
         {
-          // N5008 [temp.inst]/1-2 + [temp.point]: an implicit instantiation
+          // N5008 [temp.inst]/2 + [temp.point]: an implicit instantiation
           // that fails because a type it depends on is not complete YET
           // (libstdc++'s `_Rb_tree_node<X>' with its `unsigned char
           // _M_storage[sizeof(X)]', reached through `std::set<X>' while X
@@ -607,12 +607,12 @@ irep_idt cpp_typecheckt::ensure_virtual_table(
   return vt_name;
 }
 
-/// N5008 [temp.variadic]/5, [dcl.fct]/2: expand the pack expansions among
+/// N5008 [temp.variadic]/9.2, [dcl.fct]/1: expand the pack expansions among
 /// the call arguments of the trailing-return-type of member function type
 /// \p final_type to its replicated parameters `base$k', as the body and the
 /// mem-initializers are; then turn those names, not yet declared while the
 /// type is checked, into lvalue placeholders of the parameters' types
-/// ([expr.prim.id.unqual]/3: a named parameter is an lvalue, also when its
+/// ([expr.prim.id.unqual]/12: a named parameter is an lvalue, also when its
 /// type is an rvalue reference).
 /// \param final_type: the member's function type
 /// \param pack_counts: the replicated function parameter packs' base names
@@ -712,7 +712,7 @@ void cpp_typecheckt::expand_trailing_return_packs(
   // The trailing-return-type is typechecked before the replicated
   // parameters are declared, but a decltype operand needs only their
   // types: each `base$k' becomes an lvalue placeholder of that
-  // parameter's type ([expr.prim.id.unqual]/3: a named parameter is
+  // parameter's type ([expr.prim.id.unqual]/12: a named parameter is
   // an lvalue, also when its type is an rvalue reference).
   std::map<irep_idt, typet> replicated_types;
   for(const auto &param : final_type.find(ID_parameters).get_sub())
@@ -788,7 +788,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
   typet final_type = declarator.merge_type(declaration.type());
 
-  // N5008 [temp.variadic]/5: a function/constructor parameter that is a pack
+  // N5008 [temp.variadic]/9: a function/constructor parameter that is a pack
   // expansion `Pattern...` over a pack of length N is instantiated as N
   // parameters, one per pack element (the i-th replacing the pack with its
   // i-th element).  For a class-member function the parameter list is finalised
@@ -874,7 +874,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
       // declarator, e.g. `_Tail... t` / `const _Tail&... t` -- is replicated.
       // A parameter whose type merely *contains* the pack nested inside a
       // template-argument list (e.g. `Base<_T...> &b`) is a single parameter
-      // ([temp.variadic]/7) and must be left alone.
+      // ([temp.variadic]/6.8) and must be left alone.
       bool is_pack = false;
       if(param.id() == ID_cpp_declaration)
       {
@@ -924,7 +924,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
       // the declaration's type with the FIRST deduced element (the
       // `_Args&&... __args` of a member template instance arrives
       // here with type `tag-symbolish` instead of `_Args`), while the
-      // declarator still carries the `...`.  N5008 [temp.variadic]/5:
+      // declarator still carries the `...`.  N5008 [temp.variadic]/9:
       // the expansion must still produce one parameter per pack
       // element; when exactly one non-empty pack is bound, it is the
       // authoritative element source (a function parameter pack of a
@@ -1002,7 +1002,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
       {
         irept copy = param;
         auto &dc = to_cpp_declaration(copy);
-        // N5008 [temp.variadic]/8: the k-th expansion substitutes the k-th
+        // N5008 [temp.variadic]/9: the k-th expansion substitutes the k-th
         // pack element INTO the pattern; the pattern's cv-qualifiers are
         // part of it.  The pattern of `const _Elements&... __elements`
         // (libstdc++ tuple's converting constructor) parses as a
@@ -1087,7 +1087,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
       expand_trailing_return_packs(final_type, pack_counts);
 
       irept &inits = declarator.member_initializers();
-      // N5008 [temp.variadic]/5: a mem-initializer that is ITSELF a pack
+      // N5008 [temp.variadic]/9: a mem-initializer that is ITSELF a pack
       // expansion (`leaf<T>(u)...` paired with a base-specifier pack,
       // recorded by the parser via ID_ellipsis) expands to one
       // mem-initializer per element, all packs it mentions expanding in
@@ -1110,7 +1110,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
             arity = pack_counts[fn_pack];
             arity_known = arity > 0;
           }
-          // N5008 [temp.variadic]/5,7: a mem-initializer pack expansion
+          // N5008 [temp.variadic]/8,9: a mem-initializer pack expansion
           // need not mention a FUNCTION parameter pack at all --
           // `__tuple_leaf<_Ul, _Tl>()...` (libc++ __tuple_impl's
           // default-constructed tail leaves) expands in lockstep over
@@ -1210,7 +1210,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
                   [pp != std::string::npos ? full.substr(pp + 2) : full] =
                     pa.second[k];
               }
-              // N5008 [temp.variadic]/5 likewise for NON-TYPE packs: the
+              // N5008 [temp.variadic]/9 likewise for NON-TYPE packs: the
               // k-th VALUE substitutes for a bare reference to the pack.
               // libc++ __tuple_impl's delegating constructor initializes
               //   __tuple_leaf<_Uf>(std::forward<_Up>(__u))...
@@ -1308,7 +1308,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
                 copy.remove(ID_ellipsis);
                 mi_rename(
                   copy, base, id2string(base) + "$" + std::to_string(k));
-                // N5008 [temp.variadic]/4-5: a pack expansion expands ALL packs
+                // N5008 [temp.variadic]/8-9: a pack expansion expands ALL packs
                 // it mentions in lock-step.  Having renamed the function
                 // parameter pack `base` to `base$k`, replace any PARALLEL
                 // template TYPE pack in the same pattern (e.g. the `_U` in
@@ -1372,7 +1372,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
   }
 
   {
-    // N5008 [temp.variadic]/5: a data member whose type is a function pointer
+    // N5008 [temp.variadic]/9: a data member whose type is a function pointer
     // whose pointee parameter list contains a pack expansion of an enclosing
     // class template parameter pack -- e.g. `int (*fp)(A...)` in a *primary*
     // variadic class template `S<A...>` -- must have that pack expanded into
@@ -1425,7 +1425,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
     if(is_typedef && final_type.id() == ID_code)
       convert_parsed_parameters(to_code_type(final_type));
 
-    // N5008 [class.mem.general]/14: a non-static data member shall have a
+    // N5008 [class.mem.general]/19: a non-static data member shall have a
     // complete type, and [temp.inst]/2: the specialization is implicitly
     // instantiated when completeness affects the semantics.  An instance
     // named only through a typedef/alias has its elaboration deferred to
@@ -1442,7 +1442,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
         elaborate_class_template(*element);
     }
 
-    // N5008 [temp.variadic]/7: a function/constructor parameter that is a pack
+    // N5008 [temp.variadic]/16: a function/constructor parameter that is a pack
     // expansion over a pack empty in this instantiation contributes no
     // parameters.  Such a parameter resolves to the empty_typet zero-length
     // sentinel (see convert_template_parameter); drop it -- e.g. the trailing
@@ -1550,7 +1550,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
   bool is_destructor = declaration.is_destructor();
   bool is_virtual = declaration.member_spec().is_virtual();
   bool is_explicit = declaration.member_spec().is_explicit();
-  // N5008 [dcl.fct.spec]/3: explicit(false) declares a converting
+  // N5008 [dcl.fct.spec]/4: explicit(false) declares a converting
   // constructor -- every `explicit(...)' was taken as explicit, so the
   // conditionally-explicit constructors of std::pair, std::tuple and
   // std::optional rejected copy-initialization
@@ -1651,7 +1651,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
     // Identifiers for methods include the scope prefix.
     // Identifiers for static members include the scope prefix.
     identifier = cpp_scopes.current_scope().prefix + id2string(base_name);
-    // N5008 [temp.pre]/1 + [temp.spec]/4: each specialization of a static
+    // N5008 [temp.pre]/3 + [temp.type]/1: each specialization of a static
     // data member template (`template <class T> static constexpr bool
     // __exactly_once = ...;`, std::variant) is a distinct variable; encode
     // the instantiation suffix as for member function templates, or the
@@ -2088,7 +2088,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
       // their values to be inlined as nondet during goto conversion,
       // before the model bodies are available.
       const std::string bname = id2string(static_symbol.base_name);
-      // N5008 [class.static.data]/3 + [dcl.constexpr]/1: a constexpr
+      // N5008 [class.static.data]/4 + [dcl.constexpr]/1: a constexpr
       // static data member is implicitly inline and its in-class
       // declaration IS its definition.  A SCALAR one stays an `extern`
       // macro folded into its uses (unfolded initializers of scalars,
@@ -2138,7 +2138,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
     }
     else if(declaration.member_spec().is_inline() && value.is_not_nil())
     {
-      // N5008 [class.static.data]/3: an inline static data member's
+      // N5008 [class.static.data]/4: an inline static data member's
       // in-class declaration is its definition.  Left `extern', the
       // initializer of `static inline const V iv[2] = {...}' was never run
       // (the dynamic-initialization pass skips extern symbols) and the
@@ -2203,7 +2203,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
       {
         new_symbol->value.swap(value);
         {
-          // Per [temp.deduct]/8 applied to class-member initializer
+          // Per [temp.deduct.general]/8 applied to class-member initializer
           // evaluation during class-template instantiation: treat
           // substitution failure as SFINAE rather than a user-visible
           // error.  Also suppress recursive `elaborate_class_template`
@@ -2215,7 +2215,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
           try
           {
             sfinae_contextt sfinae_guard{*this};
-            // N5008 [expr.const]/2, [class.static.data]/4: the initializer
+            // N5008 [expr.const]/28.5, [class.static.data]/4: the initializer
             // of a constexpr (or const integral) static data member is a
             // constant expression, manifestly constant-evaluated -- a call to
             // a constexpr function in it (`static constexpr int t =
@@ -2229,7 +2229,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
             // Temporarily allow elaboration so that referenced templates
             // can be instantiated.
             // Use the C++ type-checker (which resolves cpp_names, evaluates
-            // sizeof...(Pack) from pack_size_map per [temp.variadic]/8, etc.)
+            // sizeof...(Pack) from pack_size_map per [temp.variadic]/10, etc.)
             // whenever a template substitution is active.  A multi-element
             // parameter pack populates only pack_args_map/pack_size_map (build
             // records a scalar type_map entry only for single-element packs),
@@ -2279,7 +2279,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
                   cpp_scopes.id_map.find(symbol.name) !=
                   cpp_scopes.id_map.end())
                   cpp_scopes.go_to(*cpp_scopes.id_map[symbol.name]);
-                // N5008 [temp.variadic]/5: a pack expansion in the
+                // N5008 [temp.variadic]/9: a pack expansion in the
                 // initializer (`count({sizeof(Ts)...})', libc++ variant's
                 // `__common_trait({__trait<_Types, ...>...})') produces one
                 // element per pack element -- as convert_function does for a
@@ -2317,7 +2317,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
             {
               c_typecheck_baset::do_initializer(*new_symbol);
             }
-            // N5008 [dcl.array]/5: an array of unknown bound takes its bound
+            // N5008 [dcl.array]/7: an array of unknown bound takes its bound
             // from the initializer, also as the type of the member
             // (`static constexpr bool _Bools[] = {is_same_v<_First, _Ty>,
             // is_same_v<_Rest, _Ty>...}', the MSVC STL's
@@ -2492,7 +2492,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
     component.add(ID_C_default_value, default_value);
   }
 
-  // N5008 [over.match.best]/2.6 with [temp.constr.order]: two member
+  // N5008 [over.match.best.general]/2.6 with [temp.constr.order]: two member
   // functions with the same signature, one deleted and unconstrained and the
   // other with a (trailing) requires-clause (libstdc++'s C++20 std::pair:
   // `pair &operator=(const pair &) = delete;' next to `constexpr pair
@@ -2654,7 +2654,7 @@ void cpp_typecheckt::typecheck_friend_declaration(
       return;
     }
 
-    // N5008 [class.friend]/1 + [namespace.memdef]/3: a friend FUNCTION
+    // N5008 [class.friend]/1 + [dcl.meaning.general]/2.3: a friend FUNCTION
     // TEMPLATE defined inside the class is a member of the innermost
     // enclosing namespace.  These declarations were silently DISCARDED
     // (only the friend-class-template case above was handled), so e.g.
@@ -2666,7 +2666,7 @@ void cpp_typecheckt::typecheck_friend_declaration(
     // hidden friend is only found by ADL; registering it in the
     // enclosing namespace over-approximates visibility, matching how
     // non-template friends are handled by the declarator converter.)
-    // N5008 [namespace.memdef]/3 + [temp.friend]/1: a friend function
+    // N5008 [dcl.meaning.general]/2 + [temp.friend]/1: a friend function
     // template declared with a QUALIFIED name refers to a template
     // previously declared in the named namespace and introduces NO new
     // name.  libstdc++'s match_results (privately derived from
@@ -2710,7 +2710,7 @@ void cpp_typecheckt::typecheck_friend_declaration(
         // its own namespace, writes them unqualified, so the textual
         // signature comparison can fail on spelling alone; when the
         // arity match is UNIQUE it is the referred-to template
-        // ([namespace.memdef]/3 -- a qualified friend names an existing
+        // ([dcl.meaning.general]/2.2 -- a qualified friend names an existing
         // entity).  Several arity-equal overloads fall back to the
         // spelling-normalised signature equivalence.
         const auto count_params = [](const cpp_declarationt &d) -> std::size_t
@@ -2767,7 +2767,7 @@ void cpp_typecheckt::typecheck_friend_declaration(
     {
       cpp_save_scopet saved_scope(cpp_scopes);
       // The friend's NAME belongs to the innermost enclosing NAMESPACE
-      // ([namespace.memdef]/3), so convert it there.
+      // ([dcl.meaning.general]/2.3), so convert it there.
       cpp_scopet *scope = &cpp_scopes.current_scope();
       cpp_scopet *class_scope = nullptr;
       while(scope->id_class == cpp_idt::id_classt::CLASS ||
@@ -2782,11 +2782,11 @@ void cpp_typecheckt::typecheck_friend_declaration(
         }
         scope = &scope->get_parent();
       }
-      // N5008 [class.friend]/1 + [temp.local]/1: while the friend's name
-      // is a namespace member, its DECLARATION appears in the class and
-      // is looked up there -- the enclosing (member) class template's
-      // parameters and the class's member types are visible to it.  See
-      // libc++'s take_view::__sentinel
+      // N5008 [class.friend]/1 + [basic.scope.temp]/2, [basic.scope.class]/1:
+      // while the friend's name is a namespace member, its DECLARATION appears
+      // in the class and is looked up there -- the enclosing (member) class
+      // template's parameters and the class's member types are visible to it.
+      // See libc++'s take_view::__sentinel
       //   template <bool _OtherConst = _Const>
       //   friend bool operator==(_Iter<_OtherConst>, __sentinel);
       // whose default template argument names the enclosing member class
@@ -2850,7 +2850,7 @@ void cpp_typecheckt::typecheck_friend_declaration(
           }
         }
 
-        // N5008 [temp.local]/1 + [temp.friend]/1: the friend's
+        // N5008 [basic.scope.temp]/2 + [temp.friend]/1: the friend's
         // REQUIRES-CLAUSE is also part of its declaration and is looked
         // up in the class -- libc++'s __range_adaptor_closure constrains
         // its hidden friend operator| with
@@ -2864,7 +2864,7 @@ void cpp_typecheckt::typecheck_friend_declaration(
         // holds for the TYPES of its own template parameters (`template
         // <class It2, enable_if_t<same_v<It, It2>, int> = 0>', the MSVC
         // STL reverse_iterator's _Verify_range).
-        // [temp.local]/1 shadowing: a name that is the FRIEND's own
+        // [temp.local]/7 shadowing: a name that is the FRIEND's own
         // template parameter refers to that parameter, not to the
         // enclosing template's -- do not substitute it even when an
         // enclosing binding shares the short name (libc++ <tuple>
@@ -2951,7 +2951,7 @@ void cpp_typecheckt::typecheck_friend_declaration(
         // falls back to a bogus arithmetic conversion.  Substitute the
         // bare name with this instantiation's struct_tag in the
         // friend's declarator types now.  The friend's own template
-        // parameters shadow ([temp.local]/1) and are skipped via the
+        // parameters shadow ([temp.local]/7) and are skipped via the
         // same own-parameter check as for defaults and the
         // requires-clause.
         {
@@ -2993,13 +2993,13 @@ void cpp_typecheckt::typecheck_friend_declaration(
           subst_self(declaration.type());
         }
 
-        // N5008 [temp.local]/1, [temp.friend]/1: the friend's declared types
-        // -- its return type and parameter types -- are looked up in the
-        // class, too; an enclosing template parameter they name (libstdc++
-        // 16's __normal_iterator: `friend __synth3way_t<_Iterator, _Iter>
+        // N5008 [basic.scope.temp]/2, [temp.friend]/1: the friend's declared
+        // types -- its return type and parameter types -- are looked up in the
+        // class, too; an enclosing template parameter they name (libstdc++ 16's
+        // __normal_iterator: `friend __synth3way_t<_Iterator, _Iter>
         // operator<=>(...)' with _Iterator the class's parameter) is
-        // substituted now, as for the defaults and the requires-clause
-        // above.  Declarator names are not types and are left alone.
+        // substituted now, as for the defaults and the requires-clause above.
+        // Declarator names are not types and are left alone.
         {
           std::function<void(irept &)> subst_in_types = [&](irept &node)
           {
@@ -3019,15 +3019,14 @@ void cpp_typecheckt::typecheck_friend_declaration(
         }
       }
       cpp_scopes.go_to(*scope);
-      // N5008 [class.friend]/1 + [temp.local]/1: the class scope stays
-      // attached as a secondary LOOKUP scope (it does not affect
-      // naming), because the friend's declaration -- and later its body,
+      // N5008 [class.friend]/1 + [basic.scope.temp]/2, [basic.scope.class]/1:
+      // the class scope stays attached as a secondary LOOKUP scope (it does not
+      // affect naming), because the friend's declaration -- and later its body,
       // instantiated from a call site -- must be looked up in the class.
-      // Restricted to a friend declared in a NESTED class: that is the
-      // shape whose members and enclosing template parameters are
-      // otherwise unreachable from the namespace (libc++'s
-      // take_view::__sentinel), and it keeps the members of top-level
-      // class templates out of namespace lookup.
+      // Restricted to a friend declared in a NESTED class: that is the shape
+      // whose members and enclosing template parameters are otherwise
+      // unreachable from the namespace (libc++'s take_view::__sentinel), and it
+      // keeps the members of top-level class templates out of namespace lookup.
       if(class_scope != nullptr)
       {
         const cpp_scopet *outer = &class_scope->get_parent();
@@ -3128,7 +3127,7 @@ void cpp_typecheckt::typecheck_friend_declaration(
           friend_entry.set(ID_identifier, added.front());
           symbol.type.add(ID_C_friends).move_to_sub(friend_entry);
         }
-        // N5008 [class.friend]/7, [basic.lookup.argdep]/4.2: a friend
+        // N5008 [dcl.meaning.general]/2, [basic.lookup.argdep]/4.2: a friend
         // function first declared in a class is not found by ordinary
         // lookup, only by argument-dependent lookup with that class among
         // the associated classes (cpp_typecheck_resolvet::resolve, which
@@ -3173,7 +3172,7 @@ void cpp_typecheckt::typecheck_friend_declaration(
     }
 
     cpp_save_scopet saved_scope(cpp_scopes);
-    // N5008 [class.friend]/11: an unqualified elaborated-type-specifier
+    // N5008 [dcl.type.elab]/3-4: an unqualified elaborated-type-specifier
     // (`friend class B;') is looked up -- and, if undeclared, declared --
     // in the innermost enclosing namespace, never in the class.  A
     // simple-type-specifier (`friend _Tidy_guard<vector>;', MSVC's
@@ -3295,7 +3294,7 @@ void cpp_typecheckt::typecheck_friend_declaration(
 
     cpp_declarator_convertert cpp_declarator_converter(*this);
     cpp_declarator_converter.is_friend = true;
-    // N5008 [temp.inst]/4: the definition of a friend function defined in a
+    // N5008 [temp.inst]/5: the definition of a friend function defined in a
     // class template specialization (a "hidden friend") is instantiated only
     // if it is odr-used -- libstdc++'s _Rb_tree `operator<' compares the
     // elements, which may have no operator< at all
@@ -3312,7 +3311,7 @@ void cpp_typecheckt::typecheck_friend_declaration(
         flag = saved;
       }
     };
-    // ... also in a member class of such a specialization ([temp.inst]/3:
+    // ... also in a member class of such a specialization ([temp.pre]/8.3:
     // its members are templated entities, too) -- libc++'s
     // iota_view<int, unreachable_sentinel_t>::__sentinel's `operator-'
     bool in_template_instance =
@@ -3939,7 +3938,7 @@ void cpp_typecheckt::needed_exception_specification(const irep_idt &function)
 void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
 {
   // A typedef/alias declaration defers the elaboration of the class template
-  // specialization it NAMES (skip_typechecking_elaborate, N5008 [temp.inst]/1).
+  // specialization it NAMES (skip_typechecking_elaborate, N5008 [temp.inst]/2).
   // That deferral is about the alias's own type only: once a class body IS
   // being type-checked -- here, possibly because a qualified name looked into
   // it ([temp.inst]/2) from within that alias -- its bases and members are
@@ -3985,7 +3984,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
 
   struct_union_typet &type = to_struct_union_type(symbol.type);
 
-  // Per N5008 [class.name]/1: "the class-name is also inserted into
+  // Per N5008 [class.pre]/2: "the class-name is also inserted into
   // the scope of the class itself; this is known as the
   // injected-class-name" — the class name is in scope from the
   // declarative-region of its definition.  Set `ID_name` (and
@@ -4011,7 +4010,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
       throw 0;
     }
 
-    // Per N5008 [class.derived]/2 + [temp.inst]/3: failure to
+    // Per N5008 [class.derived.general]/2: failure to
     // elaborate one base class (e.g. a class template
     // specialization whose body cannot complete because of an
     // upstream depth/structural limit, or a dependent base name
@@ -4025,15 +4024,9 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
     // gracefully and continue body elaboration here.
     //
     // ONLY APPLY DURING TEMPLATE INSTANTIATION
-    // (`!instantiation_stack.empty()`): user-code class
-    // declarations like
-    //   `struct D : virtual B, virtual C { };  // non-virtual A
-    //                                          // multi-inherit`
-    // are intentional compile errors per [class.mi]/2 and the
-    // user expects CBMC to refuse them with `CONVERSION ERROR`,
-    // not silently recover.  See the
-    // `regression/cbmc-cpp/Multiple_Inheritance3` test for the
-    // canonical case.  Recovery is only meaningful for
+    // (`!instantiation_stack.empty()`): a base of a user-code
+    // class that fails to elaborate is a CONVERSION ERROR, not
+    // silently recovered.  Recovery is only meaningful for
     // libstdc++ / CBMC-internal template specializations
     // whose elaboration fails due to CBMC's depth/structural
     // limits, not the user's intent.
@@ -4236,7 +4229,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
 
         bool is_typedef = declaration.is_typedef();
 
-        // N5008 [temp.inst]/1, [basic.def.odr]: a declaration whose every
+        // N5008 [temp.inst]/2, [basic.def.odr]: a declaration whose every
         // declarator forms a pointer or reference to the decl-specifier's
         // type (`typedef _Rb_tree_node<_Val> *_Link_type;',
         // `_Base_ptr _M_parent;') does not require that type to be complete,
@@ -4269,7 +4262,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
           // basic_ostream<char> through ostreambuf_iterator's typedef).
           is_typedef ||
             // ... nor does a member FUNCTION declaration for its return type
-            // ([temp.inst]/1; typecheck_compound_declarator instantiates the
+            // ([temp.inst]/2; typecheck_compound_declarator instantiates the
             // type of a data member, which does need it)
             (!declaration.declarators().empty() &&
              std::all_of(
@@ -4294,7 +4287,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
             declaration.type().set(ID_C_tag_only_declaration, true);
 
         declaration.name_anon_struct_union();
-        // Per [class.mem]/4 and [temp.inst]/2: the type of a data
+        // Per [class.mem.general]/19 and [temp.inst]/2: the type of a data
         // member must be complete at the closing `}` of the class.
         // If `typecheck_type` on the declaration's base type throws
         // *during* class body processing, the remainder of the
@@ -4419,7 +4412,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
           }
           if(is_self_reference)
           {
-            // Per [temp.inst]/3 + [temp.deduct]/8: elaborate under a
+            // Per [temp.inst]/3 + [temp.deduct.general]/8: elaborate under a
             // SFINAE immediate-context guard; on failure, skip the
             // declaration and let a later pass retry.
             const typet saved_self_ref_type = declaration.type();
@@ -4430,7 +4423,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
             }
             catch(...)
             {
-              // [temp.inst]/1-2 + [dcl.typedef]: a member typedef declares
+              // [temp.inst]/2 + [dcl.typedef]: a member typedef declares
               // the member and forms the aliased type but does not require
               // the aliased template's *definition* to be instantiated -- a
               // typedef-name may denote an incomplete type.  When the alias
@@ -4456,7 +4449,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
           }
           else if(is_typedef)
           {
-            // Per [temp.inst]/1-2 and [dcl.typedef]: a member typedef
+            // Per [temp.inst]/2 and [dcl.typedef]: a member typedef
             // aliasing a class-template-id (e.g.
             // `typedef std::reverse_iterator<const_iterator>
             //  const_reverse_iterator;` in libstdc++ `basic_string`)
@@ -4468,7 +4461,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
             // body does); an unguarded failure abandons the rest of the
             // class body, dropping every later member including the
             // constructors.  The class is then non-conformantly
-            // misclassified as a POD ([class.prop]: a class with
+            // misclassified as a POD ([depr.meta.types]/4: a class with
             // user-declared constructors is not a POD), so e.g.
             // `std::string s("ab")` is routed to a bogus `char[]` ->
             // `basic_string` conversion instead of a constructor call.
@@ -4504,7 +4497,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
         }
         else
         {
-          // Per N5008 [class.mem]/3 + [temp.inst]: the
+          // Per N5008 [class.mem.general]/3 + [temp.inst]: the
           // member-specification declares the full set of members of
           // the class.  A failure to elaborate one member's type must
           // not silently drop sibling member-declarations or
@@ -4587,7 +4580,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
             // a `merged_type` alias-template result, so the cpp_name
             // self-reference recovery above does not apply to it.
             //
-            // Per [temp.inst]/1-2 + [dcl.typedef]: this member typedef declares
+            // Per [temp.inst]/2 + [dcl.typedef]: this member typedef declares
             // the member and forms the aliased type but does not require the
             // aliased template's *definition* to be instantiated; a
             // typedef-name
@@ -4743,7 +4736,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
               // failure of this member alone, the class cannot be completed
               // until the dependency is defined (see typecheck_compound_type).
               // A typedef, a pointer or a function declarator does not need
-              // the complete type ([temp.inst]/1): its failure is local, and
+              // the complete type ([temp.inst]/2): its failure is local, and
               // a typedef is kept as a lazily resolved member so that the
               // members naming it (`typedef _Node *_Node_ptr;' after
               // `typedef _Rb_tree_node<_Val> _Node;' in libstdc++ 16's
@@ -4758,16 +4751,15 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
               }
               get_message_handler().set_message_count(
                 messaget::M_ERROR, errors_before);
-              // N5008 [temp.inst]/1 + [dcl.fct]/12: a member FUNCTION
-              // declaration needs neither its parameter nor its return
-              // types complete; the eager elaboration of a specialization
-              // named there (`static const _Key &_S_key(const _Node &)'
-              // with `_Node' = `_Rb_tree_node<late>' while `late' is only
-              // declared, libstdc++ 16's _Rb_tree) is what failed.
-              // Declare the member without elaborating: the body,
-              // converted later, elaborates on use.  Otherwise the member
-              // was left with an unresolved parameter type and every call
-              // to it found no match.
+              // N5008 [temp.inst]/2 + [dcl.fct.def.general]/2: a member
+              // FUNCTION declaration needs neither its parameter nor its return
+              // types complete; the eager elaboration of a specialization named
+              // there (`static const _Key &_S_key(const _Node &)' with `_Node'
+              // = `_Rb_tree_node<late>' while `late' is only declared,
+              // libstdc++ 16's _Rb_tree) is what failed.  Declare the member
+              // without elaborating: the body, converted later, elaborates on
+              // use.  Otherwise the member was left with an unresolved
+              // parameter type and every call to it found no match.
               if(
                 !is_typedef && (declarator.type().id() == ID_code ||
                                 declarator.type().id() == ID_function_type))
@@ -4813,7 +4805,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
           }
           else if(kept_unresolved_cpp_name)
           {
-            // Phase 3 narrow producer per N5008 [temp.inst]/3.1.  The
+            // Phase 3 narrow producer.  The
             // existing `kept_unresolved_cpp_name` mitigation upstream
             // preserved the unresolved cpp_name on the declaration so
             // a non-typedef data-member declarator can still register.
@@ -4905,7 +4897,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
           try
           {
             convert(cpp_using);
-            // [namespace.udecl]/19: the named member is accessible with the
+            // [namespace.udecl]/16: the named member is accessible with the
             // access of the using-declaration (`using B::operator int;' in
             // the public part of a class with a private base B), as for
             // the other members below.  Its base name is the one the
@@ -4957,7 +4949,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
                 break;
               }
             }
-            // N5008 [namespace.udecl]/1 + [class.qual]/2: `using B::B;`
+            // N5008 [namespace.udecl]/1 + [class.qual]/1: `using B::B;`
             // names the constructor when the terminal name names the
             // QUALIFIER's class -- and the qualifier may spell the base
             // through an ALIAS TEMPLATE (libc++'s
@@ -4966,7 +4958,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
             // The textual comparison above misses that; resolve the
             // qualifier to a type and compare CLASS IDENTITY with the
             // bases instead.
-            // [class.qual]/2 gate: the terminal name must spell the
+            // [class.qual]/1 gate: the terminal name must spell the
             // SAME name as the qualifier's last identifier (the class
             // name or the alias spelling that names it) -- otherwise
             // this is an ordinary member using-declaration
@@ -5017,7 +5009,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
           {
             convert(cpp_using);
 
-            // [namespace.udecl]/19: a using-declaration that names an
+            // [namespace.udecl]/16: a using-declaration that names an
             // inherited member makes that member accessible in the
             // derived class with the access of the using-declaration,
             // independent of the member's access in the base.  Adjust the
@@ -5063,7 +5055,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
               {
                 if(comp.type().id() != ID_code)
                   continue;
-                // N5008 [namespace.udecl]/3, [class.inhctor.init]: `using
+                // N5008 [namespace.udecl]/2, [class.inhctor.init]: `using
                 // B::B' names the constructors OF B; the base's components
                 // also hold the constructors of B's own bases (copied in
                 // from_base), which are not inherited -- `propt(const propt
@@ -5168,7 +5160,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
       // A data member of a type that cannot be completed yet: the class
       // cannot be completed until the dependency is defined (see
       // typecheck_compound_type).  A typedef, pointer or function member
-      // does not need the complete type ([temp.inst]/1): local failure.
+      // does not need the complete type ([temp.inst]/2): local failure.
       if(instantiation_stack.empty())
         throw;
       bool data_member = false;
@@ -5363,14 +5355,14 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
       if(!declaration.is_constructor())
         continue;
 
-      // N5008 [temp.mem]/1, [over.match.funcs.general]/7: a constructor
+      // N5008 [temp.mem]/1, [over.match.funcs.general]/8: a constructor
       // TEMPLATE is a template, registered by the first pass
-      // (convert_template_declaration); its specializations are the
-      // overload candidates.  It is not also an ordinary constructor of the
-      // class: such a copy is preferred over every template
-      // ([over.match.best]/2.4) and bypasses the template's constraints --
-      // libstdc++ pair's two SFINAE-constrained default constructors, one of
-      // which became a non-template `pair()'.
+      // (convert_template_declaration); its specializations are the overload
+      // candidates.  It is not also an ordinary constructor of the class: such
+      // a copy is preferred over every template ([over.match.best.general]/2.4)
+      // and bypasses the template's constraints -- libstdc++ pair's two
+      // SFINAE-constrained default constructors, one of which became a
+      // non-template `pair()'.
       if(declaration.is_template())
         continue;
 
@@ -5602,7 +5594,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
 
     if(declare_implicit_move)
     {
-      // the move constructor: memberwise moves ([class.copy.ctor]/15),
+      // the move constructor: memberwise moves ([class.copy.ctor]/14),
       // defined only if used
       cpp_declarationt mvctor;
       default_cpctor(symbol, mvctor, "ref", true);
@@ -5797,8 +5789,8 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
         // packed structs (padding.cpp).
         if(!cpp_is_pod(struct_type))
           struct_type.set(ID_C_non_pod, true);
-        // N5008 [class]/4 (and [intro.object]/9): a complete object of class
-        // type has a nonzero size; an empty class is one byte (more when
+        // N5008 [class.pre]/7 (and [intro.object]/8): a complete object of
+        // class type has a nonzero size; an empty class is one byte (more when
         // over-aligned, add_padding pads it up).  The byte is a padding
         // component, so the class has a real object with an address and an
         // empty MEMBER occupies its byte; an empty BASE subobject is folded
@@ -5969,7 +5961,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
     }
   }
 
-  // Phase 4 end-of-body resolution sweep per N5008 [temp.inst]/3.1:
+  // Phase 4 end-of-body resolution sweep:
   // before exiting the class body and tearing down the scope, take
   // one last pass at resolving any lazy components and the typedef
   // symbols Phase 3 may have created for them.  At this point all
@@ -6018,7 +6010,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
     }
     catch(...)
     {
-      // Substitution failure per [temp.deduct]/8 — keep the lazy
+      // Substitution failure per [temp.deduct.general]/8 — keep the lazy
       // placeholder for subsequent retries at use sites.
     }
   }
@@ -6099,7 +6091,7 @@ void cpp_typecheckt::typecheck_member_function(
 
   irep_idt f_id = function_identifier(component.type());
 
-  // [temp.spec]/4 + [temp.inst]/2: a member function template
+  // [temp.type]/1 + [temp.inst]/5: a member function template
   // specialization is a distinct entity for each set of template
   // arguments.  When instantiating one (marker set by
   // instantiate_template), this runs in the function template's
@@ -6113,7 +6105,7 @@ void cpp_typecheckt::typecheck_member_function(
   //   * Constructors/destructors: their template parameters are deduced
   //     from the parameter types, so the signature already distinguishes
   //     specializations.
-  // Instances WITHOUT a body are suffixed too: N5008 [temp.spec]/4 makes
+  // Instances WITHOUT a body are suffixed too: N5008 [temp.type]/1 makes
   // each specialization a distinct entity regardless of whether it is
   // defined, and a declaration-only member template's specializations
   // differ in their RETURN type -- libstdc++'s detection probes
@@ -6154,7 +6146,7 @@ void cpp_typecheckt::typecheck_member_function(
   // N5008 [basic.scope.scope]/4.4: two member declarations with the same
   // parameter-type-list whose trailing requires-clauses are not equivalent
   // declare different functions; both are candidates, and
-  // [over.match.viable]/3 and [over.match.best]/2.6 choose between them
+  // [over.match.viable]/3 and [over.match.best.general]/2.6 choose between them
   // (cpp_typecheck_resolvet::prefer_more_constrained_members).  The symbol
   // name encodes the signature only, so give the later one its own name.
   // A deleted declaration beside a constrained one keeps the historical
@@ -6209,7 +6201,7 @@ void cpp_typecheckt::typecheck_member_function(
     symbol_exists && new_symbol->value.is_nil() && symbol.value.is_not_nil() &&
     new_symbol->type == symbol.type && component.get_bool("#constrained"))
   {
-    // N5008 [over.match.best]/2.6: a constrained member with the same
+    // N5008 [over.match.best.general]/2.6: a constrained member with the same
     // signature as an earlier DELETED one (libstdc++'s C++20 std::pair
     // `operator=(const pair &) = delete;' beside the constrained definition)
     // is the one a well-formed program calls; the deleted declaration made
@@ -6310,7 +6302,7 @@ void cpp_typecheckt::add_this_to_method_type(
   // ABI's complete-object (C1/D1) versus base-object (C2/D2) constructor
   // and destructor distinction (5.1.4), which decides whether the virtual
   // bases are constructed/destroyed by this call ([class.base.init]/13,
-  // [class.dtor]/14) and whether the complete object's virtual pointers
+  // [class.dtor]/13) and whether the complete object's virtual pointers
   // are installed.  Ordinary construction of a complete object uses the
   // default; a base subobject's constructor is called with `false' by the
   // derived constructor (typecheck_member_initializer) and destructor.
@@ -6430,7 +6422,7 @@ void cpp_typecheckt::convert_anon_struct_union_member(
   }
 
   // N5008 [class.union.anon]/1: an anonymous union shall not have
-  // member functions or static data members; [class.union.general]/3:
+  // member functions or static data members; [class.union.general]/4:
   // its non-static data members must not be reference types.  POD-ness
   // is NOT required (a C++03-era leftover): libc++'s
   // __optional_destruct_base holds `union { char __null_state_;
@@ -6465,7 +6457,7 @@ void cpp_typecheckt::convert_anon_struct_union_member(
               << eom;
       throw 0;
     }
-    // [class.union.general]/3 is a rule for UNIONS; an anonymous struct
+    // [class.union.general]/4 is a rule for UNIONS; an anonymous struct
     // (a GNU/MSVC extension that g++ and clang++ accept) may hold a
     // reference member: libc++ 21's _LIBCPP_COMPRESSED_PAIR is an anonymous
     // struct, and __split_buffer<T, Alloc &> keeps its `allocator_type
@@ -6640,7 +6632,7 @@ bool cpp_typecheckt::get_component(
         component.type().id() == ID_union_tag ||
         component.type().id() == ID_struct_tag)
       {
-        // N5008 [class.union.anon]/1, [expr.ref]/6.2: the anonymous member
+        // N5008 [class.union.anon]/1, [expr.ref]/7.2: the anonymous member
         // subobject is an lvalue when the object is, so a member reached
         // through it stays an lvalue when the expression is type-checked
         // again (an array in an anonymous union indexed on the left of an
@@ -6690,7 +6682,7 @@ bool cpp_typecheckt::check_component_access(
 
   const irep_idt &struct_identifier = struct_union_type.get(ID_name);
 
-  // N5008 [class.access.general]/4 + [class.default.ctor]/4: the body of an
+  // N5008 [class.access.general]/1 + [class.default.ctor]/4: the body of an
   // implicitly-defined constructor/destructor is a member of its class, so
   // the member initializations it performs may name that class's OWN
   // members whatever their access.  Exact match only: a base class's
@@ -6779,7 +6771,7 @@ bool cpp_typecheckt::check_component_access(
 
       const struct_typet &scope_struct = to_struct_type(scope_symbol.type);
 
-      // N5008 [class.union.general]/3: a union has no base classes and is
+      // N5008 [class.union.general]/4: a union has no base classes and is
       // not a base class, so nothing derives from a union (libc++
       // variant's `__union' storage accessed from `__variant_detail::
       // __access::__union::__get_alt').
@@ -7100,7 +7092,7 @@ void cpp_typecheckt::typecheck_member_trailing_return_type(
 /// selects the destructor.  Candidates whose trailing requires-clause is not
 /// satisfied are not viable ([over.match.viable]/3); of several viable ones
 /// a constrained one is preferred over an unconstrained one
-/// ([over.match.best]/2.6).  The selected destructor becomes the first
+/// ([over.match.best.general]/2.6).  The selected destructor becomes the first
 /// destructor component; the definitions of the others are not instantiated
 /// ([temp.inst]/4) -- `~X() requires(!trivial) { destroy(); }' of a
 /// trivially destructible specialization calls a member whose own
@@ -7257,7 +7249,7 @@ bool cpp_typecheckt::base_publicly_accessible(
 
   // Check if we're inside the derived class or any of its bases — if so,
   // all bases are accessible regardless of access specifier
-  // (N5008 [class.access.base]/5: a base is accessible where a
+  // (N5008 [class.access.base]/4-5: a base is accessible where a
   // hypothetical public member of it would be, and members of the
   // derived class may use their own protected/private bases).  Walk
   // BOTH the current scope chain and the recorded point of use: during
@@ -7269,7 +7261,7 @@ bool cpp_typecheckt::base_publicly_accessible(
   // uses).
   const irep_idt &from_name = from.get(ID_name);
 
-  // N5008 [class.access.general]/4: inside the body of an
+  // N5008 [class.access.general]/1: inside the body of an
   // implicitly-defined constructor/destructor of this very class, its own
   // members are accessible.  Exact match only -- a base's private
   // members stay inaccessible (regression/cpp/Protection1).
@@ -7452,16 +7444,16 @@ void cpp_typecheckt::make_ptr_typecast(
   const struct_typet &dest_struct =
     follow_tag(to_struct_tag_type(dest_type.base_type()));
 
-  // N5008 [class.derived]/2 recovery interplay: when a class's base list
-  // was partially recovered during template instantiation (a base
+  // N5008 [class.derived.general]/2 recovery interplay: when a class's base
+  // list was partially recovered during template instantiation (a base
   // specifier whose resolution failed was dropped -- see
-  // typecheck_compound_bases), a member initializer of a dropped base can
-  // still request a derived-to-base cast here.  The relation is then not
-  // derivable from the recorded bases; crashing the whole front end on
-  // the precondition helps nobody.  Degrade to an offset-0 reinterpret
-  // (the base-at-offset-0 layout CBMC uses for a sole base), keeping the
-  // instantiation alive; the enclosing system-header leniency reports or
-  // havocs the affected member as appropriate.
+  // typecheck_compound_bases), a member initializer of a dropped base can still
+  // request a derived-to-base cast here.  The relation is then not derivable
+  // from the recorded bases; crashing the whole front end on the precondition
+  // helps nobody.  Degrade to an offset-0 reinterpret (the base-at-offset-0
+  // layout CBMC uses for a sole base), keeping the instantiation alive; the
+  // enclosing system-header leniency reports or havocs the affected member as
+  // appropriate.
   if(!(subtype_typecast(src_struct, dest_struct) ||
        subtype_typecast(dest_struct, src_struct)))
   {

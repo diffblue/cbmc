@@ -27,7 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bool c_typecheck_baset::empty_brace_value_initializes_scalar() const
 {
-  // C [dcl.init]/11: empty braced-init-list `{}` for any object type
+  // C23 6.7.11/11: empty braced-init-list `{}` for any object type
   // performs zero-initialization, but only at C23 and later.  Earlier C
   // standards reject the empty initializer-list outright.
   return config.ansi_c.c_standard >= configt::ansi_ct::c_standardt::C23;
@@ -1108,7 +1108,7 @@ exprt c_typecheck_baset::do_initializer_list(
       return do_initializer_rec(
         to_unary_expr(value).op(), type, force_constant);
 
-    // C++ [dcl.init.list] p3.10 / C [dcl.init] p11: an empty braced-init-list
+    // C++ [dcl.init.list] p3.11 / C23 6.7.11/11: an empty braced-init-list
     // ({}) value-initializes a scalar, yielding zero of the scalar's type.
     // Only valid at C++11+ (overridden in cpp_typecheckt) or C23+; in earlier
     // C the empty initializer-list is rejected outright.

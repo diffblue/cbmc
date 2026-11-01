@@ -8,7 +8,7 @@ Author: Kiro
 
 /// \file
 /// Lower by-value returns of non-POD C++ class types to
-/// construct-into-caller-storage (N5008 [class.copy.elis],
+/// construct-into-caller-storage (N5008 [class.copy.elision],
 /// [stmt.return]/2).
 
 #include "elide_cpp_returned_temporaries.h"
@@ -210,7 +210,7 @@ static bool contains_symbol(const exprt &expr, const irep_idt &identifier)
 /// Rewrite the body of a lowered function: for each SET RETURN VALUE of
 /// a front-end return temporary, substitute that temporary instance by
 /// the hidden result parameter's pointee so the returned object is
-/// constructed directly into the caller's storage ([class.copy.elis]/1:
+/// constructed directly into the caller's storage ([class.copy.elision]/1:
 /// the temporary and the function's result object are the same object).
 /// The temporary's declaration, liveness markers and post-return
 /// destructor call are dropped: the result object's storage and
@@ -248,9 +248,9 @@ static void lower_returns_in_body(
     {
       // Returned values that are not front-end return temporaries (the
       // front end returns a named local directly when it applies NRVO).
-      // Not eliding here is conforming ([class.copy.elis]/1 elision of a
+      // Not eliding here is conforming ([class.copy.elision]/1 elision of a
       // named object is optional); initialize the result object with a
-      // constructor call instead.  Per [class.copy.elis]/3 the operand
+      // constructor call instead.  Per [expr.prim.id.unqual]/12, 15 the operand
       // is treated as an rvalue -- selecting the move constructor --
       // only when it names an implicitly movable entity: a non-volatile
       // object with automatic storage duration declared in the function
@@ -560,7 +560,7 @@ void elide_cpp_returned_temporaries(goto_modelt &goto_model)
       }
 
       // The hidden result parameter is the last DECLARED parameter.  For a
-      // variadic function (N5008 [dcl.fct]/6: a parameter-declaration-clause
+      // variadic function (N5008 [dcl.fct]/2: a parameter-declaration-clause
       // ending in an ellipsis, e.g. `auto f(_Fn...)' with a non-pack _Fn) the
       // arguments beyond the declared parameters follow it, so the result
       // address goes in front of them, not after them -- appended last it

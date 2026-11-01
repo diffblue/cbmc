@@ -86,7 +86,7 @@ public:
   /// \param cv_per_argument: if given, receives each argument's share of
   ///   \p cv_distance (the reference-binding tie-breakers of
   ///   [over.ics.rank]/3.2.3 and /3.2.6), for the per-argument comparison of
-  ///   [over.match.best.general]/2.1
+  ///   [over.match.best.general]/2
   /// \return whether every argument has an implicit conversion sequence
   bool match(
     const code_typet &code_type,

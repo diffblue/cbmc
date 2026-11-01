@@ -1257,7 +1257,7 @@ void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
       throw 0;
     }
 
-    // N5008 [class]/4 + [expr.sizeof]/2: a complete object of class
+    // N5008 [class.pre]/7 + [expr.sizeof]/2: a complete object of class
     // type has nonzero size, so sizeof applied to a class is never 0.
     // CBMC's layout keeps empty classes at object size 0 on purpose
     // (adding a padding byte would change every empty-class

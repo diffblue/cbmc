@@ -57,7 +57,7 @@ static void copy_parent(
   bool is_move = false,
   bool parent_is_empty = false)
 {
-  // An EMPTY base subobject has zero size ([intro.object]/9: only a complete
+  // An EMPTY base subobject has zero size ([intro.object]/8: only a complete
   // object of empty class type has its one byte) -- there is nothing to
   // copy.  The base's one-byte complete-object layout (`$empty') must not
   // be assigned through a pointer into the derived object: that byte is
@@ -233,7 +233,7 @@ void cpp_typecheckt::default_ctor(
 /// \param is_move: when true, generate a *move* constructor -- each base and
 ///   non-static data member is initialized from the corresponding subobject of
 ///   the argument cast to an xvalue (static_cast<T&&>), so overload resolution
-///   selects the subobject's move constructor ([class.copy.ctor]/15).
+///   selects the subobject's move constructor ([class.copy.ctor]/14).
 void cpp_typecheckt::default_cpctor(
   const symbolt &symbol,
   cpp_declarationt &cpctor,
@@ -283,7 +283,7 @@ void cpp_typecheckt::default_cpctor(
   irept &initializers=decl0.add(ID_member_initializers);
   initializers.id(ID_member_initializers);
 
-  // [class.copy.ctor]/14: the implicit copy constructor of a union copies the
+  // [class.copy.ctor]/15: the implicit copy constructor of a union copies the
   // object representation.  A union has no base classes and copying it
   // member-by-member is not meaningful (at most one member is active), so emit
   // a single whole-object copy `*this = other` and return.
@@ -350,7 +350,7 @@ void cpp_typecheckt::default_cpctor(
       // base (e.g. `Base(U&&)`) deduce `U` as the derived type and match more
       // closely than the base copy constructor, selecting an unintended
       // constructor ([over.match.best], [temp.deduct]).
-      // For a defaulted MOVE constructor, [class.copy.ctor]/15: each base is
+      // For a defaulted MOVE constructor, [class.copy.ctor]/14: each base is
       // direct-initialized from the corresponding subobject of the argument
       // cast to an xvalue -- slice to `Base&&` instead, so overload resolution
       // selects the base's move constructor and its side effects run (e.g.
@@ -457,7 +457,7 @@ void cpp_typecheckt::default_cpctor(
       // (for a scalar or bit-field member the xvalue is its value: the
       // member is copied -- casting a bit-field to an rvalue reference of
       // its type is not even expressible)
-      // [class.copy.ctor]/15: a defaulted move constructor initializes each
+      // [class.copy.ctor]/14: a defaulted move constructor initializes each
       // non-static data member from the corresponding member of the argument
       // cast to an xvalue.  Wrap the source access in static_cast<T&&> so that
       // overload resolution selects the member's move constructor (falling
@@ -717,7 +717,7 @@ void cpp_typecheckt::check_member_initializers(
     {
       // it has to be a parent constructor
       typet member_type=(typet&) initializer.find(ID_member);
-      // N5008 [temp.variadic]/7: drop an empty pack expansion from the base-id
+      // N5008 [temp.variadic]/16: drop an empty pack expansion from the base-id
       // before resolving (e.g. `_Tuple_impl<I+1, _Tail...>` with empty
       // `_Tail`); the unsubstituted pack reference would otherwise throw.
       drop_empty_pack_template_args(member_type);
@@ -740,7 +740,7 @@ void cpp_typecheckt::check_member_initializers(
 
       if(!ok)
       {
-        // N5008 [temp.inst]/2: instantiating a class template
+        // N5008 [temp.inst]/3.1: instantiating a class template
         // specialization instantiates only the DECLARATIONS of its
         // members; a mem-initializer list belongs to a constructor's
         // DEFINITION, whose semantic checks are deferred to its own
@@ -920,7 +920,7 @@ void cpp_typecheckt::check_member_initializers(
 
     if(!ok)
     {
-      // See the [temp.inst]/2 note above: for a template instance the
+      // See the [temp.inst]/3.1 note above: for a template instance the
       // authoritative check happens when the member's definition is
       // instantiated.
       if(is_template_instance)
@@ -1001,7 +1001,7 @@ void cpp_typecheckt::full_member_initialization(
       cpp_namet("@most_derived").as_expr(), std::move(vptr_block));
   };
 
-  // N5008 [temp.variadic]/7: normalise each member-initializer's base-id by
+  // N5008 [temp.variadic]/16: normalise each member-initializer's base-id by
   // dropping pack-expansion arguments over empty packs (e.g.
   // `_Tuple_impl<I+1, _Tail...>` -> `_Tuple_impl<I+1>`), in place so the
   // base-id stays clean when later moved into the final list and type-checked.
@@ -1012,7 +1012,7 @@ void cpp_typecheckt::full_member_initialization(
       drop_empty_pack_template_args(member);
   }
 
-  // Per [temp.variadic]/7: remove empty pack expansion
+  // Per [temp.variadic]/16: remove empty pack expansion
   // expressions from member initializer arguments.
   if(!template_map.pack_size_map.empty())
   {
@@ -1029,7 +1029,7 @@ void cpp_typecheckt::full_member_initialization(
       std::function<bool(const irept &)> refs_empty_pack =
         [&](const irept &n) -> bool
       {
-        // N5008 [expr.sizeof]/5: `sizeof...(P)' of an empty pack is 0, a
+        // N5008 [expr.sizeof]/4: `sizeof...(P)' of an empty pack is 0, a
         // valid operand -- not an expansion to drop
         if(n.id() == ID_sizeof)
           return false;
@@ -1245,7 +1245,7 @@ void cpp_typecheckt::full_member_initialization(
           // #base_type makes typecheck_member_initializer resolve the name
           // in the base's own scope, where a typedef-name of the derived
           // class (`: __ios_type()', libstdc++'s basic_ostream,
-          // [class.base.init]/2) is unknown: name the base itself
+          // [class.base.init]/3) is unknown: name the base itself
           const cpp_namet base_name{symb.base_name};
           mem_init.set(ID_member, base_name);
           mem_init.add("#base_type") = struct_tag_typet(vbase_id);
@@ -1417,10 +1417,10 @@ void cpp_typecheckt::full_member_initialization(
         // constructor-called bases).
         if(has_default_member_initializer(b.type()) && !b.get_bool(ID_virtual))
         {
-          // N5008 [dcl.init]/8: an EXPLICIT empty initializer for the base
-          // (`D() : B() {}` / `: B{}`) value-initializes it, which -- the
-          // default constructor being non-trivial because of the NSDMI --
-          // also applies the default member initializers.  Only an
+          // N5008 [dcl.init.general]/16.4, 9.1: an EXPLICIT empty initializer
+          // for the base (`D() : B() {}` / `: B{}`) value-initializes it, which
+          // -- the default constructor being non-trivial because of the NSDMI
+          // -- also applies the default member initializers.  Only an
           // initializer WITH arguments (copy-initialization from another
           // object) supersedes them.
           bool named = false;
@@ -1487,7 +1487,7 @@ void cpp_typecheckt::full_member_initialization(
         // base.  This branch previously dropped such initializers
         // silently (the base stayed nondeterministic; wrong code).  The
         // mem-initializer-id may also name the base via a TEMPLATE
-        // PARAMETER ([class.base.init]/2: any name denoting the type,
+        // PARAMETER ([class.base.init]/3: any name denoting the type,
         // goto-symex/renamed.h's `renamedt(underlyingt v) :
         // underlyingt(v)`), so match by name first and by resolved type
         // second.  Lower to an assignment through the sliced base
@@ -1529,7 +1529,7 @@ void cpp_typecheckt::full_member_initialization(
             }
             if(!is_member_name)
             {
-              // N5008 [temp.names]/8: within the instance, a template
+              // N5008 [temp.param]/7.1: within the instance, a template
               // parameter denotes its bound argument -- consult the
               // active template map FIRST (scope-based resolution of
               // the parameter fails when the class is completed from a
@@ -1577,7 +1577,7 @@ void cpp_typecheckt::full_member_initialization(
           if(!names_this_base)
             continue;
 
-          // N5008 [intro.object]/9: an empty base subobject has zero size
+          // N5008 [intro.object]/8, 10: an empty base subobject has zero size
           // and may share its address with other subobjects; the trivial
           // initialization from the expression-list stores nothing.
           // Assigning the class's one-byte complete-object representation
@@ -1617,7 +1617,7 @@ void cpp_typecheckt::full_member_initialization(
           // and aggregate initialization otherwise.
           if(init_expr.operands().empty())
           {
-            // N5008 [dcl.init.general]/9.1-9.2, [class.base.init]/7: an
+            // N5008 [dcl.init.general]/9.1, [class.base.init]/7: an
             // empty mem-initializer `B()' / `B{}' value-initializes the
             // base; a POD base (no user-provided constructor) is
             // zero-initialized.  It was left uninitialized.
@@ -1707,7 +1707,7 @@ void cpp_typecheckt::full_member_initialization(
         typet member_type=
           static_cast<const typet&>(initializer.find(ID_member));
 
-        // N5008 [class.base.init]/1-2: a mem-initializer-id designates
+        // N5008 [class.base.init]/3: a mem-initializer-id designates
         // the base subobject by the TYPE it denotes.  An initializer
         // that already records the exact base (`#base_type`, set for
         // synthesized copy/move-constructor initializers and resolved
@@ -1743,7 +1743,7 @@ void cpp_typecheckt::full_member_initialization(
         {
           irep_idt init_base_name =
             to_cpp_name(initializer.find(ID_member)).get_base_name();
-          // [class.base.init]/2: `leaf<0, int>' and `leaf<1, long>' share
+          // [class.base.init]/3: `leaf<0, int>' and `leaf<1, long>' share
           // the name `leaf' but denote different bases (the pack-expanded
           // mem-initializers of libc++'s __tuple_impl); a template-id is
           // matched by the type it denotes when that resolves
@@ -1798,7 +1798,7 @@ void cpp_typecheckt::full_member_initialization(
 
         drop_empty_pack_template_args(member_type);
 
-        // N5008 [temp.names]/8 + [class.base.init]/2: the
+        // N5008 [temp.param]/7.1, [temp.dep.type]/3 + [class.base.init]/3: the
         // mem-initializer-id may denote the base via a TEMPLATE
         // PARAMETER; within the instance that parameter denotes its
         // bound argument.  Consult the active template map first --
@@ -2133,7 +2133,7 @@ bool cpp_typecheckt::find_cpctor(const symbolt &symbol) const
     if(!is_reference(parameter1_type))
       continue;
 
-    // [class.copy] p2: A copy constructor has a first parameter of
+    // [class.copy.ctor] p1: A copy constructor has a first parameter of
     // type X&, const X&, volatile X&, or const volatile X&.
     // Rvalue references (X&&) are move constructors, not copy constructors.
     if(is_rvalue_reference(parameter1_type))
@@ -2217,7 +2217,7 @@ bool cpp_typecheckt::has_constructor_template_for_arguments(
 
 /// Whether \p symbol has a (user-declared) move constructor: a constructor
 /// whose first parameter is `X &&' (possibly cv-qualified) and whose other
-/// parameters have default arguments ([class.copy.ctor]/3)
+/// parameters have default arguments ([class.copy.ctor]/2)
 bool cpp_typecheckt::find_mvctor(const symbolt &symbol) const
 {
   for(const auto &component : to_struct_union_type(symbol.type).components())

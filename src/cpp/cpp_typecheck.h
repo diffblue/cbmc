@@ -43,11 +43,11 @@ bool cpp_typecheck(
   const namespacet &ns);
 
 /// Thrown by `typecheck_template_args` when an explicit template argument has
-/// the wrong *kind* (a non-type argument supplied for a type parameter, or
-/// vice versa) while matching a candidate during overload resolution.  Per
-/// N5008 [temp.arg]/2 and [temp.deduct]/8 this is a deduction failure that
-/// removes only that candidate from the overload set, so the candidate loop in
-/// `apply_template_args` catches it and skips the candidate rather than
+/// the wrong *kind* (a non-type argument supplied for a type parameter, or vice
+/// versa) while matching a candidate during overload resolution.  Per N5008
+/// [temp.arg.general]/1 and [temp.deduct.general]/2 this is a deduction failure
+/// that removes only that candidate from the overload set, so the candidate
+/// loop in `apply_template_args` catches it and skips the candidate rather than
 /// treating it as a hard error.
 void expand_member_initializer_packs_in_body(
   irept &node,
@@ -119,7 +119,7 @@ public:
   std::string to_string(const exprt &) override;
 
   /// In C++ the empty braced-init-list `{}` value-initializes a scalar
-  /// per [dcl.init.list]/3.10.  Strictly this is a C++11 feature, but
+  /// per [dcl.init.list]/3.11.  Strictly this is a C++11 feature, but
   /// CBMC's earlier `--cppNN` modes already accept many C++11
   /// constructs as permissive extensions, so we always return true.
   bool empty_brace_value_initializes_scalar() const override;
@@ -133,7 +133,7 @@ public:
     const source_locationt &source_location,
     bool force_constant) override;
 
-  /// N5008 [class]/4 + [expr.sizeof]/2: sizeof a class type is never 0.
+  /// N5008 [class.pre]/7 + [expr.sizeof]/2: sizeof a class type is never 0.
   bool sizeof_yields_nonzero_for_class() const override
   {
     return true;
@@ -179,7 +179,7 @@ public:
 
   /// Instantiate the out-of-class definition \p member_type of the member
   /// class \p member_name for the existing specializations of the class
-  /// template \p outer_template ([temp.mem.class]/1, [temp.inst]/3).
+  /// template \p outer_template ([temp.mem.class]/1, [temp.inst]/4).
   void complete_member_class_of_instances(
     const cpp_idt &outer_template,
     const irep_idt &member_name,
@@ -202,7 +202,7 @@ public:
 
   /// Whether the braced-init-list \p list can aggregate-initialize an
   /// object of the aggregate type \p type (an array, or a class the front
-  /// end treats as POD), with brace elision ([dcl.init.aggr]/16).
+  /// end treats as POD), with brace elision ([dcl.init.aggr]/14).
   /// N5008 [over.ics.list]/8: such a list argument converts to an
   /// aggregate parameter by a user-defined conversion sequence.
   bool
@@ -257,7 +257,7 @@ protected:
 
   /// While the body of an IMPLICITLY-DEFINED constructor or destructor is
   /// being converted, the class it belongs to.  N5008
-  /// [class.access.general]/4 + [class.default.ctor]/4: such a definition
+  /// [class.access.general]/1 + [class.default.ctor]/4: such a definition
   /// is a member of its class, so the member initializations it performs
   /// may name the class's OWN private members -- but not a base's
   /// (regression/cpp/Protection1).  Hence an exact-match context rather
@@ -269,7 +269,7 @@ protected:
   // avoid triggering extra instantiations during symbol table iteration.
   std::map<irep_idt, symbolt> sfinae_alternatives;
 
-  // N5008 [temp.inst]/1, [temp.point]: a class template specialization is
+  // N5008 [temp.inst]/2, [temp.point]: a class template specialization is
   // implicitly instantiated -- and thereby completed -- only from a
   // *definition* of the template.  This set records the symbol names of class
   // templates (primary templates and partial specializations) for which a
@@ -284,7 +284,7 @@ protected:
   std::set<irep_idt> defined_class_templates;
 
   /// Nesting depth of active `sfinae_contextt` guards (substitution / deduction
-  /// / overload resolution, N5008 [temp.deduct]/8).  Non-zero means a
+  /// / overload resolution, N5008 [temp.deduct.general]/8).  Non-zero means a
   /// substitution failure is a SFINAE failure that must stay silent; zero means
   /// an ordinary context where an unresolved call is a genuine, diagnosable
   /// error.  Maintained by `sfinae_contextt` (a friend).
@@ -307,24 +307,24 @@ protected:
 
   /// Records a pending "no viable function" failure: set by resolve() when, in
   /// an ordinary (non-SFINAE) context, a call's only candidates are function
-  /// templates all removed by [temp.deduct]/8 substitution failures.  The
-  /// silent `throw 0` is kept (so recoverable callers can still absorb it via
-  /// `catch(int)`), but this flag lets typecheck_method_bodies distinguish an
-  /// UNRECOVERED such failure -- which must be diagnosed and NOT rolled back as
-  /// unsupported-STL leniency -- from an ordinary suppressible instantiation
+  /// templates all removed by [temp.deduct.general]/8 substitution failures.
+  /// The silent `throw 0` is kept (so recoverable callers can still absorb it
+  /// via `catch(int)`), but this flag lets typecheck_method_bodies distinguish
+  /// an UNRECOVERED such failure -- which must be diagnosed and NOT rolled back
+  /// as unsupported-STL leniency -- from an ordinary suppressible instantiation
   /// failure.  It is cleared at every resolve() entry, so it only survives when
   /// the throw propagates straight to the body's conversion without any
   /// intervening (recovering) resolution.
   bool pending_no_viable_call = false;
 
-  /// Non-zero while overload resolution is exploring a class's
-  /// CONSTRUCTOR candidates as part of a user-defined conversion
-  /// sequence (copy-initialization, [over.match.copy]).  N5008
-  /// [over.best.ics]/4: when the target is the first parameter of such a
-  /// constructor candidate, user-defined conversion sequences are NOT
+  /// Non-zero while overload resolution is exploring a class's CONSTRUCTOR
+  /// candidates as part of a user-defined conversion sequence
+  /// (copy-initialization, [over.match.copy]).  N5008
+  /// [over.best.ics.general]/4: when the target is the first parameter of such
+  /// a constructor candidate, user-defined conversion sequences are NOT
   /// considered -- otherwise a `template <class C> operator C()` on the
-  /// argument makes EVERY constructor viable (C deduced as each
-  /// parameter type) and resolution reports a bogus ambiguity.
+  /// argument makes EVERY constructor viable (C deduced as each parameter type)
+  /// and resolution reports a bogus ambiguity.
   unsigned copy_init_ctor_exploration = 0;
 
   /// (destination class, source type, value category, component count) for
@@ -408,7 +408,7 @@ protected:
   /// body's return statements and restores the enclosing function's context
   /// on every exit -- if the body throws and an upstream recovery absorbs it
   /// while the ENCLOSING body continues, its later return statements must
-  /// still convert against its own return type ([stmt.return]/3).  After the
+  /// still convert against its own return type ([stmt.return]/2).  After the
   /// body, finish() applies [dcl.spec.auto.general]/11 (no non-discarded
   /// return statement: void).
   class return_deduction_contextt
@@ -576,7 +576,8 @@ protected:
   /// Instantiate, by signature (parameter arity) rather than base name, the
   /// out-of-line definition body of a class-template instance member.  Used to
   /// repair a member that was attached the wrong overload's body.  See the
-  /// definition for the full rationale (N5008 [over.match], [dcl.fct]/3).
+  /// definition for the full rationale (N5008 [basic.scope.scope]/4,
+  /// [dcl.fct]/3).
   std::optional<exprt> instantiate_matching_member_body(
     const symbolt &member,
     std::vector<irep_idt> &param_names);
@@ -628,11 +629,11 @@ protected:
   /// further refactoring at the call sites.
   void complete_all_components(struct_union_typet &struct_type);
 
-  /// Phase 4 on-demand resolution per N5008 [temp.inst]/3.1: attempt
+  /// Phase 4 on-demand resolution: attempt
   /// to resolve a lazy component's placeholder type by re-running
   /// `typecheck_type` in the class scope recorded under
   /// `ID_lazy_type_source`.  The retry is wrapped in
-  /// `sfinae_contextt` ([temp.deduct]/8) so substitution failure
+  /// `sfinae_contextt` ([temp.deduct.general]/8) so substitution failure
   /// does not produce user-visible diagnostics or pollute the error
   /// counter.  Returns true if the component is (or becomes)
   /// resolved; false if it could not be resolved.  Idempotent:
@@ -718,7 +719,7 @@ protected:
 
   /// Check that the default constructor selected to default-initialize an
   /// object of class type is accessible at the point of use ([dcl.init],
-  /// [expr.new], [class.base.init]/12, [class.access.base]).  Used for
+  /// [expr.new], [class.base.init]/9.3, [class.access.base]).  Used for
   /// non-static data members (mem-initializer context), local and global
   /// variables, and new-expressions.  \p object_type is the constructed
   /// object's declared type; arrays are checked element-wise.  \p
@@ -956,7 +957,7 @@ protected:
   };
 
   /// N5008 [basic.lookup.unqual]/4, [basic.lookup.argdep]/4,
-  /// [class.mem.general]/7: a name is visible only after its declaration;
+  /// [class.mem.general]/9.1: a name is visible only after its declaration;
   /// the body of a member function defined in its (non-template) class is
   /// looked up as if it followed the class definition.  The front end
   /// converts function bodies at the end of the translation unit; while it
@@ -1001,7 +1002,7 @@ protected:
   /// manifestly constant-evaluated (N5008 [dcl.constexpr]/6, [expr.const]).
   std::set<irep_idt> constexpr_objects;
 
-  /// N5008 [expr.context]/1, [basic.def.odr]/5, [temp.inst]/4: a function
+  /// N5008 [expr.context]/1, [basic.def.odr]/3, 8, [temp.inst]/5: a function
   /// named in an unevaluated operand (the operand of decltype, sizeof,
   /// noexcept, a non-polymorphic typeid) is not odr-used, so a function
   /// template specialization it names has its declaration instantiated but
@@ -1032,7 +1033,7 @@ protected:
 
   // True while instantiate_template converts a member FUNCTION
   // template instance; gates the concretized-pack-pattern fallback in
-  // typecheck_compound_declarator ([temp.variadic]/5), which must not
+  // typecheck_compound_declarator ([temp.variadic]/9), which must not
   // fire during CLASS instantiation.
   bool instantiating_member_function_template = false;
   method_bodiest method_bodies;
@@ -1186,7 +1187,7 @@ protected:
   void typecheck_enum_body(symbolt &symbol, bool underlying_defaulted);
   void typecheck_method_bodies();
 
-  /// N5008 [temp.inst]/5 + [expr.const]: instantiate (convert) the
+  /// N5008 [temp.inst]/4, /8 + [expr.const]: instantiate (convert) the
   /// definition of a deferred member function NOW, because its value is
   /// needed for constant evaluation (e.g. a constexpr `_S_gcd` used in a
   /// DEFAULT TEMPLATE ARGUMENT of a member alias like std::chrono's
@@ -1197,7 +1198,7 @@ protected:
   bool convert_deferred_method_now(const irep_idt &identifier);
 
   /// Shared preprocessing for a deferred method body about to be converted
-  /// ([temp.inst]/1, [temp.variadic]/5,7); used by both drains in
+  /// ([temp.inst]/4, [temp.variadic]/9,16); used by both drains in
   /// typecheck_method_bodies.
   void prepare_deferred_method_body(symbolt &method_symbol);
   void complete_constructor_template_initializers(symbolt &method_symbol);
@@ -1213,13 +1214,13 @@ protected:
   codet static_local_initialization(
     const symbolt &symbol,
     const codet &initialization);
-  /// Collapse zero-length pack expansions (N5008 [temp.variadic]/7) in
+  /// Collapse zero-length pack expansions (N5008 [temp.variadic]/16) in
   /// template-argument lists within an instantiated function-template body,
   /// using the empty packs recorded in the current `template_map`.
   void remove_empty_pack_expansion_args(exprt &body);
   void typecheck_contracts();
   void typecheck_compound_bases(struct_typet &type);
-  /// N5008 [temp.variadic]/7: drop template arguments of \p name that are pack
+  /// N5008 [temp.variadic]/16: drop template arguments of \p name that are pack
   /// expansions over a parameter pack empty in the current instantiation (per
   /// template_map.pack_size_map), e.g. rewrite `X<_Tail...>` to `X<>`.  No-op
   /// when no instantiation is in progress (empty pack_size_map).
@@ -1232,7 +1233,7 @@ protected:
     exprt &value);
 
   /// \return whether the class has no storage member (an empty class: its
-  ///   base subobjects have zero size, N5008 [intro.object]/9)
+  ///   base subobjects have zero size, N5008 [intro.object]/8)
   static bool class_is_empty(const struct_typet &type);
   /// N5008 [dcl.init.list]/3.8: when \p target is an enumeration with a
   /// fixed underlying type and \p element an integral (or unscoped
@@ -1381,7 +1382,7 @@ protected:
     const exprt::operandst &arguments,
     int depth);
 
-  /// N5008 [class.prop], [class.virtual]/1, [class.dtor]/9,
+  /// N5008 [class.prop], [class.virtual]/1, [class.dtor]/11,
   /// [dcl.init.aggr]/1: the class property named by the GCC/Clang type
   /// trait \p trait (`__is_empty', `__is_polymorphic', ...) for type \p t
   bool class_property(const irep_idt &trait, const typet &t);
@@ -1422,7 +1423,7 @@ protected:
     const irept &def_params,
     const template_typet &def_tt);
 
-  /// N5008 [expr.prim.req.general]/2-3: bind a requirement-parameter of a
+  /// N5008 [expr.prim.req.general]/4: bind a requirement-parameter of a
   /// requires-expression (`requires(T a) { ... }`) as a local symbol of the
   /// current (instantiation) scope, of the substituted type \p type.  Each
   /// binding is a distinct symbol: the parameters are notation local to
@@ -1603,7 +1604,7 @@ protected:
   /// function-template name being matched against a target
   /// pointer-to-function type.  Returns a typed `address_of` expr
   /// on success, or nil on substitution failure
-  /// (silent per [temp.deduct]/8).  The \p source_location is
+  /// (silent per [temp.deduct.general]/8).  The \p source_location is
   /// attached to the synthesised `address_of`.
   ///
   /// \p name_or_addressof is the source argument: either a bare
@@ -1690,7 +1691,7 @@ public:
   /// Called from `user_defined_conversion_sequence` after the
   /// non-template cast-operator loop.  Iterates template cast
   /// operators of the source class, runs SFINAE-guarded deduction
-  /// per [temp.deduct]/8, applies [temp.deduct.partial]/3.2 partial
+  /// per [temp.deduct.general]/8, applies [temp.deduct.partial]/3.2 partial
   /// ordering across deduction survivors when more than one is
   /// viable, then instantiates the unique most-specialised match.
   /// Per [over.ics.user]/3 the second standard conversion sequence
@@ -1904,7 +1905,7 @@ public:
   /// N5008 [conv.general]/4: the contextual conversion to bool (the
   /// condition of if/while/for, the operand of !, &&, ||, ?:, static_assert,
   /// noexcept) is the direct-initialization `bool t(e)', for which an
-  /// EXPLICIT `operator bool()' is a candidate ([class.conv.fct]/2).  All
+  /// EXPLICIT `operator bool()' is a candidate ([class.conv.fct]/4).  All
   /// callers of implicit_typecast_bool are such contexts.
   void implicit_typecast_bool(exprt &expr) override
   {
@@ -2028,7 +2029,7 @@ private:
   /// Set when a class template instance is derived from itself
   /// ([class.derived.general]/2): that error is not recovered from, and the
   /// flag stays set -- an error in the instantiation of a class is not in the
-  /// immediate context of a deduction ([temp.deduct.general]/9), so the
+  /// immediate context of a deduction ([temp.deduct.general]/8), so the
   /// program is ill-formed whatever context caused the instantiation.
   bool class_derived_from_itself = false;
   /// Destination type identifiers whose converting *template* constructor is
@@ -2042,12 +2043,12 @@ private:
   /// conversion (hence the trait) as false.
   std::set<irep_idt> template_conversions_in_progress;
   bool skip_typechecking_elaborate = false;
-  /// N5008 [temp.inst]/4, [class.friend]/6-7: set while a friend function
-  /// defined in a class template specialization is declared; its definition
-  /// is instantiated only when it is odr-used, like a member's.
+  /// N5008 [temp.inst]/5, [class.friend]/5, [temp.pre]/8: set while a friend
+  /// function defined in a class template specialization is declared; its
+  /// definition is instantiated only when it is odr-used, like a member's.
   bool defining_friend_of_template_instance = false;
 
-  /// N5008 [temp.inst]/1: naming a class template specialization does NOT
+  /// N5008 [temp.inst]/2: naming a class template specialization does NOT
   /// instantiate it; only a context requiring completeness ([temp.inst]/2)
   /// does.  The front end still instantiates on naming (resolve's TYPE
   /// branch) -- switching this off is the structural change towards the
@@ -2077,7 +2078,7 @@ private:
   std::map<irep_idt, exprt> generic_lambda_map;
   /// The functions a lambda-expression is lowered to (its closure type's
   /// function call operator, called directly); N5008
-  /// [expr.prim.lambda.closure]/5 makes them constexpr functions when they
+  /// [expr.prim.lambda.closure]/6 makes them constexpr functions when they
   /// are constexpr-suitable, so calls in constant expressions are evaluated.
   std::set<irep_idt> lambda_functions;
   /// Maps a lambda-expression's source location to the symbol name of its
@@ -2190,12 +2191,12 @@ private:
 
   /// Counter > 0 while applying explicit template arguments to a candidate
   /// during overload resolution (`apply_template_args`).  In that context a
-  /// template-argument *kind* mismatch -- e.g. a non-type argument supplied
-  /// for a type parameter, as when resolving the by-index
-  /// `std::get<0>(tuple<...>)` also matches the by-type
-  /// `std::get<T>(pair<...>)` overload whose first parameter `T` is a type --
-  /// is a silent deduction failure that removes only that candidate from the
-  /// overload set ([temp.arg]/2, [temp.deduct]/8), not a user-visible error.
+  /// template-argument *kind* mismatch -- e.g. a non-type argument supplied for
+  /// a type parameter, as when resolving the by-index `std::get<0>(tuple<...>)`
+  /// also matches the by-type `std::get<T>(pair<...>)` overload whose first
+  /// parameter `T` is a type -- is a silent deduction failure that removes only
+  /// that candidate from the overload set ([temp.arg.general]/1,
+  /// [temp.deduct.general]/2), not a user-visible error.
   /// `typecheck_template_args` consults this to decide between throwing
   /// `template_arg_kind_mismatch_exceptiont` (caught by the candidate loop,
   /// which skips the candidate) and reporting a hard error.

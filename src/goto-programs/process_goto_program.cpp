@@ -67,7 +67,7 @@ bool process_goto_program(
   remove_cpp_exceptions(goto_model, log.get_message_handler());
 
   // Construct C++ returned temporaries directly into caller storage
-  // (N5008 [class.copy.elis]); must follow function pointer removal.
+  // (N5008 [class.copy.elision]); must follow function pointer removal.
   elide_cpp_returned_temporaries(goto_model);
 
   mm_io(goto_model, log.get_message_handler());

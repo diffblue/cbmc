@@ -231,8 +231,8 @@ void cpp_typecheckt::typecheck_return(code_frontend_returnt &code)
     // type-checker's implicit_typecast knows no conversion from a list.
     if(code.return_value().id() == ID_initializer_list)
     {
-      // [over.best.ics]/4.5: the copy and move constructors' `X &' / `X &&'
-      // parameter is not reached by a user-defined conversion from that
+      // [over.best.ics.general]/4.5: the copy and move constructors' `X &' / `X
+      // &&' parameter is not reached by a user-defined conversion from that
       // single inner list (as for `T x{{...}}', do_initializer)
       if(return_type.id() == ID_struct_tag)
       {
@@ -250,7 +250,7 @@ void cpp_typecheckt::typecheck_return(code_frontend_returnt &code)
     }
   }
 
-  // Per [stmt.return]/3 (C++11): `return { a, b, ... };` in a function
+  // Per [stmt.return]/2 (C++11): `return { a, b, ... };` in a function
   // whose return type is a class type constructs a temporary of the
   // return type using list-initialization with the braced-init-list
   // and returns that temporary.  For multi-element braced returns
@@ -327,12 +327,12 @@ void cpp_typecheckt::typecheck_return(code_frontend_returnt &code)
 
     typecheck_expr(code.return_value());
 
-    // N5008 [stmt.return]/2 + [dcl.init.general]/16.6.1: the result
+    // N5008 [stmt.return]/2 + [dcl.init.general]/16.6.3: the result
     // object is copy-initialized from the operand, which considers the
     // class's CONVERTING constructors.  A temporary / call result whose
     // type is a DIFFERENT class still needs that constructor call --
     // returning unique_ptr<const Derived> as unique_ptr<const Base>
-    // ([unique.ptr.single.ctor]/26; src/util/timestamper.cpp's factory).
+    // ([unique.ptr.single.ctor]/19; src/util/timestamper.cpp's factory).
     // Such operands are otherwise skipped below (already temporaries) and
     // fall through to implicit_typecast, which knows no user-defined
     // conversion.
@@ -379,16 +379,15 @@ void cpp_typecheckt::typecheck_return(code_frontend_returnt &code)
       }
       if(has_dtor)
       {
-        // N5008 [class.copy.elis]/3 (implicit move): when the operand is
-        // a (possibly parenthesized) id-expression naming a non-volatile
+        // N5008 [expr.prim.id.unqual]/12, 15 (implicit move): when the operand
+        // is a (possibly parenthesized) id-expression naming a non-volatile
         // object with automatic storage duration declared in the body or
-        // parameter list of the function, overload resolution to select
-        // the constructor is first performed treating the operand as an
-        // rvalue -- the MOVE constructor is selected if one exists.  Any
-        // other operand (a global, a class member, the referent of a
-        // reference parameter) is an lvalue and selects the COPY
-        // constructor; treating those as rvalues would move from an
-        // object the function does not own.
+        // parameter list of the function, overload resolution to select the
+        // constructor is first performed treating the operand as an rvalue --
+        // the MOVE constructor is selected if one exists.  Any other operand (a
+        // global, a class member, the referent of a reference parameter) is an
+        // lvalue and selects the COPY constructor; treating those as rvalues
+        // would move from an object the function does not own.
         exprt operand = code.return_value();
         if(operand.id() == ID_symbol)
         {
@@ -451,7 +450,7 @@ void cpp_typecheckt::typecheck_code(codet &code)
     // add_constructor_unwinding builds the destructor call from the
     // initializer as written, and only if a later initialization or the
     // body follows: building it type-checks (and instantiates) the
-    // destructor, which [class.base.init]/13 makes potentially invoked
+    // destructor, which [class.base.init]/12 makes potentially invoked
     const codet original = code;
     typecheck_member_initializer(code);
     code.add(ID_C_unwind_destructor) = original;
@@ -537,7 +536,7 @@ void cpp_typecheckt::typecheck_code(codet &code)
     PRECONDITION(code.operands().size() == 1 || code.operands().size() == 2);
 
     {
-      // N5008 [dcl.pre]/10: the condition is a constant expression.
+      // N5008 [dcl.pre]/13: the condition is a constant expression.
       constant_expression_contextt constant_expression_guard{*this};
       typecheck_expr(code.op0());
     }
@@ -550,7 +549,7 @@ void cpp_typecheckt::typecheck_code(codet &code)
 
     if(code.op0().is_constant() && code.op0() == false_exprt())
     {
-      // N5008 [dcl.pre]/10: a failed static_assert makes the program
+      // N5008 [dcl.pre]/13: a failed static_assert makes the program
       // ill-formed -- at block scope exactly as at namespace scope.  A
       // block-scope failure used to become a silent `skip', so a wrong
       // constant evaluation on our side (or a genuinely failing assertion)
@@ -902,7 +901,7 @@ void cpp_typecheckt::typecheck_code(codet &code)
         // (deducing `auto` from `*__begin`).
         cpp_declarationt &cpp_decl = static_cast<cpp_declarationt &>(decl_op);
 
-        // N5008 [stmt.ranged]/1: the for-range-declaration may be a
+        // N5008 [stmt.iter.general]/1: the for-range-declaration may be a
         // STRUCTURED-BINDING declaration (`for(auto [a, b] : range)`),
         // recorded by the parser as a `bindings` attribute with no
         // declarator.  Lower it by prepending a structured_binding
@@ -1363,7 +1362,7 @@ void cpp_typecheckt::typecheck_code(codet &code)
       return;
     }
 
-    // [dcl.struct.bind]/4: if std::tuple_size<E> is a complete type with a
+    // [dcl.struct.bind]/7: if std::tuple_size<E> is a complete type with a
     // member named `value`, the structured binding uses the "tuple-like"
     // protocol: the i-th name is bound to get<i>(e) (found by member lookup or
     // ADL), with type std::tuple_element<i, E>::type.  The data members of E
@@ -1538,7 +1537,7 @@ void cpp_typecheckt::typecheck_code(codet &code)
 
           // The binding refers to the result of get<i>; a reference for an
           // auto& binding, a copy for an auto binding.
-          // N5008 [dcl.struct.bind]/4: each binding is a REFERENCE (Ti& or
+          // N5008 [dcl.struct.bind]/7: each binding is a REFERENCE (Ti& or
           // Ti&&) initialised with get<i>(e) -- writing through `r' in
           // `auto &&[r, s] = std::pair<int &, int>(z, 1); r = 10;' writes z.
           // A get<i> returning a reference arrives here as an lvalue
@@ -1773,7 +1772,7 @@ void cpp_typecheckt::typecheck_code(codet &code)
 /// Tag every bare `throw;` (a throw side-effect with no operand -- a rethrow)
 /// reachable in \p e, but not already tagged, with \p handler_id.  Used to
 /// record, for a rethrow lexically inside a handler, which handler's exception
-/// it re-propagates (N5008 [except.throw]/8).  Because inner handlers are
+/// it re-propagates (N5008 [expr.throw]/3).  Because inner handlers are
 /// type-checked before their enclosing handler, a rethrow that already carries
 /// a tag belongs to an inner handler and is left untouched, so each rethrow is
 /// attributed to its innermost enclosing handler.
@@ -1887,12 +1886,12 @@ void cpp_typecheckt::typecheck_try_catch(codet &code)
         op.set(ID_exception_id, cpp_exception_id(type, *this));
 
         // record, for any bare `throw;` lexically inside this handler, that it
-        // re-propagates the exception this handler is handling ([except.throw]
-        // /8).  Keyed by the catch variable's identifier, which is also how
-        // remove_cpp_exceptions identifies the handler.
+        // re-propagates the exception this handler is handling ([expr.throw]/3,
+        // [except.handle]/10 /8).  Keyed by the catch variable's identifier,
+        // which is also how remove_cpp_exceptions identifies the handler.
         tag_rethrow_handler(catch_block, code_decl.symbol().get_identifier());
         // the end of the handler destroys the exception object unless it is
-        // rethrown ([except.throw]/5; goto conversion, remove_cpp_exceptions)
+        // rethrown ([except.throw]/4; goto conversion, remove_cpp_exceptions)
         op.set("#cpp_handler", code_decl.symbol().get_identifier());
       }
     }
@@ -1907,28 +1906,27 @@ void cpp_typecheckt::typecheck_ifthenelse(code_ifthenelset &code)
 
   if(code.cond().id() == ID_code)
   {
-    // C++ [stmt.select]/1-2, [stmt.if]: the condition may be a
-    // declaration.  The value of such a condition is the value of the
-    // declared variable contextually converted to bool, and the
-    // declaration is in scope throughout both substatements.  Rewrite
+    // C++ [stmt.pre]/4-6, [basic.scope.block]/1, [stmt.if]: the condition may
+    // be a declaration.  The value of such a condition is the value of the
+    // declared variable contextually converted to bool, and the declaration is
+    // in scope throughout both substatements.  Rewrite
     //   if(T v = init) S1 [else S2]
     // into the equivalent
     //   { T v = init; if(v) S1 [else S2] }
     // mirroring the existing handling of declaration conditions in
-    // typecheck_while / typecheck_switch.  (Previously only the
-    // declaration was type-checked and the condition was left as the
-    // declaration code, so the branch was never taken -- e.g.
-    // libstdc++'s `if (size_type __n = _M_finish - __pos)` in
-    // vector::_M_erase_at_end, used by clear()/resize()/erase(first,
-    // last), silently behaved as a no-op.)
-    // N5008 [stmt.pre]/6: the name introduced by a condition declaration
-    // is in scope from its point of declaration until the END OF THE
-    // SUBSTATEMENTS; it must NOT be visible in the rest of the enclosing
-    // block (redeclaring the same name after the if-statement is
-    // well-formed -- libstdc++'s _Hashtable::_M_insert_unique declares
-    // `__node_ptr __node` in an if-condition and `_Scoped_node __node`
-    // after it).  Type-check the declaration inside a fresh block scope
-    // so the name does not leak into the enclosing scope.
+    // typecheck_while / typecheck_switch.  (Previously only the declaration was
+    // type-checked and the condition was left as the declaration code, so the
+    // branch was never taken -- e.g. libstdc++'s `if (size_type __n = _M_finish
+    // - __pos)` in vector::_M_erase_at_end, used by
+    // clear()/resize()/erase(first, last), silently behaved as a no-op.)  N5008
+    // [basic.scope.block]/1: the name introduced by a condition declaration is
+    // in scope from its point of declaration until the END OF THE
+    // SUBSTATEMENTS; it must NOT be visible in the rest of the enclosing block
+    // (redeclaring the same name after the if-statement is well-formed --
+    // libstdc++'s _Hashtable::_M_insert_unique declares `__node_ptr __node` in
+    // an if-condition and `_Scoped_node __node` after it).  Type-check the
+    // declaration inside a fresh block scope so the name does not leak into the
+    // enclosing scope.
     cpp_save_scopet saved_scope(cpp_scopes);
     cpp_scopes.new_block_scope();
 
@@ -1956,7 +1954,7 @@ void cpp_typecheckt::typecheck_ifthenelse(code_ifthenelset &code)
     }
 
     // Use the declared variable as the condition; typecheck_ifthenelse
-    // below converts it to bool ([stmt.select.general]/4, [conv.bool]).
+    // below converts it to bool ([stmt.pre]/6, [conv.bool]).
     // Converting here as well made the C typechecker re-visit an already
     // converted node, which for a floating-point object is an
     // `ieee_float_notequal' it does not accept ("unexpected expression";
@@ -1965,7 +1963,7 @@ void cpp_typecheckt::typecheck_ifthenelse(code_ifthenelset &code)
     code.cond() = decl_symbol;
 
     // Type-check the condition and both branches as usual (still inside
-    // the condition's scope, [stmt.pre]/6: the name is visible in both
+    // the condition's scope, [basic.scope.block]/1: the name is visible in both
     // substatements).
     c_typecheck_baset::typecheck_ifthenelse(code);
 
@@ -1994,7 +1992,7 @@ void cpp_typecheckt::typecheck_ifthenelse(code_ifthenelset &code)
     simplify(code.cond(), *this);
 
     // N5008 [stmt.if]/2: the condition is a contextually converted constant
-    // expression of type bool; [expr.const]/4-5: an lvalue-to-rvalue
+    // expression of type bool; [expr.const]/10.9.2: an lvalue-to-rvalue
     // conversion of an object usable in constant expressions -- an element
     // of a constexpr local array (`constexpr _CCC __cat =
     // __compute_comp_type(__type_kinds)' with `constexpr _CCC
@@ -2066,7 +2064,7 @@ void cpp_typecheckt::typecheck_while(code_whilet &code)
   if(code.cond().id() == ID_code)
   {
     // Rewrite into: while(true) { decl; if(!var) break; body; }
-    // N5008 [stmt.pre]/6: scope the condition's name to the statement
+    // N5008 [basic.scope.block]/1: scope the condition's name to the statement
     // (see typecheck_ifthenelse).
     cpp_save_scopet saved_scope(cpp_scopes);
     cpp_scopes.new_block_scope();
@@ -2490,7 +2488,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
 
   const cpp_namet &member = to_cpp_name(code.find(ID_member));
 
-  // N5008 [temp.variadic]/5: a mem-initializer argument that is a bare
+  // N5008 [temp.variadic]/9: a mem-initializer argument that is a bare
   // pack expansion of a FUNCTION parameter pack (`bound_(b...)`) stands
   // for one argument per pack element.  When the enclosing constructor
   // belongs to a partial specialization whose pack supplies the
@@ -2651,7 +2649,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
             const auto &base_struct =
               ns.follow_tag(to_struct_tag_type(b.type()));
             // ... and no virtual functions or virtual base classes
-            // ([dcl.init.aggr]/1.3-1.4) -- the vtable pointer component
+            // ([dcl.init.aggr]/1.4) -- the vtable pointer component
             // marks both.
             bool has_user_ctor =
               base_struct.get_bool("has_template_constructor") ||
@@ -2679,7 +2677,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
             if(has_user_ctor)
               break; // the constructor-resolve path below handles it
 
-            // N5008 [dcl.init.list]/3.2 + [dcl.init.general]/16.6.1: a
+            // N5008 [dcl.init.list]/3.2 + [dcl.init.general]/16.6.2: a
             // SINGLE initializer of the base's own type (or derived) is
             // copy-initialization -- the synthesized copy/move
             // constructor's sliced-reference initializer takes this
@@ -2960,7 +2958,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
         }
       }
     }
-    // N5008 [intro.object]/9: an empty base subobject has zero size and
+    // N5008 [intro.object]/8, 10: an empty base subobject has zero size and
     // may overlap other subobjects; its trivial initialization stores
     // nothing (see full_member_initialization).  Only the (already
     // type-checked) operands are evaluated.
@@ -3354,7 +3352,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
 
         // For default-initialization of a class-type member (no explicit
         // initializer), the selected default constructor must be
-        // accessible in this constructor's context ([class.base.init]/12,
+        // accessible in this constructor's context ([class.base.init]/9.3,
         // [class.access.base]).  cpp_constructor resolves the member's
         // constructor in the member's own class scope, which would let a
         // private/inaccessible default constructor pass, so check here
@@ -3394,7 +3392,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
         // __perfect_forward bound-args member).  Restricted to
         // aggregates ([dcl.init.aggr]/1: no user-declared constructor)
         // and skipped for a single same/derived-type operand, which is
-        // copy-initialization ([dcl.init.general]/16.6.1).
+        // copy-initialization ([dcl.init.general]/16.6.2).
         std::optional<codet> agg_call;
         if(!wrapped_ops.empty())
         {
@@ -3506,9 +3504,9 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
           {
             inner.type().set(ID_C_constant, false);
             inner.set(ID_C_lvalue, true);
-            // Per [dcl.init]/8 value-initialization of an array is
+            // Per [dcl.init.general]/9.2 value-initialization of an array is
             // applied element-wise; a direct assignment to an array is
-            // not permitted by [expr.ass].  Emit element-wise
+            // not permitted by [expr.assign].  Emit element-wise
             // zero-assignments so that type-check succeeds.
             if(inner.type().id() == ID_array)
             {
@@ -3604,7 +3602,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
 
 /// N5008 [stmt.ambig]/1: a statement `T(x);' that can be a declaration is a
 /// declaration.  The parser decides only for a name it KNOWS to be a type;
-/// a nested class declared later in the class body ([class.mem.general]/7:
+/// a nested class declared later in the class body ([class.mem.general]/9.1:
 /// a member function body is a complete-class context -- libstdc++ 16's
 /// `__location_type (__trans_tmp_3);' in _Hashtable::find) is unknown to it
 /// and parsed as a call.  When the "function" is an unqualified name that
@@ -3692,7 +3690,7 @@ codet cpp_typecheckt::static_local_initialization(
   return std::move(guarded);
 }
 
-/// N5008 [expr.const]/2, [basic.start.static]/2: is \p expr, simplified, a
+/// N5008 [expr.const]/6, [basic.start.static]/2: is \p expr, simplified, a
 /// constant initializer -- built from constants, string literals and the
 /// addresses of objects with static storage duration and of functions?
 bool cpp_typecheckt::is_static_constant_initializer(const exprt &expr) const

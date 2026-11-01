@@ -127,7 +127,7 @@ std::optional<codet> cpp_typecheckt::cpp_destructor(
     // Itanium C++ ABI 5.1.4: a base subobject is destroyed by the
     // base-object destructor (D2) of a class with virtual bases -- hidden
     // parameter `@most_derived' false: it leaves the virtual bases to the
-    // most derived class's destructor (N5008 [class.dtor]/14)
+    // most derived class's destructor (N5008 [class.dtor]/13)
     if(base_subobject && has_most_derived_parameter)
     {
       exprt flag = false_exprt{};

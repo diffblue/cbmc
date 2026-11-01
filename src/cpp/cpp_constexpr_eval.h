@@ -23,7 +23,7 @@ class symbol_table_baset;
 /// can take as a call argument -- an expression over constants with no
 /// reference to an object, except the address of (an element of) an object
 /// with static storage duration whose value is an array constant
-/// ([expr.const]/11; a constexpr array, the backing array of a
+/// ([expr.const]/4.1; a constexpr array, the backing array of a
 /// std::initializer_list)?
 /// \param e: the expression
 /// \param symbol_table: holds the objects \p e refers to
@@ -34,7 +34,7 @@ bool is_constexpr_call_argument(
 /// Evaluate the constexpr function call \p expr (a `side_effect` function
 /// call whose arguments are constants) by interpreting the callee's
 /// definition: declarations, assignments, `if`, `while`/`do`/`for` loops
-/// (bounded), nested constexpr calls ([expr.const]/5).
+/// (bounded), nested constexpr calls ([expr.const]/10).
 /// \param expr: the call
 /// \param symbol_table: holds the callee's definition (its converted body)
 /// \param ns: for simplification

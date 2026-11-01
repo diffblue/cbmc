@@ -464,7 +464,7 @@ IREP_ID_ONE(lazy_type_source)
 // (constructor synthesis, vtable walk, member-name resolution
 // via inheritance) check this flag and either skip the
 // inherited-member work or emit a focused diagnostic.  N5008
-// [class.derived]/2: a class-or-decltype shall denote a class
+// [class.derived.general]/2: a class-or-decltype shall denote a class
 // type that is not an incompletely defined class; recovery
 // preserves the [basic.scope.class] declarative region for the
 // derived class itself even when the base couldn't elaborate.

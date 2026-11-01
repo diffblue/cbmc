@@ -259,7 +259,7 @@ bool cpp_typecheckt::standard_conversion_integral_promotion(
   typet int_type = signed_int_type();
   qual_from.write(int_type);
 
-  // N5008 [conv.prom]/2: a prvalue of type char8_t, char16_t, char32_t or
+  // N5008 [conv.prom]/6: a prvalue of type char8_t, char16_t, char32_t or
   // wchar_t converts to the first of int, unsigned int, long, unsigned
   // long, long long, unsigned long long that can represent all the values
   // of its underlying type -- also when that is as wide as int: a char32_t
@@ -602,7 +602,7 @@ bool cpp_typecheckt::standard_conversion_pointer(
     // types depends on the inheritance relationship, so it implicitly
     // instantiates the class template specializations involved -- which a
     // member typedef `typedef node<V> *link_type;' did not do
-    // ([temp.inst]/1: forming the pointer type does not require it).
+    // ([temp.inst]/2: forming the pointer type does not require it).
     elaborate_class_template(sub_from);
     elaborate_class_template(sub_to);
     const struct_typet &from_struct = follow_tag(to_struct_tag_type(sub_from));
@@ -907,7 +907,7 @@ bool cpp_typecheckt::standard_conversion_sequence(
         return false;
 
       // C++03 [conv.array]/2: a string literal (`const char[n]', N5008
-      // [lex.string]/6) converts to `char *'.  N5008 dropped this, but
+      // [lex.string]/1) converts to `char *'.  N5008 dropped this, but
       // GCC and clang still accept `char *p = "...";' with a warning, so
       // we do too -- ranked below every standard conversion (a `const
       // char *' candidate must always beat it).
@@ -1130,7 +1130,7 @@ bool cpp_typecheckt::standard_conversion_sequence(
 /// (set by `typecheck_compound_body` in
 /// `cpp_typecheck_compound_type.cpp`).  Iterates template cast
 /// operators of the source class, runs SFINAE-guarded deduction per
-/// [temp.deduct]/8, applies [temp.deduct.partial]/3.2 partial
+/// [temp.deduct.general]/8, applies [temp.deduct.partial]/3.2 partial
 /// ordering to disambiguate when multiple specialisations would
 /// be viable for the same destination type, instantiates the
 /// most-specialised (or unique) match, then builds the same kind
@@ -1544,7 +1544,7 @@ bool cpp_typecheckt::function_template_at_least_as_specialised(
       // than its frontend variant.
       cpp_convert_plain_type(A, get_message_handler());
 
-      // N5008 [temp.deduct.type]/3: a P of the form TT<args> is matched
+      // N5008 [temp.deduct.type]/8: a P of the form TT<args> is matched
       // only by an A that is a specialization of the same template TT.
       // Both P and A are still unresolved cpp_names here (the compared
       // patterns are taken from the DECLARATIONS), and matching a
@@ -1765,7 +1765,7 @@ bool cpp_typecheckt::partial_specialization_at_least_as_specialised(
                     : ga.type();
         rename_f_parameters(A);
         cpp_convert_plain_type(A, get_message_handler());
-        // [temp.deduct.type]/9.1: a pack expansion P_i's pattern is compared
+        // [temp.deduct.type]/9: a pack expansion P_i's pattern is compared
         // with the remaining argument (the argument lists have equal length
         // here, so with A_i alone)
         P.remove(ID_ellipsis);
@@ -1819,7 +1819,7 @@ bool cpp_typecheckt::partial_specialization_at_least_as_specialised(
               return &sub.find(ID_arguments);
           return nullptr;
         };
-        // N5008 [temp.deduct.type]/1, [temp.deduct.partial]/10: deduction
+        // N5008 [temp.deduct.type]/1, [temp.deduct.partial]/8: deduction
         // succeeds only if the deduced P is identical to A, so a part of P
         // that names none of G's parameters must equal A as written --
         // `int *' (from `b<A, int *>') does not match `C *' (from
@@ -2038,7 +2038,7 @@ const symbolt *cpp_typecheckt::find_template_conversion_specialisation(
   const exprt &expr,
   const typet &to)
 {
-  // N5008 [over.best.ics]/4: see cpp_typecheck.h.  Reference binding of
+  // N5008 [over.best.ics.general]/4: see cpp_typecheck.h.  Reference binding of
   // a constructor candidate's parameter must not instantiate the
   // argument's template conversion operator.
   if(copy_init_ctor_exploration > 0 && constant_expression_context == 0)
@@ -2233,7 +2233,7 @@ const symbolt *cpp_typecheckt::find_template_conversion_specialisation(
       }
     }
 
-    // SFINAE-guarded deduction per [temp.deduct]/8.
+    // SFINAE-guarded deduction per [temp.deduct.general]/8.
     cpp_save_scopet save_scope{cpp_scopes};
     cpp_saved_template_mapt saved_map{template_map};
 
@@ -2258,14 +2258,14 @@ const symbolt *cpp_typecheckt::find_template_conversion_specialisation(
       guessed_args =
         template_map.build_template_args(cand_decl.template_type());
 
-      // N5008 [temp.deduct]/5: template arguments that were not deduced
+      // N5008 [temp.deduct.general]/5: template arguments that were not deduced
       // are obtained from default template arguments -- the SFINAE
       // constraint idiom `template <class U, class = enable_if_t<...>>
       // operator U() const'.  Only `U' is deducible from the target
       // ([temp.deduct.conv]/1); the defaulted parameter was left
       // unassigned and the candidate dropped ("invalid implicit
       // conversion", user-reported Issue 13).  A default whose
-      // substitution fails is a deduction failure ([temp.deduct]/8).
+      // substitution fails is a deduction failure ([temp.deduct.general]/5).
       if(guessed_args.has_unassigned())
       {
         // The default may name the ENCLOSING class template's parameters
@@ -2321,11 +2321,11 @@ const symbolt *cpp_typecheckt::find_template_conversion_specialisation(
 
       if(!guessed_args.has_unassigned())
       {
-        // [temp.deduct]/5 with [temp.constr.decl]/1: after successful
+        // [temp.deduct.general]/5 with [temp.constr.decl]/1: after successful
         // argument deduction, the conversion-function template's
         // associated constraints (its requires-clause) must be
         // satisfied with the deduced arguments.  An unsatisfied
-        // constraint is a deduction failure ([temp.deduct]/5), so the
+        // constraint is a deduction failure ([temp.deduct.general]/5), so the
         // candidate is removed rather than instantiated.  Without this
         // check a non-viable deduction such as deducing the unsigned
         // __max_size_type's `template<integral _Tp> operator _Tp()` for
@@ -2333,7 +2333,7 @@ const symbolt *cpp_typecheckt::find_template_conversion_specialisation(
         // be instantiated, producing a spurious "operator ... is
         // unknown" error.
         bool constraint_ok = true;
-        // N5008 [temp.param]/4, [temp.constr.decl]/3: the type-constraints
+        // N5008 [temp.param]/9, [temp.constr.decl]/3: the type-constraints
         // of the template parameters (`template <integral _Ty> explicit
         // operator _Ty()', the MSVC STL's _Base128) are part of the
         // associated constraints, conjoined with the requires-clause
@@ -2378,7 +2378,7 @@ const symbolt *cpp_typecheckt::find_template_conversion_specialisation(
     }
     catch(...)
     {
-      // [temp.deduct]/8: SFINAE — substitution failure in the
+      // [temp.deduct.general]/8: SFINAE — substitution failure in the
       // immediate context is a deduction failure, not an error.
     }
 
@@ -2396,7 +2396,7 @@ const symbolt *cpp_typecheckt::find_template_conversion_specialisation(
   if(survivors.empty())
     return nullptr;
 
-  // Phase 2: [temp.deduct.partial]/3.2 + [over.match.best]/2.
+  // Phase 2: [temp.deduct.partial]/3.2 + [over.match.best.general]/2.5.
   // Find the unique most-specialised survivor.
   std::size_t winner_idx = 0;
   if(survivors.size() > 1)
@@ -2479,7 +2479,7 @@ const symbolt *cpp_typecheckt::find_template_conversion_specialisation(
   // of `user_defined_conversion_sequence` and `reference_binding`
   // skip it on subsequent calls.  Otherwise it would shadow a
   // fresh deduction for a different destination type
-  // ([over.ics.user]/3 + [over.match.conv]).
+  // ([over.ics.user]/3 + [over.match.funcs.general]/8).
   {
     symbolt *class_sym_w = symbol_table.get_writeable(class_id_with_tag);
     if(class_sym_w != nullptr && class_sym_w->type.id() == ID_struct)
@@ -2625,7 +2625,7 @@ bool cpp_typecheckt::deduce_conversion_template_for_reference(
     qual_from.write(to_reference_type(addr.type()).base_type());
   }
 
-  // [over.ics.user] gives a user-defined conversion an extra rank
+  // [over.ics.rank]/2.1 gives a user-defined conversion an extra rank
   // bump of 4 to dominate any standard conversion sequence; the
   // existing non-template reference-conversion path uses the same
   // constant.  Stay consistent with it.
@@ -2648,7 +2648,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
   PRECONDITION(!is_reference(expr.type()));
   PRECONDITION(!is_reference(to));
 
-  // N5008 [over.best.ics]/4: while constructor candidates of a
+  // N5008 [over.best.ics.general]/4: while constructor candidates of a
   // copy-initialization are being explored, a user-defined conversion
   // sequence for a candidate's parameter is not considered (also
   // [over.ics.user]: at most one user-defined conversion per sequence).
@@ -2683,13 +2683,12 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
     subtype_typecast(
       follow_tag(to_struct_tag_type(from)), follow_tag(to_struct_tag_type(to))))
   {
-    // N5008 [over.best.ics]/7: a parameter of class type initialized from
-    // an argument of a derived class type is a derived-to-base Conversion
-    // (rank 3), not a user-defined conversion sequence -- it was ranked
-    // with them, so `g(ex)' and `g(other)' (other(if_ex)) tied for an
-    // if_ex argument, and `return r;' into resultt<> tied resultt(exprt)
-    // with the copy constructor (CBMC's own simplify_expr_*.cpp,
-    // dog-fooding)
+    // N5008 [over.best.ics.general]/7: a parameter of class type initialized
+    // from an argument of a derived class type is a derived-to-base Conversion
+    // (rank 3), not a user-defined conversion sequence -- it was ranked with
+    // them, so `g(ex)' and `g(other)' (other(if_ex)) tied for an if_ex
+    // argument, and `return r;' into resultt<> tied resultt(exprt) with the
+    // copy constructor (CBMC's own simplify_expr_*.cpp, dog-fooding)
     rank += 3;
   }
   else
@@ -2697,7 +2696,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
 
   if(to.id() == ID_struct_tag)
   {
-    // See [over.best.ics]/4 note above: everything in this branch
+    // See [over.best.ics.general]/4 note above: everything in this branch
     // explores CONSTRUCTOR candidates of the target, so a user-defined
     // conversion sequence must not be used for their parameters.
     struct explorationt final
@@ -2795,14 +2794,14 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
         if(to_code_type(comp_type).return_type().id() != ID_constructor)
           continue;
 
-        // N5008 [over.match.funcs]/8 + [temp.deduct.call]: a constructor
-        // TEMPLATE contributes the one specialization deduced from the
-        // argument, not its earlier instantiations.  Those are members of
-        // the class too (`__max_size_type(_Tp)' instantiated for int and
-        // for unsigned __int128, libstdc++ 16's ranges size type), and
-        // treated as ordinary converting constructors they made a `size_t'
-        // argument ambiguous between them.  They are the template trial's
-        // business, below.
+        // N5008 [over.match.funcs.general]/8 + [temp.deduct.call]: a
+        // constructor TEMPLATE contributes the one specialization deduced from
+        // the argument, not its earlier instantiations.  Those are members of
+        // the class too (`__max_size_type(_Tp)' instantiated for int and for
+        // unsigned __int128, libstdc++ 16's ranges size type), and treated as
+        // ordinary converting constructors they made a `size_t' argument
+        // ambiguous between them.  They are the template trial's business,
+        // below.
         {
           const symbolt *comp_symbol =
             symbol_table.lookup(component.get_name());
@@ -2929,7 +2928,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
               {tmp_expr},
               uninitialized_typet{},
               expr.source_location());
-            // N5008 [over.best.ics.general]/2: if no conversion sequence
+            // N5008 [over.match.viable]/4: if no conversion sequence
             // can be formed for an argument, the candidate is simply not
             // viable -- it must not be reported as a hard error.  Trying
             // this constructor may still fail here even though the
@@ -2940,7 +2939,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
             // non-const lvalue-reference parameter of a concrete
             // candidate such as _Head_base<0, int&&>'s
             // `_Head_base(const _Head&)`, which instantiates to
-            // `_Head_base(int&)` by reference collapsing ([dcl.ref]/6).
+            // `_Head_base(int&)` by reference collapsing ([dcl.ref]/7).
             // The forwarding-reference constructor template remains the
             // viable candidate.  Guard with a SFINAE context so the
             // failed trial's diagnostics are suppressed.
@@ -2982,25 +2981,23 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
         {
           // try derived-to-base conversion
           //
-          // Per [class.copy.ctor]/1 and [dcl.init]/14: copy-initialization
-          // of an object of type `T` from an expression of type `T` (or
-          // `const T`) uses the copy constructor.  When `from == arg1_type`
-          // modulo cv-qualifiers, this is the SAME-TYPE copy-construction,
-          // not derived-to-base.  The address-of + standard-conversion
-          // path below would build `from* -> arg1*` via
-          // `standard_conversion_sequence`, which DROPS const-qualifiers
-          // on the pointee — that's not a valid implicit conversion
-          // (per [conv.qual]) so the path silently rejects the
-          // converting-ctor match for any `const T` source binding into a
-          // `T` parameter.  This shows up in CBMC's own
-          // `simplify_expr_*.cpp` files where simplification helpers
+          // Per [class.copy.ctor]/1 and [dcl.init.general]/16.6.2:
+          // copy-initialization of an object of type `T` from an expression of
+          // type `T` (or `const T`) uses the copy constructor.  When `from ==
+          // arg1_type` modulo cv-qualifiers, this is the SAME-TYPE
+          // copy-construction, not derived-to-base.  The address-of +
+          // standard-conversion path below would build `from* -> arg1*` via
+          // `standard_conversion_sequence`, which DROPS const-qualifiers on the
+          // pointee — that's not a valid implicit conversion (per [conv.qual])
+          // so the path silently rejects the converting-ctor match for any
+          // `const T` source binding into a `T` parameter.  This shows up in
+          // CBMC's own `simplify_expr_*.cpp` files where simplification helpers
           // return `const exprt&` into a class-typed `resultt<>`
           // returned-value.  Fall through to the same-type path: strip
-          // cv-qualifiers from `from` before computing the
-          // address-of and let the standard-conversion sequence run on
-          // the unqualified pointer types.  The conversion is still a
-          // user-defined conversion (constructor call) so the rank
-          // adjustment is unchanged.
+          // cv-qualifiers from `from` before computing the address-of and let
+          // the standard-conversion sequence run on the unqualified pointer
+          // types.  The conversion is still a user-defined conversion
+          // (constructor call) so the rank adjustment is unchanged.
           typet from_unqual = expr.type();
           from_unqual.remove(ID_C_constant);
           from_unqual.remove(ID_C_volatile);
@@ -3015,7 +3012,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
           {
             // create temporary object
             dereference_exprt expr_deref(expr_ptmp);
-            // [basic.lval] p1, [expr.static.cast] p3: if the original
+            // [basic.lval] p1, [expr.static.cast] p1, p3: if the original
             // expression is an rvalue, the derived-to-base result is an
             // xvalue (not an lvalue), so it can bind to rvalue references.
             if(expr.get_bool(ID_C_lvalue))
@@ -3162,7 +3159,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
           failed_template_conversions.end())
       {
         template_conversions_in_progress.insert(to_ctor_key);
-        // [over.ics.user] + [temp.deduct]/8: a user-defined
+        // [over.ics.user] + [temp.deduct.general]/8: a user-defined
         // conversion that instantiates a template constructor is
         // SFINAE-guarded — substitution failure means "no viable
         // conversion sequence", not a compilation error.  The
@@ -3549,7 +3546,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
     const struct_typet &from_struct = follow_tag(to_struct_tag_type(from));
     for(const auto &component : from_struct.components())
     {
-      // Per [class.conv.fct]/1 + [class.member.lookup]/4: the set
+      // Per [class.conv.fct]/6 + [class.member.lookup]/4: the set
       // of viable conversion operators in `from`'s class scope
       // includes those declared in `from` itself AND those
       // inherited from base classes (subject to access
@@ -3566,7 +3563,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
       if(!component.get_bool(ID_is_cast_operator))
         continue;
 
-      // N5008 [class.conv.fct]/2: an EXPLICIT conversion function is only
+      // N5008 [class.conv.fct]/4: an EXPLICIT conversion function is only
       // considered for direct-initialization ([over.match.copy]/1.2,
       // [over.match.conv]/1, [over.match.ref]/1 with explicit casts); this
       // is the implicit conversion sequence, so it is not a candidate here.
@@ -3589,7 +3586,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
       }
 
       // Skip cast operators that originated from a template
-      // specialisation: per [over.match.conv] the candidate set
+      // specialisation: per [over.match.funcs.general]/7-8 the candidate set
       // for a given destination type is the *non-template* cast
       // operators plus freshly-deduced specialisations.  A
       // specialisation that exists only because an *earlier*
@@ -3601,12 +3598,11 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
         continue;
 
       // The component flag above is lost when the class is re-elaborated
-      // (mutually-dependent class types), so also consult the persistent
-      // flag on the member symbol set by
-      // find_template_conversion_specialisation.  An instantiated
-      // template conversion operator is not a non-template candidate
-      // ([over.match.conv]) and is not name-resolvable in the class
-      // cpp_scope; the fresh template deduction handles it.
+      // (mutually-dependent class types), so also consult the persistent flag
+      // on the member symbol set by find_template_conversion_specialisation.
+      // An instantiated template conversion operator is not a non-template
+      // candidate ([over.match.funcs.general]/7-8) and is not name-resolvable
+      // in the class cpp_scope; the fresh template deduction handles it.
       if(const symbolt *comp_sym = symbol_table.lookup(component.get_name()))
       {
         if(comp_sym->type.get_bool("#instantiated_conversion_operator"))
@@ -3697,9 +3693,10 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
             dereference_exprt base_deref{casted_ptr};
             base_deref.add_source_location() = expr.source_location();
 
-            // [over.ics.scs], [conv.qual]: a derived-to-base conversion is a
-            // Conversion-rank standard conversion (worse than the exact match
-            // a same-type operator yields).
+            // [over.best.ics.general]/7, [over.best.ics.general]/7: a
+            // derived-to-base conversion is a Conversion-rank standard
+            // conversion (worse than the exact match a same-type operator
+            // yields).
             const unsigned this_rank = d2b_rank + 4;
             if(!found || this_rank < found_rank)
             {
@@ -3719,7 +3716,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
     if(found && ambiguous)
       return false;
 
-    // N5008 [over.match.best]/2: a conversion function template's
+    // N5008 [over.match.best.general]/2: a conversion function template's
     // specialization deduced for the destination ([temp.deduct.conv]) is
     // a candidate alongside the non-template conversion functions and is
     // compared by the conversion sequence from its return type; only on a
@@ -3794,7 +3791,7 @@ bool cpp_typecheckt::reference_related(
     const auto &to_s = to_struct_type(to_followed);
     if(!subtype_typecast(from_s, to_s))
       return false;
-    // N5008 [namespace.udecl]/16,19 + [over.match.funcs]/5: a base
+    // N5008 [namespace.udecl]/12,16 + [over.match.funcs.general]/4: a base
     // member republished in the derived class by a USING-DECLARATION
     // is a member of the DERIVED class for access purposes; calling it
     // on a derived object adjusts the implicit object argument to the
@@ -3878,7 +3875,7 @@ bool cpp_typecheckt::reference_compatible(
     // difference out of the primary conversion rank and report it separately
     // as a tie-breaker.  Per [over.ics.rank]/3.2.6 the cv-qualification of a
     // reference binding is only a tie-breaker *between reference bindings*,
-    // ranked below the non-template preference ([over.match.best]/2.4);
+    // ranked below the non-template preference ([over.match.best.general]/2.4);
     // folding it into the primary rank would let a by-value match by a
     // *template* specialization wrongly beat a reference binding by the
     // (non-template) copy/move special member.
@@ -3953,12 +3950,12 @@ bool cpp_typecheckt::reference_compatible(
 /// C++ expressions both are prvalues.  A dereference of an UNNAMED rvalue
 /// reference (the result of std::move, a T&& return) is an xvalue; a named
 /// one -- a variable or a class member of rvalue-reference type
-/// ([expr.ref]/6) -- is an lvalue.
+/// ([expr.ref]/7) -- is an lvalue.
 bool cpp_typecheckt::is_lvalue_expression(const exprt &expr) const
 {
   if(!expr.get_bool(ID_C_lvalue))
     return false;
-  // a conditional over two xvalues is an xvalue ([expr.cond]/4.1); the
+  // a conditional over two xvalues is an xvalue ([expr.cond]/5); the
   // conditional's type check records it
   if(expr.get_bool(ID_C_xvalue))
     return false;
@@ -4057,8 +4054,8 @@ bool cpp_typecheckt::reference_binding(
       expr.set(ID_C_lvalue, true);
     else if(expr.id() == ID_member)
     {
-      // N5008 [expr.ref]/8: a member access on a prvalue or xvalue is
-      // itself an xvalue, and [over.match.funcs]/5.3 permits binding
+      // N5008 [expr.ref]/7.2: a member access on a prvalue or xvalue is
+      // itself an xvalue, and [over.match.funcs.general]/5 permits binding
       // the implied object argument of a member function without a
       // ref-qualifier to an rvalue.  Walk the member chain: if the
       // ultimate object is itself a temporary (function-call result or
@@ -4126,7 +4123,7 @@ bool cpp_typecheckt::reference_binding(
     // through /5.3: a temporary W is copy-initialised from p (converting
     // constructor or conversion function) and the rvalue reference binds
     // to it -- handled below.
-    // [expr.sub]/1: `E1[E2]' is an lvalue if E1 is an lvalue and an xvalue
+    // [expr.sub]/2: `E1[E2]' is an lvalue if E1 is an lvalue and an xvalue
     // otherwise -- the subscript of an array prvalue (`arr3{1, 2, 3}[i]',
     // [class.temporary]/6.3) binds to an rvalue reference.
     const bool subscript_of_rvalue_array =
@@ -4151,7 +4148,7 @@ bool cpp_typecheckt::reference_binding(
       if(genuine_lvalue_form)
         return false;
 
-      // N5008 [expr.type.conv]/2: `E{2}' (a compound literal here, lvalue
+      // N5008 [expr.type.conv]/1.4: `E{2}' (a compound literal here, lvalue
       // marked for address-taking) is a prvalue of class type; binding
       // `E &&' to it is the identity conversion ([over.ics.ref]/1) and
       // better than `const E &' ([over.ics.rank]/3.2.3).  Bind like a
@@ -4162,7 +4159,7 @@ bool cpp_typecheckt::reference_binding(
       }
       // ... and `T{}' of a scalar type T (`pointer{}' in the MSVC STL's
       // `exchange(_Ptr, pointer{})') is the prvalue of its value
-      // ([expr.type.conv]/2, [dcl.init.list]/3.11); the rvalue reference
+      // ([expr.type.conv]/1.4, [dcl.init.list]/3.11); the rvalue reference
       // binds to a temporary materialized from it ([dcl.init.ref]/5.3.1,
       // [conv.rval]), below.  Binding to the compound literal passed its
       // value where the reference's address belongs.
@@ -4219,7 +4216,7 @@ bool cpp_typecheckt::reference_binding(
     expr.get_bool(ID_C_implicit) &&
     is_rvalue_reference(to_dereference_expr(expr).pointer().type()) &&
     to_dereference_expr(expr).pointer().id() != ID_symbol &&
-    // N5008 [expr.ref]/6: a class member access naming a member declared
+    // N5008 [expr.ref]/7: a class member access naming a member declared
     // with reference type is an LVALUE of the referenced type (regardless
     // of & or &&), so it binds to a non-const lvalue reference -- e.g.
     // returning std::_Head_base<I, T&&>::_M_head_impl as _Head& in
@@ -4249,7 +4246,7 @@ bool cpp_typecheckt::reference_binding(
   // (it was reported ambiguous, e.g. ranget::zip(containert &) vs
   // zip(ranget<I>) called with a prvalue).
   // The implicit object parameter (ID_C_this) is exempt: a member function
-  // may be called on an rvalue object ([over.match.funcs]/5 -- the
+  // may be called on an rvalue object ([over.match.funcs.general]/5 -- the
   // ref-qualifier, when present, is checked by the caller); the object
   // expression is marked ID_C_lvalue at the top of this function.
   const bool expr_is_lvalue =
@@ -4322,17 +4319,16 @@ bool cpp_typecheckt::reference_binding(
       // counterpart for *this* destination type (which may be a
       // different reference) is found below by
       // `deduce_conversion_template_for_reference`.
-      // ([over.ics.user]/3 + [over.match.conv])
+      // ([over.ics.user]/3 + [over.match.funcs.general]/8)
       if(component.get_bool("#is_template_specialization"))
         continue;
 
       // The component flag above is lost when the class is re-elaborated
-      // (mutually-dependent class types), so also consult the persistent
-      // flag on the member symbol set by
-      // find_template_conversion_specialisation.  An instantiated
-      // template conversion operator is not a non-template candidate
-      // ([over.match.conv]) and is not name-resolvable in the class
-      // cpp_scope; the fresh template deduction handles it.
+      // (mutually-dependent class types), so also consult the persistent flag
+      // on the member symbol set by find_template_conversion_specialisation.
+      // An instantiated template conversion operator is not a non-template
+      // candidate ([over.match.funcs.general]/7-8) and is not name-resolvable
+      // in the class cpp_scope; the fresh template deduction handles it.
       if(const symbolt *comp_sym = symbol_table.lookup(component.get_name()))
       {
         if(comp_sym->type.get_bool("#instantiated_conversion_operator"))
@@ -4425,7 +4421,7 @@ bool cpp_typecheckt::reference_binding(
   if(reference_type.get_bool(ID_C_this))
     return false;
 
-  // N5008 [dcl.init.ref]/5.3: a temporary is created and bound only when
+  // N5008 [dcl.init.ref]/5.2: a temporary is created and bound only when
   // the reference is an lvalue reference to a non-volatile const type OR an
   // rvalue reference (`void w(W &&); w(5);' with W(int) -- /5.3.2: the
   // initializer is copy-initialised into a temporary of the referenced
@@ -4438,7 +4434,7 @@ bool cpp_typecheckt::reference_binding(
      reference_type.base_type().get_bool(ID_C_volatile)))
     return false;
 
-  // N5008 [dcl.init.ref]/5.4.1: when T1 is reference-related to T2 (the
+  // N5008 [dcl.init.ref]/5.4: when T1 is reference-related to T2 (the
   // same class, or a base of it), cv1 shall be the same as or greater than
   // cv2 -- `E &&' does not bind to a `const E' prvalue by copying it into
   // a non-const temporary (`push_back(c ? neg(op) : op)' with `const E
@@ -4808,13 +4804,13 @@ exprt cpp_typecheckt::sequence_before(
   return comma;
 }
 
-/// N5008 [dcl.init.list]/3.4 + [dcl.init.ref]/5.4.2: a braced-init-list
+/// N5008 [dcl.init.list]/3.4 + [dcl.init.list]/3.10: a braced-init-list
 /// for a REFERENCE TO ARRAY parameter (`_Dest (&&)[1]', libc++ variant's
 /// narrowing check `__test_impl<_Dest>({std::declval<_Source>()})')
 /// aggregate-initializes a temporary array of the element type -- each
 /// element converted ([dcl.init.aggr]), the remaining ones value-initialized
 /// ([dcl.init.aggr]/5.2) -- and binds the reference to it.  The list must
-/// fit the bound ([dcl.init.aggr]/6).
+/// fit the bound ([dcl.init.aggr]/14).
 /// \return true and \p result set to the bound reference on success
 bool cpp_typecheckt::brace_init_to_array_reference(
   const exprt &init_list,
@@ -4934,7 +4930,7 @@ bool cpp_typecheckt::aggregate_list_initialization_is_viable(
   try
   {
     sfinae_contextt sfinae_guard{*this};
-    // [dcl.init.aggr]/16: an initializer-clause left over after all
+    // [dcl.init.aggr]/14: an initializer-clause left over after all
     // elements and subaggregates are initialized makes the program
     // ill-formed; do_initializer only warns about it ("member designator
     // index ... out of bounds"), so any warning means not viable.
@@ -4959,7 +4955,7 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
   // N5008 [dcl.init.list]/3.11: an empty braced-init-list value-initializes
   // the object -- for a scalar ([dcl.init.general]/9) that is
   // zero-initialization: `e = {}' on a scoped enumeration, an integer or a
-  // floating-point type ([expr.ass]/8.1: `x = B' means `x = t' with `T t =
+  // floating-point type ([expr.assign]/8.1: `x = B' means `x = t' with `T t =
   // B').  Class types (default constructor), pointers and references are
   // handled by their own rules below.
   if(
@@ -4982,7 +4978,7 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
   // N5008 [dcl.init.list]/3.2-3.4: copy-list-initialization of an
   // aggregate -- an array, or a class that the front end treats as POD --
   // is aggregate initialization ([dcl.init.aggr]), including brace elision
-  // ([dcl.init.aggr]/16: `return {2};' for `struct A { int v[1]; }', the
+  // ([dcl.init.aggr]/14: `return {2};' for `struct A { int v[1]; }', the
   // `return {_S_to_enum<_Args>()...};' of libstdc++'s
   // basic_format_args::_S_types_to_pack into std::array).  Only a single
   // element whose type is T or a class derived from T initializes the object
@@ -5022,7 +5018,7 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
     e.id() == ID_initializer_list && (cpp_is_pod(type) || is_reference(type)) &&
     e.operands().size() == 1)
   {
-    // [dcl.init.list]/3.9-3.10, [over.ics.list]/8: a single-element
+    // [dcl.init.list]/3.9-3.10, [over.ics.list]/9-10: a single-element
     // braced-init-list initializes a scalar, and binds a reference,
     // from that element.
     e = to_unary_expr(expr).op();
@@ -5238,8 +5234,9 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
     }
 
     // N5008 [dcl.init.aggr]/3 designated-initializer-list, and
-    // [dcl.init.list]/3.5 `{}' for a union: the shared do_initializer
-    // knows designators (`return {.a = i, .b = 2};', user-reported Issue
+    // [dcl.init.list]/3.4, [dcl.init.aggr]/5.5 `{}' for a union: the shared
+    // do_initializer knows designators (`return {.a = i, .b = 2};',
+    // user-reported Issue
     // 9) and value-initialises a POD union from an empty list (`return
     // {};' with a union return type, Issue 10); the positional loop below
     // knows neither ("invalid implicit conversion from '<<type:>>'").
@@ -5260,7 +5257,7 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
       return;
     }
 
-    // C++11 [dcl.init.list]/3.5: non-empty brace-init list to a
+    // C++11 [dcl.init.list]/3.7: non-empty brace-init list to a
     // class (or reference-to-class) type with an accessible
     // `initializer_list<U>` constructor.
     //
@@ -5510,7 +5507,7 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
           struct_exprt result =
             result_opt.has_value() ? *result_opt : struct_exprt({}, base_type);
           std::size_t i = leading_base_clauses;
-          // N5008 [dcl.init.list]/3.4: a class with a user-declared
+          // N5008 [dcl.init.list]/3.7: a class with a user-declared
           // constructor is not an aggregate ([dcl.init.aggr]/1); its
           // braced elements are constructor arguments, resolved by the
           // constructor path below.  Building a memberwise struct value
@@ -5641,7 +5638,7 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
       }
     }
 
-    // N5008 [over.ics.list]/10 + [dcl.init.list]/3.10: a brace-init-list
+    // N5008 [over.ics.list]/9 + [dcl.init.list]/3.10: a brace-init-list
     // for a REFERENCE to std::initializer_list<T> (`initializer_list<T> &&',
     // `const initializer_list<T> &', libstdc++ and user code alike)
     // initializes a temporary initializer_list -- the conversion below --
@@ -5693,7 +5690,7 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
       }
     }
 
-    // N5008 [dcl.init.list]/3.4 + [dcl.init.ref]/5.4.2: a braced-init-list
+    // N5008 [dcl.init.list]/3.4 + [dcl.init.list]/3.10: a braced-init-list
     // for a REFERENCE TO ARRAY parameter aggregate-initializes a temporary
     // array and binds the reference to it.
     if(
@@ -5923,7 +5920,7 @@ void cpp_typecheckt::reference_initializer(
   exprt &expr,
   const reference_typet &reference_type)
 {
-  // N5008 [dcl.init.list]/3.10: list-initialization of a reference with
+  // N5008 [dcl.init.list]/3.9: list-initialization of a reference with
   // a single-element braced-init-list initializes the reference FROM
   // THAT ELEMENT (`symbolt &s{table.get_ref(...)};`).  Unwrap before
   // computing the binding; multi-element/empty lists (which would bind
@@ -5999,7 +5996,7 @@ bool cpp_typecheckt::cast_away_constness(const typet &t1, const typet &t2) const
 
   // N5008 [basic.type.qualifier]/3: cv-qualifiers applied to an array type
   // attach to its element type, so an array level of the type chain below
-  // ([expr.const.cast]/8) carries no qualification of its own.  The front
+  // ([expr.const.cast]/6) carries no qualification of its own.  The front
   // end represents `const char[4]' both with the const on the array node
   // (`remove_reference<const char (&)[4]>::type', std::forward of a string
   // literal) and on the element (the written type); move it down before
@@ -6258,7 +6255,7 @@ bool cpp_typecheckt::dynamic_typecast(
   else
     return false;
 
-  // N5008 [expr.dynamic.cast]/5: a cast to a base class is the static
+  // N5008 [expr.dynamic.cast]/4: a cast to a base class is the static
   // derived-to-base conversion.  [expr.dynamic.cast]/6-9: otherwise, for a
   // polymorphic operand, the result depends on the most derived object --
   // a run-time check, resolved once every class of the translation unit
@@ -6292,13 +6289,13 @@ bool cpp_typecheckt::dynamic_typecast(
   if(static_typecast(e, type, new_expr))
     return true;
 
-  // N5008 [expr.dynamic.cast]/5-6: when the required static up-cast does
+  // N5008 [expr.dynamic.cast]/1, /5: when the required static up-cast does
   // not exist, the cast is still well-formed if the operand points to a
   // POLYMORPHIC class type and the target is a pointer to a complete
   // class type -- the run-time check then decides: a pointer to the
   // (possibly cross-cast) subobject when the most-derived object has a
   // unique public base of the target type, a null pointer otherwise
-  // ([expr.dynamic.cast]/7-8).  This is the shape of
+  // ([expr.dynamic.cast]/8-10).  This is the shape of
   //   dynamic_cast<hardness_collectort *>(&prop)
   // over unrelated interface bases (prop_conv_solver.h).  CBMC does not
   // track dynamic types precisely enough to evaluate the check, so model
@@ -6313,7 +6310,7 @@ bool cpp_typecheckt::dynamic_typecast(
   {
     const struct_typet &op_struct =
       follow_tag(to_struct_tag_type(to_pointer_type(e.type()).base_type()));
-    // [expr.dynamic.cast]/6: the operand's class must be polymorphic --
+    // [expr.dynamic.cast]/5: the operand's class must be polymorphic --
     // it has (or inherits) a virtual function, visible as a vtable
     // pointer component.
     bool polymorphic = false;
@@ -6325,7 +6322,7 @@ bool cpp_typecheckt::dynamic_typecast(
         break;
       }
     }
-    // the target class must be complete ([expr.dynamic.cast]/2)
+    // the target class must be complete ([expr.dynamic.cast]/1)
     if(
       polymorphic &&
       !follow_tag(to_struct_tag_type(to_pointer_type(type).base_type()))
@@ -6614,7 +6611,7 @@ bool cpp_typecheckt::static_typecast(
     // designates the base subobject as an xvalue.  This is std::_Tuple_impl's
     // move constructor shape, `: _Base(static_cast<_Base&&>(__in))`, without
     // which the tuple move constructor fails to convert and std::map's
-    // piecewise-construction chain breaks.  Also [expr.static.cast]/11: the
+    // piecewise-construction chain breaks.  Also [expr.static.cast]/2: the
     // inverse (base -> derived) downcast is permitted symmetrically.
     {
       typet from = e.type();
@@ -6727,12 +6724,12 @@ bool cpp_typecheckt::static_typecast(
   }
 
   // N5008 [over.match.copy]/1.2: in the direct-initialization `T(e)' /
-  // `static_cast<T>(e)' ([expr.static.cast]/4: `T t(e);'), a conversion
+  // `static_cast<T>(e)' ([expr.static.cast]/5: `T t(e);'), a conversion
   // function of e's class yielding T is a candidate for the temporary bound
   // to the copy/move constructor's `T&' parameter EVEN IF EXPLICIT.  Such a
   // function converts e to T directly (the copy/move is elided,
   // [class.copy.elision]).  Try it first: the implicit path below skips
-  // explicit conversion functions ([class.conv.fct]/2).
+  // explicit conversion functions ([class.conv.fct]/4).
   if(
     type.id() == ID_struct_tag && e.type().id() == ID_struct_tag &&
     explicit_conversion_function_to(e, type, new_expr))
@@ -6751,7 +6748,7 @@ bool cpp_typecheckt::static_typecast(
   {
     if(!cpp_is_pod(type))
     {
-      // N5008 [dcl.init]/(16.6.2): copy-initialization of a class type
+      // N5008 [dcl.init.general]/(16.6.2): copy-initialization of a class type
       // constructs the destination from the source expression; the
       // constructor is chosen by overload resolution against the
       // ARGUMENT's value category ([over.match.viable], [over.ics.ref]:
@@ -6789,7 +6786,7 @@ bool cpp_typecheckt::static_typecast(
     return true;
   }
 
-  // N5008 [expr.static.cast]/4, [dcl.init.general]/16.6.2.1: for a class T,
+  // N5008 [expr.static.cast]/5, [dcl.init.general]/16.6.2: for a class T,
   // `static_cast<T>(e)' is the direct-initialization `T t(e);', for which
   // explicit constructors are candidates ([over.match.ctor]/1) -- the
   // implicit conversion sequence above only considered converting ones
@@ -6902,7 +6899,7 @@ bool cpp_typecheckt::static_typecast(
 /// Apply C++ user-defined conversions before falling through to C-style
 /// arithmetic typechecking.
 ///
-/// Per N5008 [over.match.oper]/9: when a binary operator with no viable
+/// Per N5008 [over.match.oper]/11: when a binary operator with no viable
 /// non-member or member operator overload is processed, the operator is
 /// treated as a built-in operator per [over.built]; the operands are then
 /// subject to standard or user-defined conversion sequences to the built-in

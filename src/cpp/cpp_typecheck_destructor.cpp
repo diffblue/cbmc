@@ -133,7 +133,7 @@ codet cpp_typecheckt::dtor(
 
     // N5008 [class.dtor]/13: a destructor destroys the direct non-variant
     // non-static data members; every member of a union is a variant member
-    // ([class.union.general]/1), so a union's destructor -- and with it an
+    // ([class.union.anon]/4), so a union's destructor -- and with it an
     // anonymous union's ([class.union.anon]/1) -- destroys none of them.
     if(symbol.type.id() == ID_union)
       continue;
@@ -154,7 +154,7 @@ codet cpp_typecheckt::dtor(
     if(cit->get_base_name().empty())
       continue;
 
-    // Per [class.dtor]/13 a destructor may be invoked on a const
+    // Per [class.dtor]/5 a destructor may be invoked on a const
     // or volatile subobject, but CBMC's implicit_typecast path
     // rejects the pointer conversion from `const T*` (the address
     // of a const member) to `T*` (the destructor's `this`
@@ -191,7 +191,7 @@ codet cpp_typecheckt::dtor(
 
   // the destructor call for the base subobject of class `base_type' at
   // `this' (the address adjusted by the subobject's offset, for a virtual
-  // base the one of this complete object -- N5008 [class.dtor]/14 only has
+  // base the one of this complete object -- N5008 [class.dtor]/13 only has
   // the most derived class's destructor destroy the virtual bases, after the
   // direct non-virtual ones)
   const auto destroy_base = [&](const typet &base_type) -> std::optional<codet>

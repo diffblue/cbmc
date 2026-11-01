@@ -103,14 +103,14 @@ protected:
     bool force_constant);
 
   /// Whether the empty braced-init-list `{}` value-initializes a scalar
-  /// at the current language level.  Per C [dcl.init]/11 this requires
-  /// C23+; per C++ [dcl.init.list]/3.10 (C++11+) this is permitted.
+  /// at the current language level.  Per C23 6.7.11/11 this requires
+  /// C23+; per C++ [dcl.init.list]/3.11 (C++11+) this is permitted.
   /// Default implementation covers the C side; cpp_typecheckt overrides
   /// for C++.
   virtual bool empty_brace_value_initializes_scalar() const;
 
   /// Whether sizeof applied to a class type is at least 1 at the
-  /// current language level.  Per N5008 [class]/4 + [expr.sizeof]/2 a
+  /// current language level.  Per N5008 [class.pre]/7 + [expr.sizeof]/2 a
   /// complete object of class type has nonzero size in C++; in C
   /// (GNU mode) an empty struct is a zero-size extension.  Default
   /// covers the C side; cpp_typecheckt overrides for C++.

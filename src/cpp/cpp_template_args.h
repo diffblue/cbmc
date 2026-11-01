@@ -66,15 +66,16 @@ inline const cpp_template_args_non_tct &to_cpp_template_args_non_tc(
 class cpp_template_args_tct:public cpp_template_args_baset
 {
 public:
-  /// N5008 [temp.deduct]/2, [temp.arg]: an argument is usable only when every
-  /// template parameter in it has been deduced or specified; the undeduced
-  /// parameter may sit INSIDE the argument (`const _U2 &` in std::pair's
-  /// deprecated converting-constructor constraint `is_constructible<_T2,
-  /// const _U2&>` while `_U2` is still unassigned).  Checking only the top
-  /// level let `is_constructible<T, ? &>` be instantiated, which instantiated
-  /// T's forwarding constructor with a `?` argument; its body errors leaked
-  /// ("no match for symbol 'set'" in every TU with a std::map to such a
-  /// class) and members touched on the way were left bodiless.
+  /// N5008 [temp.deduct.general]/1, [temp.arg]: an argument is usable only when
+  /// every template parameter in it has been deduced or specified; the
+  /// undeduced parameter may sit INSIDE the argument (`const _U2 &` in
+  /// std::pair's deprecated converting-constructor constraint
+  /// `is_constructible<_T2, const _U2&>` while `_U2` is still unassigned).
+  /// Checking only the top level let `is_constructible<T, ? &>` be
+  /// instantiated, which instantiated T's forwarding constructor with a `?`
+  /// argument; its body errors leaked ("no match for symbol 'set'" in every TU
+  /// with a std::map to such a class) and members touched on the way were left
+  /// bodiless.
   bool has_unassigned() const
   {
     std::function<bool(const irept &)> nested = [&](const irept &n) -> bool

@@ -108,7 +108,7 @@ exprt convert_string_literal(const std::string &src, bool char8)
     i=j;
   }
 
-  // C++20 [lex.string]/6: a UTF-8 string literal has type `array of n
+  // C++20 [lex.string]/1: a UTF-8 string literal has type `array of n
   // const char8_t'; its elements are the UTF-8 code units
   if(wide == 0 && utf8 && char8)
   {

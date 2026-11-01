@@ -1,13 +1,13 @@
 /*******************************************************************\
 
-Module: C++ SFINAE context per [temp.deduct]/8
+Module: C++ SFINAE context per [temp.deduct.general]/8
 
 Author: Kiro
 
 \*******************************************************************/
 
 /// \file
-/// RAII guard for SFINAE immediate contexts per [temp.deduct]/8 and
+/// RAII guard for SFINAE immediate contexts per [temp.deduct.general]/8 and
 /// related rules ([temp.constr.atomic], [temp.alias],
 /// [temp.deduct.call], [temp.deduct.conv]).
 
@@ -21,7 +21,7 @@ Author: Kiro
 class cpp_typecheckt;
 
 /// RAII guard marking a SFINAE *immediate context* per
-/// [temp.deduct]/8 of N5008 (C++26 working draft):
+/// [temp.deduct.general]/8 of N5008 (C++26 working draft):
 ///
 ///   > If a substitution results in an invalid type or expression,
 ///   > type deduction fails.  An invalid type or expression is one
@@ -42,7 +42,7 @@ class cpp_typecheckt;
 ///  * [temp.constr.atomic]/3: an unsatisfied atomic constraint is a
 ///    soft failure, not an ill-formed program.
 ///
-///  * [temp.alias]/2: substitution into the defining-type-id of an
+///  * [temp.alias]/3: substitution into the defining-type-id of an
 ///    alias template that fails is a deduction failure.
 ///
 ///  * [temp.deduct.call] and [temp.deduct.conv]: per-candidate
@@ -77,7 +77,7 @@ class cpp_typecheckt;
 ///   }
 ///   catch(...)
 ///   {
-///     continue;  // [temp.deduct]/3: a substitution failure causes
+///     continue;  // [temp.deduct.general]/8: a substitution failure causes
 ///                // the candidate to be silently discarded.  The
 ///                // `guard` destructor restores handler + error
 ///                // count before we iterate.

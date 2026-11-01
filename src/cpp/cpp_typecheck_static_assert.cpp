@@ -71,7 +71,7 @@ void cpp_typecheckt::propagate_constants(
     return;
   }
 
-  // N5008 [expr.const]/5: with its operands folded, a call of a constexpr
+  // N5008 [expr.const]/10: with its operands folded, a call of a constexpr
   // function or a temporary built by a constexpr constructor is evaluated
   // (try_evaluate_constexpr), so that a member of it, or a member function
   // called on it, folds as well: `Q(2).n', `make().sum()', GCC 16's
@@ -123,7 +123,7 @@ void cpp_typecheckt::convert(cpp_static_assertt &cpp_static_assert)
 
   simplify(cpp_static_assert.op0(), *this);
 
-  // N5008 [dcl.pre]/10: the condition is a constant expression; if our
+  // N5008 [dcl.pre]/13: the condition is a constant expression; if our
   // constant evaluation falls short the check is dropped.  Say so for the
   // user's own code, as the block-scope form (typecheck_code) does -- a
   // silently skipped assertion hid several evaluation gaps.  Library

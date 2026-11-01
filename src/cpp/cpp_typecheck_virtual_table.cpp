@@ -164,16 +164,16 @@ void cpp_typecheckt::build_this_adjusting_thunk_body(
   expr_call.arguments().reserve(args.size());
 
   // the first parameter (this) was added as late_cast above.  The thunk
-  // forwards its arguments to the final overrider ([class.virtual]/14) with
+  // forwards its arguments to the final overrider ([expr.call]/2) with
   // the same parameter types.  A named rvalue reference parameter is an
-  // lvalue ([expr.prim.id.unqual]/3), which cannot bind to the overrider's
+  // lvalue ([expr.prim.id.unqual]/12), which cannot bind to the overrider's
   // rvalue reference parameter; it is passed on as an xvalue (inside a
   // system header, where conversion failures drop the body, the thunk was
   // dropped and the virtual call returned a nondeterministic value).
   for(std::size_t j = 1; j < args.size(); ++j)
   {
     exprt argument = lookup(args[j].get_identifier()).symbol_expr();
-    // `static_cast<T &&>(a)' for a parameter `T &&a' ([expr.static.cast]/3:
+    // `static_cast<T &&>(a)' for a parameter `T &&a' ([expr.static.cast]/1, 3:
     // an xvalue)
     if(is_rvalue_reference(argument.type()))
       argument = typecast_exprt{argument, argument.type()};

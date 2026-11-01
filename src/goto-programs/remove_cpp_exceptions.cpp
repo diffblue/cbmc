@@ -103,7 +103,7 @@ protected:
   // Per-handler current-exception slots, keyed by the handler's catch-variable
   // identifier.  A handler writes its own slot on entry, so a nested/sibling
   // handler cannot clobber it; a bare `throw;` tagged with a handler id
-  // re-propagates from that handler's slot ([except.throw]/8).  (ptr, type)
+  // re-propagates from that handler's slot ([expr.throw]/3).  (ptr, type)
   std::map<irep_idt, std::pair<symbol_exprt, symbol_exprt>> handler_slots;
 
   // Get-or-create the (ptr, type) slot globals for handler \p id.
@@ -129,13 +129,13 @@ public:
 
   /// Lower the handler-exit markers of the goto conversion: `cpp_end_catch'
   /// destroys the exception object of a handler that is left other than by
-  /// rethrowing it ([except.throw]/5), `cpp_note_rethrow' records the
+  /// rethrowing it ([except.throw]/4), `cpp_note_rethrow' records the
   /// exception being rethrown.
   void lower_handler_exits(goto_functionst &goto_functions);
 
   /// Call std::terminate where an exception leaves a function through which
   /// it must not propagate: the entry point (no handler was found,
-  /// [except.handle]/9) and a function with a non-throwing exception
+  /// [except.handle]/8) and a function with a non-throwing exception
   /// specification ([except.spec]/5 of C++17, [except.terminate]/1.3).
   void terminate_on_escape(goto_functionst &goto_functions);
 
@@ -260,7 +260,7 @@ void remove_cpp_exceptionst::lower_handler_exits(
       // cpp_end_catch: the handler is no longer active.  Unless the
       // exception is rethrown (its slot is read by the rethrow) or another
       // active handler holds it (this one is then not the last active
-      // handler, [except.throw]/5), destroy the exception object by the
+      // handler, [except.throw]/4), destroy the exception object by the
       // destructor of its (thrown) type.
       const null_pointer_exprt null{to_pointer_type(exc_ptr.type())};
       goto_programt tail;
@@ -551,7 +551,7 @@ void remove_cpp_exceptionst::set_inflight_exception(
 
   // A rethrow (`throw;`) has no operand -- get_exception_symbol returns the
   // throw side-effect itself.  Re-propagate the exception currently being
-  // handled ([except.throw]/8) instead of constructing a new object.
+  // handled ([expr.throw]/3) instead of constructing a new object.
   if(
     value.id() == ID_side_effect &&
     to_side_effect_expr(value).get_statement() == ID_throw)
@@ -719,7 +719,7 @@ void remove_cpp_exceptionst::prepare_handler(
       goto_program.insert_after(
         it,
         goto_programt::make_assignment(inflight_ptr, clear_inflight(), loc));
-      // a handler of a rethrown exception destroys it ([except.throw]/5)
+      // a handler of a rethrown exception destroys it ([except.throw]/4)
       goto_program.insert_after(
         it,
         goto_programt::make_assignment(

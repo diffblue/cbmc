@@ -23,7 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \param src: the literal as written, including its prefix and quotes
 /// \param force_integer_type: give it type int (C) rather than char (C++)
 /// \param source_location: the literal's location, for diagnostics
-/// \param char8: give a u8 literal type char8_t (C++20 [lex.ccon]/3)
+/// \param char8: give a u8 literal type char8_t (C++20 [lex.ccon]/2)
 /// \return the character constant
 exprt convert_character_literal(
   const std::string &src,

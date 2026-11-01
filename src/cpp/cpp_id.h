@@ -53,9 +53,9 @@ public:
   bool is_member, is_method, is_static_member,
        is_scope, is_constructor;
 
-  /// N5008 [namespace.def.general]/3: this scope is an inline namespace; its
+  /// N5008 [namespace.def.general]/4: this scope is an inline namespace; its
   /// members can be explicitly specialized as members of the enclosing
-  /// namespace ([namespace.def.general]/7).
+  /// namespace ([namespace.def.general]/6).
   bool is_inline_namespace = false;
 
   id_classt id_class;

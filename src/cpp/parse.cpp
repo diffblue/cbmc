@@ -398,7 +398,7 @@ protected:
   /// decl-specifier is a name the parser knows as a type
   bool decl_specifier_is_known_type = false;
   /// ... and that type is a class name (a tag), which a function or
-  /// variable of the same name may hide ([basic.scope.hiding]/2)
+  /// variable of the same name may hide ([basic.lookup.general]/4)
   bool decl_specifier_is_class_name = false;
   void SkipTo(int token);
   bool moreVarName();
@@ -464,7 +464,7 @@ protected:
   // Base names of C++20 concepts seen so far (`template<...> concept Name =
   // ...`).  Used to recognise a *qualified* concept name (e.g.
   // `std::__detail::__dereferenceable`) as a type-constraint on a template
-  // parameter ([temp.param]/4), where the leading namespace would otherwise
+  // parameter ([temp.param]/1), where the leading namespace would otherwise
   // make the parameter look like a non-type parameter.
   std::set<irep_idt> concept_names;
 };
@@ -1258,7 +1258,7 @@ bool Parser::rUsing(cpp_usingt &cpp_using)
 
   // N5008 [namespace.udecl]/1: `using B<I, T>::f...;` -- a pack expansion
   // over a using-declarator; recorded for the class-template instantiation
-  // to expand ([temp.variadic]/5.4)
+  // to expand ([temp.variadic]/6.2)
   if(lex.LookAhead(0) == TOK_ELLIPSIS)
   {
     lex.get_token(tk);
@@ -1322,7 +1322,7 @@ bool Parser::rUsingOrTypedef(cpp_itemt &item)
 }
 
 /*
-  static_assert.declaration                           [dcl.dcl]
+  static_assert.declaration                           [dcl.pre]
   : STATIC_ASSERT '(' constant.expression ',' string.literal ')' ';'
 
   C++11 [dcl.dcl] (A.6)
@@ -1454,7 +1454,7 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
 
     // Remember the concept's base name so a later *qualified* use as a
     // type-constraint (`ns::Name auto`/`template<ns::Name T>`) is recognised
-    // ([temp.param]/4).
+    // ([temp.param]/1).
     concept_names.insert(name_tk.data.get(ID_C_base_name));
 
     if(lex.get_token(concept_tk) != '=')
@@ -1484,7 +1484,7 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
   {
     // [temp.constr.decl]/1: a requires-clause associates a
     // constraint-expression with a declaration.
-    // [temp.pre]/4: template-head may include a requires-clause.
+    // [temp.pre]/1: template-head may include a requires-clause.
     if(lex.LookAhead(0) == TOK_REQUIRES)
     {
       cpp_tokent req_tk;
@@ -1888,7 +1888,7 @@ bool Parser::rTempArgList(irept &args)
 
   C++11 [temp.param] (A.12)
 */
-/// N5008 [temp.param]/17: in a non-type template parameter `int *...P' or
+/// N5008 [temp.param]/5: in a non-type template parameter `int *...P' or
 /// `int &...' the ellipsis makes the parameter a template parameter pack.
 /// rDeclarator attaches an ellipsis that follows a ptr-operator to that
 /// pointer or reference type (the form of a function parameter's pack
@@ -1902,7 +1902,7 @@ void Parser::hoist_template_parameter_pack_ellipsis(
   cpp_declaratort &declarator = declaration.declarators().front();
   if(declarator.get_has_ellipsis())
     return;
-  // N5008 [temp.param]/1, [dcl.fct]/1: in `N::T... I' the ellipsis
+  // N5008 [temp.param]/1, [dcl.fct]/23: in `N::T... I' the ellipsis
   // belongs to the declarator-id; the declarator parser recorded it on the
   // (non-pointer) declarator type or on the declaration's type
   if(declarator.type().get_bool(ID_ellipsis))
@@ -1944,7 +1944,7 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
   // (to avoid misinterpreting template<typename Ty, Ty V>).
   // When followed by ::, try non-type parameter parsing first (for
   // qualified types like std::size_t), falling back to concept path.
-  // N5008 [temp.param]/2, [expr.prim.id.qual]: the nested-name-specifier
+  // N5008 [temp.param]/1, [expr.prim.id.qual]: the nested-name-specifier
   // of a type-constraint may start with `::' (the MSVC STL's
   // `template <::std::ranges::contiguous_range _Rng>')
   const bool leading_scope = (cpp20 || msvc_concepts) && t0 == TOK_SCOPE &&
@@ -1960,7 +1960,7 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
     if(leading_scope || lex.LookAhead(1) == TOK_SCOPE)
     {
       // If the qualified name's final component names a known concept, this is
-      // a concept-constrained TYPE parameter ([temp.param]/4) -- e.g.
+      // a concept-constrained TYPE parameter ([temp.param]/1) -- e.g.
       // `template<std::__detail::__dereferenceable _Tp>` -- not a non-type
       // parameter.  The leading namespace would otherwise make the parameter
       // look like a non-type parameter of a qualified type, so detect the
@@ -2094,7 +2094,7 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
           else
             break;
         }
-        // N5008 [temp.param]/4: a type-constraint `C<A1, ..., An> T'
+        // N5008 [temp.param]/8: a type-constraint `C<A1, ..., An> T'
         // introduces `C<T, A1, ..., An>'; keep the arguments
         irept constraint_args(ID_nil);
         if(lex.LookAhead(0) == '<')
@@ -2137,7 +2137,7 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
               sanitized.replace(p, 2, "__");
             declaration.set("#C_concept_constraint", sanitized);
             // the concept's name as written, for the constraint-expression
-            // the type-constraint introduces ([temp.param]/4)
+            // the type-constraint introduces ([temp.param]/9)
             declaration.set("#C_concept_constraint_name", cname);
             if(constraint_args.is_not_nil())
               declaration.add("#C_concept_constraint_args") = constraint_args;
@@ -2214,7 +2214,7 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
       }
       else
       {
-        // N5008 [temp.param]/4: a type-constraint `C<A1, ..., An> T'
+        // N5008 [temp.param]/8: a type-constraint `C<A1, ..., An> T'
         // introduces `C<T, A1, ..., An>'; keep the arguments
         bool skip_ok = true;
         irept constraint_args(ID_nil);
@@ -2574,7 +2574,7 @@ bool Parser::rExternTemplateDecl(cpp_declarationt &decl)
 }
 
 /*
-  simple.declaration                                  [dcl.dcl]
+  simple.declaration                                  [dcl.pre]
   : decl.specifier.seq? init.declarator.list? ';'
   | attribute.specifier.seq decl.specifier.seq? init.declarator.list ';'
 
@@ -2598,7 +2598,7 @@ bool Parser::rExternTemplateDecl(cpp_declarationt &decl)
 /// A declaration, numbered in the order its parsing completes
 /// (ID_C_source_order): N5008 [basic.lookup.unqual]/4 makes a name visible
 /// only after its declaration, and the front end converts some bodies (of
-/// member functions, [class.mem.general]/7) only at the end of the
+/// member functions, [class.mem.general]/9.1) only at the end of the
 /// translation unit.
 bool Parser::rDeclaration(cpp_declarationt &declaration)
 {
@@ -2943,7 +2943,7 @@ bool Parser::rIntegralDeclaration(
 
     // handle trailing return type: `auto f() -> T` declares T.  Only a
     // subtype written after `->` qualifies -- for `auto *f()` / `auto &f()`
-    // ([dcl.spec.auto.general]/2: the placeholder may be followed by a
+    // ([dcl.spec.auto.general]/4: the placeholder may be followed by a
     // ptr-operator) the function type's subtype is that ptr-operator with a
     // nil pointee, and moving it into the declaration type lost the `auto`
     // (the return type became `<<type:nil>> *`).
@@ -3391,7 +3391,7 @@ bool Parser::optMemberSpec(cpp_member_spect &member_spec)
     case TOK_FRIEND:   member_spec.set_friend(true); break;
     case TOK_EXPLICIT:
       member_spec.set_explicit(true);
-      // N5008 [dcl.fct.spec]/3 (C++20): explicit(constant-expression) --
+      // N5008 [dcl.fct.spec]/4 (C++20): explicit(constant-expression) --
       // the function is explicit iff the converted expression is true.  The
       // condition is kept and evaluated when the member is declared (it is
       // usually dependent: `explicit(!is_convertible_v<U, T>)').
@@ -4698,8 +4698,9 @@ bool Parser::optThrowDecl(irept &throw_decl)
     if(lex.get_token(tk)!='(')
       return false;
 
-    // C++11 [except.spec]/15 (C++17 [except.spec]/1): `throw()' is a
-    // non-throwing exception specification, equivalent to noexcept(true)
+    // C++11 [except.spec]/12 (removed in C++20, [diff.cpp17.except]/1):
+    // `throw()' is a non-throwing exception specification, equivalent to
+    // noexcept(true)
     if(lex.LookAhead(0) == ')')
     {
       lex.get_token(tk);
@@ -5146,10 +5147,10 @@ bool Parser::rDeclarator(
       // Only for a decl-specifier the parser KNOWS to be a type: the parser
       // records type names only, so an unknown name (a member function
       // `find(__k);' as much as a nested class declared later in the class,
-      // [class.mem.general]/7) stays an expression here; the type checker
+      // [class.mem.general]/9.1) stays an expression here; the type checker
       // turns the latter into a declaration (typecheck_code).
       // A class name may be hidden by a function or variable of the same
-      // name declared in the same scope ([basic.scope.hiding]/2, `struct
+      // name declared in the same scope ([basic.lookup.general]/4, `struct
       // foo x; void foo(struct foo *); ... foo(&x);' in C code), which the
       // parser's type-only scopes cannot see: for a CLASS name accept only
       // a bare-name nested declarator (`T(x)'), leaving `T(&x)' / `T(*p)'
@@ -5355,7 +5356,7 @@ bool Parser::rDeclarator(
       // C++20 trailing requires clause ([dcl.decl.general]/4): part of
       // the declarator; its constraint-expression is associated with
       // the declaration exactly like a template-head clause
-      // ([temp.constr.decl]/2-3).  Parse the restricted [temp.pre]
+      // ([temp.constr.decl]/3).  Parse the restricted [temp.pre]
       // grammar and record it on the declarator; the satisfaction
       // check reads it alongside the template-head clause.  On parse
       // failure fall back to the historical skip.
@@ -5545,7 +5546,7 @@ bool Parser::rDeclarator(
       break;
   }
 
-  // N5008 [dcl.meaning.general]/1 + [dcl.array]: in `T (D)[N]` the
+  // N5008 [dcl.meaning.general]/8 + [dcl.array]: in `T (D)[N]` the
   // parenthesized declarator D applies ON TOP of the array type --
   // `int (&r)[3]` declares a reference to an array of 3 ints and
   // `int (*p)[3]` a pointer to such an array.  The inner declarator was
@@ -5852,7 +5853,7 @@ bool Parser::rMemberInit(exprt &init)
     // parse initializer-clause (',' initializer-clause)* ','? '}'
     if(lex.LookAhead(0) == '}')
     {
-      // N5008 [dcl.init.general]/9: `member{}` VALUE-initializes;
+      // N5008 [dcl.init.list]/3.5, 3.11: `member{}` VALUE-initializes;
       // record it so an empty operand list is distinguishable from a
       // synthesized default-initialization entry.
       init.set("#value_init", true);
@@ -5897,7 +5898,7 @@ bool Parser::rMemberInit(exprt &init)
     std::cout << std::string(__indent, ' ') << "Parser::rMemberInit 3b\n";
 #endif
     // A parenthesized argument list whose first argument is a
-    // braced-init-list, e.g. `m({a, b}, t)`.  N5008 [class.base.init]/3 +
+    // braced-init-list, e.g. `m({a, b}, t)`.  N5008 [class.base.init]/1 +
     // [dcl.init.list]: each argument of the list may itself be a
     // braced-init-list.  rFunctionArguments parses a comma-separated list of
     // initializer-clauses (each via rInitializeExpr, which accepts a leading
@@ -5937,7 +5938,7 @@ bool Parser::rMemberInit(exprt &init)
     if(lex.get_token(tk2)!=')')
       return false;
 
-    // N5008 [dcl.init.general]/9: `member()` VALUE-initializes.
+    // N5008 [dcl.init.general]/16.4: `member()` VALUE-initializes.
     if(init.operands().empty())
       init.set("#value_init", true);
   }
@@ -5948,7 +5949,7 @@ bool Parser::rMemberInit(exprt &init)
 
     // N5008 [class.base.init] grammar: a mem-initializer may be a pack
     // expansion (`leaf<T>(u)...`, expanding in lockstep with a
-    // base-specifier pack per [temp.variadic]/5); record it for
+    // base-specifier pack per [temp.variadic]/9); record it for
     // instantiation-time expansion (expand_member_initializer_packs).
     init.set(ID_ellipsis, true);
   }
@@ -5984,7 +5985,7 @@ bool Parser::rMemberInit(exprt &init)
 /// concepts), bool literals, parenthesized constraint-expressions and
 /// their !/&&/|| combinations.  The general rConditionalExpr cannot
 /// parse a multi-argument concept-id here (it reads the '<' as
-/// less-than, [temp.names]/4 requires recognising the concept), so
+/// less-than, [temp.names]/3.2 requires recognising the concept), so
 /// parse the restricted grammar directly with rName, which does
 /// consume template argument lists for known templates.
 /// N5008 [temp.pre]/1: after `template-head requires-clause' comes the
@@ -6225,7 +6226,7 @@ bool Parser::rName(irept &name)
 
                 // For qualified names (A::B<), check whether the
                 // qualifier is dependent.  Only then treat '<' as
-                // less-than per [temp.names]/4.
+                // less-than per [temp.names]/3.
                 if(found == nullptr)
                 {
                   for(std::size_t i = components.size(); i >= 2; --i)
@@ -7066,7 +7067,7 @@ bool Parser::rArgDeclList(irept &arglist)
       if(lex.LookAhead(0) == TOK_ELLIPSIS)
       {
         lex.get_token(tk);
-        // [temp.variadic]/3,5: a `...` immediately following a parameter
+        // [temp.variadic]/2,6.1: a `...` immediately following a parameter
         // declaration with no separating comma -- e.g. `f(Args...)` -- is a
         // function parameter pack, not a C-style variadic ellipsis (which is
         // written with a preceding comma, `f(T, ...)`, or alone, `f(...)`).
@@ -7418,7 +7419,7 @@ bool Parser::rFunctionArguments(exprt &args)
        (lex.LookAhead(1)==')' || lex.LookAhead(1)==','))
     {
       lex.get_token(tk);
-      // N5008 [temp.variadic]/5: a pack expansion in a function-call
+      // N5008 [temp.variadic]/6.5: a pack expansion in a function-call
       // argument list (`pattern...`).  Mark the just-parsed argument as a
       // pack expansion so that template substitution expands it into one
       // argument per pack element.  (Previously the ellipsis was silently
@@ -7672,7 +7673,7 @@ bool Parser::rEnumBody(irept &body)
 /// alike into a merged_type whose subtypes are the attribute nodes and the
 /// class; the remainder of parsing and, for a class TEMPLATE, the
 /// typechecker's `is_class_template()` test expect the class node itself
-/// (N5008 [dcl.attr.grammar]/5: an attribute appertains to the entity it
+/// (N5008 [class.pre]/2: an attribute appertains to the entity it
 /// follows).  Attributes are folded only when every merged subtype is
 /// recognised (conservative); nested merged_types (`packed, aligned(16)`
 /// parsed into one attribute group) are flattened first.
@@ -7737,7 +7738,7 @@ void Parser::unwrap_attributed_class_spec(typet &spec)
     {
       // `struct alignas(16) S { ... } __attribute__((aligned(4)))': the
       // class-head alignas is already on the class node; g++ takes the
-      // strictest of the specifiers ([dcl.align]/5)
+      // strictest of the specifiers ([dcl.align]/4)
       const exprt &existing =
         static_cast<const exprt &>(unwrapped.find(ID_C_alignment));
       const auto existing_value = existing.is_nil()
@@ -8017,7 +8018,7 @@ bool Parser::rBaseSpecifiers(irept &bases)
 
       // N5008 [class.derived.general] grammar: a base-specifier may be a
       // pack expansion; record it for instantiation-time expansion
-      // ([temp.variadic]/5.2).
+      // ([temp.variadic]/6.6).
       base.set(ID_ellipsis, true);
     }
 
@@ -8215,12 +8216,13 @@ void Parser::apply_pragma_pack(cpp_declarationt &declaration, int pack)
 }
 
 /*
-  access.declaration                                  [class.access.dcl]
+  access.declaration                                  C++03 [class.access.dcl]
   : qualified.id ';'
 
   e.g. Base::member;
 
-  C++11 [class.access.dcl] (deprecated, prefer using-declaration)
+  C++03 [class.access.dcl] (deprecated there and removed in C++11; a
+  using-declaration replaces it)
 */
 bool Parser::rAccessDecl(cpp_declarationt &mem)
 {
@@ -8302,7 +8304,7 @@ bool Parser::rCommaExpression(exprt &exp)
 }
 
 /*
-  assignment.expression                               [expr.ass]
+  assignment.expression                               [expr.assign]
   : conditional.expression
   | logical.or.expression assignment.operator initializer.clause
   | throw.expression
@@ -9309,15 +9311,15 @@ bool Parser::rTypeName(typet &tname)
 
   tname.swap(declarator.type());
 
-  // N5008 [dcl.fct]/6-7: a cv-qualifier-seq (and ref-qualifier) after the
-  // parameter list of a function declarator is part of the FUNCTION type
-  // (it qualifies the implicit object parameter, `int (S::*)(int) const`).
-  // rDeclarator reports it separately as the declarator's method qualifier;
-  // a type-id has no declarator to keep it on, so attach it to the innermost
-  // function type it belongs to.  It was previously merged into the type as
-  // if it were a cv-qualifier of the declared type, which turned
-  // `int (S::*)(int) const` into a pointer-to-member of `const int` with the
-  // return type lost (the alias-declaration spelling; the typedef spelling
+  // N5008 [dcl.fct]/10, [over.match.funcs.general]/4: a cv-qualifier-seq (and
+  // ref-qualifier) after the parameter list of a function declarator is part of
+  // the FUNCTION type (it qualifies the implicit object parameter, `int
+  // (S::*)(int) const`).  rDeclarator reports it separately as the declarator's
+  // method qualifier; a type-id has no declarator to keep it on, so attach it
+  // to the innermost function type it belongs to.  It was previously merged
+  // into the type as if it were a cv-qualifier of the declared type, which
+  // turned `int (S::*)(int) const` into a pointer-to-member of `const int` with
+  // the return type lost (the alias-declaration spelling; the typedef spelling
   // keeps its declarator and never saw this).
   if(!declarator.method_qualifier().id().empty())
   {
@@ -9776,7 +9778,7 @@ bool Parser::rUnaryExpr(exprt &exp)
 }
 
 /*
-  throw.expression                                    [except.throw]
+  throw.expression                                    [expr.throw]
   : THROW {assignment.expression}
 
   C++11 [except] (A.13)
@@ -9936,7 +9938,7 @@ bool Parser::rSizeofExpr(exprt &exp)
       {
         exp=exprt(ID_sizeof);
         exp.add(ID_type_arg).swap(tname);
-        // [expr.sizeof]/5: this is a sizeof... pack-size query, not a
+        // [expr.sizeof]/4: this is a sizeof... pack-size query, not a
         // sizeof(type); mark it so type-checking counts the pack
         // elements rather than computing a type size.
         exp.set("#sizeof_pack", true);
@@ -9956,7 +9958,7 @@ bool Parser::rSizeofExpr(exprt &exp)
       {
         if(lex.get_token(cp) == ')')
         {
-          // [expr.sizeof]/5 + [temp.variadic]/8: a `sizeof...(P)` pack-size
+          // [expr.sizeof]/4 + [temp.variadic]/10: a `sizeof...(P)` pack-size
           // query counts the elements of the pack P; this is independent of
           // whether P is a type or a NON-type parameter pack.  A non-type pack
           // (e.g. `template<unsigned... Vs>`) does not parse as a type-id
@@ -10319,7 +10321,7 @@ bool Parser::rAllocateInitializer(exprt &init)
 
   init.clear();
 
-  // N5008 [expr.new]/17: `new T()` -- a new-initializer that is an
+  // N5008 [expr.new]/24: `new T()` -- a new-initializer that is an
   // empty pair of parentheses -- VALUE-initializes, whereas `new T`
   // (no new-initializer) default-initializes.  Both leave the operand
   // list empty, so record the parentheses for the type checker.
@@ -10342,7 +10344,7 @@ bool Parser::rAllocateInitializer(exprt &init)
     if(lex.LookAhead(0)==TOK_ELLIPSIS)
     {
       lex.get_token();
-      // N5008 [temp.variadic]/5: a pack expansion in a new-initializer's
+      // N5008 [temp.variadic]/6.5: a pack expansion in a new-initializer's
       // expression-list (`::new(p) T(std::forward<Args>(args)...)`, the
       // shape of allocator construct behind the standard containers).  Mark
       // the just-parsed argument as a pack expansion, exactly as
@@ -11262,7 +11264,7 @@ bool Parser::rPrimaryExpr(exprt &exp)
     {
       cpp_tokent suffix_tk;
       lex.LookAhead(0, suffix_tk);
-      // N5008 [lex.ext]/1, [lex.pptoken]/3.3: `64us' is one
+      // N5008 [lex.ext]/1, [lex.pptoken]/4.3: `64us' is one
       // pp-number, the user-defined-integer-literal `64' with ud-suffix
       // `us' (a user-defined-integer-literal has no integer-suffix).  The
       // shared C scanner takes `64u' as an integer literal with suffix
@@ -12094,7 +12096,7 @@ bool Parser::rVarNameCore(exprt &name)
         if(try_template_args)
         {
           // For qualified names where the member is not found by
-          // lookup, treat '<' as less-than per [temp.names]/4
+          // lookup, treat '<' as less-than per [temp.names]/3
           // only when the qualifier is dependent.
           bool is_dependent_member = false;
           if(!template_keyword_seen && components.size() >= 2)
@@ -12110,12 +12112,13 @@ bool Parser::rVarNameCore(exprt &name)
 
                   if(i >= 2 && components[i - 2].id() == ID_template_args)
                   {
-                    // [temp.names]/4: a template-id qualifier makes the member
-                    // dependent ONLY when its arguments involve a template
-                    // parameter.  A concrete instantiation such as `C<int>::`
-                    // is not dependent, so the member's `<` opens a
-                    // template-argument list.  (Mirrors rName; without this the
-                    // member of a concrete class-template-id -- the shape of
+                    // [temp.dep.type]/10.11, [temp.names]/3.2: a template-id
+                    // qualifier makes the member dependent ONLY when its
+                    // arguments involve a template parameter.  A concrete
+                    // instantiation such as `C<int>::` is not dependent, so the
+                    // member's `<` opens a template-argument list.  (Mirrors
+                    // rName; without this the member of a concrete
+                    // class-template-id -- the shape of
                     // `C<int>::al<char>::value` -- was wrongly treated as
                     // dependent and `<` parsed as less-than.)
                     const irept &qtargs = components[i - 2].find(ID_arguments);
@@ -14055,7 +14058,7 @@ bool Parser::rCondition(exprt &statement)
   declaration.statement                               [stmt.dcl]
   : block.declaration
 
-  block.declaration                                   [dcl.dcl]
+  block.declaration                                   [dcl.pre]
   : simple.declaration
   | asm.definition
   | namespace.alias.definition
@@ -14288,7 +14291,7 @@ Parser::rOtherDeclStatement(cpp_storage_spect &storage_spec, typet &cv_q)
       // a class TEMPLATE name without template arguments is not a type
       // ([temp.names], [dcl.type.simple]): `set(o);' in a constructor body
       // calls the member function `set' declared later in the class
-      // ([class.mem.general]/7), even with std::set in scope -- it is not a
+      // ([class.mem.general]/9.1), even with std::set in scope -- it is not a
       // declaration of o (CBMC's own object_factory_parameterst)
       decl_specifier_is_known_type =
         found != nullptr && found->is_type() &&

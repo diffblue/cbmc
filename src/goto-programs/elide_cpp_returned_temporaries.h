@@ -8,7 +8,7 @@ Author: Kiro
 
 /// \file
 /// Lower by-value returns of non-POD C++ class types to
-/// construct-into-caller-storage, implementing N5008 [class.copy.elis]
+/// construct-into-caller-storage, implementing N5008 [class.copy.elision]
 /// and [stmt.return]/2: the operand of a return statement initializes
 /// the function call's result object directly.  Without this lowering,
 /// the returned object is relocated bitwise through the return-value

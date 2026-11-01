@@ -110,7 +110,7 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
   {
     cpp_namet &name = static_cast<cpp_namet &>(base.add(ID_name));
 
-    // N5008 [temp.variadic]/7: a base-specifier template argument that is a
+    // N5008 [temp.variadic]/16: a base-specifier template argument that is a
     // pack expansion (`X...`) over a pack empty in this instantiation expands
     // to an empty argument list, e.g. `Empty<_Tail...>` -> `Empty<>`.
     drop_empty_pack_template_args(name);
@@ -168,7 +168,7 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
       }
       if(has_param)
       {
-        // N5008 [temp.variadic]/5: substitute the WHOLE template-id, not
+        // N5008 [temp.variadic]/9: substitute the WHOLE template-id, not
         // each argument on its own.  A pack expansion `A...` is a single
         // argument node that must become one argument per pack element;
         // applying the map per argument could only replace it by the
@@ -196,27 +196,25 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
     }
     else
     {
-      // N5008 [class.derived]/2 + [temp.inst]/3: during template
-      // instantiation, failure to resolve ONE base-specifier (e.g. the
-      // `__is_destructible_impl<...>::type` SFINAE machinery of a
-      // libstdc++ trait) must not abandon the OTHER bases: the sibling
-      // bases are independently valid, and dropping them all left e.g.
+      // N5008 [class.derived.general]/2: during template instantiation, failure
+      // to resolve ONE base-specifier (e.g. the
+      // `__is_destructible_impl<...>::type` SFINAE machinery of a libstdc++
+      // trait) must not abandon the OTHER bases: the sibling bases are
+      // independently valid, and dropping them all left e.g.
       // std::optional<std::string> without its _Optional_base -- its
-      // constructors' member initializers then crashed the front end on
-      // a derived-to-base cast between "unrelated" structs
-      // (make_ptr_typecast precondition).  Recover per base: nil this
-      // entry (the same graceful degradation the non-throwing failure
-      // paths below use) and continue with the next.  User-code base
-      // errors outside instantiation still throw.
-      // N5008 [temp.names]/8 + [temp.res.general]: within an
-      // instantiated declaration a template parameter denotes its bound
+      // constructors' member initializers then crashed the front end on a
+      // derived-to-base cast between "unrelated" structs (make_ptr_typecast
+      // precondition).  Recover per base: nil this entry (the same graceful
+      // degradation the non-throwing failure paths below use) and continue with
+      // the next.  User-code base errors outside instantiation still throw.
+      // N5008 [temp.param]/7.1, [temp.dep.type]/3 + [temp.res.general]: within
+      // an instantiated declaration a template parameter denotes its bound
       // argument.  When the base-specifier is a BARE template parameter
-      // (`renamedt<T> : T`) and the active template map binds it, use
-      // the binding directly: scope-based resolution of the parameter
-      // name fails when the instance is completed from a context where
-      // the original template scope chain is not entered (the
-      // incomplete-to-complete swap; the map there is built from the
-      // instance's recorded arguments).
+      // (`renamedt<T> : T`) and the active template map binds it, use the
+      // binding directly: scope-based resolution of the parameter name fails
+      // when the instance is completed from a context where the original
+      // template scope chain is not entered (the incomplete-to-complete swap;
+      // the map there is built from the instance's recorded arguments).
       bool base_from_map = false;
       if(name.get_sub().size() == 1 && name.get_sub().front().id() == ID_name)
       {
@@ -318,7 +316,7 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
     {
       // N5008 [class.derived.general]/2 requires a complete base; this
       // point of instantiation was reached EAGERLY from a context that
-      // per [temp.inst]/1 does not require the specialization's
+      // per [temp.inst]/2 does not require the specialization's
       // definition (e.g. the return type of a function DECLARATION,
       // `renamedt<ssa_exprt> f(const ssa_exprt&);` with ssa_exprt still
       // incomplete).  Drop the base to keep going, but MARK the class:
@@ -610,8 +608,8 @@ void cpp_typecheckt::add_base_components(
   };
 
   // An EMPTY base class has no storage member of its own -- only the byte
-  // that makes it a nonzero-sized complete object ([class]/4).  As a base
-  // subobject it may have zero size ([intro.object]/9; the Itanium ABI's
+  // that makes it a nonzero-sized complete object ([class.pre]/7).  As a base
+  // subobject it may have zero size ([intro.object]/8; the Itanium ABI's
   // empty base optimisation): drop its padding on flattening.
   bool base_is_empty = true;
   for(const auto &c : from.components())

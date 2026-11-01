@@ -27,7 +27,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <map>
 #include <optional>
 
-// N5008 [expr.const]/5, [class.temporary]: the value of a temporary of
+// N5008 [expr.const]/22, [class.temporary]: the value of a temporary of
 // literal class type -- for a class-type template argument
 // ([temp.arg.nontype]/1), a value-initialized `T()' or a constexpr object's
 // initializer.  Handles a single initializing operand (a struct constant or
@@ -205,7 +205,7 @@ struct array_pointert
 
 /// Whether \p symbol is an array object whose value a constant evaluation
 /// may read: one with static storage duration initialized by an array
-/// constant, or -- N5008 [expr.const]/4, /7 -- a constexpr variable of any
+/// constant, or -- N5008 [expr.const]/9, /7 -- a constexpr variable of any
 /// storage duration, which is usable in constant expressions (constexpr
 /// declares the object const, [dcl.constexpr]/6, and its initializer is a
 /// constant expression).  The latter is libc++'s `constexpr _CCC
@@ -330,7 +330,7 @@ make_array_pointer(const array_pointert &ap, const typet &pointer_type)
 }
 
 /// `*p' for a tracked array pointer: the element (a string literal's
-/// terminating null included, [lex.string]/9), or nothing when the index is
+/// terminating null included, [lex.string]/10), or nothing when the index is
 /// out of range
 static std::optional<exprt> array_pointer_deref(
   const array_pointert &ap,
@@ -410,7 +410,7 @@ bool is_constexpr_call_argument(
 {
   if(e.id() == ID_symbol)
     return false;
-  // [expr.const]/11: the address of (an element of) an object with static
+  // [expr.const]/4.1: the address of (an element of) an object with static
   // storage duration -- a constexpr array, the backing array of a
   // std::initializer_list argument (`{ &arr[0], 3 }', [dcl.init.list]/6);
   // such a pointer is tracked by array and index
@@ -488,7 +488,7 @@ public:
   }
 
   /// As is_constant_value, also for an aggregate with aggregate members or
-  /// members that point into a constant array ([expr.const]/14: a pointer
+  /// members that point into a constant array ([expr.const]/4.1, /5: a pointer
   /// to an element of a string literal is a permitted result) -- the
   /// `const C *' of a string_view built from a literal.
   static bool
@@ -594,7 +594,7 @@ public:
     const auto i = index.is_constant()
                      ? numeric_cast<mp_integer>(to_constant_expr(index))
                      : std::nullopt;
-    // [expr.const]/5.8: undefined behaviour is not a constant expression
+    // [expr.const]/10.8: undefined behaviour is not a constant expression
     if(!i.has_value() || *i < 0 || *i >= mp_integer{array->operands().size()})
       return nullptr;
     return &array->operands()[numeric_cast_v<std::size_t>(*i)];
@@ -703,7 +703,7 @@ public:
       }
       return is_constant_value(eval(e), symbol_table);
     }
-    // N5008 [expr.const]/5 (C++14 relaxed constexpr), [expr.ass]: an
+    // N5008 [expr.const]/10.16 (C++14 relaxed constexpr), [expr.assign]: an
     // assignment to an element of an array member of the object under
     // construction or of a local array, also of a multidimensional one
     // (`this->_Data[_Idx][0] = c' in the MSVC STL's _Digit_pair_table
@@ -766,7 +766,7 @@ public:
         return applied;
       }
     }
-    // N5008 [expr.const]/5 (C++14 relaxed constexpr): an assignment or
+    // N5008 [expr.const]/10.16 (C++14 relaxed constexpr): an assignment or
     // increment of an ELEMENT of a local array object whose lifetime began
     // within the evaluation -- `int __seen[_CCC_Size] = {}; ... ++__seen[t]'
     // in libc++'s __compute_comp_type.  Apply the effect to the element
@@ -788,7 +788,7 @@ public:
         !i.has_value() || *i < 0 ||
         *i >= mp_integer{array_it->second.operands().size()})
       {
-        return false; // [expr.const]/5.8: undefined behaviour is not constant
+        return false; // [expr.const]/10.8: undefined behaviour is not constant
       }
       const std::size_t position = numeric_cast_v<std::size_t>(*i);
       const irep_idt scratch{"#constexpr_array_element"};
@@ -931,12 +931,12 @@ public:
     return it == vars.end() ? static_cast<exprt>(nil_exprt()) : it->second;
   }
 
-  /// Is \p value the address of a subobject of a tracked local -- an
-  /// element `&a[k]' (constant k) or a member `&o.m', also nested -- i.e.,
-  /// a reference or pointer bound to it?  N5008 [expr.const]/5: such an
-  /// object's lifetime began within the evaluation, so reads and writes
-  /// through it are permitted (`for(auto &e : t.data) e = 127;' in
-  /// libstdc++'s __from_chars_alnum_to_val_table<false>::_S_make_table).
+  /// Is \p value the address of a subobject of a tracked local -- an element
+  /// `&a[k]' (constant k) or a member `&o.m', also nested -- i.e., a reference
+  /// or pointer bound to it?  N5008 [expr.const]/10.9.3, /10.16: such an
+  /// object's lifetime began within the evaluation, so reads and writes through
+  /// it are permitted (`for(auto &e : t.data) e = 127;' in libstdc++'s
+  /// __from_chars_alnum_to_val_table<false>::_S_make_table).
   bool is_subobject_alias(const exprt &value)
   {
     if(value.id() != ID_address_of || value.operands().size() != 1)
@@ -1033,7 +1033,7 @@ public:
 
   exprt eval(const exprt &e)
   {
-    // N5008 [expr.type.conv]/2: `T{...}' is a prvalue of class type T whose
+    // N5008 [expr.type.conv]/1.4: `T{...}' is a prvalue of class type T whose
     // value is its initializer; the front end wraps the struct in a compound
     // literal (`return P{1, 2};' in a constexpr function)
     if(
@@ -1137,7 +1137,7 @@ public:
         // N5008 [dcl.init.ref]: a REFERENCE TO ARRAY parameter
         // (`const bool (&m)[N]', libc++'s `__find_idx') bound to a static
         // constexpr array denotes the whole array -- its constant value --
-        // so `m[i]' below indexes the array constant ([expr.const]/5.9)
+        // so `m[i]' below indexes the array constant ([expr.const]/10.9.2)
         if(
           e.type().id() == ID_array && it->second.id() == ID_address_of &&
           is_constant_array_object(
@@ -1236,7 +1236,7 @@ public:
     }
     if(e.id() == ID_side_effect && e.get(ID_statement) == ID_temporary_object)
     {
-      // N5008 [expr.type.conv]/2, [class.temporary]: `return T(args)' -- a
+      // N5008 [expr.type.conv]/1.4, [class.temporary]: `return T(args)' -- a
       // temporary constructed from arguments that may name tracked variables
       // (`sv(p + pos, len)' in string_view::substr): evaluate the arguments
       // of the initializing constructor call, then the temporary
@@ -1459,7 +1459,7 @@ public:
     }
     if(code.get_statement() == ID_dowhile)
     {
-      // C++ [stmt.dowhile]: the body is executed BEFORE the condition is
+      // C++ [stmt.do]: the body is executed BEFORE the condition is
       // evaluated.  Needed for e.g. libstdc++ chrono duration's constexpr
       // `_S_gcd`, whose do-while body computes the gcd used in the
       // `__divide` member alias's default template arguments; without it
@@ -1645,7 +1645,7 @@ static exprt evaluate_constexpr_call(
 {
   if(expr.id() != ID_side_effect)
     return nil_exprt();
-  // N5008 [expr.const]/5, [class.temporary]: a temporary of literal class
+  // N5008 [expr.const]/22, [class.temporary]: a temporary of literal class
   // type initialised by a constexpr constructor (`Fixed(42)`, `Fixed{42}`
   // as a class-type template argument, [temp.arg.nontype]/1) -- evaluate
   // the constructor call the temporary's initializer holds; its result is
@@ -1861,7 +1861,7 @@ static exprt evaluate_constexpr_call(
   {
     if(result->is_constant())
       return *result;
-    // a class prvalue ([expr.const]/14: a constant expression of class type
+    // a class prvalue ([expr.const]/22: a constant expression of class type
     // whose members are constants), `return P{1, 2};' or a string_view built
     // by a consteval function (GCC 16's _Escapes<_CharT>::_S_tab())
     if(
@@ -1870,7 +1870,7 @@ static exprt evaluate_constexpr_call(
     {
       return *result;
     }
-    // a pointer into a constant array ([expr.const]/11: the address of an
+    // a pointer into a constant array ([expr.const]/4.1: the address of an
     // element of a static object; initializer_list::begin())
     if(array_pointer(*result, symbol_table))
       return *result;

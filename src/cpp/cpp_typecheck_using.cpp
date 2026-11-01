@@ -59,7 +59,7 @@ void cpp_typecheckt::convert(cpp_usingt &cpp_using)
   auto id_set = cpp_scopes.current_scope().lookup(
     base_name, qualified ? cpp_scopet::QUALIFIED : cpp_scopet::RECURSIVE);
 
-  // Per [namespace.udecl]/3 (C++11+): a using-declaration of the
+  // Per [namespace.udecl]/1 (C++11+): a using-declaration of the
   // form `using Base::name;` must find `name` either in `Base` OR
   // in any (transitively) inherited class of `Base`.  Our QUALIFIED
   // scope lookup only searches within the immediate class scope, so

@@ -45,7 +45,7 @@ template_mapt::function_parameter_pack(const typet &param_type) const
     const auto p = key.rfind("::");
     return p != std::string::npos ? key.substr(p + 2) : key;
   };
-  // N5008 [temp.deduct]/5 + [basic.scope.temp]/2: while a template is
+  // N5008 [temp.deduct.general]/5 + [basic.scope.temp]/2: while a template is
   // being deduced (deduction_parameters non-empty) and one of ITS OWN
   // packs has this short name, only that pack's binding may drive the
   // expansion -- the flat map also holds same-named packs of enclosing
@@ -93,7 +93,7 @@ void template_mapt::expand_parameter_packs(typet &function_type) const
       const std::vector<typet> *pack = function_parameter_pack(
         static_cast<const typet &>(parameter.find(ID_type)));
 
-      // N5008 [temp.variadic]/5: the pattern of a pack expansion need not
+      // N5008 [temp.variadic]/8: the pattern of a pack expansion need not
       // be the bare pack.  `_Bind<__func_type(typename decay<_BoundArgs>::
       // type...)>` (libstdc++'s _Bind_helper, the type of every std::bind
       // result) and `B<F(decay<Bs>...)>` name the pack INSIDE the
@@ -192,7 +192,7 @@ void template_mapt::expand_parameter_packs(typet &function_type) const
                   shadow(element_map.pack_args_map);
                   shadow(element_map.pack_size_map);
                   shadow(element_map.pack_expr_map);
-                  // [temp.deduct]/5: while a function template is being
+                  // [temp.deduct.general]/5: while a function template is being
                   // deduced, apply() substitutes a short name only from that
                   // template's own parameters (deduction_parameters).  The
                   // element binding belongs to the CLASS template whose
@@ -215,7 +215,7 @@ void template_mapt::expand_parameter_packs(typet &function_type) const
 
       if(pack != nullptr)
       {
-        // [temp.variadic]/5: replace the pack-expansion parameter with
+        // [temp.variadic]/9: replace the pack-expansion parameter with
         // one parameter per deduced pack element.
         //
         // When more than one element is produced, give each replicated
@@ -245,7 +245,7 @@ void template_mapt::expand_parameter_packs(typet &function_type) const
         // function type, as typecheck_compound_declarator does for the
         // expansions it performs itself: the method-body drain reads
         // #expanded_param_packs to expand the body's `forward<A>(args)...`
-        // to the same names.  N5008 [temp.variadic]/7: a pack of ZERO
+        // to the same names.  N5008 [temp.variadic]/16: a pack of ZERO
         // elements must be recorded too -- the parameter disappears here,
         // and without the record the body kept a reference to the dead
         // name (`symbol 'args' is unknown`; every `std::function<R()>`
@@ -319,7 +319,7 @@ void template_mapt::expand_parameter_packs(typet &function_type) const
 
 /// Substitute, in place, every reference to the type parameter pack named
 /// \p base (matched by short-name suffix) appearing inside \p n with the
-/// concrete element type \p elem ([temp.variadic]/5): in the k-th expanded
+/// concrete element type \p elem ([temp.variadic]/9): in the k-th expanded
 /// copy of a pack expansion the pack reference becomes the k-th deduced
 /// element type.  The pack reference is replaced both when it is a node's
 /// `ID_type` (a type template argument) and when it is a bare `cpp_name`
@@ -329,7 +329,7 @@ void template_mapt::expand_parameter_packs(typet &function_type) const
 /// [dcl.ref] reference collapsing).
 void replace_type_pack_ref(irept &n, const std::string &base, const typet &elem)
 {
-  // N5008 [expr.sizeof]/5: in `sizeof...(P)` the pack name is the operand
+  // N5008 [expr.sizeof]/4: in `sizeof...(P)` the pack name is the operand
   // of a pack-size QUERY, not a reference to an element -- it must stay
   // unsubstituted so the query is later answered from pack_size_map
   // (mirrors template_mapt::apply's guard).
@@ -386,7 +386,7 @@ void replace_type_pack_ref(irept &n, const std::string &base, const typet &elem)
 /// Value analogue of \ref replace_type_pack_ref for NON-TYPE parameter
 /// packs: substitutes the pack's i-th VALUE for bare `cpp_name`
 /// references to \p base anywhere in the pattern (N5008
-/// [temp.variadic]/5 -- the i-th expansion element instantiates the
+/// [temp.variadic]/9 -- the i-th expansion element instantiates the
 /// pattern with the i-th pack element).  Needed for a non-type pack
 /// referenced inside a TYPE pattern, e.g. `_Idx` in
 /// `tuple_types<__type_pack_element<_Idx, _Types...>...>` (libc++'s
@@ -414,7 +414,7 @@ void replace_value_pack_ref(
 
   // a template argument the parser could not classify (`seq<Is..., Js>')
   // is an `ambiguous' node holding the name as a type; naming the value
-  // pack, it is that value ([temp.arg.general]/2)
+  // pack, it is that value ([temp.variadic]/9)
   const auto is_ambiguous_pack_ref = [&is_pack_ref](const irept &t)
   { return t.id() == ID_ambiguous && is_pack_ref(t.find(ID_type)); };
 
@@ -434,7 +434,7 @@ void replace_value_pack_ref(
   }
 }
 
-/// N5008 [temp.variadic]/5,7: "all of the parameter packs expanded by a
+/// N5008 [temp.variadic]/8,9: "all of the parameter packs expanded by a
 /// pack expansion shall have the same number of arguments", and the k-th
 /// element of the expansion instantiates the pattern with the k-th element
 /// of EVERY pack it expands.  \p copy is the k-th instance of a pattern whose
@@ -474,7 +474,7 @@ void template_mapt::substitute_other_packs_lockstep(
 void template_mapt::expand_call_argument_packs(irept &n, bool only_nontype)
   const
 {
-  // N5008 [temp.inst]/2: instantiating a class template does not instantiate
+  // N5008 [temp.inst]/3.1: instantiating a class template does not instantiate
   // its member TEMPLATES -- their bodies still reference their OWN parameter
   // packs, to be expanded only when the member template itself is
   // instantiated.  Recursing into a nested template declaration here would
@@ -501,7 +501,7 @@ void template_mapt::expand_call_argument_packs(irept &n, bool only_nontype)
     return;
   }
 
-  // N5008 [temp.variadic]/5 + [expr.new]: a new-initializer's
+  // N5008 [temp.variadic]/6.5 + [expr.new]: a new-initializer's
   // expression-list is a pack-expansion context exactly like a
   // function-call argument list -- e.g. std::construct_at's trailing return
   // type `decltype(::new((void*)0) _Tp(declval<_Args>()...))`.  So is a
@@ -532,7 +532,7 @@ void template_mapt::expand_call_argument_packs(irept &n, bool only_nontype)
 
     bool changed = false;
     irept::subt new_args;
-    // N5008 [temp.variadic]/5: a pack name is expanded by the innermost pack
+    // N5008 [temp.variadic]/8: a pack name is expanded by the innermost pack
     // expansion containing it.  While an argument's own expansion is
     // processed, its nested expansions (the `Is...' and `ls...' of
     // `f(seq<Is..., Js>{}, ls...)...', over Js) are set aside, so they
@@ -595,7 +595,7 @@ void template_mapt::expand_call_argument_packs(irept &n, bool only_nontype)
       const std::vector<typet> *elems = nullptr;
       // Or a NON-type parameter pack whose element VALUES are recorded in
       // pack_expr_map (e.g. the `I` in `add(I...)`, a non-type template
-      // parameter pack expanded as call arguments -- N5008 [temp.variadic]/5).
+      // parameter pack expanded as call arguments -- N5008 [temp.variadic]/9).
       const std::vector<exprt> *val_elems = nullptr;
       std::string base;
       bool empty_pack = false;
@@ -680,7 +680,7 @@ void template_mapt::expand_call_argument_packs(irept &n, bool only_nontype)
         // argument -- e.g. the `Args` inside the reference type of
         // `static_cast<Args&&>(a)` (libstdc++'s variadic `std::__invoke`
         // forwarding cast), which is not surfaced by ID_type because it sits
-        // inside the reference.  Check both.  [temp.variadic]/5,6.
+        // inside the reference.  Check both.  [temp.variadic]/8.
         if(match_pack(m.find(ID_type)) || match_pack(m))
           return;
         for(const auto &s : m.get_sub())
@@ -690,7 +690,7 @@ void template_mapt::expand_call_argument_packs(irept &n, bool only_nontype)
       };
       find(arg);
 
-      // N5008 [temp.variadic]/5: a NON-type parameter pack expanded as call
+      // N5008 [temp.variadic]/9: a NON-type parameter pack expanded as call
       // arguments (`add(I...)`) -- expand to one argument per element,
       // substituting the pack's k-th VALUE for its bare cpp_name reference.
       if(val_elems != nullptr)
@@ -750,7 +750,7 @@ void template_mapt::expand_call_argument_packs(irept &n, bool only_nontype)
           // (cpp_namet::has_template_args).  With the pack now expanded
           // to a concrete element the ambiguity is GONE -- normalise the
           // copy so the element resolves as a template-id
-          // ([temp.names]/2).  Local to this expansion; parse trees
+          // ([temp.names]/3.3).  Local to this expansion; parse trees
           // elsewhere keep their shape (several consumers key on the
           // id-less form to mean "maybe a comparison").
           std::function<void(irept &)> normalize_targs = [&](irept &m)
@@ -783,7 +783,7 @@ void template_mapt::expand_call_argument_packs(irept &n, bool only_nontype)
 
       if(empty_pack)
       {
-        // N5008 [temp.variadic]/7: an expansion over an empty pack
+        // N5008 [temp.variadic]/16: an expansion over an empty pack
         // instantiates to an empty list, in either mode -- the pattern is
         // not re-expanded, only removed, so the concern of only_nontype
         // (re-expanding an already expanded function-parameter pack against
@@ -805,7 +805,7 @@ void template_mapt::expand_call_argument_packs(irept &n, bool only_nontype)
           new_args.push_back(arg);
           continue;
         }
-        // N5008 [temp.variadic]/4,5: the argument carries `...` (so it is a
+        // N5008 [temp.variadic]/5,6: the argument carries `...` (so it is a
         // pack expansion) but its pattern references no *type* parameter pack
         // -- it is a *value* parameter pack expansion, e.g. `f(a...)` whose
         // `a` is a function parameter pack (the shape of a by-value variadic
@@ -813,7 +813,7 @@ void template_mapt::expand_call_argument_packs(irept &n, bool only_nontype)
         // no type to substitute; the expansion is N copies of the pattern,
         // each referencing the single in-scope value parameter (whose deduced
         // element type fixes the call-argument's type), where N is the common
-        // length of the packs in the expansion ([temp.variadic]/5).  Use the
+        // length of the packs in the expansion ([temp.variadic]/9).  Use the
         // unique non-zero deduced pack size; if every deduced pack is empty the
         // expansion is empty (drop the argument); if the size is ambiguous
         // (several distinct non-zero sizes) leave the argument untouched.
@@ -832,7 +832,7 @@ void template_mapt::expand_call_argument_packs(irept &n, bool only_nontype)
         // governs the expansion is unknown here.  With an EMPTY pack
         // among the bindings the length is genuinely ambiguous: the
         // value pack may well be governed by the empty one
-        // ([temp.variadic]/5 -- lengths come from the packs expanded in
+        // ([temp.variadic]/8 -- lengths come from the packs expanded in
         // the pattern, not from unrelated packs).  Expanding by an
         // unrelated non-zero size duplicated an EMPTY function-parameter
         // pack: `decltype(_Op()(_Idx..., __args...))` with `_Idx = {0,1}`
@@ -850,7 +850,7 @@ void template_mapt::expand_call_argument_packs(irept &n, bool only_nontype)
         // inside a member template being instantiated while `_Idx`
         // belongs to the ENCLOSING class instance, libc++
         // __perfect_forward's operator()).  Its governing pack is that
-        // unknown name ([temp.variadic]/5: lengths come from the packs
+        // unknown name ([temp.variadic]/8: lengths come from the packs
         // expanded in the pattern), so neither dropping nor sizing by
         // THIS map's packs is sound -- leave the argument for the
         // context that binds it (the method-body drain's class-pack
@@ -996,7 +996,7 @@ bool template_mapt::binds_reference(
 
 void template_mapt::apply(typet &type) const
 {
-  // N5008 [temp.variadic]/5: a `decltype` operand may contain a function-call
+  // N5008 [temp.variadic]/9: a `decltype` operand may contain a function-call
   // argument pack expansion (e.g. `decltype(declval<F>()(declval<A>()...))`,
   // the shape of libstdc++'s `__invoke_result`).  Expand it here -- before the
   // substitution recursion below -- so the operand becomes a concrete call
@@ -1007,7 +1007,7 @@ void template_mapt::apply(typet &type) const
   if(type.id() == ID_decltype)
     expand_call_argument_packs(type);
   // likewise for a decltype-specifier in a nested-name-specifier
-  // ([expr.prim.id.qual]/1: `typename decltype(f(g<Ts>()...))::type',
+  // ([expr.prim.id.qual]/3: `typename decltype(f(g<Ts>()...))::type',
   // the MSVC STL's _Meta_at_)
   else if(type.id() == ID_cpp_name)
   {
@@ -1058,7 +1058,7 @@ void template_mapt::apply(typet &type) const
   }
   else if(type.id()==ID_pointer)
   {
-    // N5008 [temp.variadic]/5: a pointer-to-function data member whose pointee
+    // N5008 [temp.variadic]/9: a pointer-to-function data member whose pointee
     // type contains a pack expansion of the enclosing class parameter pack --
     // e.g. the `_Res(*)(const _Any_data&, _ArgTypes&&...)` invoker pointer in
     // libstdc++'s `function<_Res(_ArgTypes...)>` -- must have that pack
@@ -1083,7 +1083,7 @@ void template_mapt::apply(typet &type) const
     // `const _Elements&...` constructor arguments -- are substituted.
     // As in the ID_pointer branch above, first expand an enclosing-class
     // parameter pack in a (pre-conversion) function-pointer pointee's
-    // parameter list ([temp.variadic]/5), so a function-pointer data member is
+    // parameter list ([temp.variadic]/9), so a function-pointer data member is
     // not collapsed to a single parameter.
     expand_parameter_packs(to_type_with_subtype(type).subtype());
     apply(to_type_with_subtype(type).subtype());
@@ -1141,7 +1141,7 @@ void template_mapt::apply(typet &type) const
                     }
                   }
                 }
-                // N5008 [temp.variadic]/5: an argument that NAMES a
+                // N5008 [temp.variadic]/8: an argument that NAMES a
                 // pack of two or more elements (a bare cpp_name, e.g.
                 // the `_Tp` of `__tuple_leaf<_Indx, _Tp>...`) belongs
                 // to the enclosing base-specifier pack expansion; it is
@@ -1202,7 +1202,7 @@ void template_mapt::apply(typet &type) const
       {
         irept &decl_type = op.add(ID_type);
 
-        // N5008 [dcl.typedef]/2, [temp.variadic]/5: a member
+        // N5008 [dcl.typedef]/2, [temp.variadic]/9: a member
         // alias-declaration of function type, `using F = void(T...);',
         // carries the function type in the declaration's type (not in a
         // declarator, see below); expand the class pack in its parameters
@@ -1237,12 +1237,12 @@ void template_mapt::apply(typet &type) const
           }
         }
 
-        // N5008 [temp.local]/1 + [basic.scope.temp]/2: a member template's
+        // N5008 [temp.local]/7 + [basic.scope.temp]/2: a member template's
         // own parameters shadow same-named parameters of an enclosing
         // template throughout its declaration.  Its body stores parameter
         // references as bare `cpp_name`s and its parameters are not yet
         // bound (they bind at the member's own instantiation,
-        // [temp.alias]/2, [temp.inst]/2); without a scope of their own,
+        // [temp.alias]/2, [temp.inst]/3.1); without a scope of their own,
         // apply()'s short-name scan bound e.g. the top-level `_Tp` of
         // `template<class _Tp, ...> using type = _Tp;` (libstdc++
         // `__conditional`) to an unrelated enclosing `_Tp`, baking the
@@ -1289,7 +1289,7 @@ void template_mapt::apply(typet &type) const
         if(is_member_template && !own_param_ids.empty())
         {
           parameter_scopes.push_back(own_param_ids);
-          // N5008 [temp.alias]/2 + [temp.variadic]/4-5: while substituting this
+          // N5008 [temp.alias]/2 + [temp.variadic]/8: while substituting this
           // member template's declaration during the enclosing class's
           // instantiation, its OWN parameter packs are not yet bound.  Record
           // their short names so the nested-pack expander defers any pack
@@ -1310,7 +1310,7 @@ void template_mapt::apply(typet &type) const
             apply(static_cast<typet &>(sub));
         }
 
-        // [temp.variadic]/5: expand a function parameter pack that names
+        // [temp.variadic]/9: expand a function parameter pack that names
         // the enclosing class template's parameter pack in a member
         // function declarator (e.g. `R operator()(A...)` of
         // `std::function<R(A...)>`), whose function type is carried by
@@ -1416,20 +1416,20 @@ void template_mapt::apply(typet &type) const
       // Try to match against type_map entries
       //
       // CONFORMANCE NOTE (Violation V1, see doc/architectural/
-      // cpp-frontend-review-2026-06-24-template-map-scope.md): a bare
-      // parameter reference carries only its SHORT NAME.  N5008
-      // [basic.scope.temp]/2 makes parameter identity scope + name; the
-      // active parameter scopes (parameter_scopes, innermost_parameter())
-      // supply the scope: when a template whose declaration or body is being
-      // substituted declares the name, only THAT parameter's binding may
-      // substitute.  The suffix scan across the flat map below is the
-      // fallback for references no active scope declares (an enclosing
-      // template's parameter bound by set() without build()).
-      // N5008 [basic.scope.temp]/2 + [temp.deduct]/5: when a template is
-      // being deduced and one of ITS OWN parameters has this short name,
-      // only that parameter's binding may substitute the reference; an
-      // unrelated same-short-name entry (the caller's binding) must not be
-      // baked into the deduced declaration.  See deduction_parameters.
+      // cpp-frontend-review-2026-06-24-template-map-scope.md): a bare parameter
+      // reference carries only its SHORT NAME.  N5008 [basic.scope.temp]/2
+      // makes parameter identity scope + name; the active parameter scopes
+      // (parameter_scopes, innermost_parameter()) supply the scope: when a
+      // template whose declaration or body is being substituted declares the
+      // name, only THAT parameter's binding may substitute.  The suffix scan
+      // across the flat map below is the fallback for references no active
+      // scope declares (an enclosing template's parameter bound by set()
+      // without build()).  N5008 [basic.scope.temp]/2 +
+      // [temp.deduct.general]/5: when a template is being deduced and one of
+      // ITS OWN parameters has this short name, only that parameter's binding
+      // may substitute the reference; an unrelated same-short-name entry (the
+      // caller's binding) must not be baked into the deduced declaration.  See
+      // deduction_parameters.
       bool base_is_deduction_parameter = false;
       for(const auto &dp : deduction_parameters)
       {
@@ -1444,7 +1444,7 @@ void template_mapt::apply(typet &type) const
         }
       }
 
-      // N5008 [basic.scope.temp]/2 + [temp.local]/1: when an active
+      // N5008 [basic.scope.temp]/2 + [temp.local]/7: when an active
       // template parameter scope declares this name, the reference denotes
       // THAT parameter; only its own binding may substitute (see
       // parameter_scopes).  The short-name scan below is then exact.
@@ -1573,7 +1573,7 @@ void template_mapt::apply(typet &type) const
                 break;
               }
             }
-            // N5008 [temp.names]/2: only a TEMPLATE-NAME may be
+            // N5008 [temp.names]/1, [temp.param]/7: only a TEMPLATE-NAME may be
             // followed by a template-argument-list.  Treating a
             // matched map entry as the template of `name<args...>` is
             // only sound for a TEMPLATE TEMPLATE parameter -- which
@@ -1723,7 +1723,7 @@ void template_mapt::apply(typet &type) const
                      // `<_Up, _Types...>` references get
                      // substituted.
             }
-            // N5008 [temp.names]/2: a name followed by a
+            // N5008 [temp.names]/1, [temp.param]/7.1: a name followed by a
             // template-argument-list is a TEMPLATE-NAME use.  A TYPE
             // parameter's binding must then not replace the whole
             // template-id either (that discards the argument list):
@@ -1775,7 +1775,7 @@ void template_mapt::apply(typet &type) const
         // correct behaviour; leaving it as the bare cpp_name causes
         // downstream `typecheck_template_args` to fail with
         // "too many template arguments".
-        // N5008 [temp.alias]/2 + [temp.inst]/2: a member alias template's OWN
+        // N5008 [temp.alias]/2 + [temp.inst]/3.1: a member alias template's OWN
         // parameter pack (deferred_own_pack_names) is not bound during the
         // enclosing instantiation -- it binds only at the alias's point of
         // use.  It must never be collapsed here: the suffix match below is by
@@ -1836,7 +1836,7 @@ void template_mapt::apply(typet &type) const
               }
             }
           }
-          // Per [temp.variadic]/5: a pack expansion `_Cond...` in a
+          // Per [temp.variadic]/6.8: a pack expansion `_Cond...` in a
           // template argument list may be represented as an
           // `ambiguous` node whose type is a `cpp_name` with
           // `ellipsis=true`.  Expand by matching the identifier
@@ -1902,7 +1902,7 @@ void template_mapt::apply(typet &type) const
           // Bare NON-type parameter pack `T...`: unlike a type pack, whose
           // ellipsis sits on the cpp_name TYPE, a non-type pack's ellipsis sits
           // on the `ambiguous` ARG node.  Expand to its element VALUES from
-          // pack_expr_map (N5008 [temp.variadic]/4-5).  Gated on the single
+          // pack_expr_map (N5008 [temp.variadic]/5-6).  Gated on the single
           // name actually naming a recorded non-type pack, so ordinary
           // arg-level-ellipsis arguments are untouched.
           if(
@@ -1928,7 +1928,7 @@ void template_mapt::apply(typet &type) const
                 was_pack = true;
             }
           }
-          // [temp.variadic]/4-5: a pack expansion whose pattern is not
+          // [temp.variadic]/5-6: a pack expansion whose pattern is not
           // simply the bare pack (e.g. `typename W<E>::type...`, where the
           // pack `E` is nested inside the pattern) must be expanded once
           // per pack element, with that element substituted for the pack
@@ -1939,7 +1939,7 @@ void template_mapt::apply(typet &type) const
           // compound type around the pack, `A &&...', `A *...' or
           // `const A...' (libc++'s bind: `__bind_return<..., tuple<_Args
           // &&...>>' in the return type of operator(), substituted during
-          // deduction, [temp.deduct]/5).
+          // deduction, [temp.deduct.general]/5).
           if(
             !was_pack && (arg.id() == "ambiguous" || arg.id() == ID_type) &&
             (static_cast<const exprt &>(arg).type().id() == ID_cpp_name ||
@@ -1972,7 +1972,7 @@ void template_mapt::apply(typet &type) const
                 // references it (e.g. `identity<E>::type...` with E = <>) is
                 // recognised as a pack expansion and collapses to zero
                 // arguments, rather than being left as a bare, unresolved pack
-                // reference (N5008 [temp.variadic]/4,7).
+                // reference (N5008 [temp.variadic]/5,8).
                 for(const auto &ps : pack_size_map)
                 {
                   if(binds_reference(ps.first, id2string(id)))
@@ -1986,7 +1986,7 @@ void template_mapt::apply(typet &type) const
             };
             collect(static_cast<const exprt &>(arg).type());
 
-            // [temp.alias]/2 + [temp.variadic]/4-5: if this pack expansion is
+            // [temp.alias]/2 + [temp.variadic]/8: if this pack expansion is
             // in a member alias template's body being substituted during the
             // enclosing class's instantiation, and its pattern references the
             // alias's OWN (not yet bound) parameter, leave it UNEXPANDED.
@@ -2032,7 +2032,7 @@ void template_mapt::apply(typet &type) const
                 return 0;
               };
               // All packs in a single expansion expand in lock-step and
-              // therefore must have the same length ([temp.variadic]/5).
+              // therefore must have the same length ([temp.variadic]/8).
               const std::size_t n = pack_len(*referenced_packs.begin());
               bool consistent = true;
               for(const auto &pid : referenced_packs)
@@ -2064,7 +2064,7 @@ void template_mapt::apply(typet &type) const
                   }
                   exprt element = static_cast<const exprt &>(arg);
                   element.type().remove(ID_ellipsis);
-                  // N5008 [temp.variadic]/5: the pattern may BE the bare
+                  // N5008 [temp.variadic]/9: the pattern may BE the bare
                   // pack reference (`A...`).  apply() resolves such a
                   // reference through the flat map's short-name bridge,
                   // which picks whichever same-named pack sorts first --
@@ -2114,7 +2114,7 @@ void template_mapt::apply(typet &type) const
           // than an `ambiguous` cpp_name (e.g. a comma-expression
           // `((void)Pred, true)...`, libc++'s __all/__is_same idiom) is
           // expanded later in typecheck_template_args, which folds the
-          // comma-operator per element ([temp.variadic]/4-5, [expr.comma]).
+          // comma-operator per element ([temp.variadic]/5-6, [expr.comma]).
           if(!was_pack)
             expanded_args.push_back(arg);
         }
@@ -2198,7 +2198,7 @@ static bool is_type_side_node(const irept &n)
 void template_mapt::apply(exprt &expr) const
 {
   // A `sizeof...(Pack)` pack-size query must keep its pack name unsubstituted:
-  // it is resolved against pack_size_map later ([expr.sizeof]/5).  In
+  // it is resolved against pack_size_map later ([expr.sizeof]/4).  In
   // particular, a single-element pack records a convenience type_map[Pack]
   // entry; substituting it here would turn `sizeof...(Pack)` into
   // `sizeof(<element type>)`.
@@ -2240,7 +2240,7 @@ void template_mapt::apply(exprt &expr) const
   // `!bool(Bn::value)' in libstdc++'s `__or_fn' pack expansion
   // (`__first_t<false_type, __enable_if_t<!bool(_Bn::value)>...>') only
   // for its first element, so `__or_<false_type, true_type>' was
-  // false_type ([temp.variadic]/5: the i-th element instantiates the
+  // false_type ([temp.variadic]/9: the i-th element instantiates the
   // pattern with the i-th pack element).
   for(auto &sub : expr.get_sub())
   {
@@ -2307,7 +2307,7 @@ void template_mapt::apply(exprt &expr) const
         const std::string target =
           id2string(inner.get_sub()[0].get(ID_identifier));
 
-        // N5008 [temp.variadic]/4-5: a bare NON-type parameter pack expansion
+        // N5008 [temp.variadic]/5-6: a bare NON-type parameter pack expansion
         // `T...` in a value-context template-id (e.g. `cnt<T...>::n`) expands
         // to ALL of the pack's element values, not a single scalar.  This is
         // the value-context analogue of the pack expansion in apply(typet).
@@ -2351,7 +2351,7 @@ void template_mapt::apply(exprt &expr) const
             continue;
         }
 
-        // N5008 [temp.variadic]/5: a parameter PACK may only be
+        // N5008 [temp.variadic]/8: a parameter PACK may only be
         // substituted by expanding it -- never by a scalar value.  A
         // pack name in a NON-expanded position (e.g. the `_Idx` of
         // `get<_Idx>()...`, whose `...` sits on the ENCLOSING call
@@ -2670,7 +2670,7 @@ void template_mapt::build(
       // guess_function_template_args leaves the LAST element there) --
       // apply() would concretize the pack reference in the parameter
       // pattern and the in-class replication could no longer identify
-      // the pack by name ([temp.variadic]/5).
+      // the pack by name ([temp.variadic]/9).
       for(const auto &tp : template_parameters)
       {
         if(!tp.get_bool(ID_ellipsis))
@@ -2757,7 +2757,7 @@ void template_mapt::build(
     shadow(pack_expr_map);
   }
 
-  // N5008 [temp.param]/14: a member template's template-parameter-list may
+  // N5008 [temp.param]/18: a member template's template-parameter-list may
   // contain MULTIPLE parameter packs when each is deducible from the
   // function parameters (e.g. std::pair's piecewise constructor
   // `template<class... _Args1, class... _Args2>
@@ -2794,7 +2794,7 @@ void template_mapt::build(
         // No deduction-recorded binding for this pack (a stored
         // instance's args being replayed, e.g. re-instantiating a
         // partial specialization's members).  Reconstruct the split
-        // positionally by KIND ([temp.variadic]/5: a type pack binds
+        // positionally by KIND ([temp.variadic]/9.1: a type pack binds
         // type arguments, a non-type pack binds constant arguments;
         // adjacent packs of different kinds are thus separable).  An
         // `empty_typet` argument at the pack's position is the
@@ -2831,7 +2831,7 @@ void template_mapt::build(
         if(type_pack && !ptypes.empty())
         {
           pack_args_map[pid] = std::move(ptypes);
-          // [temp.variadic]/7 convenience entry for single-element packs
+          // [temp.variadic]/9 convenience entry for single-element packs
           if(psz == 1)
             type_map[pid] = pack_args_map[pid].front();
         }
@@ -2857,7 +2857,7 @@ void template_mapt::build(
   const std::size_t nparams = template_parameters.size();
   const std::size_t nargs = instance.size();
   const std::size_t non_pack = has_pack ? nparams - 1 : nparams;
-  // N5008 [temp.variadic]/5,8: a type parameter pack binds the run of
+  // N5008 [temp.variadic]/5,10: a type parameter pack binds the run of
   // arguments not consumed by the non-pack parameters; `sizeof...` is its
   // element count (recorded below in pack_size_map/pack_args_map).
   //
@@ -2883,7 +2883,7 @@ void template_mapt::build(
     // way it then collapses pack expansions and `sizeof...(Pack)` to a single
     // element.  Packs are bound below via pack_size_map and pack_args_map (type
     // packs) / pack_expr_map (non-type packs), plus a single-element
-    // convenience entry, per [temp.variadic]/5,8.
+    // convenience entry, per [temp.variadic]/5,10.
     const bool is_pack = static_cast<int>(p) == pack_idx;
     if(is_pack)
       continue;
@@ -2947,7 +2947,7 @@ void template_mapt::build(
     if(!pack_types.empty())
     {
       pack_args_map[pack_id] = std::move(pack_types);
-      // Per [temp.variadic]/7: for single-element packs, also add
+      // Per [temp.variadic]/9: for single-element packs, also add
       // the type to type_map so template_map.apply() can substitute.
       if(pack_args_map[pack_id].size() == 1)
         type_map[pack_id] = pack_args_map[pack_id].front();
@@ -2955,7 +2955,7 @@ void template_mapt::build(
     else if(!pack_exprs.empty())
     {
       // Non-type parameter pack: bind its element VALUES (the value analogue
-      // of the type-pack branch above), per [temp.variadic]/5,8.  A
+      // of the type-pack branch above), per [temp.variadic]/5,9.  A
       // single-element non-type pack also gets a scalar expr_map convenience
       // entry, mirroring the type_map convenience.
       pack_expr_map[pack_id] = std::move(pack_exprs);
@@ -3028,7 +3028,7 @@ void template_mapt::set(
 
     // Record template template parameters (marked ID_is_template by
     // typecheck_template_parameters): only their bindings may act as
-    // the TEMPLATE-NAME of a template-id in apply() ([temp.names]/2).
+    // the TEMPLATE-NAME of a template-id in apply() ([temp.param]/7).
     if(parameter.get_bool(ID_is_template))
       template_template_parameters.insert(identifier);
   }
@@ -3042,7 +3042,7 @@ void template_mapt::set(
       // `ID_type`: this can occur during eager constexpr-eval when
       // a sub-instantiation is reached before the call's
       // arguments have been adjusted to the parameter's
-      // value-shape (see [temp.deduct]/8 — substitution failure is
+      // value-shape (see [temp.deduct.general]/8 — substitution failure is
       // not an error in immediate context).  Per the standard's
       // SFINAE rule, the right behaviour is a soft failure: leave
       // the binding unset; downstream lookup will produce a
@@ -3064,7 +3064,7 @@ void template_mapt::build_unassigned(
   const template_typet &template_type)
 {
   // deduction substitutes into this template's declaration
-  // ([temp.deduct]/5): its parameters are the innermost scope
+  // ([temp.deduct.general]/5): its parameters are the innermost scope
   push_parameter_scope(template_type);
   for(const auto &t : template_type.template_parameters())
   {
@@ -3083,7 +3083,7 @@ void template_mapt::build_unassigned(
       expr_map[t.get(ID_identifier)]=tmp;
     }
 
-    // [temp.deduct]/2: template argument deduction starts from a clean
+    // [temp.deduct.general]/1: template argument deduction starts from a clean
     // slate -- the parameters being deduced have no prior assignment.
     // A parameter pack additionally records its element list/size in
     // pack_args_map/pack_size_map; these must be cleared too.  Otherwise,

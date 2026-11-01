@@ -200,7 +200,7 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
   const std::vector<exprt> &args,
   bool copy_initialization)
 {
-  // [dcl.type.class.deduct]: deduction only applies to a class-template-id
+  // [dcl.type.simple]/3: deduction only applies to a class-template-id
   // written *without* a template-argument-list.
   for(const auto &sub : class_template_name.get_sub())
     if(sub.id() == ID_template_args)
@@ -211,7 +211,7 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
   // `__max_size_type`, with `template<class T> __max_size_type(T)`) also has a
   // TEMPLATE-classed scope entry, but that entry is a *function* template; it
   // does not make `C{...}` a class-template-argument-deduction context
-  // ([dcl.type.class.deduct] applies only to a class template).  Require the
+  // ([dcl.type.simple]/3 applies only to a class template).  Require the
   // entry to denote an actual class template, so an ordinary construction of
   // such a class (notably `C{...}` written inside C's own members, where the
   // injected-class-name makes the constructor template visible under the bare
@@ -627,7 +627,7 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
     }
   }
 
-  // Aggregate deduction candidate (N5008 [over.match.class.deduct]/1.8,
+  // Aggregate deduction candidate (N5008 [over.match.class.deduct]/1,
   // C++20): if the class has no constructors of its own, a hypothetical
   // guide is formed whose parameter types are the AGGREGATE ELEMENT
   // types; template arguments are deduced from the initializer per
@@ -753,7 +753,7 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
   //    parameter shared by several aggregate members (`Agg<T>{x, y}`) is fixed
   //    by the first argument, the rest being members of that same type.
   // No viable notional constructor: only explicit ones would have deduced
-  // ([over.match.class.deduct]/1: the deduction fails; the positional
+  // ([over.match.class.deduct]/5: the deduction fails; the positional
   // fallback below would stand in for the excluded explicit constructor)
   if(deduced_types.empty() && skipped_explicit_constructor)
     return {};
@@ -785,7 +785,7 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
   return result;
 }
 
-/// N5008 [dcl.fct]/22: a function declaration with a placeholder (`auto')
+/// N5008 [dcl.fct]/20: a function declaration with a placeholder (`auto')
 /// parameter type is an abbreviated function template; each such parameter
 /// introduces an invented template type parameter.  Applied to namespace-
 /// scope declarations and to member declarations (a constructor
@@ -903,7 +903,7 @@ bool cpp_typecheckt::convert_explicit_instantiation(
   if(!cpp_name.has_template_args())
   {
     // `template long twice(long);' -- the arguments are deduced from the
-    // function type ([temp.explicit]/2, [temp.deduct.decl]).  Nothing needs
+    // function type ([temp.explicit]/4, [temp.deduct.decl]).  Nothing needs
     // declaring: the specialization is instantiated on use exactly as an
     // implicit instantiation would be.  Declared as written, it introduced
     // a bodiless NON-template `twice(long)' that hid the template.
@@ -946,14 +946,14 @@ bool cpp_typecheckt::convert_explicit_instantiation(
   }
   // `template int box<char>::put(long);' -- a member function template of
   // a class template specialization, its own template arguments deduced
-  // from the function type ([temp.explicit]/2, [temp.deduct.decl]): as
+  // from the function type ([temp.explicit]/4, [temp.deduct.decl]): as
   // above, the specialization is instantiated on use.  Declared as written,
   // a bodiless non-template `put(long)' hid the member template.
   if(template_args_non_tc.is_nil())
     return !id_set.empty();
 
   // Several member templates of that name (overloads, e.g. rename(exprt,
-  // ns) and rename(typet &, id, ns)): N5008 [temp.explicit]/4 selects the
+  // ns) and rename(typet &, id, ns)): N5008 [temp.deduct.decl]/1 selects the
   // one whose declaration matches the explicit instantiation's declarator.
   // Approximate by the number of function parameters; if that does not
   // single one out, accept the declaration without instantiating anything
@@ -1118,7 +1118,7 @@ void cpp_typecheckt::convert_non_template_declaration(
         if(params.get_sub().size() > 0)
         {
           cpp_save_scopet save_scope(cpp_scopes);
-          // N5008 [dcl.fct]/8: the parameters are in scope in the
+          // N5008 [basic.scope.param]/1.1: the parameters are in scope in the
           // trailing return type -- but only for ITS typecheck.  This
           // conversion may run at NAMESPACE scope (the deduction-time
           // skeleton instantiation under
@@ -1142,7 +1142,7 @@ void cpp_typecheckt::convert_non_template_declaration(
               static_cast<const cpp_declarationt &>(p);
             if(pdecl.declarators().empty())
               continue;
-            // N5008 [dcl.meaning.general]/1: the decl-specifier type
+            // N5008 [dcl.meaning.general]/5: the decl-specifier type
             // modified by the declarator (`X *p' declares a pointer)
             typet ptype = pdecl.declarators().front().merge_type(pdecl.type());
             typecheck_type(ptype);
@@ -1205,7 +1205,7 @@ void cpp_typecheckt::convert_non_template_declaration(
         // converted here).  Clearing the flag on the way out made the outer
         // resolver elaborate `std::basic_string<char, ..., polymorphic_
         // allocator<char>>` while polymorphic_allocator was still only
-        // declared -- an instantiation N5008 [temp.inst]/1 does not permit
+        // declared -- an instantiation N5008 [temp.inst]/2 does not permit
         // (an alias declaration does not require a complete type), which
         // left the class laid out with an incomplete member and, for user
         // code, a member never constructed.
@@ -1269,7 +1269,7 @@ void cpp_typecheckt::convert_non_template_declaration(
         }
         if(!ctad_done)
         {
-          // N5008 [dcl.fct]/12 + [temp.inst]/1: the return type of a
+          // N5008 [dcl.fct.def.general]/2 + [temp.inst]/2: the return type of a
           // FUNCTION DECLARATION (no definition here) may be incomplete, so
           // naming a class template specialization there does not
           // instantiate it -- `std::set<late> make();' with `late' only
@@ -1367,7 +1367,7 @@ void cpp_typecheckt::convert_non_template_declaration(
     if(
       d.type().id() == ID_function_type && d.value().is_nil() && !is_typedef &&
         !d.get_is_parameter() &&
-        // N5008 [dcl.fct]/6: a cv-qualifier-seq in this position belongs
+        // N5008 [dcl.fct]/1: a cv-qualifier-seq in this position belongs
         // to a (member) function declarator only; a variable cannot have
         // one, so `... do_close(catalog) const` is unambiguously a
         // function.  (Read through a CONST reference: the non-const
@@ -1379,7 +1379,7 @@ void cpp_typecheckt::convert_non_template_declaration(
         return mq.is_nil() || mq.id().empty();
       }())
     {
-      // N5008 [basic.lookup.unqual]/5: for a member declared OUTSIDE
+      // N5008 [basic.scope.class]/1: for a member declared OUTSIDE
       // its class (`void messages<char>::do_close(catalog);`), names
       // after the declarator-id are looked up in the member's class.
       // Resolve the qualified declarator's scope and perform the

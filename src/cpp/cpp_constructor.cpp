@@ -82,7 +82,7 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
   if(object_tc.type().id() == ID_array)
   {
     // Deduce the bound of an array of unknown bound from its initializer
-    // ([dcl.array]/1, [dcl.init.aggr]/5): the number of elements equals the
+    // ([dcl.array]/7, [dcl.init.aggr]/10): the number of elements equals the
     // number of initializers.  This is needed for element types with a
     // non-trivial constructor, where initialization goes through per-element
     // construction below and would otherwise read a nil array size.  (Scalar
@@ -128,7 +128,7 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
       if(element_has_user_ctor)
       {
         // Construct each element in place from its own initializer-clause
-        // ([dcl.init.aggr]/2): a brace-init element `{args}` forwards its
+        // ([dcl.init.aggr]/3): a brace-init element `{args}` forwards its
         // elements as the element's constructor arguments; a plain
         // value/temporary is a single initializer (copy/move construction); an
         // element without an initializer-clause is value-initialized.
@@ -175,7 +175,7 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
       // do_initializer, as for a block-scope declaration -- it resolves
       // nested braced lists (an array of arrays or of aggregates,
       // `int m[2][2] = {{1, 2}, {3, 4}}'), brace elision
-      // ([dcl.init.aggr]/16), string literals, and value-initializes the
+      // ([dcl.init.aggr]/14), string literals, and value-initializes the
       // elements without a clause (`int part[3] = {9};',
       // [dcl.init.aggr]/5.2) -- then copy it.  Building an array_exprt from
       // the clauses kept raw nested lists and left missing elements
@@ -301,7 +301,7 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
             member_exprt member(object_tc, comp.get_name(), comp.type());
             member.set(ID_C_lvalue, true);
 
-            // N5008 [expr.prim.id.general]/4, [class.mem.general]/11: in a
+            // N5008 [expr.prim.id.general]/2, [expr.prim.this]/1: in a
             // default member initializer an unqualified member name `x' is
             // `(*this).x', `this' being the object under initialization;
             // without it `&x' formed a pointer to member.  Bind the class
@@ -479,7 +479,7 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
       object_tc.type().set(ID_C_constant, false);
       object_tc.set(ID_C_lvalue, true);
       side_effect_expr_assignt assign(object_tc, rhs, typet(), source_location);
-      // N5008 [dcl.init.general]/16.9 + [over.match.conv]/1: this is the
+      // N5008 [dcl.init.general]/16.7 + [over.match.conv]/1: this is the
       // direct-initialization `T t(e)' of a non-class object; an explicit
       // conversion function of e's class is a candidate (`bool b(loc)' with
       // `explicit operator bool()')
@@ -527,7 +527,7 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
                op_probe.type().id() == ID_array ||
                to_array_type(comp.type()).size().is_constant()))
             {
-              // N5008 [dcl.init.aggr]/4.2: an ARRAY element is itself
+              // N5008 [dcl.init.aggr]/4.3: an ARRAY element is itself
               // aggregate-initialized, element-wise -- arrays are not
               // assignable, so the assignment below would be rejected
               // ("direct assignments to arrays not permitted"; the
@@ -552,7 +552,7 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
               }
               else
               {
-                // N5008 [dcl.init.aggr]/16 (brace elision): the
+                // N5008 [dcl.init.aggr]/14 (brace elision): the
                 // initializer list of the SUBAGGREGATE was elided; the
                 // array element consumes the next N operands.
                 const auto n = numeric_cast_v<std::size_t>(
@@ -572,7 +572,7 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
               ++idx;
               continue;
             }
-            // [dcl.init.aggr]/4.2: a scalar element is copy-initialized;
+            // [dcl.init.aggr]/4.3: a scalar element is copy-initialized;
             // see the parenthesized-aggregate branch below
             if(
               op_probe.type().id() == ID_struct_tag &&
@@ -646,10 +646,10 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
   }
   else if(object_tc.type().id() == ID_union_tag)
   {
-    // [class.union]/2: a (non-POD) union may have a user-declared constructor;
-    // construct it by an overload-resolved call to that constructor.  A union
-    // has no base classes, virtual tables or most-derived flag, so this is the
-    // constructor-call core of the struct case below.
+    // [class.union.general]/4: a (non-POD) union may have a user-declared
+    // constructor; construct it by an overload-resolved call to that
+    // constructor.  A union has no base classes, virtual tables or most-derived
+    // flag, so this is the constructor-call core of the struct case below.
     exprt::operandst operands_tc = operands;
     for(auto &op : operands_tc)
     {
@@ -828,7 +828,7 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
     // [dcl.init.general]/16.6.2.2): if the struct has bases but no
     // user-declared constructors, initialize the elements from the
     // operands.  For a SINGLE operand this must not shadow copy/move
-    // construction ([dcl.init.general]/16.6.1 considers constructors
+    // construction ([dcl.init.general]/16.6.2 considers constructors
     // first): skip when the operand is the class itself or derived
     // from it -- the synthesized copy/move constructor handles those.
     // N5008 [dcl.init.aggr]/1: an aggregate also must not have virtual
@@ -913,7 +913,7 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
           // initialized from an empty initializer list -- member-wise, as
           // below, with no elements
           const bool has_element = idx < operands_tc.size();
-          // N5008 [dcl.init.aggr]/4.1: when the element is a BASE and
+          // N5008 [dcl.init.aggr]/4.3: when the element is a BASE and
           // the initializer is of the base's own type (or derived),
           // the base SUBOBJECT is copy-initialized from it -- a sliced
           // whole-object copy, not a member-wise splice (member-wise
@@ -1060,7 +1060,7 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
           exprt val;
           if(idx < operands_tc.size())
           {
-            // N5008 [dcl.init.aggr]/4.2 + [dcl.init.ref]: a REFERENCE
+            // N5008 [dcl.init.aggr]/4.3 + [dcl.init.ref]: a REFERENCE
             // element is BOUND to its initializer, not assigned through.
             if(is_reference(comp.type()))
             {
@@ -1080,7 +1080,7 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
                  op_probe.type().id() == ID_array ||
                  to_array_type(comp.type()).size().is_constant()))
               {
-                // N5008 [dcl.init.aggr]/4.2: an ARRAY element is itself
+                // N5008 [dcl.init.aggr]/4.3: an ARRAY element is itself
                 // aggregate-initialized, element-wise -- arrays are not
                 // assignable, so the assignment below would be rejected
                 // ("direct assignments to arrays not permitted"; the
@@ -1106,7 +1106,7 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
                 }
                 else
                 {
-                  // N5008 [dcl.init.aggr]/16 (brace elision): the
+                  // N5008 [dcl.init.aggr]/14 (brace elision): the
                   // initializer list of the SUBAGGREGATE was elided; the
                   // array element consumes the next N operands.
                   const auto n = numeric_cast_v<std::size_t>(
@@ -1126,7 +1126,7 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
                 ++idx;
                 continue;
               }
-              // [dcl.init.aggr]/4.2: an element of class type is
+              // [dcl.init.aggr]/4.3: an element of class type is
               // copy-initialized from its initializer -- by a constructor,
               // not by assignment to the (not yet constructed) member
               // (libc++'s `__tuple_leaf<tuple<int>>(__u)', whose member
@@ -1148,7 +1148,7 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
                 continue;
               }
               // ... and from a braced list: an aggregate member is itself
-              // aggregate-initialized ([dcl.init.aggr]/4.2), its non-POD
+              // aggregate-initialized ([dcl.init.aggr]/4.3), its non-POD
               // elements constructed; any other class is list-initialized
               // by a constructor ([dcl.init.list]/3.7).  Assigning the
               // list itself left an initializer_list value for symex.
@@ -1183,11 +1183,11 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
                 ++idx;
                 continue;
               }
-              // N5008 [dcl.init.aggr]/4.2, [dcl.init.general]/16.6.3: a
+              // N5008 [dcl.init.aggr]/4.3, [dcl.init.general]/16.7: a
               // scalar element is COPY-initialized from its initializer;
               // from a class object that is an implicit conversion, which
               // does not consider explicit conversion functions
-              // ([over.match.copy]/1.2) -- an explicit cast accepted them
+              // ([over.match.conv]/1.1) -- an explicit cast accepted them
               if(
                 op_probe.type().id() == ID_struct_tag &&
                 comp.type().id() != ID_struct_tag &&
@@ -1508,7 +1508,7 @@ void cpp_typecheckt::new_temporary(
 
   auto new_code = cpp_constructor(source_location, new_object, ops);
 
-  // N5008 [expr.type.conv]/2 + [dcl.init.general]/16.4: `T()' and `T{}'
+  // N5008 [expr.type.conv]/1.4 + [dcl.init.general]/16.4: `T()' and `T{}'
   // value-initialize the result object; [dcl.init.general]/9.1: a class
   // whose default constructor is not user-provided is zero-initialized
   // before that constructor runs.  cpp_constructor only calls the

@@ -24,7 +24,7 @@ void ansi_c_convert_typet::read_rec(const typet &type)
 {
   if(type.id()==ID_merged_type)
   {
-    // Per [dcl.spec]/1: cv-qualifiers in a decl-specifier-seq apply
+    // Per [basic.type.qualifier]/1: cv-qualifiers in a decl-specifier-seq apply
     // to the type. When template substitution places cv-qualifier
     // attributes on struct_tag/union_tag subtypes within a merged_type
     // (instead of inserting ID_const/ID_volatile sub-nodes), we must

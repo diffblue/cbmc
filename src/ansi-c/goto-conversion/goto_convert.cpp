@@ -799,7 +799,7 @@ void goto_convertt::convert_expression(
     // A `throw` expression: before the exception propagates to a handler, run
     // the destructors of the automatic objects constructed since entering the
     // innermost enclosing try block (or, if there is none in this function, all
-    // of the function's automatic objects) ([except.ctor], [except.throw]/4).
+    // of the function's automatic objects) ([except.ctor], [except.throw]/2).
     // The throw's own side-effects run first; then its operand is copied
     // (see below); then the destructors; then the THROW.
     // Not for Java: a Java `athrow' throws a local REFERENCE that the
@@ -841,7 +841,7 @@ void goto_convertt::convert_expression(
       // (`E()' copied into the exception object without C++17's elision)
       // are destroyed once the exception object is initialized; the one
       // that is the operand becomes the exception object (destroyed by the
-      // handler, [except.throw]/5)
+      // handler, [except.throw]/4)
       {
         std::list<irep_idt> others;
         for(const auto &id : side_effects.temporaries)
@@ -856,7 +856,7 @@ void goto_convertt::convert_expression(
                                      ? node_indext{0}
                                      : targets.cpp_try_scope_nodes.back();
       // a rethrow (`throw;'): the handlers it leaves do not destroy the
-      // exception object ([except.throw]/5, see convert_try_catch)
+      // exception object ([except.throw]/4, see convert_try_catch)
       if(
         thrown.id() == ID_side_effect && thrown.operands().empty() &&
         mode != ID_java)
@@ -1238,7 +1238,7 @@ void goto_convertt::convert_cpp_delete(const codet &code, goto_programt &dest)
   {
     if(code.get_statement() == ID_cpp_delete_array)
     {
-      // Per [expr.delete]/6: for an array delete-expression with N
+      // Per [expr.delete]/5: for an array delete-expression with N
       // elements, the destructor is invoked on each element.  Expand
       // the per-element destructor into a loop.  N is derived from
       // the pointer's object size divided by sizeof(T).

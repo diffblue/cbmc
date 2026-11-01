@@ -28,7 +28,7 @@ class symbol_table_baset;
 // STRICTLY more constrained than q (p's associated constraints subsume q's
 // but not vice versa).  Used by overload resolution and by the
 // class-template partial-specialization search
-// ([temp.class.spec.match]/2).
+// ([temp.spec.partial.match]/2).
 bool template_constraint_strictly_subsumes(
   const symbol_table_baset &symbol_table,
   const cpp_declarationt &p,
@@ -59,7 +59,7 @@ public:
   /// deduction pattern ([temp.deduct.type]): unlike resolve_scope it keeps
   /// the point of use (original_scope, source_location) of a resolution
   /// that may be in progress on this resolver, whose remaining names are
-  /// still looked up from there ([basic.lookup.unqual]/1).
+  /// still looked up from there ([basic.lookup.unqual]/4).
   cpp_scopet &resolve_pattern_scope(
     const cpp_namet &cpp_name,
     irep_idt &base_name,
@@ -103,9 +103,9 @@ public:
     std::size_t first);
 
   /// [temp.deduct.type]/8: in class-template partial-specialization
-  /// matching ([temp.class.spec.match]/2), a pattern `const T` does NOT
+  /// matching ([temp.spec.partial.match]/2), a pattern `const T` does NOT
   /// match a non-const argument -- deduction fails.  Function-call
-  /// deduction is more permissive ([temp.deduct.call]/3 ignores the
+  /// deduction is more permissive ([temp.deduct.call]/4.1 ignores the
   /// cv-qualification of a reference parameter's referred-to type), so
   /// the strict behaviour is opt-in for the partial-spec matching
   /// sites.  Without it, libc++'s alias-pattern specializations
@@ -173,7 +173,7 @@ public:
     irep_idt &pack_param_name,
     bool &variadic_pack_empty);
 
-  /// Deduce a function parameter pack ([temp.deduct.type]/9-10): match the
+  /// Deduce a function parameter pack ([temp.deduct.type]/10): match the
   /// pack pattern against each remaining desired parameter and record the
   /// element types in the template map for later expansion.
   /// \param pack_decl: pre-conversion cpp_declaration of the pack parameter
@@ -201,16 +201,16 @@ protected:
   /// not be re-expanded here.  Keyed by the pack parameter's identifier.
   std::set<irep_idt> derived_to_base_deduced_packs;
 
-  // N5008 [temp.deduct]/5: the identifiers of the template parameters of
-  // the template CURRENTLY being deduced (registered by build_unassigned).
+  // N5008 [temp.deduct.general]/5: the identifiers of the template parameters
+  // of the template CURRENTLY being deduced (registered by build_unassigned).
   // Unqualified-name deduction must bind only these; a same-short-name
-  // parameter of an unrelated enclosing template (e.g. the caller's `P2`
-  // while deducing a member constructor template's own `P2`,
-  // std::chrono::duration's converting-constructor shape) must be neither
-  // bound nor conflict-checked.  Empty means "no active restriction".
+  // parameter of an unrelated enclosing template (e.g. the caller's `P2` while
+  // deducing a member constructor template's own `P2`, std::chrono::duration's
+  // converting-constructor shape) must be neither bound nor conflict-checked.
+  // Empty means "no active restriction".
   std::set<irep_idt> current_deduction_parameters;
 
-  /// N5008 [temp.deduct.type]/17: the DECLARED types of the non-type
+  /// N5008 [temp.deduct.type]/20: the DECLARED types of the non-type
   /// parameters of the template currently being deduced (raw, as written),
   /// keyed by parameter identifier.  A non-type argument `i` of a
   /// template-id pattern P deduces only if its parameter's type is the type
@@ -248,11 +248,11 @@ protected:
     resolve_identifierst &identifiers,
     const cpp_typecheck_fargst &fargs);
 
-  /// N5008 [over.match.funcs]/5: cv penalty (0 or 1) for selecting a const
-  /// member function *template* candidate when called on a non-const object,
-  /// recovered from the candidate template's ID_method_qualifier (the deduced
-  /// function type of an uninstantiated template_function_instance carries no
-  /// `this` parameter, so disambiguate_functions cannot rank it).
+  /// N5008 [over.match.funcs.general]/4: cv penalty (0 or 1) for selecting a
+  /// const member function *template* candidate when called on a non-const
+  /// object, recovered from the candidate template's ID_method_qualifier (the
+  /// deduced function type of an uninstantiated template_function_instance
+  /// carries no `this` parameter, so disambiguate_functions cannot rank it).
   bool member_template_object_viable(
     const exprt &cand,
     const cpp_typecheck_fargst &fargs);
@@ -358,8 +358,8 @@ protected:
   std::optional<std::set<irep_idt>>
   associated_classes(const cpp_typecheck_fargst &fargs);
 
-  /// Remove the hidden friends ([class.friend]/7) of classes that are not
-  /// associated with the arguments \p fargs ([basic.lookup.argdep]/4.2).
+  /// Remove the hidden friends ([dcl.meaning.general]/2) of classes that are
+  /// not associated with the arguments \p fargs ([basic.lookup.argdep]/4.2).
   void filter_hidden_friends(
     cpp_scopest::id_sett &id_set,
     const cpp_typecheck_fargst &fargs);
@@ -384,7 +384,7 @@ protected:
     // template.  Normally identical to `specialization_args`, but for a
     // partial specialization ending in a parameter pack this holds the pack
     // expanded into one positional argument per deduced element
-    // (N5008 [temp.variadic]/5), whereas `specialization_args` (and hence
+    // (N5008 [temp.variadic]/9), whereas `specialization_args` (and hence
     // `cost`) keeps the un-expanded form so that partial-ordering selection is
     // not perturbed by the pack arity.
     cpp_template_args_tct instantiation_args;

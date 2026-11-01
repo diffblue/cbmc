@@ -377,26 +377,26 @@ ctype_char_layout(const symbol_table_baset &symbol_table)
   return {};
 }
 
-/// Create a no-op body for an I/O function that returns a reference
-/// to its first parameter (e.g., std::endl returns its ostream& argument,
-/// ostream::_M_insert returns *this).
-/// N5008 [locale.general]/8: at program startup the global locale is
+/// Create a no-op body for an I/O function that returns a reference to its
+/// first parameter (e.g., std::endl returns its ostream& argument,
+/// ostream::_M_insert returns *this).  N5008 [locale.cons]/1,
+/// [locale.statics]/5: at program startup the global locale is
 /// `std::locale::classic()`, the "C" locale.  libstdc++'s facet accessors
 /// (`std::use_facet` via `std::__try_use_facet`) read the facet out of
 /// `__loc->_M_impl->_M_facets`, which is initialised inside libstdc++.so and
 /// therefore invisible to CBMC -- every facet access dereferences a nondet
-/// pointer.  Model the ubiquitous `ctype<char>` facet of the "C" locale:
-/// a static classification table with the C99 7.4 "C"-locale character
-/// classes (`isdigit` is exactly '0'..'9', `isspace` is the six standard
-/// white-space characters, etc.), encoded with the same glibc `_ISbit`
-/// bit-assignments that the parsed <ctype.h>/<bits/ctype_base.h> gave to
-/// `std::ctype_base::digit` and friends (so table entries and user-code
-/// masks agree by construction), and a static `ctype<char>` facet object
-/// whose `_M_table` points at it.  `ctype<char>::is(mask, char)` is already
-/// an inline header body reading `_M_table[(unsigned char)c] & m`, so with
-/// this model it evaluates correctly with no virtual dispatch.
-/// Returns a nil expression if the ctype<char> struct is not in the symbol
-/// table (translation unit does not use `<locale>`).
+/// pointer.  Model the ubiquitous `ctype<char>` facet of the "C" locale: a
+/// static classification table with the C99 7.4 "C"-locale character classes
+/// (`isdigit` is exactly '0'..'9', `isspace` is the six standard white-space
+/// characters, etc.), encoded with the same glibc `_ISbit` bit-assignments that
+/// the parsed <ctype.h>/<bits/ctype_base.h> gave to `std::ctype_base::digit`
+/// and friends (so table entries and user-code masks agree by construction),
+/// and a static `ctype<char>` facet object whose `_M_table` points at it.
+/// `ctype<char>::is(mask, char)` is already an inline header body reading
+/// `_M_table[(unsigned char)c] & m`, so with this model it evaluates correctly
+/// with no virtual dispatch.  Returns a nil expression if the ctype<char>
+/// struct is not in the symbol table (translation unit does not use
+/// `<locale>`).
 static exprt provide_classic_ctype_char_model(
   symbol_table_baset &symbol_table,
   const namespacet &ns,
@@ -667,7 +667,7 @@ static exprt provide_classic_ctype_char_model(
     return nil_exprt{};
   }
 
-  // N5008 [facet.ctype.char.virtuals]/1, [facet.ctype.virtuals]/11: in the
+  // N5008 [facet.ctype.char.virtuals]/1, [locale.ctype.virtuals]/11, 13: in the
   // "C" locale do_widen and do_narrow apply the simplest reasonable
   // transformation, the identity on char.  libstdc++'s ctype<char>::widen /
   // narrow read the caches _M_widen / _M_narrow when _M_widen_ok /
@@ -780,16 +780,16 @@ static exprt static_character_array(
     index_exprt{existing->symbol_expr(), from_integer(0, c_index_type())}};
 }
 
-/// N5008 [locale.general]/8: the global locale at program startup is the
-/// "C" locale, whose facets libstdc++.so creates (invisible to CBMC).
-/// [facet.numpunct.virtuals]/1-6: in it numpunct<C> has the decimal point
-/// '.', the thousands separator ',', no grouping, and the names "true" and
-/// "false".  libstdc++ reads them through its __numpunct_cache<C>, filled
-/// from the facet by __use_cache<__numpunct_cache<C>>; model that cache as
-/// a static object holding the "C"-locale values, with libstdc++'s digit
-/// atoms (__num_base::_S_atoms_out / _S_atoms_in, the characters of
-/// [facet.num.put.virtuals] stage 1 in the "C" locale).
-/// \return the cache object, or nil if \p cache_tag is not complete
+/// N5008 [locale.cons]/1, [locale.statics]/5: the global locale at program
+/// startup is the "C" locale, whose facets libstdc++.so creates (invisible to
+/// CBMC).  [facet.numpunct.virtuals]/1-6: in it numpunct<C> has the decimal
+/// point '.', the thousands separator ',', no grouping, and the names "true"
+/// and "false".  libstdc++ reads them through its __numpunct_cache<C>, filled
+/// from the facet by __use_cache<__numpunct_cache<C>>; model that cache as a
+/// static object holding the "C"-locale values, with libstdc++'s digit atoms
+/// (__num_base::_S_atoms_out / _S_atoms_in, the characters of
+/// [facet.num.put.virtuals] stage 1 in the "C" locale).  \return the cache
+/// object, or nil if \p cache_tag is not complete
 static exprt classic_numpunct_cache(
   symbol_table_baset &symbol_table,
   const namespacet &ns,
@@ -1611,7 +1611,7 @@ make_prime_need_rehash_body(const symbolt &symbol, const namespacet &ns)
   return body;
 }
 
-/// N5008 [locale.general]/8: the num_put<C, ...> facet of the "C" locale,
+/// N5008 [locale.category]/3: the num_put<C, ...> facet of the "C" locale,
 /// which libstdc++.so creates: a static object of the facet class \p
 /// accessor returns a pointer to, zero-initialized (reference count, as
 /// locale::classic() does not count) with the vtable pointer of a complete
@@ -1713,14 +1713,14 @@ static const std::map<std::string, std::string> &library_source_models()
     // the MSVC runtime's type_info support (vcruntime_typeinfo.h): cbmc
     // gives each type one type_info object (typecheck_expr_typeid), so
     // their data compare equal iff they are the same object, as N5008
-    // [type.info]/2 requires; the order of before() is unspecified
-    // ([type.info]/4), the hash equal for equal objects ([type.info]/7)
+    // [type.info]/3 requires; the order of before() is unspecified
+    // ([type.info]/1, 5), the hash equal for equal objects ([type.info]/6)
     {"__std_type_info_compare",
      "{ return _Lhs == _Rhs ? 0 :"
      " ((unsigned long long)_Lhs < (unsigned long long)_Rhs ? -1 : 1); }"},
     {"__std_type_info_hash", "{ return (unsigned long long)_Data; }"},
     // the MSVC runtime's locale implementation (locale0.cpp): N5008
-    // [locale.cons]/1, [locale.general]/8 -- the global locale is the "C"
+    // [locale.cons]/1, [locale.statics]/5 -- the global locale is the "C"
     // locale.  It is one implementation object with no facets of its own
     // (_Getfacet then yields none, and use_facet the facets modelled
     // separately, provide_classic_ctype_char_model), constructed once and
@@ -1732,7 +1732,7 @@ static const std::map<std::string, std::string> &library_source_models()
      " return &__global; }"},
     {"std::locale::_Getgloballocale", "{ return _Init(false); }"},
     // the MSVC runtime's file streams (fiopen.cpp, the UCRT): N5008
-    // [filebuf.members]/2-4, opening a file may fail, and then open returns
+    // [filebuf.members]/3, 6, opening a file may fail, and then open returns
     // a null pointer.  As CBMC's model of fopen, _Fiopen either fails or
     // yields a fresh FILE object; whether the named file exists is not
     // known.
@@ -1740,7 +1740,7 @@ static const std::map<std::string, std::string> &library_source_models()
      "{ bool __fail; " CPROVER_PREFIX "havoc_object(&__fail);"
      " if(__fail) return nullptr; return (FILE *)malloc(sizeof(FILE)); }"},
     // the UCRT's stream buffer of a FILE, which basic_filebuf<char> uses as
-    // its get and put areas ([streambuf.general]/2): a newly opened stream
+    // its get and put areas ([streambuf.reqts]/2): a newly opened stream
     // has an empty buffer (null base and current pointers, count zero), so
     // the filebuf's own overflow and underflow do the input and output
     {"_get_stream_buffer_pointers",
@@ -1780,7 +1780,7 @@ static const std::map<std::string, std::string> &library_source_models()
      " _Data->_What = nullptr; _Data->_DoFree = false; }"},
     {"std::locale::_Locimp::_Locimp_dtor", "{ }"},
     // the MSVC runtime's filesystem conversions (xfilesystem_abi.h),
-    // MultiByteToWideChar / WideCharToMultiByte: N5008 [fs.path.type.cvt]/1,
+    // MultiByteToWideChar / WideCharToMultiByte: N5008 [fs.path.type.cvt]/1-2,
     // the native narrow encoding is converted to the native wide one.  For
     // the characters of the basic character set ([lex.charset]/2), which
     // every code page encodes as in ASCII, a character converts to the wide
@@ -2192,7 +2192,7 @@ void cpp_typecheckt::provide_standard_stream_objects()
     << "    streamsize __k = __VERIFIER_nondet_int();\n"
     << "    if(__k < 0 || __k > __n) __k = __n;\n"
     << "    return __k; }\n"
-    // [streambuf.virt.get]/16: underflow makes the next character
+    // [streambuf.virt.get]/10, 12: underflow makes the next character
     // available in the get area, or returns eof()
     << "  typename __base::int_type underflow() {\n"
     << "    int __v = __VERIFIER_nondet_int();\n"
@@ -2345,12 +2345,12 @@ void cpp_typecheckt::provide_stdlib_bodies()
     }
   }
 
-  // Static data members that the MSVC runtime defines (stl/src/locale0.cpp
-  // and ios.cpp of the MSVC STL) and its headers only declare: with no
-  // definition in the program they were nondeterministic, and `++_Id_cnt'
-  // in locale::id::_Get_index could overflow.  The runtime's definitions:
-  // the counter of the facet ids handed out ([locale.id]/1: an id is used
-  // as an index for lookup) starts at 0; so does `index' of [ios.base]/3.1
+  // Static data members that the MSVC runtime defines (stl/src/locale0.cpp and
+  // ios.cpp of the MSVC STL) and its headers only declare: with no definition
+  // in the program they were nondeterministic, and `++_Id_cnt' in
+  // locale::id::_Get_index could overflow.  The runtime's definitions: the
+  // counter of the facet ids handed out ([locale.id]/1: an id is used as an
+  // index for lookup) starts at 0; so does `index' of [ios.base.general]/3.1
   // (initialized to an unspecified value; xalloc returns index++,
   // [ios.base.storage]/1); and the streams start synchronized with the C
   // streams, so that the first sync_with_stdio returns true
@@ -2411,14 +2411,13 @@ void cpp_typecheckt::provide_stdlib_bodies()
         to_code_type(symbol.type).return_type().id() == ID_pointer)
       {
         // Override the header-inline body, which reads the invisible
-        // libstdc++-internal __loc->_M_impl->_M_facets table, with a
-        // return of the modelled classic-"C" ctype<char> facet
-        // ([locale.general]/8: the startup global locale is the "C"
-        // locale).  See provide_classic_ctype_char_model.  libstdc++ 13
-        // routes use_facet through __try_use_facet; libstdc++ 11's
-        // use_facet<_Facet>(const locale&) reads the table itself and
-        // returns `const _Facet&' (a pointer here), so it is overridden the
-        // same way.
+        // libstdc++-internal __loc->_M_impl->_M_facets table, with a return of
+        // the modelled classic-"C" ctype<char> facet ([locale.cons]/1,
+        // [locale.statics]/5: the startup global locale is the "C" locale).
+        // See provide_classic_ctype_char_model.  libstdc++ 13 routes use_facet
+        // through __try_use_facet; libstdc++ 11's use_facet<_Facet>(const
+        // locale&) reads the table itself and returns `const _Facet&' (a
+        // pointer here), so it is overridden the same way.
         exprt facet =
           provide_classic_ctype_char_model(symbol_table, ns, *ctype_layout);
         // N5008 [locale.ctype.members]: tolower/toupper call the virtual
@@ -2468,7 +2467,7 @@ void cpp_typecheckt::provide_stdlib_bodies()
         to_code_type(symbol.type).return_type().id() == ID_pointer &&
         classic_num_put(symbol).is_not_nil())
       {
-        // N5008 [locale.general]/8: the "C" locale has num_put<C, ...> and
+        // N5008 [locale.category]/3: the "C" locale has num_put<C, ...> and
         // num_get<C, ...> facets; return such an object (classic_num_put,
         // which builds one for either), so that stream insertion and
         // extraction of arithmetic values ([ostream.inserters.arithmetic],
@@ -2543,7 +2542,7 @@ void cpp_typecheckt::provide_stdlib_bodies()
         // internal __loc._M_impl->_M_facets table (libstdc++ 13's goes
         // through __try_use_facet, modelled above).  Answer as that model
         // does: the classic ctype<char> and num_put facets are present,
-        // every other facet is absent ([locale.general]/8; _M_cache_locale
+        // every other facet is absent ([locale.category]/3; _M_cache_locale
         // then caches a null num_get pointer instead of failing on the
         // table read).
         ensure_parameter_symbols(symbol, symbol_table);
@@ -2769,9 +2768,9 @@ void cpp_typecheckt::provide_stdlib_bodies()
     //     callbacks (none registered by these models), then the storage is
     //     released: no observable effect.
     //   locale::locale(), locale(const locale &), ~locale(): the __imp *
-    //     __locale_ is null (the global "C" locale, [locale.cons]/2) or the
-    //     other's ([locale.cons]/7); the destructor releases a reference
-    //     ([locale.cons]/9): no-op.
+    //     __locale_ is null (the global "C" locale, [locale.cons]/1) or the
+    //     other's ([locale.general]); the destructor releases a reference
+    //     ([locale.facet]/3): no-op.
     if(
       symbol.value.is_nil() &&
       (name == "std::__1::ios_base::init(this,ptr_void)" ||
@@ -2853,7 +2852,7 @@ void cpp_typecheckt::provide_stdlib_bodies()
         name == "std::__1::ios_base::clear(this,unsigned_int)" &&
         params.size() == 2)
       {
-        // [iostate.flags]/4: rdstate() == state if rdbuf() is not null,
+        // [iostate.flags]/4-5: rdstate() == state if rdbuf() is not null,
         // otherwise state | badbit.  (If then rdstate() & exceptions() is
         // not zero, basic_ios::failure is thrown; with the exceptions() ==
         // goodbit of Table 128 and no model of exceptions(iostate) that is
@@ -2967,7 +2966,7 @@ void cpp_typecheckt::provide_stdlib_bodies()
     // libc++ declares std::__sort<__less<T> &, T *> for the arithmetic types
     // T `extern template' (__algorithm/sort.h) and DEFINES the template only
     // in libc++.so (src/algorithm.cpp), so std::sort on such a range calls a
-    // function without a body.  N5008 [alg.sort]/1-3: sort permutes [first,
+    // function without a body.  N5008 [sort]/3, 5: sort permutes [first,
     // last) into non-decreasing order with respect to comp; __less<T> is
     // `a < b' on the arithmetic T.  Model it as an insertion sort (the
     // complexity bound of /3 is not observable).
@@ -3043,13 +3042,13 @@ void cpp_typecheckt::provide_stdlib_bodies()
       }
     }
 
-    // N5008 [locale.general]/8: the program-startup global locale is the
-    // "C" locale, and libstdc++ initialises it inside the shared library
-    // where CBMC cannot see it.  Give the default constructor, the
+    // N5008 [locale.cons]/1, [locale.statics]/5: the program-startup global
+    // locale is the "C" locale, and libstdc++ initialises it inside the shared
+    // library where CBMC cannot see it.  Give the default constructor, the
     // copy-reference management and the destructor empty bodies (the model
     // facet below carries the actual classification data), and let
-    // __try_use_facet<ctype<char>> return the modelled classic facet
-    // instead of reading the invisible _M_impl->_M_facets table.
+    // __try_use_facet<ctype<char>> return the modelled classic facet instead of
+    // reading the invisible _M_impl->_M_facets table.
     if(
       name == "std::locale::locale(this)" ||
       name == "std::locale::~locale(this)")
@@ -3140,10 +3139,10 @@ void cpp_typecheckt::provide_stdlib_bodies()
       // provide_classic_ctype_char_model), so the pointer merely needs
       // to be DETERMINATE: a null _M_impl denotes the modeled global
       // locale.
-      //   default ctor ([locale.cons]/2, a copy of the global locale):
+      //   default ctor ([locale.cons]/1, a copy of the global locale):
       //     this->_M_impl = 0
-      //   copy ctor ([locale.cons]/7):  this->_M_impl = other._M_impl
-      //   destructor ([locale.cons]/9, releases a reference): no-op
+      //   copy ctor ([locale.general]):  this->_M_impl = other._M_impl
+      //   destructor ([locale.facet]/3, releases a reference): no-op
       ensure_parameter_symbols(symbol, symbol_table);
       const auto &params = to_code_type(symbol.type).parameters();
       code_blockt block;
@@ -3459,8 +3458,8 @@ void cpp_typecheckt::provide_stdlib_bodies()
       // libc++'s vector::max_size (vector:603) can be left bodyless
       // when its eager conversion is absorbed during instantiation;
       // __recommend then calls a no-body function and every push_back
-      // havocs.  [vector.capacity]/1 with the default allocator
-      // ([allocator.traits.members]/6: SIZE_MAX / sizeof(value_type),
+      // havocs.  [container.reqmts]/57 with the default allocator
+      // ([allocator.traits.members]/8: SIZE_MAX / sizeof(value_type),
       // capped by numeric_limits<difference_type>::max()): synthesize
       // exactly that constant.
       const typet &ret = to_code_type(symbol.type).return_type();
@@ -3678,7 +3677,7 @@ void cpp_typecheckt::provide_stdlib_bodies()
       symbol.type.id() == ID_code &&
       to_code_type(symbol.type).parameters().size() == 1)
     {
-      // N5008 [forward]/4-5: std::move(t) is exactly
+      // N5008 [forward]/3, 9: std::move(t) is exactly
       // static_cast<remove_reference_t<T>&&>(t) and std::forward<T>(t)
       // is static_cast<T&&>(t).  The libc++ headers can leave these as
       // DECLARATIONS in translation paths where the definition is

@@ -127,7 +127,7 @@ void goto_convertt::convert_try_catch(
   // Record the scope-tree node at entry to the try block, so that a `throw`
   // in the try body unwinds (runs destructors of) the automatic objects
   // constructed since entering the try before control reaches a handler
-  // ([except.ctor], [except.throw]/4).
+  // ([except.ctor], [except.throw]/2).
   const node_indext try_scope_node = targets.scope_stack.get_current_node();
   targets.cpp_try_scope_nodes.push_back(try_scope_node);
 
@@ -158,7 +158,7 @@ void goto_convertt::convert_try_catch(
       convert(block, tmp, mode);
     else
     {
-      // N5008 [except.throw]/5: the exception object is destroyed when the
+      // N5008 [except.throw]/4: the exception object is destroyed when the
       // handler exits by any means other than rethrowing -- at the end of
       // its block, by a jump out of it, or by another exception.  Register
       // that as a destructor of the handler's scope; remove_cpp_exceptions

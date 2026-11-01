@@ -169,7 +169,7 @@ typet cpp_typecheckt::deduce_placeholder_type(
   {
     // [temp.deduct.call]/3: a forwarding reference bound to an lvalue
     // deduces U as an lvalue reference; with reference collapsing
-    // ([dcl.ref]/6) the declared `auto &&` is then an lvalue reference.
+    // ([dcl.ref]/7) the declared `auto &&` is then an lvalue reference.
     pattern.remove(ID_C_rvalue_reference);
   }
 
@@ -215,7 +215,7 @@ void cpp_typecheckt::deduce_return_type(code_frontend_returnt &code)
 
     typecheck_expr(code.return_value());
 
-    // N5008 [dcl.spec.auto.general]/11: an expression naming a function
+    // N5008 [dcl.spec.auto.general]/13: an expression naming a function
     // whose placeholder return type is still undeduced is ill-formed; here
     // that happens when the callee's body could not be type-checked (and
     // was dropped), so no type can be deduced from the operand either.
@@ -321,7 +321,7 @@ void cpp_typecheckt::return_deduction_contextt::finish()
                                   : typecheck.return_type;
 }
 
-/// N5008 [class.spaceship]/2-4, [class.compare.default]/6: the body of a
+/// N5008 [class.spaceship]/2-4, [class.compare.default]/5: the body of a
 /// defaulted three-way comparison: the elements of the expanded lists of
 /// subobjects (direct bases, then non-static data members, arrays element by
 /// element) are compared in order, and the first result that is not equal is
@@ -390,7 +390,7 @@ bool cpp_typecheckt::convert_to_comparison_category(
   return false;
 }
 
-/// N5008 [class.compare.default]/6: the expanded list of subobjects of the
+/// N5008 [class.compare.default]/5: the expanded list of subobjects of the
 /// operands of the defaulted comparison \p symbol: its direct base class
 /// subobjects, then its non-static data members, an array element by
 /// element, as pairs of lvalues of the two operands.
@@ -445,7 +445,7 @@ bool cpp_typecheckt::defaulted_comparison_elements(
     y = parameter_object(parameters[1]);
   }
 
-  // the expanded lists of subobjects ([class.compare.default]/6)
+  // the expanded lists of subobjects ([class.compare.default]/5)
   for(const auto &base : class_type.bases())
   {
     if(base.get_bool(ID_virtual))
@@ -639,7 +639,7 @@ std::optional<code_blockt> cpp_typecheckt::defaulted_three_way_comparison(
 
 void cpp_typecheckt::convert_function(symbolt &symbol)
 {
-  // N5008 [class.access.general]/4 + [class.default.ctor]/4: the body of
+  // N5008 [class.access.general]/1 + [class.default.ctor]/4: the body of
   // an implicitly-defined constructor/destructor, or one explicitly
   // defaulted on its first declaration ([dcl.fct.def.default]/5), is a
   // member of its class, so its member initializations may name that
@@ -740,8 +740,8 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     return;
   }
 
-  // N5008 [temp.variadic]/5 + [dcl.spec.auto]/11: a function-template instance
-  // whose body contains a call-argument pack expansion over a NON-type
+  // N5008 [temp.variadic]/9 + [dcl.spec.auto.general]/15: a function-template
+  // instance whose body contains a call-argument pack expansion over a NON-type
   // parameter pack (e.g. `return add(I...)`) is normally expanded during the
   // deferred method-body drain (which runs expand_call_argument_packs).  A
   // function with a DEDUCED return type (`auto` / `decltype(auto)`) is instead
@@ -773,7 +773,7 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   // resolves the pack name to its first element only and the braced list
   // collapses to one element.
   //
-  // Likewise an EMPTY pack ([temp.variadic]/7): libc++'s `constexpr auto
+  // Likewise an EMPTY pack ([temp.variadic]/16): libc++'s `constexpr auto
   // __get_comp_type()' builds `{_StrongOrd, __type_to_enum<_Ts>()...}' and
   // is constant-evaluated for common_comparison_category_t<>.
   bool has_multi_element_type_pack = false;
@@ -820,7 +820,7 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   // N5008 [dcl.fct.def.general]/2: the type of a parameter or the return
   // type of a function DEFINITION shall not be an incomplete class type;
   // [temp.inst]/2 instantiates the class template specializations named
-  // there (naming them in a declaration did not, [temp.inst]/1).
+  // there (naming them in a declaration did not, [temp.inst]/2).
   for(auto &parameter : function_type.parameters())
     elaborate_class_template(parameter.type());
   elaborate_class_template(function_type.return_type());
@@ -892,7 +892,7 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   // upstream, a non-exception-safe restore would leave `return_type` set to
   // the nested function's return type; the enclosing function's subsequent
   // `return` statements would then be converted against the wrong type
-  // (N5008 [stmt.return]/3 requires the operand to be implicitly converted
+  // (N5008 [stmt.return]/2 requires the operand to be implicitly converted
   // to the *enclosing* function's return type).  That produces a
   // type-inconsistent assignment that later trips the symbolic-execution
   // invariant lhs.type() == rhs.type().  A scope guard restores the saved
@@ -990,7 +990,7 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
 
       for(const auto &c : to_struct_type(class_sym.type).components())
       {
-        // N5008 [class.compare.default]/6, [class.eq]/2: the expanded list
+        // N5008 [class.compare.default]/5, [class.eq]/2: the expanded list
         // of subobjects is the base classes and the non-static data
         // MEMBERS; padding inserted by the layout is neither and has no
         // name (comparing it yielded "symbol '' is unknown" for every class
@@ -1082,10 +1082,10 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
 
   // N5008 [class.compare.default]/1: a defaulted `operator==' or
   // `operator!=' is either a non-static const member with one parameter of
-  // type `const C &' or a friend with two such parameters.  [class.eq]/2:
+  // type `const C &' or a friend with two such parameters.  [class.eq]/3:
   // the defaulted == returns the conjunction of the memberwise comparisons
-  // of the expanded list of subobjects ([class.compare.default]/6, the
-  // non-static data members in declaration order); [class.compare.default]
+  // of the expanded list of subobjects ([class.compare.default]/5, the
+  // non-static data members in declaration order); [class.compare.secondary]/2
   // /1 + [over.match.oper]: a defaulted != is `!(x == y)`.  Both forms are
   // elaborated here from the empty `= default' body.
   if(
@@ -1124,7 +1124,7 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
       exprt result = true_exprt();
       for(const auto &c : to_struct_type(class_sym.type).components())
       {
-        // N5008 [class.compare.default]/6, [class.eq]/2: the expanded list
+        // N5008 [class.compare.default]/5, [class.eq]/2: the expanded list
         // of subobjects is the base classes and the non-static data
         // MEMBERS; padding inserted by the layout is neither and has no
         // name (comparing it yielded "symbol '' is unknown" for every class
@@ -1205,7 +1205,7 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     // constructor (lvalue reference, T&) and the move constructor (rvalue
     // reference, T&&) are handled: for the trivially-copyable members we
     // restrict to below, a memberwise move is a memberwise copy
-    // ([class.copy.ctor]/15 -- scalar and pointer members are simply copied),
+    // ([class.copy.ctor]/14 -- scalar and pointer members are simply copied),
     // so the same generated body is correct for either.
     if(ft.parameters().size() == 2 && !class_id.empty())
     {
@@ -1237,7 +1237,7 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
       // rejects e.g. std::_Rb_tree_iterator merely for having a user-provided
       // converting constructor); we look only at the data members' types.
       // For such members a memberwise move coincides with a memberwise copy
-      // ([class.copy.ctor]/15), so default_cpctor's copy initializers are
+      // ([class.copy.ctor]/14), so default_cpctor's copy initializers are
       // correct for the move constructor too.  A class with a union member
       // (e.g. std::basic_string's small-string buffer) is excluded, which
       // also keeps us away from unmodelled library copies such as
@@ -1359,7 +1359,7 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
           }
         }
       }
-      // N5008 [dcl.fct.def.default]/5 + [class.copy.ctor]/14-15: an
+      // N5008 [dcl.fct.def.default]/5 + [class.copy.ctor]/14: an
       // explicitly-defaulted copy/move constructor that is not deleted is
       // defined exactly as the implicit one -- a memberwise copy/move of
       // the bases and members -- whatever the members' types.  This used
@@ -1452,7 +1452,7 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     }
   }
 
-  // [temp.deduct]/8 and the system-header analogue: when the
+  // [temp.deduct.general]/8 and the system-header analogue: when the
   // function whose body we are elaborating lives in a system
   // header, any typecheck failure is treated as SFINAE rather
   // than a user-visible compilation error.  This matches what
@@ -1491,7 +1491,7 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   }
   catch(int)
   {
-    // N5008 [class.default.ctor]/2, [class.copy.ctor]/12,
+    // N5008 [class.default.ctor]/2, [class.copy.ctor]/10,
     // [class.copy.assign]/7: an implicitly-declared special member
     // function whose implicit definition would be ill-formed (e.g. a
     // base class without a default constructor for the implicit
@@ -1561,7 +1561,7 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
       return;
     }
 
-    // N5008 [temp.inst]/4, [temp.point]/8: a member's definition is
+    // N5008 [temp.inst]/4, [temp.point]/7: a member's definition is
     // instantiated when it is odr-used, and its point of instantiation may
     // be the END of the translation unit -- so a body converted EAGERLY (an
     // auto-returning member of a class instance, converted during that
@@ -1593,21 +1593,21 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     // count; the user-code rethrow keeps going to the caller.
     if(is_system_header_body)
     {
-      // Before giving up: a class-template instance member can be left with
-      // the WRONG overload's out-of-line body (attached by an earlier
+      // Before giving up: a class-template instance member can be left with the
+      // WRONG overload's out-of-line body (attached by an earlier
       // base-name-only match), e.g. the input-iterator basic_string::
       // _M_construct body (which references `__beg`) ending up on the fill
       // _M_construct(size_type, _CharT) member, so its conversion fails with
       // "symbol '__beg' is unknown" and the member silently becomes a no-op.
-      // If a *unique* out-of-line definition whose signature (parameter
-      // arity) matches this member exists, and it is a different definition
-      // from the one currently attached (different source location), adopt
-      // that signature-matched body and the definition's parameter names and
+      // If a *unique* out-of-line definition whose signature (parameter arity)
+      // matches this member exists, and it is a different definition from the
+      // one currently attached (different source location), adopt that
+      // signature-matched body and the definition's parameter names and
       // re-type-check.  Doing this only on failure leaves correctly-converting
-      // members untouched.  Per N5008 [over.match] the definition belonging to
-      // a member is the one whose signature matches it; per [dcl.fct]/3
-      // parameter names are not part of the type, so the body must use the
-      // definition's names.
+      // members untouched.  Per N5008 [basic.scope.scope]/4 the definition
+      // belonging to a member is the one whose signature matches it; per
+      // [dcl.fct]/3 parameter names are not part of the type, so the body must
+      // use the definition's names.
       if(!symbol.type.get(ID_C_member_name).empty())
       {
         std::vector<irep_idt> def_param_names;
@@ -1705,7 +1705,7 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   // Mark this body as fully type-checked.  The final half-converted
   // sweep in cpp_typecheckt::typecheck() uses the absence of this flag
   // to find instances whose eager conversion was absorbed by candidate
-  // matching (see the [dcl.spec.auto]/11 note there).
+  // matching (see the [dcl.spec.auto.general]/15 note there).
   symbol.value.set("#cpp_converted", true);
 
   disable_access_control = saved_access_control;
@@ -1771,7 +1771,7 @@ irep_idt cpp_typecheckt::function_identifier(const typet &type)
     if(tmp_type.id() == ID_code)
       tmp_type = pointer_type(tmp_type);
     // Top-level const/volatile on parameters does not affect the
-    // function signature per [dcl.fct]/5.
+    // function signature per [dcl.fct]/3.
     tmp_type.remove(ID_C_constant);
     tmp_type.remove(ID_C_volatile);
     result += cpp_type2name(tmp_type);

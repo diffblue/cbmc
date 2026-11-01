@@ -81,7 +81,7 @@ typet cpp_typecheckt::decltype_of(const exprt &e, bool parenthesized)
     // (a wide or UTF string literal is an array constant)
     // N5008 [expr.prim.literal]/1: a string literal is an lvalue, so
     // decltype("abc") is `const char (&)[4]' ([dcl.type.decltype]/1.5);
-    // [lex.string]/6: the elements are const
+    // [lex.string]/1: the elements are const
     array_typet array = to_array_type(e.type());
     array.element_type().set(ID_C_constant, true);
     type = ::reference_type(array);
@@ -121,7 +121,7 @@ typet cpp_typecheckt::decltype_of(const exprt &e, bool parenthesized)
   {
     // N5008 [dcl.type.decltype]/1.4: an xvalue E has decltype T&&; a
     // conditional over two xvalues of one type is an xvalue
-    // ([expr.cond]/4.1).
+    // ([expr.cond]/5).
     // (the front end marks an rvalue reference with BOTH flags, see
     // cpp_convert_type.cpp)
     typet rr = ::reference_type(e.type());
@@ -153,7 +153,7 @@ typet cpp_typecheckt::decltype_of(const exprt &e, bool parenthesized)
   return cpp_bool_type(type);
 }
 
-/// N5008 [expr.rel]/2, [expr.eq]/1, [expr.log.and]/1, [expr.unary.op]/9: a
+/// N5008 [expr.rel]/2, [expr.eq]/2, [expr.log.and]/2, [expr.unary.op]/9: a
 /// comparison or logical operator yields a prvalue of type bool.  The front
 /// end represents it with the internal `__CPROVER_bool' (ID_bool); where the
 /// type of an expression becomes a C++ type -- a deduced placeholder, decltype,
@@ -269,9 +269,9 @@ void cpp_typecheckt::typecheck_type(typet &type)
 
   if(type.id() == ID_template_parameter_symbol_type)
   {
-    // Per [temp.arg]/2: if this template parameter is bound
+    // Per [temp.dep.general]/1: if this template parameter is bound
     // in the enclosing template_map, resolve it to the bound type.
-    // Per [temp.arg]/2: if this template parameter is bound
+    // Per [temp.dep.general]/1: if this template parameter is bound
     // in the enclosing template_map, resolve it to the bound type.
     {
       typet resolved = type;
@@ -334,16 +334,16 @@ void cpp_typecheckt::typecheck_type(typet &type)
     }
     catch(...)
     {
-      // The swap above moved the name OUT of `type`, so a resolution
-      // failure would otherwise leave an EMPTY cpp_name behind.  When
-      // `type` aliases a stored template declaration (e.g. a constraint
-      // default argument `typename = _Require<...>` evaluated during
-      // overload resolution, std::chrono::duration's converting
-      // constructor), that gutted node PERSISTS: the template must remain
-      // intact for later instantiations (a substitution failure is not an
-      // error and has no lasting effect, N5008 [temp.deduct]/8), so every
-      // later deduction would fail on the empty constraint.  Restore the
-      // original name before propagating the failure.
+      // The swap above moved the name OUT of `type`, so a resolution failure
+      // would otherwise leave an EMPTY cpp_name behind.  When `type` aliases a
+      // stored template declaration (e.g. a constraint default argument
+      // `typename = _Require<...>` evaluated during overload resolution,
+      // std::chrono::duration's converting constructor), that gutted node
+      // PERSISTS: the template must remain intact for later instantiations (a
+      // substitution failure is not an error and has no lasting effect, N5008
+      // [temp.deduct.general]/8), so every later deduction would fail on the
+      // empty constraint.  Restore the original name before propagating the
+      // failure.
       type.swap(cpp_name);
       throw;
     }
@@ -364,12 +364,12 @@ void cpp_typecheckt::typecheck_type(typet &type)
     // frontend_pointer) resolves to that unconverted type.  Convert it
     // here, as it would be were it spelled directly: otherwise
     // `static_cast<T &&>(t)' in forward<const int &> saw `frontend_pointer
-    // &&', no reference collapsing ([dcl.ref]/6) happened and the body was
+    // &&', no reference collapsing ([dcl.ref]/7) happened and the body was
     // dropped ("type mismatch on static_cast").
     if(type.id() == ID_frontend_pointer || type.id() == ID_merged_type)
       typecheck_type(type);
 
-    // Phase 2 audit per N5008 [temp.inst]/3.1: when a lazy typedef
+    // Phase 2 audit: when a lazy typedef
     // symbol's alias type just propagated through here, drive
     // on-demand resolution.  The type itself carries the lazy
     // markers and class-scope identifier, so the type-only helper
@@ -404,7 +404,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
       type.add_source_location() = symbol_expr.source_location();
     }
 
-    // N5008 [dcl.fct]/7: "The effect of a cv-qualifier-seq in a function
+    // N5008 [dcl.fct]/9: "The effect of a cv-qualifier-seq in a function
     // declarator is not the same as adding cv-qualification on top of the
     // function type.  In the latter case, the cv-qualifiers are ignored."
     // There are no cv-qualified function types.  When a cv-qualified template
@@ -571,8 +571,8 @@ void cpp_typecheckt::typecheck_type(typet &type)
 
         if(parameters.empty() || !parameters.front().get_this())
         {
-          // Add 'this' to the parameters.  N5008 [dcl.fct]/6-7 +
-          // [over.match.funcs]/4: the function type's cv-qualifier-seq
+          // Add 'this' to the parameters.  N5008 [dcl.fct]/10 +
+          // [over.match.funcs.general]/4: the function type's cv-qualifier-seq
           // qualifies the implicit object parameter, so `int (S::*)(int)
           // const` and `int (S::*)(int)` are distinct types (the
           // libc++ __member_pointer_traits_imp partial specializations on
@@ -606,7 +606,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
     to_array_type(type).element_type().id() == ID_cpp_name &&
     to_array_type(type).size().is_not_nil() && select_pack_element(type))
   {
-    // N5008 [dcl.type.pack.index]/1: `T...[N]' denotes the N-th element of
+    // N5008 [dcl.type.pack.index]/4: `T...[N]' denotes the N-th element of
     // the pack T (select_pack_element replaced it)
   }
   else if(type.id()==ID_array)
@@ -785,7 +785,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
           compound_body_depth > 0 &&
           param.default_value().id() != ID_cpp_deferred_default_argument)
         {
-          // N5008 [class.mem.general]/7-8: a default argument within the
+          // N5008 [class.mem.general]/9.2: a default argument within the
           // member-specification is a complete-class context -- it is
           // looked up and checked as if the class were complete, so
           // `path &replace_extension(const path &r = path())' may name
@@ -947,7 +947,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
     exprt e = static_cast<const exprt &>(type.find(ID_expr_arg));
 
     // N5008 [expr.prim.fold] in a trailing-return-type decltype
-    // ([dcl.fct]/8): fold-expressions are normally reduced in the
+    // ([basic.scope.param]/1.1): fold-expressions are normally reduced in the
     // method-body pass, which does not run on a trailing return type;
     // the unexpanded `cpp_binary_fold`/`cpp_{left,right}_fold` then
     // fails to typecheck ("found no match for symbol '<fn>'"),
@@ -956,9 +956,9 @@ void cpp_typecheckt::typecheck_type(typet &type)
     // fold's element count is that size; reduce the fold to the
     // associated operator tree over the pattern here.  For a
     // single-element pack the sole element keeps the plain parameter
-    // name (N5008 [temp.variadic]/5), so the pattern is used verbatim;
+    // name (N5008 [temp.variadic]/9.2), so the pattern is used verbatim;
     // for an empty pack the identity value is used
-    // ([expr.prim.fold]/3).  N>=2 (which requires replicated `$k`
+    // ([temp.variadic]/14).  N>=2 (which requires replicated `$k`
     // parameters not yet present at this point) is left to the body
     // pass.
     // The pack is the one of the template whose declaration is being
@@ -1002,7 +1002,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
           const irep_idt fold_op = node.get("fold_op");
           // Identify the pack-side of a binary fold by which operand
           // references a bound pack's parameter name (N5008
-          // [expr.prim.fold]/2): `(pack op ... op init)` has the pack
+          // [expr.prim.fold]/2-3): `(pack op ... op init)` has the pack
           // on the LEFT (sub[0]); `(init op ... op pack)` on the
           // RIGHT (sub[1]).  A unary fold has the pattern as its sole
           // operand.
@@ -1152,7 +1152,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
             {
               typet elem_t = t;
               typecheck_type(elem_t);
-              // N5008 [expr.prim.id.unqual]/3: a named function parameter
+              // N5008 [expr.prim.id.unqual]/12: a named function parameter
               // is an lvalue of its (referenced) type, also when declared
               // as a forwarding or rvalue reference
               if(is_reference(elem_t) || is_rvalue_reference(elem_t))
@@ -1234,7 +1234,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
       reduce(e);
     }
 
-    // N5008 [temp.variadic]/5: a call-argument pack expansion over a pack
+    // N5008 [temp.variadic]/9: a call-argument pack expansion over a pack
     // of the enclosing class template (`-> decltype(g(I...))' in a member
     // of `template <unsigned long... I> struct S'): the member's type is
     // checked here directly, with only the pack's first element bound to
@@ -1280,7 +1280,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
     typet tmp_type = static_cast<const typet &>(type.find(ID_type_arg));
     typecheck_type(tmp_type);
 
-    // N5008 [meta.trans.other]/3: remove_cvref_t<T> is
+    // N5008 [meta.trans.other]/1: remove_cvref_t<T> is
     // remove_cv_t<remove_reference_t<T>> -- the reference goes first, the
     // cv-qualifiers are those of the referenced type (`const int &' -> int)
     if(type.id() == ID_remove_cvref)
@@ -1314,7 +1314,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
       }
     }
 
-    // N5008 [meta.trans.cv]/2-3: remove_const removes only the
+    // N5008 [meta.trans.cv]/1: remove_const removes only the
     // top-level const, remove_volatile only the top-level volatile
     // (clang's __remove_const/__remove_volatile builtins, used by
     // libc++'s __remove_const_t in <__atomic/cxx_atomic_impl.h>).
@@ -1399,7 +1399,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
       // Clang's __make_unsigned(T) / __make_signed(T) builtins, the
       // compiler-accelerated backing of N5008 [meta.trans.sign]:
       // the corresponding unsigned (signed) integer type of the same
-      // width; cv-qualifiers are preserved ([meta.trans.sign]/2-3).
+      // width; cv-qualifiers are preserved ([meta.trans.sign]/1).
       // Enumerations convert to the signed/unsigned form of their
       // underlying type.
       const bool make_uns = type.id() == ID_make_unsigned;
@@ -1413,13 +1413,13 @@ void cpp_typecheckt::typecheck_type(typet &type)
       typet result;
       if(stripped.id() == ID_unsignedbv || stripped.id() == ID_signedbv)
       {
-        // [tab:meta.trans.sign]: a signed (unsigned) integer type is kept,
-        // an unsigned (signed) one becomes its corresponding type
-        // ([basic.fundamental]/2-3: same rank); otherwise -- plain char,
-        // wchar_t, char8_t ... -- the type of the smallest rank with the
-        // same size.  Return the C types with their #c_type, so that a
-        // template-id naming the result (`type_identity<__make_signed(S)>')
-        // is the same specialization as one spelled with the type itself.
+        // [tab:meta.trans.sign]: a signed (unsigned) integer type is kept, an
+        // unsigned (signed) one becomes its corresponding type
+        // ([basic.fundamental]/2-3, [conv.rank]/1.4: same rank); otherwise --
+        // plain char, wchar_t, char8_t ... -- the type of the smallest rank
+        // with the same size.  Return the C types with their #c_type, so that a
+        // template-id naming the result (`type_identity<__make_signed(S)>') is
+        // the same specialization as one spelled with the type itself.
         const std::size_t width = to_bitvector_type(stripped).get_width();
         const irep_idt &c_type = stripped.get(ID_C_c_type);
         const bool keep =
@@ -1652,12 +1652,12 @@ void cpp_typecheckt::convert_parsed_parameters(code_typet &code_type)
       type.id() == ID_cpp_name ||
       type.id() == ID_template_parameter_symbol_type)
       return; // dependent
-    // [dcl.fct]/5: parameters of array or function type are adjusted
+    // [dcl.fct]/3: parameters of array or function type are adjusted
     if(type.id() == ID_array)
       type = pointer_type(to_array_type(type).element_type());
     else if(type.id() == ID_code)
       type = pointer_type(type);
-    // [dcl.fct]/5: top-level cv-qualifiers are dropped from the function type
+    // [dcl.fct]/3: top-level cv-qualifiers are dropped from the function type
     if(type.id() != ID_pointer || !is_reference(type))
     {
       type.remove(ID_C_constant);

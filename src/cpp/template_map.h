@@ -27,7 +27,7 @@ class template_typet;
 
 /// Substitute, in place, every reference to the type parameter pack named
 /// \p base (matched by short-name suffix) inside \p n with the concrete
-/// element type \p elem ([temp.variadic]/5).  Defined in template_map.cpp;
+/// element type \p elem ([temp.variadic]/9).  Defined in template_map.cpp;
 /// also used by the template-argument pack expansion in
 /// cpp_typecheck_template.cpp.
 void replace_type_pack_ref(
@@ -70,7 +70,7 @@ public:
   /// map is built on top of the enclosing class's -- and different templates
   /// reuse parameter NAMES (`_Args`, `_ArgTypes`); when a pack reference can
   /// only be matched by its short name, the most recently bound candidate is
-  /// the innermost declaration and, per N5008 [basic.scope.scope] (name
+  /// the innermost declaration and, per N5008 [basic.lookup.unqual]/2 (name
   /// hiding), the one the reference denotes.  Missing entries are oldest.
   typedef flat_mapt<irep_idt, std::size_t> generation_mapt;
   generation_mapt generation_map;
@@ -89,7 +89,7 @@ public:
 
   /// Short names of a member alias template's OWN parameter packs while its
   /// body is being substituted during the enclosing class's instantiation.
-  /// N5008 [temp.alias]/2 + [temp.variadic]/4-5: such a pack is not yet bound
+  /// N5008 [temp.alias]/2 + [temp.variadic]/8: such a pack is not yet bound
   /// (it is substituted only at the alias's point of use), so a pack expansion
   /// whose pattern references one must be left UNEXPANDED here -- otherwise it
   /// would be driven by the enclosing class pack alone, leaving the alias's own
@@ -104,20 +104,20 @@ public:
 
   /// If \p param_type is a bare reference to a deduced template parameter
   /// pack (recorded in pack_args_map), return the deduced element types so a
-  /// function parameter pack can be expanded ([temp.variadic]/5); else null.
+  /// function parameter pack can be expanded ([temp.variadic]/9); else null.
   const std::vector<typet> *
   function_parameter_pack(const typet &param_type) const;
 
   /// Expand any function parameter pack in the parameter list of the
   /// function type \p function_type (ID_code or ID_function_type) into one
-  /// parameter per deduced pack element ([temp.variadic]/5).  Unlike apply(),
+  /// parameter per deduced pack element ([temp.variadic]/9).  Unlike apply(),
   /// this performs only pack expansion and is used at the specific sites that
   /// reconstruct a function type from a variadic pattern (e.g. matching a
   /// `std::function<R(A...)>` partial specialization), so the general
   /// substitution path is unaffected.
   void expand_parameter_packs(typet &function_type) const;
 
-  /// N5008 [temp.variadic]/5: expand pack expansions that appear as
+  /// N5008 [temp.variadic]/9: expand pack expansions that appear as
   /// function-call arguments anywhere inside \p n (e.g. the `declval<A>()...`
   /// in `decltype(declval<F>()(declval<A>()...))`, the shape of
   /// libstdc++'s `__invoke_result` used to constrain
@@ -141,18 +141,18 @@ public:
   ///   re-expanded against an unrelated enclosing pack's size.
   void expand_call_argument_packs(irept &n, bool only_nontype = false) const;
   /// Substitute the k-th element of every same-length pack other than
-  /// \p base referenced in \p copy (lockstep expansion, [temp.variadic]/5).
+  /// \p base referenced in \p copy (lockstep expansion, [temp.variadic]/9).
   void substitute_other_packs_lockstep(
     irept &copy,
     const std::string &base,
     std::size_t k,
     std::size_t n) const;
 
-  // N5008 [basic.scope.temp]/2 + [temp.deduct]/5: while a template is being
-  // DEDUCED, the identifiers of its own parameters.  The short-name fallback
-  // in apply(typet&) (conformance violation V1: it matches a bare parameter
-  // reference by suffix across the whole flat map) must not substitute an
-  // UNRELATED template's same-short-name binding into the deduced
+  // N5008 [basic.scope.temp]/2 + [temp.deduct.general]/5: while a template is
+  // being DEDUCED, the identifiers of its own parameters.  The short-name
+  // fallback in apply(typet&) (conformance violation V1: it matches a bare
+  // parameter reference by suffix across the whole flat map) must not
+  // substitute an UNRELATED template's same-short-name binding into the deduced
   // declaration -- e.g. the caller's `P2 = ratio<1,1>` into
   // std::chrono::duration's converting constructor whose own `P2` is still
   // being deduced.  When non-empty and a deduction parameter shares the
@@ -161,7 +161,7 @@ public:
   // cpp_typecheck_resolve.cpp.
   std::set<irep_idt> deduction_parameters;
 
-  /// N5008 [basic.scope.temp]/2 + [temp.local]/1: the template parameter
+  /// N5008 [basic.scope.temp]/2 + [temp.local]/7: the template parameter
   /// scopes whose declarations or bodies are currently being substituted,
   /// innermost LAST; each entry holds the scope-qualified identifiers of one
   /// template's parameters.  A bare parameter reference in a template's body
@@ -192,7 +192,7 @@ public:
   // Keys of entries whose PARAMETER is a template template parameter
   // (N5008 [temp.param]/1 template-head form).  Only these entries may
   // substitute as the TEMPLATE-NAME of a template-id in apply()
-  // ([temp.names]/2); a same-short-named TYPE parameter binding must
+  // ([temp.param]/7); a same-short-named TYPE parameter binding must
   // not.  Populated by set() from the parameter's ID_is_template mark.
   std::set<irep_idt> template_template_parameters;
 

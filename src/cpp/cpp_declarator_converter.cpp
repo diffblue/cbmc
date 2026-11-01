@@ -34,9 +34,9 @@ cpp_declarator_convertert::cpp_declarator_convertert(
 {
 }
 
-/// N5008 [dcl.spec.auto.general]/3: whether \p type is or contains, under
+/// N5008 [dcl.spec.auto.general]/4: whether \p type is or contains, under
 /// pointer and reference declarators, an undeduced placeholder (`auto',
-/// `auto &&', `const auto *'); [dcl.spec.auto.general]/13: a redeclaration
+/// `auto &&', `const auto *'); [dcl.spec.auto.general]/16: a redeclaration
 /// of a function with a deduced return type uses the placeholder, so its
 /// type does not conflict with the deduced one
 static bool placeholder_return_type(const typet &type)
@@ -76,15 +76,15 @@ symbolt &cpp_declarator_convertert::convert(
   final_type = declarator.merge_type(declaration_type);
   CHECK_RETURN(final_type.is_not_nil());
 
-  // N5008 [dcl.fct]/6-7: the cv-qualifier-seq after a parameter list is part
-  // of the FUNCTION type.  For a member function declarator it qualifies the
-  // implicit object parameter through add_this_to_method_type below; when
-  // the declarator declares something ELSE whose type contains a function
-  // type -- `typedef int (S::*TPMF)(int) const;`, a pointer-to-member
-  // variable or parameter -- rDeclarator has still reported the qualifier
-  // separately, and it must reach the pointed-to function type (as
-  // Parser::rTypeName does for a type-id, `using PMF = int (S::*)(int)
-  // const;`), where typecheck_type turns it into the cv of `this`.
+  // N5008 [dcl.fct]/10, [over.match.funcs.general]/4: the cv-qualifier-seq
+  // after a parameter list is part of the FUNCTION type.  For a member function
+  // declarator it qualifies the implicit object parameter through
+  // add_this_to_method_type below; when the declarator declares something ELSE
+  // whose type contains a function type -- `typedef int (S::*TPMF)(int)
+  // const;`, a pointer-to-member variable or parameter -- rDeclarator has still
+  // reported the qualifier separately, and it must reach the pointed-to
+  // function type (as Parser::rTypeName does for a type-id, `using PMF = int
+  // (S::*)(int) const;`), where typecheck_type turns it into the cv of `this`.
   if(
     !declarator.method_qualifier().id().empty() && final_type.id() != ID_code &&
     final_type.id() != ID_function_type)
@@ -381,7 +381,7 @@ symbolt &cpp_declarator_convertert::convert(
       if(declarator.find(ID_member_initializers).is_nil())
         declarator.set(ID_member_initializers, ID_member_initializers);
 
-      // N5008 [class.base.init]/2, [class.mfct]/1: the mem-initializer-ids
+      // N5008 [class.base.init]/2, [class.mfct]/2: the mem-initializer-ids
       // of an out-of-class constructor definition are looked up in the
       // class's scope -- a base named by a member typedef (`derived::
       // derived(int x) : my_base(x)' with `typedef base<...> my_base' in the
@@ -457,7 +457,7 @@ symbolt &cpp_declarator_convertert::convert(
     const irept hidden_friend_of = symbol.type.find(ID_C_hidden_friend_of);
     combine_types(declarator.name().source_location(), final_type, symbol);
     enforce_rules(symbol);
-    // N5008 [temp.spec.general]/5: a variable template specialization
+    // N5008 [temp.type]/1: a variable template specialization
     // instantiated again (see combine_types) already has the type and the
     // value its first instantiation deduced and converted; the repeated
     // initializer would replace that value by an unconverted one
@@ -575,7 +575,7 @@ void cpp_declarator_convertert::combine_types(
   }
   else if(symbol.type == decl_type)
     return; // ok
-  // N5008 [temp.spec.general]/5: every use of a variable template
+  // N5008 [temp.type]/1: every use of a variable template
   // specialization names the one variable; instantiating it again (the
   // specialization named once more) redeclares it with the placeholder type
   // its first instantiation deduced from the initializer
@@ -636,7 +636,7 @@ void cpp_declarator_convertert::combine_types(
     }
   }
 
-  // N5008 [temp.spec.general]/5 + [basic.def.odr]/1: a template
+  // N5008 [temp.spec.general]/5 + [basic.def.odr]/2: a template
   // specialization is defined at most once, and every instantiation of
   // the same specialization denotes the SAME entity -- the first
   // instantiation IS its definition.  An alias-template instance is
@@ -733,7 +733,7 @@ void cpp_declarator_convertert::handle_initializer(
 
     if(!is_code)
     {
-      // N5008 [temp.constr.atomic]/3, [temp.constr.op]: a concept's
+      // N5008 [temp.concept]/1, [temp.constr.op]: a concept's
       // initializer is its constraint-expression
       if(declarator.get_bool("#concept"))
         cpp_typecheck.convert_concept_initializer(symbol);
@@ -813,9 +813,9 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
 {
   irep_idt pretty_name = get_pretty_name();
 
-  // N5008 [basic.def.odr], [dcl.type.general]/... : the DEFINITION of an
+  // N5008 [basic.def.odr], [basic.def]/5/... : the DEFINITION of an
   // object requires a complete type; an array's element type must be
-  // complete ([dcl.array]/1).  [temp.inst]/2: a class template
+  // complete ([basic.types.general]/5).  [temp.inst]/2: a class template
   // specialization that is only NAMED by the type (a pointer or reference
   // to it, an extern declaration, a typedef, a function declaration) is not
   // instantiated by that.
@@ -840,7 +840,7 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
   symbol.value = declarator.value();
   symbol.location = declarator.name().source_location();
   symbol.is_extern = storage_spec.is_extern();
-  // [dcl.link]/7: a declaration directly in a linkage-specification
+  // [dcl.link]/8: a declaration directly in a linkage-specification
   // without a storage class specifier is treated as extern.
   // For non-POD class types without an initializer, mark as extern
   // to prevent default construction attempts that may fail
@@ -866,7 +866,7 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
   }
   symbol.is_macro =
     (is_typedef && !is_template_parameter) || storage_spec.is_constexpr();
-  // N5008 [dcl.constexpr]/1: a constexpr VARIABLE is still an object;
+  // N5008 [dcl.constexpr]/6: a constexpr VARIABLE is still an object;
   // for an ARRAY the object identity is essential -- its elements are
   // lvalues ([expr.sub]) and libc++ takes their address
   // (&__digits_base_10[i] in <charconv>).  Keep it a real, statically
@@ -923,7 +923,7 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
   {
     symbol.is_lvalue = !is_reference(symbol.type);
 
-    // N5008 [temp.expl.spec]/2, [basic.stc.static]/1: an explicit
+    // N5008 [temp.expl.spec]/3, [basic.stc.static]/1: an explicit
     // specialization of a variable template declared at namespace scope (in
     // the scope of its empty template-parameter-list, `template <>') is a
     // namespace-scope variable with static storage duration
@@ -1058,7 +1058,7 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
         // [temp.deduct.call]/4.3 derived-to-base call whose callee has a
         // trailing parameter pack fails to build (and poisons the callee's
         // sub-instantiations), even though the deferred drain resolves it.
-        // N5008 [expr.const]/22, [temp.inst]/8: a constexpr function named
+        // N5008 [expr.const]/29.6, [temp.inst]/8: a constexpr function named
         // in an unevaluated operand -- a requirement `__s - __i' of
         // libstdc++'s sized_sentinel_for checked for an incomplete
         // __normal_iterator -- is neither odr-used nor needed for constant
@@ -1089,7 +1089,7 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
           cpp_typecheck.convert_function(*new_symbol);
         else
         {
-          // N5008 [temp.inst]/4 + [basic.def.odr]/5: a specialization
+          // N5008 [temp.inst]/5 + [basic.def.odr]/3, 8: a specialization
           // named only in an unevaluated operand (`decltype(swap(declval<T
           // &>(), declval<T &>()))' of a SFINAE trait) is not odr-used;
           // its definition -- possibly ill-formed for these arguments,
@@ -1109,19 +1109,19 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
     }
     else
     {
-      // N5008 [dcl.init.ref], [dcl.init]/16: reference direct-initialization
-      // written with parentheses or braces, `T &r(init)` / `T &r{init}`, is
-      // stored by the parser as init_args rather than as a value.  A reference
-      // is not an object initialized by a constructor, so it is not handled by
-      // the object init_args path; attach the single initializer as the symbol
-      // value so convert_initializer performs the reference binding (exactly
-      // like `T &r = init`), and clear init_args so the declaration statement
-      // does not later see leftover init_args.
-      // N5008 [dcl.type.auto.deduct]/2.2.3: for a variable with a placeholder
-      // type, a parenthesized expression-list initializer shall be a single
-      // assignment-expression, which is the initializer-clause E
-      // (`auto x2a(i);' -- Example 3 -- is `int'); deduce from it exactly as
-      // for `auto x = i'.
+      // N5008 [dcl.init.ref], [dcl.init.general]/16.2: reference
+      // direct-initialization written with parentheses or braces, `T &r(init)`
+      // / `T &r{init}`, is stored by the parser as init_args rather than as a
+      // value.  A reference is not an object initialized by a constructor, so
+      // it is not handled by the object init_args path; attach the single
+      // initializer as the symbol value so convert_initializer performs the
+      // reference binding (exactly like `T &r = init`), and clear init_args so
+      // the declaration statement does not later see leftover init_args.  N5008
+      // [dcl.type.auto.deduct]/2.2.3: for a variable with a placeholder type, a
+      // parenthesized expression-list initializer shall be a single
+      // assignment-expression, which is the initializer-clause E (`auto
+      // x2a(i);' -- Example 3 -- is `int'); deduce from it exactly as for `auto
+      // x = i'.
       if(
         new_symbol->value.is_nil() &&
         (is_reference(new_symbol->type) ||
@@ -1154,7 +1154,7 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
         new_symbol->value = declarator.init_args().operands().front();
         declarator.remove(ID_init_args);
       }
-      // N5008 [temp.constr.atomic]/3, [temp.constr.op] (see handle_initializer)
+      // N5008 [temp.concept]/1, [temp.constr.op] (see handle_initializer)
       if(declarator.get_bool("#concept"))
         cpp_typecheck.convert_concept_initializer(*new_symbol);
       else

@@ -351,13 +351,13 @@ void cpp_typecheckt::typecheck()
 
   // A function-template instance can be left HALF-converted: its eager
   // conversion (required for `auto` return-type deduction,
-  // [dcl.spec.auto]/11) ran nested inside overload-candidate matching
+  // [dcl.spec.auto.general]/15) ran nested inside overload-candidate matching
   // and was absorbed by the SFINAE machinery -- leaving a raw body, an
   // undeduced return type, and a methods_seen entry that blocks
   // re-queueing (std::forward<int&> instantiated from
   // _Function_handler::_M_invoke).  Calls were built against the
   // half-symbol, so at goto conversion it is a bodyless callee and the
-  // std::function invocation havocs.  [temp.inst]/4: the odr-used
+  // std::function invocation havocs.  [temp.inst]/5: the odr-used
   // specialization must be instantiated; finish such conversions here,
   // to a fixpoint (a retry can instantiate further templates).
   std::set<irep_idt> unfinished;
@@ -435,9 +435,9 @@ void cpp_typecheckt::typecheck()
   // every class of the translation unit is known now
   resolve_runtime_dynamic_casts();
 
-  // N5008 [class.copy.ctor]/14, [class.default.ctor]/4: an implicitly-defined
-  // special member that is never odr-used is not defined at all; clear the
-  // remaining placeholders once every body has been elaborated.
+  // N5008 [dcl.fct.def.default]/5, [dcl.fct.def.default]/5: an
+  // implicitly-defined special member that is never odr-used is not defined at
+  // all; clear the remaining placeholders once every body has been elaborated.
   clear_not_typechecked();
 
   // N5008 [temp.inst]/11: a member whose body was DEFERRED and never
@@ -461,7 +461,7 @@ void cpp_typecheckt::typecheck()
   if(!dynamic_initializations.empty())
     static_and_dynamic_initialization();
 
-  // Final soundness sweep (N5008 [stmt.return]/3, [conv.ptr]/1): a body
+  // Final soundness sweep (N5008 [stmt.return]/2, [conv.ptr]/1): a body
   // may survive with a HALF-type-checked statement when an inner recovery
   // swallowed the failure without any catch clearing the value -- e.g. a
   // `return nullptr;` whose conversion to the function's return type
@@ -670,7 +670,7 @@ std::string cpp_typecheckt::to_string(const typet &type)
 
 bool cpp_typecheckt::empty_brace_value_initializes_scalar() const
 {
-  // C++ [dcl.init.list]/3.10: an empty braced-init-list `{}` for a
+  // C++ [dcl.init.list]/3.11: an empty braced-init-list `{}` for a
   // scalar performs value-initialization, yielding the scalar's
   // zero value.  This is a C++11 feature; CBMC accepts it in all
   // C++ modes for consistency with other permissive extensions.
@@ -883,7 +883,7 @@ void cpp_typecheckt::static_and_dynamic_initialization()
       // it here) would leave the member at 0 instead of its declared default.
       // Route such a definition to the default-constructor path below.
       // Members with an explicit initializer are unaffected (the initializer
-      // overrides the NSDMI, [class.base.init]/9).
+      // overrides the NSDMI, [class.base.init]/10).
       const bool needs_default_ctor =
         symbol.value.is_nil() && has_default_member_initializer(symbol.type);
 
@@ -976,7 +976,7 @@ void cpp_typecheckt::do_not_typechecked()
         {
           cpp_declaratort declarator;
           declarator.add_source_location() = symbol.location;
-          // the implicit MOVE assignment operator ([class.copy.assign]/12)
+          // the implicit MOVE assignment operator ([class.copy.assign]/5)
           // takes `X &&'
           const auto &parameters = to_code_type(symbol.type).parameters();
           const bool is_move =
@@ -1060,7 +1060,7 @@ void cpp_typecheckt::clean_up()
     }
     else if(symbol.type.id() == ID_code)
     {
-      // N5008 [dcl.fct]/5 + [basic.scope.param]: a parameter's name is
+      // N5008 [dcl.fct]/17 + [basic.scope.param]: a parameter's name is
       // local to its function.  A member of a class template instance
       // that was never odr-used keeps its PARSE-level parameter names
       // ("_m") in its function type; goto conversion would then

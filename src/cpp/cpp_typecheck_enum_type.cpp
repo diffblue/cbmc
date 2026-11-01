@@ -123,7 +123,7 @@ void cpp_typecheckt::typecheck_enum_body(
   // GCC's `enum __attribute__((__packed__))` extension, honoured by
   // the C front end (c_typecheck_type.cpp): with no enumeration-base
   // written, the underlying type is the SMALLEST sufficient integer
-  // type.  N5008 [dcl.enum]/8 leaves the underlying type
+  // type.  N5008 [dcl.enum]/7 leaves the underlying type
   // implementation-defined in that case, and matching the platform
   // compiler is what makes sizeof agree (user-reported: 1-byte
   // instruction fields via packed enums in packed structs).  The

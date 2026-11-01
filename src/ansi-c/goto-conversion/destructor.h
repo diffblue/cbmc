@@ -24,11 +24,11 @@ class typet;
 class code_function_callt
 get_destructor(const namespacet &ns, const typet &type);
 
-/// C++ [class.dtor]/13, [basic.life]/5: the elements of an array object of
-/// class type with a destructor are destroyed in the reverse order of their
+/// C++ [class.dtor]/13, [class.init.general]/3: the elements of an array object
+/// of class type with a destructor are destroyed in the reverse order of their
 /// construction.  \return the destructor calls for \p array (an array of
-/// constant size, possibly multidimensional), or nothing if its elements
-/// need no destruction.
+/// constant size, possibly multidimensional), or nothing if its elements need
+/// no destruction.
 std::optional<codet> array_destructor(const namespacet &ns, const exprt &array);
 
 void destruct_locals(

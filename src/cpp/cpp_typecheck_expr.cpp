@@ -87,7 +87,7 @@ bool cpp_typecheckt::requirement_expression_is_valid(exprt op)
   try
   {
     sfinae_contextt sfinae_guard{*this};
-    // N5008 [temp.variadic]/5 + [expr.prim.req]/2: the requirement is
+    // N5008 [temp.variadic]/16 + [expr.prim.req.general]/5: the requirement is
     // checked with the constrained declaration's parameter mapping,
     // including PACK bindings.  A call-argument (or new-initializer)
     // pack expansion over an EMPTY pack must disappear before
@@ -100,8 +100,9 @@ bool cpp_typecheckt::requirement_expression_is_valid(exprt op)
     // (gcc-16 <optional>'s _M_apply, reduced to a 30-line kernel).
     expand_requires_parameter_packs(op);
     template_map.expand_call_argument_packs(op);
-    // [expr.prim.req.general]/2: the expressions of a requires-expression
-    // are unevaluated operands -- nothing they name is odr-used
+    // [expr.prim.req.simple]/1, [expr.prim.req.compound]/1: the expressions of
+    // a requires-expression are unevaluated operands -- nothing they name is
+    // odr-used
     unevaluated_operandt unevaluated_guard{*this};
     typecheck_expr(op);
   }
@@ -132,7 +133,7 @@ void cpp_typecheckt::expand_requires_parameter_packs(exprt &expr)
       if(op.id() == ID_arguments)
         expand_type_pack_arguments(op, /*with_requires_parameters=*/true);
   }
-  // N5008 [temp.variadic]/5: a new-initializer's expression-list is a
+  // N5008 [temp.variadic]/6.5: a new-initializer's expression-list is a
   // pack-expansion context too -- the MSVC STL's std::construct_at is
   // constrained by `requires(_Ty *_Location, _Types &&..._Args) { ::new
   // (static_cast<void *>(_Location)) _Ty(forward<_Types>(_Args)...); }'
@@ -190,7 +191,7 @@ void cpp_typecheckt::expand_requires_parameter_packs_in_type(irept &type)
     expand_requires_parameter_packs_in_type(named.second);
 }
 
-/// N5008 [expr.prim.req.general]/4, [temp.variadic]/5: a parameter of a
+/// N5008 [expr.prim.req.general]/4, [temp.variadic]/9: a parameter of a
 /// requires-expression may be a function parameter pack, `A &&...a'; it
 /// declares one parameter per element of the template parameter pack A, the
 /// k-th of type A_k &&.  If \p type (in parsed form, with the template map of
@@ -382,7 +383,7 @@ bool cpp_typecheckt::has_trivial_destructor(const typet &type, int depth)
 /// type for an array of known bound) is not deleted and is accessible; void,
 /// function types and arrays of unknown bound are not destructible.  A class
 /// whose implicit destructor would destroy an indestructible base or
-/// non-variant member has a deleted destructor ([class.dtor]/5).
+/// non-variant member has a deleted destructor ([class.dtor]/7.1).
 bool cpp_typecheckt::is_destructible_type(const typet &type, int depth)
 {
   if(depth <= 0)
@@ -735,18 +736,19 @@ bool cpp_typecheckt::is_trivially_equality_comparable(
 /// N5008 [class.prop]/1: a trivially copyable class has at least one eligible
 /// copy constructor, move constructor, copy assignment operator or move
 /// assignment operator, each of which is trivial (implicitly declared, not
-/// user-provided, [class.copy.ctor]/11, [class.copy.assign]/9), no
-/// non-trivial ones, and a trivial non-deleted destructor; and, transitively
-/// ([class.copy.ctor]/11), no virtual functions or virtual bases, and bases
-/// and non-static data members of trivially copyable type.  /2: a trivial
-/// class is trivially copyable and has a trivial default constructor
+/// user-provided, [class.copy.ctor]/11, [class.copy.assign]/9), no non-trivial
+/// ones, and a trivial non-deleted destructor; and, transitively
+/// ([class.copy.ctor]/11), no virtual functions or virtual bases, and bases and
+/// non-static data members of trivially copyable type.  /2: a trivial class is
+/// trivially copyable and has a trivial default constructor
 /// ([class.default.ctor]/3: no user-provided one, no default member
-/// initializers, bases and members trivial).  [basic.types.general]/9
-/// extends both to scalars, arrays and cv-qualified versions.
-/// N5008 [class.prop], [class.virtual]/1, [class.dtor]/9, [dcl.init.aggr]/1:
-/// the class properties behind the GCC/Clang type traits `__is_empty',
-/// `__is_polymorphic', `__has_virtual_destructor', `__is_standard_layout',
-/// `__is_pod', `__is_aggregate', `__is_literal_type' for the type \p t.
+/// initializers, bases and members trivial).  [basic.types.general]/9,
+/// [depr.meta.types]/3 extends both to scalars, arrays and cv-qualified
+/// versions.  N5008 [class.prop], [class.virtual]/1, [class.dtor]/11,
+/// [dcl.init.aggr]/1: the class properties behind the GCC/Clang type traits
+/// `__is_empty', `__is_polymorphic', `__has_virtual_destructor',
+/// `__is_standard_layout', `__is_pod', `__is_aggregate', `__is_literal_type'
+/// for the type \p t.
 bool cpp_typecheckt::class_property(const irep_idt &trait, const typet &t)
 {
   const bool is_class = t.id() == ID_struct_tag;
@@ -846,7 +848,7 @@ bool cpp_typecheckt::class_property(const irep_idt &trait, const typet &t)
       {
         if(!code_type.get_bool("#is_implicit_ctor"))
           has_user_ctor = true;
-        // [basic.types.general]/10.5.2: a constexpr constructor that is not
+        // [basic.types.general]/10.5.3.4: a constexpr constructor that is not
         // a copy or move constructor (an implicit default constructor is
         // constexpr when it can be, [class.default.ctor]/4; a constexpr
         // member function is a macro symbol here)
@@ -904,10 +906,10 @@ bool cpp_typecheckt::class_property(const irep_idt &trait, const typet &t)
   if(trait == "__is_polymorphic")
     return is_class && has_vtptr; // [class.virtual]/1
   if(trait == "__has_virtual_destructor")
-    return has_virtual_dtor; // [class.dtor]/9
+    return has_virtual_dtor; // [class.dtor]/11
   if(trait == "__is_standard_layout")
   {
-    // [class.prop]/3 (simplified: no virtual functions or bases, uniform
+    // [class.prop]/10 (simplified: no virtual functions or bases, uniform
     // access control, standard-layout members and bases, no reference
     // members)
     // /3.6: all non-static data members and bit-fields declared in the same
@@ -973,7 +975,7 @@ bool cpp_typecheckt::is_trivially_copyable_type(
       if(!is_trivially_copyable_type(base_type, want_trivial, depth - 1))
         return false;
     }
-    // [class.default.ctor]/3, [class.prop]/2: a trivial class HAS a
+    // [class.default.ctor]/3, [depr.meta.types]/3: a trivial class HAS a
     // trivial default constructor.  A class with a user-declared
     // constructor of another signature (`S(int)') has no implicit default
     // constructor at all ([class.default.ctor]/1), so the loop below finds
@@ -1044,8 +1046,8 @@ bool cpp_typecheckt::is_trivially_copyable_type(
         return false;
       // a reference member is copied as it is ([class.copy.ctor]/14) and
       // leaves the copy constructor trivial; it deletes the default
-      // constructor ([class.default.ctor]/2.2), so the class is not trivial
-      // ([class.prop]/2: no eligible default constructor)
+      // constructor ([class.default.ctor]/2.1), so the class is not trivial
+      // ([depr.meta.types]/3: no eligible default constructor)
       if(is_reference(comp.type()) || is_rvalue_reference(comp.type()))
       {
         if(want_trivial)
@@ -1386,7 +1388,7 @@ bool cpp_typecheckt::compound_requirement_is_satisfied(const exprt &expr)
     expand_requires_parameter_packs(op);
     template_map.expand_call_argument_packs(op);
     {
-      // [expr.prim.req.general]/2: the expression is an unevaluated operand
+      // [expr.prim.req.compound]/1: the expression is an unevaluated operand
       unevaluated_operandt unevaluated_guard{*this};
       typecheck_expr(op);
     }
@@ -1448,7 +1450,7 @@ bool cpp_typecheckt::compound_requirement_is_satisfied(const exprt &expr)
             // is an unresolved cpp_name.  Here the CURRENT SCOPE is the
             // root, so name lookup cannot resolve it -- but the
             // enclosing template's binding is in the template map;
-            // use it ([temp.names]/1, [temp.arg]/1).
+            // use it ([temp.names]/1, [temp.arg.general]/3).
             if(arg_type.id() == ID_cpp_name)
             {
               irep_idt short_name;
@@ -1538,7 +1540,7 @@ bool cpp_typecheckt::compound_requirement_is_satisfied(const exprt &expr)
             template_map.clear();
             typecheck_expr(as_expr);
             simplify(as_expr, *this);
-            // [temp.constr.atomic]/1: contextually converted to bool.
+            // [temp.constr.atomic]/3: contextually converted to bool.
             // A `bool`-typed constant is not recognised by is_zero(),
             // so test the boolean forms first (the same trap that made
             // the legacy path read every satisfied requirement as
@@ -1699,13 +1701,13 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     // A CONSTANT of class or array type -- the folded value of a constexpr
     // object substituted for its symbol, e.g. `constexpr Fixed f{42}` as
     // the argument of a class-type non-type template parameter (N5008
-    // [temp.param]/7, [temp.arg.nontype]/1); it is already type-checked and
+    // [temp.param]/12, [temp.arg.nontype]/1); it is already type-checked and
     // has nothing to resolve.  (The C front-end's handler treats a struct
     // or array node as unexpected.)
   }
   else if(expr.id() == ID_string_constant)
   {
-    // N5008 [lex.string]/6: an ordinary string literal has type "array of n
+    // N5008 [lex.string]/1: an ordinary string literal has type "array of n
     // const char" (the C front-end types it `char[n]', C's rule).  The
     // constness matters for overload resolution: `std::string s("...")`
     // must select the non-template `basic_string(const char *)` -- with
@@ -1750,7 +1752,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
   }
   else if(expr.id() == ID_spaceship && expr.operands().size() == 2)
   {
-    // N5008 [expr.spaceship]/7-8: the built-in three-way comparison of two
+    // N5008 [expr.spaceship]/4.2, 4.3: the built-in three-way comparison of two
     // operands of arithmetic type yields a value of a comparison category
     // type, NOT an int -- std::strong_ordering for integral operands and
     // std::partial_ordering for floating-point operands.  (The plain int
@@ -1810,7 +1812,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       return resolved;
     };
 
-    // [expr.spaceship]/8: two operands of pointer type (after the composite
+    // [expr.spaceship]/6: two operands of pointer type (after the composite
     // pointer type conversion) also yield std::strong_ordering.  Only the
     // arithmetic case was lowered; `p <=> q' fell to the C int lowering, and
     // `if(const auto cmp = x <=> y; cmp != 0) return cmp;' in a function
@@ -2175,7 +2177,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     // [meta.rel] table: `is_base_of<Base, Derived>::value` is
     // true iff `Base` is a base class of `Derived` (or the same
     // class).  Both `class` and `struct` declarations produce
-    // class types per [class]/1; CBMC stores `struct` as a
+    // class types per [class.pre]/4; CBMC stores `struct` as a
     // `struct_typet` without `ID_C_class`, while `class` sets
     // `ID_C_class`.  `to_class_type` requires `ID_C_class`, so
     // call `to_struct_type` here — a struct is a class-key for
@@ -2387,11 +2389,11 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
           return false;
         if(a.id() == ID_code)
         {
-          // [dcl.fct]/6-7, [basic.type.qualifier]: the parameter types
-          // (their nested cv-qualifiers, e.g. `void (*)(const int *)` vs
-          // `void (*)(int *)`) and, for a member function type, the
-          // cv-qualifier-seq -- modelled as the cv of the implicit object
-          // parameter's pointee -- are part of the type's identity.
+          // [dcl.fct]/10, [over.match.funcs.general]/4, [basic.type.qualifier]:
+          // the parameter types (their nested cv-qualifiers, e.g. `void
+          // (*)(const int *)` vs `void (*)(int *)`) and, for a member function
+          // type, the cv-qualifier-seq -- modelled as the cv of the implicit
+          // object parameter's pointee -- are part of the type's identity.
           const code_typet &ca = to_code_type(a);
           const code_typet &cb = to_code_type(b);
           if(!same_including_cv(ca.return_type(), cb.return_type()))
@@ -2436,7 +2438,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
         // N5008 [meta.rel]/[meta.unary.prop]: the trait is defined via
         // declval<From>(), which is an LVALUE of the underlying type
         // when From is an lvalue reference (reference collapsing,
-        // [dcl.ref]/6) and an xvalue otherwise -- in either case the
+        // [dcl.ref]/7) and an xvalue otherwise -- in either case the
         // synthesised operand's TYPE is the underlying (non-reference)
         // type; expressions never have reference type
         // ([expr.type]/1).  A reference-typed operand tripped
@@ -2740,7 +2742,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       // from Args. For scalar types, construction from a compatible type
       // (including references) is always possible.
       //
-      // N5008 [temp.variadic]/5: an empty pack expansion in the argument list
+      // N5008 [temp.variadic]/16: an empty pack expansion in the argument list
       // (e.g. `__is_constructible(T, Args...)` with an empty `Args`, which is
       // how `std::is_default_constructible<T>` = `is_constructible<T>` and the
       // SFINAE default template argument of std::stack's default constructor
@@ -2763,7 +2765,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       // ([dcl.init.general]/16.6.2): attempt it as a substitution context,
       // each argument an lvalue for an lvalue-reference Arg and an xvalue
       // otherwise.  A non-class T cannot be initialized from a list of
-      // several expressions ([dcl.init.general]/16.9).
+      // several expressions ([dcl.init.general]/13).
       const std::vector<typet> constructor_args =
         t2.is_nil() ? std::vector<typet>{} : builtin_trait_type_args(expr);
       if(constructor_args.size() > 2)
@@ -2991,7 +2993,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       expr.id() == "__reference_constructs_from_temporary" ||
       expr.id() == "__reference_converts_from_temporary")
     {
-      // P2255R2 / N5008 [meta.rel] tab:meta.rel: true iff T (t1) is a
+      // P2255R2 / N5008 [meta.unary.prop]/5 tab:meta.rel: true iff T (t1) is a
       // reference type bound to a value of type U (t2) via a
       // MATERIALIZED TEMPORARY ([dcl.init.ref]/5.4,
       // [class.temporary]).  Approximation without user-defined
@@ -3001,7 +3003,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       //    reference-compatible binding creates no temporary -> false;
       //  * U a non-reference (prvalue): a temporary is materialized
       //    unless T is a non-const lvalue reference (which cannot bind
-      //    a temporary, [dcl.init.ref]/5.1) -> true for `const T&` and
+      //    a temporary, [dcl.init.ref]/5.2) -> true for `const T&` and
       //    `T&&` on the same (up to cv) or derived-to-base type.
       bool result = false;
       if(is_reference(t1) && t2.is_not_nil() && t2.id() != ID_empty)
@@ -3032,7 +3034,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     else if(expr.id() == "__reference_binds_to_temporary")
     {
       // Clang's `__reference_binds_to_temporary(T, U)': true iff the
-      // initialization `T t(VAL<U>);' ([meta.rqmts]/5: VAL<U> has the type
+      // initialization `T t(VAL<U>);' ([meta.unary.prop]/5: VAL<U> has the type
       // and value category of declval<U>(), a prvalue for a non-reference
       // U) is well-formed and binds t to a temporary that the initializer
       // was CONVERTED to -- N5008 [dcl.init.ref]/5.3.2 with a conversion
@@ -3119,13 +3121,13 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
   }
   else if(expr.id() == ID_cpp_datasizeof)
   {
-    // Clang's `__datasizeof(T)': the Itanium C++ ABI's dsize(T), "the size
-    // of an object of type T without tail padding" (ABI 2.2).  ABI 2.4-II:
-    // for a class that is a POD for the purpose of layout (a C++03 POD:
-    // N5008 [class.prop] trivial + standard-layout as of C++03 -- no
-    // user-declared special members, bases, virtual members or non-public
-    // non-static data members) dsize is sizeof; otherwise it is the end of
-    // the last non-static data member, 0 for an empty class, since a
+    // Clang's `__datasizeof(T)': the Itanium C++ ABI's dsize(T), "the size of
+    // an object of type T without tail padding" (ABI 2.2).  ABI 2.4-II: for a
+    // class that is a POD for the purpose of layout (a C++03 POD: N5008
+    // [depr.meta.types]/3-4, [class.prop]/10 trivial + standard-layout as of
+    // C++03 -- no user-declared special members, bases, virtual members or
+    // non-public non-static data members) dsize is sizeof; otherwise it is the
+    // end of the last non-static data member, 0 for an empty class, since a
     // derived class may place its own members in the tail padding.  For a
     // non-class type dsize is sizeof ([expr.sizeof]/1-2).  libc++ 18
     // preprocessed by clang selects `__libcpp_datasizeof<_Tp>::value =
@@ -3174,11 +3176,11 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
   }
   else if(expr.id() == ID_noexcept)
   {
-    // C++11 noexcept operator per [expr.unary.noexcept]/3: "The
+    // C++11 noexcept operator per [expr.unary.noexcept]/2: "The
     // result of the noexcept operator is a prvalue of type bool.
     // Its value is false if the expression would throw because of
     // …; otherwise it is true."  Evaluating the operand for this
-    // determination is an unevaluated operand ([basic.def.odr]/2,
+    // determination is an unevaluated operand ([basic.def.odr]/3,
     // [expr.context]/1) and substitution failures must not leak
     // as diagnostics — treat it as a SFINAE immediate context.
     auto &op = to_unary_expr(expr).op();
@@ -3190,7 +3192,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       // [expr.unary.noexcept]/1: the operand is unevaluated
       unevaluated_operandt unevaluated_guard{*this};
       typecheck_expr(op);
-      // [expr.unary.noexcept]/3 + [except.spec]/6: the operand is
+      // [expr.unary.noexcept]/2 + [except.spec]/5: the operand is
       // potentially-throwing if it contains, at any depth, a call to a
       // function that is not non-throwing, a throw-expression, or a
       // dynamic_cast / typeid that can throw.  A destructor has the
@@ -3338,7 +3340,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     else if(expr.id() == "__is_arithmetic")
     {
       expr =
-        // [basic.fundamental]/12: integral and floating-point types
+        // [basic.fundamental]/14: integral and floating-point types
         (t.id() == ID_signedbv || t.id() == ID_unsignedbv ||
          t.id() == ID_c_bool || t.id() == ID_bool || t.id() == ID_floatbv ||
          t.id() == ID_fixedbv)
@@ -3353,7 +3355,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     {
       // [basic.compound]/1.3: pointers to void, objects and functions --
       // neither pointers to members nor std::nullptr_t
-      // ([basic.fundamental]/15)
+      // ([basic.fundamental]/16)
       expr = (t.id() == ID_pointer && !is_reference(t) &&
               t.find(ID_to_member).is_nil() && !is_nullptr_type(t))
                ? exprt(true_exprt())
@@ -3478,7 +3480,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       expr.id() == "__is_aggregate" || expr.id() == "__is_literal_type")
     {
       // The class properties of N5008 [class.prop], [class.virtual]/1,
-      // [class.dtor]/9 and [dcl.init.aggr]/1, on the flattened struct
+      // [class.dtor]/11 and [dcl.init.aggr]/1, on the flattened struct
       // (base members are components marked #from_base; a polymorphic class
       // has a vtable-pointer component).  Every one of these was
       // unconditionally false, so libstdc++'s is_empty (the empty-base /
@@ -3496,7 +3498,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     }
     else if(expr.id() == "__is_compound" || expr.id() == "__is_fundamental")
     {
-      // [basic.fundamental]/15: the arithmetic types, void and
+      // [basic.fundamental]/17: the arithmetic types, void and
       // std::nullptr_t are the fundamental types; every other type is
       // compound ([basic.compound]/1)
       const bool fundamental = t.id() == ID_empty || t.id() == ID_signedbv ||
@@ -3519,12 +3521,12 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     else if(
       expr.id() == "__is_trivially_copyable" || expr.id() == "__is_trivial")
     {
-      // N5008 [basic.types.general]/9: scalar types, trivially copyable
-      // class types, arrays of such, and cv-qualified versions are
-      // trivially copyable; the trivial types add trivially default
-      // constructible classes.  Used to be an unconditional false -- so
-      // libc++'s variant computed a non-trivial copy for variant<int,
-      // double>, and std::is_trivially_copyable<int> was false.
+      // N5008 [basic.types.general]/9, [depr.meta.types]/3: scalar types,
+      // trivially copyable class types, arrays of such, and cv-qualified
+      // versions are trivially copyable; the trivial types add trivially
+      // default constructible classes.  Used to be an unconditional false -- so
+      // libc++'s variant computed a non-trivial copy for variant<int, double>,
+      // and std::is_trivially_copyable<int> was false.
       const bool want_trivial = expr.id() == "__is_trivial";
       expr = is_trivially_copyable_type(t, want_trivial, 16)
                ? exprt(true_exprt())
@@ -3769,10 +3771,10 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
   c_qualifierst{}.write(plain1);
   c_qualifierst{}.write(plain2);
   // operator== ignores the `#' attributes: #c_type, which distinguishes int
-  // from a long of the same width ([basic.fundamental]/2: distinct types),
+  // from a long of the same width ([basic.fundamental]/17: distinct types),
   // and the qualifiers below the top level -- `int *' and `const int *' are
   // different types, whose composite pointer type is `const int *'
-  // ([expr.cond]/7.3, [expr.type]/4), not the first operand's type
+  // ([expr.cond]/7.3, [expr.type]/3), not the first operand's type
   const bool same_underlying =
     plain1 == plain2 && cpp_type2name(plain1) == cpp_type2name(plain2);
 
@@ -4043,7 +4045,7 @@ void cpp_typecheckt::typecheck_expr_member(exprt &expr)
   typecheck_expr_member(expr, cpp_typecheck_fargst());
 }
 
-/// N5008 [temp.variadic]/5: a pack-expansion function-call argument whose
+/// N5008 [temp.variadic]/9: a pack-expansion function-call argument whose
 /// pattern names a TYPE template parameter pack (`declval<Args>()...' in
 /// `decltype(g(declval<Args>()...))') expands to one argument per element of
 /// the pack, the k-th substituting the pack's k-th type.  Function bodies are
@@ -4284,7 +4286,7 @@ void cpp_typecheckt::expand_type_pack_arguments(
 /// The type arguments of a builtin trait recorded by the parser in
 /// "type_args" (see Parser::rTypePredicate), typechecked, with a pack
 /// expansion `Args...' replaced by the elements of the pack (N5008
-/// [temp.variadic]/5); the pack is the template parameter of that name in
+/// [temp.variadic]/9); the pack is the template parameter of that name in
 /// scope, bound in template_map by the enclosing instantiation.
 std::vector<typet> cpp_typecheckt::builtin_trait_type_args(const exprt &expr)
 {
@@ -4321,7 +4323,7 @@ std::vector<typet> cpp_typecheckt::builtin_trait_type_args(const exprt &expr)
       if(expanded)
         continue;
     }
-    // N5008 [temp.variadic]/5: a pattern other than the bare pack name
+    // N5008 [temp.variadic]/9: a pattern other than the bare pack name
     // (`Y &&...', `const Y &...') expands to one argument per element of
     // the pack it names, each with the element substituted for the pack
     if(raw.get_bool(ID_ellipsis) && raw.id() != ID_cpp_name)
@@ -4387,7 +4389,7 @@ std::vector<typet> cpp_typecheckt::builtin_trait_type_args(const exprt &expr)
   return result;
 }
 
-/// N5008 [meta.rel]/6-7, [func.require]/1: `__is_invocable(Fn, Args...)'
+/// N5008 [meta.rel]/2, [func.require]/1: `__is_invocable(Fn, Args...)'
 /// (GCC 14's builtin, libstdc++ 16's std::is_invocable) holds iff
 /// INVOKE(declval<Fn>(), declval<Args>()...) is well-formed when treated as
 /// an unevaluated operand: for a pointer to member with at least one
@@ -4432,10 +4434,10 @@ void cpp_typecheckt::typecheck_expr_is_invocable(exprt &expr)
     fn_type.id() == ID_pointer && fn_type.find(ID_to_member).is_not_nil();
   if(pointer_to_member && args.size() >= 2)
   {
-    // (a0.*pm)(a1, ...) resp. a0.*pm for a data member.  The object
-    // operand may be a prvalue in the language ([expr.mptr.oper]/2); the
-    // front-end's pointer-to-member conversion takes the object's address
-    // and so wants an lvalue -- for the probe an lvalue is as good.
+    // (a0.*pm)(a1, ...) resp. a0.*pm for a data member.  The object operand may
+    // be a prvalue in the language ([expr.mptr.oper]/6, [basic.lval]/7); the
+    // front-end's pointer-to-member conversion takes the object's address and
+    // so wants an lvalue -- for the probe an lvalue is as good.
     exprt object = declval(args[1]);
     if(!is_reference(args[1]) && args[1].id() != ID_pointer)
       to_already_typechecked_expr(object).get_expr().set(ID_C_lvalue, true);
@@ -4467,7 +4469,7 @@ void cpp_typecheckt::typecheck_expr_is_invocable(exprt &expr)
     probe = std::move(call);
   }
 
-  // [temp.deduct]/8: the probe's ill-formedness is a substitution
+  // [temp.deduct.general]/8: the probe's ill-formedness is a substitution
   // failure, not an error of the program
   const std::size_t errors_before =
     get_message_handler().get_message_count(messaget::M_ERROR);
@@ -4663,7 +4665,7 @@ void cpp_typecheckt::typecheck_braced_argument_elements(exprt &init_list)
 }
 
 /// The thunk a pointer to the virtual member function \p function
-/// designates ([expr.mptr.oper]/4): `R C::vf\@virtual(C *this, Ps... ps)
+/// designates ([expr.call]/2): `R C::vf\@virtual(C *this, Ps... ps)
 /// { return this->vf(ps...); }' -- the call in the body dispatches through
 /// the object's virtual table, so the final overrider of the object's
 /// dynamic type runs.  Created on first use, in the function's class.
@@ -4764,7 +4766,7 @@ void cpp_typecheckt::typecheck_expr_sizeof(exprt &expr)
 
     if(type.id() == ID_cpp_name)
     {
-      // [expr.sizeof]/5: a sizeof...(Pack) pack-size query.  Only a genuine
+      // [expr.sizeof]/4: a sizeof...(Pack) pack-size query.  Only a genuine
       // `sizeof...` (marked by the parser) counts the pack's elements; a
       // plain `sizeof(type)` whose type happens to be a cpp_name (e.g. a
       // dependent qualified-id such as `first_type<A...>::type`) must compute
@@ -4775,7 +4777,7 @@ void cpp_typecheckt::typecheck_expr_sizeof(exprt &expr)
         const irep_idt &base_name =
           cpp_name.get_sub().front().get(ID_identifier);
 
-        // N5008 [temp.variadic]/8 + [basic.scope.temp]/2: `sizeof...(P)`
+        // N5008 [temp.variadic]/10 + [basic.scope.temp]/2: `sizeof...(P)`
         // counts the elements of the pack P named in the *current* scope.
         // Resolve P to its scope-qualified template-parameter identifier and
         // read its size exactly, rather than matching the bare short name
@@ -5129,7 +5131,7 @@ bool cpp_typecheckt::rewritten_comparison_candidate(exprt &expr)
     const typet &u = is_reference(t) ? to_reference_type(t).base_type() : t;
     return u.id() == ID_struct_tag || u.id() == ID_struct;
   };
-  // [over.match.oper]/3.3: with no operand of class type only candidates
+  // [over.match.oper]/3.2: with no operand of class type only candidates
   // taking the operands' enumeration types remain -- the rewrite below
   // does not model that restriction, so it is limited to class operands.
   if(
@@ -5242,12 +5244,13 @@ bool cpp_typecheckt::rewritten_comparison_candidate(exprt &expr)
   return false;
 }
 
-/// N5008 [over.match.best]/2.1, [over.match.oper]/3: whether the non-member
-/// operator function \p nonmember is a better candidate for the operands
-/// \p operands than the member operator function \p member, whose implicit
-/// object parameter takes the first operand ([over.match.funcs]/4): each
-/// conversion sequence of \p nonmember is not worse ([over.ics.rank]) and
-/// one is better.  Ranks come from implicit_conversion_sequence.
+/// N5008 [over.match.best.general]/2.1, [over.match.oper]/3: whether the
+/// non-member operator function \p nonmember is a better candidate for the
+/// operands \p operands than the member operator function \p member, whose
+/// implicit object parameter takes the first operand
+/// ([over.match.funcs.general]/4): each conversion sequence of \p nonmember is
+/// not worse ([over.ics.rank]) and one is better.  Ranks come from
+/// implicit_conversion_sequence.
 bool cpp_typecheckt::nonmember_operator_is_better(
   const exprt::operandst &operands,
   const irep_idt &member,
@@ -5280,7 +5283,7 @@ bool cpp_typecheckt::nonmember_operator_is_better(
   for(std::size_t i = 0; i < operands.size() && !worse; ++i)
   {
     // the implicit object parameter: reference to the class
-    // ([over.match.funcs]/4)
+    // ([over.match.funcs.general]/4)
     const typet member_type =
       i == 0 ? typet{reference_type(
                  to_pointer_type(member_parameters[0].type()).base_type())}
@@ -5308,7 +5311,7 @@ bool cpp_typecheckt::nonmember_operator_is_better(
       better = true;
     else
     {
-      // [over.ics.rank]/4.4.2, /4.4.4: of two derived-to-base conversions
+      // [over.ics.rank]/4.5.2, /4.5.1: of two derived-to-base conversions
       // of the same argument (of pointers, or reference bindings), the one
       // to the more derived base is better; implicit_conversion_sequence
       // ranks every derived-to-base conversion alike
@@ -5383,13 +5386,13 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
 
   if(expr.id() == "explicit-typecast")
   {
-    // N5008 [expr.type.conv]/2: only a single-operand functional cast can
-    // invoke a CONVERSION function; with two or more operands the
-    // expression is direct-initialization and this branch does not apply.
-    // A malformed cast (nil target type) cannot name a conversion function
-    // either -- both shapes occur transiently while
-    // guess_function_template_args substitutes into a candidate signature
-    // (libc++'s views::take call), and to_unary_expr below would abort.
+    // N5008 [expr.type.conv]/1.1, 1.4: only a single-operand functional cast
+    // can invoke a CONVERSION function; with two or more operands the
+    // expression is direct-initialization and this branch does not apply.  A
+    // malformed cast (nil target type) cannot name a conversion function either
+    // -- both shapes occur transiently while guess_function_template_args
+    // substitutes into a candidate signature (libc++'s views::take call), and
+    // to_unary_expr below would abort.
     if(expr.operands().size() != 1 || expr.type().is_nil())
       return false;
 
@@ -5500,7 +5503,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
       // TODO: need to resolve an incomplete struct (template) here
       // go into scope of first operand.
       //
-      // N5008 [over.match.oper]/3.2: the member candidate set for `a @ b` is
+      // N5008 [over.match.oper]/3.1: the member candidate set for `a @ b` is
       // the qualified lookup of `T1::operator@`, where T1 is the type of the
       // left operand.  An lvalue of reference-to-class type (as produced by
       // e.g. `static_cast<std::ostream &>(x)`) is an lvalue of the referenced
@@ -5516,7 +5519,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
         const irep_idt &struct_identifier =
           op0_operator_type.get(ID_identifier);
 
-        // [over.match.oper]/3.2: the SET OF MEMBER CANDIDATES is
+        // [over.match.oper]/3.1: the SET OF MEMBER CANDIDATES is
         // the result of a qualified lookup of `T1::operator@`.
         // CBMC's `resolve` performs RECURSIVE name lookup that
         // walks parent scopes when no match is found in the struct
@@ -5537,14 +5540,14 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
         // True when the only member operator@ candidate is a function template
         // (no non-template member component matched): used to prefer a
         // non-member non-template operator@ before instantiating the member
-        // template's body ([over.match.best]/2, [temp.inst]).
+        // template's body ([over.match.best.general]/2.4, [temp.inst]).
         bool member_has_template_op = false;
         const struct_typet &class_type =
           follow_tag(struct_tag_typet{struct_identifier});
         for(const auto &c : class_type.components())
         {
           // Inherited operators are member candidates too: the qualified
-          // lookup of `T1::operator@` ([over.match.oper]/3.2) finds
+          // lookup of `T1::operator@` ([over.match.oper]/3.1) finds
           // members declared in base classes ([class.member.lookup]), so
           // from_base components must not be skipped.  A free operator
           // declared at file scope is not a component of T1, so this
@@ -5558,7 +5561,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
 
         // A member operator that is a function TEMPLATE is not stored as a
         // plain ID_code component; it lives in the class's scope.  N5008
-        // [over.match.oper]/3.2 includes such template members in the member
+        // [over.match.oper]/3.1 includes such template members in the member
         // candidate set (e.g. mstreamt's
         // `template <class T> mstreamt &operator<<(const T&)`), so detect them
         // with a scope-only lookup.  SCOPE_ONLY does not walk parent scopes, so
@@ -5593,13 +5596,14 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
           // If the only member operator@ candidate is a function template, a
           // non-member non-template operator@ that is an exact match for the
           // object argument must be preferred ([over.match.oper]/3,
-          // [over.match.best]/2).  Decide this BEFORE resolving the member
-          // candidate: resolving a member function template here instantiates
-          // its body, and a type error in that body (for a T the template is
-          // not meant to handle) would be emitted as a hard error even though
-          // this candidate is ultimately not selected -- whereas only the
-          // selected, odr-used specialization's body may be instantiated
-          // ([temp.inst]/2,4, [basic.def.odr]).  Concretely, for messaget's
+          // [over.match.best.general]/2).  Decide this BEFORE resolving the
+          // member candidate: resolving a member function template here
+          // instantiates its body, and a type error in that body (for a T the
+          // template is not meant to handle) would be emitted as a hard error
+          // even though this candidate is ultimately not selected -- whereas
+          // only the selected, odr-used specialization's body may be
+          // instantiated ([temp.inst]/4-5, 10, [basic.def.odr]).  Concretely,
+          // for messaget's
           //   template <class T> mstreamt &operator<<(const T &x)
           //     { static_cast<std::ostream &>(*this) << x; ... }
           // and the free `operator<<(mstreamt &, eomt)`, `m << eom` must pick
@@ -5687,7 +5691,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
 
           // should really be a qualified search.
           //
-          // N5008 [over.match.oper]/3: the member and non-member operator@
+          // N5008 [over.match.oper]/3, 7: the member and non-member operator@
           // candidates form ONE overload set.  If no *member* candidate is
           // viable for these operands, resolution must continue with the
           // non-member candidates -- it is not an error yet.  CBMC's resolve
@@ -5714,7 +5718,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
 
           if(resolve_result.is_not_nil())
           {
-            // Per N5008 [over.match.oper]/3 + [over.match.best]/2:
+            // Per N5008 [over.match.oper]/3 + [over.match.best.general]/2.4:
             // member and non-member candidates form ONE combined
             // overload set; when both have same-rank conversion
             // sequences, a non-template specialization is preferred
@@ -5727,7 +5731,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
             // free operator is also viable (typically a `friend`
             // operator declared in the enclosing class with the
             // exact same parameter types), the free one must win
-            // per [over.match.best]/2.
+            // per [over.match.best.general]/2.4.
             //
             // Visible symptom on CBMC's own source:
             //   class messaget {
@@ -5785,20 +5789,20 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
               if(free_resolve.is_not_nil())
               {
                 bool free_is_non_template = true;
-                // N5008 [over.match.best]/2: a non-template candidate is
-                // preferred over a function-template specialization only when
-                // their conversion sequences are otherwise indistinguishable.
-                // Prefer the free operator over the member template only when
-                // the free operator's object (first) parameter is an EXACT
-                // match for the object argument's type.  If the free operator
-                // would need a derived-to-base conversion for the object (e.g.
-                // a free `operator<<(std::ostream&, ...)` on a
-                // `messaget::mstreamt` that derives from ostream, versus the
-                // member `mstreamt::operator<<` whose implicit object parameter
-                // is an exact `mstreamt&`), the member has the strictly better
-                // conversion sequence and must win -- otherwise the free
-                // operator's `std::ostream&` result cannot be returned as the
-                // derived `mstreamt&`.
+                // N5008 [over.match.best.general]/2.4: a non-template candidate
+                // is preferred over a function-template specialization only
+                // when their conversion sequences are otherwise
+                // indistinguishable.  Prefer the free operator over the member
+                // template only when the free operator's object (first)
+                // parameter is an EXACT match for the object argument's type.
+                // If the free operator would need a derived-to-base conversion
+                // for the object (e.g. a free `operator<<(std::ostream&, ...)`
+                // on a `messaget::mstreamt` that derives from ostream, versus
+                // the member `mstreamt::operator<<` whose implicit object
+                // parameter is an exact `mstreamt&`), the member has the
+                // strictly better conversion sequence and must win -- otherwise
+                // the free operator's `std::ostream&` result cannot be returned
+                // as the derived `mstreamt&`.
                 bool free_object_param_exact = false;
                 if(free_resolve.id() == ID_symbol)
                 {
@@ -5864,11 +5868,11 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
               cpp_scopes.set_scope(struct_identifier);
             }
 
-            // N5008 [over.match.oper]/3, [over.match.best]/2.1: the member
-            // and the non-member candidates are ranked together; a
-            // non-member whose conversion sequences are all at least as
-            // good, one of them better, wins over the member.
-            // resolve returns the member function as `member' of the object
+            // N5008 [over.match.oper]/3, [over.match.best.general]/2.1: the
+            // member and the non-member candidates are ranked together; a
+            // non-member whose conversion sequences are all at least as good,
+            // one of them better, wins over the member.  resolve returns the
+            // member function as `member' of the object
             const exprt &member_function =
               resolve_result.id() == ID_member
                 ? static_cast<const exprt &>(resolve_result)
@@ -5980,7 +5984,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
         exprt resolve_result =
           resolve(cpp_name, cpp_typecheck_resolvet::wantt::VAR, fargs, false);
 
-        // [over.match.oper]/3.4 (last paragraph): if no operand
+        // [over.match.oper]/3.2 (last paragraph): if no operand
         // has class type, the non-member candidate set is
         // restricted to operators whose first parameter type is T1
         // (or reference-to-T1) when T1 is an enumeration type, or
@@ -5997,7 +6001,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
         // conversion sequence on each operand) per
         // [over.ics.rank]/2; CBMC's `operator_is_overloaded` does
         // not enumerate built-in candidates, so apply the
-        // [over.match.oper]/3.4 restriction here as a filter.
+        // [over.match.oper]/3.2 restriction here as a filter.
         if(resolve_result.is_not_nil())
         {
           bool any_class_operand = false;
@@ -6142,7 +6146,7 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
     symbolt *object = symbol_table.get_writeable(op.get(ID_C_constexpr_object));
     if(object != nullptr)
     {
-      // [basic.def.odr]/4: taking the address odr-uses the variable, so it
+      // [basic.def.odr]/5: taking the address odr-uses the variable, so it
       // is an object with static storage duration, initialized with its
       // value ([basic.start.static]/2) -- no longer a mere named constant.
       // [basic.stc.static]/1: one declared at namespace or class scope (no
@@ -6272,7 +6276,7 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
 
       if(code_type.get_bool(ID_C_is_virtual))
       {
-        // N5008 [expr.mptr.oper]/4, [class.virtual]/1: a call through a
+        // N5008 [expr.call]/2, [class.virtual]/2: a call through a
         // pointer to a virtual member function is a virtual call -- the
         // final overrider in the dynamic type of the object is called.
         // The pointer designates a thunk dispatching through the
@@ -6294,7 +6298,7 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
   {
     // N5008 [expr.unary.op]/3.1: `&C::m' for a non-static data member m has
     // type "pointer to member of C of type T" and designates C::m.
-    // [basic.compound]/3: a pointer to data member identifies the member
+    // [basic.compound]/1.8: a pointer to data member identifies the member
     // within any object of its class; the Itanium C++ ABI (section 2.3)
     // represents it by the member's offset in C, a ptrdiff_t-sized value,
     // and the null member pointer value ([conv.mem]/1) by -1.  By default the
@@ -6536,7 +6540,7 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
       expr.find_source_location(),
       &cpp_scopes.current_scope());
 
-  // N5008 [expr.new]/23 + [dcl.init.list]/3: `new T{...}' is
+  // N5008 [expr.new]/24 + [dcl.init.list]/3: `new T{...}' is
   // direct-list-initialization; [over.match.list]/1 phase 1 tries the
   // initializer-list constructors with the whole list as the argument,
   // phase 2 the elements (the parenthesised form's operands).
@@ -6586,7 +6590,7 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
   if(!code.has_value())
     code = cpp_constructor(expr.find_source_location(), object_expr, new_args);
 
-  // N5008 [expr.new]/17: a new-initializer that is an EMPTY pair of
+  // N5008 [expr.new]/24: a new-initializer that is an EMPTY pair of
   // parentheses value-initializes the object ([dcl.init.general]/9); for
   // a scalar or a class without a user-provided default constructor that
   // means zero-initialization first.  A new-expression WITHOUT any
@@ -6597,12 +6601,12 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
   // shape std::construct_at takes with no arguments) left the storage
   // unchanged.  Emit the zero-initialization here, ahead of whatever
   // cpp_constructor produced (default member initializers, which
-  // [dcl.init.general]/9.2 applies after zero-initialization).
+  // [dcl.init.general]/9.1 applies after zero-initialization).
   // The same for a class whose default constructor is not user-provided
   // ([dcl.init.general]/9.1: zero-initialized, then default-initialized).
   // `new T{}' value-initializes as well ([dcl.init.list]/3.5).  For
   // `new T[n]()' / `new T[n]{}' each element is value-initialized
-  // ([dcl.init.general]/9.3, [dcl.init.aggr]/5); the initializer built
+  // ([dcl.init.general]/9.2, [dcl.init.aggr]/5); the initializer built
   // here is applied to each element (cpp_new_initializer).
   const typet &new_object_type = to_pointer_type(expr.type()).base_type();
   if(
@@ -6684,7 +6688,7 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
     // Default value, e.g., int()
     typecheck_type(expr.type());
 
-    // N5008 [expr.type.conv]/2: "if the type is cv void and the initializer
+    // N5008 [expr.type.conv]/1.2: "if the type is cv void and the initializer
     // is () or {} (after pack expansion, if any), the expression is a prvalue
     // of type void that performs no initialization" -- `return void();' in
     // libc++'s __get_comp_type.  There is nothing to zero-initialize (the
@@ -6698,7 +6702,7 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
       return;
     }
 
-    // N5008 [expr.type.conv]/2 + [dcl.init.general]/9.1: `T()' for a class
+    // N5008 [expr.type.conv]/1.4 + [dcl.init.general]/9.1: `T()' for a class
     // type VALUE-INITIALIZES the temporary -- zero-initialized and then, if
     // T's default constructor is non-trivial, default-initialized.  A
     // default member initializer makes the implicit default constructor
@@ -6750,7 +6754,7 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
 
     new_expr->add_source_location() = expr.source_location();
 
-    // N5008 [expr.type.conv]/2 + [class.temporary]/2: `T()' for a class
+    // N5008 [expr.type.conv]/1.4 + [class.temporary]/2: `T()' for a class
     // type is a prvalue whose temporary is materialised when a member is
     // accessed (`B().g()', `T().m').  A bare struct constant has no object
     // to bind the implicit object parameter to ("found no match for symbol
@@ -6830,7 +6834,7 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
         expr.type().id() == ID_struct_tag &&
         (elaborate_class_template(expr.type()), !cpp_is_pod(expr.type())))
       {
-        // N5008 [expr.type.conv]/2: `T{...}` DIRECT-LIST-INITIALIZES a
+        // N5008 [expr.type.conv]/1.4: `T{...}` DIRECT-LIST-INITIALIZES a
         // prvalue of type T; for a class type that is [dcl.init.list]/3
         // -- aggregate initialization for aggregates, otherwise
         // constructor selection per [over.match.list] -- NOT the
@@ -7136,12 +7140,12 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
   }
 
   typecheck_type(expr.type());
-  // N5008 [expr.type.conv]/2 + [temp.inst]/2: `T(...)' / `T{...}' creates an
+  // N5008 [expr.type.conv]/1 + [temp.inst]/2: `T(...)' / `T{...}' creates an
   // object of T, which must be complete (its constructors and, for an
   // aggregate, its elements decide the initialization)
   elaborate_class_template(expr.type());
 
-  // N5008 [expr.type.conv]/2: `void()' and `void{}' are prvalues of type
+  // N5008 [expr.type.conv]/1.2: `void()' and `void{}' are prvalues of type
   // void that perform no initialization.
   if(
     expr.type().id() == ID_empty &&
@@ -7157,7 +7161,7 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
     return;
   }
 
-  // N5008 [dcl.init.general]/9: "A program that calls for
+  // N5008 [dcl.init.general]/10: "A program that calls for
   // default-initialization or value-initialization of an entity of reference
   // type is ill-formed."  `T()` with T = `int(&)[5]` (owning_view's
   // `_Range _M_r = _Range()` default member initializer once _Range is
@@ -7183,7 +7187,7 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
   // branch below expect (`pair(a, b)` from CTAD used to die with
   // "explicit typecast expects 0 or 1 operands").
   // A SINGLE argument takes the same route when it cannot be a
-  // copy/move ([dcl.init.general]/16.6.1 considers constructors first;
+  // copy/move ([dcl.init.general]/16.6.2 considers constructors first;
   // for an aggregate only the synthesized copy/move are candidates, so
   // an argument of a DIFFERENT, non-derived type falls through to
   // /16.6.2.2 aggregate initialization: `take_view<int>(3)` from the
@@ -7390,7 +7394,7 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
         break;
       }
 
-      // N5008 [dcl.init.aggr]/4.2 with [class.temporary]/2: as for a
+      // N5008 [dcl.init.aggr]/4.3 with [class.temporary]/2: as for a
       // declared aggregate (aggregate_member_initialization), elements of a
       // non-POD class type are constructed in the temporary rather than
       // copied bitwise from temporaries that are then destroyed
@@ -7528,7 +7532,7 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
     // Direct-list-initialization: TYPE{a, b, c} should try to match
     // constructors with the individual elements of the braced-init-list.
     //
-    // [over.match.list]/2 distinguishes two phases:
+    // [over.match.list]/1 distinguishes two phases:
     //   2.1: try initializer-list ctors first, with the brace-init-list
     //        as a single argument.
     //   2.2: if 2.1 finds no viable ctor, retry with all ctors and the
@@ -7570,7 +7574,7 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
       {
         exprt::operandst expanded = std::move(e.operands().front().operands());
         e.operands() = std::move(expanded);
-        // [over.best.ics]/4.5, as in convert_initializer: `X{{...}}'
+        // [over.best.ics.general]/4.5, as in convert_initializer: `X{{...}}'
         if(
           e.operands().size() == 1 &&
           e.operands().front().id() == ID_initializer_list &&
@@ -7593,7 +7597,7 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
       already_typechecked_exprt::make_already_typechecked(op);
 
     // C++20 parenthesized aggregate initialization (P0960; N5008
-    // [expr.type.conv]/2 via [dcl.init.general]/16.6.2.2): constructors
+    // [expr.type.conv]/1.4 via [dcl.init.general]/16.6.2.2): constructors
     // are considered FIRST, but when overload resolution finds no
     // viable constructor and T is an aggregate, `T(a1, ..., an)`
     // initializes the aggregate's elements from the expression-list.
@@ -7699,7 +7703,7 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
 /// type.
 void cpp_typecheckt::typecheck_expr_typeid(exprt &expr)
 {
-  // [expr.typeid]/4: the program is ill-formed unless <typeinfo> has been
+  // [expr.typeid]/8: the program is ill-formed unless <typeinfo> has been
   // included before the use of typeid.
   // the MSVC STL declares type_info in the global namespace (vcruntime's
   // `class type_info', and `using ::type_info;' in std)
@@ -7721,7 +7725,7 @@ void cpp_typecheckt::typecheck_expr_typeid(exprt &expr)
   if(expr.has_operands())
   {
     // typeid(expression): use the static type of the operand.  Per
-    // [expr.typeid]/3 a non-polymorphic operand is an unevaluated operand,
+    // [expr.typeid]/5 a non-polymorphic operand is an unevaluated operand,
     // so we only retain its type and discard the operand itself.
     exprt &op = to_unary_expr(expr).op();
     typecheck_expr(op);
@@ -7751,7 +7755,7 @@ void cpp_typecheckt::typecheck_expr_typeid(exprt &expr)
     }
   }
 
-  // [expr.typeid]/5: typeid ignores top-level cv-qualifiers, and references
+  // [expr.typeid]/6-7: typeid ignores top-level cv-qualifiers, and references
   // are stripped to the referred-to type.  Types that differ only in these
   // share the same type_info object.
   if(is_reference(t))
@@ -7760,7 +7764,7 @@ void cpp_typecheckt::typecheck_expr_typeid(exprt &expr)
   t.remove(ID_C_volatile);
 
   // Canonical key so that equal types share a single type_info object
-  // ([expr.typeid]/1: the type_info denotes the type).  Use the C++
+  // ([expr.typeid]/6: the type_info denotes the type).  Use the C++
   // front-end's own type naming -- for a class type that is its tag
   // identifier, unique per class ([basic.scope.scope], [class.pre]) --
   // rather than the C linker's structural type2name, which spells out
@@ -7817,7 +7821,7 @@ void cpp_typecheckt::typecheck_expr_typeid(exprt &expr)
         // with strcmp.  This object is the only one of its type, so its
         // name is unique: clear that bit, which user-space addresses on
         // that platform never have, so that the test folds to "unique"
-        // ([expr.typeid]/1, [type.info]/2: equality is type identity).
+        // ([expr.typeid]/1, [type.info]/3: equality is type identity).
         const std::size_t width = to_bitvector_type(comp.type()).get_width();
         const exprt address =
           typecast_exprt{address_of_exprt{first_char}, comp.type()};
@@ -7940,7 +7944,7 @@ void cpp_typecheckt::typecheck_expr_delete(exprt &expr)
   else
     expr.set(ID_destructor, nil_exprt());
 
-  // N5008 [expr.delete]/3, /6: through a pointer to a polymorphic base the
+  // N5008 [expr.delete]/10, /6: through a pointer to a polymorphic base the
   // deleted object is the most derived one, and the deallocation function
   // gets its address, the value the allocation returned: that of
   // dynamic_cast<void *> ([expr.dynamic.cast]/8)
@@ -8062,7 +8066,7 @@ void cpp_typecheckt::typecheck_expr_member(
 
   irep_idt struct_identifier = type.get(ID_name);
 
-  // N5008 [expr.prim.id.dtor] + [class.dtor]/1,6: the explicit destructor
+  // N5008 [expr.prim.id.dtor] + [class.dtor]/2,8,16: the explicit destructor
   // call notation is valid for EVERY class, and invoking a TRIVIAL
   // destructor has no effect.  A class whose destructor is implicitly
   // declared and trivial has no synthesized destructor symbol (the POD
@@ -8101,15 +8105,13 @@ void cpp_typecheckt::typecheck_expr_member(
     cpp_namet component_cpp_name =
       to_cpp_name(expr.find(ID_component_cpp_name));
 
-    // Per N5008 [class.access]/4 + the lazy class-body elaboration
-    // discipline: if the struct has no `ID_name` set, it is a
-    // residual placeholder from a failed instantiation that wasn't
-    // cleanly excluded upstream.  Without this guard,
-    // `cpp_scopes.set_scope("")` aborts in the lookup with
-    // "id '' not found" and crashes goto-cc.  Emit a localized
-    // error and throw the conventional throw-0 signal instead so
-    // the failure stays a user-visible compile error in the
-    // calling translation unit rather than a CBMC abort.
+    // Per the lazy class-body elaboration discipline: if the struct has no
+    // `ID_name` set, it is a residual placeholder from a failed instantiation
+    // that wasn't cleanly excluded upstream.  Without this guard,
+    // `cpp_scopes.set_scope("")` aborts in the lookup with "id '' not found"
+    // and crashes goto-cc.  Emit a localized error and throw the conventional
+    // throw-0 signal instead so the failure stays a user-visible compile error
+    // in the calling translation unit rather than a CBMC abort.
     if(struct_identifier.empty())
     {
       error().source_location = expr.find_source_location();
@@ -8181,12 +8183,12 @@ void cpp_typecheckt::typecheck_expr_member(
     new_fargs.naming_scope = &naming_scope;
     new_fargs.member_access = true;
 
-    // N5008 [basic.lookup.qual]/6: for a ~type-name after . or ->, the
-    // type-name is looked up both in the context of the entire
-    // postfix-expression and in the scope of the object's class.  The
-    // resolver only sees the object's class scope (we just entered it);
-    // record the postfix-expression context so the destructor-typedef
-    // substitution in resolve_scope can search it as well.  RAII-restored.
+    // N5008 [basic.lookup.qual.general]/4.1: for a ~type-name after . or ->,
+    // the type-name is looked up both in the context of the entire
+    // postfix-expression and in the scope of the object's class.  The resolver
+    // only sees the object's class scope (we just entered it); record the
+    // postfix-expression context so the destructor-typedef substitution in
+    // resolve_scope can search it as well.  RAII-restored.
     struct member_access_scope_guardt
     {
       cpp_typecheckt &tc;
@@ -8249,7 +8251,7 @@ void cpp_typecheckt::typecheck_expr_member(
         // (non-static, with a 'this' parameter).  In that case, we
         // must not treat it as a static member — fall through to the
         // member-expression path so that 'this' is added.
-        // N5008 [dcl.fct]/6: an instantiated member function template with
+        // N5008 [dcl.fct]/5: an instantiated member function template with
         // an EXPLICIT object parameter (`this Self &&self') is a non-static
         // member too; the caller (typecheck_method_application) passes the
         // object as its first argument.
@@ -8272,7 +8274,7 @@ void cpp_typecheckt::typecheck_expr_member(
         const struct_typet::componentt &pcomp =
           type.get_component(to_symbol_expr(symbol_expr).identifier());
 
-        // N5008 [expr.ref]/6.3, [class.member.lookup]: `this->f<T>(...)'
+        // N5008 [expr.ref]/7.3, [class.member.lookup]: `this->f<T>(...)'
         // naming a static member function TEMPLATE specialization of the
         // class or of one of its bases (libc++ variant's
         // `this->__construct_alt(__get_alt<_Ip>(*this), ...)' from
@@ -8665,7 +8667,7 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
   else if(expr.id() == ID_member)
   {
     const irep_idt &component = expr.get(ID_component_name);
-    // [basic.def.odr]/5: a member named in an unevaluated operand is not
+    // [basic.def.odr]/3, 8: a member named in an unevaluated operand is not
     // odr-used, so its definition is not instantiated ([temp.inst]/4)
     if(!component.empty() && unevaluated_operand_depth == 0)
     {
@@ -8777,7 +8779,7 @@ exprt cpp_typecheckt::deduce_funcaddr_against_target(
   }
   catch(...)
   {
-    // [temp.deduct]/8: substitution failure is silent; let the
+    // [temp.deduct.general]/8: substitution failure is silent; let the
     // default resolve path report the mismatch.
   }
 
@@ -8821,7 +8823,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
 /// is a call `C::operator=(x)' with one argument, `C' a POD class without a
 /// declared assignment operator and `this' available (a member function of
 /// `C' or of a class derived from it), rewrite it to the builtin assignment
-/// `static_cast<C &>(*this) = x' ([expr.ass]).
+/// `static_cast<C &>(*this) = x' ([expr.assign]).
 /// \return true when \p expr was rewritten
 bool cpp_typecheckt::implicit_pod_assignment_call(
   side_effect_expr_function_callt &expr)
@@ -9535,7 +9537,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     }
   }
 
-  // N5008 [expr.type.conv]/2 + [over.match.copy]/1.2: the functional cast
+  // N5008 [expr.type.conv]/1.1 + [over.match.copy]/1.2: the functional cast
   // `T(x)' -- T a class type, x of ANOTHER class type -- is a
   // direct-initialization in which an EXPLICIT conversion function of x's
   // class yielding T is a candidate for the temporary bound to the
@@ -9543,11 +9545,11 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   // `const_iterator(__loc)' with `explicit operator const_iterator()' and
   // `explicit operator iterator()' on _Hashtable::__location_type).
   // Implicit conversion sequences never use explicit conversion functions
-  // ([class.conv.fct]/2), so constructor resolution below either finds no
+  // ([class.conv.fct]/4), so constructor resolution below either finds no
   // candidate or -- taking every conversion function as implicit -- an
   // ambiguity between the copy constructor and `const_iterator(const
   // iterator&)'.  Convert x with that function; the copy/move is elided
-  // ([class.copy.elision]/1).
+  // (as by GCC and clang; N5008 states no rule for this case, CWG2327).
   if(
     expr.function().id() == ID_cpp_name && expr.arguments().size() == 1 &&
     expr.arguments().front().type().is_not_nil())
@@ -9564,7 +9566,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       cpp_typecheck_fargst no_fargs;
       exprt type_expr = nil_exprt{};
       {
-        // a probe: no diagnostics ([temp.deduct]/8-style soft failure)
+        // a probe: no diagnostics ([temp.deduct.general]/8-style soft failure)
         sfinae_contextt probe{*this};
         try
         {
@@ -9579,7 +9581,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
           type_expr = nil_exprt{};
         }
       }
-      // N5008 [expr.type.conv]/2, [expr.cast]/4, [expr.static.cast]/4: with a
+      // N5008 [expr.type.conv]/1.1, [expr.cast]/4, [expr.static.cast]/5: with a
       // single expression `T(e)' is `static_cast<T>(e)', the
       // direct-initialization `T t(e);', and for a prvalue e of class type
       // T (cv-unqualified) [dcl.init.general]/16.6.1 initializes the
@@ -9635,7 +9637,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
         messaget::M_ERROR, errors_before_function_expr);
       return;
     }
-    // C++20 P0960 (N5008 [expr.type.conv]/2 +
+    // C++20 P0960 (N5008 [expr.type.conv]/1.4 +
     // [dcl.init.general]/16.6.2.2): constructors are considered first;
     // when overload resolution finds no viable constructor and
     // `T(args)` names an AGGREGATE class type, the expression-list
@@ -10026,7 +10028,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       // mention still-incomplete types).  Proceeding would swap a
       // non-member expression into the call and abort
       // typecheck_method_application's precondition.  Fail the
-      // conversion recoverably instead ([temp.inst]/17: a failed
+      // conversion recoverably instead ([lex.phases]/1: a failed
       // required instantiation is diagnosed, not fatal to the tool).
       error().source_location = expr.source_location();
       error() << "constructor '" << expr.function().get(ID_identifier)
@@ -10071,7 +10073,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     expr.function().swap(member);
 
     // `T()' / `T{}': no argument before the implicit object argument is
-    // added below -- value-initialization ([expr.type.conv]/2,
+    // added below -- value-initialization ([expr.type.conv]/1.4,
     // [dcl.init.general]/16.4).  Not for the constructor call
     // cpp_constructor synthesizes to initialize an object: there the
     // caller distinguishes default- from value-initialization.
@@ -10218,7 +10220,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   }
   else
   {
-    // N5008 [dcl.spec.auto.general]/11-13: a call to a function with a
+    // N5008 [dcl.spec.auto.general]/13: a call to a function with a
     // placeholder return type needs the type deduced from the function's
     // definition here.  A namespace-scope function's definition is converted
     // eagerly for that reason (cpp_declarator_converter), a non-static
@@ -10366,21 +10368,20 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   if(auto sym_expr = expr_try_dynamic_cast<symbol_exprt>(expr.function()))
   {
     const auto *symbol_ptr = symbol_table.lookup(sym_expr->get_identifier());
-    // The body is recognised as code either by `value.type().id() ==
-    // ID_code` (post-`convert_function`, when the body's TYPE is set
-    // to the function's code type) or by `value.id() == ID_code`
-    // (the parsed/queued state where the value IS a code block but
-    // its type field is empty).  Accept both — the second case
-    // matters when we are about to eagerly convert the body so it
-    // gets resolved in its own (class) scope.
-    // N5008 [temp.inst]/5 and [expr.const]/5: an inline constexpr member of
-    // a class template specialization whose definition is parked until
-    // used (deferred_typechecking, see typecheck_compound_declarator) is
+    // The body is recognised as code either by `value.type().id() == ID_code`
+    // (post-`convert_function`, when the body's TYPE is set to the function's
+    // code type) or by `value.id() == ID_code` (the parsed/queued state where
+    // the value IS a code block but its type field is empty).  Accept both —
+    // the second case matters when we are about to eagerly convert the body so
+    // it gets resolved in its own (class) scope.  N5008 [temp.inst]/4, /8 and
+    // [expr.const]/29.6: an inline constexpr member of a class template
+    // specialization whose definition is parked until used
+    // (deferred_typechecking, see typecheck_compound_declarator) is
     // instantiated when a constant expression calls it -- the initializer
     // `static constexpr type value = _S_make_table();' of libstdc++'s
     // __from_chars_alnum_to_val_table<false>.  Queue it with its class's
-    // template map and convert it now; on failure it stays queued and the
-    // call a run-time one.
+    // template map and convert it now; on failure it stays queued and the call
+    // a run-time one.
     if(
       symbol_ptr != nullptr && symbol_ptr->is_macro &&
       constant_expression_context != 0 &&
@@ -10533,7 +10534,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
               class_sym->type.find(ID_C_template_arguments)));
         }
         methods_seen.insert(sym_expr->get_identifier());
-        // N5008 [temp.inst]/1: an instantiated member function TEMPLATE
+        // N5008 [temp.inst]/4: an instantiated member function TEMPLATE
         // additionally needs its own template map (the #fn_template_*
         // records) on top of the class map built above -- without it a
         // body like `__is_constructible(T2, U2)` leaves U2 unresolved
@@ -10557,7 +10558,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     }
     if(eligible_constexpr)
     {
-      // N5008 [expr.const]/5 + [temp.inst]/5: evaluate the call with the
+      // N5008 [expr.const]/10 + [temp.inst]/5: evaluate the call with the
       // interpreting constant evaluator (try_evaluate_constexpr), which runs
       // the constexpr function's statements -- declarations, loops,
       // assignments, nested calls -- on constant arguments.  A callee whose
@@ -10641,11 +10642,11 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     expr.swap(tmp);
 } // NOLINT(readability/fn_size)
 
-/// N5008 [class.mem.general]/7-8, [dcl.fct.default]: a default argument
+/// N5008 [class.mem.general]/9.2, [dcl.fct.default]: a default argument
 /// declared in a class member-specification is a complete-class context.
 /// typecheck_type kept it unchecked (wrapped with the declaring scope); this
 /// checks it in that scope -- with the class's template parameters bound
-/// when the class is a template specialization ([temp.inst]/4 names in the
+/// when the class is a template specialization ([temp.inst]/5 names in the
 /// default argument refer to the specialization's arguments) -- and converts
 /// it to the parameter type ([dcl.init]).
 /// \param deferred: the deferred default argument
@@ -10689,7 +10690,7 @@ void cpp_typecheckt::typecheck_function_call_arguments(
   const code_typet &code_type = to_code_type(f_op.type());
   const code_typet::parameterst &parameters = code_type.parameters();
 
-  // N5008 [expr.call]/7: when a function is called, the type of a parameter
+  // N5008 [expr.call]/6: when a function is called, the type of a parameter
   // shall not be an incomplete class type (a parameter passed by value);
   // the call requires the class to be complete ([temp.inst]/2).  In a
   // requirement this makes the requirement unsatisfied
@@ -10781,7 +10782,7 @@ void cpp_typecheckt::typecheck_function_call_arguments(
       // A struct-literal PRVALUE (a struct_exprt, e.g. libc++'s
       // `__default_init_tag()` passed to __compressed_pair's
       // forwarding-reference constructor) has no storage to point at:
-      // [class.temporary]/3, [dcl.init.ref]/5.4 require materializing
+      // [class.temporary]/2.1, [dcl.init.ref]/5.3 require materializing
       // a temporary first.  A raw address-of over the literal reached
       // symbolic execution and aborted address_arithmetic.
       if(arg_it->id() == ID_struct)
@@ -10839,7 +10840,7 @@ void cpp_typecheckt::typecheck_function_call_arguments(
         continue;
       }
 
-      // N5008 [over.match.copy] + [over.best.ics]/4: copy-initializing
+      // N5008 [over.match.copy] + [over.best.ics.general]/4: copy-initializing
       // a by-value parameter from a DIFFERENT class is a TWO-STEP
       // process -- first convert the argument to the parameter's class
       // (candidates: the class's converting constructors AND the
@@ -10848,7 +10849,7 @@ void cpp_typecheckt::typecheck_function_call_arguments(
       // against the raw argument instead runs direct-initialization,
       // where a `template <class C> operator C()` on the argument makes
       // EVERY constructor viable via a user-defined conversion of its
-      // first parameter (forbidden by [over.best.ics]/4), reporting a
+      // first parameter (forbidden by [over.best.ics.general]/4), reporting a
       // bogus ambiguity across all of std::vector's constructors.
       // Derived-to-base by-value (slicing) stays on the constructor
       // path: binding derived to `const base &` is a standard
@@ -11164,12 +11165,11 @@ void cpp_typecheckt::instantiate_generic_lambda(
     if(explicit_ret.is_not_nil() && !explicit_ret.id().empty())
     {
       lambda_return_type = static_cast<const typet &>(explicit_ret);
-      // N5008 [dcl.fct]/8: the parameters are in scope in the trailing
-      // return type -- `[](int __s) -> decltype(__s)` must resolve
-      // `__s` (cvise-reduced from a preprocessed libc++ <string>
-      // seed).  Enter the lambda's scope and register the parameters
-      // before type-checking the return type, exactly as the body
-      // conversion below does.
+      // N5008 [basic.scope.param]/1.2: the parameters are in scope in the
+      // trailing return type -- `[](int __s) -> decltype(__s)` must resolve
+      // `__s` (cvise-reduced from a preprocessed libc++ <string> seed).  Enter
+      // the lambda's scope and register the parameters before type-checking the
+      // return type, exactly as the body conversion below does.
       cpp_save_scopet save_scope_for_ret(cpp_scopes);
       std::string lambda_base_ret = inst_name.substr(scope_prefix.size());
       cpp_scopet &lambda_scope_ret =
@@ -11262,7 +11262,7 @@ void cpp_typecheckt::instantiate_generic_lambda(
     // the exception while the ENCLOSING body continues, a plain
     // assignment-restore would leave `return_type` set to the lambda's
     // -- and the enclosing function's later `return` statements would
-    // convert against the wrong type (N5008 [stmt.return]/3 requires
+    // convert against the wrong type (N5008 [stmt.return]/2 requires
     // conversion to the enclosing function's return type).  No reachable
     // trigger is currently known (corpus probe found none; every valid
     // lambda body tried type-checks), so this is hardening; see
@@ -11312,7 +11312,7 @@ void cpp_typecheckt::instantiate_generic_lambda(
   func_sym.module = module;
   func_sym.location = loc;
   func_sym.is_file_local = true;
-  // N5008 [expr.prim.lambda.closure]/5: the function call operator (or
+  // N5008 [expr.prim.lambda.closure]/6: the function call operator (or
   // operator template specialization) is a constexpr function when it is
   // constexpr-suitable; this function is that operator, called directly for
   // `[] { ... }()'.  Record it so a call in a constant expression is
@@ -11424,7 +11424,7 @@ void cpp_typecheckt::typecheck_method_application(
     has_auto(to_code_type(method_symbol.type).return_type()) &&
     method_symbol.value.is_not_nil())
   {
-    // N5008 [temp.inst]/1: this EAGER conversion of a member function
+    // N5008 [temp.inst]/4: this EAGER conversion of a member function
     // template instance must run under the instance's template map,
     // exactly as the deferred drain does -- the drain's shared
     // preprocessing installs the bindings from #fn_template_type /
@@ -11492,7 +11492,7 @@ void cpp_typecheckt::typecheck_method_application(
 
       // The object argument is already present when the call was set up
       // for base-class initialisation: as many arguments as parameters
-      // (`this' included).  With an ellipsis ([dcl.fct]/4) the count does
+      // (`this' included).  With an ellipsis ([dcl.fct]/2) the count does
       // not tell: `S(...)' called as `S c(1)' also has one argument, which
       // is not the object; there, the first argument is the object only if
       // it points to the member's class or a class derived from it.
@@ -11628,26 +11628,27 @@ void cpp_typecheckt::typecheck_side_effect_assignment(side_effect_exprt &expr)
 
   const irep_idt statement = expr.get(ID_statement);
 
-  // N5008 [expr.ass]/2-7: there is no built-in compound assignment for class
-  // types; `a @= b` on a class type is rewritten to a call to the overloaded
-  // operator@= even when the class is POD (having a user-defined operator does
-  // not make the class non-POD).  Only a plain `=` of a POD class uses the
-  // implicit copy/move assignment below.  Without this, a POD class with a
-  // user-defined compound-assignment operator took the C built-in path and was
-  // rejected with e.g. "assignment 'assign_shr' not defined for types ...".
+  // N5008 [expr.assign]/6, [over.match.oper]/3: there is no built-in compound
+  // assignment for class types; `a @= b` on a class type is rewritten to a call
+  // to the overloaded operator@= even when the class is POD (having a
+  // user-defined operator does not make the class non-POD).  Only a plain `=`
+  // of a POD class uses the implicit copy/move assignment below.  Without this,
+  // a POD class with a user-defined compound-assignment operator took the C
+  // built-in path and was rejected with e.g. "assignment 'assign_shr' not
+  // defined for types ...".
   const bool is_class_type = type0.id() == ID_struct_tag ||
                              type0.id() == ID_union_tag ||
                              type0.id() == ID_struct || type0.id() == ID_union;
   bool needs_overloaded_operator = is_class_type && statement != ID_assign;
-  // N5008 [over.match.oper]/1, [over.ass]: a plain `=' with a class operand
-  // is resolved among the class's assignment operators; a POD class whose
-  // only user-declared one is an assignment operator TEMPLATE (never a copy
-  // assignment operator, [class.copy.assign]/1, so the class stays POD)
-  // still offers it: `g = [] { ... }' for a std::function-like class.  For
-  // an operand of the class type itself the implicit copy or move
-  // assignment operator, a non-template with an identity conversion, is
-  // the better candidate ([over.match.best]/2.4); the built-in path below
-  // is that member-wise assignment.
+  // N5008 [over.match.oper]/3, [over.assign]: a plain `=' with a class operand
+  // is resolved among the class's assignment operators; a POD class whose only
+  // user-declared one is an assignment operator TEMPLATE (never a copy
+  // assignment operator, [class.copy.assign]/1, so the class stays POD) still
+  // offers it: `g = [] { ... }' for a std::function-like class.  For an operand
+  // of the class type itself the implicit copy or move assignment operator, a
+  // non-template with an identity conversion, is the better candidate
+  // ([over.match.best.general]/2.4); the built-in path below is that
+  // member-wise assignment.
   typet type1 = to_binary_expr(expr).op1().type();
   if(is_reference(type1))
     type1 = to_reference_type(type1).base_type();
@@ -11743,7 +11744,7 @@ void cpp_typecheckt::typecheck_side_effect_assignment(side_effect_exprt &expr)
     expr.source_location());
 
   // [over.match.oper]/3.2: for `=` the set of non-member candidates is
-  // empty (and [over.ass]/1 requires operator= to be a member), so the
+  // empty (and [over.assign]/1 requires operator= to be a member), so the
   // member form is the only one -- and its diagnostics are the ones wanted.
   if(statement == ID_assign)
   {
@@ -11799,7 +11800,7 @@ void cpp_typecheckt::typecheck_side_effect_inc_dec(side_effect_exprt &expr)
     use_side_effect_as_lvalue(op);
     // standard stuff
     c_typecheck_baset::typecheck_expr_side_effect(expr);
-    // [expr.pre.incr]/1, [expr.pre.decr]/1: in C++ a pre-increment or
+    // [expr.pre.incr]/1, [expr.assign]/1: in C++ a pre-increment or
     // pre-decrement of an lvalue of arithmetic or pointer type yields an
     // lvalue (the shared C base does not set this because in C they are
     // prvalues).  decltype((++x)) is therefore an lvalue-reference, which
@@ -11953,7 +11954,7 @@ void cpp_typecheckt::convert_pmop(exprt &expr)
     if(op0.id() == ID_dereference)
     {
       op0 = to_dereference_expr(op0).pointer();
-      // N5008 [expr.mptr.oper]/3: the object expression's REFERENCE type
+      // N5008 [expr.mptr.oper]/2: the object expression's REFERENCE type
       // is not part of the bound object -- a call `ref().*pmf` whose
       // operand is a function returning `S&` (the front end's
       // dereference of a reference-typed pointer) binds a plain `S*`.
@@ -12027,7 +12028,7 @@ void cpp_typecheckt::convert_pmop(exprt &expr)
 
 void cpp_typecheckt::typecheck_expr_function_identifier(exprt &expr)
 {
-  // [basic.def.odr]/5, [temp.inst]/4: a function named only in an
+  // [basic.def.odr]/3, 8, [temp.inst]/4: a function named only in an
   // unevaluated operand is not odr-used; its definition is instantiated
   // only if an odr-use follows (release_referenced_held_back_bodies and the
   // deferred-body drain find that use)
@@ -12181,7 +12182,7 @@ void cpp_typecheckt::typecheck_expr(exprt &expr)
 {
   resolve_overload_set_operand(expr);
 
-  // N5008 [over.over]/1.3: the target of an explicit type conversion selects
+  // N5008 [over.over]/1.6: the target of an explicit type conversion selects
   // the function of an overload set -- `static_cast<const symbol_exprt
   // &(*)(const exprt &)>(to_symbol_expr)' (CBMC's own
   // statement_list_parser.cpp, dog-fooding)
@@ -12468,7 +12469,7 @@ void cpp_typecheckt::explicit_typecast_ambiguity(exprt &expr)
 /// names a type.  The parser took `*(wp) & m' as `*' applied to the cast
 /// `(wp) &m'; when explicit_typecast_ambiguity turns that operand into the
 /// binary `wp & m', the prefix operator -- which binds tighter than any of
-/// the binary operators involved ([expr.unary.op]) -- applies to `(wp)'
+/// the binary operators involved ([expr.unary.general]) -- applies to `(wp)'
 /// only: `(*wp) & m'.  Rotate it into the left operand.  libstdc++'s
 /// bitset::reference `(*(_M_wp) & _Base::_S_maskbit(_M_bpos))'.
 void cpp_typecheckt::unary_operand_typecast_ambiguity(exprt &expr)
@@ -12623,7 +12624,7 @@ void cpp_typecheckt::typecheck_expr_rel(binary_relation_exprt &expr)
   add_implicit_dereference(expr.op0());
   add_implicit_dereference(expr.op1());
 
-  // N5008 [expr.eq]/3, [expr.rel]/3, [expr.type]/4: pointers to classes C1
+  // N5008 [expr.eq]/3, [expr.rel]/3, [expr.type]/3: pointers to classes C1
   // and C2, C1 derived from C2, are compared after converting both to the
   // composite pointer type, pointer to (cv-combined) C2 -- the
   // derived-to-base conversion adjusts the pointer to the base subobject;
@@ -12718,7 +12719,7 @@ void cpp_typecheckt::typecheck_expr_rel(binary_relation_exprt &expr)
   }
 }
 
-/// N5008 [expr.prim.this]/2, [class.mfct.non.static]/2: in the body \p body
+/// N5008 [expr.prim.this]/2, [expr.prim.id.general]/2: in the body \p body
 /// of a lambda that captures `this', an explicit `this' and an unqualified
 /// call of a member function of the enclosing class (one of
 /// \p member_functions) refer to the enclosing object.  The closure holds
@@ -12883,7 +12884,7 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
   bool is_generic_lambda = false;
   {
     const irept &check_params = expr.find(ID_parameters);
-    // N5008 [expr.prim.lambda.general]/4: a lambda is generic iff it has an
+    // N5008 [expr.prim.lambda.general]/6: a lambda is generic iff it has an
     // explicit template-parameter-list or a parameter of (possibly
     // cv-/ref-qualified) type `auto`.  A parameter whose type is written as a
     // plain name is generic ONLY when that name is a template parameter (e.g.
@@ -13117,13 +13118,13 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
   // function cannot be modelled this way; such lambdas stay on the
   // function-pointer lowering.
   bool member_context_unsupported = false;
-  // N5008 [expr.prim.this]/2, [expr.prim.lambda.capture]/8, /10: in the body
-  // of a lambda that captures `this' by reference ([this], or a
+  // N5008 [expr.prim.this]/2, [expr.prim.lambda.capture]/4, /7, /10: in the
+  // body of a lambda that captures `this' by reference ([this], or a
   // capture-default that odr-uses it), `this' and the implicit object of an
-  // unqualified member function call ([class.mfct.non.static]/2) are the
-  // enclosing object.  The closure keeps the captured pointer in a member
-  // named lambda_this_capture; the body's explicit `this' and those calls
-  // are rewritten to use it (rewrite_lambda_this_uses).
+  // unqualified member function call ([expr.prim.id.general]/2) are the
+  // enclosing object.  The closure keeps the captured pointer in a member named
+  // lambda_this_capture; the body's explicit `this' and those calls are
+  // rewritten to use it (rewrite_lambda_this_uses).
   bool lambda_needs_this_pointer = false;
   std::set<irep_idt> lambda_member_function_names;
   // the enclosing class and its bases, by base name, for qualified calls
@@ -13137,7 +13138,7 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
     {
       std::set<irep_idt> candidates;
       bool uses_explicit_this = false;
-      // N5008 [class.mfct.non.static]/2: a qualified call `B::f(x)' of a
+      // N5008 [expr.prim.id.general]/2: a qualified call `B::f(x)' of a
       // member function of the enclosing class or of its base B is
       // `(*this).B::f(x)' as well -- it used the closure's own `this'
       // ("invalid implicit conversion from '...__lambda_0_closure' to 'const
@@ -13228,8 +13229,8 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
           // TEMPLATE of the enclosing class is not a struct component
           // at all -- it lives only in the class SCOPE -- yet an
           // unqualified call to it in the body is, per N5008
-          // [class.mfct.non.static]/3, `(*this).name(...)` on the
-          // ENCLOSING object, and [expr.prim.lambda.capture]/8 makes
+          // [expr.prim.id.general]/2, `(*this).name(...)` on the
+          // ENCLOSING object, and [expr.prim.lambda.capture]/7 makes
           // the capture-default capture that `this`.  Treated as "not
           // a member", the closure path resolved the call against the
           // closure's own `this`, the implicit-object conversion
@@ -13259,7 +13260,7 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
           }
           continue;
         }
-        // N5008 [expr.prim.lambda.capture]/8: only non-static DATA members
+        // N5008 [expr.prim.lambda.capture]/7: only non-static DATA members
         // are captured through `this'; a member typedef or a static member
         // named in the body (`for(node_indext i = 0; ...)', util/graph.h's
         // output_dot, dog-fooding) is not -- it was type-checked as a
@@ -13335,7 +13336,7 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
     // C++23 deducing this: skip explicit object parameter
     if(pdecl.get_bool("explicit_this"))
       continue;
-    // N5008 [dcl.fct]/5, [dcl.meaning]: the parameter's type is the
+    // N5008 [dcl.fct]/3, [dcl.meaning]: the parameter's type is the
     // decl-specifier type as modified by the declarator -- `int *p' is a
     // pointer, `W *win' likewise.  Taking the decl-specifier type alone
     // dropped every pointer (and array) declarator of a lambda parameter:
@@ -13345,11 +13346,11 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
                     ? pdecl.type()
                     : pdecl.declarators().front().merge_type(pdecl.type());
     typecheck_type(ptype);
-    // [dcl.fct]/5: "array of T" / "function returning T" parameters are
+    // [dcl.fct]/3: "array of T" / "function returning T" parameters are
     // adjusted to pointers (`int *p[2]' is `int **')
     adjust_function_parameter(ptype);
     irep_idt pname;
-    // Per N5008 [dcl.fct]/16: a lambda parameter may be unnamed
+    // Per N5008 [dcl.fct]/17: a lambda parameter may be unnamed
     // (e.g. `[](std::size_t) { ... }`).  Probe the declarator
     // structure defensively before reading the identifier.
     if(!pdecl.declarators().empty())
@@ -13379,14 +13380,14 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
     if(explicit_ret.is_not_nil() && !is_generic_lambda)
     {
       lambda_return_type = static_cast<const typet &>(explicit_ret);
-      // N5008 [dcl.fct]/8: the parameters are in scope in the trailing
-      // return type -- `[](int __s) -> decltype(__s)` must resolve
-      // `__s` (cvise-reduced from a preprocessed libc++ <string>
-      // seed; previously "symbol '__s' is unknown" dropped the whole
-      // enclosing body).  Register the parameters in a scope visible
-      // to the return type's type-check.  The parameter symbols
-      // proper are created below from func_type; here we install
-      // lightweight placeholders keyed by the same identifiers.
+      // N5008 [basic.scope.param]/1.2: the parameters are in scope in the
+      // trailing return type -- `[](int __s) -> decltype(__s)` must resolve
+      // `__s` (cvise-reduced from a preprocessed libc++ <string> seed;
+      // previously "symbol '__s' is unknown" dropped the whole enclosing body).
+      // Register the parameters in a scope visible to the return type's
+      // type-check.  The parameter symbols proper are created below from
+      // func_type; here we install lightweight placeholders keyed by the same
+      // identifiers.
       cpp_save_scopet save_scope_for_ret(cpp_scopes);
       cpp_scopet &ret_scope =
         cpp_scopes.current_scope().new_scope(id2string(func_sym_name) + "$ret");
@@ -13578,7 +13579,7 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
     // Restore verbosity
     get_message_handler().set_verbosity(saved_verbosity);
 
-    // N5008 [expr.prim.lambda.closure]/4: the closure type's function call
+    // N5008 [expr.prim.lambda.closure]/15: the closure type's function call
     // operator has the lambda's compound-statement as its body, defined
     // once -- here, in place.  Mark it converted like convert_function
     // does; the end-of-unit sweep that completes half-converted
@@ -13720,7 +13721,7 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
     }
   }
 
-  // N5008 [expr.prim.lambda.closure]/4: the body was type-checked in place
+  // N5008 [expr.prim.lambda.closure]/15: the body was type-checked in place
   // above; mark it converted like convert_function does.  Without the mark
   // the end-of-unit sweep that completes half-converted system-header
   // bodies (cpp_typecheckt::typecheck) converted the already-converted
@@ -13745,7 +13746,7 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
   func_sym.module = module;
   func_sym.location = loc;
   func_sym.is_file_local = true;
-  // N5008 [expr.prim.lambda.closure]/5: the function call operator (or
+  // N5008 [expr.prim.lambda.closure]/6: the function call operator (or
   // operator template specialization) is a constexpr function when it is
   // constexpr-suitable; this function is that operator, called directly for
   // `[] { ... }()'.  Record it so a call in a constant expression is
@@ -13864,7 +13865,7 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
           irept template_parameters;
           std::set<irep_idt> seen_type_params;
           std::size_t auto_index = 0;
-          // N5008 [expr.prim.lambda.closure]/4: the explicit
+          // N5008 [expr.prim.lambda.closure]/4, [dcl.fct]/21: the explicit
           // template-parameter-list comes first, followed by the invented
           // parameters of `auto' parameters
           for(const auto &tp : expr.find(ID_template_parameters).get_sub())
@@ -13890,10 +13891,10 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
             tp_name.get_sub().push_back(irept(ID_name));
             tp_name.get_sub().back().set(ID_identifier, tpname);
             tp_dtor.name() = tp_name;
-            // N5008 [dcl.spec.auto.general]/3 + [temp.param]: `auto... xs'
-            // invents a template parameter PACK (`template <class... T>
-            // operator()(T... xs)'); without the marking the pack accepted
-            // exactly one argument.
+            // N5008 [dcl.spec.auto.general]/2, [dcl.fct]/20 + [temp.param]:
+            // `auto... xs' invents a template parameter PACK (`template
+            // <class... T> operator()(T... xs)'); without the marking the pack
+            // accepted exactly one argument.
             if(is_pack)
               tp_dtor.set_has_ellipsis();
             tp.declarators().push_back(tp_dtor);
@@ -13919,10 +13920,10 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
               irept nm(ID_name);
               nm.set(ID_identifier, tpname);
               cn.get_sub().push_back(nm);
-              // N5008 [dcl.spec.auto.general]/3: the placeholder is replaced
-              // by the invented parameter -- only the `auto' itself, so a
-              // `const auto &' parameter stays a reference to const (an
-              // rvalue argument binds to it, [dcl.init.ref]/5.3)
+              // N5008 [dcl.spec.auto.general]/2, [dcl.fct]/20: the placeholder
+              // is replaced by the invented parameter -- only the `auto'
+              // itself, so a `const auto &' parameter stays a reference to
+              // const (an rvalue argument binds to it, [dcl.init.ref]/5.3)
               std::function<bool(irept &)> replace_auto = [&](irept &t)
               {
                 if(t.id() == ID_auto)
@@ -13978,7 +13979,7 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
           // using it avoids re-deducing via `auto`, which double-type-checks
           // the body and mishandles reference-member accesses of by-reference
           // captures.)
-          // N5008 [dcl.fct]/8: an explicit trailing return type may
+          // N5008 [basic.scope.param]/1.2: an explicit trailing return type may
           // reference the parameters (`-> decltype(__s)`), which are
           // NOT in scope when the closure class's body converts.  Use
           // the ALREADY-RESOLVED return type (typechecked above with
@@ -14014,7 +14015,7 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
             lambda_member_function_names,
             lambda_qualifying_classes);
         }
-        // N5008 [expr.prim.lambda.closure]/5: the function call operator is
+        // N5008 [expr.prim.lambda.closure]/6: the function call operator is
         // a constexpr function if it satisfies the requirements of one; the
         // constant evaluator attempts it and gives up otherwise.  Not yet
         // for a generic lambda: its operator() template's instance is
@@ -14026,11 +14027,11 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
         body.push_back(op_decl);
       }
 
-      // §7.5.6.2: only a captureless lambda's closure type has a (non-explicit)
-      // conversion to pointer-to-function.  Implement it as
-      // `operator <fp>() const { return <lowered function>; }`.  (For a generic
-      // captureless lambda this conversion is itself a template; not yet
-      // synthesised -- such lambdas are still usable as call targets.)
+      // [expr.prim.lambda.closure]/10: only a captureless lambda's closure type
+      // has a (non-explicit) conversion to pointer-to-function.  Implement it
+      // as `operator <fp>() const { return <lowered function>; }`.  (For a
+      // generic captureless lambda this conversion is itself a template; not
+      // yet synthesised -- such lambdas are still usable as call targets.)
       if(lambda_is_captureless && !is_generic_lambda)
       {
         cpp_declarationt conv_decl;
