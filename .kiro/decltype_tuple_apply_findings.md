@@ -15774,3 +15774,40 @@ Fixes:
 Checks on W192 (tree of 321a7a818a): 13 suites, profiles, unit, lint,
 format overall and per commit, doxygen, per-commit compile, platform
 (gcc11, m32, arm64), vacuity 1146/3, MSVC .ii (2 known timeouts).
+
+## Round 211 (2026-11-01): audit of the N5008 citations
+
+Scope: the 256735 lines this branch adds (merge base 8fcda33365, without
+.ii/.out/.patch/.inc): 9888 citations, 1531 distinct.  Tools in
+/tmp/r219: n5008idx.py (index of N5008: 3443 stable names, 15891
+paragraphs, 5897 items), extract.py, show.py (paragraph viewer).
+- First pass over every occurrence (60 batches): 6707 ok, 3058 fix,
+  112 explicitly another standard, 11 unclear.  Independent audit of
+  each fix: 3009 accepted, 40 amended, 8 rejected.
+- Multi-place citations (`[x]/4, /8'), whose later places no pass had
+  read: 131 checked, 21 fixed.
+- Re-check of 300 random ok verdicts: 5 wrong (1.7%), so a second pass
+  read all 3837 ok citations with a locator: 56 more fixes (audited:
+  55 accepted, 1 amended).  Bare stable names (lenient test) were read
+  once.
+- Section numbers next to stable names: STANDARD_COVERAGE.md headings
+  used C++17 numbers (16 fixed), 3 table rows, `§7.5.6.2' (5).
+- By hand: "C [dcl.init]/11" -> C23 6.7.11/11; C++11 [except.spec]/15 for
+  throw() -> /12 (checked in N3690); C++11 [class.access.dcl] -> C++03;
+  [temp.inst]/3.1 as a label of the lazy member-type strategy dropped
+  (not a rule there); a `struct D : virtual B, virtual C' example
+  claimed ill-formed (it is well-formed, the test it named is gone).
+Commits: 2b82f4380c src (1330), c243d7da58 tests (1303), 77bad9b81b docs
+(160), 3da92a5875 notes (386).  Common causes: C++17/C++20 paragraph
+numbers ([temp.variadic]/5 for expansion is /9, [expr.ref]/6.x is /7.x,
+[intro.object]/9 is /8), sections N5008 split into `.general'
+subsections ([temp.deduct]/8, [over.match.best]/2.x, [dcl.init]/16.x,
+[over.match.funcs]/5), removed names ([expr.ass], [class.copy.elis],
+[temp.class.spec.match], [namespace.memdef]).
+Not checked: citations of other standards (C11/C17 sections, C++03/11/14
+labels) beyond the four above; the 15 remaining mechanical hits are all
+such labels.
+Checks on W193 (tree of 3da92a5875; src changes are comments only): 13
+suites, profiles, unit, lint, format overall and per commit, doxygen,
+per-commit compile, platform (gcc11, m32, arm64), vacuity 1146/3, MSVC
+.ii (2 known timeouts).
