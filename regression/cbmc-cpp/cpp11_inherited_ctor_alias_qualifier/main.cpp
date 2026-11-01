@@ -1,7 +1,7 @@
-// N5008 [namespace.udecl]/1 + [class.qual]/2: `using pf<...>::pf;` where
+// N5008 [namespace.udecl]/1 + [class.qual]/1: `using pf<...>::pf;` where
 // `pf` is an ALIAS TEMPLATE for pf_impl -- the qualifier resolves to the
 // base class, and the terminal name spells the qualifier's own last
-// identifier, so this names the base's constructors ([class.qual]/2).
+// identifier, so this names the base's constructors ([class.qual]/1).
 // Pre-fix the textual base-name comparison missed the alias, the
 // constructor import silently never happened, and construction collapsed
 // to default-initialization (wrong-code: assertion FAILURE).  The libc++

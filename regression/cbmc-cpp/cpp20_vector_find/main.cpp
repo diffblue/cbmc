@@ -6,7 +6,7 @@
 // have its member functions (operator*, operator++, operator==/!=), which are
 // instantiated on demand once the iterator's inert C++20 `iterator_concept`
 // alias is kept lazy instead of abandoning the iterator's class body (see
-// cpp_typecheck_compound_type.cpp; [iterator.concepts.general], [temp.inst]/1-2,
+// cpp_typecheck_compound_type.cpp; [iterator.concepts.general], [temp.inst]/2,
 // [dcl.typedef]).  Before that fix the iterator was method-less, the loop body
 // could not be elaborated, and the search degenerated to nondeterminism.
 //

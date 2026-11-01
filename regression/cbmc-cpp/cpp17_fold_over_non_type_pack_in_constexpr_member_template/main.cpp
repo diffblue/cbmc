@@ -1,4 +1,4 @@
-// N5008 [expr.prim.fold]/2-3, [temp.variadic]/7: `(100 + ... + Is)' is
+// N5008 [expr.prim.fold]/2-3, [temp.variadic]/14: `(100 + ... + Is)' is
 // 100 + 1 + 2 for Is = {1, 2} and 100 for an empty Is.  A constexpr member
 // function template is converted eagerly when it is constant-evaluated;
 // that path expanded folds only with several template packs, and it did

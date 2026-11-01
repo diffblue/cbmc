@@ -2,7 +2,7 @@
 // round-85 from 45 header-dependent lines to 26 header-free ones: a
 // member function template whose TRAILING RETURN TYPE dereferences a
 // data member of CLASS type (`auto map(F f) const -> decltype(f(*b_))`
-// with b_ a user iterator, [dcl.fct]/12 + [dcl.type.decltype]) fails
+// with b_ a user iterator, [dcl.fct]/1 + [dcl.type.decltype]) fails
 // to resolve ("found no match for symbol 'map'").  With a raw POINTER
 // member it works (t1/t2/t5 negatives); the USER operator* is
 // load-bearing.

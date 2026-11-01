@@ -9,7 +9,7 @@ main.cpp
 --
 dropped the body
 --
-N5008 [temp.param]/11: a function-template parameter pack may be followed by
+N5008 [temp.param]/18: a function-template parameter pack may be followed by
 further (deducible or defaulted) template parameters, e.g.
 `template<class U, class... W, class X = void> int first(U, W...)`.  A call
 `first(5,6,7)` deduces U=int, W={int,int}, X=void (default) and returns the first

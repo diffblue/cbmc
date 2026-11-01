@@ -11,7 +11,7 @@ main.cpp
 ^.*found no match.*$
 dropped the body
 --
-N5008 [temp.variadic]/5: pack expansion of a class template parameter pack in
+N5008 [temp.variadic]/9: pack expansion of a class template parameter pack in
 the type of a data member (the parameter list of a member function-pointer type
 R(*)(A...)) must expand to one parameter per element when Func<R(A...)> is
 instantiated.  Fixed in template_mapt::apply (expand_parameter_packs on a

@@ -1,4 +1,4 @@
-// N5008 [except.throw]/4: when an exception is thrown, control is transferred
+// N5008 [except.throw]/2: when an exception is thrown, control is transferred
 // to the nearest matching handler, unwinding the call stack -- so an exception
 // thrown in a callee is caught by a handler in a (transitive) caller, with the
 // handler parameter initialized from the exception object.

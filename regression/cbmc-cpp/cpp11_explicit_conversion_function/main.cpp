@@ -1,4 +1,4 @@
-// N5008 [class.conv.fct]/2: an explicit conversion function is only
+// N5008 [class.conv.fct]/4: an explicit conversion function is only
 // considered as a user-defined conversion for direct-initialization.  Every
 // conversion function was taken as implicit, so for `CIt(loc)' -- loc with
 // `explicit operator It()' and `explicit operator CIt()' -- BOTH

@@ -1,5 +1,5 @@
 extern "C" void __CPROVER_assert(bool, const char *);
-// [expr.rel]/2, [expr.eq]/1, [expr.log.and]/1, [expr.unary.op]/9: the
+// [expr.rel]/2, [expr.eq]/2, [expr.log.and]/2, [expr.unary.op]/9: the
 // comparison and logical operators yield bool, also as seen by auto,
 // decltype and template argument deduction
 template <class A, class B>

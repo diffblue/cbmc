@@ -10,7 +10,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [temp.variadic]/8: pack expansion substitutes each element INTO the
+N5008 [temp.variadic]/9: pack expansion substitutes each element INTO the
 pattern, cv-qualifiers included.  The in-class parameter-pack replication
 used to replace the whole pattern type `const Es &` with the raw element,
 dropping the const; the non-const `Es &` parameters could not bind rvalue

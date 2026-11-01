@@ -1,7 +1,7 @@
-// N5008 [temp.local]/1 + [temp.param]/15: inside a member class template
-// defined out of line, the member template's OWN parameter is in scope
-// for its members -- including as a DEFAULT TEMPLATE ARGUMENT of a
-// friend declared inside it:
+// N5008 [basic.scope.temp]/2 + [basic.scope.temp]/2: inside a member class
+// template defined out of line, the member template's OWN parameter is in scope
+// for its members -- including as a DEFAULT TEMPLATE ARGUMENT of a friend
+// declared inside it:
 //   template <class V> template <bool Const>
 //   class view_<V>::sentinel_ {
 //     template <bool Other = Const> friend bool operator==(...);

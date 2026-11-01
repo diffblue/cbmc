@@ -10,7 +10,7 @@ main.cpp
 FAILURE
 dropped the body
 --
-N5008 [locale.general]/8, [facet.ctype.special]: libc++ keeps the "C"
+N5008 [locale.statics]/5, [facet.ctype.special]: libc++ keeps the "C"
 classification table in ctype<char>::__tab_ and its ctype_base masks have
 their own bit values; the classic ctype<char> model only knew libstdc++'s
 _M_table and glibc's encoding, so use_facet returned an unmodelled facet.

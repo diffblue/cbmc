@@ -1,4 +1,4 @@
-// N5008 [dcl.constexpr]/1 + [expr.sub] + [expr.unary.op]/3: a constexpr
+// N5008 [dcl.constexpr]/6 + [expr.sub] + [expr.unary.op]/3: a constexpr
 // ARRAY variable is still an object; its elements are lvalues whose
 // address can be taken.  CBMC lowered every constexpr variable to a
 // fold-away macro, so libc++ <charconv>'s

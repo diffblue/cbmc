@@ -1,7 +1,7 @@
 // Dog-food kernel (src/util/timestamper.cpp): a factory whose switch
 // returns unique_ptr<const Derived>(new Derived()) from a function
 // declared to return unique_ptr<const Base> must use unique_ptr's
-// converting move constructor ([unique.ptr.single.ctor]/26,
+// converting move constructor ([unique.ptr.single.ctor]/19,
 // unique_ptr<U,E> with U* convertible to T*).  CBMC rejects the
 // return conversion ("invalid implicit conversion from 'struct
 // unique_ptr' to 'struct unique_ptr'").  The plain if-based sibling

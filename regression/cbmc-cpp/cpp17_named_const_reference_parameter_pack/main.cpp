@@ -1,5 +1,5 @@
 extern "C" void __CPROVER_assert(bool, const char *);
-// N5008 [temp.variadic]/5, [dcl.init.ref]/5: the pattern `const T &' keeps
+// N5008 [temp.variadic]/9, [dcl.init.ref]/5: the pattern `const T &' keeps
 // its const for each element, so a prvalue argument binds to the
 // expanded parameter
 template <class... T>

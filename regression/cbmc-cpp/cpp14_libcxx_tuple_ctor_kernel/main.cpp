@@ -2,7 +2,7 @@
 // __make_tuple_types / __tuple_impl / tuple), the shape behind
 // std::ranges pipe closures under --stdlib libc++.  Exercises, in one
 // kernel: [temp.deduct] two-pack constructor deduction against COMPUTED
-// empty-suffix arguments, [temp.variadic]/5 lockstep base/mem-init pack
+// empty-suffix arguments, [temp.variadic]/9 lockstep base/mem-init pack
 // expansion (`__tuple_leaf<_Tf>{__u}...`), and [class.base.init]/7
 // aggregate base initialization from an instantiated ctor template.
 // g++ rejects the alias-template pack deduction shape; clang accepts.

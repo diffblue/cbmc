@@ -7,9 +7,10 @@
 //    column), so two lambdas on one line, or in two one-line member
 //    functions, shared a closure and the second call ran the first body
 //    (wrong value, or an invariant in symex for `[*this]');
-//  * [dcl.spec.auto.general]/3 + [temp.param]: `auto... xs' invents a
+//  * [dcl.spec.auto.general]/2, [dcl.fct]/20 + [temp.param]: `auto... xs'
+//  invents a
 //    template parameter PACK -- it accepted exactly one argument;
-//  * [expr.prim.fold]/2: the binary fold `(xs op ... op init)' (pack on the
+//  * [expr.prim.fold]/3: the binary fold `(xs op ... op init)' (pack on the
 //    left) was not expanded in a generic lambda's operator();
 //  * [expr.sizeof]/2: sizeof of a reference-typed expression is the size of
 //    the referenced type.

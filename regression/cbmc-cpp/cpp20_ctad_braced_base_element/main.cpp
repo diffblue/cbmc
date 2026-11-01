@@ -1,4 +1,4 @@
-// N5008 [over.match.class.deduct]/1.8 + [dcl.init.aggr]/2.2: aggregate
+// N5008 [over.match.class.deduct]/1 + [dcl.init.aggr]/2.2: aggregate
 // CTAD where the single PARENTHESIZED argument is a BRACED temporary of
 // the base-element's type: `closure(takeish{n})` deduces closure<takeish>
 // and initializes the base element from the temporary.  The paren-arg

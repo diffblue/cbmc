@@ -16,13 +16,13 @@ main.cpp
 is unknown$
 dropped the body
 --
-N5008 [class.compare.default]/1-2: a defaulted comparison operator may be a
+N5008 [class.compare.default]/1: a defaulted comparison operator may be a
 FRIEND of the class taking two `const C &' parameters; it is defined as the
-memberwise comparison ([class.eq]/2) exactly like the defaulted member form
+memberwise comparison ([class.eq]/3) exactly like the defaulted member form
 `bool operator==(const C &) const = default'.  The friend form failed with
 "symbol '' is unknown" at the declaration and the translation unit was
 rejected.  Round-163 diagnosis: not the friend form -- the synthesized
-memberwise comparison ([class.compare.default]/6: base classes and
+memberwise comparison ([class.compare.default]/5: base classes and
 non-static data MEMBERS) also compared the anonymous padding component the
 layout inserts between `char *ptr' and `errc ec'; the member form failed
 the same way for any padded class (the original `point' has none).  Fixed

@@ -12,7 +12,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body of function
 --
-N5008 [expr.const]/22, [temp.inst]/8: the requirement `a - b' of
+N5008 [expr.const]/29.6, [temp.inst]/8: the requirement `a - b' of
 subtractable<wrapper<incomplete>> names operator-<incomplete>, a constexpr
 function template specialization, in an unevaluated operand: it is not
 needed for constant evaluation and its definition is not instantiated.

@@ -1,7 +1,7 @@
-// [class.union]/2 (C++11): a union may have user-defined member functions,
-// including constructors.  Such a union is not a POD/trivial type and must be
-// constructed via its constructor.  Its implicit copy constructor and copy
-// assignment copy the object representation ([class.copy.ctor]/14,
+// [class.union.general]/4 (C++11): a union may have user-defined member
+// functions, including constructors.  Such a union is not a POD/trivial type
+// and must be constructed via its constructor.  Its implicit copy constructor
+// and copy assignment copy the object representation ([class.copy.ctor]/15,
 // [class.copy.assign]).  This is the storage shape libstdc++ uses for
 // std::optional / std::variant: a union with a constructor that initializes one
 // member, wrapped in a struct with an "engaged"/index discriminator.

@@ -16,7 +16,7 @@ fold_forms.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [expr.prim.fold]/1-3, [temp.variadic]/5: unary and binary folds whose
+N5008 [expr.prim.fold]/1-3, [temp.variadic]/8, 14: unary and binary folds whose
 pattern names the template's TYPE pack (`sizeof(Ts)', `same<Ts,
 int>::value'), alone or together with the function parameter pack
 (expanded in lockstep), over an empty pack, and in a class template's

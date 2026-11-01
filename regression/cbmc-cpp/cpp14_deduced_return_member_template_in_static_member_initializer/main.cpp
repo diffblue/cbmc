@@ -15,7 +15,7 @@ struct gen
   {
     return element<N>(1);
   }
-  // N5008 [dcl.spec.auto.general]/12: invoke's and element's return types
+  // N5008 [dcl.spec.auto.general]/15: invoke's and element's return types
   // are deduced from their definitions while gen<2> is instantiated
   static constexpr bool same = is_same_v<decltype(invoke()), int>;
 };

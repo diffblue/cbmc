@@ -11,7 +11,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [temp.deduct]/5 + [basic.scope.temp]/2: deduction binds only the
+N5008 [temp.deduct.general]/5 + [basic.scope.temp]/2: deduction binds only the
 deduced template's own parameters.  An enclosing function template's
 same-short-name parameter (P2 = ratio<1,1>, defaulted and undeducible)
 used to be substituted into the member converting constructor's deduced

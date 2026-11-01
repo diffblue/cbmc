@@ -1,4 +1,4 @@
-// N5008 [temp.arg.explicit]/2 + [temp.deduct.general]/2: an explicitly
+// N5008 [temp.arg.explicit]/7 + [temp.deduct.general]/2: an explicitly
 // specified template argument is substituted before deduction and is
 // not itself subject to it.  CBMC used to let the call-argument
 // deduction overwrite the explicit binding (T re-deduced as int below

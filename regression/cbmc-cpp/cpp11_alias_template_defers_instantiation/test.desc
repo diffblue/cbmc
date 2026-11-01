@@ -10,7 +10,7 @@ could not fully type-check
 dropped
 dropped the body
 --
-N5008 [temp.inst]/1: an alias declaration does not require a complete type,
+N5008 [temp.inst]/2: an alias declaration does not require a complete type,
 so `using str = basic_str<char>;' (an alias TEMPLATE naming a class template
 specialization whose argument is still incomplete) must not instantiate it.
 The typedef branch of convert_non_template_declaration cleared

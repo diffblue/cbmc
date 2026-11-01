@@ -14,7 +14,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-C++ [stmt.select]/1-2, [stmt.if]: an if-statement condition may be a
+C++ [stmt.pre]/4-6, [stmt.if]: an if-statement condition may be a
 declaration; the value tested is the declared variable contextually converted
 to bool.  The C++ frontend (cpp_typecheck_code.cpp typecheck_ifthenelse) used
 to type-check the declaration but leave the condition as the declaration code,

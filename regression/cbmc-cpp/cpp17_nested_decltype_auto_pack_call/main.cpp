@@ -1,7 +1,7 @@
-// N5008 [dcl.spec.auto]/3-4,11 + [temp.variadic]/4-5: a function template with
-// a DEDUCED return type (`decltype(auto)`) whose body calls ANOTHER function
-// template that itself has a deduced return type, passing a MULTI-element
-// non-type parameter pack as the call arguments:
+// N5008 [dcl.spec.auto.general]/4, 15 + [temp.variadic]/5-6: a function
+// template with a DEDUCED return type (`decltype(auto)`) whose body calls
+// ANOTHER function template that itself has a deduced return type, passing a
+// MULTI-element non-type parameter pack as the call arguments:
 //
 //   decltype(auto) apply_impl(seq<V...>) { return invoke(V...); }
 //                                                  ^^^^^^^^^^^  invoke is also

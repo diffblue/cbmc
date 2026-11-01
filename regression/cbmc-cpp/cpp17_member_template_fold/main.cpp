@@ -1,8 +1,8 @@
-// N5008 [expr.prim.fold] + [temp.variadic]/5: a fold expression over a
+// N5008 [expr.prim.fold] + [temp.variadic]/14: a fold expression over a
 // function parameter pack in a MEMBER function template's body is expanded,
 // when the member template is instantiated, into the correctly-associated
 // binary expression over the pack's elements ([expr.prim.fold]/1-2), with
-// the operator identity for an empty pack ([expr.prim.fold]/3).
+// the operator identity for an empty pack ([temp.variadic]/14).
 //
 // Regression: member function template bodies are prepared by a different
 // (deferred-drain) pack-expander than free function templates, and that
@@ -76,7 +76,7 @@ int main()
   __CPROVER_assert(S::rsum(42) == 42, "right + fold, arity 1");
   __CPROVER_assert(S::bsub(40) == 60, "binary - fold, arity 1");
 
-  // empty pack (N==0): the operator identity ([expr.prim.fold]/3)
+  // empty pack (N==0): the operator identity ([temp.variadic]/14)
   __CPROVER_assert(S::all_true(), "empty && fold identity is true");
   __CPROVER_assert(!S::any_true(), "empty || fold identity is false");
   __CPROVER_assert(S::bsub() == 100, "binary fold empty pack yields init");

@@ -1,6 +1,6 @@
 // User-reported Issue 13 (first half).  N5008 [temp.deduct.conv]/1 deduces
 // the conversion function template's parameter from the target type;
-// [temp.deduct]/5 supplies the remaining parameters from their default
+// [temp.deduct.general]/5 supplies the remaining parameters from their default
 // template arguments -- the SFINAE idiom `template <class U, class =
 // enable_if_t<...>> operator U() const'.  The defaulted parameter was left
 // unassigned and the candidate dropped ("invalid implicit conversion").

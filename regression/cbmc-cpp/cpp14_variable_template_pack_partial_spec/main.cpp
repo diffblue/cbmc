@@ -1,4 +1,4 @@
-// N5008 [temp.spec.partial] + [temp.variadic]/4-5: a VARIABLE TEMPLATE partial
+// N5008 [temp.spec.partial] + [temp.variadic]/5-6: a VARIABLE TEMPLATE partial
 // specialization whose pattern deduces a parameter PACK:
 //
 //   template <class T>    constexpr unsigned long tsize_v            = 99;

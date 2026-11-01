@@ -15,7 +15,7 @@ dropped the body
 --
 N5008 [meta.unary.prop]: __is_empty, __is_polymorphic, __has_virtual_destructor,
 __is_standard_layout, __is_aggregate, __is_literal_type and __is_pod evaluated
-from the class definition ([class.prop], [class.virtual]/1, [class.dtor]/9,
+from the class definition ([class.prop], [class.virtual]/1, [class.dtor]/11,
 [dcl.init.aggr]/1); the class is completed first ([meta.unary.prop]/3).
 libstdc++ 16's std::find (predefined_ops.h `__by_ref_or_value_fn') depends on
 is_empty<equal_to<>>.

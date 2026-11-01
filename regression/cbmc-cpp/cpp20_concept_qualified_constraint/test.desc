@@ -11,7 +11,7 @@ main.cpp
 dropped the body
 --
 C++20 qualified concept name as a template type-constraint
-([temp.param]/4, [temp.names]).  A constrained parameter
+([temp.param]/1, [temp.names]).  A constrained parameter
 `template <ns::Concept T>` (the libstdc++ iter_reference_t shape, where the
 concept lives in a nested namespace) must be parsed as a type-constraint, not as
 a non-type parameter of a qualified type.  Combined with a prior

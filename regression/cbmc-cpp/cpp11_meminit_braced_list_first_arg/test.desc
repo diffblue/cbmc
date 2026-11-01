@@ -11,7 +11,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [class.base.init]/3, [dcl.init.list]: a mem-initializer argument list may
+N5008 [class.base.init]/1, [dcl.init.list]: a mem-initializer argument list may
 have a braced-init-list element.  CBMC's parser rejected a leading braced-init-
 list argument followed by more arguments in a mem-initializer ( `m({a,b}, t)` );
 rMemberInit's `( {` special case parsed only a single braced-init-list and then

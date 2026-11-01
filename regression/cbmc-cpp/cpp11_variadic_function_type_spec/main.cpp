@@ -1,4 +1,4 @@
-// [temp.deduct.type]/9-10 and [temp.variadic]/5: a class template partial
+// [temp.deduct.type]/9-10 and [temp.variadic]/9: a class template partial
 // specialization over a function type with a function parameter pack
 // (the std::function<R(A...)> pattern) must deduce the pack from the
 // argument's parameter list and expand it when the specialization is
@@ -23,7 +23,7 @@ struct fn_traits<R(A...)>
   }
 
   // A member function whose parameter list is the enclosing class
-  // parameter pack ([temp.variadic]/5): it must be expanded to the
+  // parameter pack ([temp.variadic]/9): it must be expanded to the
   // deduced arity so the member can be called.  (Returns the arity rather
   // than R so the result is observable even when R is void.)
   int call(A...) const

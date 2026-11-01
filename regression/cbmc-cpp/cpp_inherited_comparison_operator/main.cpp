@@ -1,7 +1,7 @@
 // A comparison operator (operator==, operator<, ...) declared as a member
 // of a base class is a member candidate when comparing objects of a
 // derived class: the qualified lookup of `Derived::operator@`
-// ([over.match.oper]/3.2) finds members inherited from base classes
+// ([over.match.oper]/3.1) finds members inherited from base classes
 // ([class.member.lookup]).  These comparisons must resolve to the
 // inherited operator, not fall back to a (non-existent) built-in
 // conversion of the class to bool.

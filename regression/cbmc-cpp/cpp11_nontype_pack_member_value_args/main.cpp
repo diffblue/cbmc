@@ -1,4 +1,4 @@
-// N5008 [temp.arg.nontype] + [temp.variadic]/4-5: the arguments matched by a
+// N5008 [temp.arg.nontype] + [temp.variadic]/5-6: the arguments matched by a
 // NON-TYPE parameter pack (e.g. `template <bool...>`) are non-type template
 // arguments -- converted constant expressions -- NOT types.
 //

@@ -5,7 +5,7 @@
 // context (plus instantiation-point ADL only); `to_address` is
 // declared LATER and `int` contributes no ADL namespaces, so
 // substitution fails and the PRIMARY must be selected
-// ([temp.spec.partial.match]/2, [temp.deduct]/8).  CBMC resolves the
+// ([temp.spec.partial.match]/2, [temp.deduct.general]/8).  CBMC resolves the
 // name at instantiation time regardless of declaration order, wrongly
 // selects the specialization, and the trait evaluates TRUE.
 // Distilled by cvise from the __and_helper/_IsFancyPointer cascade of

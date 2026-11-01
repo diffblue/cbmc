@@ -1,4 +1,4 @@
-// N5008 [temp.inst]/1-2: a class template specialization is implicitly
+// N5008 [temp.inst]/2: a class template specialization is implicitly
 // instantiated only when a complete type is required; naming it in an alias
 // declaration does not.  [temp.alias]/2: an alias template's template-id is
 // equivalent to the type it denotes -- still just a type name.

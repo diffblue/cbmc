@@ -1,4 +1,4 @@
-// N5008 [expr.spaceship]/8: the built-in three-way comparison of two operands
+// N5008 [expr.spaceship]/4.2: the built-in three-way comparison of two operands
 // of integral type yields a value of type std::strong_ordering (equal / less /
 // greater), NOT an int.  Header-free model of <compare>'s strong_ordering
 // (whose only public constructor is explicit, exactly like the real type, so

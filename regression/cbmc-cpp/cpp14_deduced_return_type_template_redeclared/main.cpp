@@ -1,9 +1,10 @@
 extern "C" void __CPROVER_assert(bool, const char *);
 template <class... T>
 struct tup;
-// N5008 [dcl.spec.auto.general]/13: redeclarations of a function template
-// with a placeholder return type use the placeholder; [temp.friend]/1 the
-// friend declaration in each tup<...> redeclares the same template
+// N5008 [dcl.spec.auto.general]/16: redeclarations of a function template with
+// a placeholder return type use the placeholder; [temp.friend]/1,
+// [basic.scope.scope]/4.5 the friend declaration in each tup<...> redeclares
+// the same template
 template <int I, class... T>
 constexpr auto &&tget(tup<T...> &&t) noexcept;
 template <class... T>

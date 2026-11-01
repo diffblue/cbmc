@@ -1,7 +1,7 @@
-// N5008 [locale.general]/8: at program startup the global locale is
-// std::locale::classic(), the "C" locale.  C99 7.4 defines the "C"-locale
-// character classes: isdigit is exactly '0'..'9', isspace the six standard
-// white-space characters, isupper 'A'..'Z', punctuation the printing
+// N5008 [locale.cons]/1, [locale.statics]/5: at program startup the global
+// locale is std::locale::classic(), the "C" locale.  C99 7.4 defines the
+// "C"-locale character classes: isdigit is exactly '0'..'9', isspace the six
+// standard white-space characters, isupper 'A'..'Z', punctuation the printing
 // characters that are neither alphanumeric nor space.
 //
 // libstdc++ initialises the locale facet table inside libstdc++.so, so

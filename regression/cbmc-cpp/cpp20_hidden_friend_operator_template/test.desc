@@ -9,5 +9,5 @@ main.cpp
 dropped the body
 --
 Hidden friend operator template ([class.friend]/1,
-[namespace.memdef]/3): the ranges pipe idiom's operator| must be
+[dcl.meaning.general]/2.3): the ranges pipe idiom's operator| must be
 found and applied; it used to be silently discarded.

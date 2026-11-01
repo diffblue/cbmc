@@ -1,8 +1,8 @@
-// N5008 [stmt.return]/2 + [dcl.init.general]/16.6.1: the result object
+// N5008 [stmt.return]/2 + [dcl.init.general]/16.6.3: the result object
 // is COPY-INITIALIZED from the return operand, which considers the
 // class's constructors -- including a CONVERTING one
 // (`template <class U> uptr(uptr<U> &&)`, the
-// [unique.ptr.single.ctor]/26 shape).  CBMC materialised the result
+// [unique.ptr.single.ctor]/19 shape).  CBMC materialised the result
 // object through a constructor only when the return type had a
 // DESTRUCTOR, and skipped operands that were already temporaries, so a
 // converting temporary of a different class type fell through to
@@ -32,7 +32,7 @@ struct uptr
   explicit uptr(T *p) : p_(p)
   {
   }
-  // converting move constructor ([unique.ptr.single.ctor]/26 shape)
+  // converting move constructor ([unique.ptr.single.ctor]/19 shape)
   template <class U>
   uptr(uptr<U> &&o) : p_(o.release())
   {

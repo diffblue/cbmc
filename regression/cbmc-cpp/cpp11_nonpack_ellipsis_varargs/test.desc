@@ -8,6 +8,6 @@ main.cpp
 --
 dropped the body
 --
-N5008 [dcl.fct]/6: `_Fn __f...` (equivalently `_Fn...` unnamed) with a
+N5008 [dcl.fct]/24: `_Fn __f...` (equivalently `_Fn...` unnamed) with a
 non-pack _Fn is `_Fn, ...`; normalized at function-template
 registration.  Runtime-verified g++ 13 / clang++ 18.

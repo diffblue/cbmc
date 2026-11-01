@@ -1,4 +1,4 @@
-// N5008 [temp.deduct]/8: while matching an overloaded candidate, an
+// N5008 [temp.deduct.general]/8: while matching an overloaded candidate, an
 // invalid type or expression formed by the substituted template
 // arguments is a deduction failure that removes the candidate from
 // the overload set -- not a hard error.  Here `get<I1>` in the

@@ -9,7 +9,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-[temp.variadic] + [expr.sizeof]/5: a deduced function-template parameter pack A
+[temp.variadic] + [expr.sizeof]/4: a deduced function-template parameter pack A
 used as a class-template argument (first_type<A...>) names the correct member
 via the dependent qualified-id first_type<A...>::type.  The qualified-id
 resolution already expanded the pack; the failure was that

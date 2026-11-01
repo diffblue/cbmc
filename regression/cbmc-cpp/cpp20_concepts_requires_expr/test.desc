@@ -7,7 +7,7 @@ main.cpp
 --
 dropped the body
 --
-N5008 [expr.prim.req.general]/2 + [temp.constr].  A requires-expression with a
+N5008 [expr.prim.req.general]/4 + [temp.constr].  A requires-expression with a
 requirement-parameter-list used directly as a function template's requires-clause
 (`requires requires(T a, U b){ a + b; }`).  Previously the requirement-parameters
 (a, b) were not bound while the constraint was checked, so the requirement failed

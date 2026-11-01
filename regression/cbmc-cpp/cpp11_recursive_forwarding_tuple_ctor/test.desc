@@ -11,11 +11,11 @@ main.cpp
 --
 dropped the body
 --
-N5008 [class.base.init] + [temp.variadic] + [temp.param]/11: a recursive variadic
-forwarding constructor (the std::_Tuple_impl shape) whose member-initializer
-builds its base from the tail pack, with an enable_if trailing constraint
-referencing both the constructor's pack and the enclosing class's pack.  Covers
-a parameter pack that is not the last template parameter, `sizeof...(class-pack)`
-in a trailing default of a recursively-instantiated constructor, and the empty-
-pack terminal recursion.  Each element must be stored at its recursive position;
-assertion.4 ("WRONG") must FAIL (non-vacuity).
+N5008 [class.base.init] + [temp.variadic] + [temp.param]/18: a recursive
+variadic forwarding constructor (the std::_Tuple_impl shape) whose
+member-initializer builds its base from the tail pack, with an enable_if
+trailing constraint referencing both the constructor's pack and the enclosing
+class's pack.  Covers a parameter pack that is not the last template parameter,
+`sizeof...(class-pack)` in a trailing default of a recursively-instantiated
+constructor, and the empty-pack terminal recursion.  Each element must be
+stored at its recursive position; assertion.4 ("WRONG") must FAIL (non-vacuity).

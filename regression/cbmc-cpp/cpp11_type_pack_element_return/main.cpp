@@ -3,7 +3,7 @@
 // (the shape of libc++'s std::get<I>(tuple&), whose return type is
 // tuple_element<_Ip, tuple<_Tp...>>::type& = __type_pack_element<_Ip,
 // _Tp...>&).  During overload resolution the return type is
-// substituted with the deduced arguments ([temp.deduct]/5); CBMC
+// substituted with the deduced arguments ([temp.deduct.general]/5); CBMC
 // fails to evaluate the builtin there and rejects the only candidate
 // ("found no match for symbol 'get_'").  __type_pack_element in a
 // LOCAL typedef inside the body works, and evaluating it as a

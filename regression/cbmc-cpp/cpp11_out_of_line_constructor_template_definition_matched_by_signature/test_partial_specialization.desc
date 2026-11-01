@@ -11,7 +11,7 @@ partial_specialization.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [temp.class.spec.mfunc]/1, [class.base.init]/1: the copy
+N5008 [temp.spec.partial.member]/1, [class.base.init]/1: the copy
 constructors of two partial specializations (with and without a pack)
 are defined out of line with a ctor-initializer.  On bin53 the
 definition was attached without its mem-initializers, so the copies

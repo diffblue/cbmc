@@ -4,7 +4,7 @@
 // instantiates `std::__is_swappable_impl<T>` and hits the SFINAE
 // substitution in `swap(_Tp&, _Tp&)`'s `_Require<__not_<...>, ...>`
 // return type) emits spurious type-checker errors that are
-// supposed to be absorbed silently per [temp.deduct]/8.
+// supposed to be absorbed silently per [temp.deduct.general]/8.
 //
 // This version reproduces via `#include <array>` with `goto-cc`
 // specifically, because that was the user-facing symptom:

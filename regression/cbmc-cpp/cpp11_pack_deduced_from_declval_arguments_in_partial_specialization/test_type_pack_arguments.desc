@@ -11,7 +11,7 @@ type_pack_arguments.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [temp.variadic]/5: a pack-expansion call argument whose pattern names
+N5008 [temp.variadic]/9: a pack-expansion call argument whose pattern names
 a type template parameter pack -- `declval<Args>()...', `Args()...',
 `static_cast<Args>(0)...' -- expands to one argument per element, also for
 an empty pack, in a member typedef of a class template and in a partial

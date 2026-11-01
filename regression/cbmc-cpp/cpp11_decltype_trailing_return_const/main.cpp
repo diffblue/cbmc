@@ -16,7 +16,7 @@ struct S
 // Trailing-return decltype referencing the function parameter: the
 // deduced return type must follow the cv-qualification of the argument
 // (const S selects `const int &get() const`, S selects `int &get()`).
-// Per [dcl.type.simple]/[over.match.funcs] the implicit object
+// Per [dcl.type.decltype]/1/[over.match.funcs] the implicit object
 // parameter's cv-qualifiers participate in overload resolution, and the
 // deduction must be performed independently for each instantiation.
 template <typename T>

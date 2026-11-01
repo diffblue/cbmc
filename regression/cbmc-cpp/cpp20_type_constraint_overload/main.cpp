@@ -1,4 +1,4 @@
-// N5008 [temp.param]/4: a type-constraint `C T' (or `ns::C T', or
+// N5008 [temp.param]/9: a type-constraint `C T' (or `ns::C T', or
 // `C<A> T') on a type template parameter introduces the constraint-expression
 // `C<T>' (`C<T, A>') into the template's associated constraints; with
 // [temp.constr.decl]/3 and [over.match.viable] a function template whose

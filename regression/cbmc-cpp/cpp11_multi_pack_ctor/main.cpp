@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5,7,8: a constructor template with MULTIPLE
+// N5008 [temp.variadic]/5,8: a constructor template with MULTIPLE
 // template parameter packs, each deduced from a distinct
 // class-template-id parameter plus a trailing function parameter pack
 // -- the shape of libc++ __tuple_impl's five-pack constructor.  Four

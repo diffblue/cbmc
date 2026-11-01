@@ -21,7 +21,7 @@ From restrict_function_pointers.cpp's
 merge_function_pointer_restrictions; blocks that dog-food TU.
 See also cpp17_vector_emplace_nondefault_pair: a SINGLE emplace_back
 already fails when the pair has a non-default-constructible member
-(constrained-pair-constructor family, [temp.deduct]/8).
+(constrained-pair-constructor family, [temp.deduct.general]/8).
 More minimal same-root sibling: cpp17_vector_emplace_nondefault_pair
 (deduced heterogeneous parameter pack homogenized to its first
 element in the member-template instance signature).
@@ -39,7 +39,7 @@ unrelated (and g++-only-spelled) shape and was discarded; this test
 now belongs to the semantic-hashtable class (cf. abstract_environment
 notes), not the minimal-front-end queue.
 Round-24 fix (2026-08-08): the residual was NOT hashtable semantics --
-_Scoped_node's variadic ctor instance lost its body ([temp.variadic]/5
+_Scoped_node's variadic ctor instance lost its body ([temp.variadic]/9
 front-element stamping of N>=2 packs in mem-init patterns), the node
 stayed uninitialized, and duplicate detection compared garbage.  Fixed
 by guarding the /7 name-substitution blocks to single-element packs;

@@ -1,4 +1,4 @@
-// [temp.deduct.conv]/1 + [temp.deduct]/8: when the conversion-function
+// [temp.deduct.conv]/1 + [temp.deduct.type]/4: when the conversion-function
 // template's return type does not mention the template parameter,
 // deduction cannot determine T, so the template is not a viable
 // candidate for an implicit conversion.
@@ -26,7 +26,7 @@ int main()
   any_t a;
   a.stored = 42;
 
-  int x = a; // Per [temp.deduct]/8: deduction fails; conversion
+  int x = a; // Per [temp.deduct.type]/4: deduction fails; conversion
              // is rejected.
   (void)x;
 

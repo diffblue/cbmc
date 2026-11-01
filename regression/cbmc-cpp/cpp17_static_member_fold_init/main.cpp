@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5 + [expr.prim.fold]: a fold expression whose
+// N5008 [temp.variadic]/9 + [expr.prim.fold]: a fold expression whose
 // pattern is a QUALIFIED reference to a member of each pack element
 // (`Ts::v`) substitutes the k-th element INTO the pattern -- the trailing
 // `::v` must survive the substitution.
@@ -30,7 +30,7 @@ struct sum_holder
   static inline int value = (Ts::v + ...);
 };
 
-// binary fold, seeded ([expr.prim.fold]/2 left association)
+// binary fold, seeded ([expr.prim.fold]/3 left association)
 template <typename... Ts>
 struct seeded_holder
 {

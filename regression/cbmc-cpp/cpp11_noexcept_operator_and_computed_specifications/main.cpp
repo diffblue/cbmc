@@ -1,7 +1,7 @@
 // N5008 [except.spec]/2: noexcept(constant-expression) has the value of
 // the expression as the exception specification, also when it depends on
 // template parameters or calls a constexpr function.
-// [expr.unary.noexcept]/3, [except.spec]/5.2: the noexcept operator also
+// [expr.unary.noexcept]/2, [except.spec]/5.2: the noexcept operator also
 // sees the constructor that initializes a temporary.
 extern "C" void __CPROVER_assert(bool, const char *);
 

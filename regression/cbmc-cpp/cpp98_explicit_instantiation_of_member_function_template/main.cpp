@@ -1,7 +1,7 @@
-// N5008 [temp.explicit]/1, /10, /12: an explicit instantiation definition
-// of a member function template specialization instantiates its
-// definition; an explicit instantiation declaration (C++11 `extern
-// template') only suppresses implicit instantiation in favour of it
+// N5008 [temp.explicit]/1, /12, [temp.inst]/1: an explicit instantiation
+// definition of a member function template specialization instantiates its
+// definition; an explicit instantiation declaration (C++11 `extern template')
+// only suppresses implicit instantiation in favour of it
 extern "C" void __CPROVER_assert(bool, const char *);
 template <class C>
 struct box

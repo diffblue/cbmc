@@ -11,4 +11,4 @@ could not fully type-check
 dropped the body
 --
 User-reported Issue 13: conversion function templates with defaulted
-(SFINAE) template parameters ([temp.deduct.conv]/1, [temp.deduct]/5).
+(SFINAE) template parameters ([temp.deduct.conv]/1, [temp.deduct.general]/5).

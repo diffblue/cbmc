@@ -8,7 +8,7 @@
 // member-template registration); (2) rebind ambiguity ([temp.names]/3
 // scope-restricted lookup); (3) push_back dropped through a hybrid
 // half-substituted instance created by resolving a deduction variable
-// by short name through the enclosing template map ([temp.deduct]/2
+// by short name through the enclosing template map ([temp.deduct.general]/1
 // clean slate; see cpp17_push_back_after_unordered_set_decl).
 //
 // g++/clang++ verify at runtime.

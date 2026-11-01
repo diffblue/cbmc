@@ -13,7 +13,7 @@ main.cpp
 found no match for symbol
 dropped the body
 --
-N5008 [dcl.spec.auto.general]/11-13: a call to a function with a deduced
+N5008 [dcl.spec.auto.general]/13: a call to a function with a deduced
 return type needs the type deduced from the definition at the point of the
 call.  A STATIC member function template specialization named directly in a
 constructor template's mem-initializer (`m_pathname(_S_convert(source))',

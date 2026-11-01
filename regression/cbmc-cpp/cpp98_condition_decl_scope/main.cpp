@@ -1,4 +1,4 @@
-// N5008 [stmt.pre]/6: a name introduced by a condition declaration is
+// N5008 [basic.scope.block]/1: a name introduced by a condition declaration is
 // in scope from its point of declaration until the end of the
 // statement's SUBSTATEMENTS; it is not visible in the rest of the
 // enclosing block, so redeclaring the same name after the statement is
@@ -18,7 +18,7 @@ int f(int x)
 {
   if(int v = x)
     return v + 1;
-  P v = {5}; // same name, different type: OK per [stmt.pre]/6
+  P v = {5}; // same name, different type: OK per [basic.scope.block]/1
   return v.a;
 }
 

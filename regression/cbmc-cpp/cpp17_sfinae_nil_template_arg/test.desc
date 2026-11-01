@@ -11,5 +11,5 @@ dropped the body
 --
 Fixed 2026-07-20: nil-typed template arguments thrown while matching
 overloaded candidates convert to template_arg_kind_mismatch_exceptiont
-([temp.deduct]/8) instead of hard-erroring.  The remaining
+([temp.deduct.general]/8) instead of hard-erroring.  The remaining
 data-member variant is cpp17_optional_requires_ctor_pair.

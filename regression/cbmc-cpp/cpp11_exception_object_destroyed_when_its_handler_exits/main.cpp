@@ -1,4 +1,4 @@
-// N5008 [except.throw]/5: the exception object is destroyed when the last
+// N5008 [except.throw]/4: the exception object is destroyed when the last
 // active handler for it exits by any means other than rethrowing: at the
 // end of its block, by a return, or by another exception leaving it.
 // [except.handle]/15: a handler parameter of reference type refers to the

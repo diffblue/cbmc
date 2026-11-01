@@ -1,4 +1,4 @@
-// N5008 [temp.pre]/1, [temp.spec]/4, [temp.mem]/1: static data member
+// N5008 [temp.pre]/3, [temp.type]/1, [temp.mem]/1: static data member
 // templates (std::variant's __exactly_once / __accepted_index shape).
 extern "C" void __CPROVER_assert(bool, const char *);
 typedef unsigned long size_t;

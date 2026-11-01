@@ -11,7 +11,7 @@ main.cpp
 ^CONVERSION ERROR$
 cannot zero-initialize
 --
-N5008 [expr.type.conv]/2: "if the type is cv void and the initializer is ()
+N5008 [expr.type.conv]/1.2: "if the type is cv void and the initializer is ()
 or {} (after pack expansion, if any), the expression is a prvalue of type
 void that performs no initialization".  The front end value-initialized the
 operand-less functional cast and rejected `void()' with "cannot

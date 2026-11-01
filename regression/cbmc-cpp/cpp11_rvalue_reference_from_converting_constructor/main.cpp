@@ -1,6 +1,6 @@
 extern "C" void __CPROVER_assert(bool, const char *);
 #include <string>
-// N5008 [dcl.init.ref]/5.3: an rvalue reference (like a const lvalue
+// N5008 [dcl.init.ref]/5.4.1: an rvalue reference (like a const lvalue
 // reference) to a class type can be initialised from an expression of an
 // unrelated type: a temporary of the referenced type is copy-initialised
 // (converting constructor) and the reference binds to it.  /5.4's "shall

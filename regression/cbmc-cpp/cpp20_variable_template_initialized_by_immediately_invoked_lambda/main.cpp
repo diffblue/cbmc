@@ -1,5 +1,5 @@
 extern "C" void __CPROVER_assert(bool, const char *);
-// N5008 [expr.prim.lambda.closure]/5: the function call operator of a
+// N5008 [expr.prim.lambda.closure]/6: the function call operator of a
 // lambda is a constexpr function when it is constexpr-suitable, so a
 // variable template initialized by an immediately invoked lambda is usable
 // as a template argument ([temp.arg.nontype]/1, libc++'s

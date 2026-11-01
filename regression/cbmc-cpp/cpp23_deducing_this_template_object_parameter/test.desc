@@ -15,7 +15,7 @@ main.cpp
 found no match for symbol
 dropped the body
 --
-N5008 [dcl.fct]/6, [over.match.funcs]/3, [temp.deduct.call]: a templated
+N5008 [dcl.fct]/6, [over.match.funcs.general]/3, [temp.deduct.call]: a templated
 explicit object parameter deduced from the object expression, also with a
 function parameter pack declared before it.  Non-vacuous: the last assertion
 is deliberately wrong and must FAIL.  Before the fix: "found no match for

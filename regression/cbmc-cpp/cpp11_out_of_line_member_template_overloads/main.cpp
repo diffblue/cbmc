@@ -1,4 +1,4 @@
-// N5008 [dcl.fct]/3,5 + [temp.over.link]: the out-of-line definition that
+// N5008 [dcl.fct]/3 + [temp.over.link]: the out-of-line definition that
 // belongs to a member (template) is the one with the same signature; the
 // definition may name its parameters -- function and template parameters --
 // differently.  Same-named member templates of equal arity were matched by

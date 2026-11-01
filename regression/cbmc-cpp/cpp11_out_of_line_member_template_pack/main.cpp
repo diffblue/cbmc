@@ -1,4 +1,4 @@
-// N5008 [temp.inst]/2, [temp.mem.func]: a member function template of a
+// N5008 [temp.inst]/4, [temp.mem.func]: a member function template of a
 // class template may be defined out of line; instantiating it uses that
 // definition.  This is the shape of libstdc++'s
 // _Rb_tree::_M_emplace_hint_unique (declared in the class, defined at the

@@ -17,5 +17,5 @@ statements are dropped.  g++/clang++/valgrind clean.
 Fixed 2026-07-28 as a side effect of the mem-initializer class-scope
 derivation fix: the eager default-constructor synthesis attempt for
 the anonymous-struct member still diagnoses (harmless noise; per
-[class.default.ctor]/4 it should not be defined until odr-used), but
+[dcl.fct.def.default]/5 it should not be defined until odr-used), but
 recovery keeps the program intact and the assertion verifies.

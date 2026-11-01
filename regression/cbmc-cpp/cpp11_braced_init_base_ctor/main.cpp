@@ -1,4 +1,4 @@
-// N5008 [over.match.ctor]/1 with [namespace.udecl]/3: the candidate functions
+// N5008 [over.match.ctor]/1 with [namespace.udecl]/2: the candidate functions
 // for initializing a class object are the constructors of that class.  A base
 // class's constructors are NOT constructors of the derived class unless
 // explicitly inherited with a using-declaration.  In particular the base's

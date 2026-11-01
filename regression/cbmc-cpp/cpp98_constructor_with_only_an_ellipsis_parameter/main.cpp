@@ -1,4 +1,4 @@
-// N5008 [dcl.fct]/4, [over.ics.ellipsis]: a constructor `S(...)' accepts
+// N5008 [dcl.fct]/2, [over.ics.ellipsis]: a constructor `S(...)' accepts
 // any argument; the argument of `S c(1)' is not the object argument
 // (the front end took a call with as many arguments as parameters to be
 // set up with the object argument already in place).

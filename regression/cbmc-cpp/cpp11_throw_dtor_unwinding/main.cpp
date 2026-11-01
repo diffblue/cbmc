@@ -1,4 +1,4 @@
-// N5008 [except.ctor]/1-3, [except.throw]/4: when an exception is thrown, the
+// N5008 [except.ctor]/1-3, [except.throw]/2: when an exception is thrown, the
 // automatic objects constructed since entering the try block are destroyed, in
 // reverse order of construction, as the stack unwinds to the handler.
 //

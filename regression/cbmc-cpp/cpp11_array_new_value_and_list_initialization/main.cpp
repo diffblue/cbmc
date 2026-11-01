@@ -1,4 +1,4 @@
-// N5008 [expr.new]/17, /24, [dcl.init.general]/9.3, [dcl.init.aggr]/4-5:
+// N5008 [expr.new]/24, [dcl.init.general]/9.2-9.3, [dcl.init.aggr]/4-5:
 // `new T[n]()' and `new T[n]{}' value-initialize each element;
 // `new T[n]{e1, ..., ek}' initializes the first k elements from the list and
 // value-initializes the rest

@@ -5,7 +5,7 @@ struct L
 };
 template <class, class>
 struct find;
-// N5008 [temp.variadic]/5, [temp.spec.partial.match]/2: in a partial
+// N5008 [temp.variadic]/9, [temp.spec.partial.match]/2: in a partial
 // specialization, a pack expansion over a deduced pack R expands to one
 // element per deduced argument (the MSVC STL's _Meta_find_unique_index_)
 template <class F, class... R, class T>

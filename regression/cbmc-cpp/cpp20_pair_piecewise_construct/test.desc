@@ -11,4 +11,4 @@ dropped the body
 --
 Fixed 2026-07-20: expand_member_initializer_packs_in_body (deferred
 prepare + eager constexpr-member conversion paths) expands type and
-non-type packs in lockstep per [temp.variadic]/5.
+non-type packs in lockstep per [temp.variadic]/9.

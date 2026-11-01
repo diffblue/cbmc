@@ -1,5 +1,5 @@
 extern "C" void __CPROVER_assert(bool, const char *);
-// N5008 [class.mfct]/1, [temp.mem]/1: an out-of-class definition defines
+// N5008 [class.mfct]/2, [temp.mem]/1: an out-of-class definition defines
 // a member of the class it names; the definition of another class's
 // same-named member, however many template parameters it has, is not a
 // candidate

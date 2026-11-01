@@ -1,4 +1,4 @@
-// N5008 [dcl.fct.def.default]/5, [class.access.general]/2: a constructor
+// N5008 [dcl.fct.def.default]/5, [class.access.general]/1: a constructor
 // explicitly defaulted on its first declaration is a member of its class;
 // its implicit definition initializes the private members from their
 // default member initializers.  libstdc++ 13 <format>'s

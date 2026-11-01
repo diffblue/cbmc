@@ -1,5 +1,5 @@
-// [temp.deduct]/5 with [temp.constr.decl]/1: after argument deduction for a
-// conversion-function *template* ([temp.deduct.conv]), its associated
+// [temp.deduct.general]/5 with [temp.constr.decl]/1: after argument deduction
+// for a conversion-function *template* ([temp.deduct.conv]), its associated
 // constraints (requires-clause) must be satisfied with the deduced arguments;
 // an unsatisfied constraint is a deduction failure, so the candidate is removed
 // rather than instantiated.

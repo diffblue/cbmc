@@ -1,4 +1,4 @@
-// N5008 [expr.type.conv] + [temp.variadic]/5: expanding `A()...` (a
+// N5008 [expr.type.conv] + [temp.variadic]/9: expanding `A()...` (a
 // functional cast over the pack) inside a member alias's decltype
 // (`using result = decltype(probe(F(), A()...))`, the libc++
 // __invokable_r shape) substitutes the pack element INTO THE CALLEE

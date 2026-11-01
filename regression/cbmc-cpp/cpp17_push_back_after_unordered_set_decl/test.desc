@@ -15,5 +15,5 @@ enable_if<0,void> SFINAE throw on _S_use_relocate.
 
 FIXED 2026-07-18: convert_template_parameter's by-short-name fallback
 captured an enclosing instantiation's same-named parameter for an
-explicitly-unassigned deduction variable ([temp.deduct]/2 clean slate);
+explicitly-unassigned deduction variable ([temp.deduct.general]/1 clean slate);
 now restricted to identifiers wholly unknown to the template map.

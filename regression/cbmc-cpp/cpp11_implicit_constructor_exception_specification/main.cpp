@@ -1,6 +1,6 @@
 // N5008 [except.spec]/6: an implicitly-declared constructor of X is
 // potentially-throwing if and only if a constructor it invokes for a
-// potentially constructed subobject is; [expr.unary.noexcept]/3.
+// potentially constructed subobject is; [expr.unary.noexcept]/2.
 extern "C" void __CPROVER_assert(bool, const char *);
 
 struct Throws

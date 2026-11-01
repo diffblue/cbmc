@@ -1,4 +1,4 @@
-// [temp.variadic]/5 + [dcl.ref] (reference collapsing): a forwarding-reference
+// [temp.variadic]/9 + [dcl.ref] (reference collapsing): a forwarding-reference
 // parameter pack `A&&...` expands, for each element E, to the reference type
 // E&& / E& -- not to a by-value E.
 //

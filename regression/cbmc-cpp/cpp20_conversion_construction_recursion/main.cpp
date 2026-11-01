@@ -8,7 +8,7 @@
 // The recursion arises because the templated constructor MS(T)/MD(T) is
 // considered with T deduced as the *other class type*; that produces a bogus
 // by-value constructor whose argument has to be materialised by constructing
-// the same type again, ad infinitum.  Per [temp.deduct]/5 with
+// the same type again, ad infinitum.  Per [temp.deduct.general]/5 with
 // [temp.constr.decl]/1, a function-template specialisation whose associated
 // constraints (here `requires std::integral<T>`) are not satisfied by the
 // deduced arguments is removed from the candidate set -- integral<MD> is

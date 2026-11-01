@@ -6,7 +6,7 @@ void use(T *p)
 {
   destroy(p, p + 1);
 }
-// N5008 [dcl.fct]/5, [temp.over.link]/6: the top-level const of a parameter
+// N5008 [dcl.fct]/3, [temp.over.link]/6: the top-level const of a parameter
 // is not part of the function type, so this definition is the one of the
 // template declared above (the MSVC STL's _Destroy_range)
 template <class It, class Se>

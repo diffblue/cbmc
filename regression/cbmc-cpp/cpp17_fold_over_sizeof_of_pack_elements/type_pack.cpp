@@ -2,7 +2,7 @@ extern "C" void __CPROVER_assert(bool, const char *);
 template <class... Ts>
 int bytes(Ts...)
 {
-  // [expr.prim.fold]/2: the pattern names the TYPE pack
+  // [expr.prim.fold]/3: the pattern names the TYPE pack
   return (0 + ... + static_cast<int>(sizeof(Ts)));
 }
 int main()

@@ -1,4 +1,4 @@
-// N5008 [dcl.fct]/8: a function's parameters are in scope in its
+// N5008 [basic.scope.param]/1.2: a function's parameters are in scope in its
 // trailing return type.  A lambda's `-> decltype(__s)` naming its own
 // parameter failed "symbol '__s' is unknown" (cvise converged on this
 // from a preprocessed libc++ <string> seed): the trailing type was

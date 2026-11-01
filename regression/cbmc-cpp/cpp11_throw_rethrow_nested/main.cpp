@@ -1,8 +1,8 @@
-// N5008 [except.throw]/8: a `throw;` with no operand rethrows the exception
-// currently being handled -- i.e. the exception of the handler it (dynamically)
-// appears in.  Here the outer handler is handling E(1); it enters and completes
-// an inner try/catch handling E(2), then executes `throw;`, which must rethrow
-// E(1) (the exception the outer handler is handling), not E(2).
+// N5008 [expr.throw]/3, [except.handle]/10: a `throw;` with no operand rethrows
+// the exception currently being handled -- i.e. the exception of the handler it
+// (dynamically) appears in.  Here the outer handler is handling E(1); it enters
+// and completes an inner try/catch handling E(2), then executes `throw;`, which
+// must rethrow E(1) (the exception the outer handler is handling), not E(2).
 //
 // KNOWNBUG: remove_cpp_exceptions tracks the exception being handled in a single
 // pair of "current exception" globals rather than a stack.  Entering the inner

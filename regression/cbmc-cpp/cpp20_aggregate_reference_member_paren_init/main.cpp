@@ -1,5 +1,5 @@
 // N5008 [dcl.init.general]/16.6.2.2 (C++20 parenthesized aggregate
-// initialization) + [dcl.init.aggr]/4.2 + [dcl.init.ref]: an aggregate
+// initialization) + [dcl.init.aggr]/4.3 + [dcl.init.ref]: an aggregate
 // whose element is a REFERENCE is initializable with (...) as with {...},
 // and the reference element is BOUND to its initializer.  CBMC treated
 // the reference member as making the class non-POD and fell through to

@@ -1,4 +1,4 @@
-// N5008 [basic.scope.hiding]/2: a class or enumeration name can be hidden by
+// N5008 [basic.lookup.general]/4: a class or enumeration name can be hidden by
 // the name of a variable, data member, function, or enumerator declared in the
 // same scope.  If a class name and a function are declared in the same scope
 // with the same name, the class name is hidden wherever the function name is
@@ -26,7 +26,7 @@ struct box
 };
 
 // A function whose name is the same as the struct 'box'.  Per
-// [basic.scope.hiding]/2 this hides the type name in ordinary (value) lookup.
+// [basic.lookup.general]/4 this hides the type name in ordinary (value) lookup.
 struct box box(void);
 
 struct box box(void)

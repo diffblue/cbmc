@@ -16,7 +16,7 @@ could not be made to hold.  An explicitly specified argument is exempt
 (Example 13: `f<1>(a)` is OK) and cv-qualifiers are ignored.
 
 History.  Round-44 attempt: enforcing
-[temp.deduct.type]/17 at guess_function_template_args'
+[temp.deduct.type]/20 at guess_function_template_args'
 build_template_args point broke the (valid) libc++ tuple kernels --
 CBMC's own machinery parks deduced values with normalized kinds (e.g.
 __make_integer_seq synthesizes values whose recorded type differs from

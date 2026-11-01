@@ -10,7 +10,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-[except.ctor]/1-3, [except.throw]/4 -- an automatic object in an outer scope
+[except.ctor]/1-3, [except.throw]/2 -- an automatic object in an outer scope
 that is exited because the exception does not match an inner handler must be
 destroyed during unwinding.  Fixed by level-by-level propagation: each try emits
 an exceptional-exit landing that runs the destructors of the scopes between it

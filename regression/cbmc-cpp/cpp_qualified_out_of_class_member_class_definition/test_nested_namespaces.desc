@@ -11,6 +11,6 @@ nested_namespaces.cpp
 ^CONVERSION ERROR$
 no body for callee
 --
-N5008 [dcl.meaning.general]/2.3, [temp.mem.class]/1, [temp.mem.func]/1;
+N5008 [dcl.meaning.general]/3.4, [temp.mem.class]/1, [temp.mem.func]/1;
 see test.desc.  Fails on bin53.  g++ 13 and clang++ 18 accept this program,
 and it fails only its WRONG assertion.

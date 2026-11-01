@@ -11,7 +11,7 @@ main.cpp
 ^CONVERSION ERROR$
 incomplete type
 --
-N5008 [temp.mem.class]/1, [temp.inst]/3: a member class of a class template
+N5008 [temp.mem.class]/1, [temp.inst]/4: a member class of a class template
 defined outside the class template is instantiated for S<char> when its
 completeness is required, from the definition reachable then.  The front
 end grafted the out-of-class definition into the class template only, so an

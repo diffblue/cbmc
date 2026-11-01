@@ -21,7 +21,7 @@ invoked through reference_wrapper::operator() -- a variadic *member* template of
 a class template whose dependent return type is invoke_result_t<T&, _Args...>.
 
 Two cooperating fixes made this work (both also covered by header-free tests):
-  * [temp.deduct.call]/1 + [temp.variadic]/5: a deduced function parameter pack
+  * [temp.deduct.call]/1 + [temp.variadic]/9: a deduced function parameter pack
     is recorded as a pack (pack_args_map / pack_size_map), not only as a scalar
     type_map binding, so the dependent return type expands the pack and drops
     the `...` marker (cpp11_decltype_pack_in_class_template).

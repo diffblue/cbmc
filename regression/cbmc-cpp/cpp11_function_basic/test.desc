@@ -20,4 +20,4 @@ cpp_typecheck_resolvet::resolve.  Earlier layers: partial-spec pack deduction
 (cpp11_partial_spec_pack_after_fixed), member function-pointer pack arity
 (cpp11_variadic_pack_in_member_funptr_type / _primary), and method-body pack
 expansion (cpp11_variadic_pack_in_method_body_call).  N5008 [func.wrap.func],
-[temp.variadic]/5, [temp.deduct.call]/3.  Non-vacuous (assertion 2 must FAIL).
+[temp.variadic]/9, [temp.deduct.call]/3.  Non-vacuous (assertion 2 must FAIL).

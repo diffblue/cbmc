@@ -3,7 +3,7 @@
 // Exercises the whole libstdc++ chain -- unique_ptr's defaulted move members,
 // __uniq_ptr_data's defaulted move members over the user-defined
 // __uniq_ptr_impl move operations, and std::tuple's EBO _Tuple_impl /
-// _Head_base hierarchy underneath ([class.copy.ctor]/15,
+// _Head_base hierarchy underneath ([class.copy.ctor]/14,
 // [class.copy.assign]/12, [class.inhctor.init]).  Runtime-verified against
 // g++ and clang++.
 

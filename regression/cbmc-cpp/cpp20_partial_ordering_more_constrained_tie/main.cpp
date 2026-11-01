@@ -11,7 +11,7 @@ struct fn
   {
     return t.begin();
   }
-  // N5008 [temp.func.order]/6.4: both templates are equally specialized;
+  // N5008 [temp.func.order]/8.4: both templates are equally specialized;
   // the constrained one is more specialized and the deleted one loses
   template <class U>
   void operator()(U &&) const = delete;

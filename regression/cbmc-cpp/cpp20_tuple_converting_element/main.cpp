@@ -2,8 +2,8 @@
 // argument (`tuple<box<int>> t(3)`, libc++ <tuple> machinery
 // transliterated below).  Historically dropped the instantiated
 // constructor's body silently; root causes fixed across rounds 44-45:
-// [temp.variadic]/7 empty-pack classification beside stale same-name
-// entries, [expr.sizeof]/5 pack-query survival through the
+// [temp.variadic]/5 empty-pack classification beside stale same-name
+// entries, [expr.sizeof]/4 pack-query survival through the
 // single-element stampers, and [temp.deduct.call]/1 trailing-
 // function-pack recording clobbering the LAST type pack's deduction.
 // clang++ accepts and runs clean; g++ rejects the alias-template pack

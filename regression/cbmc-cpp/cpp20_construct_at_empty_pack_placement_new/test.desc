@@ -14,8 +14,8 @@ could not fully type-check
 dropped the body
 is unknown$
 --
-N5008 [expr.new]/1 + [temp.variadic]/5: a new-initializer's expression-list
-is a pack-expansion context, and [temp.param]/14: a function template's
+N5008 [expr.new]/1 + [temp.variadic]/6.5: a new-initializer's expression-list
+is a pack-expansion context, and [temp.param]/18: a function template's
 parameter pack need not be its last template parameter.  libc++'s
 `template <class T, class... Args, class = decltype(::new(declval<void *>())
 T(declval<Args>()...))> construct_at(T *, Args &&...)' called with NO

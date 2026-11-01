@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5: two pack expansions in one call argument list
+// N5008 [temp.variadic]/8: two pack expansions in one call argument list
 // -- the member's own function parameter pack and the ENCLOSING CLASS
 // template's non-type pack -- must expand independently:
 // `Op()(static_cast<A&&>(a)..., get<Ip>(bound_)...)`, the libc++

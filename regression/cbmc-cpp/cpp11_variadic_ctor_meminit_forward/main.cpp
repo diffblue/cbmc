@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5 (member-initializer pack expansion): a constructor
+// N5008 [temp.variadic]/9 (member-initializer pack expansion): a constructor
 // whose member/base initializer contains a pack expansion `t...` over a
 // parameter pack of length N forwards the N corresponding constructor
 // arguments to that initializer.  Here a class template partial specialization

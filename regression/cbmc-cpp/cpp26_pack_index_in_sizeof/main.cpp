@@ -1,4 +1,4 @@
-// N5008 [dcl.type.pack.index]/1, [expr.sizeof]/1: `T...[N]' names the N-th
+// N5008 [dcl.type.pack.index]/4, [expr.sizeof]/1: `T...[N]' names the N-th
 // element of the pack T; sizeof applies to it as to any type-id.  The parser
 // read it as an array of T with bound N, which only some substitution paths
 // recognized: `sizeof(T...[N])' in a variable template was sizeof(T[N]).

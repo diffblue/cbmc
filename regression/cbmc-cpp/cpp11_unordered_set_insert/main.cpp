@@ -8,10 +8,10 @@
 // This test tracked a CHAIN of five defects, all fixed: the deferred-
 // member drain's tag-strip, friendship-based private-base conversion
 // ([class.access.base]/4-5), condition-declaration scoping
-// ([stmt.pre]/6), models for the compiled-library
+// ([basic.scope.block]/1), models for the compiled-library
 // _Prime_rehash_policy::_M_next_bkt/_M_need_rehash, and the
 // destructor-via-typedef-name substitution ([expr.prim.id.dtor]/1,
-// [basic.lookup.qual]/6) that _M_deallocate_node_ptr's
+// [basic.lookup.qual.general]/4.1) that _M_deallocate_node_ptr's
 // `__n->~__node_type()` needs.
 //
 // g++/clang++ verify at runtime.

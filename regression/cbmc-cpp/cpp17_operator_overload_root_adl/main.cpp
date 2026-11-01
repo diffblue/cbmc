@@ -8,7 +8,7 @@
 //    `bigint.hh`) was not found via ADL when an unqualified-but-
 //    shadowed lookup (e.g., inside the body of an unrelated
 //    `operator<` member function) failed to locate it via the
-//    regular scope walk.  [basic.lookup.argdep]/2 says the
+//    regular scope walk.  [basic.lookup.argdep]/3.2, 4 says the
 //    associated namespaces of a class type include the namespace of
 //    which the class is a member; for a globally-declared class,
 //    that namespace IS the root namespace.
@@ -21,7 +21,7 @@
 //    malformed and the 2nd-option (free-function) path was never
 //    reached.  Pre-check that T1 declares the operator as a member
 //    before entering the 1st-option path.
-//    [over.match.oper]/3.2: the SET OF MEMBER CANDIDATES is the
+//    [over.match.oper]/3.1: the SET OF MEMBER CANDIDATES is the
 //    result of a qualified lookup `T1::operator@`.
 //
 // 3. `cpp_typecheckt::operators[]` (the table that drives
@@ -38,7 +38,7 @@
 //    selected the user-defined `operator<<(const BigInt &,
 //    const BigInt &)` for an arithmetic operand pair like
 //    `1UL << some_enum_const` because `BigInt` has implicit ctors
-//    from arithmetic types.  Per [over.match.oper]/3.4 (last
+//    from arithmetic types.  Per [over.match.oper]/3.2 (last
 //    paragraph): if no operand has class type, the non-member
 //    candidate set is restricted to operators whose first or
 //    second parameter type is the enumeration operand type itself.
@@ -106,7 +106,7 @@ BigInt mod(const BigInt &a, const BigInt &b)
   return a % b;
 }
 
-// [over.match.oper]/3.4 fix: 1UL << enum_const must use built-in
+// [over.match.oper]/3.2 fix: 1UL << enum_const must use built-in
 // shift, not the user-defined operator<<(BigInt, BigInt).
 enum E
 {

@@ -31,7 +31,7 @@ int main()
 {
   an::model m;
   // N5008 [basic.lookup.unqual]: the block-scope variable hides
-  // an::analysis; [basic.lookup.argdep]/3.2: lookup finds an object, so
+  // an::analysis; [basic.lookup.argdep]/1.3: lookup finds an object, so
   // argument-dependent lookup is not performed and this calls operator()
   ai analysis;
   analysis(m);

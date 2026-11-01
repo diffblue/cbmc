@@ -1,4 +1,4 @@
-// N5008 [temp.param]/14, [temp.variadic]/5: a member template's
+// N5008 [temp.param]/18, [temp.variadic]/5: a member template's
 // template-parameter-list may contain MULTIPLE parameter packs when each is
 // deducible from the function parameter list -- the std::pair piecewise
 // constructor `template<class... _Args1, class... _Args2>

@@ -11,7 +11,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [class.base.init]/2: a mem-initializer-id may name a base class
+N5008 [class.base.init]/3: a mem-initializer-id may name a base class
 through a typedef-name; here the virtual base ios<C> of the class template
 ostream<C> is named through the member typedef ios_type. The front end
 reported "symbol 'ios_type' is unknown" and dropped the constructor: the

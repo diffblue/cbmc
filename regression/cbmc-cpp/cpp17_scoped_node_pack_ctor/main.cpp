@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5 + [over.match.ctor]: forwarding a pack of
+// N5008 [temp.variadic]/9 + [over.match.ctor]: forwarding a pack of
 // TWO class-type rvalues into a nested class's constructor
 // (`scoped s(this, forward_<Args>(args)...)`) selects the WRONG
 // overload -- the 2-parameter (node*, alloc_base*) constructor

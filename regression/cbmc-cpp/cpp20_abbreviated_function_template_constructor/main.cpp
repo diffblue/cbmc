@@ -4,7 +4,7 @@ struct sub
 {
   It b;
   Sent e;
-  // N5008 [dcl.fct]/22: an abbreviated function template constructor;
+  // N5008 [dcl.fct]/20: an abbreviated function template constructor;
   // {first, last} initializes the parameter sub&& through it
   // ([dcl.init.list]/3.7, [over.ics.list])
   sub(auto first, Sent last) : b(first), e(last)

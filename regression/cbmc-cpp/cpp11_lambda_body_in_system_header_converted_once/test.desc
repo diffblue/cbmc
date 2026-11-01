@@ -13,7 +13,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [expr.prim.lambda.closure]/4: the closure type's function call
+N5008 [expr.prim.lambda.closure]/15: the closure type's function call
 operator has the lambda's compound-statement as its body.  The front end
 type-checks that body in place when the lambda-expression is encountered
 but did not mark it converted, so the end-of-unit sweep that completes

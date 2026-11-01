@@ -8,6 +8,6 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-Per [expr.type.conv]/2 and [dcl.init.list]/3.10: a braced-init-list
+Per [expr.type.conv]/1.4 and [dcl.init.list]/3.11: a braced-init-list
 with no elements for a scalar type performs value-initialization
 (yielding zero).

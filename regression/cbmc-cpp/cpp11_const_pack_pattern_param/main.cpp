@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/8: the k-th instantiation of a pack expansion
+// N5008 [temp.variadic]/9: the k-th instantiation of a pack expansion
 // substitutes the k-th pack element INTO the pattern -- including the
 // pattern's cv-qualifiers.  The pattern of `const Es &... e` is
 // `const Es &`; for Tup<int, double, char> the replicated parameters must

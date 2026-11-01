@@ -1,4 +1,4 @@
-// N5008 [conv.fctptr], [conv.ptr], [basic.fundamental]/2: int(long long)
+// N5008 [conv.fctptr], [conv.ptr], [basic.fundamental]/17: int(long long)
 // and int(long) are different function types even where long and long long
 // have the same width, and no standard conversion turns a pointer to one
 // into a pointer to the other

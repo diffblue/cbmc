@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/7: a trailing template parameter pack that
+// N5008 [temp.arg.explicit]/4: a trailing template parameter pack that
 // matched ZERO arguments is still deduced -- to the empty sequence.
 // A member alias template of such an instance (libc++'s
 // __integer_sequence<size_t>::__to_tuple_indices<0>, i.e. `iseq<size_t>`

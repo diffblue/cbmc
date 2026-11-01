@@ -1,9 +1,9 @@
-// User-reported Issue 11.  N5008 [dcl.fct]/5, [dcl.meaning]: a parameter's
+// User-reported Issue 11.  N5008 [dcl.fct]/3, [dcl.meaning]: a parameter's
 // type is the decl-specifier type as modified by its declarator.  The
 // lambda's operator() took the decl-specifier type alone, so a pointer
 // parameter lost its pointer: `[](W *win) { return win->soc; }' saw a `W'
 // ("operand of unary * is not a pointer").  Array and function
-// parameters are adjusted to pointers ([dcl.fct]/5).
+// parameters are adjusted to pointers ([dcl.fct]/3).
 extern "C" void __CPROVER_assert(bool, const char *);
 struct W
 {

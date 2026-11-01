@@ -1,7 +1,7 @@
-// N5008 [basic.lookup.argdep]/2: the associated namespaces of an argument of
-// class template specialization type include the namespace of the class
-// template; [temp.inst]/2: the specialization is instantiated, as its
-// definition (friends, bases) affects the lookup.  Here `ns::it<int>'
+// N5008 [basic.lookup.argdep]/3.2, 4: the associated namespaces of an
+// argument of class template specialization type include the namespace of
+// the class template; [temp.inst]/2: the specialization is instantiated, as
+// its definition (friends, bases) affects the lookup.  Here `ns::it<int>'
 // appears only in the return type of the member box<int>::first, so it was
 // not yet instantiated at `count(b.first(), b.first())' and ADL searched no
 // namespace: "symbol 'count' is unknown" (`transform(s.begin(), ...)' over

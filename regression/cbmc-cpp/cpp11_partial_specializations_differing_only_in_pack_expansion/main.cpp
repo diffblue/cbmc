@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5, [temp.spec.partial.general]: `S<T, const U &...>'
+// N5008 [temp.variadic]/6, [temp.spec.partial.general]: `S<T, const U &...>'
 // and `S<T, const U &>' are different partial specializations.  Their
 // internal identifiers ignored the pack expansion (and whether a parameter
 // is a pack), so when both used the parameter name U the later one replaced

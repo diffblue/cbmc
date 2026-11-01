@@ -10,7 +10,7 @@ main.cpp
 symbol 'read' is unknown
 dropped the body
 --
-N5008 [temp.inst]/1, [temp.point]: a class template specialization is completed
+N5008 [temp.inst]/2, [temp.point]: a class template specialization is completed
 only from a *definition* of the template.  CBMC used to eagerly elaborate a
 specialization referenced while the template was only forward-declared (as a
 by-value function parameter in a declaration, which does not require a complete

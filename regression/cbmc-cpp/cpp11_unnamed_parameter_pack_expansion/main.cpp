@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5, [dcl.fct]/15: a function parameter pack need not
+// N5008 [temp.variadic]/9, [dcl.fct]/23: a function parameter pack need not
 // be named; `Args...` expands to one parameter per deduced element exactly as
 // `Args... a` does.
 extern "C" void __CPROVER_assert(bool, const char *);

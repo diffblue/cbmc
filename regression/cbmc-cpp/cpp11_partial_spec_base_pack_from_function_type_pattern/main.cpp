@@ -1,5 +1,5 @@
 extern "C" void __CPROVER_assert(bool, const char *);
-// N5008 [temp.variadic]/5: a base-specifier `impl<F, A...>` of a partial
+// N5008 [temp.variadic]/9: a base-specifier `impl<F, A...>` of a partial
 // specialization matched through a FUNCTION-TYPE pattern `RO<F(A...)>` must
 // receive every deduced element of A (the shape of libstdc++'s
 // `result_of<_Functor(_ArgTypes...)> : __invoke_result<_Functor, _ArgTypes...>`).

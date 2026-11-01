@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5, [dcl.fct]/2 (trailing-return-type): a variadic
+// N5008 [temp.variadic]/9, [dcl.fct]/1 (trailing-return-type): a variadic
 // function template whose trailing-return type is a `decltype` containing a
 // *plain* (by-value, non-cast) function-call pack expansion --
 //   auto invk(F f, Args... a) -> decltype(f(a...));
@@ -10,7 +10,7 @@
 // (see cpp11_trailing_return_fwd_pack) because its pattern references the TYPE
 // parameter pack `Args`; the plain `a...` pattern references only the VALUE
 // parameter pack `a` (no type pack), and is expanded by replicating the pattern
-// to the common deduced pack length ([temp.variadic]/5) -- each copy referring
+// to the common deduced pack length ([temp.variadic]/9) -- each copy referring
 // to the single in-scope value parameter, whose deduced element type fixes the
 // call-argument type.
 //

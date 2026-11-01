@@ -1,5 +1,5 @@
-// N5008 [expr.prim.req.general]/2, [dcl.type.decltype]/1,
-// [basic.def.odr]/5, [temp.inst]/4: the operands of a requires-expression
+// N5008 [expr.prim.req.compound]/1, [dcl.type.decltype]/1,
+// [basic.def.odr]/3, 8, [temp.inst]/4: the operands of a requires-expression
 // and of decltype are unevaluated, so the member functions they name are
 // not odr-used and their definitions are not instantiated there
 extern "C" void __CPROVER_assert(bool, const char *);

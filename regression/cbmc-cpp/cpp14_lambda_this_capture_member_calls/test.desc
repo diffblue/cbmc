@@ -14,8 +14,8 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [expr.prim.this]/2, [class.mfct.non.static]/2,
-[expr.prim.lambda.capture]/10: in a lambda capturing `this', `this' and an
+N5008 [expr.prim.this]/2, [expr.prim.id.general]/2,
+[expr.prim.lambda.capture]/4: in a lambda capturing `this', `this' and an
 unqualified member function call denote the enclosing object.  Such lambdas
 were not given a closure (only data-member odr-uses were modelled, as
 reference members); a generic one was lowered to a function pointer with

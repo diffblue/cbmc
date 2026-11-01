@@ -1,4 +1,4 @@
-// N5008 [expr.eq]/3, [expr.type]/4: a pointer to a derived class and a
+// N5008 [expr.eq]/3, [expr.type]/3: a pointer to a derived class and a
 // pointer to its base are compared after converting both to the composite
 // pointer type, the pointer to the base, which adjusts the derived pointer
 // to its base subobject

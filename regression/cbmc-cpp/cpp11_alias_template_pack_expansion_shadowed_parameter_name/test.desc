@@ -11,7 +11,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [temp.alias]/2, [temp.variadic]/5: holder_of<int &, long &> is
+N5008 [temp.alias]/2, [temp.variadic]/9: holder_of<int &, long &> is
 holder<char, int &, long &>: the i-th element of the expansion of
 `typename id<A>::type...' substitutes the i-th element of the alias's
 pack A.  template_mapt::apply substituted only a pattern that is the bare

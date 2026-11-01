@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5: a pack name is expanded by the innermost pack
+// N5008 [temp.variadic]/8: a pack name is expanded by the innermost pack
 // expansion that contains it.  In `sum(one(seq<Js>{}, ls...)...)' the outer
 // expansion is over the template parameter pack Js; the function parameter
 // pack ls is expanded inside each element; likewise `seq<Is..., Js>' in a

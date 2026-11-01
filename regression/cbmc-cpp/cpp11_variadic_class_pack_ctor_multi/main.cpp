@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5: a class-template parameter pack used as a
+// N5008 [temp.variadic]/9: a class-template parameter pack used as a
 // constructor parameter pack of length N is instantiated as N constructor
 // parameters, and a pack expansion `a...` in the constructor body is replaced
 // by the N corresponding arguments.  Here N == 3, exercised in two distinct

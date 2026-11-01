@@ -1,4 +1,4 @@
-// N5008 [namespace.udecl]/1, [temp.variadic]/5.4: pack expansion in a
+// N5008 [namespace.udecl]/1, [temp.variadic]/6.2: pack expansion in a
 // using-declaration (the std::variant _Build_FUNs overload-set builder).
 extern "C" void __CPROVER_assert(bool, const char *);
 

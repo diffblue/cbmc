@@ -16,4 +16,4 @@ declaration still has the placeholder type, and was rejected ("symbol
 'vb<char>' already declared with different type: original: signed int,
 new: auto", combine_types).  combine_types now keeps the deduced type,
 and the repeated initializer is dropped, since it would replace the
-converted value of the first instantiation.  N5008 [temp.spec.general]/5.
+converted value of the first instantiation.  N5008 [temp.type]/1.

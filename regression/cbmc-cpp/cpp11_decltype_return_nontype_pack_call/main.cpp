@@ -1,9 +1,10 @@
-// N5008 [temp.deduct]/2,5 + [dcl.type.simple]/4 + [temp.variadic]/4-5: a
-// function template whose TRAILING RETURN TYPE is a `decltype` of a CALL with a
-// pack expansion, `-> decltype(add(I...))`, must have that return type computed
-// (with `I...` expanded) during deduction/overload resolution, and its body
-// call `add(I...)` must expand to the deduced pack's element values.  This is
-// exactly the shape of libstdc++ std::apply's helper:
+// N5008 [temp.deduct.general]/5,7 + [dcl.type.decltype]/1 +
+// [temp.variadic]/5-6: a function template whose TRAILING RETURN TYPE is a
+// `decltype` of a CALL with a pack expansion, `-> decltype(add(I...))`, must
+// have that return type computed (with `I...` expanded) during
+// deduction/overload resolution, and its body call `add(I...)` must expand to
+// the deduced pack's element values.  This is exactly the shape of libstdc++
+// std::apply's helper:
 //   template<class _Fn, class _Tuple, size_t... _Idx>
 //   constexpr decltype(auto)
 //   __apply_impl(_Fn&& __f, _Tuple&& __t, index_sequence<_Idx...>)

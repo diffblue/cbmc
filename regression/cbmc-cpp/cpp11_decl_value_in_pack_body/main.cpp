@@ -1,6 +1,6 @@
-// N5008 [dcl.init]/15-16: `S x = "s";` is copy-initialization via S's
-// converting constructor; the declarator carries a VALUE, not
-// parenthesised init-args.
+// N5008 [dcl.init.general]/14, 16.6.3: `S x = "s";` is copy-initialization via
+// S's converting constructor; the declarator carries a VALUE, not parenthesised
+// init-args.
 //
 // Regression: the function-template body pack expander created an EMPTY
 // ID_init_args entry on every declarator it visited (irept::add

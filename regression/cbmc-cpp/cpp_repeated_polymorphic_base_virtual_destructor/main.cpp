@@ -32,7 +32,7 @@ struct D : B, C
 int main()
 {
   // [class.dtor]/13 virtual destructor through either A subobject destroys
-  // the complete D object ([expr.delete]/3); each A is destroyed once
+  // the complete D object ([expr.delete]/10); each A is destroyed once
   A *p = static_cast<C *>(new D);
   __CPROVER_assert(p->id() == 3, "C's overrider in C's A");
   A *q = static_cast<B *>(new D);

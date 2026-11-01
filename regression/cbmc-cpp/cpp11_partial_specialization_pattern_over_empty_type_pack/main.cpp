@@ -13,7 +13,7 @@ struct probe
 {
   static constexpr int n = -1;
 };
-// [temp.spec.partial.match]/2, [temp.variadic]/5: Args is deduced from the
+// [temp.spec.partial.match]/2, [temp.variadic]/16: Args is deduced from the
 // trailing arguments; with Args empty, `g(declval<Args>()...)' is `g()'
 template <class... Args>
 struct probe<decltype(g(declval<Args>()...)), Args...>

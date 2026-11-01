@@ -1,4 +1,4 @@
-// Rejects-invalid: N5008 [temp.deduct.type]/17 -- the value deduced
+// Rejects-invalid: N5008 [temp.deduct.type]/20 -- the value deduced
 // for a non-type template parameter pack must have the TYPE of the
 // parameter (after conversion per [temp.arg.nontype]); deducing
 // `long... _Uf` from `indices<0ul, 1ul>` (parameters of type unsigned
@@ -16,7 +16,7 @@ struct impl
 {
   int n;
   // deducing long... _Uf from indices<unsigned long...> arguments:
-  // [temp.deduct.type]/17 -- the deduced value's type must match the
+  // [temp.deduct.type]/20 -- the deduced value's type must match the
   // corresponding template parameter's type EXACTLY (long != unsigned
   // long), so this candidate never matches.
   template <long... _Uf>

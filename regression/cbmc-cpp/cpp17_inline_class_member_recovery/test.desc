@@ -13,7 +13,7 @@ Verifies that a sibling member-declaration following an inline
 class/struct/union/enum definition whose elaboration throws is
 NOT silently dropped from the enclosing class's body.
 
-C++ standard: [class.mem]/3 — "The member-specification in a class
+C++ standard: [class.mem.general]/3 — "The member-specification in a class
 definition declares the full set of members of the class".  Per
 [temp.inst], a member-elaboration failure must remain local to that
 member; sibling members and access-specifier transitions are

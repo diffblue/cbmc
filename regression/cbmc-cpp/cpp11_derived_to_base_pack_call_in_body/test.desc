@@ -18,7 +18,7 @@ Regression: instantiating the callee with an empty trailing pack `_Tail` used
 to drop the whole parameter `__b` -- its type `Base<_Head, _Tail...>&`
 references the empty pack `_Tail` nested in a template-argument expansion -- so
 `get_head<int>` was left with an empty parameter list and an unbindable call
-(returning a nondet value).  Per N5008 [temp.variadic]/7 the empty expansion
+(returning a nondet value).  Per N5008 [temp.variadic]/16 the empty expansion
 only collapses the argument list (`Base<_Head>`); the parameter must be kept.
 Fixed by restricting the empty-pack parameter removal in
 cpp_instantiate_template.cpp to genuine function parameter packs (a top-level

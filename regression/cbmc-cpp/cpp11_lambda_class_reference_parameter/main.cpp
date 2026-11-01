@@ -1,4 +1,4 @@
-// N5008 [expr.prim.lambda.general]/4: a lambda is generic only if it has an
+// N5008 [expr.prim.lambda.general]/6: a lambda is generic only if it has an
 // explicit template-parameter-list or a parameter of type auto.  A lambda
 // parameter written with an ordinary (concrete) class name -- e.g. `E &` -- is
 // NOT a generic/template parameter and must be type-checked as that class type.

@@ -17,7 +17,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [temp.spec.partial.match]/2, [temp.param]/4: a partial
+N5008 [temp.spec.partial.match]/2, [temp.param]/9: a partial
 specialization `template <C T> struct S<T>' matches only if C<T> is
 satisfied by the deduced T.  The class-template search evaluated the
 concept's body structurally and failed when it named a variable or class

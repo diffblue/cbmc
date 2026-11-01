@@ -12,7 +12,7 @@ dropped the body
 C++20 <map>: operator[] insert + access.
 
 Reclassified CORE -> KNOWNBUG by the member-typedef conformance fix
-([temp.inst]/1-2, [dcl.typedef]).  Previously this passed only because the
+([temp.inst]/2, [dcl.typedef]).  Previously this passed only because the
 non-conformant *truncated* std::map had its operations havoc'd (symex executed
 none of the real container; the property was vacuous).  The fix makes the front
 end conformant and symex now executes the REAL std::map / _Rb_tree machinery.
@@ -126,9 +126,9 @@ returned reference is derived from a null hint.
 
 FIXED 2026-07-20 (final layer): pack-expansion mem-initializers of
 instantiated constructors are now expanded per element with type AND
-non-type packs substituted in lockstep ([temp.variadic]/5), and
+non-type packs substituted in lockstep ([temp.variadic]/9), and
 substitution failures while matching overloaded candidates are
-deduction failures ([temp.deduct]/8) instead of hard errors --
+deduction failures ([temp.deduct.general]/8) instead of hard errors --
 std::pair's piecewise delegation target converts, so the map's key
 reaches the node.  The full layer history is in this desc's earlier
 updates; every layer has its own CORE test.

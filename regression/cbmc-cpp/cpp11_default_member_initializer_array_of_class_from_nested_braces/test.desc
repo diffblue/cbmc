@@ -11,7 +11,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [class.mem.general]/11, [dcl.init.aggr]/4, [dcl.init.list]/3.7: a
+N5008 [class.mem.general]/14, [dcl.init.aggr]/4, [dcl.init.list]/3.7: a
 default member initializer `pr tbl[2] = {{'^', t_begin}, {'$', t_end}};'
 initializes each array element by list-initialization from its braced
 list, calling pr(char, token). The front end found no constructor for the

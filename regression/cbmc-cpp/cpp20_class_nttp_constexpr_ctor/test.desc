@@ -11,7 +11,7 @@ main.cpp
 static_assert condition could not be evaluated
 dropped the body
 --
-N5008 [temp.param]/7 + [temp.arg.nontype]/1: class-type non-type template
+N5008 [temp.param]/12 + [temp.arg.nontype]/1: class-type non-type template
 arguments built by constexpr constructors -- with several members, a
 constructor body (a conditional swap), the same argument spelled twice
 naming one specialization, distinct arguments naming distinct ones, use in

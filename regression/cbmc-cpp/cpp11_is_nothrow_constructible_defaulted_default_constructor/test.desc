@@ -11,7 +11,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [meta.unary.prop] is_nothrow_constructible, with [except.spec]/8:
+N5008 [meta.unary.prop] is_nothrow_constructible, with [except.spec]/6:
 an implicitly-declared or defaulted default constructor is non-throwing
 unless the initialization of a subobject (default member initializers,
 bases and members' default constructors) is potentially-throwing.  The

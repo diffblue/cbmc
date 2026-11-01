@@ -1,13 +1,13 @@
-// N5008 [temp.inst]/1-2, [dcl.fct]/12: a class template specialization named
-// while one of its arguments is only declared (`tree<late> make();' and a
-// definition using `tree<late>' before `late' is complete) is instantiated
-// as far as the context requires -- a function DECLARATION's return type
-// requires nothing.  The eager instantiation failed on `sizeof(late)' in the
-// node's storage buffer and (a) escaped the type checker ("Unknown exception
-// type!"), or (b) left the member function templates of the rolled-back
-// instance with unresolved parameter types (`key(const node_t &)' with the
-// typedef kept lazily), so every call to them found no match.  libstdc++
-// 16's std::set<late> / _Rb_tree_node<late> shape.
+// N5008 [temp.inst]/2, [dcl.fct.def.general]/2: a class template specialization
+// named while one of its arguments is only declared (`tree<late> make();' and a
+// definition using `tree<late>' before `late' is complete) is instantiated as
+// far as the context requires -- a function DECLARATION's return type requires
+// nothing.  The eager instantiation failed on `sizeof(late)' in the node's
+// storage buffer and (a) escaped the type checker ("Unknown exception type!"),
+// or (b) left the member function templates of the rolled-back instance with
+// unresolved parameter types (`key(const node_t &)' with the typedef kept
+// lazily), so every call to them found no match.  libstdc++ 16's std::set<late>
+// / _Rb_tree_node<late> shape.
 extern "C" void __CPROVER_assert(bool, const char *);
 template <class T>
 struct membuf

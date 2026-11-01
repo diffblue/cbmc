@@ -13,7 +13,7 @@ dropped the body
 N5008 [over.match.list], [over.ics.list], [over.ics.rank]: list-initializing a
 class from a braced-init-list ranks its constructors by the element conversion
 sequences; a constructor taking the elements directly (vec(int) for {7}) uses a
-standard conversion, which per [over.ics.rank]/(3.1) is always better than the
+standard conversion, which per [over.ics.rank]/2.1 is always better than the
 copy/move constructor's user-defined conversion from the list.  CBMC previously
 gave both an equal args_distance and reported "symbol 'vec' does not uniquely
 resolve".  Root cause: a failed implicit_conversion_sequence attempt leaked its

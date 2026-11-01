@@ -1,4 +1,4 @@
-// N5008 [temp.inst]/1-2: a member typedef naming a class template
+// N5008 [temp.inst]/2: a member typedef naming a class template
 // specialization does not instantiate it; a later use whose semantics
 // depend on the class does: a derived-to-base pointer conversion
 // ([conv.ptr]/3) and list-initialization of an initializer_list element

@@ -1,4 +1,4 @@
-// N5008 [temp.param]/11: a template parameter pack of a function template need
+// N5008 [temp.param]/18: a template parameter pack of a function template need
 // not be the last template parameter -- it may be followed by further template
 // parameters provided they are deducible from the parameter-type-list or have
 // default template arguments.  Here `first` has a parameter pack `W` followed by

@@ -19,7 +19,7 @@ int is_mi(T *)
   return 1;
 }
 } // namespace d
-// [basic.lookup.general]/1, [basic.lookup.unqual]/1-2: the search for is_mi
+// [basic.lookup.general]/1, [basic.lookup.unqual]/2: the search for is_mi
 // stops at the block scope, where the using-declaration introduced d::is_mi
 // ([namespace.udecl]/1); the class template s::is_mi is hidden
 // (libstdc++'s ranges::__copy_or_move: `using __detail::__is_move_iterator;'

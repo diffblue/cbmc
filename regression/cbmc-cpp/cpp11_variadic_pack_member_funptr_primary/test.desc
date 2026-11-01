@@ -11,7 +11,7 @@ main.cpp
 ^.*found no match.*$
 dropped the body
 --
-N5008 [temp.variadic]/5: pack expansion of a class template parameter pack in
+N5008 [temp.variadic]/9: pack expansion of a class template parameter pack in
 the type of a data member (the parameter list of a member function-pointer type
 int(*)(A...)) must expand to one parameter per element when the primary variadic
 class template S<A...> is instantiated.  Fixed in typecheck_compound_declarator

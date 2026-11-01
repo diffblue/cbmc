@@ -12,6 +12,6 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [expr.type.conv]/2, [expr.static.cast]/4, [dcl.init.general]/16.6.1:
+N5008 [expr.type.conv]/1.1, [expr.static.cast]/5, [dcl.init.general]/16.6.1:
 `T(prvalue of T)' initializes the object from the prvalue without a copy or
 move.

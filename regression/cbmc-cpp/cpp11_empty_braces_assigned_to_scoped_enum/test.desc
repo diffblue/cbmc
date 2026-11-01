@@ -16,7 +16,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [expr.ass]/8.1: `x = B' with a braced-init-list B and a scalar x means
+N5008 [expr.assign]/8.1: `x = B' with a braced-init-list B and a scalar x means
 `x = t' where `T t = B'; [dcl.init.list]/3.11: an empty list
 value-initializes, i.e. zero-initializes a scalar ([dcl.init.general]/9).
 The C++ front end rejected the assignment for an enumeration type ("invalid

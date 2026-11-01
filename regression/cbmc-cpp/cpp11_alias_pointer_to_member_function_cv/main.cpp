@@ -16,7 +16,7 @@ struct S
     return k + a;
   }
 };
-// N5008 [dcl.fct]/6-7: the cv-qualifier-seq after the parameter list is part
+// N5008 [dcl.fct]/10: the cv-qualifier-seq after the parameter list is part
 // of the function type; the alias-declaration spelling must denote the same
 // type as the typedef spelling.
 using PMF = int (S::*)(int) const;

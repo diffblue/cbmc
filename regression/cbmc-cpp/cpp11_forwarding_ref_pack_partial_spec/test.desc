@@ -12,7 +12,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-[temp.variadic]/5 + [dcl.ref]: a forwarding-reference parameter pack `A&&...`
+[temp.variadic]/9 + [dcl.ref]: a forwarding-reference parameter pack `A&&...`
 expands, for each element E, to the reference E&&/E& (reference collapsing), not
 to a by-value E.  expand_parameter_packs dropped the declarator's reference when
 expanding such a pack, so a partial-specialization static member like

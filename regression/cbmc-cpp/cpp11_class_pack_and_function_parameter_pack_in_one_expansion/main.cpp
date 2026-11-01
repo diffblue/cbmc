@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5: the k-th element of a pack expansion
+// N5008 [temp.variadic]/9: the k-th element of a pack expansion
 // instantiates the pattern with the k-th element of EVERY pack it names.
 // In `two(get<Is>(vs)...)' the pattern names the enclosing class
 // template's non-type pack Is and the member function's parameter pack vs;

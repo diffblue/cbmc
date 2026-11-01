@@ -13,7 +13,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [expr.delete]/3, [class.dtor]/13: deleting a D through a pointer to
+N5008 [expr.delete]/10, [class.dtor]/13: deleting a D through a pointer to
 either of its A subobjects calls D's destructor, which destroys both A
 subobjects; C::id is the final overrider in C's A only ([class.virtual]/2).
 The front end rejected the class.  g++ 13 and clang++ 18 accept this

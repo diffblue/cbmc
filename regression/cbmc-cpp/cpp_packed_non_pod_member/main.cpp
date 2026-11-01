@@ -1,7 +1,7 @@
 extern "C" void __CPROVER_assert(bool, const char *);
 // GCC and Clang do not pack a member of non-POD class type ("ignoring packed
 // attribute because of unpacked non-POD field"); a member-level packed
-// attribute is honoured.  (GCC extension; POD as in C++03 [class]/9.)
+// attribute is honoured.  (GCC extension; POD as in C++03 [class].)
 struct EB
 {
 };

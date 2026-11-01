@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5: the i-th element of a pack expansion
+// N5008 [temp.variadic]/9: the i-th element of a pack expansion
 // instantiates the pattern with the i-th element of each pack it names.
 // A pack reference under a cast (`!bool(Bn::value)', libstdc++'s __or_fn
 // and __and_fn) was substituted for the first element only, so

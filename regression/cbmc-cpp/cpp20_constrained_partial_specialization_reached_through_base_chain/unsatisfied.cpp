@@ -1,6 +1,6 @@
 extern "C" void __CPROVER_assert(bool, const char *);
 // As main.cpp, with unsatisfied constrained partial specializations on the
-// way ([temp.spec.partial.match]/1: a partial specialization whose
+// way ([temp.spec.partial.match]/2: a partial specialization whose
 // constraints are not satisfied does not match), as in libstdc++ 16's
 // common_reference<int &, long &>, which reaches bullet 4
 template <typename T, int B = 1>

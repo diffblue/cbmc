@@ -18,8 +18,9 @@ pairt make(int x)
 }
 int main()
 {
-  // [expr.ref]/8: member of a prvalue is an xvalue; [over.match.funcs]/5.3:
-  // callable on rvalues for members without ref-qualifier.
+  // [expr.ref]/7.2: member of a prvalue is an xvalue;
+  // [over.match.funcs.general]/5: callable on rvalues for members without
+  // ref-qualifier.
   __CPROVER_assert(make(7).first.get() == 7, "member of call result callable");
   return 0;
 }

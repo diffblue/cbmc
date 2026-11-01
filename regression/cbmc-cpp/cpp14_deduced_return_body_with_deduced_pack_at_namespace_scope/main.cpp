@@ -1,10 +1,10 @@
 extern "C" void __CPROVER_assert(bool, const char *);
-// N5008 [temp.deduct.call]/1, [temp.arg.explicit]/4, [dcl.spec.auto.general]/
-// 12: get<1>(tt) deduces the trailing pack T from tup<int, int>; that holds
-// also when the body of a function with a deduced return type is
-// instantiated to form a type at namespace scope (std::is_invocable_v over
-// a std::bind result of the MSVC STL, whose _Binder::operator() returns
-// decltype(auto))
+// N5008 [temp.deduct.call]/1, [temp.arg.explicit]/4,
+// [dcl.spec.auto.general]/15/ 12: get<1>(tt) deduces the trailing pack T from
+// tup<int, int>; that holds also when the body of a function with a deduced
+// return type is instantiated to form a type at namespace scope
+// (std::is_invocable_v over a std::bind result of the MSVC STL, whose
+// _Binder::operator() returns decltype(auto))
 template <class... T>
 struct tup
 {

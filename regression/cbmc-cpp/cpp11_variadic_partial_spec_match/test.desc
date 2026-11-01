@@ -13,7 +13,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-[temp.spec.partial.match] / [temp.class.spec] / [expr.sizeof]/5: a class
+[temp.spec.partial.match] / [temp.spec.partial] / [expr.sizeof]/4: a class
 template partial specialization whose pattern is a template-id with a pack
 expansion (primary<Types...>) must match a concrete instantiation, deducing the
 pack for any length (including 0 and 1).  CBMC matched the nested template-id

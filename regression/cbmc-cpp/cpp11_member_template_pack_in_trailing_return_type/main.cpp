@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5, [dcl.fct]/2: `-> decltype(f(3, a...))' in a
+// N5008 [temp.variadic]/9, [dcl.fct]/1: `-> decltype(f(3, a...))' in a
 // member function template expands the function parameter pack like the
 // body does.  With two or more elements the trailing-return-type kept the
 // unexpanded `a' ("symbol 'a' is unknown") and the call found no match;

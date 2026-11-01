@@ -11,7 +11,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [expr.call]/7: "When a function is called, the type of any
+N5008 [expr.call]/6: "When a function is called, the type of any
 parameter shall not be a class type that is either incomplete or
 abstract."  The requirement `a - b' of subtractable<wrapper<incomplete>>
 calls operator-(wrapper<T>, wrapper<T>), whose by-value parameters have

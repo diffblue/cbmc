@@ -4,7 +4,7 @@
 // constructor set is constrained via SFINAE on
 // is_constructible/is_default_constructible ([pairs.pair]); with a
 // non-default-constructible T some constrained candidate evaluation
-// fails hard instead of being discarded ([temp.deduct]/8 -- only the
+// fails hard instead of being discarded ([temp.deduct.general]/8 -- only the
 // immediate context), killing the whole overload.  Works with
 // pair<int, unsigned long> (both trivially constructible), with an
 // aggregate T (default-constructible), and with DIRECT pair

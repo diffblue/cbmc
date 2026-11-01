@@ -15,7 +15,7 @@ tuple (make_tuple's body conversion failed and was swallowed as a
 system-header body).  Arity <= 2 passed via the tuple<_T1,_T2> partial
 specialization.
 
-ROOT (fixed, 2026-07-15, two layers): (1) N5008 [temp.variadic]/8 -- the
+ROOT (fixed, 2026-07-15, two layers): (1) N5008 [temp.variadic]/9 -- the
 in-class parameter-pack replication replaced the pattern `const _Elements&`
 wholesale with the raw pack element, dropping the const, so tuple's
 converting constructor `tuple(const _Elements&...)` could not bind the

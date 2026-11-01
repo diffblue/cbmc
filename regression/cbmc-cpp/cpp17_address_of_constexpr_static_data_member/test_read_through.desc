@@ -10,7 +10,7 @@ read_through.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [basic.def.odr]/4, [basic.start.static]/2: a constexpr (or const)
+N5008 [basic.def.odr]/5, [basic.start.static]/2: a constexpr (or const)
 static data member whose address is taken is an object with static
 storage duration initialized with its value; reading through the pointer
 yields the value.  g++ 13 and clang++ 18 accept the program.  Fails on

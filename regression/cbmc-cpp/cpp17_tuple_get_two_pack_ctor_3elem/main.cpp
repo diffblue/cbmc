@@ -4,16 +4,17 @@
 // reduction into standard-conforming C++ -- both g++ and clang++ accept it and
 // run it with get<0> == 1.
 //
-// N5008 [temp.deduct]/8 + [temp.variadic]/4-5: this mirrors libstdc++ std::tuple.
-// A `tuple<_Elements...> : _Tuple_impl<0, _Elements...>` has a variadic
-// converting constructor guarded by a defaulted SFINAE template parameter whose
-// condition is a TWO-parallel-pack fold over the class pack `_Elements` and the
-// constructor's own pack `_UElements`
+// N5008 [temp.deduct.general]/8 + [temp.variadic]/6, 8: this mirrors libstdc++
+// std::tuple.  A `tuple<_Elements...> : _Tuple_impl<0, _Elements...>` has a
+// variadic converting constructor guarded by a defaulted SFINAE template
+// parameter whose condition is a TWO-parallel-pack fold over the class pack
+// `_Elements` and the constructor's own pack `_UElements`
 // (`_TupleConstraints<_Elements...>::ic<_UElements...>()` ==
-// `and_<is_ctible<_Elements, _UElements>::value...>::value`, exactly libstdc++'s
+// `and_<is_ctible<_Elements, _UElements>::value...>::value`, exactly
+// libstdc++'s
 // `_TupleConstraints<_Types...>::__is_implicitly_constructible<_UTypes...>()`).
-// `get<I>` uses the (fixed) derived-to-base deduction of the `_Tuple_impl<I,...>`
-// base.
+// `get<I>` uses the (fixed) derived-to-base deduction of the
+// `_Tuple_impl<I,...>` base.
 //
 // KNOWNBUG: for THREE elements CBMC fails to evaluate the two-parallel-pack
 // constraint in the constructor's SFINAE default template argument, reports

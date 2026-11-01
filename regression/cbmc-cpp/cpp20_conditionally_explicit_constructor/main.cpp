@@ -1,4 +1,4 @@
-// N5008 [dcl.fct.spec]/3 (C++20): with explicit(constant-expression) the
+// N5008 [dcl.fct.spec]/4 (C++20): with explicit(constant-expression) the
 // function is explicit iff the converted expression is true.  W<false>'s
 // constructor is a converting constructor, so `take(5)' copy-initializes
 // the parameter; W<true>'s is explicit.  The parser skipped the condition

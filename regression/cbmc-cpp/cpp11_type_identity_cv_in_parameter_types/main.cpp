@@ -39,7 +39,8 @@ int main()
     std::is_same<TPMF, int (S::*)(int) const>::value &&
       !std::is_same<TPMF, int (S::*)(int)>::value,
     "typedef of a const pmf");
-  // the partial-specialization form of the comparison ([temp.class.spec.match])
+  // the partial-specialization form of the comparison
+  // ([temp.spec.partial.match])
   __CPROVER_assert(
     !same_t<void (*)(const int *), void (*)(int *)>::value &&
       same_t<void (*)(const int *), void (*)(const int *)>::value,

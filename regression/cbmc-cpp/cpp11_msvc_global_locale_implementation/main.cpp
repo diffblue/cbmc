@@ -1,10 +1,10 @@
-// N5008 [locale.cons]/1, /5, /9, [locale.general]/8: default-constructed
-// and copied locales denote the global locale, the "C" locale; destroying
-// them leaves it usable.  The shape of the MSVC STL: locale::_Init and
-// _Getgloballocale, defined in the runtime library, yield the global
-// implementation object, whose facets are reference counted with
-// _InterlockedIncrement / _InterlockedDecrement, and ~locale deletes the
-// result of _Decref, which is null while references remain.
+// N5008 [locale.cons]/1, [locale.facet]/3, [locale.statics]/5:
+// default-constructed and copied locales denote the global locale, the "C"
+// locale; destroying them leaves it usable.  The shape of the MSVC STL:
+// locale::_Init and _Getgloballocale, defined in the runtime library, yield the
+// global implementation object, whose facets are reference counted with
+// _InterlockedIncrement / _InterlockedDecrement, and ~locale deletes the result
+// of _Decref, which is null while references remain.
 extern "C" void __CPROVER_assert(bool, const char *);
 extern "C" long _InterlockedIncrement(long volatile *);
 extern "C" long _InterlockedDecrement(long volatile *);

@@ -1,6 +1,6 @@
-// N5008 [concept.commonref], [meta.trans.other]/5: common_reference_t<W &,
-// const W &> is `const W &' (COMMON-REF of two lvalue references: an lvalue
-// reference to the cv-union of the referenced types), so
+// N5008 [concept.commonref], [meta.trans.other]/3.5, [meta.trans.other]/6.3.1:
+// common_reference_t<W &, const W &> is `const W &' (COMMON-REF of two lvalue
+// references: an lvalue reference to the cv-union of the referenced types), so
 // common_reference_with<W &, const W &> holds.  The front end evaluates the
 // concept false: libstdc++'s __common_ref chain (`decltype(false ? declval<
 // __copy_cv<_Xp, _Yp> &>() : declval<__copy_cv<_Yp, _Xp> &>())') is not

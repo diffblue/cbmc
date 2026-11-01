@@ -9,7 +9,7 @@ main.cpp
 dropped the body
 --
 Base-specifier pack expansion over a partial specialization's LEADING
-NON-TYPE pack ([temp.variadic]/5.2): the __tuple_leaf<_Indx>... bases
+NON-TYPE pack ([temp.variadic]/6.6): the __tuple_leaf<_Indx>... bases
 are dropped (bases()=0, components()=0).  Root under
 cpp11_libcxx_tuple / tuple_basic / apply_basic.  The type-pack
 analogue is fixed (cpp11_tuple_leaf_no_body).  A first extension
@@ -18,4 +18,4 @@ attempt (non-type element recovery in the base expander) did not fire
 base-expansion time; needs its own session.
 Fixed 2026-08-04: the spec-pattern re-deduction admits empty trailing
 packs ([temp.spec.partial.match]/2) and the base expander handles
-every bound pack including non-type value packs ([temp.variadic]/5.2).
+every bound pack including non-type value packs ([temp.variadic]/6.6).

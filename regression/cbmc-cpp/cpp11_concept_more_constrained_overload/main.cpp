@@ -1,8 +1,9 @@
-// N5008 [temp.constr.order] + [over.match.best]/2.6: when two function-template
-// overloads are otherwise indistinguishable, the more-constrained one is
-// chosen.  Cheap subsumes Cheap||Rare (a constraint subsumes a disjunction
-// containing it), so f<Cheap> is more constrained than f<CheapOrRare> and must
-// be selected for an int argument, returning 1 (matching g++).
+// N5008 [temp.constr.order] + [over.match.best.general]/2.5: when two
+// function-template overloads are otherwise indistinguishable, the
+// more-constrained one is chosen.  Cheap subsumes Cheap||Rare (a constraint
+// subsumes a disjunction containing it), so f<Cheap> is more constrained than
+// f<CheapOrRare> and must be selected for an int argument, returning 1
+// (matching g++).
 //
 // This is selected by the pre-instantiation concept-subsumption filter in
 // cpp_typecheck_resolvet::resolve, which now compares the normal forms of the

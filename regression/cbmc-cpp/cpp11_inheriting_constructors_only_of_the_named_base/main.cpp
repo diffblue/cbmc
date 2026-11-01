@@ -1,4 +1,4 @@
-// N5008 [namespace.udecl]/3, [class.inhctor.init]: `using base::base;'
+// N5008 [namespace.udecl]/2, [class.inhctor.init]: `using base::base;'
 // inherits the constructors OF base -- not those of base's own bases.  The
 // front end also took propt's constructors, which base's component list
 // holds as inherited members, and made `derived(const propt &)' and

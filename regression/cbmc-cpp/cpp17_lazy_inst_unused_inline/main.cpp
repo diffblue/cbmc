@@ -1,4 +1,4 @@
-// CORE guard for N5008 [temp.inst]/8 + /11: an unused, non-virtual member
+// CORE guard for N5008 [temp.inst]/6 + /11: an unused, non-virtual member
 // function whose body would be ill-formed for this specialization must NOT
 // cause an error, because [temp.inst]/11 forbids instantiating it ("shall not
 // implicitly instantiate ... a non-virtual member function ... unless such

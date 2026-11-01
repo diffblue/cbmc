@@ -25,7 +25,7 @@ struct P
 };
 int main()
 {
-  // N5008 [dcl.init.list]/3.4: a class with a user-declared constructor is
+  // N5008 [dcl.init.list]/3.7: a class with a user-declared constructor is
   // initialised from a braced list by constructor overload resolution, not
   // memberwise.
   P<const char *, P<const char *, const F>> q{"a", {"b", []() { return 2; }}};

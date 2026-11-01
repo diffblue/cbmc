@@ -3,7 +3,7 @@
 // class template name without template arguments is not a type-name
 // ([temp.names], [dcl.type.simple]).  So in a constructor body it calls
 // the member function `set' -- declared later in the class, visible in the
-// body ([class.mem.general]/7) -- even with std::set in scope.  The parser
+// body ([class.mem.general]/9.1) -- even with std::set in scope.  The parser
 // took the template name for a type and declared a variable `o' ("found no
 // match for symbol 'set'"; CBMC's own object_factory_parameterst with
 // <set> included, dog-fooding).

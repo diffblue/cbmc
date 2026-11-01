@@ -9,7 +9,7 @@ main.cpp
 --
 dropped the body
 --
-N5008 [expr.new]/17: `::new(p) int` default-initializes (storage kept),
+N5008 [expr.new]/24: `::new(p) int` default-initializes (storage kept),
 `::new(p) podt()` value-initializes (zero, then the default member
 initializer b = 5).  Header-free; runtime-verified g++ 13 / clang++ 18
 with a placement-new definition returning its pointer.  (The first

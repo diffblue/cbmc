@@ -9,7 +9,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [namespace.udecl]/1 + [temp.variadic]/5.4: `using B<I, T>::fun...;`
+N5008 [namespace.udecl]/1 + [temp.variadic]/6.2: `using B<I, T>::fun...;`
 in a class template body brings the member from EVERY expanded base into
 the derived class's overload set (libstdc++'s std::variant _Build_FUNs).
 Before, the parser dropped the `...` and only the first base's overload

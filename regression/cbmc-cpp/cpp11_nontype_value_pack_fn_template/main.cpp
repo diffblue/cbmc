@@ -1,6 +1,6 @@
-// N5008 [expr.sizeof]/5 + [temp.variadic]/8: `sizeof...(P)` counts the elements
-// of the pack P, independently of whether P is a type or a NON-type parameter
-// pack.
+// N5008 [expr.sizeof]/4 + [temp.variadic]/10: `sizeof...(P)` counts the
+// elements of the pack P, independently of whether P is a type or a NON-type
+// parameter pack.
 //
 // Regression: CBMC's parser stored a non-type parameter pack's name (which does
 // not parse as a type-id, e.g. `template<unsigned... Vs>`) as the OPERAND of the

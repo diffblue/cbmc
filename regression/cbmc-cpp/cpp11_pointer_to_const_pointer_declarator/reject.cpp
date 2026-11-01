@@ -1,4 +1,4 @@
-// N5008 [dcl.ptr]/1, [expr.ass]/1: `*q' is a const pointer -- not an
+// N5008 [dcl.ptr]/1, [expr.assign]/1: `*q' is a const pointer -- not an
 // assignable lvalue.
 int main()
 {

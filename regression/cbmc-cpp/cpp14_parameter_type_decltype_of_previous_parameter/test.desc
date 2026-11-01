@@ -16,7 +16,7 @@ N5008 [basic.scope.param]/1: a function parameter's scope begins at its
 declaration and includes the rest of the parameter-declaration-clause, so a
 later parameter's type may be spelled `decltype(f(orig_iter))' where
 `orig_iter' is an earlier parameter (an unevaluated operand,
-[expr.prim.id.unqual]).  The front end resolved the parameter list before
+[dcl.type.decltype]/1).  The front end resolved the parameter list before
 the earlier parameters were in scope: "symbol 'orig_iter' is unknown", and
 the enclosing function template's body was dropped.  Fixed in round 163:
 while a parameter type containing a decltype is type-checked, the earlier

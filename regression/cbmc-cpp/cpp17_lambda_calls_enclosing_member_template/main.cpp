@@ -27,7 +27,7 @@ struct vec
   template <class... Args>
   void emplace(bool has_cap, Args &&...args)
   {
-    // N5008 [class.mfct.non.static]/3 + [expr.prim.lambda.capture]/8:
+    // N5008 [expr.prim.id.general]/2 + [expr.prim.lambda.capture]/7:
     // the unqualified member call names (*this).fast_path -- `this`
     // of the ENCLOSING object, implicitly captured by [&].
     if_else(

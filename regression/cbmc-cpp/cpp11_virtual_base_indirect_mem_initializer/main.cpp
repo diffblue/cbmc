@@ -2,7 +2,7 @@
 // virtual base, and it is the most derived class's constructor that
 // initializes the virtual base -- the intermediate classes' initializers
 // for it are ignored.  Destruction is the reverse: the most derived class
-// destroys the virtual base once, after its direct bases ([class.dtor]/14).
+// destroys the virtual base once, after its direct bases ([class.dtor]/13).
 extern "C" void __CPROVER_assert(bool, const char *);
 int v_ctor, v_dtor, log_[8], log_n;
 struct V

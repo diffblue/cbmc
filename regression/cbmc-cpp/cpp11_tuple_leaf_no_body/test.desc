@@ -42,7 +42,7 @@ the static_cast-to-base in get() reads outside the object.
 Fixed 2026-08-03: the parser now records the base-specifier pack
 expansion ellipsis ([class.derived.general] grammar; it was consumed
 and DISCARDED -- a literal TODO), and instantiate_template expands
-template-id base patterns per pack element ([temp.variadic]/5.2),
+template-id base patterns per pack element ([temp.variadic]/6.6),
 recovering a partial specialization's trailing pack from the
 re-deduced spec bindings.  Flags corrected to CLANG mode: the
 __make_integer_seq/__type_pack_element builtins only lex there.

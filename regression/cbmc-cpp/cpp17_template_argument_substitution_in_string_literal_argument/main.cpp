@@ -10,7 +10,7 @@ constexpr const C *widen(const char *narrow, const wchar_t *wide)
 template <class C>
 struct spec
 {
-  // N5008 [temp.inst]/3: instantiating the member substitutes C in the
+  // N5008 [temp.inst]/4: instantiating the member substitutes C in the
   // call, whose arguments include the wide string literal (an array
   // constant) -- the shape of GCC 16's _GLIBCXX_WIDEN in <chrono>
   static constexpr const C *chars = widen<C>("0123", L"0123");

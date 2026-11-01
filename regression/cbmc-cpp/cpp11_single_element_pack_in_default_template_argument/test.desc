@@ -13,5 +13,5 @@ main.cpp
 ^warning: ignoring
 static assertion failed
 --
-N5008 [temp.variadic]/8: a single deduced pack element is bound as a pack
+N5008 [temp.variadic]/16: a single deduced pack element is bound as a pack
 when a following default expands the pack in a template-argument list.

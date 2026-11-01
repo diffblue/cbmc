@@ -10,7 +10,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [temp.param]/6, [temp.arg.nontype]/2: a pointer non-type template
+N5008 [temp.param]/11.1, [temp.arg.nontype]/2: a pointer non-type template
 parameter's argument is the address of a static-storage object.  Verifies the
 parameter keeps its pointer type and the address argument's object identity is
 preserved.  assertion.2 FAILURE proves non-vacuity.

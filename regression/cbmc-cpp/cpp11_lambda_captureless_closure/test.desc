@@ -12,7 +12,7 @@ main.cpp
 ^.*CONVERSION ERROR.*$
 dropped the body
 --
-[expr.prim.lambda.closure]/1 + §7.5.6.2: a captureless, non-generic lambda is
+[expr.prim.lambda.closure]/1, /10: a captureless, non-generic lambda is
 lowered to a closure class (struct) with operator() (the body) and a
 non-explicit conversion to pointer-to-function.  The lambda is usable both as an
 object (operator() call, by-value pass/copy, closure-type deduction) and as a

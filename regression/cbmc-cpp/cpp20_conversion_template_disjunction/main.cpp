@@ -1,9 +1,9 @@
 // [temp.constr.op]: a disjunction of constraints is satisfied iff either
 // operand is.  A conversion-function template whose requires-clause is a
-// disjunction (here integral<T> || floating_point<T>) must, per [temp.deduct]/5,
-// be removed from the candidate set when the *whole* constraint is unsatisfied
-// with the deduced arguments -- which for a class destination T means BOTH
-// disjuncts are false.
+// disjunction (here integral<T> || floating_point<T>) must, per
+// [temp.deduct.general]/5, be removed from the candidate set when the *whole*
+// constraint is unsatisfied with the deduced arguments -- which for a class
+// destination T means BOTH disjuncts are false.
 //
 // This is the shape of libstdc++'s __max_size_type / __max_diff_type templated
 // conversion operators, whose constraint is integral<_Tp> || __is_int128<_Tp>.

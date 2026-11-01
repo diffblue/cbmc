@@ -3,8 +3,9 @@ template <class E>
 struct table
 {
   E data[4][2];
-  // N5008 [class.base.init]/7, [dcl.init.list]/3.11: `data{}'
-  // value-initializes the array member, here zero-initializing each element
+  // N5008 [class.base.init]/7, [dcl.init.list]/3.4, [dcl.init.aggr]/5.2:
+  // `data{}' value-initializes the array member, here zero-initializing each
+  // element
   table() : data{}
   {
     data[3][1] = 7;

@@ -14,6 +14,6 @@ shapes.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [dcl.typedef]/2, [temp.variadic]/5; see test.desc.  Fails on bin53.
+N5008 [dcl.typedef]/2, [temp.variadic]/9; see test.desc.  Fails on bin53.
 g++ 13 and clang++ 18 accept this program (-std=c++17), and it fails only
 its WRONG assertion.

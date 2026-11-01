@@ -8,12 +8,12 @@ main.cpp
 --
 dropped the body
 --
-N5008 [class.copy.elis]/[stmt.return]/2 -- returning a local by value
+N5008 [class.copy.elision]/[stmt.return]/2 -- returning a local by value
 used to relocate the object BITWISE through the return-value mechanism
 (three hops), breaking a move constructor that branches on the source's
 self-pointer state (the SSO shape; std::string by value read a dead
 object).  Fixed by the elide_cpp_returned_temporaries lowering: the
 callee constructs the result directly into caller storage via a hidden
 result pointer (guaranteed copy elision, as compilers implement it),
-with [class.copy.elis]/3 implicit move at the return site.
+with [expr.prim.id.unqual]/12, 15 implicit move at the return site.
 Header-free, 14 essential lines; g++/clang++ runtime-verified.

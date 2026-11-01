@@ -14,7 +14,7 @@ dropped the body
 --
 std::find over a populated std::vector verifies genuinely once the iterator
 instance's member functions are instantiated on demand ([iterator.concepts.general]
-+ [temp.inst]/1-2 + [dcl.typedef]: the inert C++20 `iterator_concept` member
++ [temp.inst]/2 + [dcl.typedef]: the inert C++20 `iterator_concept` member
 alias is kept lazy instead of abandoning the iterator's class body and dropping
 its operator*/operator++/comparison members).  The forbidden patterns guard
 against the prior method-less-iterator regression and against a vacuous pass;

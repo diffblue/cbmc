@@ -14,15 +14,14 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [over.match.best]/2 + [temp.deduct.conv]: `static_cast<int>(b)' on a
-class with `explicit operator bool()' and a constrained `template <class T>
-explicit operator T()' selects the template's `operator int()' (identity)
-over operator bool plus an integral conversion; the non-template is
-preferred only on a tie (/2.4).  The template was tried only when no
-non-template conversion function matched, so the cast produced 1 for a
-value of 5.  [temp.constr.decl]: the template's requires-clause
-(`integral<T> || is_int128<T>', a disjunction of concept-ids that the type
-checker leaves as `or(false, false)') is folded before it is tested, so the
-explicit conversion function template is not instantiated -- and its body
-`return val;' not dropped -- for an unrelated class type (libstdc++
-<bits/max_size_type.h>, 315 drops over the corpus).
+N5008 [over.match.best.general]/2 + [temp.deduct.conv]: `static_cast<int>(b)' on
+a class with `explicit operator bool()' and a constrained `template <class T>
+explicit operator T()' selects the template's `operator int()' (identity) over
+operator bool plus an integral conversion; the non-template is preferred only on
+a tie (/2.4).  The template was tried only when no non-template conversion
+function matched, so the cast produced 1 for a value of 5.  [temp.constr.decl]:
+the template's requires-clause (`integral<T> || is_int128<T>', a disjunction of
+concept-ids that the type checker leaves as `or(false, false)') is folded before
+it is tested, so the explicit conversion function template is not instantiated
+-- and its body `return val;' not dropped -- for an unrelated class type
+(libstdc++ <bits/max_size_type.h>, 315 drops over the corpus).

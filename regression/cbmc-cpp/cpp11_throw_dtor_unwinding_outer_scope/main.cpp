@@ -1,4 +1,4 @@
-// N5008 [except.ctor]/1-3, [except.throw]/4: as an exception propagates to the
+// N5008 [except.ctor]/1-3, [except.throw]/2: as an exception propagates to the
 // handler that catches it, every automatic object whose scope is exited during
 // the unwinding is destroyed.  Here B is thrown in f(); the inner `try` catches
 // only A, so B propagates out of the inner try to the outer `catch(B&)`.  The

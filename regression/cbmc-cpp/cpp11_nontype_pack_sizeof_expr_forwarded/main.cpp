@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/4-5: a pack expansion whose pattern is a `sizeof`
+// N5008 [temp.variadic]/5-6: a pack expansion whose pattern is a `sizeof`
 // unary-expression, `sizeof(Us)...`, forwarded from an enclosing function
 // template, expands to one element per pack member.
 //

@@ -1,4 +1,4 @@
-// [temp.spec]/4 + [temp.inst]/2: each specialization of a member function
+// [temp.type]/1 + [temp.inst]/5: each specialization of a member function
 // template is a distinct entity -- including *non-constexpr* ones.  When the
 // template parameters do not appear in the parameter types (e.g.
 // `template<class U> static unsigned sz()` returning sizeof(U)), the

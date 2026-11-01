@@ -10,7 +10,7 @@ type_pack.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [expr.prim.fold]/2, [temp.variadic]/5: in `(0 + ... + sizeof(Ts))'
+N5008 [expr.prim.fold]/3, [temp.variadic]/9: in `(0 + ... + sizeof(Ts))'
 the pack is the template's TYPE parameter pack, not a function parameter
 pack; each element is sizeof of one type.  The function-body fold
 expansion only expanded patterns naming the function parameter pack, so

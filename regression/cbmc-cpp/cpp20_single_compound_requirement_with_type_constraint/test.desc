@@ -11,7 +11,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [expr.prim.req.compound]/1-2, [temp.constr.atomic]: `{ t.begin() }
+N5008 [expr.prim.req.compound]/1, [temp.constr.atomic]: `{ t.begin() }
 -> pointer_like;' requires `t.begin()' to be a valid expression whose type
 satisfies pointer_like; for T = int the substitution fails, so has_begin<int>
 is false.  The front end treats it as satisfied (the static_assert fails):

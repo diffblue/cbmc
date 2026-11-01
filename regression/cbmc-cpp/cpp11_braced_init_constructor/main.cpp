@@ -1,6 +1,6 @@
 // A class with a user-provided (converting) constructor is not an aggregate
 // ([dcl.init.aggr]/1), so a braced-init-list must invoke a constructor
-// ([dcl.init.list]/3.4), not perform member-wise aggregate initialization.
+// ([dcl.init.list]/3.7), not perform member-wise aggregate initialization.
 // Regression test: CBMC used to aggregate-initialize `Wrap w{x}` member-wise
 // (assigning the int x to the int* member), producing a spurious "invalid
 // implicit conversion" error.  A converting constructor whose single

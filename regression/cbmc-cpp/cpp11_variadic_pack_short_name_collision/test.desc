@@ -12,7 +12,7 @@ dropped the body
 --
 Regression for the MSVC _Construct_in_place / _Emplace_back pack
 short-name collision bug.  Per [basic.scope.temp] and
-[temp.variadic]/5, a pack parameter's short name in a template
+[temp.variadic]/8, a pack parameter's short name in a template
 refers to THAT template's pack; `pack_size_map` in CBMC is shared
 across nested template instantiations, so the "remove empty pack
 expansions" pass in `cpp_instantiate_template.cpp` must filter to

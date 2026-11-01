@@ -17,4 +17,4 @@ main.cpp
 --
 The exception object was never destroyed, and a temporary copied into it
 was not destroyed either (C++11: `throw E()' copies the temporary).  Each
-exit of a handler other than a rethrow now destroys it ([except.throw]/5).
+exit of a handler other than a rethrow now destroys it ([except.throw]/4).

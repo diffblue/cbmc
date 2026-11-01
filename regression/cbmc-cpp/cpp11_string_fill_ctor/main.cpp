@@ -11,7 +11,7 @@
 // convert_function now repairs such a member by adopting the out-of-line
 // definition whose signature (parameter arity) matches it, together with that
 // definition's parameter names ([dcl.fct]/3), so the fill constructor sets the
-// length and fills the buffer.  Grounded in N5008 [over.match] + [dcl.fct]/3.
+// length and fills the buffer (N5008 [basic.scope.scope]/4, [dcl.fct]/3).
 // See doc/architectural/cpp-extern-template-member-instantiation.md.
 
 #include <string>

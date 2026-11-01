@@ -11,7 +11,7 @@ class holder
 {
 public:
   int last = -1;
-  // [class.mem.general]/7: a member function body is a complete-class
+  // [class.mem.general]/9.1: a member function body is a complete-class
   // context -- the member typedef declared below is visible here
   void copy()
   {

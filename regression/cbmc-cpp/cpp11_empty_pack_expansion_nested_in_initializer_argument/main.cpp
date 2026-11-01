@@ -9,7 +9,7 @@ int sizes(L1, L2, int)
 {
   return 10 * L1::size + L2::size;
 }
-// N5008 [temp.variadic]/7: an expansion of an empty pack nested in an
+// N5008 [temp.variadic]/16: an expansion of an empty pack nested in an
 // argument, in a template argument list, yields an empty list there; the
 // argument itself remains
 struct member

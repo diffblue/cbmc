@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/8, [temp.deduct.general]/5: in
+// N5008 [temp.variadic]/16, [temp.deduct.general]/5: in
 // `enable_if<all_int<U...>::value, int>::type = 0' the expansion U...
 // names every deduced element of U.  With one deduced element the pack was
 // bound as a scalar only and U... expanded to no argument, so the constraint

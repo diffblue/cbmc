@@ -4,7 +4,7 @@
 // conversion sequences.  A constructor taking the element(s) directly (here
 // `vec(int)` for `{7}`) is preferred over a copy/move constructor, whose
 // parameter (`const vec&` / `vec&&`) would require first materializing a `vec`
-// from the list -- a user-defined conversion, which [over.best.ics] ranks
+// from the list -- a user-defined conversion, which [over.ics.rank]/2.1 ranks
 // below the direct list-initialization sequence.
 //
 // Here a base-class mem-initializer `Base(0, {7})` selects between

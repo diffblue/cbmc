@@ -11,7 +11,7 @@ dropped the body
 --
 C++20 std::erase_if on std::vector<int>.
 
-With the member-typedef conformance fix ([temp.inst]/1-2, [dcl.typedef]) symex
+With the member-typedef conformance fix ([temp.inst]/2, [dcl.typedef]) symex
 executes the REAL std::vector / erase_if machinery (no truncation), and the
 resulting size assertion is verified soundly within resources.
 See doc/architectural/cpp-class-template-instantiation-plan.md.

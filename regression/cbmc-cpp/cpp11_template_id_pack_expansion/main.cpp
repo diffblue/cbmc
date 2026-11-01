@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5: `get<Idx>()...` — a call-argument pack
+// N5008 [temp.variadic]/9: `get<Idx>()...` — a call-argument pack
 // expansion whose pattern names the ENCLOSING class instance's
 // non-type pack inside a template-id.  Pre-fix wrong-code: the pack
 // name was scalar-substituted with a broken constant at member

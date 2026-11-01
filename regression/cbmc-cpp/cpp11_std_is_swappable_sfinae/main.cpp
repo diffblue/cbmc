@@ -29,7 +29,7 @@
 // (an `irep::pretty()` dump, not a clean diagnostic) and then:
 //   error: found no match for symbol 'swap', candidates are: ...
 //
-// Per [temp.deduct]/8 ("any other invalid type or expression ... is
+// Per [temp.deduct.general]/8 ("any other invalid type or expression ... is
 // a deduction failure"), a substitution failure inside the return
 // type of a function-template candidate must be absorbed silently
 // during overload resolution — no user-visible error should be

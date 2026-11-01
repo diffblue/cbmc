@@ -15,7 +15,7 @@ int count(void *, T *...)
 }
 template <class T, class... Ts>
 T first(void *, T *, Ts *...);
-// [temp.variadic]/5: the element is substituted into the pattern, keeping
+// [temp.variadic]/9: the element is substituted into the pattern, keeping
 // its cv-qualifiers
 template <class... T>
 int by_const_ref(const T &...t)

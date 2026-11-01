@@ -10,7 +10,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [temp.mem.class]/1, [class.nest]/3: a member class of a class template
+N5008 [temp.mem.class]/1, [class.pre]/3: a member class of a class template
 may be defined outside the class template by a qualified name, here from
 outside its namespace (`template <class C> struct ns::S<C>::N { ... };').
 The front end grafted an out-of-class member class definition into the

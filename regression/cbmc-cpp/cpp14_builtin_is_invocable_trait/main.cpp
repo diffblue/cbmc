@@ -1,7 +1,7 @@
 // GCC 14's builtin traits __is_invocable, __is_nothrow_invocable and
 // __array_rank, which libstdc++ 16 uses for std::is_invocable,
 // std::is_nothrow_invocable and std::rank (`__bool_constant<__is_invocable(
-// _Fn, _ArgTypes...)>').  N5008 [meta.rel]/6-7, [func.require]/1: INVOKE
+// _Fn, _ArgTypes...)>').  N5008 [meta.rel]/2, [func.require]/1: INVOKE
 // with declval'd operands must be well-formed -- a call, or a pointer to
 // member applied to the first argument.  __is_nothrow_invocable is treated
 // as __is_invocable (the front end does not model exception

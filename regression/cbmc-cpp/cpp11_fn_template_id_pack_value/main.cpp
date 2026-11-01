@@ -1,4 +1,4 @@
-// N5008 [temp.names]/2 + [temp.variadic]/5: `get<Idx>...` — a pack
+// N5008 [temp.names]/3.3 + [temp.variadic]/9: `get<Idx>...` — a pack
 // expansion whose pattern is a bare fn-template-id VALUE (function
 // pointer), parsed in an ambiguous `<` context (id-less
 // template-arguments child).  The expanded elements must resolve as

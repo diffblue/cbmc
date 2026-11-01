@@ -1,4 +1,4 @@
-// N5008 [class.member.lookup] / [basic.scope.hiding]: a member declared in a
+// N5008 [class.member.lookup] / [class.member.lookup]/3: a member declared in a
 // class hides an inherited member of the same name.  In a recursively-derived
 // class template -- `TImpl<I, Head, Tail...> : HeadBase<I, Head>,
 // TImpl<I+1, Tail...>` -- every level redefines `typedef HeadBase<I, Head>

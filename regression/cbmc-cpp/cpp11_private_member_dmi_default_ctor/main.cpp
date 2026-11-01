@@ -1,4 +1,4 @@
-// N5008 [class.default.ctor]/1-4 + [class.access.general]/4: the
+// N5008 [class.default.ctor]/1-4 + [class.access.general]/1: the
 // implicitly-declared default constructor is a PUBLIC member, and the
 // member initializations it performs are done in the context of the
 // class, where private members are accessible.  CBMC judges that access

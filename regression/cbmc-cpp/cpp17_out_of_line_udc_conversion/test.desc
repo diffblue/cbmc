@@ -11,7 +11,7 @@ main.cpp
 ^found no match for symbol 'remove'$
 --
 N5008 [over.match.best] + [over.ics.user] + [temp.deduct] +
-[class.ctor.general]: a user-defined conversion via a converting constructor is
+[class.conv.ctor]: a user-defined conversion via a converting constructor is
 viable based only on the source and destination types, not on the scope of the
 call site.  CBMC used to reject `std::filesystem::remove(name)` (name :
 std::string) with "found no match for symbol 'remove'" -> CONVERSION ERROR when

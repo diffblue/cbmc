@@ -1,5 +1,5 @@
-// N5008 [temp.inst]/1-3 + [dcl.type.decltype] + [temp.deduct]/8: the base
-// specifier `impl<T>::type` names the result of the classic
+// N5008 [temp.inst]/1-3 + [dcl.type.decltype] + [temp.deduct.general]/8:
+// the base specifier `impl<T>::type` names the result of the classic
 // destructibility probe -- `decltype(test<T>(0))` selects the
 // bool_c<true> overload for class type S because
 // `decltype(declval<T&>().~T())` is well-formed.  Everything below is

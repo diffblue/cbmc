@@ -21,7 +21,7 @@ libstdc++-using code with `std::vector<X>{...}` brace-init:
   * `typecheck_expr_explicit_constructor_call` keeps a
     brace-init-list as a single operand when T has a non-explicit
     `initializer_list<U>` constructor (phase 2.1 of
-    [over.match.list]/2), only expanding it for phase 2.2 when no
+    [over.match.list]/1.1), only expanding it for phase 2.2 when no
     init-list ctor is present.
 
 `--show-symbol-table` exits cleanly after typechecking so we don't

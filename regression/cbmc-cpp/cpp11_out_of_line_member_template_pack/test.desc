@@ -10,7 +10,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-[temp.mem.func] + [temp.inst]/2: an out-of-line-defined member function
+[temp.mem.func] + [temp.inst]/4: an out-of-line-defined member function
 template of a class template is instantiated from its definition.  Fixed by
 attaching the definition's body (recorded as a template_methods entry of the
 enclosing class template, with the owning class matched to avoid same-name

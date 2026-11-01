@@ -1,6 +1,6 @@
 // A namespace-scope reference-to-pointer with a PARENTHESIZED
 // initializer (`void *&child(__left_);`, direct-initialization per
-// N5008 [dcl.init.general]/16.2) is rejected with "invalid implicit
+// N5008 [dcl.init.general]/15.1) is rejected with "invalid implicit
 // conversion from 'void *' to 'void'" -- the declarator's pointer
 // level is lost when the paren initializer is parsed (any T*&
 // fails; plain T& works; the `= init` spelling works).  Distilled

@@ -18,5 +18,5 @@ unit from a newer gcc failed on a gcc-11 host (gcc16_optional_transform on
 the 22.04 CI runners).  Sibling cpp11_revertible_builtin_remove_cv_alias
 covers libstdc++ 11's alias templates of the same names.
 Also: __remove_cvref(const int &) stripped the cv-qualifiers BEFORE the
-reference (leaving `const int'); N5008 [meta.trans.other]/3 defines it as
+reference (leaving `const int'); N5008 [meta.trans.other]/1 defines it as
 remove_cv_t<remove_reference_t<T>>.

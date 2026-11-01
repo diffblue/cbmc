@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5 + [expr.new]: a pack expansion in a
+// N5008 [temp.variadic]/9 + [expr.new]: a pack expansion in a
 // new-initializer's expression-list inside a FREE function template --
 // `::new((void*)__location) _Tp(forward<_Args>(__args)...)`, the exact
 // body of C++20 std::construct_at ([specialized.construct]) -- must

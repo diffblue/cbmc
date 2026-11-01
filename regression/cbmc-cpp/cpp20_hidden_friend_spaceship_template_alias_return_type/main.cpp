@@ -1,6 +1,6 @@
 // N5008 [over.match.oper]/3.4: for `a < b', the rewritten candidates
 // include every operator<=> found for `a <=> b', here a hidden friend
-// template ([class.friend]/6) of the class template.  Its return type is an
+// template ([class.friend]/5) of the class template.  Its return type is an
 // alias template whose arguments depend on the enclosing class's parameter
 // T -- the shape of libstdc++ 16's __normal_iterator, whose return type is
 // std::__detail::__synth3way_t<_Iterator, _Iter>.

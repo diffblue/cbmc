@@ -9,7 +9,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [temp.inst]/8 + /11: an unused, non-virtual, ill-formed-when-instantiated
+N5008 [temp.inst]/6 + /11: an unused, non-virtual, ill-formed-when-instantiated
 inline member must not cause an error.  Guards the lazy-instantiation property
 during the Option B (on-odr-use member instantiation) pivot.  See
 doc/architectural/cpp-extern-template-member-instantiation.md.

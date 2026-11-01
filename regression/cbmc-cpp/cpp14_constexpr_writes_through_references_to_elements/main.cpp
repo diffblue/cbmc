@@ -1,4 +1,4 @@
-// N5008 [expr.const]/5: a constant expression may modify an object whose
+// N5008 [expr.const]/10.16: a constant expression may modify an object whose
 // lifetime began within its evaluation, also through a reference or pointer
 // bound to one of its subobjects.  [stmt.ranged]/1: `for(auto &e : a)'
 // binds e to each element of a in turn.

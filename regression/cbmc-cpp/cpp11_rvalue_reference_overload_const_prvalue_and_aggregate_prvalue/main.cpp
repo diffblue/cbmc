@@ -1,10 +1,10 @@
-// N5008 [dcl.init.ref]/5.4.1: when the referenced type is reference-related
+// N5008 [dcl.init.ref]/5.4: when the referenced type is reference-related
 // to the initializer's type, cv1 shall be at least as cv-qualified as cv2,
 // so `E &&' does not bind to a `const E' prvalue (not even by copying it
 // into a temporary): `push_back(c ? neg(op) : op)' with `const E &op' -- a
 // `const E' prvalue by [expr.cond]/4.3 -- selects push_back(const E &); it
 // was ambiguous (CBMC's own goto_check_c.cpp, expr2c.cpp, dog-fooding).
-// [expr.type.conv]/2, [over.ics.rank]/3.2.3: the aggregate prvalue `E{2}'
+// [expr.type.conv]/1.4, [over.ics.rank]/3.2.3: the aggregate prvalue `E{2}'
 // binds to `E &&' by the identity conversion, which beats `const E &'; the
 // front end's compound literal was taken for an lvalue and the rvalue
 // reference binding ranked as a copy.

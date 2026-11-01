@@ -1,4 +1,4 @@
-// N5008 [expr.const]/5, /14: a call of a constexpr function returning a
+// N5008 [expr.const]/22, /10: a call of a constexpr function returning a
 // class, a temporary built by a constexpr constructor, and member reads and
 // member calls on them are constant expressions; [stmt.switch]/2: so is a
 // case label built from them (GCC 16's _Escapes<_CharT>::_S_tab()[0] in

@@ -2,7 +2,7 @@ extern "C" void __CPROVER_assert(bool, const char *);
 
 // GCC's `enum __attribute__((__packed__))` extension: with no
 // enumeration-base written, the underlying type is the smallest
-// sufficient integer type (N5008 [dcl.enum]/8 leaves it
+// sufficient integer type (N5008 [dcl.enum]/7 leaves it
 // implementation-defined; g++ and clang++ shrink).  User-reported:
 // firmware ABIs pack enums to get 1-byte instruction fields, and the
 // C++ front end ignored the attribute while the C front end honoured

@@ -1,5 +1,5 @@
 // N5008 [over.match.best] + [over.ics.user] + [temp.deduct] +
-// [class.ctor.general]: overload resolution of `std::filesystem::remove(name)`
+// [class.conv.ctor]: overload resolution of `std::filesystem::remove(name)`
 // (name : std::string) selects `remove(const path&)` by forming the
 // user-defined conversion std::string -> std::filesystem::path through path's
 // converting constructor.  A conversion's viability depends only on the source

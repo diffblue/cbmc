@@ -1,6 +1,6 @@
 extern "C" void __CPROVER_assert(bool, const char *);
 // [dcl.spec.auto.general]/10 (the return statements must deduce the same
-// type) with [expr.rel]/2 and [expr.eq]/1: `true' and `st == 0' are both
+// type) with [expr.rel]/2 and [expr.eq]/2: `true' and `st == 0' are both
 // prvalues of type bool (libc++'s __stop_state::__add_callback lambda)
 auto f(int st)
 {

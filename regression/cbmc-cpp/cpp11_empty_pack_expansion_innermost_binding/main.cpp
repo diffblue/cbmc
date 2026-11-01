@@ -9,7 +9,7 @@ extern "C" void __CPROVER_assert(bool, const char *);
 // with the OUTER binding (one element): the call got one argument too many,
 // `_Callable<F>' came out false and pair<int, std::function<int()>>'s
 // constructor lost its body (members never initialised).  N5008
-// [basic.scope.scope]: the innermost declaration is the one denoted -- the
+// [basic.lookup.unqual]/2: the innermost declaration is the one denoted -- the
 // most recently bound pack wins.  The failure was order dependent: any
 // earlier std::function<int()> construction in the TU hid it.
 int one()

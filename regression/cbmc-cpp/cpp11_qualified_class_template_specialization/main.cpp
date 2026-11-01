@@ -1,4 +1,4 @@
-// N5008 [temp.expl.spec]/2: an explicit specialization of a class template may
+// N5008 [temp.expl.spec]/3: an explicit specialization of a class template may
 // be declared with a qualified-id naming the template, from any namespace that
 // encloses the template's.  Here `ns::G<char>` is specialized from the global
 // scope.  The specialization (v()==2) must be selected for G<char>, not the

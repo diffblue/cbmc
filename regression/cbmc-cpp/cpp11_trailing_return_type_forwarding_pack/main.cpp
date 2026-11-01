@@ -1,6 +1,6 @@
 extern "C" void __CPROVER_assert(bool, const char *);
-// [temp.variadic]/5, [dcl.fct]/8: in the trailing return type the pattern
-// static_cast<A &&>(a) is expanded with A_k and the k-th parameter in
+// [temp.variadic]/9, [basic.scope.param]/1.1: in the trailing return type the
+// pattern static_cast<A &&>(a) is expanded with A_k and the k-th parameter in
 // lockstep
 template <class... T>
 struct tup

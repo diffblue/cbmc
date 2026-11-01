@@ -13,7 +13,7 @@ dropped the body
 A converting constructor SFINAE-constrained by a decltype that expands a
 two-or-more-element pack (declval<A>()...) must be considered: the parser now
 preserves the pack-expansion ellipsis on a function-call argument
-([temp.variadic]/5) and template_mapt::apply expands it into one argument per
+([temp.variadic]/9) and template_mapt::apply expands it into one argument per
 deduced element before the decltype operand is type-checked.  Previously the
 ellipsis was discarded, the bare pack reference was rejected, overload
 resolution reported "found no match", and construction failed silently (a

@@ -22,7 +22,7 @@ COARSE and broke regression/cpp/Protection1, a rejects-invalid test:
     class B : A {};   B b;   // must be REJECTED
 Within B's implicit default constructor, B's OWN private members are
 accessible, but A's PRIVATE default constructor is not
-([class.access.general]/4 grants the class's own context, not its
+([class.access.general]/1 grants the class's own context, not its
 bases').  A correct fix must therefore judge access in the context of
 the class that DECLARES the entity -- e.g. by setting
 access_judgment_scope to the constructed class's scope (the mechanism

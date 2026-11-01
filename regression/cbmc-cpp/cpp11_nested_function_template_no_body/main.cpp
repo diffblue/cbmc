@@ -1,4 +1,4 @@
-// N5008 [temp.inst]/4, [temp.point]/1: an odr-used function-template
+// N5008 [temp.inst]/5, [temp.point]/1: an odr-used function-template
 // specialization is implicitly instantiated, including its definition, so a
 // call to it must reach a real body -- not a nondet "no body" stub.
 //

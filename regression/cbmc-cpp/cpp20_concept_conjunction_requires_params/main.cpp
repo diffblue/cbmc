@@ -1,6 +1,6 @@
 // C++20: a requires-expression that is only a *conjunct* of a larger
 // constraint-expression (not the whole concept body) must still have its
-// requirement-parameter-list bound ([expr.prim.req.general]/2).  This is the
+// requirement-parameter-list bound ([expr.prim.req.general]/4).  This is the
 // shape of std::assignable_from / std::movable / std::copyable, which combine a
 // concept-id conjunct with a parametered requires-expression.  Exercises the
 // real library concepts over a regular copyable/movable class.

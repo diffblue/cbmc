@@ -1,5 +1,5 @@
 extern "C" void __CPROVER_assert(bool, const char *);
-// N5008 [temp.param]/17, [temp.arg.explicit]/4: `int &...' is a template
+// N5008 [temp.param]/5, [temp.arg.explicit]/4: `int &...' is a template
 // parameter pack of non-type parameters; a trailing pack not otherwise
 // deduced is deduced as empty, so `f()' and `f<>()' call the specialization
 // with no template arguments (libc++'s pair::_CheckArgs)

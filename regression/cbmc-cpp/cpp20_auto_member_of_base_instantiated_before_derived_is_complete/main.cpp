@@ -56,7 +56,7 @@ struct ref_view : view_interface<ref_view<_Range>>
 extern "C" void __CPROVER_assert(bool, const char *);
 int main()
 {
-  // [temp.inst]/11, [dcl.spec.auto.general]/12: view_interface's front() is
+  // [temp.inst]/11, [dcl.spec.auto.general]/15: view_interface's front() is
   // never used, so its body (whose return type would be deduced from it) is
   // not instantiated; ref_view<int> is complete here and has a member begin
   __CPROVER_assert(

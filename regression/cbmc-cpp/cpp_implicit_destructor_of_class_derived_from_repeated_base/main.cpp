@@ -1,4 +1,4 @@
-// N5008 [class.dtor]/7-8: E's implicit destructor destroys its base D,
+// N5008 [class.dtor]/13: E's implicit destructor destroys its base D,
 // whose two A subobjects (through B and through C) are destroyed by D's
 // destructor; [class.mi]/3 makes A an ambiguous base of D only for
 // conversions, which E's destructor does not need.

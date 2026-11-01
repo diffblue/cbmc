@@ -9,7 +9,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [expr.prim.fold] + [temp.variadic]/5: a fold expression over a
+N5008 [expr.prim.fold] + [temp.variadic]/14: a fold expression over a
 function parameter pack in a MEMBER function template's body is now
 reduced, when the member is instantiated, into the correctly-associated
 binary expression over the pack's elements (right/left association per

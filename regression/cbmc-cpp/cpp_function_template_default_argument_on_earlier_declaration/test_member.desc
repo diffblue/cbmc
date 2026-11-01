@@ -11,7 +11,7 @@ member.cpp
 ^CONVERSION ERROR$
 no body for callee
 --
-N5008 [dcl.fct.default]/4, [temp.mem]/1, [dcl.fct]/5 (default arguments are
+N5008 [dcl.fct.default]/4, [temp.mem]/1, [dcl.fct]/10 (default arguments are
 not part of the parameter-type-list): the default on the in-class
 declaration of S::m made the declaration's and the definition's parameter
 lists compare unequal, so the definition's body was never attached ("no

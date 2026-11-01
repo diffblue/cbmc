@@ -9,5 +9,5 @@ main.cpp
 found no match
 dropped the body
 --
-N5008 [expr.type.conv]/2, [class.temporary]/2: member access on the
+N5008 [expr.type.conv]/1.4, [class.temporary]/2: member access on the
 value-initialised prvalue `T()' of a class without constructors.

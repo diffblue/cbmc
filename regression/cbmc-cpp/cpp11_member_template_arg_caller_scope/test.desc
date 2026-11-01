@@ -10,7 +10,7 @@ main.cpp
 could not fully type-check
 dropped the body
 --
-N5008 [basic.lookup.unqual]/1 + [expr.ref]/1: the explicit template
+N5008 [basic.lookup.unqual]/4 + [expr.ref]/1: the explicit template
 arguments of a member template-id (`r.is_derived<I>()`,
 `(*p).template f<I>()`, `p->template f<I>()`) are expressions of the
 enclosing postfix-expression, not of the object's class.  They were

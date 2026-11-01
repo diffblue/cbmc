@@ -6,7 +6,7 @@
 //   typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 // The first two are *self-referential* (their type names the enclosing,
 // still-incomplete `vector`) and cannot be eagerly instantiated at that point.
-// They are therefore registered lazily ([temp.inst]/1-2, [dcl.typedef]: a
+// They are therefore registered lazily ([temp.inst]/2, [dcl.typedef]: a
 // member typedef declares the member and forms the alias without instantiating
 // the aliased template's definition -- a typedef-name may denote an incomplete
 // type), so the sibling `const_reverse_iterator` (and other uses) can still

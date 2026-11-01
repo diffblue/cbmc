@@ -1,8 +1,8 @@
-// [expr.prim.lambda]/3-7: a lambda expression has a unique closure *class*
-// type with a public inline `operator()` (the body) and, for a captureless
-// lambda, a non-explicit conversion to a pointer-to-function.  The closure is
-// an object, not a function pointer, so it can be stored by value in a
-// type-erasing wrapper such as std::function.
+// [expr.prim.lambda.closure]/1, /4, /10, /14, /15: a lambda expression has a
+// unique closure *class* type with a public inline `operator()` (the body) and,
+// for a captureless lambda, a non-explicit conversion to a pointer-to-function.
+// The closure is an object, not a function pointer, so it can be stored by
+// value in a type-erasing wrapper such as std::function.
 //
 // KNOWNBUG: CBMC models a captureless lambda as a bare function pointer, so a
 // std::function constructed from a lambda stores a function pointer rather than

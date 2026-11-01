@@ -1,4 +1,4 @@
-// N5008 [over.match.list]/2.2 with [over.match.ctor] and [temp.deduct]: when a
+// N5008 [over.match.list]/1.2 with [over.match.ctor] and [temp.deduct]: when a
 // class is list-initialized from a braced-init-list and no viable
 // initializer-list constructor applies, the braced-init-list is treated as the
 // argument list for the class's constructors -- and constructor *templates*

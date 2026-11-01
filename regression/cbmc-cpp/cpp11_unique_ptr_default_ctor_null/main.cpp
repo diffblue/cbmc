@@ -1,4 +1,4 @@
-// N5008 [unique.ptr.single.ctor]/1: the default constructor of
+// N5008 [unique.ptr.single.ctor]/3: the default constructor of
 // std::unique_ptr value-initializes the stored pointer -- a default-
 // constructed unique_ptr is null.  g++ and clang++ agree (runtime-checked).
 //

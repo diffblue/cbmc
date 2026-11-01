@@ -14,7 +14,7 @@ main.cpp
 dropped the body
 no body for callee
 --
-N5008 [expr.new]/1 + [temp.variadic]/5,7: a new-initializer's expression
+N5008 [expr.new]/1 + [temp.variadic]/6.5,16: a new-initializer's expression
 list is a pack-expansion context; with an EMPTY pack `::new((void *)p)
 U(forward<Args>(args)...)' is `::new((void *)p) U()' (value-initialization,
 [dcl.init.general]/9).  For a namespace-scope function template

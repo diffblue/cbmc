@@ -1,4 +1,4 @@
-// Per [dcl.init.ref]/5 and [expr.eq]/3:
+// Per [expr.unary.op]/3.1 and [expr.eq]/4:
 // Pointer-to-member-function types must be preserved consistently
 // through address_of, simplification, and comparison with NULL, so
 // that binary_relation_exprt (validated by --validate-ssa-equation)

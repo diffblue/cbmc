@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5, [dcl.fct]/2: `-> decltype(g(I...))' in a member
+// N5008 [temp.variadic]/9, [dcl.fct]/1: `-> decltype(g(I...))' in a member
 // of a class template with the non-type pack I expands to one argument per
 // element of I.  The member's type was checked with only I's first element
 // bound to its name, so g was called with one argument and the member's

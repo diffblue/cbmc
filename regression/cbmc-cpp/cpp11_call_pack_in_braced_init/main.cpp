@@ -1,5 +1,5 @@
-// N5008 [temp.variadic]/5 + [dcl.init.aggr]: a variadic function template whose
-// body expands a pack of CALLS inside a BRACED (aggregate) initializer:
+// N5008 [temp.variadic]/6.5 + [dcl.init.aggr]: a variadic function template
+// whose body expands a pack of CALLS inside a BRACED (aggregate) initializer:
 //   template <class... E> box mk(E&&... e) { return box{fwd(e)...}; }
 //
 // CORE (was KNOWNBUG): the instantiate-time body pack expander replicated a

@@ -10,7 +10,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [temp.inst]/11, [dcl.spec.auto.general]/12, [class.mem.general]/8:
+N5008 [temp.inst]/11, [dcl.spec.auto.general]/15, [class.mem.general]/10:
 view_interface<ref_view<int>>::front() has a deduced return type and is
 never used, so its definition is not instantiated; ref_view<int> is
 complete where __member_begin<ref_view<int> &> is evaluated, and its

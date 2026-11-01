@@ -1,7 +1,7 @@
-// N5008 [expr.const]/5: a constant expression may modify objects whose
+// N5008 [expr.const]/10.16: a constant expression may modify objects whose
 // lifetime began within its evaluation, also through references and
 // pointers bound to their subobjects ([stmt.ranged]: `for(auto &e : a)'
-// binds e to each element in turn).  [temp.inst]/5: a constexpr member
+// binds e to each element in turn).  [temp.inst]/4, /8: a constexpr member
 // function of a class template specialization is instantiated when a
 // constant expression needs its value.  This is the shape of libstdc++'s
 // __from_chars_alnum_to_val_table<false>::_S_make_table in <charconv>.

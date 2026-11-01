@@ -12,7 +12,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [locale.general]/8, [facet.numpunct.virtuals]: the "C"-locale
+N5008 [locale.category]/3, [facet.numpunct.virtuals]: the "C"-locale
 num_put<char> and numpunct<char> data live in libstdc++.so; the front end
 models them (cpp_typecheck_stdlib.cpp classic_num_put and
 classic_numpunct_cache).

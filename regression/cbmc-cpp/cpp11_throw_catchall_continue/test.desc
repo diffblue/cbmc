@@ -10,6 +10,6 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-[except.handle]/1,15 catch(...) matches any exception and control continues
+[except.handle]/5,15 catch(...) matches any exception and control continues
 after the handler, via the goto-level C++ exception lowering
 (remove_cpp_exceptions).  Non-vacuous.

@@ -10,7 +10,7 @@ main.cpp
 could not fully type-check
 dropped the body
 --
-N5008 [temp.dep.type]/1 + [temp.mem]: members of a member class
+N5008 [basic.scope.temp]/2 + [temp.mem]: members of a member class
 template of a class template may use the ENCLOSING template's
 parameters (`N`, or `T` as an expression).  Only the innermost
 instance's parameters were bound while converting a deferred member

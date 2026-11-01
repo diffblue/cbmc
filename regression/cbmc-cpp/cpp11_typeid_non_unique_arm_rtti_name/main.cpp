@@ -1,4 +1,4 @@
-// N5008 [expr.typeid]/1, [type.info]/2: typeid yields the type_info object
+// N5008 [expr.typeid]/1, [type.info]/3: typeid yields the type_info object
 // of its type; two of them compare equal iff they denote the same type.
 // The shape of libc++'s non-unique ARM RTTI (arm64 Darwin): the name is an
 // integer whose most significant bit marks a name that may not be unique;

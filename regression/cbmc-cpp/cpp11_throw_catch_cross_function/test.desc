@@ -10,6 +10,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-[except.throw]/4 cross-function propagation (deep -> mid -> main) with base-class
-matching and value carried across returns, via the goto-level C++ exception
-lowering (remove_cpp_exceptions on remove_exceptions_baset).  Non-vacuous.
+[except.throw]/2 cross-function propagation (deep -> mid -> main) with
+base-class matching and value carried across returns, via the goto-level C++
+exception lowering (remove_cpp_exceptions on remove_exceptions_baset).
+Non-vacuous.

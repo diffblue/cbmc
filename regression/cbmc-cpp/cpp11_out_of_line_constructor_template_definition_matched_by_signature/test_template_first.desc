@@ -13,7 +13,7 @@ template_first.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [temp.mem]/1, [class.mfct]/1: test.desc with the two out-of-line
+N5008 [temp.mem]/1, [class.mfct]/2: test.desc with the two out-of-line
 definitions in the other order (the converting constructor template's
 first).  The copy constructor must get its own definition, not the
 template's.  On bin53 the copy was wrong.  g++ 13 and clang++ 18 accept

@@ -1,14 +1,14 @@
 // libstdc++ 11's unique_ptr<U, E>&& converting constructor shape: the
 // constraint of a constructor TEMPLATE candidate evaluates an is_convertible
-// probe (`test_aux<To>(declval<From>())', [temp.deduct]/8) whose parameter
-// copy-initialization needs a further class's converting constructor
-// template (default_delete<D> -> default_delete<B>).  That nested
+// probe (`test_aux<To>(declval<From>())', [temp.deduct.general]/8) whose
+// parameter copy-initialization needs a further class's converting
+// constructor template (default_delete<D> -> default_delete<B>).  That nested
 // user-defined conversion is a separate conversion sequence
 // ([over.best.ics.general]/4 restricts only the candidate's own parameters)
-// and must be considered while a substitution is in progress; it was
-// refused, the probe evaluated false, and the constructor was dropped
-// ("found no match for symbol").  Header-free replica of the gcc-11
-// <type_traits>/<memory> shapes.
+// and must be considered while a substitution is in progress; it was refused,
+// the probe evaluated false, and the constructor was dropped ("found no match
+// for symbol").  Header-free replica of the gcc-11 <type_traits>/<memory>
+// shapes.
 extern "C" void __CPROVER_assert(bool, const char *);
 template <bool B, class T = void>
 struct enable_if

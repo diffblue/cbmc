@@ -1,4 +1,4 @@
-// N5008 [expr.dynamic.cast]/5-6: dynamic_cast between UNRELATED
+// N5008 [expr.dynamic.cast]/5, /8-10: dynamic_cast between UNRELATED
 // polymorphic classes (a cross-cast) is well-formed; the run-time
 // check yields a pointer to the target subobject when the most-derived
 // object has one, and null otherwise.  CBMC rejected it outright

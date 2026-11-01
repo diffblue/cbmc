@@ -13,8 +13,8 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [expr.prim.req.general]/2, [dcl.type.decltype]/1,
-[basic.def.odr]/5, [temp.inst]/4: `it++' in the requirement is an
+N5008 [expr.prim.req.compound]/1, [dcl.type.decltype]/1,
+[basic.def.odr]/3, 8, [temp.inst]/4: `it++' in the requirement is an
 unevaluated operand, so normal_iterator<opaque *>::operator++(int) is not
 odr-used and its definition -- ill-formed for the incomplete opaque -- is
 not instantiated.  The front end queued the body of every member named

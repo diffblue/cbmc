@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5,7: when a pack expansion has zero arguments the
+// N5008 [temp.variadic]/5,16: when a pack expansion has zero arguments the
 // expansion is discarded; with N arguments it expands to N.  A variadic
 // constructor `X(A a, Rest... rest)` must drop the pack parameter when Rest is
 // empty and expand it to one parameter per element otherwise, and a pack

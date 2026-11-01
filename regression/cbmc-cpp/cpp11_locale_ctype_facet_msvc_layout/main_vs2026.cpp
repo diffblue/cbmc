@@ -1,4 +1,4 @@
-// N5008 [locale.cons]/1, [locale.general]/8, [facet.ctype.special]: the
+// N5008 [locale.cons]/1, [locale.statics]/5, [facet.ctype.special]: the
 // default locale is the "C" locale, whose ctype<char> classifies as in the
 // C library.  The shape of the MSVC STL: the classification table is
 // ctype<char>::_Ctype._Table, the masks are enumerators of ctype_base, and

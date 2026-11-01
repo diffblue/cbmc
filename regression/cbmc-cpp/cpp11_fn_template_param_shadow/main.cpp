@@ -1,4 +1,4 @@
-// N5008 [temp.deduct]/5 + [basic.scope.temp]/2: deducing a (member)
+// N5008 [temp.deduct.general]/5 + [basic.scope.temp]/2: deducing a (member)
 // function template binds only THAT template's own parameters; a
 // same-short-name parameter of an unrelated enclosing template must be
 // neither bound, nor conflict-checked, nor substituted into the deduced

@@ -1,5 +1,5 @@
 extern "C" void __CPROVER_assert(bool, const char *);
-// N5008 [temp.inst]/3, [temp.variadic]/5: in a member function template of a
+// N5008 [temp.inst]/3, [temp.variadic]/9: in a member function template of a
 // class template specialization, the class's parameter pack V is already
 // bound -- `V...' is a list of ordinary parameters, which need not be the
 // trailing ones (the MSVC STL's _Meta_at_impl<void *, ...>::_Eval)

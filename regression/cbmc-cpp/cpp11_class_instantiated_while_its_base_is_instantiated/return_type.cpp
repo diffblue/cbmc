@@ -1,8 +1,8 @@
-// N5008 [temp.inst]/1-3, [dcl.fct]/12: a member function declaration does
-// not require its return type to be complete, so ios<char>'s
+// N5008 [temp.inst]/1-3, [dcl.fct.def.general]/2: a member function declaration
+// does not require its return type to be complete, so ios<char>'s
 // `ostream<char> *set_rdbuf(...)' does not instantiate ostream<char> while
-// ios<char> -- a base of ostream<char> -- is being instantiated (the
-// libstdc++ basic_ios / basic_ostream / basic_ofstream shape)
+// ios<char> -- a base of ostream<char> -- is being instantiated (the libstdc++
+// basic_ios / basic_ostream / basic_ofstream shape)
 extern "C" void __CPROVER_assert(bool, const char *);
 template <class C>
 struct ostream;

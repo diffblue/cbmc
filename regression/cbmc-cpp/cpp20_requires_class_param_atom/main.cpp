@@ -1,4 +1,4 @@
-// N5008 [temp.constr.decl]/1 + [temp.deduct]/5: after deduction, a
+// N5008 [temp.constr.decl]/1 + [temp.deduct.general]/5: after deduction, a
 // function template candidate whose associated constraints are not
 // satisfied is removed from the overload set.  Here the constrained
 // converting constructor deduces U2 = int for the argument 0, and

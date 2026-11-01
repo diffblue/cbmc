@@ -1,7 +1,7 @@
 // N5008 [basic.fundamental]/1, /8-9, [temp.type]/1: char, signed char and
 // unsigned char, wchar_t and int, char16_t and unsigned short, and long
 // and long long are distinct types, so they select different
-// specializations and __is_same tells them apart; [conv.prom]/2 promotes
+// specializations and __is_same tells them apart; [conv.prom]/6 promotes
 // wchar_t and char32_t to their underlying types
 extern "C" void __CPROVER_assert(bool, const char *);
 template <class T>
@@ -64,7 +64,7 @@ int main()
     !__is_same(int, wchar_t) && !__is_same(char, signed char) &&
       !__is_same(long, long long) && __is_same(wchar_t, wchar_t),
     "__is_same");
-  // [conv.prom]/2: they are promoted to their underlying types
+  // [conv.prom]/6: they are promoted to their underlying types
   char32_t c32 = U'a';
   wchar_t w = L'b';
   __CPROVER_assert(

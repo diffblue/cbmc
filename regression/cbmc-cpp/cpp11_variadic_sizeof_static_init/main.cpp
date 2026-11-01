@@ -1,7 +1,7 @@
-// C++ [temp.variadic]/8 (sizeof...): `sizeof...(Pack)` is the number of elements
-// in the pack.  This works in a member function body but not in a static data
-// member's initializer, where the pack is collapsed to a single element (or to
-// the wrong count) during class-template instantiation.
+// C++ [temp.variadic]/10 (sizeof...): `sizeof...(Pack)` is the number of
+// elements in the pack.  This works in a member function body but not in a
+// static data member's initializer, where the pack is collapsed to a single
+// element (or to the wrong count) during class-template instantiation.
 //
 // KNOWNBUG: sizeof...(T) in a static data member initializer yields the wrong
 // value for a multi-element pack (and for an empty pack).  Reclassify CORE once

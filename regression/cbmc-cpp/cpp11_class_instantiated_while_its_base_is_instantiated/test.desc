@@ -11,7 +11,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body of function
 --
-N5008 [temp.inst]/1-3: instantiating istream<char> instantiates its base
+N5008 [temp.inst]/2-3: instantiating istream<char> instantiates its base
 ios<...>, whose typedef num_put<out_iter<char>> leads to out_iter's
 typedef naming ostream<char>.  Neither typedef requires a complete class,
 but the front end instantiated the classes they name: ostream<char> was

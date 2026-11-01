@@ -1,4 +1,4 @@
-// N5008 [class.default.ctor]/4, [temp.inst]/3: zone's implicitly-declared
+// N5008 [dcl.fct.def.default]/5, [temp.inst]/3: zone's implicitly-declared
 // default constructor is implicitly defined only when it is odr-used.  It
 // is not, so holder<int>'s default constructor is not instantiated either,
 // and neither is deleter<impl>::operator(), which would need the complete

@@ -10,4 +10,4 @@ dropped the body
 --
 Fixed 2026-07-30: the post-instantiation function-parameter-pack
 expansion now sizes the pack by its own template pack's deduced arity
-([temp.variadic]/4-5) instead of lumping all packs together.
+([temp.variadic]/5-6) instead of lumping all packs together.

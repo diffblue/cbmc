@@ -1,4 +1,4 @@
-// N5008 [except.throw]/5: the exception object is destroyed when the last
+// N5008 [except.throw]/4: the exception object is destroyed when the last
 // active handler for it exits other than by rethrowing (and no
 // exception_ptr refers to it).  With a handler of reference type there is
 // no parameter object; e and the exception object are each constructed

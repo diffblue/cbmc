@@ -1,4 +1,4 @@
-// N5008 [expr.type.conv]/2 + [dcl.init.general]/9.1: `T()` value-initializes
+// N5008 [expr.type.conv]/1.4 + [dcl.init.general]/9.1: `T()` value-initializes
 // -- zero-initialization, then default-initialization when T's default
 // constructor is non-trivial; a default member initializer makes the implicit
 // default constructor non-trivial ([class.default.ctor]/3).

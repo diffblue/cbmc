@@ -18,7 +18,7 @@ bits/ostream.tcc and were not instantiated.  Such member declarations are
 now discarded ([temp.explicit]/12,
 cpp98_explicit_instantiation_of_member_function_template/test_cpp11.desc),
 and the num_put and numpunct facets of the "C" locale, which libstdc++.so
-provides, are modelled ([locale.general]/8,
+provides, are modelled ([locale.category]/3,
 cpp11_ostream_integer_insertion_classic_locale).  g++ 13 accepts this
 program, and it fails only its WRONG assertion.
 gcc-only: a libstdc++ test; with libc++ it needs 7.7 GB (macOS CI job:

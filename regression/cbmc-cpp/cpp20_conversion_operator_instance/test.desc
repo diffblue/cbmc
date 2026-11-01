@@ -10,10 +10,10 @@ main.cpp
 ^.*is unknown.*$
 dropped the body
 --
-[over.match.conv] with [temp.deduct]/8: an instantiated template conversion
-function is not a viable *non-template* conversion-operator candidate; failing
-to form its call is a soft non-viability handled by fresh template deduction,
-not a hard error.
+[over.match.funcs.general]/7-8 with [over.match.funcs.general]/8: an
+instantiated template conversion function is not a viable *non-template*
+conversion-operator candidate; failing to form its call is a soft non-viability
+handled by fresh template deduction, not a hard error.
 
 For mutually-convertible class types each carrying a templated conversion
 operator, deducing a conversion (e.g. MD -> int) instantiates the source

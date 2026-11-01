@@ -1,4 +1,4 @@
-// N5008 [expr.prim.fold]/2: `(100 + ... + Is)' over Is = {1} is 100 + 1.
+// N5008 [temp.variadic]/14: `(100 + ... + Is)' over Is = {1} is 100 + 1.
 // Is is the third template parameter pack of a constexpr static member
 // function template; libc++'s __base::__make_fmatrix_impl (std::visit)
 // folds there.  The fold was left to the C type-checker's fallback,

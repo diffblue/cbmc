@@ -18,6 +18,6 @@ deduced_bool.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [expr.rel]/2, [expr.eq]/1, [dcl.type.decltype]/1, [temp.deduct.call];
+N5008 [expr.rel]/2, [expr.eq]/2, [dcl.type.decltype]/1, [temp.deduct.call];
 see test.desc.  g++ 13 and clang++ 18 accept this program (-std=c++14), and
 it fails only its WRONG assertion.

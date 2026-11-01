@@ -1,4 +1,4 @@
-// N5008 [propagation]/7-10: current_exception() in a handler refers to the
+// N5008 [propagation]/9, 11: current_exception() in a handler refers to the
 // exception object being handled; rethrow_exception(p) throws it again.
 #include <exception>
 extern "C" void __CPROVER_assert(bool, const char *);

@@ -22,7 +22,7 @@ if the constructor selected to default-initialize it is not user-provided
 (implicitly declared, or explicitly defaulted on its first declaration,
 [dcl.fct.def.default]/5), the object is first zero-initialized and then
 default-initialized.  Value-initialization is what `T()' / `T{}'
-([expr.type.conv]/2, [dcl.init.general]/16.4), an empty braced-init-list
+([expr.type.conv]/1.4, [dcl.init.general]/16.4), an empty braced-init-list
 initializer ([dcl.init.list]/3.5) and `new T()' / `new T{}' ([expr.new])
 perform.  The front end only ran the default constructor for a non-POD
 class, so the members of `S()' were indeterminate; POD classes were already

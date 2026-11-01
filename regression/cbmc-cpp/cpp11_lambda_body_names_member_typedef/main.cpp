@@ -1,4 +1,4 @@
-// N5008 [expr.prim.lambda.closure]/13, [expr.prim.lambda.capture]/8: in a
+// N5008 [expr.prim.lambda.closure]/15, [expr.prim.lambda.capture]/7: in a
 // lambda inside a member function, a name of the enclosing class is looked
 // up from the lambda's context; only non-static DATA members odr-used in the
 // body are captured (through `this').  The closure lowering took every class

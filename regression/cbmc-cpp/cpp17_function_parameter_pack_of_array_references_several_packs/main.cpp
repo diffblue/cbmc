@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5, /7: with several template packs, the function
+// N5008 [temp.variadic]/8, /16: with several template packs, the function
 // parameter pack `const char (&...s)[N]' belongs to the NON-type pack N.
 // For an empty N it has no parameters, and for a non-empty one it has one
 // per element (cpp17_function_parameter_pack_of_array_references); with

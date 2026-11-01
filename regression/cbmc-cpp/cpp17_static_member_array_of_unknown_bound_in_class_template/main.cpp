@@ -1,5 +1,5 @@
 extern "C" void __CPROVER_assert(bool, const char *);
-// N5008 [dcl.array]/5: the bound of an array of unknown bound declared with
+// N5008 [dcl.array]/7: the bound of an array of unknown bound declared with
 // an initializer is the number of initializer-clauses; this holds for a
 // static data member of a class template specialization, too
 template <class... Ts>

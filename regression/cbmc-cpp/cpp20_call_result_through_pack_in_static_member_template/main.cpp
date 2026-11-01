@@ -1,12 +1,12 @@
-// N5008 [over.match.best]/2.5, [over.ics.rank]/2.1, [temp.deduct.partial]:
-// in `_Fn()(declval<_Args>...)' with _Fn = _Transform, the constrained
-// two-parameter operator() template is viable (viewable_range holds: the
-// substitution in view's sentinel_t fails, [temp.constr.atomic]/3) and is
-// better than the C-style variadic operator() brought in by the
-// using-declaration (an ellipsis conversion sequence is the worst), also
-// when _S_test's template arguments come from the pack of __invoke, called
-// from _Binder::_S_call.  Reduced with cvise (g++ 13 and clang++ 18 checking
-// each candidate, the assertion as a static_assert) from
+// N5008 [over.match.best.general]/2.1, [over.ics.rank]/2.1,
+// [temp.deduct.partial]: in `_Fn()(declval<_Args>...)' with _Fn = _Transform,
+// the constrained two-parameter operator() template is viable (viewable_range
+// holds: the substitution in view's sentinel_t fails, [temp.constr.atomic]/3)
+// and is better than the C-style variadic operator() brought in by the
+// using-declaration (an ellipsis conversion sequence is the worst), also when
+// _S_test's template arguments come from the pack of __invoke, called from
+// _Binder::_S_call.  Reduced with cvise (g++ 13 and clang++ 18 checking each
+// candidate, the assertion as a static_assert) from
 // cpp20_range_adaptor_closure_invoked_through_invoke_impl; declval<_Args>...
 // passes the functions themselves, as cvise left it.
 extern "C" void __CPROVER_assert(bool, const char *);

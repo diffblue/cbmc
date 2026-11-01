@@ -56,7 +56,7 @@ template <class C, class T1, class R>
 struct inv1<C, T1, R, false> : inv_functor
 {
 };
-// N5008 [temp.variadic]/5, [basic.scope.param]/1: in each specialization the
+// N5008 [temp.variadic]/9, [basic.scope.param]/1: in each specialization the
 // trailing return type expands the function parameter pack a2 with that
 // specialization's elements (the shape of the MSVC STL's std::invoke)
 template <class C, class T1, class... T2>

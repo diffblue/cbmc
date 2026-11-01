@@ -7,7 +7,7 @@ template <N::size_type... I>
 struct indices
 {
 };
-// N5008 [temp.param]/1, [temp.variadic]/5: `I...' in `indices<I...>' is a
+// N5008 [temp.param]/1, [temp.variadic]/6.8: `I...' in `indices<I...>' is a
 // pack expansion of the non-type parameter pack I (the shape of user code
 // with `std::size_t... I' and an index_sequence)
 template <N::size_type... I>

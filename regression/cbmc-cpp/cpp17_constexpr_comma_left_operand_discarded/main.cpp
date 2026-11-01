@@ -2,7 +2,7 @@
 // expression; the type and value of the result are those of the right
 // operand.  libstdc++'s <charconv> initializes a static constexpr member
 // with `(_DecOnly, _S_make_table())'; its value is the table, and reads of
-// its elements are constant expressions ([expr.const]/2).
+// its elements are constant expressions ([expr.const]/9.8, /10.9.2).
 extern "C" void __CPROVER_assert(bool, const char *);
 
 struct table

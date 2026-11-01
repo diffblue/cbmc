@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5,7: partial specialization
+// N5008 [temp.variadic]/5, [temp.deduct.type]/9: partial specialization
 // `pf<Op, index_sequence<Idx...>, Bound...>` with the trailing type pack
 // deduced EMPTY and a non-type pack deduced {0,1}.  The stored instance's
 // flat argument replay bound nothing (multi-pack split unreconstructed),

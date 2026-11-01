@@ -1,6 +1,6 @@
-// N5008 [class.base.init]/2: a mem-initializer-id denotes a base class if it
+// N5008 [class.base.init]/3: a mem-initializer-id denotes a base class if it
 // names a class type that is a direct base -- here through a typedef that is
-// a member of the class; [class.mfct]/1, [basic.scope.class]: names in an
+// a member of the class; [class.mfct]/2, [basic.scope.class]: names in an
 // out-of-class member definition are looked up in the class's scope.  The
 // mem-initializers of an out-of-class constructor definition were resolved
 // in the enclosing namespace scope ("symbol 'my_base' is unknown"; CBMC's

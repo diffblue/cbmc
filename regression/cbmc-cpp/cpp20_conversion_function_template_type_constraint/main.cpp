@@ -4,7 +4,7 @@ concept integral = __is_integral(T);
 struct wide
 {
   unsigned long long w;
-  // N5008 [temp.param]/4, [temp.constr.decl]/3, [temp.deduct]/5: the
+  // N5008 [temp.param]/9, [temp.constr.decl]/3, [temp.deduct.general]/5: the
   // type-constraint `integral' is an associated constraint of the
   // conversion function template; for a class target it is not satisfied
   // and the template is not a candidate (the MSVC STL's _Base128)

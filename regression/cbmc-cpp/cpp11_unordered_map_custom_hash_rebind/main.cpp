@@ -1,7 +1,7 @@
 // Regression for the `rebind is ambiguous` front-end bug triggered
 // by `std::unordered_map<K, V, Hash>` where Hash is user-defined.
 //
-// Per [class.member.lookup]/1 and [temp.names]/3, name lookup for
+// Per [class.member.lookup]/4 and [temp.names]/3, name lookup for
 //   _Tp::template rebind<_Up>
 // (inside libstdc++'s `std::__alloc_rebind` alias) is restricted to
 // the scope of _Tp, and a member declared in a derived class hides

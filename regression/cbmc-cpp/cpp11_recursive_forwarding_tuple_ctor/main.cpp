@@ -1,4 +1,4 @@
-// N5008 [class.base.init] + [temp.variadic] + [temp.param]/11: a recursive
+// N5008 [class.base.init] + [temp.variadic] + [temp.param]/18: a recursive
 // variadic *forwarding* constructor whose member-initializer constructs its
 // base class from the tail pack, with an enable_if trailing constraint that
 // references both the constructor's own parameter pack and the enclosing
@@ -13,7 +13,7 @@
 //   };
 //
 // This exercises a family of "a template parameter pack is not the last
-// template parameter" ([temp.param]/11) cases that previously failed:
+// template parameter" ([temp.param]/18) cases that previously failed:
 //   * the enable_if trailing parameter after the constructor's pack `UT`,
 //   * `sizeof...(Tail)` (the enclosing CLASS pack) evaluated while checking the
 //     trailing default of a recursively-instantiated constructor, and

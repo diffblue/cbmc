@@ -10,7 +10,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [temp.constr.decl]/1: libstdc++'s _RangeAdaptorClosure declares the
+N5008 [temp.res.general]/1: libstdc++'s _RangeAdaptorClosure declares the
 hidden friend `template<typename _Self, typename _Range> requires
 derived_from<remove_cvref_t<_Self>, _RangeAdaptorClosure> && ...
 operator|(_Range&&, _Self&&)` naming its class unqualified.  The

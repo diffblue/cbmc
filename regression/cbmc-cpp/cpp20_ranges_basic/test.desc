@@ -16,10 +16,10 @@ range-adaptor chain: [dcl.init.aggr]/1 a constructor template disqualifies
 the aggregate (ref_view{arr}); [temp.spec.partial.order] variable-template
 partial specializations are ordered (extent_v<int[5]>); [temp.deduct.call]/3
 no forwarding reference in a constructor-derived deduction guide and
-[dcl.init.general]/9 value-initialising a reference is an error
-(owning_view{declval<int(&)[5]>()}); [temp.constr.decl]/1 a requires-clause
+[dcl.init.general]/10 value-initialising a reference is an error
+(owning_view{declval<int(&)[5]>()}); [temp.res.general]/1 a requires-clause
 is looked up from the template's scope (the hidden friend operator|);
-[temp.variadic]/5 `Args...` in a requires-clause concept-id expands to the
+[temp.variadic]/9 `Args...` in a requires-clause concept-id expands to the
 deduced arity (__adaptor_partial_app_viable); [stmt.if]/2 no return type
 deduction from a discarded `if constexpr` branch (_All::operator());
 [temp.inst]/4 a body whose eager conversion fails while a class is being

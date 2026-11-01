@@ -10,8 +10,9 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [temp.deduct]/8: the sole function template `f`'s non-deduced defaulted
-template parameter substitutes to `enable_if<true,int>::type` == int (a valid
-substitution), so `f` is viable and `f(5)` selects it.  Well-formed counterpart
-of cpp11_sole_template_false_constraint; guards against over-rejecting a true
-constraint when the sole candidate's defaulted parameter is checked.
+N5008 [temp.deduct.general]/5: the sole function template `f`'s non-deduced
+defaulted template parameter substitutes to `enable_if<true,int>::type` == int
+(a valid substitution), so `f` is viable and `f(5)` selects it.  Well-formed
+counterpart of cpp11_sole_template_false_constraint; guards against
+over-rejecting a true constraint when the sole candidate's defaulted parameter
+is checked.

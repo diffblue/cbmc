@@ -15,6 +15,6 @@ overrider (thunks adjust `this' by the virtual base's offset in the
 complete object), a virtual-base member is read through the vtable's
 virtual-base offset (Itanium C++ ABI 2.5.2), V is constructed and
 destroyed exactly once per complete object (N5008 [class.base.init]/13,
-[class.dtor]/14: by the most derived class, via the hidden `@most_derived'
+[class.dtor]/13: by the most derived class, via the hidden `@most_derived'
 constructor/destructor parameter), and both bases' constructors update the
 single V.

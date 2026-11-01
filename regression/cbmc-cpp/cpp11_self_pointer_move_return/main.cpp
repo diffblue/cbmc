@@ -1,4 +1,4 @@
-// N5008 [class.copy.elis] + [class.copy.ctor]: returning a local by
+// N5008 [class.copy.elision] + [class.copy.ctor]: returning a local by
 // value materializes the result via the move constructor (possibly
 // elided -- but elision must behave AS IF the constructor chain ran).
 // For a class whose invariant ties a pointer member to its own buffer
@@ -14,7 +14,7 @@
 // read a dead object.  Fixed by constructing the result directly into
 // caller-provided storage (elide_cpp_returned_temporaries; guaranteed
 // copy elision as real ABIs implement it, Itanium: sret) with
-// [class.copy.elis]/3 implicit move at the return site.
+// [expr.prim.id.unqual]/12, 15 implicit move at the return site.
 //
 // g++/clang++ verify at runtime.
 extern "C" void __CPROVER_assert(bool, const char *);

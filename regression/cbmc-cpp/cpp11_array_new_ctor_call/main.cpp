@@ -1,4 +1,4 @@
-// Per [expr.new]/24 and [expr.delete]/6: for a non-array new of
+// Per [expr.new]/24 and [expr.delete]/5: for a non-array new of
 // class type T(args), the constructor is invoked on the newly
 // allocated object, and delete invokes the destructor.
 //

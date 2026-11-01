@@ -11,7 +11,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-[dcl.array]/1, [dcl.init.aggr]/5: bound of an unknown-bound array `T a[]{...}`
+[dcl.array]/7, [dcl.init.aggr]/10: bound of an unknown-bound array `T a[]{...}`
 is deduced from the initializer count, including when T has a user-provided
 constructor.  Reduced from the src/util/simplify_utils.cpp dog-food failure.
 Non-vacuous.

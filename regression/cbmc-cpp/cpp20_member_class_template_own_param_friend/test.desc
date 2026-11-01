@@ -8,7 +8,8 @@ main.cpp
 --
 dropped the body
 --
-N5008 [class.friend]/1 + [temp.local]/1 + [namespace.memdef]/3: the
-friend's name is a namespace member, but its declaration is looked up in
-the class -- here the enclosing member class template's own parameter
-(as a default template argument) and the class's member alias.
+N5008 [class.friend]/1 + [basic.scope.temp]/2, [basic.scope.class]/1 +
+[dcl.meaning.general]/2.3: the friend's name is a namespace member, but its
+declaration is looked up in the class -- here the enclosing member class
+template's own parameter (as a default template argument) and the class's member
+alias.

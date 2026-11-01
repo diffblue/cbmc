@@ -9,8 +9,8 @@ main.cpp
 --
 dropped the body
 --
-P2255R2 __reference_converts_from_temporary (N5008 [meta.rel],
-[dcl.init.ref]/5.4): binding `const int&` to an int prvalue
+P2255R2 __reference_converts_from_temporary (N5008 [meta.unary.prop],
+[dcl.init.ref]/5.2-5.3): binding `const int&` to an int prvalue
 materializes a temporary (true); a non-const lvalue reference cannot
 bind a temporary (false).  Previously both evaluated false
 (conservative default), skewing libstdc++-13's dangling-reference

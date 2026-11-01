@@ -1,5 +1,5 @@
-// N5008 [temp.arg]/2, [temp.deduct]/8: kind mismatch of an explicit
-// template argument removes the candidate (std::get<T>(variant) vs
+// N5008 [temp.arg.general]/1, [temp.deduct.general]/2: kind mismatch of an
+// explicit template argument removes the candidate (std::get<T>(variant) vs
 // std::get<N>(variant)).
 extern "C" void __CPROVER_assert(bool, const char *);
 typedef unsigned long size_t;

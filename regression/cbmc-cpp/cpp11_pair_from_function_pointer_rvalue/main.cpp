@@ -4,9 +4,9 @@
 // is_constructible<function<int()>, int (*&&)()>.  Two things made it false:
 // user_defined_conversion_sequence refused nested queries while constructor
 // candidates were being explored unless a constant-expression context was
-// active (a sfinae_contextt suspends it; N5008 [over.best.ics]/4 speaks of
-// the same conversion sequence, not of a nested is_constructible), and the
-// two instantiations of function's converting-constructor template,
+// active (a sfinae_contextt suspends it; N5008 [over.best.ics.general]/4
+// speaks of the same conversion sequence, not of a nested is_constructible),
+// and the two instantiations of function's converting-constructor template,
 // `function(int (*const &)())' and `function(int (*&&)())', tied for an
 // rvalue argument ([over.ics.rank]/3.2.3: the rvalue-reference binding is
 // better).

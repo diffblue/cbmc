@@ -1,7 +1,7 @@
 // N5008 [over.call.func]/3, [basic.lookup.argdep]/1: the EXPLICIT call
 // `operator==(o)` inside a member function uses ordinary unqualified
 // lookup; finding the member makes it a member call (this->operator==)
-// and suppresses ADL.  CBMC's [over.match.oper]/3.3 member-stripping --
+// and suppresses ADL.  CBMC's [over.match.oper]/3.2 member-stripping --
 // correct only for operator EXPRESSIONS' non-member candidate lookup --
 // also fired here whenever ANY free operator== existed, leaving only
 // non-viable free candidates: "found no match for symbol 'operator=='".

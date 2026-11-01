@@ -1,4 +1,4 @@
-// N5008 [basic.lookup.unqual]/4, [class.mem.general]/7, [basic.lookup.argdep]
+// N5008 [basic.lookup.unqual]/4, [class.mem.general]/9.1, [basic.lookup.argdep]
 // /4: a member function body defined in its class is looked up as if it
 // followed the class definition, so a namespace-scope function declared
 // after the class is not a candidate, also not through argument-dependent

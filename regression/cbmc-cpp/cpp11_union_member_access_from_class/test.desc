@@ -13,6 +13,6 @@ main.cpp
 Invariant check failed
 dropped the body
 --
-N5008 [class.union.general]/3: nothing derives from a union; the
+N5008 [class.union.general]/4: nothing derives from a union; the
 derived-from-object part of the access check is false for a union object
 rather than a precondition violation.

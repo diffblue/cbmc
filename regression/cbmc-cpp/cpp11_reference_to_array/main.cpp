@@ -1,4 +1,4 @@
-// N5008 [dcl.meaning.general]/1 + [dcl.array] + [dcl.init.ref]/5: in
+// N5008 [dcl.meaning.general]/8 + [dcl.array] + [dcl.init.ref]/5: in
 // `T (D)[N]` the parenthesized declarator applies ON TOP of the array
 // type: `int (&r)[3]` declares a reference to an array (direct
 // binding, no decay) and `int (*p)[3]` a pointer to one.  CBMC's
@@ -6,7 +6,7 @@
 // ARRAY postfixes (only the function postfix composed it), so the
 // "reference" silently COPIED the array (wrong code: writes through it
 // did not alias) and pointer-to-array initialization failed to
-// convert.  Also [dcl.type.auto.deduct]/4: plain `auto` deduced from
+// convert.  Also [dcl.type.auto.deduct]/3: plain `auto` deduced from
 // an array must DECAY to a pointer to its first element.
 extern "C" void __CPROVER_assert(bool, const char *);
 using AR = int (&)[3];

@@ -1,8 +1,8 @@
-// N5008 [basic.lookup.argdep]/3: "if the ordinary unqualified lookup of the name
-// finds the declaration of a class member function, the associated namespaces
-// and classes are not considered."  Furthermore argument-dependent lookup
-// considers only namespace-scope functions ([basic.lookup.argdep]/4) -- never
-// the member functions of an associated class.
+// N5008 [basic.lookup.argdep]/1.1: "if the ordinary unqualified lookup of the
+// name finds the declaration of a class member function, the associated
+// namespaces and classes are not considered."  Furthermore argument-dependent
+// lookup considers only namespace-scope functions ([basic.lookup.argdep]/4) --
+// never the member functions of an associated class.
 //
 // Here the unqualified call `find(s)` inside `C::get` is resolved by ordinary
 // unqualified lookup to the member `C::find`, so ADL must not be performed; and

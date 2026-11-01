@@ -1,4 +1,4 @@
-// N5008 [expr.prim.lambda.capture]/8, [class.mfct.non.static]/2: in the
+// N5008 [expr.prim.lambda.capture]/7, [expr.prim.id.general]/2: in the
 // body of a lambda that captures `this' (here by the capture-default [&]),
 // the qualified call `base::value(x)' is `(*this).base::value(x)' on the
 // enclosing object -- a non-virtual call of base's function.  Only
@@ -25,7 +25,7 @@ struct derived : base
 {
   int value(int x) const override
   {
-    // N5008 [expr.prim.lambda.capture]/7, [class.mfct.non.static]/2: in the
+    // N5008 [expr.prim.lambda.capture]/7, [expr.prim.id.general]/2: in the
     // lambda body `base::value(x)' is (*this).base::value(x) for the
     // captured this, a non-virtual call of base's function
     return call([&]() { return base::value(x) * 10; });

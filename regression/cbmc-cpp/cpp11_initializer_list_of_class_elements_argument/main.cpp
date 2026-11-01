@@ -1,4 +1,4 @@
-// N5008 [over.ics.list]/4-7: a braced-init-list argument for a parameter of
+// N5008 [over.ics.list]/5-8: a braced-init-list argument for a parameter of
 // type std::initializer_list<X> is viable when every element converts to X
 // -- including elements that are themselves braced-init-lists,
 // list-initializing X (an aggregate, a class with a matching constructor,

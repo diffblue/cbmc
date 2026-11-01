@@ -1,5 +1,5 @@
-// N5008 [expr.delete]/3, /6: an E object deleted through either of the B
-// and C base pointers is destroyed as an E ([class.dtor]/14: virtual
+// N5008 [expr.delete]/10, /6: an E object deleted through either of the B
+// and C base pointers is destroyed as an E ([class.dtor]/11: virtual
 // destructor), and its storage is deallocated at the address the
 // allocation returned.  E's base D has two A subobjects ([class.mi]/3).
 extern "C" void __CPROVER_assert(bool, const char *);

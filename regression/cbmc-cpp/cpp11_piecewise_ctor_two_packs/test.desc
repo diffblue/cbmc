@@ -9,7 +9,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [temp.param]/14 + [temp.variadic]/5: two independent deduced packs in
+N5008 [temp.param]/18 + [temp.variadic]/5: two independent deduced packs in
 a member constructor template (std::pair's piecewise constructor shape).
 The deduction-time pack bindings are now recorded on the pseudo-instance
 (#deduced_packs) and replayed at final instantiation;

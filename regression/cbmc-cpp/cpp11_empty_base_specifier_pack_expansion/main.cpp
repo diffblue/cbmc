@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5.2, /7: a base-specifier pack expansion over an
+// N5008 [temp.variadic]/6.6, /16: a base-specifier pack expansion over an
 // empty pack produces no base-specifier, so a constructor need not
 // initialize any base (leaf has no default constructor)
 extern "C" void __CPROVER_assert(bool, const char *);

@@ -1,5 +1,5 @@
 extern "C" void __CPROVER_assert(bool, const char *);
-// N5008 [dcl.type.auto.deduct]/2.2.2, /4: `auto t{l}' is not
+// N5008 [dcl.type.auto.deduct]/2.2.2, /3: `auto t{l}' is not
 // copy-list-initialization, so T is deduced from the single element l as
 // for `auto t = l' (the MSVC STL's _Unsigned128::operator<< in
 // <__msvc_int128.hpp>)

@@ -1,4 +1,4 @@
-// N5008 [pairs.pair], [temp.variadic]/5: piecewise pair construction.
+// N5008 [pairs.pair], [temp.variadic]/9: piecewise pair construction.
 // The delegating constructor pair(piecewise_construct_t,
 // tuple<_Args1...>, tuple<_Args2...>) delegates to the
 // _Index_tuple-tagged constructor whose mem-initializer

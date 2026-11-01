@@ -3,7 +3,7 @@
 // constructed subobject (member, base; [special]/7) is.  An exception
 // leaving a non-throwing destructor calls std::terminate
 // ([except.terminate]/1.3); one leaving a potentially-throwing destructor
-// propagates.  [except.spec]/5.2, [expr.unary.noexcept]/3: the noexcept
+// propagates.  [except.spec]/5.2, [expr.unary.noexcept]/2: the noexcept
 // operator sees the destructor calls of an expression, including that of a
 // temporary.
 #include <exception>

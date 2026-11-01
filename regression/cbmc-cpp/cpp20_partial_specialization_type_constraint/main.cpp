@@ -1,6 +1,6 @@
 // N5008 [temp.spec.partial.match]/2: a partial specialization matches only
 // if the deduced arguments satisfy its associated constraints, including
-// the type-constraints of its template parameters ([temp.param]/4:
+// the type-constraints of its template parameters ([temp.param]/9:
 // `C T' introduces `C<T>')
 #include <concepts>
 extern "C" void __CPROVER_assert(bool, const char *);

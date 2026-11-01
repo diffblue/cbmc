@@ -13,7 +13,7 @@ dropped the body
 Currently: assertions 2 and 3 FAIL -- the return-type-requirement of a
 compound requirement is never satisfied.
 Round-90 diagnosis (TWO stacked defects, both located):
-1. [temp.constr.atomic]/1: the concept's normalised body must be
+1. [temp.constr.atomic]/3: the concept's normalised body must be
    CONTEXTUALLY CONVERTED to bool.  A concept over a trait member
    (`static const bool value`) folds to a c_bool constant, which
    exprt::is_true() does not recognise, so every SATISFIED

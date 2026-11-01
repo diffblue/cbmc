@@ -8,7 +8,7 @@ struct S
   int f();
 };
 } // namespace ns
-// [temp.mem.class]/1, [class.nest]/3: the member class is defined outside
+// [temp.mem.class]/1, [class.pre]/3: the member class is defined outside
 // its namespace by a qualified name
 template <class C>
 struct ns::S<C>::N

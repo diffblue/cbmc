@@ -3,7 +3,7 @@
 //   * TWO member constructor templates with the SAME function signature
 //     `(_Up&&)`, differing only in their second template parameter (a
 //     deduced-class-type NTTP `enable_if_t` vs a dependent
-//     `enable_if_t<_Up::__enable_explicit>`) -- N5008 [temp.inst]/2:
+//     `enable_if_t<_Up::__enable_explicit>`) -- N5008 [temp.inst]/3.1:
 //     instantiating optional<int> instantiates only their DECLARATIONS,
 //     in which `_Up`-dependent constructs stay dependent, so `_Up` must
 //     remain resolvable as a template parameter.

@@ -1,4 +1,4 @@
-// N5008 [temp.inst]/2, [basic.lookup.unqual], [dcl.meaning]: when a class
+// N5008 [temp.inst]/4, [basic.lookup.unqual], [dcl.meaning]: when a class
 // template is instantiated, its member functions -- including those defined
 // out of line -- are instantiated in the context of the (instantiated) class;
 // unqualified names in a member are looked up as if in the class, so they reach

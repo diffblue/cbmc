@@ -1,4 +1,4 @@
-// N5008 [conv.qual]/3, [basic.fundamental]/1, /11: char, signed char,
+// N5008 [conv.qual]/3, [basic.fundamental]/7, /9, /17, /11: char, signed char,
 // unsigned char and char8_t are distinct types, so a pointer to one does
 // not convert to a pointer to another of the same representation (char
 // is signed on x86-64 and unsigned on aarch64), and these calls are not

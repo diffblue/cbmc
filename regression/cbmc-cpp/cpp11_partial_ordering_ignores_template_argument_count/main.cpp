@@ -1,4 +1,4 @@
-// N5008 [over.match.best]/2.5, [temp.func.order]: of two equally good
+// N5008 [over.match.best.general]/2.5, [temp.func.order]: of two equally good
 // function template specializations, the more specialized template wins;
 // how many template arguments each has does not matter
 extern "C" void __CPROVER_assert(bool, const char *);

@@ -4,7 +4,7 @@ auto call(C c, T... args) -> decltype(c(args...))
 {
   return c(args...);
 }
-// N5008 [basic.scope.temp]/1: the template parameter pack `args' of this
+// N5008 [basic.scope.temp]/2: the template parameter pack `args' of this
 // declaration is a different entity from the function parameter pack
 // `args' above (in the MSVC STL, _Args names both kinds)
 template <class... args>

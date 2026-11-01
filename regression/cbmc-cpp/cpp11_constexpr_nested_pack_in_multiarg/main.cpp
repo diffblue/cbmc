@@ -1,4 +1,4 @@
-// [temp.variadic]/5 + [temp.deduct] + [expr.const]: a constexpr member function
+// [temp.variadic]/9 + [temp.deduct] + [expr.const]: a constexpr member function
 // template body forms an outer template-id with MULTIPLE arguments, one of which
 // is itself a template-id containing a pack expansion -- `And<bc<true>,
 // And<ge<Ts, Us>...>>::value`, the shape of libstdc++'s

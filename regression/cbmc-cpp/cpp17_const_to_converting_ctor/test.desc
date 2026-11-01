@@ -14,6 +14,6 @@ constructor of the form `Wrapper(T)` (parameter by value) when the
 source is `const T` or `const T&`.  The conversion sequence is
 copy-initialization of the parameter from the source via the copy
 constructor, then user-defined conversion via the converting
-constructor — both legal per [class.copy.ctor]/1 + [dcl.init]/14.
+constructor — both legal per [class.copy.ctor]/1 + [dcl.init.general]/16.6.2.
 Previously CBMC rejected this because its derived-to-base pointer
 path computed `const T*` → `T*` which is not implicit per [conv.qual].

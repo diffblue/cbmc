@@ -1,4 +1,4 @@
-// N5008 [dcl.fct]/6: the bare `...` (C varargs) parameter must survive
+// N5008 [dcl.fct]/2: the bare `...` (C varargs) parameter must survive
 // the empty-pack parameter removal when the trailing template pack
 // deduces empty.  Distilled from libc++ __invoke under the ranges
 // views::take pipe.  Pre-fix: main silently dropped.

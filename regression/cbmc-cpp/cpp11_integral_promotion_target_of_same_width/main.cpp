@@ -1,4 +1,4 @@
-// N5008 [conv.prom]/1, [over.ics.rank]/4: an integral promotion is to int
+// N5008 [conv.prom]/2, [over.ics.rank]/4: an integral promotion is to int
 // (or unsigned int) only, so it ranks above the conversion to a long of the
 // same width (32-bit long on i386 and Windows) and h(us) is not ambiguous
 extern "C" void __CPROVER_assert(bool, const char *);

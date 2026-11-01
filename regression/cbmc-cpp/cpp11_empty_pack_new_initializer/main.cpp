@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5 + [expr.new]/1: a new-initializer's
+// N5008 [temp.variadic]/6.5, 16 + [expr.new]/1: a new-initializer's
 // expression-list is a pack-expansion context; with _Args EMPTY the
 // initializer `_Tp(static_cast<_Args&&>(__args)...)` collapses to `_Tp()`.
 // Previously the unexpanded pattern made the instantiated body fail

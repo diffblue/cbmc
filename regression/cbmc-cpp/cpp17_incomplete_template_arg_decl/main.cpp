@@ -1,5 +1,5 @@
 // A class template with an INCOMPLETE argument type used only in a
-// function DECLARATION.  [temp.inst]/1: a declaration that is not a
+// function DECLARATION.  [temp.inst]/2: a declaration that is not a
 // definition does not require the class template specialization to be
 // instantiated, so `renamedt<ssa_exprt>` with the merely
 // forward-declared ssa_exprt is valid (g++ and clang++ accept).  CBMC

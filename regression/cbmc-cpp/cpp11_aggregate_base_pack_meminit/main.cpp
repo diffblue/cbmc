@@ -1,6 +1,6 @@
 // N5008 [class.base.init]/7 + [dcl.init.aggr]: a mem-initializer whose
 // id denotes an AGGREGATE base (here `leaf<_Up>{__u}...` expanded per
-// [temp.variadic]/5) initializes the base subobject per [dcl.init] --
+// [temp.variadic]/9) initializes the base subobject per [dcl.init] --
 // there is no constructor to resolve.  Non-template constructors are
 // lowered eagerly at class typecheck; an instantiated constructor
 // TEMPLATE's initializers take the late path, which used to resolve a

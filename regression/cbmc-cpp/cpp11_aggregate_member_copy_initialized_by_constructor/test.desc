@@ -16,7 +16,7 @@ main.cpp
 double delete: FAILURE$
 dynamic object.*: FAILURE$
 --
-N5008 [dcl.init.aggr]/4.2, [dcl.init.general]/16.6: in `A a{owner(5), 1}'
+N5008 [dcl.init.aggr]/4.3, [dcl.init.general]/16.6: in `A a{owner(5), 1}'
 the element a.o is copy-initialized from the temporary owner(5) by owner's
 constructor.  The front end built a struct value from the temporary's
 bits and then destroyed the temporary, so a.o pointed to freed memory:

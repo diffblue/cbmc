@@ -1,4 +1,4 @@
-// [temp.variadic]/4-5 + [expr.const]: a constexpr function whose body expands a
+// [temp.variadic]/5-6 + [expr.const]: a constexpr function whose body expands a
 // *class* parameter pack into a trait, e.g. `__and_<is_default_constructible<
 // _Types>...>::value`, must fold.  This is the shape of std::tuple's
 // constructor SFINAE: `_TupleConstraints<_Cond, _Types...>::
@@ -18,7 +18,7 @@
 // be folded ("expected constant expression").  Single-element packs happened to
 // work via the single-element `type_map` convenience binding, so only tuples of
 // two or more elements were affected.  The expansion now handles both `type`
-// and `ambiguous` pack-expansion arguments ([temp.variadic]/4-5: the pattern is
+// and `ambiguous` pack-expansion arguments ([temp.variadic]/5-6: the pattern is
 // expanded once per pack element regardless of how the argument is tagged).
 
 template <bool V>

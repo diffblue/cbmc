@@ -1,5 +1,5 @@
-// N5008 [temp.deduct.call] + [dcl.fct]/2 (trailing-return-type) +
-// [temp.variadic]/5: a free function template with a trailing return type
+// N5008 [temp.deduct.call] + [dcl.fct]/1 (trailing-return-type) +
+// [temp.variadic]/9: a free function template with a trailing return type
 // `-> decltype(::new((void*)0) _Tp(declval<_Args>()...))` -- the C++20
 // std::construct_at declaration ([specialized.construct]) -- must deduce
 // _Tp and the _Args pack from the call arguments and then form the return

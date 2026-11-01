@@ -1,4 +1,4 @@
-// N5008 [expr.const], [temp.inst]/5, [temp.variadic]/5: constant evaluation
+// N5008 [expr.const], [temp.inst]/5, [temp.variadic]/9: constant evaluation
 // of a constexpr function template with a pack-initialised local array.
 extern "C" void __CPROVER_assert(bool, const char *);
 typedef unsigned long size_t;

@@ -31,7 +31,7 @@ struct self_ref
 struct holder
 {
   std::map<std::string, int> m;
-  // [dcl.init.list]/3.10, [over.ics.list]/10: the list binds the reference
+  // [dcl.init.list]/3.10, [over.ics.list]/9: the list binds the reference
   // to a temporary initializer_list
   explicit holder(std::initializer_list<std::pair<const std::string, int>> &&il)
     : m{il}

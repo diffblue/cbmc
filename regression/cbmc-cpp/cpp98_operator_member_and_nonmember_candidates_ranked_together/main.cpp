@@ -1,6 +1,6 @@
-// N5008 [over.match.oper]/3: for `a << b' the member candidates
-// (a.operator<<(b)) and the non-member candidates (operator<<(a, b)) form
-// one set, ranked by [over.match.best]/2.1.  A member found first must not
+// N5008 [over.match.oper]/3, 7: for `a << b' the member candidates
+// (a.operator<<(b)) and the non-member candidates (operator<<(a, b)) form one
+// set, ranked by [over.match.best.general]/2.1.  A member found first must not
 // hide a non-member with a better conversion sequence.
 extern "C" void __CPROVER_assert(bool, const char *);
 

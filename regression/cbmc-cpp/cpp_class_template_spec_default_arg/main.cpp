@@ -5,10 +5,10 @@
 // For
 //   template <typename T, typename = void> struct caster { ... };
 //   template <> struct caster<Big> { int operator()(int) const; };
-// a use `caster<Big>` resolves to `caster<Big, void>` ([temp.arg]/2:
+// a use `caster<Big>` resolves to `caster<Big, void>` ([temp.arg.general]/9:
 // the trailing default argument is applied).  The explicit
 // specialization is written with the single argument <Big>, but its
-// effective argument list is <Big, void> ([temp.class.spec.match]); it
+// effective argument list is <Big, void> ([temp.spec.partial.match]); it
 // must therefore match the use.
 //
 // CBMC compared the use's completed argument list <Big, void> (two

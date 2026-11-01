@@ -1,4 +1,4 @@
-// N5008 [basic.lookup.unqual]/5 + [dcl.fct]/6: for a member declared
+// N5008 [basic.scope.class]/1 + [dcl.fct]/1: for a member declared
 // outside its class -- here the explicit-specialization DECLARATION
 // `template <> void messages<char>::do_close(catalog) const;`
 // (libstdc++'s <locale>/<regex> shape) -- names after the
@@ -8,7 +8,7 @@
 // class typedef, and re-interpreted the declaration as a void
 // variable with a parenthesized initializer ("void-typed symbol not
 // permitted").  A trailing cv-qualifier also forces the function
-// interpretation outright ([dcl.fct]/6: only function declarators
+// interpretation outright ([dcl.fct]/1: only function declarators
 // carry one).
 extern "C" void __CPROVER_assert(bool, const char *);
 struct messages_base

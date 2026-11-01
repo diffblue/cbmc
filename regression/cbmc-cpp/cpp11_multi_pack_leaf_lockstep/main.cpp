@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5,7: __tuple_impl's leaf-construction shape --
+// N5008 [temp.variadic]/8,9: __tuple_impl's leaf-construction shape --
 // a base-specifier pack expansion over TWO parallel packs
 // (`leaf<Ix, Tp>...`) plus a constructor whose mem-initializer pack
 // expansions cover a three-pack lockstep

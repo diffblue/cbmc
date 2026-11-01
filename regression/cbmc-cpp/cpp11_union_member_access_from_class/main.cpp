@@ -1,4 +1,4 @@
-// N5008 [class.union.general]/3: a union has no base classes.  The access
+// N5008 [class.union.general]/4: a union has no base classes.  The access
 // check for a PRIVATE member reached through a UNION object from a member of
 // another class (a friend, [class.friend]) asked "is the enclosing class
 // derived from the union?", which requires a struct type and aborted

@@ -1,6 +1,6 @@
 extern "C" void __CPROVER_assert(bool, const char *);
 #include <functional>
-// N5008 [func.wrap.func.con]/4: the copy of a std::function holds a copy
+// N5008 [func.wrap.func.con]/3: the copy of a std::function holds a copy
 // of the target.  libc++ clones the target through the virtual
 // `__clone(__base *) const', declared with an unnamed parameter.
 int one()

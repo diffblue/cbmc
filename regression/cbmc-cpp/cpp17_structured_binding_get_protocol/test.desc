@@ -10,7 +10,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-[dcl.struct.bind]/4: when std::tuple_size<E> is a complete type with a member
+[dcl.struct.bind]/7: when std::tuple_size<E> is a complete type with a member
 `value`, a structured binding binds each name to get<i>(e) (typed
 std::tuple_element<i, E>::type), not to the i-th data member.  CBMC now detects
 std::tuple_size<E> and decomposes via get<i>(e); types without a tuple_size

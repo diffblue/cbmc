@@ -1,4 +1,4 @@
-// N5008 [dcl.type.auto.deduct]/4 with [temp.deduct.call]/2-3: for `auto &f =
+// N5008 [dcl.type.auto.deduct]/3 with [temp.deduct.call]/2-3: for `auto &f =
 // twice' the declared type is a reference, so the function-to-pointer
 // conversion of [temp.deduct.call]/2.2 does not apply and auto is deduced
 // as the function type `int(int)'.  The front end deduced a pointer, since

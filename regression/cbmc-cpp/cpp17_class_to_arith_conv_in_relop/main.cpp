@@ -1,4 +1,4 @@
-// Regression for [over.match.oper]/9 + [over.built]: when a binary
+// Regression for [over.match.oper]/11 + [over.built]: when a binary
 // operator with no viable non-member or member operator overload is
 // processed, the operator is treated as a built-in operator per
 // [over.built]; the operands must then be subject to standard or

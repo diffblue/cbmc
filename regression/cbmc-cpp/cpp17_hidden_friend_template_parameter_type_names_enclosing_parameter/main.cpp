@@ -10,9 +10,9 @@ struct en<true, T>
 };
 template <class A, class B>
 constexpr bool same_v = __is_same(A, B);
-// N5008 [temp.local]/1, [class.friend]/7: in a friend function template
-// defined in a class template, the enclosing template's parameters may be
-// named in the friend's own template parameter list
+// N5008 [basic.scope.temp]/2, [basic.scope.temp]/2: in a friend function
+// template defined in a class template, the enclosing template's parameters may
+// be named in the friend's own template parameter list
 template <class It>
 struct rev
 {

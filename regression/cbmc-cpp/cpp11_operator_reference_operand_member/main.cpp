@@ -1,4 +1,4 @@
-// N5008 [over.match.oper]/3.2: for `a @ b`, the set of member candidates is the
+// N5008 [over.match.oper]/3.1: for `a @ b`, the set of member candidates is the
 // result of qualified lookup of `T1::operator@`, where T1 is the type of the
 // left operand.  An lvalue of reference-to-class type (e.g. the result of
 // `static_cast<std::ostream &>(x)`) is an lvalue of the referenced class type,

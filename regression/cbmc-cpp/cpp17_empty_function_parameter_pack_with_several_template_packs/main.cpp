@@ -1,8 +1,8 @@
-// N5008 [temp.variadic]/7: an expansion over an empty pack has no
+// N5008 [temp.variadic]/16: an expansion over an empty pack has no
 // elements.  impl<Js..., Ls...> is instantiated with Js = {0, 1, 2} and
 // Ls = {}: its function parameter pack ls has no parameters, and in
 // `sum(impl<int>(seq<Js>{}, ls...)...)' only the nested `ls...' vanishes
-// -- the outer expansion is over Js ([temp.variadic]/5: a pack is expanded
+// -- the outer expansion is over Js ([temp.variadic]/8: a pack is expanded
 // by the innermost expansion containing it).  With several template packs
 // the empty function parameter pack was left in place ("symbol 'ls' is
 // unknown"), and removing it took the outer expansion with it.  libc++'s

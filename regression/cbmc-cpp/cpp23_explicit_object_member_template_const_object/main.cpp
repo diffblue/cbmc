@@ -2,7 +2,7 @@ extern "C" void __CPROVER_assert(bool, const char *);
 struct S
 {
   int k;
-  // N5008 [temp.deduct.call]/3, [dcl.fct]/6: for a const object, Self
+  // N5008 [temp.deduct.call]/3, [dcl.fct]/4: for a const object, Self
   // deduces as const S &
   template <class Self>
   int get(this Self &&self)

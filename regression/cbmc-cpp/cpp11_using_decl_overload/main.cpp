@@ -1,4 +1,4 @@
-// N5008 [namespace.udecl]/16 with [class.member.lookup]/4: a using-declaration
+// N5008 [namespace.udecl]/11 with [class.member.lookup]/4: a using-declaration
 // `using Base::f;` in a derived class introduces Base's `f` overloads into the
 // derived class; they are combined with any derived-class members named `f`
 // into a single overload set and are NOT hidden by them.  Only members that are

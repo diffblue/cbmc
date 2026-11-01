@@ -1,6 +1,6 @@
 extern "C" void __CPROVER_assert(bool, const char *);
 
-// N5008 [basic.lookup.argdep]/2: the associated namespaces of a class
+// N5008 [basic.lookup.argdep]/3.2, 4: the associated namespaces of a class
 // template specialization include the namespaces of its TEMPLATE
 // ARGUMENTS.  `transform(w)` must find inner::transform through
 // wrapper<inner::elem>'s argument.  CBMC's ADL used not to traverse
@@ -37,7 +37,7 @@ int main()
 {
   outer::wrapper<inner::elem> w{{41}};
   // `transform` lives in inner, associated ONLY as the namespace of the
-  // wrapper's template argument ([basic.lookup.argdep]/2)
+  // wrapper's template argument ([basic.lookup.argdep]/3.2, 4)
   __CPROVER_assert(transform(w) == 42, "ADL via template argument");
   return 0;
 }

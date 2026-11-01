@@ -1,5 +1,5 @@
 extern "C" void __CPROVER_assert(bool, const char *);
-// [expr.prim.req.general]/4, [temp.variadic]/5: requires-expression
+// [expr.prim.req.general]/4, [temp.variadic]/9: requires-expression
 // parameter packs by forwarding reference and by value, in simple and
 // compound requirements, including an empty pack
 long k(int &, long)

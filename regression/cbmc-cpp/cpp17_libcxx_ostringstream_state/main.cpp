@@ -2,7 +2,7 @@
 extern "C" void __CPROVER_assert(bool, const char *);
 int main()
 {
-  // [ostringstream.cons]/1, [basic.ios.members]: a newly constructed stream
+  // [ostringstream.cons]/1, [basic.ios.cons]/4: a newly constructed stream
   // has state goodbit
   std::ostringstream o;
   __CPROVER_assert(o.good(), "constructed stream is good");

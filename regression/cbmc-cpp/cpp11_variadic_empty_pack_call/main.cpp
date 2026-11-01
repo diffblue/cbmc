@@ -1,6 +1,6 @@
-// C++ [temp.variadic]/5: a pack expansion `pattern...` expands into a list of
-// zero or more instantiations of the pattern.  When the pack is empty the list
-// is empty, so `f(a...)` with an empty `a` is the call `f()`.
+// C++ [temp.variadic]/6, 16: a pack expansion `pattern...` expands into a list
+// of zero or more instantiations of the pattern.  When the pack is empty the
+// list is empty, so `f(a...)` with an empty `a` is the call `f()`.
 //
 // KNOWNBUG: an empty parameter pack expanded in a function-call argument list is
 // not handled -- the call `base(a...)` with zero pack elements fails to resolve

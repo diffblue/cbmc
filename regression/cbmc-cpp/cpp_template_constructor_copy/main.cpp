@@ -1,12 +1,12 @@
 // A class that has a (converting) constructor template but is not itself a
 // class template.  Copying an object of such a class must select the
 // (implicitly declared) copy constructor, not a by-value specialisation of the
-// constructor template.  N5008 [class.copy.ctor]/2: a constructor whose first
+// constructor template.  N5008 [class.copy.ctor]/5: a constructor whose first
 // parameter is its own class type by value is ill-formed, so the deduced
 // specialisation `M(M)` (with the template parameter deduced as M) is not a
 // usable candidate.  Were it selected, materialising its by-value parameter
 // would recursively construct another M without bound
-// (cf. [over.best.ics]/4 Note 2).
+// (cf. [over.best.ics.general]/4 Note 2).
 
 extern "C" unsigned long __VERIFIER_nondet_ulong();
 extern "C" void __CPROVER_assert(int, const char *);

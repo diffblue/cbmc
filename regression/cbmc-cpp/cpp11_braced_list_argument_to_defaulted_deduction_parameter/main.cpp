@@ -1,12 +1,12 @@
 // N5008 [temp.deduct.call]/1: an initializer list argument makes P a
 // non-deduced context (unless P is initializer_list<P'> or an array);
-// [temp.deduct]/5: the parameter then takes its default template argument.
-// `template <class U = T> opt(U &&)' called with `{b, e}' deduces nothing
-// and uses U = T -- libstdc++'s optional(_Up &&) with `_Up = _Tp', CBMC's
-// own `return {{checked_when_taken, op1}}' (dog-fooding).  U was bound to
-// the list's placeholder type and no constructor matched; and a `return'
-// of a single braced element that is itself a list did not reach the
-// constructor path at all once the aggregate path had declined.
+// [temp.deduct.general]/5: the parameter then takes its default template
+// argument.  `template <class U = T> opt(U &&)' called with `{b, e}' deduces
+// nothing and uses U = T -- libstdc++'s optional(_Up &&) with `_Up = _Tp',
+// CBMC's own `return {{checked_when_taken, op1}}' (dog-fooding).  U was bound
+// to the list's placeholder type and no constructor matched; and a `return' of
+// a single braced element that is itself a list did not reach the constructor
+// path at all once the aggregate path had declined.
 extern "C" void __CPROVER_assert(bool, const char *);
 struct chk
 {

@@ -1,4 +1,4 @@
-// N5008 [temp.alias]/2, [temp.variadic]/5: `typename id<A>::type...' in an
+// N5008 [temp.alias]/2, [temp.variadic]/8: `typename id<A>::type...' in an
 // alias template expands the alias's own pack A, whatever the parameters of
 // the template using the alias are called
 extern "C" void __CPROVER_assert(bool, const char *);

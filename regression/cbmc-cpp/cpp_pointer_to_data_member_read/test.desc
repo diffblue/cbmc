@@ -11,7 +11,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [expr.mptr.oper]/3-4, [expr.unary.op]/3.1: `v.*pm' with `int s::*pm =
+N5008 [expr.mptr.oper]/2, /4, [expr.unary.op]/3.1: `v.*pm' with `int s::*pm =
 &s::y' designates v.y.  The front end represented a pointer to data
 member as the member's default value cast to a pointer (`pm = (int *)7')
 or left it as `&this->y' with a placeholder `this', and `v.*pm' as `pm'

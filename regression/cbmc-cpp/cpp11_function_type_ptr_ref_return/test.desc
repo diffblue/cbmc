@@ -14,9 +14,10 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [dcl.decl]/4, [dcl.ambig.res]: an empty () after a ptr/ref-qualified
-declarator is a function parameter-list, so int*(), int&(), int&&() are function
-types; a non-empty parenthesised declarator (int(*)()) stays a grouping.  CBMC
-previously dropped the () for ptr/ref returns, breaking function-type partial
-specializations such as std::function<R&()> (root of the rename_symbol.cpp
-cascade via expr_iterator.h).  assertion.6 FAILURE proves non-vacuity.
+N5008 [dcl.decl.general]/6, [dcl.ambig.res]: an empty () after a
+ptr/ref-qualified declarator is a function parameter-list, so int*(), int&(),
+int&&() are function types; a non-empty parenthesised declarator (int(*)())
+stays a grouping.  CBMC previously dropped the () for ptr/ref returns, breaking
+function-type partial specializations such as std::function<R&()> (root of the
+rename_symbol.cpp cascade via expr_iterator.h).  assertion.6 FAILURE proves
+non-vacuity.

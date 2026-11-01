@@ -15,7 +15,7 @@ constexpr const void *fallback_typeid()
 }
 int main()
 {
-  // [basic.compound]/3, [expr.unary.op]/3: distinct objects have distinct
+  // [intro.object]/10, [expr.unary.op]/3: distinct objects have distinct
   // addresses
   __CPROVER_assert(
     fallback_typeid<int>() != fallback_typeid<char>(), "distinct identities");

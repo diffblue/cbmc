@@ -17,7 +17,7 @@ struct L
 };
 template <class>
 struct Y;
-// N5008 [temp.variadic]/5, [expr.prim.id.qual]/1: a pack expansion in the
+// N5008 [temp.variadic]/9, [expr.prim.id.qual]/3: a pack expansion in the
 // operand of a decltype-specifier that is a nested-name-specifier expands
 // like any other (the MSVC STL's _Meta_at_)
 template <class... Ts>

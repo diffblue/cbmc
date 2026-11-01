@@ -1,7 +1,8 @@
-// N5008 [over.match.oper]/3.3 + [basic.lookup.argdep]/2: for `a @ b`, the set of
-// non-member candidates is the unqualified lookup of operator@ in the context of
-// the expression, EXCEPT THAT ALL MEMBER FUNCTIONS ARE IGNORED, together with
-// the operators found by argument-dependent lookup on the operands.
+// N5008 [over.match.oper]/3.2 + [basic.lookup.argdep]/3-4: for `a @ b`, the set
+// of non-member candidates is the unqualified lookup of operator@ in the
+// context of the expression, EXCEPT THAT ALL MEMBER FUNCTIONS ARE IGNORED,
+// together with the operators found by argument-dependent lookup on the
+// operands.
 //
 // Here the operator expression `static_cast<basic_ostream<char> &>(base) << "hi"`
 // appears inside mstreamt's own member operator<< template.  Ordinary
@@ -12,8 +13,8 @@
 //   * member functions are excluded from the non-member candidate set, and
 //   * ADL on the reference-typed left operand strips the reference to reach
 //     basic_ostream<char>, whose associated namespace holds the free template
-//     operator<< ([basic.lookup.argdep]/2: a reference argument's associated
-//     types are those of the referenced type).
+//     operator<< ([basic.lookup.argdep]/3, [expr.type]/1: a reference
+//     argument's associated types are those of the referenced type).
 // The free operator (a function template) is then deduced and selected instead
 // of falling back to the built-in shift.  This is the `const char *` half of
 // the residual src/util parse_options.cpp / typecheck.cpp dog-food shl noise.

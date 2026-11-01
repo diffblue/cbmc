@@ -9,5 +9,5 @@ main.cpp
 dropped the body
 --
 Explicit template arguments must survive the deduction pass
-([temp.arg.explicit]/2); deduction from convertible call arguments
+([temp.arg.explicit]/7); deduction from convertible call arguments
 used to overwrite them.

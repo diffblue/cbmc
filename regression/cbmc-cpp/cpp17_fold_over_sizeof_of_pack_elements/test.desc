@@ -11,7 +11,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [expr.prim.fold]/2, [temp.variadic]/5, [expr.sizeof]/1: in the
+N5008 [temp.variadic]/9, [temp.variadic]/9, [expr.sizeof]/1: in the
 fold `(0 + ... + sizeof(xs))' each instantiated element is `sizeof(x_k)',
 the size of the k-th element's type (1, 4 and 8 for char, int, double).
 The front end computed a wrong value: the fold expansion substituted the

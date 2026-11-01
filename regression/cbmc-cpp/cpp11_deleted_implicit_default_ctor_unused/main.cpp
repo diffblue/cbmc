@@ -1,7 +1,7 @@
 // A class whose implicitly-declared default constructor is DELETED
 // (a member without a default constructor, [class.default.ctor]/2)
 // may be derived from and left UNUSED: the deleted definition is an
-// error only when odr-used ([class.default.ctor]/4, [dcl.fct.def.delete]/2).
+// error only when odr-used ([dcl.fct.def.default]/5, [dcl.fct.def.delete]/2).
 // CBMC eagerly generates the implicit definitions and errors on them.
 // Reduced by cvise from a 99k-line goto-symex dog-food carrier
 // (state.h: goto_statet's guard_exprt member).

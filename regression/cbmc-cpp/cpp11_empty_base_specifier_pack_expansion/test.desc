@@ -12,7 +12,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body of function
 --
-N5008 [temp.variadic]/5.2, /7: `struct impl2 : leaf<T>...' with T = <>
+N5008 [temp.variadic]/6.6, /16: `struct impl2 : leaf<T>...' with T = <>
 has no base.  An empty pack has no element list in the template map, only
 its size, so the base-specifier was kept unexpanded, and every
 constructor default-initialized the base `leaf<T>' ("found no match for

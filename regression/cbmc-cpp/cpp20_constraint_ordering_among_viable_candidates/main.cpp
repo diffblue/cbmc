@@ -3,8 +3,8 @@ template <class T>
 concept C1 = sizeof(T) > 0;
 template <class T>
 concept CC = C1<T> && sizeof(T) == sizeof(int);
-// [over.match.best]/2.5, [temp.func.order]/8.4: the more constrained of two
-// viable candidates with equivalent parameter lists is better ...
+// [over.match.best.general]/2.5, [temp.func.order]/8.4: the more constrained of
+// two viable candidates with equivalent parameter lists is better ...
 template <C1 T>
 int f(T)
 {

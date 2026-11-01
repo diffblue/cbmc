@@ -1,5 +1,5 @@
 // C++20: a *qualified* concept name used as a type-constraint on a template
-// parameter (N5008 [temp.param]/4, [temp.names]) must be recognised as a
+// parameter (N5008 [temp.param]/1, [temp.names]) must be recognised as a
 // type-constraint, not mistaken for a non-type parameter because of the
 // leading namespace.  This is the shape libstdc++ uses for iter_reference_t:
 //   namespace std::__detail { template<class T> concept __dereferenceable; }

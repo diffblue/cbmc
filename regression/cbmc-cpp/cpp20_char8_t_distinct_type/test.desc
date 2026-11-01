@@ -15,7 +15,7 @@ main.cpp
 ^CONVERSION ERROR$
 --
 N5008 [basic.fundamental]/9: char8_t is a distinct type with underlying
-type unsigned char; [lex.ccon]/3, [lex.string]/6: u8'a' has type char8_t
+type unsigned char; [lex.ccon]/2, [lex.string]/1: u8'a' has type char8_t
 and u8"a" type const char8_t[2].  The parser turned char8_t into
 unsigned char, and c_preprocess.cpp undefined __cpp_char8_t so that the
 library would not declare duplicate specializations; kind<unsigned char>

@@ -9,5 +9,5 @@ main.cpp
 dropped the body
 --
 Fixed 2026-07-22: auto&& from an lvalue now deduces an lvalue
-reference ([dcl.type.auto.deduct]/4, [temp.deduct.call]/3,
-[dcl.ref]/6).
+reference ([dcl.type.auto.deduct]/3, [temp.deduct.call]/3,
+[dcl.ref]/7).

@@ -1,4 +1,4 @@
-// N5008 [temp.expl.spec]/2 + [unord.hash]: user code makes a type usable as an
+// N5008 [temp.expl.spec]/3 + [unord.hash]: user code makes a type usable as an
 // unordered-container key by specializing std::hash for it, written with a
 // qualified-id from outside namespace std:
 //   template <> struct std::hash<D> { ... };

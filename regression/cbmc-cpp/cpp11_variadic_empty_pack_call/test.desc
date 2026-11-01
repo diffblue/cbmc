@@ -10,7 +10,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-[temp.variadic]/5 -- expanding an empty parameter pack in a function-call
+[temp.variadic]/16 -- expanding an empty parameter pack in a function-call
 argument list yields an empty argument list, so `base(a...)` with zero pack
 elements is the call `base()`.  Fixed by the unified pack-expansion rework
 (Phase 1): the empty-pack body call-argument stripping in instantiate_template

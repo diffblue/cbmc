@@ -10,5 +10,5 @@ main.cpp
 dropped the body
 --
 Fixed 2026-07-21: reference_initializer unwraps a single-element
-braced-init-list ([dcl.init.list]/3.10); statement_list_typecheck.cpp
+braced-init-list ([dcl.init.list]/3.9); statement_list_typecheck.cpp
 converts clean.

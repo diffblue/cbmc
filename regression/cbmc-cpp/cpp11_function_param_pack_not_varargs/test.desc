@@ -12,7 +12,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-[temp.variadic]/3 + [dcl.fct]: a `...` immediately following a parameter
+[temp.variadic]/2 + [dcl.fct]: a `...` immediately following a parameter
 declaration with no separating comma (`f(Args...)`) introduces a function
 parameter pack, not a C-style variadic ellipsis.  CBMC parsed an end-of-list
 `Args...` as the parameter `Args` plus a separate C-style ellipsis, giving the

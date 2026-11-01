@@ -1,4 +1,4 @@
-// N5008 [class.friend]/3, /11: a friend declaration with a
+// N5008 [class.friend]/3, [dcl.type.elab]/3: a friend declaration with a
 // simple-type-specifier (`friend G<vector>;') names an existing class by
 // ORDINARY lookup from the class scope, where the injected-class-name
 // `vector' denotes the current specialization ([temp.local]/1).  Only an

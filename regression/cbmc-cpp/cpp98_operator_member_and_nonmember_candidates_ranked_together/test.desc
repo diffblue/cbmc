@@ -10,6 +10,6 @@ main.cpp
 --
 ^warning: ignoring
 --
-N5008 [over.match.oper]/3, [over.match.best]/2.1: member and non-member
+N5008 [over.match.oper]/3, [over.match.best.general]/2.1: member and non-member
 operator candidates are ranked together.  The member operator<<(int) was
 selected without considering the non-member with an exact match for char.

@@ -1,5 +1,5 @@
 // Regression test for compound-assignment operator overload `%=`,
-// per N5008 [over.match.oper]/3.4 + [expr.assign]/8 (compound
+// per N5008 [over.match.oper]/3 + [expr.assign]/6 (compound
 // assignment behaves as the corresponding non-compound operator
 // followed by an assignment, but for class types looks up
 // `operator%=` first).

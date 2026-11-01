@@ -1,7 +1,7 @@
-// N5008 [expr.prim.fold], [temp.variadic]/5, [dcl.type.decltype]: a
+// N5008 [expr.prim.fold], [temp.variadic]/9, 14, [dcl.type.decltype]: a
 // trailing-return-type `-> decltype((a + ...))' over a function parameter
 // pack of two or more elements has the type of the expanded fold; each
-// element names a parameter, an lvalue ([expr.prim.id.unqual]/3), so
+// element names a parameter, an lvalue ([expr.prim.id.unqual]/12), so
 // `g(a)' with `int g(int &)' is well-formed.  CBMC rejected the call once
 // any other function template with a pack had been declared (its empty-pack
 // entry blocked the fold reduction), and the parameter placeholders of the

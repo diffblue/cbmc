@@ -10,7 +10,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [dcl.typedef]/2, [temp.variadic]/5: for X<int, char>, `using F =
+N5008 [dcl.typedef]/2, [temp.variadic]/9: for X<int, char>, `using F =
 void(T...);' is void(int, char).  Assigning cb to the F * member was a
 conversion error ("invalid implicit conversion from 'auto (*)(signed int,
 char) -> void' to 'auto (*)(signed int) -> void'", bin53): when the class

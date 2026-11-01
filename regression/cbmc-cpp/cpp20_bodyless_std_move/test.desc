@@ -8,5 +8,5 @@ main.cpp
 --
 dropped the body
 --
-Fixed 2026-07-30: provide_stdlib_bodies synthesizes the [forward]/4-5
+Fixed 2026-07-30: provide_stdlib_bodies synthesizes the [forward]/3, 9
 cast body for declared-only std::move / std::forward instances.

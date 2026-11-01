@@ -1,9 +1,9 @@
 extern "C" void __CPROVER_assert(bool, const char *);
-// N5008 [over.match.oper]/1, [over.ass]: `a = b' with a class operand is
+// N5008 [over.match.oper]/3, [over.assign]: `a = b' with a class operand is
 // resolved among the class's assignment operators, templates included.
 // [class.copy.assign]/1: a template is never a copy assignment operator,
 // so the implicitly declared one remains, a non-template that wins for an
-// argument of the class type itself ([over.match.best]/2.4)
+// argument of the class type itself ([over.match.best.general]/2.4)
 struct pod
 {
   int which;

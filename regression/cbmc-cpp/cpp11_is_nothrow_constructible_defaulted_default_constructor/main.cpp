@@ -19,7 +19,7 @@ struct throwing
 {
   throwing() noexcept(false);
 };
-// [except.spec]/8: an implicitly-declared or defaulted default constructor is
+// [except.spec]/6: an implicitly-declared or defaulted default constructor is
 // noexcept unless an immediate subexpression of a default member initializer
 // or a subobject's default constructor is potentially-throwing
 static_assert(__is_nothrow_constructible(mutex_like), "defaulted, nothrow");

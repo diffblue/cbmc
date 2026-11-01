@@ -16,6 +16,6 @@ main.cpp
 dropped the body
 ^CONVERSION ERROR$
 --
-N5008 [over.load]/2.3, [over.call.func]/3: const and non-const member
+N5008 [basic.scope.scope]/4, [over.call.func]/3: const and non-const member
 templates are distinct; the implied object of a const member function is
 const.

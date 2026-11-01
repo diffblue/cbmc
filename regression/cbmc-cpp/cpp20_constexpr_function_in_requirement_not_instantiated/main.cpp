@@ -1,4 +1,4 @@
-// N5008 [expr.const]/22, [temp.inst]/8, [expr.prim.req.general]/2: a
+// N5008 [expr.const]/29.6, [temp.inst]/8, [expr.prim.req.simple]/1: a
 // constexpr function template named in a requirement is neither odr-used
 // nor needed for constant evaluation, so its definition is not
 // instantiated (here it would be ill-formed: `w.value' of an incomplete

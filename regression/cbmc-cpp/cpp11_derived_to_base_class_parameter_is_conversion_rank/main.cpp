@@ -1,9 +1,9 @@
-// N5008 [over.best.ics]/7: initializing a parameter of class type ex from an
-// argument of the derived class if_ex is a derived-to-base Conversion, a
-// standard conversion sequence, which [over.ics.rank]/2.1 ranks better than
-// any user-defined conversion sequence.  The front end ranked it as a
-// user-defined conversion, so `g(r)' tied g(ex) with g(other) (other has a
-// converting constructor from if_ex), and `return r;' into res<> tied
+// N5008 [over.best.ics.general]/7: initializing a parameter of class type ex
+// from an argument of the derived class if_ex is a derived-to-base
+// Conversion, a standard conversion sequence, which [over.ics.rank]/2.1 ranks
+// better than any user-defined conversion sequence.  The front end ranked it
+// as a user-defined conversion, so `g(r)' tied g(ex) with g(other) (other has
+// a converting constructor from if_ex), and `return r;' into res<> tied
 // res(ex) with the copy constructor of res: "does not uniquely resolve"
 // (CBMC's own simplify_exprt::resultt<>, eight simplify_expr*.cpp files,
 // dog-fooding).

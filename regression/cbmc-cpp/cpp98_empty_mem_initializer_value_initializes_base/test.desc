@@ -11,7 +11,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [class.base.init]/7, [dcl.init.general]/9.1-9.2: an empty
+N5008 [class.base.init]/7, [dcl.init.general]/9.1: an empty
 mem-initializer `B()' value-initializes the base, and a class without a
 user-provided default constructor is zero-initialized.
 full_member_initialization skipped empty initializers of POD bases, so

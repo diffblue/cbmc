@@ -1,6 +1,6 @@
-// N5008 [dcl.spec.auto]/2-3 + [temp.variadic]/5: a function template with a
-// DEDUCED return type (`decltype(auto)`) whose body declares a LOCAL type alias
-// and uses it to construct the argument of a nested deduced-return call:
+// N5008 [dcl.spec.auto.general]/4 + [temp.variadic]/5: a function template with
+// a DEDUCED return type (`decltype(auto)`) whose body declares a LOCAL type
+// alias and uses it to construct the argument of a nested deduced-return call:
 //
 //   template <class T> decltype(auto) outer(T)
 //   { using Ind = seq<0, 1>; return inner(Ind{}); }   // inner is decltype(auto)

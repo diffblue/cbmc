@@ -7,7 +7,7 @@ struct It
     return sizeof(_CharT);
   }
 };
-// default given on the FORWARD declaration ([temp.param]/12), as in
+// default given on the FORWARD declaration ([temp.param]/17), as in
 // libstdc++'s <bits/localefwd.h>; the DEFINITION follows later, after
 // the enclosing template below (so its parameter scope is numbered
 // after numpunct's)

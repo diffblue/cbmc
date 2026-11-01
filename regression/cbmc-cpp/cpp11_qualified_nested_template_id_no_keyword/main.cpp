@@ -1,4 +1,4 @@
-// N5008 [temp.names]/5: the `template` keyword before a member template-id is
+// N5008 [temp.names]/3.2: the `template` keyword before a member template-id is
 // only REQUIRED when the nested-name-specifier is dependent on a template
 // parameter.  For a NON-dependent qualified-id -- e.g. naming a member of the
 // concrete class-template specialization `C<int>` -- it is optional; g++ and

@@ -1,13 +1,13 @@
-// N5008 [temp.deduct]/8, [temp.deduct.general]: if substituting the deduced
-// template arguments into the function template's declaration (including the
-// types of its template parameters and their default template arguments) would
-// be ill-formed, deduction fails and the specialization is removed from the
-// overload set.  Here the sole candidate `f`'s trailing, non-deduced template
-// parameter has type `enable_if_t<always_false<T>::value, int>`, i.e.
-// `enable_if<false, int>::type`, which does not exist -- a substitution
-// failure.  The candidate must therefore be removed, leaving no viable function
-// for `f(5)`, so the program is ill-formed and must be rejected.  g++ and
-// clang++ reject it ("no matching function").
+// N5008 [temp.deduct.general]/5, 8, [temp.deduct.general]: if substituting the
+// deduced template arguments into the function template's declaration
+// (including the types of its template parameters and their default template
+// arguments) would be ill-formed, deduction fails and the specialization is
+// removed from the overload set.  Here the sole candidate `f`'s trailing,
+// non-deduced template parameter has type `enable_if_t<always_false<T>::value,
+// int>`, i.e. `enable_if<false, int>::type`, which does not exist -- a
+// substitution failure.  The candidate must therefore be removed, leaving no
+// viable function for `f(5)`, so the program is ill-formed and must be
+// rejected.  g++ and clang++ reject it ("no matching function").
 //
 // CBMC used to evaluate the constraint carried by a non-deduced defaulted
 // template parameter only when a *second* candidate forced disambiguation; a
@@ -45,6 +45,6 @@ int f(T)
 
 int main()
 {
-  // No viable f: the only candidate is removed by [temp.deduct]/8.
+  // No viable f: the only candidate is removed by [temp.deduct.general]/5.
   return f(5);
 }

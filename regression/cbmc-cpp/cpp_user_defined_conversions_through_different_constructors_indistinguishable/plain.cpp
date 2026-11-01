@@ -17,7 +17,7 @@ struct count
   {
   }
 };
-// [over.match.best]/2.1, [over.ics.rank]/3.3: for eq(o, 0) the first
+// [over.match.best.general]/2.1, [over.ics.rank]/3.3: for eq(o, 0) the first
 // candidate is better for the first argument (identity against a
 // user-defined conversion); for the second, `0 -> unspec' (through
 // unspec(int *)) and `0 -> count' (through count(int)) use different

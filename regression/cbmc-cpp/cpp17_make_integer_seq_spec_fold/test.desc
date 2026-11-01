@@ -12,7 +12,7 @@ The clang builtin __make_integer_seq materialises
 integer_sequence<unsigned long, 0, 1, 2>, which is matched by a
 partial specialization deducing the pack _Ip..., and a binary fold
 over _Ip in a STATIC member initializer must evaluate to 3
-(N5008 [temp.deduct.type], [expr.prim.fold]/2).  CBMC leaves the fold
+(N5008 [temp.deduct.type], [expr.prim.fold]/3).  CBMC leaves the fold
 partially expanded ("in expression '<<expr:static_cast>> + 0'") and
 drops the enclosing body.  Found round 130 while kerneling the
 cpp20_ranges_basic_libcxx reduced3 artifact; suspected shared root

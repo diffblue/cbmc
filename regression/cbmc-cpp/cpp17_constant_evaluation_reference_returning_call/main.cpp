@@ -1,4 +1,4 @@
-// N5008 [expr.const]/5: a call of a constexpr function returning a
+// N5008 [expr.const]/22: a call of a constexpr function returning a
 // reference is a constant expression when the referenced object is
 // ([meta.const.eval]/1: is_constant_evaluated() is true in it).  The shapes
 // of libstdc++'s std::min, basic_string_view::operator[] and

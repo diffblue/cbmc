@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5: a variadic constructor whose trailing parameter
+// N5008 [temp.variadic]/9: a variadic constructor whose trailing parameter
 // pack has TWO OR MORE elements must expand the pack to one parameter per
 // element, and a pack expansion in the member-initializer arguments must
 // expand likewise.  This mirrors the recursion step of libstdc++'s _Tuple_impl

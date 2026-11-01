@@ -1,7 +1,8 @@
-// N5008 [dcl.spec.auto]/3-4,11 + [temp.variadic]/4-5: a function template with
-// a DEDUCED return type (`auto` / `decltype(auto)`) whose body returns a call
-// with a pack expansion, `decltype(auto) impl(seq<I...>) { return add(I...); }`.
-// The return type is deduced from the (expanded) return expression.
+// N5008 [dcl.spec.auto.general]/4, 15 + [temp.variadic]/5-6: a function
+// template with a DEDUCED return type (`auto` / `decltype(auto)`) whose body
+// returns a call with a pack expansion, `decltype(auto) impl(seq<I...>) {
+// return add(I...); }`.  The return type is deduced from the (expanded) return
+// expression.
 //
 // CORE (was KNOWNBUG): CBMC previously left such a body incomplete ("could not
 // fully type-check 'main'") because the eager auto-return type-check ran on the

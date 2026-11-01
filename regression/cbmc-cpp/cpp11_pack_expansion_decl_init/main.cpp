@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5: in a pack expansion, the k-th generated element
+// N5008 [temp.variadic]/9: in a pack expansion, the k-th generated element
 // substitutes the k-th element of EVERY pack the pattern references.  Here
 // the pattern `forward<A>(a)` references both the function parameter pack
 // `a` AND the template type pack `A`; expanding

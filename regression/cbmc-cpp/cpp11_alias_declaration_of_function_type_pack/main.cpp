@@ -4,7 +4,7 @@ void cb(int k, char)
 {
   hit = k;
 }
-// [dcl.typedef]/2, [temp.variadic]/5: F is void(int, char) for X<int, char>
+// [dcl.typedef]/2, [temp.variadic]/9: F is void(int, char) for X<int, char>
 template <class... T>
 struct X
 {

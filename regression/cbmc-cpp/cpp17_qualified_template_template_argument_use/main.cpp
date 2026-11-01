@@ -1,6 +1,6 @@
 // N5008 [temp.arg.template]/1: the template-argument for a template
 // template-parameter is a template-name, possibly QUALIFIED (`ns::is_ptr',
-// `std::is_integral'); [temp.names]/2, [temp.param]/1: a use of the parameter
+// `std::is_integral'); [temp.param]/7.3, [temp.param]/1: a use of the parameter
 // with arguments inside the template (`Pred<T>::value') names the bound
 // template.  The scope walk that resolves `Pred<T>::' looked the bound
 // template up by BASE NAME from the root scope, which does not descend into

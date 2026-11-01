@@ -9,6 +9,6 @@ main.cpp
 dropped the body
 --
 Fixed 2026-07-30: typecheck_class_template_member now recognizes the
-Outer<args>::Nested::member qualification shape ([temp.mem] +
+Outer<args>::Nested::member qualification shape ([temp.mem.class] +
 [class.nest]) and records the definition in the outer class
 template's template_methods.

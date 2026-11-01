@@ -1,5 +1,5 @@
 // Companion canary for cpp11_deduced_nontype_kind_mismatch: N5008
-// [temp.deduct.type]/17 requires a value deduced for a non-type
+// [temp.deduct.type]/20 requires a value deduced for a non-type
 // template parameter to have the parameter's type EXACTLY.  Enforcing
 // that rule must NOT break THIS valid program: the clang builtin
 // __make_integer_seq synthesizes int_seq<unsigned long, 0ul, 1ul>,

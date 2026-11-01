@@ -10,7 +10,7 @@ main.cpp
 dropped the body
 --
 C++20 requires-expression parameter binding when the requires-expression is a
-conjunct of a larger constraint-expression ([expr.prim.req.general]/2).  A
+conjunct of a larger constraint-expression ([expr.prim.req.general]/4).  A
 concept of the shape `<concept-id> && requires(params){...}` -- the shape of
 std::assignable_from, std::movable and std::copyable -- must bind the
 requires-expression's parameters even though its #requires_params node is not at

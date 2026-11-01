@@ -14,7 +14,7 @@ main.cpp
 dropped the body
 no body for callee
 --
-N5008 [expr.ref]/6.3: a class member access naming a static member (here a
+N5008 [expr.ref]/7.3: a class member access naming a static member (here a
 member function template specialization of a base class) designates that
 member; the object's class only has to be the member's class or derived from
 it.

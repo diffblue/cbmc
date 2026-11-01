@@ -1,8 +1,8 @@
-// N5008 [temp.variadic]/5: a pack expansion may appear in the
+// N5008 [temp.variadic]/6.5: a pack expansion may appear in the
 // expression-list of a new-initializer --
 // `::new((void*)__p) _Up(forward<_Args>(__args)...)` -- the
 // __new_allocator::construct shape behind every node-based standard
-// container.  Also [temp.inst]/2: instantiating a class template does not
+// container.  Also [temp.inst]/3.1: instantiating a class template does not
 // instantiate its member templates; the member template's body (with its
 // own pack expansions) must survive the class instantiation intact.
 //

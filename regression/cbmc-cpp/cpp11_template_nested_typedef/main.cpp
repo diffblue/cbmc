@@ -1,4 +1,4 @@
-// Per [temp.res]/4 and [temp.inst]/2: a typedef of the form
+// Per [temp.res.general]/1 and [temp.inst]/2: a typedef of the form
 //     typedef typename Dep<T>::nested alias;
 // inside a class template is a dependent name.  At instantiation time,
 // the compiler must instantiate Dep<T> enough to look up the nested

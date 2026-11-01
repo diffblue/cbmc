@@ -1,4 +1,4 @@
-// N5008 [temp.deduct]/8 + [over.match.viable]: std::optional's pair of
+// N5008 [temp.deduct.general]/8 + [over.match.viable]: std::optional's pair of
 // _Requires'd converting constructors (optional:754, GCC 13) -- the
 // second must SFINAE out and the FIRST must be selected.  Direct- and
 // copy-initialization of such a class fails: deduction of the viable

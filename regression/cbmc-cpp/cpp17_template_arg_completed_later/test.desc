@@ -41,4 +41,4 @@ Fixed 2026-08-03 (round 9): marked instances are re-instantiated once
 the dropped base's type completes ([temp.point]); the completion swap
 rebuilds the template map from the instance's recorded arguments, and
 bare-template-parameter base/mem-initializer ids resolve through the
-map ([temp.names]/8).
+map ([temp.param]/7.1, [temp.dep.type]/3).

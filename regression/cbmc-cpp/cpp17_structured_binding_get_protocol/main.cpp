@@ -1,4 +1,4 @@
-// [dcl.struct.bind]/4: when std::tuple_size<E> is a complete type with a member
+// [dcl.struct.bind]/7: when std::tuple_size<E> is a complete type with a member
 // `value`, a structured binding `auto [a, b] = e;` binds each name to get<i>(e)
 // (with type std::tuple_element<i, E>::type), NOT to the i-th data member.  For
 // std::tuple the internal data-member order differs from the get<i> order, so

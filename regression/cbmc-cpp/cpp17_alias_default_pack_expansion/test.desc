@@ -18,4 +18,4 @@ std::optional).  g++/clang++/valgrind run clean.
 Fixed 2026-08-02: the zero-length-expansion gate in
 typecheck_template_args now also opens on pack_size_map-only state
 (an empty pack has no args/expr entry), so the alias pattern is
-removed before its premature resolution ([temp.variadic]/7).
+removed before its premature resolution ([temp.variadic]/16).

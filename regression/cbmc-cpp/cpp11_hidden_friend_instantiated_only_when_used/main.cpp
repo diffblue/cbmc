@@ -9,7 +9,7 @@ struct tree
 {
   T element;
   // libstdc++'s _Rb_tree: a friend function defined in the class template
-  // (a "hidden friend").  [temp.inst]/4: its definition is instantiated
+  // (a "hidden friend").  [temp.inst]/5: its definition is instantiated
   // only if it is odr-used; nothing here compares two trees.
   friend bool operator<(const tree &x, const tree &y)
   {

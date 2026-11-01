@@ -1,4 +1,4 @@
-// N5008 [temp.inst]/1, [temp.deduct]/8: merely naming
+// N5008 [temp.inst]/2, [temp.deduct.general]/8: merely naming
 // std::unordered_set<K>* must not affect the later instantiation of
 // std::vector<K>::push_back.
 //
@@ -8,7 +8,7 @@
 // (stl_bvector.h), the pattern's own _Alloc -- an explicitly-unassigned
 // deduction variable -- was resolved BY SHORT NAME through the
 // enclosing unordered_set instantiation's _Alloc = allocator<K>
-// (violating [temp.deduct]/2's clean slate), instantiating a hybrid
+// (violating [temp.deduct.general]/1's clean slate), instantiating a hybrid
 // vector<bool, allocator<K>> whose half-substituted cached instances
 // (a truncated __gnu_cxx::__alloc_traits among them) later poisoned
 // vector<K>.

@@ -12,5 +12,5 @@ dropped the body
 --
 Fixed 2026-07-21: resolve_with_arguments recurses over the recorded
 template arguments of associated class specializations
-([basic.lookup.argdep]/2); goto_cc_main.cpp and ms_link_cmdline.cpp
+([basic.lookup.argdep]/3.2); goto_cc_main.cpp and ms_link_cmdline.cpp
 convert clean.

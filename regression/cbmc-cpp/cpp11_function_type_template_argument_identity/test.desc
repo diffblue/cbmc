@@ -10,7 +10,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [temp.type]/1, [dcl.fct]/5: two template-ids are the same when their
+N5008 [temp.type]/1, [dcl.fct]/3: two template-ids are the same when their
 type arguments are the same type; decltype(cb) and void(int) are.  A
 written function type template argument keeps its parameters in parsed
 form (cpp_declaration, with the declarator part such as `&' or `*'

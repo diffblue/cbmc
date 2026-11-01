@@ -1,4 +1,4 @@
-// N5008 [dcl.init.list]/3.2 + [dcl.init.general]/16.6.1: a single
+// N5008 [dcl.init.list]/3.2 + [dcl.init.general]/16.6.2: a single
 // initializer of the base's own type (a synthesized copy constructor's
 // sliced-reference initializer, or a by-value slicing static_cast) is
 // COPY-initialization of the base subobject, not element-wise aggregate

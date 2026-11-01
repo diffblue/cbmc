@@ -13,7 +13,7 @@
 // effect, but the qualified-name path did not.  The match then failed and fell
 // back to the body-less primary template, leaving `base<holder<int>>` an empty
 // (truncated) class, so `::cp` was unknown.  Per [temp.inst]/2 the argument's
-// completeness affects the semantics here, and [temp.spec.general]/7 requires
+// completeness affects the semantics here, and [temp.point]/7 requires
 // the instantiation to be the same regardless of which context first required
 // it.  See doc/architectural/cpp-requires-expression-support.md.
 

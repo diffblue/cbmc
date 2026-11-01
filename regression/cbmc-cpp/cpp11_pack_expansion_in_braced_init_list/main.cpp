@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5: pack expansions in braced-init-lists and call
+// N5008 [temp.variadic]/6.5: pack expansions in braced-init-lists and call
 // argument lists of a function template with only a type parameter pack.
 extern "C" void __CPROVER_assert(bool, const char *);
 

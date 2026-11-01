@@ -1,10 +1,10 @@
 // libc++ std::variant: the converting constructor selects the alternative
 // through `__best_match_t' -- an overload set built from a base pack
 // (`struct __all_overloads : _Bases... { using _Bases::operator()...; }',
-// N5008 [namespace.udecl]/1 pack expansion) whose members return through a
+// N5008 [temp.variadic]/6.2 pack expansion) whose members return through a
 // narrowing check `__test_impl<_Dest>({std::declval<_Source>()})' with an
 // array-reference parameter `_Dest (&&)[1]' ([dcl.init.list]/3.4,
-// [dcl.init.ref]/5.4.2), plus the five `__traits' static members computed by
+// [dcl.init.list]/3.10), plus the five `__traits' static members computed by
 // a constexpr function over an initializer_list.  Each was a separate
 // front-end gap (rounds 160-161); the non-vacuous checks below cover the
 // resulting object model.

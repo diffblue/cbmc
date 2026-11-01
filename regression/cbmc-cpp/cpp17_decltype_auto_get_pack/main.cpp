@@ -9,10 +9,10 @@
 // overloads; matching the constant against the TYPE parameter was a hard
 // "unexpected cpp type: constant" error that aborted the whole overload
 // resolution (including the viable by-index overload), so the return type was
-// never deduced ("could not fully type-check").  Per N5008 [temp.arg]/2 +
-// [temp.deduct]/8 it is a kind mismatch that removes just that candidate;
-// fixed by extending the template-arg kind-mismatch machinery to a value
-// (constant) in type position.
+// never deduced ("could not fully type-check").  Per N5008 [temp.arg.general]/1
+// + [temp.deduct.general]/2 it is a kind mismatch that removes just that
+// candidate; fixed by extending the template-arg kind-mismatch machinery to a
+// value (constant) in type position.
 //
 // The tuple is taken by reference, so this is independent of the separate
 // std::get-by-value-copy value bug.  g++ compiles and runs r == 3; clang++

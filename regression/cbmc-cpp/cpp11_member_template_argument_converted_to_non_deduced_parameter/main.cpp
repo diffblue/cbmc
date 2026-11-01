@@ -1,4 +1,4 @@
-// N5008 [temp.arg.explicit]/7, [temp.deduct.call]/4: an argument is
+// N5008 [temp.arg.explicit]/7, [temp.deduct.call]/1: an argument is
 // implicitly converted to a parameter type that contains no template
 // parameter participating in deduction -- sv<C> of a member template of
 // fstr<C>, with C fixed by the class

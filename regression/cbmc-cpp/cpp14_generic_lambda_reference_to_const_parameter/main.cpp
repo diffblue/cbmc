@@ -1,6 +1,6 @@
-// N5008 [dcl.spec.auto.general]/3: in a generic lambda's `const auto &x'
-// only `auto' is replaced by the invented template parameter, so x is a
-// reference to const and binds to an rvalue ([dcl.init.ref]/5.3)
+// N5008 [dcl.spec.auto.general]/2, [dcl.fct]/20: in a generic lambda's `const
+// auto &x' only `auto' is replaced by the invented template parameter, so x is
+// a reference to const and binds to an rvalue ([dcl.init.ref]/5.3)
 extern "C" void __CPROVER_assert(bool, const char *);
 struct A
 {

@@ -9,7 +9,7 @@ main.cpp
 --
 dropped the body
 --
-N5008 [temp.names]/5.  The `template` keyword before a member template-id is
+N5008 [temp.names]/3.2.  The `template` keyword before a member template-id is
 only required for a dependent nested-name-specifier; for a non-dependent
 class-template-id such as `C<int>` it is optional.  CBMC's expression name
 parser (rVarNameCore) previously rejected `C<int>::al<char>::value` (parse error

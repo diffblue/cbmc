@@ -1,4 +1,4 @@
-// N5008 [stmt.if]/2 + [dcl.spec.auto.general]/8: a return statement in a
+// N5008 [stmt.if]/2 + [dcl.spec.auto.general]/4: a return statement in a
 // discarded substatement of `if constexpr` takes no part in return type
 // deduction.
 extern "C" void __CPROVER_assert(bool, const char *);
@@ -20,7 +20,7 @@ constexpr auto all(R &&r)
     return 0.5;
 }
 
-// [dcl.type.auto.deduct]/4: plain `auto` drops references and top-level cv
+// [dcl.type.auto.deduct]/3: plain `auto` drops references and top-level cv
 template <typename R>
 constexpr auto fwd(R &&r)
 {

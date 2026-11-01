@@ -10,7 +10,7 @@ using str_sink = sink;
 template <class, class...>
 class arg_store;
 } // namespace fmt
-// [namespace.memdef]/2: a member of a namespace may be defined outside it
+// [class.pre]/3: a member of a namespace may be defined outside it
 // by a qualified name
 template <class, class...>
 class fmt::arg_store

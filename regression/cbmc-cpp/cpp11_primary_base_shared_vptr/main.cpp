@@ -1,6 +1,6 @@
 // Layout of dynamic classes with dynamic bases: Itanium C++ ABI 2.4 (II.1), as
 // implemented by g++ and clang.  N5008 leaves the layout of a non-standard-
-// layout class to the implementation ([class.mem.general]/26,
+// layout class to the implementation ([class.mem.general]/23,
 // [expr.sizeof]), so the ABI is the reference here, not the standard.
 //
 // - A class with a PRIMARY base (its first non-virtual dynamic base in

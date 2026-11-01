@@ -1,4 +1,4 @@
-// Access control is per-class, not per-object ([class.access]/2): a
+// Access control is per-class, not per-object ([class.access.general]/1): a
 // member function of `W` may access the private members of *any* `W`
 // object, including one named through an explicit object.  This must be
 // accepted.

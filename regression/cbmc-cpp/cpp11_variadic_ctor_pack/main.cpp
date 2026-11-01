@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/4,5 + [class.base.init]: a variadic constructor whose
+// N5008 [temp.variadic]/5,6 + [class.base.init]: a variadic constructor whose
 // trailing parameter pack is empty in the recursion base must expand that pack
 // to ZERO parameters, and its base/member initializers must construct each
 // subobject.  This mirrors libstdc++'s _Tuple_impl recursive constructor

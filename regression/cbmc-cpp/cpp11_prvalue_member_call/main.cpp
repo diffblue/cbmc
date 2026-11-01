@@ -1,4 +1,4 @@
-// N5008 [expr.type.conv]/2 + [class.temporary]/2: `T()' for a class type is a
+// N5008 [expr.type.conv]/1.4 + [class.temporary]/2: `T()' for a class type is a
 // prvalue; accessing a member materialises a temporary.  For a class without
 // user-declared constructors the value-initialised prvalue was a bare struct
 // constant with no object to bind the implicit object parameter to:

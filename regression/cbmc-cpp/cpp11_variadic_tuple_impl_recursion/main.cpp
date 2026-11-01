@@ -1,4 +1,4 @@
-// N5008 [temp.spec.partial.match], [temp.variadic]/5: end-to-end construction
+// N5008 [temp.spec.partial.match], [temp.variadic]/9: end-to-end construction
 // of a three-level recursive trailing-pack partial specialization in the exact
 // shape of libstdc++'s _Tuple_impl -- a recursive partial spec
 // `TImpl<I, Head, Tail...>` deriving from `TImpl<I+1, Tail...>` and a per-level

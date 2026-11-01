@@ -18,7 +18,7 @@ struct K
 };
 int main()
 {
-  // N5008 [dcl.fct.def.default]/5, [class.copy.ctor]/14-15: an explicitly
+  // N5008 [dcl.fct.def.default]/5, [class.copy.ctor]/14: an explicitly
   // defaulted copy/move constructor is the memberwise copy/move whatever the
   // members are.  Previously it was generated only for trivially copyable
   // members, otherwise left EMPTY (members default-initialised).

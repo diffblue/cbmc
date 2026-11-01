@@ -9,5 +9,5 @@ static assertion failed: block-scope failure is diagnosed$
 dropped the body
 --
 A block-scope static_assert(false) outside any template instantiation is an
-error ([dcl.pre]/10); inside an instantiation it stays a warned skip
+error ([dcl.pre]/13); inside an instantiation it stays a warned skip
 ([temp.res.general]/6).

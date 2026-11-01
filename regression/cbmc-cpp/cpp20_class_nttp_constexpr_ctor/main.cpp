@@ -1,4 +1,4 @@
-// N5008 [temp.param]/7, [temp.arg.nontype]/1, [expr.const]/5: class-type
+// N5008 [temp.param]/12, [temp.arg.nontype]/1, [expr.const]/22: class-type
 // non-type template arguments from constexpr constructors.
 extern "C" void __CPROVER_assert(bool, const char *);
 

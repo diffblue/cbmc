@@ -11,7 +11,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [over.match.funcs]/8 + [temp.deduct.call]: a constructor template
+N5008 [over.match.funcs.general]/8 + [temp.deduct.call]: a constructor template
 contributes to a user-defined conversion the one specialization deduced
 from the argument, not its earlier instantiations.  `big(T)' already
 instantiated for int and for unsigned __int128 made a `unsigned long'

@@ -12,7 +12,7 @@ static_assert condition could not be evaluated
 Invariant check failed
 dropped the body
 --
-N5008 [temp.deduct.call]/3 (last sentence) + [dcl.init.general]/9: for
+N5008 [temp.deduct.call]/3 (last sentence) + [dcl.init.general]/10: for
 libstdc++'s `__can_owning_view<int(&)[5]>` (`owning_view{declval<_Range>()}`)
 the constructor-derived guide `owning_view(_Range&&)` deduced `_Range =
 int(&)[5]` by the forwarding-reference rule, the class's `_Range _M_r =

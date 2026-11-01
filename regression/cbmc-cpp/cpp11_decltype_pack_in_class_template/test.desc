@@ -9,7 +9,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-[temp.deduct.call]/1 + [temp.variadic]/5: a class template member typedef
+[temp.deduct.call]/1 + [temp.variadic]/9: a class template member typedef
 computed as decltype(declval<F>()(declval<A>()...)) -- a decltype whose call
 expression contains a pack expansion -- is used as the return type of the
 function template `invoke`, which is itself called with a *deduced* parameter

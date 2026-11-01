@@ -9,7 +9,7 @@ main.cpp
 dropped the body
 --
 Namespace-scope T*& with parenthesized initializer loses the pointer
-level in parsing ([dcl.init.general]/16.2 direct-init): "invalid
+level in parsing ([dcl.init.general]/15.1 direct-init): "invalid
 implicit conversion from 'void *' to 'void'".  Root distilled from
 the set_insert reduction (libc++ __tree __insert_unique's
 __node_base_pointer& __child).  The `= init` spelling and local

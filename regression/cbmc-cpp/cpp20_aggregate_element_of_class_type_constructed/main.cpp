@@ -1,4 +1,4 @@
-// N5008 [dcl.init.aggr]/4.2: each element of an aggregate is
+// N5008 [dcl.init.aggr]/4.3: each element of an aggregate is
 // copy-initialized from its initializer; an element of class type is
 // constructed, not assigned to
 extern "C" void __CPROVER_assert(bool, const char *);

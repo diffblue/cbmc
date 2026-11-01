@@ -1,4 +1,4 @@
-// N5008 [expr.prim.fold]/2, [temp.variadic]/5, [expr.type.conv]/2: in a fold
+// N5008 [expr.prim.fold]/2, [temp.variadic]/9, [expr.type.conv]/1.4: in a fold
 // over a type pack, the pattern `Args()' value-initializes a prvalue of
 // each element type (libc++ 19's __promote, behind std::copysign and
 // std::hermite in <cmath>)

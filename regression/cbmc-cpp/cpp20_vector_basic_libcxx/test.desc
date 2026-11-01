@@ -9,5 +9,5 @@ main.cpp
 --
 History: the six-layer __to_address chain (see
 cpp20_to_address_reverse_iterator).  Fixed 2026-08-10 by the
-[basic.lookup.qual]/1 qualified-lookup fix; --object-bits 12 needed
+[basic.lookup.qual.general]/3 qualified-lookup fix; --object-bits 12 needed
 since more of libc++ converts (round-25 note).

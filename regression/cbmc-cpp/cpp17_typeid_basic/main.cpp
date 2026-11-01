@@ -23,7 +23,7 @@ int main()
   __CPROVER_assert(
     typeid(x) == typeid(int), "expression form uses static type");
 
-  // typeid ignores top-level cv-qualifiers and references ([expr.typeid]/5).
+  // typeid ignores top-level cv-qualifiers and references ([expr.typeid]/5, 7).
   const int &rx = x;
   __CPROVER_assert(typeid(rx) == typeid(int), "cv/ref ignored");
 

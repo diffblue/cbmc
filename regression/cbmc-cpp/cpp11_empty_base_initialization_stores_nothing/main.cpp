@@ -1,5 +1,5 @@
 extern "C" void __CPROVER_assert(bool, const char *);
-// N5008 [intro.object]/9: a base subobject of empty class type has zero
+// N5008 [intro.object]/8, 10: a base subobject of empty class type has zero
 // size; it may share its address with the derived object's other
 // subobjects, and initializing it stores nothing
 struct ph

@@ -2,7 +2,7 @@
 // subobject is initialized by the (implicitly defined) default
 // constructor of the derived class, the base's own default constructor
 // runs, and per [class.base.init]/9.1 a member with a default member
-// initializer (NSDMI, [class.mem.general]/10) is initialized from it.
+// initializer (NSDMI, [class.mem.general]/14) is initialized from it.
 //
 // KNOWNBUG: the implicit default construction of a DERIVED class object
 // drops the base's NSDMIs -- `opt o;` below leaves o.e / o.p.x nondet.

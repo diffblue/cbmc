@@ -1,4 +1,4 @@
-// N5008 [temp.inst]/4: instantiating a class template specialization
+// N5008 [temp.inst]/3.1: instantiating a class template specialization
 // instantiates the declarations, not the definitions, of the friend
 // functions defined in it -- also in its member classes.  The definition of
 // view<int, unreachable>::sentinel's `operator-', ill-formed for that

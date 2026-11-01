@@ -1,5 +1,5 @@
 // Pack expansion of a dependent member-alias pattern in a template argument
-// list: Container<typename Trait<E>::member...> (N5008 [temp.variadic]/4-5).
+// list: Container<typename Trait<E>::member...> (N5008 [temp.variadic]/5-6).
 // The pattern's pack E is nested inside the pattern and must be expanded once
 // per element (this is the shape of std::make_tuple's return type,
 // tuple<typename __decay_and_strip<E>::__type...>).

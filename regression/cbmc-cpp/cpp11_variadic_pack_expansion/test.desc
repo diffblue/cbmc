@@ -19,6 +19,6 @@ handled: the function-call-expression member initializer expands the inner
 call-argument pack at its own level rather than duplicating the whole
 initializer, and collapses an empty pack to a zero-arg call; and a member
 function template's own value parameter pack is expanded in its deferred body,
-so the recursive sum_of resolves.  Grounded in N5008 [temp.variadic]/5,7.  The
+so the recursive sum_of resolves.  Grounded in N5008 [temp.variadic]/8,16.  The
 base-mem-init empty-pack pattern is handled separately and verified by
 cpp11_variadic_ctor_pack.

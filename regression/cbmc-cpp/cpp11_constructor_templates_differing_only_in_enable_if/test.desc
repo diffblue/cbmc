@@ -12,13 +12,13 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [temp.mem]/1, [over.match.funcs.general]/7: a constructor template
+N5008 [temp.mem]/1, [over.match.funcs.general]/8: a constructor template
 is a template; its specializations are overload candidates, and
 [temp.deduct.general]/8 removes those whose (default) template arguments
 fail to substitute.  The class-body pass that type-checks constructors
 also turned each constructor template into an ordinary constructor; for
 one with no function parameters that is a non-template default
-constructor, preferred over every template ([over.match.best]/2.4),
+constructor, preferred over every template ([over.match.best.general]/2.4),
 built from whichever same-signature template came last.  So S<int>
 used the second template's body although its enable_if fails for int.
 libstdc++ pair has exactly these two default constructors (implicit and

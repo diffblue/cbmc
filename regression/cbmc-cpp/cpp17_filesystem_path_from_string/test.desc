@@ -11,7 +11,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [fs.path.construct]/5: path(const Source &) with a std::string source
+N5008 [fs.path.construct]/4: path(const Source &) with a std::string source
 stores the string, so the path is not empty.  Fixed (round 163w): the
 constructor called the generic __detail::__effective_range(const _Source &)
 instead of the basic_string overload, because candidates were ranked by

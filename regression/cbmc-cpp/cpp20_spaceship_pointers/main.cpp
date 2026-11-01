@@ -1,4 +1,4 @@
-// N5008 [expr.spaceship]/8: for two operands of pointer type (after the
+// N5008 [expr.spaceship]/6: for two operands of pointer type (after the
 // composite pointer type conversion) `p <=> q' yields std::strong_ordering
 // (less, equal, greater by the pointer comparison).  Only arithmetic operands
 // were lowered to the comparison-category constants; pointer operands fell to

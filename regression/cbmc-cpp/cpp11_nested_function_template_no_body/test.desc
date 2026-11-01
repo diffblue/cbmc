@@ -11,7 +11,7 @@ main.cpp
 no body for callee
 dropped the body
 --
-N5008 [temp.inst]/4, [temp.point]/1: a cvise-reduced, header-free model of the
+N5008 [temp.inst]/5, [temp.point]/1: a cvise-reduced, header-free model of the
 libstdc++ std::get<0> chain (std::get -> std::__get_helper ->
 _Tuple_impl::_M_head); returns 42 under a conforming compiler (verified g++).
 

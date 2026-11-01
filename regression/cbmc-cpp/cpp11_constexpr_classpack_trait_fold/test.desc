@@ -12,7 +12,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-[temp.variadic]/4-5 + [expr.const]: a constexpr function body that expands a
+[temp.variadic]/5-6 + [expr.const]: a constexpr function body that expands a
 class parameter pack into a trait -- `__and_<is_default_constructible<_Types>
 ...>::value`, the shape of std::tuple's constructor SFINAE
 (_TupleConstraints::__is_explicitly_default_constructible /

@@ -20,7 +20,7 @@ derived constructor now applies the base's NSDMIs through the flattened
 from_base components: a component with its own #default_value is
 initialized from it, one whose type transitively carries NSDMIs is
 default-constructed; an explicit base initializer WITH arguments
-supersedes them, while an empty one (value-initialization, [dcl.init]/8)
+supersedes them, while an empty one (value-initialization, [dcl.init.general]/9)
 still applies them.  Reduced with cvise on cbmc-preprocessed source from
 std::optional<std::string> (whose remaining KNOWNBUG is the independent
 base-specifier resolution failure).  Header-free; g++/clang++

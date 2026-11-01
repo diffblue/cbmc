@@ -9,7 +9,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [temp.spec.partial.general]/1 + [temp.constr.decl]: partial
+N5008 [temp.spec.partial.general]/2 + [temp.constr.decl]: partial
 specializations with the same argument pattern `impl<I>` that differ only in
 their requires-clauses (nested requires-expressions with type requirements,
 negations, conjunctions) are distinct specializations; the one whose

@@ -7,7 +7,7 @@ inline int good_fn(int x)
 }
 inline int bad_fn(int x)
 {
-  // ill-formed on purpose ([expr.ref]/2: the object expression of `.' must
+  // ill-formed on purpose ([expr.ref]/4-5: the object expression of `.' must
   // have class type): every compiler rejects this body, and the front end
   // must drop it with a diagnostic rather than fail the translation
   return x.value;

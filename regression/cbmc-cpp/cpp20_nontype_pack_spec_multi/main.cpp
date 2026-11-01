@@ -4,12 +4,12 @@
 //   template <size_t _NBound, size_t... _Ip>
 //   struct __bind_back_op<_NBound, index_sequence<_Ip...>> { ... };
 // Three N5008-grounded ingredients, each formerly broken:
-//   * [temp.param]/14: the defaulted second parameter references the
+//   * [basic.scope.pdecl]/12: the defaulted second parameter references the
 //     preceding NON-TYPE parameter (preceding expression parameters
 //     were not bound when the default was materialized);
 //   * [intseq.make]: the clang builtin __make_integer_seq used BARE as
 //     a type (the resolve_scope intercept only covered qualified uses);
-//   * [temp.variadic]/5: a nested non-type pack pattern deduced to TWO
+//   * [temp.variadic]/9: a nested non-type pack pattern deduced to TWO
 //     or more values -- per-element substitution went through the
 //     scalar convenience entry, so `integer_sequence<ul, _Ip...>`
 //     substituted to `<ul,0,0>` and the specialization never matched.

@@ -8,7 +8,7 @@ main.cpp
 --
 dropped the body
 --
-N5008 [expr.ref]/8 + [over.match.funcs]/5.3: calling a member function
+N5008 [expr.ref]/7.2 + [over.match.funcs.general]/5: calling a member function
 on a member of a function-call result (an xvalue).  Distilled from
 libc++ std::map::operator[]'s
 __emplace_unique_key_args(...).first->__get_value().

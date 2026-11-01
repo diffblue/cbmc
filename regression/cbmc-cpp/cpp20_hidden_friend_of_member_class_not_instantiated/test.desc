@@ -11,5 +11,5 @@ main.cpp
 ^warning: ignoring
 dropped the body
 --
-N5008 [temp.inst]/4: hidden friends of member classes of class template
+N5008 [temp.inst]/5: hidden friends of member classes of class template
 specializations are instantiated only when odr-used.

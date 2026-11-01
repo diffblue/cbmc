@@ -12,7 +12,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [dcl.init.aggr]/4.2, [dcl.init.general]/16.6.2.2 (C++20): the
+N5008 [dcl.init.aggr]/4.3, [dcl.init.general]/16.6.2.2 (C++20): the
 elements of `agg a(3, 4)' are copy-initialized; the element of class type
 `conv' is constructed from 3.  The parenthesized aggregate initialization
 assigned to the member instead (operator= of a converted temporary,

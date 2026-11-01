@@ -1,4 +1,4 @@
-// N5008 [over.ics.list]/6, [dcl.init.list]/3.4, [dcl.init.ref]/5.4.2: a
+// N5008 [over.ics.list]/6, [dcl.init.list]/3.4, [dcl.init.list]/3.10: a
 // braced-init-list argument for a reference-to-array parameter
 // (`T (&&)[1]') aggregate-initializes a temporary array and binds the
 // reference to it.  libc++'s std::variant narrowing check is

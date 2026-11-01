@@ -14,7 +14,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [stmt.return]/2, [dcl.init.list]/3.4, [dcl.init.aggr]/16: `return
+N5008 [stmt.return]/2, [dcl.init.list]/3.4, [dcl.init.aggr]/14: `return
 {1, 2, 3};' for `struct IA { int v[2]; int w; }' aggregate-initializes the
 result with brace elision; [over.ics.list]/8 makes `h({1, 2, 3})' viable.
 The front end paired the clauses with IA's members one by one ("invalid

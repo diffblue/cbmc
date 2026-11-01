@@ -9,5 +9,5 @@ main.cpp
 --
 Fixed 2026-07-28: operator_is_overloaded's conversion-operator
 branch now applies only to single-operand functional casts
-([expr.type.conv]/2); the transient multi-operand/nil casts produced
+([expr.type.conv]/1.1); the transient multi-operand/nil casts produced
 during template-argument deduction no longer abort.

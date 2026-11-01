@@ -11,7 +11,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [basic.lookup.unqual]/1: the template argument vt of
+N5008 [basic.lookup.unqual]/4: the template argument vt of
 `at<al<int>>::rebind_alloc<vt>' is looked up from its point of use.
 Selecting the partial specialization at<al<T>> deduces T with the same
 resolver, which recorded the specialization's template scope as the point

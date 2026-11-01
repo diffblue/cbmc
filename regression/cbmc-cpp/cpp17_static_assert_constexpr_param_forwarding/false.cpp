@@ -1,5 +1,5 @@
 // Negative variant of main.cpp: the condition is false and must be
-// diagnosed (N5008 [dcl.pre]/10).
+// diagnosed (N5008 [dcl.pre]/13).
 #include <cstddef>
 constexpr size_t p2(size_t x)
 {

@@ -17,7 +17,7 @@ Genuine (non-vacuous) verification of a populated std::span<int>.
 This previously passed vacuously (std::span construction failed to elaborate
 its iterator, truncating main and dropping the assertions), then -- once the
 iterator's inert C++20 `iterator_concept` alias was kept lazy
-([iterator.concepts.general], [temp.inst]/1-2) -- ran genuinely but FAILED:
+([iterator.concepts.general], [temp.inst]/2) -- ran genuinely but FAILED:
 `span size` held but `span element` did not, because span(pointer, size_type)'s
 body sets `_M_ptr = std::to_address(__first)` and std::to_address's call to
 __to_address(_Tp*) tied with __to_address(const _Ptr&) for the pointer

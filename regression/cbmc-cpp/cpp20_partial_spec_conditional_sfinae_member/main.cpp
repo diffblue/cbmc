@@ -1,11 +1,12 @@
-// KNOWNBUG (N5008 [temp.spec.partial.match]/2, [temp.deduct]/8, [expr.cond]/4).
+// KNOWNBUG (N5008 [temp.spec.partial.match]/2, [temp.deduct.general]/8,
+// [expr.cond]/4).
 //
 // A class-template partial specialization is selected when the SFINAE check in
 // its argument list -- here `void_t<decltype(false ? declval<A>() :
 // declval<B>())>` -- is well-formed, and is rejected (falling back to the
 // primary template) when that conditional-expression has no common type and is
 // therefore ill-formed.  Substitution failure in the immediate context is not
-// an error ([temp.deduct]/8); it just removes the specialization from
+// an error ([temp.deduct.general]/8); it just removes the specialization from
 // consideration.
 //
 // This is the minimal, self-contained essence of libstdc++'s C++20

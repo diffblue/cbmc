@@ -1,4 +1,4 @@
-// N5008 [fs.path.type.cvt]/1, [lex.charset]/2: constructing a path from a
+// N5008 [fs.path.type.cvt]/1-2, [lex.charset]/2: constructing a path from a
 // narrow string converts it to the native wide encoding; the characters of
 // the basic character set keep their values.  The shape of the MSVC STL:
 // the conversion is __std_fs_convert_narrow_to_wide of its runtime library

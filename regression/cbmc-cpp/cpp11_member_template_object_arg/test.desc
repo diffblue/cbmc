@@ -9,9 +9,9 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [over.match.funcs]/2: the implicit object argument pairs with the
-implicit object parameter; the deduction-time convertibility pre-filter
-must skip both together.  Distilled from allocator_traits::construct's
-`__a.construct(__p, ...)` member call (std::map node construction), which
-was rejected as not-convertible by the off-by-one object/parameter pairing.
+N5008 [over.match.funcs.general]/2-3: the implicit object argument pairs with
+the implicit object parameter; the deduction-time convertibility pre-filter must
+skip both together.  Distilled from allocator_traits::construct's
+`__a.construct(__p, ...)` member call (std::map node construction), which was
+rejected as not-convertible by the off-by-one object/parameter pairing.
 g++/clang++ runtime-verified.

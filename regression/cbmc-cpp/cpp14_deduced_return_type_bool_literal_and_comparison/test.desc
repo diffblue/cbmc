@@ -11,7 +11,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [dcl.spec.auto.general]/10, [expr.rel]/2, [expr.eq]/1: `return true;'
+N5008 [dcl.spec.auto.general]/10, [expr.rel]/2, [expr.eq]/2: `return true;'
 and `return st == 0;' both deduce bool.  The front end deduced the
 comparison as its internal __CPROVER_bool and rejected the function
 ("inconsistent deduction for the return type: 'bool' and '__CPROVER_bool'",

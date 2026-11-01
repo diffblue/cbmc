@@ -1,4 +1,4 @@
-// C++11 [ext.manip]/[iomanip]: `os << std::setw(n)` inserts the
+// C++11 [std.manip]/[iomanip]: `os << std::setw(n)` inserts the
 // smanip returned by setw via the operator<< overload taking the
 // manipulator.  CBMC used to fail to resolve the inserter
 // ("operator 'shl' not defined") because [temp.deduct.call]/4.3

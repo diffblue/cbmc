@@ -10,8 +10,8 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-[over.match.oper]/3, [over.match.best]/2, [temp.inst]/2: a non-member
-non-template operator<< that perfectly matches is preferred over a member
-operator<< template, and forming that member-template candidate must not
+[over.match.oper]/3, [over.match.best.general]/2.4, [temp.inst]/5, 10: a
+non-member non-template operator<< that perfectly matches is preferred over a
+member operator<< template, and forming that member-template candidate must not
 instantiate its (here ill-formed) body.  Reduced from the message.h dog-food
 "operator 'shl' not defined" noise.  Non-vacuous.

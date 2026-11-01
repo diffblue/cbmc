@@ -12,7 +12,7 @@ dropped the body
 --
 Defense-in-depth coverage for the macOS libc++ basic_string nested
 typedef pattern (in isolation): a class template with typedefs whose
-RHS is typename Dep<T>::nested.  Per [temp.res]/4 and [temp.inst]/2,
+RHS is typename Dep<T>::nested.  Per [temp.res.general]/1 and [temp.inst]/2,
 elaborating Dep<T>'s body is required to look up the nested name.
 
 Note: this isolated pattern currently passes.  The real-world libc++

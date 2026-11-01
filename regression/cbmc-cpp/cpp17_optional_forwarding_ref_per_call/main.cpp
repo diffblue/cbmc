@@ -4,7 +4,7 @@
 // ([temp.deduct.call]/3), and overload resolution must rank by the
 // quality of the argument conversion sequence before falling back to
 // the non-template / fewer-template-argument tie-breaker
-// ([over.match.best]/1, [over.ics.rank]).
+// ([over.match.best.general]/2, [over.ics.rank]).
 //
 // This was order-dependent.  Constructing an optional<S> from an
 // *lvalue* S first instantiates the converting constructor with

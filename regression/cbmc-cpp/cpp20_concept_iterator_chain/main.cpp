@@ -4,7 +4,7 @@
 // semiregular -> copyable -> movable -> swappable -> assignable_from -> ...)
 // over a user-defined iterator type, which depends on requires-expression
 // parameter binding for conjoined requires-expressions
-// ([expr.prim.req.general]/2) being correct.
+// ([expr.prim.req.general]/4) being correct.
 
 #include <compare>
 #include <iterator>

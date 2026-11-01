@@ -54,7 +54,8 @@ private:
   }
 };
 // a declaration returning renamedt<ssa_exprt, L0> BY VALUE while ssa_exprt is
-// incomplete ([dcl.fct]/12: a complete return type is not required here)
+// incomplete ([dcl.fct.def.general]/2: a complete return type is not required
+// here)
 renamedt<ssa_exprt, L0> symex_level0(ssa_exprt, const namespacet &, unsigned);
 // names renamedt<ssa_exprt, L0> while ssa_exprt is incomplete
 struct symex_level1t

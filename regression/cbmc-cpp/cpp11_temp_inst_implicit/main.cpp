@@ -1,4 +1,4 @@
-// Per [temp.inst]/1: a class template specialization is implicitly
+// Per [temp.inst]/2: a class template specialization is implicitly
 // instantiated when a completeness of the class type is required.
 // Before the completeness is required, the specialization is not
 // instantiated.

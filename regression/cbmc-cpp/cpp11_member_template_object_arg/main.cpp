@@ -1,7 +1,7 @@
-// N5008 [over.match.funcs]/2: in overload resolution for a member function,
-// the implicit object argument pairs with the implicit object parameter.
-// The argument-vs-parameter convertibility pre-filter used during function
-// template argument deduction must skip BOTH together.
+// N5008 [over.match.funcs.general]/2-3: in overload resolution for a member
+// function, the implicit object argument pairs with the implicit object
+// parameter.  The argument-vs-parameter convertibility pre-filter used during
+// function template argument deduction must skip BOTH together.
 //
 // Was KNOWNBUG: the filter skipped the `this` parameter but not the object
 // operand, pairing the object against the first REAL parameter.  For a

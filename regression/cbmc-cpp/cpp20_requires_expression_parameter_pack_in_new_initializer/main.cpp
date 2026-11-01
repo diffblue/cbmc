@@ -38,7 +38,7 @@ constexpr T *construct_at(T *const loc, Types &&..._Args)
 {
   return ::new(static_cast<void *>(loc)) T(forward<Types>(_Args)...);
 }
-// N5008 [temp.variadic]/5: the pack expansion forward<Types>(args)...
+// N5008 [temp.variadic]/9: the pack expansion forward<Types>(args)...
 // in both branches, with T a pointer type and Types = {T &}
 template <class T, class... Types>
 constexpr void construct_in_place(T &obj, Types &&...args)

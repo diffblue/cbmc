@@ -12,7 +12,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [dcl.fct]/7: cv-qualifiers added on top of a function type are ignored
+N5008 [dcl.fct]/9: cv-qualifiers added on top of a function type are ignored
 (there are no cv-qualified function types).  A const-qualified template
 parameter substituted with a function type must drop the const, so
 is_const<const T> is false and the libstdc++ is_function<T> idiom

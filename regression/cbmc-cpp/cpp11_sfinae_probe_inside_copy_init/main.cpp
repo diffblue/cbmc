@@ -7,9 +7,9 @@
 // copy-initialization being resolved.  Deducing a constructor template among
 // those candidates and substituting its constrained default template argument
 // ([temp.deduct.general]/5) runs separate overload resolutions
-// ([temp.deduct]/8, the immediate context); their conversions -- here a
+// ([temp.deduct.general]/8, the immediate context); their conversions -- here a
 // derived-to-base copy-initialization, a standard conversion per
-// [over.best.ics.general]/6 -- are unaffected.
+// [over.best.ics.general]/7 -- are unaffected.
 //
 // This is the libstdc++ 11 shape: `basic_string(_InputIterator,
 // _InputIterator)` constrained by `_RequireInputIter`, whose

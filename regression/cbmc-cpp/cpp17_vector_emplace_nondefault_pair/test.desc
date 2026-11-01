@@ -11,4 +11,4 @@ Fixed 2026-07-27: the member-instance parameter pattern arrives with
 its pack reference scalar-substituted to the first element; expansion
 now falls back to the single live pack when the pattern is fully
 concretized (member-function-template instantiations only).  See the
-src commit for the [temp.variadic]/5 grounding.
+src commit for the [temp.variadic]/9 grounding.

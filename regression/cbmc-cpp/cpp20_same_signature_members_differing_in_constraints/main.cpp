@@ -1,11 +1,11 @@
 // N5008 [basic.scope.scope]/4.4: two member declarations with the same
-// parameter-type-list but different trailing requires-clauses declare
-// different functions.  [over.match.viable]/3 removes a candidate whose
-// constraints are not satisfied; of two satisfied ones,
-// [over.match.best]/2.6 prefers the more constrained ([temp.constr.order]).
-// The return types may differ: libc++'s transform_view has `__sentinel
-// end()' and `__iterator end() requires common_range<_View>'.  CBMC kept
-// one symbol per signature, the first declaration's.
+// parameter-type-list but different trailing requires-clauses declare different
+// functions.  [over.match.viable]/3 removes a candidate whose constraints are
+// not satisfied; of two satisfied ones, [over.match.best.general]/2.6 prefers
+// the more constrained ([temp.constr.order]).  The return types may differ:
+// libc++'s transform_view has `__sentinel end()' and `__iterator end() requires
+// common_range<_View>'.  CBMC kept one symbol per signature, the first
+// declaration's.
 extern "C" void __CPROVER_assert(bool, const char *);
 
 template <class T>

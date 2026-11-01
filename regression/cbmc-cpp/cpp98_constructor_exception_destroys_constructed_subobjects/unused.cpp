@@ -1,4 +1,4 @@
-// N5008 [class.base.init]/13, [temp.inst]/3: the destructor of a subobject
+// N5008 [class.base.init]/12, [temp.inst]/3: the destructor of a subobject
 // is potentially invoked by a constructor only if that constructor is
 // defined; zone's implicit default constructor is not odr-used, so
 // holder<impl>'s destructor, and the deleter for the incomplete impl, are

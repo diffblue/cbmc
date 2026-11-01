@@ -1,4 +1,4 @@
-// N5008 [class.mfct]/1 + [namespace.qual]: an out-of-line member
+// N5008 [class.mfct]/2 + [namespace.qual]: an out-of-line member
 // definition may carry a redundant namespace qualifier even inside
 // that namespace (libstdc++ <streambuf>'s defaulted
 // basic_streambuf copy constructor).  The A::B<args>::member handler

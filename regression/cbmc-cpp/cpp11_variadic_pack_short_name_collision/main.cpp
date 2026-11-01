@@ -1,4 +1,4 @@
-// Per [basic.scope.temp] and [temp.variadic]/5: a template parameter
+// Per [basic.scope.temp] and [temp.variadic]/8: a template parameter
 // pack's short name used inside a template refers to THAT template's
 // pack.  Different templates may declare pack parameters with the same
 // short name; they are distinct entities.

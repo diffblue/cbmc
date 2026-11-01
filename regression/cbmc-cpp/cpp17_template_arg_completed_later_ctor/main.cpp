@@ -1,6 +1,6 @@
 // Constructor variant of cpp17_template_arg_completed_later: the
 // specialization instantiated at a declaration-only point (argument
-// type INCOMPLETE, [temp.inst]/1 requires nothing) has a constructor
+// type INCOMPLETE, [temp.inst]/2 requires nothing) has a constructor
 // with a base mem-initializer.  After the argument type is completed
 // and the specialization genuinely used ([temp.point]: a new point of
 // instantiation), CBMC serves the stale incomplete-base instance;

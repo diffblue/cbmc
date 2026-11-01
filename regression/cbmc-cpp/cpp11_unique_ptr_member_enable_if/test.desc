@@ -11,11 +11,11 @@ instantiating 'std::__enable_if_t' with <FALSE
 dropped the body
 --
 The original hard error (concretizing unique_ptr's =delete'd deleter
-constructor template into enable_if_t<false>::type, [temp.inst]/2) is fixed;
+constructor template into enable_if_t<false>::type, [temp.inst]/3.1) is fixed;
 the disallowed pattern guards against regression.  The subsequent value bugs
 are fixed by a chain of standards fixes: inherited base default constructors
 ([class.inhctor.init]), defaulted move constructors initializing bases from an
-xvalue ([class.copy.ctor]/15) with the base subobject type recorded to
+xvalue ([class.copy.ctor]/14) with the base subobject type recorded to
 disambiguate EBO hierarchies like std::tuple's, and defaulted copy/move
 assignment operators elaborated memberwise with base move-assignment going
 through the base's operator= ([class.copy.assign]/12).  assertion.2 is a

@@ -15,5 +15,5 @@ Verifies four operator-overload-resolution fixes:
   * `operator_is_overloaded`'s 1st-option (member) path is skipped
     when T1 has no member operator.
   * `operators[]` includes `ID_mod` (`%`).
-  * [over.match.oper]/3.4 restriction excludes free operators on
+  * [over.match.oper]/3.2 restriction excludes free operators on
     unrelated class types when no operand has class type.

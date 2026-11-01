@@ -1,11 +1,11 @@
-// N5008 [over.load]/2.3, [over.call.func]/3, [over.match.funcs]/5: member
-// templates `find(const K &)' and `find(const K &) const' are different
-// members, and an unqualified call in a const member function has a const
-// implied object, for which only the const one is viable.  Such a call was
-// ambiguous (the caller's body was dropped), and out-of-class definitions
-// were attached to the instances by name and arity alone, so the const
-// member ran the non-const body (libc++'s __hash_table::__count_unique,
-// behind unordered_set::count).
+// N5008 [basic.scope.scope]/4, [over.call.func]/3,
+// [over.match.funcs.general]/4: member templates `find(const K &)' and
+// `find(const K &) const' are different members, and an unqualified call in a
+// const member function has a const implied object, for which only the const
+// one is viable.  Such a call was ambiguous (the caller's body was dropped),
+// and out-of-class definitions were attached to the instances by name and arity
+// alone, so the const member ran the non-const body (libc++'s
+// __hash_table::__count_unique, behind unordered_set::count).
 extern "C" void __CPROVER_assert(bool, const char *);
 template <class T>
 struct table

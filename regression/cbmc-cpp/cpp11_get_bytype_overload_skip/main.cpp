@@ -1,7 +1,7 @@
-// N5008 [temp.arg]/2 + [temp.deduct]/8: a template argument of the wrong kind
-// (a non-type argument supplied for a type parameter) is a substitution
-// failure that, during overload resolution, removes only that candidate from
-// the overload set -- it is not a hard error.
+// N5008 [temp.arg.general]/1 + [temp.deduct.general]/2: a template argument of
+// the wrong kind (a non-type argument supplied for a type parameter) is a
+// substitution failure that, during overload resolution, removes only that
+// candidate from the overload set -- it is not a hard error.
 //
 // This is the shape of std::get<0>(tuple<...>): the by-index
 // `get<size_t, _Ts...>(tuple<_Ts...>&)` and the by-type

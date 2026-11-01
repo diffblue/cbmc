@@ -3,7 +3,7 @@ int g()
 {
   return 5;
 }
-// [dcl.fct]/5: a parameter of function type `void()' is adjusted to a
+// [dcl.fct]/3: a parameter of function type `void()' is adjusted to a
 // pointer to function, so F is int(int (*)())
 int cb(int (*h)())
 {

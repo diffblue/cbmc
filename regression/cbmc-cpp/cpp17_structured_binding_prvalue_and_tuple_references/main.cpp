@@ -39,7 +39,7 @@ int main()
   const auto &[c, d] = S{3, 4};
   __CPROVER_assert(
     m + n == 11 && c + d == 7, "auto&& / const auto& to prvalues");
-  // tuple-like protocol ([dcl.struct.bind]/4): e is a prvalue pair; bindings
+  // tuple-like protocol ([dcl.struct.bind]/7): e is a prvalue pair; bindings
   // are references to get<i>(e)
   auto [r, s] = std::pair<int, int>(7, 8);
   auto &&[t, u] = std::pair<int, int>(3, 4);

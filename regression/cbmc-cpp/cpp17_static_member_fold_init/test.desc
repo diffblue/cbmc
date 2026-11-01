@@ -12,7 +12,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [temp.variadic]/5 + [expr.prim.fold]: a fold pattern that is a
+N5008 [temp.variadic]/9 + [expr.prim.fold]: a fold pattern that is a
 QUALIFIED reference to a member of each pack element (`Ts::v`) keeps its
 trailing components across substitution.  The class-body fold expander
 used to replace the whole qualified name with the element type, so

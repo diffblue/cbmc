@@ -15,8 +15,9 @@ T &&declval_();
 // the fall back
 template <class... Args>
 nat invoke(Args &&...args);
-// N5008 [temp.func.order], [temp.deduct.partial]/8, /11: with the same
-// arguments this template is more specialized than invoke(Args&&...)
+// N5008 [temp.func.order], [temp.deduct.partial]/8, [temp.deduct.type]/10.2:
+// with the same arguments this template is more specialized than
+// invoke(Args&&...)
 template <class F, class... Args>
 decltype(declval_<F>()(declval_<Args>()...)) invoke(F &&f, Args &&...args)
 {

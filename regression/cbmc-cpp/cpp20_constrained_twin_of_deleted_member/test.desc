@@ -14,7 +14,7 @@ main.cpp
 not accessible
 dropped the body
 --
-N5008 [over.match.best]/2.6: the constrained same-signature member is
+N5008 [over.match.best.general]/2.6: the constrained same-signature member is
 selected over the deleted unconstrained one; [temp.pre]: `requires ( expr )'
 takes any expression; [temp.inst]/4: an unsatisfied constrained member's
 definition is not instantiated (no dropped-body report).  The C++20

@@ -1,6 +1,6 @@
 // C++20 selection among class-template partial specializations that share the
 // same template-argument pattern and differ only by their requires-clauses
-// ([temp.class.spec.match]/1-2 with [temp.constr.order]).
+// ([temp.spec.partial.match]/1-2 with [temp.constr.order]).
 //
 // This is the shape of libstdc++'s std::__iterator_traits<_Iterator, void>,
 // whose three specializations are distinguished solely by their constraints

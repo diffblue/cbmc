@@ -12,7 +12,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [expr.eq]/3, [expr.type]/4: in `pr == &m' (R * and M *, M derived
+N5008 [expr.eq]/3, [expr.type]/3: in `pr == &m' (R * and M *, M derived
 from R) both operands are converted to the composite pointer type R *, so
 &m is adjusted to its R subobject and the comparison is true.  The C rule
 used for the comparison cast the M * to R * without adjustment, so it was

@@ -12,6 +12,6 @@ dropped the body
 --
 Lambda feature matrix: init-captures ([expr.prim.lambda.capture]/6), one
 closure per lambda-expression ([expr.prim.lambda.closure]/1), `auto...'
-packs with binary folds of either associativity ([expr.prim.fold]/2),
+packs with binary folds of either associativity ([expr.prim.fold]/3),
 sizeof of a reference ([expr.sizeof]/2), plus the shapes that already
 worked.

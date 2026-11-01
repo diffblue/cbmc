@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5 + [basic.scope.temp]: in the pattern
+// N5008 [temp.variadic]/8 + [basic.scope.temp]: in the pattern
 // `type_pack_element<_Idx, _Types...>...`, `_Types` is expanded by the
 // NESTED expansion, so only `_Idx` governs the outer one; and the name
 // `_Idx` denotes the template parameter found by lookup, even when an

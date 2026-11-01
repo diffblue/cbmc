@@ -17,7 +17,7 @@ dropped the body
 N5008 [stmt.if]/2: the condition of `if constexpr' is a contextually
 converted constant expression of type bool; the discarded substatement does
 not contribute to return type deduction ([dcl.spec.auto.general]/10).
-[expr.const]/4: an element of a constexpr array is usable in constant
+[expr.const]/9.8: an element of a constexpr array is usable in constant
 expressions.  A constexpr variable's reference is replaced by its
 initializer, but a constexpr array stays an object (it must remain an
 lvalue), so `kinds[1]' did not fold, both branches were type-checked and

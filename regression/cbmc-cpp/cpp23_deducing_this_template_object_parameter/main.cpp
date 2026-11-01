@@ -1,13 +1,13 @@
-// N5008 [dcl.fct]/6 (explicit object parameter), [over.match.funcs]/3 and
-// [temp.deduct.call]/1-3: for a member function TEMPLATE whose explicit
+// N5008 [dcl.fct]/6 (explicit object parameter), [over.match.funcs.general]/3
+// and [temp.deduct.call]/1-3: for a member function TEMPLATE whose explicit
 // object parameter is a forwarding reference (`this Self &&self'), Self is
 // deduced from the object expression (`A &' for an lvalue A) -- the point of
 // "deducing this".  Deduction skipped the object argument together with the
-// parameter (as for an implicit `this'), so Self was never deduced and the
-// call had no viable candidate ("found no match for symbol 'get'"); the
-// viability check and the member-call construction likewise dropped the
-// object.  libstdc++ 16's std::_Bind::operator()(this _Self &&, _Args &&...)
-// is this shape (the gcc16 bind KNOWNBUG; found by its cvise reduction).
+// parameter (as for an implicit `this'), so Self was never deduced and the call
+// had no viable candidate ("found no match for symbol 'get'"); the viability
+// check and the member-call construction likewise dropped the object.
+// libstdc++ 16's std::_Bind::operator()(this _Self &&, _Args &&...)  is this
+// shape (the gcc16 bind KNOWNBUG; found by its cvise reduction).
 extern "C" void __CPROVER_assert(bool, const char *);
 struct A
 {

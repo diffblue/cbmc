@@ -1,4 +1,4 @@
-// N5008 [temp.alias]/2 + [temp.deduct.type] + [temp.variadic]/4-5: deducing a
+// N5008 [temp.alias]/2 + [temp.deduct.type] + [temp.variadic]/5-6: deducing a
 // parameter pack THROUGH an alias template that maps the pack onto a class
 // template with a fixed leading argument:
 //

@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5: `Args...` in a concept-id of a requires-clause
+// N5008 [temp.variadic]/9, 10: `Args...` in a concept-id of a requires-clause
 // expands to all deduced pack elements; `sizeof...(Args)` inside the concept
 // counts them.
 extern "C" void __CPROVER_assert(bool, const char *);

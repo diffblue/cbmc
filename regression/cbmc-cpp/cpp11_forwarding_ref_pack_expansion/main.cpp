@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5, [dcl.ref] (reference collapsing): expanding a
+// N5008 [temp.variadic]/9, [dcl.ref] (reference collapsing): expanding a
 // FORWARDING-REFERENCE parameter pack `A&&... a` in a function-call argument
 // pattern `f(static_cast<A&&>(a)...)` (i.e. `f(std::forward<A>(a)...)`) must
 // produce, for each element k, the argument `static_cast<A_k&&>(a$k)` with the

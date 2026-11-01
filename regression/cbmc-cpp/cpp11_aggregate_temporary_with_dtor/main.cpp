@@ -3,7 +3,7 @@
 // non-static data members, no virtual functions and no
 // virtual/private/protected base classes.  A user-declared (or
 // defaulted) DESTRUCTOR does not disqualify it, and
-// [expr.type.conv]/2 makes `itert{&g}` aggregate-initialize a
+// [expr.type.conv]/1.4 makes `itert{&g}` aggregate-initialize a
 // temporary.
 //
 // This used to fail ("found no match for symbol 'itert'"): declaring

@@ -1,4 +1,4 @@
-// N5008 [expr.dynamic.cast]/4, /9-10: the result of dynamic_cast<C *>(v),
+// N5008 [expr.dynamic.cast]/8, /9-10: the result of dynamic_cast<C *>(v),
 // C not a base of the class of *v, depends on the most derived object: a
 // pointer to its unique public C subobject (down- or cross-cast), else null
 extern "C" void __CPROVER_assert(bool, const char *);

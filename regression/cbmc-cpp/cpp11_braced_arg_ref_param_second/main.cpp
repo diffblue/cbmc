@@ -4,7 +4,7 @@
 // 'struct valt' to 'const struct valt *'" -- the reference binding
 // (address-of insertion) is skipped for non-initial constructor
 // parameters in the list-initialization path ([over.match.list]
-// phase 2, [over.ics.list]/8, [dcl.init.ref]/5).  With the reference
+// phase 2, [over.ics.list]/7, [dcl.init.ref]/5).  With the reference
 // in the FIRST position (itemt(const valt&, int), `take({a, 2})`) the
 // same shape converts fine.  Distilled from
 // sharing_mapt::get_delta_view's `delta_view.push_back({k1,

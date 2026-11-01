@@ -7,7 +7,7 @@ main.cpp
 --
 dropped the body
 --
-N5008 [temp.spec.partial] + [temp.variadic]/4-5.  A VARIABLE TEMPLATE partial
+N5008 [temp.spec.partial] + [temp.variadic]/5-6.  A VARIABLE TEMPLATE partial
 specialization whose pattern deduces a parameter PACK
 (`tsize_v<tup<E...>> = sizeof...(E)`), exactly libstdc++'s
 std::tuple_size_v<tuple<_Types...>> used by std::apply to size its index

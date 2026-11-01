@@ -14,11 +14,11 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [class.copy.elis], [stmt.return]/2: a by-value return of a class that
+N5008 [class.copy.elision], [stmt.return]/2: a by-value return of a class that
 is not trivially copyable is lowered (elide_cpp_returned_temporaries) to
 construction in the caller's storage through a hidden result parameter,
 appended after the declared parameters.  For a variadic function
-([dcl.fct]/6: a parameter-declaration-clause ending in an ellipsis, also
+([dcl.fct]/2: a parameter-declaration-clause ending in an ellipsis, also
 `F first...' with a non-pack F -- libc++'s `__bind_back(_Fn...)') the call
 site appended the result address after ALL arguments, so it was bound to
 the first variadic argument's position and the first variadic argument

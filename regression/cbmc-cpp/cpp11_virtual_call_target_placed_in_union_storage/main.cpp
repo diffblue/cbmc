@@ -25,7 +25,7 @@ struct impl : base
     this->~impl();
   }
 };
-// N5008 [basic.life]/1, [expr.new]: the MSVC STL std::function constructs
+// N5008 [basic.life]/2, [expr.new]: the MSVC STL std::function constructs
 // its target by placement new at the start of a union whose last pointer
 // element points to it; a virtual call through that pointer reaches the
 // target ([class.virtual]/2)

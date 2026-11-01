@@ -4,7 +4,7 @@
 // conversion functions of S that yield T (or a type convertible to T).  Here T
 // has no constructor taking S, but S has `operator T()`, so:
 //   * is_constructible<T, S> is TRUE   ([meta.unary.prop])
-//   * is_convertible<S, T>   is TRUE   ([meta.unary.prop]/[conv])
+//   * is_convertible<S, T>   is TRUE   ([meta.rel]/[conv])
 // g++ and clang++ agree.
 //
 // This was a KNOWN BUG and is now fixed.  user_defined_conversion_sequence does
@@ -13,12 +13,12 @@
 // parameter (a `const S&` `this`) failed: reference_binding requires the `this`
 // receiver to be an lvalue or a recognised temporary, and the synthetic
 // symbol_exprt source was neither, so the candidate was discarded.  Per
-// [class.mfct.non-static]/1-2 + [over.match.funcs]/5 + [class.temporary]/3 a
-// class prvalue (which declval<S>() models) may be the implicit object argument
-// of a member function via temporary materialization; the synthetic source is
-// now marked so reference_binding materializes it.  (Ordinary overload
-// resolution of a real call f(S)->f(T) already worked; only the trait /
-// conversion-sequence path was affected.)
+// [class.mfct.non-static]/1-2 + [over.match.funcs.general]/5 +
+// [class.temporary]/2.3 a class prvalue (which declval<S>() models) may be the
+// implicit object argument of a member function via temporary materialization;
+// the synthetic source is now marked so reference_binding materializes it.
+// (Ordinary overload resolution of a real call f(S)->f(T) already worked; only
+// the trait / conversion-sequence path was affected.)
 //
 // Non-vacuous: assertion 3 ("WRONG") must FAIL.
 

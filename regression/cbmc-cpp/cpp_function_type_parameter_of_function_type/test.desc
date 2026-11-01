@@ -10,7 +10,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [dcl.fct]/5: a parameter of function type is adjusted to a pointer to
+N5008 [dcl.fct]/3: a parameter of function type is adjusted to a pointer to
 function, so `typedef int F(int());' declares F as int(int (*)()), the type
 of cb.  The front end took the parameter `int()' as int: the parser read
 `()' as a parenthesized empty declarator.  N5008 [dcl.ambig.res]/3: in a

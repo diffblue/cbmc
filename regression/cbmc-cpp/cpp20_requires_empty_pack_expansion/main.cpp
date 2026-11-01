@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5 + [expr.prim.req]/2: the requirement
+// N5008 [temp.variadic]/16 + [expr.prim.req.general]/5: the requirement
 // `::new((void*)0) _Tp(my_declval<_Args>()...)` with _Args deduced
 // EMPTY must value-initialize; the unexpanded scalar pattern made the
 // constraint read unsatisfied and the calling member's body was

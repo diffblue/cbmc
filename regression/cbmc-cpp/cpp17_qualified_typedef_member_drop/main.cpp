@@ -1,12 +1,12 @@
-// N5008 [class.qual], [temp.inst]/2: instantiating __alloc_traits<int>
-// must give it the member `value_type` whose type is spelled through
-// the qualified typedef-name _Base_type::value_type.
+// N5008 [basic.lookup.qual.general]/3, [temp.inst]/2: instantiating
+// __alloc_traits<int> must give it the member `value_type` whose type is
+// spelled through the qualified typedef-name _Base_type::value_type.
 //
 // This used to fail ("symbol 'value_type' is unknown"): converting
 // the member `_Base_type::value_type value_type;` threw during
 // implicit instantiation because a deduction variable of a sibling
 // partial-specialization pattern had been resolved by short name
-// through the enclosing instantiation's template map ([temp.deduct]/2
+// through the enclosing instantiation's template map ([temp.deduct.general]/1
 // violation), leaving a poisoned half-substituted instance in the
 // cache.  Reduced by cvise from the 39-line
 // cpp17_member_template_completed_instance test.

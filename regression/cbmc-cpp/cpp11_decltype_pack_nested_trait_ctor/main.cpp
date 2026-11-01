@@ -1,7 +1,7 @@
-// N5008 [temp.variadic]/5, [temp.deduct]/8, [over.ics.user]: a converting
-// constructor whose viability is SFINAE-constrained through a NESTED trait
-// whose member type is a `decltype` containing a call-argument pack expansion
-// over the enclosing class parameter pack -- the shape of libstdc++'s
+// N5008 [temp.variadic]/9, [temp.deduct.general]/8, [over.ics.user]: a
+// converting constructor whose viability is SFINAE-constrained through a NESTED
+// trait whose member type is a `decltype` containing a call-argument pack
+// expansion over the enclosing class parameter pack -- the shape of libstdc++'s
 // `__invoke_result<F, A...>::type =
 //   decltype(declval<F>()(declval<A>()...))` used to constrain
 // `std::function<R(A...)>`'s converting constructor.  The call-argument pack

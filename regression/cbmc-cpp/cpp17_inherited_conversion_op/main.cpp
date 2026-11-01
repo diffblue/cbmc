@@ -6,7 +6,7 @@
 // Pre-fix: `user_defined_conversion_sequence` skipped any
 // component with `from_base=true` when looking for cast
 // operators.  Per [class.member.lookup]/4 +
-// [class.conv.fct]/1, conversion operators inherited from base
+// [class.conv.fct]/6, conversion operators inherited from base
 // classes ARE valid candidates in derived-class lookup
 // (subject to access checks); the early-skip filtered them out
 // silently and produced "invalid implicit conversion from

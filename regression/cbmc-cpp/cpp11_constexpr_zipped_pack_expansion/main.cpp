@@ -1,4 +1,4 @@
-// [temp.variadic]/5 + [expr.const]: a constexpr member function template of a
+// [temp.variadic]/8 + [expr.const]: a constexpr member function template of a
 // class template instantiation may, in its body, expand the *enclosing class*
 // parameter pack and its *own* parameter pack simultaneously in one pack
 // expansion (a "zipped" expansion), e.g. `And<ctible<Ts, Us>...>::value`.

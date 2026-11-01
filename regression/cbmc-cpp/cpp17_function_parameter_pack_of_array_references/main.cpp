@@ -1,4 +1,4 @@
-// N5008 [temp.deduct.call]/1, [temp.variadic]/5: in `const char
+// N5008 [temp.deduct.call]/1, [temp.variadic]/8: in `const char
 // (&...s)[N]' the function parameter pack's pattern names the NON-type
 // pack N, deduced from each argument's array bound; g("ab", "c") has
 // N = {3, 2}.  Deduction recorded the argument types as the elements of a

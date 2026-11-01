@@ -1,4 +1,4 @@
-// N5008 [dcl.fct]/7: "The effect of a cv-qualifier-seq in a function declarator
+// N5008 [dcl.fct]/9: "The effect of a cv-qualifier-seq in a function declarator
 // is not the same as adding cv-qualification on top of the function type.  In
 // the latter case, the cv-qualifiers are ignored.  [Note: A function type that
 // has a cv-qualifier-seq is not a cv-qualified type; there are no cv-qualified

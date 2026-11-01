@@ -13,7 +13,7 @@ could not fully type-check
 Conversion-level gate for regex_match: the bodies of the _Compiler
 parser, of __regex_algo_impl (formerly dropped: "bad reference
 initializer" binding match_results' private vector base in a QUALIFIED
-friend, [namespace.memdef]/3) and of the _Executor (formerly never
+friend, [dcl.meaning.general]/2.2) and of the _Executor (formerly never
 instantiated: iterator_traits<const char*>::value_type deduced as
 `const char` through the `_Tp*` partial specialisation,
 [temp.spec.partial.order]) must all be present.

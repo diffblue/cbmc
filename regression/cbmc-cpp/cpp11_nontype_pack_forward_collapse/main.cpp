@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/4-5: a pack expansion `P...` produces one element per
+// N5008 [temp.variadic]/5-6: a pack expansion `P...` produces one element per
 // element of the pack `P`, whether `P` is a type or a NON-type parameter pack.
 //
 // Forwarding a non-type parameter pack `T...` into another template-argument

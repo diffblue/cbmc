@@ -1,4 +1,4 @@
-// N5008 [stmt.return]/3 + [expr.prim.lambda]: a lambda body's return
+// N5008 [stmt.return]/2 + [expr.prim.lambda]: a lambda body's return
 // statements convert to the LAMBDA's return type, and the enclosing
 // function's return statements convert to the ENCLOSING function's --
 // the lambda's type-checking must not disturb the enclosing context.

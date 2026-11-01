@@ -9,7 +9,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [temp.deduct.call] + [dcl.fct]/2 + [temp.variadic]/5 + [expr.new]:
+N5008 [temp.deduct.call] + [dcl.fct]/1 + [temp.variadic]/9 + [expr.new]:
 a free function template whose trailing return type is
 `decltype(::new((void*)0) _Tp(declval<_Args>()...))` (the C++20
 std::construct_at declaration) must expand the `_Args` pack inside the

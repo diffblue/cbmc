@@ -8,7 +8,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-Verifies [temp.inst]/1: a class template specialization is implicitly
+Verifies [temp.inst]/2: a class template specialization is implicitly
 instantiated on demand when a complete class type is required.
 Exercises: pointer-only use (incomplete-type OK) and subsequent member
 access / static-member access (triggers full instantiation).

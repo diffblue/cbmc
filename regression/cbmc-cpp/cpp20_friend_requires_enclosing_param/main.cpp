@@ -1,4 +1,4 @@
-// N5008 [temp.local]/1 + [temp.friend]/1: inside a class template, a
+// N5008 [basic.scope.temp]/2 + [temp.friend]/1: inside a class template, a
 // hidden friend's REQUIRES-CLAUSE may name the enclosing template's
 // own parameter.  This is libc++'s __range_adaptor_closure
 //   template <class _Tp> struct __range_adaptor_closure {

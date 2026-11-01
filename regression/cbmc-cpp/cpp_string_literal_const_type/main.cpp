@@ -1,4 +1,4 @@
-// N5008 [lex.string]/6: an ordinary string literal has type "array of n
+// N5008 [lex.string]/1: an ordinary string literal has type "array of n
 // const char" and is an lvalue ([expr.prim.literal]/1).  The C front-end
 // types it `char[n]' (C's rule), which in C++ mis-ranked overload
 // candidates: `std::string s("...")' selected the string_view constructor
@@ -48,7 +48,7 @@ int main()
 {
   static_assert(
     std::is_same<decltype("abc"), const char(&)[4]>::value,
-    "[lex.string]/6, [dcl.type.decltype]/1.5: const char (&)[4]");
+    "[lex.string]/1, [dcl.type.decltype]/1.5: const char (&)[4]");
   static_assert(
     sizeof(__func__) == 5,
     "[dcl.fct.def.general]/8: static const char __func__[] = \"main\"");

@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5 + [temp.deduct]/2: a heterogeneous parameter
+// N5008 [temp.variadic]/9 + [temp.deduct.general]/5: a heterogeneous parameter
 // pack (int*, int) forwarded through the libc++ __invoke /
 // __invokable_r / invoke_result_t chain -- `declval<XA>()...` inside a
 // static member's decltype, then `declval<A>()...` inside __invoke's

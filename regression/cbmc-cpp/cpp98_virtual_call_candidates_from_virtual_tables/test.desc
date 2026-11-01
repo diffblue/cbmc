@@ -8,7 +8,7 @@ must be one of \[derived::do_f
 must be one of .*unrelated::do_g
 ^warning: ignoring
 --
-N5008 [class.virtual]/2, /7: the virtual call do_f() in numpunct::f
+N5008 [class.virtual]/2, [expr.call]/2: the virtual call do_f() in numpunct::f
 invokes the final overrider in the dynamic type, numpunct or a class
 derived from it.  The front end lowers it to a call through the virtual
 table entry `vptr->do_f', and remove_function_pointers took as candidates

@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/4-5: a NON-type parameter pack expanded as CALL
+// N5008 [temp.variadic]/5-6: a NON-type parameter pack expanded as CALL
 // ARGUMENTS -- `add(I...)` -- expands to one argument per pack element, both in
 // a function-template body and inside a `decltype` return type.  This is the
 // call-argument analogue of the type-pack `f(T{}...)` and the value-pack

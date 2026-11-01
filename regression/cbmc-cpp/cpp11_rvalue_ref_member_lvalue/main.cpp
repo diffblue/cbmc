@@ -1,4 +1,4 @@
-// N5008 [expr.ref]/6: a class member access naming a member declared with
+// N5008 [expr.ref]/7: a class member access naming a member declared with
 // reference type is an LVALUE of the referenced type -- for an
 // rvalue-reference member (`int &&m`) just as for an lvalue-reference one.
 // So inside a member function, `m` binds to a non-const lvalue reference
@@ -14,9 +14,9 @@
 //   member function was dropped;
 // * trying a concrete non-viable constructor candidate (the instantiated
 //   `_Head_base(const _Head&)` == `_Head_base(int&)` by reference
-//   collapsing, [dcl.ref]/6) during overload resolution hard-failed the
+//   collapsing, [dcl.ref]/7) during overload resolution hard-failed the
 //   conversion instead of making the candidate non-viable
-//   ([over.best.ics.general]/2), dropping the enclosing constructor.
+//   ([over.match.viable]/4), dropping the enclosing constructor.
 extern "C" void __CPROVER_assert(int, const char *);
 
 template <typename T>
@@ -41,7 +41,7 @@ constexpr T &&forward(typename remove_reference<T>::type &__t) noexcept
   return static_cast<T &&>(__t);
 }
 
-// [expr.ref]/6 directly: reference member is an lvalue inside members
+// [expr.ref]/7 directly: reference member is an lvalue inside members
 struct B
 {
   int &&m;

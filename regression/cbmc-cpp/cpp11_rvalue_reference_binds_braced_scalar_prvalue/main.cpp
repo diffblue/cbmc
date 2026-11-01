@@ -7,7 +7,7 @@ T exchange(T &v, U &&n)
   return old;
 }
 using pointer = int *;
-// N5008 [expr.type.conv]/2, [dcl.init.ref]/5.3.1, [conv.rval]: `pointer{}'
+// N5008 [expr.type.conv]/1.4, [dcl.init.ref]/5.3.1, [conv.rval]: `pointer{}'
 // is a prvalue null pointer; the rvalue reference binds to a temporary
 // materialized from it (the MSVC STL's `exchange(_Ptr, pointer{})' in
 // std::list's node insertion)

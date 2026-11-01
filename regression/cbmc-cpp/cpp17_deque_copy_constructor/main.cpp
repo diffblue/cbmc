@@ -1,4 +1,4 @@
-// N5008 [sequence.reqmts], [deque.cons]: copying a std::deque copies its
+// N5008 [container.reqmts], [deque.cons]: copying a std::deque copies its
 // elements.  The front end's model of std::__uninitialized_copy_a copies
 // between pointers with __CPROVER_array_replace; for deque's
 // _Deque_iterator arguments it was applied to the iterator objects and

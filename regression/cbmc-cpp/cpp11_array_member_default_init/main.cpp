@@ -1,4 +1,4 @@
-// N5008 [class.mem.general]/10 + [dcl.init.aggr]: a default member
+// N5008 [class.mem.general]/14 + [dcl.init.aggr]: a default member
 // initializer with a braced-init-list applies to an aggregate member
 // containing an ARRAY -- `vec v_{{7, 8}};` initializes v_.data_[0..1].
 // CBMC converts the initialization into an assignment and rejects it

@@ -1,4 +1,4 @@
-// [temp.spec.partial.match] / [temp.class.spec] / [expr.sizeof]/5: a class
+// [temp.spec.partial.match] / [temp.spec.partial] / [expr.sizeof]/4: a class
 // template partial specialization whose pattern is a class-template-id with a
 // pack expansion (`primary<Types...>`) must match a concrete instantiation of
 // that template, deducing the parameter pack -- for any pack length, including

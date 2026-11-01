@@ -3,7 +3,7 @@ namespace ns
 {
 struct sentinel
 {
-  // N5008 [class.friend]/7, [basic.lookup.argdep]/4.2: a friend function
+  // N5008 [dcl.meaning.general]/2, [basic.lookup.argdep]/4.2: a friend function
   // first declared in a class is visible only to argument-dependent lookup
   // with that class associated
   template <class T>

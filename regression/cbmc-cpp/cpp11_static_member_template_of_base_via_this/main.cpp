@@ -1,4 +1,4 @@
-// N5008 [expr.ref]/6.3, [class.member.lookup]: `this->f<T>(...)' naming a
+// N5008 [expr.ref]/7.3, [class.member.lookup]: `this->f<T>(...)' naming a
 // STATIC member function template of a BASE class.  The specialization is a
 // symbol of the base, not a component of the derived class, so the "must be a
 // static component" check rejected it ("is not static member of class") and

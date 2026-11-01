@@ -1,5 +1,5 @@
 // N5008 [except.terminate]/1-2: std::terminate is called when no handler is
-// found for an exception (1.2; [except.handle]/9) and when the search for
+// found for an exception (1.2; [except.handle]/8) and when the search for
 // a handler leaves a function with a non-throwing exception specification
 // (1.3); a program may also call it directly ([terminate]/2).  It calls the
 // handler installed by std::set_terminate ([terminate]/1,

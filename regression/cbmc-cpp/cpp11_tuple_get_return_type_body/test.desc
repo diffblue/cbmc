@@ -16,4 +16,4 @@ holds when picking this up.
 Fixed 2026-08-06 (round 16): multi-pack spec patterns absorb longer
 flat argument lists at both matching sites ([temp.spec.partial.match]
 /2), and the lockstep mem-initializer expansion substitutes non-type
-pack element VALUES ([temp.variadic]/5).
+pack element VALUES ([temp.variadic]/9).

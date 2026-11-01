@@ -24,7 +24,7 @@ failed to produce a goto binary despite exit code 0.
 
 Fixed by wrapping per-candidate function-template substitution
 and default TYPE template argument substitution with a
-null-message-handler per [temp.deduct]/7-8, so SFINAE failures no
+null-message-handler per [temp.deduct.general]/7-8, so SFINAE failures no
 longer leak diagnostics.
 
 `std::array<double, 3> a{}` now compiles cleanly through the

@@ -29,7 +29,7 @@ struct N
   P p;
   int y;
 };
-// [stmt.return]/2, [dcl.init.list]/3.4, [dcl.init.aggr]/16: a
+// [stmt.return]/2, [dcl.init.list]/3.4, [dcl.init.aggr]/14: a
 // braced-init-list operand aggregate-initializes the result object, with
 // brace elision for the array and class members
 IA g()

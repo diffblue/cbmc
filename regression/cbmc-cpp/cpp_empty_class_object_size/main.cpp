@@ -1,5 +1,5 @@
 extern "C" void __CPROVER_assert(bool, const char *);
-// N5008 [class]/4, [intro.object]/9: a complete object of class type has a
+// N5008 [class.pre]/7, [intro.object]/8: a complete object of class type has a
 // nonzero size -- an empty class is one byte (its alignment when over-aligned);
 // an empty MEMBER occupies its byte, an empty BASE subobject may have zero size
 // (the Itanium ABI empty base optimisation).  The class used to be a zero-sized

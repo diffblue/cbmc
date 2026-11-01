@@ -3,7 +3,7 @@ struct IA
   int v[2];
   int w;
 };
-// [dcl.init.aggr]/16: an initializer-clause that does not appertain to an
+// [dcl.init.aggr]/14: an initializer-clause that does not appertain to an
 // element of the aggregate or one of its subaggregates is ill-formed
 IA g()
 {

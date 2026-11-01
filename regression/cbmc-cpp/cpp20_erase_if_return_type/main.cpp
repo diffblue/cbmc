@@ -9,7 +9,7 @@
 // erase_if's body conversion threw (a separate, still-open instantiation gap)
 // and the throw was caught by the system-header guard, `return_type` was left
 // pointing at size_type.  main's subsequent `return 0;` was then converted
-// against that stale type (N5008 [stmt.return]/3 converts the operand to the
+// against that stale type (N5008 [stmt.return]/2 converts the operand to the
 // *enclosing* function's return type), so `0` became a 64-bit size_t while
 // main's return slot stayed a 32-bit int -- a type-inconsistent assignment that
 // tripped the symbolic-execution invariant lhs.type() == rhs.type() and aborted

@@ -1,4 +1,4 @@
-// N5008 [expr.const]/5, [expr.add]/4: a constexpr function may initialize,
+// N5008 [expr.const]/10.16, [expr.add]/4: a constexpr function may initialize,
 // assign and advance a pointer into a string literal (the shape of
 // GCC 16's __unicode::__literal_encoding_is_unicode)
 extern "C" void __CPROVER_assert(bool, const char *);

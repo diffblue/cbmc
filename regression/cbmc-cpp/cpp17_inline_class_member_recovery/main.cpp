@@ -1,4 +1,4 @@
-// Regression for [class.mem]/3 + [temp.inst]: failure to elaborate one
+// Regression for [class.mem.general]/3 + [temp.inst]: failure to elaborate one
 // member-declaration must not silently drop sibling member-declarations
 // (or access-specifiers) from the class body.
 //
@@ -13,7 +13,7 @@
 // every subsequent member-declaration AND access-specifier transition
 // that follows in the enclosing class's body.
 //
-// The C++ standard ([class.mem]/3) specifies:
+// The C++ standard ([class.mem.general]/3) specifies:
 //   "The member-specification in a class definition declares the full
 //   set of members of the class."
 // Each member-declaration is independently observable; a failure in one

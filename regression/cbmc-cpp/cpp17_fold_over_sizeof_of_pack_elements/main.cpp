@@ -2,7 +2,7 @@ extern "C" void __CPROVER_assert(bool, const char *);
 template <class... Ts>
 int bytes(Ts... xs)
 {
-  // [expr.prim.fold]/2 + [expr.sizeof]/1: each element of the expansion is
+  // [temp.variadic]/9 + [expr.sizeof]/1: each element of the expansion is
   // sizeof applied to one pack element
   return (0 + ... + static_cast<int>(sizeof(xs)));
 }

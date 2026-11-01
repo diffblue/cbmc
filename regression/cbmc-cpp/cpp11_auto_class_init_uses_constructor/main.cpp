@@ -1,4 +1,4 @@
-// N5008 [dcl.init]/16.6.2 + [class.copy.elision]: `auto x = init;' of a
+// N5008 [dcl.init.general]/16.6.2 + [class.copy.elision]: `auto x = init;' of a
 // class type is copy-initialization -- the copy or move constructor chosen
 // by overload resolution (a prvalue initializes the object directly), not a
 // bitwise copy.  The front end assigned bitwise and then destroyed the

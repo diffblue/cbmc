@@ -4,7 +4,7 @@
 // guarded variadic ones), so CBMC's implicit_typecast path — which
 // tries one-arg conversions — doesn't find a match and falls through.
 //
-// Per [stmt.return]/3 (C++11), `return { a, b };` in a function whose
+// Per [stmt.return]/2 (C++11), `return { a, b };` in a function whose
 // return type is a class type must perform list-initialization of a
 // temporary of the return type with the braced-init-list.
 //

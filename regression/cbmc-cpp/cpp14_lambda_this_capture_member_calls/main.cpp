@@ -1,4 +1,4 @@
-// N5008 [expr.prim.this]/2, [class.mfct.non.static]/2: in a lambda that
+// N5008 [expr.prim.this]/2, [expr.prim.id.general]/2: in a lambda that
 // captures `this', `this' and unqualified member function calls refer to
 // the enclosing object
 extern "C" void __CPROVER_assert(bool, const char *);
@@ -50,7 +50,7 @@ public:
   int generic()
   {
     // a generic lambda called with a class type: the call operator is a
-    // template ([expr.prim.lambda.closure]/7)
+    // template ([expr.prim.lambda.closure]/4)
     return visit_both([this](const auto &x)
                       { return this->twice(value(x)) + get(x); });
   }

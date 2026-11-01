@@ -1,6 +1,6 @@
 #include <cassert>
 
-// [namespace.udecl]/19: a using-declaration republishes an inherited
+// [namespace.udecl]/16: a using-declaration republishes an inherited
 // member with the access of the using-declaration (independent of the
 // member's access in the base), and -- through public derivation --
 // that access propagates to further-derived classes.  This mirrors

@@ -1,4 +1,4 @@
-// N5008 [class.copy.ctor]/14-15: a defaulted move constructor
+// N5008 [class.copy.ctor]/14: a defaulted move constructor
 // direct-initializes each base and non-static data member from the
 // corresponding subobject of the argument, cast to an xvalue
 // (`static_cast<M&&>(other.m)`).  Overload resolution on that xvalue selects
@@ -13,7 +13,7 @@
 // reported as "member 'M::M(this, ...M&...)' is not accessible" followed by a
 // CONVERSION ERROR that dropped the enclosing constructor body.  The fix emits
 // a move initializer (static_cast<T&&>(ref.member)) for the move constructor,
-// so the member's move constructor is selected ([class.copy.ctor]/15).  This
+// so the member's move constructor is selected ([class.copy.ctor]/14).  This
 // was the header-free, template-free root cause of the enable_if_t<false>
 // dog-food failures in irep_serialization.cpp and ui_message.cpp (which hold a
 // std::unique_ptr member, whose copy constructor is deleted and move

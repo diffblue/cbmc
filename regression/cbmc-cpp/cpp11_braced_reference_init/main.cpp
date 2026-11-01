@@ -1,6 +1,6 @@
 extern "C" void __CPROVER_assert(bool, const char *);
 
-// N5008 [dcl.init.list]/3.10: a braced-init-list with a single element
+// N5008 [dcl.init.list]/3.9: a braced-init-list with a single element
 // initializing a reference binds the reference to that element.  CBMC
 // used to reject the form ("bad reference initializer") -- fixed
 // 2026-07-21.  The shape of
@@ -11,7 +11,7 @@ extern "C" void __CPROVER_assert(bool, const char *);
 int main()
 {
   int x = 41;
-  int &r{x}; // [dcl.init.list]/3.10: single-element list binds the reference
+  int &r{x}; // [dcl.init.list]/3.9: single-element list binds the reference
   r += 1;
   __CPROVER_assert(x == 42, "braced reference binding");
   return 0;

@@ -1,5 +1,5 @@
-// [basic.lval] p1: derived-to-base conversion on rvalue produces xvalue.
-// An xvalue can bind to an rvalue reference parameter.
+// [conv.rval]/1, [dcl.init.ref]/5.3: derived-to-base conversion on rvalue
+// produces xvalue.  An xvalue can bind to an rvalue reference parameter.
 #include <cassert>
 struct Base
 {

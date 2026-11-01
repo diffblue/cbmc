@@ -10,6 +10,6 @@ overloads.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [namespace.udecl]/19, [class.access.general]/5; see test.desc.  Fails
+N5008 [namespace.udecl]/16, [class.access.general]/5; see test.desc.  Fails
 on bin53.  g++ 13 and clang++ 18 accept this program, and it fails only its
 WRONG assertion.

@@ -1,4 +1,4 @@
-// N5008 [expr.call]/7, [expr.prim.req.general]/5: a requirement calling a
+// N5008 [expr.call]/6, [expr.prim.req.general]/5: a requirement calling a
 // function with a by-value parameter of an incomplete class type is
 // ill-formed, so the requirement is not satisfied
 extern "C" void __CPROVER_assert(bool, const char *);

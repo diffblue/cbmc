@@ -1,9 +1,9 @@
-// [temp.spec]/4 + [over.match]: a member function template and a non-template
-// member function may have the same signature (e.g. `unsigned f()` and
-// `template<class U> unsigned f()`).  A call `f<U>()` with explicit template
-// arguments selects the template ([temp.arg.explicit]); a call `f()` selects
-// the non-template.  Each template specialization is a distinct entity
-// ([temp.spec]/4), so f<char>() and f<int>() must be independent of each other
+// [temp.fct.general]/2 + [over.match]: a member function template and a
+// non-template member function may have the same signature (e.g. `unsigned f()`
+// and `template<class U> unsigned f()`).  A call `f<U>()` with explicit
+// template arguments selects the template ([temp.arg.explicit]); a call `f()`
+// selects the non-template.  Each template specialization is a distinct entity
+// ([temp.type]/1), so f<char>() and f<int>() must be independent of each other
 // and of the non-template f().
 //
 // CBMC named the template specializations with the same unsuffixed member

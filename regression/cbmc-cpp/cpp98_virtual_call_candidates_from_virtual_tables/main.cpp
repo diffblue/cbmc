@@ -1,7 +1,7 @@
-// N5008 [class.virtual]/2, /7: a virtual call invokes the final overrider
-// in the dynamic type of the object, which is a class having the function
-// as a member; a function of an unrelated class with the same signature
-// is never called
+// N5008 [class.virtual]/2, [expr.call]/2: a virtual call invokes the final
+// overrider in the dynamic type of the object, which is a class having the
+// function as a member; a function of an unrelated class with the same
+// signature is never called
 extern "C" void __CPROVER_assert(bool, const char *);
 extern "C" int nondet_int();
 struct facet

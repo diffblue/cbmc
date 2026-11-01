@@ -12,7 +12,7 @@ main.cpp
 unexpected expression
 dropped the body
 --
-N5008 [stmt.select.general]/4 + [conv.bool]: a condition that is a
+N5008 [stmt.pre]/6 + [conv.bool]: a condition that is a
 declaration `if(T a = x)' / `while(T a = x)' tests the declared object
 contextually converted to bool.  The C++ front end converted the object to
 bool itself and then handed the statement to the C type checker, which

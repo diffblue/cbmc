@@ -11,7 +11,7 @@ struct value
   {
   }
 };
-// a variadic function ([dcl.fct]/6): the arguments beyond `first' are not
+// a variadic function ([dcl.fct]/2): the arguments beyond `first' are not
 // bound to declared parameters
 value make(int first, ...)
 {

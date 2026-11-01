@@ -17,7 +17,7 @@ for the instantiation -- libstdc++'s views::all (`if constexpr
 (view<decay_t<_Range>>) return std::forward<_Range>(__r); ... else return
 ref_view{...}`) deduced `int*` for an array argument.  A return under an `if
 constexpr` now defers deduction until the body is type-checked and the
-discarded branch is gone.  Also [dcl.type.auto.deduct]/4: the deduced type
+discarded branch is gone.  Also [dcl.type.auto.deduct]/3: the deduced type
 drops a reference and top-level cv-qualifiers (`return static_cast<R &&>(r)`
 with R = int*& used to give the function the return type `int *&`).
 Non-vacuous: the last assertion states a wrong

@@ -9,7 +9,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [temp.pre]/1, [temp.spec]/4, [temp.mem]/1: a static data member
+N5008 [temp.pre]/3, [temp.type]/1, [temp.mem]/1: a static data member
 template of a class (template).  Each specialization is a distinct
 variable (was: the second specialization was a "redeclaration" of the
 first, surfacing as "found no match"); its initializer may name the

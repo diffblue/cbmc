@@ -11,9 +11,9 @@ main.cpp
 ^(ERROR|error): invalid implicit conversion
 dropped the body
 --
-N5008 [dcl.decl]/4, [conv.bool]: a class template partial specialization matched
-on a function type with a reference return and no parameters (fn<int&()>, the
-shape of std::function<exprt&()> in util/expr_iterator.h) provides an explicit
-operator bool used in a boolean context.  Requires the empty () after the
-reference return to be parsed as a function parameter-list.  assertion.2 FAILURE
-proves non-vacuity.
+N5008 [dcl.decl.general]/6, [conv.general]/4: a class template partial
+specialization matched on a function type with a reference return and no
+parameters (fn<int&()>, the shape of std::function<exprt&()> in
+util/expr_iterator.h) provides an explicit operator bool used in a boolean
+context.  Requires the empty () after the reference return to be parsed as a
+function parameter-list.  assertion.2 FAILURE proves non-vacuity.

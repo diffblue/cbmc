@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5: a pack-expansion use of a function parameter pack in
+// N5008 [temp.variadic]/9: a pack-expansion use of a function parameter pack in
 // a function body -- here the call `fp(a...)` in `go`, where `a` is the
 // parameter pack of `go(A... a)` and `A` is the enclosing class template
 // parameter pack -- must expand to one argument per pack element.

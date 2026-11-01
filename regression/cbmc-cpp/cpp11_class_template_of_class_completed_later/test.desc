@@ -14,8 +14,8 @@ Invariant check failed
 dropped the body
 found no match
 --
-N5008 [temp.inst]/1 + [dcl.fct]/12: a function declaration's return type does
-not instantiate the specialization it names; a member function declaration's
-parameter types do not instantiate what they name either (the lazily kept
-typedef is resolved without elaboration inside the class body).  libstdc++ 16's
-std::set of a class defined after the set is first named.
+N5008 [temp.inst]/2 + [dcl.fct.def.general]/2: a function declaration's return
+type does not instantiate the specialization it names; a member function
+declaration's parameter types do not instantiate what they name either (the
+lazily kept typedef is resolved without elaboration inside the class body).
+libstdc++ 16's std::set of a class defined after the set is first named.

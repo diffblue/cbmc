@@ -1,4 +1,4 @@
-// N5008 [temp.inst]/1-2: naming `std::set<late>' (a declaration and an
+// N5008 [temp.inst]/2: naming `std::set<late>' (a declaration and an
 // inline function that only default-constructs one) while `late' is still an
 // incomplete class must not instantiate the node type -- libstdc++'s
 // _Rb_tree_node<late> has `unsigned char _M_storage[sizeof(late)]'.  The

@@ -1,7 +1,7 @@
 // A CLASS-type tuple element (box<int>) exercises the aggregate
 // [class.base.init]/7 late lowering for a NON-POD aggregate base
 // (__tuple_leaf<box<int>> is an aggregate, [dcl.init.aggr]/1, though
-// not a POD) and the [expr.sizeof]/5 pack-size queries surviving the
+// not a POD) and the [expr.sizeof]/4 pack-size queries surviving the
 // single-element pack-name stamping during instantiation
 // (`sizeof...(_Tp)` must stay a pack-size query, not become the
 // element's byte size).  clang accepts; g++ rejects the

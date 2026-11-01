@@ -1,5 +1,5 @@
 // A GNU anonymous struct member (accepted by g++ and clang++) may hold a
-// reference, unlike an anonymous union (N5008 [class.union.general]/3 is a
+// reference, unlike an anonymous union (N5008 [class.union.general]/4 is a
 // rule for unions only): libc++ 21's _LIBCPP_COMPRESSED_PAIR is an
 // anonymous struct, and __split_buffer<T, Alloc &> keeps its `allocator_type
 // __alloc_' -- a reference -- in it.  The front end rejected the reference

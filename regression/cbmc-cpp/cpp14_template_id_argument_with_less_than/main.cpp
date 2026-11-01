@@ -2,7 +2,7 @@ extern "C" void __CPROVER_assert(bool, const char *);
 typedef unsigned long size_type;
 // libc++ <string>'s basic_string::__recommend shape: a template-id whose
 // non-type argument is a conditional expression containing an unparenthesized
-// `<' ([temp.names]/3: the first non-nested `>' ends the argument list; `<'
+// `<' ([temp.names]/4: the first non-nested `>' ends the argument list; `<'
 // inside an argument is an operator)
 template <class CharT>
 struct basic_string

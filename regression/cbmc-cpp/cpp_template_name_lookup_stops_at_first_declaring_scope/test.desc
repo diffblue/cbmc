@@ -10,7 +10,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [basic.lookup.general]/1, [basic.lookup.unqual]/1-2: unqualified
+N5008 [basic.lookup.general]/1, [basic.lookup.unqual]/2: unqualified
 lookup stops at the first scope in which a declaration of the name is found.
 For template names cpp_scopet::lookup_rec kept collecting the templates of
 the enclosing class and namespace scopes (it stopped only at a block scope,

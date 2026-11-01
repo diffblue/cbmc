@@ -22,7 +22,7 @@ int algo(I s, inner::results<I, A> &m);
 }
 namespace inner
 {
-// N5008 [namespace.memdef]/3 + [temp.friend]/1: a friend declared with
+// N5008 [dcl.meaning.general]/2.2 + [temp.friend]/1: a friend declared with
 // a QUALIFIED name refers to the template previously declared in that
 // namespace (libstdc++ match_results befriending
 // __detail::__regex_algo_impl).

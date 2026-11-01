@@ -14,7 +14,7 @@ found no match for symbol
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [temp.arg.template]/1, [temp.names]/2, [temp.param]/1: a qualified
+N5008 [temp.arg.template]/1, [temp.param]/7.3, [temp.param]/1: a qualified
 template-name bound to a template template parameter, used with arguments
 inside the template.  Non-vacuous: the last assertion is deliberately wrong
 and must FAIL.  Before the fix: "found no match for symbol 'ns'" / 'std' and

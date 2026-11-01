@@ -18,7 +18,7 @@ member alias __cat has three partial specializations with the SAME
 argument pattern differing only by requires-clauses that form a
 subsumption chain (__cpp17_input_iterator < __cpp17_fwd_iterator <
 __cpp17_randacc_iterator conjunctions); for a random-access iterator all
-three are satisfied and N5008 [temp.class.spec.match]/2 +
+three are satisfied and N5008 [temp.spec.partial.match]/2 +
 [temp.constr.order] mandate the most-constrained one.  The tie-break used
 a counting heuristic that fell through to first-seen in the
 pointer-ordered id_set (std::set<cpp_idt*>), so the selected category was

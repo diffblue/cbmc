@@ -3,7 +3,7 @@ bool g(const int &, int &)
 {
   return true;
 }
-// [expr.prim.req.general]/4, [temp.variadic]/5: the parameter pack `a'
+// [expr.prim.req.general]/4, [temp.variadic]/9: the parameter pack `a'
 // declares one parameter per element of A, the k-th of type A_k &&; libc++'s
 // std::invocable has this shape (requires(_Fn &&__fn, _Args &&...__args))
 template <class... A>

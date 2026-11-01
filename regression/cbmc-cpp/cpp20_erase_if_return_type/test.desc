@@ -18,7 +18,7 @@ system-header guard before the non-exception-safe restore ran).  main's
 `return 0;` was then typed size_t while main's return slot stayed int, tripping
 the symex invariant lhs.type() == rhs.type() (goto_symex.cpp) and aborting CBMC.
 The fix restores `return_type` and the loop-context flags on every exit of
-convert_function (N5008 [stmt.return]/3: `return` converts to the *enclosing*
+convert_function (N5008 [stmt.return]/2: `return` converts to the *enclosing*
 function's return type).  The forbidden patterns guard against the crash's
 return (invariant violation / the specific condition) and against a conversion
 error.

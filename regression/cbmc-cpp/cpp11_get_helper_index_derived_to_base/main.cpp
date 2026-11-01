@@ -1,4 +1,4 @@
-// N5008 [temp.deduct.call]/4.3 (same template family) + [temp.variadic]/7.
+// N5008 [temp.deduct.call]/4.3 (same template family) + [temp.variadic]/10.
 // `tailcount<__i>(TImpl<__i, Head, Tail...>&)` has an explicitly specified
 // non-type index `__i`.  Called on a `TImpl<0, int, int>` argument, `__i = 1`
 // does not match the argument's own first template argument (0), so the

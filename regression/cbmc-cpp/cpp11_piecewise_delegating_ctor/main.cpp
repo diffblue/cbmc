@@ -1,4 +1,4 @@
-// N5008 [class.base.init]/6 (delegating constructors) + [temp.variadic]/5:
+// N5008 [class.base.init]/6 (delegating constructors) + [temp.variadic]/9:
 // std::pair's piecewise constructor is defined out-of-line in <tuple> as a
 // DELEGATING constructor:
 //

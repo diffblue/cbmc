@@ -1,11 +1,11 @@
 // N5008 [over.match.list]/1 phase 1: `std::vector<E> a{E{2}}' selects the
 // initializer-list constructor when each clause converts to E (a derived
-// class's object does, [conv.ptr]).  The viability check skipped every
-// clause that carried a type, assuming it was type-checked at the call site;
-// a parsed `E{2}' carries one without being type-checked, so the
-// initializer-list constructor looked non-viable and the iterator-pair
-// template was tried with E (found no match for symbol 'vector').
-// Regression guard for the call-site element type-check (round 185).
+// class's object does, [over.best.ics.general]/7).  The viability check skipped
+// every clause that carried a type, assuming it was type-checked at the call
+// site; a parsed `E{2}' carries one without being type-checked, so the
+// initializer-list constructor looked non-viable and the iterator-pair template
+// was tried with E (found no match for symbol 'vector').  Regression guard for
+// the call-site element type-check (round 185).
 extern "C" void __CPROVER_assert(bool, const char *);
 #include <vector>
 struct E

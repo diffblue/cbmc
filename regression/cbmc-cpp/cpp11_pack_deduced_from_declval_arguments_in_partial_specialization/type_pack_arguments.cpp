@@ -11,7 +11,7 @@ count_of<A...> g(A...);
 template <class... Args>
 struct direct
 {
-  // [temp.variadic]/5: one argument per element of the type pack
+  // [temp.variadic]/9: one argument per element of the type pack
   typedef decltype(g(declval<Args>()...)) type;
   typedef decltype(g(Args()...)) type2;
   typedef decltype(g(static_cast<Args>(0)..., 1)) type3;

@@ -10,9 +10,9 @@ struct holder
     delete p;
   }
 };
-// [over.match.best]/2.1, [over.ics.rank]/3.3: `o == 0' selects
+// [over.match.best.general]/2.1, [over.ics.rank]/3.3: `o == 0' selects
 // operator==(ord, unspec).  The hidden friend operator==(count, count) is
-// not even a candidate ([basic.lookup.argdep]/4.3: count is not an
+// not even a candidate ([basic.lookup.argdep]/4.2: count is not an
 // associated class of ord or int); the front end considered it and, ranking
 // the conversion 0 -> unspec through unspec(unspec *) worse than the
 // unrelated 0 -> count through count(P), selected it.  Its constructor

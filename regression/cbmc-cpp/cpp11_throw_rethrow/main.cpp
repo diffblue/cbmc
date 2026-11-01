@@ -1,4 +1,4 @@
-// N5008 [except.throw]/8: a throw-expression with no operand (`throw;`)
+// N5008 [expr.throw]/3: a throw-expression with no operand (`throw;`)
 // rethrows the exception currently being handled; the same exception object
 // propagates to the next enclosing handler.
 //

@@ -1,7 +1,7 @@
-// Per [dcl.init]/8: value-initialization of an array member via T()
+// Per [dcl.init.general]/9.2: value-initialization of an array member via T()
 // in a constructor's member-initializer list zero-initializes each
 // element.  Before the fix in cpp_typecheck_code.cpp, CBMC emitted a
-// direct assignment to the array lvalue, which [expr.ass] forbids,
+// direct assignment to the array lvalue, which [expr.assign] forbids,
 // producing "direct assignments to arrays not permitted" at
 // type-check time.
 //

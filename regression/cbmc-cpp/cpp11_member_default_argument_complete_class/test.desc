@@ -14,7 +14,7 @@ main.cpp
 is unknown$
 dropped the body
 --
-N5008 [class.mem.general]/7-8: a default argument in a class's
+N5008 [class.mem.general]/9.2: a default argument in a class's
 member-specification is a complete-class context.  Checking it while the class
 was still being defined failed on `= path()` (the class's own constructor) and
 on `= _S_default` (a static member declared further down), which aborted the

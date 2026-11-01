@@ -8,7 +8,7 @@ main.cpp
 --
 dropped the body
 --
-Fixed across rounds 56-57: [temp.variadic]/5 bare pack-expansion
+Fixed across rounds 56-57: [temp.variadic]/9.2 bare pack-expansion
 mem-initializer arguments resolve against the materialised parameters,
 and [dcl.init.general]/16.6.2.2 parenthesized aggregate initialization
 now covers a MEMBER of aggregate class type (previously only functional

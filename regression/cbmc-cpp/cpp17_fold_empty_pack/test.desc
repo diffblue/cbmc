@@ -11,7 +11,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-[expr.prim.fold]/3: folds over an empty pack yield the operator's identity
+[temp.variadic]/14: folds over an empty pack yield the operator's identity
 (unary && / ||) or the init operand (binary); previously the empty-pack
 instantiation left residual fold nodes that degraded the function body to
 nondeterministic values.  Runtime-verified against g++ and clang++.

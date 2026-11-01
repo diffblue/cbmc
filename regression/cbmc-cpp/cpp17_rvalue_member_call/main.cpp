@@ -1,6 +1,6 @@
 // Regression: rvalue-receiver method dispatch
-// (`std::move(receiver).method()`) per [class.this] /
-// [over.match.funcs]/3.
+// (`std::move(receiver).method()`) per [over.match.funcs.general]/4.2 /
+// [over.match.funcs.general]/4.
 //
 // Reduced from dog-fooding goto-cc on src/util/type.h:103
 //

@@ -16,7 +16,7 @@ main.cpp
 does not uniquely resolve
 dropped the body
 --
-N5008 [class.conv.fct]/2 (explicit conversion functions are not implicit
+N5008 [class.conv.fct]/4 (explicit conversion functions are not implicit
 conversions), [over.match.copy]/1.2 (direct-initialization `T(x)' through the
 copy constructor), [conv.general]/4 (contextual conversion to bool) and
 [over.match.conv]/1 (direct-initialization of a non-class object).

@@ -8,7 +8,7 @@ main.cpp
 --
 dropped the body
 --
-N5008 [temp.constr.decl]/3 -- the associated constraints of a
+N5008 [temp.inst]/17 -- the associated constraints of a
 constrained member of a class template include the enclosing class
 template's parameters; a requires atom referencing them
 (__is_constructible(T2, U2) inside pr<T2>) is now evaluated by mapping

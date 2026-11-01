@@ -1,4 +1,4 @@
-// N5008 [temp.inst]/2: the implicit instantiation of a class template
+// N5008 [temp.inst]/3.1: the implicit instantiation of a class template
 // specialization instantiates the *declarations* of its member function
 // templates, but NOT their definitions, and a member function template's
 // signature remains dependent on its own template parameters -- it is not
@@ -27,7 +27,7 @@
 // FIXED: the hard error is gone (the =delete constructor template is no
 // longer concretized), and the subsequent value bugs were fixed by modelling
 // C++17 inheriting constructors ([class.inhctor.init]), xvalue base
-// initialization in defaulted move constructors ([class.copy.ctor]/15), and
+// initialization in defaulted move constructors ([class.copy.ctor]/14), and
 // memberwise elaboration of defaulted copy/move assignment operators
 // ([class.copy.assign]/12).  assertion.2 must FAIL (non-vacuity).
 

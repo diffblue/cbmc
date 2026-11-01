@@ -11,7 +11,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [expr.prim.req.general]/4, [temp.variadic]/5: in `requires(A &&...a)' the
+N5008 [expr.prim.req.general]/4, [temp.variadic]/9: in `requires(A &&...a)' the
 pack declares one parameter per element of A, the k-th of type A_k &&. With A =
 {const int &, int &} the front end gave the parameters one and the same type
 ("type mismatch on static_cast: operand type 'const signed int', cast type

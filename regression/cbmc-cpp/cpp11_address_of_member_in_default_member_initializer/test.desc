@@ -12,7 +12,7 @@ main.cpp
 dropped the body
 --
 N5008 [expr.unary.op]/4: the address of a member forms a pointer to member
-only for a qualified-id `&C::m'; [expr.prim.id.general]/4: in a default
+only for a qualified-id `&C::m'; [expr.prim.id.general]/2: in a default
 member initializer an unqualified member name `x' is transformed into
 `(*this).x', so `&x' has type `int *'. The front end typed the NSDMI `int
 *p = &x;' as a pointer to member ("invalid implicit conversion from

@@ -1,5 +1,6 @@
-// Regression for [class.copy.ctor]/1 + [dcl.init]/14: copy-initialization
-// from `const T&` to a converting-constructor parameter of type `T`.
+// Regression for [class.copy.ctor]/1 + [dcl.init.general]/16.6.2:
+// copy-initialization from `const T&` to a converting-constructor parameter of
+// type `T`.
 //
 // CBMC's `user_defined_conversion_sequence` handles the
 // "convert source struct to constructor's first parameter struct" case

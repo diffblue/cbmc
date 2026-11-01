@@ -19,8 +19,8 @@ object through a constructor call only when the return type has a
 DESTRUCTOR, and skips operands that are already temporaries; a
 converting temporary of a different class type therefore falls through
 to implicit_typecast, which knows no user-defined conversion
-([stmt.return]/2 + [dcl.init.general]/16.6.1 require considering the
-CONVERTING constructors, [unique.ptr.single.ctor]/26).
+([stmt.return]/2 + [dcl.init.general]/16.6.3 require considering the
+CONVERTING constructors, [unique.ptr.single.ctor]/19).
 ROUND-88 UPDATE: the front-end defect IS FIXED (see CORE
 cpp17_converting_return_move_ctor, a header-free carrier of exactly
 this shape, and the commit "converting constructors for class-typed

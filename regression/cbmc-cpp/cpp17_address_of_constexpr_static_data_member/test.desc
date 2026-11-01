@@ -15,7 +15,7 @@ dropped the body
 N5008 [class.static.data]/4, [expr.unary.op]/3: `&unique_typeinfo<T>::id'
 is the address of the static data member (an object, even though it is
 constexpr and usable in constant expressions); each specialization's
-member is a distinct object ([basic.compound]/3). The front end replaced
+member is a distinct object ([temp.spec.general]/7). The front end replaced
 the constexpr member by its value and reported "address_of error: '0' not
 an lvalue", dropping the function. The substituted value now remembers its
 variable, and taking the address uses (and odr-uses) the object;

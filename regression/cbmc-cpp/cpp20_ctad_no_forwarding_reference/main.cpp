@@ -1,6 +1,6 @@
 // N5008 [temp.deduct.call]/3: in class template argument deduction an rvalue
 // reference to a template parameter OF THE CLASS TEMPLATE is not a forwarding
-// reference; [dcl.init.general]/9: value-initialising a reference is
+// reference; [dcl.init.general]/10: value-initialising a reference is
 // ill-formed (a requirement naming it is unsatisfied, not a crash).
 extern "C" void __CPROVER_assert(bool, const char *);
 #include <concepts>

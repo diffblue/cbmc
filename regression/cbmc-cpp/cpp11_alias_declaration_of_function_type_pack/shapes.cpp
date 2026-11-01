@@ -1,5 +1,5 @@
 extern "C" void __CPROVER_assert(bool, const char *);
-// [dcl.typedef]/2, [temp.variadic]/5: member alias-declarations of function
+// [dcl.typedef]/2, [temp.variadic]/9: member alias-declarations of function
 // type whose parameter list is a pack expansion, for empty, three-element
 // and reference packs, and patterns `T &...' and `T &&...'
 int hit;

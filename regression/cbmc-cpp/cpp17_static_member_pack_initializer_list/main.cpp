@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5: a pack expansion inside a braced-init-list
+// N5008 [temp.variadic]/9: a pack expansion inside a braced-init-list
 // produces one element per pack element; [class.static.data]/4 + [expr.const]:
 // the initializer of a constexpr static data member is a constant expression,
 // manifestly constant-evaluated.  Two defects in the static data member

@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/7: "when N is zero, the instantiation of the expansion
+// N5008 [temp.variadic]/16: "when N is zero, the instantiation of the expansion
 // produces an empty list".  A base-specifier whose template argument is a pack
 // expansion `_Tail...` over an empty pack therefore collapses to `Empty<>`; the
 // base remains a valid (empty) base of the instantiated class.

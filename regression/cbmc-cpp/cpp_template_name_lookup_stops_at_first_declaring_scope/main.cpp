@@ -9,7 +9,7 @@ struct f
 };
 namespace n
 {
-// [basic.lookup.general]/1, [basic.lookup.unqual]/1-2: lookup of f from g
+// [basic.lookup.general]/1, [basic.lookup.unqual]/2: lookup of f from g
 // stops at namespace n, where it finds the function template n::f; the
 // class template ::f is hidden
 template <class T>

@@ -1,4 +1,4 @@
-// N5008 [class.static.data]/3, [dcl.constexpr]/1: a constexpr static data
+// N5008 [class.static.data]/4, [dcl.constexpr]/1: a constexpr static data
 // member is implicitly inline; its in-class declaration is its definition.
 // Class-type members were kept as extern "macros" whose substitution folds
 // scalar reads only, so `A::p.x' read nondet; a constructor-initialised one

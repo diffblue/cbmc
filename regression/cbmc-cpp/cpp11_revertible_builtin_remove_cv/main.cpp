@@ -22,7 +22,7 @@ int main()
   static_assert(
     is_same<__remove_reference(rref), int>::value, "builtin reference");
   static_assert(is_same<__remove_cvref(cref), int>::value, "cvref");
-  // N5008 [meta.trans.other]/3: the reference is removed first, then the
+  // N5008 [meta.trans.other]/1: the reference is removed first, then the
   // cv-qualifiers of the referenced type
   static_assert(
     is_same<__remove_cvref(const volatile int &), int>::value, "cvref order");

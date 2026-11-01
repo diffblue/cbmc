@@ -7,7 +7,7 @@ struct B
     return v;
   }
 };
-// [namespace.udecl]/19: the using-declaration makes B::operator int a public
+// [namespace.udecl]/16: the using-declaration makes B::operator int a public
 // member of A, although B is a private base
 struct A : private B
 {

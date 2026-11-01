@@ -6,7 +6,7 @@
 // g<int>(s) used the bodiless declaration (a nondeterministic result).
 // Found while reducing libstdc++'s friend `__try_use_facet'.
 extern "C" void __CPROVER_assert(bool, const char *);
-// N5008 [basic.scope.pdecl]/7.2, [dcl.type.elab]/3: `struct S' first named
+// N5008 [basic.scope.pdecl]/7, [dcl.type.elab]/3: `struct S' first named
 // in a parameter-declaration of a function declared at namespace scope
 // declares S in that namespace; the later definition is the same class
 int f(struct S *s);

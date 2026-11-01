@@ -10,7 +10,7 @@ int f(T)
 {
   return 2;
 }
-// ::f is hidden by n::f ([basic.lookup.unqual]/1), so the call has no
+// ::f is hidden by n::f ([basic.lookup.unqual]/2), so the call has no
 // viable candidate and the program is ill-formed
 int g()
 {

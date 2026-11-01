@@ -1,4 +1,4 @@
-// N5008 [dcl.fct]/6: `B...` with B a non-pack template parameter is
+// N5008 [dcl.fct]/24: `B...` with B a non-pack template parameter is
 // B followed by C varargs.  With an unrelated trailing template pack
 // (R) deduced empty, CBMC's empty-pack parameter removal dropped the
 // varargs parameter and the call stopped resolving.

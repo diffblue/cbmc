@@ -1,4 +1,4 @@
-// N5008 [dcl.type.auto.deduct]/4, [temp.deduct.call]/1, [expr.type]/1: the
+// N5008 [dcl.type.auto.deduct]/3, [temp.deduct.call]/1, [expr.type]/1: the
 // type deduced for `auto' is the type of the initializer expression, which is
 // never a reference type -- `auto c = static_cast<T &&>(a)' declares an
 // object of type T, not a reference to a.  The front end, which represents a

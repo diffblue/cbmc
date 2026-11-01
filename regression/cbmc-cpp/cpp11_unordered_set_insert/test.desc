@@ -26,7 +26,7 @@ derived class was rejected ([class.access.base]/4-5; test
 cpp98_friend_private_base_conversion) -- _AllocNode(_Hashtable&
 -> _Hashtable_alloc&) failed and _Insert::insert's body was dropped;
 (3) an if-condition declaration's name leaked into the enclosing block
-([stmt.pre]/6; test cpp98_condition_decl_scope) -- _M_insert_unique's
+([basic.scope.block]/1; test cpp98_condition_decl_scope) -- _M_insert_unique's
 `__node` redeclaration failed conversion.  RESIDUAL (isolated 2026-07-17
 evening): NOT a further front-end defect -- the divergence is caused by
 std::__detail::_Prime_rehash_policy::_M_need_rehash and _M_next_bkt,

@@ -1,6 +1,6 @@
 // N5008 [ostream.inserters.arithmetic]/1, [facet.num.put.virtuals]: integer
 // insertion formats through the num_put and numpunct facets of the stream's
-// locale, here the "C" locale ([locale.general]/8): no grouping, decimal
+// locale, here the "C" locale ([locale.statics]/5): no grouping, decimal
 // digits, the fill character applied for the field width.
 #include <iomanip>
 #include <sstream>

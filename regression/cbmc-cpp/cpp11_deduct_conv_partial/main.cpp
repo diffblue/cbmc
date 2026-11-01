@@ -1,4 +1,4 @@
-// [temp.deduct.partial]/3.2 + [over.match.best]/2: when multiple
+// [temp.deduct.partial]/3.2 + [over.match.best.general]/2.5: when multiple
 // conversion-function templates are viable for a given destination
 // type, partial ordering on their return types picks the most-
 // specialised one.

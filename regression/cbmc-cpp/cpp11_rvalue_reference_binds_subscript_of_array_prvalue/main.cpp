@@ -1,4 +1,4 @@
-// N5008 [expr.sub]/1: E1[E2] is an lvalue if E1 is an lvalue and an xvalue
+// N5008 [expr.sub]/2: E1[E2] is an lvalue if E1 is an lvalue and an xvalue
 // otherwise; [class.temporary]/6.3 (Example 2): `int &&a = id<int[3]>{1,
 // 2, 3}[i]' binds the rvalue reference to the xvalue and the temporary
 // array has the lifetime of a.  The subscript was taken for a genuine

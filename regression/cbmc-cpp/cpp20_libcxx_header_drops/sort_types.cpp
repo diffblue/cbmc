@@ -1,4 +1,4 @@
-// N5008 [alg.sort]/1: sort leaves [first, last) in non-decreasing order
+// N5008 [sort]/3: sort leaves [first, last) in non-decreasing order
 // (libc++ defines its std::__sort for these types only in libc++.so)
 #include <algorithm>
 #include <functional>

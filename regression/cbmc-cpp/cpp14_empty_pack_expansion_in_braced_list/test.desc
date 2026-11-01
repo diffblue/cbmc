@@ -14,7 +14,7 @@ main.cpp
 static assertion failed
 dropped the body
 --
-N5008 [temp.variadic]/7: the instantiation of a pack expansion over an EMPTY
+N5008 [temp.variadic]/16: the instantiation of a pack expansion over an EMPTY
 pack produces an empty list.  An empty type pack is recorded in the
 template map's pack sizes only, and the drain that expands pack expansions
 in function bodies ran only for value packs or type packs of two or more

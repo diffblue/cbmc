@@ -1,4 +1,4 @@
-// N5008 [basic.lookup.argdep]/2.3: the associated entities of an
+// N5008 [basic.lookup.argdep]/3.3, 4: the associated entities of an
 // ENUMERATION type include its innermost enclosing namespace.  CBMC's
 // ADL only associated CLASS types, so libc++'s poison-pill pattern --
 //   using __adl_only::make_error_code;      // deleted

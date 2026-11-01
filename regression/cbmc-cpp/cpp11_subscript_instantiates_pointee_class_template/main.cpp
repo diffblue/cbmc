@@ -10,7 +10,7 @@ struct vec
   T *first;
   int size;
 };
-// N5008 [expr.add]/1, [expr.sub]/1, [temp.inst]/2: `v.first[b]' needs the
+// N5008 [expr.add]/1, [expr.sub]/2, [temp.inst]/2: `v.first[b]' needs the
 // complete type iter<K>, so iter<K> is instantiated although it was named
 // only as a template argument so far (the MSVC STL's
 // std::unordered_map::_Find_last)

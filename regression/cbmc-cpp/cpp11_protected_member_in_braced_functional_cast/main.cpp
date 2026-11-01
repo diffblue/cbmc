@@ -1,4 +1,4 @@
-// N5008 [class.access.general]/6, [expr.type.conv]/2: in `V{bias, 3}', inside
+// N5008 [class.access.general]/6, [expr.type.conv]/1.4: in `V{bias, 3}', inside
 // a member function of dec, the element `bias' names dec's protected member
 // where it appears, which is accessible.  (CBMC's own smt2_dec.cpp,
 // `argv = {solver_binary_or_empty, temp_file_problem()}' with a

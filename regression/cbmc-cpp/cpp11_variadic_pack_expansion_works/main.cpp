@@ -3,7 +3,7 @@
 // pack-expansion rework (doc/architectural/cpp-variadic-pack-expansion-rework.md)
 // does not regress it.  Header-free.
 
-// Value-pack expansion in a function-call argument list ([temp.variadic]/5),
+// Value-pack expansion in a function-call argument list ([temp.variadic]/9),
 // single, multiple, and forwarded through two layers.
 int g1(int a)
 {
@@ -49,7 +49,7 @@ struct wrap
   typedef tup<T...> type;
 };
 
-// sizeof...(T) in a member function body ([temp.variadic]/8).
+// sizeof...(T) in a member function body ([temp.variadic]/10).
 template <typename... T>
 struct holder
 {

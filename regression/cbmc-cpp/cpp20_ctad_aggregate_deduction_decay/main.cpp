@@ -1,4 +1,4 @@
-// N5008 [over.match.class.deduct]/1.8 + [temp.deduct.call]/2: the C++20
+// N5008 [over.match.class.deduct]/1.10 + [temp.deduct.call]/2: the C++20
 // AGGREGATE DEDUCTION CANDIDATE deduces class template arguments from
 // the aggregate's element types, with the by-value adjustments of
 // [temp.deduct.call]/2 -- an array argument decays to a pointer.  Here

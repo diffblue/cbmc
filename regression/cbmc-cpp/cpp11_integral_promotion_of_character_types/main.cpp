@@ -1,4 +1,4 @@
-// N5008 [conv.prom]/2: a prvalue of type char8_t, char16_t, char32_t or
+// N5008 [conv.prom]/6: a prvalue of type char8_t, char16_t, char32_t or
 // wchar_t can be converted to the first of int, unsigned int, long,
 // unsigned long, long long, unsigned long long that can represent all the
 // values of its underlying type -- for a 32-bit char32_t that is unsigned
@@ -6,7 +6,7 @@
 // char32_t at all, so `f(c)' against the int/unsigned/long/... constructor
 // overloads of a big-integer class had no best candidate ("found no match
 // for symbol 'f'"; mp_integer in CBMC's own convert_character_literal.cpp,
-// dog-fooding).  [over.ics.rank]/4.2 prefers the promotion.
+// dog-fooding).  [over.ics.rank]/4 prefers the promotion.
 extern "C" void __CPROVER_assert(bool, const char *);
 struct big
 {

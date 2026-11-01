@@ -10,7 +10,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-[except.throw]/8 -- a bare `throw;` in the inner handler re-propagates the inner
-exception E(2), the one that handler is handling, not the outer E(1).  Verifies
-the per-handler current-exception slot is keyed to the innermost enclosing
-handler (cross-checked against g++ and clang++).
+[expr.throw]/3, [except.handle]/10 -- a bare `throw;` in the inner handler
+re-propagates the inner exception E(2), the one that handler is handling, not
+the outer E(1).  Verifies the per-handler current-exception slot is keyed to the
+innermost enclosing handler (cross-checked against g++ and clang++).

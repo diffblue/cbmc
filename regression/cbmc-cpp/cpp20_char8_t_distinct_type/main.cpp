@@ -1,4 +1,4 @@
-// N5008 [basic.fundamental]/9, [lex.ccon]/3, [lex.string]/6: char8_t is a
+// N5008 [basic.fundamental]/9, [lex.ccon]/2, [lex.string]/1: char8_t is a
 // distinct type whose underlying type is unsigned char; u8 literals have
 // type char8_t and array of const char8_t
 extern "C" void __CPROVER_assert(bool, const char *);

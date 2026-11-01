@@ -1,12 +1,13 @@
-// N5008 [temp.deduct.call]/3 + [dcl.init]/17 + [temp.variadic]/4-5: a variadic
-// constructor taking a forwarding-reference parameter pack `_U&&... __e` deduces
-// each `_U` independently and forwards each element into a recursive base's
-// constructor.  This is exactly libstdc++ std::tuple's constructor
-// (`tuple(_UElements&&...) : _Inherited(std::forward<_UElements>(__e)...)`,
-// with `_Tuple_impl<_Idx,_Head,_Tail...> : _Tuple_impl<_Idx+1,_Tail...>`),
-// used for THREE or more elements (two-element tuples use a non-variadic
-// specialization, which is why cpp17_tuple_basic's make_tuple(1,2.0,'a') is the
-// first case to hit this).
+// N5008 [temp.deduct.call]/3 + [dcl.init.general]/16 + [temp.variadic]/5-6: a
+// variadic constructor taking a forwarding-reference parameter pack `_U&&...
+// __e` deduces each `_U` independently and forwards each element into a
+// recursive base's constructor.  This is exactly libstdc++ std::tuple's
+// constructor (`tuple(_UElements&&...) :
+// _Inherited(std::forward<_UElements>(__e)...)`, with
+// `_Tuple_impl<_Idx,_Head,_Tail...> : _Tuple_impl<_Idx+1,_Tail...>`), used for
+// THREE or more elements (two-element tuples use a non-variadic specialization,
+// which is why cpp17_tuple_basic's make_tuple(1,2.0,'a') is the first case to
+// hit this).
 //
 // FIXED (was KNOWNBUG): with a forwarding-reference parameter pack whose elements
 // are of DISTINCT types (`tuple<int,double>` -> `_U = {int,double}`), CBMC

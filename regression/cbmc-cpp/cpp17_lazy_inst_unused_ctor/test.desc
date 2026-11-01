@@ -16,6 +16,6 @@ default constructor IS odr-used and is still instantiated (s.v is read).
 
 This became CORE once the special members (constructors/destructors) were
 deferred together with ordinary members and operators.  The destructor of a
-*constructed* class is recovered from the type system ([class.dtor]/12) so
+*constructed* class is recovered from the type system ([class.dtor]/14) so
 needed special members are still instantiated; see
 doc/architectural/cpp-extern-template-member-instantiation.md §13.

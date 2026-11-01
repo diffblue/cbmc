@@ -1,4 +1,4 @@
-// N5008 [expr.type.conv]/2, [expr.type]/1: in the functional cast `T(e)'
+// N5008 [expr.type.conv]/1.1, [expr.type]/1: in the functional cast `T(e)'
 // an operand of reference type -- `static_cast<S &>(x)' -- denotes the
 // referred object.  The check for an explicit conversion function of the
 // operand's class took the type of e without removing the reference and

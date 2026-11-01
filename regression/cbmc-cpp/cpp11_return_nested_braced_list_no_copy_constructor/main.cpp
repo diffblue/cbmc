@@ -7,10 +7,11 @@ struct chk
 struct in_place
 {
 };
-// N5008 [over.best.ics]/4.5: in `return {{b, e}};' the list's only element
-// is itself a braced-init-list; for the first parameter of a constructor of
-// opt of type opt && or const opt & (the move and copy constructors), no
-// user-defined conversion is considered, so only opt(chk) is viable
+// N5008 [over.best.ics.general]/4.5: in `return {{b, e}};' the list's only
+// element is itself a braced-init-list; for the first parameter of a
+// constructor of opt of type opt && or const opt & (the move and copy
+// constructors), no user-defined conversion is considered, so only opt(chk) is
+// viable
 struct opt
 {
   chk value;

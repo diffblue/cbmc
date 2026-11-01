@@ -1,4 +1,4 @@
-// C++ [temp.variadic]/4-5 + [temp.names]: a parameter pack used as a template
+// C++ [temp.variadic]/5-6 + [temp.names]: a parameter pack used as a template
 // argument (Trait<A...>) instantiates the class template with the pack's
 // elements; the dependent qualified-id Trait<A...>::type then names a member of
 // that instance.  Here the pack A is a *deduced* function-template parameter

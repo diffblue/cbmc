@@ -11,5 +11,5 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-[except.throw]/8: `throw;` re-propagates the exception being handled to the next
+[expr.throw]/3: `throw;` re-propagates the exception being handled to the next
 enclosing handler, preserving the exception object.  Non-vacuous.

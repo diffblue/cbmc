@@ -13,7 +13,7 @@
 // 2. `typecheck_expr_explicit_constructor_call` previously
 //    unconditionally expanded a brace-init-list `{e1, ..., en}`
 //    operand into `[e1, ..., en]` and called `new_temporary` with
-//    those as args.  This skipped phase 2.1 of [over.match.list]/2:
+//    those as args.  This skipped phase 2.1 of [over.match.list]/1.1:
 //    when T has an `initializer_list<U>` constructor, the
 //    brace-init-list should be passed AS A WHOLE (single argument
 //    of type `initializer_list<U>`).  The unconditional expansion
@@ -51,7 +51,7 @@ int main()
   // type with an `initializer_list<X>` ctor (here, `vector`).
   // Before the fix this matched no `vector` ctor and reported
   // "found no match for symbol 'vector'".  With the fix, phase 2.1
-  // of [over.match.list]/2 picks the `initializer_list<X>` ctor.
+  // of [over.match.list]/1.1 picks the `initializer_list<X>` ctor.
   take_vec(std::vector<symbol_exprt>{std::move(s)});
 
   // Vector declarations with brace-init: this path was already

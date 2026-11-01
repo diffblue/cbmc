@@ -1,5 +1,5 @@
 extern "C" void __CPROVER_assert(bool, const char *);
-// The MSVC STL's layout: N5008 [support.initlist]/1 leaves it to the
+// The MSVC STL's layout: N5008 [initializer.list.syn]/1 leaves it to the
 // implementation; clang accepts a begin and an end pointer
 namespace std
 {

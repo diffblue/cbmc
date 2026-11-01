@@ -9,7 +9,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [temp.param]/12-14 + [temp.arg.general]/1: a default template
+N5008 [temp.param]/16-17 + [temp.names]/7.4: a default template
 argument given on a forward declaration (`template <class _CharT, class
 _InIter = It<_CharT>> struct num_get;`, libstdc++'s <bits/localefwd.h>)
 is substituted with THIS template's preceding parameters bound to the

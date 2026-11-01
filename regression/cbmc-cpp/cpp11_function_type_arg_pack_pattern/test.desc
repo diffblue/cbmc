@@ -10,7 +10,7 @@ main.cpp
 could not fully type-check
 dropped the body
 --
-N5008 [temp.variadic]/5: a pack expansion whose pattern is a function
+N5008 [temp.variadic]/9: a pack expansion whose pattern is a function
 type naming the pack inside a parameter position, F(decay<Bs>::type...),
 must be expanded per element (previously only a bare Bs... was), and the
 expanded function type must be type-checked so the partial specialization

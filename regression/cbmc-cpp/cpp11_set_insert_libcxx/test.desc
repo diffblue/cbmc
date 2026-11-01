@@ -13,7 +13,7 @@ TT-instance consumer -- disambiguate_template_classes' instance
 fallback could not find a NAMESPACE-scope template (root-scope
 RECURSIVE lookup does not descend into namespaces; fixed by looking
 up in the instance scope's grandparent per [namespace.qual]);
-(b) member-alias own-parameter capture ([temp.local]/1) extended to
+(b) member-alias own-parameter capture ([basic.scope.temp]/2) extended to
 references nested in pointer declarators and template-id arguments
 (pointer_traits<_Tp*>'s `rebind = _Up*`,
 allocator_traits' `rebind_alloc =

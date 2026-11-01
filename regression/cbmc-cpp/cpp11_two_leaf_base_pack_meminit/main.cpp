@@ -1,6 +1,6 @@
 // TWO heterogeneous elements in a base-specifier pack expansion with
 // a parallel mem-initializer pack (`impl(T... u) : leaf<T>(u)...`,
-// N5008 [temp.variadic]/5 -- the base list and the mem-initializer
+// N5008 [temp.variadic]/9 -- the base list and the mem-initializer
 // list expand in lockstep).  The single-element case and the
 // libc++ __tuple_impl partial-specialization shape are FIXED
 // (cpp11_tuple_leaf_no_body); with two elements the constructor's

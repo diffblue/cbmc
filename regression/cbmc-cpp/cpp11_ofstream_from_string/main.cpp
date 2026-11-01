@@ -2,7 +2,7 @@
 // const std::string& (filename).  CBMC used to route the functional
 // braced cast through the C compound-literal machinery, pouring the
 // string into the stream's first member ("invalid implicit conversion
-// ... to 'std::streamsize'") -- fixed 2026-07-21 ([expr.type.conv]/2
+// ... to 'std::streamsize'") -- fixed 2026-07-21 ([expr.type.conv]/1.4
 // direct-list-initialization + byte-wide @most_derived layout).
 // The shape of `auto out = std::ofstream{outfile}` in
 // solver_hardness.cpp/produce_report and goto-harness's doit(),

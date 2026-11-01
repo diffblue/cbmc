@@ -1,20 +1,20 @@
-// N5008 [temp.inst]/2, [temp.deduct]/5: a constructor template of a class
-// template instance, constrained by a SFINAE default template argument whose
-// constexpr callee is a member function template of ANOTHER class template
-// (instantiated over the class's pack) and whose body uses the callee's OWN
-// parameter pack (sizeof...(Us)), is instantiable when the enclosing class
-// instance is constructed from a function template.  This is the shape of
-// libstdc++ std::tuple's constrained constructors called from
+// N5008 [temp.inst]/2, [temp.deduct.general]/5: a constructor template of a
+// class template instance, constrained by a SFINAE default template argument
+// whose constexpr callee is a member function template of ANOTHER class
+// template (instantiated over the class's pack) and whose body uses the
+// callee's OWN parameter pack (sizeof...(Us)), is instantiable when the
+// enclosing class instance is constructed from a function template.  This is
+// the shape of libstdc++ std::tuple's constrained constructors called from
 // std::make_tuple.
 //
-// Fixed per [temp.deduct]/5: the values of deduced template parameters are
-// available when subsequent default template arguments are instantiated --
+// Fixed per [temp.deduct.general]/5: the values of deduced template parameters
+// are available when subsequent default template arguments are instantiated --
 // the deduced ELEMENT TYPES of the constructor template's parameter pack are
 // now recorded (not only its size) before default template arguments are
-// evaluated, so the `Us...` expansion in the constraint no longer collapses
-// to an empty argument list and the constexpr guard folds over the real
-// arguments.  Each ingredient of this shape was verified necessary by
-// single-dimension toggling; g++ and clang++ accept and run this test.
+// evaluated, so the `Us...` expansion in the constraint no longer collapses to
+// an empty argument list and the constexpr guard folds over the real arguments.
+// Each ingredient of this shape was verified necessary by single-dimension
+// toggling; g++ and clang++ accept and run this test.
 
 extern "C" void __CPROVER_assert(int, const char *);
 

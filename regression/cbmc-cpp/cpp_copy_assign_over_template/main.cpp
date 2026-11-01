@@ -2,17 +2,17 @@
 // operator, not a converting `operator=` function template.
 //
 // N5008 [class.copy.assign]/1: a copy-assignment operator is a non-template
-// non-static member function `X::operator=` taking one parameter of type X,
-// X&, const X&, ... ; a *template* assignment operator is never a copy
-// assignment operator and does not suppress the implicitly-declared one.  For
-// `b = a` with `a`, `b` of the same class, both the implicit copy assignment
-// (binding the argument to `const X&` — an identity conversion,
-// [over.ics.ref]) and the converting template `operator=(U)` deduced with
-// `U = X` (a by-value identity match) are viable.  Their conversion sequences
-// are indistinguishable, so the non-template copy assignment is preferred
-// ([over.match.best]/2.4).  The top-level cv-qualification of the reference
-// binding is only a tie-breaker between reference bindings
-// ([over.ics.rank]/3.2.6) and must not let the by-value template match win.
+// non-static member function `X::operator=` taking one parameter of type X, X&,
+// const X&, ... ; a *template* assignment operator is never a copy assignment
+// operator and does not suppress the implicitly-declared one.  For `b = a` with
+// `a`, `b` of the same class, both the implicit copy assignment (binding the
+// argument to `const X&` — an identity conversion, [over.ics.ref]) and the
+// converting template `operator=(U)` deduced with `U = X` (a by-value identity
+// match) are viable.  Their conversion sequences are indistinguishable, so the
+// non-template copy assignment is preferred ([over.match.best.general]/2.4).
+// The top-level cv-qualification of the reference binding is only a tie-breaker
+// between reference bindings ([over.ics.rank]/3.2.6) and must not let the
+// by-value template match win.
 
 extern "C" int __VERIFIER_nondet_int();
 extern "C" void __CPROVER_assert(int, const char *);

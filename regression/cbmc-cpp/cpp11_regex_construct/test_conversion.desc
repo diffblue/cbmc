@@ -21,6 +21,6 @@ the && deduction placeholder tied, then the ODR-used member was never
 queued); and no HYBRID facet instantiation such as
 num_get<wchar_t, istreambuf_iterator<char>> may exist (a default
 template argument bound to an enclosing instantiation's same-named
-parameter, [temp.param]/14).  In the vacuous layouts described in
+parameter, [temp.param]/16-17).  In the vacuous layouts described in
 test.desc the _Compiler constructor was bodiless and none of the _M_*
 compiler members were even instantiated.

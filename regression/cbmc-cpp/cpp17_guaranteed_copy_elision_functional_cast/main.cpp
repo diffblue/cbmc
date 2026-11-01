@@ -1,4 +1,4 @@
-// N5008 [dcl.init.general]/16.6.1, [expr.type.conv]/2: `T(e)' with a prvalue
+// N5008 [dcl.init.general]/16.6.1, [expr.type.conv]/1.1: `T(e)' with a prvalue
 // e of type T is e itself -- the object is initialized directly, without a
 // copy or move constructor (C++17 guaranteed copy elision).  CBMC called the
 // move constructor (deleted here: "not accessible") or the copy constructor.

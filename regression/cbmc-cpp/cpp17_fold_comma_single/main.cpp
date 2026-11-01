@@ -1,4 +1,4 @@
-// N5008 [expr.prim.fold]/2: a fold expression over a ONE-element pack reduces
+// N5008 [temp.variadic]/14: a fold expression over a ONE-element pack reduces
 // to the single instance of its pattern (for a binary fold, one application of
 // the operator against the init operand); with more elements the operator
 // chain applies.  Fixed: the one-element case previously skipped the fold

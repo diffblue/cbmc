@@ -1,6 +1,7 @@
-// N5008 [temp.param]/4, [temp.arg.nontype]/1-2: a non-type template parameter
-// may have reference type, and its argument designates an object with static
-// storage duration (an address constant), not a value.  CBMC's util uses this:
+// N5008 [temp.param]/11.2, [temp.arg.nontype]/1-2: a non-type template
+// parameter may have reference type, and its argument designates an object with
+// static storage duration (an address constant), not a value.  CBMC's util uses
+// this:
 //   template <typename T, const T &empty = T::blank> class reference_counting;
 // (src/util/reference_counting.h).  Here `empty` defaults to the static member
 // S::blank; r.get() returns that reference, so r.get().x == 7.  g++/clang++

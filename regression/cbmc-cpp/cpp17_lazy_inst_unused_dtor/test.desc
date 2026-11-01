@@ -16,7 +16,7 @@ program; the forbidden pattern must be absent.
 
 This became CORE once the special members were deferred.  Destructor odr-use
 for automatic/temporary objects is recovered in typecheck_method_bodies() from
-the set of constructed classes ([class.dtor]/12): a destructor is instantiated
+the set of constructed classes ([class.dtor]/14): a destructor is instantiated
 exactly when its class is constructed, so this static-only case (no object,
 hence no constructor odr-used) correctly leaves ~S() uninstantiated.  See
 doc/architectural/cpp-extern-template-member-instantiation.md §13.

@@ -11,7 +11,7 @@ is not accessible
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [class.copy.ctor]/14-15: a defaulted move constructor direct-initializes
+N5008 [class.copy.ctor]/14: a defaulted move constructor direct-initializes
 each base and non-static data member from the corresponding subobject of the
 argument cast to an xvalue (static_cast<M&&>(other.m)); overload resolution on
 that xvalue selects the member's move constructor.  A member whose copy

@@ -21,7 +21,7 @@ ROUND-90 DIAGNOSIS (bisected):
   `auto (...) -> void` although it is declared `void` -- the OUT-OF-LINE
   definition (layout.h:290) was never matched to the in-class
   declaration (layout.h:196), so the odr-used member has no body
-  ([temp.inst]/1 requires implicit instantiation when odr-used).
+  ([temp.inst]/4 requires implicit instantiation when odr-used).
 - The call is NOT flagged and the wrong answer is SILENT.  Round-91
   follow-up explains why twice over: goto-symex emits "no body for
   callee" only when unwinding assertions are enabled
@@ -93,7 +93,7 @@ sentinel counted against packless vector<_Tp, _Allocator>; sentinels
 now stripped in typecheck_template_args when the target has no trailing
 pack).  Probe trail: TMA probe showed vector (2 params) receiving
 [cpp_name][struct_tag][ambiguous:empty]; the sentinel is CBMC's own
-[temp.variadic]/7 recording convention, and it arrives AMBIGUOUS-
+[temp.variadic]/1 recording convention, and it arrives AMBIGUOUS-
 wrapped (first strip attempt matched only ID_type and missed).  The
 NEXT layer is now exposed: `found no match for symbol '_Bp'` (twice)
 resolving libc++'s `_If` alias -- `typename _IfImpl<_Cond>::template
@@ -131,7 +131,7 @@ front-end diagnostic is now GONE from main.ii (--cpp20 --stdlib
 libc++):
   * 400b2bbddd  _Bp: apply()'s short-name bridge no longer lets a
     caller's TYPE parameter binding act as a template-name
-    ([temp.names]/2); template_template_parameters set added.
+    ([temp.param]/7); template_template_parameters set added.
   * 3a4e13b168  companion: nor wholesale-replace the template-id
     (the argument-list-discarding fall-through); CORE tests
     cpp11_alias_template_short_name_capture{,2}.
@@ -153,7 +153,7 @@ front-end error):
 ROUND-128 FLIP: the last semantic failure was reference_related
 rejecting the implicit-object derived-to-base binding for a member
 using-declared from a PRIVATE (class-default) TT base
-([namespace.udecl]/16,19, [over.match.funcs]/5) --
+([namespace.udecl]/12,16, [over.match.funcs.general]/4) --
 __emplace_back_slow_path was bodiless and push_back left __end_
 nondet.  Fixed; both assertions verify with the flags above
 (--stdlib libc++ added: the preprocessed source uses libc++-23

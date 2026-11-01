@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5,7: a pack expansion whose pack expands to ZERO
+// N5008 [temp.variadic]/5,16: a pack expansion whose pack expands to ZERO
 // elements produces an empty list.  A variadic forwarding helper whose
 // trailing-return type is a `decltype` containing a function-call pack
 // expansion --

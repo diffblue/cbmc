@@ -17,5 +17,5 @@ is unknown
 N5008 [stmt.ambig]/1 and [dcl.decl.general]: `T(x);', `int (i) = k;',
 `int (*p) = &i;' are declarations.  For a type name the parser knows, rDeclarator
 accepts the parenthesised declarator; for a name it does not (a nested class
-declared later, [class.mem.general]/7) the type checker rewrites the
+declared later, [class.mem.general]/9.1) the type checker rewrites the
 call-shaped expression statement into the declaration.

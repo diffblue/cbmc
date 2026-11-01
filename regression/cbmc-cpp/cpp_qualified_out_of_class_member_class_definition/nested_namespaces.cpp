@@ -1,5 +1,5 @@
 extern "C" void __CPROVER_assert(bool, const char *);
-// [dcl.meaning.general]/2.3, [temp.mem.class]/1, [temp.mem.func]/1: the
+// [dcl.meaning.general]/3.4, [temp.mem.class]/1, [temp.mem.func]/1: the
 // member class and the member function of a class template in nested
 // namespaces are defined outside the namespaces by qualified names; S<short>
 // is instantiated before the member class definition

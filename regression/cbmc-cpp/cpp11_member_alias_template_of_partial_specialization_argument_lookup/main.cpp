@@ -14,7 +14,7 @@ struct at<al<T>>
   template <class U>
   using rebind_alloc = al<U>;
 };
-// [basic.lookup.unqual]/1, [temp.arg.general]: the template argument vt of
+// [basic.lookup.unqual]/4, [temp.arg.general]: the template argument vt of
 // `at<al<int>>::rebind_alloc<vt>' is looked up from its point of use, where
 // it is the local typedef (path::generic_string's
 // `rebind_alloc<value_type>')

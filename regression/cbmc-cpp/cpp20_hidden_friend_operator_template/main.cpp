@@ -1,4 +1,4 @@
-// N5008 [class.friend]/1 + [namespace.memdef]/3: a friend function
+// N5008 [class.friend]/1 + [dcl.meaning.general]/2.3: a friend function
 // TEMPLATE defined inside a class is a namespace member found by ADL.
 // CBMC discarded such declarations entirely (only friend class
 // templates were handled), so the range-adaptor pipe idiom's hidden

@@ -7,8 +7,8 @@ namespace ranges
 template <class T>
 concept small = sizeof(T) <= 4;
 }
-// N5008 [temp.param]/2: a type-constraint's nested-name-specifier may
-// begin with `::' ([expr.prim.id.qual]/1)
+// N5008 [temp.param]/1: a type-constraint's nested-name-specifier may
+// begin with `::' ([expr.prim.id.qual]/3)
 template <::lib::ranges::small T>
 int pick(T)
 {

@@ -11,7 +11,7 @@ main.cpp
 found no match for symbol
 dropped the body
 --
-N5008 [over.match.list]/2.2, [over.match.ctor], [temp.deduct]: constructor
+N5008 [over.match.list]/1.2, [over.match.ctor], [temp.deduct]: constructor
 templates participate in list-initialization of a class from a braced-init-list.
 Constructing a std::pair-like class (element-wise ctor is a template) from
 `{a, b}` was previously rejected as "found no match".  Root cause of the

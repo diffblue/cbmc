@@ -1,4 +1,4 @@
-// N5008 [dcl.meaning.general]/1, [basic.scope.param]/1: in
+// N5008 [dcl.meaning.general]/5, [basic.scope.param]/1: in
 // `auto pipe(X *p) -> decltype(make2(p))', p has type X * -- the
 // decl-specifier type modified by the parameter's declarator.  The
 // placeholders CBMC declared for the trailing-return-type took the

@@ -1,4 +1,4 @@
-// N5008 [temp.deduct]/8: while matching an overloaded candidate, a
+// N5008 [temp.deduct.general]/8: while matching an overloaded candidate, a
 // template argument that fails to FORM (GCC 13's __and_fn chain: the
 // pack expansion `__enable_if_t<_Bn::value>...` SFINAEs out, leaving a
 // nil type in `_Requires<_Bn...>`) is a deduction failure that removes

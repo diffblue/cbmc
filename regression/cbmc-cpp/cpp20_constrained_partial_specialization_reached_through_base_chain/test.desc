@@ -19,7 +19,7 @@ off recursion of a template after two enclosing instances unless the
 arguments converge, and for a constrained partial specialization (re-matched
 from the primary) it counted the primary's instances, so impl<int, 4> was
 never instantiated and impl<int, 3> lost its base.  Each partial
-specialization is a template of its own ([temp.spec.partial.general]/1);
+specialization is a template of its own ([temp.spec.partial.general]/2);
 the bound now counts the specialization's instances.  test_unsatisfied.desc:
 unsatisfied constrained specializations for B = 1 and 2; when none matched,
 the primary was instantiated with the specialization's arguments, B unbound,

@@ -13,7 +13,7 @@ dropped the body
 Defense-in-depth coverage for the MSVC atomic_flag::_Storage pattern
 (in isolation): a non-template class has a data member of an
 uninstantiated class template specialization, declared after the
-methods that use it.  Per [class.mem]/4 and [temp.inst]/2 the
+methods that use it.  Per [class.mem.general]/19 and [temp.inst]/2 the
 specialization must be implicitly instantiated when the data-member
 declaration is processed.
 

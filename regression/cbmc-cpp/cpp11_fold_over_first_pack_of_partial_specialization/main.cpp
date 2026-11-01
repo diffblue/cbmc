@@ -1,4 +1,4 @@
-// N5008 [temp.spec.partial.match], [temp.variadic]/5, [expr.prim.fold]: a
+// N5008 [temp.spec.partial.match], [temp.variadic]/14, [expr.prim.fold]: a
 // partial specialization may have several packs; a fold over any of them,
 // in a member's body or trailing return type, expands over the elements
 // matching deduced.  Only the last pack was expanded, and `(I + ...)'

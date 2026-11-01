@@ -1,6 +1,6 @@
-// N5008 [temp.variadic]/5 + [temp.deduct]/8 ([over.ics.user]): a converting
-// constructor whose viability is SFINAE-constrained by a `decltype` containing
-// a pack expansion over a TWO-OR-MORE-element pack -- the shape of
+// N5008 [temp.variadic]/9 + [temp.deduct.general]/8 ([over.ics.user]): a
+// converting constructor whose viability is SFINAE-constrained by a `decltype`
+// containing a pack expansion over a TWO-OR-MORE-element pack -- the shape of
 // libstdc++'s `std::function<R(A...)>` converting constructor, constrained by
 // `_Callable<F> = __is_invocable_r<R, F&, A...>` -- must be considered when the
 // pack expands to two or more elements.  (Reducing `make_bvrep`'s dog-food

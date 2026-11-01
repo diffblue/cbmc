@@ -7,7 +7,7 @@ main.cpp
 --
 dropped the body
 --
-N5008 [temp.alias]/2 + [temp.deduct.type] + [temp.variadic]/4-5.  Deducing a
+N5008 [temp.alias]/2 + [temp.deduct.type] + [temp.variadic]/5-6.  Deducing a
 parameter pack THROUGH an alias template with a fixed leading argument
 (`template <SIZE... I> using idxseq = iseq<SIZE, I...>;` then
 `f(idxseq<J...>)`), the std::index_sequence shape used by std::apply's

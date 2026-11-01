@@ -1,7 +1,7 @@
 // N5008 [namespace.udecl]/1, [class.inhctor.init]/1: a constructor
 // template inherited by `using B::B' is a member of B, so its default
 // template arguments are evaluated with B's template parameters bound
-// ([temp.inst]/1); they were looked up with the derived class's.  libc++'s
+// ([temp.inst]/4); they were looked up with the derived class's.  libc++'s
 // __bind_back_t inherits __perfect_forward_impl's constructor this way.
 extern "C" void __CPROVER_assert(bool, const char *);
 template <bool B, class T = void>

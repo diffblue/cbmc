@@ -1,4 +1,4 @@
-// `auto &&r = l;` with l a const lvalue: [dcl.type.auto.deduct]/4
+// `auto &&r = l;` with l a const lvalue: [dcl.type.auto.deduct]/3
 // deduces via the forwarding-reference rule of [temp.deduct.call]/3,
 // so auto = const listt& and reference collapsing yields const listt&.
 // CBMC instead deduces auto = const listt and then rejects binding the

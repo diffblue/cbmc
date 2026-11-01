@@ -1,4 +1,4 @@
-// CORE (N5008 [temp.spec.partial.match]/2, [temp.deduct]/8).
+// CORE (N5008 [temp.spec.partial.match]/2, [temp.deduct.general]/8).
 //
 // Classic `void_t` partial-specialization SFINAE, both as a member of a class
 // template (`has_mem`) and an expression-`decltype` form (`can_foo`).  CBMC is

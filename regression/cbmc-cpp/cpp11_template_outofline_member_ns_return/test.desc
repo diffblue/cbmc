@@ -10,7 +10,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-[temp.inst]/2, [basic.lookup.unqual]: a class template's (out-of-line) member is
+[temp.inst]/4, [basic.lookup.unqual]: a class template's (out-of-line) member is
 instantiated in the context of the instantiated class, so a namespace-scope
 typedef in the member's return type resolves correctly regardless of where the
 instantiation is triggered.  Reduced from the interval_union.cpp dog-food

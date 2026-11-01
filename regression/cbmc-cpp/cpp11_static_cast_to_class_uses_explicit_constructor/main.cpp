@@ -7,7 +7,7 @@ struct reversed
   {
   }
 };
-// N5008 [expr.static.cast]/4, [over.match.ctor]/1: `static_cast<T>(e)' is
+// N5008 [expr.static.cast]/5, [over.match.ctor]/1: `static_cast<T>(e)' is
 // the direct-initialization `T t(e);', which may use an explicit
 // constructor (the MSVC STL's reverse_iterator::_Unwrapped)
 int main()

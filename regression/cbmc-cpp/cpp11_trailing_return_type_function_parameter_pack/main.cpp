@@ -15,10 +15,10 @@ struct S
   {
   }
 };
-// [temp.variadic]/5, [dcl.fct]/8: the function parameter pack expansion
-// `a...' in the trailing return type has one element per argument (a
-// constructor template with a pack of the same name, instantiated empty,
-// must not shadow it, [basic.scope.temp]/2)
+// [temp.variadic]/9, [basic.scope.param]/1.1: the function parameter pack
+// expansion `a...' in the trailing return type has one element per argument (a
+// constructor template with a pack of the same name, instantiated empty, must
+// not shadow it, [basic.scope.temp]/2)
 template <class... A>
 auto f(A... a) -> decltype(fat(a...))
 {

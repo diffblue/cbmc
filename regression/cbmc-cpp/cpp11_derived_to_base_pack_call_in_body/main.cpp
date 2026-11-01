@@ -9,7 +9,7 @@
 // used to drop the whole parameter `__b` (its type `Base<_Head, _Tail...>&`
 // references the empty pack `_Tail` nested in a template-argument expansion),
 // leaving `get_head<int>` with an empty parameter list and an unbindable call
-// (so the function returned a nondet value).  Per N5008 [temp.variadic]/7 the
+// (so the function returned a nondet value).  Per N5008 [temp.variadic]/16 the
 // empty expansion only collapses the argument list (`Base<_Head>`); the
 // parameter itself must be kept.  Now fixed in cpp_instantiate_template.cpp.
 //

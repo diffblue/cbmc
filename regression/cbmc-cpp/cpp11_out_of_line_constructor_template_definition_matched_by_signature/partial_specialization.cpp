@@ -1,7 +1,7 @@
 extern "C" void __CPROVER_assert(bool, const char *);
 template <class S>
 struct G;
-// [temp.class.spec.mfunc]/1: members of a partial specialization defined
+// [temp.spec.partial.member]/1: members of a partial specialization defined
 // out of line; [class.base.init]/1: with their ctor-initializers
 template <class R>
 struct G<R()>

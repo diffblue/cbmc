@@ -1,5 +1,5 @@
 extern "C" void __CPROVER_assert(bool, const char *);
-// [temp.spec.partial.match]/2-3: P<int, char, char> matches the constrained
+// [temp.spec.partial.match]/2: P<int, char, char> matches the constrained
 // pack specialization (Args = {char, char}); the single-argument one does
 // not match two arguments
 template <class A, class... Args>

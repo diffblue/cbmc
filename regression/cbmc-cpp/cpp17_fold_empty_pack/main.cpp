@@ -1,4 +1,4 @@
-// N5008 [expr.prim.fold]/3: a unary fold over an EMPTY pack yields the
+// N5008 [temp.variadic]/14: a unary fold over an EMPTY pack yields the
 // operator's identity -- `true` for &&, `false` for || (any other operator
 // with an empty pack is ill-formed); a binary fold `(init op ... op pack)`
 // over an empty pack yields its init operand.  Fixed: the empty-pack

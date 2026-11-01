@@ -1,4 +1,4 @@
-// Regression for [temp.var] variable templates whose initializer body
+// Regression for [temp.pre]/3 variable templates whose initializer body
 // fails to typecheck due to unmodeled libstdc++ helpers.
 //
 // Mirrors the libstdc++ pattern that triggered dog-food failures:

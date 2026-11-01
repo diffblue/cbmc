@@ -9,5 +9,5 @@ main.cpp
 dropped the body
 --
 Fixed 2026-07-20: template-argument type-check failures while matching
-overloaded candidates are [temp.deduct]/8 deduction failures (skip the
+overloaded candidates are [temp.deduct.general]/8 deduction failures (skip the
 candidate), not hard errors.

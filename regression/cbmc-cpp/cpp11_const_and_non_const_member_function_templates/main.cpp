@@ -1,7 +1,7 @@
 // N5008 [defns.signature.member.templ]: a member function template's
 // signature includes its cv-qualifiers, so `template <class A> int f(A)'
 // and `template <class A> int f(A) const' are two templates
-// ([temp.over.link]/6); for a const object only the const one is viable
+// ([basic.scope.scope]/4.5); for a const object only the const one is viable
 // ([over.match.funcs.general]/4).
 extern "C" void __CPROVER_assert(bool, const char *);
 

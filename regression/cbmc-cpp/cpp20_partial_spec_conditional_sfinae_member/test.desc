@@ -8,12 +8,12 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-Class-template partial specialization selected via a conditional-operator
-SFINAE check (`void_t<decltype(false ? declval<A>() : declval<B>())>`) when the
-specialization is a MEMBER of a class template.  N5008 [temp.spec.partial.match]/2,
-[temp.deduct]/8, [expr.cond]/4, [class.default.ctor]/3.  The minimal essence of
-libstdc++'s C++20 `__common_ref_impl<_Xp&, _Yp&, void_t<__condres_cvref<_Xp,_Yp>>>`
-family.
+Class-template partial specialization selected via a conditional-operator SFINAE
+check (`void_t<decltype(false ? declval<A>() : declval<B>())>`) when the
+specialization is a MEMBER of a class template.  N5008
+[temp.spec.partial.match]/2, [temp.deduct.general]/8, [expr.cond]/4,
+[class.default.ctor]/3.  The minimal essence of libstdc++'s C++20
+`__common_ref_impl<_Xp&, _Yp&, void_t<__condres_cvref<_Xp,_Yp>>>` family.
 
 For `cref<int, int*>` the conditional has no common type, so the specialization
 is rejected and the primary is used (`tag == 1`).  Previously the primary

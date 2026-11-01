@@ -1,4 +1,4 @@
-// N5008 [class.virtual]/14, [expr.prim.id.unqual]/3: a virtual call of
+// N5008 [expr.call]/2, [expr.prim.id.unqual]/12: a virtual call of
 // base::call(int &&) reaches the final overrider func::call(int &&).  The
 // front end's thunk for it passed its parameter `a', an lvalue, to the
 // overrider's rvalue reference parameter; the conversion failed, and in a

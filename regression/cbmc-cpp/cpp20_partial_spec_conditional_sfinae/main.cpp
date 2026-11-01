@@ -1,4 +1,5 @@
-// CORE (N5008 [temp.spec.partial.match]/2, [temp.deduct]/8, [expr.cond]/4).
+// CORE (N5008 [temp.spec.partial.match]/2, [temp.deduct.general]/8,
+// [expr.cond]/4).
 //
 // The same conditional-operator SFINAE partial-spec selection as
 // cpp20_partial_spec_conditional_sfinae_member, but exercised with
@@ -10,8 +11,8 @@
 // This is the working contrast to the KNOWNBUG member case, isolating the
 // divergence to the class-member-instantiation context.  (CBMC currently also
 // leaks a "types are incompatible" diagnostic for the rejected case -- a
-// contained substitution failure should be silent per [temp.deduct]/8 -- but
-// the verification result itself is correct.)
+// contained substitution failure should be silent per [temp.deduct.general]/8
+// -- but the verification result itself is correct.)
 
 template <class X>
 X declval();

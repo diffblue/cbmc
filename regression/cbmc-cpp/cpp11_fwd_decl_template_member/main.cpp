@@ -1,4 +1,4 @@
-// N5008 [temp.inst]/1 with [temp.point]: a class template specialization is
+// N5008 [temp.inst]/2 with [temp.point]: a class template specialization is
 // implicitly instantiated -- and thus completed -- only from a *definition* of
 // the template, at a point where its completeness is required.  Referencing a
 // specialization while the template is merely forward-declared (e.g. as a

@@ -1,6 +1,6 @@
-// N5008 [temp.variadic]/4-5 + [temp.alias]/2: a MEMBER alias template whose body
-// is a pack expansion over TWO parallel packs -- the alias's own parameter pack
-// and the enclosing class's parameter pack -- must substitute both at the
+// N5008 [temp.variadic]/6, 8 + [temp.alias]/2: a MEMBER alias template whose
+// body is a pack expansion over TWO parallel packs -- the alias's own parameter
+// pack and the enclosing class's parameter pack -- must substitute both at the
 // alias's point of use and expand them in lock-step.  This is exactly the shape
 // of libstdc++'s std::tuple constraint machinery (_TupleConstraints):
 //

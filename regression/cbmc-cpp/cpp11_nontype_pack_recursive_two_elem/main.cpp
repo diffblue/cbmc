@@ -1,4 +1,4 @@
-// N5008 [temp.class.spec.match] + [temp.variadic]: a recursive class template
+// N5008 [temp.spec.partial.match] + [temp.variadic]: a recursive class template
 // over a NON-type parameter pack, selected via its `<H, T...>` partial
 // specialization, folds at every arity.
 //
@@ -13,7 +13,7 @@
 // expansion over an empty pack was evaluated as an unassigned scalar and threw,
 // so `sum_t<3>` fell back to the incomplete primary.  Now the empty deduced
 // trailing pack is trimmed before the pattern re-type-check
-// ([temp.arg.explicit]/4 note 1, [temp.variadic]/4).
+// ([temp.arg.explicit]/4 note 1, [temp.variadic]/16).
 //
 // CORE (was KNOWNBUG cpp11_nontype_pack_recursive_two_elem).  Non-vacuous: the
 // two-element assertion is exactly the one that used to fail.

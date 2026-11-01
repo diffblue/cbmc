@@ -1,6 +1,7 @@
-// C++ [stmt.select]/1-2, [stmt.if]: an if-statement condition may be a
-// declaration; the value tested is the declared variable contextually
-// converted to bool, and the variable is in scope in both substatements.
+// C++ [stmt.pre]/4-6, [basic.scope.block]/1, [stmt.if]: an if-statement
+// condition may be a declaration; the value tested is the declared variable
+// contextually converted to bool, and the variable is in scope in both
+// substatements.
 //
 // Regression: the C++ frontend type-checked such a declaration but left the
 // condition as the declaration code itself, so the "then" branch was never

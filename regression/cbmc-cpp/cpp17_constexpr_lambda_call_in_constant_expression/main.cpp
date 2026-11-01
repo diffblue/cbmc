@@ -1,4 +1,4 @@
-// N5008 [expr.prim.lambda.closure]/5: the function call operator of a
+// N5008 [expr.prim.lambda.closure]/6: the function call operator of a
 // closure type is constexpr if it satisfies the requirements; a call of it
 // is a constant expression.  GCC 16's __literal_encoding_is_unicode calls
 // a lambda in a consteval function (__do_vformat_to's default template

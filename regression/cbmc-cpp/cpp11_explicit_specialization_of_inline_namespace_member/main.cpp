@@ -17,7 +17,7 @@ struct key
 {
   int no;
 };
-// N5008 [namespace.def.general]/7: a member of an inline namespace can be
+// N5008 [namespace.def.general]/6: a member of an inline namespace can be
 // explicitly specialized as though it were a member of the enclosing
 // namespace
 namespace lib

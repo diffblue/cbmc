@@ -1,5 +1,5 @@
 // A class template instantiated with a then-INCOMPLETE argument type
-// in a declaration-only context ([temp.inst]/1 requires no
+// in a declaration-only context ([temp.inst]/2 requires no
 // instantiation there), where the argument type is COMPLETED later
 // and the specialization is then genuinely used.  The later use is a
 // new point of instantiation with the complete type ([temp.point]),

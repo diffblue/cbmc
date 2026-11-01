@@ -1,4 +1,4 @@
-// N5008 [dcl.fct]/6 + [temp.variadic]/1: `_Fn...` with a NON-pack _Fn
+// N5008 [dcl.fct]/24 + [temp.variadic]/1: `_Fn...` with a NON-pack _Fn
 // declares `_Fn, ...` (a deducible parameter followed by C varargs),
 // not a function parameter pack.  Deduce _Fn from the first argument;
 // extra arguments bind to the varargs.  Kernel of libc++'s reduced

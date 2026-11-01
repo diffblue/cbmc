@@ -1,4 +1,4 @@
-// N5008 [temp.deduct]/8 + [temp.variadic]/5: distilled from
+// N5008 [temp.deduct.general]/8 + [temp.variadic]/9: distilled from
 // cpp20_vector_basic_libcxx's push_back growth path -- the LAST layer
 // keeping std::vector wrong under --cpp20 --stdlib libc++.
 // std::__to_address(reverse_iterator) must select the operator->

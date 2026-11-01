@@ -14,9 +14,9 @@ main.cpp
 ^(ERROR|error): .*declared as reference but is not initialized
 dropped the body
 --
-N5008 [dcl.init.ref], [dcl.init]/16: reference direct-initialization with
-parentheses (T &r(init)) binds the reference like T &r = init.  CBMC previously
-reported such a reference as uninitialized (the parenthesized initializer was
-stored as init_args and not attached).  This is the layer behind the
-replace_symbol.cpp goto-cc cascade (`const exprt &const_dest(dest);`).
+N5008 [dcl.init.ref], [dcl.init.general]/16.2: reference direct-initialization
+with parentheses (T &r(init)) binds the reference like T &r = init.  CBMC
+previously reported such a reference as uninitialized (the parenthesized
+initializer was stored as init_args and not attached).  This is the layer behind
+the replace_symbol.cpp goto-cc cascade (`const exprt &const_dest(dest);`).
 assertion.5 FAILURE proves non-vacuity.

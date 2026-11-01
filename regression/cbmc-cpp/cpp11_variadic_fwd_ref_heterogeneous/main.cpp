@@ -1,4 +1,4 @@
-// N5008 [temp.deduct.call]/1-4 + [temp.variadic]/4: a variadic function
+// N5008 [temp.deduct.call]/1-4 + [temp.variadic]/9: a variadic function
 // template with a forwarding-reference parameter pack `A&&...` deduces each
 // pack element independently; the deduced elements may have DIFFERENT types.
 // The function then has one parameter per deduced element, each with its own

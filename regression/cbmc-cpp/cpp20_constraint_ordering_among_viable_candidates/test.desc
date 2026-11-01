@@ -12,10 +12,10 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [over.match.best]/2.5, [temp.func.order]/8: constraints order two
+N5008 [over.match.best.general]/2.5, [temp.func.order]/8: constraints order two
 function templates only when both specializations are viable and the
 templates' function parameter lists are equivalent; the more constrained
-one ([temp.constr.order]/1) is then better.  The front end removed the
+one ([temp.constr.order]/5) is then better.  The front end removed the
 less constrained candidate before deduction: f(1.0) lost `template <C1 T>
 f(T)' because `template <CC T> f(T)' is more constrained, although CC<double>
 is false; g(1, 2) lost `template <C1 I> g(I, I)' to the unrelated

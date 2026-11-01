@@ -1,7 +1,7 @@
 // Overload resolution among function-template overloads must instantiate
 // only the SIGNATURE of each candidate; the body (definition) of a
 // candidate is instantiated only when that specialization is used, i.e.
-// after it has been selected ([temp.inst]/2, [over.match]).
+// after it has been selected ([temp.inst]/5, 10, [over.match]).
 //
 // This is the arith_tools `numeric_cast_v` pattern:
 //

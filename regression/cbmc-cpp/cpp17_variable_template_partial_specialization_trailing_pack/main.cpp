@@ -16,7 +16,7 @@ struct same<T, T>
 template <class... B>
 constexpr bool all_v = (B::value && ...);
 // N5008 [temp.spec.partial.general]/1 (variable templates),
-// [temp.variadic]/5: Dests and Srcs are deduced from the arguments and
+// [temp.variadic]/9: Dests and Srcs are deduced from the arguments and
 // expanded in lockstep
 template <bool Same, class Dest, class... Srcs>
 constexpr bool constructible_v0 = false;

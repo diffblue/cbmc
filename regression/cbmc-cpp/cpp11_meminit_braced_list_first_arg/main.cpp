@@ -1,4 +1,4 @@
-// N5008 [class.base.init]/3 + [dcl.init.list]: a mem-initializer may initialize
+// N5008 [class.base.init]/1 + [dcl.init.list]: a mem-initializer may initialize
 // a base or member with a parenthesized expression-list, and an element of that
 // list may itself be a braced-init-list.  So
 //   holder(int a, int b, int t) : m({a, b}, t) {}

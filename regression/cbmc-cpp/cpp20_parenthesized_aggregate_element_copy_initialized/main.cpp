@@ -10,8 +10,8 @@ struct aggregate
 {
   int v;
 };
-// N5008 [dcl.init.general]/16.6.2.2, [dcl.init.aggr]/4.2,
-// [over.match.copy]/1.2: in the parenthesized aggregate initialization
+// N5008 [dcl.init.general]/16.6.2.2, [dcl.init.aggr]/4.3,
+// [over.match.conv]/1.1: in the parenthesized aggregate initialization
 // `aggregate a(e)' the element v is copy-initialized from e, which does not
 // use the explicit conversion function
 int main()

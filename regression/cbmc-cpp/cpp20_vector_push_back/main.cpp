@@ -10,7 +10,7 @@
 // it (and the enclosing vector) are still incomplete: the C++20 member alias
 //   using iterator_concept = std::__detail::__iter_concept<_Iterator>;
 // reaches back through the incomplete iterator via the iterator-concept
-// machinery and cannot be elaborated yet.  Per [temp.inst]/1-2 and
+// machinery and cannot be elaborated yet.  Per [temp.inst]/2 and
 // [dcl.typedef], that member typedef declares the member and forms the aliased
 // type but does not require the aliased template's *definition*; a typedef-name
 // may denote an incomplete type.  The failure to elaborate that one alias must

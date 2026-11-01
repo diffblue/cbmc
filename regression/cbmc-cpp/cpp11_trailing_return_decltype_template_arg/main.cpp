@@ -1,5 +1,5 @@
-// N5008 [dcl.fct]/[expr.type]: a function template with a trailing return type
-// that nests a decltype inside a template-id -- e.g. util/range.h's
+// N5008 [dcl.fct]/[basic.scope.param]: a function template with a trailing
+// return type that nests a decltype inside a template-id -- e.g. util/range.h's
 //   template <typename C> auto make_range(C &c) -> ranget<decltype(c.begin())>
 // -- must have its parameter names in scope when the trailing return type (and
 // the decltype it contains) is resolved during template argument deduction.

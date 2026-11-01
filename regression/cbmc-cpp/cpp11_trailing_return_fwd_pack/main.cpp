@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5, [dcl.fct]/2 (trailing-return-type): a variadic
+// N5008 [temp.variadic]/9, [dcl.fct]/1 (trailing-return-type): a variadic
 // function template whose TRAILING-RETURN type is a `decltype` containing a
 // forwarding-reference pack expansion --
 //   auto invk(F&& f, Args&&... a)

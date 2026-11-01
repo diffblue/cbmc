@@ -10,8 +10,9 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-[except.throw]/8 -- a bare `throw;` re-propagates the exception the handler it
-appears in is handling.  Fixed by keying the exception being handled per handler
-(a rethrow lexically inside a handler is tagged with that handler's catch-var id,
-and remove_cpp_exceptions gives each handler its own current-exception slot),
-so a completed inner try/catch no longer clobbers the outer handler's exception.
+[expr.throw]/3, [except.handle]/10 -- a bare `throw;` re-propagates the
+exception the handler it appears in is handling.  Fixed by keying the exception
+being handled per handler (a rethrow lexically inside a handler is tagged with
+that handler's catch-var id, and remove_cpp_exceptions gives each handler its
+own current-exception slot), so a completed inner try/catch no longer clobbers
+the outer handler's exception.

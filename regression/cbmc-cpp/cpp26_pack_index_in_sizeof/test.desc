@@ -12,5 +12,5 @@ main.cpp
 --
 ^warning: ignoring
 --
-N5008 [dcl.type.pack.index]/1: the parser marks `T...[N]' as a pack index
+N5008 [dcl.type.pack.index]/4: the parser marks `T...[N]' as a pack index
 (ID_C_pack_index); type-checking selects the N-th element of the pack.

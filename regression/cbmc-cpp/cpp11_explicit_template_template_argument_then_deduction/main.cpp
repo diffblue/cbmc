@@ -16,7 +16,7 @@ template <class X, class Y>
 struct two
 {
 };
-// N5008 [temp.arg.explicit]/2, [temp.deduct.call]/4.3: the template template
+// N5008 [temp.arg.explicit]/7, [temp.deduct.call]/4.3: the template template
 // parameter T is given explicitly; A... is deduced from the argument, or from
 // its base class that is a specialization of T (the MSVC STL's
 // _Derived_from_specialization_impl<view_interface>, behind ranges::view)

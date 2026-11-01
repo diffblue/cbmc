@@ -14,7 +14,7 @@ struct S<C>::N
 {
   int v = 7;
 };
-// [temp.inst]/3: S<char>::N is implicitly instantiated where its
+// [temp.inst]/4: S<char>::N is implicitly instantiated where its
 // completeness is required -- in the instantiated f, after its definition
 // (libstdc++: `template basic_istream<char> &basic_istream<char>::
 // ignore(streamsize);' in <istream> before istream.tcc defines

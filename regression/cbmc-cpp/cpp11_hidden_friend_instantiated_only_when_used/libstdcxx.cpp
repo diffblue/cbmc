@@ -17,7 +17,7 @@ struct target_less
 };
 int main()
 {
-  // [temp.inst]/4: the containers' non-member operator< (lexicographical
+  // [temp.inst]/5: the containers' non-member operator< (lexicographical
   // comparison of the elements) is not used, so neither it nor the
   // element comparison it needs is instantiated
   std::map<std::string, value> m;

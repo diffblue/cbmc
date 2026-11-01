@@ -1,10 +1,10 @@
-// N5008 [temp.deduct.call]/1 + [temp.variadic]/8: deducing the parameter pack
-// `U` of `packsize(Base<0, U...>)` from an argument of type `Base<0, int, int>`
-// gives `U = <int, int>` -- the number of elements of a pack is the number of
-// arguments deduced for it -- so `sizeof...(U)` is 2 and the specialization is
-// `packsize<int, int>`.  (This is the *direct* deduction case: the argument is
-// a specialization of the same class template, not a derived class as in the
-// [temp.deduct.call]/4.3 case.)
+// N5008 [temp.deduct.call]/1 + [temp.variadic]/5,10: deducing the parameter
+// pack `U` of `packsize(Base<0, U...>)` from an argument of type `Base<0, int,
+// int>` gives `U = <int, int>` -- the number of elements of a pack is the
+// number of arguments deduced for it -- so `sizeof...(U)` is 2 and the
+// specialization is `packsize<int, int>`.  (This is the *direct* deduction
+// case: the argument is a specialization of the same class template, not a
+// derived class as in the [temp.deduct.call]/4.3 case.)
 //
 // Regression: when such a call appeared in a function body other than main's
 // (so it was type-checked during the deferred method-body drain rather than

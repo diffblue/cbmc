@@ -1,4 +1,4 @@
-// Per [expr.type.conv]/2 and [dcl.init.list]/3.10:
+// Per [expr.type.conv]/1.4 and [dcl.init.list]/3.11:
 // A functional-style cast with a braced-init-list of the form T{} (no
 // elements) performs value-initialization.  For scalar types the
 // result is zero.

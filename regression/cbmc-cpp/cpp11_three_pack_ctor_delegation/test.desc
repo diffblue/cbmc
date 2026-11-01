@@ -10,5 +10,5 @@ dropped the body
 --
 Three template packs in a member constructor template with
 interleaved empty-specialization parameters, deduced through a
-mem-initializer delegation ([temp.deduct.call]/1, [temp.variadic]/4);
+mem-initializer delegation ([temp.deduct.call]/1, [temp.variadic]/5);
 the libc++ __tuple_impl constructor shape.

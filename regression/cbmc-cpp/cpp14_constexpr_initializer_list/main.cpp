@@ -5,7 +5,7 @@
 // size(), and a range-for.  The constant evaluator tracked a pointer into a
 // string literal only; now a pointer into ANY array of constants (the
 // backing array is a static object with an array constant value,
-// [expr.const]/11), pointer arithmetic and comparison, `this' for a member
+// [expr.const]/4.1), pointer arithmetic and comparison, `this' for a member
 // call on a tracked object (`xs.size()'), and a reference bound to a tracked
 // variable (`auto &&__range = xs' of the range-for lowering).  libc++'s
 // variant computes its traits with `__common_trait({...})' this way.

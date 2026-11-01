@@ -27,7 +27,7 @@ int binary_right(Ts...)
 template <class... Ts>
 int weighted(Ts... xs)
 {
-  // both packs in one pattern, expanded in lockstep ([temp.variadic]/5)
+  // both packs in one pattern, expanded in lockstep ([temp.variadic]/9)
   return (0 + ... + (static_cast<int>(sizeof(Ts)) * xs));
 }
 template <class... Ts>

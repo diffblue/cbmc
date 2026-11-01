@@ -1,6 +1,6 @@
-// N5008 [dcl.decl]/4 + [conv.bool]: `std::function<exprt &()>` (a function
-// object wrapping a nullary function returning a reference) has an explicit
-// operator bool, contextually converted in `if(f)`.  This mirrors
+// N5008 [dcl.decl.general]/6 + [conv.general]/4: `std::function<exprt &()>` (a
+// function object wrapping a nullary function returning a reference) has an
+// explicit operator bool, contextually converted in `if(f)`.  This mirrors
 // util/expr_iterator.h's `std::function<exprt &()> mutate_root; ... if
 // (mutate_root)`, the shape behind the goto-cc failure on rename_symbol.cpp.
 //

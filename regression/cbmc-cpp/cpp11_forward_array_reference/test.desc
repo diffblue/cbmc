@@ -13,13 +13,13 @@ main.cpp
 type mismatch
 dropped the body
 --
-N5008 [expr.static.cast]/3 + [dcl.ref]/6: with T deduced as `const char
+N5008 [expr.static.cast]/3 + [dcl.ref]/7: with T deduced as `const char
 (&)[4]' from a string literal argument, `static_cast<T &&>(t)' in
 std::forward is a cast to `const char (&)[4]' whose operand is the array
 lvalue -- an identity conversion.  The cast was rejected as casting const
 away ("type mismatch on static_cast"): the deduced type carried the const on
 the ARRAY node (`remove_reference<const char (&)[4]>::type') while the
-written reference type has it on the element, and the [expr.const.cast]/8
+written reference type has it on the element, and the [expr.const.cast]/6
 type-chain comparison saw the two spellings as different qualification
 levels.  [basic.type.qualifier]/3: cv-qualifiers applied to an array type
 attach to the element type -- an array level has no qualification of its

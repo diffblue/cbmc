@@ -1,10 +1,10 @@
-// N5008 [over.match.oper]/3, [over.match.best]/2: for `a << b`, the member and
-// non-member operator<< candidates form a single overload set, and a
+// N5008 [over.match.oper]/3, [over.match.best.general]/2.4: for `a << b`, the
+// member and non-member operator<< candidates form a single overload set, and a
 // non-template candidate is preferred over a function-template specialization
 // when their conversion sequences are otherwise indistinguishable.  Moreover
 // only the selected, odr-used specialization's body is instantiated
-// ([temp.inst]/2, [basic.def.odr]) -- forming a candidate must not instantiate
-// a member template's body.
+// ([temp.inst]/5, 10, [basic.def.odr]) -- forming a candidate must not
+// instantiate a member template's body.
 //
 // Regression test reduced from the src/util/message.h dog-food noise: mstreamt
 // has a member `template <class T> operator<<(const T&)` whose body streams `x`

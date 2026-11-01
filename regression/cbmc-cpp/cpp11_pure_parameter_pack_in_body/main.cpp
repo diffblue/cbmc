@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/4,8: `U... args` is a function parameter pack whose
+// N5008 [temp.variadic]/5,10: `U... args` is a function parameter pack whose
 // number of elements is the number of arguments provided; `sizeof...(U)` is
 // that count.  Instantiating `count_args<int, int>` therefore yields 2.
 //

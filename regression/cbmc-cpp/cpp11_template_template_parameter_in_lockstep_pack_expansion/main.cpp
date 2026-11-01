@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5,7: `Tr<L, R>::value...' expands the packs L and
+// N5008 [temp.variadic]/8,9: `Tr<L, R>::value...' expands the packs L and
 // R in lockstep; Tr is a template template parameter bound to `same'.
 // libc++'s __tuple_sfinae_base::__do_test is written this way, and
 // __tuple_impl's converting constructor is constrained on it.

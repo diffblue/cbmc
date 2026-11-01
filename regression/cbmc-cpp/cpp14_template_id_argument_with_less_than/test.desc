@@ -16,7 +16,7 @@ main.cpp
 dropped the body
 could not fully type-check
 --
-N5008 [temp.names]/3: within a template-argument-list the first non-nested
+N5008 [temp.names]/4: within a template-argument-list the first non-nested
 `>' ends the list; a `<' inside an argument is the less-than operator.
 `align_it<1 < 8 ? 8 : 1>(n)' (libc++'s basic_string::__recommend, via
 `__align_it<sizeof(value_type) < __alignment ? ... : 1>(__s + 1)') defeats the

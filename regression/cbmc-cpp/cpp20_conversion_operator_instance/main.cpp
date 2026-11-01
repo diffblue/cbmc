@@ -15,10 +15,10 @@
 // "symbol 'operator(signed_int)' is unknown", aborting the enclosing
 // statement.
 //
-// Per [over.match.conv] with [temp.deduct]/8, such an instantiated template
-// conversion function is not a viable *non-template* candidate; failing to
-// form its call is a soft non-viability handled by the subsequent fresh
-// template deduction, not a hard error.
+// Per [over.match.funcs.general]/7-8 with [over.match.funcs.general]/8, such an
+// instantiated template conversion function is not a viable *non-template*
+// candidate; failing to form its call is a soft non-viability handled by the
+// subsequent fresh template deduction, not a hard error.
 #include <concepts>
 namespace d
 {

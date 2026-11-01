@@ -1,11 +1,11 @@
-// N5008 [over.match.best]/2.6 with [temp.constr.order]: two member functions
-// with the same signature, one deleted and unconstrained and one with a
-// trailing requires-clause (libstdc++'s C++20 std::pair: `pair
+// N5008 [over.match.best.general]/2.6 with [temp.constr.order]: two member
+// functions with the same signature, one deleted and unconstrained and one with
+// a trailing requires-clause (libstdc++'s C++20 std::pair: `pair
 // &operator=(const pair &) = delete;' beside `constexpr pair &operator=(const
 // pair &) requires (_S_assignable<const _T1 &, const _T2 &>())'); the
 // constrained one is more constrained and is selected.  Look-up found the
-// deleted one ("operator= is not accessible"), and the requires-clause's
-// `( expression )' -- a call -- was not parsed at all ([temp.pre]: a
+// deleted one ("operator= is not accessible"), and the requires-clause's `(
+// expression )' -- a call -- was not parsed at all ([temp.pre]: a
 // primary-expression).  A constrained member whose constraints do not hold
 // (pair<const int, int>'s move assignment) is not viable and its body is not
 // instantiated ([temp.inst]/4): its failing conversion is no dropped body.

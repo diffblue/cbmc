@@ -1,5 +1,5 @@
-// N5008 [temp.deduct]/[expr.type]: resolving a function template whose trailing
-// return type contains a `decltype` naming a parameter (e.g.
+// N5008 [temp.deduct]/[basic.scope.param]: resolving a function template whose
+// trailing return type contains a `decltype` naming a parameter (e.g.
 // `template <class C> auto make_range(C &c) -> ranget<decltype(c.begin())>`)
 // must not be affected by a previous, unrelated resolution of the same
 // template.

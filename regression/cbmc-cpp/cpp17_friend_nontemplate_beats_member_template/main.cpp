@@ -1,7 +1,7 @@
-// Regression for [over.match.oper]/3 + [over.match.best]/2: when a
+// Regression for [over.match.oper]/3 + [over.match.best.general]/2.4: when a
 // member function-template specialization and a non-template free
 // function (e.g., a `friend` operator) are both viable for an
-// overloaded operator, [over.match.best]/2 (paragraph 5/6) requires
+// overloaded operator, [over.match.best.general]/2.4 (paragraph 5/6) requires
 // the non-template to win once their conversion sequences have the
 // same rank.
 //
@@ -10,7 +10,7 @@
 // When the member candidate is a function-template instantiation
 // and a non-template free operator (e.g., a `friend` declared in
 // the enclosing class) is also viable, the template member would
-// be selected even though [over.match.best]/2 prefers the
+// be selected even though [over.match.best.general]/2.4 prefers the
 // non-template.
 //
 // Concrete symptom on CBMC's own source: `messaget` has the

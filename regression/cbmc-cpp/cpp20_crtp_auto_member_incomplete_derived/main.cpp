@@ -1,4 +1,4 @@
-// N5008 [temp.inst]/4, [temp.point]/8: a member function of a class template
+// N5008 [temp.inst]/4, [temp.point]/7: a member function of a class template
 // specialization is instantiated when odr-used; a body that cannot be
 // converted while the CRTP-derived class is still incomplete must not be
 // dropped.

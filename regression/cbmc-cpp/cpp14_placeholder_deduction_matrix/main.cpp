@@ -135,7 +135,7 @@ int main()
 {
   int a3[3] = {1, 2, 3};
   static_assert(__is_same(decltype(arr_decay(a3)), int *), "array decays");
-  // lambdas: return type deduced from the body ([expr.prim.lambda.closure]/4)
+  // lambdas: return type deduced from the body ([expr.prim.lambda.general]/5)
   auto l1 = []() { return 2.5; };
   auto l2 = [](int k)
   {

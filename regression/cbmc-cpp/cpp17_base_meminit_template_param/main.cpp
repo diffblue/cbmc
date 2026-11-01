@@ -1,6 +1,6 @@
 extern "C" void __CPROVER_assert(bool, const char *);
 
-// N5008 [class.base.init]/2: a mem-initializer-id may designate the
+// N5008 [class.base.init]/3: a mem-initializer-id may designate the
 // base class by any name denoting that type -- including the template
 // PARAMETER the base is named by (`renamedt(underlyingt v) :
 // underlyingt(v)`).  CBMC used to convert this but silently DROP the
@@ -19,7 +19,7 @@ struct payloadt
 template <typename underlyingt>
 struct renamedt : underlyingt
 {
-  // N5008 [class.base.init]/2: the mem-initializer-id may name the
+  // N5008 [class.base.init]/3: the mem-initializer-id may name the
   // base class via the template parameter
   explicit renamedt(underlyingt value) : underlyingt(value)
   {

@@ -1,9 +1,9 @@
-// N5008 [over.match.oper]/3, [over.match.best]/2: for `a @ b`, member and
-// non-member operator candidates form one overload set.  A member operator that
-// is a function TEMPLATE is a member candidate too, and its implicit object
-// parameter is an exact match for the object argument.  A non-member candidate
-// is preferred over a function-template specialization only when their
-// conversion sequences are otherwise indistinguishable.
+// N5008 [over.match.oper]/3, [over.match.best.general]/2: for `a @ b`, member
+// and non-member operator candidates form one overload set.  A member operator
+// that is a function TEMPLATE is a member candidate too, and its implicit
+// object parameter is an exact match for the object argument.  A non-member
+// candidate is preferred over a function-template specialization only when
+// their conversion sequences are otherwise indistinguishable.
 //
 // This is the shape of util/message.h's mstreamt (the goto-cc failure on
 // ui_message.cpp / parser.cpp / typecheck.cpp): a class derived from a base has
@@ -15,7 +15,8 @@
 //   `Derived&`, so the member template wins (result convertible to Derived&).
 // f2: `d << Tag{}` -- a free NON-template operator whose object parameter is an
 //   exact `Derived&` competes with the member template; with equal object
-//   conversions the non-template free operator wins ([over.match.best]/2).
+//   conversions the non-template free operator wins
+//   ([over.match.best.general]/2.4).
 // g++/clang++ agree (a.tag==2, b.tag==3).  assertion.3 must FAIL.
 
 struct Base

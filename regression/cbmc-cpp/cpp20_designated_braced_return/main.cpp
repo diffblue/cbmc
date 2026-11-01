@@ -1,9 +1,9 @@
-// User-reported Issues 9 and 10.  N5008 [stmt.return]/2 + [dcl.init.list]:
-// a braced return copy-list-initializes the result object; with a
-// designated-initializer-list ([dcl.init.aggr]/3) or an empty list for a
-// union ([dcl.init.list]/3.5, value-initialization) the conversion went to
-// the positional member-wise path, which knew neither ("invalid implicit
-// conversion from '<<type:>>'").
+// User-reported Issues 9 and 10.  N5008 [stmt.return]/2 + [dcl.init.list]: a
+// braced return copy-list-initializes the result object; with a
+// designated-initializer-list ([dcl.init.aggr]/3) or an empty list for a union
+// ([dcl.init.list]/3.4, [dcl.init.aggr]/5.5, value-initialization) the
+// conversion went to the positional member-wise path, which knew neither
+// ("invalid implicit conversion from '<<type:>>'").
 extern "C" void __CPROVER_assert(bool, const char *);
 typedef unsigned long uint64_t;
 struct In

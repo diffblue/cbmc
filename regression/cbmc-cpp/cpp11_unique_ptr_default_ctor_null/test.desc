@@ -9,7 +9,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-[unique.ptr.single.ctor]/1 -- a default-constructed unique_ptr is null.  Fixed
+[unique.ptr.single.ctor]/3 -- a default-constructed unique_ptr is null.  Fixed
 by modelling C++17 inheriting constructors ([class.inhctor.init]): a base
 default constructor inherited via using Base::Base makes the derived class
 (here libstdc++'s __uniq_ptr_data, which only declares defaulted move members)

@@ -15,4 +15,4 @@ by-value value-pack expansion f(a...) -- with no type parameter pack reference
 in the pattern -- is expanded by replicating the pattern to the common deduced
 pack length, so decltype(invk(...)) resolves to the call result type.  The
 forwarding-cast form static_cast<Args&&>(a)... is handled separately via the
-type pack Args (cpp11_trailing_return_fwd_pack).  N5008 [temp.variadic]/4,5.
+type pack Args (cpp11_trailing_return_fwd_pack).  N5008 [temp.variadic]/5,6.

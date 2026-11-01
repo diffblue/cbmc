@@ -4,7 +4,7 @@
 // iterator's operator-> fails with "found no match for symbol
 // 'clear'" -- the candidates listed are std::list's own clear() (the
 // container's member leaks into the lookup) instead of the element
-// type's clear(enum) ([basic.lookup.classref]: lookup is in the class
+// type's clear(enum) ([basic.lookup.qual.general]/2: lookup is in the class
 // of the object expression, here the ELEMENT type).
 #include <list>
 extern "C" void __CPROVER_assert(bool, const char *);

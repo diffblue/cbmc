@@ -6,11 +6,11 @@
 // KNOWN BUG: CBMC drops `make_box<>()` from the candidate set (the empty
 // explicit template argument pack for a variadic function template whose return
 // type is a nested-pack expansion is not resolved), leaving the call with no
-// viable function ([temp.deduct]/8).  Previously this failure was silently
-// swallowed and the call's assertion never checked; the SFINAE-enforcement fix
-// now surfaces it as a CONVERSION ERROR.  Flip to CORE once make_box<>() is
-// resolved.  The non-empty cases work and are covered (CORE) by
-// cpp11_variadic_member_alias_pack.
+// viable function ([over.match.general]/3).  Previously this failure was
+// silently swallowed and the call's assertion never checked; the
+// SFINAE-enforcement fix now surfaces it as a CONVERSION ERROR.  Flip to CORE
+// once make_box<>() is resolved.  The non-empty cases work and are covered
+// (CORE) by cpp11_variadic_member_alias_pack.
 
 template <class T>
 struct identity

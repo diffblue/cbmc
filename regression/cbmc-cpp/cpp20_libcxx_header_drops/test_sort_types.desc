@@ -14,7 +14,7 @@ sort_types.cpp
 ^CONVERSION ERROR$
 no body for callee
 --
-N5008 [alg.sort]/1: libc++ 18 declares std::__sort<__less<T> &, T *> for
+N5008 [sort]/3: libc++ 18 declares std::__sort<__less<T> &, T *> for
 the arithmetic types `extern template' and defines the template only in
 libc++.so (src/algorithm.cpp), so these calls had no body (bin53).
 provide_stdlib_bodies models it as an insertion sort with `<'.  clang++

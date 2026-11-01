@@ -11,7 +11,7 @@ main.cpp
 --
 dropped the body
 --
-N5008 [expr.sizeof]/5 + [temp.variadic]/8.  `sizeof...(P)` counts the pack's
+N5008 [expr.sizeof]/4 + [temp.variadic]/10.  `sizeof...(P)` counts the pack's
 elements regardless of whether P is a type or a NON-type parameter pack.  CBMC's
 parser stored a non-type pack's name as the sizeof operand (type-checked as a
 value before the pack-count logic ran), so `box<N...>::n == sizeof...(Vs)` was

@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5, [temp.deduct.call]: this is the remaining layer of
+// N5008 [temp.variadic]/9, [temp.deduct.call]: this is the remaining layer of
 // libstdc++'s `std::function<R(A...)>` converting-constructor constraint that
 // is NOT yet handled.  `__invoke_result` is defined in terms of the variadic
 // helper `std::__invoke`:

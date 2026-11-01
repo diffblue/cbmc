@@ -3,7 +3,7 @@
 // chain -- fails to resolve ("found no match for symbol 'iterator'")
 // when a same-named class template is forward-declared at namespace
 // scope (libc++'s deprecated std::iterator) AND CBMC runs in libc++
-// mode (--stdlib libc++; the clang parser flavor).  [basic.scope.scope],
+// mode (--stdlib libc++; the clang parser flavor).  [basic.lookup.unqual]/2,
 // [class.member.lookup]: the member alias declaration hides the
 // namespace-scope name inside the class.  Plain (gcc-flavor) mode
 // resolves fine; removing the namespace-scope forward declaration

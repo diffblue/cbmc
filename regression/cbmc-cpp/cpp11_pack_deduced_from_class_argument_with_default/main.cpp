@@ -1,4 +1,4 @@
-// N5008 [temp.deduct.type]/9, [temp.param]/14, [temp.variadic]/8: in
+// N5008 [temp.deduct.type]/9, [temp.param]/18, [temp.variadic]/10: in
 // `template <class... U, int N = sizeof...(U)> int count(const tup<U...> &)'
 // U is deduced from the class template argument, and the default template
 // arguments that follow are substituted afterwards with all of U's elements.

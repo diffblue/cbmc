@@ -1,4 +1,4 @@
-// N5008 [class.union.anon]/1, [expr.ref]/6.2: a member of an anonymous union
+// N5008 [class.union.anon]/1, [expr.ref]/7.2: a member of an anonymous union
 // is a member of the enclosing class, and an lvalue when the object is.  An
 // array member of an anonymous union indexed with a non-constant on the left
 // of an assignment was rejected as "not an lvalue" (the intermediate

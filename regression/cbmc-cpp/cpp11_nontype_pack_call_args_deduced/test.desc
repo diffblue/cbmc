@@ -7,7 +7,7 @@ main.cpp
 --
 dropped the body
 --
-N5008 [temp.deduct.type] + [temp.variadic]/4-5.  A NON-type parameter pack
+N5008 [temp.deduct.type] + [temp.variadic]/5-6.  A NON-type parameter pack
 DEDUCED from a class-template-id argument (`I` from matching `seq<I...>` against
 `seq<1,2>`) and expanded as call arguments in the body (`add(I...)`).  Fixed by
 recording the deduced pack's element values in pack_expr_map (guess_template_

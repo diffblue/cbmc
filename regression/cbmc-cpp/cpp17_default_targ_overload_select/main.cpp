@@ -1,11 +1,11 @@
-// N5008 [temp.arg.explicit] + [temp.deduct]/2 + [over.match.best]: a call
-// `valid_args<Us...>()` that supplies only explicit template arguments to
-// an OVERLOADED member function template must perform deduction/
-// substitution per candidate and remove non-viable ones; with
-// Us = {long, double, char} the pack overload
-// `valid_args<typename, typename, typename...>` is viable (first two
-// explicit arguments bind the fixed parameters, the rest the pack) and
-// the single-parameter overload is not.
+// N5008 [temp.arg.explicit] + [temp.deduct.general]/2 + [over.match.best]:
+// a call `valid_args<Us...>()` that supplies only explicit template
+// arguments to an OVERLOADED member function template must perform
+// deduction/ substitution per candidate and remove non-viable ones; with
+// Us = {long, double, char} the pack overload `valid_args<typename,
+// typename, typename...>` is viable (first two explicit arguments bind the
+// fixed parameters, the rest the pack) and the single-parameter overload
+// is not.
 //
 // KNOWNBUG: when such a call is the initializer of a DEFAULT TEMPLATE
 // ARGUMENT of another member template (here `bool V` on the forwarding

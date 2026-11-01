@@ -1,4 +1,4 @@
-// N5008 [temp.mem]/1 + [class.nest]/1: a member class template of a
+// N5008 [temp.mem]/1 + [class.nest]/2: a member class template of a
 // class template may be defined OUT OF LINE
 // (`template<class V> template<bool B>
 //  class take_view<V>::__sentinel { ... };`, the libc++ take_view

@@ -2,7 +2,7 @@
 // declaration; `T(x);' declares x with a parenthesised declarator
 // ([dcl.decl.general]: `( ptr-declarator )'), as do `int (i) = k;' and
 // `int (*p) = &i;'.  The parser took `T(x)' for a call (a functional cast
-// with an unknown argument: "symbol 'x' is unknown").  [class.mem.general]/7:
+// with an unknown argument: "symbol 'x' is unknown").  [class.mem.general]/9.1:
 // a member function body is a complete-class context, so `T' may be a
 // nested class declared LATER in the class -- unknown to the parser, the
 // statement is turned into the declaration by the type checker (libstdc++

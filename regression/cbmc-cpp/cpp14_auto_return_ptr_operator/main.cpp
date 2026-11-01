@@ -1,4 +1,4 @@
-// N5008 [dcl.spec.auto.general]/2, [dcl.type.auto.deduct]/4: a placeholder
+// N5008 [dcl.spec.auto.general]/4, [dcl.type.auto.deduct]/3: a placeholder
 // return type under a ptr-operator (`auto &`, `auto *`, `const auto &`) is
 // deduced like the corresponding variable declaration, keeping the referred
 // type's qualifiers.

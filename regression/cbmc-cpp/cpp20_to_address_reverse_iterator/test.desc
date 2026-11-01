@@ -19,4 +19,4 @@ Round-31 fix (2026-08-10): six layers total -- concepts
 compound-requirements, two-phase lookup, static-member resolution +
 short-circuit folding, reference-pattern spec matching, and finally
 qualified-name lookup escaping to enclosing scopes
-([basic.lookup.qual]/1).
+([basic.lookup.qual.general]/3).

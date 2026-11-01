@@ -10,7 +10,7 @@ main.cpp
 ^incomplete type
 dropped the body
 --
-Deferred instantiation ([temp.inst]/1): class-body declarations whose
+Deferred instantiation ([temp.inst]/2): class-body declarations whose
 declarators are all pointers/functions are typechecked without elaborating
 class-template instances, and the up-front elaboration of template
 arguments is limited to partial-specialization patterns that are

@@ -1,4 +1,4 @@
-// N5008 [except.ctor]/1-3, [except.throw]/4: every automatic object whose
+// N5008 [except.ctor]/1-3, [except.throw]/2: every automatic object whose
 // scope is exited while an exception propagates to its handler is destroyed.
 // Two related call-site cases (cross-checked against g++ and clang++, which
 // destroy both objects):

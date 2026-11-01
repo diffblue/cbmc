@@ -16,7 +16,7 @@ int g(U u)
   return f(u);
 }
 // the same for a namespace member defined by a qualified name
-// ([dcl.meaning.general]/3.1)
+// ([dcl.meaning.general]/3.4)
 namespace n
 {
 template <class T>

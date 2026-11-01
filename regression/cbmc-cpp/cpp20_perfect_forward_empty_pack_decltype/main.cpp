@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/7 + [temp.arg.explicit]/4: a member template
+// N5008 [temp.variadic]/16 + [temp.arg.explicit]/4: a member template
 // `operator()(Args... args) -> decltype(Op()(Idx..., args...))` whose own
 // pack deduces EMPTY under an outer deduction (`invoke_`'s
 // decltype(F()())): the empty pack's dead reference must vanish from the

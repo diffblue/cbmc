@@ -10,7 +10,7 @@ namespace.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [temp.mem.class]/1, [temp.inst]/3; see test.desc.  A member class of
+N5008 [temp.mem.class]/1, [temp.inst]/4; see test.desc.  A member class of
 a class template in a namespace, depending on the template parameter, for
 two instances created before its definition and one after it.  The
 definition is written inside the namespace: the qualified form `struct

@@ -1,4 +1,4 @@
-// Issue 14: N5008 [dcl.pre]/10, [expr.const]: the static_assert condition
+// Issue 14: N5008 [dcl.pre]/13, [expr.const]: the static_assert condition
 // f(1) == 2 is a constant expression -- f forwards its parameter e to the
 // constexpr function p2.  Builds of this branch from September 2026
 // (5186cc5fe7) rejected it ("symbol 'e' is unknown"); upstream cbmc-6.9.0

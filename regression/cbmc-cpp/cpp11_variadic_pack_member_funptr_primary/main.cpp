@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5: a pack expansion `A...` of a class template
+// N5008 [temp.variadic]/9: a pack expansion `A...` of a class template
 // parameter pack that appears in the type of a data member -- here the
 // parameter list of a member function-pointer type `int (*)(A...)` -- must
 // expand to one element per pack member when the class template is

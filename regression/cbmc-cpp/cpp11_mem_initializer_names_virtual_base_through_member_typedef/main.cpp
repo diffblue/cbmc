@@ -17,7 +17,7 @@ struct ostream : virtual ios<C>
   {
   }
   // libstdc++'s basic_ostream move constructor: the virtual base is named in
-  // the mem-initializer through a member typedef ([class.base.init]/2)
+  // the mem-initializer through a member typedef ([class.base.init]/3)
   ostream(ostream &&r) : ios_type()
   {
     ios_type::move(r);

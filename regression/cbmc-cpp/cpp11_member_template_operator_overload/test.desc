@@ -12,9 +12,9 @@ main.cpp
 ^(ERROR|error): (invalid implicit conversion|operator 'shl' not defined)
 dropped the body
 --
-N5008 [over.match.oper]/3, [over.match.best]/2: a member operator that is a
-function template participates in operator overload resolution; it wins over a
-free operator that needs a derived-to-base conversion for the object, but loses
-to a free non-template operator whose object parameter is an exact match.  This
-is util/message.h's mstreamt shape (the ui_message.cpp / parser.cpp /
+N5008 [over.match.oper]/3, [over.match.best.general]/2: a member operator that
+is a function template participates in operator overload resolution; it wins
+over a free operator that needs a derived-to-base conversion for the object, but
+loses to a free non-template operator whose object parameter is an exact match.
+This is util/message.h's mstreamt shape (the ui_message.cpp / parser.cpp /
 typecheck.cpp cluster).  assertion.3 FAILURE proves non-vacuity.

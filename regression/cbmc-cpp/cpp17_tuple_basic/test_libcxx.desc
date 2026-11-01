@@ -8,7 +8,7 @@ main.cpp
 --
 --
 After the 2026 "template-only no-match silently throws" fix
-(resolve: silently discard template-only no-match per [temp.deduct]/8),
+(resolve: silently discard template-only no-match per [temp.deduct.general]/8),
 the surface symptom changed: the libc++ std::tuple constructor
 overload set (which involves many SFINAE-guarded forwarding-reference
 templates) no longer emits CONVERSION ERROR when deduction fails.
@@ -24,7 +24,7 @@ Round-10 update: the non-type base-pack root is FIXED
 VISIBLE next layer (tuple_element/get resolution: "found no match for
 symbol 'get'") instead of silent wrong-code.  Re-reduce next.
 Round-11 third batch (2026-08-04): the get redirect now compares
-parameter TYPES position-normalized ([dcl.fct]/5, [temp.over.link]/6);
+parameter TYPES position-normalized ([dcl.fct]/3, [temp.over.link]/6);
 the whole family RUNS BMC end-to-end.  Remaining layer visible as
 no-body FAILUREs: std::__1::get<0,...>'s DEFINITION body is not
 instantiated for the call (apply_basic reaches VERIFICATION SUCCESSFUL
@@ -38,7 +38,7 @@ enable-if ctor machinery); get assertions still fail through the
 unconstructed object.
 Round-19 (2026-08-07): FIXED end-to-end -- the constructor layer fell
 in three stages: has_conflict candidate gates ([temp.deduct.type]/2),
-multi-pack function templates ([temp.variadic]/5,7,8, the five-pack
+multi-pack function templates ([temp.variadic]/5,8, the five-pack
 __tuple_impl ctor), and multi-pack lockstep in mem-inits and base
 specifiers (heterogeneous leaf types).  CORE with non-vacuous
 assertions; g++/clang++ replicas verified along the way

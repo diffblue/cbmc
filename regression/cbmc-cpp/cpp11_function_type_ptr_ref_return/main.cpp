@@ -1,4 +1,4 @@
-// N5008 [dcl.decl]/4 + [dcl.ambig.res]: in a declarator, an empty `()`
+// N5008 [dcl.decl.general]/6 + [dcl.ambig.res]: in a declarator, an empty `()`
 // following the (possibly pointer/reference-qualified) leading part is a
 // function parameter-list, so `int*()`, `int&()`, `int&&()` are function types
 // returning `int*` / `int&` / `int&&` -- not just the pointer/reference type

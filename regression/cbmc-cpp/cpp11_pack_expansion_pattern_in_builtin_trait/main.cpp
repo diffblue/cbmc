@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/5: the pattern of a pack expansion in a type-trait
+// N5008 [temp.variadic]/9: the pattern of a pack expansion in a type-trait
 // argument list may be any type naming the pack: `__is_constructible(X,
 // Y &&...)' expands to one argument Y_k && per element.  CBMC expanded only
 // the bare `Y...' and treated `Y &&...' as a single argument.  libc++'s

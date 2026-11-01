@@ -1,4 +1,4 @@
-// N5008 [dcl.pre]/10: a static_assert-declaration whose condition is false
+// N5008 [dcl.pre]/13: a static_assert-declaration whose condition is false
 // makes the program ill-formed -- at block scope as much as at namespace
 // scope.  Block-scope failures were silently turned into a `skip'.
 struct S

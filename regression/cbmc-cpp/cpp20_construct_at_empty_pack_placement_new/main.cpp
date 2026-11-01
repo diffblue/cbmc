@@ -6,7 +6,7 @@ void *operator new(size_t, void *p) noexcept
 }
 // libc++ <__memory/construct_at.h>: the constraint is a placement-new inside
 // decltype whose new-initializer expands the parameter pack; the pack is not
-// the last template parameter ([temp.param]/14)
+// the last template parameter ([temp.param]/18)
 namespace std
 {
 template <class T>

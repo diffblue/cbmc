@@ -5,7 +5,7 @@ struct view
   C *p;
 };
 // N5008 [over.match.class.deduct]: view{s} deduces view<const char>;
-// [dcl.spec.auto.deduct]: so does the return type of range
+// [dcl.type.auto.deduct]: so does the return type of range
 auto range(const char *s)
 {
   return view{s};

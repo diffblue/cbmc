@@ -6,7 +6,7 @@
 // libc++'s __tuple_impl constructor shape.  Deduction recorded the
 // trailing pack's arity as zero, the instance was built with the pack
 // expanded to ZERO parameters, and the call found no match
-// ([temp.deduct.call]/1, [temp.variadic]/4).  g++/clang++ run clean.
+// ([temp.deduct.call]/1, [temp.variadic]/5).  g++/clang++ run clean.
 extern "C" void __CPROVER_assert(bool, const char *);
 template <unsigned long...>
 struct indices

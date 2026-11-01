@@ -16,7 +16,7 @@ main.cpp
 could not fully type-check
 dropped the body
 --
-N5008 [temp.param]/4 (a type-constraint introduces C<T>), [temp.constr.decl]/3,
+N5008 [temp.param]/9 (a type-constraint introduces C<T>), [temp.constr.decl]/3,
 [over.match.viable].  Non-vacuous: the last assertion is deliberately wrong and
 must FAIL.  Before the fix: "type-constraint overloads", "qualified concept" and
 "standard concepts" FAILURE (g(1.0) returned 1: the first-declared overload).

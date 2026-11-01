@@ -1,10 +1,10 @@
-// N5008 [over.ics.rank]/4.4.4: binding an expression of type C to a
-// reference to B is better than binding it to a reference to A when B is
-// derived from A and C from B.  For `d << 1' the member A::operator<<(int)
-// binds d to A&, the non-member operator<<(B &, int) binds it to B&; the
-// second argument is an exact match for both, so the non-member is better
-// ([over.match.best]/2.1, [over.match.oper]/3); with the classes swapped the
-// member is better.
+// N5008 [over.ics.rank]/4.5.2: binding an expression of type C to a reference
+// to B is better than binding it to a reference to A when B is derived from A
+// and C from B.  For `d << 1' the member A::operator<<(int) binds d to A&, the
+// non-member operator<<(B &, int) binds it to B&; the second argument is an
+// exact match for both, so the non-member is better
+// ([over.match.best.general]/2.1, [over.match.oper]/3); with the classes
+// swapped the member is better.
 extern "C" void __CPROVER_assert(bool, const char *);
 
 struct A

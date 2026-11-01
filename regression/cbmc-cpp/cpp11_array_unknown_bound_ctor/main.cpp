@@ -1,4 +1,4 @@
-// N5008 [dcl.array]/1 and [dcl.init.aggr]/5: an array of unknown bound whose
+// N5008 [dcl.array]/7 and [dcl.init.aggr]/10: an array of unknown bound whose
 // declaration has a brace-enclosed initializer list has its bound deduced from
 // the number of initializer-clauses.  This holds whether or not the element
 // type has a user-provided constructor.

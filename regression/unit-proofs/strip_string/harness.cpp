@@ -9,7 +9,7 @@
 //  * a string with no leading/trailing whitespace is returned unchanged.
 // Single translation unit: include the implementation directly.  (The
 // C++ front end does not yet merge identical inline member definitions
-// across translation units, [basic.def.odr]/13.)
+// across translation units, [basic.def.odr]/13, 15.)
 #include <util/string_utils.h>
 
 #include <cctype>

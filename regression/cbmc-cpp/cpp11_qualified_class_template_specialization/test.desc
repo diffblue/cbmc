@@ -11,7 +11,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [temp.expl.spec]/2: an explicit class template specialization may be named
+N5008 [temp.expl.spec]/3: an explicit class template specialization may be named
 with a qualified-id from an enclosing namespace (template <> struct ns::G<char>).
 CBMC previously silently skipped such a specialization (treating it like an
 out-of-class nested definition) and used the primary template, which also breaks

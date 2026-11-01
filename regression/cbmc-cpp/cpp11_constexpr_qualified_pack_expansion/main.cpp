@@ -1,4 +1,4 @@
-// [temp.variadic]/4-5: a pack expansion's pattern is expanded once per element
+// [temp.variadic]/5-6: a pack expansion's pattern is expanded once per element
 // of the packs it mentions, and the pattern may be a *qualified* type -- a
 // reference, pointer, or cv-qualified type wrapping the pack -- not just a bare
 // pack or a template-id.  std::tuple's constructors expand the element pack

@@ -1,4 +1,4 @@
-// N5008 [dcl.type.auto.deduct]/2, [temp.spec.general]/5: a variable
+// N5008 [dcl.type.auto.deduct]/2, [temp.type]/1: a variable
 // template declared with a placeholder type and a parenthesized
 // initializer; every use of the same specialization denotes the one
 // variable of the deduced type.

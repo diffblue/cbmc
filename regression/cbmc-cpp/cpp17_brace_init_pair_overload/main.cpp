@@ -1,4 +1,4 @@
-// Regression for [over.ics.list]/4 element-by-element ICS check on
+// Regression for [over.ics.list]/5 element-by-element ICS check on
 // brace-init-list to `std::initializer_list<X>`, and [over.match.list]/
 // 2.2 fallback to non-init_list constructors of T with brace-init
 // elements as args.
@@ -21,7 +21,7 @@
 //   * `brace_init_to_init_list_is_viable` checks each element has an
 //     ICS to the `_begin`/`_M_array` element type before declaring
 //     the `initializer_list<X>` overload viable.
-//   * `brace_init_is_viable` adds a [over.match.list]/2.2 phase: if
+//   * `brace_init_is_viable` adds a [over.match.list]/1.2 phase: if
 //     no init-list ctor, accept any non-explicit ctor whose required
 //     argument count matches the brace-init-list size and whose
 //     parameter types each accept the corresponding element via ICS.
@@ -30,7 +30,7 @@
 //     reference-to-class targets too.
 //   * `cpp_typecheck_fargst::match` biases brace-init candidates
 //     with an rvalue-reference target by -1 distance per
-//     [over.ics.rank]/3.3.4 so the rvalue-ref overload wins over
+//     [over.ics.rank]/3.2.3 so the rvalue-ref overload wins over
 //     the const-lvalue-ref overload for prvalue brace-init source.
 
 #include <initializer_list>
@@ -76,7 +76,7 @@ int main()
   // `insert(const pair_t&)` or `insert(pair_t&&)`, NEVER
   // `insert(initializer_list<pair_t>)` (because `k` is a `key_t`,
   // not a `pair_t`).  The rvalue-ref overload is preferred for
-  // a prvalue source per [over.ics.rank]/3.3.4.
+  // a prvalue source per [over.ics.rank]/3.2.3.
   m.insert({k, idx});
   return 0;
 }

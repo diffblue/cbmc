@@ -12,9 +12,9 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [dcl.spec.auto.general]/3, [expr.prim.lambda.closure]/7: the
-closure's operator() template takes `const T &' for `const auto &'.  The
-closure synthesis replaced the whole decl-specifier `const auto' by the
-invented parameter, dropping `const', so an rvalue argument did not bind
-("found no match for symbol 'operator()'", bin53).  g++ 13 and clang++ 18
-accept this program, and it fails only its WRONG assertion.
+N5008 [dcl.spec.auto.general]/2, [dcl.fct]/20, [expr.prim.lambda.closure]/4,
+[dcl.fct]/20: the closure's operator() template takes `const T &' for `const
+auto &'.  The closure synthesis replaced the whole decl-specifier `const auto'
+by the invented parameter, dropping `const', so an rvalue argument did not bind
+("found no match for symbol 'operator()'", bin53).  g++ 13 and clang++ 18 accept
+this program, and it fails only its WRONG assertion.

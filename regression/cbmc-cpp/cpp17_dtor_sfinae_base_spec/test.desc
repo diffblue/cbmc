@@ -11,13 +11,13 @@ main.cpp
 dropped the body
 --
 Was KNOWNBUG; fixed by two changes: (1) N5008 [expr.prim.id.dtor] +
-[class.dtor]/1,6 -- the explicit destructor call notation on a class
+[class.dtor]/2,8,16 -- the explicit destructor call notation on a class
 whose destructor is implicitly declared and trivial (no synthesized
 destructor symbol under CBMC's POD gate) now uses the same no-op dummy
 as scalar pseudo-destructor calls, so the destructibility SFINAE probe
 `decltype(declval<T&>().~T())` resolves; (2) the ~_Tp destructor-name
 substitution now prefers the template-map binding that designates the
-CURRENT class scope ([expr.prim.id.dtor]/2) instead of an arbitrary
+CURRENT class scope ([class.dtor]/16) instead of an arbitrary
 same-short-name binding, and extracts the class's unqualified name
 ANGLE-AWARE (a naive rfind("::") landed inside a template instance's
 arguments, spelling e.g. `~allocator` for basic_string).  Header-free

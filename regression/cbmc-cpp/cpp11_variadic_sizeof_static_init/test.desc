@@ -10,7 +10,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-[temp.variadic]/8 `sizeof...(T)` in a static data member initializer.  Fixed by
+[temp.variadic]/10 `sizeof...(T)` in a static data member initializer.  Fixed by
 the unified pack-expansion rework (Phase 0 + Phase 4,
 doc/architectural/cpp-variadic-pack-expansion-rework.md):
   * template_mapt::build no longer scalar-binds a parameter pack to its first

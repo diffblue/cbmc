@@ -1,7 +1,7 @@
 // cvise-reduced from the libc++ <tuple> driver (cpp11_libcxx_tuple):
 // a partial specialization deriving from a base pack over its
 // LEADING NON-TYPE pack (`__tuple_impl<__tuple_indices<_Indx...>,
-// _Tp...> : __tuple_leaf<_Indx>...`, [temp.variadic]/5.2).  The
+// _Tp...> : __tuple_leaf<_Indx>...`, [temp.variadic]/6.6).  The
 // instance is built with ZERO bases and zero components, so get()'s
 // member access reads outside the object.  The TYPE-pack analogue
 // (`: leaf<T>...`, cpp11_tuple_leaf_no_body) is fixed; the non-type

@@ -1,4 +1,4 @@
-// N5008 [expr.prim.fold]/2,3, [temp.variadic]/5: a fold over a class
+// N5008 [expr.prim.fold]/2,3, [temp.variadic]/14: a fold over a class
 // template's pack may appear in a base-specifier's or an alias member's
 // template arguments; it expands like a fold in the class body.  Over a
 // one-element pack it is the single pattern instance.  libc++'s tuple

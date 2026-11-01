@@ -1,4 +1,4 @@
-// N5008 [class.dtor]/13, [class.union.general]/1, [class.union.anon]/1: a
+// N5008 [class.dtor]/13, [class.union.anon]/4, [class.union.anon]/1: a
 // destructor destroys only non-variant members.  The members of a union,
 // named or anonymous, are variant members; a user-provided union or class
 // destructor used to destroy them anyway (libc++'s ~__hash_node() {} then

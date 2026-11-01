@@ -12,7 +12,7 @@ struct same<A, A>
 {
   static const bool value = true;
 };
-// [temp.type]/1, [dcl.fct]/5: decltype(cb) and the type-id void(int) denote
+// [temp.type]/1, [dcl.fct]/3: decltype(cb) and the type-id void(int) denote
 // the same function type, so same<...> is its partial specialization
 int main()
 {

@@ -10,9 +10,9 @@ main.cpp
 ^.*is unknown.*$
 dropped the body
 --
-[temp.deduct]/5 with [temp.constr.decl]/1: a function-template specialisation
-whose associated constraints (its requires-clause) are not satisfied by the
-deduced arguments is removed from the candidate set.
+[temp.deduct.general]/5 with [temp.constr.decl]/1: a function-template
+specialisation whose associated constraints (its requires-clause) are not
+satisfied by the deduced arguments is removed from the candidate set.
 
 Mutually-convertible class types that each have a templated integral
 constructor `C(T) requires integral<T>` and an explicit converting constructor

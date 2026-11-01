@@ -33,7 +33,7 @@ struct impl<indices<Idx...>, T...> : leaf<Idx, T>...
   // libc++'s __tuple_impl: the elements given an argument are initialized
   // from it, the remaining ones (Ul/Tl) value-initialized.  With every
   // element given, the second pack expansion is over EMPTY packs and
-  // expands to nothing ([temp.variadic]/7, [class.base.init]).
+  // expands to nothing ([temp.variadic]/16, [class.base.init]).
   template <int... Uf, class... Tf, int... Ul, class... Tl, class... U>
   impl(indices<Uf...>, types<Tf...>, indices<Ul...>, types<Tl...>, U &&...u)
     : leaf<Uf, Tf>(static_cast<U &&>(u))..., leaf<Ul, Tl>()...

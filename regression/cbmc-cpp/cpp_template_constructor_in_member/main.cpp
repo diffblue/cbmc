@@ -2,7 +2,7 @@
 // braced form `M{...}` from inside one of its own member functions.  Inside the
 // class the injected-class-name 'M' makes the constructor template visible
 // under the bare name, but `M{...}` is an ordinary construction, not a
-// class-template-argument-deduction context ([dcl.type.class.deduct] applies
+// class-template-argument-deduction context ([dcl.type.simple]/3 applies
 // only to a class template).  This mirrors libstdc++'s __max_size_type, whose
 // operator~ returns `_Max_size_type{~_M_val, ...}` from inside the class.
 

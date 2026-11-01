@@ -8,7 +8,7 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-Originally a regression for [class.member.lookup]/1 + [temp.names]/3:
+Originally a regression for [class.member.lookup]/4 + [temp.names]/3:
 a nested-template member (`rebind<_Up>`) declared in a derived
 class hides a same-named member inherited from any base class.
 

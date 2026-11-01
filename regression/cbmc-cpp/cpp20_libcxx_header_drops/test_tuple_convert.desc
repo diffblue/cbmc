@@ -14,7 +14,7 @@ dropped the body of system-header function
 --
 libc++ (LLVM 18) <tuple>: `std::tuple<int> c(std::forward_as_tuple(3))'.
 tuple<int>'s element-wise constructor tuple(_Up &&...) is removed by its
-_EnableUTypesCtor<_Up...> constraint (N5008 [temp.variadic]/8: with one
+_EnableUTypesCtor<_Up...> constraint (N5008 [temp.variadic]/16: with one
 deduced element, _Up... in the default's template-argument list used to
 expand to no argument, so the constraint held and __tuple_impl's body for
 it, tuple:469, was dropped).

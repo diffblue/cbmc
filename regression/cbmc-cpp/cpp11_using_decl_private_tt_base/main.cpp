@@ -16,7 +16,7 @@ class buft : _Layout<buft<_Tp, _Alloc, _Layout>, _Tp, _Alloc>
   // class default: the base is PRIVATE ([class.access.base]/2).
 public:
   using __base_type = _Layout<buft, _Tp, _Alloc>;
-  // [namespace.udecl]/16,19: the member is republished PUBLIC; a call
+  // [namespace.udecl]/12,16: the member is republished PUBLIC; a call
   // on a buft lvalue adjusts the implicit object argument to the
   // (privately inherited) base.
   using __base_type::__relocate;

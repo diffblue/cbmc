@@ -1,7 +1,8 @@
 extern "C" void __CPROVER_assert(bool, const char *);
-// N5008 [over.match.best]/2.1, [over.ics.rank]/3.2.3: binding an rvalue
+// N5008 [over.match.best.general]/2.1, [over.ics.rank]/3.2.3: binding an rvalue
 // reference to an rvalue is better than binding an lvalue reference; this
-// decides before the preference for a non-template ([over.match.best]/2.4)
+// decides before the preference for a non-template
+// ([over.match.best.general]/2.4)
 struct up
 {
   int which = 0;

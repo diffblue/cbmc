@@ -3,7 +3,7 @@
 // For a class iterator, std::iterator_traits derives from __iterator_traits,
 // whose meaningful definition (under __cpp_lib_concepts) is a *constrained*
 // partial specialization selected by its requires-clause
-// (__detail::__iter_with_nested_types) per [temp.class.spec.match] and
+// (__detail::__iter_with_nested_types) per [temp.spec.partial.match] and
 // [temp.constr].  That specialization exposes
 //   iterator_category = typename _Iterator::iterator_category,
 // so for std::vector<int>::iterator (a random-access __normal_iterator) the

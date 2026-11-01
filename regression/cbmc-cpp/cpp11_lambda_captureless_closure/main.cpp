@@ -1,4 +1,4 @@
-// [expr.prim.lambda.closure]/1 + §7.5.6.2: a captureless, non-generic lambda
+// [expr.prim.lambda.closure]/1, /10: a captureless, non-generic lambda
 // has a closure *class* type with a public inline operator() and a non-explicit
 // conversion to pointer-to-function with the same signature.  The lambda is
 // thus usable both as an object (called via operator(), stored by value,

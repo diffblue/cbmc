@@ -1,4 +1,4 @@
-// N5008 [temp.deduct.type] + [temp.variadic]/4-5: a NON-type parameter pack
+// N5008 [temp.deduct.type] + [temp.variadic]/5-6: a NON-type parameter pack
 // DEDUCED from a class-template-id argument (`I` deduced by matching the
 // parameter `seq<I...>` against the argument `seq<1,2>`) and then expanded as
 // call arguments in the function body (`add(I...)`).

@@ -11,9 +11,9 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-N5008 [namespace.memdef]/2: a member of a namespace may be defined outside
+N5008 [class.pre]/3: a member of a namespace may be defined outside
 it by a qualified name (`template <class, class...> class fmt::arg_store
-{};'); [namespace.def]/2: a later `namespace fmt { }' is an extension of
+{};'); [namespace.def.general]/2: a later `namespace fmt { }' is an extension of
 the SAME namespace; [basic.lookup.qual.general]/1: `fmt::' then names that
 one namespace.  After the qualified class template definition followed by
 the reopening, the front end reported "scope 'fmt' is ambiguous" and

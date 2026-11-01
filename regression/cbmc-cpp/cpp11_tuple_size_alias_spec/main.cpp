@@ -12,7 +12,7 @@
 //    must be substituted into the alias body; it was skipped (only
 //    plain names were), leaving the alias's own parameter name to
 //    collide with the specialization's.
-// 3. N5008 [temp.variadic]/5: expanding `Tup<_Tp...>` in a partial-
+// 3. N5008 [temp.variadic]/9: expanding `Tup<_Tp...>` in a partial-
 //    specialization pattern must substitute the pack's i-th ELEMENT;
 //    the emitted argument kept the name `_Tp`, which later resolved
 //    against the PRIMARY template's identically-named parameter (bound

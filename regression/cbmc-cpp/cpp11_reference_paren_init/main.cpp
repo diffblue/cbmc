@@ -1,6 +1,6 @@
-// N5008 [dcl.init.ref], [dcl.init]/16: a reference may be direct-initialized
-// with parentheses (or braces): `T &r(init)` binds the reference exactly like
-// `T &r = init`.  util/replace_symbol.cpp uses this form
+// N5008 [dcl.init.ref], [dcl.init.general]/16.2: a reference may be
+// direct-initialized with parentheses (or braces): `T &r(init)` binds the
+// reference exactly like `T &r = init`.  util/replace_symbol.cpp uses this form
 // (`const exprt &const_dest(dest);`), the layer of the goto-cc cascade on
 // replace_symbol.cpp reached after the incomplete-pair fix.
 //

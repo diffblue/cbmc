@@ -1,4 +1,4 @@
-// N5008 [filebuf.members]/2-4: opening a file may fail, and open returns a
+// N5008 [filebuf.members]/3, 6: opening a file may fail, and open returns a
 // null pointer then.  The shape of the MSVC STL: basic_filebuf opens with
 // _Fiopen and takes the FILE's buffer pointers from the UCRT's
 // _get_stream_buffer_pointers; _Lockit guards the locale machinery.  All

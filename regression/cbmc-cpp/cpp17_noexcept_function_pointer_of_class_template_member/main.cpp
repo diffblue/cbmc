@@ -1,4 +1,4 @@
-// N5008 [except.spec]/12.3, [conv.fctptr]: the type of &W<int>::f is
+// N5008 [except.spec]/12.2, [conv.fctptr]: the type of &W<int>::f is
 // `void (*)()', so overload resolution selects is_nothrow_fp(void (*)()).
 extern "C" void __CPROVER_assert(bool, const char *);
 template <class T>

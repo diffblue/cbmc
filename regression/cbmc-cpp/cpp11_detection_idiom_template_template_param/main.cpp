@@ -1,4 +1,4 @@
-// N5008 [temp.class.spec.match] + [temp.alias]/2 + [temp.deduct]: a class
+// N5008 [temp.spec.partial.match] + [temp.alias]/2 + [temp.deduct]: a class
 // template partial specialization is selected when its argument list, after
 // deduction and substitution, matches the specialization arguments and every
 // substituted argument is valid.  The detection idiom relies on this:
@@ -22,7 +22,7 @@
 // through to a global-name fallback that re-selected the template-template-
 // PARAMETER itself, leaving the argument unsubstituted so the specialization did
 // not match.  Fixed by wiring the argument directly from its deduced
-// template_map binding ([temp.arg.template], [temp.class.spec.match]).  The
+// template_map binding ([temp.arg.template], [temp.spec.partial.match]).  The
 // equivalent detection written with a direct member access
 // ( void_t<typename T::foo> ) already worked; this is the template-template-
 // parameter analogue (the shape of libstdc++ std::__detected_or).

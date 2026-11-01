@@ -1,4 +1,4 @@
-// [temp.variadic]/3 + [dcl.fct]: a `...` that immediately follows a parameter
+// [temp.variadic]/2 + [dcl.fct]: a `...` that immediately follows a parameter
 // declaration with no separating comma -- e.g. `f(Args...)` where Args is a
 // template parameter pack -- introduces a function parameter pack.  It is NOT a
 // C-style variadic ellipsis (which is written with a preceding comma,

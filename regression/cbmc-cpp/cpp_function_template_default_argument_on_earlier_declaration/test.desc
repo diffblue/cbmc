@@ -18,7 +18,7 @@ of a function template applies to calls that follow its definition, which
 redeclares it without the default.  The definition replaced the
 declaration and lost it ("found no match for symbol 'f'"; inside the
 template g the body was dropped).  A namespace member defined
-by a qualified name (`n::h', [dcl.meaning.general]/3.1) was never merged
+by a qualified name (`n::h', [dcl.meaning.general]/3.4) was never merged
 with its declaration at all, default or not.  test_member.desc
 covers a member function template defined outside its class.  libstdc++ 13's vformat_to
 calls __format::__do_vformat_to with three arguments, so its bodies

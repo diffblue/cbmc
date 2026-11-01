@@ -1,4 +1,4 @@
-// N5008 [temp.arg.type], [temp.variadic]/7: in `derived<void>' the argument
+// N5008 [temp.arg.type], [temp.variadic]/16: in `derived<void>' the argument
 // `void' is bound to R and the pack A is empty; the base-specifier
 // `base<R, A...>' names base<void>.  The front end represents an empty pack
 // by trailing `void' sentinels and stripped every trailing `void' argument,
@@ -7,7 +7,7 @@
 // _Maybe_unary_or_binary_function<_Res, _ArgTypes...>, the base of every
 // std::function<void()>; CBMC's own contracts/utils.cpp, dog-fooding).
 extern "C" void __CPROVER_assert(bool, const char *);
-// N5008 [temp.arg.type], [temp.variadic]/7: in base<void> the argument void
+// N5008 [temp.arg.type], [temp.variadic]/16: in base<void> the argument void
 // is bound to R; only the arguments of the (here empty) pack A contribute
 // nothing
 template <typename R, typename... A>

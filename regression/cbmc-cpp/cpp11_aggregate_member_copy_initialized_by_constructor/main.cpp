@@ -1,4 +1,4 @@
-// N5008 [dcl.init.aggr]/4.2, [dcl.init.general]/16.6: an element of an
+// N5008 [dcl.init.aggr]/4.3, [dcl.init.general]/16.6: an element of an
 // aggregate is copy-initialized from its initializer-clause; for a class
 // with user-provided copy constructor and destructor that is a constructor
 // call, not a copy of the bits of a temporary that is then destroyed

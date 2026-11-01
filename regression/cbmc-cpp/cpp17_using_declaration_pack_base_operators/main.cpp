@@ -1,9 +1,9 @@
-// N5008 [namespace.udecl]/1: a using-declarator may be a pack expansion,
-// `using Bases::operator()...;' introducing every base's operator() into
-// the derived class (the "overloaded" idiom; libc++ variant's
-// __all_overloads).  Only the first base's operator() was introduced, so
-// the overload set had one member and `all(1.0)' called A's int
-// operator().
+// N5008 [namespace.udecl]/1, [temp.variadic]/6.2: a using-declarator may be
+// a pack expansion, `using Bases::operator()...;' introducing every base's
+// operator() into the derived class (the "overloaded" idiom; libc++
+// variant's __all_overloads).  Only the first base's operator() was
+// introduced, so the overload set had one member and `all(1.0)' called A's
+// int operator().
 extern "C" void __CPROVER_assert(bool, const char *);
 struct A
 {

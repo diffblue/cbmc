@@ -10,7 +10,7 @@ shapes.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [dcl.init.aggr]/4,5,16, [dcl.init.string]/1: array default member
+N5008 [dcl.init.aggr]/4,5,14, [dcl.init.string]/1: array default member
 initializers of scalars, arrays (nested lists and brace elision),
 aggregates, classes with a constructor and a string literal; elements
 without an initializer-clause are value-initialized (`int part[3] = {9};'

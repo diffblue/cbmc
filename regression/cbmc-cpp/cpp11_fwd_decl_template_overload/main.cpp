@@ -6,7 +6,7 @@ template <long, class...>
 int get(int);
 template <int, class>
 int get(void);
-// [dcl.fct]/4: `(void)` declares NO parameters -- distinct from (int)
+// [dcl.fct]/2: `(void)` declares NO parameters -- distinct from (int)
 // even with identical template heads (second cvise harvest).
 template <long, class...>
 int get(void);
@@ -14,7 +14,7 @@ int get(void);
 // Same heads and arity but structurally different parameter types
 // (third cvise harvest): the by-index get over tuple<_Tp...> must not
 // redirect to the tuple<> overload's definition.  Parameter NAMES are
-// not signature ([dcl.fct]/5): the unnamed declaration still redirects
+// not signature ([dcl.fct]/3): the unnamed declaration still redirects
 // to a definition with named parameters.
 template <class...>
 struct tuple

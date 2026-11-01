@@ -1,5 +1,5 @@
 extern "C" void __CPROVER_assert(bool, const char *);
-// N5008 [temp.explicit]/4: an explicit instantiation of a member function
+// N5008 [temp.deduct.decl]/1: an explicit instantiation of a member function
 // template names ONE of several overloaded templates by its declaration.
 // `template renamedt<E, L1> S::rename<L1>(E, int);' with two `rename' member
 // templates was rejected: "found no match for symbol 'L1'" (the enumerator

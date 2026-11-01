@@ -1,4 +1,4 @@
-// N5008 [temp.variadic]/7 + [expr.const]: the instantiation of a pack
+// N5008 [temp.variadic]/16 + [expr.const]: the instantiation of a pack
 // expansion whose pack(s) expand to zero elements produces an empty list.  So
 // when a (member) function template is instantiated with an *empty* type pack,
 // a pack expansion appearing as a template argument in its body -- e.g.

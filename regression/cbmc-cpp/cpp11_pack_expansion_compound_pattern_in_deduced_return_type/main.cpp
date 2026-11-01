@@ -5,9 +5,9 @@ struct tup
 };
 template <class>
 struct only;
-// N5008 [temp.variadic]/5: `A &&...' expands to one element per pack
-// element, `A *...' and `const A...' likewise; [temp.deduct]/5 substitutes
-// the deduced arguments into the return type before the candidate is used
+// N5008 [temp.variadic]/9: `A &&...' expands to one element per pack element,
+// `A *...' and `const A...' likewise; [temp.deduct.general]/5 substitutes the
+// deduced arguments into the return type before the candidate is used
 template <>
 struct only<tup<int &&, int &&>>
 {
