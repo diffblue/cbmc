@@ -1990,6 +1990,7 @@ public:
   /// (cpp_typecheck_dynamic_cast.cpp), resolved once every class is known
   exprt runtime_dynamic_cast(const exprt &check);
   exprt runtime_dynamic_cast_check(const exprt &operand, const typet &type);
+  void typecheck_builtin_invoke(side_effect_expr_function_callt &expr);
   exprt evaluate_once(
     const exprt &value,
     const std::function<exprt(const exprt &)> &use);

@@ -8994,6 +8994,109 @@ void cpp_typecheckt::user_defined_numeric_literal(
   }
 }
 
+/// Clang's `__builtin_invoke(f, t1, ..., tN)' is INVOKE(f, t1, ..., tN) of
+/// N5008 [func.require]/1 (Xcode 26's libc++ implements std::invoke,
+/// std::invoke_result and std::is_invocable with it): for a pointer to
+/// member f of class T, `t1.*f', `t1.get().*f' for a reference_wrapper, or
+/// `(*t1).*f', called with t2, ..., tN for a member function (/1.1-1.3) and
+/// alone for a data member when N = 1 (/1.4-1.6); otherwise f(t1, ..., tN)
+/// (/1.7).  \p expr is replaced by that expression, type-checked.
+void cpp_typecheckt::typecheck_builtin_invoke(
+  side_effect_expr_function_callt &expr)
+{
+  exprt::operandst arguments = expr.arguments();
+  for(auto &argument : arguments)
+    typecheck_expr(argument);
+  const source_locationt location = expr.source_location();
+  auto typechecked = [](exprt e)
+  {
+    already_typechecked_exprt::make_already_typechecked(e);
+    return e;
+  };
+
+  const exprt &f = arguments.front();
+  exprt result;
+  if(
+    f.type().id() == ID_pointer && f.type().find(ID_to_member).is_not_nil() &&
+    arguments.size() >= 2)
+  {
+    const typet &member_class =
+      static_cast<const typet &>(f.type().find(ID_to_member));
+    const exprt &t1 = arguments[1];
+    exprt object = t1;
+    bool is_object = false;
+    if(t1.type().id() == ID_struct_tag && member_class.id() == ID_struct_tag)
+    {
+      const struct_typet &t1_class = follow_tag(to_struct_tag_type(t1.type()));
+      const struct_typet &t_class =
+        follow_tag(to_struct_tag_type(member_class));
+      is_object = to_struct_tag_type(t1.type()).get_identifier() ==
+                    to_struct_tag_type(member_class).get_identifier() ||
+                  subtype_typecast(t1_class, t_class);
+      // /1.2, /1.5: a reference_wrapper
+      const std::string t1_id =
+        id2string(to_struct_tag_type(t1.type()).get_identifier());
+      if(
+        !is_object && (has_prefix(t1_id, "std::tag-reference_wrapper<") ||
+                       has_prefix(t1_id, "std::__1::tag-reference_wrapper<")))
+      {
+        exprt get{ID_member};
+        get.add_to_operands(typechecked(t1));
+        get.add(ID_component_cpp_name) = cpp_namet{"get", location};
+        object = side_effect_expr_function_callt{
+          std::move(get), {}, typet{}, location};
+        is_object = true;
+      }
+    }
+    if(!is_object)
+    {
+      // /1.3, /1.6: `(*t1).*f'; a pointer is accepted by convert_pmop as
+      // it is, a class with operator* (a smart pointer) is dereferenced
+      if(t1.type().id() != ID_pointer)
+      {
+        exprt deref{ID_dereference};
+        deref.add_to_operands(typechecked(t1));
+        deref.add_source_location() = location;
+        object = std::move(deref);
+      }
+    }
+    exprt member{ID_pointer_to_member};
+    member.add_to_operands(
+      object == t1 ? typechecked(t1) : std::move(object), typechecked(f));
+    member.add_source_location() = location;
+    const bool member_function =
+      to_pointer_type(f.type()).base_type().id() == ID_code;
+    if(member_function)
+    {
+      exprt::operandst rest;
+      for(std::size_t i = 2; i < arguments.size(); ++i)
+        rest.push_back(typechecked(arguments[i]));
+      result = side_effect_expr_function_callt{
+        std::move(member), std::move(rest), typet{}, location};
+    }
+    else if(arguments.size() == 2)
+      result = std::move(member);
+    else
+    {
+      error().source_location = location;
+      error() << "__builtin_invoke of a pointer to data member with more "
+                 "than one argument"
+              << eom;
+      throw 0;
+    }
+  }
+  else
+  {
+    exprt::operandst rest;
+    for(std::size_t i = 1; i < arguments.size(); ++i)
+      rest.push_back(typechecked(arguments[i]));
+    result = side_effect_expr_function_callt{
+      typechecked(f), std::move(rest), typet{}, location};
+  }
+  typecheck_expr(result);
+  expr.swap(result);
+}
+
 void cpp_typecheckt::typecheck_side_effect_function_call(
   side_effect_expr_function_callt &expr)
 {
@@ -9059,6 +9162,15 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     ctor_call.add_source_location() = expr.source_location();
     expr.swap(ctor_call);
     typecheck_expr(expr);
+    return;
+  }
+
+  if(
+    expr.function().id() == ID_cpp_name &&
+    to_cpp_name(expr.function()).get_base_name() == "__builtin_invoke" &&
+    !expr.arguments().empty())
+  {
+    typecheck_builtin_invoke(expr);
     return;
   }
 
