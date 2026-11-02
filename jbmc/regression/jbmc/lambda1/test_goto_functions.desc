@@ -3,12 +3,18 @@ Lambdatest
 --verbosity 10 --show-goto-functions --function Lambdatest.main -cp `../../../../scripts/format_classpath.sh target/classes ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
 lambda function reference lambda\$new\$0 in class 'Lambdatest'
 lambda function reference lambda\$new\$1 in class 'Lambdatest'
-lambda function reference lambda\$captureReference\$2 in class 'Lambdatest'
-lambda function reference lambda\$captureInt\$3 in class 'Lambdatest'
-lambda function reference lambda\$captureThisPrimitive\$4 in class 'Lambdatest'
-lambda function reference lambda\$captureThisReference\$5 in class 'Lambdatest'
-lambda function reference lambda\$captureAndCall\$6 in class 'Lambdatest'
-lambda function reference lambda\$captureAndAssign\$7 in class 'Lambdatest'
+lambda function reference lambda\$captureReference\$[0-9]+ in class 'Lambdatest'
+lambda function reference lambda\$captureInt\$[0-9]+ in class 'Lambdatest'
+lambda function reference lambda\$captureThisPrimitive\$[0-9]+ in class 'Lambdatest'
+lambda function reference lambda\$captureThisReference\$[0-9]+ in class 'Lambdatest'
+lambda function reference lambda\$captureAndCall\$[0-9]+ in class 'Lambdatest'
+lambda function reference lambda\$captureAndAssign\$[0-9]+ in class 'Lambdatest'
 lambda function reference lambda\$static\$0 in class 'B'
 ^EXIT=0$
 ^SIGNAL=0$
+--
+--
+javac 17 numbers the synthetic methods of lambdas within each class,
+javac 25 within each enclosing method (e.g., lambda$captureInt$3 vs.
+lambda$captureInt$0). The expected names thus do not include the number
+where it differs.
