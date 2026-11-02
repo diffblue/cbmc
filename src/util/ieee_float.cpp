@@ -1080,11 +1080,16 @@ ieee_floatt &ieee_floatt::operator/=(const ieee_floatt &other)
   exponent-=other.exponent;
   fraction*=power(2, spec.f);
 
-  // to account for error
-  fraction*=power(2, spec.f);
-  exponent-=spec.f;
+  // Retain a rounding bit and a sticky bit even for a subnormal dividend.
+  fraction *= power(2, spec.f + 3);
+  exponent -= spec.f + 3;
 
-  fraction/=other.fraction;
+  const bool have_remainder = fraction % other.fraction != 0;
+  fraction /= other.fraction;
+
+  // Preserve any nonzero remainder in the sticky bit for align().
+  if(have_remainder && fraction.is_even())
+    ++fraction;
 
   if(other.sign_flag)
     negate();
