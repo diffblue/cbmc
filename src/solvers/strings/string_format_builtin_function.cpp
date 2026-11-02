@@ -9,6 +9,7 @@ Author: Romain Brenguier, Joel Allred
 /// \file
 ///  Built-in function for String.format
 
+#include <cstdint>
 #include <iterator>
 #include <string>
 
