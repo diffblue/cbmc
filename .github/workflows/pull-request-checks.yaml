@@ -780,10 +780,10 @@ jobs:
         uses: actions/cache/restore@v6
         with:
           path: .ccache
-          key: ${{ runner.os }}-Release-${{ github.ref }}-${{ github.sha }}-PR
+          key: ${{ runner.os }}-26-Release-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
-            ${{ runner.os }}-Release-${{ github.ref }}
-            ${{ runner.os }}-Release
+            ${{ runner.os }}-26-Release-${{ github.ref }}
+            ${{ runner.os }}-26-Release
       - name: ccache environment
         run: |
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
