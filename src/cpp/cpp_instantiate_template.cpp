@@ -1412,11 +1412,17 @@ static bool template_args_may_recurse(
     }
     return prefix || suffix;
   }
+  // An argument that grows from the enclosing instance's is evidence of a
+  // runaway recursion; an argument that is the same in both is not (a
+  // recursion that keeps an argument, `F<L<T...>, Len>' in the partial
+  // specialization `F<L<H, T...>, Len>', libc++'s __find_max_align, was
+  // cut after three levels).  Identical argument lists are a cycle, which
+  // the caller detects separately.
   for(std::size_t k = 0; k < o.size(); ++k)
   {
     const std::string os = spell(o[k]);
     const std::string is = spell(i[k]);
-    if(!os.empty() && is.find(os) != std::string::npos)
+    if(!os.empty() && is != os && is.find(os) != std::string::npos)
       return true;
   }
   return false;
