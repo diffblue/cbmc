@@ -3042,10 +3042,29 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
     // initializes the complete class object, not a subobject: it gets the
     // delegating constructor's own `@most_derived', so that it constructs
     // the virtual bases exactly when the delegating constructor would have.
-    for(const auto &parameter : code_type.parameters())
+    const code_typet::parameterst &parameters = code_type.parameters();
+    for(std::size_t index = 0; index < parameters.size(); ++index)
     {
+      const auto &parameter = parameters[index];
       if(parameter.get_base_name() == "@most_derived")
       {
+        // The flag is the last parameter: the default arguments of the
+        // parameters the mem-initializer leaves out ([dcl.fct.default]/1)
+        // come first.  Appended right after the written arguments, `false'
+        // bound to the first defaulted parameter instead, and the flag took
+        // its own default `true' -- the MSVC STL's basic_istringstream
+        // constructed its basic_istream base, `basic_istream(_Mysb *, bool
+        // _Isstd = false)', as a complete object, which installed the
+        // virtual pointer of a complete basic_istream.
+        for(std::size_t i = function_call.arguments().size(); i < index; ++i)
+        {
+          if(!parameters[i].has_default_value())
+            break;
+          exprt value = parameters[i].default_value();
+          if(value.id() == ID_cpp_deferred_default_argument)
+            value = typecheck_deferred_default_argument(value);
+          function_call.arguments().push_back(std::move(value));
+        }
         const typet &target_class =
           to_pointer_type(code_type.parameters().front().type()).base_type();
         const exprt &own_this = cpp_scopes.current_scope().this_expr;
