@@ -660,8 +660,26 @@ void cpp_typecheckt::typecheck_type(typet &type)
     // the expression is the exception specification.  [class.mem.general]
     // /9.4: in a member declaration it is a complete-class context, so it is
     // evaluated with the class's members (implicit_exception_specifications)
-    evaluate_noexcept_expression(
-      code_type, cpp_scopes.current_scope().is_class());
+    // [except.spec]/12: for a member of a class template specialization the
+    // specifier is not evaluated now, while the class is being instantiated
+    // (an `is_nothrow_constructible<C>' in it instantiated with C still
+    // incomplete, and the result stuck: libc++'s __tuple_leaf<int &&>
+    // swap made is_nothrow_move_constructible<__tuple_leaf> false), but
+    // when it is needed (implicit_exception_specifications keeps it).
+    bool in_class_template_instance = false;
+    if(cpp_scopes.current_scope().is_class())
+    {
+      const symbolt *class_symbol =
+        symbol_table.lookup(cpp_scopes.current_scope().identifier);
+      in_class_template_instance =
+        class_symbol != nullptr && class_symbol->is_type &&
+        class_symbol->type.get_bool(ID_template_class_instance);
+    }
+    if(!in_class_template_instance)
+    {
+      evaluate_noexcept_expression(
+        code_type, cpp_scopes.current_scope().is_class());
+    }
 
     // N5008 [basic.scope.param]/1: a parameter's scope begins at its
     // declaration and includes the rest of the parameter-declaration-clause,

@@ -8661,6 +8661,30 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
   symbol_expr.add_source_location() = source_location;
   expr = symbol_expr;
 
+  // N5008 [except.spec]/12.1: the exception specification of a function
+  // selected by overload resolution in an expression is needed -- also for
+  // its type (`&W<int>::f' is a pointer to a noexcept function or not,
+  // [conv.fctptr]); a member of a class template specialization keeps its
+  // noexcept-specifier until then (implicit_exception_specifications)
+  if(
+    (expr.id() == ID_symbol || expr.id() == ID_member) &&
+    expr.type().id() == ID_code)
+  {
+    const irep_idt function = expr.id() == ID_symbol
+                                ? to_symbol_expr(expr).get_identifier()
+                                : expr.get(ID_component_name);
+    if(deferred_exception_specifications.count(function) != 0)
+    {
+      needed_exception_specification(function);
+      if(const symbolt *function_symbol = symbol_table.lookup(function))
+      {
+        expr.type().set(
+          "#C_noexcept", function_symbol->type.get_bool("#C_noexcept"));
+        expr.type().remove("#C_noexcept_expression");
+      }
+    }
+  }
+
   if(expr.id() == ID_symbol)
     typecheck_expr_function_identifier(expr);
   else if(expr.id() == ID_member)
