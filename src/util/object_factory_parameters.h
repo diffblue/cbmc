@@ -52,7 +52,7 @@ struct object_factory_parameterst
   /// pointer has been dereferenced in a 'depth' counter variable. If a pointer
   /// to be initialized points to an object of a type that already occured on
   /// the current pointer chain, and if 'depth' is larger than
-  /// 'max_nondet_tree_depth`, then the pointer is set to null. The parameter
+  /// `max_nondet_tree_depth`, then the pointer is set to null. The parameter
   /// does not affect non-recursive data structures, which are always
   /// initialized to their full depth.
   size_t max_nondet_tree_depth = 5;

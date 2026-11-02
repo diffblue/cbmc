@@ -307,7 +307,7 @@ get_loop_head(const unsigned int loop_number, goto_functiont &function);
 
 /// Extract loop invariants from annotated loop end.
 /// Will check if the loop invariant is side-effect free if
-/// \p check_side_effect` is set.
+/// \p check_side_effect is set.
 exprt get_loop_invariants(
   const goto_programt::const_targett &loop_end,
   const bool check_side_effect = true);
@@ -317,7 +317,7 @@ exprt get_loop_assigns(const goto_programt::const_targett &loop_end);
 
 /// Extract loop decreases from annotated loop end.
 /// Will check if the loop decreases is side-effect free if
-/// \p check_side_effect` is set.
+/// \p check_side_effect is set.
 exprt get_loop_decreases(
   const goto_programt::const_targett &loop_end,
   const bool check_side_effect = true);

@@ -122,7 +122,7 @@ protected:
   std::size_t nof_frees_targets;
 
   /// Translates the contract's assigns clause to a GOTO function that uses the
-  /// `assignable`, `object_upto`, `object_from`, object_whole` built-ins to
+  /// `assignable`, `object_upto`, `object_from`, `object_whole` built-ins to
   /// express targets.
   void gen_spec_assigns_function();
 

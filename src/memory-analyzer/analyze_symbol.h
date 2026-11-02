@@ -128,7 +128,7 @@ private:
     /// Compute the distance of \p point from the beginning of this scope
     /// \param point: memory address to have the offset computed
     /// \param member_size: size of one element of this scope in bytes
-    /// \return `n' such that \p point is the n-th element of this scope
+    /// \return `n` such that \p point is the n-th element of this scope
     mp_integer
     distance(const memory_addresst &point, mp_integer member_size) const;
 
@@ -175,7 +175,7 @@ private:
   mp_integer get_malloc_size(irep_idt name);
 
   /// Build the pointee string for address \p point assuming it points to a
-  ///   dynamic allocation of `n' elements each of size \p member_size. E.g.:
+  ///   dynamic allocation of `n` elements each of size \p member_size. E.g.:
   ///
   ///   int *p = (int*)malloc(sizeof(int)*4);
   ///   int *q = &(p[2]);

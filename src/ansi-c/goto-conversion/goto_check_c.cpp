@@ -131,8 +131,8 @@ protected:
   /// Check that a member expression is valid:
   /// - check the structure this expression is a member of (via pointer of its
   ///   dereference)
-  /// - run pointer-validity check on `*(s+member_offset)' instead of
-  ///   `s->member' to avoid checking safety of `s'
+  /// - run pointer-validity check on `*(s+member_offset)` instead of
+  ///   `s->member` to avoid checking safety of `s`
   /// - check all operands of the expression
   /// \param member: the expression to be checked
   /// \param guard: the condition for the check
@@ -160,7 +160,7 @@ protected:
   /// \param is_assigned: the expression is assigned to
   void check_rec(const exprt &expr, const guardt &guard, bool is_assigned);
 
-  /// Initiate the recursively analysis of \p expr with its `guard' set to TRUE.
+  /// Initiate the recursively analysis of \p expr with its `guard` set to TRUE.
   /// \param expr: the expression to be checked
   /// \param is_assigned: the expression is assigned to
   void check(const exprt &expr, bool is_assigned);
