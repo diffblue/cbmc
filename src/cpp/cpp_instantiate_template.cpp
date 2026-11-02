@@ -10575,6 +10575,23 @@ skip_pack_removal_ft:
   // restricting empty-pack parameter removal to genuine function parameter
   // packs per [temp.variadic]/16.  See
   // doc/architectural/cpp-frontend-review-2026-06-23-instantiation-context.md.)
+  //
+  // N5008 [temp.alias]/2, [temp.variadic]/14: in an alias template, a fold
+  // over its pack (libc++'s `__promote_t = decltype(..., (std::
+  // __promote_impl(_Args()) + ...))', used by the math functions of Xcode
+  // 26's libc++) is expanded over the pack's elements, as in a class or
+  // variable template; left in place, the C type checker's residual-fold
+  // fallback made it `true', so __promote_t<double, double> was bool.
+  if(new_decl.is_typedef() && has_template_pack)
+  {
+    expand_folds_over_template_packs(
+      new_decl.type(), template_type, /*single_pack_too=*/true);
+    for(auto &declarator : new_decl.declarators())
+    {
+      expand_folds_over_template_packs(
+        declarator.type(), template_type, /*single_pack_too=*/true);
+    }
+  }
   convert_non_template_declaration(new_decl);
 
   const symbolt &symb = lookup(new_decl.declarators()[0].get(ID_identifier));
