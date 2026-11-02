@@ -58,6 +58,15 @@ protected:
   typedef std::map<irep_idt, a_rect> address_mapt;
   address_mapt address_map;
 
+  // For each address, store the L1 ssa_exprt of a representative
+  // non-may-alias event (used to build alias conditions).
+  typedef std::map<irep_idt, ssa_exprt> address_representativet;
+  address_representativet address_representatives;
+
+  /// For a may-alias event, return the condition under which it aliases
+  /// with the given address. For non-may-alias events, return true.
+  exprt alias_condition(event_it event, const irep_idt &target_address) const;
+
   /// First call \ref add_init_writes then for each shared read/write (or
   /// spawn) populate:
   /// 1) the _address_map_ (with a list of reads/writes for the address of each

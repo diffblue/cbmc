@@ -1,0 +1,12 @@
+CORE
+main.c
+--no-malloc-may-fail
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+pointer handling for concurrency is unsound
+^warning: ignoring
+--
+Tests the original issue #790 example: allocator thread creates an
+object via __CPROVER_allocate and writes through the shared pointer.

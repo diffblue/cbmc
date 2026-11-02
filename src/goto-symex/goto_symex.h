@@ -526,7 +526,7 @@ protected:
   /// \param state: Symbolic execution state for current instruction
   void symex_catch(statet &state);
 
-  virtual void do_simplify(exprt &expr, const value_sett &value_set);
+  virtual void do_simplify(exprt &expr, const statet &state);
 
   /// Symbolically execute an ASSIGN instruction or simulate such an execution
   /// for a synthetic assignment

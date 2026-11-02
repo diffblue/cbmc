@@ -1,0 +1,12 @@
+CORE
+main.c
+
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+pointer handling for concurrency is unsound
+^warning: ignoring
+--
+Verify that may-alias does NOT trigger for non-shared pointers in
+sequential code. All assertions must succeed — no false positives.

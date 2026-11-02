@@ -119,7 +119,7 @@ void goto_symext::symex_goto(statet &state)
       // generate assume(false) or a suitable negation if this
       // instruction is a conditional goto
       exprt negated_guard = boolean_negate(new_guard);
-      do_simplify(negated_guard, state.value_set);
+      do_simplify(negated_guard, state);
       log.statistics() << "replacing self-loop at "
                        << state.source.pc->source_location() << " by assume("
                        << from_expr(ns, state.source.function_id, negated_guard)

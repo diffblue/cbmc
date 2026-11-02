@@ -142,14 +142,12 @@ public:
   /// \param rhs: right-hand-side value that was used in the preceding update of
   ///   the full object
   /// \param target: symbolic execution equation store
-  /// \param allow_pointer_unsoundness: allow pointer unsoundness
   void field_assignments(
     const namespacet &ns,
     goto_symex_statet &state,
     const ssa_exprt &lhs,
     const exprt &rhs,
-    symex_targett &target,
-    bool allow_pointer_unsoundness) const;
+    symex_targett &target) const;
 
   /// Turn an expression \p expr into a field-sensitive SSA expression.
   /// Field-sensitive SSA expressions have individual symbols for each
@@ -215,8 +213,7 @@ private:
     goto_symex_statet &state,
     const exprt &lhs_fs,
     const exprt &ssa_rhs,
-    symex_targett &target,
-    bool allow_pointer_unsoundness) const;
+    symex_targett &target) const;
 
   [[nodiscard]] exprt simplify_opt(
     exprt e,

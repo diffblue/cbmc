@@ -1,0 +1,9 @@
+CORE
+main.c
+--no-malloc-may-fail
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+pointer handling for concurrency is unsound
+^warning: ignoring
