@@ -1989,6 +1989,10 @@ public:
   /// N5008 [expr.dynamic.cast]/9: the run-time check of a dynamic_cast
   /// (cpp_typecheck_dynamic_cast.cpp), resolved once every class is known
   exprt runtime_dynamic_cast(const exprt &check);
+  exprt runtime_dynamic_cast_check(const exprt &operand, const typet &type);
+  exprt evaluate_once(
+    const exprt &value,
+    const std::function<exprt(const exprt &)> &use);
   static bool is_class_prvalue_temporary(const exprt &expr);
   std::optional<codet> subobject_unwind_destructor(const codet &code);
   void add_constructor_unwinding(codet &body);

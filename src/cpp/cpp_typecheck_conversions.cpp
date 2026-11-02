@@ -6139,6 +6139,60 @@ bool cpp_typecheckt::const_typecast(
   return false;
 }
 
+/// `use(v)' where v is \p value; a value with side effects is evaluated
+/// once, into a local of the enclosing function, by a statement expression
+/// (the run-time check of a dynamic_cast reads its operand more than once).
+exprt cpp_typecheckt::evaluate_once(
+  const exprt &value,
+  const std::function<exprt(const exprt &)> &use)
+{
+  if(!has_subexpr(value, ID_side_effect))
+    return use(value);
+  const source_locationt &location = value.source_location();
+  symbolt local{
+    id2string(cpp_scopes.current_scope().prefix) + "$dynamic_cast_operand" +
+      std::to_string(anon_counter++),
+    value.type(),
+    ID_cpp};
+  local.base_name = local.name;
+  local.location = location;
+  local.is_lvalue = true;
+  local.is_file_local = true;
+  const symbol_exprt local_expr = local.symbol_expr();
+  symbol_table.insert(std::move(local));
+
+  exprt result_value = use(local_expr);
+  const typet result_type = result_value.type();
+  code_blockt block;
+  block.add(code_frontend_declt{local_expr});
+  block.add(code_frontend_assignt{local_expr, value});
+  block.add(code_expressiont{std::move(result_value)});
+  block.add_source_location() = location;
+  side_effect_expr_statement_expressiont result{
+    std::move(block), result_type, location};
+  return std::move(result);
+}
+
+/// The run-time check of `dynamic_cast<\p type>(\p operand)' (resolved by
+/// resolve_runtime_dynamic_casts).  The check used to be skipped for an
+/// operand with side effects (`dynamic_cast<C *>(std::addressof(e))', a call
+/// in libc++'s rethrow_if_nested), and a cross cast then reinterpreted the
+/// pointer.
+exprt cpp_typecheckt::runtime_dynamic_cast_check(
+  const exprt &operand,
+  const typet &type)
+{
+  return evaluate_once(
+    operand,
+    [&type](const exprt &v)
+    {
+      exprt check{ID_cpp_runtime_dynamic_cast, type};
+      check.add_source_location() = v.source_location();
+      check.add_to_operands(v);
+      return check;
+    });
+}
+
 bool cpp_typecheckt::dynamic_typecast(
   const exprt &expr,
   const typet &type,
@@ -6164,9 +6218,7 @@ bool cpp_typecheckt::dynamic_typecast(
     // N5008 [expr.dynamic.cast]/10: for a reference, the run-time check of
     // the corresponding pointer cast ([expr.dynamic.cast]/9) applies, and a
     // failed check throws an exception matching a std::bad_cast handler
-    if(
-      e.type().id() == ID_struct_tag && e.get_bool(ID_C_lvalue) &&
-      !has_subexpr(e, ID_side_effect))
+    if(e.type().id() == ID_struct_tag && e.get_bool(ID_C_lvalue))
     {
       const pointer_typet target_pointer =
         pointer_type(to_reference_type(type).base_type());
@@ -6190,16 +6242,21 @@ bool cpp_typecheckt::dynamic_typecast(
           throw_expr.set(
             ID_exception_list,
             cpp_exception_list(struct_tag_typet{bad_cast->name}, *this));
-          exprt reference = typecast_exprt{pointer_result, type};
-          exprt failure{ID_comma, type};
-          failure.add_to_operands(
-            std::move(throw_expr), null_pointer_exprt{to_pointer_type(type)});
-          new_expr = if_exprt{
-            notequal_exprt{pointer_result, null_pointer_exprt{target_pointer}},
-            std::move(reference),
-            std::move(failure),
-            type};
-          new_expr.add_source_location() = location;
+          new_expr = evaluate_once(
+            pointer_result,
+            [&type, &target_pointer, &throw_expr, &location](const exprt &p)
+            {
+              exprt failure{ID_comma, type};
+              failure.add_to_operands(
+                exprt{throw_expr}, null_pointer_exprt{to_pointer_type(type)});
+              exprt result = if_exprt{
+                notequal_exprt{p, null_pointer_exprt{target_pointer}},
+                typecast_exprt{p, type},
+                std::move(failure),
+                type};
+              result.add_source_location() = location;
+              return result;
+            });
           return true;
         }
       }
@@ -6219,8 +6276,7 @@ bool cpp_typecheckt::dynamic_typecast(
       // subobject in each candidate most derived class.
       if(
         e.type().id() != ID_pointer ||
-        to_pointer_type(e.type()).base_type().id() != ID_struct_tag ||
-        has_subexpr(e, ID_side_effect))
+        to_pointer_type(e.type()).base_type().id() != ID_struct_tag)
       {
         return false;
       }
@@ -6233,10 +6289,7 @@ bool cpp_typecheckt::dynamic_typecast(
       }
       if(!polymorphic)
         return false;
-      exprt check{ID_cpp_runtime_dynamic_cast, type};
-      check.add_to_operands(e);
-      check.add_source_location() = e.source_location();
-      new_expr = std::move(check);
+      new_expr = runtime_dynamic_cast_check(e, type);
       return true;
     }
     else if(to_pointer_type(type).base_type().id() == ID_struct_tag)
@@ -6264,8 +6317,7 @@ bool cpp_typecheckt::dynamic_typecast(
     type.id() == ID_pointer && !is_reference(type) &&
     to_pointer_type(type).base_type().id() == ID_struct_tag &&
     e.type().id() == ID_pointer &&
-    to_pointer_type(e.type()).base_type().id() == ID_struct_tag &&
-    !has_subexpr(e, ID_side_effect))
+    to_pointer_type(e.type()).base_type().id() == ID_struct_tag)
   {
     const struct_typet &op_struct =
       follow_tag(to_struct_tag_type(to_pointer_type(e.type()).base_type()));
@@ -6278,10 +6330,7 @@ bool cpp_typecheckt::dynamic_typecast(
       polymorphic && !target_struct.is_incomplete() &&
       !subtype_typecast(op_struct, target_struct))
     {
-      exprt check{ID_cpp_runtime_dynamic_cast, type};
-      check.add_to_operands(e);
-      check.add_source_location() = e.source_location();
-      new_expr = std::move(check);
+      new_expr = runtime_dynamic_cast_check(e, type);
       return true;
     }
   }
