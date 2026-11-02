@@ -21,7 +21,6 @@ class goto_modelt;
 class namespacet;
 class optionst;
 class symbol_table_baset;
-class symbolt;
 class value_setst;
 
 /// Wrapper for functions removing dereferences in expressions contained in
