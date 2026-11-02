@@ -22,7 +22,11 @@ jobs:
         run: |
           # inspired by https://github.com/easimon/maximize-build-space/blob/master/action.yml
           df -h
-          sudo rm -rf /usr/share/dotnet /usr/local/lib/* /opt/*
+          # Only remove specific toolchains: deleting all of /usr/local/lib and
+          # /opt also removes parts of the GitHub Actions runner on current
+          # runner images, which breaks all later steps that use a JavaScript
+          # action.
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
           df -h
       - name: Download testing and coverage dependencies
         env:
