@@ -84,6 +84,12 @@ void cpp_internal_additions(std::ostream &out)
   // default handler, which calls abort() ([set.terminate]/3,
   // [terminate.handler]/3)
   out << "void (*" CPROVER_PREFIX "cpp_terminate_handler)() = 0;" << '\n';
+  // the exception objects of std::exception_ptr's models, lowered by
+  // remove_cpp_exceptions (lower_exception_ptr_intrinsics)
+  out << "void *" CPROVER_PREFIX "cpp_exception_ptr_current(void);" << '\n';
+  out << "void " CPROVER_PREFIX "cpp_exception_ptr_addref(void *);" << '\n';
+  out << "void " CPROVER_PREFIX "cpp_exception_ptr_release(void *);" << '\n';
+  out << "void " CPROVER_PREFIX "cpp_exception_ptr_rethrow(void *);" << '\n';
 
   // auxiliaries for new/delete
   out << "void *__new(__CPROVER::size_t);" << '\n';

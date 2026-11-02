@@ -1697,6 +1697,54 @@ static const std::map<std::string, std::string> &library_source_models()
      " for(size_t __d = 3; __d <= __p / __d; __d += 2)"
      " if(__p % __d == 0) { __prime = false; break; }"
      " if(__prime) return __p; } }"},
+    // libstdc++'s exception_ptr (libsupc++/eh_ptr.cc), N5008 [propagation]:
+    // the exception object it refers to, counted by remove_cpp_exceptions
+    // (lower_exception_ptr_intrinsics), which keeps it alive while
+    // referred to ([propagation]/7, [except.throw]/4.2).  current_exception
+    // refers to the handled exception itself, not a copy ([propagation]/9).
+    {"std::current_exception",
+     "{ std::__exception_ptr::exception_ptr __p;"
+     " __p._M_exception_object = " CPROVER_PREFIX "cpp_exception_ptr_current();"
+     " if(__p._M_exception_object) __p._M_addref(); return __p; }"},
+    {"std::__exception_ptr::exception_ptr::_M_addref",
+     "{ " CPROVER_PREFIX "cpp_exception_ptr_addref(_M_exception_object); }"},
+    {"std::__exception_ptr::exception_ptr::_M_release",
+     "{ " CPROVER_PREFIX "cpp_exception_ptr_release(_M_exception_object); }"},
+    {"std::rethrow_exception",
+     "{ " CPROVER_PREFIX "cpp_exception_ptr_rethrow(" CPROVER_PREFIX
+     "parameter0._M_exception_object); }"},
+    // libsupc++/nested_exception.cc; the member exception_ptr is destroyed
+    // after the body
+    {"std::nested_exception::~nested_exception", "{ }"},
+    // libc++'s exception_ptr (src/support/runtime/
+    // exception_pointer_cxxabi.ipp), as libstdc++'s above; its names are
+    // those of libstdc++'s free functions (the inline namespace std::__1
+    // is not part of the identifiers): `libc++:' entries apply when the
+    // program uses libc++ (provide_library_source_models)
+    {"libc++:std::current_exception",
+     "{ std::exception_ptr __p;"
+     " __p.__ptr_ = " CPROVER_PREFIX "cpp_exception_ptr_current();"
+     " " CPROVER_PREFIX "cpp_exception_ptr_addref(__p.__ptr_); return __p; }"},
+    {"libc++:std::rethrow_exception",
+     "{ " CPROVER_PREFIX "cpp_exception_ptr_rethrow(" CPROVER_PREFIX
+     "parameter0.__ptr_); }"},
+    {"libc++:std::exception_ptr::exception_ptr",
+     "{ __ptr_ = " CPROVER_PREFIX "parameter0.__ptr_;"
+     " " CPROVER_PREFIX "cpp_exception_ptr_addref(__ptr_); }"},
+    {"libc++:std::exception_ptr::operator=",
+     "{ if(__ptr_ != " CPROVER_PREFIX "parameter0.__ptr_) {"
+     " " CPROVER_PREFIX "cpp_exception_ptr_addref(" CPROVER_PREFIX
+     "parameter0.__ptr_);"
+     " " CPROVER_PREFIX "cpp_exception_ptr_release(__ptr_);"
+     " __ptr_ = " CPROVER_PREFIX "parameter0.__ptr_; } return *this; }"},
+    {"libc++:std::exception_ptr::~exception_ptr",
+     "{ " CPROVER_PREFIX "cpp_exception_ptr_release(__ptr_); }"},
+    // libc++ src/support/runtime/exception_pointer_cxxabi.ipp,
+    // nested_exception
+    {"libc++:std::nested_exception::nested_exception",
+     "{ __ptr_ = std::current_exception(); }"},
+    {"libc++:std::nested_exception::rethrow_nested",
+     "{ if(!__ptr_) std::terminate(); std::rethrow_exception(__ptr_); }"},
     // libc++ src/support/runtime/exception_fallback.ipp, N5008
     // [exception]
     // libstdc++ config/os/gnu-linux/ctype_noninline.h: the "C" locale's
@@ -2017,8 +2065,54 @@ static void provide_set_terminate_model(symbol_table_baset &symbol_table)
   }
 }
 
+/// Bodies, in C++, that replace those of the headers, keyed by the
+/// function's name without its template arguments and parameter list.  N5008
+/// [propagation]/12 specifies make_exception_ptr(e) as `try { throw e; }
+/// catch(...) { return current_exception(); }'; libstdc++'s body with RTTI
+/// creates the exception object with __cxa_allocate_exception and
+/// __cxa_init_primary_exception, which remove_cpp_exceptions does not know.
+static const std::map<std::string, std::string> &library_replacing_models()
+{
+  static const std::map<std::string, std::string> models = {
+    {"std::make_exception_ptr",
+     "{ try { throw __ex; } catch(...) { return std::current_exception(); } }"},
+    {"libc++:std::make_exception_ptr",
+     "{ try { throw __e; } catch(...) { return std::current_exception(); } }"},
+  };
+  return models;
+}
+
 void cpp_typecheckt::provide_library_source_models()
 {
+  // libc++'s exception_ptr is std::exception_ptr with member __ptr_
+  const symbolt *libcxx_exception_ptr =
+    symbol_table.lookup("std::tag-exception_ptr");
+  bool libcxx = false;
+  if(
+    libcxx_exception_ptr != nullptr &&
+    libcxx_exception_ptr->type.id() == ID_struct)
+  {
+    for(const auto &component :
+        to_struct_type(libcxx_exception_ptr->type).components())
+    {
+      if(component.get_base_name() == "__ptr_")
+        libcxx = true;
+    }
+  }
+  // the model of \p models for \p key, libc++'s first when it applies
+  auto find_model =
+    [libcxx](
+      const std::map<std::string, std::string> &models, const std::string &key)
+  {
+    if(libcxx)
+    {
+      auto found = models.find("libc++:" + key);
+      if(found != models.end())
+        return found;
+    }
+    return models.find(key);
+  };
+
   std::vector<std::pair<irep_idt, const std::string *>> to_define;
   for(const auto &entry : symbol_table.symbols)
   {
@@ -2026,15 +2120,30 @@ void cpp_typecheckt::provide_library_source_models()
     // extern "C" functions declared in C++ (the MSVC runtime's
     // __std_type_info_compare) have mode C
     if(
-      symbol.type.id() != ID_code || symbol.value.is_not_nil() ||
-      symbol.is_type || (symbol.mode != ID_cpp && symbol.mode != ID_C))
+      symbol.type.id() != ID_code || symbol.is_type ||
+      (symbol.mode != ID_cpp && symbol.mode != ID_C))
     {
       continue;
     }
     const std::string name = id2string(symbol.name);
-    auto model = library_source_models().find(name);
+    if(symbol.value.is_not_nil())
+    {
+      const auto replacing = find_model(
+        library_replacing_models(), name.substr(0, name.find_first_of("<(")));
+      if(
+        replacing != library_replacing_models().end() &&
+        is_system_header_file(id2string(symbol.location.get_file())))
+      {
+        to_define.emplace_back(entry.first, &replacing->second);
+      }
+      continue;
+    }
+    auto model = find_model(library_source_models(), name);
     if(model == library_source_models().end())
-      model = library_source_models().find(name.substr(0, name.find('(')));
+    {
+      model =
+        find_model(library_source_models(), name.substr(0, name.find('(')));
+    }
     // the MSVC runtime's global terminate and _get_terminate: their models
     // apply to the runtime's own declarations, not to a function of the
     // program of the same name
@@ -2071,6 +2180,21 @@ void cpp_typecheckt::provide_library_source_models()
     exprt body = declaration.declarators().front().value();
 
     symbolt &symbol = symbol_table.get_writeable_ref(item.first);
+    // a parameter the declaration leaves unnamed (libstdc++'s
+    // `rethrow_exception(exception_ptr)') is __CPROVER_parameter<n> in the
+    // model
+    std::size_t parameter_index = 0;
+    for(auto &parameter : to_code_type(symbol.type).parameters())
+    {
+      if(parameter.get_this())
+        continue;
+      if(parameter.get_base_name().empty())
+      {
+        parameter.set_base_name(
+          CPROVER_PREFIX "parameter" + std::to_string(parameter_index));
+      }
+      ++parameter_index;
+    }
     symbol.value = body;
     try
     {

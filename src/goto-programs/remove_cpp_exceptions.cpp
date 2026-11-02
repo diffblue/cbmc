@@ -27,6 +27,7 @@ Author: Kiro
 #include <util/cprover_prefix.h>
 #include <util/fresh_symbol.h>
 #include <util/pointer_expr.h>
+#include <util/prefix.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/symbol_table_base.h>
@@ -100,6 +101,39 @@ protected:
   // the number of exceptions whose stack unwinding is running a destructor
   symbol_exprt unwinding_count{irep_idt{}, typet{}};
 
+  /// The exception object of a throw site: a static object holding a copy
+  /// of the thrown value ([except.throw]/3), the type tag of the thrown
+  /// type, and the number of std::exception_ptr objects that refer to it
+  /// ([propagation]/7), which keep it alive past its handlers
+  /// ([except.throw]/4.2).
+  struct exception_objectt
+  {
+    symbol_exprt object;
+    mp_integer tag;
+    symbol_exprt references;
+  };
+  std::map<const goto_programt::instructiont *, exception_objectt> site_objects;
+  /// whether a model of std::exception_ptr is called: only then are the
+  /// references of the exception objects counted
+  bool uses_exception_ptr = false;
+
+  /// `(void *)&object' of \p site
+  static exprt object_address(const exception_objectt &site)
+  {
+    return typecast_exprt{
+      address_of_exprt{site.object}, pointer_type(empty_typet{})};
+  }
+
+  /// Create the exception object of the throw \p instruction.
+  void add_site_object(const goto_programt::instructiont &instruction);
+
+  /// Lower the calls of the std::exception_ptr intrinsics (see
+  /// lower_exception_ptr_intrinsics).
+  void lower_exception_ptr_call(
+    goto_programt &goto_program,
+    goto_programt::targett it,
+    const irep_idt &callee);
+
   // Per-handler current-exception slots, keyed by the handler's catch-variable
   // identifier.  A handler writes its own slot on entry, so a nested/sibling
   // handler cannot clobber it; a bare `throw;` tagged with a handler id
@@ -132,6 +166,22 @@ public:
   /// rethrowing it ([except.throw]/4), `cpp_note_rethrow' records the
   /// exception being rethrown.
   void lower_handler_exits(goto_functionst &goto_functions);
+
+  /// Lower the intrinsics through which the models of std::exception_ptr
+  /// ([propagation], cpp_typecheck_stdlib.cpp) reach the exception objects
+  /// of this pass:
+  /// - `__CPROVER_cpp_exception_ptr_current()': the exception object currently
+  ///   handled ([propagation]/9; the most recently entered handler's, also
+  ///   after it was left: an approximation), null when none;
+  /// - `__CPROVER_cpp_exception_ptr_addref(p)', `..._release(p)': one more or
+  ///   one fewer exception_ptr refers to the exception object p.  The last
+  ///   release destroys it unless a handler of it is active or it is in
+  ///   flight ([except.throw]/4);
+  /// - `__CPROVER_cpp_exception_ptr_rethrow(p)': p becomes the in-flight
+  ///   exception ([propagation]/10), with the type tag of its throw site;
+  ///   the dispatch after the call propagates it.
+  /// Run after the throws and calls are instrumented.
+  void lower_exception_ptr_intrinsics(goto_functionst &goto_functions);
 
   /// Call std::terminate where an exception leaves a function through which
   /// it must not propagate: the entry point (no handler was found,
@@ -268,6 +318,17 @@ void remove_cpp_exceptionst::lower_handler_exits(
       goto_programt deactivate;
       goto_programt::targett deactivate_target =
         deactivate.add(goto_programt::make_skip(loc));
+      // no longer the currently handled exception ([except.handle]/10), so
+      // current_exception() is null and an exception_ptr's last release
+      // destroys it (the handler of an enclosing one is not restored: an
+      // approximation)
+      deactivate.add(goto_programt::make_assignment(
+        current_exc_ptr,
+        if_exprt{
+          equal_exprt{current_exc_ptr, exc_ptr},
+          null_pointer_exprt{to_pointer_type(current_exc_ptr.type())},
+          current_exc_ptr},
+        loc));
       if(exc_ptr != current_exc_ptr)
         deactivate.add(goto_programt::make_assignment(exc_ptr, null, loc));
       goto_programt dispatch;
@@ -281,6 +342,18 @@ void remove_cpp_exceptionst::lower_handler_exits(
       {
         if(other.second.first != exc_ptr)
           held.push_back(equal_exprt{other.second.first, exc_ptr});
+      }
+      // an exception_ptr that refers to the object keeps it alive
+      // ([except.throw]/4.2); its last release destroys it
+      for(const auto &site : site_objects)
+      {
+        if(!uses_exception_ptr)
+          break;
+        held.push_back(and_exprt{
+          equal_exprt{exc_ptr, object_address(site.second)},
+          notequal_exprt{
+            site.second.references,
+            from_integer(0, site.second.references.type())}});
       }
       if(!held.empty())
       {
@@ -309,6 +382,125 @@ void remove_cpp_exceptionst::lower_handler_exits(
       body.destructive_insert(std::next(it), dispatch);
     }
   }
+}
+
+void remove_cpp_exceptionst::lower_exception_ptr_intrinsics(
+  goto_functionst &goto_functions)
+{
+  for(auto &[name, function] : goto_functions.function_map)
+  {
+    (void)name;
+    goto_programt &body = function.body;
+    for(auto it = body.instructions.begin(); it != body.instructions.end();
+        ++it)
+    {
+      if(!it->is_function_call() || it->call_function().id() != ID_symbol)
+        continue;
+      const irep_idt &callee =
+        to_symbol_expr(it->call_function()).get_identifier();
+      if(has_prefix(id2string(callee), CPROVER_PREFIX "cpp_exception_ptr_"))
+        lower_exception_ptr_call(body, it, callee);
+    }
+  }
+}
+
+void remove_cpp_exceptionst::lower_exception_ptr_call(
+  goto_programt &goto_program,
+  goto_programt::targett it,
+  const irep_idt &callee)
+{
+  const source_locationt loc = it->source_location();
+  const exprt lhs = it->call_lhs();
+  const exprt::operandst arguments = it->call_arguments();
+  const std::string kind = id2string(callee).substr(
+    std::string{CPROVER_PREFIX "cpp_exception_ptr_"}.size());
+  goto_programt code;
+
+  if(kind == "current")
+  {
+    if(lhs.is_not_nil())
+    {
+      code.add(goto_programt::make_assignment(
+        lhs,
+        typecast_exprt::conditional_cast(current_exc_ptr, lhs.type()),
+        loc));
+    }
+  }
+  else if(
+    (kind == "addref" || kind == "release" || kind == "rethrow") &&
+    arguments.size() == 1)
+  {
+    const exprt p =
+      typecast_exprt::conditional_cast(arguments.front(), inflight_ptr.type());
+    if(kind == "rethrow")
+    {
+      // N5008 [propagation]/10: p is not null
+      goto_programt::instructiont non_null =
+        goto_programt::make_assertion(notequal_exprt{p, clear_inflight()}, loc);
+      non_null.source_location_nonconst().set_comment(
+        "rethrow_exception of a null exception_ptr");
+      non_null.source_location_nonconst().set_property_class("precondition");
+      code.add(std::move(non_null));
+      code.add(goto_programt::make_assignment(inflight_ptr, p, loc));
+      code.add(goto_programt::make_assignment(rethrown_ptr, p, loc));
+    }
+    for(const auto &[instruction, site] : site_objects)
+    {
+      (void)instruction;
+      goto_programt case_code;
+      goto_programt::targett next =
+        case_code.add(goto_programt::make_skip(loc));
+      goto_programt guarded;
+      guarded.add(goto_programt::make_goto(
+        next, notequal_exprt{p, object_address(site)}, loc));
+      if(kind == "rethrow")
+      {
+        guarded.add(goto_programt::make_assignment(
+          inflight_type, from_integer(site.tag, inflight_type.type()), loc));
+      }
+      else if(kind == "addref")
+      {
+        guarded.add(goto_programt::make_assignment(
+          site.references,
+          plus_exprt{site.references, from_integer(1, site.references.type())},
+          loc));
+      }
+      else
+      {
+        guarded.add(goto_programt::make_assignment(
+          site.references,
+          minus_exprt{site.references, from_integer(1, site.references.type())},
+          loc));
+        // the last exception_ptr is destroyed: so is the exception object,
+        // unless it is in flight or a handler of it is active
+        // ([except.throw]/4)
+        const auto destructor = tag_destructor.find(site.tag);
+        if(destructor != tag_destructor.end())
+        {
+          exprt::operandst kept{
+            notequal_exprt{
+              site.references, from_integer(0, site.references.type())},
+            equal_exprt{inflight_ptr, p},
+            equal_exprt{current_exc_ptr, p}};
+          for(const auto &slot : handler_slots)
+            kept.push_back(equal_exprt{slot.second.first, p});
+          guarded.add(goto_programt::make_goto(next, disjunction(kept), loc));
+          guarded.add(goto_programt::make_function_call(
+            code_function_callt{
+              destructor->second.first,
+              {typecast_exprt{p, pointer_type(destructor->second.second)}}},
+            loc));
+        }
+      }
+      guarded.destructive_append(case_code);
+      code.destructive_append(guarded);
+    }
+  }
+  else
+    return;
+
+  *it = goto_programt::make_skip(loc);
+  goto_program.destructive_insert(std::next(it), code);
 }
 
 /// The instructions that call std::terminate, which does not return
@@ -432,6 +624,17 @@ bool remove_cpp_exceptionst::prepare(goto_functionst &goto_functions)
     {
       if(i.is_catch())
         has_exceptions = true;
+      // a model of std::exception_ptr (no throw needed: rethrowing a null
+      // exception_ptr is undefined, but its models still need lowering)
+      if(
+        i.is_function_call() && i.call_function().id() == ID_symbol &&
+        has_prefix(
+          id2string(to_symbol_expr(i.call_function()).get_identifier()),
+          CPROVER_PREFIX "cpp_exception_ptr_"))
+      {
+        has_exceptions = true;
+        uses_exception_ptr = true;
+      }
       if(i.is_throw())
       {
         has_exceptions = true;
@@ -486,6 +689,15 @@ bool remove_cpp_exceptionst::prepare(goto_functionst &goto_functions)
 
   if(!has_exceptions)
     return false;
+
+  for(const auto &gf : goto_functions.function_map)
+  {
+    for(const auto &i : gf.second.body.instructions)
+    {
+      if(i.is_throw())
+        add_site_object(i);
+    }
+  }
 
   const pointer_typet void_ptr = pointer_type(empty_typet{});
   inflight_ptr = make_global(
@@ -591,9 +803,9 @@ void remove_cpp_exceptionst::set_inflight_exception(
   const mp_integer tag = ids.empty() ? mp_integer{0} : type_tag[ids.front()];
 
   // per-throw-site static object holding a copy of the thrown value
-  const irep_idt obj_name =
-    CPROVER_PREFIX "cpp_exception_object$" + std::to_string(++object_counter);
-  const symbol_exprt exc_obj = make_global(obj_name, thrown_type, nil_exprt{});
+  const auto site = site_objects.find(&*instr_it);
+  CHECK_RETURN(site != site_objects.end());
+  const symbol_exprt &exc_obj = site->second.object;
 
   // exc_obj = value
   *instr_it = goto_programt::make_assignment(exc_obj, value, loc);
@@ -609,6 +821,33 @@ void remove_cpp_exceptionst::set_inflight_exception(
     instr_it,
     goto_programt::make_assignment(
       inflight_type, from_integer(tag, inflight_type.type()), loc));
+}
+
+void remove_cpp_exceptionst::add_site_object(
+  const goto_programt::instructiont &instruction)
+{
+  const exprt value =
+    uncaught_exceptions_domaint::get_exception_symbol(instruction.code());
+  // a rethrow (`throw;') has no operand and no object of its own
+  if(
+    value.id() == ID_side_effect &&
+    to_side_effect_expr(value).get_statement() == ID_throw)
+  {
+    return;
+  }
+  const std::vector<irep_idt> ids = thrown_type_ids(instruction);
+  const mp_integer tag = ids.empty() ? mp_integer{0} : type_tag[ids.front()];
+  const std::string name =
+    CPROVER_PREFIX "cpp_exception_object$" + std::to_string(++object_counter);
+  const symbol_exprt object = make_global(name, value.type(), nil_exprt{});
+  const symbol_exprt references =
+    uses_exception_ptr ? make_global(
+                           name + "$references",
+                           signed_int_type(),
+                           from_integer(0, signed_int_type()))
+                       : symbol_exprt{irep_idt{}, signed_int_type()};
+  site_objects.emplace(
+    &instruction, exception_objectt{object, tag, references});
 }
 
 /// A destructor called during stack unwinding ([except.ctor]/1-2) runs
@@ -788,6 +1027,7 @@ void remove_cpp_exceptions(goto_modelt &goto_model, message_handlert &msg)
     return; // no exceptions: nothing to do
   pass.lower_handler_exits(goto_model.goto_functions);
   pass(goto_model.goto_functions);
+  pass.lower_exception_ptr_intrinsics(goto_model.goto_functions);
   pass.terminate_on_escape(goto_model.goto_functions);
   pass.initialize_globals(goto_model.goto_functions);
   goto_model.goto_functions.update();
