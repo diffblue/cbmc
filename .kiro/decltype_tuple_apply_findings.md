@@ -15811,3 +15811,39 @@ Checks on W193 (tree of 3da92a5875; src changes are comments only): 13
 suites, profiles, unit, lint, format overall and per commit, doxygen,
 per-commit compile, platform (gcc11, m32, arm64), vacuity 1146/3, MSVC
 .ii (2 known timeouts).
+
+## Round 212 (2026-11-02): CI jobs, the MSVC istringstream, exception_ptr
+
+- ac814ba56f include-what-you-use: in the CI job's set-up (Ubuntu 26.04,
+  iwyu 0.23, image iwyu-gate) develop 8fcda33365 has 5 findings (fixed by
+  d625f542b9 on fix-ci-ubuntu-latest), this branch 2 more:
+  <util/expr_util.h> in cpp_typecheck_dynamic_cast.cpp and
+  cpp_typecheck_expr.cpp, now removed.
+- perf-benchcomp: aws_byte_buf_append_dynamic 18.8 s -> 32.6 s comes from
+  cf8a92b641 (malloc records __CPROVER_new_object): +43 steps, +0.3%
+  variables and clauses; MiniSat 7.7 s -> 10.1 s locally, 7.5 s or 18.5 s
+  for the same formula size depending on the goto binary; +10% solver time
+  over the 50 proofs.  Kept, with the analysis in malloc's comment
+  (41bb71af94).
+- 27efd8500f VS 2022/2026 istringstream (CI artifact
+  msvc-2022-preprocessed-headers reproduced it): a mem-initializer's
+  `false' for `@most_derived' bound to the base constructor's first
+  defaulted parameter (`basic_istream(_Mysb *, bool _Isstd = false)'), so
+  the base was built as a complete object ([dcl.fct.default]/1,
+  [class.base.init]/13).  KNOWNBUG _msvc removed, test CORE for all three
+  libraries.  The 2 MSVC stream timeouts remain (not this cause).
+- 436e6e994c dynamic_cast of an operand with side effects: the run-time
+  check was skipped and a cross cast reinterpreted the pointer (libc++'s
+  rethrow_if_nested); the reference form was rejected.
+- dc5544c79d std::exception_ptr models for libstdc++ and libc++
+  ([propagation]/9-12, [except.throw]/4): four intrinsics lowered by
+  remove_cpp_exceptions, a reference count per throw site's object;
+  make_exception_ptr gets the /12 body.  KNOWNBUG cpp11_exception_ptr_
+  rethrow -> CORE.  Approximation: the currently handled exception is not
+  restored to an enclosing handler's after a nested handler exits.
+  Not modelled: the MSVC STL's exception_ptr.
+Checks on W194 (tree of dc5544c79d): 13 suites, profiles, unit, lint,
+format overall and per commit, doxygen, per-commit compile, iwyu on the
+changed files, platform (gcc11, m32, arm64), vacuity 1146/3, MSVC .ii (2
+known timeouts; istringstream from the CI artifact passes).
+Next: libc++ use_facet and the vsnprintf model, MSVC streams.
