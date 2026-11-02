@@ -182,7 +182,7 @@ __CPROVER_HIDE:;
   malloc_res = __CPROVER_allocate(alloc_size, 1);
 
   // non-deterministically record the object for delete/delete[] and free
-  // checking: it was not allocated by new[]
+  // checking: it was not allocated by new[] (see malloc for why and its cost)
   __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
   __CPROVER_new_object = record_malloc ? malloc_res : __CPROVER_new_object;
   __CPROVER_malloc_is_new_array =
@@ -249,6 +249,21 @@ __CPROVER_HIDE:;
 
   // non-deterministically record the object for delete/delete[] and free
   // checking: it was not allocated by new[]
+  //
+  // Recording the object (not only clearing __CPROVER_malloc_is_new_array)
+  // is needed: otherwise a malloc after `new T[n]' leaves that array as
+  // __CPROVER_new_object with the flag cleared, and its delete[] fails
+  // "delete[] of non-array object" (cpp98_array_delete_after_malloc).  It
+  // also reports delete[] of a malloc'd object.  The cost, measured on the
+  // aws-c-common proofs of perf-benchcomp: aws_byte_buf_append_dynamic has
+  // 2245 instead of 2202 steps and 0.3% more variables and clauses.
+  // MiniSat's run time is very sensitive to such small changes (7.7 s ->
+  // 10.1 s here, 18.8 s -> 32.6 s on CI; the same formula size took 7.5 s
+  // or 18.5 s depending on the goto binary), and over 50 proofs the total
+  // solver time grew by 10%, with some proofs faster.  Leaving the pair
+  // untouched in malloc would also fix the false failure, but loses the
+  // delete[]-of-malloc check and was not faster overall (priority_queue_push
+  // 94 s -> 115 s); clearing __CPROVER_new_object instead was slower.
   __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
   __CPROVER_new_object = record_malloc ? malloc_res : __CPROVER_new_object;
   __CPROVER_malloc_is_new_array =
@@ -281,7 +296,7 @@ void *__builtin_alloca(__CPROVER_size_t alloca_size)
   res = __CPROVER_allocate(alloca_size, 0);
 
   // non-deterministically record the object for delete/delete[] and free
-  // checking: it was not allocated by new[]
+  // checking: it was not allocated by new[] (see malloc for why and its cost)
   __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
   __CPROVER_new_object = record_malloc ? res : __CPROVER_new_object;
   __CPROVER_malloc_is_new_array =
