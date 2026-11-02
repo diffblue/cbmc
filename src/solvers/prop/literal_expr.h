@@ -52,7 +52,6 @@ inline void validate_expr(const literal_exprt &literal)
 /// conversion. \a expr must be known to be \ref literal_exprt.
 /// \param expr: Source expression
 /// \return Object of type \ref literal_exprt
-/// \ingroup gr_std_expr
 inline const literal_exprt &to_literal_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_literal);
@@ -62,7 +61,6 @@ inline const literal_exprt &to_literal_expr(const exprt &expr)
 }
 
 /// \copydoc to_literal_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline literal_exprt &to_literal_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_literal);

@@ -58,7 +58,6 @@ inline bool can_cast_expr<literal_vector_exprt>(const exprt &base)
 /// conversion. \a expr must be known to be \ref literal_vector_exprt.
 /// \param expr: Source expression
 /// \return Object of type \ref literal_vector_exprt
-/// \ingroup gr_std_expr
 inline const literal_vector_exprt &to_literal_vector_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_literal_vector);
@@ -67,7 +66,6 @@ inline const literal_vector_exprt &to_literal_vector_expr(const exprt &expr)
 }
 
 /// \copydoc to_literal_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline literal_vector_exprt &to_literal_vector_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_literal_vector);

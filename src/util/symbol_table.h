@@ -9,7 +9,6 @@
 #include "symbol_table_base.h"
 
 /// \brief The symbol table
-/// \ingroup gr_symbol_table
 class symbol_tablet : public symbol_table_baset
 {
 private:

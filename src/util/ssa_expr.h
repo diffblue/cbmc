@@ -141,7 +141,6 @@ inline void validate_expr(const ssa_exprt &expr)
 /// Cast a generic exprt to an \ref ssa_exprt.
 /// \param expr: Source expression
 /// \return Object of type \ref ssa_exprt
-/// \ingroup gr_std_expr
 inline const ssa_exprt &to_ssa_expr(const exprt &expr)
 {
   ssa_exprt::check(expr);
@@ -149,7 +148,6 @@ inline const ssa_exprt &to_ssa_expr(const exprt &expr)
 }
 
 /// \copydoc to_ssa_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline ssa_exprt &to_ssa_expr(exprt &expr)
 {
   ssa_exprt::check(expr);

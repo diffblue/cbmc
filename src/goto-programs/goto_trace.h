@@ -45,7 +45,6 @@ class merge_irept;
 ///   - a memory barrier
 ///   - an atomic begin (unused)
 ///   - an atomic end (unused)
-/// \ingroup gr_goto_symex
 class goto_trace_stept
 {
 public:
@@ -172,7 +171,6 @@ public:
 
 /// Trace of a GOTO program.
 /// This is a wrapper for a list of steps.
-/// \ingroup gr_goto_symex
 class goto_tracet
 {
 public:

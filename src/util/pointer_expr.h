@@ -371,7 +371,6 @@ to_is_dynamic_object_expr(const exprt &expr)
 }
 
 /// \copydoc to_is_dynamic_object_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline is_dynamic_object_exprt &to_is_dynamic_object_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_is_dynamic_object);
@@ -438,7 +437,6 @@ inline const pointer_in_range_exprt &to_pointer_in_range_expr(const exprt &expr)
 }
 
 /// \copydoc to_pointer_in_range_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline pointer_in_range_exprt &to_pointer_in_range_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_pointer_in_range);
@@ -524,7 +522,6 @@ to_prophecy_pointer_in_range_expr(const exprt &expr)
 }
 
 /// \copydoc to_prophecy_pointer_in_range_expr(const exprt &)
-/// \ingroup gr_std_expr
 inline prophecy_pointer_in_range_exprt &
 to_prophecy_pointer_in_range_expr(exprt &expr)
 {

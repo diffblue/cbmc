@@ -21,7 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "invariant.h"
 
 /// \brief Symbol table entry.
-/// \ingroup gr_symbol_table
+///
 /// This is a symbol in the symbol table, stored in an
 /// object of type symbol_tablet.
 class symbolt
@@ -133,7 +133,7 @@ public:
 std::ostream &operator<<(std::ostream &out, const symbolt &symbol);
 
 /// \brief Symbol table entry describing a data type
-/// \ingroup gr_symbol_table
+///
 /// This is a symbol generated as part of type checking.
 class type_symbolt:public symbolt
 {
@@ -146,7 +146,7 @@ public:
 };
 
 /// \brief Internally generated symbol table entry
-/// \ingroup gr_symbol_table
+///
 /// This is a symbol generated as part of translation to or
 /// modification of the intermediate representation.
 class auxiliary_symbolt:public symbolt
@@ -173,7 +173,7 @@ public:
 };
 
 /// \brief Symbol table entry of function parameter
-/// \ingroup gr_symbol_table
+///
 /// This is a symbol generated as part of type checking.
 class parameter_symbolt:public symbolt
 {

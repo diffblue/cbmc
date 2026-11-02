@@ -18,7 +18,6 @@ typedef std::multimap<irep_idt, irep_idt> symbol_module_mapt;
 class symbol_tablet;
 
 /// \brief The symbol table base class interface
-/// \ingroup gr_symbol_table
 class symbol_table_baset
 {
 public:
