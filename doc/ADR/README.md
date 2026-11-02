@@ -1,4 +1,4 @@
-# Architecture Decision Records
+\page adr-readme Architecture Decision Records
 
 This folder is designated to contain our ADRs (Architecture
 Decision Records) - documentation for why specific decision
