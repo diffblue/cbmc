@@ -236,19 +236,6 @@ bool dfcc_instrumentt::do_not_instrument(const irep_idt &id) const
          (dfcc_is_cprover_function_symbol(id) || is_internal_symbol(id));
 }
 
-/// Recompute the numbers of one function body after it changed. The
-/// whole-program goto_functionst::update() renumbers every function, so calling
-/// it for each instrumented function costs time quadratic in the number of
-/// functions. dfcct::transform_goto_model renumbers the whole program after all
-/// functions are instrumented.
-static void update_numbers(goto_functionst &goto_functions, goto_programt &body)
-{
-  body.compute_incoming_edges();
-  body.compute_target_numbers();
-  goto_functions.compute_location_numbers(body);
-  body.compute_loop_numbers();
-}
-
 void dfcc_instrumentt::instrument_harness_function(
   const irep_idt &function_id,
   const loop_contract_configt &loop_contract_config,
@@ -481,8 +468,12 @@ void dfcc_instrumentt::instrument_goto_function(
     cfg_info,
     function_pointer_contracts);
 
-  // recalculate numbers, etc. (this function only: see update_numbers)
-  update_numbers(goto_model.goto_functions, body);
+  // Recalculate the numbers of this function only. Renumbering the whole
+  // program after each function costs time quadratic in the number of
+  // functions. Each body that DFCC creates or changes is renumbered when
+  // DFCC has finished changing it, so the other bodies keep valid numbers.
+  // dfcct::transform_goto_model renumbers the whole program at the end.
+  goto_model.goto_functions.update(body);
 
   if(loop_contract_config.apply_loop_contracts)
   {
@@ -527,8 +518,8 @@ void dfcc_instrumentt::instrument_goto_function(
 
   remove_skip(body);
 
-  // recalculate numbers, etc. (this function only: see update_numbers)
-  update_numbers(goto_model.goto_functions, body);
+  // recalculate numbers, etc. (this function only)
+  goto_model.goto_functions.update(body);
 }
 
 void dfcc_instrumentt::instrument_instructions(
