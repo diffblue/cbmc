@@ -50,6 +50,7 @@ perl -p -i -e 's/^__inet_(addr|aton|ntoa|network)\n//' __functions # inet_*, Fre
 perl -p -i -e 's/^__isoc99_v?fscanf\n//' __functions # fscanf, Linux
 perl -p -i -e 's/^__isoc99_v?scanf\n//' __functions # scanf, Linux
 perl -p -i -e 's/^__isoc99_v?sscanf\n//' __functions # sscanf, Linux
+perl -p -i -e 's/^__isoc23_strtou?ll?_l\n//' __functions # strto*_l, Linux
 perl -p -i -e 's/^__sigsetjmp\n//' __functions # sigsetjmp, Linux
 perl -p -i -e 's/^__stdio_common_vfscanf\n//' __functions # fscanf, Windows
 perl -p -i -e 's/^__stdio_common_vsprintf\n//' __functions # snprintf, Windows

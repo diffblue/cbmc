@@ -1,0 +1,12 @@
+CORE
+main.c
+--unwind 8 --no-unwinding-assertions
+^\[main\.assertion\.5\] line \d+ assertion .*: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+^\[main\.assertion\.[1-4]\] .*: FAILURE$
+--
+strtoul_l converts as strtoul does; the locale argument is not read.
