@@ -304,6 +304,12 @@ array_pointer(const exprt &e, const symbol_table_baset &symbol_table)
     ap->index += e.id() == ID_plus ? *n : -*n;
     return ap;
   }
+  // a string literal as a pointer value: a constexpr object's value keeps a
+  // pointer member initialized by a constructor from a string literal as the
+  // literal itself (`{ .p="32" }' for `constexpr string_view a("32")',
+  // [conv.array]/1: the address of its first element)
+  if(e.id() == ID_string_constant && e.type().id() == ID_array)
+    return array_pointert{e, 0};
   if(e.id() != ID_address_of || e.operands().size() != 1)
     return std::nullopt;
   const exprt &object = to_address_of_expr(e).object();
@@ -442,12 +448,44 @@ static exprt evaluate_builtin_memcmp(
   return from_integer(result, call.type());
 }
 
+/// The value of the object \p object names when it is a constexpr object of
+/// class type -- a const (or constexpr, a macro symbol) symbol whose value is
+/// a struct constant ([dcl.constexpr]/6, [expr.const]/9: usable in constant
+/// expressions); nil otherwise.
+static exprt constexpr_object_value(
+  const exprt &object,
+  const symbol_table_baset &symbol_table)
+{
+  if(object.id() != ID_symbol)
+    return nil_exprt();
+  const symbolt *symbol =
+    symbol_table.lookup(to_symbol_expr(object).get_identifier());
+  if(
+    symbol == nullptr || symbol->is_type ||
+    !(symbol->type.get_bool(ID_C_constant) || symbol->is_macro) ||
+    symbol->value.id() != ID_struct)
+  {
+    return nil_exprt();
+  }
+  return simplify_expr(symbol->value, namespacet{symbol_table});
+}
+
 bool is_constexpr_call_argument(
   const exprt &e,
   const symbol_table_baset &symbol_table)
 {
   if(e.id() == ID_symbol)
     return false;
+  // the address of a constexpr object of class type, bound to a reference
+  // parameter (the copy constructor making a by-value argument of it):
+  // the object's value ([expr.const]/9)
+  if(
+    e.id() == ID_address_of &&
+    constexpr_object_value(to_address_of_expr(e).object(), symbol_table)
+      .is_not_nil())
+  {
+    return true;
+  }
   // [expr.const]/4.1: the address of (an element of) an object with static
   // storage duration -- a constexpr array, the backing array of a
   // std::initializer_list argument (`{ &arr[0], 3 }', [dcl.init.list]/6);
@@ -1786,6 +1824,31 @@ static exprt evaluate_constexpr_call(
   const symbolt *func_sym = symbol_table.lookup(func_id);
   if(func_sym == nullptr)
     return nil_exprt();
+  // N5008 [class.copy.ctor]/14, /12: the implicitly-defined copy or move
+  // constructor of a class copies its subobjects, so the object's value is
+  // that of the source; it is constexpr when it can be ([class.copy.ctor]/
+  // 12.2).  It may not be defined yet (it is only when odr-used).  The
+  // source has the constructed class type, as for a copy or move.
+  // (also one defaulted on its first declaration, [dcl.fct.def.default]/5)
+  if(
+    is_constructor &&
+    (func_type_probe.get_bool("#is_implicit_ctor") ||
+     func_type_probe.get_bool("#explicitly_defaulted")) &&
+    arguments.size() == 2 && arguments[1].id() == ID_address_of)
+  {
+    const exprt &source = to_address_of_expr(arguments[1]).object();
+    exprt value = source.is_constant() || source.id() == ID_struct
+                    ? source
+                    : constexpr_object_value(source, symbol_table);
+    if(
+      value.is_not_nil() && value.type() == constructed_type &&
+      constexpr_interpretert::is_constant_value(value, symbol_table))
+    {
+      if(final_this != nullptr)
+        *final_this = value;
+      return value;
+    }
+  }
   // N5008 [temp.inst]/5: a definition still in the deferred queue (its
   // parsed body carries no code type yet) is instantiated on demand
   if(func_sym->value.type().id() != ID_code)
@@ -1851,8 +1914,11 @@ static exprt evaluate_constexpr_call(
     if(arguments[i].id() == ID_address_of)
     {
       const auto &obj = to_address_of_expr(arguments[i]).object();
+      const exprt object_value = constexpr_object_value(obj, symbol_table);
       if(obj.is_constant())
         vars[params[i].get_identifier()] = obj;
+      else if(object_value.is_not_nil())
+        vars[params[i].get_identifier()] = object_value;
       else if(
         obj.id() == ID_side_effect && obj.operands().size() == 1 &&
         obj.operands()[0].is_constant())
@@ -1877,6 +1943,22 @@ static exprt evaluate_constexpr_call(
       // `(unsigned long)7') is folded to the constant it denotes; unfolded,
       // `return r' would not yield a constant.
       exprt argument = arguments[i];
+      // N5008 [expr.call]/7: a by-value parameter of class type is
+      // copy-initialized from its argument; for a class with a copy
+      // constructor the argument is the temporary that constructor makes
+      // (`f(a)' with `constexpr V a'): its value is the result of the
+      // constructor
+      if(
+        argument.id() == ID_side_effect &&
+        argument.get(ID_statement) == ID_temporary_object)
+      {
+        // (not evaluable: kept as it is, for a parameter the body may not
+        // read -- the tag argument of an overload set, `f(true_type{})')
+        exprt value = evaluate_temporary_object(
+          argument, symbol_table, ns, ensure_definition);
+        if(value.is_not_nil())
+          argument = std::move(value);
+      }
       simplify(argument, ns);
       vars[params[i].get_identifier()] = std::move(argument);
     }
