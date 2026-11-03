@@ -354,12 +354,40 @@ static std::optional<exprt> array_pointer_deref(
   return c;
 }
 
+/// `__builtin_strlen(s)' over a constant array, which GCC and clang
+/// evaluate in a constant expression: the number of characters before the
+/// first null one (C17 7.24.6.3); Xcode 26's libc++ computes
+/// char_traits<char>::length with it.  Nil when not evaluable.
+static exprt evaluate_builtin_strlen(
+  const side_effect_expr_function_callt &call,
+  const symbol_table_baset &symbol_table,
+  const namespacet &ns)
+{
+  if(call.arguments().size() != 1)
+    return nil_exprt{};
+  auto p = array_pointer(call.arguments().front(), symbol_table);
+  if(!p.has_value())
+    return nil_exprt{};
+  for(mp_integer length = 0;; ++length, ++p->index)
+  {
+    const auto c = array_pointer_deref(*p, symbol_table, ns);
+    if(!c.has_value())
+      return nil_exprt{};
+    const auto v = integer_constant(*c);
+    if(!v.has_value())
+      return nil_exprt{};
+    if(*v == 0)
+      return from_integer(length, call.type());
+  }
+}
+
 /// `__builtin_memcmp(s1, s2, n)' over constant arrays, which GCC and clang
 /// evaluate in a constant expression: libstdc++ 11's
 /// char_traits<char>::compare calls it when __builtin_constant_p(__n),
 /// folded at its definition, is false.  The sign of the first differing
 /// pair of bytes, compared as unsigned char (C17 7.24.4/1); nil when \p call
-/// is not such a call or its (evaluated) arguments are not constant.
+/// is not such a call or its (evaluated) arguments are not constant.  Also
+/// __builtin_strlen (evaluate_builtin_strlen).
 static exprt evaluate_builtin_memcmp(
   const exprt &call,
   const symbol_table_baset &symbol_table,
@@ -370,6 +398,13 @@ static exprt evaluate_builtin_memcmp(
     return nil_exprt{};
   }
   const auto &function_call = to_side_effect_expr_function_call(call);
+  if(
+    function_call.function().id() == ID_symbol &&
+    to_symbol_expr(function_call.function()).get_identifier() ==
+      "__builtin_strlen")
+  {
+    return evaluate_builtin_strlen(function_call, symbol_table, ns);
+  }
   if(
     function_call.function().id() != ID_symbol ||
     to_symbol_expr(function_call.function()).get_identifier() !=
@@ -1234,6 +1269,16 @@ public:
       simplify(result, ns);
       return result;
     }
+    // N5008 [expr.comma]/1: the left operand is a discarded-value
+    // expression, evaluated first; the value is the right operand's.
+    // Xcode 26's libc++ returns `((void)0), _Traits::length(__s)' from
+    // __char_traits_length_checked (behind string_view's constructor).
+    if(e.id() == ID_comma && e.operands().size() == 2)
+    {
+      if(!apply_side_effect(to_binary_expr(e).op0()))
+        return e;
+      return eval(to_binary_expr(e).op1());
+    }
     if(e.id() == ID_side_effect && e.get(ID_statement) == ID_temporary_object)
     {
       // N5008 [expr.type.conv]/1.4, [class.temporary]: `return T(args)' -- a
@@ -1294,7 +1339,8 @@ public:
       }
       if(
         callee.id() == ID_symbol &&
-        to_symbol_expr(callee).get_identifier() == "__builtin_memcmp")
+        (to_symbol_expr(callee).get_identifier() == "__builtin_memcmp" ||
+         to_symbol_expr(callee).get_identifier() == "__builtin_strlen"))
       {
         exprt call_copy = e;
         for(auto &op : to_side_effect_expr_function_call(call_copy).arguments())
