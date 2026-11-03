@@ -1,0 +1,15 @@
+CORE
+exact.c
+--unwind 30 --unwinding-assertions
+^\[main\.assertion\.6\] line \d+ assertion r == 3: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+^\[main\.assertion\.[1-5]\] .*: FAILURE$
+unwinding assertion loop \d+: FAILURE
+--
+The integer conversions, %c, %s and %% produce exact output: the length
+returned is that of the whole output, and the buffer holds as much as fits.
+Before, the output was unknown characters.
