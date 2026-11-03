@@ -250,6 +250,8 @@ void dfcc_swap_and_wrapt::check_contract(
 
   // write the body to the GOTO function
   goto_model.goto_functions.function_map.at(function_id).body.swap(body);
+  goto_model.goto_functions.update(
+    goto_model.goto_functions.function_map.at(function_id).body);
 
   // extend the signature of the wrapper function with the write set parameter
   dfcc_utilst::add_parameter(goto_model, write_set_symbol, function_id);
@@ -259,8 +261,6 @@ void dfcc_swap_and_wrapt::check_contract(
   // instrument the wrapped function
   instrument.instrument_wrapped_function(
     wrapped_id, wrapper_id, loop_contract_config, function_pointer_contracts);
-
-  goto_model.goto_functions.update();
 }
 
 void dfcc_swap_and_wrapt::replace_with_contract(

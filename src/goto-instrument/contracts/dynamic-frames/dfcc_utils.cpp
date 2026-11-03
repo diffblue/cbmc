@@ -401,6 +401,7 @@ void dfcc_utilst::wrap_function(
   goto_functiont &wrapper_fun = goto_functions.function_map[function_id];
   wrapper_fun.set_parameter_identifiers(new_code_type);
   wrapper_fun.body.add(goto_programt::make_end_function(sl));
+  goto_functions.update(wrapper_fun.body);
 }
 
 const exprt dfcc_utilst::make_null_check_expr(const exprt &ptr)
