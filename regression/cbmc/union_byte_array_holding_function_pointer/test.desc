@@ -1,0 +1,16 @@
+CORE
+main.c
+
+^\[main\.assertion\.1\] line \d+ assertion call\(p, &x\) == 14: SUCCESS$
+^\[main\.assertion\.2\] line \d+ assertion call\(p, &x\) == 15: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+A read of a pointer from a union whose only member is a byte array was not
+rewritten to the bytes of that member: the pointer read from the union was
+not a constant, every address-taken function of a compatible type was a
+target of the call through it, and the recursion through `call' was not
+bounded.
