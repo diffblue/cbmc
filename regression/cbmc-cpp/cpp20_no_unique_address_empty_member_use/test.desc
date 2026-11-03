@@ -9,7 +9,8 @@ main.cpp
 ^\[main\.assertion\.6\] line \d+ Holder: SUCCESS$
 ^\[main\.assertion\.7\] line \d+ offsetof: SUCCESS$
 ^\[main\.assertion\.8\] line \d+ pointer to member: SUCCESS$
-^\[main\.assertion\.9\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\[main\.assertion\.9\] line \d+ destructor of an empty member runs: SUCCESS$
+^\[main\.assertion\.10\] line \d+ WRONG \(must FAIL\): FAILURE$
 ^\*\* 1 of \d+ failed
 ^VERIFICATION FAILED$
 ^EXIT=10$

@@ -6560,10 +6560,14 @@ void cpp_typecheckt::make_empty_potentially_overlapping_members_zero_sized(
 
 /// The offsets of the empty potentially-overlapping members made zero-sized
 /// by make_empty_potentially_overlapping_members_zero_sized, as the Itanium
-/// C++ ABI (2.4 II.3) and GCC and Clang place them: at the lowest multiple
-/// of the class's alignment at which no subobject of the same class type
-/// lies -- N5008 [intro.object]/10: two such objects have distinct
-/// addresses -- offset 0 when there is none.  The class grows when the
+/// C++ ABI (2.4 II.3, "empty data member") and GCC and Clang place them:
+/// offset 0, or else the data size of the members declared before it
+/// (dsize), rounded up to its alignment, and then further multiples of its
+/// alignment -- the first at which no subobject of the same class type lies
+/// (N5008 [intro.object]/10: two such objects have distinct addresses).
+/// The ABI checks only the subobjects allocated before the member and would
+/// move a later member instead; the other members keep their sequential
+/// offsets here, so all of them are checked.  The class grows when the
 /// member lies beyond its end.
 void cpp_typecheckt::place_empty_potentially_overlapping_members(
   struct_typet &struct_type,
@@ -6584,9 +6588,16 @@ void cpp_typecheckt::place_empty_potentially_overlapping_members(
     if(type.id() == ID_array)
     {
       const auto &array = to_array_type(type);
+      const typet *element = &array.element_type();
+      while(element->id() == ID_array)
+        element = &to_array_type(*element).element_type();
+      // only class elements have class subobjects
+      if(element->id() != ID_struct_tag)
+        return;
       const auto n = numeric_cast<mp_integer>(array.size());
       const auto element_size = pointer_offset_size(array.element_type(), ns);
-      if(!n.has_value() || !element_size.has_value() || *n > 64)
+      // (an array of more than 2^16 class objects is not searched)
+      if(!n.has_value() || !element_size.has_value() || *n > 65536)
         return;
       for(mp_integer i = 0; i < *n; ++i)
         collect(array.element_type(), offset + i * *element_size, out);
@@ -6644,15 +6655,35 @@ void cpp_typecheckt::place_empty_potentially_overlapping_members(
   }
 
   bytest end{0};
+  bytest data_size{0};
   for(auto &c : struct_type.components())
   {
-    if(c.find("#nua_type").is_nil())
+    if(
+      c.type().id() == ID_code || c.get_bool(ID_is_static) ||
+      c.get_bool(ID_is_type) || c.get_is_padding())
+    {
       continue;
+    }
+    if(c.find("#nua_type").is_nil())
+    {
+      const auto member_offset_bytes =
+        member_offset(struct_type, c.get_name(), ns);
+      const auto member_size = pointer_offset_size(c.type(), ns);
+      if(member_offset_bytes.has_value() && member_size.has_value())
+        data_size = std::max(data_size, *member_offset_bytes + *member_size);
+      continue;
+    }
     const typet &class_type = static_cast<const typet &>(c.find("#nua_type"));
     const bytest step = alignment(class_type, ns);
     bytest offset{0};
-    for(;; offset += step)
+    for(bool first = true;; first = false)
     {
+      if(!first)
+      {
+        // after offset 0: dsize rounded up to the alignment, then onwards
+        const bytest start = ((data_size + step - bytest{1}) / step) * step;
+        offset = offset < start ? start : offset + step;
+      }
       subobjectst candidate;
       collect(class_type, offset, candidate);
       bool conflict = false;

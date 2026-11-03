@@ -170,7 +170,13 @@ codet cpp_typecheckt::dtor(
 
     const cpp_namet cppname(cit->get_base_name(), source_location);
 
-    exprt member(ID_ptrmember, cit->type());
+    // an empty potentially-overlapping member is an object of its class
+    // type (see make_empty_potentially_overlapping_members_zero_sized)
+    exprt member(
+      ID_ptrmember,
+      cit->find("#nua_type").is_not_nil()
+        ? static_cast<const typet &>(cit->find("#nua_type"))
+        : cit->type());
     member.set(ID_component_cpp_name, cppname);
     member.operands().push_back(this_expr);
     member.add_source_location() = source_location;

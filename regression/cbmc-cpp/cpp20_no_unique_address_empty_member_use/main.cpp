@@ -7,6 +7,19 @@
 #include <utility>
 extern "C" void __CPROVER_assert(bool, const char *);
 int constructed = 0;
+int destroyed = 0;
+struct D
+{
+  ~D()
+  {
+    ++destroyed;
+  }
+};
+struct WithD
+{
+  [[no_unique_address]] D d;
+  int i;
+};
 struct E
 {
   constexpr int get() const
@@ -77,6 +90,11 @@ int main()
   __CPROVER_assert(&(s.*pm) == &s.e, "pointer to member");
   constexpr S cs{};
   static_assert(cs.e.get() == 7, "constant evaluation");
+  {
+    WithD wd;
+    wd.i = 1;
+  }
+  __CPROVER_assert(destroyed == 1, "destructor of an empty member runs");
   __CPROVER_assert(false, "WRONG (must FAIL)");
   return 0;
 }

@@ -11,7 +11,10 @@ main.cpp
 ^\[main\.assertion\.8\] line \d+ S9: SUCCESS$
 ^\[main\.assertion\.9\] line \d+ S10: SUCCESS$
 ^\[main\.assertion\.10\] line \d+ sizeof the member: SUCCESS$
-^\[main\.assertion\.11\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\[main\.assertion\.11\] line \d+ R1: SUCCESS$
+^\[main\.assertion\.12\] line \d+ R2: SUCCESS$
+^\[main\.assertion\.13\] line \d+ BigArr: SUCCESS$
+^\[main\.assertion\.14\] line \d+ WRONG \(must FAIL\): FAILURE$
 ^\*\* 1 of \d+ failed
 ^VERIFICATION FAILED$
 ^EXIT=10$
