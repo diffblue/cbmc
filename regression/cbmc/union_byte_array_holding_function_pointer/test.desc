@@ -1,4 +1,4 @@
-CORE
+CORE no-new-smt
 main.c
 
 ^\[main\.assertion\.1\] line \d+ assertion call\(p, &x\) == 14: SUCCESS$
