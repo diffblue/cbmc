@@ -941,6 +941,27 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
     return changed(simplify_typecast(new_expr)); // recursive call
   }
 
+  // an integer cast to a pointer, read as a bit vector and converted back to
+  // an integer type as wide as it: (T)(bv)(void *)x -> (T)x (Visual Studio's
+  // va_arg, see simplify_extractbits)
+  if(
+    (expr_type.id() == ID_signedbv || expr_type.id() == ID_unsignedbv) &&
+    op_type.id() == ID_bv && expr.op().id() == ID_typecast &&
+    to_typecast_expr(expr.op()).op().id() == ID_typecast &&
+    to_typecast_expr(expr.op()).op().type().id() == ID_pointer)
+  {
+    const exprt &value =
+      to_typecast_expr(to_typecast_expr(expr.op()).op()).op();
+    if(
+      (value.type().id() == ID_signedbv ||
+       value.type().id() == ID_unsignedbv) &&
+      to_bitvector_type(value.type()).get_width() ==
+        to_bitvector_type(expr_type).get_width())
+    {
+      return changed(simplify_typecast(typecast_exprt{value, expr_type}));
+    }
+  }
+
   // casts from integer to pointer and back:
   // (int)(void *)int -> (int)(size_t)int
   if(
