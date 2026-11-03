@@ -3733,6 +3733,34 @@ exprt cpp_typecheck_resolvet::do_builtin(
   return dest;
 }
 
+/// The name of the class whose tag is \p tag, as a destructor is named
+/// ([class.dtor]/1): the final component of the qualified tag, without
+/// `tag-' and template arguments.  The final component is found
+/// angle-aware, as the arguments hold `::' (`std::tag-basic_string<char,
+/// std::tag-allocator<char>>'); the `->' of a function type among them
+/// (`tag-__bind<ref_(...)->(signed_int),...>') closes no angle bracket.
+static std::string destructor_class_name(const std::string &tag)
+{
+  std::size_t depth = 0;
+  std::size_t final_component = 0;
+  for(std::size_t i = 0; i + 1 < tag.size(); ++i)
+  {
+    if(tag[i] == '<')
+      ++depth;
+    else if(tag[i] == '>' && depth > 0 && (i == 0 || tag[i - 1] != '-'))
+      --depth;
+    else if(depth == 0 && tag[i] == ':' && tag[i + 1] == ':')
+      final_component = i + 2;
+  }
+  std::string name = tag.substr(final_component);
+  if(name.substr(0, 4) == "tag-")
+    name = name.substr(4);
+  const auto angle = name.find('<');
+  if(angle != std::string::npos)
+    name = name.substr(0, angle);
+  return name;
+}
+
 /// \par parameters: a cpp_name
 /// \return a base_name, and potentially template arguments for the base name;
 ///   as side-effect, we got to the right scope
@@ -4651,25 +4679,7 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
           // name (`~allocator`).
           irep_idt tag = to_struct_tag_type(*chosen).get_identifier();
           std::string tag_str = id2string(tag);
-          {
-            std::size_t depth = 0;
-            std::size_t final_component = 0;
-            for(std::size_t i = 0; i + 1 < tag_str.size(); ++i)
-            {
-              if(tag_str[i] == '<')
-                ++depth;
-              else if(tag_str[i] == '>' && depth > 0)
-                --depth;
-              else if(depth == 0 && tag_str[i] == ':' && tag_str[i + 1] == ':')
-                final_component = i + 2;
-            }
-            tag_str = tag_str.substr(final_component);
-          }
-          if(tag_str.substr(0, 4) == "tag-")
-            tag_str = tag_str.substr(4);
-          auto angle = tag_str.find('<');
-          if(angle != std::string::npos)
-            tag_str = tag_str.substr(0, angle);
+          tag_str = destructor_class_name(tag_str);
           final_base_name += tag_str;
         }
         else
@@ -4717,26 +4727,7 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
             ++pos; // skip the typedef-name sub-node (it is replaced)
             std::string tag_str =
               id2string(to_struct_tag_type(designated).get_identifier());
-            {
-              std::size_t depth = 0;
-              std::size_t final_component = 0;
-              for(std::size_t i = 0; i + 1 < tag_str.size(); ++i)
-              {
-                if(tag_str[i] == '<')
-                  ++depth;
-                else if(tag_str[i] == '>' && depth > 0)
-                  --depth;
-                else if(
-                  depth == 0 && tag_str[i] == ':' && tag_str[i + 1] == ':')
-                  final_component = i + 2;
-              }
-              tag_str = tag_str.substr(final_component);
-            }
-            if(tag_str.substr(0, 4) == "tag-")
-              tag_str = tag_str.substr(4);
-            auto angle = tag_str.find('<');
-            if(angle != std::string::npos)
-              tag_str = tag_str.substr(0, angle);
+            tag_str = destructor_class_name(tag_str);
             final_base_name += tag_str;
           }
         }
@@ -6508,26 +6499,7 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_namespace(const cpp_namet &cpp_name)
         // inside a template instance's ARGUMENTS.
         const irep_idt &tag = to_struct_tag_type(entry.second).get_identifier();
         std::string tag_str = id2string(tag);
-        {
-          std::size_t depth = 0;
-          std::size_t final_component = 0;
-          for(std::size_t i = 0; i + 1 < tag_str.size(); ++i)
-          {
-            if(tag_str[i] == '<')
-              ++depth;
-            else if(tag_str[i] == '>' && depth > 0)
-              --depth;
-            else if(depth == 0 && tag_str[i] == ':' && tag_str[i + 1] == ':')
-              final_component = i + 2;
-          }
-          tag_str = tag_str.substr(final_component);
-        }
-        if(tag_str.substr(0, 4) == "tag-")
-          tag_str = tag_str.substr(4);
-        // Remove template args for destructor name
-        auto angle = tag_str.find('<');
-        if(angle != std::string::npos)
-          tag_str = tag_str.substr(0, angle);
+        tag_str = destructor_class_name(tag_str);
         base_name = "~" + tag_str;
         break;
       }
