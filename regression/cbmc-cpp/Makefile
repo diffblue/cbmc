@@ -3,12 +3,13 @@ default: tests.log
 include ../../src/config.inc
 include ../../src/common
 
+# `msvc-stl': tests of the MSVC STL, which needs cl's preprocessing
 ifeq ($(BUILD_ENV_),MSVC)
   excluded_tests = -X gcc-only -X gnu-extensions -X itanium-abi
 else ifneq ($(shell ../../../src/goto-cc/goto-cc --version 2>&1 | grep -c 'gcc:'),0)
-  excluded_tests =
+  excluded_tests = -X msvc-stl
 else
-  excluded_tests = -X gcc-only
+  excluded_tests = -X gcc-only -X msvc-stl
 endif
 
 # Tests tagged `libstdcxxNN' need the libstdc++ headers of GCC >= NN (cbmc

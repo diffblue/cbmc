@@ -2212,6 +2212,41 @@ static const std::map<std::string, std::string> &library_replacing_models()
      "{ try { throw __ex; } catch(...) { return std::current_exception(); } }"},
     {"libc++:std::make_exception_ptr",
      "{ try { throw __e; } catch(...) { return std::current_exception(); } }"},
+    // the MSVC STL's copies of locale names and strings (<xlocinfo>,
+    // <xlocale>): _Ntcts_dup_dbg (for _Yarn) and _Maklocstr (for numpunct
+    // and the other facets) allocate with malloc and calloc (one model per
+    // character type: a body naming the template parameter is not checked).
+    // As CBMC's operator new, they are taken to succeed: their failure (an
+    // empty name, or bad_alloc thrown by _Xbad_alloc) is not modelled, which
+    // otherwise doubles the paths at each of the dozens of copies a stream's
+    // construction makes.  The "C" locale converts a character to the wide
+    // character of the same value.
+    {"std::_Ntcts_dup_dbg<char>",
+     "{ const size_t __b = (char_traits<char>::length(_Ptr) + 1) *"
+     " sizeof(char);"
+     " char *__r = static_cast<char *>(::malloc(__b));"
+     " " CPROVER_PREFIX "assume(__r != nullptr);"
+     " ::memcpy(__r, _Ptr, __b); return __r; }"},
+    {"std::_Maklocstr<char>",
+     "{ const size_t __n = ::strlen(_Ptr) + 1;"
+     " char *__d = static_cast<char *>(::calloc(__n, sizeof(char)));"
+     " " CPROVER_PREFIX "assume(__d != nullptr);"
+     " for(size_t __i = 0; __i < __n; ++__i)"
+     " __d[__i] = (char)(unsigned char)_Ptr[__i];"
+     " return __d; }"},
+    {"std::_Ntcts_dup_dbg<wchar_t>",
+     "{ const size_t __b = (char_traits<wchar_t>::length(_Ptr) + 1) *"
+     " sizeof(wchar_t);"
+     " wchar_t *__r = static_cast<wchar_t *>(::malloc(__b));"
+     " " CPROVER_PREFIX "assume(__r != nullptr);"
+     " ::memcpy(__r, _Ptr, __b); return __r; }"},
+    {"std::_Maklocstr<wchar_t>",
+     "{ const size_t __n = ::strlen(_Ptr) + 1;"
+     " wchar_t *__d = static_cast<wchar_t *>(::calloc(__n, sizeof(wchar_t)));"
+     " " CPROVER_PREFIX "assume(__d != nullptr);"
+     " for(size_t __i = 0; __i < __n; ++__i)"
+     " __d[__i] = (wchar_t)(unsigned char)_Ptr[__i];"
+     " return __d; }"},
     // libc++'s fill_n over characters (char_traits<char>::assign(p, n, c),
     // string(n, c), resize): N5008 [alg.fill]/2, assigns value through
     // [first, first + n) -- for char, set the bytes without a loop, which

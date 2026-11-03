@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE msvc-stl
 main.cpp
 --cpp11 --unwind 8
 ^\[main\.assertion\.1\] line \d+ padded to the field width: SUCCESS$
@@ -10,25 +10,11 @@ main.cpp
 --
 ^warning: ignoring
 --
-Meaningful only with the MSVC STL (Windows); elsewhere the #error makes it
-fail, which is why it is not CORE: the Linux jobs run every CORE test.
-The time-outs had two causes: setw, defined in the runtime, had no model,
-so inserting the manipulator called every function of a compatible type
-through its unknown function pointer (cpp11_msvc_runtime_manipulator_models);
-and num_put formats with sprintf_s, whose UCRT function
-__stdio_common_vsprintf_s had no model.  Both are modelled now.  With the
-MSVC 14.51 headers preprocessed by cl and --winx64 on Linux (the C library
-models compiled from the Linux headers there, so the probe defined
-__stdio_common_vsprintf_s as the model does), `ss << setw(4) << 7' still
-needs more than 10 GB, for two reasons.  First, Visual Studio's va_arg
-reads the value 7 as the bytes of the pointer va_start stores it in,
-`(bv)(void *)7', which the simplifier does not fold: the 22 digit steps
-of the vsnprintf model divide a symbolic 64-bit value.  Folding the cast
-(to `(bv)(size_t)7') makes the program verify in 10 s with
---no-malloc-may-fail, but breaks the constant propagation of pointers
-copied by memcpy (cbmc-library/memcpy/constant-propagation_01.desc),
-whose bytes then no longer reassemble into the pointer.  Second, without
---no-malloc-may-fail (the default, as unwinding assertions are on) each
-locale name the runtime copies with malloc (_Yarn) may fail to be
-copied, and the alternatives make the string sizes that follow
-symbolic.
+Meaningful only with the MSVC STL (Windows), hence the tag msvc-stl, which
+the other platforms exclude (elsewhere the #error makes it fail).
+Symbolic execution did not end: setw (defined in the runtime) had no
+model, num_put's sprintf_s (the UCRT's __stdio_common_vsprintf_s) had
+none, Visual Studio's va_arg read the value as `(bv)(void *)7', which the
+simplifier did not fold, and each locale-name copy (_Ntcts_dup_dbg,
+_Maklocstr) could fail.  Checked with the MSVC 14.51 headers preprocessed
+by cl and --winx64 on Linux: 10 s.

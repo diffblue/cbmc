@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE msvc-stl
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ cerr good: SUCCESS$
@@ -13,11 +13,9 @@ main.cpp
 --
 ^warning: ignoring
 --
-Meaningful only with the MSVC STL (Windows); elsewhere the #error makes it
-fail, which is why it is not CORE: the Linux jobs run every CORE test.
-provide_standard_stream_objects now defines the stream objects for the MSVC
-STL too, and the runtime functions its locale initialization calls are
-modelled (_Locinfo_ctor, _Locinfo_dtor, _Getcvt).  With the MSVC 14.51
-headers preprocessed by cl (iostream.ii of the VS 2026 CI job) and
---winx64 on Linux, the program verifies in 7 s with these results
-(_Getctype and _Mbrtowc, still without a model, are not on its paths).
+Meaningful only with the MSVC STL (Windows), hence the tag msvc-stl, which
+the other platforms exclude (elsewhere the #error makes it fail).
+provide_standard_stream_objects did not define the stream objects for the
+MSVC STL, and the runtime functions its locale initialization calls had
+no model.  Checked with the MSVC 14.51 headers preprocessed by cl
+(iostream.ii of the VS 2026 CI job) and --winx64 on Linux: 7 s.

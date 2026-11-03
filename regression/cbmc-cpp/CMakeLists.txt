@@ -10,6 +10,9 @@ endif()
 # share
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   list(APPEND gcc_only -X gnu-extensions -X itanium-abi)
+else()
+  # tests of the MSVC STL, which needs cl's preprocessing
+  list(APPEND gcc_only -X msvc-stl)
 endif()
 
 # Tests tagged `libstdcxxNN' need the libstdc++ headers of GCC >= NN (13:

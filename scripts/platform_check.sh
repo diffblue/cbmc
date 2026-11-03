@@ -64,7 +64,7 @@ for mode in "${MODES[@]}"; do
       fi
       PATH="$(gcc11_path):$PATH" run gcc11 \
         -c "$BUILD/bin/cbmc --validate-goto-model --validate-ssa-equation" \
-        -C -X libstdcxx12 -X libstdcxx13 -X libstdcxx16 -X libcxx
+        -C -X libstdcxx12 -X libstdcxx13 -X libstdcxx16 -X libcxx -X msvc-stl
       ;;
     m32)
       if [ ! -x "$BUILD32/bin/cbmc" ]; then
@@ -72,7 +72,8 @@ for mode in "${MODES[@]}"; do
       fi
       extra=()
       command -v g++-11 > /dev/null && extra=(-X libstdcxx12 -X libstdcxx13)
-      run m32 -c "$BUILD32/bin/cbmc" -C -X libstdcxx16 -X libcxx "${extra[@]}"
+      run m32 -c "$BUILD32/bin/cbmc" -C -X libstdcxx16 -X libcxx -X msvc-stl \
+        "${extra[@]}"
       ;;
     arm64)
       dirs=()
@@ -82,7 +83,7 @@ for mode in "${MODES[@]}"; do
         dirs+=("$d")
       done
       run arm64 -c "$BUILD/bin/cbmc --arch arm64 --validate-goto-model" \
-        -C -X libcxx -X libstdcxx16 "${dirs[@]}"
+        -C -X libcxx -X libstdcxx16 -X msvc-stl "${dirs[@]}"
       ;;
   esac
 done
