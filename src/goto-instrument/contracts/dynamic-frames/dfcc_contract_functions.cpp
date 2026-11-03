@@ -149,7 +149,7 @@ void dfcc_contract_functionst::gen_spec_assigns_function()
     spec_function_symbol.mode, targets, body);
   body.add(goto_programt::make_end_function(spec_function_symbol.location));
 
-  goto_model.goto_functions.update();
+  goto_model.goto_functions.update(body);
 }
 
 void dfcc_contract_functionst::gen_spec_frees_function()
@@ -203,5 +203,5 @@ void dfcc_contract_functionst::gen_spec_frees_function()
     spec_function_symbol.mode, targets, body);
   body.add(goto_programt::make_end_function(spec_function_symbol.location));
 
-  goto_model.goto_functions.update();
+  goto_model.goto_functions.update(body);
 }

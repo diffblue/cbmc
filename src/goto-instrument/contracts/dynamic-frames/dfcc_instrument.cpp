@@ -293,7 +293,7 @@ void dfcc_instrumentt::instrument_harness_function(
     goto_programt::make_assignment(
       write_set, null_expr, first_instr->source_location()));
 
-  goto_model.goto_functions.update();
+  goto_model.goto_functions.update(body);
 }
 
 std::set<symbol_exprt>
@@ -423,7 +423,7 @@ void dfcc_instrumentt::instrument_goto_program(
   goto_program.clear();
   goto_program.copy_from(goto_function.body);
   remove_skip(goto_program);
-  goto_model.goto_functions.update();
+  goto_model.goto_functions.update(goto_program);
 }
 
 void dfcc_instrumentt::instrument_goto_function(
