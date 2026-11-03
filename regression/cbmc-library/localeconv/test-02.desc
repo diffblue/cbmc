@@ -1,0 +1,12 @@
+CORE
+main2.c
+--unwind 10
+^\[main\.assertion\.1\] line \d+ assertion lc->decimal_point\[0\] != 0: SUCCESS$
+^\[main\.assertion\.2\] line \d+ assertion .*: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+After a call to setlocale the decimal point need not be ".".
