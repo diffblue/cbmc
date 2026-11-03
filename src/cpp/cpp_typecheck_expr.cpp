@@ -11807,6 +11807,26 @@ void cpp_typecheckt::typecheck_side_effect_assignment(side_effect_exprt &expr)
 
   if(cpp_is_pod(type0) && !needs_overloaded_operator)
   {
+    // N5008 [class.copy.assign]/12: the implicit assignment operator of an
+    // empty class assigns its subobjects, of which it has none: it stores
+    // nothing.  Its object can overlap other objects -- an empty base, a
+    // potentially-overlapping member ([intro.object]/8) -- whose byte the
+    // store of the class's one byte of storage would overwrite.
+    if(
+      statement == ID_assign && same_class &&
+      class_is_empty(follow_tag(to_struct_tag_type(type0))))
+    {
+      exprt lhs = to_binary_expr(expr).op0();
+      exprt rhs = to_binary_expr(expr).op1();
+      const source_locationt location = expr.source_location();
+      exprt evaluated{ID_comma, lhs.type()};
+      evaluated.add_to_operands(
+        typecast_exprt{std::move(rhs), empty_typet{}}, std::move(lhs));
+      evaluated.add_source_location() = location;
+      evaluated.set(ID_C_lvalue, true);
+      expr.swap(evaluated);
+      return;
+    }
     // for structs we use the 'implicit assignment operator',
     // and therefore, it is allowed to assign to a rvalue struct.
     if(type0.id() == ID_struct_tag)
