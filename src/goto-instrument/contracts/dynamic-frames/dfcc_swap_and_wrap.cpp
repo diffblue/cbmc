@@ -301,4 +301,7 @@ void dfcc_swap_and_wrapt::replace_with_contract(
 
   // extend the signature with the new write set parameter
   dfcc_utilst::add_parameter(goto_model, write_set_symbol, function_id);
+
+  goto_model.goto_functions.update(
+    goto_model.goto_functions.function_map.at(function_id).body);
 }

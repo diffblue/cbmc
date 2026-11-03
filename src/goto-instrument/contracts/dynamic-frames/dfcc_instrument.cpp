@@ -443,6 +443,7 @@ void dfcc_instrumentt::instrument_goto_function(
       options, object_factory_params, goto_model.symbol_table, message_handler);
     generate_function_bodies->generate_function_body(
       goto_function, goto_model.symbol_table, function_id);
+    goto_model.goto_functions.update(goto_function.body);
     return;
   }
 
