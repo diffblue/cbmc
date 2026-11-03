@@ -6,7 +6,10 @@ on:
 jobs:
   # This job takes approximately 1 minute
   check-clang-format:
-    runs-on: ubuntu-22.04
+    # Ubuntu 26.04 packages clang-format-18 version 18.1.8. Do not use
+    # ubuntu-24.04 (or ubuntu-latest, while it may still be 24.04): its
+    # clang-format-18 is version 18.1.3, which formats some code differently.
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v7
         with:
@@ -19,8 +22,8 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq clang-format-15
-      - name: Check updated lines of code match clang-format-15 style
+          sudo apt-get install --no-install-recommends -yq clang-format-18
+      - name: Check updated lines of code match clang-format-18 style
         env:
           BASE_BRANCH: ${{ github.base_ref }}
           MERGE_BRANCH: ${{ github.ref }}
