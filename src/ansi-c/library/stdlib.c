@@ -777,6 +777,272 @@ __CPROVER_HIDE:;
   return res;
 }
 
+/* FUNCTION: strtol_l */
+
+// POSIX.1-2024 (and glibc, macOS): as strtol, with the locale argument; the
+// conversion of integers does not depend on the locale beyond the
+// white-space and digit characters, which the model of strtol takes from the
+// "C" locale.  libc++ converts integers read by num_get with it.
+
+#ifndef _WIN32
+
+#  ifndef __CPROVER_STDLIB_H_INCLUDED
+#    include <stdlib.h>
+#    define __CPROVER_STDLIB_H_INCLUDED
+#  endif
+
+#  ifndef __CPROVER_LOCALE_H_INCLUDED
+#    include <locale.h>
+#    define __CPROVER_LOCALE_H_INCLUDED
+#  endif
+
+#  ifdef __APPLE__
+#    ifndef __CPROVER_XLOCALE_H_INCLUDED
+#      include <xlocale.h>
+#      define __CPROVER_XLOCALE_H_INCLUDED
+#    endif
+#  endif
+
+#  undef strtol_l
+
+long strtol_l(const char *nptr, char **endptr, int base, locale_t loc)
+{
+__CPROVER_HIDE:;
+  (void)loc;
+  return strtol(nptr, endptr, base);
+}
+
+#endif
+
+/* FUNCTION: strtoul_l */
+
+// POSIX.1-2024 (and glibc, macOS): as strtoul, with the locale argument; the
+// conversion of integers does not depend on the locale beyond the
+// white-space and digit characters, which the model of strtoul takes from the
+// "C" locale.  libc++ converts integers read by num_get with it.
+
+#ifndef _WIN32
+
+#  ifndef __CPROVER_STDLIB_H_INCLUDED
+#    include <stdlib.h>
+#    define __CPROVER_STDLIB_H_INCLUDED
+#  endif
+
+#  ifndef __CPROVER_LOCALE_H_INCLUDED
+#    include <locale.h>
+#    define __CPROVER_LOCALE_H_INCLUDED
+#  endif
+
+#  ifdef __APPLE__
+#    ifndef __CPROVER_XLOCALE_H_INCLUDED
+#      include <xlocale.h>
+#      define __CPROVER_XLOCALE_H_INCLUDED
+#    endif
+#  endif
+
+#  undef strtoul_l
+
+unsigned long strtoul_l(const char *nptr, char **endptr, int base, locale_t loc)
+{
+__CPROVER_HIDE:;
+  (void)loc;
+  return strtoul(nptr, endptr, base);
+}
+
+#endif
+
+/* FUNCTION: strtoll_l */
+
+// POSIX.1-2024 (and glibc, macOS): as strtoll, with the locale argument; the
+// conversion of integers does not depend on the locale beyond the
+// white-space and digit characters, which the model of strtoll takes from the
+// "C" locale.  libc++ converts integers read by num_get with it.
+
+#ifndef _WIN32
+
+#  ifndef __CPROVER_STDLIB_H_INCLUDED
+#    include <stdlib.h>
+#    define __CPROVER_STDLIB_H_INCLUDED
+#  endif
+
+#  ifndef __CPROVER_LOCALE_H_INCLUDED
+#    include <locale.h>
+#    define __CPROVER_LOCALE_H_INCLUDED
+#  endif
+
+#  ifdef __APPLE__
+#    ifndef __CPROVER_XLOCALE_H_INCLUDED
+#      include <xlocale.h>
+#      define __CPROVER_XLOCALE_H_INCLUDED
+#    endif
+#  endif
+
+#  undef strtoll_l
+
+long long strtoll_l(const char *nptr, char **endptr, int base, locale_t loc)
+{
+__CPROVER_HIDE:;
+  (void)loc;
+  return strtoll(nptr, endptr, base);
+}
+
+#endif
+
+/* FUNCTION: strtoull_l */
+
+// POSIX.1-2024 (and glibc, macOS): as strtoull, with the locale argument; the
+// conversion of integers does not depend on the locale beyond the
+// white-space and digit characters, which the model of strtoull takes from the
+// "C" locale.  libc++ converts integers read by num_get with it.
+
+#ifndef _WIN32
+
+#  ifndef __CPROVER_STDLIB_H_INCLUDED
+#    include <stdlib.h>
+#    define __CPROVER_STDLIB_H_INCLUDED
+#  endif
+
+#  ifndef __CPROVER_LOCALE_H_INCLUDED
+#    include <locale.h>
+#    define __CPROVER_LOCALE_H_INCLUDED
+#  endif
+
+#  ifdef __APPLE__
+#    ifndef __CPROVER_XLOCALE_H_INCLUDED
+#      include <xlocale.h>
+#      define __CPROVER_XLOCALE_H_INCLUDED
+#    endif
+#  endif
+
+#  undef strtoull_l
+
+unsigned long long
+strtoull_l(const char *nptr, char **endptr, int base, locale_t loc)
+{
+__CPROVER_HIDE:;
+  (void)loc;
+  return strtoull(nptr, endptr, base);
+}
+
+#endif
+
+/* FUNCTION: __isoc23_strtol_l */
+
+// glibc's name for strtol_l in C23 mode (<stdlib.h> defines one as the other)
+
+#ifndef _WIN32
+
+#  ifndef __CPROVER_STDLIB_H_INCLUDED
+#    include <stdlib.h>
+#    define __CPROVER_STDLIB_H_INCLUDED
+#  endif
+
+#  ifndef __CPROVER_LOCALE_H_INCLUDED
+#    include <locale.h>
+#    define __CPROVER_LOCALE_H_INCLUDED
+#  endif
+
+#  undef strtol_l
+
+long strtol_l(const char *nptr, char **endptr, int base, locale_t loc);
+
+long __isoc23_strtol_l(const char *nptr, char **endptr, int base, locale_t loc)
+{
+__CPROVER_HIDE:;
+  return strtol_l(nptr, endptr, base, loc);
+}
+
+#endif
+
+/* FUNCTION: __isoc23_strtoul_l */
+
+// glibc's name for strtoul_l in C23 mode (<stdlib.h> defines one as the other)
+
+#ifndef _WIN32
+
+#  ifndef __CPROVER_STDLIB_H_INCLUDED
+#    include <stdlib.h>
+#    define __CPROVER_STDLIB_H_INCLUDED
+#  endif
+
+#  ifndef __CPROVER_LOCALE_H_INCLUDED
+#    include <locale.h>
+#    define __CPROVER_LOCALE_H_INCLUDED
+#  endif
+
+#  undef strtoul_l
+
+unsigned long
+strtoul_l(const char *nptr, char **endptr, int base, locale_t loc);
+
+unsigned long
+__isoc23_strtoul_l(const char *nptr, char **endptr, int base, locale_t loc)
+{
+__CPROVER_HIDE:;
+  return strtoul_l(nptr, endptr, base, loc);
+}
+
+#endif
+
+/* FUNCTION: __isoc23_strtoll_l */
+
+// glibc's name for strtoll_l in C23 mode (<stdlib.h> defines one as the other)
+
+#ifndef _WIN32
+
+#  ifndef __CPROVER_STDLIB_H_INCLUDED
+#    include <stdlib.h>
+#    define __CPROVER_STDLIB_H_INCLUDED
+#  endif
+
+#  ifndef __CPROVER_LOCALE_H_INCLUDED
+#    include <locale.h>
+#    define __CPROVER_LOCALE_H_INCLUDED
+#  endif
+
+#  undef strtoll_l
+
+long long strtoll_l(const char *nptr, char **endptr, int base, locale_t loc);
+
+long long
+__isoc23_strtoll_l(const char *nptr, char **endptr, int base, locale_t loc)
+{
+__CPROVER_HIDE:;
+  return strtoll_l(nptr, endptr, base, loc);
+}
+
+#endif
+
+/* FUNCTION: __isoc23_strtoull_l */
+
+// glibc's name for strtoull_l in C23 mode (<stdlib.h> defines one as the other)
+
+#ifndef _WIN32
+
+#  ifndef __CPROVER_STDLIB_H_INCLUDED
+#    include <stdlib.h>
+#    define __CPROVER_STDLIB_H_INCLUDED
+#  endif
+
+#  ifndef __CPROVER_LOCALE_H_INCLUDED
+#    include <locale.h>
+#    define __CPROVER_LOCALE_H_INCLUDED
+#  endif
+
+#  undef strtoull_l
+
+unsigned long long
+strtoull_l(const char *nptr, char **endptr, int base, locale_t loc);
+
+unsigned long long
+__isoc23_strtoull_l(const char *nptr, char **endptr, int base, locale_t loc)
+{
+__CPROVER_HIDE:;
+  return strtoull_l(nptr, endptr, base, loc);
+}
+
+#endif
+
 /* FUNCTION: atoi */
 
 #undef atoi
