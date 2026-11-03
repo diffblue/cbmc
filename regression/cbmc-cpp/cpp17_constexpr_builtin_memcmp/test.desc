@@ -1,4 +1,4 @@
-CORE gnu-extensions
+CORE gnu-extensions libstdcxx
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ run time: SUCCESS$
