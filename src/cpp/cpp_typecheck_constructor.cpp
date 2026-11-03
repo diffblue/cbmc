@@ -99,9 +99,10 @@ static void copy_array(
     ID_component_cpp_name, cpp_namet(member_base_name, source_location));
   member.copy_to_operands(cpp_namet(arg_name, source_location).as_expr());
 
+  // The array operands are not typechecked yet, so avoid index_exprt's checks.
   side_effect_expr_assignt assign(
-    index_exprt(array.as_expr(), constant),
-    index_exprt(member, constant),
+    binary_exprt(array.as_expr(), ID_index, constant, uninitialized_typet()),
+    binary_exprt(member, ID_index, constant, uninitialized_typet()),
     typet(),
     source_location);
 
@@ -392,7 +393,7 @@ void cpp_typecheckt::default_assignop_value(
       }
 
       const auto size = numeric_cast<mp_integer>(size_expr);
-      CHECK_RETURN(!size.has_value());
+      CHECK_RETURN(size.has_value());
       CHECK_RETURN(*size >= 0);
 
       for(mp_integer i = 0; i < *size; ++i)
