@@ -1,0 +1,14 @@
+CORE
+legacy.c
+--unwind 10 --unwinding-assertions
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+On Windows, _vsnprintf (the Universal CRT's __stdio_common_vsprintf without
+_CRT_INTERNAL_PRINTF_STANDARD_SNPRINTF_BEHAVIOR) writes up to the buffer's size
+characters and null-terminates them only if there is room; an output longer than
+the buffer gives -1, except for the size query _vsnprintf(NULL, 0, ...).
+Elsewhere this test is vacuous.

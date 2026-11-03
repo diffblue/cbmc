@@ -1,0 +1,12 @@
+CORE
+overlap.c
+--pointer-check
+^\[__CPROVER_vsnprintf\.precondition\.1\] line \d+ vsnprintf object overlap: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+The output must not overlap the string that %s converts (C23 7.23.6.12 declares
+both restrict).
