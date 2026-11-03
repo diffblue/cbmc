@@ -579,6 +579,16 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
         typecast_exprt::conditional_cast(pointer_expr, object_pointer.type()),
         object_pointer);
     }
+    else if(o.offset().is_constant())
+    {
+      // The value is built for this constant offset below, so the guard needs
+      // to rule out other offsets into the same object.
+      result.pointer_guard = and_exprt{
+        same_object(pointer_expr, object_pointer),
+        equal_exprt{
+          pointer_offset(pointer_expr),
+          typecast_exprt::conditional_cast(o.offset(), size_type())}};
+    }
     else
     {
       result.pointer_guard=same_object(pointer_expr, object_pointer);
