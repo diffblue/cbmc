@@ -55,6 +55,14 @@ typet cpp_typecheckt::decltype_of(const exprt &e, bool parenthesized)
     // id-expression, which decltype does not perform.
     type = to_address_of_expr(e).object().type();
   }
+  else if(e.get_bool("#potentially_overlapping_member"))
+  {
+    // N5008 [dcl.type.decltype]/1.3, /1.5: the member access to an empty
+    // potentially-overlapping member (get_component): its declared type,
+    // or T& when parenthesized
+    type = parenthesized ? ::reference_type(e.type())
+                         : static_cast<const typet &>(e.find("#declared_type"));
+  }
   else if(
     e.id() == ID_dereference && e.get_bool(ID_C_implicit) &&
     e.operands().size() == 1)

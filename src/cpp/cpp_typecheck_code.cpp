@@ -3140,6 +3140,35 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
       symbol_expr.swap(tmp);
     }
 
+    // an empty potentially-overlapping member (get_component), at its
+    // offset: it is initialized as a class object, by its constructor
+    // ([class.base.init]/7); a trivial one stores nothing, as the class has
+    // no subobjects ([class.copy.ctor]/14), only the operands are evaluated
+    // (the store of its one byte could overwrite the object it overlaps)
+    if(symbol_expr.get_bool("#potentially_overlapping_member"))
+    {
+      const source_locationt location = code.source_location();
+      exprt::operandst operands = code.operands();
+      std::optional<codet> initialization;
+      if(!cpp_is_pod(symbol_expr.type()))
+      {
+        exprt::operandst wrapped;
+        for(const auto &op : operands)
+          wrapped.push_back(already_typechecked_exprt{op});
+        initialization = cpp_constructor(location, symbol_expr, wrapped);
+      }
+      if(!initialization.has_value())
+      {
+        code_blockt evaluate;
+        for(const auto &op : operands)
+          evaluate.add(code_expressiont{op});
+        evaluate.add_source_location() = location;
+        initialization = std::move(evaluate);
+      }
+      code.swap(*initialization);
+      return;
+    }
+
     if(symbol_expr.id() == ID_symbol && symbol_expr.type().id() != ID_code)
     {
       // maybe the name of the member collides with a parameter of the

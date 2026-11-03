@@ -30,6 +30,8 @@ public:
     : parsert(message_handler),
       tag_following(false),
       asm_block_following(false),
+      no_unique_address_seen(false),
+      msvc_no_unique_address_seen(false),
       parenthesis_counter(0),
       mode(modet::NONE),
       cpp98(false),
@@ -59,6 +61,10 @@ public:
   // internal state of the scanner
   bool tag_following;
   bool asm_block_following;
+  // a C++ [[no_unique_address]] / [[msvc::no_unique_address]] in the
+  // attribute-specifier being skipped
+  bool no_unique_address_seen;
+  bool msvc_no_unique_address_seen;
   unsigned parenthesis_counter;
   std::string string_literal;
   std::string raw_string_delimiter;

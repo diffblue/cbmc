@@ -1912,7 +1912,34 @@ enable_or_disable ("enable"|"disable")
 .               { loc(); PARSER.tag_following=false; return yytext[0]; }
 }
 
-<STD_ANNOTATION>"]]" { BEGIN(GRAMMAR); }
+<STD_ANNOTATION>"]]" {
+                  BEGIN(GRAMMAR);
+                  // N5008 [dcl.attr.nouniqueaddr]: the one attribute the C++
+                  // parser needs (it changes the class layout)
+                  const bool nua = PARSER.no_unique_address_seen;
+                  const bool msvc_nua = PARSER.msvc_no_unique_address_seen;
+                  PARSER.no_unique_address_seen = false;
+                  PARSER.msvc_no_unique_address_seen = false;
+                  if(msvc_nua)
+                  {
+                    loc();
+                    return TOK_MSC_NO_UNIQUE_ADDRESS;
+                  }
+                  if(nua)
+                  {
+                    loc();
+                    return TOK_NO_UNIQUE_ADDRESS;
+                  }
+                }
+<STD_ANNOTATION>"msvc"{ws}"::"{ws}"no_unique_address" {
+                  if(PARSER.cpp98)
+                    PARSER.msvc_no_unique_address_seen = true;
+                }
+<STD_ANNOTATION>"no_unique_address"|"__no_unique_address__" {
+                  if(PARSER.cpp98)
+                    PARSER.no_unique_address_seen = true;
+                }
+<STD_ANNOTATION>{identifier} { /* ignore */ }
 <STD_ANNOTATION>.   { /* ignore */ }
 
 <MSC_ANNOTATION>"]" { BEGIN(GRAMMAR); }

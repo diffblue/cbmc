@@ -1,8 +1,7 @@
 // N5008 [dcl.attr.nouniqueaddr]/2, [intro.object]/8, 10: a non-static data
 // member with [[no_unique_address]] of an empty class type need not have
 // a distinct address; g++ and clang++ (Itanium C++ ABI) give it none, so
-// sizeof(S) == sizeof(int).  The front end ignores the attribute and lays
-// out the empty member as a byte, so sizeof(S) is 8.
+// sizeof(S) == sizeof(int).
 extern "C" void __CPROVER_assert(bool, const char *);
 struct E
 {

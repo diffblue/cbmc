@@ -283,6 +283,8 @@ int yyansi_cerror(const std::string &error);
 %token TOK_REQUIRES    "requires"
 %token TOK_NEW         "new"
 %token TOK_NODISCARD   "nodiscard"
+%token TOK_NO_UNIQUE_ADDRESS "[[no_unique_address]]"
+%token TOK_MSC_NO_UNIQUE_ADDRESS "[[msvc::no_unique_address]]"
 %token TOK_NOEXCEPT    "noexcept"
 %token TOK_OPERATOR    "operator"
 %token TOK_PRIVATE     "private"

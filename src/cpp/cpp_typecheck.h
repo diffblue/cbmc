@@ -1235,6 +1235,10 @@ protected:
   /// \return whether the class has no storage member (an empty class: its
   ///   base subobjects have zero size, N5008 [intro.object]/8)
   static bool class_is_empty(const struct_typet &type);
+  void make_empty_potentially_overlapping_members_zero_sized(struct_typet &);
+  void place_empty_potentially_overlapping_members(
+    struct_typet &,
+    const namespacet &);
   /// N5008 [dcl.init.list]/3.8: when \p target is an enumeration with a
   /// fixed underlying type and \p element an integral (or unscoped
   /// enumeration) value, replace \p element by the enumeration value it

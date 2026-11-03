@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] .* no_unique_address: SUCCESS$
@@ -10,5 +10,5 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-g++ 13 (-fsanitize=address,undefined) and clang++ 18 accept this program,
-and it fails only its WRONG assertion.  Currently the first assertion fails.
+The front end ignored the attribute and laid out the empty member as a
+byte, so sizeof(S) was 8.

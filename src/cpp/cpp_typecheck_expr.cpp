@@ -6305,6 +6305,24 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
     // itanium_abi_cpp_zero_initializer.h).
     const struct_tag_typet class_tag = to_struct_tag_type(
       to_pointer_type(to_unary_expr(op).op().type()).base_type());
+    // an empty potentially-overlapping member: its class type, at its
+    // offset (see get_component)
+    const auto &member_component =
+      follow_tag(class_tag).get_component(op.get(ID_component_name));
+    if(member_component.find("#nua_type").is_not_nil())
+    {
+      pointer_typet result_type = pointer_type(
+        static_cast<const typet &>(member_component.find("#nua_type")));
+      result_type.add(ID_to_member) = class_tag;
+      const mp_integer offset = numeric_cast_v<mp_integer>(to_constant_expr(
+        static_cast<const exprt &>(member_component.find("#nua_offset"))));
+      exprt value = typecast_exprt{
+        from_integer(offset + data_member_pointer_bias(), signed_size_type()),
+        result_type};
+      value.add_source_location() = expr.source_location();
+      expr.swap(value);
+      return;
+    }
     pointer_typet result_type = pointer_type(op.type());
     result_type.add(ID_to_member) = class_tag;
     if(op.type().id() == ID_c_bit_field)
@@ -8205,6 +8223,13 @@ void cpp_typecheckt::typecheck_expr_member(
 
     exprt symbol_expr = resolve(
       component_cpp_name, cpp_typecheck_resolvet::wantt::VAR, new_fargs);
+
+    // an empty potentially-overlapping member, at its offset (get_component)
+    if(symbol_expr.get_bool("#potentially_overlapping_member"))
+    {
+      expr.swap(symbol_expr);
+      return;
+    }
 
     if(symbol_expr.id() == ID_dereference)
     {

@@ -816,7 +816,21 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
         {
           found=true;
 
-          if(type.id() == ID_struct_tag)
+          const auto &component =
+            struct_union_type.get_component(component_name);
+          if(component.find("#nua_offset").is_not_nil())
+          {
+            // a C++ empty potentially-overlapping member: it lies at the
+            // offset the C++ front end gave it, not in the sequence of the
+            // components
+            result = plus_exprt(
+              result,
+              typecast_exprt::conditional_cast(
+                static_cast<const exprt &>(component.find("#nua_offset")),
+                size_type()));
+            type = static_cast<const typet &>(component.find("#nua_type"));
+          }
+          else if(type.id() == ID_struct_tag)
           {
             auto o_opt = member_offset_expr(
               follow_tag(to_struct_tag_type(type)), component_name, *this);
@@ -832,9 +846,10 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
             result = plus_exprt(
               result,
               typecast_exprt::conditional_cast(o_opt.value(), size_type()));
+            type = component.type();
           }
-
-          type=struct_union_type.get_component(component_name).type();
+          else
+            type = component.type();
         }
         else
         {

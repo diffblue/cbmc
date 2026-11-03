@@ -77,6 +77,11 @@ void cpp_convert_typet::read_rec(const typet &type)
 
   if(type.id() == ID_gcc_float80)
     ++gcc_float64x_cnt;
+  else if(
+    type.id() == "no_unique_address" || type.id() == "msvc_no_unique_address")
+  {
+    // the member's attribute, read by typecheck_compound_declarator
+  }
   else if(type.id()==ID_wchar_t)
     ++wchar_t_count;
   else if(type.id() == ID_char8_t)

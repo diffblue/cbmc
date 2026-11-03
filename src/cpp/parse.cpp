@@ -2600,6 +2600,19 @@ bool Parser::rExternTemplateDecl(cpp_declarationt &decl)
 /// only after its declaration, and the front end converts some bodies (of
 /// member functions, [class.mem.general]/9.1) only at the end of the
 /// translation unit.
+/// Whether the decl-specifier-seq \p type carries the attribute \p id.
+static bool has_attribute(const typet &type, const irep_idt &id)
+{
+  if(type.id() == id)
+    return true;
+  if(type.id() != ID_merged_type)
+    return false;
+  for(const typet &subtype : to_type_with_subtypes(type).subtypes())
+    if(has_attribute(subtype, id))
+      return true;
+  return false;
+}
+
 bool Parser::rDeclaration(cpp_declarationt &declaration)
 {
   if(!rDeclarationBody(declaration))
@@ -2618,6 +2631,16 @@ bool Parser::rDeclarationBody(cpp_declarationt &declaration)
 
   if(!optAttribute(declaration.type()))
     return false;
+  // N5008 [dcl.attr.nouniqueaddr]/1, recorded on the declaration: the
+  // decl-specifier-seq, the attributes in it included, is replaced by the
+  // type it denotes before the members are declared
+  // (typecheck_compound_declarator)
+  for(const irep_idt &id :
+      {irep_idt{"no_unique_address"}, irep_idt{"msvc_no_unique_address"}})
+  {
+    if(has_attribute(declaration.type(), id))
+      declaration.set(id, true);
+  }
 
   // C++11 [dcl.align]: alignas is an alignment-specifier, part of
   // attribute-specifier-seq
@@ -3868,12 +3891,32 @@ bool Parser::optAttribute(typet &t)
 {
   // C++11 [dcl.attr] (A.6): attribute-specifier-seq is zero or more
   // attribute-specifiers.
-  while(lex.LookAhead(0) == TOK_GCC_ATTRIBUTE)
+  for(;;)
   {
-    lex.get_token();
+    const int kind = lex.LookAhead(0);
+    if(kind == TOK_GCC_ATTRIBUTE)
+    {
+      lex.get_token();
 
-    if(!rGCCAttribute(t))
-      return false;
+      if(!rGCCAttribute(t))
+          return false;
+    }
+    else if(kind == TOK_NO_UNIQUE_ADDRESS || kind == TOK_MSC_NO_UNIQUE_ADDRESS)
+    {
+      // N5008 [dcl.attr.nouniqueaddr]/1: the non-static data member is a
+      // potentially-overlapping subobject.  The scanner skips the
+      // attribute-specifiers, reporting only this attribute (and Visual
+      // Studio's spelling of it, [[msvc::no_unique_address]]).
+      cpp_tokent tk;
+      lex.get_token(tk);
+      typet attr{
+        kind == TOK_NO_UNIQUE_ADDRESS ? irep_idt{"no_unique_address"}
+                                      : irep_idt{"msvc_no_unique_address"}};
+      set_location(attr, tk);
+      merge_types(attr, t);
+    }
+    else
+      break;
   }
 
   if(lex.LookAhead(0)!='[' ||

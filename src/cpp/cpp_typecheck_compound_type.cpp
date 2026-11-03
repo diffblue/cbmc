@@ -23,6 +23,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/expr_initializer.h>
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 #include <util/std_types.h>
@@ -1683,6 +1684,21 @@ void cpp_typecheckt::typecheck_compound_declarator(
   component.add_source_location() = cpp_name.source_location();
   if(base_name.empty() && final_type.id() == ID_c_bit_field)
     component.set_anonymous(true);
+
+  // N5008 [dcl.attr.nouniqueaddr]/1: a potentially-overlapping member.
+  // Visual Studio ignores [[no_unique_address]] and honours its own
+  // [[msvc::no_unique_address]].
+  if(!is_static && !is_typedef)
+  {
+    const bool visual_studio =
+      config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO;
+    if(declaration.get_bool(
+         visual_studio ? irep_idt{"msvc_no_unique_address"}
+                       : irep_idt{"no_unique_address"}))
+    {
+      component.set("#no_unique_address", true);
+    }
+  }
 
   if(declarator.get_bool("#member_fn_template_instance"))
     component.set("#member_fn_template_instance", true);
@@ -5796,13 +5812,16 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
         // empty MEMBER occupies its byte; an empty BASE subobject is folded
         // away on flattening (cpp_typecheck_bases.cpp).  sizeof used to
         // special-case the zero-sized object to report 1.
+        make_empty_potentially_overlapping_members_zero_sized(struct_type);
         bool has_storage = false;
         for(const auto &c : struct_type.components())
         {
-          // (a zero-width bit-field occupies no storage either, [class.bit]/2)
+          // (a zero-width bit-field occupies no storage either, [class.bit]/2,
+          // nor does an empty potentially-overlapping member)
           if(
             c.type().id() != ID_code && !c.get_bool(ID_is_static) &&
             !c.get_bool(ID_is_type) && !c.get_is_padding() &&
+            c.find("#nua_type").is_nil() &&
             !(c.type().id() == ID_c_bit_field &&
               to_c_bit_field_type(c.type()).get_width() == 0))
           {
@@ -5851,6 +5870,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
           }
         }
         add_padding(struct_type, ns);
+        place_empty_potentially_overlapping_members(struct_type, ns);
         // The padding placed in front of or among the virtual bases (and the
         // class's tail padding) is not part of the non-virtual part either:
         // mark every padding component after the last non-virtual-part
@@ -6509,6 +6529,210 @@ void cpp_typecheckt::convert_anon_struct_union_member(
   struct_union_symbol.type.set(ID_C_unnamed_object, base_name);
 }
 
+/// N5008 [intro.object]/8: a potentially-overlapping subobject of an empty
+/// class type ([dcl.attr.nouniqueaddr]/1) may have zero size; in the Itanium
+/// C++ ABI (2.4 II.3) it has, and does not take part in the sequential
+/// layout.  Such a member keeps its place among the components as a
+/// zero-sized array of its class type (so that the class's size and the
+/// other members' offsets are those of the ABI), with the class type in
+/// `#nua_type'; place_empty_potentially_overlapping_members gives it its
+/// offset and get_component reaches it there.
+void cpp_typecheckt::make_empty_potentially_overlapping_members_zero_sized(
+  struct_typet &struct_type)
+{
+  for(auto &c : struct_type.components())
+  {
+    if(
+      !c.get_bool("#no_unique_address") || c.type().id() != ID_struct_tag ||
+      c.get_bool(ID_is_static) || c.get_bool(ID_is_type) ||
+      c.find("#nua_type").is_not_nil())
+    {
+      continue;
+    }
+    const struct_typet &member_class = follow_tag(to_struct_tag_type(c.type()));
+    if(member_class.is_incomplete() || !class_is_empty(member_class))
+      continue;
+    const typet class_type = c.type();
+    c.add("#nua_type") = class_type;
+    c.type() = array_typet{class_type, from_integer(0, size_type())};
+  }
+}
+
+/// The offsets of the empty potentially-overlapping members made zero-sized
+/// by make_empty_potentially_overlapping_members_zero_sized, as the Itanium
+/// C++ ABI (2.4 II.3) and GCC and Clang place them: at the lowest multiple
+/// of the class's alignment at which no subobject of the same class type
+/// lies -- N5008 [intro.object]/10: two such objects have distinct
+/// addresses -- offset 0 when there is none.  The class grows when the
+/// member lies beyond its end.
+void cpp_typecheckt::place_empty_potentially_overlapping_members(
+  struct_typet &struct_type,
+  const namespacet &ns)
+{
+  bool any = false;
+  for(const auto &c : struct_type.components())
+    any = any || c.find("#nua_type").is_not_nil();
+  if(!any)
+    return;
+
+  // the class subobjects (tag, offset) of an object of type `type' at
+  // `offset': itself, its empty bases, and those of its members
+  using subobjectst = std::vector<std::pair<irep_idt, bytest>>;
+  std::function<void(const typet &, const bytest &, subobjectst &)> collect =
+    [&](const typet &type, const bytest &offset, subobjectst &out)
+  {
+    if(type.id() == ID_array)
+    {
+      const auto &array = to_array_type(type);
+      const auto n = numeric_cast<mp_integer>(array.size());
+      const auto element_size = pointer_offset_size(array.element_type(), ns);
+      if(!n.has_value() || !element_size.has_value() || *n > 64)
+        return;
+      for(mp_integer i = 0; i < *n; ++i)
+        collect(array.element_type(), offset + i * *element_size, out);
+      return;
+    }
+    if(type.id() != ID_struct_tag)
+      return;
+    out.emplace_back(to_struct_tag_type(type).get_identifier(), offset);
+    const struct_typet &st = follow_tag(to_struct_tag_type(type));
+    if(st.is_incomplete())
+      return;
+    for(const auto &b : st.bases())
+      if(class_is_empty(follow_tag(b.type())))
+        collect(b.type(), offset, out);
+    for(const auto &c : st.components())
+    {
+      if(
+        c.type().id() == ID_code || c.get_bool(ID_is_static) ||
+        c.get_bool(ID_is_type) || c.get_is_padding())
+      {
+        continue;
+      }
+      if(c.find("#nua_type").is_not_nil())
+      {
+        collect(
+          static_cast<const typet &>(c.find("#nua_type")),
+          offset + bytest{numeric_cast_v<mp_integer>(to_constant_expr(
+                     static_cast<const exprt &>(c.find("#nua_offset"))))},
+          out);
+        continue;
+      }
+      const auto member_offset_bytes = member_offset(st, c.get_name(), ns);
+      if(member_offset_bytes.has_value())
+        collect(c.type(), offset + *member_offset_bytes, out);
+    }
+  };
+
+  subobjectst placed;
+  for(const auto &b : struct_type.bases())
+    if(class_is_empty(follow_tag(b.type())))
+      collect(b.type(), bytest{0}, placed);
+  for(const auto &c : struct_type.components())
+  {
+    if(
+      c.type().id() == ID_code || c.get_bool(ID_is_static) ||
+      c.get_bool(ID_is_type) || c.get_is_padding() ||
+      c.find("#nua_type").is_not_nil())
+    {
+      continue;
+    }
+    const auto member_offset_bytes =
+      member_offset(struct_type, c.get_name(), ns);
+    if(member_offset_bytes.has_value())
+      collect(c.type(), *member_offset_bytes, placed);
+  }
+
+  bytest end{0};
+  for(auto &c : struct_type.components())
+  {
+    if(c.find("#nua_type").is_nil())
+      continue;
+    const typet &class_type = static_cast<const typet &>(c.find("#nua_type"));
+    const bytest step = alignment(class_type, ns);
+    bytest offset{0};
+    for(;; offset += step)
+    {
+      subobjectst candidate;
+      collect(class_type, offset, candidate);
+      bool conflict = false;
+      for(const auto &s : candidate)
+        for(const auto &p : placed)
+          conflict = conflict || s == p;
+      if(!conflict)
+      {
+        placed.insert(placed.end(), candidate.begin(), candidate.end());
+        break;
+      }
+    }
+    c.add("#nua_offset") = from_integer(offset, size_type());
+    end = std::max(end, offset + pointer_offset_size(class_type, ns).value());
+  }
+
+  const auto size = pointer_offset_size(struct_type, ns);
+  if(size.has_value() && end > *size)
+  {
+    const bytest a = alignment(struct_type, ns);
+    const bytest grown = ((end + a - bytest{1}) / a) * a;
+    struct_typet::componentt tail{
+      "$nua_tail",
+      unsignedbv_typet{numeric_cast_v<std::size_t>(
+        (grown - *size) * config.ansi_c.char_width)}};
+    tail.set_is_padding(true);
+    struct_type.components().push_back(std::move(tail));
+  }
+}
+
+/// The lvalue of the empty potentially-overlapping member \p component (see
+/// make_empty_potentially_overlapping_members_zero_sized) of \p object, of
+/// its class type, at its offset: `*(T *)((char *)&object + offset)'.  An
+/// empty class has no state, so of an rvalue object (a prvalue, which has
+/// no address) the member's value is that of any object of the class,
+/// after the object's evaluation: `(object, T{})'.
+static exprt potentially_overlapping_member(
+  const exprt &object,
+  const struct_typet::componentt &component,
+  bool constant,
+  const source_locationt &source_location,
+  const namespacet &ns)
+{
+  typet class_type = static_cast<const typet &>(component.find("#nua_type"));
+  if(constant)
+    class_type.set(ID_C_constant, true);
+  const bool addressable = object.get_bool(ID_C_lvalue) ||
+                           object.id() == ID_dereference ||
+                           object.id() == ID_symbol ||
+                           object.id() == ID_member || object.id() == ID_index;
+  if(!addressable)
+  {
+    auto value = zero_initializer(class_type, source_location, ns);
+    CHECK_RETURN(value.has_value());
+    exprt evaluated{ID_comma, class_type};
+    evaluated.add_to_operands(
+      typecast_exprt{object, empty_typet{}}, std::move(*value));
+    evaluated.add_source_location() = source_location;
+    evaluated.set("#potentially_overlapping_member", true);
+    static_cast<irept &>(evaluated).add("#declared_type") =
+      component.find("#nua_type");
+    return evaluated;
+  }
+  const exprt bytes = typecast_exprt{
+    address_of_exprt{object}, pointer_type(unsigned_char_type())};
+  const exprt at = plus_exprt{
+    bytes,
+    typecast_exprt{
+      static_cast<const exprt &>(component.find("#nua_offset")),
+      signed_size_type()}};
+  dereference_exprt member{
+    typecast_exprt{at, pointer_type(class_type)}, class_type};
+  member.set(ID_C_lvalue, true);
+  member.set("#potentially_overlapping_member", true);
+  static_cast<irept &>(member).add("#declared_type") =
+    component.find("#nua_type");
+  member.add_source_location() = source_location;
+  return std::move(member);
+}
+
 bool cpp_typecheckt::get_component(
   const source_locationt &source_location,
   const exprt &object,
@@ -6612,6 +6836,16 @@ bool cpp_typecheckt::get_component(
       }
 
       member.add_source_location() = source_location;
+
+      if(component.find("#nua_type").is_not_nil())
+      {
+        member = potentially_overlapping_member(
+          object,
+          component,
+          member.type().get_bool(ID_C_constant),
+          source_location,
+          *this);
+      }
 
       return true; // component found
     }
