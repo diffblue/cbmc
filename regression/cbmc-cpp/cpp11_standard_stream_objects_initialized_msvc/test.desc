@@ -14,8 +14,10 @@ main.cpp
 ^warning: ignoring
 --
 Meaningful only with the MSVC STL (Windows); elsewhere the #error makes it
-fail.  provide_standard_stream_objects does not define the stream objects
-for the MSVC STL: constructing a stream there initializes its locale
-through runtime functions without a model (std::_Locinfo::_Locinfo_ctor,
-_Getctype, _Getcvt, _Mbrtowc), so cout and cerr stay nondeterministic and
-every assertion fails.  Checked with MSVC 14.51 headers preprocessed by cl.
+fail, which is why it is not CORE: the Linux jobs run every CORE test.
+provide_standard_stream_objects now defines the stream objects for the MSVC
+STL too, and the runtime functions its locale initialization calls are
+modelled (_Locinfo_ctor, _Locinfo_dtor, _Getcvt).  With the MSVC 14.51
+headers preprocessed by cl (iostream.ii of the VS 2026 CI job) and
+--winx64 on Linux, the program verifies in 7 s with these results
+(_Getctype and _Mbrtowc, still without a model, are not on its paths).

@@ -11,10 +11,24 @@ main.cpp
 ^warning: ignoring
 --
 Meaningful only with the MSVC STL (Windows); elsewhere the #error makes it
-fail.  With the MSVC STL, symbolic execution of stream insertion does not
-end: cpp11_stream_setw and cpp11_ostream_integer_insertion_classic_locale
-time out on VS 2022 and VS 2026 and with --winx64 on MSVC 14.51 headers
-preprocessed by cl (5000+ steps through basic_string and the locale
-machinery in 60 s, also at --unwind 1).  Not reduced.  Related:
-cpp11_standard_stream_objects_initialized_msvc (the locale's runtime
-functions have no model).
+fail, which is why it is not CORE: the Linux jobs run every CORE test.
+The time-outs had two causes: setw, defined in the runtime, had no model,
+so inserting the manipulator called every function of a compatible type
+through its unknown function pointer (cpp11_msvc_runtime_manipulator_models);
+and num_put formats with sprintf_s, whose UCRT function
+__stdio_common_vsprintf_s had no model.  Both are modelled now.  With the
+MSVC 14.51 headers preprocessed by cl and --winx64 on Linux (the C library
+models compiled from the Linux headers there, so the probe defined
+__stdio_common_vsprintf_s as the model does), `ss << setw(4) << 7' still
+needs more than 10 GB, for two reasons.  First, Visual Studio's va_arg
+reads the value 7 as the bytes of the pointer va_start stores it in,
+`(bv)(void *)7', which the simplifier does not fold: the 22 digit steps
+of the vsnprintf model divide a symbolic 64-bit value.  Folding the cast
+(to `(bv)(size_t)7') makes the program verify in 10 s with
+--no-malloc-may-fail, but breaks the constant propagation of pointers
+copied by memcpy (cbmc-library/memcpy/constant-propagation_01.desc),
+whose bytes then no longer reassemble into the pointer.  Second, without
+--no-malloc-may-fail (the default, as unwinding assertions are on) each
+locale name the runtime copies with malloc (_Yarn) may fail to be
+copied, and the alternatives make the string sizes that follow
+symbolic.

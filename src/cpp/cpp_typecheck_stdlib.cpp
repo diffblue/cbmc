@@ -1779,11 +1779,72 @@ static const std::map<std::string, std::string> &library_source_models()
      "{ static _Locimp __global(false); if(_Do_incref) __global._Incref();"
      " return &__global; }"},
     {"std::locale::_Getgloballocale", "{ return _Init(false); }"},
+    // the MSVC runtime's locale information (xlocinfo.cpp, wlocale.cpp):
+    // the "C" locale is the one locale modelled -- any other name is not
+    // available, which the runtime reports with the name "*" (std::locale
+    // then throws runtime_error, [locale.cons]/4); the empty name, the
+    // native environment's locale, is taken to be the "C" locale
+    // ([locale.cons]/1: what it denotes is implementation-defined)
+    {"std::_Locinfo::_Locinfo_ctor(ptr_struct_tag(identifier=std::tag-_Locinfo)"
+     ","
+     "ptr_const_char)",
+     "{ " CPROVER_PREFIX "parameter0->_Oldlocname = \"C\";"
+     " const char *__n = " CPROVER_PREFIX "parameter1;"
+     " " CPROVER_PREFIX "parameter0->_Newlocname ="
+     " (__n[0] == 0 || (__n[0] == 'C' && __n[1] == 0)) ? \"C\" : \"*\"; }"},
+    {"std::_Locinfo::_Locinfo_ctor(ptr_struct_tag(identifier=std::tag-_Locinfo)"
+     ","
+     "signed_int,ptr_const_char)",
+     "{ " CPROVER_PREFIX "parameter0->_Oldlocname = \"C\";"
+     " const char *__n = " CPROVER_PREFIX "parameter2;"
+     " " CPROVER_PREFIX "parameter0->_Newlocname ="
+     " (__n[0] == 0 || (__n[0] == 'C' && __n[1] == 0)) ? \"C\" : \"*\"; }"},
+    {"std::_Locinfo::_Locinfo_dtor", "{ }"},
+    // the "C" locale's conversion data: the code page 0 of the "C" locale, one
+    // byte per character, no lead bytes
+    {"_Getcvt",
+     "{ _Cvtvec __c = {}; __c._Mbcurmax = 1; __c._Isclocale = 1;"
+     " return __c; }"},
     // the MSVC runtime's file streams (fiopen.cpp, the UCRT): N5008
     // [filebuf.members]/3, 6, opening a file may fail, and then open returns
     // a null pointer.  As CBMC's model of fopen, _Fiopen either fails or
     // yields a fresh FILE object; whether the named file exists is not
     // known.
+    // the MSVC runtime's manipulators (iomanip.cpp): N5008 [std.manip]/2-6 --
+    // an _Smanip whose function sets the stream's flags, base, precision or
+    // field width when the manipulator is inserted or extracted
+    {"std::resetiosflags",
+     "{ return _Smanip<ios_base::fmtflags>([](ios_base &__s,"
+     " ios_base::fmtflags __m) { __s.setf(ios_base::fmtflags(0), __m); },"
+     " " CPROVER_PREFIX "parameter0); }"},
+    {"std::setiosflags",
+     "{ return _Smanip<ios_base::fmtflags>([](ios_base &__s,"
+     " ios_base::fmtflags __m) { __s.setf(__m); }, " CPROVER_PREFIX
+     "parameter0); }"},
+    {"std::setbase",
+     "{ return _Smanip<int>([](ios_base &__s, int __b) {"
+     " __s.setf(__b == 8 ? ios_base::oct : __b == 10 ? ios_base::dec :"
+     " __b == 16 ? ios_base::hex : ios_base::fmtflags(0),"
+     " ios_base::basefield); }, " CPROVER_PREFIX "parameter0); }"},
+    {"std::setprecision",
+     "{ return _Smanip<streamsize>([](ios_base &__s, streamsize __n) {"
+     " __s.precision(__n); }, " CPROVER_PREFIX "parameter0); }"},
+    {"std::setw",
+     "{ return _Smanip<streamsize>([](ios_base &__s, streamsize __n) {"
+     " __s.width(__n); }, " CPROVER_PREFIX "parameter0); }"},
+    // the MSVC runtime's exception helpers (xthrow.cpp): each throws the
+    // exception it is named after
+    {"std::_Xbad_alloc", "{ throw bad_alloc(); }"},
+    {"std::_Xinvalid_argument",
+     "{ throw invalid_argument(" CPROVER_PREFIX "parameter0); }"},
+    {"std::_Xlength_error",
+     "{ throw length_error(" CPROVER_PREFIX "parameter0); }"},
+    {"std::_Xout_of_range",
+     "{ throw out_of_range(" CPROVER_PREFIX "parameter0); }"},
+    {"std::_Xoverflow_error",
+     "{ throw overflow_error(" CPROVER_PREFIX "parameter0); }"},
+    {"std::_Xruntime_error",
+     "{ throw runtime_error(" CPROVER_PREFIX "parameter0); }"},
     {"std::_Fiopen",
      "{ bool __fail; " CPROVER_PREFIX "havoc_object(&__fail);"
      " if(__fail) return nullptr; return (FILE *)malloc(sizeof(FILE)); }"},
@@ -2337,11 +2398,9 @@ void cpp_typecheckt::provide_standard_stream_objects()
   // (the written characters are not observable by the program) and may fail,
   // and whose input is an unknown sequence of characters ending at an unknown
   // point.
-  // Not for the MSVC STL: constructing a stream there initializes its
-  // locale through runtime functions (std::_Locinfo::_Locinfo_ctor,
-  // _Getctype, _Getcvt) that have no model.
-  if(config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
-    return;
+  // The MSVC STL defines them in msvcp too (cout.cpp and friends); its
+  // streams initialize their locale through the runtime's _Locinfo
+  // functions, modelled in library_source_models.
 
   const std::string ns_prefix = symbol_table.has_symbol("std::__1::cout") ||
                                     symbol_table.has_symbol("std::__1::cin")
