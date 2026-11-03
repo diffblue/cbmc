@@ -1,0 +1,13 @@
+CORE gcc-only
+fixedbv.c
+
+^EXIT=6$
+^SIGNAL=0$
+^file fixedbv.c line \d+ function main: operator 'shl' not defined for vectors of type 'fixed'$
+^CONVERSION ERROR$
+--
+^warning: ignoring
+Invariant check failed
+--
+Shifts of vectors with fixed-point elements are rejected, as the back-ends do
+not support them.
