@@ -15847,3 +15847,55 @@ format overall and per commit, doxygen, per-commit compile, iwyu on the
 changed files, platform (gcc11, m32, arm64), vacuity 1146/3, MSVC .ii (2
 known timeouts; istringstream from the CI artifact passes).
 Next: libc++ use_facet and the vsnprintf model, MSVC streams.
+
+## Round 213 (2026-11-03): macOS 26 CI job, [[no_unique_address]], items 1-3
+
+macOS 26 (Xcode 26.6 libc++, artifact macos-14-preprocessed-headers):
+locally on its .ii files W195 133 of 143 failing, now 0 of 142 (the
+memcmp test's libc++ desc became KNOWNBUG).  Fixes, each with a test
+failing on W195:
+- 5bb7ad3d97 fold expressions in alias templates (__promote_t; 125
+  failures); d3f08514f8 a recursion that keeps an argument is not runaway
+  (aligned_storage); 54633414bf Clang's __builtin_invoke.
+- 27c9ba870a deferred noexcept of class template members
+  ([except.spec]/12.1); 4a0a624f2f comma and __builtin_strlen in constant
+  evaluation; 5390953d44 constexpr objects with converted initializers.
+- f163946e56 destructor names of classes with function-type arguments;
+  474b28b291 a one-class pack in a member's function type;
+  230b555ba8 parenthesized aggregate initialization of a union.
+- 30dd959fae symex (also on develop): a pointer read from a union whose
+  only member is a byte array was never constant (std::function over
+  Xcode's aligned_storage recursed until out of memory).
+- d56bad5ca0 assigning an empty class object stores nothing; 67e0fcad8d,
+  28ced31f77, 9def286860 [[no_unique_address]]: the scanner now reports
+  the attribute; empty members have zero size at their Itanium offsets
+  (offset 0, else dsize, avoiding same-type subobjects); classes with
+  only such a member are empty; Visual Studio honours only
+  [[msvc::no_unique_address]].  FUTURE tests record what GCC/Clang do
+  beyond that (tail-padding reuse of non-empty members, over-aligned
+  empty members, declaration-order allocation, MSVC's placement); the
+  layouts conform to N5008 ([intro.object]/8, /10), hence not KNOWNBUG.
+Item 1 (libc++ cin >> i): 6e5d53665f the simplifier folds relations of
+pointers to distinct objects to false, as bv_pointers decides them
+(libc++ stringbuf::underflow's `__hm_ < pptr()' with no put area made
+1144 guards symbolic); 9e97901d17 strto*_l; 7c6683a798 num_get's facets,
+numpunct<char>, __get_base, __src, __check_grouping, __cloc, do_widen
+without a loop, fill_n over characters with memset.  test_libcxx.desc of
+cpp11_istream_integer_extraction CORE at --unwind 3 (4: > 14 GB).
+Item 2: c0470ae397 vsnprintf (as __CPROVER_vsnprintf for its variants)
+with exact integer, c, s and %% output, 3344 calls equal to glibc;
+regression/cbmc 95 s vs 96 s, cbmc-library 28 s vs 26 s; 7dcbe6a2bb
+uselocale; 9fbee8bed9 __format_int, __identify_padding: the libc++
+ostream KNOWNBUG is CORE.
+Item 3 (MSVC): 6407e618be localeconv's "C" values; f0eb0f474a the
+runtime's manipulators, _Locinfo, _Getcvt, _X*, stream objects for the
+MSVC STL.  With the VS 2026 .ii files on Linux the stream-objects test
+verifies; `ss << setw(4) << 7' needs more than 10 GB: MSVC's va_arg
+reads `(bv)(void *)7', which folding breaks memcpy constant propagation
+of pointers, and malloc failures in _Yarn's copies fan out.  Both
+_msvc tests stay KNOWNBUG (the Linux jobs run every CORE test).
+Checks on W196 and the final tree: 13 suites (dfcc and cprover-smt2 need
+smt2_solver on PATH), profiles, unit, lint, format overall and per
+commit, doxygen, per-commit compile, iwyu on the changed files, platform
+(gcc11, m32, arm64), vacuity 1065/3 (cbmc-cpp without libcxx and
+libstdcxx16), MSVC .ii (2 known), macOS 142/142.
