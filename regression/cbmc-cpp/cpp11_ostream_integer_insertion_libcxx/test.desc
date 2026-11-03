@@ -1,4 +1,4 @@
-KNOWNBUG libcxx
+CORE libcxx
 main.cpp
 --cpp11 --stdlib libc++ --object-bits 12 --unwind 2 --unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ one digit: SUCCESS$
@@ -10,9 +10,8 @@ main.cpp
 unwinding assertion loop \d+: FAILURE
 --
 libc++ formats an integer with vsnprintf (num_put::__do_put_integral).  The
-C library model of vsnprintf writes a nondeterministic string, so the
-loops over its result in num_put and __pad_and_output have no bound
-smaller than the buffer, and symbolic execution of `os << 7' does not
-terminate in practice (cpp11_stream_setw and
-cpp11_ostream_integer_insertion_classic_locale time out on macOS).  With
-libstdc++, which formats integers itself, the program verifies in 8 s.
+C library model of vsnprintf wrote a nondeterministic string, so the loops
+over its result in num_put and __pad_and_output had no bound smaller than
+the buffer, and symbolic execution of `os << 7' did not terminate in
+practice.  The model now produces the exact output of the integer
+conversions.

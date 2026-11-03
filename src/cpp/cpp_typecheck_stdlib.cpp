@@ -1869,6 +1869,33 @@ static const std::map<std::string, std::string> &library_source_models()
      " ios_base::basefield; if(__f == ios_base::oct) return 8;"
      " if(__f == ios_base::hex) return 16; if(__f == 0) return 0;"
      " return 10; }"},
+    // libc++ src/locale.cpp: N5008 [facet.num.put.virtuals]/5, Table 106
+    // and Table 107 -- the printf conversion specification of stage 1 for
+    // an integer: + for showpos (not with oct or hex), # for showbase, the
+    // length modifier, and o, x, X, d or u by basefield and uppercase
+    {"std::__1::__num_put_base::__format_int",
+     "{ if((__flags & ios_base::showpos) &&"
+     " (__flags & ios_base::basefield) != ios_base::oct &&"
+     " (__flags & ios_base::basefield) != ios_base::hex && __signd)"
+     " *__fmt++ = '+';"
+     " if(__flags & ios_base::showbase) *__fmt++ = '#';"
+     " while(*__len) *__fmt++ = *__len++;"
+     " if((__flags & ios_base::basefield) == ios_base::oct) *__fmt = 'o';"
+     " else if((__flags & ios_base::basefield) == ios_base::hex)"
+     " *__fmt = (__flags & ios_base::uppercase) ? 'X' : 'x';"
+     " else *__fmt = __signd ? 'd' : 'u'; }"},
+    // libc++ src/locale.cpp: [facet.num.put.virtuals]/5, stage 3 -- where
+    // the fill characters go: after a sign or a 0x prefix for internal,
+    // after the characters for left, before them otherwise
+    {"std::__1::__num_put_base::__identify_padding",
+     "{ ios_base::fmtflags __a = __iob.flags() & ios_base::adjustfield;"
+     " if(__a == ios_base::internal) {"
+     " if(__nb[0] == '-' || __nb[0] == '+') return __nb + 1;"
+     " if(__ne - __nb >= 2 && __nb[0] == '0' &&"
+     " (__nb[1] == 'x' || __nb[1] == 'X')) return __nb + 2;"
+     " return __nb; }"
+     " if(__a == ios_base::left) return __ne;"
+     " return __nb; }"},
     // libc++ src/locale.cpp: the "C" locale handle for the C library's
     // *_l conversions, whose models do not read it
     {"std::__1::__cloc", "{ return 0; }"},
