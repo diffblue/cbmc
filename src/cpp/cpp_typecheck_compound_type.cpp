@@ -6535,8 +6535,8 @@ void cpp_typecheckt::convert_anon_struct_union_member(
 /// layout.  Such a member keeps its place among the components as a
 /// zero-sized array of its class type (so that the class's size and the
 /// other members' offsets are those of the ABI), with the class type in
-/// `#nua_type'; place_empty_potentially_overlapping_members gives it its
-/// offset and get_component reaches it there.
+/// the component's `\#nua_type'; place_empty_potentially_overlapping_members
+/// gives it its offset and get_component reaches it there.
 void cpp_typecheckt::make_empty_potentially_overlapping_members_zero_sized(
   struct_typet &struct_type)
 {
