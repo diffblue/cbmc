@@ -2199,8 +2199,8 @@ static void provide_set_terminate_model(symbol_table_baset &symbol_table)
 }
 
 /// Bodies, in C++, that replace those of the headers, keyed by the
-/// function's name without its parameter list, with or without its template
-/// arguments.  N5008
+/// function's name without its parameter list, with its template arguments,
+/// without those of the function itself, or without any.  N5008
 /// [propagation]/12 specifies make_exception_ptr(e) as `try { throw e; }
 /// catch(...) { return current_exception(); }'; libstdc++'s body with RTTI
 /// creates the exception object with __cxa_allocate_exception and
@@ -2247,6 +2247,71 @@ static const std::map<std::string, std::string> &library_replacing_models()
      " for(size_t __i = 0; __i < __n; ++__i)"
      " __d[__i] = (wchar_t)(unsigned char)_Ptr[__i];"
      " return __d; }"},
+    // libc++'s num_get stage 2 for integers ([facet.num.get.virtuals]/3):
+    // the header's code, with the characters gathered in an array of 64
+    // instead of a std::string -- the string's union representation, written
+    // at an index that differs between paths, made every write and read
+    // touch the whole object (cpp11_istream_integer_extraction took more
+    // than 14 GB at --unwind 4).  A field of more than 64 characters is not
+    // modelled: an assertion reports it.
+    {"libc++:std::__1::num_get<char,std::__1::tag-istreambuf_iterator<char,std:"
+     ":__1::tag-char_traits<char>>>::__do_get_signed",
+     "{ int __base = this->__get_base(__iob); "
+     " char __thousands_sep; "
+     " char __atoms[26]; "
+     " string __grouping = this->__stage2_int_prep(__iob, __atoms, "
+     "__thousands_sep); "
+     " char __buf[64] = {}; "
+     " char *__a = __buf; "
+     " char *__a_end = __a; "
+     " unsigned __g[__num_get_base::__num_get_buf_sz]; "
+     " unsigned *__g_end = __g; "
+     " unsigned __dc = 0; "
+     " for(; __b != __e; ++__b) { "
+     " " CPROVER_PREFIX "assert(__a_end != __a + 64, "
+     " \"the model of num_get reads at most 64 characters\"); "
+     " " CPROVER_PREFIX "assume(__a_end != __a + 64); "
+     " if(this->__stage2_int_loop(*__b, __base, __a, __a_end, __dc, "
+     " __thousands_sep, __grouping, __g, __g_end, __atoms)) break; } "
+     " if(__grouping.size() != 0 && __g_end - __g < "
+     "__num_get_base::__num_get_buf_sz) "
+     " *__g_end++ = __dc; "
+     " __v = "
+     "std::__num_get_signed_integral<__libcpp_remove_reference_t<decltype(__v)>"
+     ">( "
+     " __a, __a_end, __err, __base); "
+     " __check_grouping(__grouping, __g, __g_end, __err); "
+     " if(__b == __e) __err |= ios_base::eofbit; "
+     " return __b; } "},
+    {"libc++:std::__1::num_get<char,std::__1::tag-istreambuf_iterator<char,std:"
+     ":__1::tag-char_traits<char>>>::__do_get_unsigned",
+     "{ int __base = this->__get_base(__iob); "
+     " char __thousands_sep; "
+     " char __atoms[26]; "
+     " string __grouping = this->__stage2_int_prep(__iob, __atoms, "
+     "__thousands_sep); "
+     " char __buf[64] = {}; "
+     " char *__a = __buf; "
+     " char *__a_end = __a; "
+     " unsigned __g[__num_get_base::__num_get_buf_sz]; "
+     " unsigned *__g_end = __g; "
+     " unsigned __dc = 0; "
+     " for(; __b != __e; ++__b) { "
+     " " CPROVER_PREFIX "assert(__a_end != __a + 64, "
+     " \"the model of num_get reads at most 64 characters\"); "
+     " " CPROVER_PREFIX "assume(__a_end != __a + 64); "
+     " if(this->__stage2_int_loop(*__b, __base, __a, __a_end, __dc, "
+     " __thousands_sep, __grouping, __g, __g_end, __atoms)) break; } "
+     " if(__grouping.size() != 0 && __g_end - __g < "
+     "__num_get_base::__num_get_buf_sz) "
+     " *__g_end++ = __dc; "
+     " __v = "
+     "std::__num_get_unsigned_integral<__libcpp_remove_reference_t<decltype(__"
+     "v)>>( "
+     " __a, __a_end, __err, __base); "
+     " __check_grouping(__grouping, __g, __g_end, __err); "
+     " if(__b == __e) __err |= ios_base::eofbit; "
+     " return __b; } "},
     // libc++'s fill_n over characters (char_traits<char>::assign(p, n, c),
     // string(n, c), resize): N5008 [alg.fill]/2, assigns value through
     // [first, first + n) -- for char, set the bytes without a loop, which
@@ -2307,6 +2372,21 @@ void cpp_typecheckt::provide_library_source_models()
       // keyed by the name with its template arguments, or without them
       auto replacing =
         find_model(library_replacing_models(), name.substr(0, name.find('(')));
+      if(replacing == library_replacing_models().end())
+      {
+        // without the template arguments of the function (a member function
+        // template of a class template specialization)
+        const std::string without_parameters = name.substr(0, name.find('('));
+        const std::string::size_type last = without_parameters.rfind("::");
+        const std::string::size_type angle =
+          last == std::string::npos ? std::string::npos
+                                    : without_parameters.find('<', last);
+        if(angle != std::string::npos)
+        {
+          replacing = find_model(
+            library_replacing_models(), without_parameters.substr(0, angle));
+        }
+      }
       if(replacing == library_replacing_models().end())
       {
         replacing = find_model(
