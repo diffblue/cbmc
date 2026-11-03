@@ -1860,20 +1860,65 @@ static const std::map<std::string, std::string> &library_source_models()
     {"__std_fs_code_page",
      "{ unsigned int __c; " CPROVER_PREFIX "havoc_object(&__c);"
      " return (__std_code_page)__c; }"},
+    // libc++ src/locale.cpp: N5008 [facet.num.get.virtuals]/3, stage 1 --
+    // the conversion base of the basefield flags (0, from the prefix, when
+    // none is set)
+    {"std::__1::__num_get_base::__get_base(ref_struct_tag(identifier="
+     "std::__1::tag-ios_base))",
+     "{ ios_base::fmtflags __f = " CPROVER_PREFIX "parameter0.flags() &"
+     " ios_base::basefield; if(__f == ios_base::oct) return 8;"
+     " if(__f == ios_base::hex) return 16; if(__f == 0) return 0;"
+     " return 10; }"},
+    // libc++ src/locale.cpp: the "C" locale handle for the C library's
+    // *_l conversions, whose models do not read it
+    {"std::__1::__cloc", "{ return 0; }"},
+    // libc++ src/locale.cpp: N5008 [facet.num.get.virtuals]/4 -- if
+    // grouping() is not empty and the thousands separators read are not
+    // positioned as it specifies, failbit is set.  __g[0, __g_end) holds the
+    // number of digits of each group, the first group first.
+    {"std::__1::__check_grouping",
+     "{ if(__grouping.size() == 0 || __g_end - __g <= 1) return;"
+     " for(unsigned *__l = __g, *__h = __g_end - 1; __l < __h; ++__l, --__h)"
+     " { unsigned __t = *__l; *__l = *__h; *__h = __t; }"
+     " const char *__ig = __grouping.data();"
+     " const char *__eg = __ig + __grouping.size();"
+     " for(unsigned *__r = __g; __r < __g_end - 1; ++__r) {"
+     " if(0 < *__ig && *__ig < 127 && (unsigned)*__ig != *__r) {"
+     " __err = ios_base::failbit; return; }"
+     " if(__eg - __ig > 1) ++__ig; }"
+     " if(0 < *__ig && *__ig < 127 &&"
+     " ((unsigned)*__ig < __g_end[-1] || __g_end[-1] == 0))"
+     " __err = ios_base::failbit; }"},
+    // libc++ src/locale.cpp, the virtuals of numpunct<char>: N5008
+    // [facet.numpunct.virtuals]/1-5, the members set by its constructor
+    // (the "C" locale's values, see use_facet<numpunct<char>> in
+    // provide_stdlib_bodies) and the names "true" and "false"
+    {"std::__1::numpunct<char>::do_decimal_point($constthis)",
+     "{ return __decimal_point_; }"},
+    {"std::__1::numpunct<char>::do_thousands_sep($constthis)",
+     "{ return __thousands_sep_; }"},
+    {"std::__1::numpunct<char>::do_grouping($constthis)",
+     "{ return __grouping_; }"},
+    {"std::__1::numpunct<char>::do_truename($constthis)",
+     "{ return \"true\"; }"},
+    {"std::__1::numpunct<char>::do_falsename($constthis)",
+     "{ return \"false\"; }"},
     // libc++ src/locale.cpp, the virtuals of ctype<char>: N5008
     // [facet.ctype.char.virtuals]/1, [locale.ctype.virtuals]/11 and /13:
     // do_widen and do_narrow apply the simplest reasonable transformation,
-    // for char to char the identity.
+    // for char to char the identity.  The ranges are copied without a loop
+    // (num_get widens its 26 or 32 atoms on every extraction, a loop a
+    // smaller --unwind bound would cut).
     {"std::__1::ctype<char>::do_widen($constthis,char)", "{ return __c; }"},
     {"std::__1::ctype<char>::do_widen($constthis,ptr_const_char,ptr_const_char,"
      "ptr_char)",
-     "{ for(; __low != __high; ++__low, ++__to) *__to = *__low;"
+     "{ if(__high != __low) __builtin_memcpy(__to, __low, __high - __low);"
      " return __high; }"},
     {"std::__1::ctype<char>::do_narrow($constthis,char,char)",
      "{ return __c; }"},
     {"std::__1::ctype<char>::do_narrow($constthis,ptr_const_char,"
      "ptr_const_char,char,ptr_char)",
-     "{ for(; __low != __high; ++__low, ++__to) *__to = *__low;"
+     "{ if(__high != __low) __builtin_memcpy(__to, __low, __high - __low);"
      " return __high; }"},
     // libc++ src/string.cpp: N5008 [string.conversions]/7, to_string of an
     // integer is its decimal representation, with a '-' if negative
@@ -2066,7 +2111,8 @@ static void provide_set_terminate_model(symbol_table_baset &symbol_table)
 }
 
 /// Bodies, in C++, that replace those of the headers, keyed by the
-/// function's name without its template arguments and parameter list.  N5008
+/// function's name without its parameter list, with or without its template
+/// arguments.  N5008
 /// [propagation]/12 specifies make_exception_ptr(e) as `try { throw e; }
 /// catch(...) { return current_exception(); }'; libstdc++'s body with RTTI
 /// creates the exception object with __cxa_allocate_exception and
@@ -2078,6 +2124,13 @@ static const std::map<std::string, std::string> &library_replacing_models()
      "{ try { throw __ex; } catch(...) { return std::current_exception(); } }"},
     {"libc++:std::make_exception_ptr",
      "{ try { throw __e; } catch(...) { return std::current_exception(); } }"},
+    // libc++'s fill_n over characters (char_traits<char>::assign(p, n, c),
+    // string(n, c), resize): N5008 [alg.fill]/2, assigns value through
+    // [first, first + n) -- for char, set the bytes without a loop, which
+    // symbolic execution unrolls n times
+    {"std::__1::__fill_n<ptr_char,unsigned_long_int,char>",
+     "{ if(__n <= 0) return __first; __builtin_memset(__first, __value, __n);"
+     " return __first + __n; }"},
   };
   return models;
 }
@@ -2128,8 +2181,14 @@ void cpp_typecheckt::provide_library_source_models()
     const std::string name = id2string(symbol.name);
     if(symbol.value.is_not_nil())
     {
-      const auto replacing = find_model(
-        library_replacing_models(), name.substr(0, name.find_first_of("<(")));
+      // keyed by the name with its template arguments, or without them
+      auto replacing =
+        find_model(library_replacing_models(), name.substr(0, name.find('(')));
+      if(replacing == library_replacing_models().end())
+      {
+        replacing = find_model(
+          library_replacing_models(), name.substr(0, name.find_first_of("<(")));
+      }
       if(
         replacing != library_replacing_models().end() &&
         is_system_header_file(id2string(symbol.location.get_file())))
@@ -2416,6 +2475,29 @@ void cpp_typecheckt::provide_stdlib_bodies()
   // spurious overflow/shift failures from alphabetical init ordering.
   fold_numeric_traits_integer(symbol_table);
 
+  // libc++ src/locale.cpp defines the characters num_get recognizes in
+  // stage 2 ([facet.num.get.virtuals]/3: the atoms of "0123456789abcdef
+  // ABCDEFxX+-pPiInN" widened); the header only declares the array
+  if(
+    symbolt *src =
+      symbol_table.get_writeable("std::__1::__num_get_base::__src"))
+  {
+    const std::string atoms = "0123456789abcdefABCDEFxX+-pPiInN";
+    if(
+      src->value.is_nil() && src->type.id() == ID_array &&
+      numeric_cast<mp_integer>(to_array_type(src->type).size()) ==
+        mp_integer{atoms.size() + 1})
+    {
+      const typet &element = to_array_type(src->type).element_type();
+      exprt::operandst characters;
+      for(const char c : atoms)
+        characters.push_back(from_integer(c, element));
+      characters.push_back(from_integer(0, element));
+      src->value = array_exprt{std::move(characters), to_array_type(src->type)};
+      src->is_extern = false;
+    }
+  }
+
   // Fold __safe_multiply::__c to avoid division-by-zero in <ratio>.
   // __c = uintmax_t(1) << (sizeof(intmax_t) * 4) which is 2^32 on
   // 64-bit systems. CBMC's constexpr evaluation may fail to compute
@@ -2587,10 +2669,37 @@ void cpp_typecheckt::provide_stdlib_bodies()
       else if(
         (base.find("__try_use_facet") == 0 || base.find("use_facet") == 0) &&
         (name.find("<std::tag-num_put<") != std::string::npos ||
-         name.find("<std::tag-num_get<") != std::string::npos) &&
+         name.find("<std::tag-num_get<") != std::string::npos ||
+         name.find("<std::__1::tag-num_put<") != std::string::npos ||
+         name.find("<std::__1::tag-num_get<") != std::string::npos ||
+         name.find("<std::__1::tag-numpunct<char>>") != std::string::npos) &&
         to_code_type(symbol.type).return_type().id() == ID_pointer &&
         classic_num_put(symbol).is_not_nil())
       {
+        // libc++'s use_facet<F>(const locale &) reads the facet from the
+        // locale's implementation (locale::use_facet, in libc++.so); its
+        // numpunct<char> keeps the "C"-locale values in data members, which
+        // the virtuals return (library_source_models): N5008
+        // [facet.numpunct.virtuals]/1-3, the decimal point '.', the
+        // thousands separator ',' and no grouping (an empty __grouping_, the
+        // zero-initialized string)
+        if(name.find("<std::__1::tag-numpunct<char>>") != std::string::npos)
+        {
+          symbolt &facet = symbol_table.get_writeable_ref(
+            to_symbol_expr(classic_num_put(symbol)).get_identifier());
+          set_struct_component(
+            facet.value,
+            facet.type,
+            "__decimal_point_",
+            from_integer('.', char_type()),
+            ns);
+          set_struct_component(
+            facet.value,
+            facet.type,
+            "__thousands_sep_",
+            from_integer(',', char_type()),
+            ns);
+        }
         // N5008 [locale.category]/3: the "C" locale has num_put<C, ...> and
         // num_get<C, ...> facets; return such an object (classic_num_put,
         // which builds one for either), so that stream insertion and
