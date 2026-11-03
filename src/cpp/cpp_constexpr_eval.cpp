@@ -184,7 +184,10 @@ static exprt constexpr_this_object_value(
        object_symbol->is_macro) &&
       object_symbol->value.id() == ID_struct)
     {
-      return object_symbol->value;
+      // the members' initializers may still hold the conversions of the
+      // initialization (`{ .n=(unsigned long)2 }' for `constexpr W w{2}'),
+      // which a member read must see as constants
+      return simplify_expr(object_symbol->value, namespacet{symbol_table});
     }
   }
   return nil_exprt();
