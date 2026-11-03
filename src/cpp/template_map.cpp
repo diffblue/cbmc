@@ -79,6 +79,26 @@ template_mapt::function_parameter_pack(const typet &param_type) const
   return nullptr;
 }
 
+/// Whether every name in \p node is a class tag identifier (`tag-E',
+/// `n::tag-E<int>'), which no source name can spell: the substituted
+/// element of a type parameter pack, not a pack name.
+static bool names_only_tags(const irept &node)
+{
+  if(node.id() == ID_name)
+  {
+    const std::string id = id2string(node.get(ID_identifier));
+    return id.compare(0, 4, "tag-") == 0 ||
+           id.find("::tag-") != std::string::npos;
+  }
+  for(const auto &sub : node.get_sub())
+    if(!names_only_tags(sub))
+      return false;
+  for(const auto &named : node.get_named_sub())
+    if(!names_only_tags(named.second))
+      return false;
+  return true;
+}
+
 void template_mapt::expand_parameter_packs(typet &function_type) const
 {
   if(function_type.id() != ID_code && function_type.id() != ID_function_type)
@@ -209,6 +229,18 @@ void template_mapt::expand_parameter_packs(typet &function_type) const
               }
               pack = &nested_pack_elements;
             }
+          }
+          else if(names_only_tags(pattern))
+          {
+            // The pattern names no pack, only class tags: a pack of ONE
+            // element whose name was already replaced by that element
+            // (in `vg<int(E)>', `func<long, R(A...)>' became
+            // `func<long, int(tag-E...)>').  It is that single parameter
+            // ([temp.variadic]/9); the stray ellipsis made it a distinct
+            // template argument whose specialization stayed incomplete.
+            nested_pack_elements.push_back(pattern);
+            nested_pack_elements.back().remove(ID_ellipsis);
+            pack = &nested_pack_elements;
           }
         }
       }
