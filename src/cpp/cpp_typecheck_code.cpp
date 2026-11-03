@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/c_types.h>
+#include <util/expr_util.h>
 #include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
 #include <util/source_location.h>
@@ -3159,9 +3160,15 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
       }
       if(!initialization.has_value())
       {
+        // only operands with side effects: reading the source object of a
+        // copy, itself an empty class object, can go past the end of its
+        // enclosing object (an empty base subobject is laid out at the end)
         code_blockt evaluate;
         for(const auto &op : operands)
-          evaluate.add(code_expressiont{op});
+        {
+          if(has_subexpr(op, ID_side_effect))
+            evaluate.add(code_expressiont{op});
+        }
         evaluate.add_source_location() = location;
         initialization = std::move(evaluate);
       }

@@ -614,10 +614,11 @@ void cpp_typecheckt::add_base_components(
   bool base_is_empty = true;
   for(const auto &c : from.components())
   {
+    // (an empty potentially-overlapping member has zero size too)
     if(
       c.type().id() != ID_code && !c.get_bool(ID_is_static) &&
       !c.get_bool(ID_is_type) && !c.get_is_padding() &&
-      c.get(ID_C_virtual_base).empty() &&
+      c.get(ID_C_virtual_base).empty() && c.find("#nua_type").is_nil() &&
       !(c.type().id() == ID_c_bit_field &&
         to_c_bit_field_type(c.type()).get_width() == 0))
     {

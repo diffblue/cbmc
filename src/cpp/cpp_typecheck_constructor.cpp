@@ -30,9 +30,13 @@ bool cpp_typecheckt::class_is_empty(const struct_typet &type)
 {
   for(const auto &c : type.components())
   {
+    // N5008 [meta.unary.prop]/5: no non-static data members other than
+    // subobjects of zero size (an empty potentially-overlapping member, see
+    // make_empty_potentially_overlapping_members_zero_sized)
     if(
       c.type().id() != ID_code && !c.get_bool(ID_is_static) &&
       !c.get_bool(ID_is_type) && !c.get_is_padding() &&
+      c.find("#nua_type").is_nil() &&
       !(c.type().id() == ID_c_bit_field &&
         to_c_bit_field_type(c.type()).get_width() == 0))
     {

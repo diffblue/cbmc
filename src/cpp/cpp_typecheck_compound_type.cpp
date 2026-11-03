@@ -6655,12 +6655,39 @@ void cpp_typecheckt::place_empty_potentially_overlapping_members(
   }
 
   bytest end{0};
+  // a member inherited from a base keeps its place in the base subobject:
+  // its offset is relative to the base it was copied from
+  // (add_base_components), which lies at its offset in this class (0 for
+  // an empty base)
+  for(auto &c : struct_type.components())
+  {
+    if(c.find("#nua_type").is_nil() || !c.get_bool(ID_from_base))
+      continue;
+    const auto &path = c.find(ID_C_subobject_path).get_sub();
+    bytest base_offset{0};
+    if(!path.empty())
+    {
+      for(const auto &subobject : base_subobjects(struct_type, path[0].id()))
+      {
+        if(subobject.path.size() == 1)
+          base_offset = subobject.offset;
+      }
+    }
+    const bytest offset =
+      base_offset + bytest{numeric_cast_v<mp_integer>(to_constant_expr(
+                      static_cast<const exprt &>(c.find("#nua_offset"))))};
+    c.add("#nua_offset") = from_integer(offset, size_type());
+    const typet &class_type = static_cast<const typet &>(c.find("#nua_type"));
+    collect(class_type, offset, placed);
+    end = std::max(end, offset + pointer_offset_size(class_type, ns).value());
+  }
   bytest data_size{0};
   for(auto &c : struct_type.components())
   {
     if(
       c.type().id() == ID_code || c.get_bool(ID_is_static) ||
-      c.get_bool(ID_is_type) || c.get_is_padding())
+      c.get_bool(ID_is_type) || c.get_is_padding() ||
+      (c.find("#nua_type").is_not_nil() && c.get_bool(ID_from_base)))
     {
       continue;
     }

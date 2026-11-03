@@ -16,11 +16,14 @@ Author: Kiro
 #include <map>
 
 /// Whether \p component occupies storage in the flattened layout (the layout
-/// ignores member functions, static members and member types).
+/// ignores member functions, static members and member types, and an empty
+/// potentially-overlapping member has zero size and is not in the sequence:
+/// make_empty_potentially_overlapping_members_zero_sized).
 static bool is_storage(const struct_typet::componentt &component)
 {
   return component.type().id() != ID_code &&
-         !component.get_bool(ID_is_static) && !component.get_bool(ID_is_type);
+         !component.get_bool(ID_is_static) && !component.get_bool(ID_is_type) &&
+         component.find("#nua_type").is_nil();
 }
 
 std::vector<cpp_typecheckt::base_subobjectt> cpp_typecheckt::base_subobjects(

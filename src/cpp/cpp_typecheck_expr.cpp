@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/bitvector_types.h>
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/expr_util.h>
 #include <util/floatbv_expr.h>
 #include <util/mathematical_types.h>
 #include <util/pointer_expr.h>
@@ -871,8 +872,11 @@ bool cpp_typecheckt::class_property(const irep_idt &trait, const typet &t)
         has_vtptr = true;
       continue;
     }
-    // a non-static data member (own or from a base)
-    has_data_member = true;
+    // a non-static data member (own or from a base); an empty
+    // potentially-overlapping member is a subobject of zero size, which
+    // leaves the class empty ([meta.unary.prop]/5)
+    if(comp.find("#nua_type").is_nil())
+      has_data_member = true;
     if(comp.get_bool(ID_from_base))
       has_base_data_member = true;
     else
@@ -11843,6 +11847,14 @@ void cpp_typecheckt::typecheck_side_effect_assignment(side_effect_exprt &expr)
     {
       exprt lhs = to_binary_expr(expr).op0();
       exprt rhs = to_binary_expr(expr).op1();
+      // (the right operand is read only for its side effects: the object
+      // need not have storage of its own, see typecheck_member_initializer)
+      if(!has_subexpr(rhs, ID_side_effect))
+      {
+        lhs.set(ID_C_lvalue, true);
+        expr.swap(lhs);
+        return;
+      }
       const source_locationt location = expr.source_location();
       exprt evaluated{ID_comma, lhs.type()};
       evaluated.add_to_operands(
