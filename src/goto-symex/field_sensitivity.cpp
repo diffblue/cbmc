@@ -17,6 +17,8 @@ Author: Michael Tautschnig
 #include "simplify_expr_with_value_set.h"
 #include "symex_target.h"
 
+#include <optional>
+
 #define ENABLE_ARRAY_FIELD_SENSITIVITY
 
 exprt field_sensitivityt::apply(
@@ -40,12 +42,13 @@ exprt field_sensitivityt::apply_byte_extract(
   if(be.op().type().id() != ID_union && be.op().type().id() != ID_union_tag)
     return be;
 
-  // For non-constant offsets, decompose through the widest union member so
-  // that field sensitivity can process the resulting struct/array expression.
-  // This avoids materialising the full union as a flat bitvector in the SMT
-  // encoding. The operand need not be an SSA expression (e.g., it may be an
-  // index into an array of unions when array field sensitivity is disabled).
-  if(!be.offset().is_constant())
+  // Decompose through the widest union member so that field sensitivity can
+  // process the resulting struct/array expression.  This avoids
+  // materialising the full union as a flat bitvector in the SMT encoding,
+  // and lets constant propagation see the member's fields.  The operand need
+  // not be an SSA expression (e.g., it may be an index into an array of
+  // unions when array field sensitivity is disabled).
+  const auto through_widest_member = [&]() -> std::optional<exprt>
   {
     const union_typet &union_type =
       be.op().type().id() == ID_union_tag
@@ -55,18 +58,24 @@ exprt field_sensitivityt::apply_byte_extract(
     const auto union_size = pointer_offset_bits(union_type, ns);
     const auto widest = union_type.find_widest_union_component(ns);
     if(
-      widest.has_value() && union_size.has_value() &&
-      widest->second == *union_size)
+      !widest.has_value() || !union_size.has_value() ||
+      widest->second != *union_size)
     {
-      byte_extract_exprt new_be{
-        be.id(),
-        member_exprt{be.op(), widest->first.get_name(), widest->first.type()},
-        be.offset(),
-        be.get_bits_per_byte(),
-        be.type()};
-      return apply(ns, state, std::move(new_be), write);
+      return {};
     }
+    byte_extract_exprt new_be{
+      be.id(),
+      member_exprt{be.op(), widest->first.get_name(), widest->first.type()},
+      be.offset(),
+      be.get_bits_per_byte(),
+      be.type()};
+    return apply(ns, state, std::move(new_be), write);
+  };
 
+  if(!be.offset().is_constant())
+  {
+    if(auto decomposed = through_widest_member())
+      return *decomposed;
     return be;
   }
 
@@ -147,6 +156,15 @@ exprt field_sensitivityt::apply_byte_extract(
       return full_exprt;
     }
   }
+
+  // No member has a subexpression of the extracted type at this offset:
+  // e.g. a pointer read from a union whose only member is a byte array
+  // (libc++'s aligned_storage<N>::type, `union type { unsigned char
+  // __data[N]; }', holding the object a std::function placed in it).
+  // Extract from the widest member instead, whose fields hold the bytes
+  // written.
+  if(auto decomposed = through_widest_member())
+    return *decomposed;
 
   return be;
 }
