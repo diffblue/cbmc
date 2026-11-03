@@ -430,8 +430,10 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
       if(
         config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP20 &&
         rhs.id() != ID_initializer_list &&
-        object_tc.type().id() == ID_struct_tag &&
-        !follow_tag(to_struct_tag_type(object_tc.type())).is_incomplete())
+        ((object_tc.type().id() == ID_struct_tag &&
+          !follow_tag(to_struct_tag_type(object_tc.type())).is_incomplete()) ||
+         (object_tc.type().id() == ID_union_tag &&
+          !follow_tag(to_union_tag_type(object_tc.type())).is_incomplete())))
       {
         exprt probe = rhs;
         unsigned rank = 0;
@@ -612,6 +614,31 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
           ++idx;
         }
         return std::move(block);
+      }
+      // [dcl.init.aggr]/2: the elements of a union are its non-static data
+      // members; with one initializer, the first one is copy-initialized
+      // ([dcl.init.general]/16.6.2.2).  libc++'s basic_string (Xcode 26)
+      // initializes its union member `__rep_(__short())'.
+      if(object_tc.type().id() == ID_union_tag && operands_tc.size() == 1)
+      {
+        const union_typet &union_type =
+          follow_tag(to_union_tag_type(object_tc.type()));
+        for(const auto &comp : union_type.components())
+        {
+          if(
+            comp.get_bool(ID_is_type) || comp.get_bool(ID_is_static) ||
+            comp.type().id() == ID_code || comp.get_is_padding())
+          {
+            continue;
+          }
+          member_exprt member(object_tc, comp.get_name(), comp.type());
+          member.set(ID_C_lvalue, true);
+          member.type().set(ID_C_constant, false);
+          auto init = cpp_constructor(source_location, member, operands_tc);
+          if(init.has_value())
+            return init;
+          break;
+        }
       }
       // GCC's __complex__ extension (also accepted by Clang): two scalar
       // initializers give the real and the imaginary part -- as for a
