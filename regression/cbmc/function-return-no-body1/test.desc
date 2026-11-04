@@ -1,6 +1,6 @@
 CORE
 main.c
---xml-ui
+--xml-ui --trace
 activate-multi-line-match
 ^EXIT=10$
 ^SIGNAL=0$

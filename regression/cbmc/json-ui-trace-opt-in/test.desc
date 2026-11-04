@@ -1,0 +1,12 @@
+CORE
+main.c
+--json-ui
+^EXIT=10$
+^SIGNAL=0$
+"status": "FAILURE"
+--
+"trace": \[
+--
+Traces are opt-in for all user interfaces: without --trace, the JSON
+interface must not generate counterexample traces for failed properties,
+only their status.
