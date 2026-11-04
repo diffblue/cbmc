@@ -672,22 +672,22 @@ void smt2_incremental_decision_proceduret::set_to(
 void smt2_incremental_decision_proceduret::push(
   const std::vector<exprt> &assumptions)
 {
+  push();
   for(const auto &assumption : assumptions)
-  {
-    UNIMPLEMENTED_FEATURE(
-      "pushing of assumption:\n  " + assumption.pretty(2, 0));
-  }
-  UNIMPLEMENTED_FEATURE("`push` of empty assumptions.");
+    set_to(assumption, true);
 }
 
 void smt2_incremental_decision_proceduret::push()
 {
-  UNIMPLEMENTED_FEATURE("`push`.");
+  solver_process->send(smt_push_commandt{1});
+  ++number_of_pushed_contexts;
 }
 
 void smt2_incremental_decision_proceduret::pop()
 {
-  UNIMPLEMENTED_FEATURE("`pop`.");
+  PRECONDITION(number_of_pushed_contexts > 0);
+  solver_process->send(smt_pop_commandt{1});
+  --number_of_pushed_contexts;
 }
 
 [[nodiscard]] static decision_proceduret::resultt

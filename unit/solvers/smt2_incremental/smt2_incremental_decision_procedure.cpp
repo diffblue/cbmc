@@ -1197,3 +1197,35 @@ TEST_CASE(
 
   CHECK(test.sent_commands == expected_commands);
 }
+
+TEST_CASE(
+  "smt2_incremental_decision_proceduret push pop.",
+  "[core][smt2_incremental]")
+{
+  auto test = decision_procedure_test_environmentt::make();
+  test.sent_commands.clear();
+  SECTION("push sends push command")
+  {
+    test.procedure.push();
+    REQUIRE(
+      test.sent_commands == std::vector<smt_commandt>{smt_push_commandt{1}});
+    test.sent_commands.clear();
+    SECTION("pop sends pop command")
+    {
+      test.procedure.pop();
+      REQUIRE(
+        test.sent_commands == std::vector<smt_commandt>{smt_pop_commandt{1}});
+    }
+    SECTION("push with assumptions")
+    {
+      const symbolt foo = make_test_symbol("foo", bool_typet{});
+      const smt_identifier_termt foo_term{"foo", smt_bool_sortt{}};
+      test.procedure.push({foo.symbol_expr()});
+      REQUIRE(
+        test.sent_commands == std::vector<smt_commandt>{
+                                smt_push_commandt{1},
+                                smt_declare_function_commandt{foo_term, {}},
+                                smt_assert_commandt{foo_term}});
+    }
+  }
+}
