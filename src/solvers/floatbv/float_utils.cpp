@@ -641,12 +641,23 @@ bvt float_utilst::div(const bvt &src1, const bvt &src2)
   // guard bit) above the remainder, which provides the sticky bit.  Padding
   // the dividend with spec.f + 2 zeros achieves this for a normal dividend.
   // A subnormal dividend, however, has up to spec.f leading zeros, each of
-  // which costs one significant bit of the quotient, so we add spec.f more
-  // bits of padding.
-  std::size_t div_width = unpacked1.fraction.size() * 2 + 1 + spec.f;
+  // which would cost one significant bit of the quotient.  Rather than
+  // padding with spec.f more zeros, which makes every division more
+  // expensive, normalize the dividend: shift out the leading zeros and
+  // decrease the exponent accordingly, which preserves the value.
+  // The exponent of a normalized subnormal can be as small as
+  // 1 - bias - spec.f, which also needs to be representable once we have
+  // subtracted the exponents and added spec.f below.  Hence extend the
+  // exponent to the width used for this exponent arithmetic first.
+  bvt dividend_fraction = unpacked1.fraction;
+  bvt dividend_exponent = bv_utils.sign_extension(
+    unpacked1.exponent, std::max(spec.e, address_bits(spec.f)) + 2);
+  normalization_shift(dividend_fraction, dividend_exponent);
+
+  std::size_t div_width = dividend_fraction.size() * 2 + 1;
 
   // pad fraction1 with zeros
-  bvt fraction1=unpacked1.fraction;
+  bvt fraction1 = dividend_fraction;
   fraction1.reserve(div_width);
   while(fraction1.size()<div_width)
     fraction1.insert(fraction1.begin(), const_literal(false));
@@ -669,11 +680,10 @@ bvt float_utilst::div(const bvt &src1, const bvt &src2)
     result.fraction.begin(), have_remainder);
 
   // We will subtract the exponents and then add spec.f.  The result lies in
-  // [1 - 2 * bias, 2 * bias - 1 + spec.f], which fits into
-  // max(spec.e, address_bits(spec.f)) + 2 bits.
-  const std::size_t exponent_width = std::max(spec.e, address_bits(spec.f)) + 2;
-  const bvt exponent1 =
-    bv_utils.sign_extension(unpacked1.exponent, exponent_width);
+  // [1 - 2 * bias, 2 * bias - 1 + spec.f], which fits into the width of the
+  // (extended) exponent of the normalized dividend.
+  const std::size_t exponent_width = dividend_exponent.size();
+  const bvt &exponent1 = dividend_exponent;
   const bvt exponent2 =
     bv_utils.sign_extension(unpacked2.exponent, exponent_width);
 
