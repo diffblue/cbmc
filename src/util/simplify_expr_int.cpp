@@ -366,6 +366,21 @@ simplify_exprt::resultt<> simplify_exprt::simplify_div(const div_exprt &expr)
   return unchanged(expr);
 }
 
+/// Is \p expr a binary multiplication that has \p factor as one of its
+/// constant operands?
+static bool
+is_multiplication_with_factor(const exprt &expr, const mp_integer &factor)
+{
+  if(expr.id() != ID_mult || expr.operands().size() != 2)
+    return false;
+  const auto &mul = to_mult_expr(expr);
+  const auto c0 = numeric_cast<mp_integer>(mul.op0());
+  if(c0.has_value() && *c0 == factor)
+    return true;
+  const auto c1 = numeric_cast<mp_integer>(mul.op1());
+  return c1.has_value() && *c1 == factor;
+}
+
 simplify_exprt::resultt<> simplify_exprt::simplify_mod(const mod_exprt &expr)
 {
   if(!is_number(expr.type()))
@@ -396,6 +411,43 @@ simplify_exprt::resultt<> simplify_exprt::simplify_mod(const mod_exprt &expr)
       {
         mp_integer result = *int_value0 % *int_value1;
         return from_integer(result, expr.type());
+      }
+
+      // (x * n) % n simplifies to zero.  Crucially we only ever conclude a
+      // *zero* remainder, and that is independent of the modulo convention:
+      // truncated (C), floored and Euclidean modulo differ only in how they
+      // round a non-integer quotient, i.e. only when the remainder is
+      // non-zero.  They all agree that a % n == 0 exactly when n divides a,
+      // so we need not assume any particular semantics for negative
+      // operands -- it suffices that n divides the value of x * n.
+      //
+      // For mathematical integers x * n is exact and n always divides it,
+      // for any sign of x and n.  For bitvector types multiplication wraps
+      // modulo 2^width; that wrap preserves divisibility by n exactly when
+      // |n| divides 2^width, and then the wrapped product is a multiple of n
+      // for every x.  This is necessary and sufficient and is tested by
+      // power(2, width) % n == 0.  Divisibility is sign-independent, so the
+      // test also admits negative power-of-two-magnitude moduli (e.g.
+      // n == -8: 2^width % -8 == 0, and (x * -8) % -8 is zero under any
+      // convention); hence no sign restriction on the modulus is needed.
+      if(int_value1.has_value())
+      {
+        const auto &type_id = expr.type().id();
+        bool can_simplify = (type_id == ID_integer || type_id == ID_natural);
+
+        if(
+          !can_simplify && (type_id == ID_unsignedbv || type_id == ID_signedbv))
+        {
+          const auto width = to_bitvector_type(expr.type()).get_width();
+          can_simplify = (power(2, width) % *int_value1 == 0);
+        }
+
+        if(
+          can_simplify &&
+          is_multiplication_with_factor(expr.op0(), *int_value1))
+        {
+          return from_integer(0, expr.type());
+        }
       }
     }
   }
