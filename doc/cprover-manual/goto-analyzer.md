@@ -236,6 +236,17 @@ the foundational pointer and reaching definitions analysis.  This
 means it can be configured using the VSD options and give more precise
 analysis (for example, field aware) of the dependencies.
 
+`--predicate-tracking-domain`
+: This adds some very basic relational sensitivity on top of VSD.
+When predicates are applied to the domain, either from
+__CPROVER_assume() or from conditional GOTO instructions, the domain
+adds them to a set of current known conditions.  Merging of control
+flow takes the intersection of the two sets and assigning to a
+variable will remove all predicates that include that variable.  When
+checking verification conditions (such as during the --verify task)
+the set will be checked for conditions that are obviously true or false.
+As this domain builds on VSD, all of the VSD configuration options apply.
+
 
 ### Configuration of the Variable Sensitivity Domain
 

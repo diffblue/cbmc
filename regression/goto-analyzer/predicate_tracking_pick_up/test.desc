@@ -1,0 +1,13 @@
+CORE
+main.c
+--verify --predicate-tracking
+^\[main.assertion.1\] line (\d+) Direct syntactic match: SUCCESS$
+^\[main.assertion.2\] line (\d+) Should be unknown as pruned: UNKNOWN$
+^\[main.assertion.3\] line (\d+) Safe as unreachable: SUCCESS \(unreachable\)$
+^\[main.assertion.4\] line (\d+) Preserved after merge with bottom: SUCCESS$
+^\[main.assertion.5\] line (\d+) Safe using context-free simplification: SUCCESS$
+^\[main.assertion.6\] line (\d+) Safe using context-dependent simplification: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring

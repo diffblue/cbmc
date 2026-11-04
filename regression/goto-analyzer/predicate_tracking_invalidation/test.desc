@@ -1,0 +1,12 @@
+CORE
+main.c
+--verify --predicate-tracking
+^\[main.assertion.1\] line (\d+) Unrelated assignment does not invalidate: SUCCESS$
+^\[main.assertion.2\] line (\d+) Relevant assignment does invalidate: UNKNOWN$
+^\[main.assertion.3\] line (\d+) Predicate preserved by loop: SUCCESS$
+^\[main.assertion.4\] line (\d+) Predicate true but not lost: UNKNOWN$
+^\[main.assertion.5\] line (\d+) Infinite loop exit condition: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
