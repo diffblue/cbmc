@@ -1,6 +1,6 @@
 CORE msvc-stl
 main.cpp
---cpp11 --unwind 8
+--cpp11 --unwind 8 --object-bits 12
 ^\[main\.assertion\.1\] line \d+ padded to the field width: SUCCESS$
 ^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
 ^\*\* 1 of \d+ failed
@@ -17,4 +17,5 @@ model, num_put's sprintf_s (the UCRT's __stdio_common_vsprintf_s) had
 none, Visual Studio's va_arg read the value as `(bv)(void *)7', which the
 simplifier did not fold, and each locale-name copy (_Ntcts_dup_dbg,
 _Maklocstr) could fail.  Checked with the MSVC 14.51 headers preprocessed
-by cl and --winx64 on Linux: 10 s.
+by cl and --winx64 on Linux: 10 s.  It needs more than the 256 objects of
+the default --object-bits 8.
