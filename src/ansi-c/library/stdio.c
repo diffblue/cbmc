@@ -433,6 +433,9 @@ size_t __VERIFIER_nondet_size_t(void);
 size_t fread(void *ptr, size_t size, size_t nitems, FILE *stream)
 {
 __CPROVER_HIDE:;
+  // C11 7.21.8.1p3: if size or nmemb is zero, fread returns zero
+  if(size == 0 || nitems == 0)
+    return 0;
   size_t bytes_read = __VERIFIER_nondet_size_t();
   size_t upper_bound = nitems * size;
   __CPROVER_assume(bytes_read <= upper_bound);
@@ -473,6 +476,8 @@ size_t
 __fread_chk(void *ptr, size_t ptrlen, size_t size, size_t nitems, FILE *stream)
 {
 __CPROVER_HIDE:;
+  if(size == 0 || nitems == 0)
+    return 0;
   size_t bytes_read = __VERIFIER_nondet_size_t();
   size_t upper_bound = nitems * size;
   __CPROVER_assume(bytes_read <= upper_bound);
@@ -914,6 +919,9 @@ size_t fwrite(
   FILE *stream)
 {
   __CPROVER_HIDE:;
+  // C11 7.21.8.2p3: if size or nmemb is zero, fwrite returns zero
+  if(size == 0 || nitems == 0)
+    return 0;
   (void)*(char*)ptr;
   (void)size;
 
