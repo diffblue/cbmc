@@ -265,17 +265,39 @@ void java_static_lifetime_init(
   for(const auto &entry : symbol_table.symbols)
     symbol_names.insert(id2string(entry.first));
 
+  // Class literals are initialised by calling a method of the model of
+  // java.lang.Class, which may access static fields and thus run static
+  // initializers. Initialise class literals only once all other static symbols
+  // have been initialised: otherwise, zero-initialising a static field, or the
+  // flag that records whether a static initializer has run, may undo the
+  // effects of that method.
+  std::set<std::string> class_literals;
+  bool class_literal_phase = false;
   std::set<std::string> additional_symbols;
-  while(!symbol_names.empty() || !additional_symbols.empty())
+  while(true)
   {
     if(!additional_symbols.empty())
       symbol_names.swap(additional_symbols);
+    else if(symbol_names.empty())
+    {
+      if(class_literal_phase || class_literals.empty())
+        break;
+      class_literal_phase = true;
+      symbol_names.swap(class_literals);
+    }
 
     for(const auto &symbol_name : symbol_names)
     {
       const symbolt &sym = symbol_table.lookup_ref(symbol_name);
       if(should_init_symbol(sym))
       {
+        if(
+          !class_literal_phase &&
+          get_class_literal_initializer(sym, symbol_table) != nullptr)
+        {
+          class_literals.insert(symbol_name);
+          continue;
+        }
         auto new_symbols = init_symbol(
           sym,
           code_block,

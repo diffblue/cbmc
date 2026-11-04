@@ -1,0 +1,14 @@
+CORE
+Test
+--function Test.main -cp target/classes
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+JBMC initialises class literals by calling cproverInitializeClassLiteral of the
+model of java.lang.Class. Its effects on static fields must persist: class
+literals must thus only be initialised once all other static symbols
+(including the static fields of java.lang.Class and the flag recording whether
+its static initializer has run) have been initialised.
