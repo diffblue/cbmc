@@ -4,7 +4,7 @@ void *malloc(__CPROVER_size_t);
 
 char *make_str()
 {
-  unsigned short len;
+  unsigned short len = __VERIFIER_nondet_short();
   char *str;
 
   __CPROVER_assume(len > 0);

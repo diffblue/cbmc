@@ -8,7 +8,7 @@ typedef enum
 
 int main()
 {
-  unsigned x;
+  unsigned x = __VERIFIER_nondet_unsigned();
   switch(x)
   {
   case VALUE_1:

@@ -7,7 +7,7 @@ int uninitializedGlobalArray2[2];
 int main(void)
 {
   // Variable access
-  long directUseReadLocation; // Non-det
+  long directUseReadLocation = __VERIFIER_nondet_long();
 
   long x = directUseReadLocation;
   if(0 <= directUseReadLocation && directUseReadLocation < 2)
@@ -16,7 +16,7 @@ int main(void)
   /*** Variable non-redundant update ***/
   // No obvious simplifications to writes
 
-  long nonRedundantWriteLocation;
+  long nonRedundantWriteLocation = __VERIFIER_nondet_long();
 
   if(
     0 <= nonRedundantWriteLocation && nonRedundantWriteLocation < 2 &&

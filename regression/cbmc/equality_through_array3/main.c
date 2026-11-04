@@ -15,8 +15,8 @@ void main ()
 
   fill_array(a,LIMIT);
 
-  int x;
-  int y;
+  int x = __VERIFIER_nondet_int();
+  int y = __VERIFIER_nondet_int();
 
   __CPROVER_assume(0 <= x && x < LIMIT);
   __CPROVER_assume(0 <= y && y < LIMIT);

@@ -1,6 +1,6 @@
 int main()
 {
-  double f, f2;
+  double f, f2 = __VERIFIER_nondet_double();
   // the following rely on f not being a NaN or Infinity
   __CPROVER_assume(!__CPROVER_isnand(f2));
   __CPROVER_assume(!__CPROVER_isinfd(f2));

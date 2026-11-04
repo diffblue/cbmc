@@ -15,7 +15,7 @@ struct hash_table
 void main(void)
 {
   struct hash_table map;
-  size_t num_entries;
+  size_t num_entries = __VERIFIER_nondet_size_t();
   __CPROVER_assume(num_entries <= 8ul);
   size_t required_bytes = num_entries * sizeof(int) + sizeof(struct state);
   struct state *impl = malloc(required_bytes);

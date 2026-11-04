@@ -15,7 +15,7 @@ int main()
   assert(__CPROVER_r_ok(p, sizeof(int)));
   assert(__CPROVER_w_ok(p, sizeof(int)));
 
-  size_t n;
+  size_t n = __VERIFIER_nondet_size_t();
   char *arbitrary_size = malloc(n);
 
   assert(__CPROVER_r_ok(arbitrary_size, n));

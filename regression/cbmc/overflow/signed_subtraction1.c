@@ -2,7 +2,7 @@
 
 int main()
 {
-  int a, b, neg;
+  int a = __VERIFIER_nondet_int(), b, neg = __VERIFIER_nondet_int();
 
   // this should not overflow, even not for a=INT_MIN
   b = a - a;

@@ -13,7 +13,7 @@ static int
 
 int main()
 {
- int a, b;
+ int a = __VERIFIER_nondet_int(), b = __VERIFIER_nondet_int();
 #ifdef __CPROVER__
  __CPROVER_assume(a==1);
  __CPROVER_assume(b==-2);

@@ -1,6 +1,6 @@
 int main()
 {
-  unsigned size;
+  unsigned size = __VERIFIER_nondet_unsigned();
   __CPROVER_assume(size >= sizeof(short));
   char *buf = __CPROVER_allocate(size, 0);
 

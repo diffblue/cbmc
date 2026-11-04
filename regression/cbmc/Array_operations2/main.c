@@ -11,7 +11,7 @@ int main()
 {
   my_struct arr[3] = {0};
   char *ptr = &(arr[1].c[2]);
-  int offset;
+  int offset = __VERIFIER_nondet_int();
   __CPROVER_assume(offset < 1 && offset > -1);
   void *ptr_plus = ptr + offset;
   char nondet[3];

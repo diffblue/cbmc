@@ -1,7 +1,7 @@
 int main()
 {
   static void *table[] = {&&l0, &&l1, &&l2};
-  int in, out;
+  int in = __VERIFIER_nondet_int(), out;
 
   if(in>=0 && in<=2)
   {

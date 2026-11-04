@@ -2,7 +2,8 @@
 
 int main()
 {
-  int *p, o, n, x, x_before;
+  int *p, o = __VERIFIER_nondet_int(), n = __VERIFIER_nondet_int(),
+          x = __VERIFIER_nondet_int(), x_before;
   x_before = x;
   p = &x;
 

@@ -7,8 +7,8 @@ void main ()
   a[2] = 2;
   a[3] = 3;
 
-  int x;
-  int y;
+  int x = __VERIFIER_nondet_int();
+  int y = __VERIFIER_nondet_int();
 
   __CPROVER_assume(0 <= x && x < 4);
   __CPROVER_assume(0 <= y && y < 4);

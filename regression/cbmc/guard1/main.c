@@ -1,15 +1,16 @@
 int main()
 {
-int i;
-int j;
-while(i) j = j + 1;
+  int i = __VERIFIER_nondet_int();
+  int j = __VERIFIER_nondet_int();
+  while(i)
+    j = j + 1;
 }
 
 /*
 #include <assert.h>
 
 int main (void) {
-	int i;
+	int i = __VERIFIER_nondet_int();
 
 	while (1) {
 		i++;

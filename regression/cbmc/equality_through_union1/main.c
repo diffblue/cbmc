@@ -10,21 +10,21 @@ union u
 
 union u pass_through_union (int32_t q)
 {
-  union u un;
+   union u un;
 
-  un.z[0] = 0;
-  un.y = q;
+   un.z[0] = 0;
+   un.y = q;
 
-  return un;
+   return un;
 }
 
 int main (void)
 {
-  int32_t q;
+   int32_t q = __VERIFIER_nondet_int32_t();
 
-  union u un = pass_through_union(q);
+   union u un = pass_through_union(q);
 
-  assert(q == un.y);
+   assert(q == un.y);
 
-  return 1;
+   return 1;
 }

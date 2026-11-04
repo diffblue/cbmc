@@ -13,7 +13,7 @@ struct O
 int main()
 {
   struct O t = {{{{0}, 2}, {{42}, 2}}, 2};
-  unsigned n;
+  unsigned n = __VERIFIER_nondet_unsigned();
   __CPROVER_assume(n < 2);
   __CPROVER_assume(n > 0);
   char src_n[n];
