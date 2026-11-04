@@ -1,0 +1,11 @@
+CORE
+assert_ctg1.json_symtab
+
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+Segmentation fault
+--
+A conditional_target_group with a single operand must be printed without
+accessing a second operand.
