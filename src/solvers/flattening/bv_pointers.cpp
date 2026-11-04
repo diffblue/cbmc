@@ -403,11 +403,23 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
       op_type.id() == ID_c_enum || op_type.id() == ID_c_enum_tag)
     {
       // Cast from a bitvector type to pointer.
-      // We just do a zero extension.
+      // Extend according to the signedness of the source type (GCC
+      // semantics for implementation-defined integer-to-pointer
+      // conversion).
 
-      const bvt &op_bv=convert_bv(op);
+      const bvt &op_bv = convert_bv(op);
 
-      return bv_utils.zero_extension(op_bv, bits);
+      if(
+        op_type.id() == ID_signedbv ||
+        (op_type.id() == ID_c_enum &&
+         to_c_enum_type(op_type).underlying_type().id() == ID_signedbv))
+      {
+        return bv_utils.sign_extension(op_bv, bits);
+      }
+      else
+      {
+        return bv_utils.zero_extension(op_bv, bits);
+      }
     }
   }
   else if(expr.id()==ID_if)
@@ -719,10 +731,10 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
     // pointer to int
     bvt op0 = convert_bv(to_typecast_expr(expr).op());
 
-    // squeeze it in!
-    std::size_t width=boolbv_width(expr.type());
+    // GCC sign-extends pointers converted to wider integer types.
+    std::size_t width = boolbv_width(expr.type());
 
-    return bv_utils.zero_extension(op0, width);
+    return bv_utils.sign_extension(op0, width);
   }
 
   return SUB::convert_bitvector(expr);
