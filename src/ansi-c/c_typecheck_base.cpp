@@ -655,10 +655,22 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
 }
 
 void c_typecheck_baset::apply_asm_label(
-  const irep_idt &asm_label,
+  const irep_idt &asm_label_in,
   symbolt &symbol)
 {
   const irep_idt orig_name=symbol.name;
+
+  // Darwin's object files spell every C name with a leading underscore, and
+  // Apple's headers write that spelling as an asm label (`FILE *fopen(...)
+  // __asm("_" "fopen")').  Such a label names the function it is attached to,
+  // not another one: keep the name, so that calls from C++ (whose front end
+  // does not apply asm labels) and the C library models agree on it.  Other
+  // labels (`_realpath$DARWIN_EXTSN') do select a different function.
+  const irep_idt asm_label =
+    config.ansi_c.os == configt::ansi_ct::ost::OS_MACOS &&
+        asm_label_in == "_" + id2string(orig_name)
+      ? irep_idt{}
+      : asm_label_in;
 
   // restrict renaming to functions and global variables;
   // procedure-local ones would require fixing the scope, as we
