@@ -14,6 +14,8 @@ Date:   September 2014
 #include "remove_vector.h"
 
 #include <util/arith_tools.h>
+#include <util/byte_operators.h>
+#include <util/c_types.h>
 #include <util/std_expr.h>
 
 #include <ansi-c/c_expr.h>
@@ -108,8 +110,28 @@ static void remove_vector(exprt &expr)
     return;
   }
 
+  // (scalar-type) vector, e.g. (uint64_t)u8x8, is a bit-wise reinterpretation
+  // of the vector (the C front-end ensures both have the same size). Once the
+  // vector has become an array, a plain typecast can no longer express this,
+  // so turn it into a byte extract.
+  const bool is_vector_to_scalar_cast =
+    expr.id() == ID_typecast && expr.type().id() != ID_vector &&
+    to_typecast_expr(expr).op().type().id() == ID_vector;
+
   Forall_operands(it, expr)
     remove_vector(*it);
+
+  if(is_vector_to_scalar_cast)
+  {
+    source_locationt source_location = expr.source_location();
+    exprt result = make_byte_extract(
+      to_typecast_expr(expr).op(),
+      from_integer(0, c_index_type()),
+      expr.type());
+    expr.swap(result);
+    expr.add_source_location() = std::move(source_location);
+    return;
+  }
 
   if(expr.type().id()==ID_vector)
   {
