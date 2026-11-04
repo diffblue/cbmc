@@ -3,6 +3,7 @@
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 #include <util/c_types.h>
+#include <util/ieee_float.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
@@ -129,6 +130,32 @@ TEST_CASE("Value expr construction from smt.", "[core][smt2_incremental]")
     REQUIRE(
       construct_value_expr_from_smt(*input_term, expected_result->type(), ns) ==
       *expected_result);
+  }
+  SECTION("Floating-point values.")
+  {
+    // IEEE 754 double -2.5 has bit pattern 0xC004000000000000.
+    const floatbv_typet double_type =
+      ieee_float_spect::double_precision().to_type();
+    const mp_integer minus_2_5_bits{0xC004000000000000ull};
+    const smt_bit_vector_constant_termt smt_double{minus_2_5_bits, 64};
+    const exprt double_result =
+      construct_value_expr_from_smt(smt_double, double_type, ns);
+    REQUIRE(double_result.type() == double_type);
+    // The result should be a constant_exprt with the bit representation, not
+    // an integer interpretation.
+    const auto &double_const = to_constant_expr(double_result);
+    REQUIRE(double_const.get_value() == integer2bvrep(minus_2_5_bits, 64));
+
+    // IEEE 754 float 1.25f has bit pattern 0x3FA00000.
+    const floatbv_typet float_type =
+      ieee_float_spect::single_precision().to_type();
+    const mp_integer one_25_bits{0x3FA00000u};
+    const smt_bit_vector_constant_termt smt_float{one_25_bits, 32};
+    const exprt float_result =
+      construct_value_expr_from_smt(smt_float, float_type, ns);
+    REQUIRE(float_result.type() == float_type);
+    const auto &float_const = to_constant_expr(float_result);
+    REQUIRE(float_const.get_value() == integer2bvrep(one_25_bits, 32));
   }
 }
 
