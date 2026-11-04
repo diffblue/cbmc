@@ -1,0 +1,10 @@
+CORE no-new-smt
+main.c
+--trace --z3
+^EXIT=10$
+^SIGNAL=0$
+^  s\.bf=5u
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+assignment removed
