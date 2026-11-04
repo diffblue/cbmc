@@ -16,6 +16,7 @@ Author: Remi Delmas, delmasrd@amazon.com
 #include <analyses/local_may_alias.h>
 #include <goto-instrument/contracts/utils.h>
 
+#include "dfcc_is_cprover_symbol.h"
 #include "dfcc_loop_nesting_graph.h"
 #include "dfcc_root_object.h"
 
@@ -336,11 +337,53 @@ void dfcc_infer_loop_assigns_for_function(
   auto malloc_body = goto_functions.function_map.extract(irep_idt("malloc"));
   auto free_body = goto_functions.function_map.extract(irep_idt("free"));
 
+  // Nor the functions that DFCC does not instrument (`__CPROVER_*`,
+  // `__VERIFIER_*`, `nondet*`, see `dfcc_is_cprover_function_symbol`): their
+  // writes are never checked against a write set, and the inference would drop
+  // the targets they contribute, which are not visible in `goto_function`.
+  // Inlining them can cost a lot of time and memory when a tool instruments
+  // every instruction of a loop with calls to such functions.
+  std::vector<decltype(goto_functions.function_map.extract(irep_idt()))>
+    uninstrumented_bodies;
+  for(auto it = goto_functions.function_map.begin();
+      it != goto_functions.function_map.end();)
+  {
+    auto next = std::next(it);
+    if(dfcc_is_cprover_function_symbol(it->first))
+      uninstrumented_bodies.push_back(goto_functions.function_map.extract(it));
+    it = next;
+  }
+
   // Inline all function calls in goto_function_copy; this is best-effort
   // inlining, we can safely ignore warnings here.
   null_message_handlert null_message_handler;
   goto_program_inline(
     goto_functions, goto_function_copy.body, ns, null_message_handler);
+  // The calls to those functions stay in place. The may-alias analysis treats
+  // a call as possibly changing every pointer whose address is taken, which
+  // would make the targets of the loop's writes alias every other object whose
+  // address is taken, and add them to the write set. These calls change nothing
+  // a write set covers: replace each one with a nondeterministic assignment to
+  // its result.
+  for(auto &instruction : goto_function_copy.body.instructions)
+  {
+    if(!instruction.is_function_call())
+      continue;
+    const exprt &callee = instruction.call_function();
+    if(
+      callee.id() != ID_symbol ||
+      !dfcc_is_cprover_function_symbol(to_symbol_expr(callee).identifier()))
+    {
+      continue;
+    }
+    const exprt lhs = instruction.call_lhs();
+    const source_locationt location = instruction.source_location();
+    if(lhs.is_nil())
+      instruction = goto_programt::make_skip(location);
+    else
+      instruction = goto_programt::make_assignment(
+        lhs, side_effect_expr_nondett(lhs.type(), location), location);
+  }
   // Update the body to make sure all goto correctly jump to valid targets.
   goto_function_copy.body.update();
   // Build the loop graph after inlining.
@@ -376,4 +419,6 @@ void dfcc_infer_loop_assigns_for_function(
   // Restore the function boyd of `malloc` and `free`.
   goto_functions.function_map.insert(std::move(malloc_body));
   goto_functions.function_map.insert(std::move(free_body));
+  for(auto &body : uninstrumented_bodies)
+    goto_functions.function_map.insert(std::move(body));
 }

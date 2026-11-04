@@ -1,0 +1,14 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts _ --no-standard-checks
+^EXIT=0$
+^SIGNAL=0$
+^\[main.assertion.\d+\] .* assertion y == 1: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that the loop assigns inference does not consider calls to
+functions that DFCC does not instrument (here, with the `__VERIFIER` prefix).
+Such a call made the may-alias analysis treat every pointer whose address is
+taken as unknown, so that `*p` aliased `y`, `y` was havocked, and the assertion
+failed.
