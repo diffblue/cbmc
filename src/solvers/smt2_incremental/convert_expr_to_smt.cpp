@@ -24,6 +24,7 @@
 #include <functional>
 #include <numeric>
 #include <stack>
+#include <type_traits>
 
 /// Post order visitation is used in order to construct the the smt terms bottom
 /// upwards without using recursion to traverse the input `exprt`. Therefore
@@ -969,17 +970,23 @@ static smt_termt convert_to_smt_shift(
   const std::size_t second_width = second_bit_vector_sort->bit_width();
   if(first_width > second_width)
   {
+    // Shift distances are unsigned: always zero-extend the distance.
     return factory(
       first_operand,
-      extension_for_type(shift.op1().type())(first_width - second_width)(
+      smt_bit_vector_theoryt::zero_extend(first_width - second_width)(
         second_operand));
   }
   else if(first_width < second_width)
   {
-    const auto result = factory(
-      extension_for_type(shift.op0().type())(second_width - first_width)(
-        first_operand),
-      second_operand);
+    // The operand must be extended according to the shift kind, not
+    // its type signedness: ashr sign-extends (to shift copies of the
+    // MSB into the result), all others zero-extend.
+    const std::size_t ext = second_width - first_width;
+    const smt_termt extended_operand =
+      std::is_same<shiftt, ashr_exprt>::value
+        ? smt_termt{smt_bit_vector_theoryt::sign_extend(ext)(first_operand)}
+        : smt_termt{smt_bit_vector_theoryt::zero_extend(ext)(first_operand)};
+    const auto result = factory(extended_operand, second_operand);
     return smt_bit_vector_theoryt::extract(first_width - 1, 0)(result);
   }
   else
