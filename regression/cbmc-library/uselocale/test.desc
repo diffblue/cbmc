@@ -1,4 +1,4 @@
-CORE
+CORE unix
 main.c
 
 ^\[main\.assertion\.5\] line \d+ assertion .*: FAILURE$
@@ -11,3 +11,4 @@ main.c
 --
 uselocale returns the locale in effect before the call, LC_GLOBAL_LOCALE
 at first; (locale_t)0 only queries it.
+uselocale and locale_t are POSIX; Windows has none, hence the unix tag.
