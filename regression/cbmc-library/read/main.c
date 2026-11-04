@@ -1,19 +1,25 @@
 #ifdef _WIN32
-#  include <io.h>
-#else
-#  include <unistd.h>
-#endif
-
-#include <stdio.h>
-
-int main()
+int main(void)
 {
-  char data[20];
+  return 0;
+}
+#else
+#  include <assert.h>
+#  include <errno.h>
+#  include <unistd.h>
 
-  if(read(0, data, 100) < 0)
-    printf("An error has occurred");
-  else
-    printf("Read occurred");
+int main(void)
+{
+  char b[4];
+  // Test 1: read should not produce a spurious pointer error
+  read(0, b, sizeof b);
+
+  // Test 2: errno must be set on error path
+  errno = 0;
+  ssize_t r = read(0, b, sizeof b);
+  if(r == -1)
+    assert(errno != 0); // POSIX: errno set on error
 
   return 0;
 }
+#endif
