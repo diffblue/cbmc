@@ -23,6 +23,8 @@ Author: Daniel Kroening, Peter Schrammel
 #include "counterexample_beautification.h"
 #include "goto_symex_fault_localizer.h"
 
+#include <fstream>
+
 multi_path_symex_checkert::multi_path_symex_checkert(
   const optionst &options,
   ui_message_handlert &ui_message_handler,
@@ -37,8 +39,8 @@ multi_path_symex_checkert::multi_path_symex_checkert(
   PRECONDITION(!has_vector(goto_model.get_goto_functions()));
 }
 
-incremental_goto_checkert::resultt multi_path_symex_checkert::
-operator()(propertiest &properties)
+incremental_goto_checkert::resultt
+multi_path_symex_checkert::operator()(propertiest &properties)
 {
   resultt result(resultt::progresst::DONE);
 
@@ -59,6 +61,21 @@ operator()(propertiest &properties)
       goto_model,
       symex,
       ui_message_handler);
+
+    // Write callgrind-format symex profile if requested
+    {
+      const std::string callgrind_file = options.get_option("symex-callgrind");
+      if(!callgrind_file.empty())
+      {
+        std::ofstream out(callgrind_file);
+        if(out)
+        {
+          symex.write_callgrind(out);
+          log.status() << "Symex callgrind data written to " << callgrind_file
+                       << messaget::eom;
+        }
+      }
+    }
 
     update_properties(properties, result.updated_properties);
 

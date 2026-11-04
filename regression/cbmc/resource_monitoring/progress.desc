@@ -1,0 +1,12 @@
+CORE
+main.c
+--unwind 7 --show-symex-progress --verbosity 9
+^Max call depth: [1-9]\d*, max active loops: \d+$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Tests that --show-symex-progress reports max call depth and loop nesting.
+The interactive terminal display is not tested here (requires a real
+terminal), but the summary statistics are always emitted.

@@ -62,6 +62,8 @@ class optionst;
   "(export-symex-ready-goto):" \
   OPT_COVER \
   "(symex-coverage-report):" \
+  "(symex-callgrind):" \
+  "(show-symex-progress)" \
   "(mm):" \
   OPT_TIMESTAMP \
   "(arrays-uf-always)(arrays-uf-never)" \

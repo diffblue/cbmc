@@ -81,3 +81,32 @@ void memory_info(std::ostream &out)
   out << "  maximum resident set size [bytes]: " << r_usage.ru_maxrss << '\n';
 #endif
 }
+
+std::size_t peak_memory_bytes()
+{
+#ifdef __GLIBC__
+  struct mallinfo m = mallinfo();
+  return m.uordblks + m.hblkhd;
+#elif defined(_WIN32)
+  PROCESS_MEMORY_COUNTERS pmc;
+  if(GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc)))
+    return pmc.PeakWorkingSetSize;
+  return 0;
+#elif defined(__APPLE__)
+  struct task_basic_info t_info;
+  mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_COUNT;
+  if(
+    task_info(
+      current_task(), TASK_BASIC_INFO, (task_info_t)&t_info, &t_info_count) ==
+    KERN_SUCCESS)
+  {
+    return t_info.virtual_size;
+  }
+  return 0;
+#else
+  struct rusage r_usage;
+  if(getrusage(RUSAGE_SELF, &r_usage) == 0)
+    return static_cast<std::size_t>(r_usage.ru_maxrss) * 1024;
+  return 0;
+#endif
+}
