@@ -8,13 +8,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "float_bv.h"
 
-#include <algorithm>
-
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/bitvector_types.h>
 #include <util/floatbv_expr.h>
 #include <util/std_expr.h>
+
+#include "float_utils.h"
+
+#include <algorithm>
 
 exprt float_bvt::convert(const exprt &expr) const
 {
@@ -810,12 +812,11 @@ exprt float_bvt::div(
     concatenation_exprt(
       result.fraction, have_remainder, unsignedbv_typet(div_width+1));
 
-  // We will subtract the exponents;
-  // to account for overflow, we add a bit.
-  const typecast_exprt exponent1(
-    unpacked1.exponent, signedbv_typet(spec.e + 1));
-  const typecast_exprt exponent2(
-    unpacked2.exponent, signedbv_typet(spec.e + 1));
+  // We will subtract the exponents and then add spec.f, see
+  // float_div_exponent_width.
+  const signedbv_typet exponent_type{float_div_exponent_width(spec)};
+  const typecast_exprt exponent1{unpacked1.exponent, exponent_type};
+  const typecast_exprt exponent2{unpacked2.exponent, exponent_type};
 
   // subtract exponents
   const minus_exprt added_exponent(exponent1, exponent2);

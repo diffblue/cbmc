@@ -627,6 +627,11 @@ bvt float_utilst::fma(
   return round_and_pack(result);
 }
 
+std::size_t float_div_exponent_width(const ieee_float_spect &spec)
+{
+  return std::max(spec.e, address_bits(spec.f)) + 2;
+}
+
 bvt float_utilst::div(const bvt &src1, const bvt &src2)
 {
   // unpack
@@ -658,13 +663,13 @@ bvt float_utilst::div(const bvt &src1, const bvt &src2)
   result.fraction.insert(
     result.fraction.begin(), have_remainder);
 
-  // We will subtract the exponents;
-  // to account for overflow, we add a bit.
-  // we add a second bit for the adjust by extra fraction bits
-  const bvt exponent1=
-    bv_utils.sign_extension(unpacked1.exponent, unpacked1.exponent.size()+2);
-  const bvt exponent2=
-    bv_utils.sign_extension(unpacked2.exponent, unpacked2.exponent.size()+2);
+  // We will subtract the exponents and then add spec.f, see
+  // float_div_exponent_width.
+  const std::size_t exponent_width = float_div_exponent_width(spec);
+  const bvt exponent1 =
+    bv_utils.sign_extension(unpacked1.exponent, exponent_width);
+  const bvt exponent2 =
+    bv_utils.sign_extension(unpacked2.exponent, exponent_width);
 
   // subtract exponents
   bvt added_exponent=bv_utils.sub(exponent1, exponent2);
