@@ -983,7 +983,10 @@ std::unordered_map<irep_idt, irep_idt> linkingt::rename_symbols(
 
     irep_idt new_identifier;
 
-    if(new_symbol.is_type)
+    // a typedef (is_macro) is a name, not a type of its own: it is renamed
+    // as other symbols are, with a $link suffix, and the types written with
+    // it follow (rename_symbolt renames their typedef name)
+    if(new_symbol.is_type && !new_symbol.is_macro)
       new_identifier=type_to_name(src_ns, id, new_symbol.type);
     else
       new_identifier = rename(src_symbol_table, id);

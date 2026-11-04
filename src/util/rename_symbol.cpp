@@ -133,6 +133,22 @@ bool rename_symbolt::rename(typet &dest) const
 
   bool result=true;
 
+  // a type written with a typedef name records the typedef symbol, which
+  // find_type_symbols reports as a dependency: rename it along with the
+  // symbol
+  {
+    const irep_idt &typedef_name = dest.get(ID_C_typedef);
+    if(!typedef_name.empty())
+    {
+      type_mapt::const_iterator it = type_map.find(typedef_name);
+      if(it != type_map.end())
+      {
+        dest.set(ID_C_typedef, it->second);
+        result = false;
+      }
+    }
+  }
+
   if(dest.has_subtype())
     if(!rename(to_type_with_subtype(dest).subtype()))
       result=false;
@@ -231,6 +247,12 @@ bool rename_symbolt::have_to_rename(const typet &dest) const
 {
   if(expr_map.empty() && type_map.empty())
     return false;
+
+  {
+    const irep_idt &typedef_name = dest.get(ID_C_typedef);
+    if(!typedef_name.empty() && type_map.find(typedef_name) != type_map.end())
+      return true;
+  }
 
   if(dest.has_subtype())
     if(have_to_rename(to_type_with_subtype(dest).subtype()))
