@@ -239,6 +239,18 @@ public:
       unexpected_term_visited = true;
     }
   }
+
+  void visit(const smt_const_array_termt &) override
+  {
+    if(std::is_same<expected_termt, smt_const_array_termt>::value)
+    {
+      expected_term_visited = true;
+    }
+    else
+    {
+      unexpected_term_visited = true;
+    }
+  }
 };
 
 template <typename term_typet>
@@ -284,6 +296,14 @@ smt_exists_termt make_test_term<smt_exists_termt>()
     {identifier}, smt_core_theoryt::equal(identifier, identifier)};
 }
 
+template <>
+smt_const_array_termt make_test_term<smt_const_array_termt>()
+{
+  return smt_const_array_termt{
+    smt_array_sortt{smt_bit_vector_sortt{8}, smt_bit_vector_sortt{8}},
+    smt_bit_vector_constant_termt{0, 8}};
+}
+
 TEMPLATE_TEST_CASE(
   "smt_termt::accept(visitor)",
   "[core][smt2_incremental]",
@@ -292,7 +312,8 @@ TEMPLATE_TEST_CASE(
   smt_bit_vector_constant_termt,
   smt_function_application_termt,
   smt_forall_termt,
-  smt_exists_termt)
+  smt_exists_termt,
+  smt_const_array_termt)
 {
   term_visit_type_checkert<TestType> checker;
   make_test_term<TestType>().accept(checker);
