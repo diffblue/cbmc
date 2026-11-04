@@ -1,0 +1,9 @@
+CORE
+a
+--function a.fun
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+assertion at file a.java line 3 .*: FAILURE
+--
+^warning: ignoring
