@@ -1,0 +1,11 @@
+CORE no-new-smt broken-z3-smt-backend
+main.c
+
+^EXIT=10$
+^SIGNAL=0$
+\[main\.assertion\.1\] .* FAILURE
+\[main\.assertion\.2\] .* FAILURE
+\[main\.assertion\.3\] .* FAILURE
+^VERIFICATION FAILED$
+--
+^warning: ignoring
