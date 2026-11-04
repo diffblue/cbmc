@@ -559,19 +559,39 @@ main_function_resultt get_main_symbol(
     irep_idt main_symbol_id = resolve_friendly_method_name(
       config.main.value(), symbol_table, error_message);
 
-    if(main_symbol_id.empty())
+    if(!main_symbol_id.empty())
     {
-      message.error()
-        << "main symbol resolution failed: " << error_message << messaget::eom;
+      const symbolt *symbol = symbol_table.lookup(main_symbol_id);
+      INVARIANT(
+        symbol != nullptr,
+        "resolve_friendly_method_name should return a symbol-table "
+        "identifier");
+
+      return *symbol; // Return found function
+    }
+
+    // resolve_friendly_method_name failed; if config.main has no colon
+    // it may be a class name rather than a method name, so fall back to
+    // looking for the standard main method in that class.
+    if(config.main.value().find(':') != std::string::npos)
+    {
+      message.error() << "main symbol resolution failed: " << error_message
+                      << messaget::eom;
       return main_function_resultt::Error;
     }
 
-    const symbolt *symbol = symbol_table.lookup(main_symbol_id);
-    INVARIANT(
-      symbol != nullptr,
-      "resolve_friendly_method_name should return a symbol-table identifier");
+    std::string class_name = config.main.value();
+    if(has_suffix(class_name, ".class"))
+      class_name.resize(class_name.size() - 6);
 
-    return *symbol; // Return found function
+    std::string entry_method = "java::" + class_name + "." + JAVA_MAIN_METHOD;
+    const symbolt *symbol = symbol_table.lookup(entry_method);
+
+    if(symbol && is_java_main(*symbol))
+      return *symbol;
+
+    // allow this situation to output symbol table, goto functions, etc
+    return main_function_resultt::NotFound;
   }
   else
   {
