@@ -1,0 +1,36 @@
+KNOWNBUG broken-cprover-smt-backend no-new-smt
+main.c
+--arrays-uf-always
+^\[main.assertion.12\] line 34 assertion arr\[1\].c\[2\] == 0: FAILURE$
+^\[main.assertion.13\] line 35 assertion arr\[1\].c\[3\] == 0: FAILURE$
+^\[main.assertion.14\] line 36 assertion arr\[1\].c\[4\] == 0: FAILURE$
+^\*\* 3 of 21 failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+With --arrays-uf-always the array theory's union-find incorrectly conflates
+structurally different arrays that happen to have equal initial values.
+
+The SSA equations for the zero-initialised struct array produce:
+  arr#2[0].c = {0,0,0,0,0}
+  arr#2[1].c = {0,0,0,0,0}
+  arr#2[2].c = {0,0,0,0,0}
+
+Because all three equalities share the same RHS literal {0,0,0,0,0},
+record_array_equality transitively unifies arr#2[0].c, arr#2[1].c, and
+arr#2[2].c into a single equivalence class.  After __CPROVER_array_replace
+modifies arr (producing arr#3 via byte_update), the array theory cannot
+distinguish the three .c sub-arrays: constraints meant for arr#3[1].c
+(the replaced region) bleed into arr#3[0].c and arr#3[2].c, causing
+spurious failures on assertions 1-11 and 15-21.
+
+Without --arrays-uf-always the char[5] sub-arrays are small enough to be
+flattened to bitvectors, bypassing the array decision procedure entirely,
+so the test passes.
+
+Fixing this requires the union-find to distinguish "structurally same
+array" from "arrays with equal values", which is a fundamental change to
+the Nelson-Oppen style array decision procedure as used in CBMC.

@@ -1,0 +1,18 @@
+CORE thorough-smt-backend no-new-smt
+main.c
+--no-malloc-may-fail --arrays-uf-always --refine-arrays
+^EXIT=10$
+^SIGNAL=0$
+\[\(.*\)i2\]: FAILURE
+dest\[\(.*\)j2\]: FAILURE
+payload\[\(.*\)[kl]2\]: FAILURE
+\*\* 7 of [0-9]+ failed
+--
+^warning: ignoring
+\[\(.*\)i\]: FAILURE
+dest\[\(.*\)j\]: FAILURE
+payload\[\(.*\)[kl]\]: FAILURE
+--
+Tests that --refine-arrays with --arrays-uf-always produces correct results
+and completes quickly. Without --refine-arrays this test takes ~85 seconds;
+with --refine-arrays the lazy with/if/Ackermann constraints reduce it to ~2s.
