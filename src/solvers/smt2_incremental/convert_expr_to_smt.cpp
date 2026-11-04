@@ -1894,11 +1894,22 @@ exprt lower_address_of_array_index(exprt expr)
       expr_try_dynamic_cast<index_exprt>(address_of_expr->object());
     if(!array_index_expr)
       return;
-    expr = plus_exprt{
-      address_of_exprt{
-        array_index_expr->array(),
-        type_checked_cast<pointer_typet>(address_of_expr->type())},
-      array_index_expr->index()};
+    // The pointer type of the new address_of must be a pointer to the
+    // array element type so that pointer arithmetic scales by the
+    // correct element size. For nested arrays like int a[3][4],
+    // &a[1] gets type int(*)[4] so that +1 adds sizeof(int[4]) = 16.
+    // The result is typecast back to the original address_of type to
+    // keep the types of enclosing expressions consistent.
+    const auto &outer_ptr_type =
+      type_checked_cast<pointer_typet>(address_of_expr->type());
+    const pointer_typet element_pointer_type(
+      array_index_expr->type(), outer_ptr_type.get_width());
+    exprt lowered = plus_exprt(
+      address_of_exprt(array_index_expr->array(), element_pointer_type),
+      array_index_expr->index());
+    if(element_pointer_type != outer_ptr_type)
+      lowered = typecast_exprt(std::move(lowered), outer_ptr_type);
+    expr = std::move(lowered);
   });
   return expr;
 }

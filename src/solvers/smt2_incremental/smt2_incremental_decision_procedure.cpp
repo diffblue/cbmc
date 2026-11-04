@@ -416,16 +416,21 @@ smt2_incremental_decision_proceduret::convert_expr_to_smt(const exprt &expr)
   define_index_identifiers(expr);
   const exprt substituted = substitute_defined_padding(
     substitute_identifiers(expr, expression_identifiers));
-  track_expression_objects(substituted, ns, object_map);
+  // Lower address-of-array-index before scanning for pointer sizes, so
+  // that any new pointer types introduced by the lowering (e.g. a
+  // pointer to a row type in a nested array) are registered in the
+  // pointer size map.
+  const exprt lowered = lower_address_of_array_index(substituted);
+  track_expression_objects(lowered, ns, object_map);
   associate_pointer_sizes(
-    substituted,
+    lowered,
     ns,
     pointer_sizes_map,
     object_map,
     object_size_function.make_application,
     is_dynamic_object_function.make_application);
   return ::convert_expr_to_smt(
-    substituted,
+    lowered,
     object_map,
     pointer_sizes_map,
     object_size_function.make_application,
