@@ -148,6 +148,11 @@ int pthread_mutex_lock(pthread_mutex_t *mutex)
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
 #ifndef __CPROVER_mutex_t_defined
 #define __CPROVER_mutex_t_defined
 #if defined __CYGWIN__ || defined __MINGW32__ || defined _WIN32
@@ -175,7 +180,7 @@ int pthread_mutex_trylock(pthread_mutex_t *mutex)
   if(*((__CPROVER_mutex_t *)mutex)==1)
   {
     // failed
-    return_value=1;
+    return_value = EBUSY;
   }
   else
   {
@@ -479,11 +484,20 @@ int pthread_rwlock_rdlock(pthread_rwlock_t *lock)
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
 int pthread_rwlock_tryrdlock(pthread_rwlock_t *lock)
 {
   __CPROVER_HIDE:;
   __CPROVER_atomic_begin();
-  if((*(signed char *)lock &2)!=0) { __CPROVER_atomic_end(); return 1; }
+  if((*(signed char *)lock & 2) != 0)
+  {
+    __CPROVER_atomic_end();
+    return EBUSY;
+  }
   (*(signed char *)lock)|=1;
   __CPROVER_atomic_end();
   return 0;
@@ -496,11 +510,20 @@ int pthread_rwlock_tryrdlock(pthread_rwlock_t *lock)
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
 int pthread_rwlock_trywrlock(pthread_rwlock_t *lock)
 {
   __CPROVER_HIDE:;
   __CPROVER_atomic_begin();
-  if(*(signed char *)lock) { __CPROVER_atomic_end(); return 1; }
+  if(*(signed char *)lock)
+  {
+    __CPROVER_atomic_end();
+    return EBUSY;
+  }
   (*(signed char *)lock)=2;
   __CPROVER_atomic_end();
   return 0;
