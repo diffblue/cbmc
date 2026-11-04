@@ -1,4 +1,4 @@
-CORE
+CORE itanium-abi
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ aggregate: SUCCESS$
@@ -23,3 +23,6 @@ could not be evaluated
 The member had no zero-size layout before; this checks that its
 initialization, aggregate initialization, member calls and decltype work
 with the layout that gives it zero size.
+Tagged itanium-abi: Visual Studio ignores [[no_unique_address]] (it has
+[[msvc::no_unique_address]]), which [intro.object]/8 permits, and so does
+cbmc's Visual Studio mode.

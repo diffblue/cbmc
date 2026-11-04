@@ -1,4 +1,4 @@
-CORE
+CORE itanium-abi
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ empty base: SUCCESS$
@@ -17,3 +17,6 @@ static assertion failed
 H was not empty (is_empty, and as a base), and the member of a base kept
 its offset within the base: T was 8 bytes with H at offset 4, its end, so
 copying h.e read past the end of t.
+Tagged itanium-abi: Visual Studio ignores [[no_unique_address]] (it has
+[[msvc::no_unique_address]]), which [intro.object]/8 permits, and so does
+cbmc's Visual Studio mode.

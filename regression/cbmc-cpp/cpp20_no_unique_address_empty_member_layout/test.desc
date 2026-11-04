@@ -1,4 +1,4 @@
-CORE
+CORE itanium-abi
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ S1: SUCCESS$
@@ -26,3 +26,6 @@ could not be evaluated
 --
 An empty member declared [[no_unique_address]] occupied a byte of the class
 as any other member: sizeof(S1) was 5, not 4.
+Tagged itanium-abi: Visual Studio ignores [[no_unique_address]] (it has
+[[msvc::no_unique_address]]), which [intro.object]/8 permits, and so does
+cbmc's Visual Studio mode.

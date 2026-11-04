@@ -1,4 +1,4 @@
-CORE
+CORE itanium-abi
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] .* no_unique_address: SUCCESS$
@@ -12,3 +12,6 @@ main.cpp
 --
 The front end ignored the attribute and laid out the empty member as a
 byte, so sizeof(S) was 8.
+Tagged itanium-abi: Visual Studio ignores [[no_unique_address]] (it has
+[[msvc::no_unique_address]]), which [intro.object]/8 permits, and so does
+cbmc's Visual Studio mode.
