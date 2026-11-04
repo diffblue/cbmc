@@ -3977,6 +3977,32 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
       }
     }
 
+    // N5008 [expr.cond]/7: the operands are prvalues of different types
+    // here; array-to-pointer and function-to-pointer conversions are applied
+    // to them before their composite pointer type is formed (7.3) -- `b ?
+    // "C" : nullptr' is a `const char *'.  Two arrays of the same element
+    // type are handled below.
+    const bool both_arrays =
+      expr.op1().type().id() == ID_array && expr.op2().type().id() == ID_array;
+    for(exprt *op : {&expr.op1(), &expr.op2()})
+    {
+      if(both_arrays)
+        break;
+      exprt converted;
+      if(
+        op->type().id() == ID_array &&
+        standard_conversion_array_to_pointer(*op, converted))
+      {
+        op->swap(converted);
+      }
+      else if(
+        op->type().id() == ID_code &&
+        standard_conversion_function_to_pointer(*op, converted))
+      {
+        op->swap(converted);
+      }
+    }
+
     exprt e1 = expr.op1();
     exprt e2 = expr.op2();
 
