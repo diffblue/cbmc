@@ -295,8 +295,19 @@ only show program expression
 \fB\-\-show\-byte\-ops\fR
 show all byte extracts and updates
 .TP
-\fB\-\-depth\fR nr
-limit search depth
+\fB\-\-depth\fR \fInr\fR
+limit search depth to \fInr\fR instructions on any single execution path.
+When the depth limit is reached, any remaining paths are cut short.
+Use \fB\-\-depth\-assertions\fR (enabled by default) to check whether the
+depth limit was actually reached.
+.TP
+\fB\-\-depth\-assertions\fR
+generate depth bounding assertions (enabled by default when using
+\fB\-\-depth\fR). These assertions will fail when the depth limit is
+reached on any execution path, ensuring that the analysis is sound.
+.TP
+\fB\-\-no\-depth\-assertions\fR
+do not generate depth bounding assertions
 .TP
 \fB\-\-max\-field\-sensitivity\-array\-size\fR M
 maximum size M of arrays for which field
