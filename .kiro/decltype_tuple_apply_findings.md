@@ -16005,4 +16005,10 @@ succeed instead ([exception]/2: equal what() of copies) and drops the
 loop bound of cpp11_standard_stream_objects_initialized_msvc.
 Side finding: `b ? "C" : nullptr' is rejected ("types are incompatible",
 const char[2] vs nullptr_t), valid by [expr.cond]/7 (array-to-pointer,
-then composite pointer type); g++ and clang++ accept it.  Not fixed yet.
+then composite pointer type); g++ and clang++ accept it.  Fixed in c5107cff47:
+the conversions are applied to operands of different types (not both
+arrays) before the implicit conversion sequences are tried.  Checked:
+cbmc-cpp CORE, KNOWNBUG, libc++, cpp, systemc, unit, macOS set 143/143,
+MSVC .ii 8/8.  The format check of a new regression file was missed in
+232ef71367 (fixed after): run the merge-base check of
+pull-request-check-clang-format.sh before reporting.
