@@ -1270,8 +1270,20 @@ simplify_exprt::simplify_extractbits(const extractbits_exprt &expr)
   }
   else if(*end == 0 && *start + 1 == *width)
   {
-    typecast_exprt tc{expr.src(), expr.type()};
-    return changed(simplify_typecast(tc));
+    // Extracting all bits re-interprets them. A typecast only does the same
+    // when converting between integer types: typecasts to _Bool or from or to
+    // floating-point and fixed-point types convert the value instead.
+    auto is_integer_bv = [](const typet &type)
+    {
+      return type.id() == ID_signedbv || type.id() == ID_unsignedbv ||
+             type.id() == ID_bv || type.id() == ID_c_enum ||
+             type.id() == ID_c_enum_tag;
+    };
+    if(is_integer_bv(op0_type) && is_integer_bv(expr.type()))
+    {
+      typecast_exprt tc{expr.src(), expr.type()};
+      return changed(simplify_typecast(tc));
+    }
   }
 
   return unchanged(expr);
