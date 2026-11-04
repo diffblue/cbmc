@@ -3,18 +3,19 @@
 // an exception and its copy have equal what() strings, also for a copy of
 // a copy.
 extern "C" void __CPROVER_assert(bool, const char *);
-extern "C" {
-struct __std_exception_data
+extern "C"
 {
-  const char *_What;
-  bool _DoFree;
-};
-void __cdecl __std_exception_copy(
-  const __std_exception_data *_From,
-  __std_exception_data *_To);
-void __cdecl __std_exception_destroy(__std_exception_data *_Data);
-void *malloc(decltype(sizeof 0));
-void free(void *);
+  struct __std_exception_data
+  {
+    const char *_What;
+    bool _DoFree;
+  };
+  void __cdecl __std_exception_copy(
+    const __std_exception_data *_From,
+    __std_exception_data *_To);
+  void __cdecl __std_exception_destroy(__std_exception_data *_Data);
+  void *malloc(decltype(sizeof 0));
+  void free(void *);
 }
 
 int main()
