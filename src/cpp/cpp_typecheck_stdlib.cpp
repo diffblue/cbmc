@@ -1668,6 +1668,41 @@ exprt cpp_typecheckt::classic_num_put(const symbolt &accessor)
   return inserted->symbol_expr();
 }
 
+/// The body of the MSVC runtime's _Getctype (xlocinfo.cpp) for the "C"
+/// locale: N5008 [facet.ctype.char.statics]/1, the classification of the
+/// characters in the "C" locale, with the masks of the Universal CRT's
+/// <ctype.h> (_UPPER 0x1, _LOWER 0x2, _DIGIT 0x4, _SPACE 0x8, _PUNCT 0x10,
+/// _CONTROL 0x20, _BLANK 0x40 for the space character, _HEX 0x80, and 0x100
+/// for the letters), which the MSVC STL's ctype_base masks are made of.  The
+/// table is static, so _Delfl is 0 and ctype's destructor does not free it.
+static std::string msvc_classic_getctype_model()
+{
+  std::string table;
+  for(int c = 0; c < 256; ++c)
+  {
+    int mask = 0;
+    if(c < 32 || c == 127)
+      mask |= 0x20;
+    if(c >= 9 && c <= 13)
+      mask |= 0x08;
+    if(c == ' ')
+      mask |= 0x08 | 0x40;
+    if(c >= '0' && c <= '9')
+      mask |= 0x04 | 0x80;
+    if(c >= 'A' && c <= 'Z')
+      mask |= 0x01 | 0x100;
+    if(c >= 'a' && c <= 'z')
+      mask |= 0x02 | 0x100;
+    if((c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f'))
+      mask |= 0x80;
+    if(c > ' ' && c < 127 && mask == 0)
+      mask |= 0x10;
+    table += (c == 0 ? "" : ",") + std::to_string(mask);
+  }
+  return "{ static const short __t[256] = {" + table +
+         "}; _Ctypevec __c = {}; __c._Table = __t; return __c; }";
+}
+
 /// Bodies, in C++, of functions that libc++ (LLVM 18) declares in its
 /// headers and defines in its compiled library (src/*.cpp there), keyed by
 /// the function's name without its parameter list.  The std::bad_alloc
@@ -1805,6 +1840,18 @@ static const std::map<std::string, std::string> &library_source_models()
     {"_Getcvt",
      "{ _Cvtvec __c = {}; __c._Mbcurmax = 1; __c._Isclocale = 1;"
      " return __c; }"},
+    {"_Getctype", msvc_classic_getctype_model()},
+    // the "C" locale's conversion of one multibyte character: a byte is
+    // the character of the same value ([c.mb.wcs]/4, C17 7.29.6.3.2: 0 for
+    // the null character, else the one byte read; -2 when no byte is
+    // available), as the runtime's _Mbrtowc does for a _Cvtvec of the "C"
+    // locale
+    {"_Mbrtowc",
+     "{ const char *__s = " CPROVER_PREFIX "parameter1;"
+     " if(__s == nullptr) return 0; if(_Max_multibyte == 0) return -2;"
+     " if(" CPROVER_PREFIX "parameter0 != nullptr)"
+     " *" CPROVER_PREFIX "parameter0 = (wchar_t)(unsigned char)*__s;"
+     " return *__s != 0 ? 1 : 0; }"},
     // the MSVC runtime's file streams (fiopen.cpp, the UCRT): N5008
     // [filebuf.members]/3, 6, opening a file may fail, and then open returns
     // a null pointer.  As CBMC's model of fopen, _Fiopen either fails or
