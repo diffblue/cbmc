@@ -734,7 +734,7 @@ void add_character_set_constraint(
 /// Create a refined_string_exprt `str` whose content and length are fresh
 /// symbols, calls the string primitive with name `function_id`.
 /// In the arguments of the primitive `str` takes the place of the result and
-/// the following arguments are given by parameter `arguments.
+/// the following arguments are given by parameter `arguments`.
 /// \param function_id: the name of the function
 /// \param arguments: arguments of the function
 /// \param loc: source location
@@ -744,7 +744,7 @@ void add_character_set_constraint(
 /// int return_code;
 /// int str.length;
 /// char str.data[str.length]
-/// return_code = <function_id>(str.length, str.data, arguments)
+/// return_code = FUNCTION_ID(str.length, str.data, arguments)
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /// \return refined string expression `str`
 refined_string_exprt java_string_library_preprocesst::string_expr_of_function(

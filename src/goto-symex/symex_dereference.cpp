@@ -38,7 +38,7 @@ Author: Daniel Kroening, kroening@kroening.com
 ///   side-effects of a dereference operation.
 /// \param keep_array: if true and an underlying object is an array, return
 ///   its address (`&array`); otherwise return the address of its first element
-///   (`&array[0]).
+///   (`&array[0]`).
 /// \return the transformed lvalue expression
 exprt goto_symext::address_arithmetic(
   const exprt &expr,

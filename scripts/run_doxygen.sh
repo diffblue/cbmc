@@ -3,7 +3,7 @@
 echo "Running doxygen version $(doxygen --version)"
 
 # Check doxygen version
-EXPECTED_VERSION="1.9.8"
+EXPECTED_VERSION="1.15.0"
 doxygen --version | grep ^$EXPECTED_VERSION > /dev/null
 if [ $? -ne 0 ]
 then

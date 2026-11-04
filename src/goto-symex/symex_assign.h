@@ -46,7 +46,10 @@ public:
   }
 
   /// Record the assignment of value \p rhs to variable \p lhs in \p state and
-  /// add the equation to target: `lhs#{n+1} == guard ? rhs#{m} : lhs#{n}`
+  /// add the equation to target:
+  /// \code
+  /// lhs#{n+1} == guard ? rhs#{m} : lhs#{n}
+  /// \endcode
   /// where {n} and {m} denote the current L2 indexes of lhs and rhs
   /// respectively.
   void assign_symbol(

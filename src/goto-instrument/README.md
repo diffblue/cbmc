@@ -74,7 +74,7 @@ Then, assuming you have compiled it to a goto-binary with `goto-cc`, called
 `function_pointers.goto`, you could see the output of the 
 `--show-goto-functions` flag on the unmodified program:
 
-	Reading GOTO program from `function_pointers.goto'
+	Reading GOTO program from 'function_pointers.goto'
 	^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 	func /* func */
@@ -98,7 +98,7 @@ Then, you can run a transformation pass with `goto-instrument --remove-function-
 and then ask to show the result of the transformation through
 showing the goto-functions again:
 
-	Reading GOTO program from `function_pointers_modified.goto'
+	Reading GOTO program from 'function_pointers_modified.goto'
 	^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 	func /* func */
@@ -170,7 +170,7 @@ specifying the input file.
 
 You can see the call graph of a particular goto-binary by issuing `goto-instrument --call-graph <goto_binary>`. This gives a result similar to this:
 
-	Reading GOTO program from `a.out'
+	Reading GOTO program from 'a.out'
 	Function Pointer Removal
 	Virtual function removal
 	Cleaning inline assembler statements

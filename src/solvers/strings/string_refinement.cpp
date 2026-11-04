@@ -1173,12 +1173,12 @@ static exprt substitute_array_access(
                         : sparse_arrayt::to_if_expression(expr, index);
 }
 
-/// Create an equivalent expression where array accesses are replaced by 'if'
-/// expressions: for instance in array access `arr[index]`, where:
-/// `arr := {12, 24, 48}` the constructed expression will be:
-///    `index==0 ? 12 : index==1 ? 24 : 48`
-/// Avoids repetition so `arr := {12, 12, 24, 48}` will give
-///    `index<=1 ? 12 : index==1 ? 24 : 48`
+/// Create an equivalent expression where array accesses are replaced by
+/// if-expressions: for instance in array access \c arr[index], where
+/// \c arr is \code {12, 24, 48} \endcode the constructed expression will be:
+/// \code index==0 ? 12 : index==1 ? 24 : 48 \endcode
+/// Avoids repetition so if \c arr is \code {12, 12, 24, 48} \endcode we get:
+/// \code index<=1 ? 12 : index==2 ? 24 : 48 \endcode
 static exprt substitute_array_access(
   const array_exprt &array_expr,
   const exprt &index,

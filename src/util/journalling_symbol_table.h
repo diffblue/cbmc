@@ -14,7 +14,7 @@
 
 /// \brief A symbol table wrapper that records which entries have been
 /// updated/removed
-/// \ingroup gr_symbol_table
+///
 /// A caller can pass a `journalling_symbol_tablet` into a callee that is
 /// expected to mutate it somehow, then after it has run inspect the recording
 /// table's journal to determine what has changed more cheaply than examining

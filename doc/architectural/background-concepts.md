@@ -1234,7 +1234,7 @@ For our example, we use the following domain:
 - `merge` is defined as follows:
   * `merge(bottom, x)` = `x`
   * `merge("could be 0", x)` = `"could be 0"`
-  * `merge(x,x) = `x`
+  * `merge(x,x)` = `x`
   * `merge("equals 0", "not 0")` = `"could be 0"`
 - `bottom` is bottom, obviously.
 It is easy but tedious to check that all conditions hold.
