@@ -1194,7 +1194,23 @@ void smt2_parsert::setup_expressions()
   expressions["or"] = [this] { return multi_ary(ID_or, operands()); };
   expressions["xor"] = [this] { return multi_ary(ID_xor, operands()); };
   expressions["not"] = [this] { return unary(ID_not, operands()); };
-  expressions["="] = [this] { return binary_predicate(ID_equal, operands()); };
+  expressions["="] = [this]() -> exprt
+  {
+    auto op = operands();
+    if(op.size() != 2)
+      throw error("= takes exactly two operands");
+    check_matching_operand_types(op);
+    // SMT-LIB FloatingPoint theory: = is identity of values.
+    // All NaN bit patterns denote the same value, so
+    // (= NaN1 NaN2) is true regardless of their bit patterns.
+    if(op[0].type().id() == ID_floatbv)
+    {
+      exprt both_nan = and_exprt(isnan_exprt(op[0]), isnan_exprt(op[1]));
+      exprt bw_equal = equal_exprt(op[0], op[1]);
+      return or_exprt(std::move(both_nan), std::move(bw_equal));
+    }
+    return binary_predicate_exprt(op[0], ID_equal, op[1]);
+  };
   expressions["<="] = [this] { return binary_predicate(ID_le, operands()); };
   expressions[">="] = [this] { return binary_predicate(ID_ge, operands()); };
   expressions["<"] = [this] { return binary_predicate(ID_lt, operands()); };
@@ -1293,22 +1309,36 @@ void smt2_parsert::setup_expressions()
     return concatenation_exprt(std::move(op), unsignedbv_typet(total_width));
   };
 
-  expressions["distinct"] = [this] {
+  expressions["distinct"] = [this]() -> exprt
+  {
     // pair-wise different constraint, multi-ary
     auto op = operands();
+
+    auto make_neq = [](const exprt &a, const exprt &b) -> exprt
+    {
+      // For FloatingPoint, distinct means "not the same value",
+      // where all NaN bit patterns are one value.
+      if(a.type().id() == ID_floatbv)
+      {
+        exprt both_nan = and_exprt(isnan_exprt(a), isnan_exprt(b));
+        exprt bw_equal = equal_exprt(a, b);
+        return not_exprt(or_exprt(std::move(both_nan), std::move(bw_equal)));
+      }
+      return binary_exprt(a, ID_notequal, b, bool_typet());
+    };
+
     if(op.size() == 2)
-      return binary_predicate(ID_notequal, op);
+    {
+      check_matching_operand_types(op);
+      return make_neq(op[0], op[1]);
+    }
     else
     {
       std::vector<exprt> pairwise_constraints;
       for(std::size_t i = 0; i < op.size(); i++)
       {
-        for(std::size_t j = i; j < op.size(); j++)
-        {
-          if(i != j)
-            pairwise_constraints.push_back(
-              binary_exprt(op[i], ID_notequal, op[j], bool_typet()));
-        }
+        for(std::size_t j = i + 1; j < op.size(); j++)
+          pairwise_constraints.push_back(make_neq(op[i], op[j]));
       }
       return multi_ary(ID_and, pairwise_constraints);
     }
