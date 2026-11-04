@@ -140,7 +140,6 @@ void contracts_wranglert::mangle(
   // Parse the fake function.
   std::istringstream is(pr.str());
   ansi_c_parsert ansi_c_parser{message_handler};
-  ansi_c_parser.set_line_no(0);
   ansi_c_parser.set_file("<predicate>");
   ansi_c_parser.in = &is;
   ansi_c_parser.for_has_scope = config.ansi_c.for_has_scope;
