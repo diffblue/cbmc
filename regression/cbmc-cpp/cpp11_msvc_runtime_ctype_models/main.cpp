@@ -4,36 +4,37 @@
 // of the "C" locale; [c.mb.wcs]/4 (C17 7.29.6.3.2): in the "C" locale a
 // byte converts to the wide character of the same value.
 extern "C" void __CPROVER_assert(bool, const char *);
-extern "C" {
-typedef decltype(sizeof 0) size_t;
-typedef struct _Mbstatet
+extern "C"
 {
-  unsigned long _Wchar;
-  unsigned short _Byte, _State;
-} _Mbstatet;
-typedef _Mbstatet mbstate_t;
-struct _Ctypevec
-{
-  unsigned int _Page;
-  const short *_Table;
-  int _Delfl;
-  wchar_t *_LocaleName;
-};
-struct _Cvtvec
-{
-  unsigned int _Page;
-  unsigned int _Mbcurmax;
-  int _Isclocale;
-  unsigned char _Isleadbyte[32];
-};
-_Ctypevec __cdecl _Getctype() noexcept;
-_Cvtvec __cdecl _Getcvt() noexcept;
-int __cdecl _Mbrtowc(
-  wchar_t *,
-  const char *,
-  size_t _Max_multibyte,
-  mbstate_t *,
-  const _Cvtvec *) noexcept;
+  typedef decltype(sizeof 0) size_t;
+  typedef struct _Mbstatet
+  {
+    unsigned long _Wchar;
+    unsigned short _Byte, _State;
+  } _Mbstatet;
+  typedef _Mbstatet mbstate_t;
+  struct _Ctypevec
+  {
+    unsigned int _Page;
+    const short *_Table;
+    int _Delfl;
+    wchar_t *_LocaleName;
+  };
+  struct _Cvtvec
+  {
+    unsigned int _Page;
+    unsigned int _Mbcurmax;
+    int _Isclocale;
+    unsigned char _Isleadbyte[32];
+  };
+  _Ctypevec __cdecl _Getctype() noexcept;
+  _Cvtvec __cdecl _Getcvt() noexcept;
+  int __cdecl _Mbrtowc(
+    wchar_t *,
+    const char *,
+    size_t _Max_multibyte,
+    mbstate_t *,
+    const _Cvtvec *) noexcept;
 }
 
 int main()
@@ -45,8 +46,8 @@ int main()
   __CPROVER_assert(
     (t['A'] & 0x1) && (t['z'] & 0x2) && (t['7'] & 0x4) && (t['7'] & 0x80) &&
       (t[' '] & 0x8) && (t['\n'] & 0x8) && (t['!'] & 0x10) &&
-      (t['\t'] & 0x20) && !(t['g'] & 0x80) && t[200] == 0 &&
-      ct._Delfl == 0 && ct._LocaleName == nullptr,
+      (t['\t'] & 0x20) && !(t['g'] & 0x80) && t[200] == 0 && ct._Delfl == 0 &&
+      ct._LocaleName == nullptr,
     "classification of the C locale");
   _Cvtvec cvt = _Getcvt();
   mbstate_t st{};

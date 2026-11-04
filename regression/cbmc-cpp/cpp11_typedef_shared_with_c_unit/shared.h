@@ -6,13 +6,14 @@ typedef struct locale_pointers
 } locale_pointers;
 typedef locale_pointers *locale_handle;
 #ifdef __cplusplus
-extern "C" {
-#endif
-int common(int, locale_handle);
-inline int wrap(int const x, locale_handle const l)
+extern "C"
 {
-  return common(x, l);
-}
+#endif
+  int common(int, locale_handle);
+  inline int wrap(int const x, locale_handle const l)
+  {
+    return common(x, l);
+  }
 #ifdef __cplusplus
 }
 #endif
