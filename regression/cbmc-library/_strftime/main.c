@@ -1,9 +1,9 @@
 #include <assert.h>
 #include <time.h>
 
-#ifndef __DARWIN_ALIAS
+// the name of strftime in Apple's object files, which cbmc's library models
+// for goto binaries that call it
 size_t _strftime(char *s, size_t max, const char *format, const struct tm *tm);
-#endif
 
 int main()
 {
