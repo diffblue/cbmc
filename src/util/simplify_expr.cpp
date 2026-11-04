@@ -942,24 +942,19 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
   }
 
   // an integer cast to a pointer, read as a bit vector and converted back to
-  // an integer type as wide as it: (T)(bv)(void *)x -> (T)x (Visual Studio's
-  // va_arg, see simplify_extractbits)
+  // the integer's type: (T)(bv)(void *)x -> x (Visual Studio's va_arg, see
+  // simplify_extractbits).  Only to x's own type: where a pointer is as wide
+  // as int, the pointer read back from memcpy's bytes is
+  // (int *)(unsigned)(bv)(int *)44, and (int *)44u is not then found equal
+  // to (int *)44.
   if(
     (expr_type.id() == ID_signedbv || expr_type.id() == ID_unsignedbv) &&
     op_type.id() == ID_bv && expr.op().id() == ID_typecast &&
     to_typecast_expr(expr.op()).op().id() == ID_typecast &&
-    to_typecast_expr(expr.op()).op().type().id() == ID_pointer)
+    to_typecast_expr(expr.op()).op().type().id() == ID_pointer &&
+    to_typecast_expr(to_typecast_expr(expr.op()).op()).op().type() == expr_type)
   {
-    const exprt &value =
-      to_typecast_expr(to_typecast_expr(expr.op()).op()).op();
-    if(
-      (value.type().id() == ID_signedbv ||
-       value.type().id() == ID_unsignedbv) &&
-      to_bitvector_type(value.type()).get_width() ==
-        to_bitvector_type(expr_type).get_width())
-    {
-      return changed(simplify_typecast(typecast_exprt{value, expr_type}));
-    }
+    return to_typecast_expr(to_typecast_expr(expr.op()).op()).op();
   }
 
   // casts from integer to pointer and back:

@@ -1266,23 +1266,18 @@ simplify_exprt::simplify_extractbits(const extractbits_exprt &expr)
   DATA_INVARIANT(*start >= *end, "extractbits must have start >= end");
 
   // the low bits of an integer cast to a pointer and read as a bit vector,
-  // as wide as the integer: the integer (Visual Studio's va_arg reads the
+  // as the integer's type: the integer (Visual Studio's va_arg reads the
   // immediate values va_start stores in pointer-sized slots this way,
-  // `(bv)(void *)7[31, 0]')
+  // `(bv)(void *)7[31, 0]').  Only as x's own type, see simplify_typecast.
   if(
     *end == bitst{0} && expr.src().id() == ID_typecast &&
     to_typecast_expr(expr.src()).op().id() == ID_typecast &&
-    to_typecast_expr(expr.src()).op().type().id() == ID_pointer)
+    to_typecast_expr(expr.src()).op().type().id() == ID_pointer &&
+    to_typecast_expr(to_typecast_expr(expr.src()).op()).op().type() ==
+      expr.type() &&
+    (expr.type().id() == ID_signedbv || expr.type().id() == ID_unsignedbv))
   {
-    const exprt &value =
-      to_typecast_expr(to_typecast_expr(expr.src()).op()).op();
-    if(
-      (value.type().id() == ID_signedbv ||
-       value.type().id() == ID_unsignedbv) &&
-      pointer_offset_bits(value.type(), ns) == *result_width)
-    {
-      return changed(simplify_typecast(typecast_exprt{value, expr.type()}));
-    }
+    return to_typecast_expr(to_typecast_expr(expr.src()).op()).op();
   }
 
   if(expr.src().is_constant())
