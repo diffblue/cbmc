@@ -1895,11 +1895,14 @@ exprt string_refinementt::get(const exprt &expr) const
     {
       const exprt length = super_get(length_from_pool.value());
 
-      if(const auto n = numeric_cast<std::size_t>(length))
+      if(numeric_cast<std::size_t>(length))
       {
-        const interval_sparse_arrayt sparse_array(from_integer(
-          CHARACTER_FOR_UNKNOWN, to_array_type(arr.type()).element_type()));
-        return sparse_array.concretize(*n, length.type());
+        // No character values are known. Keep the repeated placeholder compact
+        // so building a trace does not allocate and print one per character.
+        const typet &char_type = to_array_type(arr.type()).element_type();
+        return array_of_exprt(
+          from_integer(CHARACTER_FOR_UNKNOWN, char_type),
+          array_typet(char_type, length));
       }
     }
     return arr;
