@@ -15930,3 +15930,40 @@ Checks on W197: 13 suites (cbmc-cpp with -X msvc-stl), profiles (z3
 complex2 flaky, passes on rerun), unit, lint, format overall and per
 commit, doxygen, per-commit compile, iwyu on the changed files, platform
 (gcc11, m32, arm64), vacuity 1065/3, MSVC .ii 8/8, macOS 143/143.
+
+## Round 215 (2026-11-04): CI failures of the Round 214 push (0bdc1ef02f)
+
+The run on 32f9d1b1ab failed only macOS; the push broke 5 more jobs.
+- c51f2577fe gcc-16 cbmc-cpp job: its direct test.pl call lacked
+  -X msvc-stl.
+- 4db13b9686 VS 2022: the strto*_l and uselocale library tests use
+  POSIX locale_t; tagged unix.
+- 3c495c99c6 32-bit: e64382cc5a folded (T)(bv)(int *)44 for any T of the
+  width, so memcpy's int * read back as unsigned became (int *)44u, not
+  equal to (int *)44; folds only to x's own type now.
+- 38eb1d5b5d arm64: AArch64's va_list is a struct, named differently by
+  the C and C++ front ends; symex rejected the libc++ call of vsnprintf.
+  Layout-compatible struct arguments ([class.mem.general]/27) are
+  reinterpreted.  Reproduced with PATH=/tmp/r225/a64bin (clang
+  --target=aarch64-linux-gnu) and --arch arm64: all libc++ tests pass.
+- VS 2026, from the CI's cl-preprocessed artifact:
+  e9ca84501b [[no_unique_address]] layout tests are itanium-abi (MSVC
+  ignores the attribute, [intro.object]/8); 3a88ad1371 linking renamed
+  a conflicting typedef to a type2name string while types kept its
+  #typedef: "__crt_locale_pointers not found" (pre-existing, also on
+  32f9d1b1ab; reproduced with a C++ unit and a C unit linked after it);
+  e7faf8a1f5 _Getctype and _Mbrtowc models; bce46492e4 --object-bits 12.
+  On Linux --winx64 the C library models do not load; with them inlined
+  the four MSVC iostream tests verify (11 s for the stringstream one).
+- 7cdcb2315e macOS: Apple's headers declare fopen __asm("_" "fopen"); the
+  C front end renamed it to _fopen, the C++ front end kept fopen, which so
+  had no body and basic_filebuf closed an arbitrary FILE.  The
+  underscore label is now not applied on macOS.  Not runnable here:
+  the macOS-preprocessed .ii passes locally even before the fix because
+  on Linux the macOS C library models do not load either.
+- perf-benchcomp: aws_priority_queue_push solver time 110 -> 208 s with
+  the same 8431 steps it had at 88 s in the previous run: solver noise.
+Checks on W198: 13 suites, profiles (z3 complex2 flaky), vacuity
+1065/3, unit, lint, format per commit, doxygen, iwyu, per-commit compile,
+platform (gcc11, m32, arm64), cbmc and cbmc-library on 32-bit, libc++
+suite with AArch64 headers, MSVC .ii 8/8, macOS set 143/143.
