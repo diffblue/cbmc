@@ -1065,6 +1065,31 @@ bool linkingt::link(const symbol_table_baset &src_symbol_table)
 
   std::unordered_set<irep_idt> needs_to_be_renamed;
 
+  // Handle section-attributed symbols: when a symbol has been renamed due to
+  // __attribute__((section("name"))) (resulting in a "name$$base" identifier),
+  // ensure that any matching extern declaration using just the base name is
+  // renamed to the section-prefixed name.
+  for(const auto &src_sym_pair : src_symbol_table.symbols)
+  {
+    const std::string &name_str = id2string(src_sym_pair.first);
+    std::size_t pos = name_str.find("$$");
+    if(pos == std::string::npos)
+      continue;
+
+    // Only handle non-type symbols with static lifetime (global variables)
+    if(src_sym_pair.second.is_type || !src_sym_pair.second.is_static_lifetime)
+      continue;
+
+    irep_idt base_name(name_str.substr(pos + 2));
+    auto m_it = main_symbol_table.symbols.find(base_name);
+    if(
+      m_it != main_symbol_table.symbols.end() && !m_it->second.is_type &&
+      m_it->second.is_extern)
+    {
+      rename_main_symbol.insert_expr(base_name, src_sym_pair.first);
+    }
+  }
+
   for(const auto &symbol_pair : src_symbol_table.symbols)
   {
     symbol_table_baset::symbolst::const_iterator m_it =
