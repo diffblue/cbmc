@@ -27,7 +27,7 @@ struct java_bytecode_parse_treet;
 /// \return parse tree, or empty std::optional on failure
 std::optional<java_bytecode_parse_treet> java_bytecode_parse(
   const std::string &file,
-  const irep_idt &class_name,
+  irep_idt class_name,
   class message_handlert &msg,
   bool skip_instructions = false);
 
@@ -40,7 +40,7 @@ std::optional<java_bytecode_parse_treet> java_bytecode_parse(
 /// \return parse tree, or empty std::optional on failure
 std::optional<java_bytecode_parse_treet> java_bytecode_parse(
   std::istream &stream,
-  const irep_idt &class_name,
+  irep_idt class_name,
   class message_handlert &msg,
   bool skip_instructions = false);
 

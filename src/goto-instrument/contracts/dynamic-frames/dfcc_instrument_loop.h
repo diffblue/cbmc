@@ -131,7 +131,7 @@ public:
   ///
   void operator()(
     const std::size_t loop_id,
-    const irep_idt &function_id,
+    irep_idt function_id,
     goto_functiont &goto_function,
     dfcc_cfg_infot &cfg_info,
     const std::set<symbol_exprt> &local_statics,
@@ -196,7 +196,7 @@ protected:
   /// \return `history_var_map` that maps variables to loop_entry variables.
   std::unordered_map<exprt, symbol_exprt, irep_hash> add_prehead_instructions(
     const std::size_t loop_id,
-    const irep_idt &function_id,
+    irep_idt function_id,
     goto_functionst::goto_functiont &goto_function,
     symbol_table_baset &symbol_table,
     goto_programt::targett loop_head,
@@ -209,7 +209,7 @@ protected:
     const symbol_exprt &entered_loop,
     const symbol_exprt &initial_invariant,
     const symbol_exprt &in_base_case,
-    const irep_idt &symbol_mode);
+    irep_idt symbol_mode);
 
   /// \brief Adds instructions of the step block, and returns the STEP
   /// jump target so that it can be used to jump back from the loop body block.
@@ -246,7 +246,7 @@ protected:
   goto_programt::instructiont::targett add_step_instructions(
     const std::size_t loop_id,
     const std::size_t cbmc_loop_id,
-    const irep_idt &function_id,
+    irep_idt function_id,
     goto_functionst::goto_functiont &goto_function,
     symbol_table_baset &symbol_table,
     goto_programt::targett loop_head,
@@ -295,7 +295,7 @@ protected:
   void add_body_instructions(
     const std::size_t loop_id,
     const std::size_t cbmc_loop_id,
-    const irep_idt &function_id,
+    irep_idt function_id,
     goto_functionst::goto_functiont &goto_function,
     symbol_table_baset &symbol_table,
     goto_programt::targett loop_head,
@@ -307,7 +307,7 @@ protected:
     const std::vector<symbol_exprt> &old_decreases_vars,
     const std::vector<symbol_exprt> &new_decreases_vars,
     const goto_programt::instructiont::targett &step_case_target,
-    const irep_idt &symbol_mode);
+    irep_idt symbol_mode);
 
   /// \brief Adds instructions of the exit block.
   ///

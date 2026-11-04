@@ -227,24 +227,22 @@ protected:
   virtual exprt do_special_functions(side_effect_expr_function_callt &expr);
   exprt typecheck_builtin_overflow(
     side_effect_expr_function_callt &expr,
-    const irep_idt &arith_op);
+    irep_idt arith_op);
   exprt
   typecheck_saturating_arithmetic(const side_effect_expr_function_callt &expr);
   virtual std::optional<symbol_exprt> typecheck_gcc_polymorphic_builtin(
-    const irep_idt &identifier,
+    irep_idt identifier,
     const exprt::operandst &arguments,
     const source_locationt &source_location);
   virtual code_blockt instantiate_gcc_polymorphic_builtin(
-    const irep_idt &identifier,
+    irep_idt identifier,
     const symbol_exprt &function_symbol);
   virtual std::optional<symbol_exprt>
   typecheck_shadow_memory_builtin(const side_effect_expr_function_callt &expr);
   virtual exprt
   typecheck_shuffle_vector(const side_effect_expr_function_callt &expr);
-  void disallow_subexpr_by_id(
-    const exprt &,
-    const irep_idt &,
-    const std::string &) const;
+  void
+  disallow_subexpr_by_id(const exprt &, irep_idt, const std::string &) const;
 
   virtual void make_index_type(exprt &expr);
   virtual void make_constant(exprt &expr);
@@ -252,7 +250,7 @@ protected:
 
   virtual bool gcc_types_compatible_p(const typet &, const typet &);
 
-  virtual bool builtin_factory(const irep_idt &);
+  virtual bool builtin_factory(irep_idt);
 
   // types
   virtual void typecheck_type(typet &type);
@@ -319,7 +317,7 @@ protected:
   typedef std::unordered_map<irep_idt, irep_idt> asm_label_mapt;
   asm_label_mapt asm_label_map;
 
-  void apply_asm_label(const irep_idt &asm_label, symbolt &symbol);
+  void apply_asm_label(irep_idt asm_label, symbolt &symbol);
 };
 
 class already_typechecked_exprt : public expr_protectedt

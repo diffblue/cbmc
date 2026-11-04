@@ -52,7 +52,7 @@ void generic_parameter_specialization_mapt::pop(std::size_t container_index)
 }
 
 std::optional<reference_typet>
-generic_parameter_specialization_mapt::pop(const irep_idt &parameter_name)
+generic_parameter_specialization_mapt::pop(irep_idt parameter_name)
 {
   const auto types_it = param_to_container.find(parameter_name);
   if(types_it == param_to_container.end())

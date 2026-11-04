@@ -230,7 +230,7 @@ exprt get_array_element_type_field(const exprt &pointer)
 /// \param tag: Tag of a struct
 /// \return True if the given string is a Java array tag, i.e., has a prefix
 ///   of java::array[
-bool is_java_array_tag(const irep_idt& tag)
+bool is_java_array_tag(irep_idt tag)
 {
   return tag.starts_with("java::array[");
 }

@@ -29,10 +29,8 @@ public:
   class inherited_componentt
   {
   public:
-    inherited_componentt(
-      const irep_idt &class_id, const irep_idt &component_id):
-        class_identifier(class_id),
-        component_identifier(component_id)
+    inherited_componentt(irep_idt class_id, irep_idt component_id)
+      : class_identifier(class_id), component_identifier(component_id)
     {}
 
     irep_idt get_full_component_identifier() const;
@@ -48,15 +46,14 @@ public:
   };
 
   std::optional<inherited_componentt> operator()(
-    const irep_idt &class_id,
-    const irep_idt &component_name,
+    irep_idt class_id,
+    irep_idt component_name,
     bool include_interfaces,
-    std::function<bool(const symbolt &)> user_filter = [](const symbolt &) {
-      return true;
-    });
+    std::function<bool(const symbolt &)> user_filter = [](const symbolt &)
+    { return true; });
 
-  static irep_idt build_full_component_identifier(
-    const irep_idt &class_name, const irep_idt &component_name);
+  static irep_idt
+  build_full_component_identifier(irep_idt class_name, irep_idt component_name);
 
 private:
   const symbol_table_baset &symbol_table;
@@ -64,8 +61,8 @@ private:
 
 std::optional<resolve_inherited_componentt::inherited_componentt>
 get_inherited_method_implementation(
-  const irep_idt &call_basename,
-  const irep_idt &classname,
+  irep_idt call_basename,
+  irep_idt classname,
   const symbol_table_baset &symbol_table);
 
 #endif // CPROVER_GOTO_PROGRAMS_RESOLVE_INHERITED_COMPONENT_H

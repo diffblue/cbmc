@@ -61,7 +61,7 @@ struct function_call_harness_generatort::implt
   std::set<symbol_exprt> global_pointers;
 
   /// \see goto_harness_generatort::generate
-  void generate(goto_modelt &goto_model, const irep_idt &harness_function_name);
+  void generate(goto_modelt &goto_model, irep_idt harness_function_name);
   /// Iterate over the symbol table and generate initialisation code for
   /// globals into the function body.
   void generate_nondet_globals(code_blockt &function_body);
@@ -218,14 +218,14 @@ void function_call_harness_generatort::handle_option(
 
 void function_call_harness_generatort::generate(
   goto_modelt &goto_model,
-  const irep_idt &harness_function_name)
+  irep_idt harness_function_name)
 {
   p_impl->generate(goto_model, harness_function_name);
 }
 
 void function_call_harness_generatort::implt::generate(
   goto_modelt &goto_model,
-  const irep_idt &harness_function_name)
+  irep_idt harness_function_name)
 {
   symbol_table = &goto_model.symbol_table;
   goto_functions = &goto_model.goto_functions;

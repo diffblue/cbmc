@@ -80,9 +80,9 @@ public:
   }
 
   void transform(
-    const irep_idt &function_from,
+    irep_idt function_from,
     trace_ptrt from,
-    const irep_idt &function_to,
+    irep_idt function_to,
     trace_ptrt to,
     ai_baset &ai,
     const namespacet &ns) override;
@@ -118,9 +118,9 @@ typedef value_set_domain_templatet<value_sett> value_set_domaint;
 
 template <class VST>
 void value_set_domain_templatet<VST>::transform(
-  const irep_idt &,
+  irep_idt,
   trace_ptrt from,
-  const irep_idt &function_to,
+  irep_idt function_to,
   trace_ptrt to,
   ai_baset &,
   const namespacet &ns)

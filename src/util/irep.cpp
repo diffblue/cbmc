@@ -23,7 +23,7 @@ const irept &get_nil_irep()
   return nil_rep_storage;
 }
 
-void irept::move_to_named_sub(const irep_idt &name, irept &irep)
+void irept::move_to_named_sub(irep_idt name, irept &irep)
 {
   #ifdef SHARING
   detach();
@@ -41,7 +41,7 @@ void irept::move_to_sub(irept &irep)
   get_sub().back().swap(irep);
 }
 
-const irep_idt &irept::get(const irep_idt &name) const
+const irep_idt &irept::get(irep_idt name) const
 {
   const named_subt &s = get_named_sub();
   named_subt::const_iterator it=s.find(name);
@@ -54,43 +54,43 @@ const irep_idt &irept::get(const irep_idt &name) const
   return it->second.id();
 }
 
-bool irept::get_bool(const irep_idt &name) const
+bool irept::get_bool(irep_idt name) const
 {
   return get(name)==ID_1;
 }
 
-int irept::get_int(const irep_idt &name) const
+int irept::get_int(irep_idt name) const
 {
   return unsafe_string2int(get_string(name));
 }
 
-std::size_t irept::get_size_t(const irep_idt &name) const
+std::size_t irept::get_size_t(irep_idt name) const
 {
   return unsafe_string2size_t(get_string(name));
 }
 
-long long irept::get_long_long(const irep_idt &name) const
+long long irept::get_long_long(irep_idt name) const
 {
   return unsafe_string2signedlonglong(get_string(name));
 }
 
-void irept::set(const irep_idt &name, const long long value)
+void irept::set(irep_idt name, const long long value)
 {
   add(name).id(to_dstring(value));
 }
 
-void irept::set_size_t(const irep_idt &name, const std::size_t value)
+void irept::set_size_t(irep_idt name, const std::size_t value)
 {
   add(name).id(to_dstring(value));
 }
 
-void irept::remove(const irep_idt &name)
+void irept::remove(irep_idt name)
 {
   named_subt &s = get_named_sub();
   s.erase(name);
 }
 
-const irept &irept::find(const irep_idt &name) const
+const irept &irept::find(irep_idt name) const
 {
   const named_subt &s = get_named_sub();
   auto it = s.find(name);
@@ -100,13 +100,13 @@ const irept &irept::find(const irep_idt &name) const
   return it->second;
 }
 
-irept &irept::add(const irep_idt &name)
+irept &irept::add(irep_idt name)
 {
   named_subt &s = get_named_sub();
   return s[name];
 }
 
-irept &irept::add(const irep_idt &name, irept irep)
+irept &irept::add(irep_idt name, irept irep)
 {
   named_subt &s = get_named_sub();
 

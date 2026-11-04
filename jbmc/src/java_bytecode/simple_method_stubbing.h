@@ -19,7 +19,7 @@ struct java_object_factory_parameterst;
 class symbol_table_baset;
 
 void java_generate_simple_method_stub(
-  const irep_idt &function_name,
+  irep_idt function_name,
   symbol_table_baset &symbol_table,
   bool assume_non_null,
   const java_object_factory_parameterst &object_factory_parameters,

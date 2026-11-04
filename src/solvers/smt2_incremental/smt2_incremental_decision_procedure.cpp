@@ -165,7 +165,7 @@ void smt2_incremental_decision_proceduret::define_array_function(
 
 void send_function_definition(
   const exprt &expr,
-  const irep_idt &symbol_identifier,
+  irep_idt symbol_identifier,
   const std::unique_ptr<smt_base_solver_processt> &solver_process,
   std::unordered_map<exprt, smt_identifier_termt, irep_hash>
     &expression_identifiers,

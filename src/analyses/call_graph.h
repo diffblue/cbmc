@@ -52,7 +52,7 @@ public:
 
   static call_grapht create_from_root_function(
     const goto_modelt &model,
-    const irep_idt &root,
+    irep_idt root,
     bool collect_callsites)
   {
     return call_grapht(model, root, collect_callsites);
@@ -60,7 +60,7 @@ public:
 
   static call_grapht create_from_root_function(
     const goto_functionst &functions,
-    const irep_idt &root,
+    irep_idt root,
     bool collect_callsites)
   {
     return call_grapht(functions, root, collect_callsites);
@@ -69,13 +69,10 @@ public:
   // Constructors used to implement the above:
 
 private:
-  call_grapht(
-    const goto_modelt &model,
-    const irep_idt &root,
-    bool collect_callsites);
+  call_grapht(const goto_modelt &model, irep_idt root, bool collect_callsites);
   call_grapht(
     const goto_functionst &functions,
-    const irep_idt &root,
+    irep_idt root,
     bool collect_callsites);
 
 public:
@@ -115,8 +112,8 @@ public:
   /// Map from call-graph edges to a set of callsites that make the given call.
   callsitest callsites;
 
-  void add(const irep_idt &caller, const irep_idt &callee);
-  void add(const irep_idt &caller, const irep_idt &callee, locationt callsite);
+  void add(irep_idt caller, irep_idt callee);
+  void add(irep_idt caller, irep_idt callee, locationt callsite);
 
   call_grapht get_inverted() const;
 
@@ -147,7 +144,7 @@ public:
     /// Find the graph node by function name
     /// \param function: function to find
     /// \return none if function is not in this graph, or some index otherwise.
-    std::optional<node_indext> get_node_index(const irep_idt &function) const;
+    std::optional<node_indext> get_node_index(irep_idt function) const;
 
     /// Type of the node name -> node index map.
     typedef std::unordered_map<irep_idt, node_indext> nodes_by_namet;
@@ -163,8 +160,8 @@ public:
   directed_grapht get_directed_graph() const;
 
 protected:
-  void add(const irep_idt &function,
-           const goto_programt &body);
+  void add(irep_idt function, const goto_programt &body);
+
 private:
   bool collect_callsites;
   std::string format_callsites(const edget &edge) const;

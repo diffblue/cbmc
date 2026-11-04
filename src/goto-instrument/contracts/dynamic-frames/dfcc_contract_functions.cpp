@@ -65,7 +65,7 @@ dfcc_contract_functionst::dfcc_contract_functionst(
 
 void dfcc_contract_functionst::
   instrument_without_loop_contracts_check_no_pointer_contracts(
-    const irep_idt &spec_function_id)
+    irep_idt spec_function_id)
 {
   std::set<irep_idt> function_pointer_contracts;
   instrument.instrument_function(

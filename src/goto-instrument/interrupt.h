@@ -23,7 +23,7 @@ class value_setst;
 void interrupt(
   value_setst &,
   goto_modelt &,
-  const irep_idt &interrupt_handler,
+  irep_idt interrupt_handler,
   message_handlert &);
 
 #endif // CPROVER_GOTO_INSTRUMENT_INTERRUPT_H

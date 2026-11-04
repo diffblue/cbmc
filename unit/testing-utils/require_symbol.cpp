@@ -17,7 +17,7 @@ Author: Diffblue Limited.
 /// \param symbol_identifier: The name of the symbol
 const symbolt &require_symbol::require_symbol_exists(
   const symbol_tablet &symbol_table,
-  const irep_idt &symbol_identifier)
+  irep_idt symbol_identifier)
 {
   const symbolt *found_symbol = symbol_table.lookup(symbol_identifier);
   INFO("Looking for symbol: " + id2string(symbol_identifier));

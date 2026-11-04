@@ -85,9 +85,9 @@ public:
   }
 
   void transform(
-    const irep_idt &function_from,
+    irep_idt function_from,
     trace_ptrt trace_from,
-    const irep_idt &function_to,
+    irep_idt function_to,
     trace_ptrt trace_to,
     ai_baset &ai,
     const namespacet &ns) override;
@@ -193,9 +193,9 @@ private:
     const;
 
   void control_dependencies(
-    const irep_idt &from_function,
+    irep_idt from_function,
     goto_programt::const_targett from,
-    const irep_idt &to_function,
+    irep_idt to_function,
     goto_programt::const_targett to,
     variable_sensitivity_dependence_grapht &dep_graph);
 
@@ -247,8 +247,7 @@ public:
     const vsd_configt &_configuration,
     message_handlert &message_handler);
 
-  void
-  initialize(const irep_idt &function_id, const goto_programt &goto_program)
+  void initialize(irep_idt function_id, const goto_programt &goto_program)
   {
     ai_recursive_interproceduralt::initialize(function_id, goto_program);
   }

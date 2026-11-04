@@ -2136,7 +2136,7 @@ void c_typecheck_baset::typecheck_obeys_contract_call(
   expr.type() = bool_typet();
 }
 
-bool c_typecheck_baset::builtin_factory(const irep_idt &identifier)
+bool c_typecheck_baset::builtin_factory(irep_idt identifier)
 {
   return ::builtin_factory(
     identifier,
@@ -3902,7 +3902,7 @@ exprt c_typecheck_baset::do_special_functions(
 
 exprt c_typecheck_baset::typecheck_builtin_overflow(
   side_effect_expr_function_callt &expr,
-  const irep_idt &arith_op)
+  irep_idt arith_op)
 {
   const irep_idt &identifier = to_symbol_expr(expr.function()).identifier();
 
@@ -4862,7 +4862,7 @@ void c_typecheck_baset::make_constant_index(exprt &expr)
 
 void c_typecheck_baset::disallow_subexpr_by_id(
   const exprt &expr,
-  const irep_idt &id,
+  irep_idt id,
   const std::string &message) const
 {
   if(!has_subexpr(expr, id))

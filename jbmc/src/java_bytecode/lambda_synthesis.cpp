@@ -35,7 +35,7 @@ static std::string escape_symbol_special_chars(std::string input)
 }
 
 irep_idt lambda_synthetic_class_name(
-  const irep_idt &method_identifier,
+  irep_idt method_identifier,
   std::size_t instruction_address)
 {
   return "java::lambda_synthetic_class$" +
@@ -76,7 +76,7 @@ get_lambda_method_handle(
 static std::optional<java_class_typet::java_lambda_method_handlet>
 lambda_method_handle(
   const symbol_table_baset &symbol_table,
-  const irep_idt &method_identifier,
+  irep_idt method_identifier,
   const java_method_typet &dynamic_method_type)
 {
   const namespacet ns{symbol_table};
@@ -132,7 +132,7 @@ typedef std::map<
 /// for example because both If1.f(int) and If2.f(int) are inherited here, only
 /// one is stored in the map, chosen arbitrarily.
 static const methods_by_name_and_descriptort
-get_interface_methods(const irep_idt &interface_id, const namespacet &ns)
+get_interface_methods(irep_idt interface_id, const namespacet &ns)
 {
   static const irep_idt jlo = "java::java.lang.Object";
   // Terminate recursion at Object; any other base of an interface must
@@ -204,7 +204,7 @@ get_interface_methods(const irep_idt &interface_id, const namespacet &ns)
 static const java_class_typet::methodt *try_get_unique_unimplemented_method(
   const symbol_table_baset &symbol_table,
   const struct_tag_typet &functional_interface_tag,
-  const irep_idt &method_identifier,
+  irep_idt method_identifier,
   const int instruction_address,
   const messaget &log)
 {
@@ -248,7 +248,7 @@ static const java_class_typet::methodt *try_get_unique_unimplemented_method(
 }
 
 symbolt synthetic_class_symbol(
-  const irep_idt &synthetic_class_name,
+  irep_idt synthetic_class_name,
   const java_class_typet::java_lambda_method_handlet &lambda_method_handle,
   const struct_tag_typet &functional_interface_tag,
   const java_method_typet &dynamic_method_type)
@@ -297,7 +297,7 @@ symbolt synthetic_class_symbol(
 
 static symbolt constructor_symbol(
   synthetic_methods_mapt &synthetic_methods,
-  const irep_idt &synthetic_class_name,
+  irep_idt synthetic_class_name,
   java_method_typet constructor_type) // dynamic_method_type
 {
   irep_idt constructor_name = id2string(synthetic_class_name) + ".<init>";
@@ -337,7 +337,7 @@ static symbolt constructor_symbol(
 static symbolt implemented_method_symbol(
   synthetic_methods_mapt &synthetic_methods,
   const java_class_typet::methodt &method_to_implement,
-  const irep_idt &synthetic_class_name)
+  irep_idt synthetic_class_name)
 {
   const std::string implemented_method_name =
     id2string(synthetic_class_name) + "." +
@@ -393,7 +393,7 @@ static symbolt implemented_method_symbol(
 // invoke instruction will return null when eventually converted by
 // java_bytecode_convert_method.
 void create_invokedynamic_synthetic_classes(
-  const irep_idt &method_identifier,
+  irep_idt method_identifier,
   const java_bytecode_parse_treet::methodt::instructionst &instructions,
   symbol_table_baset &symbol_table,
   synthetic_methods_mapt &synthetic_methods,
@@ -449,11 +449,11 @@ void create_invokedynamic_synthetic_classes(
 #endif
 static const symbolt &
 get_or_create_method_symbol(
-  const irep_idt &identifier,
-  const irep_idt &base_name,
-  const irep_idt &pretty_name,
+  irep_idt identifier,
+  irep_idt base_name,
+  irep_idt pretty_name,
   const typet &type,
-  const irep_idt &declaring_class,
+  irep_idt declaring_class,
   symbol_table_baset &symbol_table,
   message_handlert &log)
 {
@@ -473,7 +473,7 @@ get_or_create_method_symbol(
 }
 
 codet invokedynamic_synthetic_constructor(
-  const irep_idt &function_id,
+  irep_idt function_id,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler)
 {
@@ -539,8 +539,8 @@ codet invokedynamic_synthetic_constructor(
 }
 
 static symbol_exprt create_and_declare_local(
-  const irep_idt &function_id,
-  const irep_idt &basename,
+  irep_idt function_id,
+  irep_idt basename,
   const typet &type,
   symbol_table_baset &symbol_table,
   code_blockt &method)
@@ -570,7 +570,7 @@ static symbol_exprt create_and_declare_local(
 /// \param result: will gain instructions instantiating the required type
 /// \return the newly instantiated symbol
 static symbol_exprt instantiate_new_object(
-  const irep_idt &function_id,
+  irep_idt function_id,
   const symbolt &lambda_method_symbol,
   symbol_table_baset &symbol_table,
   code_blockt &result)
@@ -686,7 +686,7 @@ exprt box_or_unbox_type_if_necessary(
   const typet &required_type,
   code_blockt &code_block,
   symbol_table_baset &symbol_table,
-  const irep_idt &function_id,
+  irep_idt function_id,
   const std::string &role)
 {
   const typet &original_type = expr.type();
@@ -745,7 +745,7 @@ exprt adjust_type_if_necessary(
   const typet &required_type,
   code_blockt &code_block,
   symbol_table_baset &symbol_table,
-  const irep_idt &function_id,
+  irep_idt function_id,
   const std::string &role)
 {
   return typecast_exprt::conditional_cast(
@@ -771,7 +771,7 @@ exprt adjust_type_if_necessary(
 /// \param message_handler: log
 /// \return the method body for `function_id`
 codet invokedynamic_synthetic_method(
-  const irep_idt &function_id,
+  irep_idt function_id,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler)
 {

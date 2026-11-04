@@ -471,7 +471,7 @@ constant_interval_exprt constant_interval_exprt::decrement() const
 constant_interval_exprt constant_interval_exprt::get_extremes(
   const constant_interval_exprt &a,
   const constant_interval_exprt &b,
-  const irep_idt &operation)
+  irep_idt operation)
 {
   std::vector<exprt> results;
 
@@ -572,7 +572,7 @@ exprt constant_interval_exprt::get_extreme(
 void constant_interval_exprt::generate_expression(
   const exprt &lhs,
   const exprt &rhs,
-  const irep_idt &operation,
+  irep_idt operation,
   std::vector<exprt> &collection)
 {
   if(operation == ID_mult)
@@ -790,7 +790,7 @@ exprt constant_interval_exprt::generate_modulo_expression(
   return simplified_expr(modulo_expr);
 }
 
-constant_interval_exprt constant_interval_exprt::eval(const irep_idt &id) const
+constant_interval_exprt constant_interval_exprt::eval(irep_idt id) const
 {
   if(id == ID_unary_plus)
   {
@@ -813,7 +813,7 @@ constant_interval_exprt constant_interval_exprt::eval(const irep_idt &id) const
 }
 
 constant_interval_exprt constant_interval_exprt::eval(
-  const irep_idt &binary_operator,
+  irep_idt binary_operator,
   const constant_interval_exprt &other) const
 {
   if(binary_operator == ID_plus)
@@ -899,7 +899,7 @@ constant_interval_exprt constant_interval_exprt::eval(
 exprt constant_interval_exprt::generate_shift_expression(
   const exprt &lhs,
   const exprt &rhs,
-  const irep_idt &operation)
+  irep_idt operation)
 {
   PRECONDITION(operation == ID_shl || operation == ID_ashr);
 
@@ -936,8 +936,7 @@ exprt constant_interval_exprt::generate_shift_expression(
 }
 
 constant_interval_exprt
-constant_interval_exprt::handle_constant_unary_expression(
-  const irep_idt &op) const
+constant_interval_exprt::handle_constant_unary_expression(irep_idt op) const
 {
   if(is_single_value_interval())
   {
@@ -950,7 +949,7 @@ constant_interval_exprt::handle_constant_unary_expression(
 constant_interval_exprt
 constant_interval_exprt::handle_constant_binary_expression(
   const constant_interval_exprt &other,
-  const irep_idt &op) const
+  irep_idt op) const
 {
   PRECONDITION(is_single_value_interval() && other.is_single_value_interval());
   auto expr = binary_exprt(get_lower(), op, other.get_lower());

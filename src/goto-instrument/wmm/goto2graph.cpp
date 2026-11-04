@@ -30,7 +30,7 @@ Date: 2012
 
 
 /// is local variable?
-bool inline instrumentert::local(const irep_idt &id)
+bool inline instrumentert::local(irep_idt id)
 {
   std::string identifier=id2string(id);
 
@@ -78,7 +78,7 @@ bool inline instrumentert::local(const irep_idt &id)
   }
 }
 
-bool inline instrumentert::cfg_visitort::local(const irep_idt &i)
+bool inline instrumentert::cfg_visitort::local(irep_idt i)
 {
   return instrumenter.local(i);
 }
@@ -150,7 +150,7 @@ void instrumentert::cfg_visitort::visit_cfg_function(
   memory_modelt model,
   bool no_dependencies,
   loop_strategyt replicate_body,
-  const irep_idt &function_id,
+  irep_idt function_id,
   std::set<instrumentert::cfg_visitort::nodet> &ending_vertex)
 {
   /* flow: egraph */
@@ -406,7 +406,7 @@ event_idt alt_copy_segment(wmm_grapht &alt_egraph,
 }
 
 bool instrumentert::cfg_visitort::contains_shared_array(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt::const_targett targ,
   goto_programt::const_targett i_it,
   value_setst &value_sets
@@ -414,7 +414,7 @@ bool instrumentert::cfg_visitort::contains_shared_array(
   ,
   local_may_aliast local_may
 #endif
-  ) const // NOLINT(whitespace/parens)
+) const // NOLINT(whitespace/parens)
 {
   instrumenter.message.debug()
     << "contains_shared_array called for " << targ->source_location().get_line()
@@ -462,7 +462,7 @@ bool instrumentert::cfg_visitort::contains_shared_array(
 
 /// strategy: fwd/bwd alternation
 void inline instrumentert::cfg_visitort::visit_cfg_body(
-  const irep_idt &function_id,
+  irep_idt function_id,
   const goto_programt &goto_program,
   goto_programt::const_targett i_it,
   loop_strategyt replicate_body,
@@ -647,7 +647,7 @@ void inline instrumentert::cfg_visitort::visit_cfg_backedge(
 }
 
 void instrumentert::cfg_visitort::visit_cfg_goto(
-  const irep_idt &function_id,
+  irep_idt function_id,
   const goto_programt &goto_program,
   goto_programt::instructionst::iterator i_it,
   loop_strategyt replicate_body,
@@ -748,7 +748,7 @@ void instrumentert::cfg_visitort::visit_cfg_function_call(
 
 void instrumentert::cfg_visitort::visit_cfg_lwfence(
   goto_programt::instructionst::iterator i_it,
-  const irep_idt &function_id)
+  irep_idt function_id)
 {
   const goto_programt::instructiont &instruction=*i_it;
   const abstract_eventt new_fence_event(
@@ -787,7 +787,7 @@ void instrumentert::cfg_visitort::visit_cfg_lwfence(
 
 void instrumentert::cfg_visitort::visit_cfg_asm_fence(
   goto_programt::instructionst::iterator i_it,
-  const irep_idt &function_id)
+  irep_idt function_id)
 {
   const goto_programt::instructiont &instruction=*i_it;
   bool WRfence = instruction.code().get_bool(ID_WRfence);
@@ -840,7 +840,7 @@ void instrumentert::cfg_visitort::visit_cfg_asm_fence(
 
 void instrumentert::cfg_visitort::visit_cfg_assign(
   value_setst &value_sets,
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt::instructionst::iterator &i_it,
   bool no_dependencies
 #ifdef LOCAL_MAY
@@ -1177,7 +1177,7 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
 
 void instrumentert::cfg_visitort::visit_cfg_fence(
   goto_programt::instructionst::iterator i_it,
-  const irep_idt &function_id)
+  irep_idt function_id)
 {
   const goto_programt::instructiont &instruction=*i_it;
   const abstract_eventt new_fence_event(

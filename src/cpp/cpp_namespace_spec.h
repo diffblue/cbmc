@@ -41,7 +41,7 @@ public:
     return get(ID_namespace);
   }
 
-  void set_namespace(const irep_idt &_namespace)
+  void set_namespace(irep_idt _namespace)
   {
     set(ID_namespace, _namespace);
   }

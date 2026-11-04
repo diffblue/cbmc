@@ -63,7 +63,7 @@ public:
 
   void output(std::ostream &out) const;
 
-  bool operator()(const irep_idt &id) const
+  bool operator()(irep_idt id) const
   {
     die_if_uninitialized();
     return dirty.find(id) != dirty.end();
@@ -118,10 +118,10 @@ class incremental_dirtyt
 {
 public:
   void populate_dirty_for_function(
-    const irep_idt &id,
+    irep_idt id,
     const goto_functionst::goto_functiont &function);
 
-  bool operator()(const irep_idt &id) const
+  bool operator()(irep_idt id) const
   {
     return dirty(id);
   }

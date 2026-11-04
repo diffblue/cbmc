@@ -125,7 +125,7 @@ public:
   field_sensitivityt(
     std::size_t max_array_size,
     bool should_simplify,
-    const irep_idt &language_mode)
+    irep_idt language_mode)
     : max_field_sensitivity_array_size(max_array_size),
       should_simplify(should_simplify),
       language_mode(language_mode)
@@ -208,7 +208,7 @@ private:
   const std::size_t max_field_sensitivity_array_size;
 
   const bool should_simplify;
-  const irep_idt &language_mode;
+  irep_idt language_mode;
 
   void field_assignments_rec(
     const namespacet &ns,

@@ -156,20 +156,18 @@ public:
   {
     return lazy_goto_modelt(
       [&handler,
-       &options](goto_model_functiont &fun, const abstract_goto_modelt &model) {
-        handler.process_goto_function(fun, model, options);
-      },
-      [&handler, &options](goto_modelt &goto_model) -> bool {
-        return handler.process_goto_functions(goto_model, options);
-      },
-      [&handler](const irep_idt &name) -> bool {
-        return handler.can_generate_function_body(name);
-      },
+       &options](goto_model_functiont &fun, const abstract_goto_modelt &model)
+      { handler.process_goto_function(fun, model, options); },
+      [&handler, &options](goto_modelt &goto_model) -> bool
+      { return handler.process_goto_functions(goto_model, options); },
+      [&handler](irep_idt name) -> bool
+      { return handler.can_generate_function_body(name); },
       [&handler](
-        const irep_idt &function_name,
+        irep_idt function_name,
         symbol_table_baset &symbol_table,
         goto_functiont &function,
-        bool is_first_chance) {
+        bool is_first_chance)
+      {
         return handler.generate_function_body(
           function_name, symbol_table, function, is_first_chance);
       },
@@ -217,7 +215,7 @@ public:
     return symbol_table;
   }
 
-  bool can_produce_function(const irep_idt &id) const override;
+  bool can_produce_function(irep_idt id) const override;
 
   /// Get a GOTO function body. `id` must be a valid symbol-table symbol. Its
   /// body is produced by:
@@ -233,8 +231,7 @@ public:
   ///    `languaget::convert_lazy_method` function. If that results in a `codet`
   ///    representation of the function stored in the symbol table, convert it
   ///    to GOTO and return it as in step (3).
-  const goto_functionst::goto_functiont &
-  get_goto_function(const irep_idt &id) override
+  const goto_functionst::goto_functiont &get_goto_function(irep_idt id) override
   {
     return goto_functions.at(id);
   }

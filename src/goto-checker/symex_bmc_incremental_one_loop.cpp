@@ -112,7 +112,7 @@ bool symex_bmc_incremental_one_loopt::should_stop_unwind(
 /// \return True if the back edge encountered during symbolic execution
 ///   corresponds to the given loop (incr_loop_id)
 bool symex_bmc_incremental_one_loopt::check_break(
-  const irep_idt &loop_id,
+  irep_idt loop_id,
   unsigned unwind)
 {
   if(unwind < incr_min_unwind)

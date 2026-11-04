@@ -266,7 +266,7 @@ void find_symbols(const exprt &src, std::set<symbol_exprt> &dest)
 
 bool has_symbol_expr(
   const exprt &src,
-  const irep_idt &identifier,
+  irep_idt identifier,
   bool include_bound_symbols)
 {
   return !find_symbols(

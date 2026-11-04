@@ -44,8 +44,8 @@ public:
   /// 6. Insert harness function into \p goto_model.
   /// \param goto_model: goto model to be modified
   /// \param harness_function_name: name of the resulting harness function
-  void generate(goto_modelt &goto_model, const irep_idt &harness_function_name)
-    override;
+  void
+  generate(goto_modelt &goto_model, irep_idt harness_function_name) override;
 
 protected:
   /// User provided goto location: function name and (maybe) location number;
@@ -143,7 +143,7 @@ protected:
 
     void match_up(
       const size_t &candidate_distance,
-      const irep_idt &candidate_function_name,
+      irep_idt candidate_function_name,
       const goto_programt::const_targett &candidate_instruction)
     {
       if(match_found && distance <= candidate_distance)

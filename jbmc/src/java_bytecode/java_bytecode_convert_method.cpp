@@ -61,7 +61,7 @@ Author: Daniel Kroening, kroening@kroening.com
 ///   Global symbol table.
 static void assign_parameter_names(
   java_method_typet &ftype,
-  const irep_idt &name_prefix,
+  irep_idt name_prefix,
   symbol_table_baset &symbol_table)
 {
   java_method_typet::parameterst &parameters = ftype.parameters();
@@ -92,11 +92,11 @@ static void assign_parameter_names(
 }
 
 void create_method_stub_symbol(
-  const irep_idt &identifier,
-  const irep_idt &base_name,
-  const irep_idt &pretty_name,
+  irep_idt identifier,
+  irep_idt base_name,
+  irep_idt pretty_name,
   const typet &type,
-  const irep_idt &declaring_class,
+  irep_idt declaring_class,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler)
 {
@@ -116,7 +116,7 @@ void create_method_stub_symbol(
   symbol_table.add(symbol);
 }
 
-static bool is_constructor(const irep_idt &method_name)
+static bool is_constructor(irep_idt method_name)
 {
   return id2string(method_name).find("<init>") != std::string::npos;
 }
@@ -155,7 +155,7 @@ void java_bytecode_convert_methodt::push(const exprt::operandst &o)
 }
 
 // JVM program locations
-irep_idt java_bytecode_convert_methodt::label(const irep_idt &address)
+irep_idt java_bytecode_convert_methodt::label(irep_idt address)
 {
   return "pc"+id2string(address);
 }
@@ -298,7 +298,7 @@ java_method_typet member_type_lazy(
 /// \param message_handler: A message handler to collect warnings.
 void java_bytecode_convert_method_lazy(
   symbolt &class_symbol,
-  const irep_idt &method_identifier,
+  irep_idt method_identifier,
   const java_bytecode_parse_treet::methodt &m,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler)
@@ -411,7 +411,7 @@ void java_bytecode_convert_method_lazy(
 }
 
 static irep_idt get_method_identifier(
-  const irep_idt &class_identifier,
+  irep_idt class_identifier,
   const java_bytecode_parse_treet::methodt &method)
 {
   return
@@ -421,7 +421,7 @@ static irep_idt get_method_identifier(
 
 void create_parameter_names(
   const java_bytecode_parse_treet::methodt &m,
-  const irep_idt &method_identifier,
+  irep_idt method_identifier,
   java_method_typet::parameterst &parameters,
   const java_bytecode_convert_methodt::method_offsett &slots_for_parameters)
 {
@@ -694,8 +694,8 @@ static member_exprt to_member(
 /// \param new_label: The label to replace `old_label` with.
 void java_bytecode_convert_methodt::replace_goto_target(
   codet &repl,
-  const irep_idt &old_label,
-  const irep_idt &new_label)
+  irep_idt old_label,
+  irep_idt new_label)
 {
   const auto &stmt=repl.get_statement();
   if(stmt==ID_goto)
@@ -981,8 +981,7 @@ static void gather_symbol_live_ranges(
 /// \param classname: Class name
 /// \return Returns a function call to the given class' static initializer
 ///   wrapper if one is needed, or a skip instruction otherwise.
-codet java_bytecode_convert_methodt::get_clinit_call(
-  const irep_idt &classname)
+codet java_bytecode_convert_methodt::get_clinit_call(irep_idt classname)
 {
   auto findit = symbol_table.symbols.find(clinit_wrapper_name(classname));
   if(findit == symbol_table.symbols.end())
@@ -2031,7 +2030,7 @@ java_bytecode_convert_methodt::convert_instructions(const methodt &method)
 }
 
 codet java_bytecode_convert_methodt::convert_pop(
-  const irep_idt &statement,
+  irep_idt statement,
   const exprt::operandst &op)
 {
   // these are skips
@@ -2097,7 +2096,7 @@ code_switcht java_bytecode_convert_methodt::convert_switch(
 }
 
 codet java_bytecode_convert_methodt::convert_monitorenterexit(
-  const irep_idt &statement,
+  irep_idt statement,
   const exprt::operandst &op,
   const source_locationt &source_location)
 {
@@ -2167,7 +2166,7 @@ void java_bytecode_convert_methodt::convert_dup2_x2(
 }
 
 exprt::operandst &java_bytecode_convert_methodt::convert_const(
-  const irep_idt &statement,
+  irep_idt statement,
   const constant_exprt &arg0,
   exprt::operandst &results) const
 {
@@ -2230,7 +2229,7 @@ static void adjust_invoke_argument_types(
 
 void java_bytecode_convert_methodt::convert_invoke(
   source_locationt location,
-  const irep_idt &statement,
+  irep_idt statement,
   class_method_descriptor_exprt &class_method_descriptor,
   codet &c,
   exprt::operandst &results)
@@ -2568,7 +2567,7 @@ code_blockt java_bytecode_convert_methodt::convert_multianewarray(
 
 code_blockt java_bytecode_convert_methodt::convert_newarray(
   const source_locationt &location,
-  const irep_idt &statement,
+  irep_idt statement,
   const exprt &arg0,
   const exprt::operandst &op,
   exprt::operandst &results)
@@ -2737,7 +2736,7 @@ void java_bytecode_convert_methodt::convert_getstatic(
 }
 
 exprt::operandst &java_bytecode_convert_methodt::convert_cmp2(
-  const irep_idt &statement,
+  irep_idt statement,
   const exprt::operandst &op,
   exprt::operandst &results) const
 {
@@ -2785,7 +2784,7 @@ exprt::operandst &java_bytecode_convert_methodt::convert_cmp(
 }
 
 exprt::operandst &java_bytecode_convert_methodt::convert_shl(
-  const irep_idt &statement,
+  irep_idt statement,
   const exprt::operandst &op,
   exprt::operandst &results) const
 {
@@ -2802,7 +2801,7 @@ exprt::operandst &java_bytecode_convert_methodt::convert_shl(
 }
 
 exprt::operandst &java_bytecode_convert_methodt::convert_ushr(
-  const irep_idt &statement,
+  irep_idt statement,
   const exprt::operandst &op,
   exprt::operandst &results) const
 {
@@ -2896,7 +2895,7 @@ code_ifthenelset java_bytecode_convert_methodt::convert_ifnonull(
 code_ifthenelset java_bytecode_convert_methodt::convert_if(
   const java_bytecode_convert_methodt::address_mapt &address_map,
   const exprt::operandst &op,
-  const irep_idt &id,
+  irep_idt id,
   const mp_integer &number,
   const source_locationt &location) const
 {
@@ -2991,7 +2990,7 @@ static exprt conditional_array_cast(const exprt &expr, char type_char)
 }
 
 exprt java_bytecode_convert_methodt::convert_aload(
-  const irep_idt &statement,
+  irep_idt statement,
   const exprt::operandst &op)
 {
   PRECONDITION(op.size() == 2);
@@ -3032,7 +3031,7 @@ exprt java_bytecode_convert_methodt::convert_load(
 }
 
 code_blockt java_bytecode_convert_methodt::convert_store(
-  const irep_idt &statement,
+  irep_idt statement,
   const exprt &arg0,
   const exprt::operandst &op,
   const method_offsett address,
@@ -3057,7 +3056,7 @@ code_blockt java_bytecode_convert_methodt::convert_store(
 }
 
 code_blockt java_bytecode_convert_methodt::convert_astore(
-  const irep_idt &statement,
+  irep_idt statement,
   const exprt::operandst &op,
   const source_locationt &location)
 {
@@ -3313,8 +3312,8 @@ void java_bytecode_convert_method(
 /// \param classname: class whose method is referenced
 /// \param mangled_method_name: The particular overload of a given method.
 bool java_bytecode_convert_methodt::is_method_inherited(
-  const irep_idt &classname,
-  const irep_idt &mangled_method_name) const
+  irep_idt classname,
+  irep_idt mangled_method_name) const
 {
   const auto inherited_method = get_inherited_method_implementation(
     mangled_method_name, classname, symbol_table);
@@ -3328,8 +3327,8 @@ bool java_bytecode_convert_methodt::is_method_inherited(
 /// \param component_name: component (static field) name
 /// \return identifier of the actual concrete field referred to
 irep_idt java_bytecode_convert_methodt::get_static_field(
-  const irep_idt &class_identifier,
-  const irep_idt &component_name) const
+  irep_idt class_identifier,
+  irep_idt component_name) const
 {
   const auto inherited_method = get_inherited_component(
     class_identifier, component_name, symbol_table, true);
@@ -3350,7 +3349,7 @@ void java_bytecode_convert_methodt::save_stack_entries(
   const std::string &tmp_var_prefix,
   code_blockt &block,
   const bytecode_write_typet write_type,
-  const irep_idt &identifier)
+  irep_idt identifier)
 {
   const std::function<bool(
     const std::function<tvt(const exprt &expr)>, const exprt &expr)>

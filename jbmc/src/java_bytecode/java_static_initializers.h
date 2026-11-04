@@ -24,12 +24,12 @@ class symbolt;
 struct java_object_factory_parameterst;
 struct object_creation_referencet;
 
-irep_idt clinit_wrapper_name(const irep_idt &class_name);
-irep_idt user_specified_clinit_name(const irep_idt &class_name);
+irep_idt clinit_wrapper_name(irep_idt class_name);
+irep_idt user_specified_clinit_name(irep_idt class_name);
 
-bool is_clinit_wrapper_function(const irep_idt &function_id);
-bool is_clinit_function(const irep_idt &function_id);
-bool is_user_specified_clinit_function(const irep_idt &function_id);
+bool is_clinit_wrapper_function(irep_idt function_id);
+bool is_clinit_function(irep_idt function_id);
+bool is_user_specified_clinit_function(irep_idt function_id);
 
 void create_static_initializer_symbols(
   symbol_table_baset &symbol_table,
@@ -38,7 +38,7 @@ void create_static_initializer_symbols(
   const bool is_user_clinit_needed);
 
 code_blockt get_thread_safe_clinit_wrapper_body(
-  const irep_idt &function_id,
+  irep_idt function_id,
   symbol_table_baset &symbol_table,
   const bool nondet_static,
   const bool replace_clinit,
@@ -47,7 +47,7 @@ code_blockt get_thread_safe_clinit_wrapper_body(
   message_handlert &message_handler);
 
 code_ifthenelset get_clinit_wrapper_body(
-  const irep_idt &function_id,
+  irep_idt function_id,
   symbol_table_baset &symbol_table,
   const bool nondet_static,
   const bool replace_clinit,
@@ -83,7 +83,7 @@ class_to_declared_symbols(const symbol_table_baset &symbol_table);
 ///   they declare.
 /// \return the body of the user_specified_clinit function as a code block.
 code_blockt get_user_specified_clinit_body(
-  const irep_idt &class_id,
+  irep_idt class_id,
   const json_objectt &static_values_json,
   symbol_table_baset &symbol_table,
   std::optional<ci_lazy_methods_neededt> needed_lazy_methods,
@@ -105,7 +105,7 @@ public:
     synthetic_methods_mapt &synthetic_methods);
 
   code_blockt get_stub_initializer_body(
-    const irep_idt &function_id,
+    irep_idt function_id,
     symbol_table_baset &symbol_table,
     const java_object_factory_parameterst &object_factory_parameters,
     const select_pointer_typet &pointer_type_selector,

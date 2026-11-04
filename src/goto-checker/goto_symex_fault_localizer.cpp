@@ -29,8 +29,8 @@ goto_symex_fault_localizert::goto_symex_fault_localizert(
 {
 }
 
-fault_location_infot goto_symex_fault_localizert::
-operator()(const irep_idt &failed_property_id)
+fault_location_infot
+goto_symex_fault_localizert::operator()(irep_idt failed_property_id)
 {
   fault_location_infot fault_location;
   localization_pointst localization_points;
@@ -51,7 +51,7 @@ operator()(const irep_idt &failed_property_id)
 }
 
 const SSA_stept &goto_symex_fault_localizert::collect_guards(
-  const irep_idt &failed_property_id,
+  irep_idt failed_property_id,
   localization_pointst &localization_points,
   fault_location_infot &fault_location)
 {

@@ -18,7 +18,7 @@ Author: Daniel Kroening
 #include <algorithm>
 
 void cover_path_instrumentert::instrument(
-  const irep_idt &,
+  irep_idt,
   goto_programt &,
   goto_programt::targett &i_it,
   const cover_blocks_baset &,
@@ -31,7 +31,7 @@ void cover_path_instrumentert::instrument(
 }
 
 void cover_assertion_instrumentert::instrument(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt &,
   goto_programt::targett &i_it,
   const cover_blocks_baset &,
@@ -49,7 +49,7 @@ void cover_assertion_instrumentert::instrument(
 }
 
 void cover_cover_instrumentert::instrument(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt &,
   goto_programt::targett &i_it,
   const cover_blocks_baset &,
@@ -76,7 +76,7 @@ void cover_cover_instrumentert::instrument(
 }
 
 void cover_instrument_end_of_function(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt &goto_program,
   const cover_instrumenter_baset::assertion_factoryt &make_assertion)
 {

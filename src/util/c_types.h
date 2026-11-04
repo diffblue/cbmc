@@ -198,7 +198,7 @@ inline union_typet &to_union_type(typet &type)
 class union_tag_typet : public struct_or_union_tag_typet
 {
 public:
-  explicit union_tag_typet(const irep_idt &identifier)
+  explicit union_tag_typet(irep_idt identifier)
     : struct_or_union_tag_typet(ID_union_tag, identifier)
   {
   }
@@ -250,7 +250,7 @@ public:
     {
       return get(ID_value);
     }
-    void set_value(const irep_idt &value)
+    void set_value(irep_idt value)
     {
       set(ID_value, value);
     }
@@ -258,7 +258,7 @@ public:
     {
       return get(ID_identifier);
     }
-    void set_identifier(const irep_idt &identifier)
+    void set_identifier(irep_idt identifier)
     {
       set(ID_identifier, identifier);
     }
@@ -266,7 +266,7 @@ public:
     {
       return get(ID_base_name);
     }
-    void set_base_name(const irep_idt &base_name)
+    void set_base_name(irep_idt base_name)
     {
       set(ID_base_name, base_name);
     }
@@ -351,7 +351,7 @@ inline c_enum_typet &to_c_enum_type(typet &type)
 class c_enum_tag_typet : public tag_typet
 {
 public:
-  explicit c_enum_tag_typet(const irep_idt &identifier)
+  explicit c_enum_tag_typet(irep_idt identifier)
     : tag_typet(ID_c_enum_tag, identifier)
   {
   }
@@ -509,6 +509,6 @@ reference_typet reference_type(const typet &);
 
 // Turns an ID_C_c_type into a string, e.g.,
 // ID_signed_int gets "signed int".
-std::string c_type_as_string(const irep_idt &);
+std::string c_type_as_string(irep_idt);
 
 #endif // CPROVER_UTIL_C_TYPES_H

@@ -33,7 +33,7 @@ public:
     symex_targett::assignment_typet assignment_type,
     const namespacet &ns,
     const symex_configt &symex_config,
-    const irep_idt &language_mode,
+    irep_idt language_mode,
     symex_targett &target)
     : shadow_memory(shadow_memory),
       state(state),
@@ -67,7 +67,7 @@ private:
   symex_targett::assignment_typet assignment_type;
   const namespacet &ns;
   const symex_configt &symex_config;
-  const irep_idt &language_mode;
+  irep_idt language_mode;
   symex_targett &target;
 
   void assign_from_struct(

@@ -142,7 +142,7 @@ void report_error(ui_message_handlert &ui_message_handler)
 }
 
 static void output_single_property_plain(
-  const irep_idt &property_id,
+  irep_idt property_id,
   const property_infot &property_info,
   messaget &log,
   irep_idt current_file = irep_idt())
@@ -206,7 +206,8 @@ is_property_less_than(const propertyt &property1, const propertyt &property2)
            std::stoul(id2string(p2.get_line()));
 
   const auto split_property_id =
-    [](const irep_idt &property_id) -> std::pair<std::string, std::size_t> {
+    [](irep_idt property_id) -> std::pair<std::string, std::size_t>
+  {
     const auto property_string = id2string(property_id);
     const auto last_dot = property_string.rfind('.');
     std::string property_name;
@@ -450,7 +451,7 @@ max_fault_localization_score(const fault_location_infot &fault_location)
 }
 
 static void output_fault_localization_plain(
-  const irep_idt &property_id,
+  irep_idt property_id,
   const fault_location_infot &fault_location,
   messaget &log)
 {
@@ -481,7 +482,7 @@ static void output_fault_localization_plain(
 }
 
 static xmlt xml(
-  const irep_idt &property_id,
+  irep_idt property_id,
   const fault_location_infot &fault_location,
   messaget &log)
 {

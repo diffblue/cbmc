@@ -23,7 +23,7 @@ Author: Romain Brenguier, Joel Allred
 
 static exprt format_arg_from_string(
   const array_string_exprt &string,
-  const irep_idt &id,
+  irep_idt id,
   array_poolt &array_pool);
 
 string_format_builtin_functiont::string_format_builtin_functiont(
@@ -242,7 +242,7 @@ add_axioms_for_format_specifier(
 /// The characters of `string` must be of type `unsignedbv_typet(16)`.
 static exprt format_arg_from_string(
   const array_string_exprt &string,
-  const irep_idt &id,
+  irep_idt id,
   array_poolt &array_pool)
 {
   PRECONDITION(

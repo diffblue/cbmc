@@ -84,15 +84,15 @@ public:
   /// be swapped_and_wrapped in replacement mode if they are not already.
   void add_contract_instructions(
     const dfcc_contract_modet contract_mode,
-    const irep_idt &wrapper_id,
-    const irep_idt &wrapped_id,
-    const irep_idt &contract_id,
+    irep_idt wrapper_id,
+    irep_idt wrapped_id,
+    irep_idt contract_id,
     const symbolt &wrapper_write_set_symbol,
     goto_programt &dest,
     std::set<irep_idt> &function_pointer_contracts);
 
   /// Returns the size assigns clause of the given contract in number of targets
-  const std::size_t get_assigns_clause_size(const irep_idt &contract_id);
+  const std::size_t get_assigns_clause_size(irep_idt contract_id);
 
   /// Searches for a symbol named "contract::contract_id" in the symbol table.
   /// If the "contract::contract_id" is found and \p function_id_opt is present,
@@ -104,7 +104,7 @@ public:
   /// If the symbol was not found and \p function_id_opt was not provided, a
   /// PRECONDITION is triggered.
   const symbolt &get_pure_contract_symbol(
-    const irep_idt &contract_id,
+    irep_idt contract_id,
     const std::optional<irep_idt> function_id_opt = {});
 
 protected:
@@ -123,8 +123,7 @@ protected:
 
   /// Returns the `dfcc_contract_functionst` object for the given contract
   /// from the cache, creates it if it does not exists.
-  const dfcc_contract_functionst &
-  get_contract_functions(const irep_idt &contract_id);
+  const dfcc_contract_functionst &get_contract_functions(irep_idt contract_id);
 
   /// \brief Throws an error if the type signatures are not compatible
   /// \param contract_id name of the function that carries the contract
@@ -132,9 +131,9 @@ protected:
   /// \param pure_contract_id name of the pure contract symbol for contract_id
   /// \param pure_contract_type code_type of pure_contract_id
   void check_signature_compat(
-    const irep_idt &contract_id,
+    irep_idt contract_id,
     const code_typet &contract_type,
-    const irep_idt &pure_contract_id,
+    irep_idt pure_contract_id,
     const code_typet &pure_contract_type);
 };
 

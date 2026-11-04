@@ -56,8 +56,7 @@ const std::list<goto_tracet> &goto_trace_storaget::all() const
   return traces;
 }
 
-const goto_tracet &goto_trace_storaget::
-operator[](const irep_idt &property_id) const
+const goto_tracet &goto_trace_storaget::operator[](irep_idt property_id) const
 {
   const auto trace_found = property_id_to_trace_index.find(property_id);
   PRECONDITION(trace_found != property_id_to_trace_index.end());

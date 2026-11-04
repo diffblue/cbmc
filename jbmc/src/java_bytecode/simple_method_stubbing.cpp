@@ -41,7 +41,7 @@ public:
     const typet &expected_type,
     const exprt &ptr,
     const source_locationt &loc,
-    const irep_idt &function_id,
+    irep_idt function_id,
     code_blockt &parent_block,
     unsigned insert_before_index,
     bool is_constructor,
@@ -49,7 +49,7 @@ public:
 
   void create_method_stub(symbolt &symbol);
 
-  void check_method_stub(const irep_idt &);
+  void check_method_stub(irep_idt);
 
 protected:
   symbol_table_baset &symbol_table;
@@ -82,7 +82,7 @@ void java_simple_method_stubst::create_method_stub_at(
   const typet &expected_type,
   const exprt &ptr,
   const source_locationt &loc,
-  const irep_idt &function_id,
+  irep_idt function_id,
   code_blockt &parent_block,
   const unsigned insert_before_index,
   const bool is_constructor,
@@ -250,7 +250,7 @@ void java_simple_method_stubst::create_method_stub(symbolt &symbol)
 /// Replaces `sym` with a function stub per the function above if it is
 ///   of suitable type.
 /// \param symname: Symbol name to consider stubbing
-void java_simple_method_stubst::check_method_stub(const irep_idt &symname)
+void java_simple_method_stubst::check_method_stub(irep_idt symname)
 {
   const symbolt &sym = symbol_table.lookup_ref(symname);
   if(!sym.is_type && sym.value.id() == ID_nil &&
@@ -270,7 +270,7 @@ void java_simple_method_stubst::check_method_stub(const irep_idt &symname)
 }
 
 void java_generate_simple_method_stub(
-  const irep_idt &function_name,
+  irep_idt function_name,
   symbol_table_baset &symbol_table,
   bool assume_non_null,
   const java_object_factory_parameterst &object_factory_parameters,

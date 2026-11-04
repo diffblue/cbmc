@@ -40,11 +40,11 @@ class cfg_infot
 {
 public:
   /// Returns true iff `ident` is locally declared.
-  virtual bool is_local(const irep_idt &ident) const = 0;
+  virtual bool is_local(irep_idt ident) const = 0;
 
   /// Returns true iff the given `ident` is either non-locally declared
   /// or is locally-declared but dirty.
-  virtual bool is_not_local_or_dirty_local(const irep_idt &ident) const = 0;
+  virtual bool is_not_local_or_dirty_local(irep_idt ident) const = 0;
 
   /// Returns true iff `expr` is an access to a locally declared symbol
   /// and does not contain `dereference` or `address_of` operations.
@@ -119,7 +119,7 @@ public:
   }
 
   /// Returns true iff `ident` is a local or parameter of the goto_function.
-  bool is_local(const irep_idt &ident) const override
+  bool is_local(irep_idt ident) const override
   {
     return locals.is_local(ident) ||
            (parameters.find(ident) != parameters.end());
@@ -127,7 +127,7 @@ public:
 
   /// Returns true iff the given `ident` is either not a goto_function local
   /// or is a local that is dirty.
-  bool is_not_local_or_dirty_local(const irep_idt &ident) const override
+  bool is_not_local_or_dirty_local(irep_idt ident) const override
   {
     return is_local(ident) ? is_dirty(ident) : true;
   }
@@ -153,14 +153,14 @@ public:
   }
 
   /// Returns true iff `ident` is a loop local.
-  bool is_local(const irep_idt &ident) const override
+  bool is_local(irep_idt ident) const override
   {
     return locals.find(ident) != locals.end();
   }
 
   /// Returns true iff the given `ident` is either not a loop local
   /// or is a loop local that is dirty.
-  bool is_not_local_or_dirty_local(const irep_idt &ident) const override
+  bool is_not_local_or_dirty_local(irep_idt ident) const override
   {
     if(is_local(ident))
       return is_dirty(ident);
@@ -176,9 +176,10 @@ public:
       const std::unordered_set<irep_idt> symbols = find_symbol_identifiers(*it);
 
       if(
-        std::find_if(symbols.begin(), symbols.end(), [this](const irep_idt &s) {
-          return is_local(s);
-        }) != symbols.end())
+        std::find_if(
+          symbols.begin(),
+          symbols.end(),
+          [this](irep_idt s) { return is_local(s); }) != symbols.end())
       {
         it = exprs.erase(it);
       }
@@ -214,14 +215,14 @@ public:
   }
 
   /// Returns true iff `ident` is a loop local.
-  bool is_local(const irep_idt &ident) const override
+  bool is_local(irep_idt ident) const override
   {
     return locals.find(ident) != locals.end();
   }
 
   /// Returns true iff the given `ident` is either not a loop local
   /// or is a loop local that is dirty.
-  bool is_not_local_or_dirty_local(const irep_idt &ident) const override
+  bool is_not_local_or_dirty_local(irep_idt ident) const override
   {
     if(is_local(ident))
       return dirty.find(ident) != dirty.end();

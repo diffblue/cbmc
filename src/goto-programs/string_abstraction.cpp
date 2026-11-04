@@ -219,7 +219,7 @@ void string_abstractiont::add_str_parameters(
 code_typet::parametert string_abstractiont::add_parameter(
   const symbolt &fct_symbol,
   const typet &type,
-  const irep_idt &identifier)
+  irep_idt identifier)
 {
   typet final_type=is_ptr_argument(type)?
                    type:pointer_type(type);
@@ -298,10 +298,11 @@ void string_abstractiont::declare_define_locals(goto_programt &dest)
   }
 }
 
-void string_abstractiont::make_decl_and_def(goto_programt &dest,
-    goto_programt::targett ref_instr,
-    const irep_idt &identifier,
-    const irep_idt &source_sym)
+void string_abstractiont::make_decl_and_def(
+  goto_programt &dest,
+  goto_programt::targett ref_instr,
+  irep_idt identifier,
+  irep_idt source_sym)
 {
   const symbolt &symbol=ns.lookup(identifier);
   symbol_exprt sym_expr=symbol.symbol_expr();
@@ -395,12 +396,12 @@ exprt string_abstractiont::make_val_or_dummy_rec(goto_programt &dest,
 }
 
 symbol_exprt string_abstractiont::add_dummy_symbol_and_value(
-    goto_programt &dest,
-    goto_programt::targett ref_instr,
-    const symbolt &symbol,
-    const irep_idt &component_name,
-    const typet &type,
-    const typet &source_type)
+  goto_programt &dest,
+  goto_programt::targett ref_instr,
+  const symbolt &symbol,
+  irep_idt component_name,
+  const typet &type,
+  const typet &source_type)
 {
   std::string suffix="$strdummy";
   if(!component_name.empty())
@@ -1040,8 +1041,10 @@ bool string_abstractiont::build_symbol(const symbol_exprt &sym, exprt &dest)
   return false;
 }
 
-void string_abstractiont::build_new_symbol(const symbolt &symbol,
-    const irep_idt &identifier, const typet &type)
+void string_abstractiont::build_new_symbol(
+  const symbolt &symbol,
+  irep_idt identifier,
+  const typet &type)
 {
   if(!symbol.is_static_lifetime)
     locals[symbol.name]=identifier;

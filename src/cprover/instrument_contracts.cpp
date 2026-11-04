@@ -24,7 +24,7 @@ Author: Daniel Kroening, dkr@amazon.com
 #define MAX_TEXT 20
 
 std::optional<code_with_contract_typet>
-get_contract(const irep_idt &function_identifier, const namespacet &ns)
+get_contract(irep_idt function_identifier, const namespacet &ns)
 {
   // contracts are in a separate symbol, with prefix "contract::"
   auto contract_identifier = "contract::" + id2string(function_identifier);
@@ -35,7 +35,7 @@ get_contract(const irep_idt &function_identifier, const namespacet &ns)
     return to_code_with_contract_type(symbol_ptr->type);
 }
 
-bool has_contract(const irep_idt &function_identifier, const namespacet &ns)
+bool has_contract(irep_idt function_identifier, const namespacet &ns)
 {
   return get_contract(function_identifier, ns).has_value();
 }
@@ -179,8 +179,7 @@ static exprt make_assigns_assertion(
   return disjunction(disjuncts);
 }
 
-static bool
-is_procedure_local(const irep_idt &function_identifier, const exprt &lhs)
+static bool is_procedure_local(irep_idt function_identifier, const exprt &lhs)
 {
   if(lhs.id() == ID_member)
     return is_procedure_local(

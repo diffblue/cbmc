@@ -35,7 +35,7 @@ gdb_value_extractort::gdb_value_extractort(
 gdb_value_extractort::memory_scopet::memory_scopet(
   const memory_addresst &begin,
   const mp_integer &byte_size,
-  const irep_idt &name)
+  irep_idt name)
   : // the address is given in hex, starting with 0x....
     begin_int(
       safe_string2size_t(std::string_view{begin.address_string}.substr(2), 16)),
@@ -151,7 +151,7 @@ void gdb_value_extractort::analyze_symbols(
   }
 }
 
-void gdb_value_extractort::analyze_symbol(const irep_idt &symbol_name)
+void gdb_value_extractort::analyze_symbol(irep_idt symbol_name)
 {
   const symbolt &symbol = ns.lookup(symbol_name);
   const symbol_exprt symbol_expr = symbol.symbol_expr();

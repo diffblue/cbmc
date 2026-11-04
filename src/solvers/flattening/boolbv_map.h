@@ -39,22 +39,16 @@ public:
 
   void show(std::ostream &out) const;
 
-  const bvt &get_literals(
-    const irep_idt &identifier,
-    const typet &type,
-    std::size_t width);
+  const bvt &
+  get_literals(irep_idt identifier, const typet &type, std::size_t width);
 
-  void set_literals(
-    const irep_idt &identifier,
-    const typet &type,
-    const bvt &literals);
+  void
+  set_literals(irep_idt identifier, const typet &type, const bvt &literals);
 
-  void erase_literals(
-    const irep_idt &identifier,
-    const typet &type);
+  void erase_literals(irep_idt identifier, const typet &type);
 
   std::optional<std::reference_wrapper<const map_entryt>>
-  get_map_entry(const irep_idt &identifier) const
+  get_map_entry(irep_idt identifier) const
   {
     const auto entry = mapping.find(identifier);
     if(entry == mapping.end())

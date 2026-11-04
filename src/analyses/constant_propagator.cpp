@@ -122,9 +122,9 @@ void constant_propagator_domaint::assign_rec(
 }
 
 void constant_propagator_domaint::transform(
-  const irep_idt &function_from,
+  irep_idt function_from,
   trace_ptrt trace_from,
-  const irep_idt &function_to,
+  irep_idt function_to,
   trace_ptrt trace_to,
   ai_baset &ai,
   const namespacet &ns)
@@ -426,7 +426,7 @@ public:
   {
   }
 
-  bool is_constant(const irep_idt &id) const
+  bool is_constant(irep_idt id) const
   {
     return replace_const.replaces_symbol(id);
   }
@@ -451,7 +451,7 @@ bool constant_propagator_domaint::valuest::is_constant(
 }
 
 bool constant_propagator_domaint::valuest::is_constant(
-  const irep_idt &id,
+  irep_idt id,
   const namespacet &ns) const
 {
   return constant_propagator_can_forward_propagatet(replace_const, ns)

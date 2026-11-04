@@ -28,12 +28,12 @@ typedef java_bytecode_parse_treet::methodt methodt;
 
 const methodt require_method(
   const java_bytecode_parse_treet::classt &parsed_class,
-  const irep_idt &method_name);
+  irep_idt method_name);
 
 struct expected_instructiont
 {
   expected_instructiont(
-    const irep_idt &instruction_mnemoic,
+    irep_idt instruction_mnemoic,
     const std::vector<exprt> &instruction_arguments)
     : instruction_mnemoic(instruction_mnemoic),
       instruction_arguments(instruction_arguments)

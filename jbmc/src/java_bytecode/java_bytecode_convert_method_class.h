@@ -201,7 +201,7 @@ protected:
   symbol_exprt tmp_variable(const std::string &prefix, const typet &type);
 
   // JVM program locations
-  static irep_idt label(const irep_idt &address);
+  static irep_idt label(irep_idt address);
 
   // JVM Stack
   typedef std::vector<exprt> stackt;
@@ -294,10 +294,8 @@ protected:
     }
   };
 
-  static void replace_goto_target(
-    codet &repl,
-    const irep_idt &old_label,
-    const irep_idt &new_label);
+  static void
+  replace_goto_target(codet &repl, irep_idt old_label, irep_idt new_label);
 
   code_blockt &get_block_for_pcrange(
     block_tree_nodet &tree,
@@ -327,14 +325,13 @@ protected:
 
   code_blockt convert_instructions(const methodt &);
 
-  codet get_clinit_call(const irep_idt &classname);
+  codet get_clinit_call(irep_idt classname);
 
-  bool is_method_inherited(
-    const irep_idt &classname,
-    const irep_idt &mangled_method_name) const;
+  bool
+  is_method_inherited(irep_idt classname, irep_idt mangled_method_name) const;
 
-  irep_idt get_static_field(
-    const irep_idt &class_identifier, const irep_idt &component_name) const;
+  irep_idt
+  get_static_field(irep_idt class_identifier, irep_idt component_name) const;
 
   enum class bytecode_write_typet
   {
@@ -348,7 +345,7 @@ protected:
     const std::string &,
     code_blockt &,
     const bytecode_write_typet,
-    const irep_idt &);
+    irep_idt);
 
   void create_stack_tmp_var(
     const std::string &,
@@ -375,19 +372,18 @@ protected:
     codet &result_code);
 
   code_blockt convert_astore(
-    const irep_idt &statement,
+    irep_idt statement,
     const exprt::operandst &op,
     const source_locationt &location);
 
   code_blockt convert_store(
-    const irep_idt &statement,
+    irep_idt statement,
     const exprt &arg0,
     const exprt::operandst &op,
     const method_offsett address,
     const source_locationt &location);
 
-  static exprt
-  convert_aload(const irep_idt &statement, const exprt::operandst &op);
+  static exprt convert_aload(irep_idt statement, const exprt::operandst &op);
 
   /// Load reference from local variable.
   /// \p index must be an unsigned byte and an index in the local variable array
@@ -416,7 +412,7 @@ protected:
   code_ifthenelset convert_if(
     const java_bytecode_convert_methodt::address_mapt &address_map,
     const exprt::operandst &op,
-    const irep_idt &id,
+    irep_idt id,
     const mp_integer &number,
     const source_locationt &location) const;
 
@@ -439,12 +435,12 @@ protected:
     method_offsett address);
 
   exprt::operandst &convert_shl(
-    const irep_idt &statement,
+    irep_idt statement,
     const exprt::operandst &op,
     exprt::operandst &results) const;
 
   exprt::operandst &convert_ushr(
-    const irep_idt &statement,
+    irep_idt statement,
     const exprt::operandst &op,
     exprt::operandst &results) const;
 
@@ -452,7 +448,7 @@ protected:
   convert_cmp(const exprt::operandst &op, exprt::operandst &results) const;
 
   exprt::operandst &convert_cmp2(
-    const irep_idt &statement,
+    irep_idt statement,
     const exprt::operandst &op,
     exprt::operandst &results) const;
 
@@ -481,7 +477,7 @@ protected:
 
   code_blockt convert_newarray(
     const source_locationt &location,
-    const irep_idt &statement,
+    irep_idt statement,
     const exprt &arg0,
     const exprt::operandst &op,
     exprt::operandst &results);
@@ -511,7 +507,7 @@ protected:
     exprt::operandst &results) const;
 
   codet convert_monitorenterexit(
-    const irep_idt &statement,
+    irep_idt statement,
     const exprt::operandst &op,
     const source_locationt &source_location);
 
@@ -519,13 +515,13 @@ protected:
 
   void convert_invoke(
     source_locationt location,
-    const irep_idt &statement,
+    irep_idt statement,
     class_method_descriptor_exprt &class_method_descriptor,
     codet &c,
     exprt::operandst &results);
 
   exprt::operandst &convert_const(
-    const irep_idt &statement,
+    irep_idt statement,
     const constant_exprt &arg0,
     exprt::operandst &results) const;
 
@@ -540,7 +536,7 @@ protected:
     const java_bytecode_parse_treet::instructiont::argst &args,
     const source_locationt &location);
 
-  codet convert_pop(const irep_idt &statement, const exprt::operandst &op);
+  codet convert_pop(irep_idt statement, const exprt::operandst &op);
 
   friend class java_bytecode_convert_method_unit_testt;
 };

@@ -111,7 +111,7 @@ protected:
 
   void convert_anon_struct_union_member(
     const cpp_declarationt &declaration,
-    const irep_idt &access,
+    irep_idt access,
     struct_typet::componentst &components);
 
   //
@@ -138,12 +138,12 @@ protected:
   void typecheck_class_template_member(cpp_declarationt &declaration);
 
   std::string class_template_identifier(
-    const irep_idt &base_name,
+    irep_idt base_name,
     const template_typet &template_type,
     const cpp_template_args_non_tct &partial_specialization_args);
 
   std::string function_template_identifier(
-    const irep_idt &base_name,
+    irep_idt base_name,
     const template_typet &template_type,
     const typet &function_type);
 
@@ -217,12 +217,10 @@ protected:
     cpp_scopet &template_scope,
     const std::string &suffix);
 
-  void
-  convert_parameters(const irep_idt &current_mode, code_typet &function_type);
+  void convert_parameters(irep_idt current_mode, code_typet &function_type);
 
-  void convert_parameter(
-    const irep_idt &current_mode,
-    code_typet::parametert &parameter);
+  void
+  convert_parameter(irep_idt current_mode, code_typet::parametert &parameter);
 
   //
   // Misc
@@ -230,7 +228,7 @@ protected:
 
   void default_ctor(
     const source_locationt &source_location,
-    const irep_idt &base_name,
+    irep_idt base_name,
     cpp_declarationt &ctor) const;
 
   void default_cpctor(
@@ -263,15 +261,13 @@ protected:
   bool find_assignop(const symbolt &symbol)const;
   bool find_dtor(const symbolt &symbol)const;
 
-  bool find_parent(
-    const symbolt &symb,
-    const irep_idt &base_name,
-    irep_idt &identifier);
+  bool
+  find_parent(const symbolt &symb, irep_idt base_name, irep_idt &identifier);
 
   bool get_component(
     const source_locationt &source_location,
     const exprt &object,
-    const irep_idt &component_name,
+    irep_idt component_name,
     exprt &member);
 
   void new_temporary(const source_locationt &source_location,
@@ -289,12 +285,12 @@ protected:
   void clean_up();
 
   void add_base_components(
-        const struct_typet &from,
-        const irep_idt &access,
-        struct_typet &to,
-        std::set<irep_idt> &bases,
-        std::set<irep_idt> &vbases,
-        bool is_virtual);
+    const struct_typet &from,
+    irep_idt access,
+    struct_typet &to,
+    std::set<irep_idt> &bases,
+    std::set<irep_idt> &vbases,
+    bool is_virtual);
 
   bool cast_away_constness(const typet &t1,
                            const typet &t2) const;
@@ -328,7 +324,7 @@ protected:
 
   void add_method_body(symbolt *_method_symbol);
 
-  bool builtin_factory(const irep_idt &) override;
+  bool builtin_factory(irep_idt) override;
 
   // types
 
@@ -343,17 +339,15 @@ protected:
 
   // determine the scope into which a tag goes
   // (enums, structs, union, classes)
-  cpp_scopet &tag_scope(
-    const irep_idt &_base_name,
-    bool has_body,
-    bool tag_only_declaration);
+  cpp_scopet &
+  tag_scope(irep_idt _base_name, bool has_body, bool tag_only_declaration);
 
   void typecheck_compound_declarator(
     const symbolt &symbol,
     const cpp_declarationt &declaration,
     cpp_declaratort &declarator,
     struct_typet::componentst &components,
-    const irep_idt &access,
+    irep_idt access,
     bool is_static,
     bool is_typedef,
     bool is_mutable);

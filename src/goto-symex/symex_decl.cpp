@@ -31,9 +31,8 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
   // doing it this way).
   ssa_exprt ssa = state.add_object(
     expr,
-    [this](const irep_idt &l0_name) {
-      return path_storage.get_unique_l1_index(l0_name, 1);
-    },
+    [this](irep_idt l0_name)
+    { return path_storage.get_unique_l1_index(l0_name, 1); },
     ns);
 
   ssa = state.declare(std::move(ssa), ns);

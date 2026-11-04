@@ -30,14 +30,13 @@ public:
     {
     }
 
-    explicit namet(const irep_idt &base_name):irept(ID_name)
+    explicit namet(irep_idt base_name) : irept(ID_name)
     {
       set(ID_identifier, base_name);
     }
 
-    namet(
-      const irep_idt &_base_name,
-      const source_locationt &_source_location):irept(ID_name)
+    namet(irep_idt _base_name, const source_locationt &_source_location)
+      : irept(ID_name)
     {
       set(ID_identifier, _base_name);
       add_source_location()=_source_location;
@@ -58,14 +57,13 @@ public:
   {
   }
 
-  explicit cpp_namet(const irep_idt &base_name):irept(ID_cpp_name)
+  explicit cpp_namet(irep_idt base_name) : irept(ID_cpp_name)
   {
     get_sub().push_back(namet(base_name));
   }
 
-  cpp_namet(
-    const irep_idt &_base_name,
-    const source_locationt &_source_location):irept(ID_cpp_name)
+  cpp_namet(irep_idt _base_name, const source_locationt &_source_location)
+    : irept(ID_cpp_name)
   {
     get_sub().push_back(namet(_base_name, _source_location));
   }

@@ -32,8 +32,7 @@ bool is_java_string_type(const struct_typet &struct_type)
          struct_type.has_component("data");
 }
 
-const java_boxed_type_infot *
-get_boxed_type_info_by_name(const irep_idt &type_name)
+const java_boxed_type_infot *get_boxed_type_info_by_name(irep_idt type_name)
 {
   static std::unordered_map<irep_idt, java_boxed_type_infot> type_info_by_name =
     {
@@ -106,7 +105,7 @@ get_java_primitive_type_info(const typet &maybe_primitive_type)
   return found == type_info_by_primitive_type.end() ? nullptr : &found->second;
 }
 
-bool is_primitive_wrapper_type_id(const irep_idt &id)
+bool is_primitive_wrapper_type_id(irep_idt id)
 {
   return get_boxed_type_info_by_name(id) != nullptr;
 }
@@ -160,7 +159,7 @@ const std::string java_class_to_package(const std::string &canonical_classname)
 }
 
 void generate_class_stub(
-  const irep_idt &class_name,
+  irep_idt class_name,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler,
   const struct_union_typet::componentst &componentst)
@@ -204,7 +203,7 @@ void merge_source_location_rec(
     merge_source_location_rec(op, source_location);
 }
 
-bool is_java_string_literal_id(const irep_idt &id)
+bool is_java_string_literal_id(irep_idt id)
 {
   return id.starts_with(JAVA_STRING_LITERAL_PREFIX);
 }
@@ -356,7 +355,7 @@ void java_add_components_to_class(
 /// \param symbol_table: symbol table
 /// \return newly created symbol
 static auxiliary_symbolt declare_function(
-  const irep_idt &function_name,
+  irep_idt function_name,
   const mathematical_function_typet &type,
   symbol_table_baset &symbol_table)
 {
@@ -382,7 +381,7 @@ static auxiliary_symbolt declare_function(
 /// \return a function application expression representing:
 ///   `function_name(arguments)`
 exprt make_function_application(
-  const irep_idt &function_name,
+  irep_idt function_name,
   const exprt::operandst &arguments,
   const typet &range,
   symbol_table_baset &symbol_table)
@@ -404,7 +403,7 @@ exprt make_function_application(
 /// Strip java:: prefix from given identifier
 /// \param to_strip: identifier from which the prefix is stripped
 /// \return the identifier without without java:: prefix
-irep_idt strip_java_namespace_prefix(const irep_idt &to_strip)
+irep_idt strip_java_namespace_prefix(irep_idt to_strip)
 {
   const std::string to_strip_str=id2string(to_strip);
   const std::string prefix="java::";
@@ -446,8 +445,8 @@ std::string pretty_print_java_type(const std::string &fqn_java_type)
 ///   resolve_inherited_componentt::inherited_componentt otherwise.
 std::optional<resolve_inherited_componentt::inherited_componentt>
 get_inherited_component(
-  const irep_idt &component_class_id,
-  const irep_idt &component_name,
+  irep_idt component_class_id,
+  irep_idt component_name,
   const symbol_table_baset &symbol_table,
   bool include_interfaces)
 {
@@ -516,7 +515,7 @@ get_inherited_component(
 /// Check if a symbol is a well-known non-null global
 /// \param symbolid: symbol id to check
 /// \return true if this static field is known never to be null
-bool is_non_null_library_global(const irep_idt &symbolid)
+bool is_non_null_library_global(irep_idt symbolid)
 {
   static const irep_idt in = "java::java.lang.System.in";
   static const irep_idt out = "java::java.lang.System.out";
@@ -556,7 +555,7 @@ symbolt &fresh_java_symbol(
   const typet &type,
   const std::string &basename_prefix,
   const source_locationt &source_location,
-  const irep_idt &function_name,
+  irep_idt function_name,
   symbol_table_baset &symbol_table)
 {
   PRECONDITION(!function_name.empty());
@@ -571,7 +570,7 @@ std::optional<irep_idt> declaring_class(const symbolt &symbol)
   return class_id.empty() ? std::optional<irep_idt>{} : class_id;
 }
 
-void set_declaring_class(symbolt &symbol, const irep_idt &declaring_class)
+void set_declaring_class(symbolt &symbol, irep_idt declaring_class)
 {
   symbol.type.set(ID_C_class, declaring_class);
 }

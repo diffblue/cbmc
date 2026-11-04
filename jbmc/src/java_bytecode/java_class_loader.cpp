@@ -15,8 +15,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_class_loader_limit.h"
 
-java_class_loadert::parse_tree_with_overlayst &java_class_loadert::
-operator()(const irep_idt &class_name, message_handlert &message_handler)
+java_class_loadert::parse_tree_with_overlayst &java_class_loadert::operator()(
+  irep_idt class_name,
+  message_handlert &message_handler)
 {
   messaget log(message_handler);
 
@@ -105,7 +106,7 @@ static bool is_overlay_class(const java_bytecode_parse_treet::classt &c)
 }
 
 bool java_class_loadert::can_load_class(
-  const irep_idt &class_name,
+  irep_idt class_name,
   message_handlert &message_handler)
 {
   for(const auto &cp_entry : classpath_entries)
@@ -133,7 +134,7 @@ bool java_class_loadert::can_load_class(
 java_class_loadert::parse_tree_with_overlayst &
 java_class_loadert::get_parse_tree(
   java_class_loader_limitt &class_loader_limit,
-  const irep_idt &class_name,
+  irep_idt class_name,
   message_handlert &message_handler)
 {
   parse_tree_with_overlayst &parse_trees = class_map[class_name];

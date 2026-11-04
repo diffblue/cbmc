@@ -66,7 +66,7 @@ static void build_dead_map_from_ai(
 
 static void output_dead_plain(
   const namespacet &ns,
-  const irep_idt &function_identifier,
+  irep_idt function_identifier,
   const goto_programt &goto_program,
   const dead_mapt &dead_map,
   std::ostream &os)
@@ -80,7 +80,7 @@ static void output_dead_plain(
 }
 
 static void add_to_xml(
-  const irep_idt &function_identifier,
+  irep_idt function_identifier,
   const goto_programt &goto_program,
   const dead_mapt &dead_map,
   xmlt &dest)
@@ -115,7 +115,7 @@ file_name_string_opt(const source_locationt &source_location)
 
 static void add_to_json(
   const namespacet &ns,
-  const irep_idt &function_identifier,
+  irep_idt function_identifier,
   const goto_programt &goto_program,
   const dead_mapt &dead_map,
   json_arrayt &dest)
@@ -263,7 +263,7 @@ line_string_opt(const source_locationt &source_location)
 }
 
 static void json_output_function(
-  const irep_idt &function,
+  irep_idt function,
   const source_locationt &first_location,
   const source_locationt &last_location,
   json_arrayt &dest)
@@ -280,7 +280,7 @@ static void json_output_function(
 }
 
 static void xml_output_function(
-  const irep_idt &function,
+  irep_idt function,
   const source_locationt &first_location,
   const source_locationt &last_location,
   xmlt &dest)

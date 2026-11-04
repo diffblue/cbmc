@@ -65,7 +65,7 @@ public:
 
   /// Determines whether an identifier of a given type should have its fields
   /// distinguished. Virtual so that subclasses can override this behaviour.
-  virtual bool field_sensitive(const irep_idt &id, const typet &type);
+  virtual bool field_sensitive(irep_idt id, const typet &type);
 
   /// Matches the location_number field of the instruction that corresponds
   /// to this value_sett instance in value_set_domaint's state map
@@ -194,7 +194,7 @@ public:
     {
     }
 
-    entryt(const irep_idt &_identifier, const std::string &_suffix)
+    entryt(irep_idt _identifier, const std::string &_suffix)
       : identifier(_identifier), suffix(_suffix)
     {
     }
@@ -248,7 +248,7 @@ public:
   /// \ref update_entry.
   /// \param id: identifier to find.
   /// \return a constant pointer to an entry if found, or null otherwise.
-  const entryt *find_entry(const irep_idt &id) const;
+  const entryt *find_entry(irep_idt id) const;
 
   /// Adds or replaces an entry in this value-set.
   /// \param e: entry to find. Its `id` and `suffix` fields will be used
@@ -355,7 +355,7 @@ public:
   /// \param arguments: actual arguments
   /// \param ns: global namespace
   void do_function_call(
-    const irep_idt &function,
+    irep_idt function,
     const exprt::operandst &arguments,
     const namespacet &ns);
 
@@ -413,7 +413,7 @@ public:
   /// \param index: index in the value set
   /// \param values_to_erase: set of values to remove from the entry
   void erase_values_from_entry(
-    const irep_idt &index,
+    irep_idt index,
     const std::unordered_set<exprt, irep_hash> &values_to_erase);
 
   void erase_symbol(const symbol_exprt &symbol_expr, const namespacet &ns);

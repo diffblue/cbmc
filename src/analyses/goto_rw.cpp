@@ -519,7 +519,7 @@ void rw_range_sett::get_objects_address_of(const exprt &object)
 
 void rw_range_sett::add(
   get_modet mode,
-  const irep_idt &identifier,
+  irep_idt identifier,
   const range_spect &range_start,
   const range_spect &range_end)
 {
@@ -662,7 +662,7 @@ void rw_range_sett::get_objects_rec(const typet &type)
 }
 
 void rw_range_sett::get_array_objects(
-  const irep_idt &,
+  irep_idt,
   goto_programt::const_targett,
   get_modet mode,
   const exprt &pointer)
@@ -757,7 +757,7 @@ void rw_guarded_range_set_value_sett::get_objects_if(
 
 void rw_guarded_range_set_value_sett::add(
   get_modet mode,
-  const irep_idt &identifier,
+  irep_idt identifier,
   const range_spect &range_start,
   const range_spect &range_end)
 {
@@ -776,7 +776,7 @@ void rw_guarded_range_set_value_sett::add(
 }
 
 static void goto_rw_assign(
-  const irep_idt &function,
+  irep_idt function,
   goto_programt::const_targett target,
   const exprt &lhs,
   const exprt &rhs,
@@ -788,7 +788,7 @@ static void goto_rw_assign(
 }
 
 static void goto_rw_other(
-  const irep_idt &function,
+  irep_idt function,
   goto_programt::const_targett target,
   const codet &code,
   rw_range_sett &rw_set)
@@ -843,7 +843,7 @@ static void goto_rw_other(
 }
 
 static void goto_rw(
-  const irep_idt &function,
+  irep_idt function,
   goto_programt::const_targett target,
   const exprt &lhs,
   const exprt &function_expr,
@@ -865,7 +865,7 @@ static void goto_rw(
 }
 
 void goto_rw(
-  const irep_idt &function,
+  irep_idt function,
   goto_programt::const_targett target,
   rw_range_sett &rw_set)
 {
@@ -933,7 +933,7 @@ void goto_rw(
 }
 
 void goto_rw(
-  const irep_idt &function,
+  irep_idt function,
   const goto_programt &goto_program,
   rw_range_sett &rw_set)
 {
@@ -941,9 +941,10 @@ void goto_rw(
     goto_rw(function, i_it, rw_set);
 }
 
-void goto_rw(const goto_functionst &goto_functions,
-             const irep_idt &function,
-             rw_range_sett &rw_set)
+void goto_rw(
+  const goto_functionst &goto_functions,
+  irep_idt function,
+  rw_range_sett &rw_set)
 {
   goto_functionst::function_mapt::const_iterator f_it=
     goto_functions.function_map.find(function);

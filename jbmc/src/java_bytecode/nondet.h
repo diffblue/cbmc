@@ -93,10 +93,10 @@ typedef std::vector<codet> alternate_casest;
 /// \return Returns a nondet-switch choosing between switch_cases. The resulting
 ///   switch block has no default case.
 code_blockt generate_nondet_switch(
-  const irep_idt &name_prefix,
+  irep_idt name_prefix,
   const alternate_casest &switch_cases,
   const typet &int_type,
-  const irep_idt &mode,
+  irep_idt mode,
   const source_locationt &source_location,
   symbol_table_baset &symbol_table);
 

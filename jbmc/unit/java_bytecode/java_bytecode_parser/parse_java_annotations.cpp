@@ -32,8 +32,8 @@ public:
     return parsed_class_names;
   }
 
-  java_class_loadert::parse_tree_with_overlayst &get_parse_trees_for_class(
-    const irep_idt &class_name)
+  java_class_loadert::parse_tree_with_overlayst &
+  get_parse_trees_for_class(irep_idt class_name)
   {
     return java_class_loader.get_class_with_overlays_map().at(class_name);
   }

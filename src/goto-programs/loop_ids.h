@@ -26,7 +26,7 @@ class goto_programt;
 ///     goto instruction.
 struct loop_idt
 {
-  loop_idt(const irep_idt &function_id, const unsigned int loop_number)
+  loop_idt(irep_idt function_id, const unsigned int loop_number)
     : function_id(function_id), loop_number(loop_number)
   {
   }
@@ -63,7 +63,7 @@ void show_loop_ids(
 
 void show_loop_ids(
   ui_message_handlert::uit,
-  const irep_idt &function_id,
+  irep_idt function_id,
   const goto_programt &);
 
 #endif // CPROVER_GOTO_PROGRAMS_LOOP_IDS_H

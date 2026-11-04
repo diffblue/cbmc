@@ -51,28 +51,26 @@ protected:
   goto_functionst &goto_functions;
   message_handlert &message_handler;
 
-  void process_function(const irep_idt &, goto_functionst::goto_functiont &);
+  void process_function(irep_idt, goto_functionst::goto_functiont &);
 
   void process_instruction(
-    const irep_idt &function_id,
+    irep_idt function_id,
     goto_programt::instructiont &instruction,
     goto_programt &dest);
 
   void process_instruction_gcc(const code_asm_gcct &, goto_programt &dest);
 
-  void process_instruction_msc(
-    const irep_idt &,
-    const code_asmt &,
-    goto_programt &dest);
+  void
+  process_instruction_msc(irep_idt, const code_asmt &, goto_programt &dest);
 
   void gcc_asm_function_call(
-    const irep_idt &function_base_name,
+    irep_idt function_base_name,
     const code_asm_gcct &code,
     std::size_t n_args,
     goto_programt &dest);
 
   void msc_asm_function_call(
-    const irep_idt &function_base_name,
+    irep_idt function_base_name,
     const exprt::operandst &operands,
     const code_asmt &code,
     goto_programt &dest);
@@ -87,7 +85,7 @@ protected:
 /// \param n_args: Number of arguments required by \p function_base_name
 /// \param dest: Goto program to append the function call to
 void remove_asmt::gcc_asm_function_call(
-  const irep_idt &function_base_name,
+  irep_idt function_base_name,
   const code_asm_gcct &code,
   std::size_t n_args,
   goto_programt &dest)
@@ -171,7 +169,7 @@ void remove_asmt::gcc_asm_function_call(
 ///   call
 /// \param dest: Goto program to append the function call to
 void remove_asmt::msc_asm_function_call(
-  const irep_idt &function_base_name,
+  irep_idt function_base_name,
   const exprt::operandst &operands,
   const code_asmt &code,
   goto_programt &dest)
@@ -223,7 +221,7 @@ void remove_asmt::msc_asm_function_call(
 ///   assembly statements
 /// \param dest: The goto program to append the new instructions to
 void remove_asmt::process_instruction(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt::instructiont &instruction,
   goto_programt &dest)
 {
@@ -415,7 +413,7 @@ void remove_asmt::process_instruction_gcc(
 /// \param code: The inline assembly code statement to translate
 /// \param dest: The goto program to append the new instructions to
 void remove_asmt::process_instruction_msc(
-  const irep_idt &function_id,
+  irep_idt function_id,
   const code_asmt &code,
   goto_programt &dest)
 {
@@ -542,7 +540,7 @@ void remove_asmt::process_instruction_msc(
 /// \param function_id: Name of function being processed
 /// \param goto_function: The goto function
 void remove_asmt::process_function(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_functionst::goto_functiont &goto_function)
 {
   bool did_something = false;

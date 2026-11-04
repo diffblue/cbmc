@@ -55,7 +55,7 @@ void remove_unused_functions(
 }
 
 void find_used_functions(
-  const irep_idt &start,
+  irep_idt start,
   goto_functionst &functions,
   std::set<irep_idt> &seen)
 {

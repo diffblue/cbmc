@@ -164,10 +164,10 @@ public:
     const abstract_goto_modelt &model,
     const optionst &options);
 
-  bool can_generate_function_body(const irep_idt &name);
+  bool can_generate_function_body(irep_idt name);
 
   bool generate_function_body(
-    const irep_idt &function_name,
+    irep_idt function_name,
     symbol_table_baset &symbol_table,
     goto_functiont &function,
     bool body_available);

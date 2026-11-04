@@ -42,7 +42,7 @@ Function: init
 
 \*******************************************************************/
 
-inline static void init(YYSTYPE &expr, const irep_idt &id)
+inline static void init(YYSTYPE &expr, irep_idt id)
 {
   newstack(expr);
   parser_stack(expr).id(id);
@@ -60,7 +60,7 @@ Function: set
 
 \*******************************************************************/
 
-inline static void set(YYSTYPE expr, const irep_idt &id)
+inline static void set(YYSTYPE expr, irep_idt id)
 {
   parser_stack(expr).id(id);
 }
@@ -77,7 +77,7 @@ Function: statement
 
 \*******************************************************************/
 
-static void statement(YYSTYPE &expr, const irep_idt &id)
+static void statement(YYSTYPE &expr, irep_idt id)
 {
   set(expr, ID_code);
   parser_stack(expr).set(ID_statement, id);

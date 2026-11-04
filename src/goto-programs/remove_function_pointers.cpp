@@ -42,9 +42,8 @@ public:
 
   void operator()(goto_functionst &goto_functions);
 
-  bool remove_function_pointers(
-    goto_programt &goto_program,
-    const irep_idt &function_id);
+  bool
+  remove_function_pointers(goto_programt &goto_program, irep_idt function_id);
 
 protected:
   message_handlert &message_handler;
@@ -67,7 +66,7 @@ protected:
   /// \param target: location with function call with function pointer
   void remove_function_pointer(
     goto_programt &goto_program,
-    const irep_idt &function_id,
+    irep_idt function_id,
     goto_programt::targett target);
 
   std::unordered_set<irep_idt> address_taken;
@@ -203,7 +202,7 @@ static void fix_argument_types(code_function_callt &function_call)
 }
 
 static void fix_return_type(
-  const irep_idt &in_function_id,
+  irep_idt in_function_id,
   code_function_callt &function_call,
   const source_locationt &source_location,
   symbol_tablet &symbol_table,
@@ -245,7 +244,7 @@ static void fix_return_type(
 
 void remove_function_pointerst::remove_function_pointer(
   goto_programt &goto_program,
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt::targett target)
 {
   const auto &function = to_dereference_expr(as_const(*target).call_function());
@@ -380,7 +379,7 @@ void remove_function_pointer(
   message_handlert &message_handler,
   symbol_tablet &symbol_table,
   goto_programt &goto_program,
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt::targett target,
   const std::unordered_set<symbol_exprt, irep_hash> &functions_set)
 {
@@ -493,7 +492,7 @@ void remove_function_pointer(
 
 bool remove_function_pointerst::remove_function_pointers(
   goto_programt &goto_program,
-  const irep_idt &function_id)
+  irep_idt function_id)
 {
   bool did_something=false;
 

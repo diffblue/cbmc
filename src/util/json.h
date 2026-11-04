@@ -274,7 +274,7 @@ public:
   {
   }
 
-  explicit json_stringt(const irep_idt &_value)
+  explicit json_stringt(irep_idt _value)
     : jsont(kindt::J_STRING, id2string(_value))
   {
   }

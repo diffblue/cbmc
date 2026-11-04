@@ -50,7 +50,7 @@ struct java_bytecode_parse_treet
 
   static std::optional<annotationt> find_annotation(
     const annotationst &annotations,
-    const irep_idt &annotation_type_name);
+    irep_idt annotation_type_name);
 
   struct instructiont
   {
@@ -75,7 +75,7 @@ struct java_bytecode_parse_treet
     {
     }
 
-    bool has_annotation(const irep_idt &annotation_id) const
+    bool has_annotation(irep_idt annotation_id) const
     {
       return find_annotation(annotations, annotation_id).has_value();
     }
@@ -198,7 +198,7 @@ struct java_bytecode_parse_treet
     classt() = default;
 
     /// Create a class \p name.
-    explicit classt(const irep_idt &name) : name(name)
+    explicit classt(irep_idt name) : name(name)
     {
     }
 
@@ -321,7 +321,7 @@ struct java_bytecode_parse_treet
   java_bytecode_parse_treet() = default;
 
   /// Create a blank parse tree for class \p class_name.
-  explicit java_bytecode_parse_treet(const irep_idt &class_name)
+  explicit java_bytecode_parse_treet(irep_idt class_name)
     : parsed_class(class_name)
   {
   }
@@ -335,8 +335,8 @@ class fieldref_exprt : public exprt
 public:
   fieldref_exprt(
     const typet &type,
-    const irep_idt &component_name,
-    const irep_idt &class_name)
+    irep_idt component_name,
+    irep_idt class_name)
     : exprt(ID_empty_string, type)
   {
     set(ID_class, class_name);

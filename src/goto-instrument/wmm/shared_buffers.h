@@ -86,7 +86,7 @@ public:
   // events in cycles: var->locations (for read instrumentations)
   std::multimap<irep_idt, source_locationt> cycles_r_loc;
 
-  const varst &operator()(const irep_idt &object);
+  const varst &operator()(irep_idt object);
 
   void add_initialization_code(goto_functionst &goto_functions);
 
@@ -94,20 +94,20 @@ public:
     goto_programt &goto_program,
     goto_programt::targett &t,
     const source_locationt &source_location,
-    const irep_idt &read_object,
-    const irep_idt &write_object);
+    irep_idt read_object,
+    irep_idt write_object);
 
   void flush_read(
     goto_programt &goto_program,
     goto_programt::targett &t,
     const source_locationt &source_location,
-    const irep_idt &write_object);
+    irep_idt write_object);
 
   void write(
     goto_programt &goto_program,
     goto_programt::targett &t,
     const source_locationt &source_location,
-    const irep_idt &object,
+    irep_idt object,
     goto_programt::instructiont &original_instruction,
     const unsigned current_thread);
 
@@ -115,15 +115,15 @@ public:
     goto_programt &goto_program,
     goto_programt::targett &t,
     const source_locationt &source_location,
-    const irep_idt &object,
+    irep_idt object,
     const unsigned current_thread);
 
   void nondet_flush(
-    const irep_idt &function_id,
+    irep_idt function_id,
     goto_programt &goto_program,
     goto_programt::targett &t,
     const source_locationt &source_location,
-    const irep_idt &object,
+    irep_idt object,
     const unsigned current_thread,
     const bool tso_pso_rmo);
 
@@ -131,22 +131,22 @@ public:
     goto_programt &goto_program,
     goto_programt::targett &t,
     const source_locationt &source_location,
-    const irep_idt &id_lhs,
+    irep_idt id_lhs,
     const exprt &rhs);
 
   void assignment(
     goto_programt &goto_program,
     goto_programt::targett &t,
     const source_locationt &source_location,
-    const irep_idt &id_lhs,
-    const irep_idt &id_rhs)
+    irep_idt id_lhs,
+    irep_idt id_rhs)
   {
     namespacet ns(symbol_table);
     assignment(goto_program, t, source_location, id_lhs,
       ns.lookup(id_rhs).symbol_expr());
   }
 
-  bool track(const irep_idt &id) const
+  bool track(irep_idt id) const
   {
     namespacet ns(symbol_table);
 
@@ -159,7 +159,7 @@ public:
     return true;
   }
 
-  irep_idt choice(const irep_idt &function_id, const std::string &suffix)
+  irep_idt choice(irep_idt function_id, const std::string &suffix)
   {
     const auto maybe_symbol = symbol_table.lookup(function_id);
     CHECK_RETURN(maybe_symbol);
@@ -217,7 +217,7 @@ public:
 
     void weak_memory(
       value_setst &value_sets,
-      const irep_idt &function_id,
+      irep_idt function_id,
       memory_modelt model);
   };
 

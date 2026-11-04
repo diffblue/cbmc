@@ -44,7 +44,7 @@ static goto_programt get_gen_nondet_init_instructions(
   symbol_table_baset &symbol_table,
   message_handlert &message_handler,
   const java_object_factory_parameterst &object_factory_parameters,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   code_blockt gen_nondet_init_code;
   const bool skip_classid = true;
@@ -79,13 +79,13 @@ static goto_programt get_gen_nondet_init_instructions(
 /// \return The next instruction to process with this function and a boolean
 ///   indicating whether any changes were made to the goto program.
 static std::pair<goto_programt::targett, bool> insert_nondet_init_code(
-  const irep_idt &function_identifier,
+  irep_idt function_identifier,
   goto_programt &goto_program,
   const goto_programt::targett &target,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler,
   java_object_factory_parameterst object_factory_parameters,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   const auto next_instr = std::next(target);
 
@@ -164,12 +164,12 @@ static std::pair<goto_programt::targett, bool> insert_nondet_init_code(
 ///   nondet objects.
 /// \param mode: Language mode
 void convert_nondet(
-  const irep_idt &function_identifier,
+  irep_idt function_identifier,
   goto_programt &goto_program,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler,
   const java_object_factory_parameterst &user_object_factory_parameters,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   java_object_factory_parameterst object_factory_parameters =
     user_object_factory_parameters;
@@ -202,7 +202,7 @@ void convert_nondet(
   goto_model_functiont &function,
   message_handlert &message_handler,
   const java_object_factory_parameterst &object_factory_parameters,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   convert_nondet(
     function.get_function_id(),

@@ -158,8 +158,7 @@ private:
   /// \param class_name: class the method is declared on
   /// \param method: a `methodt` object from a java bytecode parse tree
   /// \return true if the method is an ignored method, else false
-  static bool is_ignored_method(
-    const irep_idt &class_name, const methodt &method)
+  static bool is_ignored_method(irep_idt class_name, const methodt &method)
   {
     static irep_idt org_cprover_CProver_name = "org.cprover.CProver";
     return
@@ -170,7 +169,7 @@ private:
 
   bool check_field_exists(
     const fieldt &field,
-    const irep_idt &qualified_fieldname,
+    irep_idt qualified_fieldname,
     const struct_union_typet::componentst &fields) const;
 
   std::unordered_set<std::string> no_load_classes;
@@ -620,7 +619,7 @@ void java_bytecode_convert_classt::convert(
 
 bool java_bytecode_convert_classt::check_field_exists(
   const java_bytecode_parse_treet::fieldt &field,
-  const irep_idt &qualified_fieldname,
+  irep_idt qualified_fieldname,
   const struct_union_typet::componentst &fields) const
 {
   if(field.is_static)
@@ -1178,7 +1177,7 @@ void convert_java_annotations(
 /// the inner class are updated to point to the type parameters of the
 /// corresponding outer classes.
 void mark_java_implicitly_generic_class_type(
-  const irep_idt &class_name,
+  irep_idt class_name,
   symbol_table_baset &symbol_table)
 {
   const std::string qualified_class_name = "java::" + id2string(class_name);

@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_storage_spec.h"
 
 ansi_c_id_classt ansi_c_parsert::lookup(
-  const irep_idt &base_name,
+  irep_idt base_name,
   irep_idt &identifier, // output
   bool tag,
   bool label)
@@ -181,9 +181,7 @@ void ansi_c_parsert::pragma_cprover_pop()
   pragma_cprover_stack.pop_back();
 }
 
-void ansi_c_parsert::pragma_cprover_add_check(
-  const irep_idt &name,
-  bool enabled)
+void ansi_c_parsert::pragma_cprover_add_check(irep_idt name, bool enabled)
 {
   if(pragma_cprover_stack.empty())
     pragma_cprover_push();
@@ -191,7 +189,7 @@ void ansi_c_parsert::pragma_cprover_add_check(
   pragma_cprover_stack.back()[name] = enabled;
 }
 
-bool ansi_c_parsert::pragma_cprover_clash(const irep_idt &name, bool enabled)
+bool ansi_c_parsert::pragma_cprover_clash(irep_idt name, bool enabled)
 {
   auto top = pragma_cprover_stack.back();
   auto found = top.find(name);

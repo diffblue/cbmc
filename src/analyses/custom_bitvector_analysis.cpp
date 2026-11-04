@@ -22,7 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 
 void custom_bitvector_domaint::set_bit(
-  const irep_idt &identifier,
+  irep_idt identifier,
   unsigned bit_nr,
   modet mode)
 {
@@ -118,7 +118,7 @@ void custom_bitvector_domaint::assign_lhs(
 }
 
 void custom_bitvector_domaint::assign_lhs(
-  const irep_idt &identifier,
+  irep_idt identifier,
   const vectorst &vectors)
 {
   // we erase blank ones to avoid noise
@@ -135,7 +135,7 @@ void custom_bitvector_domaint::assign_lhs(
 }
 
 custom_bitvector_domaint::vectorst
-  custom_bitvector_domaint::get_rhs(const irep_idt &identifier) const
+custom_bitvector_domaint::get_rhs(irep_idt identifier) const
 {
   vectorst vectors;
 
@@ -269,9 +269,9 @@ void custom_bitvector_domaint::assign_struct_rec(
 }
 
 void custom_bitvector_domaint::transform(
-  const irep_idt &function_from,
+  irep_idt function_from,
   trace_ptrt trace_from,
-  const irep_idt &function_to,
+  irep_idt function_to,
   trace_ptrt trace_to,
   ai_baset &ai,
   const namespacet &ns)

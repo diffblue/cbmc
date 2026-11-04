@@ -32,7 +32,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_program2code.h"
 
-static std::string clean_identifier(const irep_idt &id)
+static std::string clean_identifier(irep_idt id)
 {
   std::string result;
   result.reserve(id2string(id).size());
@@ -1194,9 +1194,9 @@ void dump_ct::convert_function_declaration(
 }
 
 static bool find_block_position_rec(
-  const irep_idt &identifier,
+  irep_idt identifier,
   codet &root,
-  code_blockt* &dest,
+  code_blockt *&dest,
   exprt::operandst::iterator &before)
 {
   if(!root.has_operands())

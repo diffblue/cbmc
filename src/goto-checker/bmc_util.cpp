@@ -47,8 +47,7 @@ void build_error_trace(
   build_goto_trace(symex_target_equation, decision_procedure, ns, goto_trace);
 }
 
-ssa_step_predicatet
-ssa_step_matches_failing_property(const irep_idt &property_id)
+ssa_step_predicatet ssa_step_matches_failing_property(irep_idt property_id)
 {
   return [property_id](
            symex_target_equationt::SSA_stepst::const_iterator step,
@@ -386,9 +385,8 @@ void run_property_decider(
     << messaget::eom;
 
   property_decider.add_constraint_from_goals(
-    [&properties](const irep_idt &property_id) {
-      return is_property_to_check(properties.at(property_id).status);
-    });
+    [&properties](irep_idt property_id)
+    { return is_property_to_check(properties.at(property_id).status); });
 
   auto const sat_solver_start = std::chrono::steady_clock::now();
 

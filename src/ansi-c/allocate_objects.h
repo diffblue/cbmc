@@ -27,9 +27,9 @@ class allocate_objectst
 {
 public:
   allocate_objectst(
-    const irep_idt &symbol_mode,
+    irep_idt symbol_mode,
     const source_locationt &source_location,
-    const irep_idt &name_prefix,
+    irep_idt name_prefix,
     symbol_table_baset &symbol_table)
     : symbol_mode(symbol_mode),
       source_location(source_location),
@@ -44,19 +44,19 @@ public:
     const exprt &target_expr,
     const typet &allocate_type,
     const lifetimet lifetime,
-    const irep_idt &basename_prefix = "tmp");
+    irep_idt basename_prefix = "tmp");
 
   exprt allocate_automatic_local_object(
     code_blockt &assignments,
     const exprt &target_expr,
     const typet &allocate_type,
-    const irep_idt &basename_prefix = "tmp");
+    irep_idt basename_prefix = "tmp");
 
   exprt allocate_static_global_object(
     code_blockt &assignments,
     const exprt &target_expr,
     const typet &allocate_type,
-    const irep_idt &basename_prefix = "tmp");
+    irep_idt basename_prefix = "tmp");
 
   /// Generates code for allocating a dynamic object. A new variable with
   /// basename prefix `alloc_site` is introduced to which the allocated memory
@@ -88,7 +88,7 @@ public:
 
   symbol_exprt allocate_automatic_local_object(
     const typet &allocate_type,
-    const irep_idt &basename_prefix = "tmp");
+    irep_idt basename_prefix = "tmp");
 
   void add_created_symbol(const symbolt &symbol);
 
@@ -111,7 +111,7 @@ private:
     const exprt &target_expr,
     const typet &allocate_type,
     const bool static_lifetime,
-    const irep_idt &basename_prefix);
+    irep_idt basename_prefix);
 };
 
 /// Create code allocating an object of size `size` and assigning it to `lhs`

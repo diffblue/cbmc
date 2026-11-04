@@ -115,7 +115,7 @@ public:
       find(ID_partial_specialization_args));
   }
 
-  void set_specialization_of(const irep_idt &id)
+  void set_specialization_of(irep_idt id)
   {
     set(ID_specialization_of, id);
   }

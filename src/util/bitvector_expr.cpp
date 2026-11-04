@@ -12,10 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "bitvector_types.h"
 #include "mathematical_types.h"
 
-shift_exprt::shift_exprt(
-  exprt _src,
-  const irep_idt &_id,
-  const std::size_t _distance)
+shift_exprt::shift_exprt(exprt _src, irep_idt _id, const std::size_t _distance)
   : binary_exprt(std::move(_src), _id, from_integer(_distance, integer_typet()))
 {
 }

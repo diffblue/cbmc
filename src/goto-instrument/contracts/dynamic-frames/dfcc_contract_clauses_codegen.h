@@ -47,7 +47,7 @@ public:
   /// \param assigns_clause Sequence of targets to encode
   /// \param dest Destination program
   void gen_spec_assigns_instructions(
-    const irep_idt &language_mode,
+    irep_idt language_mode,
     const exprt::operandst &assigns_clause,
     goto_programt &dest);
 
@@ -62,7 +62,7 @@ public:
   /// \param frees_clause Sequence of targets to encode
   /// \param dest Destination program
   void gen_spec_frees_instructions(
-    const irep_idt &language_mode,
+    irep_idt language_mode,
     const exprt::operandst &frees_clause,
     goto_programt &dest);
 
@@ -76,28 +76,28 @@ protected:
   /// Generates GOTO instructions to build the representation of the given
   /// conditional target group.
   void encode_assignable_target_group(
-    const irep_idt &language_mode,
+    irep_idt language_mode,
     const conditional_target_group_exprt &group,
     goto_programt &dest);
 
   /// Generates GOTO instructions to build the representation of the given
   /// assignable target.
   void encode_assignable_target(
-    const irep_idt &language_mode,
+    irep_idt language_mode,
     const exprt &target,
     goto_programt &dest);
 
   /// Generates GOTO instructions to build the representation of the given
   /// conditional target group.
   void encode_freeable_target_group(
-    const irep_idt &language_mode,
+    irep_idt language_mode,
     const conditional_target_group_exprt &group,
     goto_programt &dest);
 
   /// Generates GOTO instructions to build the representation of the given
   /// freeable target.
   void encode_freeable_target(
-    const irep_idt &language_mode,
+    irep_idt language_mode,
     const exprt &target,
     goto_programt &dest);
 

@@ -83,7 +83,7 @@ inline bool is_c_enum_type(const typet &type)
 /// \return constant, that could be assigned as the value of an expression with
 ///   type c_enum.
 inline constant_exprt convert_member_name_to_enum_value(
-  const irep_idt &member_name,
+  irep_idt member_name,
   const c_enum_typet &c_enum)
 {
   for(const auto &enum_value : c_enum.members())

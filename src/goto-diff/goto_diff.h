@@ -57,9 +57,8 @@ protected:
     const std::string &group_name,
     const std::set<irep_idt> &function_group,
     const goto_modelt &goto_model) const;
-  void output_function(
-    const irep_idt &function_name,
-    const goto_modelt &goto_model) const;
+  void
+  output_function(irep_idt function_name, const goto_modelt &goto_model) const;
 
   void convert_function_group_json(
     json_arrayt &result,
@@ -67,7 +66,7 @@ protected:
     const goto_modelt &goto_model) const;
   void convert_function_json(
     json_objectt &result,
-    const irep_idt &function_name,
+    irep_idt function_name,
     const goto_modelt &goto_model) const;
 };
 

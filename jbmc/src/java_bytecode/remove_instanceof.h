@@ -87,7 +87,7 @@ class message_handlert;
 class symbol_table_baset;
 
 void remove_instanceof(
-  const irep_idt &function_identifier,
+  irep_idt function_identifier,
   goto_programt::targett target,
   goto_programt &goto_program,
   symbol_table_baset &symbol_table,
@@ -95,7 +95,7 @@ void remove_instanceof(
   message_handlert &);
 
 void remove_instanceof(
-  const irep_idt &function_identifier,
+  irep_idt function_identifier,
   goto_functionst::goto_functiont &function,
   symbol_table_baset &symbol_table,
   const class_hierarchyt &class_hierarchy,

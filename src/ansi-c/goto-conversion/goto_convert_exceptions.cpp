@@ -17,7 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 void goto_convertt::convert_msc_try_finally(
   const codet &code,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   INVARIANT_WITH_DIAGNOSTICS(
     code.operands().size() == 2,
@@ -55,7 +55,7 @@ void goto_convertt::convert_msc_try_finally(
 void goto_convertt::convert_msc_try_except(
   const codet &code,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   INVARIANT_WITH_DIAGNOSTICS(
     code.operands().size() == 3,
@@ -70,7 +70,7 @@ void goto_convertt::convert_msc_try_except(
 void goto_convertt::convert_msc_leave(
   const codet &code,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   INVARIANT_WITH_DIAGNOSTICS(
     targets.leave_set, "leave without target", code.find_source_location());
@@ -86,7 +86,7 @@ void goto_convertt::convert_msc_leave(
 void goto_convertt::convert_try_catch(
   const codet &code,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   INVARIANT_WITH_DIAGNOSTICS(
     code.operands().size() >= 2,
@@ -145,7 +145,7 @@ void goto_convertt::convert_try_catch(
 void goto_convertt::convert_CPROVER_try_catch(
   const codet &code,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   INVARIANT_WITH_DIAGNOSTICS(
     code.operands().size() == 2,
@@ -181,7 +181,7 @@ void goto_convertt::convert_CPROVER_try_catch(
 void goto_convertt::convert_CPROVER_throw(
   const codet &code,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   // set the 'exception' flag
   dest.add(goto_programt::make_assignment(
@@ -212,7 +212,7 @@ void goto_convertt::convert_CPROVER_throw(
 void goto_convertt::convert_CPROVER_try_finally(
   const codet &code,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   INVARIANT_WITH_DIAGNOSTICS(
     code.operands().size() == 2,
@@ -233,7 +233,7 @@ void goto_convertt::convert_CPROVER_try_finally(
   convert(to_code(code.op1()), dest, mode);
 }
 
-symbol_exprt goto_convertt::exception_flag(const irep_idt &mode)
+symbol_exprt goto_convertt::exception_flag(irep_idt mode)
 {
   irep_idt id = "$exception_flag";
 
@@ -280,7 +280,7 @@ symbol_exprt goto_convertt::exception_flag(const irep_idt &mode)
 void goto_convertt::unwind_destructor_stack(
   const source_locationt &source_location,
   goto_programt &dest,
-  const irep_idt &mode,
+  irep_idt mode,
   std::optional<node_indext> end_index,
   std::optional<node_indext> starting_index)
 {

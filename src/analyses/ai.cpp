@@ -38,7 +38,7 @@ void ai_baset::output(
 
 void ai_baset::output(
   const namespacet &ns,
-  const irep_idt &function_id,
+  irep_idt function_id,
   const goto_programt &goto_program,
   std::ostream &out) const
 {
@@ -82,7 +82,7 @@ jsont ai_baset::output_json(
 
 jsont ai_baset::output_json(
   const namespacet &ns,
-  const irep_idt &function_id,
+  irep_idt function_id,
   const goto_programt &goto_program) const
 {
   (void)function_id; // unused parameter
@@ -135,7 +135,7 @@ xmlt ai_baset::output_xml(
 
 xmlt ai_baset::output_xml(
   const namespacet &ns,
-  const irep_idt &function_id,
+  irep_idt function_id,
   const goto_programt &goto_program) const
 {
   (void)function_id; // unused parameter
@@ -188,13 +188,13 @@ ai_baset::trace_ptrt ai_baset::entry_state(const goto_programt &goto_program)
 }
 
 void ai_baset::initialize(
-  const irep_idt &function_id,
+  irep_idt function_id,
   const goto_functionst::goto_functiont &goto_function)
 {
   initialize(function_id, goto_function.body);
 }
 
-void ai_baset::initialize(const irep_idt &, const goto_programt &goto_program)
+void ai_baset::initialize(irep_idt, const goto_programt &goto_program)
 {
   // Domains are created and set to bottom on access.
   // So we do not need to set them to be bottom before hand.
@@ -231,7 +231,7 @@ ai_baset::trace_ptrt ai_baset::get_next(working_sett &working_set)
 
 bool ai_baset::fixedpoint(
   trace_ptrt start_trace,
-  const irep_idt &function_id,
+  irep_idt function_id,
   const goto_programt &goto_program,
   const goto_functionst &goto_functions,
   const namespacet &ns)
@@ -268,7 +268,7 @@ void ai_baset::fixedpoint(
 }
 
 bool ai_baset::visit(
-  const irep_idt &function_id,
+  irep_idt function_id,
   trace_ptrt p,
   working_sett &working_set,
   const goto_programt &goto_program,
@@ -329,9 +329,9 @@ bool ai_baset::visit(
 }
 
 bool ai_baset::visit_edge(
-  const irep_idt &function_id,
+  irep_idt function_id,
   trace_ptrt p,
-  const irep_idt &to_function_id,
+  irep_idt to_function_id,
   locationt to_l,
   trace_ptrt caller_history,
   const namespacet &ns,
@@ -414,10 +414,10 @@ bool ai_baset::visit_edge(
 }
 
 bool ai_baset::visit_edge_function_call(
-  const irep_idt &calling_function_id,
+  irep_idt calling_function_id,
   trace_ptrt p_call,
   locationt l_return,
-  const irep_idt &,
+  irep_idt,
   working_sett &working_set,
   const goto_programt &,
   const goto_functionst &,
@@ -442,7 +442,7 @@ bool ai_baset::visit_edge_function_call(
 }
 
 bool ai_baset::visit_function_call(
-  const irep_idt &calling_function_id,
+  irep_idt calling_function_id,
   trace_ptrt p_call,
   working_sett &working_set,
   const goto_programt &caller,
@@ -521,7 +521,7 @@ bool ai_baset::visit_function_call(
 }
 
 bool ai_baset::visit_end_function(
-  const irep_idt &function_id,
+  irep_idt function_id,
   trace_ptrt p,
   working_sett &working_set,
   const goto_programt &goto_program,
@@ -540,10 +540,10 @@ bool ai_baset::visit_end_function(
 }
 
 bool ai_recursive_interproceduralt::visit_edge_function_call(
-  const irep_idt &calling_function_id,
+  irep_idt calling_function_id,
   trace_ptrt p_call,
   locationt l_return,
-  const irep_idt &callee_function_id,
+  irep_idt callee_function_id,
   working_sett &working_set,
   const goto_programt &callee,
   const goto_functionst &goto_functions,

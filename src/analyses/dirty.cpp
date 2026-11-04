@@ -110,7 +110,7 @@ void dirtyt::output(std::ostream &out) const
 /// \param id: function id to analyse
 /// \param function: function to analyse
 void incremental_dirtyt::populate_dirty_for_function(
-  const irep_idt &id,
+  irep_idt id,
   const goto_functionst::goto_functiont &function)
 {
   auto insert_result = dirty_processed_functions.insert(id);

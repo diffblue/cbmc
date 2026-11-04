@@ -40,9 +40,9 @@ public:
 
   std::list<irep_idt> w_guards;
 
-  const symbolt &get_guard_symbol(const irep_idt &object);
+  const symbolt &get_guard_symbol(irep_idt object);
 
-  const exprt get_guard_symbol_expr(const irep_idt &object)
+  const exprt get_guard_symbol_expr(irep_idt object)
   {
     return get_guard_symbol(object).symbol_expr();
   }
@@ -63,7 +63,7 @@ protected:
   symbol_table_baset &symbol_table;
 };
 
-const symbolt &w_guardst::get_guard_symbol(const irep_idt &object)
+const symbolt &w_guardst::get_guard_symbol(irep_idt object)
 {
   const irep_idt identifier=id2string(object)+"$w_guard";
 
@@ -160,7 +160,7 @@ static bool has_shared_entries(const namespacet &ns, const rw_set_baset &rw_set)
 static void race_check(
   value_setst &value_sets,
   symbol_table_baset &symbol_table,
-  const irep_idt &function_id,
+  irep_idt function_id,
   L_M_ARG(const goto_functionst::goto_functiont &goto_function)
   goto_programt &goto_program,
   w_guardst &w_guards,
@@ -269,7 +269,7 @@ static void race_check(
 void race_check(
   value_setst &value_sets,
   symbol_table_baset &symbol_table,
-  const irep_idt &function_id,
+  irep_idt function_id,
 #ifdef LOCAL_MAY
   const goto_functionst::goto_functiont &goto_function,
 #endif

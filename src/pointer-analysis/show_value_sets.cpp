@@ -40,7 +40,7 @@ void show_value_sets(
 void show_value_sets(
   ui_message_handlert::uit ui,
   const namespacet &ns,
-  const irep_idt &function_name,
+  irep_idt function_name,
   const goto_programt &goto_program,
   const value_set_analysist &value_set_analysis)
 {

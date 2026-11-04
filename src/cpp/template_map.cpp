@@ -90,7 +90,7 @@ void template_mapt::apply(exprt &expr) const
     apply(*it);
 }
 
-exprt template_mapt::lookup(const irep_idt &identifier) const
+exprt template_mapt::lookup(irep_idt identifier) const
 {
   type_mapt::const_iterator t_it=
     type_map.find(identifier);
@@ -111,7 +111,7 @@ exprt template_mapt::lookup(const irep_idt &identifier) const
   return static_cast<const exprt &>(get_nil_irep());
 }
 
-typet template_mapt::lookup_type(const irep_idt &identifier) const
+typet template_mapt::lookup_type(irep_idt identifier) const
 {
   type_mapt::const_iterator t_it=
     type_map.find(identifier);
@@ -122,7 +122,7 @@ typet template_mapt::lookup_type(const irep_idt &identifier) const
   return static_cast<const typet &>(get_nil_irep());
 }
 
-exprt template_mapt::lookup_expr(const irep_idt &identifier) const
+exprt template_mapt::lookup_expr(irep_idt identifier) const
 {
   expr_mapt::const_iterator e_it=
     expr_map.find(identifier);

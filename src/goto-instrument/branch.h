@@ -16,8 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class goto_modelt;
 
-void branch(
-  goto_modelt &,
-  const irep_idt &id);
+void branch(goto_modelt &, irep_idt id);
 
 #endif // CPROVER_GOTO_INSTRUMENT_BRANCH_H

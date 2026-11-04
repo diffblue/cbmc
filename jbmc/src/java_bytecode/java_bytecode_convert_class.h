@@ -40,7 +40,7 @@ void convert_java_annotations(
   java_bytecode_parse_treet::annotationst &annotations);
 
 void mark_java_implicitly_generic_class_type(
-  const irep_idt &class_name,
+  irep_idt class_name,
   symbol_table_baset &symbol_table);
 
 /// Register in the \p symbol_table new symbols for the objects

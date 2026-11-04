@@ -47,7 +47,7 @@ void weak_memory(
 void introduce_temporaries(
   value_setst &,
   symbol_tablet &,
-  const irep_idt &function,
+  irep_idt function,
   goto_programt &,
 #ifdef LOCAL_MAY
   const goto_functionst::goto_functiont &goto_function,

@@ -460,7 +460,7 @@ static symbol_exprt create_fresh_symbol(
   const std::string &suffix,
   const typet &type,
   const source_locationt &location,
-  const irep_idt &mode,
+  irep_idt mode,
   symbol_table_baset &symbol_table)
 {
   return get_fresh_aux_symbol(
@@ -992,8 +992,7 @@ bool instrument_spec_assignst::must_check_assign(
 }
 
 /// Track the symbol is not a local or is a dirty local.
-bool instrument_spec_assignst::must_track_decl_or_dead(
-  const irep_idt &ident) const
+bool instrument_spec_assignst::must_track_decl_or_dead(irep_idt ident) const
 {
   return cfg_info.is_not_local_or_dirty_local(ident);
 }

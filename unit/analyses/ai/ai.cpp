@@ -31,9 +31,9 @@ public:
   std::optional<unsigned> path_length;
 
   void transform(
-    const irep_idt &,
+    irep_idt,
     trace_ptrt,
-    const irep_idt &,
+    irep_idt,
     trace_ptrt,
     ai_baset &,
     const namespacet &) override

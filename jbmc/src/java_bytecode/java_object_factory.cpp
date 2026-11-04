@@ -292,7 +292,7 @@ public:
   /// entry and erase it on destruction; otherwise do nothing.
   /// \param entry: entry to add
   /// \return true if added to the set (and therefore owned by this object)
-  bool insert_entry(const irep_idt &entry)
+  bool insert_entry(irep_idt entry)
   {
     INVARIANT(erase_entry.empty(), "insert_entry should only be called once");
     INVARIANT(!entry.empty(), "entry should be a struct tag");
@@ -365,7 +365,7 @@ void initialize_nondet_string_fields(
   const std::size_t &min_nondet_string_length,
   const std::size_t &max_nondet_string_length,
   const source_locationt &loc,
-  const irep_idt &function_id,
+  irep_idt function_id,
   symbol_table_baset &symbol_table,
   bool printable,
   allocate_objectst &allocate_objects)

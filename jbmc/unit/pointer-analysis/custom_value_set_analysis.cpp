@@ -147,8 +147,7 @@ typedef
 #define TEST_FUNCTION_NAME TEST_PREFIX "test:()V"
 #define TEST_LOCAL_PREFIX TEST_FUNCTION_NAME "::"
 
-static std::size_t
-exprs_with_id(const std::vector<exprt> &exprs, const irep_idt &id)
+static std::size_t exprs_with_id(const std::vector<exprt> &exprs, irep_idt id)
 {
   return std::count_if(
     exprs.begin(),

@@ -51,7 +51,7 @@ std::string invalid_function_contract_pair_exceptiont::what() const
 }
 
 static std::pair<irep_idt, irep_idt>
-parse_function_contract_pair(const irep_idt &cli_flag)
+parse_function_contract_pair(irep_idt cli_flag)
 {
   auto const correct_format_message =
     "the format for function and contract pairs is "
@@ -93,7 +93,7 @@ parse_function_contract_pair(const irep_idt &cli_flag)
 void dfcc(
   const optionst &options,
   goto_modelt &goto_model,
-  const irep_idt &harness_id,
+  irep_idt harness_id,
   const std::optional<irep_idt> &to_check,
   const bool allow_recursive_calls,
   const std::set<irep_idt> &to_replace,
@@ -121,7 +121,7 @@ void dfcc(
 dfcct::dfcct(
   const optionst &options,
   goto_modelt &goto_model,
-  const irep_idt &harness_id,
+  irep_idt harness_id,
   const std::optional<std::pair<irep_idt, irep_idt>> &to_check,
   const bool allow_recursive_calls,
   const std::map<irep_idt, irep_idt> &to_replace,

@@ -82,8 +82,8 @@ pointer_typet select_pointer_typet::specialize_generics(
 
 std::set<struct_tag_typet>
 select_pointer_typet::get_parameter_alternative_types(
-  const irep_idt &,
-  const irep_idt &,
+  irep_idt,
+  irep_idt,
   const namespacet &) const
 {
   return {};

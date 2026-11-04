@@ -123,7 +123,7 @@ public:
   }
 
   ansi_c_id_classt lookup(
-    const irep_idt &base_name, // in
+    irep_idt base_name,   // in
     irep_idt &identifier, // out
     bool tag,
     bool label);
@@ -147,11 +147,11 @@ public:
   void pragma_cprover_pop();
 
   /// \brief Adds a check to the CPROVER pragma stack
-  void pragma_cprover_add_check(const irep_idt &name, bool enabled);
+  void pragma_cprover_add_check(irep_idt name, bool enabled);
 
   /// Returns true iff the same check with  polarity
   /// is already present at top of the stack
-  bool pragma_cprover_clash(const irep_idt &name, bool enabled);
+  bool pragma_cprover_clash(irep_idt name, bool enabled);
 
   /// \brief Tags \ref source_location with
   /// the current CPROVER pragma stack

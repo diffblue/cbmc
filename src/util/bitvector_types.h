@@ -26,16 +26,16 @@ class constant_exprt;
 class bitvector_typet : public typet
 {
 public:
-  explicit bitvector_typet(const irep_idt &_id) : typet(_id)
+  explicit bitvector_typet(irep_idt _id) : typet(_id)
   {
   }
 
-  bitvector_typet(const irep_idt &_id, std::size_t width) : typet(_id)
+  bitvector_typet(irep_idt _id, std::size_t width) : typet(_id)
   {
     set_width(width);
   }
 
-  bitvector_typet(const irep_idt &_id, mp_integer _width) : typet(_id)
+  bitvector_typet(irep_idt _id, mp_integer _width) : typet(_id)
   {
     width(_width);
   }
@@ -165,12 +165,12 @@ inline bv_typet &to_bv_type(typet &type)
 class integer_bitvector_typet : public bitvector_typet
 {
 public:
-  integer_bitvector_typet(const irep_idt &id, std::size_t width)
+  integer_bitvector_typet(irep_idt id, std::size_t width)
     : bitvector_typet(id, width)
   {
   }
 
-  integer_bitvector_typet(const irep_idt &id, const mp_integer &width)
+  integer_bitvector_typet(irep_idt id, const mp_integer &width)
     : bitvector_typet(id, width)
   {
   }

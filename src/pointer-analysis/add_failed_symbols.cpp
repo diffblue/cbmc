@@ -23,7 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// to by a given pointer-typed symbol.
 /// \param id: base symbol id
 /// \return id of the corresponding unknown-object ("failed") symbol.
-irep_idt failed_symbol_id(const irep_idt &id)
+irep_idt failed_symbol_id(irep_idt id)
 {
   return id2string(id)+"$object";
 }

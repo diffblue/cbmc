@@ -18,9 +18,9 @@ Date: January 2010
 #include <list>
 
 void uninitialized_domaint::transform(
-  const irep_idt &,
+  irep_idt,
   trace_ptrt trace_from,
-  const irep_idt &,
+  irep_idt,
   trace_ptrt,
   ai_baset &,
   const namespacet &ns)

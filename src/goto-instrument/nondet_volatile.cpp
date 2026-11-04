@@ -73,12 +73,10 @@ private:
     symbol_table_baset &symbol_table,
     goto_programt &goto_program);
 
-  const symbolt &typecheck_variable(const irep_idt &id, const namespacet &ns);
+  const symbolt &typecheck_variable(irep_idt id, const namespacet &ns);
 
-  void typecheck_model(
-    const irep_idt &id,
-    const symbolt &variable,
-    const namespacet &ns);
+  void
+  typecheck_model(irep_idt id, const symbolt &variable, const namespacet &ns);
 
   void typecheck_options(const optionst &options);
 
@@ -269,7 +267,7 @@ void nondet_volatilet::nondet_volatile(
 }
 
 const symbolt &
-nondet_volatilet::typecheck_variable(const irep_idt &id, const namespacet &ns)
+nondet_volatilet::typecheck_variable(irep_idt id, const namespacet &ns)
 {
   const symbolt *symbol;
 
@@ -297,7 +295,7 @@ nondet_volatilet::typecheck_variable(const irep_idt &id, const namespacet &ns)
 }
 
 void nondet_volatilet::typecheck_model(
-  const irep_idt &id,
+  irep_idt id,
   const symbolt &variable,
   const namespacet &ns)
 {

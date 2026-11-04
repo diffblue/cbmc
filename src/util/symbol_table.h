@@ -79,7 +79,7 @@ public:
   }
 
 public:
-  virtual const symbol_tablet &get_symbol_table() const override
+  const symbol_tablet &get_symbol_table() const override
   {
     return *this;
   }
@@ -87,29 +87,29 @@ public:
   /// Find a symbol in the symbol table for read-write access.
   /// \param name: The name of the symbol to look for
   /// \return A pointer to the found symbol if it exists, nullptr otherwise.
-  virtual symbolt *get_writeable(const irep_idt &name) override
+  symbolt *get_writeable(irep_idt name) override
   {
     symbolst::iterator it = internal_symbols.find(name);
     return it != internal_symbols.end() ? &it->second : nullptr;
   }
 
-  virtual std::pair<symbolt &, bool> insert(symbolt symbol) override;
-  virtual bool move(symbolt &symbol, symbolt *&new_symbol) override;
+  std::pair<symbolt &, bool> insert(symbolt symbol) override;
+  bool move(symbolt &symbol, symbolt *&new_symbol) override;
 
-  virtual void erase(const symbolst::const_iterator &entry) override;
+  void erase(const symbolst::const_iterator &entry) override;
   /// Wipe internal state of the symbol table.
-  virtual void clear() override
+  void clear() override
   {
     internal_symbols.clear();
     internal_symbol_base_map.clear();
     internal_symbol_module_map.clear();
   }
 
-  virtual iteratort begin() override
+  iteratort begin() override
   {
     return iteratort(internal_symbols.begin());
   }
-  virtual iteratort end() override
+  iteratort end() override
   {
     return iteratort(internal_symbols.end());
   }

@@ -69,7 +69,7 @@ public:
   /// Remove the function named \p name from the function map, if it exists.
   /// \return Returns 0 when \p name was not present, and 1 when \p name was
   ///   removed.
-  std::size_t unload(const irep_idt &name)
+  std::size_t unload(irep_idt name)
   {
     return function_map.erase(name);
   }

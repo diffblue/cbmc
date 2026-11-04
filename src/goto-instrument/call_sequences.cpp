@@ -24,9 +24,7 @@ Date: April 2013
 
 #include <linking/static_lifetime_init.h>
 
-void show_call_sequences(
-  const irep_idt &caller,
-  const goto_programt &goto_program)
+void show_call_sequences(irep_idt caller, const goto_programt &goto_program)
 {
   // show calls in  blocks within caller body
   // dfs on code blocks using stack

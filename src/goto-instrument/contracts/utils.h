@@ -42,7 +42,7 @@ public:
   }
 
   [[nodiscard]] std::list<irep_idt>
-  clean(exprt &guard, goto_programt &dest, const irep_idt &mode)
+  clean(exprt &guard, goto_programt &dest, irep_idt mode)
   {
     auto clean_result = goto_convertt::clean_expr(guard, mode, true);
     dest.destructive_append(clean_result.side_effects);
@@ -53,7 +53,7 @@ public:
     const symbol_exprt &function,
     const exprt::operandst &arguments,
     goto_programt &dest,
-    const irep_idt &mode)
+    irep_idt mode)
   {
     goto_convertt::do_havoc_slice(nil_exprt{}, function, arguments, dest, mode);
   }
@@ -93,7 +93,7 @@ public:
     const assignst &mod,
     symbol_tablet &st,
     message_handlert &message_handler,
-    const irep_idt &mode)
+    irep_idt mode)
     : havoc_if_validt(mod, ns),
       ns(st),
       cleaner(st, message_handler),
@@ -121,7 +121,7 @@ public:
   namespacet ns;
   cleanert cleaner;
   messaget log;
-  const irep_idt &mode;
+  irep_idt mode;
 };
 
 /// \brief Generate a validity check over all dereferences in an expression
@@ -210,12 +210,12 @@ bool is_loop_free(
 /// `target` was assigned by the contract of `function_id`.
 irep_idt make_assigns_clause_replacement_tracking_comment(
   const exprt &target,
-  const irep_idt &function_id,
+  irep_idt function_id,
   const namespacet &ns);
 
 /// Returns true if the given comment matches the type of comments created by
 /// \ref make_assigns_clause_replacement_tracking_comment.
-bool is_assigns_clause_replacement_tracking_comment(const irep_idt &comment);
+bool is_assigns_clause_replacement_tracking_comment(irep_idt comment);
 
 /// Infer loop assigns using alias analysis result `local_may_alias`.
 void infer_loop_assigns(
@@ -243,7 +243,7 @@ replace_history_parametert replace_history_old(
   symbol_table_baset &symbol_table,
   const exprt &expr,
   const source_locationt &location,
-  const irep_idt &mode);
+  irep_idt mode);
 
 /// This function recursively identifies the "loop_entry" expressions within
 /// \p expr and replaces them with corresponding history variables.
@@ -251,14 +251,14 @@ replace_history_parametert replace_history_loop_entry(
   symbol_table_baset &symbol_table,
   const exprt &expr,
   const source_locationt &location,
-  const irep_idt &mode);
+  irep_idt mode);
 
 /// This function generates all the instructions required to initialize
 /// history variables.
 void generate_history_variables_initialization(
   symbol_table_baset &symbol_table,
   exprt &clause,
-  const irep_idt &mode,
+  irep_idt mode,
   goto_programt &program);
 
 /// Return true if `target` is the head of some transformed loop.

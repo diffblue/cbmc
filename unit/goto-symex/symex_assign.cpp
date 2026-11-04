@@ -45,9 +45,8 @@ SCENARIO(
   symex_targett::sourcet source{"fun", target.begin()};
   guard_managert manager;
   std::size_t fresh_name_count = 1;
-  auto fresh_name = [&fresh_name_count](const irep_idt &) {
-    return fresh_name_count++;
-  };
+  auto fresh_name = [&fresh_name_count](irep_idt)
+  { return fresh_name_count++; };
   goto_symex_statet state{
     source,
     DEFAULT_MAX_FIELD_SENSITIVITY_ARRAY_SIZE,

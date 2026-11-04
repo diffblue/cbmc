@@ -190,7 +190,7 @@ void unwindsett::parse_unwindset(
 }
 
 std::optional<unsigned>
-unwindsett::get_limit(const irep_idt &loop_id, unsigned thread_nr) const
+unwindsett::get_limit(irep_idt loop_id, unsigned thread_nr) const
 {
   // We use the most specific limit we have
 

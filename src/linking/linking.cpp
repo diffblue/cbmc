@@ -40,7 +40,7 @@ static const typet &follow_tags_symbols(
 }
 
 irep_idt
-linkingt::rename(const symbol_table_baset &src_symbol_table, const irep_idt &id)
+linkingt::rename(const symbol_table_baset &src_symbol_table, irep_idt id)
 {
   unsigned cnt=0;
 

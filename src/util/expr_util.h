@@ -51,7 +51,7 @@ exprt boolean_negate(const exprt &);
 bool has_subexpr(const exprt &, const std::function<bool(const exprt &)> &pred);
 
 /// returns true if the expression has a subexpression with given ID
-bool has_subexpr(const exprt &, const irep_idt &);
+bool has_subexpr(const exprt &, irep_idt);
 
 /// returns true if any of the contained types satisfies pred
 /// \param type: a type
@@ -70,7 +70,7 @@ bool has_subtype(
   const namespacet &ns);
 
 /// returns true if any of the contained types is id
-bool has_subtype(const typet &, const irep_idt &id, const namespacet &);
+bool has_subtype(const typet &, irep_idt id, const namespacet &);
 
 /// lift up an if_exprt one level
 if_exprt lift_if(const exprt &, std::size_t operand_number);

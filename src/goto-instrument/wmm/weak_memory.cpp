@@ -38,7 +38,7 @@ Date: September 2011
 void introduce_temporaries(
   value_setst &value_sets,
   symbol_tablet &symbol_table,
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt &goto_program,
 #ifdef LOCAL_MAY
   const goto_functionst::goto_functiont &goto_function,

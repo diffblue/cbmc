@@ -25,9 +25,9 @@ class constant_simplification_mockt:public ai_domain_baset
 {
 public:
   void transform(
-    const irep_idt &,
+    irep_idt,
     trace_ptrt,
-    const irep_idt &,
+    irep_idt,
     trace_ptrt,
     ai_baset &,
     const namespacet &) override

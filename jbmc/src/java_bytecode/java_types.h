@@ -200,7 +200,7 @@ public:
   public:
     componentt() = default;
 
-    componentt(const irep_idt &_name, typet _type)
+    componentt(irep_idt _name, typet _type)
       : class_typet::componentt(_name, std::move(_type))
     {
     }
@@ -230,7 +230,7 @@ public:
     return (componentst &)(add(ID_components).get_sub());
   }
 
-  const componentt &get_component(const irep_idt &component_name) const
+  const componentt &get_component(irep_idt component_name) const
   {
     return static_cast<const componentt &>(
       class_typet::get_component(component_name));
@@ -241,7 +241,7 @@ public:
   public:
     methodt() = delete;
 
-    methodt(const irep_idt &_name, java_method_typet _type)
+    methodt(irep_idt _name, java_method_typet _type)
       : class_typet::methodt(_name, std::move(_type))
     {
     }
@@ -288,7 +288,7 @@ public:
     }
 
     /// Sets the method's descriptor -- the mangled form of its type
-    void set_descriptor(const irep_idt &id)
+    void set_descriptor(irep_idt id)
     {
       set(ID_object_descriptor, id);
     }
@@ -324,7 +324,7 @@ public:
     return get(ID_access);
   }
 
-  void set_access(const irep_idt &access)
+  void set_access(irep_idt access)
   {
     return set(ID_access, access);
   }
@@ -344,7 +344,7 @@ public:
     return get(ID_outer_class);
   }
 
-  void set_outer_class(const irep_idt &outer_class)
+  void set_outer_class(irep_idt outer_class)
   {
     return set(ID_outer_class, outer_class);
   }
@@ -354,7 +354,7 @@ public:
     return get(ID_super_class);
   }
 
-  void set_super_class(const irep_idt &super_class)
+  void set_super_class(irep_idt super_class)
   {
     return set(ID_super_class, super_class);
   }
@@ -560,7 +560,7 @@ public:
 
   /// Set the name of the struct, which can be used to look up its symbol
   /// in the symbol table.
-  void set_name(const irep_idt &name)
+  void set_name(irep_idt name)
   {
     set(ID_name, name);
   }
@@ -572,7 +572,7 @@ public:
   }
 
   /// Set the name of a java inner class.
-  void set_inner_name(const irep_idt &name)
+  void set_inner_name(irep_idt name)
   {
     set(ID_inner_name, name);
   }
@@ -690,7 +690,7 @@ std::vector<std::string> parse_raw_list_types(
   char opening_bracket,
   char closing_bracket);
 
-bool is_java_array_tag(const irep_idt &tag);
+bool is_java_array_tag(irep_idt tag);
 bool is_valid_java_array(const struct_typet &);
 
 bool equal_java_types(const typet &type1, const typet &type2);
@@ -704,7 +704,7 @@ public:
   typedef struct_tag_typet type_variablet;
 
   java_generic_parameter_tagt(
-    const irep_idt &_type_var_name,
+    irep_idt _type_var_name,
     const struct_tag_typet &_bound)
     : struct_tag_typet(_bound)
   {
@@ -777,7 +777,7 @@ public:
   typedef struct_tag_typet type_variablet;
 
   java_generic_parametert(
-    const irep_idt &_type_var_name,
+    irep_idt _type_var_name,
     const struct_tag_typet &_bound)
     : reference_typet(java_reference_type(
         java_generic_parameter_tagt(_type_var_name, _bound)))
@@ -1158,7 +1158,7 @@ inline std::optional<typet> java_type_from_string_with_exception(
 /// \return Optional with the size if the identifier was found.
 inline const std::optional<size_t> java_generics_get_index_for_subtype(
   const std::vector<java_generic_parametert> &gen_types,
-  const irep_idt &identifier)
+  irep_idt identifier)
 {
   const auto iter = std::find_if(
     gen_types.cbegin(),

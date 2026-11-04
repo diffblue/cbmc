@@ -82,7 +82,7 @@ class_hierarchy_grapht::idst class_hierarchy_grapht::ids_from_indices(
 /// \param c: The class to consider
 /// \return A list containing ids of all direct children of c.
 class_hierarchy_grapht::idst
-class_hierarchy_grapht::get_direct_children(const irep_idt &c) const
+class_hierarchy_grapht::get_direct_children(irep_idt c) const
 {
   const node_indext &node_index = nodes_by_name.at(c);
   const auto &child_indices = get_successors(node_index);
@@ -90,9 +90,8 @@ class_hierarchy_grapht::get_direct_children(const irep_idt &c) const
 }
 
 /// Helper function for `get_children_trans` and `get_parents_trans`
-class_hierarchy_grapht::idst class_hierarchy_grapht::get_other_reachable_ids(
-  const irep_idt &c,
-  bool forwards) const
+class_hierarchy_grapht::idst
+class_hierarchy_grapht::get_other_reachable_ids(irep_idt c, bool forwards) const
 {
   idst direct_child_ids;
   const node_indext &node_index = nodes_by_name.at(c);
@@ -112,7 +111,7 @@ class_hierarchy_grapht::idst class_hierarchy_grapht::get_other_reachable_ids(
 /// \param c: The class to consider
 /// \return A list containing ids of all classes that eventually inherit from c.
 class_hierarchy_grapht::idst
-class_hierarchy_grapht::get_children_trans(const irep_idt &c) const
+class_hierarchy_grapht::get_children_trans(irep_idt c) const
 {
   return get_other_reachable_ids(c, true);
 }
@@ -121,14 +120,12 @@ class_hierarchy_grapht::get_children_trans(const irep_idt &c) const
 /// \param c: The class to consider
 /// \return A list of class ids that c eventually inherits from.
 class_hierarchy_grapht::idst
-class_hierarchy_grapht::get_parents_trans(const irep_idt &c) const
+class_hierarchy_grapht::get_parents_trans(irep_idt c) const
 {
   return get_other_reachable_ids(c, false);
 }
 
-void class_hierarchyt::get_children_trans_rec(
-  const irep_idt &c,
-  idst &dest) const
+void class_hierarchyt::get_children_trans_rec(irep_idt c, idst &dest) const
 {
   class_mapt::const_iterator it=class_map.find(c);
   if(it==class_map.end())
@@ -176,9 +173,7 @@ void class_hierarchyt::operator()(const symbol_table_baset &symbol_table)
 /// the order is all the parents of the first immediate parent
 /// \param c: The class to consider
 /// \param [out] dest: A list of class ids that c eventually inherits from.
-void class_hierarchyt::get_parents_trans_rec(
-  const irep_idt &c,
-  idst &dest) const
+void class_hierarchyt::get_parents_trans_rec(irep_idt c, idst &dest) const
 {
   class_mapt::const_iterator it=class_map.find(c);
   if(it==class_map.end())

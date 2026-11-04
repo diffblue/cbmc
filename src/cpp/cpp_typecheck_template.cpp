@@ -412,7 +412,7 @@ void cpp_typecheckt::typecheck_class_template_member(
 }
 
 std::string cpp_typecheckt::class_template_identifier(
-  const irep_idt &base_name,
+  irep_idt base_name,
   const template_typet &template_type,
   const cpp_template_args_non_tct &partial_specialization_args)
 {
@@ -471,7 +471,7 @@ std::string cpp_typecheckt::class_template_identifier(
 }
 
 std::string cpp_typecheckt::function_template_identifier(
-  const irep_idt &base_name,
+  irep_idt base_name,
   const template_typet &template_type,
   const typet &function_type)
 {

@@ -24,13 +24,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "path_storage.h"
 #include "symex_assign.h"
 
-bool goto_symext::get_unwind_recursion(const irep_idt &, unsigned, unsigned)
+bool goto_symext::get_unwind_recursion(irep_idt, unsigned, unsigned)
 {
   return false;
 }
 
 void goto_symext::parameter_assignments(
-  const irep_idt &function_identifier,
+  irep_idt function_identifier,
   const goto_functionst::goto_functiont &goto_function,
   statet &state,
   const exprt::operandst &arguments)
@@ -466,7 +466,7 @@ void goto_symext::symex_end_of_function(statet &state)
 }
 
 void goto_symext::locality(
-  const irep_idt &function_identifier,
+  irep_idt function_identifier,
   goto_symext::statet &state,
   const goto_functionst::goto_functiont &goto_function)
 {
@@ -478,9 +478,8 @@ void goto_symext::locality(
   {
     const ssa_exprt &renamed_param = state.add_object(
       ns.lookup(param).symbol_expr(),
-      [this, &frame_nr](const irep_idt &l0_name) {
-        return path_storage.get_unique_l1_index(l0_name, frame_nr);
-      },
+      [this, &frame_nr](irep_idt l0_name)
+      { return path_storage.get_unique_l1_index(l0_name, frame_nr); },
       ns);
 
     // Allocate shadow memory for parameters.

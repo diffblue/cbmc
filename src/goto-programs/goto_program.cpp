@@ -514,7 +514,7 @@ std::list<exprt> objects_written(
 
 std::string as_string(
   const class namespacet &ns,
-  const irep_idt &function,
+  irep_idt function,
   const goto_programt::instructiont &i)
 {
   std::string result;

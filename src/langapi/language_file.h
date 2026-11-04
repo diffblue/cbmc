@@ -49,7 +49,7 @@ public:
   void get_modules();
 
   void convert_lazy_method(
-    const irep_idt &id,
+    irep_idt id,
     symbol_table_baset &symbol_table,
     message_handlert &message_handler);
 
@@ -132,7 +132,7 @@ public:
   // in lazy_method_map (currently always in language_filest::typecheck)
   // for this to be legal.
   void convert_lazy_method(
-    const irep_idt &id,
+    irep_idt id,
     symbol_table_baset &symbol_table,
     message_handlert &message_handler)
   {
@@ -142,7 +142,7 @@ public:
       it->second->convert_lazy_method(id, symbol_table, message_handler);
   }
 
-  bool can_convert_lazy_method(const irep_idt &id) const
+  bool can_convert_lazy_method(irep_idt id) const
   {
     return lazy_method_map.count(id) != 0;
   }
