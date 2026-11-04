@@ -15967,3 +15967,21 @@ Checks on W198: 13 suites, profiles (z3 complex2 flaky), vacuity
 1065/3, unit, lint, format per commit, doxygen, iwyu, per-commit compile,
 platform (gcc11, m32, arm64), cbmc and cbmc-library on 32-bit, libc++
 suite with AArch64 headers, MSVC .ii 8/8, macOS set 143/143.
+
+## Round 216 (2026-11-04): CI of 2fb1ca5d7d
+
+35 pass; the VS 2026, arm64, 32-bit and gcc-16 jobs are green.  Fixed:
+- check-clang-format covers regression/: 1941c7c5f6 formats the two new
+  test sources (whole-PR check from the merge base now clean).
+- macOS 15 and 26: only cbmc-library/_strftime failed; it relied on
+  strftime's label "_" "strftime" declaring _strftime, which 7cdcb2315e
+  stopped applying.  4eac5ae2c9 declares _strftime in the test.  The
+  ofstream test passed on both macOS jobs.
+- VS 2022 (MSVC 14.44, first full cbmc-cpp run there): 3d86e0fba4 the three
+  MSVC stream tests needed --object-bits 12; the standard stream objects
+  one also unwound __std_exception_copy's copy loop without end on
+  unpruned paths: bounded to 8 with an unwinding assertion, which holds
+  (checked with the 14.44 and 14.51 .ii files of the CI artifacts, C
+  library models inlined, 7 to 10 s).  A model of 14.44's
+  _Yarn<char>::operator= was tried and dropped: not applied, and not
+  the cause.
