@@ -8,5 +8,6 @@ main.c
 ^warning: ignoring
 --
 Round-to-integral (rintf, rint) under all rounding modes, with coverage
-of special values (NaN, ±Inf, ±0), denormals, negative ties, and
-already-integral inputs that hit the exp_ge_f early-out.
+of special values (NaN, ±Inf, ±0), denormals, negative ties,
+already-integral inputs that hit the exp_ge_f early-out, and a format with a
+narrow exponent.

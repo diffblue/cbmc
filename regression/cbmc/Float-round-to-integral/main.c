@@ -1,10 +1,12 @@
 // Test that round-to-integral (rintf, rint) works correctly under various
 // rounding modes, special-value inputs, denormals, and already-integral
-// inputs.
+// inputs, as well as for a format with a narrow exponent.
 //
 // Previously, `cbmc --smt2 --z3` (the non-FPA SMT path, exercised by
 // test_smt.desc) hit an UNEXPECTEDCASE invariant in
-// smt2_conv.cpp::convert_floatbv_round_to_integral.
+// smt2_conv.cpp::convert_floatbv_round_to_integral, and the flattening back
+// end returned infinity for the narrow-exponent format, as its 2^f magic
+// number was not representable.
 
 #include <assert.h>
 #include <float.h>
@@ -159,6 +161,21 @@ int main()
   double dbig = 9007199254740992.0;
   double dr_big = rint(dbig);
   assert(dr_big == 9007199254740992.0);
+
+  // A format with a narrow exponent (4 bits, bias 7) and 23 fraction bits:
+  // f = 23 is not representable as an unbiased exponent, and 2^23 is not a
+  // finite value of this format.
+  typedef __CPROVER_floatbv[28][23] narrow_exponent_floatt;
+  __CPROVER_rounding_mode = 0;
+  narrow_exponent_floatt na;
+  __CPROVER_assume(na == (narrow_exponent_floatt)2.5f);
+  narrow_exponent_floatt nr1 = __CPROVER_round_to_integralf(na, 0);
+  assert(nr1 == (narrow_exponent_floatt)2.0f);
+
+  narrow_exponent_floatt nb;
+  __CPROVER_assume(nb == (narrow_exponent_floatt)-0x1.fffffep7f);
+  narrow_exponent_floatt nr2 = __CPROVER_round_to_integralf(nb, 3);
+  assert(nr2 == (narrow_exponent_floatt)-255.0f);
 
   return 0;
 }
