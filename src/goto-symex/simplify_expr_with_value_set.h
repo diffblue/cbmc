@@ -31,6 +31,10 @@ public:
   [[nodiscard]] resultt<>
   simplify_inequality_pointer_object(const binary_relation_exprt &) override;
   [[nodiscard]] resultt<>
+  simplify_is_invalid_pointer(const unary_exprt &) override;
+  [[nodiscard]] resultt<>
+  simplify_object_size(const object_size_exprt &) override;
+  [[nodiscard]] resultt<>
   simplify_pointer_offset(const pointer_offset_exprt &) override;
 
 protected:
