@@ -1,0 +1,12 @@
+CORE
+prune_malloc.c
+--paths lifo --pointer-check --no-malloc-may-fail
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Tests that branch pruning works correctly with malloc/free.
+With --no-malloc-may-fail, malloc always succeeds, so the p==0
+branch should be pruned.

@@ -803,4 +803,10 @@ void parse_solver_options(const cmdlinet &cmdline, optionst &options)
     options.set_option(
       "max-node-refinement", cmdline.get_value("max-node-refinement"));
   }
+
+  if(cmdline.isset("solver-time-limit"))
+  {
+    options.set_option(
+      "solver-time-limit", cmdline.get_value("solver-time-limit"));
+  }
 }

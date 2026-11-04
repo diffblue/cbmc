@@ -1,0 +1,12 @@
+CORE
+stdlib_no_paths_explosion.c
+--paths lifo --pointer-check --no-malloc-may-fail --unwind 1
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Tests that free() does not cause path explosion in --paths mode.
+The stdlib.c implementation uses conditional expressions instead of
+if-branches to avoid creating additional paths.
