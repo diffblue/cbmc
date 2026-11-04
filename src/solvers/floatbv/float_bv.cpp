@@ -814,12 +814,13 @@ exprt float_bvt::div(
     concatenation_exprt(
       result.fraction, have_remainder, unsignedbv_typet(div_width+1));
 
-  // We will subtract the exponents;
-  // to account for overflow, we add a bit.
-  const typecast_exprt exponent1(
-    unpacked1.exponent, signedbv_typet(spec.e + 1));
-  const typecast_exprt exponent2(
-    unpacked2.exponent, signedbv_typet(spec.e + 1));
+  // We will subtract the exponents and then add spec.f.  The result lies in
+  // [1 - 2 * bias, 2 * bias - 1 + spec.f], which fits into
+  // max(spec.e, address_bits(spec.f)) + 2 bits.
+  const signedbv_typet exponent_type{
+    std::max(spec.e, address_bits(spec.f)) + 2};
+  const typecast_exprt exponent1{unpacked1.exponent, exponent_type};
+  const typecast_exprt exponent2{unpacked2.exponent, exponent_type};
 
   // subtract exponents
   const minus_exprt added_exponent(exponent1, exponent2);

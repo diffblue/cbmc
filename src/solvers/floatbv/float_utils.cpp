@@ -662,13 +662,14 @@ bvt float_utilst::div(const bvt &src1, const bvt &src2)
   result.fraction.insert(
     result.fraction.begin(), have_remainder);
 
-  // We will subtract the exponents;
-  // to account for overflow, we add a bit.
-  // we add a second bit for the adjust by extra fraction bits
-  const bvt exponent1=
-    bv_utils.sign_extension(unpacked1.exponent, unpacked1.exponent.size()+2);
-  const bvt exponent2=
-    bv_utils.sign_extension(unpacked2.exponent, unpacked2.exponent.size()+2);
+  // We will subtract the exponents and then add spec.f.  The result lies in
+  // [1 - 2 * bias, 2 * bias - 1 + spec.f], which fits into
+  // max(spec.e, address_bits(spec.f)) + 2 bits.
+  const std::size_t exponent_width = std::max(spec.e, address_bits(spec.f)) + 2;
+  const bvt exponent1 =
+    bv_utils.sign_extension(unpacked1.exponent, exponent_width);
+  const bvt exponent2 =
+    bv_utils.sign_extension(unpacked2.exponent, exponent_width);
 
   // subtract exponents
   bvt added_exponent=bv_utils.sub(exponent1, exponent2);
