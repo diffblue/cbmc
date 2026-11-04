@@ -1,0 +1,8 @@
+CORE
+chained-eq1.smt2
+
+^EXIT=(0|20)$
+^SIGNAL=0$
+^(unknown|unsat)$
+--
+A parse error that drops an assertion must not produce sat.
