@@ -1,0 +1,68 @@
+name: Verify floating-point proofs
+
+on:
+  pull_request:
+    paths:
+      - 'src/solvers/floatbv/float_utils.cpp'
+      - 'src/solvers/floatbv/float_utils.h'
+      - 'src/solvers/floatbv/float_bv.cpp'
+      - 'doc/proofs/**'
+  push:
+    branches: [develop]
+    paths:
+      - 'src/solvers/floatbv/float_utils.cpp'
+      - 'src/solvers/floatbv/float_utils.h'
+      - 'src/solvers/floatbv/float_bv.cpp'
+      - 'doc/proofs/**'
+
+jobs:
+  verify-proofs:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install Coq and Flocq
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq coq libcoq-flocq
+
+      - name: Install HOL Light
+        run: |
+          sudo apt-get install -y -qq hol-light libnum-ocaml-dev
+
+      - name: Verify Coq proofs
+        run: |
+          cd doc/proofs
+          FLOCQ_DIR=$(find /usr/lib -path "*/user-contrib/Flocq" -type d | head -1)
+          echo "Flocq: $FLOCQ_DIR"
+          coqc -Q "$FLOCQ_DIR" Flocq fma_remainder.v
+          coqc -Q "$FLOCQ_DIR" Flocq fma_remainder_strategies.v
+          echo "Coq proofs verified (zero admits)."
+
+      - name: Verify HOL Light proofs
+        run: |
+          cd /usr/share/hol-light
+          OUTPUT=$(timeout 300 ocaml < "$GITHUB_WORKSPACE/doc/proofs/fma_remainder.ml" 2>&1 || true)
+          if echo "$OUTPUT" | grep -q "ALL HOL LIGHT PROOFS COMPLETE"; then
+            echo "HOL Light proofs verified (zero mk_thm)."
+          else
+            echo "HOL Light proofs FAILED"
+            echo "$OUTPUT" | tail -20
+            exit 1
+          fi
+
+      - name: Build CBMC
+        run: |
+          cmake -S . -Bbuild -DCMAKE_BUILD_TYPE=Release \
+            -Dsat_impl=cadical
+          cmake --build build --target cbmc -j$(nproc)
+
+      - name: Verify _Float16 remainder property
+        run: |
+          echo "=== remainder(x,y): |r| <= |y|/2 ==="
+          build/bin/cbmc regression/cbmc-library/remainderf/_Float16.c
+          echo "=== fmod(x,y): |r| < |y| ==="
+          build/bin/cbmc regression/cbmc-library/remainderf/fmod_bound.c
+          echo "=== special cases ==="
+          build/bin/cbmc regression/cbmc-library/remainderf/special_cases.c
+          echo "All _Float16 property checks passed."

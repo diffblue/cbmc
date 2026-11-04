@@ -1,0 +1,8 @@
+CORE no-new-smt thorough-z3-smt-backend
+main.c
+--floatbv
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+remainderf(3.0f, 2.0f) == -1.0f (IEEE 754 remainder tie-breaking).

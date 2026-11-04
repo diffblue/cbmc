@@ -1,0 +1,9 @@
+FUTURE
+fp-rem-nonstandard1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+--
+Based on Z3#8414: fp.rem on non-standard FP sort should not crash. It actually
+works fine, provided sufficient memory is available (>= 20 GB). Marking it
+"FUTURE" as CI systems typically don't have such high memory specs.

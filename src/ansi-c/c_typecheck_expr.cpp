@@ -3354,7 +3354,8 @@ exprt c_typecheck_baset::do_special_functions(
   else if(
     identifier == CPROVER_PREFIX "fmod" ||
     identifier == CPROVER_PREFIX "fmodf" ||
-    identifier == CPROVER_PREFIX "fmodl")
+    identifier == CPROVER_PREFIX "fmodl" ||
+    identifier == CPROVER_PREFIX "fmodf16")
   {
     if(expr.arguments().size() != 2)
     {
@@ -3378,7 +3379,8 @@ exprt c_typecheck_baset::do_special_functions(
   else if(
     identifier == CPROVER_PREFIX "remainder" ||
     identifier == CPROVER_PREFIX "remainderf" ||
-    identifier == CPROVER_PREFIX "remainderl")
+    identifier == CPROVER_PREFIX "remainderl" ||
+    identifier == CPROVER_PREFIX "remainderf16")
   {
     if(expr.arguments().size() != 2)
     {
@@ -3401,7 +3403,8 @@ exprt c_typecheck_baset::do_special_functions(
   }
   else if(
     identifier == CPROVER_PREFIX "fma" || identifier == CPROVER_PREFIX "fmaf" ||
-    identifier == CPROVER_PREFIX "fmal")
+    identifier == CPROVER_PREFIX "fmal" ||
+    identifier == CPROVER_PREFIX "fmaf16")
   {
     if(expr.arguments().size() != 3)
     {
