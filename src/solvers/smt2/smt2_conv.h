@@ -242,6 +242,7 @@ protected:
     const exprt &expr, const pointer_typet &result_type);
 
   void define_object_size(const irep_idt &id, const object_size_exprt &expr);
+  void define_is_dynamic_object(const irep_idt &id, const unary_exprt &expr);
 
   // keeps track of all non-Boolean symbols and their value
   struct identifiert
@@ -285,6 +286,7 @@ protected:
   std::unordered_map<irep_idt, bool> set_values;
 
   std::map<object_size_exprt, irep_idt> object_sizes;
+  std::map<unary_exprt, irep_idt> is_dynamic_objects;
 
   typedef std::set<std::string> smt2_identifierst;
   smt2_identifierst smt2_identifiers;
