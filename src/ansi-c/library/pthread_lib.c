@@ -728,12 +728,20 @@ int pthread_cond_broadcast(pthread_cond_t *cond)
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
+#ifndef __CPROVER_mutex_t_defined
+#  define __CPROVER_mutex_t_defined
+#  if defined __CYGWIN__ || defined __MINGW32__ || defined _WIN32
+// on Windows, the mutexes are integers already
+typedef pthread_mutex_t __CPROVER_mutex_t;
+#  else
+typedef signed char __CPROVER_mutex_t;
+#  endif
+#endif
+
 int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex)
 { __CPROVER_HIDE:
 
-  (void)*mutex;
-
-  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+#ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_assert(__CPROVER_get_must(mutex, "mutex-init"),
                    "mutex must be initialized");
 
@@ -744,12 +752,47 @@ int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex)
                    "mutex must not be destroyed");
 
   __CPROVER_clear_may(mutex, "mutex-locked");
-  #endif
+#else
+  // POSIX.1-2017 pthread_cond_wait(): "atomically release mutex and
+  // cause the calling thread to block on the condition variable cond;
+  // [...] upon successful return, the mutex shall have been locked and
+  // shall be owned by the calling thread."
+  // Release the mutex so that the signalling thread can acquire it.
+  __CPROVER_fence(
+    "WWfence",
+    "RRfence",
+    "RWfence",
+    "WRfence",
+    "WWcumul",
+    "RRcumul",
+    "RWcumul",
+    "WRcumul");
+  __CPROVER_atomic_begin();
+  *((__CPROVER_mutex_t *)mutex) = 0;
+  __CPROVER_atomic_end();
 
+  // Block until the condition is signalled (or spurious wakeup).
   __CPROVER_atomic_begin();
   if(*((unsigned *)cond))
     (*((unsigned *)cond))--;
   __CPROVER_atomic_end();
+
+  // Re-acquire the mutex before returning.
+  __CPROVER_atomic_begin();
+  __CPROVER_assume(!*((__CPROVER_mutex_t *)mutex));
+  *((__CPROVER_mutex_t *)mutex) = 1;
+  __CPROVER_atomic_end();
+
+  __CPROVER_fence(
+    "WWfence",
+    "RRfence",
+    "RWfence",
+    "WRfence",
+    "WWcumul",
+    "RRcumul",
+    "RWcumul",
+    "WRcumul");
+#endif
 
   return 0; // we never fail
 }
