@@ -1,7 +1,7 @@
 <map id="path_storaget" name="path_storaget">
-<area shape="rect" id="Node000001" title="Storage for symbolic execution paths to be resumed later." alt="" coords="45,5,157,31"/>
-<area shape="rect" id="Node000002" href="$classpath__fifot.html" title="FIFO save queue: paths are resumed in the order that they were saved." alt="" coords="5,79,89,104"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="86,43,58,80,54,77,82,40"/>
-<area shape="rect" id="Node000003" href="$classpath__lifot.html" title="LIFO save queue: depth&#45;first search, try to finish paths." alt="" coords="113,79,197,104"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="120,40,149,77,144,80,116,43"/>
+<area shape="rect" id="Node000001" title="Storage for symbolic execution paths to be resumed later." alt="" coords="45,5,156,33"/>
+<area shape="rect" id="Node000002" href="$classpath__fifot.html" title="FIFO save queue: paths are resumed in the order that they were saved." alt="" coords="5,81,89,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="84,45,58,82,54,79,79,47"/>
+<area shape="rect" id="Node000003" href="$classpath__lifot.html" title="LIFO save queue: depth&#45;first search, try to finish paths." alt="" coords="113,81,197,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="120,43,148,81,143,80,118,48"/>
 </map>

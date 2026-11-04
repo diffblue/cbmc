@@ -1,8 +1,8 @@
 var structsolver__hardnesst =
 [
-    [ "assertion_statst", "structsolver__hardnesst_1_1assertion__statst.html", "structsolver__hardnesst_1_1assertion__statst" ],
-    [ "hardness_ssa_keyt", "structsolver__hardnesst_1_1hardness__ssa__keyt.html", "structsolver__hardnesst_1_1hardness__ssa__keyt" ],
     [ "sat_hardnesst", "structsolver__hardnesst_1_1sat__hardnesst.html", "structsolver__hardnesst_1_1sat__hardnesst" ],
+    [ "hardness_ssa_keyt", "structsolver__hardnesst_1_1hardness__ssa__keyt.html", "structsolver__hardnesst_1_1hardness__ssa__keyt" ],
+    [ "assertion_statst", "structsolver__hardnesst_1_1assertion__statst.html", "structsolver__hardnesst_1_1assertion__statst" ],
     [ "solver_hardnesst", "structsolver__hardnesst.html#a79b1654d3a538f42108e080160d692b8", null ],
     [ "solver_hardnesst", "structsolver__hardnesst.html#ae5326ec9857f75379e1a64faf25a29b0", null ],
     [ "solver_hardnesst", "structsolver__hardnesst.html#ad7b93f3798e76f154ac98c2886afc2fb", null ],

@@ -6,7 +6,7 @@ var classjava__bytecode__parsert =
     [ "constant_poolt", "classjava__bytecode__parsert.html#a9b598982a32e5d466a4b120181451c59", null ],
     [ "fieldt", "classjava__bytecode__parsert.html#aa5b41a84794461067e5271baf4d5d22d", null ],
     [ "instructiont", "classjava__bytecode__parsert.html#ac8f556495c48d3f17a73e54178918198", null ],
-    [ "lambda_method_handlet", "classjava__bytecode__parsert.html#aed56f2da7da503d383cfa4d9f0db3299", null ],
+    [ "lambda_method_handlet", "classjava__bytecode__parsert.html#af9b8194e8c9ac2dc2c9697f617039457", null ],
     [ "method_handle_typet", "classjava__bytecode__parsert.html#a630ea2feb3eb4c89ffa19128179a835c", null ],
     [ "methodt", "classjava__bytecode__parsert.html#a41002c091e079d5768dacfd26db245a0", null ],
     [ "java_bytecode_parsert", "classjava__bytecode__parsert.html#a9b872e3d62d5d2374d906072d9c8e85a", null ],

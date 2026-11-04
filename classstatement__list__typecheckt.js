@@ -1,9 +1,9 @@
 var classstatement__list__typecheckt =
 [
     [ "nesting_stack_entryt", "structstatement__list__typecheckt_1_1nesting__stack__entryt.html", "structstatement__list__typecheckt_1_1nesting__stack__entryt" ],
-    [ "stl_jump_locationt", "structstatement__list__typecheckt_1_1stl__jump__locationt.html", "structstatement__list__typecheckt_1_1stl__jump__locationt" ],
     [ "stl_label_locationt", "structstatement__list__typecheckt_1_1stl__label__locationt.html", "structstatement__list__typecheckt_1_1stl__label__locationt" ],
-    [ "label_referencest", "classstatement__list__typecheckt.html#a02d24e8442b709e2bbccafa98f72a9b9", null ],
+    [ "stl_jump_locationt", "structstatement__list__typecheckt_1_1stl__jump__locationt.html", "structstatement__list__typecheckt_1_1stl__jump__locationt" ],
+    [ "label_referencest", "classstatement__list__typecheckt.html#af1c34d2bc8b19ee9c9eb05fbdaa9f95a", null ],
     [ "nesting_stackt", "classstatement__list__typecheckt.html#adbcf3e7b64783e3adff21bb5f4aea10b", null ],
     [ "stl_labelst", "classstatement__list__typecheckt.html#a7287210957a0d1e322c62d3762020b8d", null ],
     [ "statement_list_typecheckt", "classstatement__list__typecheckt.html#a3e5e9cb6ec0910ec99814d344a2fad0a", null ],
@@ -103,9 +103,10 @@ var classstatement__list__typecheckt =
     [ "typecheck_statement_list_xor_not", "classstatement__list__typecheckt.html#a777d059dc62f57117bad5e809e61c3c8", null ],
     [ "typecheck_tag_list", "classstatement__list__typecheckt.html#a7768661bfcaa048f0a20eb54d3ed858d", null ],
     [ "typecheck_temp_var_decls", "classstatement__list__typecheckt.html#ab9552b2e9a475f487dacc85e53d90e1e", null ],
-    [ "accumulator", "classstatement__list__typecheckt.html#a4182845482e63dbd7995cd3024e88377", null ],
+    [ "accumulator", "classstatement__list__typecheckt.html#a63eda8311561a1d47e8a4d1eee9fb925", null ],
     [ "fc_bit", "classstatement__list__typecheckt.html#aa16076a0dc1e723cd67d9319a8bbb5aa", null ],
     [ "label_references", "classstatement__list__typecheckt.html#a83e4612d80306e82d66d5fc2ab7a3495", null ],
+    [ "module", "classstatement__list__typecheckt.html#a5b1a9d511a64d647e5f20396d904bd11", null ],
     [ "nesting_stack", "classstatement__list__typecheckt.html#ad7172092fae096c755b74bc113dc8d59", null ],
     [ "or_bit", "classstatement__list__typecheckt.html#a8745faa449aa7dfc1574b33933eb0333", null ],
     [ "parse_tree", "classstatement__list__typecheckt.html#a0d8916daeeb4d0ed301c97bd5d9c4a3f", null ],

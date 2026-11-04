@@ -3,7 +3,7 @@ var java__entry__point_8h =
     [ "main_function_resultt", "structmain__function__resultt.html", "structmain__function__resultt" ],
     [ "JAVA_ENTRY_POINT_EXCEPTION_SYMBOL", "java__entry__point_8h.html#a9fcd4dd8dea94ef1514b8e9159865fb6", null ],
     [ "JAVA_ENTRY_POINT_RETURN_SYMBOL", "java__entry__point_8h.html#a903d03bedacce69645cc924f846ce16c", null ],
-    [ "build_argumentst", "java__entry__point_8h.html#ab57e44074f152b86f9f39f7eed301efb", null ],
+    [ "build_argumentst", "java__entry__point_8h.html#a2a31f595185dc5466b1f08cc75fb6e4c", null ],
     [ "create_java_initialize", "java__entry__point_8h.html#a9098d44c0f5b16d454013b63d610fc18", null ],
     [ "generate_java_start_function", "java__entry__point_8h.html#a452b9898c1b4bdb4325ec49ac7c29bd2", null ],
     [ "get_java_class_literal_initializer_signature", "java__entry__point_8h.html#adf20ddd9a3c3a13e61f9ad953636cd90", null ],

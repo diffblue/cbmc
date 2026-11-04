@@ -1,63 +1,63 @@
 <map id="/home/runner/work/cbmc/cbmc/src/cpp/template_map.h" name="/home/runner/work/cbmc/cbmc/src/cpp/template_map.h">
-<area shape="rect" id="Node000001" title="C++ Language Type Checking." alt="" coords="3409,5,3632,45"/>
-<area shape="rect" id="Node000002" href="$cpp__typecheck_8h.html" title="C++ Language Type Checking." alt="" coords="3295,101,3519,141"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="3489,56,3432,103,3429,99,3485,52"/>
-<area shape="rect" id="Node000031" href="$template__map_8cpp.html" title="C++ Language Type Checking." alt="" coords="3543,93,3727,148"/>
-<area shape="poly" id="edge30_Node000001_Node000031" title=" " alt="" coords="3556,52,3605,91,3601,95,3553,56"/>
-<area shape="rect" id="Node000003" href="$cpp__constructor_8cpp.html" title="C++ Language Type Checking." alt="" coords="5,203,249,243"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="3281,125,2679,128,1806,138,1347,147,916,160,543,177,262,199,213,206,212,201,262,193,543,172,915,155,1347,142,1806,133,2679,122,3281,119"/>
-<area shape="rect" id="Node000004" href="$cpp__declarator__converter_8cpp.html" title="C++ Language Type Checking." alt="" coords="274,196,485,251"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="3282,125,2719,127,1914,137,1492,146,1096,159,755,176,497,199,485,200,484,195,496,193,755,171,1096,153,1492,140,1914,131,2719,122,3282,119"/>
-<area shape="rect" id="Node000005" href="$cpp__destructor_8cpp.html" title="C++ Language Type Checking." alt="" coords="509,203,746,243"/>
-<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="3282,125,2765,130,2035,142,1298,164,991,180,758,199,711,206,710,201,758,193,991,174,1298,159,2035,137,2765,125,3282,120"/>
-<area shape="rect" id="Node000006" href="$cpp__instantiate__template_8cpp.html" title="C++ Language Type Checking." alt="" coords="771,196,985,251"/>
-<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="3281,125,2806,130,2146,142,1483,164,1206,180,997,199,986,200,986,195,996,193,1206,174,1482,159,2146,137,2806,125,3281,120"/>
-<area shape="rect" id="Node000007" href="$cpp__is__pod_8cpp.html" title="C++ Language Type Checking." alt="" coords="1009,203,1224,243"/>
-<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="3281,126,2849,132,2258,145,1668,167,1423,181,1237,199,1194,206,1193,201,1236,193,1423,176,1668,162,2258,140,2849,127,3281,121"/>
-<area shape="rect" id="Node000008" href="$cpp__language_8cpp.html" title="C++ Language Module." alt="" coords="1249,203,1481,243"/>
-<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="3281,127,2895,135,2379,150,1867,171,1654,184,1493,199,1447,206,1446,201,1492,193,1654,179,1867,165,2379,144,2895,130,3281,122"/>
-<area shape="rect" id="Node000009" href="$cpp__typecheck_8cpp.html" title="C++ Language Type Checking." alt="" coords="1505,203,1744,243"/>
-<area shape="poly" id="edge8_Node000002_Node000009" title=" " alt="" coords="3282,124,3006,126,2627,135,2194,158,1972,176,1756,199,1709,206,1708,201,1755,193,1972,170,2194,153,2627,130,3006,120,3281,118"/>
-<area shape="rect" id="Node000010" href="$cpp__typecheck__bases_8cpp.html" title="C++ Language Type Checking." alt="" coords="1768,196,1980,251"/>
-<area shape="poly" id="edge9_Node000002_Node000010" title=" " alt="" coords="3282,124,3042,127,2721,138,2358,160,2173,177,1992,199,1980,200,1980,195,1991,193,2172,172,2358,155,2721,132,3042,122,3282,119"/>
-<area shape="rect" id="Node000011" href="$cpp__typecheck__code_8cpp.html" title="C++ Language Type Checking." alt="" coords="2004,196,2216,251"/>
-<area shape="poly" id="edge10_Node000002_Node000011" title=" " alt="" coords="3281,126,3079,132,2816,144,2523,165,2228,199,2216,200,2216,195,2227,193,2522,160,2816,138,3079,126,3281,121"/>
-<area shape="rect" id="Node000012" href="$cpp__typecheck__compound__type_8cpp.html" title="C++ Language Type Checking." alt="" coords="2240,196,2452,251"/>
-<area shape="poly" id="edge11_Node000002_Node000012" title=" " alt="" coords="3282,129,2914,150,2689,170,2464,199,2452,200,2452,195,2463,193,2688,165,2913,145,3281,124"/>
-<area shape="rect" id="Node000013" href="$cpp__typecheck__constructor_8cpp.html" title="C++ Language Type Checking." alt="" coords="2476,196,2688,251"/>
-<area shape="poly" id="edge12_Node000002_Node000013" title=" " alt="" coords="3282,133,3014,158,2856,176,2700,199,2689,201,2688,195,2699,193,2856,171,3013,152,3282,128"/>
-<area shape="rect" id="Node000014" href="$cpp__typecheck__conversions_8cpp.html" title="C++ Language Type Checking." alt="" coords="2712,196,2924,251"/>
-<area shape="poly" id="edge13_Node000002_Node000014" title=" " alt="" coords="3282,142,3117,167,2936,199,2925,201,2924,196,2935,193,3116,162,3281,137"/>
-<area shape="rect" id="Node000015" href="$cpp__typecheck__declaration_8cpp.html" title="C++ Language Type Checking." alt="" coords="2948,196,3160,251"/>
-<area shape="poly" id="edge14_Node000002_Node000015" title=" " alt="" coords="3329,147,3147,199,3145,193,3328,142"/>
-<area shape="rect" id="Node000016" href="$cpp__typecheck__destructor_8cpp.html" title="C++ Language Type Checking." alt="" coords="3184,196,3396,251"/>
-<area shape="poly" id="edge15_Node000002_Node000016" title=" " alt="" coords="3377,152,3323,198,3319,194,3373,148"/>
-<area shape="rect" id="Node000017" href="$cpp__typecheck__enum__type_8cpp.html" title="C++ Language Type Checking." alt="" coords="3420,196,3632,251"/>
-<area shape="poly" id="edge16_Node000002_Node000017" title=" " alt="" coords="3442,148,3497,194,3493,198,3439,152"/>
-<area shape="rect" id="Node000018" href="$cpp__typecheck__expr_8cpp.html" title="C++ Language Type Checking." alt="" coords="3656,196,3868,251"/>
-<area shape="poly" id="edge17_Node000002_Node000018" title=" " alt="" coords="3487,142,3670,193,3669,199,3486,147"/>
-<area shape="rect" id="Node000019" href="$cpp__typecheck__fargs_8cpp.html" title="C++ Language Type Checking." alt="" coords="3892,196,4104,251"/>
-<area shape="poly" id="edge18_Node000002_Node000019" title=" " alt="" coords="3506,141,3532,145,3630,160,3706,169,3783,178,3881,193,3892,195,3891,201,3880,199,3782,183,3706,174,3629,166,3531,151,3506,146"/>
-<area shape="rect" id="Node000020" href="$cpp__typecheck__function_8cpp.html" title="C++ Language Type Checking." alt="" coords="4128,196,4340,251"/>
-<area shape="poly" id="edge19_Node000002_Node000020" title=" " alt="" coords="3503,141,3532,145,3696,163,3824,169,3953,175,4117,193,4128,195,4128,200,4116,199,3952,180,3824,174,3695,169,3531,151,3502,146"/>
-<area shape="rect" id="Node000021" href="$cpp__typecheck__initializer_8cpp.html" title="C++ Language Type Checking." alt="" coords="4364,196,4576,251"/>
-<area shape="poly" id="edge20_Node000002_Node000021" title=" " alt="" coords="3501,141,3532,145,3656,159,3762,166,3942,169,4123,171,4229,179,4353,193,4364,195,4364,200,4352,199,4228,184,4122,177,3942,174,3762,171,3656,165,3531,151,3501,146"/>
-<area shape="rect" id="Node000022" href="$cpp__typecheck__linkage__spec_8cpp.html" title="C++ Language Type Checking." alt="" coords="4600,196,4812,251"/>
-<area shape="poly" id="edge21_Node000002_Node000022" title=" " alt="" coords="3501,141,3532,145,3692,162,3828,169,3948,170,4060,168,4172,167,4292,168,4429,176,4589,193,4600,195,4600,200,4588,199,4428,181,4292,173,4172,172,4060,174,3948,176,3828,174,3691,167,3531,151,3500,146"/>
-<area shape="rect" id="Node000023" href="$cpp__typecheck__method__bodies_8cpp.html" title="C++ Language Type Checking." alt="" coords="4836,196,5048,251"/>
-<area shape="poly" id="edge22_Node000002_Node000023" title=" " alt="" coords="3501,141,3532,145,3728,164,3894,172,4041,172,4178,168,4315,164,4462,165,4629,173,4825,193,4836,195,4836,200,4824,199,4629,178,4462,170,4315,170,4178,173,4041,177,3894,177,3727,170,3531,151,3500,146"/>
-<area shape="rect" id="Node000024" href="$cpp__typecheck__namespace_8cpp.html" title="C++ Language Type Checking." alt="" coords="5072,196,5284,251"/>
-<area shape="poly" id="edge23_Node000002_Node000024" title=" " alt="" coords="3500,141,3532,145,3763,167,3960,175,4134,174,4296,168,4458,162,4632,162,4829,170,5061,193,5072,195,5072,200,5060,199,4829,176,4632,167,4458,168,4296,173,4134,179,3960,180,3763,172,3531,151,3499,146"/>
-<area shape="rect" id="Node000025" href="$cpp__typecheck__resolve_8cpp.html" title="C++ Language Type Checking." alt="" coords="5308,196,5520,251"/>
-<area shape="poly" id="edge24_Node000002_Node000025" title=" " alt="" coords="3500,141,3532,145,3799,170,4027,178,4227,175,4414,168,4601,160,4802,158,5029,167,5297,193,5308,195,5308,200,5296,199,5029,173,4802,164,4601,165,4414,173,4227,181,4026,183,3799,175,3531,151,3499,146"/>
-<area shape="rect" id="Node000026" href="$cpp__typecheck__static__assert_8cpp.html" title="C++ Language Type Checking." alt="" coords="5544,196,5756,251"/>
-<area shape="poly" id="edge25_Node000002_Node000026" title=" " alt="" coords="3499,141,3532,145,3690,162,3835,172,4093,181,4320,177,4532,167,4744,158,4972,155,5229,165,5375,176,5533,193,5544,195,5544,200,5532,199,5374,182,5229,170,4972,160,4744,163,4532,173,4320,183,4093,186,3835,178,3690,167,3531,151,3498,146"/>
-<area shape="rect" id="Node000027" href="$cpp__typecheck__template_8cpp.html" title="C++ Language Type Checking." alt="" coords="5780,196,5992,251"/>
-<area shape="poly" id="edge26_Node000002_Node000027" title=" " alt="" coords="3499,141,3532,145,3709,163,3871,175,4020,182,4159,184,4413,179,4650,167,4887,156,5141,152,5280,154,5430,162,5592,174,5769,193,5780,195,5780,200,5768,199,5591,180,5429,167,5280,160,5141,157,4887,161,4650,173,4413,184,4159,189,4020,187,3871,180,3708,169,3531,151,3498,146"/>
-<area shape="rect" id="Node000028" href="$cpp__typecheck__type_8cpp.html" title="C++ Language Type Checking." alt="" coords="6016,196,6228,251"/>
-<area shape="poly" id="edge27_Node000002_Node000028" title=" " alt="" coords="3499,141,3532,145,3727,165,3907,178,4072,185,4225,187,4506,181,4768,167,5030,154,5311,148,5465,151,5630,159,5809,173,6005,193,6016,195,6016,200,6004,199,5809,178,5630,164,5465,157,5311,154,5030,159,4768,172,4506,186,4225,192,4072,190,3906,183,3727,170,3531,151,3498,146"/>
-<area shape="rect" id="Node000029" href="$cpp__typecheck__using_8cpp.html" title="C++ Language Type Checking." alt="" coords="6252,196,6464,251"/>
-<area shape="poly" id="edge28_Node000002_Node000029" title=" " alt="" coords="3499,141,3532,145,3654,156,3795,164,4123,171,4494,171,4886,168,5278,165,5649,165,5977,174,6118,182,6241,193,6252,195,6252,200,6240,199,6118,187,5977,179,5649,171,5278,170,4886,173,4494,177,4123,177,3795,169,3654,162,3531,151,3498,146"/>
-<area shape="rect" id="Node000030" href="$cpp__typecheck__virtual__table_8cpp.html" title="C++ Language Type Checking." alt="" coords="6488,196,6700,251"/>
-<area shape="poly" id="edge29_Node000002_Node000030" title=" " alt="" coords="3499,141,3532,145,3665,157,3818,165,4175,173,4578,172,5004,168,5431,164,5834,164,6190,172,6344,181,6477,193,6488,195,6488,200,6476,199,6343,186,6190,178,5834,169,5431,169,5004,173,4578,178,4175,178,3818,170,3664,162,3531,151,3498,146"/>
+<area shape="rect" id="Node000001" title="C++ Language Type Checking." alt="" coords="3403,5,3624,50"/>
+<area shape="rect" id="Node000002" href="$cpp__typecheck_8h.html" title="C++ Language Type Checking." alt="" coords="3289,106,3512,151"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="3480,59,3426,109,3424,104,3475,61"/>
+<area shape="rect" id="Node000031" href="$template__map_8cpp.html" title="C++ Language Type Checking." alt="" coords="3537,98,3720,160"/>
+<area shape="poly" id="edge30_Node000001_Node000031" title=" " alt="" coords="3551,58,3596,98,3591,97,3549,63"/>
+<area shape="rect" id="Node000003" href="$cpp__constructor_8cpp.html" title="C++ Language Type Checking." alt="" coords="5,216,249,261"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="3270,130,2671,135,1799,144,1342,154,912,167,541,186,261,210,214,218,213,213,260,205,540,181,911,162,1342,148,1799,139,2671,129,3276,130"/>
+<area shape="rect" id="Node000004" href="$cpp__declarator__converter_8cpp.html" title="C++ Language Type Checking." alt="" coords="272,208,483,269"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="3271,130,2711,134,1908,143,1487,152,1092,166,752,185,612,197,495,210,483,212,483,207,495,205,611,192,752,180,1092,161,1487,147,1908,138,2711,128,3276,130"/>
+<area shape="rect" id="Node000005" href="$cpp__destructor_8cpp.html" title="C++ Language Type Checking." alt="" coords="508,216,744,261"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="3270,131,2756,137,2029,149,1650,159,1294,172,988,189,757,210,711,218,710,213,756,205,988,184,1294,167,1650,154,2029,144,2756,132,3276,131"/>
+<area shape="rect" id="Node000006" href="$cpp__instantiate__template_8cpp.html" title="C++ Language Type Checking." alt="" coords="768,208,982,269"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="3271,131,2798,138,2140,150,1798,159,1478,172,1202,189,994,210,983,212,983,207,993,205,1202,184,1478,167,1798,154,2139,144,2798,132,3276,131"/>
+<area shape="rect" id="Node000007" href="$cpp__is__pod_8cpp.html" title="C++ Language Type Checking." alt="" coords="1006,216,1219,261"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="3270,131,2840,140,2251,153,1662,175,1417,191,1231,210,1189,218,1189,213,1231,205,1416,186,1661,170,2250,147,2840,134,3276,131"/>
+<area shape="rect" id="Node000008" href="$cpp__language_8cpp.html" title="C++ Language Module." alt="" coords="1243,216,1475,261"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="3270,132,2887,143,2372,158,1861,180,1648,194,1487,210,1443,218,1442,213,1487,205,1648,189,1860,174,2371,152,2887,138,3276,132"/>
+<area shape="rect" id="Node000009" href="$cpp__typecheck_8cpp.html" title="C++ Language Type Checking." alt="" coords="1498,216,1737,261"/>
+<area shape="poly" id="edge8_Node000002_Node000009" title=" " alt="" coords="3271,133,2497,162,2065,183,1886,196,1750,210,1705,218,1704,213,1749,205,1886,191,2065,178,2497,156,3276,133"/>
+<area shape="rect" id="Node000010" href="$cpp__typecheck__bases_8cpp.html" title="C++ Language Type Checking." alt="" coords="1761,208,1973,269"/>
+<area shape="poly" id="edge9_Node000002_Node000010" title=" " alt="" coords="3270,129,3033,134,2713,144,2351,168,2166,187,1986,210,1973,212,1973,207,1985,205,2166,181,2350,163,2712,139,3033,129,3276,129"/>
+<area shape="rect" id="Node000011" href="$cpp__typecheck__code_8cpp.html" title="C++ Language Type Checking." alt="" coords="1997,208,2209,269"/>
+<area shape="poly" id="edge10_Node000002_Node000011" title=" " alt="" coords="3270,131,3071,139,2808,151,2516,174,2367,190,2222,210,2209,212,2209,207,2221,205,2367,185,2515,169,2808,146,3071,134,3276,131"/>
+<area shape="rect" id="Node000012" href="$cpp__typecheck__compound__type_8cpp.html" title="C++ Language Type Checking." alt="" coords="2233,208,2445,269"/>
+<area shape="poly" id="edge11_Node000002_Node000012" title=" " alt="" coords="3276,134,3110,145,2906,158,2682,180,2458,210,2445,213,2445,207,2457,205,2681,174,2906,153,3110,139,3271,134"/>
+<area shape="rect" id="Node000013" href="$cpp__typecheck__constructor_8cpp.html" title="C++ Language Type Checking." alt="" coords="2469,208,2681,269"/>
+<area shape="poly" id="edge12_Node000002_Node000013" title=" " alt="" coords="3276,139,3006,167,2849,186,2694,210,2681,213,2681,207,2693,205,2849,181,3005,161,3270,139"/>
+<area shape="rect" id="Node000014" href="$cpp__typecheck__conversions_8cpp.html" title="C++ Language Type Checking." alt="" coords="2705,208,2917,269"/>
+<area shape="poly" id="edge13_Node000002_Node000014" title=" " alt="" coords="3276,148,3110,177,2930,210,2917,213,2917,208,2929,205,3109,172,3271,149"/>
+<area shape="rect" id="Node000015" href="$cpp__typecheck__declaration_8cpp.html" title="C++ Language Type Checking." alt="" coords="2941,208,3153,269"/>
+<area shape="poly" id="edge14_Node000002_Node000015" title=" " alt="" coords="3317,156,3147,210,3146,204,3312,157"/>
+<area shape="rect" id="Node000016" href="$cpp__typecheck__destructor_8cpp.html" title="C++ Language Type Checking." alt="" coords="3177,208,3389,269"/>
+<area shape="poly" id="edge15_Node000002_Node000016" title=" " alt="" coords="3368,161,3317,209,3315,205,3363,163"/>
+<area shape="rect" id="Node000017" href="$cpp__typecheck__enum__type_8cpp.html" title="C++ Language Type Checking." alt="" coords="3413,208,3625,269"/>
+<area shape="poly" id="edge16_Node000002_Node000017" title=" " alt="" coords="3436,159,3488,208,3483,206,3434,164"/>
+<area shape="rect" id="Node000018" href="$cpp__typecheck__expr_8cpp.html" title="C++ Language Type Checking." alt="" coords="3649,208,3861,269"/>
+<area shape="poly" id="edge17_Node000002_Node000018" title=" " alt="" coords="3487,154,3658,207,3652,207,3486,159"/>
+<area shape="rect" id="Node000019" href="$cpp__typecheck__fargs_8cpp.html" title="C++ Language Type Checking." alt="" coords="3885,208,4097,269"/>
+<area shape="poly" id="edge18_Node000002_Node000019" title=" " alt="" coords="3502,152,3525,157,3622,173,3699,181,3775,189,3873,205,3888,210,3882,210,3872,210,3775,194,3698,186,3622,178,3524,162,3501,158"/>
+<area shape="rect" id="Node000020" href="$cpp__typecheck__function_8cpp.html" title="C++ Language Type Checking." alt="" coords="4121,208,4333,269"/>
+<area shape="poly" id="edge19_Node000002_Node000020" title=" " alt="" coords="3499,152,3525,157,3613,169,3688,176,3817,181,3945,185,4020,193,4109,205,4124,210,4118,210,4108,210,4020,198,3945,191,3816,186,3688,181,3612,174,3524,162,3498,158"/>
+<area shape="rect" id="Node000021" href="$cpp__typecheck__initializer_8cpp.html" title="C++ Language Type Checking." alt="" coords="4357,208,4569,269"/>
+<area shape="poly" id="edge20_Node000002_Node000021" title=" " alt="" coords="3497,152,3525,157,3649,172,3754,179,3934,180,4115,182,4221,189,4345,205,4360,210,4354,210,4344,210,4220,195,4115,187,3934,186,3754,185,3648,177,3524,162,3497,158"/>
+<area shape="rect" id="Node000022" href="$cpp__typecheck__linkage__spec_8cpp.html" title="C++ Language Type Checking." alt="" coords="4593,208,4805,269"/>
+<area shape="poly" id="edge21_Node000002_Node000022" title=" " alt="" coords="3497,152,3525,157,3684,175,3820,183,3940,183,4052,180,4165,177,4285,178,4421,186,4581,205,4596,210,4590,210,4580,210,4420,192,4285,183,4165,183,4053,185,3940,188,3820,188,3684,180,3524,162,3496,158"/>
+<area shape="rect" id="Node000023" href="$cpp__typecheck__method__bodies_8cpp.html" title="C++ Language Type Checking." alt="" coords="4829,208,5041,269"/>
+<area shape="poly" id="edge22_Node000002_Node000023" title=" " alt="" coords="3496,152,3525,157,3720,178,3886,186,4033,185,4170,180,4308,175,4455,174,4621,183,4817,205,4832,210,4826,210,4816,210,4621,188,4454,180,4308,180,4171,185,4033,190,3886,191,3720,183,3524,162,3496,158"/>
+<area shape="rect" id="Node000024" href="$cpp__typecheck__namespace_8cpp.html" title="C++ Language Type Checking." alt="" coords="5065,208,5277,269"/>
+<area shape="poly" id="edge23_Node000002_Node000024" title=" " alt="" coords="3496,152,3525,157,3756,181,3953,189,4126,187,4288,180,4451,173,4624,171,4821,180,5053,205,5068,210,5062,209,5052,210,4821,185,4624,176,4451,178,4289,185,4126,192,3953,195,3756,186,3524,162,3496,158"/>
+<area shape="rect" id="Node000025" href="$cpp__typecheck__resolve_8cpp.html" title="C++ Language Type Checking." alt="" coords="5301,208,5513,269"/>
+<area shape="poly" id="edge24_Node000002_Node000025" title=" " alt="" coords="3495,152,3525,157,3664,173,3792,184,4019,193,4219,189,4406,180,4594,170,4794,167,5021,177,5149,188,5289,205,5304,210,5298,209,5288,210,5149,193,5021,182,4794,172,4594,175,4407,185,4219,194,4019,198,3791,189,3663,178,3524,162,3495,158"/>
+<area shape="rect" id="Node000026" href="$cpp__typecheck__static__assert_8cpp.html" title="C++ Language Type Checking." alt="" coords="5537,208,5749,269"/>
+<area shape="poly" id="edge25_Node000002_Node000026" title=" " alt="" coords="3495,152,3525,157,3683,175,3827,187,3961,194,4085,196,4312,191,4524,179,4737,168,4964,164,5088,166,5222,174,5367,186,5525,205,5540,210,5534,209,5524,210,5366,191,5221,179,5088,172,4964,169,4737,173,4525,185,4312,196,4085,201,3961,199,3827,192,3682,180,3524,162,3495,158"/>
+<area shape="rect" id="Node000027" href="$cpp__typecheck__template_8cpp.html" title="C++ Language Type Checking." alt="" coords="5773,208,5985,269"/>
+<area shape="poly" id="edge26_Node000002_Node000027" title=" " alt="" coords="3495,152,3525,157,3701,177,3863,190,4012,197,4151,199,4405,193,4642,179,4880,165,5134,160,5273,163,5422,170,5584,184,5761,205,5776,210,5770,209,5760,210,5583,190,5422,176,5273,168,5134,165,4880,171,4643,184,4405,198,4151,205,4012,202,3863,195,3701,182,3524,162,3495,158"/>
+<area shape="rect" id="Node000028" href="$cpp__typecheck__type_8cpp.html" title="C++ Language Type Checking." alt="" coords="6009,208,6221,269"/>
+<area shape="poly" id="edge27_Node000002_Node000028" title=" " alt="" coords="3495,152,3525,157,3636,168,3765,176,4064,184,4402,184,4760,180,5119,176,5457,177,5756,185,5885,193,5997,205,6012,210,6006,209,5996,210,5885,199,5756,190,5457,182,5119,182,4760,185,4402,189,4064,189,3765,181,3636,173,3524,162,3495,158"/>
+<area shape="rect" id="Node000029" href="$cpp__typecheck__using_8cpp.html" title="C++ Language Type Checking." alt="" coords="6245,208,6457,269"/>
+<area shape="poly" id="edge28_Node000002_Node000029" title=" " alt="" coords="3495,152,3525,157,3647,169,3788,178,4115,185,4486,185,4878,180,5271,175,5641,175,5969,184,6110,192,6233,205,6248,210,6242,209,6232,210,6110,198,5969,189,5641,180,5271,181,4879,185,4486,190,4115,191,3788,183,3646,174,3524,162,3495,158"/>
+<area shape="rect" id="Node000030" href="$cpp__typecheck__virtual__table_8cpp.html" title="C++ Language Type Checking." alt="" coords="6481,208,6693,269"/>
+<area shape="poly" id="edge29_Node000002_Node000030" title=" " alt="" coords="3495,152,3525,157,3657,170,3811,179,4167,187,4570,186,4996,180,5423,174,5826,173,6182,182,6336,191,6469,205,6484,210,6478,209,6468,210,6335,197,6182,187,5826,179,5423,179,4997,185,4570,191,4167,192,3811,184,3657,175,3524,162,3495,158"/>
 </map>

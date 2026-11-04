@@ -1,41 +1,41 @@
 <map id="/home/runner/work/cbmc/cbmc/src/solvers/qbf/qdimacs_cnf.h" name="/home/runner/work/cbmc/cbmc/src/solvers/qbf/qdimacs_cnf.h">
-<area shape="rect" id="Node000001" title=" " alt="" coords="525,5,709,60"/>
-<area shape="rect" id="Node000002" href="$qbf__quantor_8h.html" title=" " alt="" coords="5,108,189,163"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="513,53,365,79,202,111,190,113,189,108,201,105,364,73,512,48"/>
-<area shape="rect" id="Node000004" href="$qbf__qube_8h.html" title=" " alt="" coords="213,108,397,163"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="524,67,387,110,386,105,522,62"/>
-<area shape="rect" id="Node000006" href="$qbf__skizzo_8h.html" title=" " alt="" coords="421,108,605,163"/>
-<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="582,72,542,110,539,106,578,68"/>
-<area shape="rect" id="Node000008" href="$qbf__squolem_8h.html" title="Squolem Backend." alt="" coords="629,108,813,163"/>
-<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="656,68,696,106,692,110,653,72"/>
-<area shape="rect" id="Node000010" href="$qdimacs__cnf_8cpp.html" title=" " alt="" coords="837,108,1021,163"/>
-<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="713,62,849,105,847,110,711,67"/>
-<area shape="rect" id="Node000011" href="$qdimacs__core_8h.html" title=" " alt="" coords="1045,108,1229,163"/>
-<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="723,48,871,73,1034,105,1046,108,1044,113,1033,111,870,79,722,53"/>
-<area shape="rect" id="Node000003" href="$qbf__quantor_8cpp.html" title=" " alt="" coords="5,211,189,265"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="100,176,100,211,95,211,95,176"/>
-<area shape="rect" id="Node000005" href="$qbf__qube_8cpp.html" title=" " alt="" coords="213,211,397,265"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="308,176,308,211,303,211,303,176"/>
-<area shape="rect" id="Node000007" href="$qbf__skizzo_8cpp.html" title=" " alt="" coords="421,211,605,265"/>
-<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="516,176,516,211,511,211,511,176"/>
-<area shape="rect" id="Node000009" href="$qbf__squolem_8cpp.html" title="Squolem Backend." alt="" coords="629,211,813,265"/>
-<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="724,176,724,211,719,211,719,176"/>
-<area shape="rect" id="Node000012" href="$qbf__bdd__core_8h.html" title=" " alt="" coords="837,211,1021,265"/>
-<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="1072,171,985,213,982,208,1070,166"/>
-<area shape="rect" id="Node000016" href="$qbf__qube__core_8h.html" title=" " alt="" coords="1045,211,1229,265"/>
-<area shape="poly" id="edge15_Node000011_Node000016" title=" " alt="" coords="1140,176,1140,211,1135,211,1135,176"/>
-<area shape="rect" id="Node000018" href="$qbf__squolem__core_8h.html" title="Squolem Backend (with Proofs)" alt="" coords="1253,211,1437,265"/>
-<area shape="poly" id="edge17_Node000011_Node000018" title=" " alt="" coords="1205,166,1292,208,1290,213,1203,171"/>
-<area shape="rect" id="Node000020" href="$qdimacs__core_8cpp.html" title=" " alt="" coords="1461,211,1645,265"/>
-<area shape="poly" id="edge19_Node000011_Node000020" title=" " alt="" coords="1243,159,1450,208,1462,211,1460,216,1449,213,1242,164"/>
-<area shape="rect" id="Node000013" href="$qbf__bdd__core_8cpp.html" title=" " alt="" coords="629,313,813,368"/>
-<area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="864,274,777,316,774,311,862,269"/>
-<area shape="rect" id="Node000014" href="$qbf__skizzo__core_8h.html" title=" " alt="" coords="837,313,1021,368"/>
-<area shape="poly" id="edge13_Node000012_Node000014" title=" " alt="" coords="932,279,932,313,927,313,927,279"/>
-<area shape="rect" id="Node000015" href="$qbf__skizzo__core_8cpp.html" title=" " alt="" coords="837,416,1021,471"/>
-<area shape="poly" id="edge14_Node000014_Node000015" title=" " alt="" coords="932,382,932,416,927,416,927,382"/>
-<area shape="rect" id="Node000017" href="$qbf__qube__core_8cpp.html" title=" " alt="" coords="1045,313,1229,368"/>
-<area shape="poly" id="edge16_Node000016_Node000017" title=" " alt="" coords="1140,279,1140,313,1135,313,1135,279"/>
-<area shape="rect" id="Node000019" href="$qbf__squolem__core_8cpp.html" title="Squolem Backend (with proofs)" alt="" coords="1253,313,1437,368"/>
-<area shape="poly" id="edge18_Node000018_Node000019" title=" " alt="" coords="1348,279,1348,313,1343,313,1343,279"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="525,5,709,67"/>
+<area shape="rect" id="Node000002" href="$qbf__quantor_8h.html" title=" " alt="" coords="5,115,189,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="508,56,363,84,202,118,191,120,188,116,200,112,362,78,512,53"/>
+<area shape="rect" id="Node000004" href="$qbf__qube_8h.html" title=" " alt="" coords="213,115,397,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="513,74,394,117,391,112,517,71"/>
+<area shape="rect" id="Node000006" href="$qbf__skizzo_8h.html" title=" " alt="" coords="421,115,605,177"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="580,76,544,116,540,112,576,80"/>
+<area shape="rect" id="Node000008" href="$qbf__squolem_8h.html" title="Squolem Backend." alt="" coords="629,115,813,177"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="657,75,694,115,689,114,656,81"/>
+<area shape="rect" id="Node000010" href="$qdimacs__cnf_8cpp.html" title=" " alt="" coords="837,115,1021,177"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="719,70,844,114,839,115,719,75"/>
+<area shape="rect" id="Node000011" href="$qdimacs__core_8h.html" title=" " alt="" coords="1045,115,1229,177"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="724,52,872,78,1034,112,1047,118,1042,118,1032,118,871,84,724,57"/>
+<area shape="rect" id="Node000003" href="$qbf__quantor_8cpp.html" title=" " alt="" coords="5,225,189,286"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="97,190,100,224,94,224,97,195"/>
+<area shape="rect" id="Node000005" href="$qbf__qube_8cpp.html" title=" " alt="" coords="213,225,397,286"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="306,190,307,225,303,223,304,195"/>
+<area shape="rect" id="Node000007" href="$qbf__skizzo_8cpp.html" title=" " alt="" coords="421,225,605,286"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="514,190,515,225,511,223,512,194"/>
+<area shape="rect" id="Node000009" href="$qbf__squolem_8cpp.html" title="Squolem Backend." alt="" coords="629,225,813,286"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="723,190,723,226,719,223,719,194"/>
+<area shape="rect" id="Node000012" href="$qbf__bdd__core_8h.html" title=" " alt="" coords="837,225,1021,286"/>
+<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="1068,183,988,227,986,222,1063,185"/>
+<area shape="rect" id="Node000016" href="$qbf__qube__core_8h.html" title=" " alt="" coords="1045,225,1229,286"/>
+<area shape="poly" id="edge15_Node000011_Node000016" title=" " alt="" coords="1139,190,1139,226,1135,223,1135,194"/>
+<area shape="rect" id="Node000018" href="$qbf__squolem__core_8h.html" title="Squolem Backend (with Proofs)." alt="" coords="1253,225,1437,286"/>
+<area shape="poly" id="edge17_Node000011_Node000018" title=" " alt="" coords="1209,181,1289,224,1284,224,1208,187"/>
+<area shape="rect" id="Node000020" href="$qdimacs__core_8cpp.html" title=" " alt="" coords="1461,225,1645,286"/>
+<area shape="poly" id="edge19_Node000011_Node000020" title=" " alt="" coords="1244,170,1450,222,1464,228,1459,228,1448,227,1243,175"/>
+<area shape="rect" id="Node000013" href="$qbf__bdd__core_8cpp.html" title=" " alt="" coords="629,334,813,396"/>
+<area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="860,293,780,336,778,331,855,295"/>
+<area shape="rect" id="Node000014" href="$qbf__skizzo__core_8h.html" title=" " alt="" coords="837,334,1021,396"/>
+<area shape="poly" id="edge13_Node000012_Node000014" title=" " alt="" coords="931,300,931,335,927,332,927,304"/>
+<area shape="rect" id="Node000015" href="$qbf__skizzo__core_8cpp.html" title=" " alt="" coords="837,444,1021,506"/>
+<area shape="poly" id="edge14_Node000014_Node000015" title=" " alt="" coords="931,410,931,445,927,442,927,413"/>
+<area shape="rect" id="Node000017" href="$qbf__qube__core_8cpp.html" title=" " alt="" coords="1045,334,1229,396"/>
+<area shape="poly" id="edge16_Node000016_Node000017" title=" " alt="" coords="1139,300,1139,335,1135,332,1135,304"/>
+<area shape="rect" id="Node000019" href="$qbf__squolem__core_8cpp.html" title="Squolem Backend (with proofs)." alt="" coords="1253,334,1437,396"/>
+<area shape="poly" id="edge18_Node000018_Node000019" title=" " alt="" coords="1347,300,1347,336,1343,332,1343,304"/>
 </map>

@@ -5,8 +5,8 @@ var goto__program_8h =
     [ "goto_programt::instructiont::target_less_than", "structgoto__programt_1_1instructiont_1_1target__less__than.html", "structgoto__programt_1_1instructiont_1_1target__less__than" ],
     [ "const_target_hash", "structconst__target__hash.html", "structconst__target__hash" ],
     [ "pointee_address_equalt", "structpointee__address__equalt.html", "structpointee__address__equalt" ],
-    [ "forall_goto_program_instructions", "goto__program_8h.html#a21f949b9c8de9b9a887eb6e593d51728", null ],
     [ "Forall_goto_program_instructions", "goto__program_8h.html#a70232dd124bfcc17855c337bac57477f", null ],
+    [ "forall_goto_program_instructions", "goto__program_8h.html#a21f949b9c8de9b9a887eb6e593d51728", null ],
     [ "goto_program_instruction_typet", "goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beb", [
       [ "NO_INSTRUCTION_TYPE", "goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296bebaaa45afe235bfa489c600a7852893002f", null ],
       [ "GOTO", "goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296bebadf1256e4198172eedfbf12c770d11589", null ],

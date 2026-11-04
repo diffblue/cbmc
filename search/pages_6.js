@@ -1,17 +1,12 @@
 var searchData=
 [
-  ['folder_20walkthrough_0',['folder walkthrough',['../folder-walkthrough.html',1,'Folder Walkthrough'],['../group__module__hidden.html',1,'folder-walkthrough']]],
-  ['for_20code_20contracts_1',['Command Line Interface for Code Contracts',['../contracts-user-cli.html',1,'contracts-user']]],
-  ['frame_20condition_20checking_2',['Dynamic Frame Condition Checking',['../contracts-dev-spec-dfcc.html',1,'contracts-dev-spec']]],
-  ['frees_20clauses_3',['Frees Clauses',['../contracts-frees.html',1,'contracts-user']]],
-  ['frees_20specification_20functions_4',['Rewriting Declarative Assign and Frees Specification Functions',['../contracts-dev-spec-spec-rewriting.html',1,'contracts-dev-spec']]],
-  ['from_20contract_20clauses_5',['Generating GOTO Functions From Contract Clauses',['../contracts-dev-spec-codegen.html',1,'contracts-dev-spec']]],
-  ['function_6',['function',['../contracts-dev-spec-contract-checking.html',1,'Checking a Contract Against a Function'],['../contracts-dev-spec-contract-checking-rec.html',1,'Checking a Contract Against a Recursive Function']]],
-  ['function_20by_20a_20contract_7',['Replacing a Function by a Contract',['../contracts-dev-spec-contract-replacement.html',1,'contracts-dev-spec']]],
-  ['function_20contracts_8',['Function Contracts',['../contracts-functions.html',1,'contracts-user']]],
-  ['function_20contracts_20reminder_9',['Function Contracts Reminder',['../contracts-dev-spec-reminder.html',1,'contracts-dev-spec']]],
-  ['function_20instrumentation_10',['GOTO Function Instrumentation',['../contracts-dev-spec-dfcc-instrument.html',1,'contracts-dev-spec-dfcc']]],
-  ['function_20pointer_20predicates_11',['Function Pointer Predicates',['../contracts-function-pointer-predicates.html',1,'contracts-user']]],
-  ['functions_12',['Rewriting Declarative Assign and Frees Specification Functions',['../contracts-dev-spec-spec-rewriting.html',1,'contracts-dev-spec']]],
-  ['functions_20from_20contract_20clauses_13',['Generating GOTO Functions From Contract Clauses',['../contracts-dev-spec-codegen.html',1,'contracts-dev-spec']]]
+  ['_5f_5fcprover_5fis_5ffreeable_20and_20_5f_5fcprover_5fwas_5ffreed_20predicates_0',['Rewriting Calls to __CPROVER_is_freeable and __CPROVER_was_freed Predicates',['../contracts-dev-spec-is-freeable.html',1,'contracts-dev-spec-dfcc-instrument']]],
+  ['_5f_5fcprover_5fis_5ffresh_20predicate_1',['Rewriting Calls to the __CPROVER_is_fresh Predicate',['../contracts-dev-spec-is-fresh.html',1,'contracts-dev-spec-dfcc-instrument']]],
+  ['_5f_5fcprover_5fis_5ffresh_20predicate_2',['The __CPROVER_is_fresh predicate',['../contracts-memory-predicates.html#autotoc_md115',1,'']]],
+  ['_5f_5fcprover_5fobeys_5fcontract_20predicate_3',['Rewriting Calls to the __CPROVER_obeys_contract Predicate',['../contracts-dev-spec-obeys-contract.html',1,'contracts-dev-spec-dfcc-instrument']]],
+  ['_5f_5fcprover_5fpointer_5fequals_20predicate_4',['Rewriting Calls to the __CPROVER_pointer_equals Predicate',['../contracts-dev-spec-pointer-equals.html',1,'contracts-dev-spec-dfcc-instrument']]],
+  ['_5f_5fcprover_5fpointer_5fequals_20predicate_5',['The __CPROVER_pointer_equals predicate',['../contracts-memory-predicates.html#autotoc_md114',1,'']]],
+  ['_5f_5fcprover_5fpointer_5fin_5frange_5fdfcc_20predicate_6',['Rewriting Calls to the __CPROVER_pointer_in_range_dfcc Predicate',['../contracts-dev-spec-pointer-in-range.html',1,'contracts-dev-spec-dfcc-instrument']]],
+  ['_5f_5fcprover_5fpointer_5fin_5frange_5fdfcc_20predicate_7',['The __CPROVER_pointer_in_range_dfcc predicate',['../contracts-memory-predicates.html#autotoc_md116',1,'']]],
+  ['_5f_5fcprover_5fwas_5ffreed_20predicates_8',['Rewriting Calls to __CPROVER_is_freeable and __CPROVER_was_freed Predicates',['../contracts-dev-spec-is-freeable.html',1,'contracts-dev-spec-dfcc-instrument']]]
 ];

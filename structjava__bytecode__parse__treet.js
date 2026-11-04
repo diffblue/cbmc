@@ -1,11 +1,11 @@
 var structjava__bytecode__parse__treet =
 [
     [ "annotationt", "structjava__bytecode__parse__treet_1_1annotationt.html", "structjava__bytecode__parse__treet_1_1annotationt" ],
-    [ "classt", "structjava__bytecode__parse__treet_1_1classt.html", "structjava__bytecode__parse__treet_1_1classt" ],
-    [ "fieldt", "structjava__bytecode__parse__treet_1_1fieldt.html", "structjava__bytecode__parse__treet_1_1fieldt" ],
     [ "instructiont", "structjava__bytecode__parse__treet_1_1instructiont.html", "structjava__bytecode__parse__treet_1_1instructiont" ],
     [ "membert", "structjava__bytecode__parse__treet_1_1membert.html", "structjava__bytecode__parse__treet_1_1membert" ],
     [ "methodt", "structjava__bytecode__parse__treet_1_1methodt.html", "structjava__bytecode__parse__treet_1_1methodt" ],
+    [ "fieldt", "structjava__bytecode__parse__treet_1_1fieldt.html", "structjava__bytecode__parse__treet_1_1fieldt" ],
+    [ "classt", "structjava__bytecode__parse__treet_1_1classt.html", "structjava__bytecode__parse__treet_1_1classt" ],
     [ "annotationst", "structjava__bytecode__parse__treet.html#a8dedee9d40b009a136b65ff0c3dea067", null ],
     [ "class_refst", "structjava__bytecode__parse__treet.html#a56f0dcd1b1cebd40f9d019767944c398", null ],
     [ "java_bytecode_parse_treet", "structjava__bytecode__parse__treet.html#aadabb76db33fbe098a927b01b7a11549", null ],

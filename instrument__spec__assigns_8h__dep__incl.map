@@ -1,17 +1,17 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/contracts/instrument_spec_assigns.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/contracts/instrument_spec_assigns.h">
-<area shape="rect" id="Node000001" title="Specify write set in function contracts." alt="" coords="315,5,513,75"/>
-<area shape="rect" id="Node000002" href="$contracts_8cpp.html" title="Verify and use annotated loop and function contracts." alt="" coords="5,247,199,302"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="302,59,241,70,182,85,134,103,116,113,104,124,90,153,86,186,89,218,96,246,91,247,84,219,81,186,85,152,100,121,113,109,131,98,180,80,240,65,301,54"/>
-<area shape="rect" id="Node000003" href="$havoc__assigns__clause__targets_8cpp.html" title="Havoc multiple and possibly dependent targets simultaneously." alt="" coords="236,240,429,309"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="390,88,374,124,354,185,342,240,336,239,349,184,369,122,385,86"/>
-<area shape="rect" id="Node000004" href="$havoc__assigns__clause__targets_8h.html" title="Havoc function assigns clauses." alt="" coords="115,123,308,192"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="344,84,272,125,269,120,341,79"/>
-<area shape="rect" id="Node000005" href="$instrument__spec__assigns_8cpp.html" title="Specify write set in code contracts." alt="" coords="383,123,581,192"/>
-<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="443,85,464,121,460,124,439,88"/>
-<area shape="rect" id="Node000006" href="$memory__predicates_8cpp.html" title="Predicates to specify memory footprint in function contracts." alt="" coords="605,130,852,185"/>
-<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="519,77,658,127,656,132,518,82"/>
-<area shape="rect" id="Node000007" href="$cegis__verifier_8cpp.html" title="Verifier for Counterexample&#45;Guided Synthesis." alt="" coords="877,130,1074,185"/>
-<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="527,55,688,83,865,120,893,127,892,132,864,125,687,88,526,61"/>
-<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="172,204,129,249,125,245,168,200"/>
-<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="259,200,299,238,295,242,255,204"/>
+<area shape="rect" id="Node000001" title="Specify write set in function contracts." alt="" coords="326,5,523,84"/>
+<area shape="rect" id="Node000002" href="$contracts_8cpp.html" title="Verify and use annotated loop and function contracts." alt="" coords="5,267,198,329"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="308,65,251,79,194,94,146,113,117,134,100,165,93,200,93,236,97,267,92,266,88,236,88,200,95,163,113,130,144,108,192,89,250,74,313,62"/>
+<area shape="rect" id="Node000003" href="$havoc__assigns__clause__targets_8cpp.html" title="Havoc multiple and possibly dependent targets simultaneously." alt="" coords="247,259,439,337"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="398,96,384,133,365,199,351,260,347,256,360,197,379,131,394,100"/>
+<area shape="rect" id="Node000004" href="$havoc__assigns__clause__targets_8h.html" title="Havoc function assigns clauses." alt="" coords="127,132,319,211"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="347,94,287,134,284,129,351,91"/>
+<area shape="rect" id="Node000005" href="$instrument__spec__assigns_8cpp.html" title="Specify write set in code contracts." alt="" coords="394,132,591,211"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="454,95,474,132,468,131,452,100"/>
+<area shape="rect" id="Node000006" href="$memory__predicates_8cpp.html" title="Predicates to specify memory footprint in function contracts." alt="" coords="614,140,861,202"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="536,87,664,140,659,140,535,93"/>
+<area shape="rect" id="Node000007" href="$cegis__verifier_8cpp.html" title="Verifier for Counterexample&#45;Guided Synthesis." alt="" coords="885,140,1081,202"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="538,61,698,89,873,129,902,140,897,140,871,135,697,95,538,66"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="177,221,132,269,129,265,172,223"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="271,219,308,258,303,258,270,225"/>
 </map>

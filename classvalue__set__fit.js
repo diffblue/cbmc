@@ -1,7 +1,7 @@
 var classvalue__set__fit =
 [
-    [ "entryt", "structvalue__set__fit_1_1entryt.html", "structvalue__set__fit_1_1entryt" ],
     [ "object_map_dt", "classvalue__set__fit_1_1object__map__dt.html", "classvalue__set__fit_1_1object__map__dt" ],
+    [ "entryt", "structvalue__set__fit_1_1entryt.html", "structvalue__set__fit_1_1entryt" ],
     [ "assign_recursion_sett", "classvalue__set__fit.html#a3cd93e52c8df2048d90dcc942c8f2e71", null ],
     [ "dynamic_object_id_sett", "classvalue__set__fit.html#aa68cbfd7ce5eb7c896a3bac26bbb4a33", null ],
     [ "expr_sett", "classvalue__set__fit.html#aa1f18db30605befb3d2d5ded8fbe6f34", null ],

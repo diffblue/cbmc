@@ -6,7 +6,7 @@ var gcc_8c =
     [ "__ATOMIC_RELAXED", "gcc_8c.html#a8faf1f097f05558889df4c44d052d35e", null ],
     [ "__ATOMIC_RELEASE", "gcc_8c.html#a5822cf04414d99e0ee81e8bbe182226b", null ],
     [ "__ATOMIC_SEQ_CST", "gcc_8c.html#a0609dc2b702d5980de44c01bd373136a", null ],
-    [ "__attribute__", "gcc_8c.html#a91381b4694df009d9255070c0172b4bc", null ],
+    [ "__attribute__", "gcc_8c.html#a1d908f4606b1fb4431a9428aaf713f64", null ],
     [ "__atomic_always_lock_free", "gcc_8c.html#a5cecb3748eeb51b10517cc10972696db", null ],
     [ "__atomic_clear", "gcc_8c.html#ab414295fd68fb892e32790efbbb4c45c", null ],
     [ "__atomic_is_lock_free", "gcc_8c.html#ab3bd9d903c9f6974038bee5be928fbc3", null ],

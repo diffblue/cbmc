@@ -10,7 +10,7 @@ var classcprover__exception__baset =
     [ "reason", "classcprover__exception__baset.html#a82ba498c65b36016ea4379daa02ff663", null ],
     [ "what", "classcprover__exception__baset.html#adfa34194a22e105cf3ee5af8340da3ca", null ],
     [ "what", "classcprover__exception__baset.html#a145581e38abe46b1a64a656d2f5e62cc", null ],
-    [ "operator<<", "classcprover__exception__baset.html#abef85b6ef69e83fe1a26658906f6abb4", null ],
+    [ "operator<<", "classcprover__exception__baset.html#a7ac96af2839baaeeefe1b046638d6e7d", null ],
     [ "_reason", "classcprover__exception__baset.html#a07cad41a8cb1a4e435e4f77fe8c3cabb", null ],
     [ "reason", "classcprover__exception__baset.html#af5c7a8313f75f5bd969ada8472f339c5", null ]
 ];

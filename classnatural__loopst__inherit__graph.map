@@ -1,11 +1,13 @@
 <map id="natural_loopst" name="natural_loopst">
-<area shape="rect" id="Node000001" title="A concretized version of natural_loops_templatet&lt;const goto_programt, goto_programt::const_targett&gt;" alt="" coords="916,45,1031,71"/>
-<area shape="rect" id="Node000002" href="$classnatural__loops__templatet.html" title=" " alt="" coords="613,23,867,93"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="880,55,916,55,916,61,880,61"/>
-<area shape="rect" id="Node000003" href="$classloop__analysist.html" title=" " alt="" coords="231,5,401,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="415,20,590,34,614,37,613,42,589,39,415,26"/>
-<area shape="rect" id="Node000004" href="$classnatural__loops__templatet.html" title="Main driver for working out if a class (normally goto_programt) has any natural loops." alt="" coords="225,77,407,117"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="420,99,503,99,589,93,613,89,614,94,590,98,503,104,421,105"/>
-<area shape="rect" id="Node000005" href="$classloop__analysist.html" title=" " alt="" coords="5,84,176,109"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="190,94,225,94,225,99,190,99"/>
+<area shape="rect" id="Node000001" title="A concretized version of natural_loops_templatet&lt;const goto_programt, goto_programt::const_targett&gt;." alt="" coords="1168,117,1282,145"/>
+<area shape="rect" id="Node000002" href="$classnatural__loops__templatet.html" title=" " alt="" coords="866,92,1118,170"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1134,128,1170,131,1164,131,1134,134"/>
+<area shape="rect" id="Node000003" href="$classloop__analysist.html" title=" " alt="" coords="395,44,647,106"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="662,75,752,81,842,91,868,98,863,98,842,96,751,86,663,80"/>
+<area shape="rect" id="Node000004" href="$classloop__analysist.html" title=" " alt="" coords="5,61,176,89"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="191,72,396,73,392,77,192,78"/>
+<area shape="rect" id="Node000005" href="$classnatural__loops__templatet.html" title="Main driver for working out if a class (normally goto_programt) has any natural loops." alt="" coords="431,165,611,209"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="627,196,731,199,787,196,841,188,905,171,911,171,843,194,788,201,731,205,627,202"/>
+<area shape="rect" id="Node000006" href="$classloop__analysist.html" title=" " alt="" coords="5,173,176,201"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="191,184,431,184,429,190,191,190"/>
 </map>

@@ -1,47 +1,40 @@
 <map id="qbf_qube_coret" name="qbf_qube_coret">
-<area shape="rect" id="Node000001" title=" " alt="" coords="1951,214,2073,239"/>
-<area shape="rect" id="Node000002" href="$classqdimacs__coret.html" title=" " alt="" coords="1700,159,1817,185"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1831,185,1927,205,1954,211,1953,217,1926,211,1830,190"/>
-<area shape="rect" id="Node000003" href="$classqdimacs__cnft.html" title=" " alt="" coords="1362,102,1470,127"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1484,120,1676,149,1709,157,1708,162,1676,155,1483,125"/>
-<area shape="rect" id="Node000004" href="$classdimacs__cnft.html" title=" " alt="" coords="1011,111,1111,137"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="1124,120,1361,113,1362,119,1124,125"/>
-<area shape="rect" id="Node000005" href="$classcnf__clause__listt.html" title=" " alt="" coords="701,115,823,141"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="837,124,1010,122,1010,127,837,130"/>
-<area shape="rect" id="Node000006" href="$classcnft.html" title=" " alt="" coords="437,177,484,202"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="497,179,700,138,701,143,499,185"/>
-<area shape="rect" id="Node000007" href="$classpropt.html" title="TO_BE_DOCUMENTED." alt="" coords="194,185,250,210"/>
-<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="264,193,437,187,437,193,264,199"/>
-<area shape="rect" id="Node000031" title=" " alt="" coords="400,115,521,141"/>
-<area shape="poly" id="edge7_Node000005_Node000031" title=" " alt="" coords="535,125,700,125,700,131,535,131"/>
-<area shape="rect" id="Node000010" title=" " alt="" coords="157,86,287,111"/>
-<area shape="poly" id="edge8_Node000031_Node000010" title=" " alt="" coords="301,106,400,118,400,123,300,111"/>
-<area shape="rect" id="Node000033" title=" " alt="" coords="967,58,1155,83"/>
-<area shape="poly" id="edge16_Node000033_Node000010" title=" " alt="" coords="300,89,311,88,674,74,966,69,967,74,674,79,311,93,300,94"/>
-<area shape="rect" id="Node000011" title=" " alt="" coords="5,135,44,161"/>
-<area shape="poly" id="edge9_Node000010_Node000011" title=" " alt="" coords="56,132,67,128,157,107,158,112,69,133,57,137"/>
-<area shape="rect" id="Node000032" title=" " alt="" coords="168,135,276,161"/>
-<area shape="poly" id="edge11_Node000032_Node000011" title=" " alt="" coords="58,145,168,145,168,151,58,151"/>
-<area shape="rect" id="Node000037" title=" " alt="" coords="993,211,1128,237"/>
-<area shape="poly" id="edge20_Node000037_Node000011" title=" " alt="" coords="52,168,83,192,124,218,171,237,196,243,221,245,763,245,885,240,993,230,993,235,886,245,763,251,221,251,195,248,169,242,122,222,80,197,48,172"/>
-<area shape="poly" id="edge10_Node000031_Node000032" title=" " alt="" coords="290,150,376,147,418,138,419,143,376,152,290,155"/>
-<area shape="poly" id="edge12_Node000003_Node000033" title=" " alt="" coords="1169,81,1314,99,1362,105,1361,110,1313,104,1168,86"/>
-<area shape="rect" id="Node000034" href="$classqdimacs__cnft_1_1quantifiert.html" title=" " alt="" coords="671,7,853,33"/>
-<area shape="poly" id="edge13_Node000033_Node000034" title=" " alt="" coords="852,32,985,55,985,61,851,38"/>
-<area shape="rect" id="Node000035" href="$classtypet.html" title="The type of an expression, extends irept." alt="" coords="433,7,489,33"/>
-<area shape="poly" id="edge14_Node000034_Node000035" title=" " alt="" coords="503,17,671,17,671,23,503,23"/>
-<area shape="rect" id="Node000024" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="196,7,248,33"/>
-<area shape="poly" id="edge15_Node000035_Node000024" title=" " alt="" coords="262,17,432,17,432,23,262,23"/>
-<area shape="rect" id="Node000036" title=" " alt="" coords="1337,152,1495,192"/>
-<area shape="poly" id="edge17_Node000002_Node000036" title=" " alt="" coords="1508,169,1700,169,1700,175,1508,175"/>
-<area shape="poly" id="edge18_Node000036_Node000037" title=" " alt="" coords="1141,210,1337,181,1337,186,1142,215"/>
-<area shape="rect" id="Node000041" title=" " alt="" coords="1519,208,1676,248"/>
-<area shape="poly" id="edge24_Node000041_Node000037" title=" " alt="" coords="1141,223,1179,224,1518,226,1518,231,1179,229,1141,229"/>
-<area shape="rect" id="Node000038" title=" " alt="" coords="743,185,781,210"/>
-<area shape="poly" id="edge19_Node000037_Node000038" title=" " alt="" coords="795,198,993,215,993,221,795,203"/>
-<area shape="rect" id="Node000039" title=" " alt="" coords="1715,275,1802,301"/>
-<area shape="poly" id="edge21_Node000001_Node000039" title=" " alt="" coords="1815,279,1869,270,1926,257,1982,237,1984,242,1927,263,1870,276,1816,284"/>
-<area shape="rect" id="Node000040" title=" " alt="" coords="1347,268,1485,308"/>
-<area shape="poly" id="edge22_Node000039_Node000040" title=" " alt="" coords="1499,285,1715,285,1715,291,1499,291"/>
-<area shape="poly" id="edge23_Node000001_Node000041" title=" " alt="" coords="1690,225,1950,224,1950,230,1690,230"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="1978,235,2100,262"/>
+<area shape="rect" id="Node000002" href="$classqdimacs__coret.html" title=" " alt="" coords="1725,172,1841,200"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1857,201,1982,234,1977,234,1856,206"/>
+<area shape="rect" id="Node000003" href="$classqdimacs__cnft.html" title=" " alt="" coords="1389,111,1496,138"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1512,125,1603,135,1702,153,1752,172,1747,171,1700,158,1602,140,1512,131"/>
+<area shape="rect" id="Node000004" href="$classdimacs__cnft.html" title=" " alt="" coords="1062,60,1161,88"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="1177,79,1341,103,1391,114,1386,114,1340,108,1177,85"/>
+<area shape="rect" id="Node000005" href="$classcnf__clause__listt.html" title=" " alt="" coords="798,57,920,85"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="935,69,1064,73,1059,74,936,75"/>
+<area shape="rect" id="Node000006" href="$classcnft.html" title=" " alt="" coords="480,5,525,33"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="540,17,646,22,710,28,774,39,825,57,820,57,773,44,710,34,646,27,541,22"/>
+<area shape="rect" id="Node000007" href="$classpropt.html" title="TO_BE_DOCUMENTED." alt="" coords="197,5,253,33"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="268,17,481,17,477,21,269,22"/>
+<area shape="rect" id="Node000033" title=" " alt="" coords="442,57,562,85"/>
+<area shape="poly" id="edge7_Node000005_Node000033" title=" " alt="" coords="578,69,800,70,795,72,578,74"/>
+<area shape="rect" id="Node000034" title=" " alt="" coords="171,57,279,85"/>
+<area shape="poly" id="edge8_Node000033_Node000034" title=" " alt="" coords="293,69,444,70,439,73,295,74"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="5,113,44,141"/>
+<area shape="poly" id="edge9_Node000034_Node000010" title=" " alt="" coords="55,104,67,98,119,82,173,74,169,78,121,88,69,103,59,107"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="161,113,289,141"/>
+<area shape="poly" id="edge12_Node000009_Node000010" title=" " alt="" coords="58,125,162,125,159,129,60,130"/>
+<area shape="rect" id="Node000037" title=" " alt="" coords="1045,203,1178,230"/>
+<area shape="poly" id="edge16_Node000037_Node000010" title=" " alt="" coords="58,141,133,171,178,183,224,187,860,187,957,192,1047,206,1042,206,957,198,860,192,223,192,177,188,132,176,58,147"/>
+<area shape="rect" id="Node000035" title=" " alt="" coords="586,112,774,140"/>
+<area shape="poly" id="edge10_Node000003_Node000035" title=" " alt="" coords="789,123,1391,124,1386,126,789,128"/>
+<area shape="poly" id="edge11_Node000035_Node000009" title=" " alt="" coords="304,124,588,124,584,128,305,130"/>
+<area shape="rect" id="Node000036" title=" " alt="" coords="1364,165,1521,210"/>
+<area shape="poly" id="edge13_Node000002_Node000036" title=" " alt="" coords="1536,184,1727,186,1722,186,1536,189"/>
+<area shape="poly" id="edge14_Node000036_Node000037" title=" " alt="" coords="1194,207,1367,194,1362,194,1194,212"/>
+<area shape="rect" id="Node000041" title=" " alt="" coords="1545,226,1701,271"/>
+<area shape="poly" id="edge20_Node000041_Node000037" title=" " alt="" coords="1181,231,1203,235,1294,244,1386,248,1547,251,1542,251,1386,253,1294,249,1202,240,1181,237"/>
+<area shape="rect" id="Node000038" title=" " alt="" coords="840,227,878,254"/>
+<area shape="poly" id="edge15_Node000037_Node000038" title=" " alt="" coords="894,238,953,236,1021,231,1042,230,1047,230,1021,236,953,241,894,243"/>
+<area shape="rect" id="Node000039" title=" " alt="" coords="1740,296,1826,324"/>
+<area shape="poly" id="edge17_Node000001_Node000039" title=" " alt="" coords="1842,307,1897,302,1954,290,1986,276,2013,264,2018,262,1988,281,1955,295,1898,307,1842,312"/>
+<area shape="rect" id="Node000040" title=" " alt="" coords="1373,288,1512,332"/>
+<area shape="poly" id="edge18_Node000039_Node000040" title=" " alt="" coords="1528,307,1742,310,1737,310,1528,312"/>
+<area shape="poly" id="edge19_Node000001_Node000041" title=" " alt="" coords="1716,246,1981,248,1976,249,1717,251"/>
 </map>

@@ -1,9 +1,9 @@
 var classfloat__utilst =
 [
-    [ "biased_floatt", "structfloat__utilst_1_1biased__floatt.html", null ],
     [ "rounding_mode_bitst", "structfloat__utilst_1_1rounding__mode__bitst.html", "structfloat__utilst_1_1rounding__mode__bitst" ],
-    [ "unbiased_floatt", "structfloat__utilst_1_1unbiased__floatt.html", null ],
     [ "unpacked_floatt", "structfloat__utilst_1_1unpacked__floatt.html", "structfloat__utilst_1_1unpacked__floatt" ],
+    [ "biased_floatt", "structfloat__utilst_1_1biased__floatt.html", null ],
+    [ "unbiased_floatt", "structfloat__utilst_1_1unbiased__floatt.html", null ],
     [ "relt", "classfloat__utilst.html#adf904c0115eb6af8aafb50c5ae901745", [
       [ "LT", "classfloat__utilst.html#adf904c0115eb6af8aafb50c5ae901745ac562607189d77eb9dfb707464c1e7b0b", null ],
       [ "LE", "classfloat__utilst.html#adf904c0115eb6af8aafb50c5ae901745acfe6055d2e0503be378bb63449ec7ba6", null ],

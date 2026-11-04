@@ -1,23 +1,23 @@
 <map id="is_compile_time_constantt" name="is_compile_time_constantt">
-<area shape="rect" id="Node000001" title="Architecturally similar to can_forward_propagatet, but specialized for what is a constexpr,..." alt="" coords="28,519,225,544"/>
-<area shape="rect" id="Node000002" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="75,431,178,456"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="129,470,129,518,124,518,124,470"/>
-<area shape="rect" id="Node000003" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="35,328,175,353"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="113,366,127,430,122,431,108,367"/>
-<area shape="rect" id="Node000004" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="199,328,353,353"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="249,363,145,433,142,428,246,359"/>
-<area shape="rect" id="Node000005" title=" " alt="" coords="293,93,445,133"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="375,147,375,182,371,224,360,266,341,306,327,320,310,330,307,325,324,316,336,302,355,264,366,223,370,182,370,147"/>
-<area shape="rect" id="Node000006" title=" " alt="" coords="178,5,217,31"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="209,42,216,56,227,67,254,80,294,92,292,97,252,85,224,71,212,59,204,45"/>
-<area shape="rect" id="Node000010" title=" " alt="" coords="101,101,269,126"/>
-<area shape="poly" id="edge10_Node000010_Node000006" title=" " alt="" coords="176,42,168,56,166,67,168,78,179,99,174,102,163,80,161,67,163,54,171,39"/>
-<area shape="rect" id="Node000007" title=" " alt="" coords="323,5,362,31"/>
-<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="359,42,364,54,371,93,366,94,359,55,354,44"/>
-<area shape="poly" id="edge11_Node000010_Node000007" title=" " alt="" coords="316,41,267,72,209,103,207,98,264,67,313,36"/>
-<area shape="rect" id="Node000008" title=" " alt="" coords="109,211,262,251"/>
-<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="187,264,191,284,199,302,214,316,232,325,230,330,211,320,195,306,185,286,182,265"/>
-<area shape="rect" id="Node000009" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="5,101,77,126"/>
-<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="63,134,116,185,152,208,149,213,113,189,59,138"/>
-<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="188,140,188,210,183,210,183,140"/>
+<area shape="rect" id="Node000001" title="Architecturally similar to can_forward_propagatet, but specialized for what is a constexpr,..." alt="" coords="5,587,202,615"/>
+<area shape="rect" id="Node000002" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="53,487,154,514"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="106,528,106,588,101,586,101,532"/>
+<area shape="rect" id="Node000003" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="12,364,152,391"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="88,404,104,486,99,486,86,409"/>
+<area shape="rect" id="Node000004" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="175,364,328,391"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="223,403,121,488,118,484,226,399"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="70,224,231,268"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="168,279,188,310,209,338,236,363,230,364,205,341,183,312,168,285"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="73,106,224,151"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="150,164,153,223,147,223,149,169"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="138,5,176,33"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="130,47,127,58,124,70,126,81,136,105,131,106,121,83,119,69,122,56,132,42"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="249,114,416,142"/>
+<area shape="poly" id="edge10_Node000010_Node000007" title=" " alt="" coords="165,45,177,64,190,80,225,96,277,113,273,115,223,101,187,84,172,67,165,50"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="291,5,329,33"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="277,43,259,59,233,84,196,107,192,104,230,80,255,55,280,39"/>
+<area shape="poly" id="edge11_Node000010_Node000008" title=" " alt="" coords="328,44,334,56,338,87,337,115,332,114,333,88,329,58,327,50"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="255,224,408,268"/>
+<area shape="poly" id="edge8_Node000004_Node000009" title=" " alt="" coords="312,279,262,365,257,362,309,283"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="334,155,334,224,329,223,331,160"/>
 </map>

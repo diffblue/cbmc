@@ -1,9 +1,9 @@
 var classsharing__mapt =
 [
-    [ "delta_view_itemt", "classsharing__mapt_1_1delta__view__itemt.html", "classsharing__mapt_1_1delta__view__itemt" ],
     [ "falset", "structsharing__mapt_1_1falset.html", "structsharing__mapt_1_1falset" ],
     [ "noop_value_comparatort", "structsharing__mapt_1_1noop__value__comparatort.html", "structsharing__mapt_1_1noop__value__comparatort" ],
     [ "real_value_comparatort", "structsharing__mapt_1_1real__value__comparatort.html", "structsharing__mapt_1_1real__value__comparatort" ],
+    [ "delta_view_itemt", "classsharing__mapt_1_1delta__view__itemt.html", "classsharing__mapt_1_1delta__view__itemt" ],
     [ "sharing_map_statst", "structsharing__mapt_1_1sharing__map__statst.html", "structsharing__mapt_1_1sharing__map__statst" ],
     [ "delta_viewt", "classsharing__mapt.html#a8cef0d6016c6edd740d50d463ac8b045", null ],
     [ "hash", "classsharing__mapt.html#ae3352cb3381c546269899b76ce4b3a3d", null ],

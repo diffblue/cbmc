@@ -1,3 +1,13 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classempty__edget.html" title=" " alt="" coords="5,5,113,31"/>
+<area shape="rect" id="Node000000" href="$classenumerator__baset.html" title="A base class for expression enumerators." alt="" coords="5,84,146,112"/>
+<area shape="rect" id="Node000001" href="$classalternatives__enumeratort.html" title="Enumerators that enumerates expressions in the union of enumerated expressions of sub&#45;enumerators." alt="" coords="194,5,381,33"/>
+<area shape="poly" id="edge197_Node000000_Node000001" title=" " alt="" coords="118,75,193,43,234,32,229,35,195,48,121,79"/>
+<area shape="rect" id="Node000002" href="$classleaf__enumeratort.html" title="Enumerator that enumerates leaf expressions from a given list." alt="" coords="220,57,354,85"/>
+<area shape="poly" id="edge198_Node000000_Node000002" title=" " alt="" coords="160,85,222,78,217,81,161,90"/>
+<area shape="rect" id="Node000003" href="$classnon__leaf__enumeratort.html" title="Non&#45;leaf enumerator enumerates expressions of form f(a_1, a_2, ..., a_n) where a_i&#39;s are sub&#45;expressi..." alt="" coords="205,109,370,137"/>
+<area shape="poly" id="edge199_Node000000_Node000003" title=" " alt="" coords="161,105,207,112,202,114,161,111"/>
+<area shape="rect" id="Node000005" href="$classrecursive__enumerator__placeholdert.html" title="Placeholders for actual enumerators, which represent nonterminals." alt="" coords="205,161,370,206"/>
+<area shape="poly" id="edge201_Node000000_Node000005" title=" " alt="" coords="123,116,195,146,226,160,221,160,193,151,123,121"/>
+<area shape="rect" id="Node000004" href="$classbinary__functional__enumeratort.html" title="Enumerator that enumerates binary functional expressions." alt="" coords="429,109,651,137"/>
+<area shape="poly" id="edge200_Node000003_Node000004" title=" " alt="" coords="385,121,431,123,426,123,386,126"/>
 </map>

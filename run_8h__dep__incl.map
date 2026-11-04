@@ -1,33 +1,33 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/run.h" name="/home/runner/work/cbmc/cbmc/src/util/run.h">
-<area shape="rect" id="Node000001" title=" " alt="" coords="1727,5,1911,45"/>
-<area shape="rect" id="Node000002" href="$c__preprocess_8cpp.html" title=" " alt="" coords="5,101,248,141"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1713,28,1456,30,1096,38,681,58,468,75,260,96,213,103,212,98,260,91,468,69,681,53,1096,32,1456,24,1713,23"/>
-<area shape="rect" id="Node000003" href="$gcc__version_8cpp.html" title=" " alt="" coords="272,101,507,141"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1713,29,1495,33,1198,43,860,62,688,77,519,96,474,103,473,98,518,91,687,72,860,57,1198,37,1495,27,1713,24"/>
-<area shape="rect" id="Node000004" href="$c__wrangler_8cpp.html" title="C Wrangler." alt="" coords="531,101,773,141"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="1713,32,1536,38,1305,49,1046,68,786,96,740,103,739,98,785,91,1046,63,1305,44,1536,32,1713,26"/>
-<area shape="rect" id="Node000005" href="$as__mode_8cpp.html" title="Assembler Mode." alt="" coords="797,101,1024,141"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="1713,34,1408,55,1222,73,1036,96,994,103,993,98,1036,91,1222,67,1408,50,1712,29"/>
-<area shape="rect" id="Node000006" href="$compile_8cpp.html" title="Compile and link source and object files." alt="" coords="1048,101,1267,141"/>
-<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="1714,40,1512,62,1279,96,1241,103,1240,98,1278,91,1511,57,1713,34"/>
-<area shape="rect" id="Node000007" href="$gcc__mode_8cpp.html" title="GCC Mode." alt="" coords="1291,93,1475,148"/>
-<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1714,49,1487,96,1476,99,1474,93,1486,91,1713,44"/>
-<area shape="rect" id="Node000008" href="$hybrid__binary_8cpp.html" title="Create hybrid binary with goto&#45;binary section." alt="" coords="1499,93,1683,148"/>
-<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1761,53,1656,96,1654,91,1759,48"/>
-<area shape="rect" id="Node000009" href="$ld__mode_8cpp.html" title="LD Mode." alt="" coords="1707,101,1930,141"/>
-<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1821,59,1821,101,1816,101,1816,59"/>
-<area shape="rect" id="Node000010" href="$linker__script__merge_8cpp.html" title=" " alt="" coords="1955,93,2139,148"/>
-<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="1878,48,1983,91,1981,96,1876,53"/>
-<area shape="rect" id="Node000011" href="$ms__cl__version_8cpp.html" title=" " alt="" coords="2163,93,2347,148"/>
-<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="1925,44,2151,91,2163,93,2162,99,2150,96,1924,49"/>
-<area shape="rect" id="Node000012" href="$osx__fat__reader_8cpp.html" title="Read Mach&#45;O." alt="" coords="2371,93,2555,148"/>
-<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="1925,33,2127,55,2359,91,2371,93,2370,98,2358,96,2126,61,1924,39"/>
-<area shape="rect" id="Node000013" href="$external__sat_8cpp.html" title="Allows call an external SAT solver to allow faster integration of newer SAT solvers." alt="" coords="2579,93,2763,148"/>
-<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="1925,28,2215,48,2391,66,2567,91,2579,93,2578,98,2566,96,2391,71,2215,53,1924,34"/>
-<area shape="rect" id="Node000014" href="$smt2__dec_8cpp.html" title=" " alt="" coords="2787,93,2971,148"/>
-<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="1924,25,2089,30,2301,41,2538,60,2775,91,2787,93,2786,98,2774,96,2537,66,2301,46,2089,36,1924,31"/>
-<area shape="rect" id="Node000015" href="$console_8cpp.html" title=" " alt="" coords="2995,101,3186,141"/>
-<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="1925,24,2122,27,2386,36,2683,56,2835,71,2983,91,3021,98,3020,103,2982,96,2834,77,2683,62,2385,41,2122,32,1925,29"/>
-<area shape="rect" id="Node000016" href="$run_8cpp.html" title=" " alt="" coords="3211,101,3395,141"/>
-<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="1925,26,2574,48,2935,66,3085,78,3199,91,3236,98,3235,103,3198,96,3085,83,2935,72,2574,53,1924,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="1722,5,1905,50"/>
+<area shape="rect" id="Node000002" href="$c__preprocess_8cpp.html" title=" " alt="" coords="5,106,248,151"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1703,32,974,56,561,76,390,87,260,101,215,108,213,103,259,95,390,82,561,70,974,51,1708,31"/>
+<area shape="rect" id="Node000003" href="$gcc__version_8cpp.html" title=" " alt="" coords="272,106,506,151"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1704,29,1488,33,1193,43,857,64,685,80,518,101,474,109,473,103,517,95,685,75,856,58,1192,38,1488,28,1709,28"/>
+<area shape="rect" id="Node000004" href="$c__wrangler_8cpp.html" title="C Wrangler." alt="" coords="530,106,771,151"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="1704,31,1530,39,1300,51,1042,70,783,101,739,109,738,103,782,95,1041,65,1299,45,1530,34,1709,31"/>
+<area shape="rect" id="Node000005" href="$as__mode_8cpp.html" title="Assembler Mode." alt="" coords="795,106,1020,151"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="1703,34,1402,57,1217,75,1032,101,992,108,991,103,1031,95,1217,70,1402,51,1709,33"/>
+<area shape="rect" id="Node000006" href="$compile_8cpp.html" title="Compile and link source and object files." alt="" coords="1044,106,1262,151"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="1709,39,1506,65,1275,101,1237,109,1236,103,1274,95,1505,60,1704,39"/>
+<area shape="rect" id="Node000007" href="$gcc__mode_8cpp.html" title="GCC Mode." alt="" coords="1287,98,1470,160"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1709,49,1483,101,1471,104,1470,98,1482,95,1703,50"/>
+<area shape="rect" id="Node000008" href="$hybrid__binary_8cpp.html" title="Create hybrid binary with goto&#45;binary section." alt="" coords="1495,98,1678,160"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1752,56,1657,100,1655,95,1747,57"/>
+<area shape="rect" id="Node000009" href="$ld__mode_8cpp.html" title="LD Mode." alt="" coords="1702,106,1924,151"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1815,64,1815,108,1811,104,1811,67"/>
+<area shape="rect" id="Node000010" href="$linker__script__merge_8cpp.html" title=" " alt="" coords="1948,98,2132,160"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="1877,54,1973,98,1968,97,1876,59"/>
+<area shape="rect" id="Node000011" href="$ms__cl__version_8cpp.html" title=" " alt="" coords="2156,98,2340,160"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="1921,47,2144,95,2159,101,2153,101,2143,101,1920,52"/>
+<area shape="rect" id="Node000012" href="$osx__fat__reader_8cpp.html" title="Read Mach&#45;O." alt="" coords="2364,98,2548,160"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="1920,35,2122,58,2238,75,2352,95,2366,101,2361,100,2351,101,2237,80,2121,63,1920,41"/>
+<area shape="rect" id="Node000013" href="$external__sat_8cpp.html" title="Allows call an external SAT solver to allow faster integration of newer SAT solvers." alt="" coords="2572,98,2756,160"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="1920,30,2050,37,2211,49,2386,68,2560,95,2574,101,2569,100,2559,101,2385,74,2210,55,2050,42,1920,35"/>
+<area shape="rect" id="Node000014" href="$smt2__dec_8cpp.html" title=" " alt="" coords="2780,98,2964,160"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="1920,27,2085,31,2297,42,2532,62,2652,77,2768,95,2782,101,2777,100,2767,101,2651,82,2532,68,2297,47,2085,37,1921,32"/>
+<area shape="rect" id="Node000015" href="$console_8cpp.html" title=" " alt="" coords="2988,106,3177,151"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="1920,25,2118,27,2381,36,2678,57,2829,74,2976,95,3015,106,3010,106,2975,101,2828,79,2677,63,2381,41,2118,32,1921,31"/>
+<area shape="rect" id="Node000016" href="$run_8cpp.html" title=" " alt="" coords="3202,106,3385,151"/>
+<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="1920,29,2202,36,2568,49,2928,69,3076,81,3190,95,3228,106,3223,106,3189,101,3076,87,2927,74,2568,55,2202,41,1920,34"/>
 </map>

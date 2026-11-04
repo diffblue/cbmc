@@ -1,58 +1,58 @@
 <map id="/home/runner/work/cbmc/cbmc/jbmc/src/java_bytecode/mz_zip_archive.h" name="/home/runner/work/cbmc/cbmc/jbmc/src/java_bytecode/mz_zip_archive.h">
-<area shape="rect" id="Node000001" title=" " alt="" coords="923,5,1142,60"/>
-<area shape="rect" id="Node000002" href="$jar__file_8h.html" title=" " alt="" coords="802,108,1021,163"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="992,71,945,110,941,106,989,67"/>
-<area shape="rect" id="Node000031" href="$mz__zip__archive_8cpp.html" title=" " alt="" coords="1045,108,1263,163"/>
-<area shape="poly" id="edge31_Node000001_Node000031" title=" " alt="" coords="1077,67,1124,106,1121,110,1073,71"/>
-<area shape="rect" id="Node000003" href="$jar__file_8cpp.html" title=" " alt="" coords="582,211,801,265"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="843,171,750,213,748,208,840,166"/>
-<area shape="rect" id="Node000004" href="$jar__pool_8cpp.html" title=" " alt="" coords="681,313,899,368"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="889,176,866,212,807,314,802,312,861,209,884,173"/>
-<area shape="rect" id="Node000005" href="$jar__pool_8h.html" title=" " alt="" coords="875,211,1094,265"/>
-<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="941,172,968,209,963,212,936,175"/>
-<area shape="rect" id="Node000030" href="$java__class__loader__base_8cpp.html" title=" " alt="" coords="1070,416,1289,471"/>
-<area shape="poly" id="edge30_Node000002_Node000030" title=" " alt="" coords="1035,164,1073,183,1108,209,1128,232,1144,258,1166,315,1178,371,1182,416,1176,416,1172,372,1161,317,1140,260,1124,235,1104,213,1071,188,1033,169"/>
-<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="923,274,842,316,840,311,921,269"/>
-<area shape="rect" id="Node000006" href="$java__class__loader__base_8h.html" title=" " alt="" coords="923,313,1142,368"/>
-<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="1006,277,1023,312,1018,314,1001,279"/>
-<area shape="rect" id="Node000007" href="$java__class__loader_8h.html" title=" " alt="" coords="827,416,1046,471"/>
-<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="1000,380,964,418,960,414,996,376"/>
-<area shape="poly" id="edge29_Node000006_Node000030" title=" " alt="" coords="1084,374,1142,414,1139,418,1081,378"/>
-<area shape="rect" id="Node000008" href="$ci__lazy__methods_8cpp.html" title=" " alt="" coords="827,621,1046,676"/>
-<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="939,485,939,621,934,621,934,485"/>
-<area shape="rect" id="Node000009" href="$java__bytecode__convert__class_8h.html" title="JAVA Bytecode Language Conversion." alt="" coords="494,519,723,573"/>
-<area shape="poly" id="edge9_Node000007_Node000009" title=" " alt="" coords="839,477,695,521,693,516,837,472"/>
-<area shape="rect" id="Node000014" href="$java__bytecode__language_8cpp.html" title=" " alt="" coords="585,621,803,676"/>
-<area shape="poly" id="edge13_Node000007_Node000014" title=" " alt="" coords="897,481,727,623,724,619,893,477"/>
-<area shape="rect" id="Node000017" href="$java__bytecode__language_8h.html" title=" " alt="" coords="1433,519,1651,573"/>
-<area shape="poly" id="edge14_Node000007_Node000017" title=" " alt="" coords="1060,468,1262,502,1433,527,1432,532,1261,507,1059,474"/>
-<area shape="rect" id="Node000029" href="$java__class__loader_8cpp.html" title=" " alt="" coords="1675,519,1894,573"/>
-<area shape="poly" id="edge28_Node000007_Node000029" title=" " alt="" coords="1060,468,1230,486,1363,492,1496,498,1664,516,1675,518,1675,523,1663,521,1496,503,1363,497,1230,492,1059,473"/>
-<area shape="rect" id="Node000010" href="$java__bytecode__convert__class_8cpp.html" title="JAVA Bytecode Language Conversion." alt="" coords="5,621,249,676"/>
-<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="481,577,250,625,249,619,480,571"/>
-<area shape="rect" id="Node000011" href="$java__bytecode__convert__method__class_8h.html" title="JAVA Bytecode Language Conversion." alt="" coords="273,621,560,676"/>
-<area shape="poly" id="edge11_Node000009_Node000011" title=" " alt="" coords="548,582,468,624,465,619,546,577"/>
-<area shape="poly" id="edge12_Node000009_Node000014" title=" " alt="" coords="642,582,674,620,670,623,638,586"/>
-<area shape="poly" id="edge18_Node000017_Node000008" title=" " alt="" coords="1419,567,1248,592,1058,624,1047,626,1046,621,1058,619,1247,587,1419,561"/>
-<area shape="poly" id="edge19_Node000017_Node000014" title=" " alt="" coords="1419,558,1142,583,979,601,816,624,804,626,803,621,815,619,978,596,1142,577,1419,553"/>
-<area shape="rect" id="Node000018" href="$janalyzer__parse__options_8cpp.html" title="JANALYZER Command Line Option Processing." alt="" coords="2289,724,2499,779"/>
-<area shape="poly" id="edge15_Node000017_Node000018" title=" " alt="" coords="1665,570,1833,574,2079,576,2202,580,2311,587,2393,600,2421,609,2439,619,2447,632,2450,645,2447,673,2435,701,2419,725,2414,722,2430,698,2442,672,2445,645,2442,634,2435,623,2419,613,2392,605,2310,592,2202,585,2079,581,1833,579,1665,576"/>
-<area shape="rect" id="Node000019" href="$janalyzer__parse__options_8h.html" title="JANALYZER Command Line Option Processing." alt="" coords="2228,621,2424,676"/>
-<area shape="poly" id="edge16_Node000017_Node000019" title=" " alt="" coords="1665,571,1821,588,1942,594,2063,600,2216,619,2228,621,2227,626,2215,624,2063,605,1942,599,1820,593,1665,576"/>
-<area shape="rect" id="Node000021" href="$java__entry__point_8cpp.html" title=" " alt="" coords="2499,621,2718,676"/>
-<area shape="poly" id="edge20_Node000017_Node000021" title=" " alt="" coords="1665,571,1790,585,1895,592,2075,595,2254,598,2358,605,2481,619,2500,621,2499,627,2480,624,2358,611,2254,604,2075,601,1895,597,1789,590,1665,576"/>
-<area shape="rect" id="Node000022" href="$lazy__goto__model_8cpp.html" title="Author: Diffblue Ltd." alt="" coords="1070,621,1289,676"/>
-<area shape="poly" id="edge21_Node000017_Node000022" title=" " alt="" coords="1435,580,1275,624,1273,619,1434,574"/>
-<area shape="rect" id="Node000023" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="1379,724,1571,779"/>
-<area shape="poly" id="edge22_Node000017_Node000023" title=" " alt="" coords="1540,588,1532,631,1519,677,1495,725,1490,723,1514,675,1527,630,1535,587"/>
-<area shape="rect" id="Node000024" href="$jbmc__parse__options_8h.html" title="JBMC Command Line Option Processing." alt="" coords="1313,621,1505,676"/>
-<area shape="poly" id="edge23_Node000017_Node000024" title=" " alt="" coords="1498,584,1445,623,1442,619,1495,579"/>
-<area shape="rect" id="Node000026" href="$jdiff__languages_8cpp.html" title="Language Registration." alt="" coords="1579,621,1763,676"/>
-<area shape="poly" id="edge25_Node000017_Node000026" title=" " alt="" coords="1588,579,1639,619,1636,623,1585,584"/>
-<area shape="rect" id="Node000027" href="$jdiff__parse__options_8cpp.html" title="JDIFF Command Line Option Processing." alt="" coords="1787,621,1971,676"/>
-<area shape="poly" id="edge26_Node000017_Node000027" title=" " alt="" coords="1644,575,1792,619,1791,624,1642,580"/>
-<area shape="rect" id="Node000028" href="$load__java__class_8cpp.html" title=" " alt="" coords="1995,621,2203,676"/>
-<area shape="poly" id="edge27_Node000017_Node000028" title=" " alt="" coords="1665,571,1826,595,1984,619,1996,621,1995,626,1983,624,1826,600,1664,576"/>
-<area shape="poly" id="edge17_Node000019_Node000018" title=" " alt="" coords="2354,686,2378,722,2374,725,2349,689"/>
-<area shape="poly" id="edge24_Node000024_Node000023" title=" " alt="" coords="1436,686,1460,722,1456,725,1431,689"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="920,5,1139,67"/>
+<area shape="rect" id="Node000002" href="$jar__file_8h.html" title=" " alt="" coords="799,115,1018,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="987,76,944,117,941,112,982,79"/>
+<area shape="rect" id="Node000031" href="$mz__zip__archive_8cpp.html" title=" " alt="" coords="1042,115,1260,177"/>
+<area shape="poly" id="edge31_Node000001_Node000031" title=" " alt="" coords="1075,75,1120,115,1114,114,1075,80"/>
+<area shape="rect" id="Node000003" href="$jar__file_8cpp.html" title=" " alt="" coords="579,225,798,286"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="830,185,752,226,749,222,835,182"/>
+<area shape="rect" id="Node000004" href="$jar__pool_8cpp.html" title=" " alt="" coords="678,334,896,396"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="883,188,863,226,804,336,800,332,858,223,879,192"/>
+<area shape="rect" id="Node000005" href="$jar__pool_8h.html" title=" " alt="" coords="872,225,1091,286"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="938,187,964,225,958,224,937,192"/>
+<area shape="rect" id="Node000030" href="$java__class__loader__base_8cpp.html" title=" " alt="" coords="1067,444,1286,506"/>
+<area shape="poly" id="edge30_Node000002_Node000030" title=" " alt="" coords="1032,177,1071,197,1105,223,1126,247,1142,275,1165,336,1176,395,1179,445,1174,442,1170,396,1160,337,1138,278,1121,250,1101,227,1068,201,1032,182"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="912,295,843,336,840,331,916,293"/>
+<area shape="rect" id="Node000006" href="$java__class__loader__base_8h.html" title=" " alt="" coords="920,334,1139,396"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="1002,298,1019,335,1014,333,1000,303"/>
+<area shape="rect" id="Node000007" href="$java__class__loader_8h.html" title=" " alt="" coords="824,444,1043,506"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="995,406,962,446,959,441,991,409"/>
+<area shape="poly" id="edge29_Node000006_Node000030" title=" " alt="" coords="1084,403,1138,444,1133,443,1083,408"/>
+<area shape="rect" id="Node000008" href="$ci__lazy__methods_8cpp.html" title=" " alt="" coords="824,663,1043,725"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="936,520,936,664,931,662,932,523"/>
+<area shape="rect" id="Node000009" href="$java__bytecode__convert__class_8h.html" title="JAVA Bytecode Language Conversion." alt="" coords="492,554,720,615"/>
+<area shape="poly" id="edge9_Node000007_Node000009" title=" " alt="" coords="824,512,699,556,697,551,829,510"/>
+<area shape="rect" id="Node000014" href="$java__bytecode__language_8cpp.html" title=" " alt="" coords="582,663,800,725"/>
+<area shape="poly" id="edge13_Node000007_Node000014" title=" " alt="" coords="891,515,726,665,723,661,887,517"/>
+<area shape="rect" id="Node000017" href="$java__bytecode__language_8h.html" title=" " alt="" coords="1430,554,1648,615"/>
+<area shape="poly" id="edge14_Node000007_Node000017" title=" " alt="" coords="1058,504,1259,540,1432,568,1427,568,1258,545,1058,509"/>
+<area shape="rect" id="Node000029" href="$java__class__loader_8cpp.html" title=" " alt="" coords="1672,554,1891,615"/>
+<area shape="poly" id="edge28_Node000007_Node000029" title=" " alt="" coords="1058,503,1150,515,1228,522,1361,527,1493,532,1571,539,1661,551,1675,556,1669,556,1660,556,1570,544,1493,537,1361,532,1228,528,1149,521,1058,509"/>
+<area shape="rect" id="Node000010" href="$java__bytecode__convert__class_8cpp.html" title="JAVA Bytecode Language Conversion." alt="" coords="5,663,249,725"/>
+<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="474,617,250,668,248,663,478,613"/>
+<area shape="rect" id="Node000011" href="$java__bytecode__convert__method__class_8h.html" title="JAVA Bytecode Language Conversion." alt="" coords="272,663,558,725"/>
+<area shape="poly" id="edge11_Node000009_Node000011" title=" " alt="" coords="541,622,469,665,467,661,536,624"/>
+<area shape="poly" id="edge12_Node000009_Node000014" title=" " alt="" coords="640,625,670,663,664,662,638,630"/>
+<area shape="poly" id="edge18_Node000017_Node000008" title=" " alt="" coords="1412,603,1244,632,1056,666,1044,668,1043,663,1054,661,1243,627,1417,603"/>
+<area shape="poly" id="edge19_Node000017_Node000014" title=" " alt="" coords="1412,594,1138,622,975,641,813,666,801,668,800,663,812,661,974,636,1137,616,1417,594"/>
+<area shape="rect" id="Node000018" href="$janalyzer__parse__options_8cpp.html" title="JANALYZER Command Line Option Processing." alt="" coords="2283,773,2494,835"/>
+<area shape="poly" id="edge15_Node000017_Node000018" title=" " alt="" coords="1663,612,1832,616,2076,618,2199,622,2306,629,2388,642,2416,651,2433,661,2442,674,2446,688,2443,718,2431,748,2414,775,2411,770,2426,745,2438,717,2440,689,2437,677,2429,665,2413,655,2387,647,2306,635,2198,627,2076,624,1832,621,1664,618"/>
+<area shape="rect" id="Node000019" href="$janalyzer__parse__options_8h.html" title="JANALYZER Command Line Option Processing." alt="" coords="2224,663,2419,725"/>
+<area shape="poly" id="edge16_Node000017_Node000019" title=" " alt="" coords="1664,613,1818,631,1940,635,2061,641,2131,648,2213,661,2226,666,2221,665,2212,666,2130,653,2060,646,1940,641,1818,636,1664,618"/>
+<area shape="rect" id="Node000021" href="$java__entry__point_8cpp.html" title=" " alt="" coords="2494,663,2712,725"/>
+<area shape="poly" id="edge20_Node000017_Node000021" title=" " alt="" coords="1664,613,1787,628,1892,635,2071,637,2249,639,2353,646,2475,661,2496,666,2491,666,2475,666,2353,651,2249,644,2071,643,1892,640,1787,633,1664,618"/>
+<area shape="rect" id="Node000022" href="$lazy__goto__model_8cpp.html" title="Author: Diffblue Ltd." alt="" coords="1067,663,1286,725"/>
+<area shape="poly" id="edge21_Node000017_Node000022" title=" " alt="" coords="1425,620,1279,665,1278,660,1420,621"/>
+<area shape="rect" id="Node000023" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="1377,773,1568,835"/>
+<area shape="poly" id="edge22_Node000017_Node000023" title=" " alt="" coords="1536,629,1529,677,1516,726,1493,775,1490,770,1511,724,1524,676,1532,632"/>
+<area shape="rect" id="Node000024" href="$jbmc__parse__options_8h.html" title="JBMC Command Line Option Processing." alt="" coords="1310,663,1501,725"/>
+<area shape="poly" id="edge23_Node000017_Node000024" title=" " alt="" coords="1492,624,1444,665,1442,661,1487,626"/>
+<area shape="rect" id="Node000026" href="$jdiff__languages_8cpp.html" title="Language Registration." alt="" coords="1577,663,1760,725"/>
+<area shape="poly" id="edge25_Node000017_Node000026" title=" " alt="" coords="1588,623,1635,664,1630,662,1586,628"/>
+<area shape="rect" id="Node000027" href="$jdiff__parse__options_8cpp.html" title="JDIFF Command Line Option Processing." alt="" coords="1785,663,1968,725"/>
+<area shape="poly" id="edge26_Node000017_Node000027" title=" " alt="" coords="1648,618,1787,664,1782,664,1648,623"/>
+<area shape="rect" id="Node000028" href="$load__java__class_8cpp.html" title=" " alt="" coords="1993,663,2200,725"/>
+<area shape="poly" id="edge27_Node000017_Node000028" title=" " alt="" coords="1664,613,1754,628,1824,637,1893,645,1981,661,1995,666,1989,666,1980,666,1893,651,1823,642,1753,633,1663,619"/>
+<area shape="poly" id="edge17_Node000019_Node000018" title=" " alt="" coords="2350,736,2372,774,2367,771,2347,741"/>
+<area shape="poly" id="edge24_Node000024_Node000023" title=" " alt="" coords="1434,736,1456,774,1451,771,1431,741"/>
 </map>

@@ -1,7 +1,7 @@
 var classmini__bdd__mgrt =
 [
-    [ "reverse_keyt", "structmini__bdd__mgrt_1_1reverse__keyt.html", "structmini__bdd__mgrt_1_1reverse__keyt" ],
     [ "var_table_entryt", "structmini__bdd__mgrt_1_1var__table__entryt.html", "structmini__bdd__mgrt_1_1var__table__entryt" ],
+    [ "reverse_keyt", "structmini__bdd__mgrt_1_1reverse__keyt.html", "structmini__bdd__mgrt_1_1reverse__keyt" ],
     [ "freet", "classmini__bdd__mgrt.html#ac83d8ff3a6e9993cd0bffa6cbc699b32", null ],
     [ "nodest", "classmini__bdd__mgrt.html#a37a40cf0599a8a80620a42631016a05f", null ],
     [ "reverse_mapt", "classmini__bdd__mgrt.html#aece9a8955301b67d4daefd53b02652e3", null ],

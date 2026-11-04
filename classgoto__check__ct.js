@@ -8,7 +8,7 @@ var classgoto__check__ct =
     [ "error_labelst", "classgoto__check__ct.html#abbe2c76790bac3bae54a55601d7b2e9e", null ],
     [ "goto_functiont", "classgoto__check__ct.html#a7a99c5bc30d2ec542054b17b3b39a55d", null ],
     [ "guardt", "classgoto__check__ct.html#a225dc1a80a70337760033fc17c1185a2", null ],
-    [ "named_check_statust", "classgoto__check__ct.html#a0559a53f204fa7c9b1432d4b1a95af15", null ],
+    [ "named_check_statust", "classgoto__check__ct.html#a81ec74e4b19f6da8b55cc2855132dcac", null ],
     [ "check_statust", "classgoto__check__ct.html#a4a98afeb77e36684a7d5b2353980e129", [
       [ "ENABLE", "classgoto__check__ct.html#a4a98afeb77e36684a7d5b2353980e129a11f997ce70c0345214ac5eef4548e4de", null ],
       [ "DISABLE", "classgoto__check__ct.html#a4a98afeb77e36684a7d5b2353980e129a2c8076edcbfd0e2b63d54ab5b60342e3", null ],

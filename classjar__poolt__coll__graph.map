@@ -1,35 +1,35 @@
 <map id="jar_poolt" name="jar_poolt">
-<area shape="rect" id="Node000001" title="A chache for jar_filet objects, by file name." alt="" coords="1763,123,1841,149"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="1472,116,1635,156"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1649,133,1763,133,1763,139,1649,139"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="634,38,721,63"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="735,50,1040,69,1243,87,1448,113,1472,117,1471,122,1448,119,1242,93,1039,74,734,56"/>
-<area shape="rect" id="Node000014" title=" " alt="" coords="952,143,1115,183"/>
-<area shape="poly" id="edge12_Node000014_Node000003" title=" " alt="" coords="735,59,760,74,770,88,773,101,775,114,784,125,823,146,866,159,910,165,952,167,952,172,910,171,865,164,821,151,781,129,771,116,768,102,765,90,757,78,733,64"/>
-<area shape="rect" id="Node000004" title=" " alt="" coords="213,5,352,45"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="366,28,634,45,634,51,366,33"/>
-<area shape="rect" id="Node000005" href="$classjar__filet.html" title="Class representing a .jar archive." alt="" coords="1288,123,1359,149"/>
-<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="1372,133,1472,133,1472,139,1372,139"/>
-<area shape="rect" id="Node000006" href="$classmz__zip__archivet.html" title="Thin object&#45;oriented wrapper around the MZ Zip library Zip file reader and extractor." alt="" coords="969,93,1097,118"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="1111,111,1288,130,1287,135,1111,116"/>
-<area shape="rect" id="Node000007" title=" " alt="" coords="596,88,759,128"/>
-<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="772,105,969,103,969,108,772,110"/>
-<area shape="rect" id="Node000008" href="$classmz__zip__archive__statet.html" title=" " alt="" coords="199,70,367,95"/>
-<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="381,86,596,100,595,105,380,92"/>
-<area shape="rect" id="Node000009" href="$structmz__zip__archive.html" title=" " alt="" coords="5,70,128,95"/>
-<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="142,80,198,80,198,85,142,85"/>
-<area shape="rect" id="Node000012" title=" " alt="" coords="204,119,361,145"/>
-<area shape="poly" id="edge9_Node000007_Node000012" title=" " alt="" coords="375,132,470,132,572,125,595,122,596,128,572,131,471,137,376,137"/>
-<area shape="rect" id="Node000013" title=" " alt="" coords="47,171,86,197"/>
-<area shape="poly" id="edge10_Node000012_Node000013" title=" " alt="" coords="99,174,229,142,230,147,100,179"/>
-<area shape="rect" id="Node000015" title=" " alt="" coords="601,176,753,216"/>
-<area shape="poly" id="edge15_Node000015_Node000013" title=" " alt="" coords="100,182,601,192,601,197,100,187"/>
-<area shape="rect" id="Node000017" title=" " alt="" coords="610,251,745,277"/>
-<area shape="poly" id="edge18_Node000017_Node000013" title=" " alt="" coords="89,205,136,250,166,272,200,288,258,304,320,312,382,314,442,310,552,294,634,274,636,279,553,299,443,316,382,319,319,318,257,309,198,293,163,277,132,254,85,209"/>
-<area shape="poly" id="edge11_Node000005_Node000014" title=" " alt="" coords="1129,163,1195,160,1264,152,1287,146,1288,151,1264,157,1196,165,1129,168"/>
-<area shape="poly" id="edge13_Node000014_Node000015" title=" " alt="" coords="768,199,846,199,928,192,977,180,978,185,928,197,846,205,768,204"/>
-<area shape="rect" id="Node000016" title=" " alt="" coords="263,238,302,263"/>
-<area shape="poly" id="edge14_Node000015_Node000016" title=" " alt="" coords="315,245,429,234,572,215,601,210,602,215,572,220,429,239,316,251"/>
-<area shape="poly" id="edge17_Node000017_Node000016" title=" " alt="" coords="316,252,391,260,507,264,610,263,610,268,507,269,390,265,315,258"/>
-<area shape="poly" id="edge16_Node000002_Node000017" title=" " alt="" coords="758,255,986,233,1125,216,1264,196,1372,175,1471,153,1472,158,1373,181,1264,201,1125,222,986,238,759,260"/>
+<area shape="rect" id="Node000001" title="A chache for jar_filet objects, by file name." alt="" coords="1779,151,1858,179"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="1486,143,1648,187"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1664,162,1781,165,1776,165,1664,168"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="639,66,725,94"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="741,76,871,77,1051,84,1256,101,1360,114,1463,132,1497,142,1492,142,1461,137,1360,119,1255,106,1050,89,871,82,741,81"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="960,171,1123,215"/>
+<area shape="poly" id="edge12_Node000012_Node000003" title=" " alt="" coords="741,88,765,103,775,120,777,137,779,153,789,167,828,188,872,200,917,204,963,206,957,206,917,210,871,205,826,193,786,171,774,155,772,138,770,122,761,107,740,93"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="216,5,354,50"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="370,29,470,38,577,52,641,67,636,68,577,57,469,43,371,35"/>
+<area shape="rect" id="Node000005" href="$classjar__filet.html" title="Class representing a .jar archive." alt="" coords="1299,151,1369,179"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="1384,162,1488,165,1483,165,1384,168"/>
+<area shape="rect" id="Node000006" href="$classmz__zip__archivet.html" title="Thin object&#45;oriented wrapper around the MZ Zip library Zip file reader and extractor." alt="" coords="978,119,1105,147"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="1121,139,1301,161,1296,161,1121,144"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="601,117,763,162"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="779,135,980,134,975,135,779,141"/>
+<area shape="rect" id="Node000008" href="$classmz__zip__archive__statet.html" title=" " alt="" coords="202,74,369,102"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="384,90,478,99,577,112,603,119,598,119,577,117,478,104,385,96"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="5,74,128,102"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="142,85,203,86,199,89,144,90"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="207,127,364,155"/>
+<area shape="poly" id="edge9_Node000007_Node000010" title=" " alt="" coords="379,138,603,139,598,141,380,143"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="47,190,86,218"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="100,192,236,153,233,158,102,196"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="606,223,758,267"/>
+<area shape="poly" id="edge15_Node000013_Node000011" title=" " alt="" coords="101,200,303,201,439,207,577,220,609,227,604,227,577,225,439,212,303,206,102,205"/>
+<area shape="rect" id="Node000015" title=" " alt="" coords="616,291,749,319"/>
+<area shape="poly" id="edge18_Node000015_Node000011" title=" " alt="" coords="87,227,136,280,167,305,203,324,260,341,319,350,380,353,439,351,548,336,630,320,636,319,549,341,440,356,380,358,319,355,259,346,201,328,165,309,132,284,86,232"/>
+<area shape="poly" id="edge11_Node000005_Node000012" title=" " alt="" coords="1138,197,1206,196,1274,187,1303,180,1308,179,1275,193,1206,202,1138,203"/>
+<area shape="poly" id="edge13_Node000012_Node000013" title=" " alt="" coords="773,251,853,252,895,248,936,241,970,229,1001,217,1006,215,972,234,937,246,896,253,853,257,773,257"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="266,262,305,290"/>
+<area shape="poly" id="edge14_Node000013_Node000014" title=" " alt="" coords="320,270,608,249,604,252,320,276"/>
+<area shape="poly" id="edge17_Node000015_Node000014" title=" " alt="" coords="319,284,393,301,511,308,618,309,613,309,511,314,393,306,319,289"/>
+<area shape="poly" id="edge16_Node000002_Node000015" title=" " alt="" coords="764,301,995,288,1135,273,1274,251,1397,220,1502,188,1507,187,1399,225,1275,256,1135,278,995,293,765,306"/>
 </map>

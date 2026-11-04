@@ -1,25 +1,26 @@
 <map id="w_guardst" name="w_guardst">
-<area shape="rect" id="Node000001" title=" " alt="" coords="1152,105,1241,131"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="516,47,667,72"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="681,62,886,77,1128,103,1152,107,1152,112,1128,109,885,83,681,67"/>
-<area shape="rect" id="Node000003" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="205,71,277,96"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="291,77,516,62,516,67,292,83"/>
-<area shape="rect" id="Node000009" title=" " alt="" coords="515,123,668,163"/>
-<area shape="poly" id="edge10_Node000009_Node000003" title=" " alt="" coords="291,95,350,109,515,133,514,138,349,114,290,100"/>
-<area shape="rect" id="Node000004" title=" " alt="" coords="187,5,295,31"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="309,23,491,45,516,48,515,53,490,50,309,28"/>
-<area shape="rect" id="Node000005" title=" " alt="" coords="5,60,44,85"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="56,55,67,50,129,34,187,23,188,28,130,39,69,55,58,60"/>
-<area shape="rect" id="Node000007" title=" " alt="" coords="165,189,317,229"/>
-<area shape="poly" id="edge8_Node000007_Node000005" title=" " alt="" coords="45,94,70,117,87,127,102,131,117,136,135,147,147,161,159,175,179,186,176,191,156,179,143,165,132,151,115,141,100,136,84,132,66,121,42,98"/>
-<area shape="rect" id="Node000010" title=" " alt="" coords="157,139,325,164"/>
-<area shape="poly" id="edge13_Node000010_Node000005" title=" " alt="" coords="58,77,134,99,217,136,214,141,132,105,56,82"/>
-<area shape="rect" id="Node000006" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="857,131,1011,156"/>
-<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="1024,132,1151,120,1152,125,1025,137"/>
-<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="331,205,488,201,668,187,777,172,873,153,874,159,778,177,668,193,488,206,331,211"/>
-<area shape="rect" id="Node000008" title=" " alt="" coords="5,173,44,199"/>
-<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="57,201,69,205,117,212,165,213,165,218,117,217,67,210,56,206"/>
-<area shape="poly" id="edge12_Node000010_Node000008" title=" " alt="" coords="57,178,161,161,162,167,58,184"/>
-<area shape="poly" id="edge9_Node000006_Node000009" title=" " alt="" coords="682,141,857,141,857,146,682,146"/>
-<area shape="poly" id="edge11_Node000009_Node000010" title=" " alt="" coords="339,160,413,164,490,161,514,158,515,163,491,166,413,169,339,165"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="1178,94,1266,121"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="530,63,679,91"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="694,73,904,77,1029,83,1154,93,1180,99,1175,99,1153,98,1029,88,904,82,695,79"/>
+<area shape="rect" id="Node000003" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="209,7,280,35"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="295,22,391,32,501,48,556,62,551,63,500,53,391,37,296,27"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="191,63,298,91"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="313,74,532,75,528,78,314,80"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="5,119,44,147"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="55,109,67,104,130,86,192,79,188,82,131,92,69,109,59,113"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="169,115,320,159"/>
+<area shape="poly" id="edge9_Node000008_Node000005" title=" " alt="" coords="59,131,170,133,167,138,60,136"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="161,202,328,229"/>
+<area shape="poly" id="edge13_Node000011_Node000005" title=" " alt="" coords="54,154,69,162,121,183,174,200,169,202,119,188,67,167,55,159"/>
+<area shape="rect" id="Node000006" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="881,124,1034,152"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="1049,129,1153,118,1175,117,1180,116,1154,123,1050,135"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="524,115,685,159"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="701,135,884,138,878,138,701,140"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="335,134,526,136,521,138,336,140"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="5,259,44,287"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="57,260,96,243,135,219,147,204,159,188,204,158,200,161,163,192,151,207,138,223,99,248,59,265"/>
+<area shape="poly" id="edge12_Node000011_Node000009" title=" " alt="" coords="58,293,68,297,102,304,136,297,164,283,190,265,228,231,233,229,194,269,167,288,138,302,102,309,67,302,57,298"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="529,193,681,238"/>
+<area shape="poly" id="edge10_Node000006_Node000010" title=" " alt="" coords="696,213,775,206,857,188,899,171,933,153,938,152,901,176,858,194,776,211,697,218"/>
+<area shape="poly" id="edge11_Node000010_Node000011" title=" " alt="" coords="344,213,531,215,526,216,344,218"/>
 </map>

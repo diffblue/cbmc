@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['specification_20for_20cbmc_20traces_0',['XML Specification for CBMC Traces',['../md_xml__spec.html',1,'']]]
+  ['goto_20trace_0',['SSA to GOTO Trace',['../md_xml__spec.html#autotoc_md8',1,'']]]
 ];

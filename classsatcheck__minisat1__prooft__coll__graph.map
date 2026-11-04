@@ -1,39 +1,36 @@
 <map id="satcheck_minisat1_prooft" name="satcheck_minisat1_prooft">
-<area shape="rect" id="Node000001" title=" " alt="" coords="177,636,366,661"/>
-<area shape="rect" id="Node000002" href="$classsatcheck__minisat1t.html" title=" " alt="" coords="119,548,269,573"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="216,582,263,634,259,637,212,586"/>
-<area shape="rect" id="Node000003" href="$classsatcheck__minisat1__baset.html" title=" " alt="" coords="77,453,263,478"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="179,491,194,547,188,549,174,492"/>
-<area shape="rect" id="Node000004" href="$classcnf__solvert.html" title=" " alt="" coords="123,357,217,383"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="173,396,173,453,167,453,167,396"/>
-<area shape="rect" id="Node000005" href="$classcnft.html" title=" " alt="" coords="147,269,193,295"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="173,309,173,357,167,357,167,309"/>
-<area shape="rect" id="Node000006" href="$classpropt.html" title="TO_BE_DOCUMENTED." alt="" coords="142,181,198,207"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="173,221,173,269,167,269,167,221"/>
-<area shape="rect" id="Node000007" title=" " alt="" coords="116,93,280,119"/>
-<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="191,132,187,143,176,182,171,180,182,142,186,131"/>
-<area shape="rect" id="Node000034" href="$classclauset.html" title=" " alt="" coords="347,181,417,207"/>
-<area shape="poly" id="edge14_Node000034_Node000007" title=" " alt="" coords="233,123,298,155,354,179,352,184,296,160,230,128"/>
-<area shape="rect" id="Node000009" title=" " alt="" coords="331,5,460,31"/>
-<area shape="poly" id="edge7_Node000007_Node000009" title=" " alt="" coords="353,38,306,57,222,96,220,91,304,52,351,33"/>
-<area shape="rect" id="Node000033" title=" " alt="" coords="367,269,535,295"/>
-<area shape="poly" id="edge18_Node000033_Node000009" title=" " alt="" coords="443,35,464,53,472,72,474,93,489,170,490,204,480,246,466,270,461,267,476,244,485,204,484,171,469,94,467,73,460,56,440,39"/>
-<area shape="rect" id="Node000035" title=" " alt="" coords="305,93,459,119"/>
-<area shape="poly" id="edge17_Node000035_Node000009" title=" " alt="" coords="394,44,386,93,381,92,389,44"/>
-<area shape="rect" id="Node000011" href="$classmessaget.html" title="Class that provides messages with a built&#45;in verbosity &#39;level&#39;." alt="" coords="5,93,92,119"/>
-<area shape="poly" id="edge8_Node000006_Node000011" title=" " alt="" coords="78,125,155,179,152,183,75,129"/>
-<area shape="rect" id="Node000030" href="$classminisat__prooft.html" title=" " alt="" coords="301,548,417,573"/>
-<area shape="poly" id="edge9_Node000001_Node000030" title=" " alt="" coords="340,585,285,637,282,634,336,581"/>
-<area shape="rect" id="Node000031" title=" " alt="" coords="455,453,571,478"/>
-<area shape="poly" id="edge10_Node000030_Node000031" title=" " alt="" coords="504,492,493,510,477,526,449,542,419,552,417,547,447,537,474,522,489,507,500,489"/>
-<area shape="rect" id="Node000032" href="$classresolution__prooft.html" title=" " alt="" coords="288,445,431,485"/>
-<area shape="poly" id="edge11_Node000030_Node000032" title=" " alt="" coords="362,499,362,548,357,548,357,499"/>
-<area shape="poly" id="edge12_Node000032_Node000033" title=" " alt="" coords="399,302,358,325,340,340,326,359,320,380,324,403,334,425,346,444,342,447,329,428,319,405,315,380,321,356,336,336,355,320,397,297"/>
-<area shape="rect" id="Node000037" href="$classresolution__prooft.html" title=" " alt="" coords="389,357,559,383"/>
-<area shape="poly" id="edge20_Node000037_Node000033" title=" " alt="" coords="460,307,473,356,468,357,455,309"/>
-<area shape="poly" id="edge13_Node000033_Node000034" title=" " alt="" coords="397,217,415,244,439,267,435,271,411,247,392,220"/>
-<area shape="poly" id="edge15_Node000034_Node000035" title=" " alt="" coords="385,133,385,181,379,181,379,133"/>
-<area shape="rect" id="Node000036" href="$structclauset_1_1stept.html" title=" " alt="" coords="136,5,247,31"/>
-<area shape="poly" id="edge16_Node000035_Node000036" title=" " alt="" coords="189,44,190,57,195,67,207,74,234,80,305,92,304,97,232,85,205,79,191,71,184,58,183,45"/>
-<area shape="poly" id="edge19_Node000032_Node000037" title=" " alt="" coords="451,393,384,447,381,443,448,389"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="226,727,415,755"/>
+<area shape="rect" id="Node000002" href="$classsatcheck__minisat1t.html" title=" " alt="" coords="329,626,478,654"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="395,667,373,705,344,729,342,724,369,701,391,669"/>
+<area shape="rect" id="Node000003" href="$classsatcheck__minisat1__baset.html" title=" " alt="" coords="325,517,511,545"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="416,559,407,627,403,624,412,562"/>
+<area shape="rect" id="Node000004" href="$classcnf__solvert.html" title=" " alt="" coords="371,408,465,436"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="419,449,420,518,416,515,417,454"/>
+<area shape="rect" id="Node000005" href="$classcnft.html" title=" " alt="" coords="395,307,441,335"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="419,348,420,408,416,406,417,353"/>
+<area shape="rect" id="Node000006" href="$classpropt.html" title="TO_BE_DOCUMENTED." alt="" coords="390,207,446,234"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="419,248,421,308,415,306,417,252"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="258,106,421,134"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="358,143,389,181,409,206,404,206,385,184,358,149"/>
+<area shape="rect" id="Node000037" href="$classclauset.html" title=" " alt="" coords="124,207,192,234"/>
+<area shape="poly" id="edge15_Node000037_Node000007" title=" " alt="" coords="300,144,184,208,180,204,303,139"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="92,5,221,33"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="198,37,234,55,320,104,316,107,231,59,200,42"/>
+<area shape="rect" id="Node000036" title=" " alt="" coords="6,307,174,335"/>
+<area shape="poly" id="edge18_Node000036_Node000008" title=" " alt="" coords="122,44,94,72,80,88,70,107,61,134,58,163,62,220,74,270,87,307,82,307,69,272,56,221,52,162,56,133,65,105,76,85,90,68,125,40"/>
+<area shape="rect" id="Node000038" title=" " alt="" coords="80,106,233,134"/>
+<area shape="poly" id="edge17_Node000038_Node000008" title=" " alt="" coords="157,46,159,106,154,105,156,51"/>
+<area shape="rect" id="Node000010" href="$classmessaget.html" title="Class that provides messages with a built&#45;in verbosity &#39;level&#39;." alt="" coords="445,106,530,134"/>
+<area shape="poly" id="edge8_Node000006_Node000010" title=" " alt="" coords="473,145,449,184,431,208,427,205,445,181,470,149"/>
+<area shape="rect" id="Node000032" href="$classminisat__prooft.html" title=" " alt="" coords="186,626,301,654"/>
+<area shape="poly" id="edge9_Node000001_Node000032" title=" " alt="" coords="254,666,275,701,302,727,297,726,271,705,252,671"/>
+<area shape="rect" id="Node000033" title=" " alt="" coords="186,517,301,545"/>
+<area shape="poly" id="edge10_Node000032_Node000033" title=" " alt="" coords="245,558,246,627,241,625,242,563"/>
+<area shape="rect" id="Node000034" href="$classresolution__prooft.html" title=" " alt="" coords="19,509,161,553"/>
+<area shape="poly" id="edge11_Node000032_Node000034" title=" " alt="" coords="101,565,112,585,126,600,154,618,188,630,183,632,152,623,122,604,108,588,100,570"/>
+<area shape="rect" id="Node000035" href="$classresolution__prooft.html" title=" " alt="" coords="5,408,175,436"/>
+<area shape="poly" id="edge12_Node000034_Node000035" title=" " alt="" coords="91,449,93,508,87,508,89,454"/>
+<area shape="poly" id="edge13_Node000035_Node000036" title=" " alt="" coords="90,348,93,408,87,407,90,353"/>
+<area shape="poly" id="edge14_Node000036_Node000037" title=" " alt="" coords="139,250,102,308,97,306,141,245"/>
+<area shape="poly" id="edge16_Node000037_Node000038" title=" " alt="" coords="157,147,160,206,155,206,157,152"/>
 </map>

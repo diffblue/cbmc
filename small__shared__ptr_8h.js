@@ -1,7 +1,7 @@
 var small__shared__ptr_8h =
 [
-    [ "small_shared_ptrt< T >", "classsmall__shared__ptrt.html", "classsmall__shared__ptrt" ],
-    [ "small_shared_pointeet< Num >", "classsmall__shared__pointeet.html", "classsmall__shared__pointeet" ],
+    [ "small_shared_ptrt&lt; T &gt;", "classsmall__shared__ptrt.html", "classsmall__shared__ptrt" ],
+    [ "small_shared_pointeet&lt; Num &gt;", "classsmall__shared__pointeet.html", "classsmall__shared__pointeet" ],
     [ "make_small_shared_ptr", "small__shared__ptr_8h.html#a4b6bd9b65064588996def4938fe09137", null ],
     [ "operator!=", "small__shared__ptr_8h.html#ae16b0402a91046eb89f43a39db384809", null ],
     [ "operator<", "small__shared__ptr_8h.html#a3f43b6935bb324066bf3a69a9ae019d5", null ],

@@ -1,13 +1,13 @@
 <map id="enumerator_baset" name="enumerator_baset">
-<area shape="rect" id="Node000001" title="A base class for expression enumerators." alt="" coords="5,80,147,105"/>
-<area shape="rect" id="Node000002" href="$classalternatives__enumeratort.html" title="Enumerators that enumerates expressions in the union of enumerated expressions of sub&#45;enumerators." alt="" coords="195,5,383,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="115,72,194,39,232,28,233,33,196,45,117,76"/>
-<area shape="rect" id="Node000003" href="$classleaf__enumeratort.html" title="Enumerator that enumerates leaf expressions from a given list." alt="" coords="221,55,356,80"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="160,80,221,73,222,78,161,85"/>
-<area shape="rect" id="Node000004" href="$classnon__leaf__enumeratort.html" title="Non&#45;leaf enumerator enumerates expressions of form f(a_1, a_2, ..., a_n) where a_i&#39;s are sub&#45;expressi..." alt="" coords="205,104,372,129"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="160,99,206,105,205,110,160,105"/>
-<area shape="rect" id="Node000006" href="$classrecursive__enumerator__placeholdert.html" title="Placeholders for actual enumerators, which represent nonterminals." alt="" coords="206,154,371,194"/>
-<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="121,108,196,138,231,151,229,156,194,143,119,113"/>
-<area shape="rect" id="Node000005" href="$classbinary__functional__enumeratort.html" title="Enumerator that enumerates binary functional expressions." alt="" coords="431,104,653,129"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="385,114,431,114,431,119,385,119"/>
+<area shape="rect" id="Node000001" title="A base class for expression enumerators." alt="" coords="5,84,146,112"/>
+<area shape="rect" id="Node000002" href="$classalternatives__enumeratort.html" title="Enumerators that enumerates expressions in the union of enumerated expressions of sub&#45;enumerators." alt="" coords="194,5,381,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="118,75,193,43,234,32,229,35,195,48,121,79"/>
+<area shape="rect" id="Node000003" href="$classleaf__enumeratort.html" title="Enumerator that enumerates leaf expressions from a given list." alt="" coords="220,57,354,85"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="160,85,222,78,217,81,161,90"/>
+<area shape="rect" id="Node000004" href="$classnon__leaf__enumeratort.html" title="Non&#45;leaf enumerator enumerates expressions of form f(a_1, a_2, ..., a_n) where a_i&#39;s are sub&#45;expressi..." alt="" coords="205,109,370,137"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="161,105,207,112,202,114,161,111"/>
+<area shape="rect" id="Node000006" href="$classrecursive__enumerator__placeholdert.html" title="Placeholders for actual enumerators, which represent nonterminals." alt="" coords="205,161,370,206"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="123,116,195,146,226,160,221,160,193,151,123,121"/>
+<area shape="rect" id="Node000005" href="$classbinary__functional__enumeratort.html" title="Enumerator that enumerates binary functional expressions." alt="" coords="429,109,651,137"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="385,121,431,123,426,123,386,126"/>
 </map>

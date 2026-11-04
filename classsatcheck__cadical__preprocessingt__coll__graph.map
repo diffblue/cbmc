@@ -1,39 +1,37 @@
 <map id="satcheck_cadical_preprocessingt" name="satcheck_cadical_preprocessingt">
-<area shape="rect" id="Node000001" title=" " alt="" coords="1771,81,2007,107"/>
-<area shape="rect" id="Node000002" href="$classsatcheck__cadical__baset.html" title=" " alt="" coords="1545,81,1721,107"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1735,91,1770,91,1770,97,1735,97"/>
-<area shape="rect" id="Node000003" href="$classcnf__solvert.html" title=" " alt="" coords="1401,107,1496,132"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1509,108,1545,103,1546,109,1510,114"/>
-<area shape="rect" id="Node000004" href="$classcnft.html" title=" " alt="" coords="1305,115,1352,140"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="1365,122,1401,120,1401,125,1366,128"/>
-<area shape="rect" id="Node000005" href="$classpropt.html" title="TO_BE_DOCUMENTED." alt="" coords="1001,116,1057,141"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="1070,126,1305,125,1305,130,1070,131"/>
-<area shape="rect" id="Node000006" title=" " alt="" coords="621,116,785,141"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="798,126,1000,126,1000,131,798,131"/>
-<area shape="rect" id="Node000007" href="$classliteralt.html" title=" " alt="" coords="224,153,289,179"/>
-<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="303,162,432,156,590,143,626,139,627,144,591,149,433,161,303,167"/>
-<area shape="rect" id="Node000008" title=" " alt="" coords="192,104,321,129"/>
-<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="335,116,621,124,621,129,335,121"/>
-<area shape="rect" id="Node000009" title=" " alt="" coords="5,80,44,105"/>
-<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="57,106,69,110,131,119,192,119,192,125,131,124,67,115,56,112"/>
-<area shape="rect" id="Node000032" title=" " alt="" coords="178,55,335,80"/>
-<area shape="poly" id="edge19_Node000032_Node000009" title=" " alt="" coords="57,87,177,73,178,79,58,92"/>
-<area shape="rect" id="Node000010" href="$classmessaget.html" title="Class that provides messages with a built&#45;in verbosity &#39;level&#39;." alt="" coords="659,244,746,269"/>
-<area shape="poly" id="edge9_Node000005_Node000010" title=" " alt="" coords="748,236,999,137,1001,142,750,241"/>
-<area shape="rect" id="Node000015" href="$classmessaget_1_1mstreamt.html" title=" " alt="" coords="949,244,1108,269"/>
-<area shape="poly" id="edge14_Node000015_Node000010" title=" " alt="" coords="760,266,815,274,870,277,925,274,972,267,973,272,926,279,870,283,814,279,759,271"/>
-<area shape="rect" id="Node000011" href="$classmessaget_1_1eomt.html" title=" " alt="" coords="193,252,321,277"/>
-<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="335,261,591,257,659,255,659,260,591,262,335,266"/>
-<area shape="rect" id="Node000012" href="$classmessaget_1_1commandt.html" title=" " alt="" coords="175,441,339,467"/>
-<area shape="poly" id="edge11_Node000010_Node000012" title=" " alt="" coords="346,465,403,469,467,466,530,453,561,442,589,428,611,412,630,392,662,347,683,302,695,269,700,271,688,305,666,350,635,395,615,416,592,432,563,447,532,458,467,471,403,474,345,471"/>
-<area shape="rect" id="Node000013" href="$classmessage__handlert.html" title=" " alt="" coords="185,203,328,228"/>
-<area shape="poly" id="edge12_Node000010_Node000013" title=" " alt="" coords="342,220,591,242,660,249,659,255,590,247,341,225"/>
-<area shape="poly" id="edge13_Node000010_Node000015" title=" " alt="" coords="936,259,746,259,746,254,936,254"/>
-<area shape="rect" id="Node000029" href="$classhardness__collectort.html" title=" " alt="" coords="1132,56,1281,81"/>
-<area shape="poly" id="edge15_Node000002_Node000029" title=" " alt="" coords="1295,71,1545,86,1545,91,1295,77"/>
-<area shape="rect" id="Node000030" title=" " alt="" coords="615,47,791,87"/>
-<area shape="poly" id="edge16_Node000029_Node000030" title=" " alt="" coords="805,65,1132,66,1132,71,805,70"/>
-<area shape="rect" id="Node000031" href="$classclause__hardness__collectort.html" title=" " alt="" coords="157,5,356,31"/>
-<area shape="poly" id="edge17_Node000030_Node000031" title=" " alt="" coords="370,23,591,45,615,48,614,54,590,50,369,28"/>
-<area shape="poly" id="edge18_Node000030_Node000032" title=" " alt="" coords="349,65,615,65,615,70,349,70"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="1773,89,2008,117"/>
+<area shape="rect" id="Node000002" href="$classsatcheck__cadical__baset.html" title=" " alt="" coords="1548,89,1724,117"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1739,101,1775,103,1770,104,1740,106"/>
+<area shape="rect" id="Node000003" href="$classcnf__solvert.html" title=" " alt="" coords="1406,115,1499,142"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1514,117,1550,115,1545,116,1515,123"/>
+<area shape="rect" id="Node000004" href="$classcnft.html" title=" " alt="" coords="1311,116,1356,144"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="1372,127,1408,129,1403,129,1372,132"/>
+<area shape="rect" id="Node000005" href="$classpropt.html" title="TO_BE_DOCUMENTED." alt="" coords="1008,123,1064,150"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="1079,133,1313,130,1308,131,1080,138"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="626,123,789,150"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="805,134,1010,136,1005,137,805,139"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="195,119,324,146"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="339,131,627,134,623,138,340,136"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="5,64,44,92"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="57,92,69,95,133,112,197,124,193,127,132,117,67,100,59,96"/>
+<area shape="rect" id="Node000034" title=" " alt="" coords="181,11,338,38"/>
+<area shape="poly" id="edge18_Node000034_Node000008" title=" " alt="" coords="57,68,197,37,194,41,60,73"/>
+<area shape="rect" id="Node000009" href="$classmessaget.html" title="Class that provides messages with a built&#45;in verbosity &#39;level&#39;." alt="" coords="665,407,750,434"/>
+<area shape="poly" id="edge8_Node000005_Node000009" title=" " alt="" coords="736,394,1016,152,1021,150,739,398"/>
+<area shape="rect" id="Node000014" href="$classmessaget_1_1mstreamt.html" title=" " alt="" coords="957,407,1115,434"/>
+<area shape="poly" id="edge13_Node000014_Node000009" title=" " alt="" coords="766,437,820,448,876,454,933,448,994,435,999,434,934,454,876,459,819,454,765,442"/>
+<area shape="rect" id="Node000010" href="$classmessaget_1_1eomt.html" title=" " alt="" coords="196,176,323,204"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="337,175,398,171,466,174,534,188,567,200,598,217,622,237,643,261,675,314,695,366,706,407,701,405,690,368,670,317,639,264,618,241,595,221,565,205,533,193,465,179,398,176,339,180"/>
+<area shape="rect" id="Node000011" href="$classmessaget_1_1commandt.html" title=" " alt="" coords="178,455,341,482"/>
+<area shape="poly" id="edge10_Node000009_Node000011" title=" " alt="" coords="356,476,472,478,534,474,595,465,641,451,678,436,683,434,643,456,597,470,535,479,472,483,357,481"/>
+<area shape="rect" id="Node000012" href="$classmessage__handlert.html" title=" " alt="" coords="189,511,330,538"/>
+<area shape="poly" id="edge11_Node000009_Node000012" title=" " alt="" coords="346,533,403,536,467,534,532,526,595,508,625,493,652,473,692,436,697,434,656,477,628,497,597,513,533,531,467,540,403,541,346,538"/>
+<area shape="poly" id="edge12_Node000009_Node000014" title=" " alt="" coords="939,421,751,423,751,418,944,420"/>
+<area shape="rect" id="Node000031" href="$classhardness__collectort.html" title=" " alt="" coords="1139,64,1287,92"/>
+<area shape="poly" id="edge14_Node000002_Node000031" title=" " alt="" coords="1302,81,1550,97,1545,98,1303,86"/>
+<area shape="rect" id="Node000032" title=" " alt="" coords="620,54,795,99"/>
+<area shape="poly" id="edge15_Node000031_Node000032" title=" " alt="" coords="811,74,1141,77,1136,79,812,79"/>
+<area shape="rect" id="Node000033" href="$classclause__hardness__collectort.html" title=" " alt="" coords="161,64,358,92"/>
+<area shape="poly" id="edge16_Node000032_Node000033" title=" " alt="" coords="373,75,622,75,618,78,374,80"/>
+<area shape="poly" id="edge17_Node000032_Node000034" title=" " alt="" coords="352,26,470,34,596,49,622,55,617,56,596,54,469,39,354,31"/>
 </map>

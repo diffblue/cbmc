@@ -1,19 +1,19 @@
 <map id="symbol_exprt" name="symbol_exprt">
-<area shape="rect" id="Node000001" title="Expression to hold a symbol (variable)" alt="" coords="120,525,231,551"/>
-<area shape="rect" id="Node000008" href="$classdecorated__symbol__exprt.html" title="Expression to hold a symbol (variable) with extra accessors to ID_c_static_lifetime and ID_C_thread_l..." alt="" coords="5,600,188,625"/>
-<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="155,562,111,602,108,598,151,558"/>
-<area shape="rect" id="Node000009" href="$classssa__exprt.html" title="Expression providing an SSA&#45;renamed symbol of expressions." alt="" coords="213,600,298,625"/>
-<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="200,558,244,598,240,602,196,562"/>
-<area shape="rect" id="Node000002" href="$classnullary__exprt.html" title="An expression without operands." alt="" coords="121,451,229,476"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="178,490,178,525,173,525,173,490"/>
-<area shape="rect" id="Node000003" href="$classexpr__protectedt.html" title="Base class for all expressions." alt="" coords="113,376,238,401"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="178,416,178,450,173,450,173,416"/>
-<area shape="rect" id="Node000004" href="$classexprt.html" title="Base class for all expressions." alt="" coords="147,301,203,327"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="178,341,178,376,173,376,173,341"/>
-<area shape="rect" id="Node000005" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="149,227,201,252"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="178,266,178,301,173,301,173,266"/>
-<area shape="rect" id="Node000006" href="$classsharing__treet.html" title=" " alt="" coords="92,123,259,177"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="178,191,178,226,173,226,173,191"/>
-<area shape="rect" id="Node000007" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="85,5,266,45"/>
-<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="178,59,178,122,173,122,173,59"/>
+<area shape="rect" id="Node000001" title="Expression to hold a symbol (variable)." alt="" coords="120,564,230,592"/>
+<area shape="rect" id="Node000008" href="$classdecorated__symbol__exprt.html" title="Expression to hold a symbol (variable) with extra accessors to ID_c_static_lifetime and ID_C_thread_l..." alt="" coords="5,641,188,669"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="153,602,112,643,108,639,148,604"/>
+<area shape="rect" id="Node000009" href="$classssa__exprt.html" title="Expression providing an SSA&#45;renamed symbol of expressions." alt="" coords="212,641,296,669"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="201,600,243,641,238,641,199,605"/>
+<area shape="rect" id="Node000002" href="$classnullary__exprt.html" title="An expression without operands." alt="" coords="122,487,229,515"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="177,528,178,565,173,563,174,533"/>
+<area shape="rect" id="Node000003" href="$classexpr__protectedt.html" title="Base class for all expressions." alt="" coords="113,410,237,438"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="176,451,178,488,173,486,174,456"/>
+<area shape="rect" id="Node000004" href="$classexprt.html" title="Base class for all expressions." alt="" coords="148,333,203,361"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="176,374,178,411,173,409,174,379"/>
+<area shape="rect" id="Node000005" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="150,256,201,284"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="176,297,178,334,173,333,174,302"/>
+<area shape="rect" id="Node000006" href="$classsharing__treet.html" title=" " alt="" coords="92,145,258,207"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="176,220,178,256,173,255,175,225"/>
+<area shape="rect" id="Node000007" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="85,5,265,50"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="176,63,178,145,173,145,175,68"/>
 </map>

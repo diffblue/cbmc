@@ -1,29 +1,3 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classcprover__exception__baset.html" title="Base class for exceptions thrown in the cprover project." alt="" coords="5,319,191,344"/>
-<area shape="rect" id="Node000001" href="$classanalysis__exceptiont.html" title="Thrown when an unexpected error occurs during the analysis (e.g., when the SAT solver returns an erro..." alt="" coords="265,5,417,31"/>
-<area shape="poly" id="edge169_Node000000_Node000001" title=" " alt="" coords="102,305,115,249,141,177,159,140,181,103,207,69,237,40,263,26,266,30,240,44,211,73,185,106,164,142,146,179,120,251,107,306"/>
-<area shape="rect" id="Node000002" href="$classdeserialization__exceptiont.html" title="Thrown when failing to deserialize a value from some low level format, like JSON or raw bytes." alt="" coords="243,55,438,80"/>
-<area shape="poly" id="edge170_Node000000_Node000002" title=" " alt="" coords="104,305,121,258,148,199,187,140,210,113,237,89,257,78,260,82,240,94,214,116,191,143,153,202,126,260,109,307"/>
-<area shape="rect" id="Node000003" href="$classgdb__interaction__exceptiont.html" title=" " alt="" coords="241,104,440,129"/>
-<area shape="poly" id="edge171_Node000000_Node000003" title=" " alt="" coords="108,305,128,268,156,223,193,178,237,140,263,127,265,132,240,144,197,182,161,226,133,270,113,307"/>
-<area shape="rect" id="Node000004" href="$classincorrect__goto__program__exceptiont.html" title="Thrown when a goto program that&#39;s being processed is in an invalid format, for example passing the wr..." alt="" coords="252,154,429,194"/>
-<area shape="poly" id="edge172_Node000000_Node000004" title=" " alt="" coords="117,306,168,255,202,228,237,204,262,192,265,197,240,208,205,232,172,259,121,310"/>
-<area shape="rect" id="Node000005" href="$classinvalid__command__line__argument__exceptiont.html" title="Thrown when users pass incorrect command line arguments, for example passing no files to analysis or ..." alt="" coords="256,218,425,258"/>
-<area shape="poly" id="edge173_Node000000_Node000005" title=" " alt="" coords="137,310,238,268,272,255,274,261,240,272,140,315"/>
-<area shape="rect" id="Node000006" href="$classinvalid__function__contract__pair__exceptiont.html" title="Exception thrown for bad function/contract specification pairs passed on the CLI." alt="" coords="247,282,434,322"/>
-<area shape="poly" id="edge174_Node000000_Node000006" title=" " alt="" coords="204,316,247,311,247,316,205,321"/>
-<area shape="rect" id="Node000007" href="$classinvalid__input__exceptiont.html" title="Thrown when user&#45;provided input cannot be processed." alt="" coords="249,347,432,372"/>
-<area shape="poly" id="edge175_Node000000_Node000007" title=" " alt="" coords="205,341,249,346,249,351,204,346"/>
-<area shape="rect" id="Node000009" href="$classinvalid__restriction__exceptiont.html" title=" " alt="" coords="271,397,410,437"/>
-<area shape="poly" id="edge177_Node000000_Node000009" title=" " alt="" coords="146,346,240,381,278,394,277,399,238,386,144,351"/>
-<area shape="rect" id="Node000010" href="$classsmt2__tokenizert_1_1smt2__errort.html" title="Exception thrown by the tokenizer (and the parser built on top of it) to report a syntactic error at ..." alt="" coords="257,461,425,501"/>
-<area shape="poly" id="edge178_Node000000_Node000010" title=" " alt="" coords="122,352,173,399,206,424,240,446,266,458,264,463,237,451,203,429,170,403,119,356"/>
-<area shape="rect" id="Node000011" href="$classsystem__exceptiont.html" title="Thrown when some external system fails unexpectedly." alt="" coords="267,525,414,551"/>
-<area shape="poly" id="edge179_Node000000_Node000011" title=" " alt="" coords="114,355,134,391,162,433,198,475,240,510,268,524,266,529,237,515,194,479,158,436,129,393,109,358"/>
-<area shape="rect" id="Node000012" href="$classunsupported__operation__exceptiont.html" title="Thrown when we encounter an instruction, parameters to an instruction etc." alt="" coords="255,575,427,615"/>
-<area shape="poly" id="edge180_Node000000_Node000012" title=" " alt="" coords="111,356,128,401,156,455,193,512,216,537,240,560,262,573,259,578,237,564,212,541,189,515,151,458,124,403,106,358"/>
-<area shape="rect" id="Node000013" href="$classuser__input__error__exceptiont.html" title=" " alt="" coords="239,640,443,665"/>
-<area shape="poly" id="edge181_Node000000_Node000013" title=" " alt="" coords="106,357,120,413,145,486,163,524,185,561,210,596,240,625,261,638,258,642,237,629,206,599,180,564,158,527,140,488,115,415,101,358"/>
-<area shape="rect" id="Node000008" href="$classinvalid__source__file__exceptiont.html" title="Thrown when we can&#39;t handle something in an input source file." alt="" coords="491,339,633,379"/>
-<area shape="poly" id="edge176_Node000007_Node000008" title=" " alt="" coords="446,357,490,357,490,362,446,362"/>
+<area shape="rect" id="Node000000" href="$classcscannert.html" title=" " alt="" coords="5,5,90,33"/>
 </map>

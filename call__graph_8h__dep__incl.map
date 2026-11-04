@@ -1,25 +1,25 @@
 <map id="/home/runner/work/cbmc/cbmc/src/analyses/call_graph.h" name="/home/runner/work/cbmc/cbmc/src/analyses/call_graph.h">
-<area shape="rect" id="Node000001" title="Function Call Graphs." alt="" coords="455,5,639,60"/>
-<area shape="rect" id="Node000002" href="$call__graph_8cpp.html" title="Function Call Graphs." alt="" coords="19,108,203,163"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="442,59,215,111,204,113,202,108,214,105,441,54"/>
-<area shape="rect" id="Node000003" href="$call__graph__helpers_8h.html" title="Function Call Graph Helpers." alt="" coords="227,108,411,163"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="476,68,379,110,377,106,474,63"/>
-<area shape="rect" id="Node000006" href="$aggressive__slicer_8h.html" title="Aggressive slicer Consider the control flow graph of the goto program and a criterion description of ..." alt="" coords="450,108,643,163"/>
-<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="549,74,549,108,544,108,544,74"/>
-<area shape="rect" id="Node000010" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="631,313,889,368"/>
-<area shape="poly" id="edge11_Node000001_Node000010" title=" " alt="" coords="609,65,634,84,657,106,693,159,722,216,742,270,756,312,751,314,737,272,717,218,689,162,653,110,631,88,606,70"/>
-<area shape="rect" id="Node000011" href="$slice__global__inits_8cpp.html" title="Remove initializations of unused global variables." alt="" coords="749,108,933,163"/>
-<area shape="poly" id="edge12_Node000001_Node000011" title=" " alt="" coords="637,62,765,105,764,110,635,67"/>
-<area shape="rect" id="Node000004" href="$call__graph__helpers_8cpp.html" title="Function Call Graph Helpers." alt="" coords="5,211,189,265"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="250,171,156,213,154,208,248,166"/>
-<area shape="rect" id="Node000005" href="$aggressive__slicer_8cpp.html" title="Aggressive program slicer." alt="" coords="214,211,407,265"/>
-<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="318,177,315,211,310,210,313,176"/>
-<area shape="poly" id="edge6_Node000006_Node000005" title=" " alt="" coords="474,170,373,213,371,208,472,166"/>
-<area shape="rect" id="Node000007" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="432,211,675,265"/>
-<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="552,176,554,210,549,211,547,177"/>
-<area shape="rect" id="Node000008" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="148,313,383,368"/>
-<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="467,272,341,316,340,311,465,267"/>
-<area shape="rect" id="Node000009" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="407,313,607,368"/>
-<area shape="poly" id="edge9_Node000007_Node000009" title=" " alt="" coords="538,279,521,314,516,312,533,277"/>
-<area shape="poly" id="edge10_Node000007_Node000010" title=" " alt="" coords="620,269,707,311,705,316,618,274"/>
+<area shape="rect" id="Node000001" title="Function Call Graphs." alt="" coords="451,5,634,67"/>
+<area shape="rect" id="Node000002" href="$call__graph_8cpp.html" title="Function Call Graphs." alt="" coords="16,115,199,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="434,63,212,118,201,120,198,116,211,112,437,59"/>
+<area shape="rect" id="Node000003" href="$call__graph__helpers_8h.html" title="Function Call Graph Helpers." alt="" coords="224,115,407,177"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="463,76,381,117,378,112,467,73"/>
+<area shape="rect" id="Node000006" href="$aggressive__slicer_8h.html" title="Aggressive slicer Consider the control flow graph of the goto program and a criterion description of ..." alt="" coords="446,115,638,177"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="544,80,545,116,540,113,541,85"/>
+<area shape="rect" id="Node000010" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="627,334,884,396"/>
+<area shape="poly" id="edge11_Node000001_Node000010" title=" " alt="" coords="609,73,632,92,652,113,689,170,718,230,738,288,751,335,746,333,733,289,713,232,685,172,648,117,629,96,608,79"/>
+<area shape="rect" id="Node000011" href="$slice__global__inits_8cpp.html" title="Remove initializations of unused global variables." alt="" coords="747,115,930,177"/>
+<area shape="poly" id="edge12_Node000001_Node000011" title=" " alt="" coords="640,70,758,114,753,115,640,75"/>
+<area shape="rect" id="Node000004" href="$call__graph__helpers_8cpp.html" title="Function Call Graph Helpers." alt="" coords="5,225,189,286"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="239,186,160,226,157,222,242,182"/>
+<area shape="rect" id="Node000005" href="$aggressive__slicer_8cpp.html" title="Aggressive program slicer." alt="" coords="213,225,405,286"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="314,190,313,225,309,223,311,194"/>
+<area shape="poly" id="edge6_Node000006_Node000005" title=" " alt="" coords="460,185,376,227,373,222,465,182"/>
+<area shape="rect" id="Node000007" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="429,225,672,286"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="547,190,550,226,546,223,544,194"/>
+<area shape="rect" id="Node000008" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="147,334,380,396"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="458,292,345,336,343,331,453,293"/>
+<area shape="rect" id="Node000009" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="404,334,603,396"/>
+<area shape="poly" id="edge9_Node000007_Node000009" title=" " alt="" coords="534,299,518,336,515,332,529,302"/>
+<area shape="poly" id="edge10_Node000007_Node000010" title=" " alt="" coords="622,291,701,334,695,333,621,297"/>
 </map>

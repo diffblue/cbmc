@@ -1,7 +1,7 @@
 var classreachability__slicert =
 [
-    [ "search_stack_entryt", "structreachability__slicert_1_1search__stack__entryt.html", "structreachability__slicert_1_1search__stack__entryt" ],
     [ "slicer_entryt", "structreachability__slicert_1_1slicer__entryt.html", "structreachability__slicert_1_1slicer__entryt" ],
+    [ "search_stack_entryt", "structreachability__slicert_1_1search__stack__entryt.html", "structreachability__slicert_1_1search__stack__entryt" ],
     [ "cfgt", "classreachability__slicert.html#a1159abe5d588184faef36d53cc30848e", null ],
     [ "queuet", "classreachability__slicert.html#a5919a414e11285df24a9e79f88fe3a2a", null ],
     [ "backward_inwards_walk_from", "classreachability__slicert.html#a68cca4ff13609adda0bd3aa6fc923d07", null ],

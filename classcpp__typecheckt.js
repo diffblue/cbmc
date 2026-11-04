@@ -1,7 +1,7 @@
 var classcpp__typecheckt =
 [
-    [ "instantiation_levelt", "classcpp__typecheckt_1_1instantiation__levelt.html", "classcpp__typecheckt_1_1instantiation__levelt" ],
     [ "instantiationt", "classcpp__typecheckt_1_1instantiationt.html", "classcpp__typecheckt_1_1instantiationt" ],
+    [ "instantiation_levelt", "classcpp__typecheckt_1_1instantiation__levelt.html", "classcpp__typecheckt_1_1instantiation__levelt" ],
     [ "method_bodyt", "structcpp__typecheckt_1_1method__bodyt.html", "structcpp__typecheckt_1_1method__bodyt" ],
     [ "dynamic_initializationst", "classcpp__typecheckt.html#ad35e4477e931351fc6ea863f5dab3b77", null ],
     [ "instantiation_stackt", "classcpp__typecheckt.html#a72dbce84b89f9b44121099a6951aad9d", null ],

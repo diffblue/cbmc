@@ -1,91 +1,91 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/parser.h" name="/home/runner/work/cbmc/cbmc/src/util/parser.h">
-<area shape="rect" id="Node000001" title="Parser utilities." alt="" coords="1700,5,1884,45"/>
-<area shape="rect" id="Node000002" href="$java__bytecode__parser_8cpp.html" title=" " alt="" coords="5,93,224,148"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1686,32,956,54,544,72,373,84,243,96,224,99,224,93,242,91,373,78,544,67,956,48,1686,26"/>
-<area shape="rect" id="Node000003" href="$ansi__c__parser_8h.html" title=" " alt="" coords="989,93,1173,148"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1687,43,1174,110,1173,105,1686,38"/>
-<area shape="rect" id="Node000008" href="$cpp__parser_8h.html" title="C++ Parser." alt="" coords="963,321,1160,361"/>
-<area shape="poly" id="edge20_Node000001_Node000008" title=" " alt="" coords="1686,33,1342,49,1123,63,898,81,683,103,498,130,422,145,360,162,315,179,289,198,278,215,274,231,278,247,289,263,301,272,321,280,384,294,468,306,567,315,779,328,963,334,962,340,779,333,567,320,467,311,383,299,320,285,298,277,285,267,273,249,269,231,273,212,285,194,313,174,359,156,421,140,497,125,683,98,897,76,1123,58,1342,44,1686,28"/>
-<area shape="rect" id="Node000015" href="$preprocessor__line_8cpp.html" title="ANSI&#45;C Language Conversion." alt="" coords="1439,93,1654,148"/>
-<area shape="poly" id="edge16_Node000001_Node000015" title=" " alt="" coords="1730,53,1617,96,1615,91,1729,48"/>
-<area shape="rect" id="Node000016" href="$assembler__parser_8h.html" title=" " alt="" coords="1678,93,1906,148"/>
-<area shape="poly" id="edge17_Node000001_Node000016" title=" " alt="" coords="1795,59,1795,93,1789,93,1789,59"/>
-<area shape="rect" id="Node000019" href="$json__parser_8h.html" title=" " alt="" coords="3101,101,3307,141"/>
-<area shape="poly" id="edge21_Node000001_Node000019" title=" " alt="" coords="1898,31,3101,110,3101,115,1897,36"/>
-<area shape="rect" id="Node000036" href="$statement__list__parser_8h.html" title="Statement List Language Parser." alt="" coords="4089,93,4273,148"/>
-<area shape="poly" id="edge39_Node000001_Node000036" title=" " alt="" coords="1898,28,4089,113,4089,118,1898,33"/>
-<area shape="rect" id="Node000039" href="$parser_8cpp.html" title=" " alt="" coords="4297,101,4481,141"/>
-<area shape="poly" id="edge42_Node000001_Node000039" title=" " alt="" coords="1898,24,2379,25,3070,33,3432,41,3771,53,4064,69,4286,91,4324,98,4323,103,4285,96,4064,75,3771,58,3431,46,3070,38,2379,30,1898,29"/>
-<area shape="rect" id="Node000040" href="$xml__parser_8h.html" title=" " alt="" coords="5436,93,5620,148"/>
-<area shape="poly" id="edge43_Node000001_Node000040" title=" " alt="" coords="1898,27,4493,91,5436,114,5436,120,4493,96,1898,32"/>
-<area shape="rect" id="Node000004" href="$ansi__c__internal__additions_8cpp.html" title=" " alt="" coords="299,203,485,258"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="976,132,754,156,625,174,498,199,469,206,468,201,497,193,625,169,754,150,975,127"/>
-<area shape="rect" id="Node000005" href="$ansi__c__language_8cpp.html" title=" " alt="" coords="509,203,693,258"/>
-<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="976,142,847,167,706,199,680,206,679,201,705,193,845,161,975,137"/>
-<area shape="rect" id="Node000006" href="$ansi__c__parser_8cpp.html" title=" " alt="" coords="717,203,901,258"/>
-<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="1003,156,876,206,874,201,1001,151"/>
-<area shape="rect" id="Node000007" href="$builtin__factory_8cpp.html" title=" " alt="" coords="925,203,1109,258"/>
-<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="1061,161,1035,204,1031,202,1056,159"/>
-<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="1109,159,1124,195,1131,231,1124,266,1107,297,1085,322,1081,319,1102,294,1119,264,1125,231,1119,197,1104,161"/>
-<area shape="rect" id="Node000012" href="$cpp__token__buffer_8h.html" title="C++ Parser: Token Buffer." alt="" coords="1184,203,1368,258"/>
-<area shape="poly" id="edge11_Node000003_Node000012" title=" " alt="" coords="1142,152,1230,201,1227,205,1139,157"/>
-<area shape="rect" id="Node000014" href="$contracts__wrangler_8cpp.html" title="Parse and annotate contracts." alt="" coords="1873,313,2113,368"/>
-<area shape="poly" id="edge15_Node000003_Node000014" title=" " alt="" coords="1187,128,1235,136,1286,150,1335,168,1382,194,1399,212,1407,230,1416,248,1432,263,1466,278,1511,291,1626,311,1754,324,1873,332,1873,337,1754,329,1625,316,1510,296,1464,283,1429,268,1411,251,1402,232,1394,215,1378,198,1333,173,1284,155,1234,141,1187,133"/>
-<area shape="rect" id="Node000009" href="$cpp__language_8cpp.html" title="C++ Language Module." alt="" coords="729,423,961,463"/>
-<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="1010,369,887,426,885,421,1007,364"/>
-<area shape="rect" id="Node000010" href="$cpp__parser_8cpp.html" title="C++ Parser." alt="" coords="986,423,1198,463"/>
-<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="1074,373,1089,422,1084,424,1068,374"/>
-<area shape="rect" id="Node000011" href="$parse_8cpp.html" title="C++ Language Parsing." alt="" coords="1283,423,1467,463"/>
-<area shape="poly" id="edge10_Node000008_Node000011" title=" " alt="" coords="1134,362,1317,421,1315,426,1132,367"/>
-<area shape="poly" id="edge12_Node000012_Node000008" title=" " alt="" coords="1213,267,1100,323,1098,318,1210,262"/>
-<area shape="poly" id="edge14_Node000012_Node000011" title=" " alt="" coords="1340,264,1364,286,1382,312,1391,341,1392,372,1383,423,1378,423,1387,372,1386,342,1378,314,1360,289,1336,268"/>
-<area shape="rect" id="Node000013" href="$cpp__token__buffer_8cpp.html" title="C++ Parser: Token Buffer." alt="" coords="1184,313,1368,368"/>
-<area shape="poly" id="edge13_Node000012_Node000013" title=" " alt="" coords="1279,272,1279,313,1273,313,1273,272"/>
-<area shape="rect" id="Node000017" href="$assembler__parser_8cpp.html" title=" " alt="" coords="1678,203,1906,258"/>
-<area shape="poly" id="edge18_Node000016_Node000017" title=" " alt="" coords="1795,162,1795,203,1789,203,1789,162"/>
-<area shape="rect" id="Node000018" href="$remove__asm_8cpp.html" title="Remove &#39;asm&#39; statements by compiling them into suitable standard goto program instructions." alt="" coords="1443,203,1653,258"/>
-<area shape="poly" id="edge19_Node000016_Node000018" title=" " alt="" coords="1721,156,1609,206,1606,201,1719,151"/>
-<area shape="rect" id="Node000020" href="$java__bytecode__language_8cpp.html" title=" " alt="" coords="4132,203,4351,258"/>
-<area shape="poly" id="edge22_Node000019_Node000020" title=" " alt="" coords="3321,122,3479,128,3679,141,3899,162,4119,193,4154,201,4153,206,4118,199,3899,167,3679,146,3479,134,3321,127"/>
-<area shape="rect" id="Node000021" href="$java__class__loader__limit_8cpp.html" title="limit class path loading" alt="" coords="4375,203,4593,258"/>
-<area shape="poly" id="edge23_Node000019_Node000021" title=" " alt="" coords="3320,119,3519,122,3779,133,4070,155,4218,172,4363,193,4398,201,4397,206,4362,199,4218,177,4070,160,3778,138,3518,127,3320,124"/>
-<area shape="rect" id="Node000022" href="$crangler__parse__options_8cpp.html" title="CRANGLER Command Line Option Processing." alt="" coords="4618,203,4817,258"/>
-<area shape="poly" id="edge24_Node000019_Node000022" title=" " alt="" coords="3321,122,3609,130,3980,144,4342,165,4492,178,4606,193,4639,201,4638,206,4605,199,4491,184,4341,171,3979,150,3609,135,3320,127"/>
-<area shape="rect" id="Node000023" href="$taint__parser_8cpp.html" title="Taint Parser." alt="" coords="1931,203,2115,258"/>
-<area shape="poly" id="edge25_Node000019_Node000023" title=" " alt="" coords="3088,124,2902,126,2662,136,2395,159,2259,176,2127,199,2097,206,2096,201,2126,193,2259,171,2394,154,2662,131,2902,121,3088,118"/>
-<area shape="rect" id="Node000024" href="$linker__script__merge_8cpp.html" title=" " alt="" coords="2139,203,2323,258"/>
-<area shape="poly" id="edge26_Node000019_Node000024" title=" " alt="" coords="3088,126,2936,132,2748,144,2541,165,2335,199,2306,206,2304,201,2334,193,2540,160,2748,139,2936,127,3087,121"/>
-<area shape="rect" id="Node000025" href="$memory__snapshot__harness__generator_8cpp.html" title=" " alt="" coords="2347,196,2552,265"/>
-<area shape="poly" id="edge27_Node000019_Node000025" title=" " alt="" coords="3088,132,2846,155,2705,174,2565,199,2553,201,2552,196,2563,193,2704,169,2845,150,3088,127"/>
-<area shape="rect" id="Node000026" href="$contracts__wrangler_8h.html" title="Parse and annotate contracts." alt="" coords="2577,203,2802,258"/>
-<area shape="poly" id="edge28_Node000019_Node000026" title=" " alt="" coords="3088,144,2815,199,2785,206,2784,201,2814,193,3087,139"/>
-<area shape="rect" id="Node000031" href="$restrict__function__pointers_8cpp.html" title=" " alt="" coords="2827,203,3045,258"/>
-<area shape="poly" id="edge34_Node000019_Node000031" title=" " alt="" coords="3146,148,3002,206,3000,201,3144,143"/>
-<area shape="rect" id="Node000032" href="$json__symtab__language_8cpp.html" title=" " alt="" coords="3070,203,3338,258"/>
-<area shape="poly" id="edge35_Node000019_Node000032" title=" " alt="" coords="3207,154,3207,203,3201,203,3201,154"/>
-<area shape="rect" id="Node000033" href="$json__interface_8cpp.html" title="JSON Commandline Interface." alt="" coords="3362,211,3601,251"/>
-<area shape="poly" id="edge36_Node000019_Node000033" title=" " alt="" coords="3266,143,3434,208,3432,213,3264,148"/>
-<area shape="rect" id="Node000034" href="$json__parser_8cpp.html" title=" " alt="" coords="3625,211,3845,251"/>
-<area shape="poly" id="edge37_Node000019_Node000034" title=" " alt="" coords="3321,138,3461,162,3613,193,3671,208,3669,213,3611,199,3460,168,3320,143"/>
-<area shape="rect" id="Node000035" href="$symtab2gb__parse__options_8cpp.html" title=" " alt="" coords="3869,203,4107,258"/>
-<area shape="poly" id="edge38_Node000019_Node000035" title=" " alt="" coords="3321,128,3568,152,3713,170,3856,193,3892,201,3890,206,3856,199,3712,176,3567,157,3320,133"/>
-<area shape="poly" id="edge29_Node000026_Node000014" title=" " alt="" coords="2584,264,2565,268,2445,289,2325,306,2114,331,2113,326,2324,301,2445,284,2563,263,2583,259"/>
-<area shape="rect" id="Node000027" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="2568,313,2811,368"/>
-<area shape="poly" id="edge30_Node000026_Node000027" title=" " alt="" coords="2692,272,2692,313,2687,313,2687,272"/>
-<area shape="rect" id="Node000028" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="2331,416,2565,471"/>
-<area shape="poly" id="edge31_Node000027_Node000028" title=" " alt="" coords="2615,376,2512,418,2510,413,2613,371"/>
-<area shape="rect" id="Node000029" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="2589,416,2789,471"/>
-<area shape="poly" id="edge32_Node000027_Node000029" title=" " alt="" coords="2692,382,2692,416,2687,416,2687,382"/>
-<area shape="rect" id="Node000030" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="2813,416,3072,471"/>
-<area shape="poly" id="edge33_Node000027_Node000030" title=" " alt="" coords="2769,370,2878,413,2876,418,2767,375"/>
-<area shape="rect" id="Node000037" href="$statement__list__language_8cpp.html" title="Statement List Language Interface." alt="" coords="5061,203,5275,258"/>
-<area shape="poly" id="edge40_Node000036_Node000037" title=" " alt="" coords="4288,145,4403,160,4502,166,4670,167,4837,169,4935,177,5048,193,5083,201,5082,206,5048,199,4934,183,4837,175,4670,173,4501,172,4403,165,4287,151"/>
-<area shape="rect" id="Node000038" href="$statement__list__parser_8cpp.html" title="Statement List Language Parser." alt="" coords="4841,203,5036,258"/>
-<area shape="poly" id="edge41_Node000036_Node000038" title=" " alt="" coords="4287,145,4370,157,4440,163,4560,167,4679,172,4748,180,4829,193,4860,201,4859,206,4827,199,4747,185,4678,178,4560,172,4440,168,4369,162,4287,151"/>
-<area shape="rect" id="Node000041" href="$graphml_8cpp.html" title="Read/write graphs as GraphML." alt="" coords="5300,211,5527,251"/>
-<area shape="poly" id="edge44_Node000040_Node000041" title=" " alt="" coords="5491,160,5435,212,5432,209,5488,156"/>
-<area shape="rect" id="Node000042" href="$xml__interface_8cpp.html" title="XML Interface." alt="" coords="5551,203,5735,258"/>
-<area shape="poly" id="edge45_Node000040_Node000042" title=" " alt="" coords="5568,156,5616,201,5613,205,5565,160"/>
-<area shape="rect" id="Node000043" href="$xml__parser_8cpp.html" title=" " alt="" coords="5759,203,5943,258"/>
-<area shape="poly" id="edge46_Node000040_Node000043" title=" " alt="" coords="5620,150,5773,201,5772,206,5618,155"/>
+<area shape="rect" id="Node000001" title="Parser utilities." alt="" coords="1699,5,1882,50"/>
+<area shape="rect" id="Node000002" href="$java__bytecode__parser_8cpp.html" title=" " alt="" coords="5,98,224,160"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1681,33,954,56,543,75,372,87,243,101,226,103,223,99,242,95,372,82,542,70,953,50,1685,30"/>
+<area shape="rect" id="Node000003" href="$ansi__c__parser_8h.html" title=" " alt="" coords="990,98,1173,160"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1681,45,1174,117,1173,112,1686,43"/>
+<area shape="rect" id="Node000008" href="$cpp__parser_8h.html" title="C++ Parser." alt="" coords="964,343,1161,388"/>
+<area shape="poly" id="edge20_Node000001_Node000008" title=" " alt="" coords="1681,34,1339,55,1121,70,896,89,682,112,497,140,422,156,360,173,315,191,288,210,276,229,272,247,276,266,288,284,301,293,321,301,384,315,468,327,568,337,781,351,966,361,961,362,780,356,567,343,468,333,383,321,319,306,298,298,285,288,271,268,267,247,271,226,285,206,312,186,358,168,420,151,496,135,681,107,895,84,1121,64,1339,49,1686,33"/>
+<area shape="rect" id="Node000015" href="$preprocessor__line_8cpp.html" title="ANSI&#45;C Language Conversion." alt="" coords="1438,98,1652,160"/>
+<area shape="poly" id="edge16_Node000001_Node000015" title=" " alt="" coords="1725,55,1621,100,1619,95,1720,57"/>
+<area shape="rect" id="Node000016" href="$assembler__parser_8h.html" title=" " alt="" coords="1677,98,1904,160"/>
+<area shape="poly" id="edge17_Node000001_Node000016" title=" " alt="" coords="1792,63,1793,99,1788,96,1789,68"/>
+<area shape="rect" id="Node000019" href="$json__parser_8h.html" title=" " alt="" coords="3094,106,3298,151"/>
+<area shape="poly" id="edge21_Node000001_Node000019" title=" " alt="" coords="1898,34,3096,120,3091,121,1898,39"/>
+<area shape="rect" id="Node000036" href="$statement__list__parser_8h.html" title="Statement List Language Parser." alt="" coords="4076,98,4260,160"/>
+<area shape="poly" id="edge39_Node000001_Node000036" title=" " alt="" coords="1898,31,4077,121,4074,126,1898,36"/>
+<area shape="rect" id="Node000039" href="$parser_8cpp.html" title=" " alt="" coords="4284,106,4468,151"/>
+<area shape="poly" id="edge42_Node000001_Node000039" title=" " alt="" coords="1897,26,2377,26,3064,33,3424,41,3762,54,4053,72,4272,95,4312,106,4307,106,4271,101,4052,77,3761,59,3424,47,3064,38,2377,31,1898,31"/>
+<area shape="rect" id="Node000040" href="$xml__parser_8h.html" title=" " alt="" coords="5416,98,5600,160"/>
+<area shape="poly" id="edge43_Node000001_Node000040" title=" " alt="" coords="1898,29,4480,95,5418,125,5413,125,4480,101,1898,34"/>
+<area shape="rect" id="Node000004" href="$ansi__c__internal__additions_8cpp.html" title=" " alt="" coords="299,216,485,278"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="971,138,753,164,625,184,498,210,471,218,468,213,497,205,624,179,752,159,976,137"/>
+<area shape="rect" id="Node000005" href="$ansi__c__language_8cpp.html" title=" " alt="" coords="510,216,693,278"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="972,149,845,176,706,210,681,218,679,213,704,205,844,171,977,147"/>
+<area shape="rect" id="Node000006" href="$ansi__c__parser_8cpp.html" title=" " alt="" coords="718,216,901,278"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="999,165,881,218,879,213,994,167"/>
+<area shape="rect" id="Node000007" href="$builtin__factory_8cpp.html" title=" " alt="" coords="926,216,1109,278"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="1060,171,1036,218,1032,214,1055,175"/>
+<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="1109,171,1124,207,1131,247,1124,287,1108,318,1086,345,1083,340,1103,316,1119,285,1126,247,1119,208,1107,176"/>
+<area shape="rect" id="Node000012" href="$cpp__token__buffer_8h.html" title="C++ Parser: Token Buffer." alt="" coords="1184,216,1368,278"/>
+<area shape="poly" id="edge11_Node000003_Node000012" title=" " alt="" coords="1145,165,1228,216,1222,215,1144,170"/>
+<area shape="rect" id="Node000014" href="$contracts__wrangler_8cpp.html" title="Parse and annotate contracts." alt="" coords="1871,334,2110,396"/>
+<area shape="poly" id="edge15_Node000003_Node000014" title=" " alt="" coords="1189,136,1237,145,1287,159,1336,179,1382,206,1399,226,1407,247,1415,267,1432,284,1465,300,1510,313,1624,334,1752,348,1873,359,1868,359,1751,353,1623,339,1508,318,1463,305,1429,289,1410,269,1402,249,1395,228,1378,210,1334,184,1285,164,1236,150,1189,141"/>
+<area shape="rect" id="Node000009" href="$cpp__language_8cpp.html" title="C++ Language Module." alt="" coords="732,452,964,497"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="1008,394,892,454,890,449,1003,396"/>
+<area shape="rect" id="Node000010" href="$cpp__parser_8cpp.html" title="C++ Parser." alt="" coords="988,452,1199,497"/>
+<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="1075,401,1089,453,1085,450,1071,405"/>
+<area shape="rect" id="Node000011" href="$parse_8cpp.html" title="C++ Language Parsing." alt="" coords="1283,452,1466,497"/>
+<area shape="poly" id="edge10_Node000008_Node000011" title=" " alt="" coords="1141,390,1314,452,1309,452,1140,396"/>
+<area shape="poly" id="edge12_Node000012_Node000008" title=" " alt="" coords="1209,285,1103,345,1101,340,1204,286"/>
+<area shape="poly" id="edge14_Node000012_Node000011" title=" " alt="" coords="1342,285,1365,307,1382,333,1391,364,1393,397,1383,454,1379,450,1387,397,1386,365,1377,335,1361,311,1340,290"/>
+<area shape="rect" id="Node000013" href="$cpp__token__buffer_8cpp.html" title="C++ Parser: Token Buffer." alt="" coords="1184,334,1368,396"/>
+<area shape="poly" id="edge13_Node000012_Node000013" title=" " alt="" coords="1278,291,1278,335,1274,332,1274,295"/>
+<area shape="rect" id="Node000017" href="$assembler__parser_8cpp.html" title=" " alt="" coords="1677,216,1904,278"/>
+<area shape="poly" id="edge18_Node000016_Node000017" title=" " alt="" coords="1792,173,1793,217,1788,214,1789,177"/>
+<area shape="rect" id="Node000018" href="$remove__asm_8cpp.html" title="Remove &#39;asm&#39; statements by compiling them into suitable standard goto program instructions." alt="" coords="1443,216,1652,278"/>
+<area shape="poly" id="edge19_Node000016_Node000018" title=" " alt="" coords="1716,166,1612,218,1610,213,1711,168"/>
+<area shape="rect" id="Node000020" href="$java__bytecode__language_8cpp.html" title=" " alt="" coords="4119,216,4337,278"/>
+<area shape="poly" id="edge22_Node000019_Node000020" title=" " alt="" coords="3313,129,3472,135,3670,148,3889,171,4107,205,4142,216,4137,215,4106,210,3888,176,3670,153,3471,141,3314,135"/>
+<area shape="rect" id="Node000021" href="$java__class__loader__limit_8cpp.html" title="limit class path loading" alt="" coords="4361,216,4580,278"/>
+<area shape="poly" id="edge23_Node000019_Node000021" title=" " alt="" coords="3313,126,3512,129,3770,139,4060,163,4206,182,4350,205,4386,216,4380,215,4349,210,4206,187,4059,168,3770,145,3511,134,3314,132"/>
+<area shape="rect" id="Node000022" href="$crangler__parse__options_8cpp.html" title="CRANGLER Command Line Option Processing." alt="" coords="4604,216,4801,278"/>
+<area shape="poly" id="edge24_Node000019_Node000022" title=" " alt="" coords="3313,132,4024,164,4384,185,4515,195,4592,205,4626,216,4621,215,4591,210,4514,201,4384,191,4024,170,3313,138"/>
+<area shape="rect" id="Node000023" href="$taint__parser_8cpp.html" title="Taint Parser." alt="" coords="1928,216,2112,278"/>
+<area shape="poly" id="edge25_Node000019_Node000023" title=" " alt="" coords="3075,135,2853,147,2578,163,2315,184,2207,197,2124,210,2095,218,2094,213,2123,205,2206,191,2315,179,2578,158,2853,142,3081,134"/>
+<area shape="rect" id="Node000024" href="$linker__script__merge_8cpp.html" title=" " alt="" coords="2136,216,2320,278"/>
+<area shape="poly" id="edge26_Node000019_Node000024" title=" " alt="" coords="3075,131,2927,139,2740,151,2535,174,2432,190,2331,210,2303,218,2302,213,2330,205,2431,185,2534,168,2739,146,2927,133,3081,131"/>
+<area shape="rect" id="Node000025" href="$memory__snapshot__harness__generator_8cpp.html" title=" " alt="" coords="2343,208,2547,286"/>
+<area shape="poly" id="edge27_Node000019_Node000025" title=" " alt="" coords="3076,138,2838,164,2698,184,2560,210,2548,213,2547,208,2559,205,2698,179,2837,159,3081,137"/>
+<area shape="rect" id="Node000026" href="$contracts__wrangler_8h.html" title="Parse and annotate contracts." alt="" coords="2572,216,2796,278"/>
+<area shape="poly" id="edge28_Node000019_Node000026" title=" " alt="" coords="3081,150,2948,178,2808,210,2779,218,2778,213,2807,205,2947,173,3075,151"/>
+<area shape="rect" id="Node000031" href="$restrict__function__pointers_8cpp.html" title=" " alt="" coords="2820,216,3038,278"/>
+<area shape="poly" id="edge34_Node000019_Node000031" title=" " alt="" coords="3135,157,2999,218,2998,213,3130,158"/>
+<area shape="rect" id="Node000032" href="$json__symtab__language_8cpp.html" title=" " alt="" coords="3062,216,3330,278"/>
+<area shape="poly" id="edge35_Node000019_Node000032" title=" " alt="" coords="3198,164,3198,218,3194,214,3194,168"/>
+<area shape="rect" id="Node000033" href="$json__interface_8cpp.html" title="JSON Commandline Interface." alt="" coords="3353,225,3590,269"/>
+<area shape="poly" id="edge36_Node000019_Node000033" title=" " alt="" coords="3261,155,3423,224,3418,224,3261,160"/>
+<area shape="rect" id="Node000034" href="$json__parser_8cpp.html" title=" " alt="" coords="3614,225,3834,269"/>
+<area shape="poly" id="edge37_Node000019_Node000034" title=" " alt="" coords="3314,146,3453,172,3603,205,3663,224,3657,224,3602,210,3452,177,3313,152"/>
+<area shape="rect" id="Node000035" href="$symtab2gb__parse__options_8cpp.html" title=" " alt="" coords="3857,216,4094,278"/>
+<area shape="poly" id="edge38_Node000019_Node000035" title=" " alt="" coords="3314,136,3560,160,3703,180,3846,205,3882,216,3876,215,3845,210,3703,185,3559,166,3314,141"/>
+<area shape="poly" id="edge29_Node000026_Node000014" title=" " alt="" coords="2580,282,2560,289,2442,312,2321,331,2111,356,2110,351,2321,325,2441,307,2559,284,2574,283"/>
+<area shape="rect" id="Node000027" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="2563,334,2805,396"/>
+<area shape="poly" id="edge30_Node000026_Node000027" title=" " alt="" coords="2686,291,2686,336,2682,332,2682,295"/>
+<area shape="rect" id="Node000028" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="2327,444,2560,506"/>
+<area shape="poly" id="edge31_Node000027_Node000028" title=" " alt="" coords="2605,402,2512,446,2511,441,2600,403"/>
+<area shape="rect" id="Node000029" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="2584,444,2784,506"/>
+<area shape="poly" id="edge32_Node000027_Node000029" title=" " alt="" coords="2686,410,2686,445,2682,442,2682,413"/>
+<area shape="rect" id="Node000030" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="2807,444,3064,506"/>
+<area shape="poly" id="edge33_Node000027_Node000030" title=" " alt="" coords="2769,400,2868,444,2862,443,2768,405"/>
+<area shape="rect" id="Node000037" href="$statement__list__language_8cpp.html" title="Statement List Language Interface." alt="" coords="5044,216,5257,278"/>
+<area shape="poly" id="edge40_Node000036_Node000037" title=" " alt="" coords="4275,157,4390,173,4488,179,4655,179,4736,177,4822,179,4919,187,5032,205,5068,216,5062,215,5031,210,4919,193,4822,184,4736,183,4656,184,4488,184,4390,178,4275,163"/>
+<area shape="rect" id="Node000038" href="$statement__list__parser_8cpp.html" title="Statement List Language Parser." alt="" coords="4826,216,5019,278"/>
+<area shape="poly" id="edge41_Node000036_Node000038" title=" " alt="" coords="4275,157,4357,169,4427,175,4546,178,4665,182,4734,190,4814,205,4846,216,4840,215,4813,210,4733,196,4665,188,4546,183,4426,181,4356,175,4275,163"/>
+<area shape="rect" id="Node000041" href="$graphml_8cpp.html" title="Read/write graphs as GraphML." alt="" coords="5282,225,5507,269"/>
+<area shape="poly" id="edge44_Node000040_Node000041" title=" " alt="" coords="5470,170,5417,226,5415,222,5466,172"/>
+<area shape="rect" id="Node000042" href="$xml__interface_8cpp.html" title="XML Interface." alt="" coords="5531,216,5714,278"/>
+<area shape="poly" id="edge45_Node000040_Node000042" title=" " alt="" coords="5549,168,5595,217,5590,215,5547,173"/>
+<area shape="rect" id="Node000043" href="$xml__parser_8cpp.html" title=" " alt="" coords="5739,216,5922,278"/>
+<area shape="poly" id="edge46_Node000040_Node000043" title=" " alt="" coords="5608,162,5727,205,5751,216,5746,215,5726,210,5607,168"/>
 </map>

@@ -1,36 +1,36 @@
 <map id="ternary_exprt" name="ternary_exprt">
-<area shape="rect" id="Node000001" title="An expression with three operands." alt="" coords="1028,277,1139,303"/>
-<area shape="rect" id="Node000007" href="$classallocate__exprt.html" title=" " alt="" coords="1217,5,1331,31"/>
-<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1085,263,1095,215,1113,154,1142,93,1162,65,1186,40,1215,24,1218,29,1190,44,1166,68,1147,95,1118,156,1100,216,1091,264"/>
-<area shape="rect" id="Node000008" href="$classbyte__update__exprt.html" title="Expression corresponding to op() where the bytes starting at position offset (given in number of byte..." alt="" coords="1202,55,1346,80"/>
-<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1088,263,1101,224,1121,178,1149,130,1186,89,1205,78,1208,82,1190,93,1153,133,1125,180,1106,226,1094,265"/>
-<area shape="rect" id="Node000009" href="$classieee__float__op__exprt.html" title="IEEE floating&#45;point operations These have two data operands (op0 and op1) and one rounding mode (op2)..." alt="" coords="1199,104,1349,129"/>
-<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1093,263,1128,201,1155,167,1186,138,1208,127,1210,132,1190,143,1159,171,1133,204,1098,266"/>
-<area shape="rect" id="Node000010" href="$classif__exprt.html" title="The trinary if&#45;then&#45;else operator." alt="" coords="1238,153,1310,179"/>
-<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="1101,265,1138,225,1187,188,1212,176,1237,169,1238,174,1214,182,1189,192,1141,229,1105,268"/>
-<area shape="rect" id="Node000011" href="$classpointer__in__range__exprt.html" title="pointer_in_range(a, b, c) evaluates to true iff same_object(a, b, c) ∧ r_ok(a, offset(c)&#45;offset(a)) ∧..." alt="" coords="1188,203,1360,228"/>
-<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="1118,269,1187,237,1221,226,1223,231,1189,242,1121,273"/>
-<area shape="rect" id="Node000012" href="$classreallocate__exprt.html" title=" " alt="" coords="1210,252,1338,277"/>
-<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="1152,278,1209,270,1210,276,1153,284"/>
-<area shape="rect" id="Node000013" href="$classreallocate__state__exprt.html" title=" " alt="" coords="1190,301,1358,327"/>
-<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="1153,296,1190,301,1189,306,1152,301"/>
-<area shape="rect" id="Node000014" href="$classstate__ok__exprt.html" title=" " alt="" coords="1215,351,1333,376"/>
-<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="1122,306,1189,337,1223,348,1222,353,1187,342,1119,311"/>
-<area shape="rect" id="Node000015" href="$classtranst.html" title="Transition system, consisting of state invariant, initial state predicate, and transition predicate." alt="" coords="1244,400,1304,425"/>
-<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="1105,312,1142,350,1189,386,1217,398,1245,406,1243,411,1215,403,1187,391,1138,354,1101,315"/>
-<area shape="rect" id="Node000016" href="$classupdate__exprt.html" title="Operator to update elements in structs and arrays." alt="" coords="1220,449,1328,475"/>
-<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="1098,314,1133,375,1159,408,1189,436,1221,451,1219,455,1187,440,1155,412,1129,378,1093,316"/>
-<area shape="rect" id="Node000017" href="$classupdate__state__exprt.html" title=" " alt="" coords="1200,499,1348,524"/>
-<area shape="poly" id="edge16_Node000001_Node000017" title=" " alt="" coords="1092,316,1103,356,1123,406,1151,455,1169,478,1190,497,1201,505,1198,509,1186,501,1165,481,1147,458,1118,408,1098,358,1087,317"/>
-<area shape="poly" id="edge17_Node000001_Node000017" title=" " alt="" coords="1096,315,1109,351,1128,394,1155,437,1190,473,1216,488,1244,496,1243,501,1214,493,1186,477,1151,440,1124,396,1104,353,1091,317"/>
-<area shape="rect" id="Node000002" href="$classexpr__protectedt.html" title="Base class for all expressions." alt="" coords="853,277,979,303"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="992,287,1028,287,1028,293,992,293"/>
-<area shape="rect" id="Node000003" href="$classexprt.html" title="Base class for all expressions." alt="" coords="748,277,804,303"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="818,287,853,287,853,293,818,293"/>
-<area shape="rect" id="Node000004" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="647,277,699,303"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="712,287,748,287,748,293,712,293"/>
-<area shape="rect" id="Node000005" href="$classsharing__treet.html" title=" " alt="" coords="431,263,597,317"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="611,287,647,287,647,293,611,293"/>
-<area shape="rect" id="Node000006" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="5,270,187,310"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="200,287,431,287,431,293,200,293"/>
+<area shape="rect" id="Node000001" title="An expression with three operands." alt="" coords="1038,292,1148,320"/>
+<area shape="rect" id="Node000007" href="$classallocate__exprt.html" title=" " alt="" coords="1226,5,1340,33"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1095,275,1104,226,1122,163,1151,99,1171,70,1195,44,1223,31,1227,28,1199,48,1175,73,1156,102,1127,165,1109,227,1100,278"/>
+<area shape="rect" id="Node000008" href="$classbyte__update__exprt.html" title="Expression corresponding to op() where the bytes starting at position offset (given in number of byte..." alt="" coords="1211,57,1354,85"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1099,276,1110,236,1130,188,1158,138,1195,96,1214,87,1219,84,1199,100,1162,142,1134,190,1115,238,1103,279"/>
+<area shape="rect" id="Node000009" href="$classieee__float__op__exprt.html" title="IEEE floating&#45;point operations These have two data operands (op0 and op1) and one rounding mode (op2)..." alt="" coords="1208,109,1357,137"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1104,276,1138,212,1164,177,1195,148,1216,139,1221,137,1199,152,1168,181,1143,215,1107,280"/>
+<area shape="rect" id="Node000010" href="$classif__exprt.html" title="The trinary if&#45;then&#45;else operator." alt="" coords="1247,161,1318,189"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="1112,277,1148,238,1196,200,1220,188,1244,183,1249,181,1222,193,1198,204,1152,242,1115,282"/>
+<area shape="rect" id="Node000011" href="$classpointer__in__range__exprt.html" title="pointer_in_range(a, b, c) evaluates to true iff same_object(a, b, c) ∧ r_ok(a, offset(c)&#45;offset(a)) ∧..." alt="" coords="1197,213,1368,241"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="1133,282,1196,251,1228,242,1233,241,1198,256,1134,287"/>
+<area shape="rect" id="Node000012" href="$classreallocate__exprt.html" title=" " alt="" coords="1219,265,1346,293"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="1162,293,1221,288,1216,289,1163,299"/>
+<area shape="rect" id="Node000013" href="$classreallocate__state__exprt.html" title=" " alt="" coords="1199,317,1366,345"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="1163,312,1201,320,1196,320,1163,318"/>
+<area shape="rect" id="Node000014" href="$classstate__ok__exprt.html" title=" " alt="" coords="1224,369,1342,397"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="1135,325,1198,354,1234,369,1229,369,1196,359,1134,330"/>
+<area shape="rect" id="Node000015" href="$classtranst.html" title="Transition system, consisting of state invariant, initial state predicate, and transition predicate." alt="" coords="1253,421,1312,449"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="1115,329,1152,369,1198,406,1226,419,1255,430,1250,429,1224,424,1196,411,1148,373,1113,334"/>
+<area shape="rect" id="Node000016" href="$classupdate__exprt.html" title="Operator to update elements in structs and arrays." alt="" coords="1229,473,1336,501"/>
+<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="1107,331,1143,396,1168,430,1199,458,1231,477,1226,476,1195,463,1164,433,1138,399,1105,336"/>
+<area shape="rect" id="Node000017" href="$classupdate__state__exprt.html" title=" " alt="" coords="1209,525,1356,553"/>
+<area shape="poly" id="edge16_Node000001_Node000017" title=" " alt="" coords="1101,333,1113,376,1132,427,1161,479,1178,502,1199,522,1211,533,1206,532,1195,527,1174,506,1156,482,1128,430,1108,378,1098,337"/>
+<area shape="poly" id="edge17_Node000001_Node000017" title=" " alt="" coords="1105,332,1118,371,1138,415,1164,460,1199,498,1223,513,1252,525,1247,524,1221,518,1195,503,1160,463,1133,418,1113,373,1102,337"/>
+<area shape="rect" id="Node000002" href="$classexpr__protectedt.html" title="Base class for all expressions." alt="" coords="865,292,989,320"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1004,303,1041,306,1035,306,1005,308"/>
+<area shape="rect" id="Node000003" href="$classexprt.html" title="Base class for all expressions." alt="" coords="760,292,815,320"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="831,303,867,305,861,306,831,308"/>
+<area shape="rect" id="Node000004" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="659,292,711,320"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="726,303,762,305,757,306,727,308"/>
+<area shape="rect" id="Node000005" href="$classsharing__treet.html" title=" " alt="" coords="445,275,610,337"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="625,303,662,305,656,306,626,308"/>
+<area shape="rect" id="Node000006" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="5,284,186,328"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="201,303,446,304,443,308,202,308"/>
 </map>

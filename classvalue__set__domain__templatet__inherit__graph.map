@@ -1,5 +1,7 @@
 <map id="value_set_domain_templatet&lt; VST &gt;" name="value_set_domain_templatet&lt; VST &gt;">
-<area shape="rect" id="Node000001" title="This is the domain for a value set analysis." alt="" coords="5,79,217,119"/>
-<area shape="rect" id="Node000002" href="$classai__domain__baset.html" title="The interface offered by a domain, allows code to manipulate domains without knowing their exact type..." alt="" coords="45,5,178,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="114,44,114,79,109,79,109,44"/>
+<area shape="rect" id="Node000001" title="This is the domain for a value set analysis." alt="" coords="5,82,217,127"/>
+<area shape="rect" id="Node000003" href="$classvalue__set__domain__templatet.html" title=" " alt="" coords="5,200,217,245"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="113,141,114,200,108,199,109,145"/>
+<area shape="rect" id="Node000002" href="$classai__domain__baset.html" title="The interface offered by a domain, allows code to manipulate domains without knowing their exact type..." alt="" coords="45,5,177,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="112,46,114,82,108,81,110,51"/>
 </map>

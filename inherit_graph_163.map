@@ -1,3 +1,21 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classcover__goalst.html" title="Try to cover some given set of goals incrementally." alt="" coords="5,5,111,31"/>
+<area shape="rect" id="Node000000" href="$classcover__instrumenter__baset.html" title="Base class for goto program coverage instrumenters." alt="" coords="5,205,154,250"/>
+<area shape="rect" id="Node000001" href="$classcover__assertion__instrumentert.html" title="Assertion coverage instrumenter." alt="" coords="202,5,422,33"/>
+<area shape="poly" id="edge162_Node000000_Node000001" title=" " alt="" coords="93,189,110,154,134,115,164,76,200,44,226,32,223,36,203,48,168,80,138,118,115,156,98,191"/>
+<area shape="rect" id="Node000002" href="$classcover__assume__instrumentert.html" title=" " alt="" coords="206,57,418,85"/>
+<area shape="poly" id="edge163_Node000000_Node000002" title=" " alt="" coords="102,190,144,141,171,116,200,96,231,84,227,87,203,100,174,120,148,144,107,193"/>
+<area shape="rect" id="Node000003" href="$classcover__branch__instrumentert.html" title="Branch coverage instrumenter." alt="" coords="210,109,414,137"/>
+<area shape="poly" id="edge164_Node000000_Node000003" title=" " alt="" coords="121,193,159,169,201,147,239,136,235,139,203,152,162,173,125,197"/>
+<area shape="rect" id="Node000004" href="$classcover__condition__instrumentert.html" title="Condition coverage instrumenter." alt="" coords="202,161,422,189"/>
+<area shape="poly" id="edge165_Node000000_Node000004" title=" " alt="" coords="168,205,249,188,245,191,170,210"/>
+<area shape="rect" id="Node000005" href="$classcover__cover__instrumentert.html" title="__CPROVER_cover coverage instrumenter" alt="" coords="214,213,410,241"/>
+<area shape="poly" id="edge166_Node000000_Node000005" title=" " alt="" coords="168,225,215,226,211,229,170,230"/>
+<area shape="rect" id="Node000006" href="$classcover__decision__instrumentert.html" title="Decision coverage instrumenter." alt="" coords="205,265,419,293"/>
+<area shape="poly" id="edge167_Node000000_Node000006" title=" " alt="" coords="168,244,249,263,244,266,169,250"/>
+<area shape="rect" id="Node000007" href="$classcover__location__instrumentert.html" title="Basic block coverage instrumenter." alt="" coords="206,317,418,345"/>
+<area shape="poly" id="edge168_Node000000_Node000007" title=" " alt="" coords="123,256,162,281,203,302,240,316,235,317,201,307,159,285,123,262"/>
+<area shape="rect" id="Node000008" href="$classcover__mcdc__instrumentert.html" title="MC/DC coverage instrumenter." alt="" coords="214,369,410,397"/>
+<area shape="poly" id="edge169_Node000000_Node000008" title=" " alt="" coords="105,260,148,310,174,334,203,354,231,369,226,369,200,359,171,338,144,314,104,265"/>
+<area shape="rect" id="Node000009" href="$classcover__path__instrumentert.html" title="Path coverage instrumenter." alt="" coords="217,421,406,449"/>
+<area shape="poly" id="edge170_Node000000_Node000009" title=" " alt="" coords="96,262,115,298,138,337,168,375,203,406,227,421,222,420,200,411,164,378,134,340,110,300,95,267"/>
 </map>

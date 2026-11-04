@@ -1,6 +1,5 @@
 var mp__arith_8h =
 [
-    [ "mp_integer", "mp__arith_8h.html#a227c0a2ab070454740bbf7e63fa5aa06", null ],
     [ "arith_left_shift", "mp__arith_8h.html#ad7ffc3ca50c525a8e9686f9ee0be8a94", null ],
     [ "arith_right_shift", "mp__arith_8h.html#a8e0795426fe61412b83bf6a4575488b9", null ],
     [ "binary2integer", "mp__arith_8h.html#a1156690125fb90385a5c2382220fb68d", null ],

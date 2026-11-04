@@ -7,5 +7,5 @@ var c__api_8h =
     [ "get_property_status", "c__api_8h.html#a95967161d96bf80081f9a8cfa2237e4b", null ],
     [ "get_verification_result", "c__api_8h.html#a9e196608e5045363bd73649bfe8c39ff", null ],
     [ "new_api_session", "c__api_8h.html#a66d137444fc798bc2cdf8867dc787dbe", null ],
-    [ "trycatch", "c__api_8h.html#a21ff5bf9e7f38edc407311580a62acfa", null ]
+    [ "rust::behavior::trycatch", "namespacerust_1_1behavior.html#a21ff5bf9e7f38edc407311580a62acfa", null ]
 ];

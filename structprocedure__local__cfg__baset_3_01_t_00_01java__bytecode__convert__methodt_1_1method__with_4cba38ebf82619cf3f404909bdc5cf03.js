@@ -6,6 +6,7 @@ var structprocedure__local__cfg__baset_3_01_t_00_01java__bytecode__convert__meth
     [ "method_with_amapt", "structprocedure__local__cfg__baset_3_01_t_00_01java__bytecode__convert__methodt_1_1method__with_4cba38ebf82619cf3f404909bdc5cf03.html#a4e8f3d5e2025013dc187382cb94708d6", null ],
     [ "nodet", "structprocedure__local__cfg__baset_3_01_t_00_01java__bytecode__convert__methodt_1_1method__with_4cba38ebf82619cf3f404909bdc5cf03.html#acd85046fe391339d6b3c43f6bb23dc44", null ],
     [ "procedure_local_cfg_baset", "structprocedure__local__cfg__baset_3_01_t_00_01java__bytecode__convert__methodt_1_1method__with_4cba38ebf82619cf3f404909bdc5cf03.html#a46c15e1bc239c842ce2b74861a835b9c", null ],
+    [ "compute_edges_function_call", "classprocedure__local__cfg__baset.html#ad36193caee4d174dbb754ba4115e4d78", null ],
     [ "get_first_node", "structprocedure__local__cfg__baset_3_01_t_00_01java__bytecode__convert__methodt_1_1method__with_4cba38ebf82619cf3f404909bdc5cf03.html#ac29d379d88bcc690e4072b4c74f334e5", null ],
     [ "get_last_node", "structprocedure__local__cfg__baset_3_01_t_00_01java__bytecode__convert__methodt_1_1method__with_4cba38ebf82619cf3f404909bdc5cf03.html#ae86ccedb3c3ab21b800d8b436dfb5ea4", null ],
     [ "get_node", "structprocedure__local__cfg__baset_3_01_t_00_01java__bytecode__convert__methodt_1_1method__with_4cba38ebf82619cf3f404909bdc5cf03.html#a1b64cfe454c111e424c6f56b9a897682", null ],

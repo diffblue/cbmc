@@ -1,9 +1,26 @@
 <map id="nfat&lt; T &gt;::statet" name="nfat&lt; T &gt;::statet">
-<area shape="rect" id="Node000001" title="A state is a set of possibly active transitions." alt="" coords="31,284,163,309"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="25,181,168,221"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="99,235,99,284,94,284,94,235"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="5,93,188,119"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="99,132,99,181,94,181,94,132"/>
-<area shape="rect" id="Node000004" title=" " alt="" coords="77,5,116,31"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="99,45,99,93,94,93,94,45"/>
+<area shape="rect" id="Node000001" title="A state is a set of possibly active transitions." alt="" coords="466,341,598,369"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="308,207,450,251"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="427,258,450,273,490,308,522,341,517,341,486,312,447,277,428,263"/>
+<area shape="rect" id="Node000006" href="$structnfat_1_1transitiont.html" title=" " alt="" coords="232,462,392,489"/>
+<area shape="poly" id="edge6_Node000006_Node000002" title=" " alt="" coords="367,264,349,325,317,462,312,460,344,324,365,268"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="110,324,280,386"/>
+<area shape="poly" id="edge9_Node000007_Node000002" title=" " alt="" coords="291,249,267,262,242,277,222,300,208,325,204,323,218,297,239,273,264,257,295,246"/>
+<area shape="rect" id="Node000003" href="$structnfat.html" title=" " alt="" coords="266,781,422,808"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="392,770,409,755,424,728,427,695,427,354,423,326,415,299,393,255,394,249,420,297,429,325,432,354,432,695,429,729,413,758,394,775"/>
+<area shape="rect" id="Node000004" href="$structnfat.html" title="Very simple NFA implementation Not super performant, but should be good enough for our purposes." alt="" coords="216,680,302,708"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="255,721,256,740,262,755,275,768,292,781,287,780,271,772,258,758,251,741,251,725"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="189,562,328,607"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="260,620,261,681,256,679,257,625"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="301,501,272,563,267,560,297,506"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="229,395,268,436,297,461,292,462,265,440,229,401"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="101,215,139,243"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="136,253,179,324,174,325,136,259"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="5,410,134,438"/>
+<area shape="poly" id="edge11_Node000011_Node000008" title=" " alt="" coords="88,256,76,276,66,312,64,350,69,410,64,410,58,350,61,311,71,274,90,251"/>
+<area shape="poly" id="edge10_Node000005_Node000011" title=" " alt="" coords="69,451,75,471,83,488,106,512,132,532,191,562,186,564,129,536,102,516,79,491,70,473,69,456"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="288,106,470,134"/>
+<area shape="poly" id="edge12_Node000002_Node000012" title=" " alt="" coords="380,147,381,207,376,205,378,152"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="360,5,398,33"/>
+<area shape="poly" id="edge13_Node000012_Node000010" title=" " alt="" coords="380,46,381,106,376,105,378,51"/>
 </map>

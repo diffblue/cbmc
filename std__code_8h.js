@@ -64,7 +64,7 @@ var std__code_8h =
     [ "can_cast_expr< side_effect_expr_statement_expressiont >", "std__code_8h.html#a8c7a061340e6db11286e11dd3ee0ed93", null ],
     [ "can_cast_expr< side_effect_expr_throwt >", "std__code_8h.html#a099ab30869464b0a4967284662fe264f", null ],
     [ "can_cast_expr< side_effect_exprt >", "std__code_8h.html#aba33080147b70ff7bbaa8fd898446120", null ],
-    [ "can_cast_side_effect_expr_impl", "std__code_8h.html#a6500ba327a08ad092bf17fab12c6e898", null ],
+    [ "detail::can_cast_side_effect_expr_impl", "namespacedetail.html#a6500ba327a08ad092bf17fab12c6e898", null ],
     [ "create_fatal_assertion", "std__code_8h.html#a03a0302f5d041c27101910016a1cb581", null ],
     [ "to_code_asm", "std__code_8h.html#abc523b1f680a8a2f7fb227e38706d45e", null ],
     [ "to_code_asm", "std__code_8h.html#a155d75cbe6638a2ba0e07dcd16966ed5", null ],

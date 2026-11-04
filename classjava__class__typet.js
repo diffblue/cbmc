@@ -1,8 +1,8 @@
 var classjava__class__typet =
 [
     [ "componentt", "classjava__class__typet_1_1componentt.html", "classjava__class__typet_1_1componentt" ],
-    [ "java_lambda_method_handlet", "classjava__class__typet_1_1java__lambda__method__handlet.html", "classjava__class__typet_1_1java__lambda__method__handlet" ],
     [ "methodt", "classjava__class__typet_1_1methodt.html", "classjava__class__typet_1_1methodt" ],
+    [ "java_lambda_method_handlet", "classjava__class__typet_1_1java__lambda__method__handlet.html", "classjava__class__typet_1_1java__lambda__method__handlet" ],
     [ "componentst", "classjava__class__typet.html#ae52c9d9a7be1390b22b6ead8d192ca18", null ],
     [ "java_lambda_method_handlest", "classjava__class__typet.html#adfc014174ab3b54369dbe100ec21bb25", null ],
     [ "methodst", "classjava__class__typet.html#ada1d56a60e6959c0c793165fe0a6d7ce", null ],

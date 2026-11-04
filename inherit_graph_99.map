@@ -1,3 +1,9 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classcfg__dominators__templatet.html" title=" " alt="" coords="5,5,200,45"/>
+<area shape="rect" id="Node000000" href="$classcfg__infot.html" title="Stores information about a goto function computed from its CFG." alt="" coords="5,57,84,85"/>
+<area shape="rect" id="Node000001" href="$classfunction__cfg__infot.html" title=" " alt="" coords="151,5,289,33"/>
+<area shape="poly" id="edge122_Node000000_Node000001" title=" " alt="" coords="98,53,172,32,168,35,100,58"/>
+<area shape="rect" id="Node000002" href="$classgoto__program__cfg__infot.html" title="For a goto program." alt="" coords="132,57,308,85"/>
+<area shape="poly" id="edge123_Node000000_Node000002" title=" " alt="" coords="99,69,134,70,129,72,100,74"/>
+<area shape="rect" id="Node000003" href="$classloop__cfg__infot.html" title=" " alt="" coords="163,109,276,137"/>
+<area shape="poly" id="edge124_Node000000_Node000003" title=" " alt="" coords="99,84,173,107,168,110,98,90"/>
 </map>
