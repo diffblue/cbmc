@@ -9,13 +9,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_SMT2_SMT2_PARSER_H
 #define CPROVER_SOLVERS_SMT2_SMT2_PARSER_H
 
-#include <map>
-#include <unordered_map>
-
 #include <util/mathematical_types.h>
 #include <util/std_expr.h>
 
 #include "smt2_tokenizer.h"
+
+#include <map>
+#include <optional>
+#include <unordered_map>
 
 class smt2_parsert
 {
@@ -150,12 +151,25 @@ protected:
   void setup_expressions();
   exprt expression();
   exprt function_application();
+  /// Dispatch a function application whose opening '(' and head symbol \p id
+  /// have already been consumed from the token stream. Factored out of
+  /// function_application() so that the iterative expression() can dispatch
+  /// using a head symbol it has already read.
+  exprt function_application_with_id(const irep_idt &id);
   exprt function_application_ieee_float_op(
     const irep_idt &,
     const exprt::operandst &);
   exprt function_application_ieee_float_eq(const exprt::operandst &);
   exprt function_application_fp(const exprt::operandst &);
   exprt::operandst operands();
+
+  /// When set, the next call to operands() returns this vector instead of
+  /// reading further tokens. The iterative operand collector in expression()
+  /// uses this to feed already-parsed operands to the expressions[] / id_map
+  /// dispatch logic in function_application_with_id(), so that a deeply
+  /// right-nested operand chain such as (bvand x (bvand x ...)) is parsed
+  /// without recursing once per nesting level.
+  std::optional<exprt::operandst> precollected_operands;
   typet function_signature_declaration();
   signature_with_parameter_idst function_signature_definition();
   void check_matching_operand_types(const exprt::operandst &) const;
