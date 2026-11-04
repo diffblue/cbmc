@@ -35,6 +35,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "build_analyzer.h"
 #include "show_on_source.h"
+#include "static_instrument.h"
 #include "static_show_domain.h"
 #include "static_simplifier.h"
 #include "static_verifier.h"
@@ -198,6 +199,18 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
     options.set_option(
       "simplify-slicing",
       !(cmdline.isset("no-simplify-slicing")));
+  }
+  else if(cmdline.isset("instrument"))
+  {
+    if(cmdline.get_value("instrument") == "-")
+      throw invalid_command_line_argument_exceptiont(
+        "cannot output goto binary to stdout", "--instrument");
+
+    options.set_option("instrument", true);
+    options.set_option("outfile", cmdline.get_value("instrument"));
+    options.set_option("general-analysis", true);
+    options.set_option(
+      "instrument-targets", cmdline.get_value("instrument-targets"));
   }
   else if(cmdline.isset("show-intervals"))
   {
@@ -679,6 +692,34 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
       result = static_simplifier(
         goto_model, *analyzer, options, ui_message_handler, out);
     }
+    else if(options.get_bool_option("instrument"))
+    {
+      PRECONDITION(!outfile.empty() && outfile != "-");
+      output_stream.close();
+      output_stream.open(outfile, std::ios::binary);
+      if(
+        options.is_set("instrument-targets") &&
+        options.get_option("instrument-targets") != "")
+      {
+        result = static_instrument(
+          goto_model,
+          *analyzer,
+          options.get_option("instrument-targets"),
+          ui_message_handler,
+          out);
+      }
+      else
+      {
+        // A reasonably sane set of defaults
+        result = static_instrument(
+          goto_model,
+          *analyzer,
+          "function_start=assume,function_return=assume,backwards_goto_target="
+          "assume",
+          ui_message_handler,
+          out);
+      }
+    }
     else if(options.get_bool_option("unreachable-instructions"))
     {
       result = static_unreachable_instructions(goto_model,
@@ -769,6 +810,8 @@ void goto_analyzer_parse_optionst::help()
     " program\n"
     " {y--no-simplify-slicing} \t do not remove instructions from which no"
     " property can be reached (use with {y--simplify})\n"
+    " {y--instrument} {ufile_name} \t use the abstract domains to generate annotations\n"
+    " {y--instrument-targets} {ulist} \t where to annotate and what annotations to use\n"
     " {y--unreachable-instructions} \t list dead code\n"
     " {y--unreachable-functions} \t list functions unreachable from the entry"
     " point\n"

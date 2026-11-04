@@ -180,7 +180,8 @@ protected:
     const abstract_object_pointert &other,
     const widen_modet &widen_mode) const override;
 
-  exprt to_predicate_internal(const exprt &name) const override;
+  exprt to_predicate_internal(const exprt &name, const std::set<exprt> &scope)
+    const override;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_FULL_STRUCT_ABSTRACT_OBJECT_H

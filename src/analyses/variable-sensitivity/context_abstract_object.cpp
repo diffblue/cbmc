@@ -171,9 +171,11 @@ abstract_object_pointert context_abstract_objectt::unwrap_context() const
   return child_abstract_object->unwrap_context();
 }
 
-exprt context_abstract_objectt::to_predicate_internal(const exprt &name) const
+exprt context_abstract_objectt::to_predicate_internal(
+  const exprt &name,
+  const std::set<exprt> &scope) const
 {
-  return child_abstract_object->to_predicate(name);
+  return child_abstract_object->to_predicate(name, scope);
 }
 
 void context_abstract_objectt::get_statistics(

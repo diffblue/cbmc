@@ -1,0 +1,12 @@
+CORE
+main.c
+--instrument out.gb --instrument-targets ensures --verbosity 9 --vsd
+activate-multi-line-match
+^EXIT=0$
+^SIGNAL=0$
+^Instrumenting example_function\nAdd ensures contract... single history... condition is example_function::argument = 1 ∧ true_from_calling_context = 1... added as contract$
+--
+^warning: ignoring
+--
+Testing instrumenting add ensures contract
+
