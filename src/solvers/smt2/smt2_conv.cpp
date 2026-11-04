@@ -431,10 +431,24 @@ constant_exprt smt2_convt::parse_literal(
       value=string2integer(s);
     }
   }
-  else if(src.get_sub().size()==2 &&
-          src.get_sub()[0].id()=="-") // (- 100)
+  else if(src.get_sub().size() == 2 && src.get_sub()[0].id() == "-") // (- X)
   {
-    value=-string2integer(src.get_sub()[1].id_string());
+    // X may be a numeral, a decimal, or a compound expression such as
+    // (/ 1.0 3.0): parse it recursively and negate the result.
+    constant_exprt inner = parse_literal(src.get_sub()[1], type);
+    if(type.id() == ID_rational)
+    {
+      rationalt rat;
+      if(!to_rational(inner, rat))
+        return from_rational(-rat);
+    }
+    else if(type.id() == ID_real)
+    {
+      rationalt rat;
+      if(!to_rational(inner, rat))
+        return algebraic_numbert{-rat}.as_expr();
+    }
+    value = -numeric_cast_v<mp_integer>(inner);
   }
   else if(src.get_sub().size()==3 &&
           src.get_sub()[0].id()=="_" &&
@@ -504,6 +518,19 @@ constant_exprt smt2_convt::parse_literal(
     std::size_t e = unsafe_string2size_t(src.get_sub()[2].id_string());
     std::size_t s = unsafe_string2size_t(src.get_sub()[3].id_string());
     return ieee_float_valuet::NaN(ieee_float_spect(s - 1, e)).to_expr();
+  }
+  else if(
+    src.get_sub().size() == 4 && src.get_sub()[0].id() == "_" &&
+    (src.get_sub()[1].id() == "+zero" ||
+     src.get_sub()[1].id() == "-zero")) // (_ +zero e s), (_ -zero e s)
+  {
+    std::size_t e = unsafe_string2size_t(src.get_sub()[2].id_string());
+    std::size_t s = unsafe_string2size_t(src.get_sub()[3].id_string());
+    ieee_float_valuet result =
+      ieee_float_valuet::zero(ieee_float_spect(s - 1, e));
+    if(src.get_sub()[1].id() == "-zero")
+      result.negate();
+    return result.to_expr();
   }
   else if(
     src.get_sub().size() == 3 &&
