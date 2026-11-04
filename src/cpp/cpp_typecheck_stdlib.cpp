@@ -1918,16 +1918,19 @@ static const std::map<std::string, std::string> &library_source_models()
     {"std::ios_base::_Ios_base_dtor", "{ }"},
     // the MSVC runtime's exception data (vcruntime_exception.h, the
     // runtime's std_exception.cpp): a message the exception owns
-    // (_DoFree) is a copy it frees on destruction; N5008 [exception]/2, an
-    // exception and its copy have equal what() strings.  A failed allocation
-    // of the copy leaves the message null, as the runtime does.
+    // (_DoFree) is a copy it frees on destruction.  N5008 [exception]/2: an
+    // exception and its copy have equal what() strings, so the copy is
+    // taken to succeed.  (The runtime leaves the message null when the
+    // allocation fails.  Modelling that failure also made symbolic execution
+    // unwind the copy of a copy without end: the merge after the failed
+    // allocation's early return gives the copied bytes a value that depends
+    // on whether malloc failed, which a later read cannot resolve.)
     {"__std_exception_copy",
      "{ if(!_From->_DoFree || _From->_What == nullptr) {"
      " _To->_What = _From->_What; _To->_DoFree = false; return; }"
      " " CPROVER_PREFIX "size_t __n = 0; while(_From->_What[__n] != 0) ++__n;"
      " char *__p = (char *)malloc(__n + 1);"
-     " if(__p == nullptr) { _To->_What = nullptr; _To->_DoFree = false;"
-     " return; }"
+     " " CPROVER_PREFIX "assume(__p != nullptr);"
      " for(" CPROVER_PREFIX "size_t __i = 0; __i <= __n; ++__i)"
      " __p[__i] = _From->_What[__i];"
      " _To->_What = __p; _To->_DoFree = true; }"},
