@@ -473,7 +473,8 @@ void dfcc_instrumentt::instrument_goto_function(
   // program after each function costs time quadratic in the number of
   // functions. Each body that DFCC creates or changes is renumbered when
   // DFCC has finished changing it, so the other bodies keep valid numbers.
-  // dfcct::transform_goto_model renumbers the whole program at the end.
+  // dfcct::transform_goto_model renumbers the whole program after loading
+  // the DFCC library and at the end.
   goto_model.goto_functions.update(body);
 
   if(loop_contract_config.apply_loop_contracts)
