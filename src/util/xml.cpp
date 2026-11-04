@@ -8,11 +8,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "xml.h"
 
-#include <ostream>
-
 #include "exception_utils.h"
 #include "string2int.h"
 #include "structured_data.h"
+
+#include <iomanip>
+#include <ostream>
 
 void xmlt::clear()
 {
@@ -75,6 +76,34 @@ void xmlt::output(std::ostream &out, unsigned indent) const
   out << '<' << '/' << name << '>' << "\n";
 }
 
+/// Escape a character that is not valid in XML 1.0. Characters below 0x20
+/// (other than TAB, LF, CR) and DEL (0x7F) are not valid in XML 1.0, not
+/// even as numeric character references. Encode them as C-style escape
+/// sequences with fixed-width two-digit hex. Backslashes are escaped to
+/// avoid ambiguity.
+/// \return true if the character was handled, false if it should be emitted
+///   as-is
+static bool escape_non_printable(char ch, std::ostream &out)
+{
+  if(ch == '\0')
+  {
+    out << "\\0";
+    return true;
+  }
+  else if(static_cast<unsigned char>(ch) < 32u || ch == 0x7F)
+  {
+    out << "\\x" << std::hex << std::setfill('0') << std::setw(2)
+        << (unsigned int)(unsigned char)ch << std::dec;
+    return true;
+  }
+  else if(ch == '\\')
+  {
+    out << "\\\\";
+    return true;
+  }
+  return false;
+}
+
 /// escaping for XML elements
 void xmlt::escape(const std::string &s, std::ostream &out)
 {
@@ -101,17 +130,13 @@ void xmlt::escape(const std::string &s, std::ostream &out)
       out << '\n';
       break;
 
-    case 0x9:  // TAB
-    case 0x7F: // DEL
+    case 0x9: // TAB
       out << "&#" << std::to_string((unsigned char)ch) << ';';
       break;
 
     default:
-      DATA_INVARIANT(
-        static_cast<unsigned char>(ch) >= 32u,
-        "XML does not support escaping non-printable character " +
-          std::to_string((unsigned char)ch));
-      out << ch;
+      if(!escape_non_printable(ch, out))
+        out << ch;
     }
   }
 }
@@ -143,16 +168,12 @@ void xmlt::escape_attribute(const std::string &s, std::ostream &out)
     case 0x9:  // TAB
     case 0xA:  // LF
     case 0xD:  // CR
-    case 0x7F: // DEL
       out << "&#" << std::to_string((unsigned char)ch) << ';';
       break;
 
     default:
-      DATA_INVARIANT(
-        static_cast<unsigned char>(ch) >= 32u,
-        "XML does not support escaping non-printable character " +
-          std::to_string((unsigned char)ch));
-      out << ch;
+      if(!escape_non_printable(ch, out))
+        out << ch;
     }
   }
 }
