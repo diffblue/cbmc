@@ -1,0 +1,10 @@
+CORE
+exists.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+Exercises the exists/assumption code path with a struct-typed bound variable,
+where renaming runs before quantifier rewriting.
