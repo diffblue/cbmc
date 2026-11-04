@@ -1,0 +1,17 @@
+CORE
+division_before_call.c
+--div-by-zero-check --evaluation-order-check
+^\[main\.division-by-zero\.1\] line 12 division by zero in a / b: FAILURE$
+^\[main\.evaluation-order\.1\] line 12 value of a / b is independent of evaluation order: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+The call f() sets b from 0 to 1, so evaluating a / b before the call divides
+by zero, while goto conversion's fixed lowering places the call's side
+effects first and hence misses the division without
+--evaluation-order-check. With the check, the pre-call snapshot of a / b
+carries the division-by-zero check into the pre-call state and the
+evaluation-order-independence assertion fails.

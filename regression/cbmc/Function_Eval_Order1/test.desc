@@ -1,7 +1,15 @@
-FUTURE
+CORE
 main.c
-
+--evaluation-order-check
+^\[main\.assertion\.1\] line 24 assertion z == 5: FAILURE$
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
 --
+^warning: ignoring
+--
+The two calls to f00() are evaluated in an unspecified order (C99 6.5.2.2:10)
+and increment a static counter, so z is 5 under left-to-right and 7 under
+right-to-left evaluation. --evaluation-order-check explores both orders and
+refutes the assertion. This test was FUTURE before --evaluation-order-check
+existed.
