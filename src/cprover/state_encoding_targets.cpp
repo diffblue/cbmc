@@ -8,6 +8,9 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include "state_encoding_targets.h"
 
+#include <util/arith_tools.h>
+#include <util/c_types.h>
+#include <util/exception_utils.h>
 #include <util/format_expr.h>
 #include <util/pointer_offset_size.h>
 
@@ -77,10 +80,26 @@ void state_encoding_smt2_convt::add_converters()
     out << ' ';
     convert_expr(to_binary_expr(expr).op1());
     out << ' ';
-    auto size_opt = size_of_expr(
-      to_pointer_type(to_binary_expr(expr).op1().type()).base_type(), ns);
-    CHECK_RETURN(size_opt.has_value());
-    convert_expr(*size_opt);
+    const auto &base_type =
+      to_pointer_type(to_binary_expr(expr).op1().type()).base_type();
+    auto size_opt = size_of_expr(base_type, ns);
+    if(size_opt.has_value())
+      convert_expr(*size_opt);
+    else if(
+      base_type.id() == ID_integer || base_type.id() == ID_natural ||
+      base_type.id() == ID_rational || base_type.id() == ID_real)
+    {
+      // Mathematical types (as used by the Strata encoding) have no byte
+      // size. Such objects are not byte-addressed, so the enter-scope size is
+      // immaterial and a unit size is sound. Any other type without a size is
+      // unexpected (e.g. a function or incomplete type) and fails loudly
+      // below.
+      convert_expr(from_integer(1, size_type()));
+    }
+    else
+      throw incorrect_goto_program_exceptiont(
+        "enter-scope-state for an object whose type has no byte size: " +
+        base_type.id_string());
     out << ')';
   });
 

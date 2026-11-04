@@ -79,6 +79,10 @@ public:
   {
     use_array_of_bool = true;
     use_as_const = true;
+    // Struct (tuple) values returned by functions and other computed
+    // whole-struct values are emitted using SMT datatypes; the solvers this
+    // cprover pipeline targets all support declare-datatypes.
+    use_datatypes = true;
     add_converters();
   }
 

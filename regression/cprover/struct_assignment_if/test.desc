@@ -1,0 +1,9 @@
+CORE
+main.c
+--text --solve --inline
+^EXIT=0$
+^SIGNAL=0$
+❝main::1::t❞:=\(ς\(❝main::1::c❞\) ≠ 0 \?
+^\[main\.assertion\.1\] line \d+ reachable: SUCCESS$
+--
+❝main::1::t❞\.❝x❞:=
