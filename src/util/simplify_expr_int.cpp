@@ -1231,30 +1231,18 @@ simplify_exprt::simplify_extractbits(const extractbits_exprt &expr)
 
     return std::move(*result);
   }
+  else if(*end == 0 && *start + 1 == *width)
+  {
+    // This must precede the concatenation case below: that case recurses on a
+    // smaller extract over a reduced concatenation, and when the reduced
+    // extract covers the whole reduced concatenation it relies on this branch
+    // to collapse to a typecast/identity.
+    typecast_exprt tc{expr.src(), expr.type()};
+    return changed(simplify_typecast(tc));
+  }
   else if(expr.src().id() == ID_concatenation)
   {
-    // the most-significant bit comes first in an concatenation_exprt, hence we
-    // count down
-    mp_integer offset = *width;
-
-    for(const auto &op : expr.src().operands())
-    {
-      auto op_width = pointer_offset_bits(op.type(), ns);
-
-      if(!op_width.has_value() || *op_width <= 0)
-        return unchanged(expr);
-
-      if(*start < offset && offset <= *end + *op_width)
-      {
-        extractbits_exprt result = expr;
-        result.src() = op;
-        result.index() =
-          from_integer(*end - (offset - *op_width), expr.index().type());
-        return changed(simplify_extractbits(result));
-      }
-
-      offset -= *op_width;
-    }
+    return simplify_extractbits_over_concatenation(expr);
   }
   else if(auto eb_src = expr_try_dynamic_cast<extractbits_exprt>(expr.src()))
   {
@@ -1268,10 +1256,76 @@ simplify_exprt::simplify_extractbits(const extractbits_exprt &expr)
       return changed(simplify_extractbits(result));
     }
   }
-  else if(*end == 0 && *start + 1 == *width)
+
+  return unchanged(expr);
+}
+
+simplify_exprt::resultt<>
+simplify_exprt::simplify_extractbits_over_concatenation(
+  const extractbits_exprt &expr)
+{
+  PRECONDITION(expr.src().id() == ID_concatenation);
+
+  const auto end = numeric_cast<mp_integer>(expr.index());
+  const auto width = pointer_offset_bits(expr.src().type(), ns);
+  const auto result_width = pointer_offset_bits(expr.type(), ns);
+  // these are all guaranteed by simplify_extractbits, which is our only caller
+  PRECONDITION(
+    end.has_value() && width.has_value() && result_width.has_value());
+  const mp_integer start = *end + *result_width - 1;
+
+  // the most-significant bit comes first in an concatenation_exprt, hence we
+  // count down
+  mp_integer offset = *width;
+
+  exprt::operandst new_operands;
+  new_operands.reserve(expr.src().operands().size());
+  mp_integer new_index = *end;
+  mp_integer new_concat_width = 0;
+
+  for(const auto &op : expr.src().operands())
   {
-    typecast_exprt tc{expr.src(), expr.type()};
-    return changed(simplify_typecast(tc));
+    auto op_width = pointer_offset_bits(op.type(), ns);
+
+    if(!op_width.has_value() || *op_width <= 0)
+      return unchanged(expr);
+
+    // current value of offset is the index (within the concatenated
+    // expression) of the most-significant bit of op plus 1
+    if(*end >= offset)
+    {
+      // Operand is entirely below the extracted range.
+      // Adjust new_index to account for the removed operand.
+      new_index -= *op_width;
+    }
+    else if(offset - *op_width <= start)
+    {
+      new_operands.push_back(op);
+      new_concat_width += *op_width;
+    }
+
+    offset -= *op_width;
+  }
+
+  if(new_operands.size() == 1)
+  {
+    extractbits_exprt result = expr;
+    result.src() = new_operands.front();
+    result.index() = from_integer(new_index, expr.index().type());
+    return changed(simplify_extractbits(result));
+  }
+  else if(
+    !new_operands.empty() && new_operands.size() < expr.src().operands().size())
+  {
+    bitvector_typet new_type = to_bitvector_type(expr.src().type());
+    new_type.set_width(numeric_cast_v<std::size_t>(new_concat_width));
+    concatenation_exprt new_concat{
+      std::move(new_operands), std::move(new_type)};
+    extractbits_exprt result{
+      std::move(new_concat),
+      from_integer(new_index, expr.index().type()),
+      expr.type()};
+    return changed(simplify_extractbits(result));
   }
 
   return unchanged(expr);

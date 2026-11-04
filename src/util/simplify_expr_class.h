@@ -155,6 +155,8 @@ public:
   [[nodiscard]] resultt<> simplify_typecast_preorder(const typecast_exprt &);
   [[nodiscard]] resultt<> simplify_extractbit(const extractbit_exprt &);
   [[nodiscard]] resultt<> simplify_extractbits(const extractbits_exprt &);
+  [[nodiscard]] resultt<>
+  simplify_extractbits_over_concatenation(const extractbits_exprt &);
   [[nodiscard]] resultt<> simplify_concatenation(const concatenation_exprt &);
   [[nodiscard]] resultt<> simplify_zero_extend(const zero_extend_exprt &);
   [[nodiscard]] resultt<> simplify_mult(const mult_exprt &);
