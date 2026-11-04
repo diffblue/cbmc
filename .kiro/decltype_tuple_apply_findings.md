@@ -15899,3 +15899,34 @@ smt2_solver on PATH), profiles, unit, lint, format overall and per
 commit, doxygen, per-commit compile, iwyu on the changed files, platform
 (gcc11, m32, arm64), vacuity 1065/3 (cbmc-cpp without libcxx and
 libstdcxx16), MSVC .ii (2 known), macOS 142/142.
+
+## Round 214 (2026-11-03): MSVC streams, string_view constexpr, num_get
+
+- e64382cc5a simplifier: bits [w-1, 0] of `(bv)(T *)x' and its conversion
+  to an integer of x's width are x (Visual Studio's va_arg reads the
+  immediates va_start stores as pointers).  Folding `(bv)(T *)x' itself
+  broke memcpy's pointer propagation (cbmc-library memcpy
+  constant-propagation_01), so only these two reads.
+- 2e8c9b73b3 the MSVC STL's _Ntcts_dup_dbg and _Maklocstr (per character
+  type: a source model naming _Elem is not type-checked and silently
+  dropped) succeed like operator new.  `ss << setw(4) << 7' with the MSVC
+  14.51 .ii on Linux: > 10 GB -> 10 s.  The two _msvc tests are CORE with
+  tag msvc-stl, excluded by cbmc-cpp's Makefile, CMakeLists and
+  scripts/platform_check.sh except under MSVC.  The local MSVC emulation
+  set (/tmp/r209/msvc_build-work) now passes 8/8; its main.ii of
+  stream_setw and classic_locale carry the UCRT models inline, as Linux
+  headers cannot compile the C library models in --winx64 mode.
+- ab94f119e0 constant evaluation of by-value class arguments: `&a' of a
+  constexpr object is a constant argument, an implicit or defaulted
+  copy/move constructor yields its source, a by-value temporary argument
+  is evaluated (kept as is when not: tag arguments; dropping it broke
+  libstdc++ vector's _S_relocate in 10 CORE tests on the first try).
+  memcmp's libc++ desc CORE; macOS set 143/143.
+- 17874c1910 libc++ __do_get_signed/__do_get_unsigned model with a char
+  array of 64 instead of std::string (its union made the formula 28x
+  larger from --unwind 3 to 4); istream extraction --unwind 12 in 24 s.
+  Replacing models can be keyed without a member template's own arguments.
+Checks on W197: 13 suites (cbmc-cpp with -X msvc-stl), profiles (z3
+complex2 flaky, passes on rerun), unit, lint, format overall and per
+commit, doxygen, per-commit compile, iwyu on the changed files, platform
+(gcc11, m32, arm64), vacuity 1065/3, MSVC .ii 8/8, macOS 143/143.
