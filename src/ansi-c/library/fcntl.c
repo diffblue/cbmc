@@ -219,7 +219,10 @@ int __VERIFIER_nondet_int(void);
 int __CPROVER_openat(int dirfd, const char *pathname, int flags)
 {
 __CPROVER_HIDE:;
-  if(dirfd < 0)
+  // POSIX.1-2017: AT_FDCWD means use the current working directory;
+  // EBADF only applies when the path is relative and dirfd is neither
+  // AT_FDCWD nor a valid open file descriptor
+  if(dirfd < 0 && dirfd != AT_FDCWD)
   {
     errno = EBADF;
     return -1;
