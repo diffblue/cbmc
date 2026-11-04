@@ -568,7 +568,8 @@ jobs:
         run: |
           cd regression/cbmc-cpp
           # test.pl directly: exclude what CMakeLists.txt excludes for gcc 16
-          ../test.pl -e -p -c "../../../build/bin/cbmc --validate-goto-model --validate-ssa-equation" -X libcxx -X broken-libstdcxx16 -j${{env.linux-vcpus}}
+          # and for any non-MSVC build (msvc-stl)
+          ../test.pl -e -p -c "../../../build/bin/cbmc --validate-goto-model --validate-ssa-equation" -X libcxx -X broken-libstdcxx16 -X msvc-stl -j${{env.linux-vcpus}}
       - name: Run the libstdcxx16-tagged tests on their own
         run: |
           cd regression/cbmc-cpp
