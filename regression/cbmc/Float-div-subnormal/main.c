@@ -47,9 +47,12 @@ int main()
   assert(r4 == 0x1.555556p-24f);
 
   // A format with a narrow exponent (4 bits, bias 7) and 23 fraction bits:
-  // the smallest subnormal (2^-29) has 23 leading zeros in its fraction. The
-  // wider quotient needs a deeper normalization shift when rounding, which
-  // relies on the exponent arithmetic covering the full range.
+  // the smallest subnormal (2^-29) has 23 leading zeros in its fraction, and
+  // normalizing it yields an unbiased exponent of -29, which does not fit
+  // into the 4-bit exponent. The exponent therefore needs to be extended
+  // before the dividend is normalized. (Without that extension, the modular
+  // exponent arithmetic of the default back end happens to wrap back into
+  // range for this case; Float-div-exponent-range also covers it.)
   typedef __CPROVER_floatbv[28][23] narrow_exponent_floatt;
   narrow_exponent_floatt i, j;
   __CPROVER_assume(i == (narrow_exponent_floatt)0x1p-29f);
