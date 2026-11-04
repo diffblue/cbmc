@@ -344,6 +344,38 @@ bool remove_const_function_pointerst::try_resolve_dereference_function_call(
     return false;
   }
 
+  // Check if the dereferenced values are themselves pointers to
+  // function pointers that need further dereferencing
+  // (e.g., **fp where fp is func_ptr *const)
+  // This check helps ensure we have valid types before attempting resolution
+  bool all_are_valid_types = true;
+  for(const exprt &deref_val : potential_deref_values)
+  {
+    // Accept either function types (ID_code) or pointers to functions
+    if(deref_val.type().id() == ID_pointer)
+    {
+      const pointer_typet &ptr_type = to_pointer_type(deref_val.type());
+      if(ptr_type.base_type().id() != ID_code)
+      {
+        all_are_valid_types = false;
+        break;
+      }
+    }
+    else if(deref_val.type().id() != ID_code)
+    {
+      all_are_valid_types = false;
+      break;
+    }
+  }
+
+  if(!all_are_valid_types)
+  {
+    LOG(
+      "Dereferenced value has incompatible type for function resolution",
+      deref_expr);
+    return false;
+  }
+
   return try_resolve_function_calls(potential_deref_values, out_functions);
 }
 
@@ -429,8 +461,23 @@ bool remove_const_function_pointerst::try_resolve_expression(
   }
   else if(simplified_expr.id()==ID_symbol)
   {
-    LOG("Non const symbol will not be squashed", simplified_expr);
-    resolved=false;
+    // Try to look up the symbol's initial value from the symbol table.
+    // Return it with is_const=false; callers that need constness
+    // (e.g., try_resolve_dereference with a const-qualified pointee type)
+    // can override this based on context.
+    const symbolt *sym = ns.get_symbol_table().lookup(
+      to_symbol_expr(simplified_expr).get_identifier());
+    if(sym != nullptr && sym->value.is_not_nil())
+    {
+      resolved_expressions.push_back(sym->value);
+      is_resolved_expression_const = is_const_expression(simplified_expr);
+      resolved = true;
+    }
+    else
+    {
+      LOG("Non const symbol will not be squashed", simplified_expr);
+      resolved = false;
+    }
   }
   else
   {
@@ -606,7 +653,8 @@ bool remove_const_function_pointerst::try_resolve_index_of(
 /// \param out_is_const: Is the squashed expression constant
 /// \return Returns true if it was able to squash the member expression If this
 ///   is the case, out_expressions will contain the possible values this member
-///   could return The out_is_const will return whether the struct is const.
+///   could return The out_is_const will return whether the struct is const or
+///   the specific member is const.
 bool remove_const_function_pointerst::try_resolve_member(
   const member_exprt &member_expr,
   expressionst &out_expressions,
@@ -621,6 +669,9 @@ bool remove_const_function_pointerst::try_resolve_member(
       member_expr.compound(), potential_structs, is_struct_const);
   if(resolved_struct)
   {
+    // Also check if the specific member being accessed is const
+    bool member_is_const = is_const_type(member_expr.type());
+
     for(const exprt &potential_struct : potential_structs)
     {
       if(potential_struct.id()==ID_struct)
@@ -654,7 +705,9 @@ bool remove_const_function_pointerst::try_resolve_member(
         return false;
       }
     }
-    out_is_const=is_struct_const;
+    // A member access is const if either the struct is const
+    // OR the member itself is const
+    out_is_const = is_struct_const || member_is_const;
     return true;
   }
   else
@@ -688,6 +741,20 @@ bool remove_const_function_pointerst::try_resolve_dereference(
     try_resolve_expression(deref_expr.pointer(), pointer_values, pointer_const);
   if(resolved && pointer_const)
   {
+    // Check if the pointer's base type is const (e.g., const T *).
+    // If so, the pointed-to value is accessed as const even if the
+    // underlying object wasn't declared const.
+    bool pointee_type_is_const = false;
+    {
+      const typet &ptr_type = deref_expr.pointer().type();
+      if(
+        ptr_type.id() == ID_pointer &&
+        to_pointer_type(ptr_type).base_type().get_bool(ID_C_constant))
+      {
+        pointee_type_is_const = true;
+      }
+    }
+
     bool all_objects_const=true;
     for(const exprt &pointer_val : pointer_values)
     {
@@ -696,8 +763,26 @@ bool remove_const_function_pointerst::try_resolve_dereference(
         address_of_exprt address_expr=to_address_of_expr(pointer_val);
         bool object_const=false;
         expressionst out_object_values;
-        const bool resolved_address = try_resolve_expression(
+        bool resolved_address = try_resolve_expression(
           address_expr.object(), out_object_values, object_const);
+
+        // If the pointee type is const and normal resolution failed
+        // (e.g., because the object is a non-const symbol), look up
+        // the symbol's initial value directly.
+        if(!resolved_address && pointee_type_is_const)
+        {
+          if(address_expr.object().id() == ID_symbol)
+          {
+            const symbolt *sym = ns.get_symbol_table().lookup(
+              to_symbol_expr(address_expr.object()).get_identifier());
+            if(sym != nullptr && sym->value.is_not_nil())
+            {
+              out_object_values.push_back(sym->value);
+              object_const = true;
+              resolved_address = true;
+            }
+          }
+        }
 
         if(resolved_address)
         {
@@ -711,7 +796,14 @@ bool remove_const_function_pointerst::try_resolve_dereference(
         else
         {
           LOG("Failed to resolve value of a dereference", address_expr);
+          return false;
         }
+      }
+      else if(pointer_val.is_constant() && pointer_val.is_zero())
+      {
+        // Null pointer - we can't dereference it but it's a valid constant
+        // Skip it but don't fail
+        continue;
       }
       else
       {
@@ -720,7 +812,7 @@ bool remove_const_function_pointerst::try_resolve_dereference(
         return false;
       }
     }
-    out_is_const=all_objects_const;
+    out_is_const = all_objects_const || pointee_type_is_const;
     return true;
   }
   else
