@@ -34,6 +34,12 @@ runs:
           1.3.4-Linux-X64)
             asset=cvc5-Linux-x86_64-static
             sha256=dcdbfada0ce493ee98259c0816e0daafc561c223aadb3af298c2968e73ea39c6 ;;
+          1.4.1-Linux-X64)
+            asset=cvc5-Linux-x86_64-static
+            sha256=2f8efe58fe27ba7bccbb504533f690b9312d69da14192712460e4a19231f02a1 ;;
+          1.4.2-Linux-X64)
+            asset=cvc5-Linux-x86_64-static
+            sha256=7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8 ;;
           1.3.4-Linux-ARM64)
             asset=cvc5-Linux-arm64-static
             sha256=2a4c108367f20b0c8990abd6b9535a5d62e08908d471d4671c00734e408f85bc ;;

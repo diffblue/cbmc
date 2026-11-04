@@ -1,0 +1,9 @@
+CORE witness
+main.c
+
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ p1 >= p2: FAILURE$
+^VERIFICATION FAILED$
+--
+^VERIFICATION SUCCESSFUL$
