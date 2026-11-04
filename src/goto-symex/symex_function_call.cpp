@@ -29,6 +29,45 @@ bool goto_symext::get_unwind_recursion(const irep_idt &, unsigned, unsigned)
   return false;
 }
 
+/// True if \p t1 and \p t2 are structs whose data members, in declaration
+/// order, have the same types or are themselves such structs: the
+/// layout-compatible classes of C++ [class.mem.general]/27.  The C and the
+/// C++ front ends name the members of the same struct differently, so a C
+/// library function taking a struct by value (AArch64's va_list) declares a
+/// parameter type that differs from the C++ caller's argument type.
+static bool layout_compatible_structs(
+  const typet &t1,
+  const typet &t2,
+  const namespacet &ns)
+{
+  if(
+    (t1.id() != ID_struct && t1.id() != ID_struct_tag) ||
+    (t2.id() != ID_struct && t2.id() != ID_struct_tag))
+  {
+    return false;
+  }
+  const struct_typet &s1 = t1.id() == ID_struct_tag
+                             ? ns.follow_tag(to_struct_tag_type(t1))
+                             : to_struct_type(t1);
+  const struct_typet &s2 = t2.id() == ID_struct_tag
+                             ? ns.follow_tag(to_struct_tag_type(t2))
+                             : to_struct_type(t2);
+  if(
+    s1.is_incomplete() || s2.is_incomplete() ||
+    s1.components().size() != s2.components().size())
+  {
+    return false;
+  }
+  for(std::size_t i = 0; i < s1.components().size(); ++i)
+  {
+    const typet &c1 = s1.components()[i].type();
+    const typet &c2 = s2.components()[i].type();
+    if(c1 != c2 && !layout_compatible_structs(c1, c2, ns))
+      return false;
+  }
+  return true;
+}
+
 void goto_symext::parameter_assignments(
   const irep_idt &function_identifier,
   const goto_functionst::goto_functiont &goto_function,
@@ -101,6 +140,11 @@ void goto_symext::parameter_assignments(
            rhs_type.id() == ID_union ||
            rhs_type.id() == ID_union_tag))
         // clang-format on
+        {
+          rhs = make_byte_extract(
+            rhs, from_integer(0, c_index_type()), parameter_type);
+        }
+        else if(layout_compatible_structs(parameter_type, rhs_type, ns))
         {
           rhs = make_byte_extract(
             rhs, from_integer(0, c_index_type()), parameter_type);
