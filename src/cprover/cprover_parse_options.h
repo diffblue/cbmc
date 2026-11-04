@@ -19,6 +19,7 @@ Author: Daniel Kroening, dkr@amazon.com
   "(safety)(no-safety)(no-assertions)"                                         \
   "(contract):"                                                                \
   "(solve)(unwind):(trace)"                                                    \
+  "(external-smt2-solver):"                                                    \
   "(inline)(no-inline)"                                                        \
   "D:I:"                                                                       \
   "(32)(64)"                                                                   \

@@ -277,6 +277,10 @@ int cprover_parse_optionst::main()
 
     solver_options.trace = cmdline.isset("trace");
     solver_options.verbose = cmdline.isset("verbose");
+    solver_options.smt2_solver_binary =
+      cmdline.isset("external-smt2-solver")
+        ? cmdline.get_value("external-smt2-solver")
+        : "";
 
     // solve
     auto result = state_encoding_solver(
@@ -327,5 +331,8 @@ void cprover_parse_optionst::help()
     " {y--outfile} {ufile-name} \t set output file for formula\n"
     " {y--smt2} \t output formula in SMT-LIB2 format\n"
     " {y--text} \t output formula in text format\n"
+    " {y--external-smt2-solver} {ucmd} \t discharge queries with the given"
+    " external SMT2 solver binary (e.g. {uz3}); defaults to the built-in SAT"
+    " backend\n"
     "\n");
 }
