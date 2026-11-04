@@ -84,6 +84,10 @@ public:
   bvt shift(const bvt &op, const shiftt shift, const bvt &distance);
 
   bvt unsigned_multiplier(const bvt &op0, const bvt &op1);
+  bvt unsigned_karatsuba_multiplier(const bvt &op0, const bvt &op1);
+  bvt unsigned_karatsuba_full_multiplier(const bvt &op0, const bvt &op1);
+  bvt unsigned_toom_cook_multiplier(const bvt &op0, const bvt &op1);
+  bvt unsigned_schoenhage_strassen_multiplier(const bvt &a, const bvt &b);
   bvt signed_multiplier(const bvt &op0, const bvt &op1);
   bvt multiplier(const bvt &op0, const bvt &op1, representationt rep);
   bvt multiplier_no_overflow(
@@ -255,6 +259,7 @@ protected:
 
   bvt wallace_tree(const std::vector<bvt> &pps);
   bvt dadda_tree(const std::vector<bvt> &pps);
+  bvt comba_column_wise(const std::vector<bvt> &pps);
 };
 
 #endif // CPROVER_SOLVERS_FLATTENING_BV_UTILS_H

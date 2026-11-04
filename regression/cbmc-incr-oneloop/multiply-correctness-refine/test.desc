@@ -1,0 +1,17 @@
+CORE
+main.c
+--no-standard-checks --refine-arithmetic
+\[test_factor_narrow\.assertion\.1\].*narrow factor.*FAILURE
+\[test_prime_narrow\.assertion\.1\].*narrow prime.*SUCCESS
+\[test_factor_wide\.assertion\.1\].*wide factor.*FAILURE
+\[test_prime_wide\.assertion\.1\].*wide prime.*SUCCESS
+\[test_commutativity\.assertion\.1\].*commutativity.*SUCCESS
+\[test_not_equal\.assertion\.1\].*mul != add.*FAILURE
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Same as multiply-correctness but with --refine-arithmetic to catch
+soundness issues in the refinement loop.

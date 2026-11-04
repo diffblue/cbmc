@@ -1,0 +1,11 @@
+(set-logic QF_BV)
+(declare-fun a () (_ BitVec 16))
+(declare-fun b () (_ BitVec 16))
+(declare-fun r () (_ BitVec 16))
+(assert (= r (bvmul a b)))
+; Check: if a != 0 then r/a == b (no overflow case)
+(assert (not (= a (_ bv0 16))))
+(assert (not (= (bvudiv r a) b)))
+; This is SAT when overflow occurs
+(check-sat)
+(exit)

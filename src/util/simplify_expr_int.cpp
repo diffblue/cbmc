@@ -1388,6 +1388,176 @@ simplify_exprt::simplify_inequality(const binary_relation_exprt &expr)
   if(tmp0.type() != tmp1.type())
     return unchanged(expr);
 
+  // Check for commutative equivalence: a op b == b op a
+  // for commutative operators (mult, plus, bitand, bitor, bitxor)
+  if(expr.id() == ID_equal || expr.id() == ID_notequal)
+  {
+    if(
+      tmp0.id() == tmp1.id() && tmp0.operands().size() == 2 &&
+      tmp1.operands().size() == 2 &&
+      (tmp0.id() == ID_mult || tmp0.id() == ID_plus ||
+       tmp0.id() == ID_bitand || tmp0.id() == ID_bitor ||
+       tmp0.id() == ID_bitxor))
+    {
+      if(
+        tmp0.operands()[0] == tmp1.operands()[1] &&
+        tmp0.operands()[1] == tmp1.operands()[0])
+      {
+        if(expr.id() == ID_equal)
+          return true_exprt();
+        else
+          return false_exprt();
+      }
+    }
+
+    // Check for distributivity: a * (b + c) == a * b + a * c
+    // Try expanding multiplication over addition on each side and compare.
+    auto distribute_mult = [](const exprt &e) -> std::optional<exprt> {
+      if(e.id() != ID_mult || e.operands().size() != 2)
+        return {};
+      for(int i = 0; i < 2; ++i)
+      {
+        const exprt &factor = e.operands()[i];
+        const exprt &sum = e.operands()[1 - i];
+        if(sum.id() == ID_plus && sum.operands().size() == 2)
+        {
+          // a * (b + c) -> a*b + a*c
+          mult_exprt prod0(factor, sum.operands()[0]);
+          prod0.type() = e.type();
+          mult_exprt prod1(factor, sum.operands()[1]);
+          prod1.type() = e.type();
+          plus_exprt result(std::move(prod0), std::move(prod1));
+          result.type() = e.type();
+          return std::move(result);
+        }
+      }
+      return {};
+    };
+
+    // Try expanding LHS and comparing with RHS, and vice versa
+    auto expanded0 = distribute_mult(tmp0);
+    auto expanded1 = distribute_mult(tmp1);
+
+    // Compare expanded forms, accounting for commutativity of + and *
+    auto comm_equal = [](const exprt &a, const exprt &b) -> bool {
+      if(a == b)
+        return true;
+      // Check commutativity of the top-level operator
+      if(
+        a.id() == b.id() && a.operands().size() == 2 &&
+        b.operands().size() == 2 &&
+        (a.id() == ID_plus || a.id() == ID_mult))
+      {
+        if(
+          a.operands()[0] == b.operands()[1] &&
+          a.operands()[1] == b.operands()[0])
+          return true;
+      }
+      return false;
+    };
+
+    // Also check commutativity within sub-expressions
+    auto deep_comm_equal = [&comm_equal](const exprt &a, const exprt &b) {
+      if(comm_equal(a, b))
+        return true;
+      // If both are plus with 2 operands, check if individual products
+      // match with commutativity
+      if(
+        a.id() == ID_plus && b.id() == ID_plus &&
+        a.operands().size() == 2 && b.operands().size() == 2)
+      {
+        auto prod_eq = [](const exprt &p, const exprt &q) {
+          if(p == q)
+            return true;
+          if(
+            p.id() == ID_mult && q.id() == ID_mult &&
+            p.operands().size() == 2 && q.operands().size() == 2)
+          {
+            return p.operands()[0] == q.operands()[1] &&
+                   p.operands()[1] == q.operands()[0];
+          }
+          return false;
+        };
+        return (prod_eq(a.operands()[0], b.operands()[0]) &&
+                prod_eq(a.operands()[1], b.operands()[1])) ||
+               (prod_eq(a.operands()[0], b.operands()[1]) &&
+                prod_eq(a.operands()[1], b.operands()[0]));
+      }
+      return false;
+    };
+
+    bool is_equal = false;
+    if(expanded0.has_value() && deep_comm_equal(*expanded0, tmp1))
+      is_equal = true;
+    else if(expanded1.has_value() && deep_comm_equal(tmp0, *expanded1))
+      is_equal = true;
+    else if(
+      expanded0.has_value() && expanded1.has_value() &&
+      deep_comm_equal(*expanded0, *expanded1))
+      is_equal = true;
+
+    if(is_equal)
+    {
+      if(expr.id() == ID_equal)
+        return true_exprt();
+      else
+        return false_exprt();
+    }
+
+    // Check for associative+commutative equivalence.
+    // Flatten nested applications of the same operator and compare
+    // the multisets of leaves. E.g., (a*b)*c == a*(b*c) both flatten
+    // to {a, b, c} under *.
+    if(
+      tmp0.operands().size() == 2 && tmp1.operands().size() == 2 &&
+      (tmp0.id() == ID_mult || tmp0.id() == ID_plus ||
+       tmp0.id() == ID_bitand || tmp0.id() == ID_bitor ||
+       tmp0.id() == ID_bitxor) &&
+      (tmp1.id() == tmp0.id() ||
+       // one side has the op at top, other has it nested
+       (tmp0.operands().size() == 2 && tmp1.operands().size() == 2)))
+    {
+      const irep_idt &op_id = tmp0.id();
+      // Only proceed if both sides use the same top-level operator
+      // or one side has it nested
+      auto flatten = [&op_id](const exprt &e, std::vector<exprt> &leaves) {
+        std::vector<const exprt *> worklist = {&e};
+        while(!worklist.empty())
+        {
+          const exprt *cur = worklist.back();
+          worklist.pop_back();
+          if(cur->id() == op_id && cur->operands().size() == 2)
+          {
+            worklist.push_back(&cur->operands()[0]);
+            worklist.push_back(&cur->operands()[1]);
+          }
+          else
+            leaves.push_back(*cur);
+        }
+      };
+
+      if(tmp0.id() == op_id && tmp1.id() == op_id)
+      {
+        std::vector<exprt> leaves0, leaves1;
+        flatten(tmp0, leaves0);
+        flatten(tmp1, leaves1);
+
+        if(leaves0.size() == leaves1.size() && leaves0.size() <= 4)
+        {
+          std::sort(leaves0.begin(), leaves0.end());
+          std::sort(leaves1.begin(), leaves1.end());
+          if(leaves0 == leaves1)
+          {
+            if(expr.id() == ID_equal)
+              return true_exprt();
+            else
+              return false_exprt();
+          }
+        }
+      }
+    }
+  }
+
   // if rhs is ID_if (and lhs is not), swap operands for == and !=
   if((expr.id()==ID_equal || expr.id()==ID_notequal) &&
      tmp0.id()!=ID_if &&
