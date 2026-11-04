@@ -260,8 +260,14 @@ void goto_symext::rewrite_quantifiers(exprt &expr, statet &state)
     // for assumptions we can rewrite "exists X. P" to "P"
     // we keep the quantified variable unique by means of L2 renaming
     auto &quant_expr = to_quantifier_expr(expr);
-    symbol_exprt tmp0 =
-      to_symbol_expr(to_ssa_expr(quant_expr.symbol()).get_original_expr());
+    // The bound variable is an SSA expression when produced by the C front
+    // end, but other front ends (e.g. Strata) may present it as a plain
+    // symbol. Only unwrap the original expression when it really is an SSA
+    // expression.
+    const symbol_exprt &quant_symbol = quant_expr.symbol();
+    symbol_exprt tmp0 = quant_symbol;
+    if(is_ssa_expr(quant_symbol))
+      tmp0 = to_symbol_expr(to_ssa_expr(quant_symbol).get_original_expr());
     symex_decl(state, tmp0);
     instruction_local_symbols.push_back(tmp0);
     exprt tmp = quant_expr.where();
