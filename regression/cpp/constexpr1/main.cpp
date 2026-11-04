@@ -14,6 +14,18 @@ constexpr int some_other_value =
 
 static_assert(some_other_value == 2, "some_other_value == 2");
 
+constexpr int some_function2(int a)
+{
+  int b;
+  a = a + 1;
+  b = a;
+  return b + 1;
+}
+
+constexpr int some_other_value2 = some_function2(1);
+
+static_assert(some_other_value2 == 3, "some_other_value == 2");
+
 int main()
 {
 }

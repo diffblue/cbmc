@@ -73,6 +73,10 @@ bool cpp_typecheckt::cpp_is_pod(const typet &type) const
   {
     return cpp_is_pod(to_array_type(type).element_type());
   }
+  else if(type.id()==ID_vector)
+  {
+    return cpp_is_pod(to_vector_type(type).element_type());
+  }
   else if(type.id()==ID_pointer)
   {
     if(is_reference(type)) // references are not PODs

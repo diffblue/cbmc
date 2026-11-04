@@ -554,11 +554,14 @@ int cbmc_parse_optionst::doit()
   register_languages();
 
   // configure gcc, if required
-  if(config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::GCC)
+  if(config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::GCC ||
+    config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::CLANG)
   {
     gcc_versiont gcc_version;
     gcc_version.get("gcc");
     configure_gcc(gcc_version);
+    config.ansi_c.c_standard = gcc_version.default_c_standard;
+    config.cpp.cpp_standard = gcc_version.default_cxx_standard;
   }
 
   if(cmdline.isset("test-preprocessor"))
