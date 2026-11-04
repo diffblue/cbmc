@@ -1,9 +1,8 @@
-KNOWNBUG
+CORE
 main.c
 
-^EXIT=64$
+^EXIT=6$
 ^SIGNAL=0$
-^PARSING ERROR$
+^CONVERSION ERROR$
 --
---
-Tests a parsing issue regarding array declarators, see Array_Declarator1
+^warning: ignoring
