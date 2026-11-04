@@ -1,8 +1,8 @@
-KNOWNBUG unix
+CORE unix
 main.c
---pointer-check --bounds-check
-^EXIT=0$
+
+^EXIT=10$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
+^VERIFICATION FAILED$
 --
 ^warning: ignoring
