@@ -15985,3 +15985,24 @@ suite with AArch64 headers, MSVC .ii 8/8, macOS set 143/143.
   library models inlined, 7 to 10 s).  A model of 14.44's
   _Yarn<char>::operator= was tried and dropped: not applied, and not
   the cause.
+
+## Round 217 (2026-11-04): why __std_exception_copy's loop did not end
+
+Reduced to plain C (/tmp/r227/s7.c): `char *dup(const char *s)` mallocs
+16 bytes, returns 0 if malloc failed, else copies s; main checks the
+result for 0 and then loops `while(q[m]) ++m`.  With malloc-may-fail
+(cbmc's default, return-null mode) the loop does not end; with
+--no-malloc-may-fail it ends at 15.  Mechanism: the merge at malloc's
+return assigns the new object on both paths (one side has L2 count 0);
+the merge after dup's early return then gives each byte
+`\guard#1 ? nondet : 'b'' with \guard#1 = (p == NULL).  main's
+`q == 0' test is on q = dup!0#3 = (\guard#1 ? NULL : p), which is not
+forward-propagated (an if with a symbolic condition), so neither the
+condition nor apply_condition relates !(q == 0) to !\guard#1, and the
+bytes stay unresolved.  A general symex limitation (path-sensitive
+propagation); not fixed in symex.  232ef71367 makes the model's copy
+succeed instead ([exception]/2: equal what() of copies) and drops the
+loop bound of cpp11_standard_stream_objects_initialized_msvc.
+Side finding: `b ? "C" : nullptr' is rejected ("types are incompatible",
+const char[2] vs nullptr_t), valid by [expr.cond]/7 (array-to-pointer,
+then composite pointer type); g++ and clang++ accept it.  Not fixed yet.
