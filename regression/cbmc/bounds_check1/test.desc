@@ -1,6 +1,6 @@
 CORE thorough-smt-backend no-new-smt
 main.c
---no-malloc-may-fail
+--no-malloc-may-fail --arrays-uf-never
 ^EXIT=10$
 ^SIGNAL=0$
 \[\(.*\)i2\]: FAILURE

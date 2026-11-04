@@ -3,7 +3,9 @@
 
 struct inner
 {
-  uint32_t exts[32]; // 32 is the minimum to crash
+  // 32 is the minimum to crash as it will produce an array wider than 1000 bits
+  // (the default value of MAX_FLATTENED_ARRAY_SIZE)
+  uint32_t exts[32];
 };
 
 struct outer
