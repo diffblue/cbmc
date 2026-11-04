@@ -19,6 +19,10 @@ Author: Michael Tautschnig
 
 #include "goto_symex_can_forward_propagate.h"
 
+#include <cstdint>
+#include <set>
+#include <vector>
+
 /// Try to evaluate a simple pointer comparison.
 /// \param operation: ID_equal or ID_not_equal
 /// \param symbol_expr: The symbol expression in the condition
@@ -155,6 +159,62 @@ simplify_exprt::resultt<> simplify_expr_with_value_sett::simplify_inequality(
     return unchanged(expr);
 }
 
+/// Compute the object number (in \ref value_sett::object_numbering) of the
+/// root object of the object numbered \p object_number, or return an empty
+/// std::optional when the object is "unknown," "invalid," or a failed symbol.
+/// Results are cached: the numbering is global, append-only, and maps numbers
+/// to immutable expressions, so a result computed once remains valid for the
+/// lifetime of the program. This matters as value sets are repeatedly
+/// re-inspected element by element in
+/// \ref simplify_expr_with_value_sett::simplify_inequality_pointer_object,
+/// which makes the per-element cost of testing for failed symbols and of
+/// numbering root objects a dominant cost of symbolic execution when value
+/// sets grow large.
+static std::optional<object_numberingt::number_type>
+root_object_number(object_numberingt::number_type object_number)
+{
+  enum class statet : std::uint8_t
+  {
+    NOT_COMPUTED,
+    EXCLUDED,
+    VALID
+  };
+  struct cache_entryt
+  {
+    statet state = statet::NOT_COMPUTED;
+    object_numberingt::number_type root_object_number = 0;
+  };
+  static std::vector<cache_entryt> cache;
+
+  if(cache.size() <= object_number)
+    cache.resize(object_number + 1);
+
+  cache_entryt &entry = cache[object_number];
+  if(entry.state == statet::NOT_COMPUTED)
+  {
+    const exprt &object = value_sett::object_numbering[object_number];
+    const exprt &root_object = object_descriptor_exprt::root_object(object);
+
+    if(
+      object.id() == ID_unknown || object.id() == ID_invalid ||
+      is_failed_symbol(root_object))
+    {
+      entry.state = statet::EXCLUDED;
+    }
+    else
+    {
+      entry.state = statet::VALID;
+      entry.root_object_number =
+        value_sett::object_numbering.number(root_object);
+    }
+  }
+
+  if(entry.state == statet::EXCLUDED)
+    return {};
+  else
+    return entry.root_object_number;
+}
+
 simplify_exprt::resultt<>
 simplify_expr_with_value_sett::simplify_inequality_pointer_object(
   const binary_relation_exprt &expr)
@@ -162,44 +222,58 @@ simplify_expr_with_value_sett::simplify_inequality_pointer_object(
   PRECONDITION(expr.id() == ID_equal || expr.id() == ID_notequal);
   PRECONDITION(expr.is_boolean());
 
+  // Collect the objects that `pointer` may point to, as a set of object
+  // numbers in value_sett::object_numbering. Working with object numbers
+  // rather than materialized expressions avoids both the cost of building an
+  // object_descriptor_exprt per value-set element and the cost of comparing
+  // deep expression trees when populating the set: the numbering is
+  // hash-consed, so each distinct expression is numbered once and set
+  // operations are operations over integers. An empty set means "no
+  // information".
   auto collect_objects = [this](const exprt &pointer)
   {
-    std::set<exprt> objects;
+    std::set<object_numberingt::number_type> objects;
     if(auto address_of = expr_try_dynamic_cast<address_of_exprt>(pointer))
     {
-      objects.insert(
-        object_descriptor_exprt::root_object(address_of->object()));
+      objects.insert(value_sett::object_numbering.number(
+        object_descriptor_exprt::root_object(address_of->object())));
     }
     else if(auto ssa_expr = expr_try_dynamic_cast<ssa_exprt>(pointer))
     {
       ssa_exprt l1_expr{*ssa_expr};
       l1_expr.remove_level_2();
-      const std::vector<exprt> value_set_elements =
-        value_set.get_value_set(l1_expr, ns);
+      const value_sett::object_mapt value_set_elements =
+        value_set.get_value_set(l1_expr, ns, false);
 
-      for(const auto &value_set_element : value_set_elements)
+      for(const auto &object_number_and_offset : value_set_elements.read())
       {
-        if(
-          value_set_element.id() == ID_unknown ||
-          value_set_element.id() == ID_invalid ||
-          is_failed_symbol(
-            to_object_descriptor_expr(value_set_element).root_object()))
+        auto object_number = root_object_number(object_number_and_offset.first);
+
+        if(!object_number.has_value())
         {
           objects.clear();
           break;
         }
 
-        objects.insert(
-          to_object_descriptor_expr(value_set_element).root_object());
+        objects.insert(*object_number);
       }
     }
     return objects;
   };
 
-  auto lhs_objects =
+  const auto lhs_objects =
     collect_objects(to_pointer_object_expr(expr.lhs()).pointer());
-  auto rhs_objects =
+
+  // an empty set of objects on either side means we cannot simplify, so don't
+  // bother collecting the objects of the other side
+  if(lhs_objects.empty())
+    return simplify_exprt::simplify_inequality_pointer_object(expr);
+
+  const auto rhs_objects =
     collect_objects(to_pointer_object_expr(expr.rhs()).pointer());
+
+  if(rhs_objects.empty())
+    return simplify_exprt::simplify_inequality_pointer_object(expr);
 
   if(lhs_objects.size() == 1 && lhs_objects == rhs_objects)
   {
@@ -209,14 +283,23 @@ simplify_expr_with_value_sett::simplify_inequality_pointer_object(
                                  : changed(static_cast<exprt>(false_exprt{}));
   }
 
-  std::list<exprt> intersection;
-  std::set_intersection(
-    lhs_objects.begin(),
-    lhs_objects.end(),
-    rhs_objects.begin(),
-    rhs_objects.end(),
-    std::back_inserter(intersection));
-  if(!lhs_objects.empty() && !rhs_objects.empty() && intersection.empty())
+  auto lhs_it = lhs_objects.begin();
+  auto rhs_it = rhs_objects.begin();
+  bool intersection_empty = true;
+  while(lhs_it != lhs_objects.end() && rhs_it != rhs_objects.end())
+  {
+    if(*lhs_it < *rhs_it)
+      ++lhs_it;
+    else if(*rhs_it < *lhs_it)
+      ++rhs_it;
+    else
+    {
+      intersection_empty = false;
+      break;
+    }
+  }
+
+  if(intersection_empty)
   {
     // all pointed-to objects on the left-hand side are different from any of
     // the pointed-to objects on the right-hand side
