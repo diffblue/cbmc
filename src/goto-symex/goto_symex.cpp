@@ -132,7 +132,7 @@ void goto_symext::symex_assign(
     const bool maybe_divisible =
       lhs.id() == ID_index ||
       (is_ssa_expr(lhs) &&
-       state.field_sensitivity.is_divisible(to_ssa_expr(lhs), false));
+       state.field_sensitivity.is_divisible(ns, to_ssa_expr(lhs), false));
     const bool need_atomic_section = maybe_divisible &&
                                      state.threads.size() > 1 &&
                                      state.atomic_section_id == 0;
