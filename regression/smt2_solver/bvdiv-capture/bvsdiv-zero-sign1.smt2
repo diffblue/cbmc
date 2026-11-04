@@ -1,0 +1,7 @@
+; bvsdiv by zero of a negative dividend is 1 (not all-ones)
+; SMT-LIB 2.6: bvsdiv(s, 0) = ite(bvslt(s, 0), 1, ~0)
+(set-logic QF_BV)
+(declare-const r (_ BitVec 8))
+(assert (= r (bvsdiv #xff #x00)))
+(check-sat)
+(get-value (r))
