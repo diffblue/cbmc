@@ -14,9 +14,8 @@ Author: Elizabeth Polgreen, elizabeth.polgreen@cs.ox.ac.uk
 #include <util/message.h>
 
 #include <goto-programs/goto_model.h>
+#include <goto-programs/initialize_function.h>
 #include <goto-programs/show_properties.h>
-
-#include <linking/static_lifetime_init.h>
 
 #include <analyses/call_graph_helpers.h>
 

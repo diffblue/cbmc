@@ -20,8 +20,7 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 
 #include <goto-programs/adjust_float_expressions.h>
 #include <goto-programs/goto_functions.h>
-
-#include <linking/static_lifetime_init.h>
+#include <goto-programs/initialize_function.h>
 
 /// Postfix for the artificial data block that is created when calling a main
 /// symbol that is a function block.
