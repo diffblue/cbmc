@@ -637,7 +637,13 @@ bvt float_utilst::div(const bvt &src1, const bvt &src2)
   const unbiased_floatt unpacked1=unpack(src1);
   const unbiased_floatt unpacked2=unpack(src2);
 
-  std::size_t div_width=unpacked1.fraction.size()*2+1;
+  // The quotient needs spec.f + 2 significant bits (the significand plus a
+  // guard bit) above the remainder, which provides the sticky bit.  Padding
+  // the dividend with spec.f + 2 zeros achieves this for a normal dividend.
+  // A subnormal dividend, however, has up to spec.f leading zeros, each of
+  // which costs one significant bit of the quotient, so we add spec.f more
+  // bits of padding.
+  std::size_t div_width = unpacked1.fraction.size() * 2 + 1 + spec.f;
 
   // pad fraction1 with zeros
   bvt fraction1=unpacked1.fraction;

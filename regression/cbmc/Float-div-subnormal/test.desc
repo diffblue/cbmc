@@ -1,0 +1,10 @@
+CORE no-new-smt
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Division with subnormal dividend.
