@@ -84,9 +84,9 @@ exprt update_bits_exprt::lower() const
   auto src_bv_type = bv_typet(width);
 
   // build a mask 1...1 0...0
-  auto mask_bv = make_bvrep(width, [new_value_width](std::size_t index) {
-    return index >= new_value_width;
-  });
+  auto mask_bv = make_bvrep(
+    width,
+    [new_value_width](std::size_t index) { return index >= new_value_width; });
   auto mask_expr = constant_exprt(mask_bv, src_bv_type);
 
   // shift the mask by the index
@@ -124,10 +124,10 @@ exprt popcount_exprt::lower() const
   const std::size_t bits = address_bits(x_width);
   const std::size_t new_width = numeric_cast_v<std::size_t>(power(2, bits));
 
-  const bool need_typecast =
-    new_width > x_width || x.type().id() != ID_unsignedbv;
+  if(x.type().id() != ID_unsignedbv)
+    x = typecast_exprt(x, unsignedbv_typet(x_width));
 
-  if(need_typecast)
+  if(new_width > x_width)
     x = typecast_exprt(x, unsignedbv_typet(new_width));
 
   // repeatedly compute x = (x & bitmask) + ((x >> shift) & bitmask)
@@ -168,10 +168,10 @@ exprt count_leading_zeros_exprt::lower() const
   const std::size_t bits = address_bits(x_width);
   const std::size_t new_width = numeric_cast_v<std::size_t>(power(2, bits));
 
-  const bool need_typecast =
-    new_width > x_width || x.type().id() != ID_unsignedbv;
+  if(x.type().id() != ID_unsignedbv)
+    x = typecast_exprt(x, unsignedbv_typet(x_width));
 
-  if(need_typecast)
+  if(new_width > x_width)
     x = typecast_exprt(x, unsignedbv_typet(new_width));
 
   // repeatedly compute x = x | (x >> shift)
