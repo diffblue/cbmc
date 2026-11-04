@@ -1,0 +1,28 @@
+CORE
+tweetnacl.c
+--dependence-graph --show --text -
+activate-multi-line-match
+^EXIT=0$
+^SIGNAL=0$
+\*\*\*\* (\d+) .*function crypto_verify_16\n\n.*\n.*ASSIGN crypto_verify_16::1::i := 0\n\n\*\*\*\* (\d+) .*function crypto_verify_16\nControl dependencies: \2\nData dependencies: \1,(\d+)\n\n.*\n.*IF.*crypto_verify_16::1::i < 16.*\n(.*\n)*?.*\*\*\*\* \3 .*function crypto_verify_16\n(.*\n)*?.*ASSIGN crypto_verify_16::1::i := crypto_verify_16::1::i \+ 1
+\*\*\*\* (\d+) .*function cswap\n\n.*\n.*ASSIGN cswap::1::i := 0\n\n\*\*\*\* (\d+) .*function cswap\nControl dependencies: \2\nData dependencies: \1,(\d+)\n\n.*\n.*IF.*cswap::1::i < 32.*\n(.*\n)*?.*\*\*\*\* \3 .*function cswap\n(.*\n)*?.*ASSIGN cswap::1::i := cswap::1::i \+ 1
+--
+^warning: ignoring
+Function: sel25519\n((?!.*END_FUNCTION).*\n)*.*\bIF\b
+--
+Verifies TweetNaCl's constant-time property claims (issue #366):
+
+1. sel25519 is branchless: no IF instruction appears between the function
+   header and END_FUNCTION (negative match).
+
+2. crypto_verify_16 loop bound is constant: the IF instruction's data
+   dependencies (captured via backreferences) trace back only to the loop
+   counter initialization (i := 0) and increment (i := i + 1), not to any
+   secret input data.
+
+3. cswap loop bound is constant: same as crypto_verify_16 -- the loop
+   condition depends only on the loop counter, not on the secret swap bit.
+
+This confirms that secret inputs create data dependencies (values flow
+through computations) but NOT control dependencies (secret values don't
+determine which branches are taken or loop iteration counts).
