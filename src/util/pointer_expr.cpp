@@ -61,7 +61,18 @@ static void build_object_descriptor_rec(
     build_object_descriptor_rec(ns, struct_op, dest);
 
     auto offset = member_offset_expr(member, ns);
-    CHECK_RETURN(offset.has_value());
+    if(!offset.has_value())
+    {
+      // member_offset_expr cannot compute the offset when a preceding member
+      // has non-constant width. Use the member access itself as the (precise)
+      // object; the offset relative to it is then zero, so reset the offset
+      // accumulated while descending into struct_op above. (The ID_index
+      // branch instead keeps the root object and marks the offset unknown --
+      // here the member-as-object form is both consistent and more precise.)
+      dest.object() = member;
+      dest.offset() = from_integer(0, c_index_type());
+      return;
+    }
 
     dest.offset() = plus_exprt(
       dest.offset(),
