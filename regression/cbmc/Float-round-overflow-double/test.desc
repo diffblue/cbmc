@@ -1,0 +1,14 @@
+CORE no-new-smt broken-cprover-smt-backend
+main.c
+--floatbv
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Conversion and arithmetic on double whose rounding carries out of the
+significand. With the non-FPA SMT encoding (e.g., --z3), float_bvt used to set
+the most significant bit of the significand via 1 << 52 computed in int.
+Complements Float-to-double-round-up, which covers conversion from binary128.
+Regression test for GitHub issue #9200.
