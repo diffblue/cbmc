@@ -1,0 +1,13 @@
+CORE unix
+main.c
+--arch ppc64le --os linux --float-overflow-check --nan-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+On ppc64le, long double is IEEE binary128.  This covers the binary128 variant of
+the library model, while test.desc covers the x86 80-bit extended variant on
+x86 hosts.  Restricted to unix as --os linux requires a GCC-compatible
+preprocessor.

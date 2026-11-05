@@ -498,6 +498,12 @@ unsignedbv_typet char32_t_type();
 floatbv_typet float_type();
 floatbv_typet double_type();
 floatbv_typet long_double_type();
+/// Returns true iff `long_double_type()` returns the x86 80-bit extended
+/// format (i.e., its `ID_x86_extended` flag is set).  This is the canonical
+/// way for callers outside `c_types.cpp` to ask "does the current target
+/// use x86-extended long double" without having to re-derive the answer
+/// from `(arch, long_double_width)`.
+bool long_double_is_x86_extended();
 unsignedbv_typet size_type();
 signedbv_typet signed_size_type();
 signedbv_typet pointer_diff_type();

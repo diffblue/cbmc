@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "cprover_library.h"
 
+#include <util/c_types.h>
 #include <util/config.h>
 #include <util/cprover_prefix.h>
 #include <util/symbol_table_base.h>
@@ -23,6 +24,15 @@ static std::string get_cprover_library_text(
 {
   std::ostringstream library_text;
 
+  // Decide whether the target uses x86 80-bit extended `long double`.
+  // We delegate to `c_types::long_double_is_x86_extended()` (which is
+  // defined in terms of the type-system decision in
+  // `c_types.cpp::long_double_type()`) so this and the type system stay
+  // in sync by construction; the math.c models use the macro to dispatch
+  // between layout-specific encodings of the Schraudolph-style fast-math
+  // approximations for `expl`, `logl`, `powl` and friends.
+  const bool ld_is_x86_extended = long_double_is_x86_extended();
+
   library_text << "#line 1 \"<built-in-additions>\"\n"
                   "#define " CPROVER_PREFIX "malloc_failure_mode "
                << std::to_string(config.ansi_c.malloc_failure_mode)
@@ -36,7 +46,10 @@ static std::string get_cprover_library_text(
                     config.ansi_c.malloc_failure_mode_assert_then_assume)
                << "\n"
                   "#define " CPROVER_PREFIX "malloc_may_fail "
-               << std::to_string(config.ansi_c.malloc_may_fail) << "\n";
+               << std::to_string(config.ansi_c.malloc_may_fail)
+               << "\n"
+                  "#define " CPROVER_PREFIX "LDBL_IS_X86_EXTENDED "
+               << (ld_is_x86_extended ? "1" : "0") << "\n";
 
   library_text <<
     "#line 1 \"<builtin-library>\"\n"

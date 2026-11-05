@@ -2308,6 +2308,87 @@ float expf(float x)
   return u.f;
 }
 
+/* FUNCTION: __cprover_x86ld_to_schraudolph */
+
+#ifndef __CPROVER_STDINT_H_INCLUDED
+#  include <stdint.h>
+#  define __CPROVER_STDINT_H_INCLUDED
+#endif
+
+#if __CPROVER_LDBL_IS_X86_EXTENDED
+// Decode an x86 80-bit extended `long double` into the 32-bit Schraudolph
+// integer representation used by the long-double-only fast-math models.
+//
+// Layout of the 80-bit value (low to high):
+//   bits 0..62  : 63-bit explicit fraction
+//   bit  63     : explicit integer bit (J-bit, always 1 for normal numbers)
+//   bits 64..78 : 15-bit biased exponent
+//   bit  79     : sign bit
+//   bits 80+    : storage padding (zero on Linux/macOS/FreeBSD)
+//
+// The Schraudolph 32-bit integer for value x = 2^q * (1 + top16_frac/2^16) is
+// (q + 16383) << 16 | top16_frac, with the sign bit (bit 31) cleared.  The
+// long-double fast-math callers (logl, log2l, log10l, powl, __builtin_powil)
+// only invoke this on x > 0 (the negative-input cases short-circuit via NaN
+// or special-value handling above), so we mask the sign bit out
+// unconditionally rather than threading it through the result.
+int32_t __cprover_x86ld_to_schraudolph(long double x)
+{
+  union
+  {
+    long double l;
+    unsigned char b[sizeof(long double)];
+  } u = {.l = x};
+  uint64_t low_bits = ((uint64_t)u.b[0]) | ((uint64_t)u.b[1] << 8) |
+                      ((uint64_t)u.b[2] << 16) | ((uint64_t)u.b[3] << 24) |
+                      ((uint64_t)u.b[4] << 32) | ((uint64_t)u.b[5] << 40) |
+                      ((uint64_t)u.b[6] << 48) | ((uint64_t)u.b[7] << 56);
+  uint16_t high_bits = (uint16_t)((uint16_t)u.b[8] | ((uint16_t)u.b[9] << 8));
+  return (
+    int32_t)(((uint32_t)(high_bits & 0x7FFFu) << 16) | (uint32_t)((low_bits >> 47) & 0xFFFFu));
+}
+#endif
+
+/* FUNCTION: __cprover_x86ld_from_schraudolph */
+
+#ifndef __CPROVER_STDINT_H_INCLUDED
+#  include <stdint.h>
+#  define __CPROVER_STDINT_H_INCLUDED
+#endif
+
+#if __CPROVER_LDBL_IS_X86_EXTENDED
+// Inverse of `__cprover_x86ld_to_schraudolph`: encode the 32-bit Schraudolph
+// integer `s` as an x86 80-bit extended `long double` value.  See the layout
+// comment in `__cprover_x86ld_to_schraudolph` for the bit positions; the
+// J-bit is set to 1 (Schraudolph results are always positive non-zero) and
+// any storage padding above the 80-bit value is zero.
+//
+// The byte-by-byte writes are independent of host endianness; x86 itself is
+// always little-endian, which is what the union read at the use site
+// expects.
+long double __cprover_x86ld_from_schraudolph(int32_t s)
+{
+  uint16_t high_bits = (uint16_t)(((uint32_t)s >> 16) & 0xFFFFu);
+  uint64_t low_bits = ((uint64_t)((uint32_t)s & 0xFFFFu) << 47) | (1ULL << 63);
+  union
+  {
+    long double l;
+    unsigned char b[sizeof(long double)];
+  } u = {.b = {0}};
+  u.b[0] = (unsigned char)(low_bits >> 0);
+  u.b[1] = (unsigned char)(low_bits >> 8);
+  u.b[2] = (unsigned char)(low_bits >> 16);
+  u.b[3] = (unsigned char)(low_bits >> 24);
+  u.b[4] = (unsigned char)(low_bits >> 32);
+  u.b[5] = (unsigned char)(low_bits >> 40);
+  u.b[6] = (unsigned char)(low_bits >> 48);
+  u.b[7] = (unsigned char)(low_bits >> 56);
+  u.b[8] = (unsigned char)(high_bits >> 0);
+  u.b[9] = (unsigned char)(high_bits >> 8);
+  return u.l;
+}
+#endif
+
 /* FUNCTION: expl */
 
 #ifndef __CPROVER_MATH_H_INCLUDED
@@ -2359,6 +2440,7 @@ long double expl(long double x)
     return HUGE_VALL;
 #  pragma CPROVER check pop
   }
+  // Schraudolph-style fast approximation of exp(x) ≈ 2^(x/ln(2)).
   // 16 is 32 - 1 sign bit - 15 exponent bits
   int32_t bias = (1 << 16) * ((1 << 14) - 1);
   int32_t exp_a_x = (int32_t)(x / M_LN2 * (long double)(1 << 16)) + bias;
@@ -2370,11 +2452,17 @@ long double expl(long double x)
   __CPROVER_assume(result >= lower);
   __CPROVER_assume(result <= upper);
 
-#  ifndef _MSC_VER
-  _Static_assert
+#  if __CPROVER_LDBL_IS_X86_EXTENDED
+  // See `__cprover_x86ld_from_schraudolph` for the byte-level encoding;
+  // this is just a one-liner once the helper is in scope.
+  long double __cprover_x86ld_from_schraudolph(int32_t);
+  return __cprover_x86ld_from_schraudolph(result);
 #  else
+#    ifndef _MSC_VER
+  _Static_assert
+#    else
   static_assert
-#  endif
+#    endif
     (sizeof(long double) % sizeof(int32_t) == 0,
      "bit width of long double is a multiple of bit width of int32_t");
   union
@@ -2382,12 +2470,13 @@ long double expl(long double x)
     long double l;
     int32_t i[sizeof(long double) / sizeof(int32_t)];
   } u = {.i = {0}};
-#  if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#    if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
   u.i[sizeof(long double) / sizeof(int32_t) - 1] = result;
-#  else
+#    else
   u.i[0] = result;
-#  endif
+#    endif
   return u.l;
+#  endif
 #endif
 }
 
@@ -2576,11 +2665,27 @@ long double logl(long double x)
 #if LDBL_MAX_EXP == DBL_MAX_EXP
   return log(x);
 #else
-#  ifndef _MSC_VER
-  _Static_assert
+  // Schraudolph-style fast logarithm: reconstruct the 32-bit integer that
+  // would have been produced by the corresponding `expl` encoding, then
+  // invert the Schraudolph linear formula.
+  int32_t bias = (1 << 16) * ((1 << 14) - 1);
+  int32_t exp_c = __VERIFIER_nondet_int32_t();
+  __CPROVER_assume(exp_c >= -5641 && exp_c <= 1);
+#  if __CPROVER_LDBL_IS_X86_EXTENDED
+  // x86 80-bit extended layout: see __cprover_x86ld_to_schraudolph for
+  // the byte-level decoding.  This function is only called with x > 0
+  // (the early-out checks above handle x <= 0), so the sign bit is
+  // always zero and the helper masks it out unconditionally.
+  int32_t __cprover_x86ld_to_schraudolph(long double);
+  int32_t exp_a_x = __cprover_x86ld_to_schraudolph(x);
+  return ((long double)exp_a_x - (long double)(bias + exp_c)) * M_LN2 /
+         (long double)(1 << 16);
 #  else
+#    ifndef _MSC_VER
+  _Static_assert
+#    else
   static_assert
-#  endif
+#    endif
     (sizeof(long double) % sizeof(int32_t) == 0,
      "bit width of long double is a multiple of bit width of int32_t");
   union
@@ -2588,16 +2693,14 @@ long double logl(long double x)
     long double l;
     int32_t i[sizeof(long double) / sizeof(int32_t)];
   } u = {x};
-  int32_t bias = (1 << 16) * ((1 << 14) - 1);
-  int32_t exp_c = __VERIFIER_nondet_int32_t();
-  __CPROVER_assume(exp_c >= -5641 && exp_c <= 1);
-#  if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#    if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
   return ((long double)u.i[sizeof(long double) / sizeof(int32_t) - 1] -
           (long double)(bias + exp_c)) *
          M_LN2 / (long double)(1 << 16);
-#  else
+#    else
   return ((long double)u.i[0] - (long double)(bias + exp_c)) * M_LN2 /
          (long double)(1 << 16);
+#    endif
 #  endif
 #endif
 }
@@ -2785,11 +2888,26 @@ long double log2l(long double x)
 #if LDBL_MAX_EXP == DBL_MAX_EXP
   return log2(x);
 #else
-#  ifndef _MSC_VER
-  _Static_assert
+  // Schraudolph-style fast log2: same Schraudolph integer reconstruction as
+  // logl, then divide by 2^16 (no M_LN2 factor).
+  int32_t bias = (1 << 16) * ((1 << 14) - 1);
+  int32_t exp_c = __VERIFIER_nondet_int32_t();
+  __CPROVER_assume(exp_c >= -5641 && exp_c <= 1);
+#  if __CPROVER_LDBL_IS_X86_EXTENDED
+  // x86 80-bit extended layout: see __cprover_x86ld_to_schraudolph for
+  // the byte-level decoding.  This function is only called with x > 0
+  // (the early-out checks above handle x <= 0), so the sign bit is
+  // always zero and the helper masks it out unconditionally.
+  int32_t __cprover_x86ld_to_schraudolph(long double);
+  int32_t exp_a_x = __cprover_x86ld_to_schraudolph(x);
+  return ((long double)exp_a_x - (long double)(bias + exp_c)) /
+         (long double)(1 << 16);
 #  else
+#    ifndef _MSC_VER
+  _Static_assert
+#    else
   static_assert
-#  endif
+#    endif
     (sizeof(long double) % sizeof(int32_t) == 0,
      "bit width of long double is a multiple of bit width of int32_t");
   union
@@ -2797,16 +2915,14 @@ long double log2l(long double x)
     long double l;
     int32_t i[sizeof(long double) / sizeof(int32_t)];
   } u = {x};
-  int32_t bias = (1 << 16) * ((1 << 14) - 1);
-  int32_t exp_c = __VERIFIER_nondet_int32_t();
-  __CPROVER_assume(exp_c >= -5641 && exp_c <= 1);
-#  if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#    if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
   return ((long double)u.i[sizeof(long double) / sizeof(int32_t) - 1] -
           (long double)(bias + exp_c)) /
          (long double)(1 << 16);
-#  else
+#    else
   return ((long double)u.i[0] - (long double)(bias + exp_c)) /
          (long double)(1 << 16);
+#    endif
 #  endif
 #endif
 }
@@ -2999,11 +3115,26 @@ long double log10l(long double x)
 #if LDBL_MAX_EXP == DBL_MAX_EXP
   return log10(x);
 #else
-#  ifndef _MSC_VER
-  _Static_assert
+  // Schraudolph-style fast log10: same Schraudolph integer reconstruction
+  // as logl, then multiply by ln(2)/ln(10) / 2^16.
+  int32_t bias = (1 << 16) * ((1 << 14) - 1);
+  int32_t exp_c = __VERIFIER_nondet_int32_t();
+  __CPROVER_assume(exp_c >= -5641 && exp_c <= 1);
+#  if __CPROVER_LDBL_IS_X86_EXTENDED
+  // x86 80-bit extended layout: see __cprover_x86ld_to_schraudolph for
+  // the byte-level decoding.  This function is only called with x > 0
+  // (the early-out checks above handle x <= 0), so the sign bit is
+  // always zero and the helper masks it out unconditionally.
+  int32_t __cprover_x86ld_to_schraudolph(long double);
+  int32_t exp_a_x = __cprover_x86ld_to_schraudolph(x);
+  return ((long double)exp_a_x - (long double)(bias + exp_c)) *
+         (M_LN2 / M_LN10) / (long double)(1 << 16);
 #  else
+#    ifndef _MSC_VER
+  _Static_assert
+#    else
   static_assert
-#  endif
+#    endif
     (sizeof(long double) % sizeof(int32_t) == 0,
      "bit width of long double is a multiple of bit width of int32_t");
   union
@@ -3011,16 +3142,14 @@ long double log10l(long double x)
     long double l;
     int32_t i[sizeof(long double) / sizeof(int32_t)];
   } u = {x};
-  int32_t bias = (1 << 16) * ((1 << 14) - 1);
-  int32_t exp_c = __VERIFIER_nondet_int32_t();
-  __CPROVER_assume(exp_c >= -5641 && exp_c <= 1);
-#  if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#    if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
   return ((long double)u.i[sizeof(long double) / sizeof(int32_t) - 1] -
           (long double)(bias + exp_c)) *
          (M_LN2 / M_LN10) / (long double)(1 << 16);
-#  else
+#    else
   return ((long double)u.i[0] - (long double)(bias + exp_c)) *
          (M_LN2 / M_LN10) / (long double)(1 << 16);
+#    endif
 #  endif
 #endif
 }
@@ -3431,11 +3560,29 @@ long double powl(long double x, long double y)
 #if LDBL_MAX_EXP == DBL_MAX_EXP
   return pow(x, y);
 #else
-#  ifndef _MSC_VER
-  _Static_assert
+  // Schraudolph-style fast pow: pow(x, y) ≈ exp(y * log(x)) is implemented
+  // by extracting the Schraudolph 32-bit integer encoding of x, multiplying
+  // by y, and writing the result back as a long double.  See `expl` and
+  // `logl` for the per-layout encoding details.  Only the read of the
+  // encoding and the write-back of the result differ between the x86
+  // 80-bit extended and the IEEE binary128 layout; the overflow handling
+  // and arithmetic in between are shared.
+  int32_t bias = (1 << 16) * ((1 << 14) - 1);
+  int32_t exp_c = __VERIFIER_nondet_int32_t();
+  __CPROVER_assume(exp_c >= -5641 && exp_c <= 1);
+
+#  if __CPROVER_LDBL_IS_X86_EXTENDED
+  // This branch is only reached after the early-out checks above have
+  // eliminated x <= 0, so the helper can mask out the sign bit
+  // unconditionally.
+  int32_t __cprover_x86ld_to_schraudolph(long double);
+  int32_t exponent = __cprover_x86ld_to_schraudolph(x);
 #  else
+#    ifndef _MSC_VER
+  _Static_assert
+#    else
   static_assert
-#  endif
+#    endif
     (sizeof(long double) % sizeof(int32_t) == 0,
      "bit width of long double is a multiple of bit width of int32_t");
   union U
@@ -3443,14 +3590,13 @@ long double powl(long double x, long double y)
     long double l;
     int32_t i[sizeof(long double) / sizeof(int32_t)];
   } u = {x};
-#  if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#    if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
   int32_t exponent = u.i[sizeof(long double) / sizeof(int32_t) - 1];
-#  else
+#    else
   int32_t exponent = u.i[0];
+#    endif
 #  endif
-  int32_t bias = (1 << 16) * ((1 << 14) - 1);
-  int32_t exp_c = __VERIFIER_nondet_int32_t();
-  __CPROVER_assume(exp_c >= -5641 && exp_c <= 1);
+
 #  pragma CPROVER check push
 #  pragma CPROVER check disable "signed-overflow"
   long double mult_result = y * (long double)(exponent - (bias + exp_c));
@@ -3464,13 +3610,19 @@ long double powl(long double x, long double y)
 #  pragma CPROVER check pop
   }
   int32_t result = (int32_t)mult_result + (bias + exp_c);
-  union U result_u = {.i = {0}};
-#  if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-  result_u.i[sizeof(long double) / sizeof(int32_t) - 1] = result;
+
+#  if __CPROVER_LDBL_IS_X86_EXTENDED
+  long double __cprover_x86ld_from_schraudolph(int32_t);
+  return __cprover_x86ld_from_schraudolph(result);
 #  else
+  union U result_u = {.i = {0}};
+#    if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+  result_u.i[sizeof(long double) / sizeof(int32_t) - 1] = result;
+#    else
   result_u.i[0] = result;
-#  endif
+#    endif
   return result_u.l;
+#  endif
 #endif
 }
 
@@ -3876,11 +4028,25 @@ long double __builtin_powil(long double x, int y)
 #if LDBL_MAX_EXP == DBL_MAX_EXP
   return __builtin_powi(x, y);
 #else
-#  ifndef _MSC_VER
-  _Static_assert
+  // Schraudolph-style fast pow with integer exponent.  Same encoding as
+  // `powl`; see `expl` and `logl` for layout details.  Only the read of
+  // the encoding and the write-back of the result differ between the x86
+  // 80-bit extended and the IEEE binary128 layout.
+  int32_t bias = (1 << 16) * ((1 << 14) - 1);
+  int32_t exp_c = __VERIFIER_nondet_int32_t();
+  __CPROVER_assume(exp_c >= -5641 && exp_c <= 1);
+
+#  if __CPROVER_LDBL_IS_X86_EXTENDED
+  // This branch is only reached after the early-out checks above have
+  // eliminated x <= 0.
+  int32_t __cprover_x86ld_to_schraudolph(long double);
+  int32_t exponent = __cprover_x86ld_to_schraudolph(x);
 #  else
+#    ifndef _MSC_VER
+  _Static_assert
+#    else
   static_assert
-#  endif
+#    endif
     (sizeof(long double) % sizeof(int32_t) == 0,
      "bit width of long double is a multiple of bit width of int32_t");
   union U
@@ -3888,14 +4054,13 @@ long double __builtin_powil(long double x, int y)
     long double l;
     int32_t i[sizeof(long double) / sizeof(int32_t)];
   } u = {x};
-#  if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#    if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
   int32_t exponent = u.i[sizeof(long double) / sizeof(int32_t) - 1];
-#  else
+#    else
   int32_t exponent = u.i[0];
+#    endif
 #  endif
-  int32_t bias = (1 << 16) * ((1 << 14) - 1);
-  int32_t exp_c = __VERIFIER_nondet_int32_t();
-  __CPROVER_assume(exp_c >= -5641 && exp_c <= 1);
+
 #  pragma CPROVER check push
 #  pragma CPROVER check disable "signed-overflow"
   long double mult_result =
@@ -3910,12 +4075,18 @@ long double __builtin_powil(long double x, int y)
 #  pragma CPROVER check pop
   }
   int32_t result = (int32_t)mult_result + (bias + exp_c);
-  union U result_u = {.i = {0}};
-#  if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-  result_u.i[sizeof(long double) / sizeof(int32_t) - 1] = result;
+
+#  if __CPROVER_LDBL_IS_X86_EXTENDED
+  long double __cprover_x86ld_from_schraudolph(int32_t);
+  return __cprover_x86ld_from_schraudolph(result);
 #  else
+  union U result_u = {.i = {0}};
+#    if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+  result_u.i[sizeof(long double) / sizeof(int32_t) - 1] = result;
+#    else
   result_u.i[0] = result;
-#  endif
+#    endif
   return result_u.l;
+#  endif
 #endif
 }
