@@ -1,7 +1,8 @@
-FUTURE
+CORE
 main.cpp
 --cpp26
 ^\[main\.assertion\.1\] line \d+ a call satisfying the precondition: SUCCESS$
+^\[main\.precondition_instance\.2\] line \d+ precondition x > 0: FAILURE$
 ^\*\* 1 of \d+ failed
 ^VERIFICATION FAILED$
 ^EXIT=10$
@@ -14,10 +15,7 @@ With the enforce evaluation semantic ([basic.contract.eval]/4: a contract
 violation invokes the contract-violation handler, then the program is
 terminated), as GCC 16 -fcontracts uses by default, f(0) violates its
 precondition and the program ends there: the precondition is the one
-property that fails.  CBMC parses pre() and post() but ignores them, so
-verification succeeds.  Ignoring is one of the four evaluation semantics,
-and which one is used is implementation-defined ([basic.contract.eval]/2),
-so CBMC conforms; but a verifier is expected to check contracts.
-goto-instrument's DFCC checks such contracts with --enforce-contract
-(contracts-cpp-dfcc/cpp_pre_post).  Checked with GCC 16 -fcontracts (f(0)
-aborts).
+property that fails.  CBMC ignored pre() and post(); in C++26 mode it now
+enforces them (the precondition is checked at each call site, by
+goto-programs' instrument_preconditions).  Checked with GCC 16 -fcontracts
+(f(0) aborts).

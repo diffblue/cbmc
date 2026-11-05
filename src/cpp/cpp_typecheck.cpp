@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/cprover_prefix.h>
 #include <util/find_symbols.h>
 #include <util/mathematical_expr.h>
@@ -748,6 +749,18 @@ void cpp_typecheckt::typecheck_contracts()
       lambda_exprt lambda{parameter_symbols, ens};
       lambda.add_source_location() = ens.source_location();
       ens.swap(lambda);
+    }
+
+    // N5008 [basic.contract.eval]/2: which evaluation semantic is used is
+    // implementation-defined.  In C++26 mode CBMC uses enforce: the
+    // contract assertions of a definition are checked (properties
+    // "precondition" and "postcondition").  In earlier modes pre() and
+    // post() are a CBMC extension used by goto-instrument's contracts.
+    if(
+      config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP26 &&
+      symbol.value.is_not_nil())
+    {
+      instrument_function_contract_assertions(symbol, code_type);
     }
 
     // Create a dedicated contract symbol

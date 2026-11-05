@@ -11,7 +11,11 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/cprover_prefix.h>
+#include <util/fresh_symbol.h>
+#include <util/mathematical_expr.h>
 #include <util/pointer_expr.h>
+#include <util/replace_symbol.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/symbol_table_base.h>
@@ -659,6 +663,179 @@ void cpp_typecheckt::report_unsupported_coroutine(symbolt &symbol)
   code_blockt body{{std::move(unsupported), std::move(stop)}};
   body.add_source_location() = symbol.value.source_location();
   body.add(std::move(to_code(symbol.value)));
+  symbol.value = std::move(body);
+}
+
+code_blockt cpp_typecheckt::contract_check(
+  const exprt &predicate,
+  const irep_idt &kind,
+  const source_locationt &location,
+  const std::optional<exprt> &display)
+{
+  source_locationt property_location = location;
+  property_location.set_property_class(kind);
+  const char *what = kind == "precondition"    ? "precondition "
+                     : kind == "postcondition" ? "postcondition "
+                                               : "contract assertion ";
+  property_location.set_comment(
+    what + to_string(display.has_value() ? *display : predicate));
+  code_assertt check{predicate};
+  check.add_source_location() = property_location;
+  code_assumet terminate{predicate};
+  terminate.add_source_location() = location;
+  code_blockt result{{std::move(check), std::move(terminate)}};
+  result.add_source_location() = location;
+  return result;
+}
+
+void cpp_typecheckt::instrument_function_contract_assertions(
+  symbolt &symbol,
+  const code_with_contract_typet &contract)
+{
+  if(symbol.value.id() != ID_code)
+    return;
+  const auto &requires_clauses = contract.c_requires();
+  const auto &ensures_clauses = contract.c_ensures();
+
+  // [basic.contract.eval]/1, [dcl.contract.func]/5: the precondition
+  // assertions are evaluated after the parameters are initialized, before
+  // the function body
+  // (the assertions first: goto-programs' instrument_preconditions moves
+  // the leading precondition assertions of a function to its call sites)
+  // properties are named after the function as its other ones are
+  const irep_idt function_name =
+    symbol.value.source_location().get_function().empty()
+      ? symbol.base_name
+      : symbol.value.source_location().get_function();
+  code_blockt body;
+  body.add_source_location() = symbol.value.source_location();
+  code_blockt assumptions;
+  for(const auto &clause : requires_clauses)
+  {
+    const exprt &predicate = clause.id() == ID_lambda
+                               ? to_lambda_expr(clause).where()
+                               : static_cast<const exprt &>(clause);
+    source_locationt location = clause.source_location();
+    location.set_function(function_name);
+    code_blockt check = contract_check(predicate, "precondition", location);
+    body.add(std::move(check.statements().front()));
+    assumptions.add(std::move(check.statements().back()));
+  }
+  body.append(assumptions);
+
+  // ... and the postcondition assertions when the function returns, with
+  // the result name denoting the returned object ([dcl.contract.res]/1).
+  // The result is held in a variable: done for non-class return types, as
+  // a class-type result would be copied.
+  const typet &return_type = contract.return_type();
+  const bool checkable_result =
+    return_type.id() == ID_empty ||
+    (return_type.id() != ID_struct_tag && return_type.id() != ID_union_tag &&
+     !is_reference(return_type) && !is_rvalue_reference(return_type));
+  if(!ensures_clauses.empty() && !checkable_result)
+  {
+    warning().source_location = symbol.location;
+    warning() << "postconditions of '" << symbol.display_name()
+              << "' are not checked: its return type is a class or "
+              << "reference type" << eom;
+  }
+  const auto postconditions = [&](const exprt &result)
+  {
+    code_blockt checks;
+    for(const auto &clause : ensures_clauses)
+    {
+      exprt predicate = clause.id() == ID_lambda
+                          ? to_lambda_expr(clause).where()
+                          : static_cast<const exprt &>(clause);
+      source_locationt location = clause.source_location();
+      location.set_function(function_name);
+      // the description names the result as written ([dcl.contract.res]/1)
+      exprt display = predicate;
+      const irep_idt &name = predicate.get("#contract_result_name");
+      if(!name.empty())
+      {
+        replace_symbolt rename;
+        rename.insert(
+          symbol_exprt{CPROVER_PREFIX "return_value", return_type},
+          symbol_exprt{name, return_type});
+        rename(display);
+      }
+      if(result.is_not_nil())
+      {
+        replace_symbolt replace;
+        replace.insert(
+          symbol_exprt{CPROVER_PREFIX "return_value", return_type}, result);
+        replace(predicate);
+      }
+      code_blockt check =
+        contract_check(predicate, "postcondition", location, display);
+      checks.append(check);
+    }
+    return checks;
+  };
+
+  codet original = to_code(symbol.value);
+  if(!ensures_clauses.empty() && checkable_result)
+  {
+    std::size_t counter = 0;
+    std::function<void(codet &)> instrument_returns = [&](codet &code)
+    {
+      if(code.get_statement() == ID_return)
+      {
+        auto &ret = to_code_frontend_return(code);
+        code_blockt replacement;
+        replacement.add_source_location() = code.source_location();
+        if(ret.has_return_value() && return_type.id() != ID_empty)
+        {
+          symbolt &result_symbol = get_fresh_aux_symbol(
+            return_type,
+            id2string(symbol.name),
+            "contract_result$" + std::to_string(counter++),
+            code.source_location(),
+            symbol.mode,
+            symbol_table);
+          result_symbol.is_static_lifetime = false;
+          const symbol_exprt result = result_symbol.symbol_expr();
+          code_frontend_declt declaration{result};
+          declaration.add_source_location() = code.source_location();
+          replacement.add(std::move(declaration));
+          code_frontend_assignt assignment{result, ret.return_value()};
+          assignment.add_source_location() = code.source_location();
+          replacement.add(std::move(assignment));
+          replacement.append(postconditions(result));
+          code_frontend_returnt new_return{result};
+          new_return.add_source_location() = code.source_location();
+          replacement.add(std::move(new_return));
+        }
+        else
+        {
+          if(ret.has_return_value())
+          {
+            // a void expression returned from a void function
+            code_expressiont evaluate{ret.return_value()};
+            evaluate.add_source_location() = code.source_location();
+            replacement.add(std::move(evaluate));
+          }
+          replacement.append(postconditions(nil_exprt{}));
+          code_frontend_returnt new_return;
+          new_return.add_source_location() = code.source_location();
+          replacement.add(std::move(new_return));
+        }
+        code = std::move(replacement);
+        return;
+      }
+      for(auto &op : code.operands())
+      {
+        if(op.id() == ID_code)
+          instrument_returns(to_code(op));
+      }
+    };
+    instrument_returns(original);
+  }
+  body.add(std::move(original));
+  // flowing off the end of a void function returns ([stmt.return]/4)
+  if(!ensures_clauses.empty() && return_type.id() == ID_empty)
+    body.append(postconditions(nil_exprt{}));
   symbol.value = std::move(body);
 }
 

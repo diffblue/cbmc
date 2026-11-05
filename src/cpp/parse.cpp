@@ -12598,6 +12598,8 @@ bool Parser::rContractAttributes(typet &type)
             replace_return_value(op);
         };
         replace_return_value(expr);
+        // for the property's description ([dcl.contract.res]/1)
+        expr.set("#contract_result_name", return_value_name);
       }
 
       static_cast<exprt &>(type.add(ID_C_spec_ensures))
@@ -12957,6 +12959,29 @@ std::optional<codet> Parser::rStatement()
 
   case TOK_GCC_IDENTIFIER:
   case TOK_MSC_IDENTIFIER:
+  {
+    // N5008 [stmt.contract.assert]: assertion-statement:
+    //   contract_assert attribute-specifier-seq? ( conditional-expression ) ;
+    // contract_assert is a keyword of C++26 only ([lex.key]).
+    cpp_tokent name_tk;
+    if(
+      config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP26 &&
+      is_identifier(lex.LookAhead(0, name_tk)) &&
+      name_tk.data.get(ID_C_base_name) == "contract_assert" &&
+      lex.LookAhead(1) == '(')
+    {
+        lex.get_token(tk1);
+        lex.get_token(tk2); // (
+        exprt predicate;
+        if(!rExpression(predicate, false))
+          return {};
+        if(lex.get_token(tk2) != ')' || lex.get_token(tk3) != ';')
+          return {};
+        codet statement{"contract_assert", {std::move(predicate)}};
+        set_location(statement, tk1);
+        return std::move(statement);
+    }
+  }
     if(lex.LookAhead(1)==':')        // label statement
     {
       // the label

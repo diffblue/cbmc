@@ -24,10 +24,13 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <limits>
 #include <list>
+#include <optional>
 #include <set>
 #include <unordered_set>
 #include <vector>
 
+class code_blockt;
+class code_with_contract_typet;
 class pointer_typet;
 class reference_typet;
 
@@ -1040,6 +1043,23 @@ protected:
   /// function body
   bool coroutine_seen = false;
   void report_unsupported_coroutine(symbolt &);
+  /// The check of a contract assertion with the enforce evaluation semantic
+  /// (N5008 [basic.contract.eval]/1, /13): an assertion of the type-checked
+  /// \p predicate with property class \p kind, then an assumption of it --
+  /// a violation contract-terminates the program, which ends the path.
+  /// The property is described by \p display if given, else by
+  /// \p predicate.
+  code_blockt contract_check(
+    const exprt &predicate,
+    const irep_idt &kind,
+    const source_locationt &location,
+    const std::optional<exprt> &display = {});
+  /// N5008 [basic.contract.eval]/1, [dcl.contract.func]: check the
+  /// precondition assertions of the function \p symbol at the start of its
+  /// body and its postcondition assertions where it returns (C++26).
+  void instrument_function_contract_assertions(
+    symbolt &symbol,
+    const code_with_contract_typet &contract);
   method_bodiest method_bodies;
 
   // Deferred method bodies for lazy template elaboration.

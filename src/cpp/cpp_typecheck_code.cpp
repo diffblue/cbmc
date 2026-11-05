@@ -440,7 +440,17 @@ void cpp_typecheckt::typecheck_code(codet &code)
 {
   const irep_idt &statement = code.get_statement();
 
-  if(statement == "co_return")
+  if(statement == "contract_assert")
+  {
+    // N5008 [stmt.contract.assert]/2: the predicate is the
+    // conditional-expression contextually converted to bool
+    exprt predicate = code.op0();
+    typecheck_expr(predicate);
+    implicit_typecast_bool(predicate);
+    code = contract_check(predicate, "contract_assert", code.source_location());
+    return;
+  }
+  else if(statement == "co_return")
   {
     // coroutines are not supported (convert_function); the operand is
     // evaluated

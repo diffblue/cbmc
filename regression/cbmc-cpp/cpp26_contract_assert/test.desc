@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp26
 ^\[main\.assertion\.1\] line \d+ a call satisfying the contract: SUCCESS$
@@ -12,6 +12,6 @@ main.cpp
 ^CONVERSION ERROR$
 --
 contract_assert(e) is an assertion statement ([stmt.contract.assert]).  CBMC
-reports "symbol 'contract_assert' is unknown" (CONVERSION ERROR).
-Precondition and postcondition specifiers are parsed (cpp26_contracts).
-Checked with GCC 16 -fcontracts.
+reported "symbol 'contract_assert' is unknown" (CONVERSION ERROR); it now
+checks it, and pre() and post(), with the enforce semantic
+(cpp26_contract_assertions_enforced).  Checked with GCC 16 -fcontracts.
