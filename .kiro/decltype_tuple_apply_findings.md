@@ -16041,3 +16041,40 @@ pull-request-check-clang-format.sh before reporting.
 Checks on W199: 13 suites, profiles (z3 complex2 flaky, 3/3 on rerun),
 vacuity 1065/3, unit, lint, whole-PR format, doxygen, iwyu, per-commit
 compile, platform (gcc11, m32, arm64), MSVC .ii 8/8, macOS 143/143.
+
+## Round 219 (2026-11-05): census tests and the KNOWNBUG plan
+
+b7b5cb173e: 66 probe tests (56 CORE, 10 KNOWNBUG); ae57913d1c: 17 C++26
+feature tests; 856aeb2e5a: the modules probe.  Probes were run with g++ 13,
+clang++ 18 and GCC 16 (-fcontracts, -freflection, -fmodules); the untagged
+CORE ones also pass under --winx64 and --os macos.  Converting the probes
+found one more bug: an init-capture by move does not move-construct the
+member (the census had only looked at the two named assertions).  Also:
+GCC 16's <utility> does not parse in C++26 mode (pack expansion in a
+subscript); a static_assert whose condition cannot be evaluated is
+skipped with a warning; GCC 16 renamed add_sat to saturating_add.
+
+Plan (silently wrong results before rejections, small before large):
+1. init-capture by move (false "double delete"), small.
+2. std::thread models (thread bodies never run: unsound), medium.
+3. coroutines: an explicit "unsupported" error now (silently wrong today),
+   the implementation later.
+4. CTAD of std::vector from an iterator pair (wrong size) and a braced
+   list (rejected), medium.
+5. if consteval in constant evaluation (wrong value), small.
+6. operator== from a defaulted operator<=>, small.
+7. pack expansion in a subscript (unblocks GCC 16 C++26 <utility>,
+   inplace_vector, text_encoding), small.
+8. contracts: contract_assert, then checking pre/post (enforce semantic),
+   medium.
+9. structured binding as a condition, variadic friends, <debugging>
+   models, small each.
+10. constexpr exceptions and placement new in the constant evaluator,
+    medium.
+11. std::print not finishing, investigate.
+Decide later: coroutines (days), modules (weeks; toolchains' support is
+still experimental), reflection (weeks; GCC 16 only).  No action: the
+FUTURE library features (no library implements them) and the FUTURE
+no_unique_address layouts.
+Both findings are now tests: cpp26_static_assert_unevaluated_condition
+and cpp26_saturating_arithmetic_gcc16 (KNOWNBUG each).
