@@ -79,6 +79,26 @@ static std::string pointer_offset_bits_as_string(
   return integer2string(*bits);
 }
 
+/// Encode the attributes of \p type (or a component) that affect the layout of
+/// an aggregate, i.e., packing and explicit alignment.
+static std::string layout_attributes2name(const irept &src)
+{
+  std::string result;
+
+  if(src.get_bool(ID_C_packed))
+    result += 'p';
+
+  const exprt &alignment = static_cast<const exprt &>(src.find(ID_C_alignment));
+  if(alignment.is_not_nil())
+  {
+    const auto alignment_int = numeric_cast<mp_integer>(alignment);
+    result += 'a';
+    result += alignment_int.has_value() ? integer2string(*alignment_int) : "?";
+  }
+
+  return result;
+}
+
 static std::string type2name(
   const typet &type,
   const namespacet &ns,
@@ -203,6 +223,7 @@ static std::string type2name(
         result += "ST";
       if(type.id() == ID_union)
         result += "UN";
+      result += layout_attributes2name(type);
       result += '[';
       bool first = true;
       for(const auto &c : struct_union_type.components())
@@ -212,7 +233,8 @@ static std::string type2name(
         else
           first = false;
 
-        result += type2name(c.type(), ns, symbol_number);
+        result += layout_attributes2name(c.type()) +
+                  type2name(c.type(), ns, symbol_number);
         const irep_idt &component_name = c.get_name();
         CHECK_RETURN(!component_name.empty());
         result += "'" + id2string(component_name) + "'";
