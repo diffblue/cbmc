@@ -1,9 +1,7 @@
 // N5008 [dcl.fct.def.coroutine], [expr.yield], [coroutine.handle]: count()
 // is a coroutine; its first resume() runs to `co_yield 1', storing 1 in the
-// promise through yield_value, the second to `co_yield 2'.  The front end
-// parses co_yield / co_await / co_return (cpp20_coroutines) but does not
-// implement the coroutine transformation: the promise values are not
-// produced and the assertion fails.
+// promise through yield_value, the second to `co_yield 2'.  See test.desc
+// for what CBMC does instead.
 extern "C" void __CPROVER_assert(bool, const char *);
 #include <coroutine>
 struct gen
