@@ -1,0 +1,12 @@
+CORE smt-backend no-new-smt
+main.i
+--arch ppc64le --os linux --smt2 --z3
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+On ppc64le, long double is IEEE binary128.  The non-FPA SMT encoding of the
+conversion to double used to set bit 20 instead of bit 52 when rounding
+overflowed the significand, as it computed 1 << 52 in int.
