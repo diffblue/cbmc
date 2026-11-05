@@ -1651,8 +1651,8 @@ aggregate_name:
           parser_stack($1).add(ID_components).get_sub().swap(
             (irept::subt &)parser_stack($6).operands());
 
-          // throw in the gcc attributes
-          $$=merge($1, merge($2, $8));
+          // throw in the gcc attributes and Visual Studio declspecs
+          $$=merge($1, merge($2, merge($3, $8)));
         }
         | aggregate_key
           gcc_type_attribute_opt
@@ -1674,8 +1674,8 @@ aggregate_name:
           parser_stack($1).add(ID_components).get_sub().swap(
             (irept::subt &)parser_stack($7).operands());
 
-          // throw in the gcc attributes
-          $$=merge($1, merge($2, $9));
+          // throw in the gcc attributes and Visual Studio declspecs
+          $$=merge($1, merge($2, merge($3, $9)));
         }
         | aggregate_key
           gcc_type_attribute_opt
@@ -1688,8 +1688,8 @@ aggregate_name:
           gcc_type_attribute_opt
         {
           parser_stack($1).set(ID_components, ID_nil);
-          // type attributes
-          $$=merge($1, merge($2, $6));
+          // type attributes and Visual Studio declspecs
+          $$=merge($1, merge($2, merge($3, $6)));
         }
         ;
 
