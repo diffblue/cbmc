@@ -47,6 +47,34 @@ void c_typecheck_baset::typecheck_type(typet &type)
     ansi_c_convert_type.write(type);
   }
 
+  // Type-check an alignment attribute and fold it to a constant.
+  const auto typecheck_alignment =
+    [this](exprt &alignment, const source_locationt &source_location)
+  {
+    if(alignment.id() == ID_default)
+      return;
+
+    // Prefer the location of the alignment expression itself, which is
+    // available even when the type carries none.
+    const source_locationt &alignment_location =
+      alignment.find_source_location();
+    const source_locationt &error_location =
+      alignment_location.is_not_nil() ? alignment_location : source_location;
+
+    typecheck_expr(alignment);
+    make_constant(alignment);
+    const auto align_int = numeric_cast<mp_integer>(alignment);
+    // A valid alignment is a positive power of two (C11 6.2.8 "Alignment of
+    // objects": "Every valid alignment value shall be a nonnegative integral
+    // power of two"). is_power_of_two already requires a strictly positive
+    // value, so the has_value() guard is the only additional check needed.
+    if(!align_int.has_value() || !is_power_of_two(*align_int))
+    {
+      throw errort().with_location(error_location)
+        << "alignment is not a positive power of 2";
+    }
+  };
+
   if(type.id()==ID_already_typechecked)
   {
     already_typechecked_typet &already_typechecked =
@@ -56,7 +84,12 @@ void c_typecheck_baset::typecheck_type(typet &type)
     c_qualifierst c_qualifiers(type);
     c_qualifiers += c_qualifierst(already_typechecked.get_type());
     bool packed=type.get_bool(ID_C_packed);
+    // An alignment attribute that follows a declarator (e.g. a struct member
+    // `int x __attribute__((aligned(16 + 0)));`) is attached here, outside
+    // the already type-checked type, and has not been type-checked yet.
     exprt alignment = alignment_of(type);
+    if(alignment.is_not_nil())
+      typecheck_alignment(alignment, type.source_location());
     bool alignment_increase_only = type.get_bool(ID_C_alignment_increase_only);
     irept _typedef=type.find(ID_C_typedef);
 
@@ -78,22 +111,8 @@ void c_typecheck_baset::typecheck_type(typet &type)
   // do we have alignment?
   if(type.find(ID_C_alignment).is_not_nil())
   {
-    exprt &alignment=static_cast<exprt &>(type.add(ID_C_alignment));
-    if(alignment.id()!=ID_default)
-    {
-      typecheck_expr(alignment);
-      make_constant(alignment);
-      const auto align_int = numeric_cast<mp_integer>(alignment);
-      // A valid alignment is a positive power of two (C11 6.2.8 "Alignment of
-      // objects": "Every valid alignment value shall be a nonnegative integral
-      // power of two"). is_power_of_two already requires a strictly positive
-      // value, so the has_value() guard is the only additional check needed.
-      if(!align_int.has_value() || !is_power_of_two(*align_int))
-      {
-        throw errort().with_location(type.source_location())
-          << "alignment is not a positive power of 2";
-      }
-    }
+    typecheck_alignment(
+      static_cast<exprt &>(type.add(ID_C_alignment)), type.source_location());
   }
 
   if(type.id()==ID_code)
