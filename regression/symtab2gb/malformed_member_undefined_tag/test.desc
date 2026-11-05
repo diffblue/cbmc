@@ -1,0 +1,9 @@
+CORE
+member.json_symtab
+
+^EXIT=6$
+^SIGNAL=0$
+^malformed symbol table entry .m.: member must address a struct or union type that is defined$
+--
+--
+Rejects a member expression whose struct tag is not defined in any input file.

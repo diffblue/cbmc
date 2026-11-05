@@ -69,7 +69,7 @@ public:
     const validation_modet vm = validation_modet::INVARIANT)
   {
     bitvector_typet::check(type, vm);
-    type_with_subtypet::check(type);
+    type_with_subtypet::check(type, vm);
   }
 };
 

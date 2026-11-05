@@ -334,6 +334,14 @@ void member_exprt::validate(
   const auto &member_expr = to_member_expr(expr);
 
   const typet &compound_type = member_expr.compound().type();
+  if(compound_type.id() == ID_struct_tag || compound_type.id() == ID_union_tag)
+  {
+    const symbolt *symbol = nullptr;
+    DATA_CHECK(
+      vm,
+      !ns.lookup(to_tag_type(compound_type).get_identifier(), symbol),
+      "member must address a struct or union type that is defined");
+  }
   const auto *struct_union_type =
     (compound_type.id() == ID_struct_tag || compound_type.id() == ID_union_tag)
       ? &ns.follow_tag(to_struct_or_union_tag_type(compound_type))
@@ -359,7 +367,10 @@ void member_exprt::validate(
     "component");
 }
 
-void let_exprt::validate(const exprt &expr, const validation_modet vm)
+void let_exprt::validate(
+  const exprt &expr,
+  const namespacet &,
+  const validation_modet vm)
 {
   check(expr, vm);
 

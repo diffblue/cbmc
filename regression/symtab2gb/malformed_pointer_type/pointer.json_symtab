@@ -1,0 +1,48 @@
+{
+ "symbolTable": {
+  "p": {
+   "type": {
+    "id": "pointer",
+    "sub": [],
+    "namedSub": {
+     "width": {
+      "id": "64",
+      "sub": [],
+      "namedSub": {}
+     }
+    }
+   },
+   "value": {
+    "id": "nil",
+    "sub": [],
+    "namedSub": {}
+   },
+   "location": {
+    "id": "nil",
+    "sub": [],
+    "namedSub": {}
+   },
+   "name": "p",
+   "module": "",
+   "baseName": "p",
+   "mode": "C",
+   "prettyName": "p",
+   "isType": false,
+   "isMacro": false,
+   "isExported": false,
+   "isInput": false,
+   "isOutput": false,
+   "isStateVar": false,
+   "isProperty": false,
+   "isStaticLifetime": true,
+   "isThreadLocal": false,
+   "isLvalue": true,
+   "isFileLocal": false,
+   "isExtern": false,
+   "isVolatile": false,
+   "isParameter": false,
+   "isAuxiliary": false,
+   "isWeak": false
+  }
+ }
+}
