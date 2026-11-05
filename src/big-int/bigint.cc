@@ -1125,9 +1125,10 @@ BigInt::div (BigInt const &x, BigInt const &y, BigInt &q, BigInt &r)
       if (a[al-1] >= b[bl-1])
 	a[al++] = 0;
 
-      // Prepare q for receiving the quotient.
+      // Prepare q for receiving the quotient. Its digits are overwritten
+      // below, so there is no need to keep its contents.
+      q.reallocate(al - bl);
       q.length = al - bl;
-      q.resize (q.length);
 
       // Divide.
       digit_div (a, b, bl, q.digit, q.length);
@@ -1137,8 +1138,8 @@ BigInt::div (BigInt const &x, BigInt const &y, BigInt &q, BigInt &r)
       if (scale != 1)
 	digit_div (a, al, scale);
       if (al && a[al - 1] == 0) --al;
+      r.reallocate(al);
       r.length = al;
-      r.resize (r.length);
       memcpy (r.digit, a, al * sizeof (onedig_t));
     }
   q.adjust();
