@@ -1888,6 +1888,59 @@ bool cpp_typecheckt::partial_specialization_at_least_as_specialised(
           {
             return false;
           }
+          // N5008 [temp.deduct.type]/9: a pack expansion P_i (the last
+          // argument of P) is compared with each remaining argument of A;
+          // during partial ordering an A_i that was a pack expansion fails
+          // deduction against a P_i that is not one (9.2) and is ignored
+          // when P has no argument for it (9.1).  So `tup<Ts...>' deduces
+          // from `tup<F, R...>', but `tup<F, R...>' not from `tup<Ts...>'.
+          const auto &p_list = p_args->get_sub();
+          const auto &a_list = a_args->get_sub();
+          if(
+            !p_list.empty() &&
+            is_pack_expansion(static_cast<const exprt &>(p_list.back())))
+          {
+            const std::size_t fixed = p_list.size() - 1;
+            if(a_list.size() < fixed)
+              return false;
+            for(std::size_t k = 0; k < a_list.size(); ++k)
+            {
+              const exprt &pk =
+                static_cast<const exprt &>(p_list[std::min(k, fixed)]);
+              const exprt &ak = static_cast<const exprt &>(a_list[k]);
+              if(k < fixed && is_pack_expansion(ak))
+                return false;
+              const bool pk_type =
+                pk.id() == ID_type || pk.id() == ID_ambiguous;
+              const bool ak_type =
+                ak.id() == ID_type || ak.id() == ID_ambiguous;
+              if(pk_type != ak_type)
+                return false;
+              if(!pk_type)
+              {
+                if(pk.id() == ID_cpp_name && pk.get_sub().size() == 1)
+                  continue;
+                if(pk != ak)
+                  return false;
+                continue;
+              }
+              typet pt = static_cast<const typet &>(pk.find(ID_type));
+              typet at = static_cast<const typet &>(ak.find(ID_type));
+              pt.remove(ID_ellipsis);
+              at.remove(ID_ellipsis);
+              cpp_convert_plain_type(pt, get_message_handler());
+              cpp_convert_plain_type(at, get_message_handler());
+              fold_qualifiers(at);
+              if(!deduce_from(pt, at))
+                return false;
+            }
+            return true;
+          }
+          for(std::size_t k = 0; k < a_list.size(); ++k)
+          {
+            if(is_pack_expansion(static_cast<const exprt &>(a_list[k])))
+              return false;
+          }
           // N5008 [temp.arg.general]/9 (default template arguments): a
           // template-id written with fewer arguments (`equal_to<>') stands
           // for the one with the defaults filled in (`equal_to<void>')
@@ -2013,6 +2066,11 @@ bool cpp_typecheckt::partial_specialization_at_least_as_specialised(
         break;
       const exprt &arg = guessed_args[pi];
       if(arg.id() != ID_unassigned && arg.type().id() != ID_unassigned)
+        continue;
+      // [temp.arg.explicit]/4: a pack not otherwise deduced is deduced to
+      // an empty sequence (and the elements a pack expansion P_i matched
+      // are not recorded here)
+      if(g_params_decl[pi].get_bool(ID_ellipsis))
         continue;
       const irep_idt pid = g_params_decl[pi].id() == ID_type
                              ? g_params_decl[pi].type().get(ID_identifier)

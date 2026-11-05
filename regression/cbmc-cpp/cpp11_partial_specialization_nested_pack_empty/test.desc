@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ counts: SUCCESS$
@@ -12,8 +12,8 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-For tup<double>, CBMC chooses the specialization for tup<Ts...>: the one
-for tup<F, R...> does not match, as R stays unassigned when deduced to the
-empty pack.  libstdc++ 11's variant then rejects
-`std::variant<int, double> v = 2.5' (cpp17_probe_std_variant, tagged
-libstdcxx12).
+For tup<double>, the specialization for tup<F, R...> (R empty) did not
+match: R stayed unassigned and the pattern was type-checked without
+expanding R..., so tup<Ts...> was chosen.  Partial ordering also treated
+an undeduced pack as a failure.  libstdc++ 11's variant then rejected
+`std::variant<int, double> v = 2.5' (cpp17_probe_std_variant).

@@ -1,4 +1,4 @@
-CORE libstdcxx libstdcxx12
+CORE libstdcxx
 main.cpp
 --cpp17 --object-bits 12
 ^\[main\.assertion\.1\] line \d+ variant alternative: SUCCESS$
@@ -14,6 +14,7 @@ main.cpp
 A probe of the C++17 support census (2026-11-05): std::variant holding a
 double.  The last assertion is WRONG and must fail, so a pass is not vacuous.
 
-Tagged libstdcxx12: with libstdc++ 11's <variant>, initializing
-variant<int, double> from a double is rejected ("found no match for
-symbol 'variant'"); from an int it works (cpp17_variant_basic).
+With libstdc++ 11's <variant>, initializing variant<int, double> from a
+double was rejected ("found no match for symbol 'variant'"): its
+__tuple_count chose the wrong partial specialization
+(cpp11_partial_specialization_nested_pack_empty).

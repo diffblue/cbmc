@@ -5428,6 +5428,59 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
       cpp_typecheck.template_map.build_template_args(
         cpp_declaration.template_type());
 
+    // N5008 [temp.deduct.type]/9, [temp.arg.explicit]/4: a template
+    // parameter pack that deduction matched against no argument (`R' in
+    // `tup<F, R...>' for `tup<double>') is deduced to an empty sequence,
+    // as in elaborate_class_template.  It stayed unassigned, so the
+    // specialization never matched and `tup<Ts...>' was chosen instead
+    // (libstdc++ 11's __tuple_count, used by variant's converting
+    // constructor).
+    // (A pack that is itself a written argument, `or_<B1, B2, B3, Bn...>',
+    // is bound by bind_trailing_pack above; it is not filled here.)
+    std::set<irep_idt> top_level_packs;
+    for(const auto &written : partial_specialization_args.arguments())
+    {
+      const irept &pattern = pattern_of(written);
+      if(
+        (written.get_bool(ID_ellipsis) || pattern.get_bool(ID_ellipsis)) &&
+        pattern.id() == ID_cpp_name && pattern.get_sub().size() == 1)
+      {
+        top_level_packs.insert(pattern.get_sub().front().get(ID_identifier));
+      }
+    }
+    if(guessed_template_args.has_unassigned())
+    {
+      const auto &tparams =
+        cpp_declaration.template_type().template_parameters();
+      for(std::size_t i = 0;
+          i < tparams.size() && i < guessed_template_args.arguments().size();
+          i++)
+      {
+        exprt &arg = guessed_template_args.arguments()[i];
+        const std::string full_name =
+          id2string(tparams[i].type().get(ID_identifier));
+        const std::string::size_type separator = full_name.rfind("::");
+        const irep_idt short_name{
+          separator == std::string::npos ? full_name
+                                         : full_name.substr(separator + 2)};
+        if(
+          tparams[i].get_bool(ID_ellipsis) && tparams[i].id() == ID_type &&
+          top_level_packs.count(short_name) == 0 &&
+          (arg.id() == ID_unassigned || arg.type().id() == ID_unassigned))
+        {
+          arg = exprt{ID_type, empty_typet{}};
+          const irep_idt pid = tparams[i].type().get(ID_identifier);
+          if(
+            !pid.empty() &&
+            cpp_typecheck.template_map.pack_size_map.find(pid) ==
+              cpp_typecheck.template_map.pack_size_map.end())
+          {
+            cpp_typecheck.template_map.set_pack_size(pid, 0);
+          }
+        }
+      }
+    }
+
     if(
       !guessed_template_args.has_unassigned() &&
       !guessed_template_args.has_conflict())
@@ -5530,8 +5583,29 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
           // completed list can be compared for equality against the
           // instantiation's arguments; keep pack expansion enabled in that
           // case.  Otherwise disable it (the established SFINAE behaviour).
+          // A pack of the specialization's own that deduction bound
+          // (`R' in `tup<F, R...>', possibly to the empty sequence) is
+          // expanded too, wherever in the pattern it occurs.
+          bool own_pack_deduced = false;
+          for(const auto &tparam :
+              cpp_declaration.template_type().template_parameters())
+          {
+            if(!tparam.get_bool(ID_ellipsis))
+              continue;
+            const irep_idt pid = tparam.id() == ID_type
+                                   ? tparam.type().get(ID_identifier)
+                                   : tparam.get(ID_identifier);
+            const auto &tm = cpp_typecheck.template_map;
+            if(
+              tm.pack_args_map.count(pid) != 0 ||
+              tm.pack_expr_map.count(pid) != 0 ||
+              tm.pack_size_map.count(pid) != 0)
+            {
+              own_pack_deduced = true;
+            }
+          }
           cpp_typecheck.disable_template_arg_pack_expansion =
-            !partial_trailing_pack;
+            !partial_trailing_pack && !own_pack_deduced;
           partial_specialization_args_tc =
             cpp_typecheck.typecheck_template_args(
               source_location,
