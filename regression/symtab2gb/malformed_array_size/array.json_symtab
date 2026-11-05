@@ -1,0 +1,89 @@
+{
+ "symbolTable": {
+  "a": {
+   "type": {
+    "id": "array",
+    "sub": [
+     {
+      "id": "signedbv",
+      "sub": [],
+      "namedSub": {
+       "width": {
+        "id": "32",
+        "sub": [],
+        "namedSub": {}
+       }
+      }
+     }
+    ],
+    "namedSub": {
+     "size": {
+      "id": "if",
+      "sub": [
+       {
+        "id": "constant",
+        "sub": [],
+        "namedSub": {
+         "type": {
+          "id": "bool",
+          "sub": [],
+          "namedSub": {}
+         },
+         "value": {
+          "id": "1",
+          "sub": [],
+          "namedSub": {}
+         }
+        }
+       }
+      ],
+      "namedSub": {
+       "type": {
+        "id": "unsignedbv",
+        "sub": [],
+        "namedSub": {
+         "width": {
+          "id": "64",
+          "sub": [],
+          "namedSub": {}
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "value": {
+    "id": "nil",
+    "sub": [],
+    "namedSub": {}
+   },
+   "location": {
+    "id": "nil",
+    "sub": [],
+    "namedSub": {}
+   },
+   "name": "a",
+   "module": "",
+   "baseName": "a",
+   "mode": "C",
+   "prettyName": "a",
+   "isType": false,
+   "isMacro": false,
+   "isExported": false,
+   "isInput": false,
+   "isOutput": false,
+   "isStateVar": false,
+   "isProperty": false,
+   "isStaticLifetime": true,
+   "isThreadLocal": false,
+   "isLvalue": true,
+   "isFileLocal": false,
+   "isExtern": false,
+   "isVolatile": false,
+   "isParameter": false,
+   "isAuxiliary": false,
+   "isWeak": false
+  }
+ }
+}

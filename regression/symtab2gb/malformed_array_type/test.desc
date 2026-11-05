@@ -1,0 +1,9 @@
+CORE
+array.json_symtab
+
+^EXIT=6$
+^SIGNAL=0$
+^malformed symbol table entry .a.: type must have one type parameter$
+--
+--
+Rejects an array type without an element type.

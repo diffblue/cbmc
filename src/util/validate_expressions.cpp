@@ -16,6 +16,7 @@ Author: Daniel Poetzl
 #include "bitvector_expr.h" // IWYU pragma: keep
 #include "pointer_expr.h"   // IWYU pragma: keep
 #include "ssa_expr.h"
+#include "std_expr.h"
 
 #define CALL_ON_EXPR(expr_type)                                                \
   C<exprt, expr_type>()(expr, std::forward<Args>(args)...)
@@ -62,6 +63,10 @@ void call_on_expr(const exprt &expr, Args &&... args)
   else if(expr.id() == ID_count_leading_zeros)
   {
     CALL_ON_EXPR(count_leading_zeros_exprt);
+  }
+  else if(expr.id() == ID_let)
+  {
+    CALL_ON_EXPR(let_exprt);
   }
   else
   {
