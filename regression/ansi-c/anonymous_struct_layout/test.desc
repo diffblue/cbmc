@@ -1,0 +1,11 @@
+CORE gcc-only broken-test-c++-front-end
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Anonymous aggregates must not be conflated when they only differ in packing or
+alignment attributes.

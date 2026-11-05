@@ -181,6 +181,7 @@ void ansi_c_convert_typet::read_rec(const typet &type)
   else if(type.id()==ID_aligned)
   {
     aligned=true;
+    aligned_pointer_declarator = type.get_bool(ID_C_pointer_declarator);
 
     // may come with size or not
     if(type.find(ID_size).is_nil())
@@ -688,5 +689,24 @@ void ansi_c_convert_typet::set_attributes(typet &type) const
     type.set(ID_C_packed, true);
 
   if(aligned)
-    type.set(ID_C_alignment, alignment);
+  {
+    // An alignment attribute generally applies to the entity being declared
+    // (object, member, typedef), irrespective of its position in the
+    // declaration: we record it as ID_C_declaration_alignment, which the
+    // type checker moves to the declared entity's type. For members such an
+    // alignment can only increase the alignment, whereas for typedefs it
+    // becomes the alignment of the type (ID_C_alignment), which may also be
+    // smaller than the natural one; see
+    // c_typecheck_baset::apply_declaration_alignment.
+    // GCC, however, applies an attribute that follows the '*' of a pointer
+    // declarator to the pointer type itself (Clang does not).
+    if(
+      aligned_pointer_declarator && type.id() == ID_pointer &&
+      config.ansi_c.mode != configt::ansi_ct::flavourt::CLANG)
+    {
+      type.set(ID_C_alignment, alignment);
+    }
+    else
+      type.set(ID_C_declaration_alignment, alignment);
+  }
 }

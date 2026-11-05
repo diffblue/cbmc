@@ -1,0 +1,10 @@
+CORE
+main.c
+--winx64
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+__declspec(align(n)) on a struct or union definition was previously ignored.

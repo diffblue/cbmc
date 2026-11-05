@@ -1128,13 +1128,30 @@ void c_typecheck_baset::typecheck_expr_alignof(exprt &expr)
 {
   typet argument_type;
 
-  if(expr.operands().size()==1)
-    argument_type = to_unary_expr(expr).op().type();
+  if(expr.operands().size() == 1)
+  {
+    const exprt &op = to_unary_expr(expr).op();
+
+    // The alignment of an object is the one requested by its declaration, if
+    // any, which (unlike for members) may also be smaller than the alignment
+    // of its type, as is the case with GCC and Clang.
+    const auto declaration_alignment = numeric_cast<mp_integer>(
+      static_cast<const exprt &>(op.type().find(ID_C_declaration_alignment)));
+    if(op.id() == ID_symbol && declaration_alignment.has_value())
+    {
+      exprt tmp = from_integer(*declaration_alignment, size_type());
+      tmp.add_source_location() = expr.source_location();
+      expr.swap(tmp);
+      return;
+    }
+
+    argument_type = op.type();
+  }
   else
   {
-    typet &op_type=static_cast<typet &>(expr.add(ID_type_arg));
+    typet &op_type = static_cast<typet &>(expr.add(ID_type_arg));
     typecheck_type(op_type);
-    argument_type=op_type;
+    argument_type = op_type;
   }
 
   // we only care about the type
