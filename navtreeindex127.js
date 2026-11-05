@@ -1,6 +1,5 @@
 var NAVTREEINDEX127 =
 {
-"new_8c.html#a217b0e974cb2f9721122caf56c064d38":[6,0,2,5,0,1,2],
 "new_8c.html#a5ee9f7c0b65d03b4a6227451e9974178":[6,0,2,5,0,1,4],
 "new_8c.html#a5ef264d7c09f165e1d72b108c150dd32":[6,0,2,5,0,1,0],
 "new_8c.html#a69b79506a08d1d49d8ce8b043d0cd720":[6,0,2,5,0,1,8],
@@ -133,6 +132,8 @@ var NAVTREEINDEX127 =
 "osx__fat__reader_8h.html#a3c143b7ea6adf4f1a47914624d45e320":[6,0,2,16,56,3],
 "osx__fat__reader_8h.html#ad0c1a6408782fa0fce93821b11574022":[6,0,2,16,56,4],
 "osx__fat__reader_8h_source.html":[6,0,2,16,56],
+"other-tools.html":[0,4,12],
+"other-tools.html#autotoc_md207":[0,4,12,0],
 "output__file_8cpp.html":[6,0,2,30,151],
 "output__file_8cpp_source.html":[6,0,2,30,151],
 "output__file_8h.html":[6,0,2,30,152],
@@ -248,6 +249,5 @@ var NAVTREEINDEX127 =
 "pointer__expr_8h.html#a01a47199f5ded7d509acc0787fe4c56f":[6,0,2,30,160,76],
 "pointer__expr_8h.html#a040fcd63d0f64cc9fc4de17e6c435ab6":[6,0,2,30,160,50],
 "pointer__expr_8h.html#a05c7c1b305d3b1c100156b37daf27746":[6,0,2,30,160,71],
-"pointer__expr_8h.html#a05e5dfb9ac0987988cf1a69072be2fc8":[6,0,2,30,160,121],
-"pointer__expr_8h.html#a06ec5c60a0f1bd2fdbaddf7c370233bf":[6,0,2,30,160,85]
+"pointer__expr_8h.html#a05e5dfb9ac0987988cf1a69072be2fc8":[6,0,2,30,160,121]
 };

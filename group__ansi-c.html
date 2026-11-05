@@ -120,7 +120,7 @@ Preprocessing &amp; Parsing</h1>
 <li><a class="el" href="classansi__c__parse__treet.html">ansi_c_parse_treet</a></li>
 </ul>
 <div class="dotgraph">
-<iframe scrolling="no" loading="lazy" frameborder="0" src="dot_inline_dotgraph_1.svg" width="928" height="59"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<iframe scrolling="no" loading="lazy" frameborder="0" src="dot_inline_dotgraph_15.svg" width="928" height="59"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 <h1 class="doxsection"><a class="anchor" id="type-checking"></a>
 Type-checking</h1>
 <p>In the <a class="el" href="group__ansi-c.html">ansi-c</a> directory</p>
@@ -132,7 +132,7 @@ Type-checking</h1>
 <li><a class="el" href="classsymbol__tablet.html" title="The symbol table.">symbol_tablet</a></li>
 </ul>
 <div class="dotgraph">
-<iframe scrolling="no" loading="lazy" frameborder="0" src="dot_inline_dotgraph_2.svg" width="627" height="59"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<iframe scrolling="no" loading="lazy" frameborder="0" src="dot_inline_dotgraph_16.svg" width="627" height="59"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 <p>This stage generates a symbol table, mapping identifiers to symbols; <a class="el" href="classsymbolt.html">symbols</a> are tuples of (value, type, location, flags).</p>
 <p>This is a good point to introduce the <a class="el" href="classirept.html">irept</a> ("internal
 representation") class&mdash;the base type of many of CBMC's hierarchical data structures. In particular, <a class="el" href="classexprt.html">expressions</a>, <a class="el" href="classtypet.html">types</a> and <a class="el" href="classcodet.html">statements</a> are all subtypes of <a class="el" href="classirept.html">irept</a>. An irep is a tree of ireps. A subtlety is that an irep is actually the root of <em>three</em> (possibly empty) trees, i.e. it has three disjoint sets of children: <a class="el" href="classirept.html#a96f142ba81c529c4c27fa76ba6aafe52">irept::get_sub()</a> returns a list of children, and <a class="el" href="classirept.html#afe01f92b95e655ac1736dbce321bbdf3">irept::get_named_sub()</a> returns an association from names to children. <b>Most clients never use these functions directly</b>, as subtypes of irept generally provide more descriptive functions. For example, the operands of an <a class="el" href="classexprt.html">expression</a> (<a class="el" href="classexprt.html#a99463408e9c07a17a369e29eadec8d8b">op0</a>, op1 etc) are really that expression's children; the <a class="el" href="classcode__assignt.html#aabcfd63a5278e69c154cd23a30515039">left-hand</a> and right-hand side of an <a class="el" href="classcode__assignt.html">assignment</a> are the children of that assignment. The <a class="el" href="classirept.html#a0fd0f0b7d9f7e9a01f503d596333eb06">irept::pretty()</a> function provides a descriptive string representation of an irep.</p>

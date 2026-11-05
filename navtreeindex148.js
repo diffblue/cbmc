@@ -1,5 +1,6 @@
 var NAVTREEINDEX148 =
 {
+"structstatement__list__parse__treet_1_1var__declarationt.html#a61d2e084a2ce08e718f6dcb07dcfa120":[5,0,1210,0,2],
 "structstatement__list__typecheckt_1_1nesting__stack__entryt.html":[5,0,1212,0],
 "structstatement__list__typecheckt_1_1nesting__stack__entryt.html#a097f692b25975130783f1d5399181265":[5,0,1212,0,0],
 "structstatement__list__typecheckt_1_1nesting__stack__entryt.html#a0ba3323812f4b7374c92e205431be93d":[5,0,1212,0,3],
@@ -248,6 +249,5 @@ var NAVTREEINDEX148 =
 "structxml__graph__nodet.html#a243e84901c308d14d7038c1e93b314f3":[5,0,1391,2],
 "structxml__graph__nodet.html#a50002630d1238e2b20af34efac0f8d72":[5,0,1391,7],
 "structxml__graph__nodet.html#a7b63bbcef94622fc61e28c474a94ae63":[5,0,1391,3],
-"structxml__graph__nodet.html#abfc1a12b9c8f13b7218c4cf01eda21a5":[5,0,1391,5],
-"structxml__graph__nodet.html#ad19cd0d9a179ca4c2ea26f1c0b96007c":[5,0,1391,6]
+"structxml__graph__nodet.html#abfc1a12b9c8f13b7218c4cf01eda21a5":[5,0,1391,5]
 };

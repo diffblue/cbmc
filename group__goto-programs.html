@@ -127,7 +127,7 @@ Goto Conversion</h1>
 <li><a class="el" href="classgoto__programt_1_1instructiont.html">goto_programt::instructiont</a></li>
 </ul>
 <div class="dotgraph">
-<iframe scrolling="no" loading="lazy" frameborder="0" src="dot_inline_dotgraph_3.svg" width="971" height="59"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<iframe scrolling="no" loading="lazy" frameborder="0" src="dot_inline_dotgraph_17.svg" width="971" height="59"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 <p>At this stage, CBMC constructs a goto-program from a symbol table. Each symbol in the symbol table with function type (that is, the symbol's <span class="tt">type</span> field contains a <a class="el" href="classcode__typet.html">code_typet</a>) will be converted to a corresponding GOTO program. The parse tree and source file are not used at all for this step.</p>
 <p>The conversion happens in two phases:</p>
 <ol type="1">
@@ -136,7 +136,7 @@ Goto Conversion</h1>
 </ol>
 <p>Here is an example of a simple C program being converted into GOTO code (note the <span class="tt">targets</span> member of each instruction isn't populated yet):</p>
 <div class="dotgraph">
-<iframe scrolling="no" loading="lazy" frameborder="0" src="dot_inline_dotgraph_4.svg" width="1268" height="1394"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<iframe scrolling="no" loading="lazy" frameborder="0" src="dot_inline_dotgraph_18.svg" width="1268" height="1394"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 <p>The <span class="tt"><a class="el" href="classcodet.html" title="Data structure for representing an arbitrary statement in a program.">codet</a></span> representation of method bodies that is stored in the symbol table resembles C code quite strongly: it uses lexical variable scoping and has complex control-flow constructs such as <span class="tt"><a class="el" href="classcode__whilet.html" title="codet representing a while statement.">code_whilet</a></span> and <span class="tt"><a class="el" href="classcode__ifthenelset.html" title="codet representation of an if-then-else statement.">code_ifthenelset</a></span>. In converting to a GOTO program this structure is changed in several ways:</p>
 <ul>
 <li>Variable lifespan implied by <a class="el" href="classcode__declt.html">code_declt</a> instructions and lexical scopes described by <a class="el" href="classcode__blockt.html">code_blockt</a> nodes is replaced by <span class="tt"><a class="el" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296bebac511d45de1f5895f447fbfd7a0741cd8">DECL</a></span> and corresponding <span class="tt"><a class="el" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beba11fd9ca455f92c69c084484d5cd803c2">DEAD</a></span> instructions. There are therefore no lexical scopes in GOTO programs (not even local variable death on function exit is enforced).</li>

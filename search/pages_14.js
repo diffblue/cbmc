@@ -12,7 +12,7 @@ var searchData=
   ['newarray_9',['Single Dimensional Arrays (&lt;span class=&quot;tt&quot;&gt;newarray&lt;/span&gt;)',['../group__java__bytecode.html#oned_arrays',1,'']]],
   ['newarray_20and_20multianewarray_20bytecode_20operators_10',['Remove &lt;span class=&quot;tt&quot;&gt;new&lt;/span&gt;, &lt;span class=&quot;tt&quot;&gt;newarray&lt;/span&gt; and &lt;span class=&quot;tt&quot;&gt;multianewarray&lt;/span&gt; bytecode operators',['../group__java__bytecode.html#java-bytecode-remove-java-new',1,'']]],
   ['newmultiarray_11',['Multi Dimensional Arrays (&lt;span class=&quot;tt&quot;&gt;newmultiarray&lt;/span&gt;)',['../group__java__bytecode.html#multidarrays',1,'']]],
-  ['non_20deterministic_20initialisation_20of_20global_20scoped_20variables_12',['Add Non-Deterministic Initialisation of Global Scoped Variables',['../group__module__hidden.html#nondet-transform',1,'']]],
+  ['non_20deterministic_20initialisation_20of_20global_20scoped_20variables_12',['Add Non-Deterministic Initialisation of Global Scoped Variables',['../goto-program-transformations.html#nondet-transform',1,'']]],
   ['notes_13',['Notes',['../dir_b7965a39a409f36e81d9861fd6daf46f.html#autotoc_md156',1,'']]],
   ['null_20etc_20ndash_20local_5fbitvector_5fanalysist_14',['Pointer classification analysis (is-heap-pointer, might-be-null, etc &amp;ndash; local_bitvector_analysist)',['../group__analyses.html#analyses-pointer-classification',1,'']]],
   ['numbering_20object_5fnumberingt_15',['Object / expression numbering (object_numberingt)',['../group__pointer-analysis.html#pointer-analysis-object-numbering',1,'']]],
