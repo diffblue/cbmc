@@ -1,4 +1,4 @@
-KNOWNBUG libstdcxx16
+CORE libstdcxx16
 main.cpp
 --cpp23 --object-bits 12
 ^\[main\.assertion\.1\] line \d+ print returned: SUCCESS$
@@ -12,7 +12,9 @@ main.cpp
 ^CONVERSION ERROR$
 --
 g++ and clang++ (GCC 16 for C++23 and C++26) accept this program, and it fails
-only its WRONG assertion.  With the libstdc++ 16 headers, CBMC does not finish
-within 300 s (the test has no unwinding bound; symbolic execution of
-std::vprint_unicode's formatting into a buffer and the unicode check does not
-end).  The program has no observable result but its termination.
+only its WRONG assertion.  With the libstdc++ 16 headers, CBMC did not finish
+within 300 s: vprint_nonunicode formats into the FILE's own buffer through
+glibc internals CBMC does not model.  It is now modelled as libstdc++'s
+buffered variant (format into a string, then fwrite, [print.fun]/16-17), with
+models of system_error's categories for the failing write
+(cpp11_system_error_generic_category).  About 60 s.

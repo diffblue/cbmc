@@ -1943,6 +1943,25 @@ static const std::map<std::string, std::string> &library_source_models()
     {"std::breakpoint", "{ }"},
     {"std::breakpoint_if_debugging",
      "{ if(is_debugger_present()) breakpoint(); }"},
+    // libstdc++ src/c++11/functexcept.cc and system_error.cc: N5008
+    // [syserr.errcat.objects]/1-2, generic_category() returns a reference to
+    // an object whose name() is "generic" (and system_category() one whose
+    // name() is "system"); [syserr.syserr.members]/2, the exception thrown
+    // for an errno value is a system_error with error_code(e,
+    // generic_category()).  The message strings are not modelled (empty).
+    {"std::_V2::generic_category",
+     "{ static const struct __category final : error_category {"
+     " const char *name() const noexcept override { return \"generic\"; }"
+     " string message(int) const override { return string(); } } __c;"
+     " return __c; }"},
+    {"std::_V2::system_category",
+     "{ static const struct __category final : error_category {"
+     " const char *name() const noexcept override { return \"system\"; }"
+     " string message(int) const override { return string(); } } __c;"
+     " return __c; }"},
+    {"std::__throw_system_error",
+     "{ throw system_error(error_code(" CPROVER_PREFIX "parameter0,"
+     " generic_category())); }"},
     {"std::_Lockit::_Lockit", "{ }"},
     {"std::_Lockit::~_Lockit", "{ }"},
     {"std::_Facet_Register", "{ }"},
@@ -2292,6 +2311,20 @@ static void provide_set_terminate_model(symbol_table_baset &symbol_table)
 static const std::map<std::string, std::string> &library_replacing_models()
 {
   static const std::map<std::string, std::string> models = {
+    // libstdc++ 16's vprint_nonunicode(FILE *, ...) formats into the
+    // stream's own buffer through glibc's FILE internals (_IO_write_ptr,
+    // __overflow, __fbufsize), of which CBMC's FILE has no model, and
+    // symbolic execution of it did not end.  N5008 [print.fun]/16 requires
+    // the formatted characters to be written to the stream (holding its
+    // lock, not observable in one thread): do it as libstdc++'s
+    // vprint_nonunicode_buffered does, formatting into a string first and
+    // writing that with fwrite (system_error if writing fails, /17).
+    {"std::vprint_nonunicode",
+     "{ __format::_Str_sink<char> __buf;"
+     " std::vformat_to(__buf.out(), __fmt, __args);"
+     " auto __out = __buf.view();"
+     " if(std::fwrite(__out.data(), 1, __out.size(), __stream) !="
+     " __out.size()) __throw_system_error(int(errc::io_error)); }"},
     {"std::make_exception_ptr",
      "{ try { throw __ex; } catch(...) { return std::current_exception(); } }"},
     {"libc++:std::make_exception_ptr",
@@ -2541,6 +2574,9 @@ void cpp_typecheckt::provide_library_source_models()
       }
       ++parameter_index;
     }
+    // a replacing model that does not type-check (a library version whose
+    // internals differ) leaves the header's own body
+    const exprt original_value = symbol.value;
     symbol.value = body;
     try
     {
@@ -2582,7 +2618,7 @@ void cpp_typecheckt::provide_library_source_models()
       symbol.value.make_nil();
     }
     if(!symbol.value.get_bool("#cpp_converted"))
-      symbol.value.make_nil();
+      symbol.value = original_value;
   }
 }
 
@@ -3953,15 +3989,15 @@ void cpp_typecheckt::provide_stdlib_bodies()
        base == "~length_error" || base == "~out_of_range" ||
        base == "~invalid_argument" || base == "~domain_error" ||
        base == "~range_error" || base == "~overflow_error" ||
-       base == "~underflow_error") &&
+       base == "~underflow_error" || base == "~system_error") &&
       name.find("std::") == 0 && symbol.value.is_nil())
     {
       // libc++ defines these exception constructors/destructors in its
       // compiled library (_LIBCPP_EXPORTED_FROM_ABI); libstdc++'s are
-      // header-inline.  [stdexcept]: the constructors store the
-      // message (observable only through what()); an empty body is a
-      // sufficient model for verification of non-throwing paths, and
-      // throwing paths fail visibly at the throw itself.
+      // header-inline, but for ~system_error.  [stdexcept]: the
+      // constructors store the message (observable only through what()); an
+      // empty body is a sufficient model for verification of non-throwing
+      // paths, and throwing paths fail visibly at the throw itself.
       ensure_parameter_symbols(symbol, symbol_table);
       symbol.value = code_blockt();
       symbol.value.type() = symbol.type;
