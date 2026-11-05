@@ -1307,6 +1307,8 @@ void cpp_typecheckt::typecheck_code(codet &code)
       init = obj_expr;
     }
 
+    structured_binding_object = init;
+
     // Get the struct type
     typet init_type = init.type();
     if(init_type.id() == ID_struct_tag)

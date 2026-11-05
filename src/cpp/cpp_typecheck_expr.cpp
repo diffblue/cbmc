@@ -3596,6 +3596,20 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
   {
     typecheck_expr_lambda(expr);
   }
+  else if(expr.id() == "structured_binding_condition")
+  {
+    // N5008 [stmt.pre]/4: see Parser::rIfStatement; the structured binding
+    // declaration was type-checked just before, as the init-statement
+    if(!structured_binding_object.has_value())
+    {
+      error().source_location = expr.source_location();
+      error() << "structured binding condition without its declaration" << eom;
+      throw 0;
+    }
+    const source_locationt location = expr.source_location();
+    expr = *structured_binding_object;
+    expr.add_source_location() = location;
+  }
   else if(expr.id() == ID_index)
   {
     // C++23 multidimensional subscript: struct[args] → operator[](args)

@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp26
 ^\[main\.assertion\.1\] line \d+ structured binding declaration as a condition: SUCCESS$
@@ -11,8 +11,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-g++ and clang++ (GCC 16 for C++23 and C++26) accept this program, and it fails
-only its WRONG assertion.  [stmt.pre]/4: a condition may be a structured
-binding declaration, whose decision variable is the object it binds
-(contextually converted to bool, [stmt.pre]/5).  CBMC reports a parse error
-before `[ x , y'.
+[stmt.pre]/4: a condition may be a structured binding declaration, whose
+decision variable is the object it binds (contextually converted to bool,
+[stmt.pre]/5).  CBMC reported a parse error before `[ x , y'
+(cpp26_structured_binding_condition_forms).  Checked with GCC 16.

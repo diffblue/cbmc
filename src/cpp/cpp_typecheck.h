@@ -1043,6 +1043,10 @@ protected:
   /// function body
   bool coroutine_seen = false;
   void report_unsupported_coroutine(symbolt &);
+  /// The object (`e') of the structured binding declaration type-checked
+  /// last: the decision variable of a structured binding declaration used
+  /// as a condition (N5008 [stmt.pre]/4).
+  std::optional<exprt> structured_binding_object;
   /// The check of a contract assertion with the enforce evaluation semantic
   /// (N5008 [basic.contract.eval]/1, /13): an assertion of the type-checked
   /// \p predicate with property class \p kind, then an assumption of it --

@@ -13156,6 +13156,7 @@ std::optional<codet> Parser::rIfStatement()
   // C++17 if with init-statement: if(init; condition)
   exprt exp;
   codet init_stmt(ID_skip);
+  bool structured_binding_condition = false;
   {
     // N5008 [stmt.pre] (C++23, P2360R0): an init-statement may also be
     // an ALIAS-DECLARATION -- `if constexpr (using T = ...; cond)`.
@@ -13270,9 +13271,16 @@ std::optional<codet> Parser::rIfStatement()
                 {
                   lex.get_token(tk3);
                   exprt init;
-                  if(rExpression(init, false) && lex.LookAhead(0) == ';')
+                  // N5008 [stmt.pre]/1, /4 (C++26): the condition itself
+                  // may be a structured binding declaration
+                  if(
+                    rExpression(init, false) &&
+                    (lex.LookAhead(0) == ';' || lex.LookAhead(0) == ')'))
                   {
-                    lex.get_token(tk3); // ;
+                    if(lex.LookAhead(0) == ';')
+                      lex.get_token(tk3); // ;
+                    else
+                      structured_binding_condition = true;
                     codet sb(irep_idt("structured_binding"), {std::move(init)});
                     sb.add(irep_idt("bindings")) = std::move(bindings);
                     if(is_ref)
@@ -13309,7 +13317,14 @@ std::optional<codet> Parser::rIfStatement()
     }
   }
 
-  if(!rCondition(exp))
+  if(structured_binding_condition)
+  {
+    // [stmt.pre]/4: the decision variable is the object the structured
+    // binding declaration introduces, contextually converted to bool
+    exp = exprt{"structured_binding_condition"};
+    set_location(exp, tk2);
+  }
+  else if(!rCondition(exp))
     return {};
 
   if(lex.get_token(tk3)!=')')
