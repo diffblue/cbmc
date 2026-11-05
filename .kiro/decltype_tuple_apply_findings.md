@@ -16012,3 +16012,32 @@ cbmc-cpp CORE, KNOWNBUG, libc++, cpp, systemc, unit, macOS set 143/143,
 MSVC .ii 8/8.  The format check of a new regression file was missed in
 232ef71367 (fixed after): run the merge-base check of
 pull-request-check-clang-format.sh before reporting.
+
+## Round 218 (2026-11-05): fma, stale descs, coroutines, C library option C
+
+- 3b27b633da regression/cbmc/malloc_may_fail_unresolved_read_after_callee:
+  CORE with --unwind 17, the desc says why that is undesirable (symex
+  does not end without it under --malloc-may-fail).
+- fma: 4d7e4e39d2 expr2c printed floatbv_fma via to_floatbv_fma_expr (4
+  operands), but the C front end makes 3 (adjust_float_expressions adds
+  the rounding mode later): --show-symbol-table and goto-instrument
+  --dump-c hit the invariant (develop has it too); dump-c also now
+  includes <math.h>.  Found along the way: c7a010a95b a call whose linked
+  definition returns double through an `int f();' declaration got a
+  floatbv_typecast lvalue ("l2_rename_rvalues case not handled"), and,
+  once kept a typecast, an unconstrained int (the solvers need a rounding
+  mode for float->int).  Also in develop.
+- 6c64da6b0a ten stale CORE descs (and four main.cpp headers) rewritten.
+- d420db1ba7 coroutine KNOWNBUG explained: coroutines are parsed only
+  (parse.cpp keeps co_await/co_yield operands, co_return -> skip);
+  implementing them is the [dcl.fct.def.coroutine]/5 replacement body
+  plus a state-machine lowering.
+- 59a80e83ca --dump-c-library-models DIR / --c-library-models DIR, and
+  the CI preprocessing scripts dump the models into their artifacts.
+  Checked: Linux dump and load, a Fedora-container dump loaded on Ubuntu,
+  regression/cbmc-library-models.  Not yet run on Windows or macOS CI.
+  Local environment: regression/goto-gcc/archives/foo.o is owned by root
+  (a docker run in October), so the CMake `all' target fails there.
+Checks on W199: 13 suites, profiles (z3 complex2 flaky, 3/3 on rerun),
+vacuity 1065/3, unit, lint, whole-PR format, doxygen, iwyu, per-commit
+compile, platform (gcc11, m32, arm64), MSVC .ii 8/8, macOS 143/143.
