@@ -1,0 +1,13 @@
+CORE no-new-smt
+nondet.i
+--arch x86_64 --os linux
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Range constraints on non-deterministic x86 80-bit extended long double values
+exclude unnormals, which are NaN.
+The new SMT2 back end (--incremental-smt2-solver) runs out of memory on this
+test.

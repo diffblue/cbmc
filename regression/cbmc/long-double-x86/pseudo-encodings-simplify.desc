@@ -1,0 +1,11 @@
+CORE no-new-smt
+pseudo-encodings.i
+--arch x86_64 --os linux --floatbv
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+As pseudo-encodings.desc, but with the simplifier enabled, so that the
+constant-initialised values are folded using ieee_float_valuet.

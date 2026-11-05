@@ -1,0 +1,13 @@
+CORE no-new-smt
+round-to-integral.i
+--arch x86_64 --os linux
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Rounding x86 80-bit extended long double values to integers, including results
+that carry into the exponent.
+The new SMT2 back end (--incremental-smt2-solver) does not yet support
+floatbv_round_to_integral, as it does not implement extractbit.
