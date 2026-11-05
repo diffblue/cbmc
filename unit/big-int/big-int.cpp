@@ -53,6 +53,27 @@ TEST_CASE("arbitrary precision integers", "[core][big-int][bigint]")
         BigInt("99999999999999999999999999999999", 10) %
         BigInt("999999999999999999999999", 10)) == "99999999");
 
+    // Divisors with at least two digits whose most significant digit is the
+    // largest digit value: the scale factor used to normalise the divisor
+    // used to be computed as base / (1 + digit), which overflowed to a
+    // division by zero.
+    REQUIRE(
+      to_string(
+        BigInt("ffffffffffffffff0000000000000000", 16) /
+          BigInt("ffffffffffffffff", 16),
+        16) == "10000000000000000");
+    REQUIRE(
+      to_string(
+        BigInt("100000000000000000000000000", 16) %
+          BigInt("ffffffffffffffff", 16),
+        16) == "10000000000");
+    BigInt quotient("1fffffffffffffffe0000000000000000", 16);
+    quotient /= BigInt("ffffffffffffffff", 16);
+    REQUIRE(to_string(quotient, 16) == "20000000000000000");
+    BigInt remainder("1fffffffffffffffe0000000000000005", 16);
+    remainder %= BigInt("ffffffffffffffff", 16);
+    REQUIRE(to_string(remainder) == "5");
+
     BigInt t(100);
     t -= 300;
     REQUIRE(to_string(t) == "-200");
