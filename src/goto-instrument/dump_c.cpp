@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "dump_c.h"
 #include "dump_c_class.h"
 
+#include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/config.h>
@@ -535,6 +536,32 @@ void dump_ct::convert_compound(
 
   std::stringstream struct_body;
 
+  // Reproduce any #pragma pack(n) that applied to the members: a single
+  // value applying to all members is set before the definition (which works
+  // for all compilers), varying values (which only Visual Studio supports) are
+  // set member by member.
+  const auto pragma_pack_of = [](const struct_union_typet::componentt &c)
+  {
+    const exprt &value = static_cast<const exprt &>(c.find(ID_C_pragma_pack));
+    return value.is_nil() ? mp_integer{0}
+                          : numeric_cast<mp_integer>(value).value_or(0);
+  };
+  std::optional<mp_integer> pragma_pack;
+  bool pragma_pack_varies = false;
+  for(const auto &comp : type.components())
+  {
+    if(comp.get_bool(ID_from_base) || comp.get_is_padding())
+      continue;
+    const mp_integer n = pragma_pack_of(comp);
+    if(!pragma_pack.has_value())
+      pragma_pack = n;
+    else if(*pragma_pack != n)
+      pragma_pack_varies = true;
+  }
+  const bool use_pragma_pack =
+    pragma_pack.has_value() && (pragma_pack_varies || *pragma_pack != 0);
+  mp_integer current_pragma_pack = pragma_pack.value_or(0);
+
   for(const auto &comp : type.components())
   {
     const typet &comp_type = comp.type();
@@ -544,6 +571,15 @@ void dump_ct::convert_compound(
 
     if(comp.get_bool(ID_from_base) || comp.get_is_padding())
       continue;
+
+    if(pragma_pack_varies && pragma_pack_of(comp) != current_pragma_pack)
+    {
+      current_pragma_pack = pragma_pack_of(comp);
+      struct_body << "#pragma pack(";
+      if(current_pragma_pack != 0)
+        struct_body << integer2string(current_pragma_pack);
+      struct_body << ")\n";
+    }
 
     const typet *non_array_type = &comp_type;
     while(non_array_type->id()==ID_array)
@@ -632,6 +668,14 @@ void dump_ct::convert_compound(
     struct_body << ";\n";
   }
 
+  if(use_pragma_pack)
+  {
+    os << "#pragma pack(push";
+    if(*pragma_pack != 0)
+      os << ", " << integer2string(*pragma_pack);
+    os << ")\n";
+  }
+
   typet unresolved_clean=unresolved;
   irep_idt typedef_str;
   for(auto td_entry : typedef_types)
@@ -681,7 +725,10 @@ void dump_ct::convert_compound(
     os << " __attribute__ ((__packed__))";
   if(!typedef_str.empty())
     os << " " << typedef_str;
-  os << ";\n\n";
+  os << ";\n";
+  if(use_pragma_pack)
+    os << "#pragma pack(pop)\n";
+  os << '\n';
 }
 
 void dump_ct::convert_compound_enum(

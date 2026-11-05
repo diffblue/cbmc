@@ -1,0 +1,10 @@
+CORE broken-test-c++-front-end
+main.c
+--winx64
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Visual Studio applies the #pragma pack in effect at each member.
