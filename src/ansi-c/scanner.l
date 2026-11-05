@@ -359,10 +359,11 @@ enable_or_disable ("enable"|"disable")
                   // Done by Visual Studio and gcc
                   // http://msdn.microsoft.com/en-us/library/2e70t5y1%28v=vs.80%29.aspx
                   // push, pop could also use identifiers
+                  // The last element of the stack is the current value, which
+                  // is the default (0) when the stack is empty.
                   if(PARSER.pragma_pack.empty())
                     PARSER.pragma_pack.push_back(convert_integer_literal("0"));
-                  else
-                    PARSER.pragma_pack.push_back(PARSER.pragma_pack.back());
+                  PARSER.pragma_pack.push_back(PARSER.pragma_pack.back());
                 }
 
 <GRAMMAR>{cppstart}"pragma"{ws}"pack"{ws}"("{ws}"push"{ws}","{ws}{integer_s}{ws}")"{ws}{newline} {
@@ -374,32 +375,42 @@ enable_or_disable ("enable"|"disable")
                   while(tmp[p]==' ' || tmp[p]=='\t') ++p;
                   std::string value=std::string(tmp, p, tmp.find_last_not_of(") \t\n\r")+1-p);
                   exprt n=convert_integer_literal(value);
+                  if(PARSER.pragma_pack.empty())
+                    PARSER.pragma_pack.push_back(convert_integer_literal("0"));
                   PARSER.pragma_pack.push_back(n);
                 }
 
 <GRAMMAR>{cppstart}"pragma"{ws}"pack"{ws}"("{ws}{integer_s}{ws}")"{ws}{newline} {
                   // Done by Visual Studio and gcc
                   // http://msdn.microsoft.com/en-us/library/2e70t5y1%28v=vs.80%29.aspx
+                  // sets the current value without pushing (the last element
+                  // of the stack is the current value)
                   std::string tmp(yytext);
                   std::string::size_type p=tmp.find('(')+1;
                   while(tmp[p]==' ' || tmp[p]=='\t') ++p;
                   std::string value=std::string(tmp, p, tmp.find_last_not_of(") \t\n\r")+1-p);
                   exprt n=convert_integer_literal(value);
-                  PARSER.pragma_pack.push_back(n);
+                  if(PARSER.pragma_pack.empty())
+                    PARSER.pragma_pack.push_back(n);
+                  else
+                    PARSER.pragma_pack.back() = n;
                 }
 
 <GRAMMAR>{cppstart}"pragma"{ws}"pack"{ws}"("{ws}"pop"{ws}")"{ws}{newline} {
                   // Done by Visual Studio and gcc
                   // http://msdn.microsoft.com/en-us/library/2e70t5y1%28v=vs.80%29.aspx
                   // push, pop could also use identifiers
-                  if(!PARSER.pragma_pack.empty()) PARSER.pragma_pack.pop_back();
+                  // without a matching push, the current value is retained
+                  if(PARSER.pragma_pack.size() > 1)
+                    PARSER.pragma_pack.pop_back();
                 }
 
 <GRAMMAR>{cppstart}"pragma"{ws}"pack"{ws}"("{ws}")"{ws}{newline} {
                   // Done by Visual Studio and gcc
                   // http://msdn.microsoft.com/en-us/library/2e70t5y1%28v=vs.80%29.aspx
-                  // should be equivalent to pop-all
-                  PARSER.pragma_pack.clear();
+                  // resets the current value to the default without popping
+                  if(!PARSER.pragma_pack.empty())
+                    PARSER.pragma_pack.back() = convert_integer_literal("0");
                 }
 
 <GRAMMAR>{cppstart}"pragma"{ws}"CPROVER" { BEGIN(CPROVER_PRAGMA); }

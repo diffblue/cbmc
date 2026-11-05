@@ -51,6 +51,58 @@ _Static_assert(_Alignof(struct S4) == 2, "");
 _Static_assert(sizeof(struct S5) == 2, "");
 _Static_assert(_Alignof(struct S5) == 1, "");
 
+// #pragma pack(n) sets the current value without pushing, and
+// #pragma pack() resets to the default without popping
+#pragma pack(push, 1)
+#pragma pack(2)
+#pragma pack(pop)
+struct S6
+{
+  char c;
+  int i;
+};
+#pragma pack(4)
+#pragma pack(push, 1)
+#pragma pack()
+struct S7
+{
+  char c;
+  long long i;
+};
+#pragma pack(pop)
+struct S8
+{
+  char c;
+  long long i;
+};
+#pragma pack()
+
+// #pragma pack(pop) without a matching push retains the current value
+#pragma pack(2)
+#pragma pack(pop)
+struct S9
+{
+  char c;
+  int i;
+};
+#pragma pack()
+#pragma pack(push, 1)
+#pragma pack(push)
+#pragma pack(pop)
+#pragma pack(pop)
+#pragma pack(pop)
+struct S10
+{
+  char c;
+  int i;
+};
+
+_Static_assert(sizeof(struct S6) == 8, "");
+_Static_assert(sizeof(struct S7) == 16, "");
+_Static_assert(sizeof(struct S8) == 12, "");
+_Static_assert(sizeof(struct S9) == 6, "");
+_Static_assert(sizeof(struct S10) == 8, "");
+
 // anonymous aggregates that only differ in their packing are distinct types
 struct
 {
