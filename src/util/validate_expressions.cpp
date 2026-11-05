@@ -67,7 +67,7 @@ void call_on_expr(const exprt &expr, Args &&... args)
   {
 #ifdef REPORT_UNIMPLEMENTED_EXPRESSION_CHECKS
     std::cerr << "Unimplemented well-formedness check for expression with id: "
-              << expr.id_string() std::endl;
+              << expr.id_string() << std::endl;
 #endif
 
     CALL_ON_EXPR(exprt);
