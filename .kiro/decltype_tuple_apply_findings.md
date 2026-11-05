@@ -16078,3 +16078,31 @@ FUTURE library features (no library implements them) and the FUTURE
 no_unique_address layouts.
 Both findings are now tests: cpp26_static_assert_unevaluated_condition
 and cpp26_saturating_arithmetic_gcc16 (KNOWNBUG each).
+
+## Round 220 (2026-11-05): KNOWNBUG plan items 1-6
+
+- 550df9beab init-capture by move: member type deduced as auto (no
+  reference), class-type closure members constructed (copy/move).
+- 72db6894c3 std::thread start/join/detach models (libstdc++ thread.cc,
+  libc++ thread.cpp).  The probe stays KNOWNBUG: symex then stops with
+  "pointer handling for concurrency is unsound" (#305) -- the thread
+  state's destructor writes its dirty `this'.  Fixing #305 is the next
+  step for threads.
+- 4c2d54b0f7 coroutines: warning plus a failing "unsupported" property at
+  each coroutine's entry; operators kept by the parser.
+- aa9a827368 CTAD: -U__cpp_deduction_guides removed (libstdc++'s guides
+  had been compiled out); guides with defaulted parameters; undeduced
+  guide template parameters take defaults, substitution failure removes
+  the guide; initializer-list guides first for braced lists; qualified
+  lookup through inline namespaces; guides not found by name lookup in a
+  template-id.
+- da5afd772c if consteval keeps both branches under
+  __builtin_is_constant_evaluated().
+- 6961a66ab1 the implicit operator== of a defaulted operator<=>.
+- cpp17_probe_std_variant tagged libstdcxx12 (GCC 11 headers: variant from
+  a double rejected; pre-existing).
+Checks on W200: 13 suites (one cbmc-cpp test failed once in the batch,
+passes alone and in test.pl), profiles (z3 complex2 flaky), vacuity
+1063/3, unit, lint, whole-PR format, doxygen, per-commit compile,
+platform (gcc11 after the tag, m32, arm64), MSVC .ii 8/8, macOS 142/142.
+Remaining plan items 7-11 not started.
