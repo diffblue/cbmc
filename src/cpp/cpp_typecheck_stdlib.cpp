@@ -1931,6 +1931,18 @@ static const std::map<std::string, std::string> &library_source_models()
     {"libc++:std::__1::thread::join",
      "{ __libcpp_thread_join(&__t_); __t_ = _LIBCPP_NULL_THREAD; }"},
     {"libc++:std::__1::thread::detach", "{ __t_ = _LIBCPP_NULL_THREAD; }"},
+    // libstdc++exp's <debugging> (N5008 [debugging.utility]): whether a
+    // debugger is present is the environment's business, so either answer
+    // is possible (/4: the default behaviour is implementation-defined);
+    // breakpoint's semantics are implementation-defined (/1): it returns,
+    // as when a debugger continues the program; /2 for
+    // breakpoint_if_debugging
+    {"std::is_debugger_present",
+     "{ bool __present; " CPROVER_PREFIX "havoc_object(&__present);"
+     " return __present; }"},
+    {"std::breakpoint", "{ }"},
+    {"std::breakpoint_if_debugging",
+     "{ if(is_debugger_present()) breakpoint(); }"},
     {"std::_Lockit::_Lockit", "{ }"},
     {"std::_Lockit::~_Lockit", "{ }"},
     {"std::_Facet_Register", "{ }"},

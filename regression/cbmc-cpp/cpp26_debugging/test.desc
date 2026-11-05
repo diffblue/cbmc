@@ -1,4 +1,4 @@
-KNOWNBUG libstdcxx16
+CORE libstdcxx16
 main.cpp
 --cpp26
 ^\[main\.assertion\.1\] line \d+ returns: SUCCESS$
@@ -12,6 +12,6 @@ main.cpp
 ^CONVERSION ERROR$
 --
 <debugging> ([debugging.utility]): is_debugger_present and
-breakpoint_if_debugging.  libstdc++ 16 defines both in libstdc++exp,
-which has no models: their "no body" checks fail.  Checked with GCC 16
-(linked with -lstdc++exp).
+breakpoint_if_debugging.  libstdc++ 16 defines both in libstdc++exp, for
+which CBMC had no models: their "no body" checks failed
+(cpp26_debugging_models).  Checked with GCC 16 (linked with -lstdc++exp).
