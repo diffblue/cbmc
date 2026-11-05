@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp23
 ^\[main\.assertion\.1\] line \d+ if consteval: SUCCESS$
@@ -11,8 +11,8 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-g++ and clang++ (GCC 16 for C++23 and C++26) accept this program, and it fails
-only its WRONG assertion.  [stmt.if]/4: the first substatement of `if
-consteval' is executed in an immediate function context or during manifestly
-constant evaluation.  CBMC takes the else branch in the constant evaluation of
-`constexpr int c = f()' (c is 2); at run time it takes it correctly.
+[stmt.if]/4: the first substatement of `if consteval' is executed in an
+immediate function context or during manifestly constant evaluation.  The
+parser kept only the else branch, so the constant evaluation of
+`constexpr int c = f()' took it too (c was 2).  Both branches are now kept
+(cpp23_if_consteval_forms).

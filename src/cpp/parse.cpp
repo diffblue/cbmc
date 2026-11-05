@@ -13028,49 +13028,59 @@ std::optional<codet> Parser::rIfStatement()
     is_constexpr_if = true;
   }
 
-  // C++23 if consteval: CBMC performs runtime verification via symbolic
-  // execution, so always take the runtime (else) branch.
-  if(lex.LookAhead(0) == TOK_CONSTEVAL)
+  // C++23 if consteval / if !consteval ([stmt.if]/4): the first
+  // substatement is executed when the evaluation happens in an immediate
+  // function context or is manifestly constant-evaluated, the else
+  // substatement otherwise.  Both are kept, under the condition
+  // __builtin_is_constant_evaluated() ([meta.const.eval]/1), which constant
+  // evaluation folds to true and which is false at run time.
   {
-    lex.get_token(tk2);
-
-    // Parse and discard the consteval branch
-    auto consteval_body = rCompoundStatement();
-    if(!consteval_body.has_value())
-        return {};
-
-    // Take the else (runtime) branch if present, otherwise skip
-    if(lex.LookAhead(0) == TOK_ELSE)
+    const bool negated =
+      lex.LookAhead(0) == '!' && lex.LookAhead(1) == TOK_CONSTEVAL;
+    if(negated || lex.LookAhead(0) == TOK_CONSTEVAL)
     {
-        lex.get_token(tk2);
-        return rStatement();
-    }
+        if(negated)
+          lex.get_token(tk2); // '!'
+        lex.get_token(tk2);   // consteval
+        const source_locationt location = tk1.data.source_location();
 
-    return codet(ID_skip);
-  }
-
-  // C++23 if !consteval: the negated form — take the if-body (runtime)
-  // and discard the else-body (consteval).
-  if(lex.LookAhead(0) == '!' && lex.LookAhead(1) == TOK_CONSTEVAL)
-  {
-    lex.get_token(tk2); // consume '!'
-    lex.get_token(tk2); // consume 'consteval'
-
-    // Take the if-body (runtime branch)
-    auto runtime_body = rCompoundStatement();
-    if(!runtime_body.has_value())
-        return {};
-
-    // Discard the else-body (consteval branch) if present
-    if(lex.LookAhead(0) == TOK_ELSE)
-    {
-        lex.get_token(tk2);
-        auto consteval_body = rCompoundStatement();
-        if(!consteval_body.has_value())
+        auto first = rCompoundStatement();
+        if(!first.has_value())
           return {};
-    }
+        std::optional<codet> second;
+        if(lex.LookAhead(0) == TOK_ELSE)
+        {
+          lex.get_token(tk2);
+          // [stmt.if]/4: "The statement, if any, in a consteval if statement
+          // shall be a compound-statement."
+          auto else_body = rCompoundStatement();
+          if(!else_body.has_value())
+          return {};
+          second = std::move(*else_body);
+        }
 
-    return std::move(runtime_body.value());
+        cpp_namet callee{"__builtin_is_constant_evaluated", location};
+        side_effect_expr_function_callt is_constant_evaluated(
+          static_cast<exprt &>(static_cast<irept &>(callee)),
+          {},
+          typet{},
+          location);
+        exprt condition = std::move(is_constant_evaluated);
+        if(negated)
+        {
+          // `!' as written, type-checked with its operand
+          exprt negation{ID_not};
+          negation.add_to_operands(std::move(condition));
+          negation.add_source_location() = location;
+          condition = std::move(negation);
+        }
+
+        code_ifthenelset result{std::move(condition), std::move(*first)};
+        if(second.has_value())
+          result.else_case() = std::move(*second);
+        result.add_source_location() = location;
+        return std::move(result);
+    }
   }
 
   if(lex.get_token(tk2)!='(')
