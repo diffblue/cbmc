@@ -191,6 +191,17 @@ digit_div (onedig_t *b, unsigned l, onedig_t d)
 
 // Subroutines for division primitive. Mostly for clarity.
 
+/// Factor by which to scale a divisor of at least two digits, and the
+/// dividend, such that the most significant digit of the divisor is no less
+/// than half base, as guess_q() requires.
+/// \param leading_digit: the most significant digit of the divisor
+/// \return base / (leading_digit + 1), computed in twodig_t: in onedig_t, the
+///   addition would wrap around to zero for a leading digit of single_max.
+static inline onedig_t normalisation_scale(onedig_t leading_digit)
+{
+  return onedig_t(base / (twodig_t{1} + leading_digit));
+}
+
 // Guess quotient digit based on the three most significant dividend
 // digits and the two most significant digits of the divisor. Since we
 // have least significant digit first here, the indices used to access
@@ -1113,7 +1124,7 @@ BigInt::div (BigInt const &x, BigInt const &y, BigInt &q, BigInt &r)
       onedig_t *b = (onedig_t *)alloca (bl * sizeof (onedig_t));
       memcpy (b, y.digit, bl * sizeof (onedig_t));
 
-      onedig_t scale = onedig_t (base / (1 + b[bl - 1]));
+      onedig_t scale = normalisation_scale(b[bl - 1]);
       if (scale != 1)
 	{
 	  if ((a[al] = digit_mul (a, al, scale)) != 0) ++al;
@@ -1203,7 +1214,7 @@ BigInt::operator/= (BigInt const &y)
       onedig_t *b = (onedig_t *)alloca (bl * sizeof (onedig_t));
       memcpy (b, y.digit, bl * sizeof (onedig_t));
 
-      onedig_t scale = onedig_t (base / (1 + b[bl - 1]));
+      onedig_t scale = normalisation_scale(b[bl - 1]);
       if (scale != 1)
 	{
 	  if ((a[al] = digit_mul (a, al, scale)) != 0) ++al;
@@ -1279,7 +1290,7 @@ BigInt::operator%= (BigInt const &y)
       onedig_t *b = (onedig_t *)alloca (bl * sizeof (onedig_t));
       memcpy (b, y.digit, bl * sizeof (onedig_t));
 
-      onedig_t scale = onedig_t (base / (1 + b[bl - 1]));
+      onedig_t scale = normalisation_scale(b[bl - 1]);
       if (scale != 1)
 	{
 	  if ((a[al] = digit_mul (a, al, scale)) != 0) ++al;
