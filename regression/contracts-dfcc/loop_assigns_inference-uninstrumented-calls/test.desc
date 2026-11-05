@@ -1,0 +1,21 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts _ --no-standard-checks
+^EXIT=10$
+^SIGNAL=0$
+^\[main.assertion.1\] .* y written through a parameter: FAILURE$
+^\[main.assertion.2\] .* g written as a global: FAILURE$
+^\[main.assertion.3\] .* r assigned the result: FAILURE$
+^\[main.assertion.4\] .* z only read: SUCCESS$
+^VERIFICATION FAILED$
+--
+^\[main\.assigns\.\d+\] .*: FAILURE$
+^\[main\.loop_assigns\.\d+\] .*: FAILURE$
+--
+The loop assigns inference replaces the bodies of the functions that DFCC does
+not instrument (here, with the `__VERIFIER` prefix) by summaries of their writes.
+Each loop must still havoc what such a function writes: through a parameter, to
+a global, and to the variable the result is assigned to. The writes happen in
+the sixth iteration, after the base case, so that the assertions after the loops
+fail only if the loops havoc their targets. A function that only reads through
+its parameter adds nothing to the write set.
