@@ -589,6 +589,154 @@ public:
   // string literal returned 0), and a static_assert built on them failed.
   bool failed = false;
 
+  // N5008 [expr.const]/10.22 (C++26): an exception may be thrown and caught
+  // within a constant evaluation.  A throw sets `throwing' together with
+  // `failed', so that every statement stops as for a failure, until a
+  // try-block's handler that matches it ([except.handle]/3) clears both.  An
+  // exception that leaves the evaluated function is not caught here: the
+  // evaluation fails ([expr.const]/10.22 requires the exception object to be
+  // destroyed within the evaluation).
+  bool throwing = false;
+  exprt thrown_value;
+  irept thrown_types;
+  // the exception the innermost active handler caught, for `throw;'
+  std::vector<std::pair<exprt, irept>> handled;
+
+  /// Start the throw of \p value, of the types listed by \p types
+  /// (cpp_exception_list).
+  void start_throw(const exprt &value, const irept &types)
+  {
+    throwing = true;
+    failed = true;
+    thrown_value = value;
+    thrown_types = types;
+  }
+
+  /// A throw-expression as the expression of an expression statement:
+  /// evaluate it.  \return whether \p e is one.
+  bool execute_throw(const exprt &e)
+  {
+    if(e.id() != ID_side_effect || e.get(ID_statement) != ID_throw)
+      return false;
+    if(e.operands().empty())
+    {
+      // [expr.throw]/3: rethrow the currently handled exception
+      if(handled.empty())
+        failed = true;
+      else
+        start_throw(handled.back().first, handled.back().second);
+      return true;
+    }
+    // [expr.throw]/4: the exception object is copy-initialized from the
+    // operand; an aggregate temporary (`throw E{x}') holds its value as its
+    // operand
+    const exprt &operand = e.operands().front();
+    exprt value = nil_exprt{};
+    if(
+      operand.id() == ID_side_effect &&
+      operand.get(ID_statement) == ID_temporary_object)
+    {
+      if(operand.operands().size() == 1)
+        value = eval(operand.operands().front());
+      else
+      {
+        // `new_object = {x}' as the temporary's initializer
+        const exprt &init =
+          static_cast<const exprt &>(operand.find(ID_initializer));
+        if(
+          init.id() == ID_code &&
+          to_code(init).get_statement() == ID_expression &&
+          init.operands().size() == 1 &&
+          init.operands().front().id() == ID_side_effect &&
+          init.operands().front().get(ID_statement) == ID_assign &&
+          init.operands().front().operands().size() == 2 &&
+          init.operands().front().operands().front().id() == ID_new_object)
+        {
+          exprt rhs = init.operands().front().operands().back();
+          if(rhs.id() == ID_compound_literal && rhs.operands().size() == 1)
+            rhs = rhs.operands().front();
+          value = eval(rhs);
+        }
+      }
+    }
+    if(value.is_nil())
+      value = eval(operand);
+    if(!is_constant_value(value, symbol_table))
+    {
+      failed = true;
+      return true;
+    }
+    start_throw(value, e.find(ID_exception_list));
+    return true;
+  }
+
+  /// [except.handle]/3: whether the handler \p handler (a catch block of a
+  /// try_catch statement) matches the exception being thrown.
+  bool handler_matches(const exprt &handler) const
+  {
+    if(handler.get("#cpp_handler") == ID_ellipsis)
+      return true;
+    const irep_idt &id = handler.get(ID_exception_id);
+    for(const auto &type : thrown_types.get_sub())
+      if(type.id() == id)
+        return true;
+    return false;
+  }
+
+  /// [except.handle]: execute the try-block of \p code, and the first
+  /// handler that matches an exception thrown by it.
+  std::optional<exprt> execute_try_catch(const codet &code, int depth)
+  {
+    auto result = execute(to_code(code.op0()), depth + 1);
+    if(!throwing)
+      return result;
+    for(std::size_t i = 1; i < code.operands().size(); ++i)
+    {
+      const exprt &handler = code.operands()[i];
+      if(handler.id() != ID_code || !handler_matches(handler))
+        continue;
+      throwing = false;
+      failed = false;
+      const auto &statements = to_code(handler).operands();
+      std::size_t first = 0;
+      if(handler.get("#cpp_handler") != ID_ellipsis)
+      {
+        // [except.handle]/15: the exception-declaration's variable is
+        // initialized from the exception object
+        if(
+          statements.empty() || statements.front().id() != ID_code ||
+          to_code(statements.front()).get_statement() != ID_decl_block ||
+          statements.front().operands().empty())
+        {
+          failed = true;
+          return std::nullopt;
+        }
+        const codet &decl = to_code(statements.front().operands().front());
+        if(decl.get_statement() != ID_decl || decl.op0().id() != ID_symbol)
+        {
+          failed = true;
+          return std::nullopt;
+        }
+        vars[to_symbol_expr(decl.op0()).get_identifier()] = thrown_value;
+        first = 1;
+      }
+      handled.emplace_back(thrown_value, thrown_types);
+      std::optional<exprt> handler_result;
+      for(std::size_t k = first; k < statements.size(); ++k)
+      {
+        if(statements[k].id() != ID_code)
+          continue;
+        handler_result = execute(to_code(statements[k]), depth + 1);
+        if(handler_result.has_value() || failed)
+          break;
+      }
+      handled.pop_back();
+      return handler_result;
+    }
+    // no handler matches: the exception propagates
+    return std::nullopt;
+  }
+
   // Apply an assignment-like side effect (`=`, compound assignment,
   // `++`/`--`) to a tracked variable.  Returns false when the effect cannot
   // be tracked (the caller then gives up on the evaluation).
@@ -1191,7 +1339,9 @@ public:
       e.operands()[0].id() == ID_symbol)
     {
       auto it = vars.find(to_symbol_expr(e.operands()[0]).get_identifier());
-      if(it != vars.end() && it->second.is_constant())
+      // (a reference bound to a class object holds the object's value, as
+      // a reference parameter does: a struct of constants)
+      if(it != vars.end() && is_constant_value(it->second))
         return it->second;
       if(it != vars.end())
       {
@@ -1700,10 +1850,14 @@ public:
       // compound assignment / increment (`__n = __i`, `++__i`).  Apply it to
       // the tracked variables; skipping it froze the loop variables, so the
       // termination condition never changed and evaluation gave up.
+      if(!code.operands().empty() && execute_throw(code.op0()))
+        return std::nullopt;
       if(!code.operands().empty() && !apply_side_effect(code.op0()))
         failed = true;
       return std::nullopt;
     }
+    if(code.get_statement() == ID_try_catch && code.operands().size() >= 2)
+      return execute_try_catch(code, depth);
     if(code.get_statement() == ID_skip)
       return std::nullopt;
 

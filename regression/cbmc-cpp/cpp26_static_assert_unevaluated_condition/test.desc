@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp26
 ^file main\.cpp line \d+: static assertion failed: f\(\) is 4$
@@ -10,11 +10,8 @@ static_assert condition could not be evaluated
 ^VERIFICATION SUCCESSFUL$
 --
 The program is ill-formed: GCC 16 reports "static assertion failed: f() is
-4".  CBMC's constant evaluator does not evaluate throw and try
+4".  CBMC's constant evaluator did not evaluate throw and try
 (cpp26_constexpr_exception), and a static_assert whose condition it cannot
 evaluate is skipped with the warning "static_assert condition could not be
-evaluated; the assertion is not checked", so verification succeeds.  The
+evaluated; the assertion is not checked", so verification succeeded.  The
 static_assert is the check that must fail, so there is no WRONG assertion.
-Fixing the constant evaluation fixes this test; making an unevaluated
-condition an error would not be correct in general, as the evaluator falls
-short on conditions that hold, too.

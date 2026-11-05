@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp26
 ^\[main\.assertion\.1\] line \d+ an exception thrown and caught in a constant expression: SUCCESS$
@@ -13,7 +13,6 @@ main.cpp
 --
 C++26 permits an exception object in a constant expression when it is
 destroyed within the evaluation ([expr.const]/10.22).  CBMC's constant
-evaluator does not evaluate throw and try: W<f()> fails to type-check
-(CONVERSION ERROR), and `static_assert(f() == 4)' passes silently (an
-assertion whose condition cannot be evaluated is not checked, with a
-warning).  Checked with GCC 16.
+evaluator did not evaluate throw and try: W<f()> failed to type-check
+(CONVERSION ERROR) (cpp26_constexpr_exceptions_forms).  Checked with
+GCC 16.
