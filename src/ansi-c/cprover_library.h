@@ -33,11 +33,23 @@ std::string get_cprover_library_text(
 /// Parses and typechecks the given src and adds its contents to the
 /// symbol table. Symbols with names found in `keep` will survive
 /// the symbol table cleanup pass and be found in the symbol_table.
+/// Type-checks the C library model text \p src and links it into the symbol
+/// table; \p preprocessed: \p src is already preprocessed (by
+/// dump_c_library_models)
 void add_library(
   const std::string &src,
   symbol_table_baset &,
   message_handlert &,
-  const std::set<irep_idt> &keep = {});
+  const std::set<irep_idt> &keep = {},
+  bool preprocessed = false);
+
+/// Preprocesses each model of the C library with this platform's
+/// preprocessor (for the target and options of \ref config) and writes it to
+/// \p directory as `FUNCTION.i', with a manifest, for
+/// `--c-library-models' on another host.  \return true on error
+bool dump_c_library_models(
+  const std::string &directory,
+  message_handlert &message_handler);
 
 void cprover_c_library_factory(
   const std::set<irep_idt> &functions,

@@ -1,6 +1,8 @@
 # Preprocess cbmc-cpp tests with the MSVC toolchain so that a failure on a
 # Windows CI job can be reproduced elsewhere from the resulting .ii files:
-# `cbmc --winx64 <flags from test.desc> test_X.ii'.
+# `cbmc --winx64 <flags from test.desc> test_X.ii', adding
+# `--c-library-models OUTDIR\c-library-models' for the C library models
+# preprocessed by cl.
 #
 # usage: preprocess_cpp_tests.ps1 CBMC OUTDIR [TEST...]
 #
@@ -18,6 +20,10 @@ $Cbmc = (Resolve-Path $Cbmc).Path
 New-Item -ItemType Directory -Force -Path $OutDir | Out-Null
 $OutDir = (Resolve-Path $OutDir).Path
 $root = Split-Path -Parent $PSScriptRoot
+
+# the C library models preprocessed with the MSVC toolchain, for
+# `cbmc --winx64 --c-library-models DIR' on another host
+& $Cbmc --dump-c-library-models (Join-Path $OutDir "c-library-models") *> $null
 
 foreach ($hdr in @("tuple", "string_view", "variant", "any", "string", "map",
                    "optional", "vector", "list", "set", "thread", "mutex",

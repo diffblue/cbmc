@@ -1250,6 +1250,9 @@ bool configt::set(const cmdlinet &cmdline)
   if(cmdline.isset("no-library"))
     ansi_c.lib=configt::ansi_ct::libt::LIB_NONE;
 
+  if(cmdline.isset("c-library-models"))
+    ansi_c.c_library_models_dir = cmdline.get_value("c-library-models");
+
   if(cmdline.isset("stdlib"))
   {
     const std::string stdlib = cmdline.get_value("stdlib");

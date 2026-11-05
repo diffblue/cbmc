@@ -100,7 +100,8 @@ class symbol_table_baset;
   "(no-malloc-may-fail)"                                                       \
   "(string-abstraction)"                                                       \
   "(dfcc-debug-lib)"                                                           \
-  "(dfcc-simple-invalid-pointer-model)"
+  "(dfcc-simple-invalid-pointer-model)"                                        \
+  "(c-library-models):"
 
 #define HELP_CONFIG_LIBRARY                                                    \
   " {y--malloc-may-fail} \t allow malloc calls to return a null pointer\n"     \
@@ -112,7 +113,9 @@ class symbol_table_baset;
   " {y--dfcc-debug-lib} \t enable debug assertions in the cprover contracts "  \
   "library\n"                                                                  \
   " {y--dfcc-simple-invalid-pointer-model} \t use simplified invalid pointer " \
-  "model in the cprover contracts library (faster, unsound)\n"
+  "model in the cprover contracts library (faster, unsound)\n"                 \
+  " {y--c-library-models} {udir} \t use the C library models preprocessed "    \
+  "into {udir} by cbmc {y--dump-c-library-models}\n"
 
 #define OPT_CONFIG_JAVA "(classpath)(cp)(main-class)"
 
@@ -351,6 +354,10 @@ public:
     libt lib;
 
     bool string_abstraction;
+    /// A directory of C library models preprocessed by
+    /// `cbmc --dump-c-library-models' (possibly on another platform), used
+    /// instead of preprocessing the built-in models on this host.
+    std::string c_library_models_dir;
     bool malloc_may_fail = true;
 
     /// enable debug code in cprover_contracts library

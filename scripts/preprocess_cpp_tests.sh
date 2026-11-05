@@ -2,7 +2,9 @@
 
 # Preprocess cbmc-cpp tests with the host toolchain so that a failure on a
 # CI platform (macOS: Apple libc++) can be reproduced elsewhere from the
-# resulting .ii files: `cbmc --os macos <flags from test.desc> test_X.ii'.
+# resulting .ii files: `cbmc --os macos <flags from test.desc> test_X.ii',
+# adding `--c-library-models OUTDIR/c-library-models' for the C library
+# models preprocessed with the platform's headers.
 #
 # usage: preprocess_cpp_tests.sh CBMC OUTDIR [TEST...]
 #
@@ -17,6 +19,9 @@ mkdir -p "$2"
 out=$(cd "$2" && pwd)
 shift 2
 root=$(cd "$(dirname "$0")/.." && pwd)
+# the C library models preprocessed with this host's headers, for
+# `cbmc --os macos --arch ARCH --c-library-models DIR' on another host
+"$cbmc" --dump-c-library-models "$out/c-library-models" > /dev/null 2>&1
 
 for hdr in vector iterator; do
   printf '#include <%s>\nint main() {}\n' "$hdr" > "$out/pp_$hdr.cpp"

@@ -145,6 +145,13 @@ stop after preprocessing
 \fB\-\-test\-preprocessor\fR
 stop after preprocessing, discard output
 .TP
+\fB\-\-dump\-c\-library\-models\fR dir
+preprocess each model of the C library with this host's preprocessor and
+headers, for the target and library options given, into \fIdir\fR (one
+\fIfunction\fR.i file per model and a manifest), and stop; for
+\fB\-\-c\-library\-models\fR on a host that cannot preprocess them, for
+example to debug a Windows or macOS run on Linux
+.TP
 \fB\-I\fR path
 set include path (C/C++)
 .TP
@@ -346,6 +353,12 @@ enable debug assertions in the cprover contracts library
 \fB\-\-dfcc\-simple\-invalid\-pointer\-model\fR
 use simplified invalid pointer model in the cprover contracts library
 (faster, unsound)
+.TP
+\fB\-\-c\-library\-models\fR dir
+use the C library models preprocessed into \fIdir\fR by
+\fBcbmc \-\-dump\-c\-library\-models\fR, on this or another host, for the
+same target and library options, instead of preprocessing the built-in
+models with this host's headers
 .TP
 \fB\-\-reachability\-slice\fR
 remove instructions that cannot appear on a trace

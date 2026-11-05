@@ -16,6 +16,7 @@ DIRS = cbmc-shadow-memory \
        cbmc-incr-smt2 \
        cbmc-incr \
        cbmc-output-file \
+       cbmc-library-models \
        cbmc-with-incr \
        array-refinement-with-incr \
        goto-instrument-chc \

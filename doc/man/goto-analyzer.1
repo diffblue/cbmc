@@ -595,6 +595,12 @@ enable debug assertions in the cprover contracts library
 \fB\-\-dfcc\-simple\-invalid\-pointer\-model\fR
 use simplified invalid pointer model in the cprover contracts library
 (faster, unsound)
+.TP
+\fB\-\-c\-library\-models\fR dir
+use the C library models preprocessed into \fIdir\fR by
+\fBcbmc \-\-dump\-c\-library\-models\fR, on this or another host, for the
+same target and library options, instead of preprocessing the built-in
+models with this host's headers
 .SS "Standard Checks"
 From version \fB6.0\fR onwards, \fBcbmc\fR, \fBgoto-analyzer\fR and some other tools
 apply some checks to the program by default (called the "standard checks"), with the

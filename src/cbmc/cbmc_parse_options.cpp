@@ -580,6 +580,14 @@ int cbmc_parse_optionst::doit()
     return CPROVER_EXIT_SUCCESS;
   }
 
+  if(cmdline.isset("dump-c-library-models"))
+  {
+    return dump_c_library_models(
+             cmdline.get_value("dump-c-library-models"), ui_message_handler)
+             ? CPROVER_EXIT_INTERNAL_ERROR
+             : CPROVER_EXIT_SUCCESS;
+  }
+
   // Log the banner now that the preprocess-only short-circuits are past:
   // doing so earlier would write the banner to stdout (via log.status())
   // and corrupt the output of --preprocess, which has to emit the
@@ -1062,6 +1070,8 @@ void cbmc_parse_optionst::help()
     "\n"
     "C/C++ frontend options:\n"
     " {y--preprocess} \t stop after preprocessing\n"
+    " {y--dump-c-library-models} {udir} \t preprocess the C library models "
+    "for this target into {udir} and stop (for {y--c-library-models})\n"
     " {y--test-preprocessor} \t stop after preprocessing, discard output\n"
     HELP_CONFIG_C_CPP
     HELP_ANSI_C_LANGUAGE

@@ -10,17 +10,22 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/config.h>
 #include <util/cprover_prefix.h>
+#include <util/message.h>
 #include <util/symbol_table_base.h>
+#include <util/tempfile.h>
+#include <util/unicode.h>
 
 #include "ansi_c_language.h"
+#include "c_preprocess.h"
 
 #include <cctype>
+#include <filesystem>
+#include <fstream>
 #include <sstream>
 
-static std::string get_cprover_library_text(
-  const std::set<irep_idt> &functions,
-  const symbol_table_baset &symbol_table,
-  const bool force_load)
+/// The text that precedes the models of the C library: the macros for the
+/// options that the models depend on.
+static std::string library_prologue()
 {
   std::ostringstream library_text;
 
@@ -53,16 +58,136 @@ static std::string get_cprover_library_text(
     library_text << "#define " CPROVER_PREFIX
                     "DFCC_SIMPLE_INVALID_POINTER_MODEL\n";
 
-  // cprover_library.inc may not have been generated when running Doxygen, thus
-  // make Doxygen skip this part
-  /// \cond
-  const struct cprover_library_entryt cprover_library[] =
-#include "cprover_library.inc" // IWYU pragma: keep
-    ;                          // NOLINT(whitespace/semicolon)
-  /// \endcond
+  return library_text.str();
+}
 
+// cprover_library.inc may not have been generated when running Doxygen, thus
+// make Doxygen skip this part
+/// \cond
+static const struct cprover_library_entryt cprover_library[] =
+#include "cprover_library.inc" // IWYU pragma: keep
+  ;                            // NOLINT(whitespace/semicolon)
+/// \endcond
+
+static std::string get_cprover_library_text(
+  const std::set<irep_idt> &functions,
+  const symbol_table_baset &symbol_table,
+  const bool force_load)
+{
   return get_cprover_library_text(
-    functions, symbol_table, cprover_library, library_text.str(), force_load);
+    functions, symbol_table, cprover_library, library_prologue(), force_load);
+}
+
+/// What the models in a directory of preprocessed models were made for: the
+/// target and the prologue (the options the models depend on).  Models
+/// preprocessed for another target or other options are not used.
+static std::string library_models_manifest()
+{
+  return "os " + configt::ansi_ct::os_to_string(config.ansi_c.os) + "\narch " +
+         id2string(config.ansi_c.arch) + "\nmode " +
+         std::to_string(static_cast<int>(config.ansi_c.mode)) +
+         "\npointer width " + std::to_string(config.ansi_c.pointer_width) +
+         "\nprologue\n" + library_prologue();
+}
+
+bool dump_c_library_models(
+  const std::string &directory,
+  message_handlert &message_handler)
+{
+  messaget log{message_handler};
+  std::error_code error;
+  std::filesystem::create_directories(directory, error);
+  if(error)
+  {
+    log.error() << "failed to create directory '" << directory << "'"
+                << messaget::eom;
+    return true;
+  }
+  {
+    std::ofstream manifest{widen_if_needed(
+      (std::filesystem::path{directory} / "manifest").string())};
+    manifest << library_models_manifest();
+    if(!manifest)
+    {
+      log.error() << "failed to write the manifest" << messaget::eom;
+      return true;
+    }
+  }
+  std::size_t written = 0, failed = 0;
+  const std::string prologue = library_prologue();
+  for(const cprover_library_entryt *e = cprover_library; e->function != nullptr;
+      e++)
+  {
+    std::istringstream in{prologue + e->model};
+    std::ostringstream preprocessed;
+    // a model may need headers or definitions this platform lacks; it is
+    // then left out, and loading falls back to the built-in model
+    null_message_handlert quiet;
+    if(c_preprocess(in, preprocessed, quiet))
+    {
+      ++failed;
+      log.debug() << "not preprocessed: " << e->function << messaget::eom;
+      continue;
+    }
+    std::ofstream out{widen_if_needed(
+      (std::filesystem::path{directory} / (std::string{e->function} + ".i"))
+        .string())};
+    out << preprocessed.str();
+    ++written;
+  }
+  log.status() << "C library models: " << written << " preprocessed, " << failed
+               << " not preprocessed, into '" << directory << "'"
+               << messaget::eom;
+  return false;
+}
+
+/// Adds the models of \p functions found in config.ansi_c.c_library_models_dir
+/// to \p dest_symbol_table, each as a translation unit of its own (each
+/// carries the declarations of the headers it includes), and removes them
+/// from \p functions.  Uses no model if the directory's manifest does not
+/// match the current target and options.
+static void add_preprocessed_library_models(
+  std::set<irep_idt> &functions,
+  const symbol_table_baset &symbol_table,
+  symbol_table_baset &dest_symbol_table,
+  message_handlert &message_handler)
+{
+  messaget log{message_handler};
+  const std::string &directory = config.ansi_c.c_library_models_dir;
+  std::ifstream manifest_file{
+    widen_if_needed((std::filesystem::path{directory} / "manifest").string())};
+  std::ostringstream manifest;
+  manifest << manifest_file.rdbuf();
+  if(!manifest_file || manifest.str() != library_models_manifest())
+  {
+    // the library is linked in rounds; say it once
+    static bool warned = false;
+    if(warned)
+      return;
+    warned = true;
+    log.warning() << "the C library models in '" << directory
+                  << "' were not preprocessed for this target and these "
+                     "options; using the built-in models"
+                  << messaget::eom;
+    return;
+  }
+  for(auto it = functions.begin(); it != functions.end();)
+  {
+    const auto old = symbol_table.symbols.find(*it);
+    std::ifstream model{widen_if_needed(
+      (std::filesystem::path{directory} / (id2string(*it) + ".i")).string())};
+    if(
+      old == symbol_table.symbols.end() || old->second.value.is_not_nil() ||
+      !model)
+    {
+      ++it;
+      continue;
+    }
+    std::ostringstream text;
+    text << model.rdbuf();
+    add_library(text.str(), dest_symbol_table, message_handler, {}, true);
+    it = functions.erase(it);
+  }
 }
 
 /// \p model with every occurrence of the identifier \p from (as a whole
@@ -206,8 +331,15 @@ void cprover_c_library_factory(
   if(config.ansi_c.lib==configt::ansi_ct::libt::LIB_NONE)
     return;
 
+  std::set<irep_idt> remaining = functions;
+  if(!config.ansi_c.c_library_models_dir.empty())
+  {
+    add_preprocessed_library_models(
+      remaining, symbol_table, dest_symbol_table, message_handler);
+  }
+
   std::string library_text =
-    get_cprover_library_text(functions, symbol_table, false);
+    get_cprover_library_text(remaining, symbol_table, false);
 
   add_library(library_text, dest_symbol_table, message_handler);
 }
@@ -216,7 +348,8 @@ void add_library(
   const std::string &src,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler,
-  const std::set<irep_idt> &keep)
+  const std::set<irep_idt> &keep,
+  const bool preprocessed)
 {
   if(src.empty())
     return;
@@ -224,7 +357,18 @@ void add_library(
   std::istringstream in(src);
 
   ansi_c_languaget ansi_c_language;
-  ansi_c_language.parse(in, "", message_handler);
+  if(preprocessed)
+  {
+    // a `.i' file is not preprocessed again
+    temporary_filet file{"library", ".i"};
+    {
+      std::ofstream out{widen_if_needed(file())};
+      out << src;
+    }
+    ansi_c_language.parse(in, file(), message_handler);
+  }
+  else
+    ansi_c_language.parse(in, "", message_handler);
 
   ansi_c_language.typecheck(
     symbol_table, "<built-in-library>", message_handler, true, keep);
