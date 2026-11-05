@@ -112,7 +112,7 @@ $(function(){initNavTree('classfield__sensitivityt.html','','classfield__sensiti
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aaaa2bc8c874c3661022f3a5ba5391159" id="r_aaaa2bc8c874c3661022f3a5ba5391159"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaaa2bc8c874c3661022f3a5ba5391159">field_sensitivityt</a> (std::size_t max_array_size, bool <a class="el" href="#a191ae665484df4a4971364500152abf8">should_simplify</a>, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;<a class="el" href="#ae1960ee54caed357459827e49eee9292">language_mode</a>)</td></tr>
+<tr class="memitem:a244c252c75c4254b23397f190526fae0" id="r_a244c252c75c4254b23397f190526fae0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a244c252c75c4254b23397f190526fae0">field_sensitivityt</a> (std::size_t max_array_size, bool <a class="el" href="#a191ae665484df4a4971364500152abf8">should_simplify</a>, <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> <a class="el" href="#ab6a61a1f8949dadfcadd8b296e60bfdd">language_mode</a>)</td></tr>
 <tr class="memitem:acb85cf6b9db2203521e695cc227d1435" id="r_acb85cf6b9db2203521e695cc227d1435"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acb85cf6b9db2203521e695cc227d1435">field_assignments</a> (const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, <a class="el" href="classgoto__symex__statet.html">goto_symex_statet</a> &amp;state, const <a class="el" href="classssa__exprt.html">ssa_exprt</a> &amp;lhs, const <a class="el" href="classexprt.html">exprt</a> &amp;rhs, <a class="el" href="classsymex__targett.html">symex_targett</a> &amp;target, bool allow_pointer_unsoundness) const</td></tr>
 <tr class="memdesc:acb85cf6b9db2203521e695cc227d1435"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assign to the individual fields of a non-expanded symbol <code class="param">lhs</code>.  <br /></td></tr>
 <tr class="memitem:ab8283bec88669c814dcc228231a2fbc6" id="r_ab8283bec88669c814dcc228231a2fbc6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab8283bec88669c814dcc228231a2fbc6">apply</a> (const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, <a class="el" href="classgoto__symex__statet.html">goto_symex_statet</a> &amp;state, <a class="el" href="classexprt.html">exprt</a> expr, bool <a class="el" href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a>) const</td></tr>
@@ -136,7 +136,7 @@ Private Member Functions</h2></td></tr>
 Private Attributes</h2></td></tr>
 <tr class="memitem:aa6e675e5a676c38dcfe93e75f3ebee92" id="r_aa6e675e5a676c38dcfe93e75f3ebee92"><td class="memItemLeft" align="right" valign="top">const std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa6e675e5a676c38dcfe93e75f3ebee92">max_field_sensitivity_array_size</a></td></tr>
 <tr class="memitem:a191ae665484df4a4971364500152abf8" id="r_a191ae665484df4a4971364500152abf8"><td class="memItemLeft" align="right" valign="top">const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a191ae665484df4a4971364500152abf8">should_simplify</a></td></tr>
-<tr class="memitem:ae1960ee54caed357459827e49eee9292" id="r_ae1960ee54caed357459827e49eee9292"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae1960ee54caed357459827e49eee9292">language_mode</a></td></tr>
+<tr class="memitem:ab6a61a1f8949dadfcadd8b296e60bfdd" id="r_ab6a61a1f8949dadfcadd8b296e60bfdd"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab6a61a1f8949dadfcadd8b296e60bfdd">language_mode</a></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Control granularity of object accesses. </p>
@@ -163,8 +163,8 @@ Assignment to an array</h3>
 
 <p class="definition">Definition at line <a class="el" href="field__sensitivity_8h_source.html#l00118">118</a> of file <a class="el" href="field__sensitivity_8h_source.html">field_sensitivity.h</a>.</p>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="aaaa2bc8c874c3661022f3a5ba5391159" name="aaaa2bc8c874c3661022f3a5ba5391159"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaaa2bc8c874c3661022f3a5ba5391159">&#9670;&#160;</a></span>field_sensitivityt()</h2>
+<a id="a244c252c75c4254b23397f190526fae0" name="a244c252c75c4254b23397f190526fae0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a244c252c75c4254b23397f190526fae0">&#9670;&#160;</a></span>field_sensitivityt()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -185,7 +185,7 @@ Assignment to an array</h3>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>language_mode</em></span>&#160;)</td>
+          <td class="paramtype"><a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a></td>          <td class="paramname"><span class="paramname"><em>language_mode</em></span>&#160;)</td>
         </tr>
       </table>
   </td>
@@ -618,8 +618,8 @@ Assignment to an array</h3>
 </div>
 </div>
 <a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
-<a id="ae1960ee54caed357459827e49eee9292" name="ae1960ee54caed357459827e49eee9292"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae1960ee54caed357459827e49eee9292">&#9670;&#160;</a></span>language_mode</h2>
+<a id="ab6a61a1f8949dadfcadd8b296e60bfdd" name="ab6a61a1f8949dadfcadd8b296e60bfdd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab6a61a1f8949dadfcadd8b296e60bfdd">&#9670;&#160;</a></span>language_mode</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -628,7 +628,7 @@ Assignment to an array</h3>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&amp; field_sensitivityt::language_mode</td>
+          <td class="memname">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> field_sensitivityt::language_mode</td>
         </tr>
       </table>
   </td>
