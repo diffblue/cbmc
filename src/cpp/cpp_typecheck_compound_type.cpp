@@ -3161,6 +3161,42 @@ void cpp_typecheckt::typecheck_friend_declaration(
     return;
   }
 
+  // N5008 [class.friend]/3: a friend-type-specifier-list; a pack expansion
+  // stands for one friend-type-specifier per element of the pack, and an
+  // element that does not designate a class type is ignored
+  if(declaration.find("#friend_types").is_not_nil())
+  {
+    std::vector<typet> friends;
+    for(const auto &entry : declaration.find("#friend_types").get_sub())
+    {
+      typet ftype = static_cast<const typet &>(entry);
+      if(ftype.get_bool(ID_ellipsis))
+      {
+        ftype.remove(ID_ellipsis);
+        const std::vector<typet> *pack =
+          template_map.function_parameter_pack(ftype);
+        if(pack == nullptr)
+        {
+          // not instantiated yet: the template's own pattern
+          continue;
+        }
+        for(const auto &element : *pack)
+          friends.push_back(element);
+      }
+      else
+      {
+        typecheck_type(ftype);
+        friends.push_back(ftype);
+      }
+    }
+    for(auto &ftype : friends)
+    {
+      if(ftype.id() == ID_struct_tag || ftype.id() == ID_union_tag)
+        symbol.type.add(ID_C_friends).get_sub().push_back(ftype);
+    }
+    return;
+  }
+
   // we distinguish these whether there is a declarator
   if(declaration.declarators().empty())
   {

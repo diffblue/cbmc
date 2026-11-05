@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp26
 ^\[main\.assertion\.1\] line \d+ a friend from a pack: SUCCESS$
@@ -12,4 +12,5 @@ main.cpp
 ^CONVERSION ERROR$
 --
 A friend declaration may name a pack expansion ([class.friend]/3, `friend
-Ts...;').  CBMC reports a parse error.  Checked with GCC 16.
+Ts...;').  CBMC reported a parse error (cpp26_friend_type_specifier_list).
+Checked with GCC 16.

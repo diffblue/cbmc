@@ -8210,6 +8210,62 @@ bool Parser::rClassMember(cpp_itemt &member)
     }
 
     cpp_token_buffert::post pos=lex.Save();
+
+    // N5008 [class.friend]/3 (C++26): friend-type-declaration:
+    //   friend friend-type-specifier-list ;
+    // whose elements may be pack expansions (`friend Ts...;').  The single
+    // non-expanded form is left to rDeclaration.
+    if(t == TOK_FRIEND)
+    {
+      cpp_tokent friend_tk;
+      lex.get_token(friend_tk);
+      irept types{ID_type};
+      bool any_pack = false;
+      bool ok = true;
+      for(;;)
+      {
+        if(lex.LookAhead(0) == TOK_TYPENAME)
+        {
+          cpp_tokent typename_tk;
+          lex.get_token(typename_tk);
+        }
+        irept name;
+        if(!rName(name))
+        {
+          ok = false;
+          break;
+        }
+        typet type{static_cast<const typet &>(name)};
+        if(lex.LookAhead(0) == TOK_ELLIPSIS)
+        {
+          cpp_tokent ellipsis_tk;
+          lex.get_token(ellipsis_tk);
+          type.set(ID_ellipsis, true);
+          any_pack = true;
+        }
+        types.get_sub().push_back(std::move(type));
+        if(lex.LookAhead(0) != ',')
+          break;
+        cpp_tokent comma_tk;
+        lex.get_token(comma_tk);
+      }
+      if(
+        ok && lex.LookAhead(0) == ';' &&
+        (any_pack || types.get_sub().size() > 1))
+      {
+        cpp_tokent semicolon_tk;
+        lex.get_token(semicolon_tk);
+        cpp_declarationt &declaration = member.make_declaration();
+        declaration.member_spec().set_friend(true);
+        declaration.type() =
+          static_cast<const typet &>(types.get_sub().front());
+        declaration.add("#friend_types") = std::move(types);
+        set_location(declaration, friend_tk);
+        return true;
+      }
+      lex.Restore(pos);
+    }
+
     cpp_tokent first_token;
     lex.LookAhead(0, first_token);
     if(rDeclaration(member.make_declaration()))
