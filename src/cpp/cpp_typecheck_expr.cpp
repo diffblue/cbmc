@@ -5398,6 +5398,68 @@ bool cpp_typecheckt::nonmember_operator_is_better(
   return better && !worse;
 }
 
+/// N5008 [over.match.oper]/3.3, [over.built]: the built-in candidates
+/// compete with the non-member ones for an operator expression \p expr whose
+/// operands have no class type.  For operands of the same enumeration type
+/// the built-in relational and equality operators ([over.built]/16) are
+/// exact matches, and for arithmetic or unscoped enumeration operands the
+/// arithmetic, bitwise and relational ones need standard conversions only;
+/// a candidate with parameters \p params that needs a user-defined
+/// conversion for some operand is worse on it ([over.ics.rank]/2.1).
+/// libstdc++ 16's `operator==(const text_encoding &, id)', whose body
+/// `__encoding.mib() == __i' compares two ids, called itself.
+/// \return whether a viable built-in candidate is better than the candidate
+static bool builtin_candidate_is_better(
+  const exprt &expr,
+  const code_typet::parameterst &params,
+  const namespacet &ns)
+{
+  const auto &ops = expr.operands();
+  if(ops.size() != 2)
+    return false;
+  const auto unqualified = [](const typet &type)
+  {
+    return is_reference(type) || is_rvalue_reference(type)
+             ? to_reference_type(type).base_type()
+             : type;
+  };
+  bool needs_user_conversion = false;
+  for(std::size_t k = 0; k < params.size() && k < ops.size(); ++k)
+  {
+    const typet pt = unqualified(params[k].type());
+    if(
+      pt.id() == ID_struct_tag || pt.id() == ID_union_tag ||
+      pt.id() == ID_struct || pt.id() == ID_union)
+    {
+      needs_user_conversion = true;
+    }
+  }
+  if(!needs_user_conversion)
+    return false;
+  const auto is_unscoped_or_arithmetic = [&ns](const typet &t)
+  {
+    if(t.id() == ID_c_enum_tag)
+      return !ns.follow_tag(to_c_enum_tag_type(t)).get_bool(ID_C_class);
+    return t.id() == ID_signedbv || t.id() == ID_unsignedbv ||
+           t.id() == ID_c_bool || t.id() == ID_bool || t.id() == ID_floatbv ||
+           t.id() == ID_c_bit_field;
+  };
+  const irep_idt &op_id = expr.id();
+  const bool comparison = op_id == ID_equal || op_id == ID_notequal ||
+                          op_id == ID_lt || op_id == ID_gt || op_id == ID_le ||
+                          op_id == ID_ge;
+  const bool arithmetic =
+    comparison || op_id == ID_plus || op_id == ID_minus || op_id == ID_mult ||
+    op_id == ID_div || op_id == ID_mod || op_id == ID_shl || op_id == ID_shr ||
+    op_id == ID_bitand || op_id == ID_bitor || op_id == ID_bitxor;
+  const typet t0 = unqualified(ops[0].type());
+  const typet t1 = unqualified(ops[1].type());
+  if(comparison && t0.id() == ID_c_enum_tag && t0 == t1)
+    return true;
+  return arithmetic && is_unscoped_or_arithmetic(t0) &&
+         is_unscoped_or_arithmetic(t1);
+}
+
 bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
 {
   // Check argument types first.
@@ -6115,6 +6177,13 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
               }
               if(!restriction_ok)
                 resolve_result.make_nil();
+
+              if(
+                resolve_result.is_not_nil() &&
+                builtin_candidate_is_better(expr, params, *this))
+              {
+                resolve_result.make_nil();
+              }
             }
           }
         }
