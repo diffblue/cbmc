@@ -32,6 +32,22 @@ public:
   static exprt isnormal(const exprt &, const ieee_float_spect &);
   static exprt isfinite(const exprt &, const ieee_float_spect &);
 
+  /// Returns the lowest `spec.value_width()` bits of `src` as an unsigned
+  /// bit-vector, in a canonical encoding that can be compared bit-wise.
+  /// This only differs from the bits of `src` for x86 80-bit extended
+  /// `long double`: the padding of the 96-/128-bit storage is dropped, and
+  /// a pseudo-denormal (zero exponent, integer bit set) is re-encoded with
+  /// exponent 1, which denotes the same value.
+  static exprt
+  canonical_value_bits(const exprt &src, const ieee_float_spect &spec);
+
+  /// Bitwise equality of the canonical encodings of two floatbv values.
+  /// See `canonical_value_bits`.
+  static exprt canonical_value_bits_equal(
+    const exprt &,
+    const exprt &,
+    const ieee_float_spect &);
+
   // add/sub
   exprt add_sub(
     bool subtract,

@@ -95,11 +95,20 @@ public:
 
   bvt build_constant(const ieee_float_valuet &);
 
-  static inline literalt sign_bit(const bvt &src)
+  inline literalt sign_bit(const bvt &src) const
   {
-    // this is the top bit
-    return src[src.size()-1];
+    // For x86 80-bit extended in padded storage the sign bit lives at
+    // value_width()-1, not at the top of the storage container.
+    return src[spec.value_width() - 1];
   }
+
+  /// Returns the lowest `spec.value_width()` literals of `src`, dropping
+  /// any storage-padding bits above the value, in a canonical encoding that
+  /// can be compared bit-wise.  This only differs from `src` for x86 80-bit
+  /// extended `long double`: the padding of the 96-/128-bit storage is
+  /// dropped, and a pseudo-denormal (zero exponent, integer bit set) is
+  /// re-encoded with exponent 1, which denotes the same value.
+  bvt canonical_value_bits(const bvt &src);
 
   // extraction
   bvt get_exponent(const bvt &); // still biased
