@@ -1909,6 +1909,28 @@ static const std::map<std::string, std::string> &library_source_models()
     // execution they have no effect the program can observe ([intro.races]
     // concerns several threads; a program with several threads using
     // locales is not modelled by these)
+    // libstdc++ src/c++11/thread.cc: N5008 [thread.thread.constr]/6, the
+    // new thread runs the state's invocation; [thread.thread.member]/3, 5,
+    // join blocks until it has completed and then *this represents no
+    // thread; /8-9, detach leaves it running.  As thread.cc, by POSIX
+    // threads: CBMC's models of pthread_create and pthread_join start a
+    // thread and wait for its exit.  The state is owned by the new thread,
+    // which deletes it after its run.  The error conditions of /7 and /11
+    // (system_error when *this is not joinable) are not modelled.
+    {"std::thread::_M_start_thread",
+     "{ _State *__s = " CPROVER_PREFIX "parameter0.release();"
+     " void *(*__run)(void *) = [](void *__p) -> void * {"
+     " _State *__q = static_cast<_State *>(__p); __q->_M_run(); delete __q;"
+     " return nullptr; };"
+     " pthread_create(&_M_id._M_thread, nullptr, __run, __s); }"},
+    {"std::thread::join",
+     "{ pthread_join(_M_id._M_thread, nullptr); _M_id = id(); }"},
+    {"std::thread::detach", "{ _M_id = id(); }"},
+    // libc++ src/thread.cpp: the same, for the thread libc++'s header
+    // started with __libcpp_thread_create (pthread_create)
+    {"libc++:std::__1::thread::join",
+     "{ __libcpp_thread_join(&__t_); __t_ = _LIBCPP_NULL_THREAD; }"},
+    {"libc++:std::__1::thread::detach", "{ __t_ = _LIBCPP_NULL_THREAD; }"},
     {"std::_Lockit::_Lockit", "{ }"},
     {"std::_Lockit::~_Lockit", "{ }"},
     {"std::_Facet_Register", "{ }"},

@@ -11,8 +11,13 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-g++ and clang++ (GCC 16 for C++23 and C++26) accept this program, and it fails
-only its WRONG assertion.  The thread's function never runs: libstdc++ defines
-std::thread::_M_start_thread (which starts it) and std::thread::join in its
-compiled library, and neither has a model ("no body for callee").  A fix
-models both, starting the thread with CBMC's thread primitives and joining it.
+libstdc++ defines std::thread::_M_start_thread (which starts the thread)
+and join in its compiled library (thread.cc), and libc++ join and detach
+(thread.cpp); cpp_typecheck_stdlib.cpp now models them with CBMC's
+pthread_create and pthread_join.  Symbolic execution then stops with
+"pointer handling for concurrency is unsound" (goto_symex_state.cpp,
+issue #305) before any property is checked: in the new thread, the
+destructor of the thread's state writes its `this', a local whose address
+is taken (so taken to be shared), and symex does not track pointers shared
+between threads.  cpp11_std_thread_starts_a_thread checks that the thread
+is started.  Fixing #305 makes this test pass.
