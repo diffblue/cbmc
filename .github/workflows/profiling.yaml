@@ -104,13 +104,16 @@ jobs:
 
       - name: Generate differential summary
         if: always()
+        env:
+          # Branch names are controlled by the pull request's author: pass them
+          # via the environment rather than expanding them into the script.
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
         run: |
           if [ -f base-results/results.json ] && [ -f profile-results/results.json ]; then
             python3 scripts/profile_cbmc.py \
               --compare base-results profile-results \
-              --compare-labels \
-                "${{ github.event.pull_request.base.ref }}" \
-                "${{ github.event.pull_request.head.ref }}" \
+              --compare-labels "$BASE_REF" "$HEAD_REF" \
               --output-dir diff-results
           fi
 
