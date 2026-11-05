@@ -109,6 +109,7 @@ SRC += analyses/ai/ai.cpp \
        solvers/flattening/boolbv_update_bit.cpp \
        solvers/flattening/bv_utils.cpp \
        solvers/floatbv/float_utils.cpp \
+       solvers/floatbv/x86_extended.cpp \
        solvers/prop/bdd_expr.cpp \
        solvers/sat/external_sat.cpp \
        solvers/sat/satcheck_cadical.cpp \
