@@ -1036,6 +1036,10 @@ protected:
   // typecheck_compound_declarator ([temp.variadic]/9), which must not
   // fire during CLASS instantiation.
   bool instantiating_member_function_template = false;
+  /// a co_await, co_yield or co_return was type-checked in the current
+  /// function body
+  bool coroutine_seen = false;
+  void report_unsupported_coroutine(symbolt &);
   method_bodiest method_bodies;
 
   // Deferred method bodies for lazy template elaboration.

@@ -15,3 +15,6 @@ g++ and clang++ (GCC 16 for C++23 and C++26) accept this program, and it fails
 only its WRONG assertion.  Coroutines are parsed but not implemented; see
 cpp20_coroutine_generator_semantics for what CBMC does instead and what a fix
 needs.
+
+Since coroutines are reported as unsupported, the call of the coroutine
+also fails the property "coroutines are not supported" and ends the path.

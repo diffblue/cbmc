@@ -9640,13 +9640,19 @@ bool Parser::rUnaryExpr(exprt &exp)
   std::cout << std::string(__indent, ' ') << "Parser::rUnaryExpr 0\n";
 #endif
 
-  // C++20 co_await/co_yield: parse operand and pass through
+  // C++20 co_await/co_yield ([expr.await], [expr.yield]): a side effect
+  // with the operand; the type checker reports coroutines as unsupported
   if(t == TOK_CO_AWAIT || t == TOK_CO_YIELD)
   {
     cpp_tokent tk;
     lex.get_token(tk);
-    if(!rCastExpr(exp))
+    exprt operand;
+    if(!rCastExpr(operand))
       return false;
+    exp = exprt(ID_side_effect);
+    exp.set(ID_statement, t == TOK_CO_AWAIT ? "co_await" : "co_yield");
+    set_location(exp, tk);
+    exp.add_to_operands(std::move(operand));
     return true;
   }
 
@@ -12789,9 +12795,9 @@ std::optional<codet> Parser::rStatement()
   {
     lex.get_token(tk1);
 
-    // co_return in a coroutine doesn't return a value to the caller;
-    // the coroutine machinery does.  Model as skip.
-    codet statement(ID_skip);
+    // [stmt.return.coroutine]: the type checker reports coroutines as
+    // unsupported
+    codet statement("co_return");
     set_location(statement, tk1);
 
     if(lex.LookAhead(0) == ';')
@@ -12800,18 +12806,18 @@ std::optional<codet> Parser::rStatement()
     }
     else
     {
-      // co_return expr; — parse and discard the expression
-      exprt discard;
+      exprt operand;
       if(lex.LookAhead(0) == '{')
       {
-        if(!rInitializeExpr(discard))
+        if(!rInitializeExpr(operand))
           return {};
       }
-      else if(!rCommaExpression(discard))
+      else if(!rCommaExpression(operand))
         return {};
 
       if(lex.get_token(tk2) != ';')
         return {};
+      statement.add_to_operands(std::move(operand));
     }
 
     return std::move(statement);

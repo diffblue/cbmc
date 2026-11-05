@@ -637,6 +637,31 @@ std::optional<code_blockt> cpp_typecheckt::defaulted_three_way_comparison(
   return body;
 }
 
+/// N5008 [dcl.fct.def.coroutine]/1: a function whose body contains
+/// co_await, co_yield or co_return is a coroutine.  Coroutines are not
+/// supported: the body runs as an ordinary function with the operators
+/// removed, which is not what the program does.  Warn, and make a call of
+/// the coroutine fail a property and end the path, so that verification
+/// does not report results for the wrong program.
+void cpp_typecheckt::report_unsupported_coroutine(symbolt &symbol)
+{
+  warning().source_location = symbol.location;
+  warning() << "C++20 coroutines are not supported: calls of '"
+            << symbol.display_name() << "' fail a property" << eom;
+  source_locationt location = symbol.location;
+  location.set_comment(
+    "coroutines are not supported: " + id2string(symbol.display_name()));
+  location.set_property_class("unsupported");
+  code_assertt unsupported{false_exprt{}};
+  unsupported.add_source_location() = location;
+  code_assumet stop{false_exprt{}};
+  stop.add_source_location() = symbol.location;
+  code_blockt body{{std::move(unsupported), std::move(stop)}};
+  body.add_source_location() = symbol.value.source_location();
+  body.add(std::move(to_code(symbol.value)));
+  symbol.value = std::move(body);
+}
+
 void cpp_typecheckt::convert_function(symbolt &symbol)
 {
   // N5008 [class.access.general]/1 + [class.default.ctor]/4: the body of
@@ -1481,7 +1506,12 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
 
   try
   {
+    const bool saved_coroutine_seen = coroutine_seen;
+    coroutine_seen = false;
     typecheck_code(to_code(symbol.value));
+    if(coroutine_seen)
+      report_unsupported_coroutine(symbol);
+    coroutine_seen = saved_coroutine_seen;
     if(
       symbol.type.id() == ID_code &&
       to_code_type(symbol.type).return_type().id() == ID_constructor)

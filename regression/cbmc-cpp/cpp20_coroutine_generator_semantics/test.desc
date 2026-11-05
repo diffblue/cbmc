@@ -32,3 +32,6 @@ lowered to a state machine: a frame holding the promise, the parameters,
 the locals live across a suspend point and a resume index, and a resume
 function that dispatches on the index.  It is KNOWNBUG, not FUTURE, as
 the program is accepted and its coroutine semantics silently dropped.
+
+Since coroutines are reported as unsupported, the call of the coroutine
+also fails the property "coroutines are not supported" and ends the path.

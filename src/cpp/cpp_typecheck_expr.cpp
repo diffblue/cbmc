@@ -11545,6 +11545,16 @@ void cpp_typecheckt::typecheck_expr_side_effect(side_effect_exprt &expr)
   {
     typecheck_expr_throw(expr);
   }
+  else if(statement == "co_await" || statement == "co_yield")
+  {
+    // coroutines are not supported: the function is reported as such
+    // (convert_function); the operand is evaluated in place of the
+    // await-expression or yield-expression
+    coroutine_seen = true;
+    exprt operand = to_unary_expr(expr).op();
+    typecheck_expr(operand);
+    expr.swap(operand);
+  }
   else if(statement == ID_temporary_object)
   {
     // TODO

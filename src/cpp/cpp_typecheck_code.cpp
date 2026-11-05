@@ -440,7 +440,27 @@ void cpp_typecheckt::typecheck_code(codet &code)
 {
   const irep_idt &statement = code.get_statement();
 
-  if(statement == ID_try_catch)
+  if(statement == "co_return")
+  {
+    // coroutines are not supported (convert_function); the operand is
+    // evaluated
+    coroutine_seen = true;
+    if(code.operands().size() == 1)
+    {
+      exprt operand = code.op0();
+      if(operand.id() != ID_initializer_list)
+        typecheck_expr(operand);
+      code_expressiont evaluate{std::move(operand)};
+      evaluate.add_source_location() = code.source_location();
+      code.swap(evaluate);
+      if(code.op0().id() == ID_initializer_list)
+        code = code_skipt{};
+    }
+    else
+      code = code_skipt{};
+    return;
+  }
+  else if(statement == ID_try_catch)
   {
     code.type() = empty_typet();
     typecheck_try_catch(code);
