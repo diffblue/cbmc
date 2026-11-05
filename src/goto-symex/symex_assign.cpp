@@ -14,8 +14,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/pointer_expr.h>
 #include <util/range.h>
+
+#include <goto-programs/adjust_float_expressions.h>
 
 #include "expr_skeleton.h"
 #include "goto_symex_state.h"
@@ -319,6 +322,18 @@ void symex_assignt::assign_typecast(
   }
 
   exprt rhs_typecasted = typecast_exprt::conditional_cast(rhs, lhs.op().type());
+  // a conversion between a floating-point and an integer type needs a
+  // rounding mode (C17 6.3.1.4: towards zero to an integer); the solvers do
+  // not convert a plain typecast between them.  Linking inserts such a
+  // typecast lvalue when a function returning double is called through a
+  // declaration returning int.
+  const symbolt *rounding_mode = nullptr;
+  if(
+    rhs_typecasted.id() == ID_typecast &&
+    !ns.lookup(configt::rounding_mode_identifier(), rounding_mode))
+  {
+    adjust_float_expressions(rhs_typecasted, rounding_mode->symbol_expr());
+  }
   expr_skeletont new_skeleton =
     full_lhs.compose(expr_skeletont::remove_op0(lhs));
   assign_rec(lhs.op(), new_skeleton, rhs_typecasted, guard);

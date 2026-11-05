@@ -1,0 +1,21 @@
+CORE
+main.c
+supp.c
+^\[main\.assertion\.1\] line \d+ the result converted to int: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+not handled
+^warning: ignoring
+--
+When the definition linked in returns double and the call's declaration
+int, link_goto_model makes the call's left-hand side a typecast of the
+int variable.  adjust_float_expressions turned it into a floatbv_typecast,
+which symex cannot assign to ("l2_rename_rvalues case `floatbv_typecast'
+not handled"); with that fixed, symex assigned a plain typecast from double
+to int, which the SAT backend does not convert (it needs a rounding
+mode), so the variable was unconstrained.  The typecast lvalue is now kept,
+and symex assigns `x := (int)result' rounding towards zero (C17 6.3.1.4).

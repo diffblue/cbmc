@@ -213,6 +213,27 @@ void adjust_float_expressions(
   const namespacet &ns)
 {
   for(auto &i : goto_function.body.instructions)
+  {
+    // The left-hand side of a call may be a typecast of the variable that
+    // receives the result: linking (link_goto_model) inserts one when the
+    // callee's definition has another return type than the declaration
+    // that the caller used.  That typecast is an lvalue, assigned by symex
+    // as `x := (typeof x) result', not an arithmetic conversion: keep it a
+    // typecast (symex does not assign to a floatbv_typecast) and adjust its
+    // operand only.
+    if(i.is_function_call() && i.call_lhs().id() == ID_typecast)
+    {
+      const auto adjust = [&ns](exprt &e)
+      {
+        if(have_to_adjust_float_expressions(e))
+          adjust_float_expressions(e, ns);
+      };
+      adjust(to_typecast_expr(i.call_lhs()).op());
+      adjust(i.call_function());
+      for(auto &argument : i.call_arguments())
+        adjust(argument);
+      continue;
+    }
     i.transform([&ns](exprt expr) -> std::optional<exprt> {
       if(have_to_adjust_float_expressions(expr))
       {
@@ -222,6 +243,7 @@ void adjust_float_expressions(
       else
         return {};
     });
+  }
 }
 
 void adjust_float_expressions(
