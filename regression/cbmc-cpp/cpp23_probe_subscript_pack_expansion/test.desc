@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp23
 ^\[main\.assertion\.1\] line \d+ pack expansion in a subscript: SUCCESS$
@@ -11,9 +11,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-g++ and clang++ (GCC 16 for C++23 and C++26) accept this program, and it fails
-only its WRONG assertion.  The expression-list of a subscript may contain a
-pack expansion ([expr.sub]/1, [temp.variadic]/5): `m[a...]' is a parse error.
-libstdc++ 16's <utility> (std::constant_wrapper::operator[]) uses this in
-C++26 mode, so every C++26 program including <utility> (or <inplace_vector>,
-<text_encoding>) with GCC 16's headers fails to parse.
+The expression-list of a subscript may contain a pack expansion
+([expr.sub]/1, [temp.variadic]/5): `m[a...]' was a parse error
+(cpp23_subscript_pack_expansion_forms).  libstdc++ 16's <utility>
+(std::constant_wrapper::operator[]) uses this in C++26 mode.

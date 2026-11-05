@@ -10568,6 +10568,48 @@ bool Parser::rPostfixExpr(exprt &exp)
       else if(!rCommaExpression(e))
         return false;
 
+      // N5008 [expr.sub]/1, [temp.variadic]/5.4: the expression-list of a
+      // subscript may contain pack expansions (`m[a...]', `m[i, a...]').
+      // Such a list is kept as an `arguments' node with the expanded
+      // elements marked, as a call's argument list is (rFunctionArguments),
+      // so that template instantiation expands it; the type checker passes
+      // its elements to operator[].
+      if(
+        lex.LookAhead(0) == TOK_ELLIPSIS &&
+        (lex.LookAhead(1) == ']' || lex.LookAhead(1) == ','))
+      {
+        exprt list{ID_arguments};
+        std::function<void(exprt &)> flatten = [&](exprt &element)
+        {
+          if(element.id() == ID_comma && element.operands().size() == 2)
+          {
+            flatten(to_binary_expr(element).op0());
+            flatten(to_binary_expr(element).op1());
+          }
+          else
+            list.add_to_operands(std::move(element));
+        };
+        flatten(e);
+        for(;;)
+        {
+          if(lex.LookAhead(0) == TOK_ELLIPSIS)
+          {
+            cpp_tokent ellipsis;
+            lex.get_token(ellipsis);
+            list.operands().back().set(ID_ellipsis, true);
+          }
+          if(lex.LookAhead(0) != ',')
+            break;
+          cpp_tokent comma;
+          lex.get_token(comma);
+          exprt element;
+          if(!rExpression(element, false))
+            return false;
+          list.add_to_operands(std::move(element));
+        }
+        e = std::move(list);
+      }
+
 #ifdef DEBUG
       std::cout << std::string(__indent, ' ') << "Parser::rPostfixExpr 2\n";
 #endif

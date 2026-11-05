@@ -10046,9 +10046,13 @@ skip_pack_removal_ft:
           }
 
           // Look for function call arguments containing pack_var...
+          // (and a subscript's expression-list, [expr.sub]/1, kept as an
+          // `arguments' operand by the parser when it has pack expansions)
           if(
-            node.id() == ID_side_effect &&
-            node.get(ID_statement) == ID_function_call)
+            (node.id() == ID_side_effect &&
+             node.get(ID_statement) == ID_function_call) ||
+            (node.id() == ID_index && node.get_sub().size() == 2 &&
+             node.get_sub()[1].id() == ID_arguments))
           {
             for(auto &sub : node.get_sub())
             {

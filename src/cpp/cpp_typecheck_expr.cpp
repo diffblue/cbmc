@@ -3618,7 +3618,15 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       // Collect arguments: if the index is a comma expression, split it
       exprt::operandst args;
       exprt &idx = index_expr.op1();
-      if(idx.id() == ID_comma)
+      if(idx.id() == ID_arguments)
+      {
+        // an expression-list with pack expansions (see Parser::rPostfixExpr),
+        // expanded by instantiation
+        args = idx.operands();
+        for(auto &arg : args)
+          arg.remove(ID_ellipsis);
+      }
+      else if(idx.id() == ID_comma)
       {
         // Flatten comma expression into argument list
         std::function<void(exprt &)> flatten = [&](exprt &e)
@@ -3642,7 +3650,24 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       expr.swap(call);
     }
     else
+    {
+      // [expr.sub]/2: the built-in subscript takes a single expression
+      exprt &idx = index_expr.op1();
+      if(idx.id() == ID_arguments)
+      {
+        if(idx.operands().size() != 1)
+        {
+          error().source_location = expr.source_location();
+          error() << "built-in subscript with " << idx.operands().size()
+                  << " expressions" << eom;
+          throw 0;
+        }
+        exprt only = idx.operands().front();
+        only.remove(ID_ellipsis);
+        idx = std::move(only);
+      }
       c_typecheck_baset::typecheck_expr_main(expr);
+    }
   }
   else
     c_typecheck_baset::typecheck_expr_main(expr);
