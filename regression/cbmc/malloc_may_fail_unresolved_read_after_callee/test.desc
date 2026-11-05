@@ -1,0 +1,27 @@
+CORE
+main.c
+--unwind 17
+^\[main\.assertion\.1\] line \d+ length of the copy: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^\[.*\.unwind\.\d+\] .*: FAILURE$
+^warning: ignoring
+--
+The need for --unwind here is undesirable: every loop of this program has a
+constant bound, yet without --unwind symbolic execution does not end.  With
+--malloc-may-fail (the default), the merge after dup's early return gives
+each byte of the buffer the value `malloc failed ? unknown : copied byte',
+because the merge at malloc's return made the buffer defined on both paths.
+main's test `q == 0' excludes the failure path, but q's value
+`malloc failed ? NULL : buffer' is not constant-propagated (an if with a
+symbolic condition), so the condition is not carried into the reads of the
+while loop, whose condition then never becomes false.  test_no_fail.desc
+shows that the loop ends without --unwind when malloc cannot fail.  A fix
+would propagate branch conditions into later reads (path-sensitive constant
+propagation in goto-symex); then --unwind should be removed.  The same
+pattern made the C++ front end's model of the MSVC runtime's
+__std_exception_copy unwind without end (cpp11_msvc_exception_copy_of_copy).
