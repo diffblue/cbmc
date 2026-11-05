@@ -1255,8 +1255,76 @@ public:
     return result;
   }
 
+  /// N5008 [expr.const]/10.18.2 (C++26): a placement new-expression whose
+  /// placement argument points to an object of a similar type whose
+  /// lifetime began within the evaluation (a tracked local) -- the object
+  /// is initialized ([expr.new]/26) and the result points to it.  Only a
+  /// single object of scalar type with an initializer is handled.
+  /// \return the result (the address of that local), or nil.
+  exprt eval_placement_new(const exprt &e)
+  {
+    const typet &allocated = to_pointer_type(e.type()).base_type();
+    exprt place = e.operands().front();
+    while(place.id() == ID_typecast && place.operands().size() == 1)
+      place = to_typecast_expr(place).op();
+    if(
+      place.id() != ID_address_of ||
+      to_address_of_expr(place).object().id() != ID_symbol)
+    {
+      return nil_exprt{};
+    }
+    const symbol_exprt &object =
+      to_symbol_expr(to_address_of_expr(place).object());
+    const auto it = vars.find(object.get_identifier());
+    // [conv.qual]/2: similar types -- here, the same type up to
+    // cv-qualification
+    typet object_type = object.type();
+    typet allocated_type = allocated;
+    object_type.remove(ID_C_constant);
+    object_type.remove(ID_C_volatile);
+    allocated_type.remove(ID_C_constant);
+    allocated_type.remove(ID_C_volatile);
+    if(it == vars.end() || object_type != allocated_type)
+      return nil_exprt{};
+    if(
+      allocated.id() != ID_signedbv && allocated.id() != ID_unsignedbv &&
+      allocated.id() != ID_c_bool && allocated.id() != ID_bool &&
+      allocated.id() != ID_floatbv && allocated.id() != ID_c_enum_tag &&
+      allocated.id() != ID_pointer)
+    {
+      return nil_exprt{};
+    }
+    const exprt &init = static_cast<const exprt &>(e.find(ID_initializer));
+    if(
+      init.id() != ID_code || to_code(init).get_statement() != ID_expression ||
+      init.operands().size() != 1 ||
+      init.operands().front().id() != ID_side_effect ||
+      init.operands().front().get(ID_statement) != ID_assign ||
+      init.operands().front().operands().size() != 2 ||
+      init.operands().front().operands().front().id() != ID_new_object)
+    {
+      return nil_exprt{};
+    }
+    exprt value = eval(init.operands().front().operands().back());
+    value = typecast_exprt::conditional_cast(value, allocated);
+    simplify(value, ns);
+    if(!value.is_constant())
+      return nil_exprt{};
+    it->second = value;
+    return address_of_exprt{object, to_pointer_type(e.type())};
+  }
+
   exprt eval(const exprt &e)
   {
+    if(
+      e.id() == ID_side_effect && e.get(ID_statement) == ID_cpp_new &&
+      e.operands().size() == 1 && e.type().id() == ID_pointer)
+    {
+      const exprt result = eval_placement_new(e);
+      if(result.is_nil())
+        failed = true;
+      return result.is_nil() ? e : result;
+    }
     // N5008 [expr.type.conv]/1.4: `T{...}' is a prvalue of class type T whose
     // value is its initializer; the front end wraps the struct in a compound
     // literal (`return P{1, 2};' in a constexpr function)

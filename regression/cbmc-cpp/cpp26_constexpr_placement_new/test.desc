@@ -1,4 +1,4 @@
-KNOWNBUG libstdcxx
+CORE libstdcxx
 main.cpp
 --cpp26
 ^\[main\.assertion\.1\] line \d+ placement new in a constant expression: SUCCESS$
@@ -14,5 +14,5 @@ main.cpp
 C++26 permits a placement new-expression in a constant expression when the
 placement argument points to an object of a similar type whose lifetime
 began in the evaluation ([expr.const]/10.18.2).  CBMC's constant evaluator
-does not evaluate it: W<f()> fails to type-check (CONVERSION ERROR).
+did not evaluate it: W<f()> failed to type-check (CONVERSION ERROR).
 Checked with GCC 16.
