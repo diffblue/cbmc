@@ -181,11 +181,51 @@ static mp_integer member_layout_alignment_unconstrained(
   return given_int;
 }
 
+/// \return true iff a zero-width bit-field contributes the alignment of its
+///   underlying type to the alignment of the enclosing aggregate, as is the
+///   case with the ARM procedure call standard (other than Apple's variant).
+static bool zero_width_bit_field_affects_alignment()
+{
+  const irep_idt &arch = config.ansi_c.arch;
+  return (arch == "arm64" || arch == "armel" || arch == "armhf" ||
+          arch == "arm") &&
+         config.ansi_c.os != configt::ansi_ct::ost::OS_MACOS;
+}
+
 static mp_integer member_layout_alignment(
   const struct_union_typet::componentt &component,
   bool container_is_packed,
   const namespacet &ns)
 {
+  if(
+    component.type().id() == ID_c_bit_field &&
+    config.ansi_c.mode != configt::ansi_ct::flavourt::VISUAL_STUDIO)
+  {
+    const c_bit_field_typet &bit_field_type =
+      to_c_bit_field_type(component.type());
+
+    // A zero-width bit-field aligns the next member. Only the ARM ABIs (other
+    // than Apple's) also make it affect the alignment of the aggregate,
+    // irrespective of packing.
+    if(bit_field_type.get_width() == 0)
+    {
+      if(zero_width_bit_field_affects_alignment())
+        return alignment(bit_field_type.underlying_type(), ns);
+      return 1;
+    }
+
+    // Bit-fields are densely packed in a packed aggregate -- unless
+    // #pragma pack(n) is in effect, which then caps their alignment at n
+    // instead, as GCC and Clang do.
+    const mp_integer natural = alignment(bit_field_type.underlying_type(), ns);
+    const mp_integer max_alignment = pragma_pack(component);
+    if(max_alignment > 0)
+      return std::min(max_alignment, natural);
+    if(container_is_packed || bit_field_type.get_bool(ID_C_packed))
+      return 1;
+    return natural;
+  }
+
   const mp_integer a = member_layout_alignment_unconstrained(
     component.type(), container_is_packed, ns);
 
@@ -443,27 +483,40 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
       it++)
   {
     const typet it_type=it->type();
-    mp_integer a=1;
+    mp_integer a = 1;
     const mp_integer max_alignment_pragma = pragma_pack(*it);
 
-    if(it_type.id()==ID_c_bit_field)
+    if(it_type.id() == ID_c_bit_field)
     {
-      a = alignment(to_c_bit_field_type(it_type).underlying_type(), ns);
-      if(max_alignment_pragma > 0)
-        a = std::min(a, max_alignment_pragma);
-
-      // A zero-width bit-field causes alignment to the base-type.
-      if(to_c_bit_field_type(it_type).get_width()==0)
+      if(to_c_bit_field_type(it_type).get_width() == 0)
       {
+        // A zero-width bit-field causes alignment of the next member to the
+        // underlying type, irrespective of packing.
+        a = alignment(to_c_bit_field_type(it_type).underlying_type(), ns);
+        max_alignment = std::max(
+          max_alignment, member_layout_alignment(*it, struct_is_packed, ns));
+        DATA_INVARIANT(
+          bit_field_bits == 0, "padding ensures offset at byte boundaries");
+        const mp_integer displacement = offset % a;
+        if(displacement != 0)
+        {
+          const mp_integer pad_bytes = a - displacement;
+          const std::size_t pad_bits =
+            numeric_cast_v<std::size_t>(pad_bytes * config.ansi_c.char_width);
+          it = pad(components, it, pad_bits);
+          offset += pad_bytes;
+        }
+        continue;
       }
       else
       {
         // Otherwise, ANSI-C says that bit-fields do not get padded!
         // We consider the type for max_alignment, however.
-        if(max_alignment<a)
-          max_alignment=a;
+        a = member_layout_alignment(*it, struct_is_packed, ns);
+        if(max_alignment < a)
+          max_alignment = a;
 
-        std::size_t w=to_c_bit_field_type(it_type).get_width();
+        std::size_t w = to_c_bit_field_type(it_type).get_width();
         bit_field_bits += w;
         const std::size_t bytes = bit_field_bits / config.ansi_c.char_width;
         bit_field_bits %= config.ansi_c.char_width;
