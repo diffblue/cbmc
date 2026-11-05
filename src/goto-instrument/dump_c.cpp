@@ -539,10 +539,11 @@ void dump_ct::convert_compound(
   // Reproduce any #pragma pack(n) that applied to the members: a single
   // value applying to all members is set before the definition (which works
   // for all compilers), varying values (which only Visual Studio supports) are
-  // set member by member.
-  const auto pragma_pack_of = [](const struct_union_typet::componentt &c)
+  // set member by member. Visual Studio additionally uses the value in effect
+  // at the end of the definition, which we reproduce before the closing brace.
+  const auto pragma_pack_of = [](const irept &src)
   {
-    const exprt &value = static_cast<const exprt &>(c.find(ID_C_pragma_pack));
+    const exprt &value = static_cast<const exprt &>(src.find(ID_C_pragma_pack));
     return value.is_nil() ? mp_integer{0}
                           : numeric_cast<mp_integer>(value).value_or(0);
   };
@@ -557,6 +558,14 @@ void dump_ct::convert_compound(
       pragma_pack = n;
     else if(*pragma_pack != n)
       pragma_pack_varies = true;
+  }
+  // only aggregates laid out following Visual Studio's rules record a value
+  const bool is_visual_studio = type.find(ID_C_pragma_pack).is_not_nil();
+  if(
+    is_visual_studio && pragma_pack.has_value() &&
+    *pragma_pack != pragma_pack_of(type))
+  {
+    pragma_pack_varies = true;
   }
   const bool use_pragma_pack =
     pragma_pack.has_value() && (pragma_pack_varies || *pragma_pack != 0);
@@ -666,6 +675,16 @@ void dump_ct::convert_compound(
       UNREACHABLE;
 
     struct_body << ";\n";
+  }
+
+  if(
+    pragma_pack_varies && is_visual_studio &&
+    pragma_pack_of(type) != current_pragma_pack)
+  {
+    struct_body << "#pragma pack(";
+    if(pragma_pack_of(type) != 0)
+      struct_body << integer2string(pragma_pack_of(type));
+    struct_body << ")\n";
   }
 
   if(use_pragma_pack)
