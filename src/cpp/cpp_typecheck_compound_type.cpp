@@ -4098,6 +4098,59 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
   exprt &body = static_cast<exprt &>(type.add(ID_body));
   struct_union_typet::componentst &components = type.components();
 
+  // N5008 [class.compare.default]/4: if the member-specification declares
+  // no member or friend named operator==, an == operator function is
+  // declared for each defaulted three-way comparison operator function,
+  // with the same access, parameters and class scope, the return type bool
+  // and the declarator-id operator==; it is defined as defaulted.
+  {
+    const auto operator_symbol = [](const cpp_declaratort &d) -> irep_idt
+    {
+      const auto &parts = d.name().get_sub();
+      if(parts.size() == 2 && parts[0].id() == ID_operator)
+        return parts[1].id();
+      return irep_idt{};
+    };
+    bool declares_equality = false;
+    std::vector<std::size_t> defaulted_spaceship;
+    for(std::size_t i = 0; i < body.operands().size(); ++i)
+    {
+      const exprt &item = body.operands()[i];
+      if(item.id() != ID_cpp_declaration)
+        continue;
+      const cpp_declarationt &declaration = to_cpp_declaration(item);
+      for(const auto &d : declaration.declarators())
+      {
+        const irep_idt op = operator_symbol(d);
+        if(op == "==")
+          declares_equality = true;
+        else if(
+          op == "<=>" && d.value().id() == ID_code &&
+          to_code(d.value()).get_statement() == ID_default)
+        {
+          defaulted_spaceship.push_back(i);
+        }
+      }
+    }
+    if(!declares_equality)
+    {
+      for(const std::size_t i : defaulted_spaceship)
+      {
+        cpp_declarationt equality = to_cpp_declaration(body.operands()[i]);
+        equality.type() = c_bool_type();
+        for(auto &d : equality.declarators())
+        {
+          d.name().get_sub()[1] = irept{"=="};
+          // the return type is replaced with bool ([class.compare.default]
+          // /4): a declarator's own trailing return type goes too
+          d.type().remove(ID_C_trailing_return_type);
+        }
+        equality.set("#implicit_defaulted_equality", true);
+        body.operands().push_back(std::move(equality));
+      }
+    }
+  }
+
   // (`set(ID_name, symbol.name)` already done above before bases.)
 
   // default access

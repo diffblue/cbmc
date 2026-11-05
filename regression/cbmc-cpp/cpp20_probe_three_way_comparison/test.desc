@@ -1,4 +1,4 @@
-KNOWNBUG libstdcxx
+CORE libstdcxx
 main.cpp
 --cpp20 --object-bits 12
 ^\[main\.assertion\.1\] line \d+ defaulted three-way comparison: SUCCESS$
@@ -11,9 +11,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-g++ and clang++ (GCC 16 for C++23 and C++26) accept this program, and it fails
-only its WRONG assertion.  `a < b' works (rewritten to (a <=> b) < 0), but `a
-== b' fails to type-check: "no comparison operator for an operand of class
-type". [class.compare.default]/5: a defaulted operator<=> also declares a
-defaulted operator== (with the same parameters), which CBMC does not.  A
-separately defaulted operator== works.
+`a < b' is rewritten to (a <=> b) < 0; `a == b' uses the operator== that
+a defaulted operator<=> implicitly declares ([class.compare.default]/4),
+which CBMC did not declare: "no comparison operator for an operand of
+class type" (cpp20_defaulted_spaceship_declares_equality).
