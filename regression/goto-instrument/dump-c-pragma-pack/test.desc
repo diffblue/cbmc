@@ -1,0 +1,14 @@
+CORE
+main.c
+--dump-c
+^#pragma pack\(push, 1\)$
+^#pragma pack\(push, 2\)$
+^#pragma pack\(pop\)$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+This test should be run via chain.sh, which will try to recompile the dumped C
+code. The layout established by #pragma pack must be preserved.

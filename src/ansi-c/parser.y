@@ -1628,34 +1628,26 @@ array_of_construct:
         { $$=$1; stack_type($$).add_subtype().swap(parser_stack($2)); }
         ;
 
-pragma_packed:
-        {
-          init($$);
-          if(!PARSER.pragma_pack.empty() &&
-             PARSER.pragma_pack.back() == 1)
-          {
-            set($$, ID_packed);
-          }
-        }
-        ;
-
 aggregate_name:
           aggregate_key
           gcc_type_attribute_opt
           msc_declspec_opt
           {
             // an anon struct/union with body
+            // the #pragma pack in effect where the definition starts
+            record_pragma_pack(parser_stack($1));
           }
           '{' member_declaration_list_opt '}'
           gcc_type_attribute_opt
-          pragma_packed
         {
+          apply_pragma_pack(parser_stack($1), parser_stack($6));
+
           // save the members
           parser_stack($1).add(ID_components).get_sub().swap(
             (irept::subt &)parser_stack($6).operands());
 
           // throw in the gcc attributes
-          $$=merge($1, merge($2, merge($8, $9)));
+          $$=merge($1, merge($2, $8));
         }
         | aggregate_key
           gcc_type_attribute_opt
@@ -1665,17 +1657,20 @@ aggregate_name:
             // A struct/union with tag and body.
             PARSER.add_tag_with_body(parser_stack($4));
             parser_stack($1).set(ID_tag, parser_stack($4));
+            // the #pragma pack in effect where the definition starts
+            record_pragma_pack(parser_stack($1));
           }
           '{' member_declaration_list_opt '}'
           gcc_type_attribute_opt
-          pragma_packed
         {
+          apply_pragma_pack(parser_stack($1), parser_stack($7));
+
           // save the members
           parser_stack($1).add(ID_components).get_sub().swap(
             (irept::subt &)parser_stack($7).operands());
 
           // throw in the gcc attributes
-          $$=merge($1, merge($2, merge($9, $10)));
+          $$=merge($1, merge($2, $9));
         }
         | aggregate_key
           gcc_type_attribute_opt
@@ -1821,6 +1816,8 @@ member_default_declaring_list:
           to_ansi_c_declaration(parser_stack($$)).set_is_member(true);
           parser_stack($$).add_source_location()=parser_stack($2).source_location();
           parser_stack($$).type().swap(parser_stack($2));
+          // the #pragma pack in effect at this member
+          record_pragma_pack(parser_stack($$));
           PARSER.add_declarator(parser_stack($$), parser_stack($3));
         }
         | member_default_declaring_list ',' member_identifier_declarator
@@ -1835,30 +1832,14 @@ member_declaring_list:
           type_specifier
           member_declarator
         {
-          if(parser_stack($2).id() != ID_struct &&
-             parser_stack($2).id() != ID_union &&
-             !PARSER.pragma_pack.empty() &&
-             PARSER.pragma_pack.back() != 0)
-          {
-            // communicate #pragma pack(n) alignment constraints by
-            // by both setting packing AND alignment for individual struct/union
-            // members; see padding.cpp for more details
-            init($$);
-            set($$, ID_packed);
-            $2=merge($2, $$);
-
-            init($$);
-            set($$, ID_aligned);
-            parser_stack($$).set(ID_size, PARSER.pragma_pack.back());
-            $2=merge($2, $$);
-          }
-
           $2=merge($2, $1);
 
           init($$, ID_declaration);
           to_ansi_c_declaration(parser_stack($$)).set_is_member(true);
           parser_stack($$).add_source_location()=parser_stack($2).source_location();
           parser_stack($$).type().swap(parser_stack($2));
+          // the #pragma pack in effect at this member
+          record_pragma_pack(parser_stack($$));
           PARSER.add_declarator(parser_stack($$), parser_stack($3));
         }
         | member_declaring_list ',' member_declarator

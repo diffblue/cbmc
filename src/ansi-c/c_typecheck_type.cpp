@@ -1041,6 +1041,12 @@ void c_typecheck_baset::typecheck_compound_body(
         new_component.add_source_location() = source_location;
         new_component.set_pretty_name(declarator.get_base_name());
 
+        // the maximum alignment set by #pragma pack(n), as determined by the
+        // parser
+        const irept &pragma_pack = declaration.find(ID_C_pragma_pack);
+        if(pragma_pack.is_not_nil())
+          new_component.add(ID_C_pragma_pack) = pragma_pack;
+
         typecheck_type(new_component.type());
 
         // the rules for anonymous members depend on the type and the compiler,

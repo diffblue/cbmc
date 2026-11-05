@@ -528,3 +528,65 @@ static void new_auto_type_declaration(
   to_ansi_c_declaration(parser_stack(result))
     .add_initializer(parser_stack(initializer));
 }
+
+/*******************************************************************\
+
+Function: record_pragma_pack
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Record the maximum member alignment set by the active
+          `#pragma pack(n)`, if any.
+
+\*******************************************************************/
+
+static void record_pragma_pack(irept &dest)
+{
+  if(!PARSER.pragma_pack.empty() && !PARSER.pragma_pack.back().is_zero())
+    dest.add(ID_C_pragma_pack) = PARSER.pragma_pack.back();
+}
+
+/*******************************************************************\
+
+Function: apply_pragma_pack
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Determine the maximum member alignment set by `#pragma pack(n)` for
+          each of the member declarations of an aggregate with body.
+          Compilers differ in which value they use: GCC uses the value in
+          effect at the end of the definition, Clang uses the value in effect
+          at the start of the definition (recorded in \p aggregate by
+          record_pragma_pack), and Visual Studio uses the value in effect at
+          each member (recorded in each declaration by record_pragma_pack).
+
+\*******************************************************************/
+
+static void apply_pragma_pack(irept &aggregate, exprt &member_declarations)
+{
+  irept value;
+  if(PARSER.mode == configt::ansi_ct::flavourt::CLANG)
+    value = aggregate.find(ID_C_pragma_pack);
+  else if(PARSER.mode != configt::ansi_ct::flavourt::VISUAL_STUDIO)
+  {
+    irept tmp;
+    record_pragma_pack(tmp);
+    value = tmp.find(ID_C_pragma_pack);
+  }
+  aggregate.remove(ID_C_pragma_pack);
+
+  if(PARSER.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
+    return;
+
+  for(auto &declaration : member_declarations.operands())
+  {
+    if(value.is_nil())
+      declaration.remove(ID_C_pragma_pack);
+    else
+      declaration.add(ID_C_pragma_pack) = value;
+  }
+}

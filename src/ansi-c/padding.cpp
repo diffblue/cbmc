@@ -23,9 +23,20 @@ Author: Daniel Kroening, kroening@kroening.com
 // Forward declaration: the alignment used to lay out a component within an
 // aggregate, which depends on whether the aggregate is packed.
 static mp_integer member_layout_alignment(
-  const typet &comp_type,
+  const struct_union_typet::componentt &component,
   bool container_is_packed,
   const namespacet &ns);
+
+/// \return the maximum alignment set by a `#pragma pack(n)` in effect for
+///   \p component, or 0 when there is none
+static mp_integer pragma_pack(const struct_union_typet::componentt &component)
+{
+  const exprt &value =
+    static_cast<const exprt &>(component.find(ID_C_pragma_pack));
+  if(value.is_nil())
+    return 0;
+  return numeric_cast<mp_integer>(value).value_or(0);
+}
 
 mp_integer alignment(const typet &type, const namespacet &ns)
 {
@@ -72,7 +83,7 @@ mp_integer alignment(const typet &type, const namespacet &ns)
     {
       if(c.get_is_padding())
         continue;
-      result = std::max(result, member_layout_alignment(c.type(), packed, ns));
+      result = std::max(result, member_layout_alignment(c, packed, ns));
     }
     if(a_int > result)
       result = a_int;
@@ -127,7 +138,10 @@ mp_integer alignment(const typet &type, const namespacet &ns)
   return result;
 }
 
-static mp_integer member_layout_alignment(
+/// The alignment of \p comp_type when used as the type of a component in an
+/// aggregate that is packed iff \p container_is_packed, ignoring any
+/// `#pragma pack`.
+static mp_integer member_layout_alignment_unconstrained(
   const typet &comp_type,
   bool container_is_packed,
   const namespacet &ns)
@@ -149,22 +163,11 @@ static mp_integer member_layout_alignment(
   natural_type.remove(ID_C_packed);
   const mp_integer natural = alignment(natural_type, ns);
 
-  // A component-level packing attribute models #pragma pack(n): the parser
-  // attaches both a packing flag and the alignment n to each member, and the
-  // resulting alignment is the cap min(n, natural) ("a multiple of n or of the
-  // member's size, whichever is smaller"). A bare packed component (no
-  // alignment) is densely packed to a single byte.
-  if(comp_type.get_bool(ID_C_packed))
-  {
-    if(given_int > 0)
-      return std::min(given_int, natural);
-    return 1;
-  }
-
-  // The enclosing aggregate is packed (e.g. struct __attribute__((packed))):
-  // members are densely packed to a single byte, but an explicit aligned() on
-  // the member is honoured verbatim and may raise or lower the alignment.
-  if(container_is_packed)
+  // The component or the enclosing aggregate is packed (e.g.,
+  // struct __attribute__((packed))): members are densely packed to a single
+  // byte, but an explicit aligned() on the member is honoured verbatim and may
+  // raise or lower the alignment.
+  if(container_is_packed || comp_type.get_bool(ID_C_packed))
     return given_int > 0 ? given_int : mp_integer{1};
 
   // Without any packing: an alignment attribute on the member's declarator
@@ -176,6 +179,24 @@ static mp_integer member_layout_alignment(
   if(comp_type.get_bool(ID_C_alignment_increase_only))
     return std::max(given_int, natural);
   return given_int;
+}
+
+static mp_integer member_layout_alignment(
+  const struct_union_typet::componentt &component,
+  bool container_is_packed,
+  const namespacet &ns)
+{
+  const mp_integer a = member_layout_alignment_unconstrained(
+    component.type(), container_is_packed, ns);
+
+  // #pragma pack(n) caps the alignment of each member at n ("a multiple of n
+  // or of the member's size, whichever is smaller"), including any alignment
+  // requested by an attribute on the member.
+  const mp_integer max_alignment = pragma_pack(component);
+  if(max_alignment > 0)
+    return std::min(max_alignment, a);
+
+  return a;
 }
 
 static std::optional<std::size_t>
@@ -294,7 +315,11 @@ static void add_padding_msvc(struct_typet &type, const namespacet &ns)
       // pad up to underlying type unless the struct is packed
       if(!is_packed)
       {
-        const mp_integer a = alignment(it->type(), ns);
+        mp_integer a = alignment(it->type(), ns);
+        // #pragma pack(n) caps the alignment of each member at n
+        const mp_integer max_alignment_pragma = pragma_pack(*it);
+        if(max_alignment_pragma > 0)
+          a = std::min(a, max_alignment_pragma);
         if(a > 1)
         {
           const mp_integer displacement = offset % a;
@@ -419,10 +444,13 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
   {
     const typet it_type=it->type();
     mp_integer a=1;
+    const mp_integer max_alignment_pragma = pragma_pack(*it);
 
     if(it_type.id()==ID_c_bit_field)
     {
       a = alignment(to_c_bit_field_type(it_type).underlying_type(), ns);
+      if(max_alignment_pragma > 0)
+        a = std::min(a, max_alignment_pragma);
 
       // A zero-width bit-field causes alignment to the base-type.
       if(to_c_bit_field_type(it_type).get_width()==0)
@@ -456,14 +484,15 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
       continue;
     }
     else
-      a = member_layout_alignment(it_type, struct_is_packed, ns);
+      a = member_layout_alignment(*it, struct_is_packed, ns);
 
     DATA_INVARIANT(
       bit_field_bits == 0, "padding ensures offset at byte boundaries");
 
     // check minimum alignment
     if(
-      a < config.ansi_c.alignment && !it_type.get_bool(ID_C_packed) &&
+      a < config.ansi_c.alignment && max_alignment_pragma == 0 &&
+      !it_type.get_bool(ID_C_packed) &&
       (it_type.id() != ID_struct_tag ||
        !ns.follow_tag(to_struct_tag_type(it_type)).get_bool(ID_C_packed)) &&
       (it_type.id() != ID_union_tag ||
