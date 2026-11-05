@@ -1,9 +1,9 @@
 // std::common_reference_with<const W &, const W &> -- the same reference
-// type on both sides -- is false with libstdc++ 16's <concepts>/<type_traits>
-// (the common_reference machinery there takes a path the front end
-// mis-evaluates), so every std::assignable_from / std::movable /
-// std::copyable check, and cpp20_concept_conjunction_requires_params, fails
-// ("static assertion failed").  With gcc 13's headers it holds.
+// type on both sides -- holds; with libstdc++ 16's <concepts> and
+// <type_traits> it takes another path through the common_reference
+// machinery than with gcc 13's headers.  std::assignable_from,
+// std::movable and std::copyable depend on it
+// (cpp20_concept_conjunction_requires_params).
 #include <concepts>
 struct W
 {

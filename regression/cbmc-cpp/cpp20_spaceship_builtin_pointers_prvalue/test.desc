@@ -23,4 +23,5 @@ it yields (const std::strong_ordering), so libc++'s
 classified it as no comparison category and rejected
 std::compare_three_way()(p, q); and it tested `<' and `>' first, so two
 pointers to different objects (unordered in cbmc's model) came out equal.
-KNOWNBUG cpp20_compare_three_way_pointers_libcxx.  Fixed in round 163b.
+Both are fixed; cpp20_compare_three_way_pointers_libcxx covers the libc++
+use.
