@@ -63,6 +63,16 @@ struct Outer
   PInner_t __attribute__((aligned(8))) inner;
 };
 
+// An aligned() attribute following the member's declarator, with a value
+// that is a constant expression rather than a literal (as in the Linux
+// kernel's `__aligned((x + 0) ? : SMP_CACHE_BYTES)` cache-line alignment).
+struct M_expr
+{
+  uint8_t c;
+  int32_t m __attribute__((aligned(8 + 8)));
+  int32_t n __attribute__((aligned(sizeof(int32_t) * 2)));
+};
+
 int main(void)
 {
   _Static_assert(sizeof(struct M_a2) == 8, "");
@@ -82,6 +92,11 @@ int main(void)
 
   _Static_assert(sizeof(ai2_t) == 4, "");
   _Static_assert(_Alignof(ai2_t) == 2, "");
+
+  _Static_assert(__builtin_offsetof(struct M_expr, m) == 16, "");
+  _Static_assert(__builtin_offsetof(struct M_expr, n) == 24, "");
+  _Static_assert(sizeof(struct M_expr) == 32, "");
+  _Static_assert(_Alignof(struct M_expr) == 16, "");
 
   _Static_assert(sizeof(struct Outer) == 16, "");
   _Static_assert(_Alignof(struct Outer) == 8, "");
