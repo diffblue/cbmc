@@ -80,7 +80,7 @@ static std::string pointer_offset_bits_as_string(
 }
 
 /// Encode the attributes of \p type (or a component) that affect the layout of
-/// an aggregate, i.e., packing and explicit alignment.
+/// an aggregate, i.e., packing, explicit alignment, and `#pragma pack`.
 static std::string layout_attributes2name(const irept &src)
 {
   std::string result;
@@ -88,12 +88,14 @@ static std::string layout_attributes2name(const irept &src)
   if(src.get_bool(ID_C_packed))
     result += 'p';
 
-  const exprt &alignment = static_cast<const exprt &>(src.find(ID_C_alignment));
-  if(alignment.is_not_nil())
+  for(const auto &id : {ID_C_alignment, ID_C_pragma_pack})
   {
-    const auto alignment_int = numeric_cast<mp_integer>(alignment);
-    result += 'a';
-    result += alignment_int.has_value() ? integer2string(*alignment_int) : "?";
+    const exprt &value = static_cast<const exprt &>(src.find(id));
+    if(value.is_nil())
+      continue;
+    result += id == ID_C_alignment ? 'a' : 'P';
+    const auto value_int = numeric_cast<mp_integer>(value);
+    result += value_int.has_value() ? integer2string(*value_int) : "?";
   }
 
   return result;
@@ -233,7 +235,7 @@ static std::string type2name(
         else
           first = false;
 
-        result += layout_attributes2name(c.type()) +
+        result += layout_attributes2name(c) + layout_attributes2name(c.type()) +
                   type2name(c.type(), ns, symbol_number);
         const irep_idt &component_name = c.get_name();
         CHECK_RETURN(!component_name.empty());
