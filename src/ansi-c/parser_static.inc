@@ -590,3 +590,30 @@ static void apply_pragma_pack(irept &aggregate, exprt &member_declarations)
       declaration.add(ID_C_pragma_pack) = value;
   }
 }
+
+/*******************************************************************\
+
+Function: mark_pointer_declarator_attributes
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Mark alignment attributes in \p src as following the '*' of a
+          pointer declarator, which GCC applies to the pointer type.
+
+\*******************************************************************/
+
+static void mark_pointer_declarator_attributes(irept &src)
+{
+  if(src.id() == ID_aligned)
+    src.set(ID_C_pointer_declarator, true);
+  else if(src.id() == ID_merged_type)
+  {
+    for(auto &subtype :
+        to_type_with_subtypes(static_cast<typet &>(src)).subtypes())
+    {
+      mark_pointer_declarator_attributes(subtype);
+    }
+  }
+}

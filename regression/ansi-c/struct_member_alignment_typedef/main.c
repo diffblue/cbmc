@@ -5,9 +5,9 @@
 //
 // This is distinct from an alignment attribute on the member's *declarator*,
 // which can only increase the alignment (a smaller request is ignored -- see
-// the M_a2 case in struct_member_alignment). The two are told apart by the
-// C_alignment_increase_only provenance flag, set when the attribute comes from
-// an object/field/tag declaration rather than a typedef.
+// the M_a2 case in struct_member_alignment). The former is the alignment of
+// the type (ID_C_alignment), the latter an alignment of the declaration
+// (ID_C_declaration_alignment).
 
 typedef int __attribute__((aligned(2))) ai2_t;
 

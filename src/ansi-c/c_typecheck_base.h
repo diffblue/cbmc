@@ -271,8 +271,21 @@ protected:
   virtual void adjust_function_parameter(typet &type) const;
   virtual bool is_complete_type(const typet &type) const;
 
-  typet enum_constant_type(
-    const mp_integer &min, const mp_integer &max) const;
+  /// Move all alignments that alignment attributes of a declaration request
+  /// for the declared entity (ID_C_declaration_alignment), which may be
+  /// attached anywhere along the declarator, to the outermost level of the
+  /// type-checked \p type of the declared entity. For a typedef, given
+  /// \p is_typedef, the alignment becomes the alignment of the type
+  /// (ID_C_alignment), which may also be smaller than the natural one, as is
+  /// the case with GCC and Clang. Otherwise, it remains an alignment of the
+  /// declaration, which for members can only increase the alignment.
+  static void apply_declaration_alignment(typet &type, bool is_typedef);
+
+  /// Remove all alignments of declarations from \p type, as required when
+  /// the type of an expression becomes the type of another declaration.
+  static void remove_declaration_alignment(typet &type);
+
+  typet enum_constant_type(const mp_integer &min, const mp_integer &max) const;
 
   bitvector_typet enum_underlying_type(
     const mp_integer &min,

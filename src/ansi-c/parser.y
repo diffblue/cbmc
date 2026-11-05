@@ -1203,8 +1203,13 @@ type_qualifier_list:
 
 attribute_type_qualifier_list:
           attribute_or_type_qualifier
+        {
+          // these are the qualifiers and attributes of a pointer declarator
+          mark_pointer_declarator_attributes(parser_stack($1));
+        }
         | attribute_type_qualifier_list attribute_or_type_qualifier
         {
+          mark_pointer_declarator_attributes(parser_stack($2));
           $$=merge($1, $2);
         }
         ;

@@ -9,5 +9,5 @@ main.c
 --
 A reduced-alignment typedef used as a struct member keeps its alignment (as
 GCC/Clang/icx do), while a reducing alignment attribute on the member
-declarator is ignored. The two are distinguished by the
-C_alignment_increase_only provenance flag.
+declarator is ignored. The former is the alignment of the type, the latter an
+alignment of the declaration.
