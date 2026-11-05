@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_convert_type.h"
 #include "cpp_declarator_converter.h"
+#include "cpp_sfinae_context.h"
 #include "cpp_template_type.h"
 #include "cpp_typecheck.h"
 #include "cpp_typecheck_fargs.h"
@@ -198,7 +199,8 @@ std::optional<typet> cpp_typecheckt::deduce_alias_template_arguments(
 std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
   const cpp_namet &class_template_name,
   const std::vector<exprt> &args,
-  bool copy_initialization)
+  bool copy_initialization,
+  bool braced_list)
 {
   // [dcl.type.simple]/3: deduction only applies to a class-template-id
   // written *without* a template-argument-list.
@@ -232,8 +234,10 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
         irep_idt qbase;
         cpp_template_args_non_tct qargs;
         resolver.resolve_scope(class_template_name, qbase, qargs);
+        // N5008 [namespace.qual]/2: qualified lookup in a namespace also
+        // considers its inline namespaces (libc++'s std::__1::vector)
         id_set = cpp_scopes.current_scope().lookup(
-          qbase, cpp_scopet::SCOPE_ONLY, cpp_idt::id_classt::TEMPLATE);
+          qbase, cpp_scopet::QUALIFIED, cpp_idt::id_classt::TEMPLATE);
       }
       catch(...)
       {
@@ -372,6 +376,8 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
 
     // The guide's parameter types are the deduction patterns.
     std::vector<typet> pattern_types;
+    // parameters from the first one with a default argument on
+    std::size_t first_defaulted = 0;
     for(const auto &p :
         guide.declarators().front().type().find(ID_parameters).get_sub())
     {
@@ -384,9 +390,24 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
       else
         pattern_types.push_back(
           pdecl.declarators().front().merge_type(pdecl.type()));
+      if(
+        pdecl.declarators().empty() ||
+        pdecl.declarators().front().value().is_nil())
+      {
+        first_defaulted = pattern_types.size();
+      }
     }
-    if(pattern_types.size() != arg_types.size())
+    // N5008 [over.match.viable]/2.3: a guide with more parameters than
+    // arguments is viable if each further parameter has a default argument
+    // (libstdc++'s `vector(_InputIterator, _InputIterator, _Allocator =
+    // _Allocator()) -> vector<...>'); those take no part in deduction
+    if(
+      pattern_types.size() < arg_types.size() ||
+      first_defaulted > arg_types.size())
+    {
       continue;
+    }
+    pattern_types.resize(arg_types.size());
 
     auto scope_it = cpp_scopes.id_map.find(gid->identifier);
     if(scope_it == cpp_scopes.id_map.end() || scope_it->second == nullptr)
@@ -420,6 +441,58 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
       catch(...)
       {
         deduced_ok = false;
+      }
+
+      // [temp.deduct.general]/5: a template parameter of the guide that is
+      // not deduced takes its default argument, in which the deduced ones
+      // are substituted (`class _Allocator = allocator<_ValT>')
+      if(deduced_ok)
+      {
+        for(const auto &tparam : guide.template_type().template_parameters())
+        {
+          if(
+            tparam.id() != ID_type || !tparam.has_default_argument() ||
+            tparam.get_bool(ID_ellipsis))
+          {
+            continue;
+          }
+          const irep_idt &tid = tparam.type().get(ID_identifier);
+          const typet current = template_map.lookup_type(tid);
+          if(current.is_not_nil() && current.id() != ID_unassigned)
+            continue;
+          // a substitution failure in the default argument
+          // (`typename = _RequireInputIter<_InputIterator>' with an int)
+          // removes the guide ([temp.deduct.general]/8)
+          const auto errors_before =
+            get_message_handler().get_message_count(messaget::M_ERROR);
+          bool failed = false;
+          {
+            sfinae_contextt sfinae_guard{*this};
+            template_arg_candidate_matchingt matching_guard{*this};
+            try
+            {
+              exprt value = tparam.default_argument();
+              typecheck_type(value.type());
+              if(
+                get_message_handler().get_message_count(messaget::M_ERROR) !=
+                errors_before)
+              {
+                failed = true;
+              }
+              else
+                template_map.set(tparam, value);
+            }
+            catch(...)
+            {
+              failed = true;
+            }
+          }
+          if(failed)
+          {
+            deduced_ok = false;
+            break;
+          }
+        }
       }
 
       if(
@@ -483,147 +556,240 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
       scope_it != cpp_scopes.id_map.end() && scope_it->second != nullptr)
     {
       const cpp_declarationt &class_decl = to_cpp_declaration(csym->type);
-      for(const auto &mem : class_decl.type().find(ID_body).get_sub())
-      {
-        if(!deduced_types.empty())
-          break;
-        if(mem.id() != ID_cpp_declaration)
-          continue;
-        const cpp_declarationt &mdecl =
-          to_cpp_declaration(static_cast<const exprt &>(mem));
-        if(mdecl.type().id() != ID_constructor || mdecl.declarators().empty())
-          continue;
-        // N5008 [over.match.class.deduct]/5: the notional constructor keeps
-        // the explicit-specifier; [over.match.copy]/1.1: in
-        // copy-initialization only converting constructors are candidates
-        if(copy_initialization && mdecl.member_spec().is_explicit())
+      // N5008 [over.match.class.deduct]/2, [over.match.list]/1: for a
+      // braced-init-list, the guides from initializer-list constructors
+      // are tried first, with the list as their single argument -- `std::
+      // vector v{1, 2, 3}' is vector<int> through vector(initializer_list<
+      // value_type>, const allocator_type & = allocator_type()); then, if
+      // none is viable, all guides with the elements as the arguments.
+      // An initializer-list constructor's guide deduces the list's element
+      // type from each element (as an initializer_list<P> parameter does
+      // from a braced list, [temp.deduct.call]/1).
+      for(int phase = braced_list ? 0 : 1; phase < 2; ++phase)
+        for(const auto &mem : class_decl.type().find(ID_body).get_sub())
         {
-          skipped_explicit_constructor = true;
-          continue;
-        }
-
-        // Constructor parameter patterns (in terms of the class parameters).
-        std::vector<typet> patterns;
-        // parameters from the first one with a default argument on
-        std::size_t first_defaulted = 0;
-        for(const auto &p :
-            mdecl.declarators().front().type().find(ID_parameters).get_sub())
-        {
-          if(p.id() != ID_cpp_declaration)
+          if(!deduced_types.empty())
+            break;
+          if(mem.id() != ID_cpp_declaration)
             continue;
-          const cpp_declarationt &pdecl =
-            to_cpp_declaration(static_cast<const exprt &>(p));
-          patterns.push_back(
-            pdecl.declarators().empty()
-              ? pdecl.type()
-              : pdecl.declarators().front().merge_type(pdecl.type()));
-          const bool defaulted =
-            !pdecl.declarators().empty() &&
-            pdecl.declarators().front().value().is_not_nil();
-          if(!defaulted)
-            first_defaulted = patterns.size();
-        }
-        // N5008 [over.match.viable]/2.3: a candidate with more parameters
-        // than arguments is viable if each further parameter has a default
-        // argument; those parameters take no part in deduction
-        if(
-          patterns.empty() || patterns.size() < arg_types.size() ||
-          first_defaulted > arg_types.size())
-        {
-          continue;
-        }
-        patterns.resize(arg_types.size());
-
-        cpp_save_scopet save_scope(cpp_scopes);
-        cpp_saved_template_mapt saved_map(template_map);
-        cpp_scopes.go_to(*scope_it->second);
-        template_map.build_unassigned(class_decl.template_type());
-
-        cpp_typecheck_resolvet resolver(*this);
-        bool deduced_ok = true;
-        try
-        {
-          for(std::size_t i = 0; i < patterns.size(); ++i)
+          const cpp_declarationt &mdecl =
+            to_cpp_declaration(static_cast<const exprt &>(mem));
+          if(mdecl.type().id() != ID_constructor || mdecl.declarators().empty())
+            continue;
+          // N5008 [over.match.class.deduct]/5: the notional constructor keeps
+          // the explicit-specifier; [over.match.copy]/1.1: in
+          // copy-initialization only converting constructors are candidates
+          if(copy_initialization && mdecl.member_spec().is_explicit())
           {
-            // N5008 [temp.deduct.call]/3: a forwarding reference is an
-            // rvalue reference to a cv-unqualified template parameter "that
-            // does not represent a template parameter of a class template
-            // (during class template argument deduction)" -- so for a
-            // constructor-derived guide, `C(_Range&&)` deduces `_Range =
-            // int[5]` (not `int(&)[5]`) from an array lvalue
-            // (`owning_view{declval<int(&)[5]>()}`; the class's
-            // `_Range _M_r = _Range();` is ill-formed for a reference).
-            // [temp.deduct.call]/3: "If P is a reference type, the type
-            // referred to by P is used for type deduction" -- `S(W<T> &)'
-            // deduces T from an lvalue W<int>.  (A reference to a bare
-            // template parameter, `T &' / `T &&', is matched as written.)
-            const typet &pattern = patterns[i];
-            const auto is_plain_name = [](const typet &t)
-            {
-              return t.id() == ID_cpp_name &&
-                     !to_cpp_name(t).has_template_args() &&
-                     !to_cpp_name(t).is_qualified();
-            };
-            const bool reference_to_template_id =
-              pattern.id() == ID_frontend_pointer &&
-              (pattern.get_bool(ID_C_reference) ||
-               pattern.get_bool(ID_C_rvalue_reference)) &&
-              !is_plain_name(to_type_with_subtype(pattern).subtype());
-            if(reference_to_template_id)
-            {
-              typet argument = arg_types[i];
-              if(is_reference(argument) || is_rvalue_reference(argument))
-                argument = to_reference_type(argument).base_type();
-              resolver.guess_template_args(
-                to_type_with_subtype(pattern).subtype(), argument);
+            skipped_explicit_constructor = true;
+            continue;
+          }
+
+          // Constructor parameter patterns (in terms of the class parameters).
+          std::vector<typet> patterns;
+          // parameters from the first one with a default argument on
+          std::size_t first_defaulted = 0;
+          for(const auto &p :
+              mdecl.declarators().front().type().find(ID_parameters).get_sub())
+          {
+            if(p.id() != ID_cpp_declaration)
               continue;
-            }
-            resolver.guess_template_args(
-              patterns[i],
-              adjust_deduction_arg(patterns[i], arg_types[i], false));
+            const cpp_declarationt &pdecl =
+              to_cpp_declaration(static_cast<const exprt &>(p));
+            patterns.push_back(
+              pdecl.declarators().empty()
+                ? pdecl.type()
+                : pdecl.declarators().front().merge_type(pdecl.type()));
+            const bool defaulted =
+              !pdecl.declarators().empty() &&
+              pdecl.declarators().front().value().is_not_nil();
+            if(!defaulted)
+              first_defaulted = patterns.size();
           }
-        }
-        catch(...)
-        {
-          deduced_ok = false;
-        }
-
-        if(deduced_ok)
-        {
-          const cpp_template_args_tct ta =
-            template_map.build_template_args(class_decl.template_type());
-          // N5008 [over.match.class.deduct]/1, [temp.deduct.general]/5: a
-          // trailing template parameter not deduced from the guide takes its
-          // default argument (`template <class C, class D = C> struct view
-          // { C *p; }': view{s} is view<const char>); pass the deduced prefix
-          // and let the class template supply the rest
-          const auto &tparams =
-            class_decl.template_type().template_parameters();
-          std::vector<typet> dt;
-          bool usable = true;
-          for(std::size_t i = 0; i < ta.arguments().size(); ++i)
+          // N5008 [over.match.viable]/2.3: a candidate with more parameters
+          // than arguments is viable if each further parameter has a default
+          // argument; those parameters take no part in deduction
+          // the element type P of an initializer_list<P> (or a reference to
+          // one) as the first parameter
+          const auto initializer_list_element =
+            [](const typet &pattern) -> std::optional<typet>
           {
-            const exprt &a = ta.arguments()[i];
-            cpp_template_args_tct one;
-            one.arguments().push_back(a);
-            if(one.has_unassigned())
+            const typet *t = &pattern;
+            if(
+              t->id() == ID_frontend_pointer &&
+              (t->get_bool(ID_C_reference) ||
+               t->get_bool(ID_C_rvalue_reference)))
             {
-              for(std::size_t j = i; j < tparams.size(); ++j)
-                if(!tparams[j].has_default_argument())
-                  usable = false;
-              break;
+              t = &to_type_with_subtype(*t).subtype();
             }
-            if(a.id() != ID_type)
+            if(t->id() == ID_merged_type)
             {
-              usable = false;
-              break;
+              for(const auto &sub : to_type_with_subtypes(*t).subtypes())
+              {
+                if(sub.id() == ID_cpp_name)
+                  t = &sub;
+              }
             }
-            dt.push_back(a.type());
+            if(t->id() != ID_cpp_name)
+              return {};
+            const auto &parts = to_cpp_name(*t).get_sub();
+            for(std::size_t i = 0; i + 1 < parts.size(); ++i)
+            {
+              if(
+                parts[i].id() == ID_name &&
+                parts[i].get(ID_identifier) == "initializer_list" &&
+                parts[i + 1].id() == ID_template_args)
+              {
+                const auto &arguments =
+                  to_cpp_template_args_non_tc(parts[i + 1]).arguments();
+                if(arguments.size() != 1)
+                  return {};
+                const exprt &arg = arguments.front();
+                // a type argument, possibly not yet told apart from an
+                // expression (`ambiguous')
+                if(arg.id() == ID_type || arg.id() == ID_ambiguous)
+                  return arg.type();
+                return {};
+              }
+            }
+            return {};
+          };
+          if(phase == 0)
+          {
+            // only an initializer-list constructor, whose other parameters
+            // have defaults ([dcl.init.list]/2), with the list
+            if(patterns.empty() || first_defaulted > 1)
+              continue;
+            auto element = initializer_list_element(patterns.front());
+            if(!element.has_value())
+              continue;
+            // a member typedef of the class (`initializer_list<value_type>'
+            // with `typedef _Tp value_type;') denotes its type in the guide,
+            // which is formed in the scope of the class template
+            if(
+              element->id() == ID_cpp_name &&
+              to_cpp_name(*element).get_sub().size() == 1)
+            {
+              const irep_idt member_name =
+                to_cpp_name(*element).get_sub().front().get(ID_identifier);
+              for(const auto &other : class_decl.type().find(ID_body).get_sub())
+              {
+                if(other.id() != ID_cpp_declaration)
+                  continue;
+                const cpp_declarationt &odecl =
+                  to_cpp_declaration(static_cast<const exprt &>(other));
+                if(!odecl.is_typedef() || odecl.declarators().size() != 1)
+                  continue;
+                const cpp_declaratort &od = odecl.declarators().front();
+                if(
+                  od.name().get_sub().size() == 1 &&
+                  od.name().get_sub().front().get(ID_identifier) == member_name)
+                {
+                  element = od.merge_type(odecl.type());
+                  break;
+                }
+              }
+            }
+            patterns.assign(arg_types.size(), *element);
           }
-          if(usable && !dt.empty())
-            deduced_types = std::move(dt);
+          else if(
+            patterns.empty() || patterns.size() < arg_types.size() ||
+            first_defaulted > arg_types.size())
+          {
+            continue;
+          }
+          patterns.resize(arg_types.size());
+
+          cpp_save_scopet save_scope(cpp_scopes);
+          cpp_saved_template_mapt saved_map(template_map);
+          cpp_scopes.go_to(*scope_it->second);
+          template_map.build_unassigned(class_decl.template_type());
+
+          cpp_typecheck_resolvet resolver(*this);
+          bool deduced_ok = true;
+          try
+          {
+            for(std::size_t i = 0; i < patterns.size(); ++i)
+            {
+              // N5008 [temp.deduct.call]/3: a forwarding reference is an
+              // rvalue reference to a cv-unqualified template parameter "that
+              // does not represent a template parameter of a class template
+              // (during class template argument deduction)" -- so for a
+              // constructor-derived guide, `C(_Range&&)` deduces `_Range =
+              // int[5]` (not `int(&)[5]`) from an array lvalue
+              // (`owning_view{declval<int(&)[5]>()}`; the class's
+              // `_Range _M_r = _Range();` is ill-formed for a reference).
+              // [temp.deduct.call]/3: "If P is a reference type, the type
+              // referred to by P is used for type deduction" -- `S(W<T> &)'
+              // deduces T from an lvalue W<int>.  (A reference to a bare
+              // template parameter, `T &' / `T &&', is matched as written.)
+              const typet &pattern = patterns[i];
+              const auto is_plain_name = [](const typet &t)
+              {
+                return t.id() == ID_cpp_name &&
+                       !to_cpp_name(t).has_template_args() &&
+                       !to_cpp_name(t).is_qualified();
+              };
+              const bool reference_to_template_id =
+                pattern.id() == ID_frontend_pointer &&
+                (pattern.get_bool(ID_C_reference) ||
+                 pattern.get_bool(ID_C_rvalue_reference)) &&
+                !is_plain_name(to_type_with_subtype(pattern).subtype());
+              if(reference_to_template_id)
+              {
+                typet argument = arg_types[i];
+                if(is_reference(argument) || is_rvalue_reference(argument))
+                  argument = to_reference_type(argument).base_type();
+                resolver.guess_template_args(
+                  to_type_with_subtype(pattern).subtype(), argument);
+                continue;
+              }
+              resolver.guess_template_args(
+                patterns[i],
+                adjust_deduction_arg(patterns[i], arg_types[i], false));
+            }
+          }
+          catch(...)
+          {
+            deduced_ok = false;
+          }
+
+          if(deduced_ok)
+          {
+            const cpp_template_args_tct ta =
+              template_map.build_template_args(class_decl.template_type());
+            // N5008 [over.match.class.deduct]/1, [temp.deduct.general]/5: a
+            // trailing template parameter not deduced from the guide takes its
+            // default argument (`template <class C, class D = C> struct view
+            // { C *p; }': view{s} is view<const char>); pass the deduced prefix
+            // and let the class template supply the rest
+            const auto &tparams =
+              class_decl.template_type().template_parameters();
+            std::vector<typet> dt;
+            bool usable = true;
+            for(std::size_t i = 0; i < ta.arguments().size(); ++i)
+            {
+              const exprt &a = ta.arguments()[i];
+              cpp_template_args_tct one;
+              one.arguments().push_back(a);
+              if(one.has_unassigned())
+              {
+                for(std::size_t j = i; j < tparams.size(); ++j)
+                  if(!tparams[j].has_default_argument())
+                    usable = false;
+                break;
+              }
+              if(a.id() != ID_type)
+              {
+                usable = false;
+                break;
+              }
+              dt.push_back(a.type());
+            }
+            if(usable && !dt.empty())
+              deduced_types = std::move(dt);
+          }
         }
-      }
     }
   }
 
@@ -1260,7 +1426,10 @@ void cpp_typecheckt::convert_non_template_declaration(
             if(
               auto deduced = deduce_class_template_arguments(
                 to_cpp_name(static_cast<const irept &>(declaration_type)),
-                ctad_args))
+                ctad_args,
+                false,
+                init_args.get_sub().empty() && init.is_not_nil() &&
+                  init.id() == ID_initializer_list))
             {
               declaration_type = *deduced;
               ctad_done = true;

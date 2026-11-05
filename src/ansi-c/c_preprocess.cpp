@@ -240,11 +240,6 @@ std::vector<std::string> cprover_cxx_preprocessor_macro_flags()
 
   if(config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP17)
   {
-    // CBMC doesn't support deduction guides ([over.match.class.deduct]);
-    // undefine the feature macro so standard library headers don't use
-    // them (the parser would otherwise misclassify a deduction guide as
-    // a constructor).
-    flags.push_back("-U__cpp_deduction_guides");
     // Prevent PSTL (Parallel STL) execution policy headers from being
     // included; they cause infinite template recursion in CBMC.
     flags.push_back("-D_PSTL_GLUE_MEMORY_DEFS_H=1");

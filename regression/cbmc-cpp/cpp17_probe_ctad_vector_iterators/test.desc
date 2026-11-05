@@ -1,4 +1,4 @@
-KNOWNBUG libstdcxx
+CORE libstdcxx
 main.cpp
 --cpp17 --object-bits 12 --unwind 8 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ vector deduced from an iterator pair: SUCCESS$
@@ -11,8 +11,12 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-g++ and clang++ (GCC 16 for C++23 and C++26) accept this program, and it fails
-only its WRONG assertion.  `std::vector v(a.begin(), a.end())' uses vector's
-deduction guide from an iterator pair ([vector.overview]: vector(InputIter,
-InputIter, Allocator = Allocator()) -> vector<iter-value-type<InputIter>,
-Allocator>).  CBMC accepts the program but v.size() is not 3.
+`std::vector v(a.begin(), a.end())' uses vector's deduction guide from an
+iterator pair ([vector.overview]: vector(InputIter, InputIter, Allocator =
+Allocator()) -> vector<iter-value-type<InputIter>, Allocator>).  CBMC
+undefined __cpp_deduction_guides when preprocessing, so libstdc++'s guides
+were compiled out, deduced vector<iterator, iterator> by position, and
+v.size() was not 3.  Also needed: a guide parameter with a default
+argument ([over.match.viable]/2.3), and undeduced guide template
+parameters taking their defaults, with substitution failures removing the
+guide ([temp.deduct.general]/5, /8).

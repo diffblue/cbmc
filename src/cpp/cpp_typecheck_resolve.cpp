@@ -7733,6 +7733,16 @@ resolved_after_strip:
         continue;
       }
       const cpp_declarationt &cpp_declaration = to_cpp_declaration(s.type);
+      // N5008 [temp.deduct.guide]/1: deduction guides are not found by name
+      // lookup -- a template-id `W<int>' with a guide for W names the class
+      // template, also where a function would do (sizeof(W<int>))
+      if(
+        !cpp_declaration.declarators().empty() &&
+        cpp_declaration.declarators().front().get_bool("#is_deduction_guide"))
+      {
+        it = id_set.erase(it);
+        continue;
+      }
       if(cpp_declaration.is_template_alias())
         have_aliases = true;
       else if(cpp_declaration.is_class_template())

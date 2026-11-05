@@ -1,4 +1,4 @@
-KNOWNBUG libstdcxx
+CORE libstdcxx
 main.cpp
 --cpp17 --object-bits 12 --unwind 8 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ vector<int> deduced from a braced list: SUCCESS$
@@ -11,11 +11,10 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-g++ and clang++ (GCC 16 for C++23 and C++26) accept this program, and it fails
-only its WRONG assertion.  `std::vector v{1, 2, 3}' deduces std::vector<int,
-int> and main fails to type-check (CONVERSION ERROR): the guide from the
-initializer_list constructor, vector(initializer_list<T>, const Allocator & =
-Allocator()), should be chosen ([over.match.list]/1 considers initializer-list
-constructors first), deducing T = int and the default Allocator.  The class
-template argument deduction of user-defined classes, std::pair and an
-initializer_list constructor of a user class works.
+[over.match.class.deduct]/2, [over.match.list]/1: for a braced list, the
+guide from vector's initializer-list constructor, vector(initializer_list<
+value_type>, const allocator_type & = allocator_type()), is tried first,
+with value_type the class's typedef of T: `std::vector v{1, 2, 3}' is
+vector<int>.  CBMC deduced vector<int, int> (CONVERSION ERROR): it tried
+the guides with the elements as the arguments only, and libstdc++'s guides
+were compiled out, as CBMC undefined __cpp_deduction_guides.

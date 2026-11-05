@@ -7178,7 +7178,13 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
     // default template arguments supply the rest ([temp.deduct.general]/5)
     // -- `less<void>' in the MSVC STL's <charconv>
     {
-      if(auto deduced = deduce_class_template_arguments(ctad_name, ctad_args))
+      if(
+        auto deduced = deduce_class_template_arguments(
+          ctad_name,
+          ctad_args,
+          false,
+          expr.operands().size() == 1 &&
+            expr.operands().front().id() == ID_initializer_list))
       {
         expr.type() = *deduced;
         expr.set("#ctad_deduced", true);

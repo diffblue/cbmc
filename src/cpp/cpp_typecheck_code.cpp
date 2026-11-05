@@ -3863,7 +3863,9 @@ void cpp_typecheckt::typecheck_decl(codet &code)
           auto deduced = deduce_class_template_arguments(
             to_cpp_name(static_cast<const irept &>(type)),
             ctad_args,
-            copy_initialization))
+            copy_initialization,
+            init_args.get_sub().empty() && value.is_not_nil() &&
+              value.id() == ID_initializer_list))
         {
           type = *deduced;
           ctad_done = true;

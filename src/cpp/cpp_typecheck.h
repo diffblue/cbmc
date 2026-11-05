@@ -1480,7 +1480,8 @@ protected:
   std::optional<typet> deduce_class_template_arguments(
     const cpp_namet &class_template_name,
     const std::vector<exprt> &args,
-    bool copy_initialization = false);
+    bool copy_initialization = false,
+    bool braced_list = false);
   /// Class template argument deduction for an alias template among
   /// \p id_set (N5008 [over.match.class.deduct]/3-4): see the definition.
   std::optional<typet> deduce_alias_template_arguments(
