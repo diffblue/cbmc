@@ -30,9 +30,9 @@ int yyansi_cparse(ansi_c_parsert &_ansi_c_parser)
 
 int yyansi_cerror(const std::string &error);
 
-#include "parser_static.inc"
-
 #include "literals/convert_integer_literal.h"
+
+#include "parser_static.inc"
 
 #include "ansi_c_y.tab.h"
 

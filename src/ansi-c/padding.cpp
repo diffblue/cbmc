@@ -28,14 +28,19 @@ static mp_integer member_layout_alignment(
   const namespacet &ns);
 
 /// \return the maximum alignment set by a `#pragma pack(n)` in effect for
-///   \p component, or 0 when there is none
-static mp_integer pragma_pack(const struct_union_typet::componentt &component)
+///   \p src (a component, or, with Visual Studio, an aggregate), or 0 when
+///   there is none
+static mp_integer pragma_pack(const irept &src)
 {
-  const exprt &value =
-    static_cast<const exprt &>(component.find(ID_C_pragma_pack));
+  const exprt &value = static_cast<const exprt &>(src.find(ID_C_pragma_pack));
   if(value.is_nil())
     return 0;
   return numeric_cast<mp_integer>(value).value_or(0);
+}
+
+static bool is_visual_studio()
+{
+  return config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO;
 }
 
 /// \return the value of the alignment attribute \p id (ID_C_alignment or
@@ -92,6 +97,14 @@ static mp_integer type_alignment(const typet &type, const namespacet &ns)
     {
       if(c.get_is_padding())
         continue;
+      // With Visual Studio, bit-fields do not affect the alignment of a union
+      // (but its size, see add_padding).
+      if(
+        type.id() == ID_union && c.type().id() == ID_c_bit_field &&
+        is_visual_studio())
+      {
+        continue;
+      }
       result = std::max(result, member_layout_alignment(c, packed, ns));
     }
     return std::max(result, a_int);
@@ -123,6 +136,37 @@ static mp_integer type_alignment(const typet &type, const namespacet &ns)
   }
   else
     return 1;
+}
+
+/// Visual Studio does not let `#pragma pack(n)` reduce an alignment that
+/// `__declspec(align(m))` requires.
+/// \return the largest alignment that `__declspec(align(m))` requires for
+///   \p type or any of its members, or 0 when there is none
+static mp_integer
+msvc_declspec_alignment(const typet &type, const namespacet &ns)
+{
+  mp_integer result = alignment_attribute(type, ID_C_alignment);
+
+  if(type.id() == ID_array)
+  {
+    return std::max(
+      result, msvc_declspec_alignment(to_array_type(type).element_type(), ns));
+  }
+  else if(type.id() == ID_struct_tag || type.id() == ID_union_tag)
+  {
+    // the tag type may carry an alignment of its own (from a typedef)
+    return std::max(
+      result,
+      msvc_declspec_alignment(
+        ns.follow_tag(to_struct_or_union_tag_type(type)), ns));
+  }
+
+  if(type.id() == ID_struct || type.id() == ID_union)
+  {
+    for(const auto &c : to_struct_union_type(type).components())
+      result = std::max(result, msvc_declspec_alignment(c.type(), ns));
+  }
+  return result;
 }
 
 mp_integer alignment(const typet &type, const namespacet &ns)
@@ -185,9 +229,7 @@ static mp_integer member_layout_alignment(
   bool container_is_packed,
   const namespacet &ns)
 {
-  if(
-    component.type().id() == ID_c_bit_field &&
-    config.ansi_c.mode != configt::ansi_ct::flavourt::VISUAL_STUDIO)
+  if(component.type().id() == ID_c_bit_field && !is_visual_studio())
   {
     const c_bit_field_typet &bit_field_type =
       to_c_bit_field_type(component.type());
@@ -224,7 +266,15 @@ static mp_integer member_layout_alignment(
   // requested by an attribute on the member.
   const mp_integer max_alignment = pragma_pack(component);
   if(max_alignment > 0)
+  {
+    if(is_visual_studio())
+    {
+      return std::max(
+        std::min(max_alignment, a),
+        msvc_declspec_alignment(component.type(), ns));
+    }
     return std::min(max_alignment, a);
+  }
 
   return a;
 }
@@ -295,9 +345,23 @@ static struct_typet::componentst::iterator pad(
   return std::next(components.insert(where, component));
 }
 
+/// Visual Studio pads the size of an aggregate up to its alignment, but caps
+/// this at the `#pragma pack(n)` in effect at the end of its definition,
+/// unless `__declspec(align(m))` requires a larger alignment.
+static mp_integer
+msvc_trailing_padding_alignment(const typet &type, const namespacet &ns)
+{
+  const mp_integer a = alignment(type, ns);
+  const mp_integer max_alignment = pragma_pack(type);
+  if(max_alignment == 0)
+    return a;
+  return std::max(
+    std::min(a, max_alignment), msvc_declspec_alignment(type, ns));
+}
+
 static void add_padding_msvc(struct_typet &type, const namespacet &ns)
 {
-  struct_typet::componentst &components=type.components();
+  struct_typet::componentst &components = type.components();
 
   std::size_t bit_field_bits = 0, underlying_bits = 0;
   mp_integer offset = 0;
@@ -345,11 +409,7 @@ static void add_padding_msvc(struct_typet &type, const namespacet &ns)
       // pad up to underlying type unless the struct is packed
       if(!is_packed)
       {
-        mp_integer a = alignment(it->type(), ns);
-        // #pragma pack(n) caps the alignment of each member at n
-        const mp_integer max_alignment_pragma = pragma_pack(*it);
-        if(max_alignment_pragma > 0)
-          a = std::min(a, max_alignment_pragma);
+        const mp_integer a = member_layout_alignment(*it, false, ns);
         if(a > 1)
         {
           const mp_integer displacement = offset % a;
@@ -402,7 +462,7 @@ static void add_padding_msvc(struct_typet &type, const namespacet &ns)
 
   // alignment of the struct
   // Note that this is done even if the struct is packed.
-  const mp_integer a = alignment(type, ns);
+  const mp_integer a = msvc_trailing_padding_alignment(type, ns);
   const mp_integer displacement = offset % a;
 
   if(displacement != 0)
@@ -653,7 +713,9 @@ void add_padding(union_typet &type, const namespacet &ns)
   // the alignment even when the union is packed), so the size is padded up to
   // that alignment, matching GCC and Clang.
   mp_integer max_alignment_bits =
-    alignment(type, ns) * config.ansi_c.char_width;
+    (is_visual_studio() ? msvc_trailing_padding_alignment(type, ns)
+                        : alignment(type, ns)) *
+    config.ansi_c.char_width;
   mp_integer size_bits = 0;
 
   // check per component, and ignore those without fixed size

@@ -563,6 +563,9 @@ Function: apply_pragma_pack
           at the start of the definition (recorded in \p aggregate by
           record_pragma_pack), and Visual Studio uses the value in effect at
           each member (recorded in each declaration by record_pragma_pack).
+          Visual Studio additionally uses the value in effect at the end of
+          the definition to determine the trailing padding, which we record
+          in \p aggregate (even when it is the default).
 
 \*******************************************************************/
 
@@ -580,7 +583,13 @@ static void apply_pragma_pack(irept &aggregate, exprt &member_declarations)
   aggregate.remove(ID_C_pragma_pack);
 
   if(PARSER.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
+  {
+    // also record the default (0) to mark the use of Visual Studio's rules
+    aggregate.add(ID_C_pragma_pack) = PARSER.pragma_pack.empty()
+                                        ? convert_integer_literal("0")
+                                        : PARSER.pragma_pack.back();
     return;
+  }
 
   for(auto &declaration : member_declarations.operands())
   {
