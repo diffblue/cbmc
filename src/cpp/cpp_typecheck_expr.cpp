@@ -11333,6 +11333,9 @@ void cpp_typecheckt::instantiate_generic_lambda(
     {
       exprt init_copy = init;
       typecheck_expr(init_copy);
+      // [dcl.type.auto.deduct]/3: an init-capture's type, deduced as for
+      // `auto', is not a reference (`q = static_cast<M &&>(m)')
+      add_implicit_dereference(init_copy);
       capture_values[cap_name] = init_copy;
     }
     else
@@ -13240,6 +13243,9 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
     {
       exprt init_copy = init;
       typecheck_expr(init_copy);
+      // [dcl.type.auto.deduct]/3: an init-capture's type, deduced as for
+      // `auto', is not a reference (`q = static_cast<M &&>(m)')
+      add_implicit_dereference(init_copy);
       capture_values[cap_name] = init_copy;
     }
     else
@@ -14308,10 +14314,31 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
       struct_exprt closure_value = closure_value_opt.has_value()
                                      ? *closure_value_opt
                                      : struct_exprt({}, closure_tag_type);
+      // N5008 [expr.prim.lambda.capture]/15: the members of class type are
+      // direct-initialized from the captured entities (an init-capture
+      // `q = std::move(p)' as its initializer indicates), by their
+      // constructors: a copy, or a move of an xvalue.  They are constructed
+      // in the initializer below, after the other members are set.
+      std::vector<std::pair<const struct_typet::componentt *, exprt>>
+        constructed_members;
       for(const auto &name : capture_members)
       {
         const exprt &entity = capture_values.at(name);
         exprt value = entity;
+        if(
+          !by_ref_captures.count(name) && closure_value_opt.has_value() &&
+          entity.type().id() == ID_struct_tag)
+        {
+          for(const auto &c : closure_struct_type.components())
+          {
+            if(c.get_base_name() == name && !c.get_is_padding())
+            {
+              constructed_members.emplace_back(&c, entity);
+              break;
+            }
+          }
+          continue;
+        }
         if(by_ref_captures.count(name))
         {
           // [expr.prim.lambda.capture]: bind the reference member to the
@@ -14336,7 +14363,41 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
         }
       }
       side_effect_exprt tmp(ID_temporary_object, closure_tag_type, loc);
-      tmp.add_to_operands(std::move(closure_value));
+      if(constructed_members.empty())
+        tmp.add_to_operands(std::move(closure_value));
+      else
+      {
+        exprt object{ID_new_object, closure_tag_type};
+        object.set(ID_C_lvalue, true);
+        code_blockt initialization;
+        code_frontend_assignt assign_others{object, closure_value};
+        assign_others.add_source_location() = loc;
+        initialization.add(std::move(assign_others));
+        for(const auto &member : constructed_members)
+        {
+          member_exprt member_object{
+            object, member.first->get_name(), member.first->type()};
+          member_object.set(ID_C_lvalue, true);
+          member_object.add_source_location() = loc;
+          already_typechecked_exprt::make_already_typechecked(member_object);
+          auto code = cpp_constructor(
+            loc, member_object, {already_typechecked_exprt{member.second}});
+          if(code.has_value())
+            initialization.add(std::move(*code));
+          else
+          {
+            // a trivially copyable member: copy its value
+            code_frontend_assignt copy{
+              member_exprt{
+                object, member.first->get_name(), member.first->type()},
+              member.second};
+            copy.add_source_location() = loc;
+            initialization.add(std::move(copy));
+          }
+        }
+        initialization.add_source_location() = loc;
+        tmp.add(ID_initializer) = std::move(initialization);
+      }
       tmp.set(ID_C_lvalue, true);
       tmp.set(ID_mode, ID_cpp);
       expr.swap(tmp);
