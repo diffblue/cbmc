@@ -7,7 +7,7 @@ set -e
 echo "Pull request's base branch is: ${BASE_BRANCH}"
 echo "Pull request's merge branch is: ${MERGE_BRANCH}"
 echo "Pull request's source branch is: ${GITHUB_HEAD_REF}"
-clang-format-15 --version
+clang-format-18 --version
 
 # The checkout action leaves us in detatched head state. The following line
 # names the checked out commit, for simpler reference later.
@@ -26,7 +26,7 @@ echo "Checking for formatting errors introduced since $MERGE_BASE"
 
 # Do the checking. "eval" is used so that quotes (as inserted into $EXCLUDES
 # above) are not interpreted as parts of file names.
-eval git-clang-format-15 --binary clang-format-15 $MERGE_BASE -- $EXCLUDES || true
+eval git-clang-format-18 --binary clang-format-18 $MERGE_BASE -- $EXCLUDES || true
 git diff > formatted.diff
 if [[ -s formatted.diff ]] ; then
   echo 'Formatting error! The following diff shows the required changes'

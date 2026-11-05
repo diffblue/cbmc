@@ -340,14 +340,26 @@ Now, you can commit and push the formatting fixes.
 To avoid waiting until you've made a PR to find formatting issues, you can
 install clang-format locally and run it against your code as you are working.
 
-Different versions of clang-format have slightly different behaviors.  CBMC
-uses clang-format-15, or later, available in the standard Ubuntu 24.04 and
-Homebrew repositories.  To install on a Unix-like system, try installing
-using the system package manager:
+Different versions of clang-format have slightly different behaviors.  CBMC's
+continuous integration uses clang-format 18.1.8, and only checks the lines that
+a pull request changes.  To install this version:
 ```
-apt-get install clang-format     # Run this on Ubuntu, Debian etc.
-brew install clang-format        # Run this on a Mac with Homebrew installed
+apt-get install clang-format-18                 # Ubuntu 26.04
+brew install llvm@18                            # macOS with Homebrew
+pipx install --suffix=-18 clang-format==18.1.8  # Any platform with Python
 ```
+The `apt-get` and `pipx` commands install the commands `clang-format-18` and
+`git-clang-format-18`, which the commands below use. Homebrew's `llvm@18` is
+keg-only and installs unversioned `clang-format` and `git-clang-format` in
+`$(brew --prefix llvm@18)/bin`; to use the commands below, create links with the
+versioned names in a directory on your `PATH`, e.g.:
+```
+ln -s "$(brew --prefix llvm@18)/bin/clang-format" /usr/local/bin/clang-format-18
+ln -s "$(brew --prefix llvm@18)/bin/git-clang-format" \
+  /usr/local/bin/git-clang-format-18
+```
+The `clang-format-18` package of Ubuntu 24.04 is version 18.1.3, which formats
+some code differently; use `pipx` there instead.
 
 If your platform doesn't have a package for clang-format, you can download a
 pre-built binary, or compile clang-format yourself using the appropriate files
@@ -358,22 +370,23 @@ the [LLVM Snapshot Builds page](http://llvm.org/builds/).
 
 ### FORMATTING A RANGE OF COMMITS
 
-Clang-format is distributed with a driver script called git-clang-format.
-This script can be used to format git diffs (rather than entire files).
+Clang-format is distributed with a driver script called git-clang-format
+(`git-clang-format-18` when installed as described above). This script can be
+used to format git diffs (rather than entire files).
 
 After committing some code, it is recommended to run:
 ```
-git-clang-format upstream/develop
+git-clang-format-18 --binary clang-format-18 upstream/develop
 ```
 *Important:* If your branch is based on a branch other than `upstream/develop`,
 use the name or checksum of that branch instead. It is strongly recommended to
 rebase your work onto the tip of the branch it's based on before running
-`git-clang-format` in this way.
+`git-clang-format-18` in this way.
 
-Note: By default, git-clang-format uses the git config variable
-`clangformat.binary`. If you have multiple versions of clang-format installed,
-you might need to update this, or explicitly specify the binary to use via
-`--binary clang-format-11`.
+Note: Without the `--binary` option, git-clang-format uses the binary that the
+git config variable `clangformat.binary` names, or else `clang-format`, which
+may be a different version. Alternatively to passing `--binary` each time, you
+can run `git config clangformat.binary clang-format-18`.
 
 ### RETROACTIVELY FORMATTING INDIVIDUAL COMMITS
 
@@ -385,10 +398,11 @@ The following command will stop at each commit in the range and run
 clang-format on the diff at that point.  This rewrites git history, so it's
 *unsafe*, and you should back up your branch before running this command:
 ```
-git filter-branch --tree-filter 'git-clang-format upstream/develop' \
+git filter-branch --tree-filter \
+  'git-clang-format-18 --binary clang-format-18 upstream/develop' \
   -- upstream/develop..HEAD
 ```
 *Important*: `upstream/develop` should be changed in *both* places in the
 command above if your work is based on a different branch. It is strongly
 recommended to rebase your work onto the tip of the branch it's based on before
-running `git-clang-format` in this way.
+running `git-clang-format-18` in this way.
