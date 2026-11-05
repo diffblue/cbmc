@@ -172,6 +172,42 @@ TEST_CASE("arbitrary precision integers", "[core][big-int][bigint]")
     REQUIRE(qr.quotient * divisor2 + qr.remainder == dividend);
   }
 
+  // BigInt::div used to determine the sign of the quotient of operands of
+  // equal magnitude from the divisor only, and BigInt::div and operator/=
+  // returned 1 for 0 / 0.
+  SECTION("combined division/remainder with operands of equal magnitude")
+  {
+    const BigInt five{5};
+    const BigInt large = pow(BigInt{2}, 100);
+    for(const BigInt &magnitude : {five, large})
+    {
+      for(int sign_x : {1, -1})
+      {
+        for(int sign_y : {1, -1})
+        {
+          const BigInt x = magnitude * sign_x;
+          const BigInt y = magnitude * sign_y;
+          const BigInt::divisiont qr = BigInt::div(x, y);
+          REQUIRE(qr.quotient == BigInt{sign_x * sign_y});
+          REQUIRE(qr.remainder.is_zero());
+        }
+      }
+    }
+
+    // Division by zero is an error, and leaves both results zero.
+    const BigInt::divisiont qr = BigInt::div(BigInt{0}, BigInt{0});
+    REQUIRE(qr.quotient.is_zero());
+    REQUIRE(qr.remainder.is_zero());
+
+    // operator/= and operator%= leave the dividend unchanged.
+    BigInt q{0};
+    q /= BigInt{0};
+    REQUIRE(q.is_zero());
+    BigInt r{0};
+    r %= BigInt{0};
+    REQUIRE(r.is_zero());
+  }
+
   // =====================================================================
   // Test cases from the clisp test suite in number.tst.
   // =====================================================================

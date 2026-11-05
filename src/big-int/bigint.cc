@@ -1059,6 +1059,12 @@ BigInt::divisiont BigInt::div(BigInt const &x, BigInt const &y)
   BigInt &q = result.quotient;
   BigInt &r = result.remainder;
 
+  if(y.length == 0)
+  {
+    error("Division by zero.");
+    return result;
+  }
+
   // Eliminate some trivial cases.
   int cmp = x.ucompare (y);
   if (cmp < 0)
@@ -1071,19 +1077,13 @@ BigInt::divisiont BigInt::div(BigInt const &x, BigInt const &y)
     }
   if (cmp == 0)
     {
-      // Both operands are equal: Quotient = 1, remainder = 0.
+      // Both operands have the same magnitude: Quotient = +/-1,
+      // remainder = 0.
       r.length = 0;
       r.positive = true;
       q.length = 1;
       q.digit[0] = 1;
-      if (!y.positive)
-	q.negate();
-      return result;
-    }
-  if (y.length == 0)
-    {
-    zero:
-      error ("Division by zero.");
+      q.positive = x.positive == y.positive;
       return result;
     }
   if (x.is_ulong())
@@ -1091,8 +1091,6 @@ BigInt::divisiont BigInt::div(BigInt const &x, BigInt const &y)
       // Can do it directly.
       ullong_t n = x.to_ulong();
       ullong_t m = y.to_ulong();
-      if (m == 0)
-	goto zero;
       q.assign (n / m);
       r.assign (n % m);
     }
@@ -1161,6 +1159,12 @@ BigInt::operator/= (BigInt const &y)
       abort();
   }
 
+  if(y.length == 0)
+  {
+      error("Division by zero.");
+      return *this;
+  }
+
   // Eliminate some trivial cases.
   int cmp = ucompare (y);
   if (cmp < 0)
@@ -1177,19 +1181,11 @@ BigInt::operator/= (BigInt const &y)
       digit[0] = 1;
       goto set_sign;
     }
-  if (y.length == 0)
-    {
-    zero:
-      error ("Division by zero.");
-      return *this;
-    }
   if (is_ulong())
     {
       // Can do it directly.
       ullong_t n = to_ulong();
       ullong_t m = y.to_ulong();
-      if (m == 0)
-	goto zero;
       digit_set (n / m, digit, length);
     }
   else if (y.length == 1)
@@ -1236,6 +1232,12 @@ BigInt::operator%= (BigInt const &y)
     abort();
   }
 
+  if(y.length == 0)
+  {
+    error("Division by zero.");
+    return *this;
+  }
+
   // Eliminate some trivial cases.
   int cmp = ucompare (y);
   if (cmp < 0)
@@ -1250,19 +1252,11 @@ BigInt::operator%= (BigInt const &y)
       positive = true;
       return *this;
     }
-  if (y.length == 0)
-    {
-    zero:
-      error ("Division by zero.");
-      return *this;
-    }
   if (is_ulong())
     {
       // Can do it directly.
       ullong_t n = to_ulong();
       ullong_t m = y.to_ulong();
-      if (m == 0)
-	goto zero;
       digit_set (n % m, digit, length);
     }
   else if (y.length == 1)
