@@ -7,6 +7,7 @@ var classconfigt =
     [ "bv_encodingt", "structconfigt_1_1bv__encodingt.html", "structconfigt_1_1bv__encodingt" ],
     [ "max_malloc_size", "classconfigt.html#aabd629509cf78655135bd5c47866e647", null ],
     [ "object_bits_info", "classconfigt.html#a67eb5a80f10aec480ac30f2dfb81a34d", null ],
+    [ "rounding_mode_identifier", "classconfigt.html#aa56d707a1ca5d9a2554193ea27074dbf", null ],
     [ "set", "classconfigt.html#a40a799302a1c539d1e2cc232dbf7ac27", null ],
     [ "set_arch", "classconfigt.html#a2e57e31f2c6225eb4baef887b9248def", null ],
     [ "set_classpath", "classconfigt.html#a8752312ff730905ac4da575e88c868a7", null ],

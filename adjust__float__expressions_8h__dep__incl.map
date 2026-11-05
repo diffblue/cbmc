@@ -1,33 +1,17 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/adjust_float_expressions.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/adjust_float_expressions.h">
-<area shape="rect" id="Node000001" title="Symbolic Execution." alt="" coords="1640,5,1839,67"/>
-<area shape="rect" id="Node000002" href="$java__bytecode__internal__additions_8cpp.html" title=" " alt="" coords="5,124,277,185"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1623,41,943,69,565,91,408,103,289,118,249,125,247,120,289,112,408,98,564,85,943,64,1628,40"/>
-<area shape="rect" id="Node000003" href="$java__entry__point_8cpp.html" title=" " alt="" coords="301,124,520,185"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1622,42,1059,70,754,91,628,104,532,118,498,125,497,120,531,112,627,98,753,86,1059,65,1628,41"/>
-<area shape="rect" id="Node000004" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="544,124,735,185"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="1622,37,1453,43,1234,54,991,78,868,95,748,118,718,126,717,120,747,112,867,90,990,72,1233,49,1453,38,1627,37"/>
-<area shape="rect" id="Node000005" href="$jdiff__parse__options_8cpp.html" title="JDIFF Command Line Option Processing." alt="" coords="760,124,943,185"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="1622,40,1489,49,1321,62,1138,84,956,118,928,126,927,120,955,112,1137,79,1320,57,1488,44,1628,40"/>
-<area shape="rect" id="Node000006" href="$constant__propagator_8cpp.html" title="Constant Propagation." alt="" coords="968,124,1173,185"/>
-<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="1627,47,1419,75,1302,94,1186,118,1156,125,1155,120,1184,112,1301,89,1418,70,1622,48"/>
-<area shape="rect" id="Node000007" href="$abstract__value__object_8cpp.html" title=" " alt="" coords="1197,115,1400,194"/>
-<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1628,62,1412,118,1401,121,1400,116,1411,112,1622,62"/>
-<area shape="rect" id="Node000008" href="$ansi__c__internal__additions_8cpp.html" title=" " alt="" coords="1424,124,1610,185"/>
-<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1671,74,1576,125,1574,120,1666,75"/>
-<area shape="rect" id="Node000009" href="$c__typecheck__expr_8cpp.html" title="ANSI&#45;C Language Type Checking." alt="" coords="1634,124,1845,185"/>
-<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1742,81,1742,125,1738,121,1738,84"/>
-<area shape="rect" id="Node000010" href="$cpp__internal__additions_8cpp.html" title=" " alt="" coords="1869,124,2064,185"/>
-<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="1813,72,1910,123,1905,122,1811,77"/>
-<area shape="rect" id="Node000011" href="$cprover__parse__options_8cpp.html" title="cprover Command Line Options Processing" alt="" coords="2088,124,2277,185"/>
-<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="1854,58,1963,82,2076,112,2104,123,2098,123,2075,118,1961,88,1854,63"/>
-<area shape="rect" id="Node000012" href="$full__slicer_8cpp.html" title="Slicing." alt="" coords="2301,124,2493,185"/>
-<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="1854,44,2058,69,2175,88,2290,112,2320,123,2315,123,2288,118,2174,93,2058,74,1854,50"/>
-<area shape="rect" id="Node000013" href="$adjust__float__expressions_8cpp.html" title="Symbolic Execution." alt="" coords="2517,124,2730,185"/>
-<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="1854,39,1988,47,2151,61,2329,82,2506,112,2539,123,2534,123,2504,118,2328,87,2150,66,1987,52,1854,44"/>
-<area shape="rect" id="Node000014" href="$process__goto__program_8cpp.html" title="Get a Goto Program." alt="" coords="2754,124,2954,185"/>
-<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="1854,34,2028,38,2250,50,2496,73,2621,90,2743,112,2776,123,2771,123,2742,118,2620,96,2496,78,2250,55,2027,43,1854,40"/>
-<area shape="rect" id="Node000015" href="$remove__internal__symbols_8cpp.html" title="Remove symbols that are internal only." alt="" coords="2979,124,3164,185"/>
-<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="1855,38,2110,47,2430,62,2741,83,2869,97,2967,112,2999,123,2994,123,2966,118,2869,102,2741,89,2430,67,2110,52,1855,43"/>
-<area shape="rect" id="Node000016" href="$statement__list__entry__point_8cpp.html" title="Statement List Language Entry Point." alt="" coords="3189,124,3416,185"/>
-<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="1854,37,2150,46,2531,61,2905,83,3060,97,3177,112,3215,123,3210,123,3177,118,3059,102,2905,88,2531,66,2150,51,1855,43"/>
+<area shape="rect" id="Node000001" title="Symbolic Execution." alt="" coords="662,5,860,67"/>
+<area shape="rect" id="Node000002" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="5,124,197,185"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="644,48,442,74,325,93,210,118,182,126,180,120,208,112,324,88,441,69,649,46"/>
+<area shape="rect" id="Node000003" href="$jdiff__parse__options_8cpp.html" title="JDIFF Command Line Option Processing." alt="" coords="221,124,405,185"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="649,59,536,87,418,118,393,125,391,120,416,112,534,81,644,60"/>
+<area shape="rect" id="Node000004" href="$abstract__value__object_8cpp.html" title=" " alt="" coords="429,115,632,194"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="690,74,608,117,607,112,685,75"/>
+<area shape="rect" id="Node000005" href="$c__typecheck__expr_8cpp.html" title="ANSI&#45;C Language Type Checking." alt="" coords="655,124,867,185"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="763,81,763,125,759,121,759,84"/>
+<area shape="rect" id="Node000006" href="$cprover__parse__options_8cpp.html" title="cprover Command Line Options Processing" alt="" coords="890,124,1080,185"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="833,72,929,123,924,123,832,77"/>
+<area shape="rect" id="Node000007" href="$adjust__float__expressions_8cpp.html" title="Symbolic Execution." alt="" coords="1104,124,1317,185"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="876,59,1092,112,1122,123,1117,123,1091,118,875,65"/>
+<area shape="rect" id="Node000008" href="$process__goto__program_8cpp.html" title="Get a Goto Program." alt="" coords="1341,124,1541,185"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="876,44,1088,69,1210,88,1330,112,1361,123,1356,123,1328,118,1209,93,1087,74,876,49"/>
 </map>

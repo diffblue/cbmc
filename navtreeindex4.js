@@ -1,7 +1,5 @@
 var NAVTREEINDEX4 =
 {
-"bv__pointers_8cpp_source.html":[6,0,2,27,1,61],
-"bv__pointers_8h.html":[6,0,2,27,1,62],
 "bv__pointers_8h_source.html":[6,0,2,27,1,62],
 "bv__pointers__wide_8cpp.html":[6,0,2,6,4],
 "bv__pointers__wide_8cpp.html#a410158ad7a2822d61069379e4e218be0":[6,0,2,6,4,0],
@@ -249,5 +247,7 @@ var NAVTREEINDEX4 =
 "bytecode__info_8h.html#aee59b4b6418f68471206f8c6d223676f":[6,0,1,0,1,3,16],
 "bytecode__info_8h.html#af05357c98b7bd1b17e689e2bf7b57a8f":[6,0,1,0,1,3,137],
 "bytecode__info_8h.html#af45404c371b7a1be33d10040b17e397f":[6,0,1,0,1,3,117],
-"bytecode__info_8h.html#af5560016dd18c86ea7471969f1054b4d":[6,0,1,0,1,3,42]
+"bytecode__info_8h.html#af5560016dd18c86ea7471969f1054b4d":[6,0,1,0,1,3,42],
+"bytecode__info_8h.html#af88405d92e668a06b8506b2d7ff7d827":[6,0,1,0,1,3,39],
+"bytecode__info_8h.html#af89b2fe1c41ffdda8ded6eda37971058":[6,0,1,0,1,3,59]
 };

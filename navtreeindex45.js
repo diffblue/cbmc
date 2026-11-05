@@ -1,6 +1,5 @@
 var NAVTREEINDEX45 =
 {
-"classjava__generic__struct__tag__typet.html#a6a2d216fce3fe3972b614a5e8692d4a9":[5,0,719,5],
 "classjava__generic__struct__tag__typet.html#aa81e7378832224cfb92714efeedfcb1e":[5,0,719,2],
 "classjava__generic__struct__tag__typet.html#ac4457bb048d2b9433caaf5352f445645":[5,0,719,3],
 "classjava__generic__typet.html":[5,0,720],
@@ -249,5 +248,6 @@ var NAVTREEINDEX45 =
 "classjson__irept.html#afb9f884f78402667e2637198483f7a7f":[5,0,742,3],
 "classjson__nullt.html":[5,0,743],
 "classjson__nullt.html#aaedffe58a955c7db6f6e210b4c5b6494":[5,0,743,0],
-"classjson__numbert.html":[5,0,744]
+"classjson__numbert.html":[5,0,744],
+"classjson__numbert.html#a2b31c9181b16c2a77173d96563c848e0":[5,0,744,0]
 };

@@ -1,7 +1,5 @@
 var NAVTREEINDEX1 =
 {
-"ansi__c__declaration_8cpp_source.html":[6,0,2,1,10],
-"ansi__c__declaration_8h.html":[6,0,2,1,11],
 "ansi__c__declaration_8h.html#a18cc5b674e34f0e7579d9c21c2611f98":[6,0,2,1,11,2],
 "ansi__c__declaration_8h.html#a2bedf97444f4ca5b367dced25a84d279":[6,0,2,1,11,5],
 "ansi__c__declaration_8h.html#a64e7a58cd2e306cdce59677390212998":[6,0,2,1,11,3],
@@ -249,5 +247,7 @@ var NAVTREEINDEX1 =
 "as86__cmdline_8cpp.html#ad188fd46919c040d9ceea98c22c97ddd":[6,0,2,10,4,2],
 "as86__cmdline_8cpp.html#af7ec8b2c2d53122f99d9f90007efb350":[6,0,2,10,4,0],
 "as86__cmdline_8cpp_source.html":[6,0,2,10,4],
-"as86__cmdline_8h.html":[6,0,2,10,5]
+"as86__cmdline_8h.html":[6,0,2,10,5],
+"as86__cmdline_8h_source.html":[6,0,2,10,5],
+"as__cmdline_8cpp.html":[6,0,2,10,6]
 };
