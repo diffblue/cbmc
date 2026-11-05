@@ -1,4 +1,4 @@
-KNOWNBUG libstdcxx16 gcc16
+CORE libstdcxx16 gcc16
 main.cpp
 --cpp26
 ^\[main\.assertion\.1\] line \d+ saturated: SUCCESS$
@@ -13,7 +13,6 @@ main.cpp
 --
 libstdc++ 16's saturating_add and saturating_cast (<numeric>, C++26).  With
 GCC 16 (-fsanitize=address,undefined) only the WRONG assertion fails.  CBMC
-fails to parse GCC 16's <utility> in C++26 mode (a pack expansion in a
-subscript in std::constant_wrapper::operator[],
-cpp23_probe_subscript_pack_expansion), which <numeric> includes.  Tagged
-libstdcxx16: runs only where the host gcc is 16 or later.
+failed to parse GCC 16's <utility> in C++26 mode (a pack expansion in a
+subscript, cpp23_subscript_pack_expansion_forms), which <numeric> includes.
+Tagged libstdcxx16: runs only where the host gcc is 16 or later.

@@ -752,8 +752,10 @@ bool c_preprocess_gcc_clang(
       break;
 
     case configt::cppt::cpp_standardt::CPP26:
-      // C++26 is not yet widely supported by preprocessors; use C++23
-      // for preprocessing and rely on CBMC's own parser for C++26 features.
+      // GCC 14 and later know C++26 (-std=gnu++2c: __cplusplus > 202302L,
+      // which libstdc++ requires for its C++26 headers such as
+      // <inplace_vector>); older preprocessors get C++23, and CBMC's own
+      // parser handles the C++26 features.
 #if defined(__OpenBSD__)
       if(preprocessor == configt::ansi_ct::preprocessort::CLANG)
         argv.push_back("-std=c++23");
@@ -766,7 +768,9 @@ bool c_preprocess_gcc_clang(
         {
           gcc_versiont gcc_ver;
           gcc_ver.get("gcc");
-          if(gcc_ver.is_at_least(11u))
+          if(gcc_ver.is_at_least(14u))
+            argv.push_back("-std=gnu++2c");
+          else if(gcc_ver.is_at_least(11u))
             argv.push_back("-std=gnu++2b");
           else
             argv.push_back("-std=gnu++2a");

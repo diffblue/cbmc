@@ -1,4 +1,4 @@
-KNOWNBUG libstdcxx16
+CORE libstdcxx16
 main.cpp
 --cpp26 --object-bits 12 --unwind 8 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ UTF-8: SUCCESS$
@@ -12,5 +12,7 @@ main.cpp
 ^CONVERSION ERROR$
 --
 std::text_encoding ([text.encoding]) from a name.  With GCC 16's headers
-CBMC fails to parse <utility> in C++26 mode, as cpp26_inplace_vector.
+CBMC failed to parse <utility> in C++26 mode, as cpp26_inplace_vector, and
+then the friend operator==(const text_encoding &, id) called itself for
+`mib() == __i' (cpp11_builtin_enum_comparison_beats_converting_friend).
 Checked with GCC 16.
