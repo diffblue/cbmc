@@ -38,6 +38,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_typecast.h"
 #include "c_typecheck_base.h"
 #include "expr2c.h"
+#include "gcc_conditional_expression.h"
 #include "padding.h"
 #include "type2name.h"
 
@@ -4824,6 +4825,14 @@ protected:
 void c_typecheck_baset::make_constant(exprt &expr)
 {
   source_locationt location = expr.find_source_location();
+
+  // GCC's `a ? : b` (omitted middle operand) is kept as a side-effect
+  // expression for goto-conversion (a is evaluated once).  In a constant
+  // context there are no side effects, so it is equivalent to
+  // `(a != 0) ? a : b`; lower it to an if-expression here so that the
+  // simplifier can fold it (e.g. the kernel's `__aligned((x + 0) ? :
+  // SMP_CACHE_BYTES)` cache-line alignment).
+  lower_gcc_conditional_expressions(expr);
 
   // Floating-point expressions may require a rounding mode.
   // ISO 9899:1999 F.7.2 says that the default is "round to nearest".

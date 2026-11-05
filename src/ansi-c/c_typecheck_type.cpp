@@ -24,6 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ansi_c_declaration.h"
 #include "c_qualifiers.h"
 #include "c_typecheck_base.h"
+#include "gcc_conditional_expression.h"
 #include "gcc_types.h"
 #include "padding.h"
 #include "type2name.h"
@@ -619,6 +620,11 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
     // We simplify it, for the benefit of array initialisation.
 
     exprt tmp_size=size;
+    // GCC's `a ? : b` is kept as a side effect for once-only evaluation; in
+    // this constant context there are no side effects, so lower it to an
+    // if-expression that the simplifier below can fold (e.g. a kernel array
+    // sized `(N + 0) ? : DEFAULT`).
+    lower_gcc_conditional_expressions(tmp_size);
     add_rounding_mode(tmp_size);
     simplify(tmp_size, *this);
 
@@ -1306,6 +1312,10 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
     {
       exprt tmp_v=v;
       typecheck_expr(tmp_v);
+      // GCC's `a ? : b` is kept as a side effect for once-only evaluation;
+      // in this constant context there are no side effects, so lower it to
+      // an if-expression that the simplifier below can fold.
+      lower_gcc_conditional_expressions(tmp_v);
       add_rounding_mode(tmp_v);
       simplify(tmp_v, *this);
       if(tmp_v == true)
