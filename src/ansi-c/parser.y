@@ -1652,8 +1652,8 @@ aggregate_name:
           parser_stack($1).add(ID_components).get_sub().swap(
             (irept::subt &)parser_stack($6).operands());
 
-          // throw in the gcc attributes
-          $$=merge($1, merge($2, $8));
+          // throw in the gcc attributes and Visual Studio declspecs
+          $$=merge($1, merge($2, merge($3, $8)));
         }
         | aggregate_key
           gcc_type_attribute_opt
@@ -1675,8 +1675,8 @@ aggregate_name:
           parser_stack($1).add(ID_components).get_sub().swap(
             (irept::subt &)parser_stack($7).operands());
 
-          // throw in the gcc attributes
-          $$=merge($1, merge($2, $9));
+          // throw in the gcc attributes and Visual Studio declspecs
+          $$=merge($1, merge($2, merge($3, $9)));
         }
         | aggregate_key
           gcc_type_attribute_opt
@@ -1693,7 +1693,8 @@ aggregate_name:
           // the tag of a declaration without body (and Clang warns about
           // them), while those following the tag apply to the declared entity
           strip_ignored_attributes(parser_stack($2), {ID_packed, ID_aligned});
-          $$=merge($1, merge($2, $6));
+          // Visual Studio declspecs
+          $$=merge($1, merge($2, merge($3, $6)));
         }
         ;
 
