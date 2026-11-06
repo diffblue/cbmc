@@ -1218,6 +1218,106 @@ code_blockt java_string_library_preprocesst::make_class_identifier_code(
   return code;
 }
 
+/// Provide code for `StringBuilder.appendCodePoint(I)Ljava/lang/StringBuilder;`
+/// and `StringBuffer.appendCodePoint(I)Ljava/lang/StringBuffer;`. The result is
+/// expressed in terms of the generic per-`char` `__CPROVER_string_concat_char`
+/// primitive: a Basic Multilingual Plane code point appends one UTF-16 code
+/// unit, and a supplementary-plane code point appends a high+low surrogate
+/// pair. Keeping the UTF-16 surrogate-pair encoding here, rather than in the
+/// generic string solver, means the solver does not have to know about Java's
+/// chosen string encoding.
+/// \param type: type of the function called
+/// \param loc: location in the source
+/// \param function_id: function the generated code will be added to
+/// \param symbol_table: the symbol table
+/// \param message_handler: a message handler
+/// \return Code corresponding to:
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// if(code_point < 0x010000)
+///   this = __CPROVER_string_concat_char(this, (char)code_point);
+/// else
+/// {
+///   this = __CPROVER_string_concat_char(
+///     this,
+///     (char)(0xD800 + (code_point - 0x010000) / 0x0400));
+///   this = __CPROVER_string_concat_char(
+///     this,
+///     (char)(0xDC00 + code_point % 0x0400));
+/// }
+/// return this;
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+code_blockt java_string_library_preprocesst::make_append_code_point_code(
+  const java_method_typet &type,
+  const source_locationt &loc,
+  const irep_idt &function_id,
+  symbol_table_baset &symbol_table,
+  message_handlert &message_handler)
+{
+  (void)message_handler;
+
+  const java_method_typet::parameterst &params = type.parameters();
+  PRECONDITION(params.size() == 2);
+  PRECONDITION(!params[0].get_identifier().empty());
+  PRECONDITION(!params[1].get_identifier().empty());
+  const symbol_exprt arg_this{params[0].get_identifier(), params[0].type()};
+  const symbol_exprt arg_code_point{
+    params[1].get_identifier(), params[1].type()};
+
+  code_blockt code;
+
+  // Constants for surrogate-pair arithmetic, in the same int type as the
+  // codePoint argument.
+  const typet &int_type = arg_code_point.type();
+  const exprt c_supp = from_integer(0x010000, int_type);
+  const exprt c_high_base = from_integer(0xD800, int_type);
+  const exprt c_low_base = from_integer(0xDC00, int_type);
+  const exprt c_block = from_integer(0x0400, int_type);
+
+  // Helper: append a single char, computed as `char_int`, to `arg_this`.
+  // Equivalent to a call to StringBuilder.append(C)/StringBuffer.append(C),
+  // which `java_string_library_preprocesst` already lowers via
+  // `ID_cprover_string_concat_char_func`.
+  auto append_char = [&](code_blockt &block, const exprt &char_int)
+  {
+    const exprt::operandst processed = process_operands(
+      exprt::operandst{arg_this}, loc, function_id, symbol_table, block);
+    const refined_string_exprt result = string_expr_of_function(
+      ID_cprover_string_concat_char_func,
+      {processed[0], typecast_exprt{char_int, java_char_type()}},
+      loc,
+      symbol_table,
+      block);
+    block.add(
+      code_assign_string_expr_to_java_string(
+        arg_this, result, symbol_table, false),
+      loc);
+  };
+
+  // BMP branch: append((char) code_point).
+  code_blockt bmp_block;
+  append_char(bmp_block, arg_code_point);
+
+  // Supplementary-plane branch: append the surrogate pair.
+  code_blockt supp_block;
+  const exprt adjusted = minus_exprt{arg_code_point, c_supp};
+  const exprt high_surrogate =
+    plus_exprt{c_high_base, div_exprt{adjusted, c_block}};
+  const exprt low_surrogate =
+    plus_exprt{c_low_base, mod_exprt{arg_code_point, c_block}};
+  append_char(supp_block, high_surrogate);
+  append_char(supp_block, low_surrogate);
+
+  code.add(
+    code_ifthenelset{
+      binary_relation_exprt{arg_code_point, ID_lt, c_supp},
+      std::move(bmp_block),
+      std::move(supp_block)},
+    loc);
+
+  code.add(code_returnt{arg_this}, loc);
+  return code;
+}
+
 /// Provide code for a function that calls a function from the solver and simply
 /// returns it.
 /// \param function_id: name of the function to be called
@@ -1782,10 +1882,17 @@ void java_string_library_preprocesst::initialize_conversion_table()
   cprover_equivalent_to_java_assign_and_return_function
     ["java::java.lang.StringBuilder.append:(Ljava/lang/StringBuffer;)"
      "Ljava/lang/StringBuilder;"] = ID_cprover_string_concat_func;
-  cprover_equivalent_to_java_assign_and_return_function
+  conversion_table
     ["java::java.lang.StringBuilder.appendCodePoint:(I)"
-     "Ljava/lang/StringBuilder;"]=
-      ID_cprover_string_concat_code_point_func;
+     "Ljava/lang/StringBuilder;"] =
+      std::bind(
+        &java_string_library_preprocesst::make_append_code_point_code,
+        this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3,
+        std::placeholders::_4,
+        std::placeholders::_5);
   cprover_equivalent_to_java_function
     ["java::java.lang.StringBuilder.charAt:(I)C"]=
       ID_cprover_string_char_at_func;
@@ -1846,10 +1953,17 @@ void java_string_library_preprocesst::initialize_conversion_table()
   cprover_equivalent_to_java_assign_and_return_function
     ["java::java.lang.StringBuffer.append:(Ljava/lang/StringBuffer;)"
      "Ljava/lang/StringBuffer;"] = ID_cprover_string_concat_func;
-  cprover_equivalent_to_java_assign_and_return_function
+  conversion_table
     ["java::java.lang.StringBuffer.appendCodePoint:(I)"
-     "Ljava/lang/StringBuffer;"]=
-      ID_cprover_string_concat_code_point_func;
+     "Ljava/lang/StringBuffer;"] =
+      std::bind(
+        &java_string_library_preprocesst::make_append_code_point_code,
+        this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3,
+        std::placeholders::_4,
+        std::placeholders::_5);
   cprover_equivalent_to_java_function
     ["java::java.lang.StringBuffer.codePointAt:(I)I"]=
       ID_cprover_string_code_point_at_func;
