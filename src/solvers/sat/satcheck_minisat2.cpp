@@ -13,13 +13,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #  include <unistd.h>
 #endif
 
-#include <limits>
-
 #include <util/invariant.h>
 #include <util/threeval.h>
 
 #include <minisat/core/Solver.h>
 #include <minisat/simp/SimpSolver.h>
+
+#include <limits>
+#include <type_traits>
 
 #ifndef l_False
 #  define l_False Minisat::l_False
@@ -240,6 +241,15 @@ propt::resultt satcheck_minisat2_baset<T>::do_prop_solve(const bvt &assumptions)
 
     using Minisat::lbool;
 
+    // For the simplifying solver, decide whether to run the simplifier on this
+    // solve. When simplification is limited, it runs only on the first solve:
+    // MiniSat's variable elimination, re-run before every incremental call,
+    // can otherwise make a later solve blow up for the CDCL search (it hurts
+    // both SAT and UNSAT search; in practice it was observed as a hang).
+    [[maybe_unused]] bool do_simp = true;
+    if constexpr(std::is_same_v<T, Minisat::SimpSolver>)
+      do_simp = simplify_on_next_solve();
+
 #ifndef _WIN32
 
     void (*old_handler)(int) = SIG_ERR;
@@ -254,7 +264,15 @@ propt::resultt satcheck_minisat2_baset<T>::do_prop_solve(const bvt &assumptions)
         alarm(time_limit_seconds);
     }
 
-    lbool solver_result = solver->solveLimited(solver_assumptions);
+    lbool solver_result;
+    if constexpr(std::is_same_v<T, Minisat::SimpSolver>)
+    {
+      solver_result = solver->solveLimited(solver_assumptions, do_simp, false);
+    }
+    else
+    {
+      solver_result = solver->solveLimited(solver_assumptions);
+    }
 
     if(old_handler != SIG_ERR)
     {
@@ -271,7 +289,16 @@ propt::resultt satcheck_minisat2_baset<T>::do_prop_solve(const bvt &assumptions)
                     << messaget::eom;
     }
 
-    lbool solver_result = solver->solve(solver_assumptions) ? l_True : l_False;
+    lbool solver_result;
+    if constexpr(std::is_same_v<T, Minisat::SimpSolver>)
+    {
+      solver_result =
+        solver->solve(solver_assumptions, do_simp) ? l_True : l_False;
+    }
+    else
+    {
+      solver_result = solver->solve(solver_assumptions) ? l_True : l_False;
+    }
 
 #endif
 
