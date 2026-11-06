@@ -23,6 +23,9 @@ fi
 
 models=models.dir
 rm -rf "${models}"
+# the directory is not left in the source tree (CI checks that the tree is
+# clean after the tests)
+trap 'rm -rf "${models}"' EXIT
 # shellcheck disable=SC2086
 $cbmc ${args_dump} --dump-c-library-models "${models}" > /dev/null
 for model in *.i
