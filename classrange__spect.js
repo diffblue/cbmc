@@ -13,7 +13,7 @@ var classrange__spect =
     [ "operator==", "classrange__spect.html#acbdceecb249179d327b3fb89444c00ab", null ],
     [ "operator>", "classrange__spect.html#a22c5acf078674b8d5772b5a0656155a7", null ],
     [ "operator>=", "classrange__spect.html#adf066c67b544d86b1bdccd2baccc1ad4", null ],
-    [ "to_range_spect", "classrange__spect.html#a7c87146f636090edc38d0787ab2c500b", null ],
+    [ "to_range_spect", "classrange__spect.html#a085be33ca963c4bbfb5be399d1fa1e45", null ],
     [ "unknown", "classrange__spect.html#a284cf0799d97813cff30afa280dc7862", null ],
     [ "operator<<", "classrange__spect.html#acfeaf5c618ef4ef2a7ac3db6afc5546e", null ],
     [ "v", "classrange__spect.html#a8de6c2251c42df8294b2937f69703acd", null ]

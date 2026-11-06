@@ -98,24 +98,36 @@ $(function(){initNavTree('mp__arith_8h.html','',''); });
   <div class="headertitle"><div class="title">mp_arith.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;iosfwd&gt;</code><br />
+<div class="textblock"><code>#include &quot;<a class="el" href="src_2util_2invariant_8h_source.html">invariant.h</a>&quot;</code><br />
+<code>#include &lt;iosfwd&gt;</code><br />
 <code>#include &lt;string&gt;</code><br />
 <code>#include &quot;big-int/bigint.hh&quot;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return dynsection.toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;"><span class="dynarrow"><span class="arrowhead closed"></span></span>Include dependency graph for mp_arith.h:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" loading="lazy" frameborder="0" src="mp__arith_8h__incl.svg" width="306" height="131"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" loading="lazy" frameborder="0" src="mp__arith_8h__incl.svg" width="583" height="207"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return dynsection.toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;"><span class="dynarrow"><span class="arrowhead closed"></span></span>This graph shows which files directly or indirectly include this file:</div>
 <div id="dynsection-1-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-1-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" loading="lazy" frameborder="0" src="mp__arith_8h__dep__incl.svg" width="9240" height="419"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" loading="lazy" frameborder="0" src="mp__arith_8h__dep__incl.svg" width="8506" height="419"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 </div>
 <p><a href="mp__arith_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:named_5Fmp_5Fintegert_3C_20Tag_20_3E" id="r_named_5Fmp_5Fintegert_3C_20Tag_20_3E"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnamed__mp__integert.html">named_mp_integert&lt; Tag &gt;</a></td></tr>
+<tr class="memitem:bits_5Ftagt" id="r_bits_5Ftagt"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structbits__tagt.html">bits_tagt</a></td></tr>
+<tr class="memitem:bytes_5Ftagt" id="r_bytes_5Ftagt"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structbytes__tagt.html">bytes_tagt</a></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-typedef-members" class="groupheader"><a id="typedef-members" name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:afde6afd06c2e3d1697235ee0b2993b7b" id="r_afde6afd06c2e3d1697235ee0b2993b7b"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afde6afd06c2e3d1697235ee0b2993b7b">bitst</a> = <a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt;<a class="el" href="structbits__tagt.html">bits_tagt</a>&gt;</td></tr>
+<tr class="memitem:affb72b791a03f9366ccbc15f87ba0ea0" id="r_affb72b791a03f9366ccbc15f87ba0ea0"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#affb72b791a03f9366ccbc15f87ba0ea0">bytest</a> = <a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt;<a class="el" href="structbytes__tagt.html">bytes_tagt</a>&gt;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a921571075276493d861c282d18a9943b" id="r_a921571075276493d861c282d18a9943b"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a921571075276493d861c282d18a9943b">operator&lt;&lt;</a> (std::ostream &amp;, const <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;)</td></tr>
@@ -144,7 +156,60 @@ Functions</h2></td></tr>
 <tr class="memitem:a8c13ece8a7037d6b9ff750343e43a12e" id="r_a8c13ece8a7037d6b9ff750343e43a12e"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8c13ece8a7037d6b9ff750343e43a12e">integer2binary</a> (const <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;, std::size_t width)</td></tr>
 <tr class="memitem:a1156690125fb90385a5c2382220fb68d" id="r_a1156690125fb90385a5c2382220fb68d"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1156690125fb90385a5c2382220fb68d">binary2integer</a> (const std::string &amp;, bool <a class="el" href="util_8cpp.html#a64961c7c96a166ee16517f63747c3496">is_signed</a>)</td></tr>
 <tr class="memdesc:a1156690125fb90385a5c2382220fb68d"><td class="mdescLeft">&#160;</td><td class="mdescRight">convert binary string representation to <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a>  <br /></td></tr>
+<tr class="memitem:aa44cac7aab87bb111320da06585db4a8" id="r_aa44cac7aab87bb111320da06585db4a8"><td class="memTemplParams" colspan="2">template&lt;typename T&gt; </td></tr>
+<tr class="memitem:aa44cac7aab87bb111320da06585db4a8 template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; T &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa44cac7aab87bb111320da06585db4a8">operator+</a> (const <a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; T &gt; &amp;lhs, const <a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; T &gt; &amp;rhs)</td></tr>
+<tr class="memitem:ae0fb666d8eb884e33e5fa13faf3564b7" id="r_ae0fb666d8eb884e33e5fa13faf3564b7"><td class="memTemplParams" colspan="2">template&lt;typename T&gt; </td></tr>
+<tr class="memitem:ae0fb666d8eb884e33e5fa13faf3564b7 template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; T &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae0fb666d8eb884e33e5fa13faf3564b7">operator-</a> (const <a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; T &gt; &amp;lhs, const <a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; T &gt; &amp;rhs)</td></tr>
+<tr class="memitem:aa934da40a63e78afb9a0fc5bf277447b" id="r_aa934da40a63e78afb9a0fc5bf277447b"><td class="memTemplParams" colspan="2">template&lt;typename T&gt; </td></tr>
+<tr class="memitem:aa934da40a63e78afb9a0fc5bf277447b template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; T &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa934da40a63e78afb9a0fc5bf277447b">operator*</a> (const <a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; T &gt; &amp;lhs, const <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;rhs)</td></tr>
+<tr class="memitem:acda74bd0ef1a11e832638504f7a5f8f2" id="r_acda74bd0ef1a11e832638504f7a5f8f2"><td class="memTemplParams" colspan="2">template&lt;typename T&gt; </td></tr>
+<tr class="memitem:acda74bd0ef1a11e832638504f7a5f8f2 template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; T &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acda74bd0ef1a11e832638504f7a5f8f2">operator*</a> (const <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;lhs, const <a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; T &gt; &amp;rhs)</td></tr>
+<tr class="memitem:a4dae234f50d5136ca4c8fb38a2c25aac" id="r_a4dae234f50d5136ca4c8fb38a2c25aac"><td class="memTemplParams" colspan="2">template&lt;typename T&gt; </td></tr>
+<tr class="memitem:a4dae234f50d5136ca4c8fb38a2c25aac template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; T &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4dae234f50d5136ca4c8fb38a2c25aac">operator%</a> (const <a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; T &gt; &amp;lhs, const <a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; T &gt; &amp;rhs)</td></tr>
+<tr class="memitem:a4d74156b85a3b3ad77b935825a7b4d5d" id="r_a4d74156b85a3b3ad77b935825a7b4d5d"><td class="memTemplParams" colspan="2">template&lt;typename T&gt; </td></tr>
+<tr class="memitem:a4d74156b85a3b3ad77b935825a7b4d5d template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4d74156b85a3b3ad77b935825a7b4d5d">operator/</a> (const <a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; T &gt; &amp;lhs, const <a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; T &gt; &amp;rhs)</td></tr>
+<tr class="memitem:a2587ce31a368a053c6278d6761e57d32" id="r_a2587ce31a368a053c6278d6761e57d32"><td class="memTemplParams" colspan="2">template&lt;typename T&gt; </td></tr>
+<tr class="memitem:a2587ce31a368a053c6278d6761e57d32 template"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2587ce31a368a053c6278d6761e57d32">operator&lt;&lt;</a> (std::ostream &amp;os, const <a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; T &gt; &amp;value)</td></tr>
+<tr class="memitem:a1008ad005a06f12a494ab9eb1bbc506c" id="r_a1008ad005a06f12a494ab9eb1bbc506c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#afde6afd06c2e3d1697235ee0b2993b7b">bitst</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1008ad005a06f12a494ab9eb1bbc506c">bytes_to_bits</a> (const <a class="el" href="#affb72b791a03f9366ccbc15f87ba0ea0">bytest</a> &amp;bytes, const <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;bits_per_byte)</td></tr>
+<tr class="memdesc:a1008ad005a06f12a494ab9eb1bbc506c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert <code class="param">bytes</code> to bits assuming <code class="param">bits_per_byte</code> number of bits in one byte.  <br /></td></tr>
+<tr class="memitem:a57978c27dd0661faa234b1e48370aabe" id="r_a57978c27dd0661faa234b1e48370aabe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#affb72b791a03f9366ccbc15f87ba0ea0">bytest</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a57978c27dd0661faa234b1e48370aabe">bits_to_bytes_trunc</a> (const <a class="el" href="#afde6afd06c2e3d1697235ee0b2993b7b">bitst</a> &amp;<a class="el" href="sharing__map_8h.html#a46b67d6a7b4ce51e4ea2ac97473c5570">bits</a>, const <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;bits_per_byte)</td></tr>
+<tr class="memdesc:a57978c27dd0661faa234b1e48370aabe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert <code class="param">bits</code> to bytes assuming <code class="param">bits_per_byte</code> number of bits in one byte, rounding downwards.  <br /></td></tr>
+<tr class="memitem:a14a3b5b2ea8c6c38a9032fa1cb005f26" id="r_a14a3b5b2ea8c6c38a9032fa1cb005f26"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#affb72b791a03f9366ccbc15f87ba0ea0">bytest</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a14a3b5b2ea8c6c38a9032fa1cb005f26">bits_to_bytes_ceil</a> (const <a class="el" href="#afde6afd06c2e3d1697235ee0b2993b7b">bitst</a> &amp;<a class="el" href="sharing__map_8h.html#a46b67d6a7b4ce51e4ea2ac97473c5570">bits</a>, const <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;bits_per_byte)</td></tr>
+<tr class="memdesc:a14a3b5b2ea8c6c38a9032fa1cb005f26"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert <code class="param">bits</code> to bytes assuming <code class="param">bits_per_byte</code> number of bits in one byte, rounding upwards.  <br /></td></tr>
 </table>
+<a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">Typedef Documentation</h2>
+<a id="afde6afd06c2e3d1697235ee0b2993b7b" name="afde6afd06c2e3d1697235ee0b2993b7b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afde6afd06c2e3d1697235ee0b2993b7b">&#9670;&#160;</a></span>bitst</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="#afde6afd06c2e3d1697235ee0b2993b7b">bitst</a> = <a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt;<a class="el" href="structbits__tagt.html">bits_tagt</a>&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="mp__arith_8h_source.html#l00179">179</a> of file <a class="el" href="mp__arith_8h_source.html">mp_arith.h</a>.</p>
+
+</div>
+</div>
+<a id="affb72b791a03f9366ccbc15f87ba0ea0" name="affb72b791a03f9366ccbc15f87ba0ea0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#affb72b791a03f9366ccbc15f87ba0ea0">&#9670;&#160;</a></span>bytest</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="#affb72b791a03f9366ccbc15f87ba0ea0">bytest</a> = <a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt;<a class="el" href="structbytes__tagt.html">bytes_tagt</a>&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="mp__arith_8h_source.html#l00184">184</a> of file <a class="el" href="mp__arith_8h_source.html">mp_arith.h</a>.</p>
+
+</div>
+</div>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
 <a id="ad7ffc3ca50c525a8e9686f9ee0be8a94" name="ad7ffc3ca50c525a8e9686f9ee0be8a94"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad7ffc3ca50c525a8e9686f9ee0be8a94">&#9670;&#160;</a></span>arith_left_shift()</h2>
@@ -233,6 +298,72 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a14a3b5b2ea8c6c38a9032fa1cb005f26" name="a14a3b5b2ea8c6c38a9032fa1cb005f26"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a14a3b5b2ea8c6c38a9032fa1cb005f26">&#9670;&#160;</a></span>bits_to_bytes_ceil()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#affb72b791a03f9366ccbc15f87ba0ea0">bytest</a> bits_to_bytes_ceil </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="#afde6afd06c2e3d1697235ee0b2993b7b">bitst</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>bits</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>bits_per_byte</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Convert <code class="param">bits</code> to bytes assuming <code class="param">bits_per_byte</code> number of bits in one byte, rounding upwards. </p>
+
+<p class="definition">Definition at line <a class="el" href="mp__arith_8h_source.html#l00205">205</a> of file <a class="el" href="mp__arith_8h_source.html">mp_arith.h</a>.</p>
+
+</div>
+</div>
+<a id="a57978c27dd0661faa234b1e48370aabe" name="a57978c27dd0661faa234b1e48370aabe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a57978c27dd0661faa234b1e48370aabe">&#9670;&#160;</a></span>bits_to_bytes_trunc()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#affb72b791a03f9366ccbc15f87ba0ea0">bytest</a> bits_to_bytes_trunc </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="#afde6afd06c2e3d1697235ee0b2993b7b">bitst</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>bits</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>bits_per_byte</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Convert <code class="param">bits</code> to bytes assuming <code class="param">bits_per_byte</code> number of bits in one byte, rounding downwards. </p>
+
+<p class="definition">Definition at line <a class="el" href="mp__arith_8h_source.html#l00196">196</a> of file <a class="el" href="mp__arith_8h_source.html">mp_arith.h</a>.</p>
+
+</div>
+</div>
 <a id="a6d5a8b46e4e3a07fa087cfb6f90e995f" name="a6d5a8b46e4e3a07fa087cfb6f90e995f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6d5a8b46e4e3a07fa087cfb6f90e995f">&#9670;&#160;</a></span>bitwise_and()</h2>
 
@@ -305,6 +436,39 @@ Functions</h2></td></tr>
 <p>bitwise 'xor' of two nonnegative integers </p>
 
 <p class="definition">Definition at line <a class="el" href="mp__arith_8cpp_source.html#l00239">239</a> of file <a class="el" href="mp__arith_8cpp_source.html">mp_arith.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a1008ad005a06f12a494ab9eb1bbc506c" name="a1008ad005a06f12a494ab9eb1bbc506c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1008ad005a06f12a494ab9eb1bbc506c">&#9670;&#160;</a></span>bytes_to_bits()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#afde6afd06c2e3d1697235ee0b2993b7b">bitst</a> bytes_to_bits </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="#affb72b791a03f9366ccbc15f87ba0ea0">bytest</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>bytes</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>bits_per_byte</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Convert <code class="param">bytes</code> to bits assuming <code class="param">bits_per_byte</code> number of bits in one byte. </p>
+
+<p class="definition">Definition at line <a class="el" href="mp__arith_8h_source.html#l00188">188</a> of file <a class="el" href="mp__arith_8h_source.html">mp_arith.h</a>.</p>
 
 </div>
 </div>
@@ -415,8 +579,206 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a4dae234f50d5136ca4c8fb38a2c25aac" name="a4dae234f50d5136ca4c8fb38a2c25aac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4dae234f50d5136ca4c8fb38a2c25aac">&#9670;&#160;</a></span>operator%()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; T &gt; operator% </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; T &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>lhs</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; T &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>rhs</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="mp__arith_8h_source.html#l00153">153</a> of file <a class="el" href="mp__arith_8h_source.html">mp_arith.h</a>.</p>
+
+</div>
+</div>
+<a id="acda74bd0ef1a11e832638504f7a5f8f2" name="acda74bd0ef1a11e832638504f7a5f8f2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acda74bd0ef1a11e832638504f7a5f8f2">&#9670;&#160;</a></span>operator*() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; T &gt; operator* </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>lhs</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; T &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>rhs</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="mp__arith_8h_source.html#l00146">146</a> of file <a class="el" href="mp__arith_8h_source.html">mp_arith.h</a>.</p>
+
+</div>
+</div>
+<a id="aa934da40a63e78afb9a0fc5bf277447b" name="aa934da40a63e78afb9a0fc5bf277447b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa934da40a63e78afb9a0fc5bf277447b">&#9670;&#160;</a></span>operator*() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; T &gt; operator* </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; T &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>lhs</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>rhs</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="mp__arith_8h_source.html#l00139">139</a> of file <a class="el" href="mp__arith_8h_source.html">mp_arith.h</a>.</p>
+
+</div>
+</div>
+<a id="aa44cac7aab87bb111320da06585db4a8" name="aa44cac7aab87bb111320da06585db4a8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa44cac7aab87bb111320da06585db4a8">&#9670;&#160;</a></span>operator+()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; T &gt; operator+ </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; T &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>lhs</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; T &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>rhs</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="mp__arith_8h_source.html#l00125">125</a> of file <a class="el" href="mp__arith_8h_source.html">mp_arith.h</a>.</p>
+
+</div>
+</div>
+<a id="ae0fb666d8eb884e33e5fa13faf3564b7" name="ae0fb666d8eb884e33e5fa13faf3564b7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae0fb666d8eb884e33e5fa13faf3564b7">&#9670;&#160;</a></span>operator-()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; T &gt; operator- </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; T &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>lhs</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; T &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>rhs</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="mp__arith_8h_source.html#l00132">132</a> of file <a class="el" href="mp__arith_8h_source.html">mp_arith.h</a>.</p>
+
+</div>
+</div>
+<a id="a4d74156b85a3b3ad77b935825a7b4d5d" name="a4d74156b85a3b3ad77b935825a7b4d5d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4d74156b85a3b3ad77b935825a7b4d5d">&#9670;&#160;</a></span>operator/()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> operator/ </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; T &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>lhs</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; T &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>rhs</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="mp__arith_8h_source.html#l00161">161</a> of file <a class="el" href="mp__arith_8h_source.html">mp_arith.h</a>.</p>
+
+</div>
+</div>
 <a id="ac98a461d462be040a036a62693ac5b0a" name="ac98a461d462be040a036a62693ac5b0a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac98a461d462be040a036a62693ac5b0a">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ac98a461d462be040a036a62693ac5b0a">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -439,7 +801,7 @@ Functions</h2></td></tr>
 </div>
 </div>
 <a id="a921571075276493d861c282d18a9943b" name="a921571075276493d861c282d18a9943b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a921571075276493d861c282d18a9943b">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a921571075276493d861c282d18a9943b">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -458,6 +820,39 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="mp__arith_8cpp_source.html#l00045">45</a> of file <a class="el" href="mp__arith_8cpp_source.html">mp_arith.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a2587ce31a368a053c6278d6761e57d32" name="a2587ce31a368a053c6278d6761e57d32"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2587ce31a368a053c6278d6761e57d32">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream &amp; operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;</td>          <td class="paramname"><span class="paramname"><em>os</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; T &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>value</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="mp__arith_8h_source.html#l00169">169</a> of file <a class="el" href="mp__arith_8h_source.html">mp_arith.h</a>.</p>
 
 </div>
 </div>

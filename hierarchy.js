@@ -195,6 +195,7 @@ var hierarchy =
     ] ],
     [ "bdd_exprt", "classbdd__exprt.html", null ],
     [ "bdd_nodet", "classbdd__nodet.html", null ],
+    [ "bits_tagt", "structbits__tagt.html", null ],
     [ "cover_basic_blockst::block_infot", "structcover__basic__blockst_1_1block__infot.html", null ],
     [ "java_bytecode_convert_methodt::block_tree_nodet", "structjava__bytecode__convert__methodt_1_1block__tree__nodet.html", null ],
     [ "boolbv_mapt", "classboolbv__mapt.html", null ],
@@ -210,6 +211,7 @@ var hierarchy =
     [ "bv_spect", "classbv__spect.html", null ],
     [ "bv_utilst", "classbv__utilst.html", null ],
     [ "bytecode_infot", "structbytecode__infot.html", null ],
+    [ "bytes_tagt", "structbytes__tagt.html", null ],
     [ "c_declarationt", "structc__declarationt.html", null ],
     [ "c_definest", "classc__definest.html", null ],
     [ "c_qualifierst", "classc__qualifierst.html", [
@@ -1121,6 +1123,7 @@ var hierarchy =
     [ "mz_zip_archivet", "classmz__zip__archivet.html", null ],
     [ "mz_zip_array", "structmz__zip__array.html", null ],
     [ "mz_zip_internal_state_tag", "structmz__zip__internal__state__tag.html", null ],
+    [ "named_mp_integert&lt; Tag &gt;", "classnamed__mp__integert.html", null ],
     [ "smt2_parsert::named_termt", "structsmt2__parsert_1_1named__termt.html", null ],
     [ "namespace_baset", "classnamespace__baset.html", [
       [ "namespacet", "classnamespacet.html", [
@@ -1150,6 +1153,7 @@ var hierarchy =
     [ "numberingt&lt; keyt, hasht &gt;", "classnumberingt.html", null ],
     [ "numeric_castt&lt; Target, typename &gt;", "structnumeric__castt.html", null ],
     [ "numeric_castt&lt; mp_integer &gt;", "structnumeric__castt_3_01mp__integer_01_4.html", null ],
+    [ "numeric_castt&lt; named_mp_integert&lt; Tag &gt; &gt;", "structnumeric__castt_3_01named__mp__integert_3_01_tag_01_4_01_4.html", null ],
     [ "numeric_castt&lt; T, typename std::enable_if&lt; std::is_integral&lt; T &gt;::value &gt;::type &gt;", "structnumeric__castt_3_01_t_00_01typename_01std_1_1enable__if_3_01std_1_1is__integral_3_01_t_01_4_1_1value_01_4_1_1type_01_4.html", null ],
     [ "object_creation_infot", "structobject__creation__infot.html", null ],
     [ "object_creation_referencet", "structobject__creation__referencet.html", null ],

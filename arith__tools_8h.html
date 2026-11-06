@@ -106,7 +106,7 @@ $(function(){initNavTree('arith__tools_8h.html','',''); });
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" loading="lazy" frameborder="0" src="arith__tools_8h__incl.svg" width="1331" height="888"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" loading="lazy" frameborder="0" src="arith__tools_8h__incl.svg" width="1212" height="888"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 </div>
 <p><a href="arith__tools_8h_source.html">Go to the source code of this file.</a></p>
@@ -117,6 +117,7 @@ Classes</h2></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Numerical cast provides a unified way of converting from one numerical type to another.  <a href="structnumeric__castt.html#details">More...</a><br /></td></tr>
 <tr class="memitem:numeric_5Fcastt_3C_20mp_5Finteger_20_3E" id="r_numeric_5Fcastt_3C_20mp_5Finteger_20_3E"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnumeric__castt_3_01mp__integer_01_4.html">numeric_castt&lt; mp_integer &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert expression to <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a>.  <a href="structnumeric__castt_3_01mp__integer_01_4.html#details">More...</a><br /></td></tr>
+<tr class="memitem:numeric_5Fcastt_3C_20named_5Fmp_5Fintegert_3C_20Tag_20_3E_20_3E" id="r_numeric_5Fcastt_3C_20named_5Fmp_5Fintegert_3C_20Tag_20_3E_20_3E"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnumeric__castt_3_01named__mp__integert_3_01_tag_01_4_01_4.html">numeric_castt&lt; named_mp_integert&lt; Tag &gt; &gt;</a></td></tr>
 <tr class="memitem:numeric_5Fcastt_3C_20T_2C_20typename_20std_3A_3Aenable_5Fif_3C_20std_3A_3Ais_5Fintegral_3C_20T_20_3E_3A_3Avalue_20_3E_3A_3Atype_20_3E" id="r_numeric_5Fcastt_3C_20T_2C_20typename_20std_3A_3Aenable_5Fif_3C_20std_3A_3Ais_5Fintegral_3C_20T_20_3E_3A_3Avalue_20_3E_3A_3Atype_20_3E"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnumeric__castt_3_01_t_00_01typename_01std_1_1enable__if_3_01std_1_1is__integral_3_01_t_01_4_1_1value_01_4_1_1type_01_4.html">numeric_castt&lt; T, typename std::enable_if&lt; std::is_integral&lt; T &gt;::value &gt;::type &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> or expr to any integral type.  <a href="structnumeric__castt_3_01_t_00_01typename_01std_1_1enable__if_3_01std_1_1is__integral_3_01_t_01_4_1_1value_01_4_1_1type_01_4.html#details">More...</a><br /></td></tr>
 </table><table class="memberdecls">
@@ -130,10 +131,14 @@ Functions</h2></td></tr>
 <tr class="memitem:a8e191e6b9b8b495a97b0e3f78b4fc7ed" id="r_a8e191e6b9b8b495a97b0e3f78b4fc7ed"><td class="memTemplParams" colspan="2">template&lt;typename Target&gt; </td></tr>
 <tr class="memitem:a8e191e6b9b8b495a97b0e3f78b4fc7ed template"><td class="memItemLeft" align="right" valign="top">Target&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8e191e6b9b8b495a97b0e3f78b4fc7ed">numeric_cast_v</a> (const <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;arg)</td></tr>
 <tr class="memdesc:a8e191e6b9b8b495a97b0e3f78b4fc7ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert an <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> to integral type Target An invariant will fail if the conversion is not possible.  <br /></td></tr>
+<tr class="memitem:afdea6c51580e11f509f934cd8642e48c" id="r_afdea6c51580e11f509f934cd8642e48c"><td class="memTemplParams" colspan="2">template&lt;typename Target, typename Tag&gt; </td></tr>
+<tr class="memitem:afdea6c51580e11f509f934cd8642e48c template"><td class="memItemLeft" align="right" valign="top">Target&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afdea6c51580e11f509f934cd8642e48c">numeric_cast_v</a> (const <a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; Tag &gt; &amp;arg)</td></tr>
 <tr class="memitem:ac9a2e33eb23834425a9eefb4e44b3630" id="r_ac9a2e33eb23834425a9eefb4e44b3630"><td class="memTemplParams" colspan="2">template&lt;typename Target&gt; </td></tr>
 <tr class="memitem:ac9a2e33eb23834425a9eefb4e44b3630 template"><td class="memItemLeft" align="right" valign="top">Target&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac9a2e33eb23834425a9eefb4e44b3630">numeric_cast_v</a> (const <a class="el" href="classconstant__exprt.html">constant_exprt</a> &amp;arg)</td></tr>
 <tr class="memdesc:ac9a2e33eb23834425a9eefb4e44b3630"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert an expression to integral type Target An invariant will fail if the conversion is not possible.  <br /></td></tr>
 <tr class="memitem:a31f0721a9ec3035332ed9ede9732fc9b" id="r_a31f0721a9ec3035332ed9ede9732fc9b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classconstant__exprt.html">constant_exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a> (const <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;int_value, const <a class="el" href="classtypet.html">typet</a> &amp;type)</td></tr>
+<tr class="memitem:a48840c67c7b7568e01f0292b6cd59c61" id="r_a48840c67c7b7568e01f0292b6cd59c61"><td class="memTemplParams" colspan="2">template&lt;typename Tag&gt; </td></tr>
+<tr class="memitem:a48840c67c7b7568e01f0292b6cd59c61 template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classconstant__exprt.html">constant_exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a48840c67c7b7568e01f0292b6cd59c61">from_integer</a> (const <a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; Tag &gt; &amp;int_value, const <a class="el" href="classtypet.html">typet</a> &amp;type)</td></tr>
 <tr class="memitem:a5902666fb744db615dbf736ad4c19a26" id="r_a5902666fb744db615dbf736ad4c19a26"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5902666fb744db615dbf736ad4c19a26">address_bits</a> (const <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;size)</td></tr>
 <tr class="memdesc:a5902666fb744db615dbf736ad4c19a26"><td class="mdescLeft">&#160;</td><td class="mdescRight">ceil(log2(size))  <br /></td></tr>
 <tr class="memitem:aeb16c38f897b6b8d22a2c6d169e9f456" id="r_aeb16c38f897b6b8d22a2c6d169e9f456"><td class="memItemLeft" align="right" valign="top"><a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aeb16c38f897b6b8d22a2c6d169e9f456">power</a> (const <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;base, const <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;exponent)</td></tr>
@@ -203,7 +208,7 @@ Functions</h2></td></tr>
 </div>
 </div>
 <a id="a31f0721a9ec3035332ed9ede9732fc9b" name="a31f0721a9ec3035332ed9ede9732fc9b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a31f0721a9ec3035332ed9ede9732fc9b">&#9670;&#160;</a></span>from_integer()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a31f0721a9ec3035332ed9ede9732fc9b">&#9670;&#160;</a></span>from_integer() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -222,6 +227,39 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="arith__tools_8cpp_source.html#l00100">100</a> of file <a class="el" href="arith__tools_8cpp_source.html">arith_tools.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a48840c67c7b7568e01f0292b6cd59c61" name="a48840c67c7b7568e01f0292b6cd59c61"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a48840c67c7b7568e01f0292b6cd59c61">&#9670;&#160;</a></span>from_integer() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Tag&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classconstant__exprt.html">constant_exprt</a> from_integer </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; Tag &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>int_value</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classtypet.html">typet</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>type</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="arith__tools_8h_source.html#l00193">193</a> of file <a class="el" href="arith__tools_8h_source.html">arith_tools.h</a>.</p>
 
 </div>
 </div>
@@ -419,12 +457,12 @@ template&lt;typename Target&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>optional integer of type Target if conversion is possible, empty optional otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="arith__tools_8h_source.html#l00124">124</a> of file <a class="el" href="arith__tools_8h_source.html">arith_tools.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="arith__tools_8h_source.html#l00146">146</a> of file <a class="el" href="arith__tools_8h_source.html">arith_tools.h</a>.</p>
 
 </div>
 </div>
 <a id="ac9a2e33eb23834425a9eefb4e44b3630" name="ac9a2e33eb23834425a9eefb4e44b3630"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac9a2e33eb23834425a9eefb4e44b3630">&#9670;&#160;</a></span>numeric_cast_v() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ac9a2e33eb23834425a9eefb4e44b3630">&#9670;&#160;</a></span>numeric_cast_v() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -455,12 +493,12 @@ template&lt;typename Target&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>value of type Target </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="arith__tools_8h_source.html#l00148">148</a> of file <a class="el" href="arith__tools_8h_source.html">arith_tools.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="arith__tools_8h_source.html#l00179">179</a> of file <a class="el" href="arith__tools_8h_source.html">arith_tools.h</a>.</p>
 
 </div>
 </div>
 <a id="a8e191e6b9b8b495a97b0e3f78b4fc7ed" name="a8e191e6b9b8b495a97b0e3f78b4fc7ed"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8e191e6b9b8b495a97b0e3f78b4fc7ed">&#9670;&#160;</a></span>numeric_cast_v() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a8e191e6b9b8b495a97b0e3f78b4fc7ed">&#9670;&#160;</a></span>numeric_cast_v() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -491,7 +529,28 @@ template&lt;typename Target&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>value of type Target </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="arith__tools_8h_source.html#l00135">135</a> of file <a class="el" href="arith__tools_8h_source.html">arith_tools.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="arith__tools_8h_source.html#l00157">157</a> of file <a class="el" href="arith__tools_8h_source.html">arith_tools.h</a>.</p>
+
+</div>
+</div>
+<a id="afdea6c51580e11f509f934cd8642e48c" name="afdea6c51580e11f509f934cd8642e48c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afdea6c51580e11f509f934cd8642e48c">&#9670;&#160;</a></span>numeric_cast_v() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Target, typename Tag&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">Target numeric_cast_v </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classnamed__mp__integert.html">named_mp_integert</a>&lt; Tag &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>arg</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="arith__tools_8h_source.html#l00165">165</a> of file <a class="el" href="arith__tools_8h_source.html">arith_tools.h</a>.</p>
 
 </div>
 </div>

@@ -2,10 +2,12 @@ var arith__tools_8h =
 [
     [ "numeric_castt&lt; Target, typename &gt;", "structnumeric__castt.html", null ],
     [ "numeric_castt&lt; mp_integer &gt;", "structnumeric__castt_3_01mp__integer_01_4.html", "structnumeric__castt_3_01mp__integer_01_4" ],
+    [ "numeric_castt&lt; named_mp_integert&lt; Tag &gt; &gt;", "structnumeric__castt_3_01named__mp__integert_3_01_tag_01_4_01_4.html", "structnumeric__castt_3_01named__mp__integert_3_01_tag_01_4_01_4" ],
     [ "numeric_castt&lt; T, typename std::enable_if&lt; std::is_integral&lt; T &gt;::value &gt;::type &gt;", "structnumeric__castt_3_01_t_00_01typename_01std_1_1enable__if_3_01std_1_1is__integral_3_01_t_01_4_1_1value_01_4_1_1type_01_4.html", "structnumeric__castt_3_01_t_00_01typename_01std_1_1enable__if_3_01std_1_1is__integral_3_01_t_01_4_1_1value_01_4_1_1type_01_4" ],
     [ "address_bits", "arith__tools_8h.html#a5902666fb744db615dbf736ad4c19a26", null ],
     [ "bvrep2integer", "arith__tools_8h.html#ae092137df14934bb20a34b294f2c9eeb", null ],
     [ "from_integer", "arith__tools_8h.html#a31f0721a9ec3035332ed9ede9732fc9b", null ],
+    [ "from_integer", "arith__tools_8h.html#a48840c67c7b7568e01f0292b6cd59c61", null ],
     [ "get_bvrep_bit", "arith__tools_8h.html#a94aad2c2b250c696a03398149d4d78a1", null ],
     [ "integer2bvrep", "arith__tools_8h.html#a4d06cc8c81db0245efe3a17fd8fcd02e", null ],
     [ "is_power_of_two", "arith__tools_8h.html#a7ef35213fbfc656e4f056e3b28d6a9f6", null ],
@@ -15,6 +17,7 @@ var arith__tools_8h =
     [ "numeric_cast", "arith__tools_8h.html#ae071d7e3c28f5303d58fc9a4a1189d0b", null ],
     [ "numeric_cast_v", "arith__tools_8h.html#ac9a2e33eb23834425a9eefb4e44b3630", null ],
     [ "numeric_cast_v", "arith__tools_8h.html#a8e191e6b9b8b495a97b0e3f78b4fc7ed", null ],
+    [ "numeric_cast_v", "arith__tools_8h.html#afdea6c51580e11f509f934cd8642e48c", null ],
     [ "power", "arith__tools_8h.html#aeb16c38f897b6b8d22a2c6d169e9f456", null ],
     [ "to_integer", "arith__tools_8h.html#a921fb92421ece03cfac32ce34e24e100", null ]
 ];

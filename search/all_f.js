@@ -177,7 +177,7 @@ var searchData=
   ['havoc_5futils_2eh_174',['havoc_utils.h',['../havoc__utils_8h.html',1,'']]],
   ['havoc_5futils_5fcan_5fforward_5fpropagatet_175',['havoc_utils_can_forward_propagatet',['../classhavoc__utils__can__forward__propagatet.html',1,'havoc_utils_can_forward_propagatet'],['../classhavoc__utils__can__forward__propagatet.html#af629c12c2b1d0c3f659408b2d3d1d4f8',1,'havoc_utils_can_forward_propagatet::havoc_utils_can_forward_propagatet()']]],
   ['havoc_5futilst_176',['havoc_utilst',['../classhavoc__utilst.html',1,'havoc_utilst'],['../classhavoc__utilst.html#aad19b26e632ed52da6b97ac0604cc383',1,'havoc_utilst::havoc_utilst()']]],
-  ['havoced_5fpointer_5foffsets_177',['havoced_pointer_offsets',['../classcext.html#ade391b607a1494314e2a166a443cd3aa',1,'cext']]],
+  ['havoced_5fpointer_5foffsets_177',['havoced_pointer_offsets',['../classcext.html#aa90a21c7ade6aa94f0182ecd63cfef0f',1,'cext']]],
   ['havoced_5fvalues_178',['havoced_values',['../classcext.html#a91d7f1dbaa70ed6cde30b9378b365120',1,'cext']]],
   ['head_179',['head',['../structdfcc__loop__nesting__graph__nodet.html#a8252947ce887494e7e40e93f290c1f3b',1,'dfcc_loop_nesting_graph_nodet::head'],['../classstate__is__sentinel__dll__exprt.html#a486749003ea65427fc14bf3be69259e8',1,'state_is_sentinel_dll_exprt::head() const'],['../classstate__is__sentinel__dll__exprt.html#abc817d8f3f78b471eb68982a360dc208',1,'state_is_sentinel_dll_exprt::head()']]],
   ['heap_20pointer_20might_20be_20null_20etc_20ndash_20local_5fbitvector_5fanalysist_180',['Pointer classification analysis (is-heap-pointer, might-be-null, etc &amp;ndash; local_bitvector_analysist)',['../group__analyses.html#analyses-pointer-classification',1,'']]],

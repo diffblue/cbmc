@@ -73,7 +73,7 @@ var searchData=
   ['bv_5futils_70',['bv_utils',['../classboolbvt.html#aa59a8da9af6503055d0082088819e8b2',1,'boolbvt::bv_utils'],['../classfloat__utilst.html#a269acf493d1f9e897ea26c03496f5f23',1,'float_utilst::bv_utils']]],
   ['bv_5fwidth_71',['bv_width',['../classansi__c__convert__typet.html#ac2a4fd91b4dfe49a7fb47bf6cf3531de',1,'ansi_c_convert_typet::bv_width'],['../classboolbvt.html#a7ef9c52b4cff850ba00e11a799d1db65',1,'boolbvt::bv_width']]],
   ['bvfp_5fset_72',['bvfp_set',['../classsmt2__convt.html#a2996591922da21109eee3ae29c799c24',1,'smt2_convt']]],
-  ['byte_5fsize_73',['byte_size',['../structgdb__value__extractort_1_1memory__scopet.html#a7019323f1d418fd39fa97a9667f40fba',1,'gdb_value_extractort::memory_scopet']]],
+  ['byte_5fsize_73',['byte_size',['../structgdb__value__extractort_1_1memory__scopet.html#a72ca2e529b9bc85fe021440e9a53863a',1,'gdb_value_extractort::memory_scopet']]],
   ['bytecode_74',['bytecode',['../structjava__bytecode__parse__treet_1_1instructiont.html#ad92705c3d4c3235a7fddd3b2f233d708',1,'java_bytecode_parse_treet::instructiont']]],
   ['bytecode_5finfo_75',['bytecode_info',['../bytecode__info_8cpp.html#a9d21aadefe78728c5475c9c8e1d0f6b5',1,'bytecode_info:&#160;bytecode_info.cpp'],['../bytecode__info_8h.html#a9d21aadefe78728c5475c9c8e1d0f6b5',1,'bytecode_info:&#160;bytecode_info.cpp']]],
   ['bytes_76',['bytes',['../classmemory__sizet.html#a53ce8515da87e373340f8b5f4095f652',1,'memory_sizet']]]

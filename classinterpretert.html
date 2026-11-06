@@ -202,10 +202,10 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:acfefc942aececfd8725ffa61405322f1" id="r_acfefc942aececfd8725ffa61405322f1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acfefc942aececfd8725ffa61405322f1">evaluate_boolean</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
 <tr class="memitem:ac06613ec5c87290838581db34407c88f" id="r_ac06613ec5c87290838581db34407c88f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac06613ec5c87290838581db34407c88f">count_type_leaves</a> (const <a class="el" href="classtypet.html">typet</a> &amp;source_type, <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;result)</td></tr>
 <tr class="memdesc:ac06613ec5c87290838581db34407c88f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Count the number of leaf subtypes of <span class="tt">ty</span>, a leaf type is a type that is not an array or a struct.  <br /></td></tr>
-<tr class="memitem:a3b8e7c8c13c6f943e3bf4bf35dea606b" id="r_a3b8e7c8c13c6f943e3bf4bf35dea606b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3b8e7c8c13c6f943e3bf4bf35dea606b">byte_offset_to_memory_offset</a> (const <a class="el" href="classtypet.html">typet</a> &amp;source_type, const <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;byte_offset, <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;result)</td></tr>
-<tr class="memdesc:a3b8e7c8c13c6f943e3bf4bf35dea606b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Supposing the caller has an mp_vector representing a value with type 'source_type', this yields the offset into that vector at which to find a value at <em>byte</em> address 'offset'.  <br /></td></tr>
-<tr class="memitem:af0d8b8c7587f3de55e0841c43d729a7f" id="r_af0d8b8c7587f3de55e0841c43d729a7f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af0d8b8c7587f3de55e0841c43d729a7f">memory_offset_to_byte_offset</a> (const <a class="el" href="classtypet.html">typet</a> &amp;source_type, const <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;cell_offset, <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;result)</td></tr>
-<tr class="memdesc:af0d8b8c7587f3de55e0841c43d729a7f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Similarly to the above, the interpreter's memory objects contain mp_integers that represent variable-sized struct members.  <br /></td></tr>
+<tr class="memitem:a3518248bcf9ad5fd8082d3d0260be1bd" id="r_a3518248bcf9ad5fd8082d3d0260be1bd"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3518248bcf9ad5fd8082d3d0260be1bd">byte_offset_to_memory_offset</a> (const <a class="el" href="classtypet.html">typet</a> &amp;source_type, const <a class="el" href="mp__arith_8h.html#affb72b791a03f9366ccbc15f87ba0ea0">bytest</a> &amp;byte_offset, <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;result)</td></tr>
+<tr class="memdesc:a3518248bcf9ad5fd8082d3d0260be1bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Supposing the caller has an mp_vector representing a value with type 'source_type', this yields the offset into that vector at which to find a value at <em>byte</em> address 'offset'.  <br /></td></tr>
+<tr class="memitem:a25d0e4960f7980e2f560ef66f6ecab3c" id="r_a25d0e4960f7980e2f560ef66f6ecab3c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a25d0e4960f7980e2f560ef66f6ecab3c">memory_offset_to_byte_offset</a> (const <a class="el" href="classtypet.html">typet</a> &amp;source_type, const <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;cell_offset, <a class="el" href="mp__arith_8h.html#affb72b791a03f9366ccbc15f87ba0ea0">bytest</a> &amp;result)</td></tr>
+<tr class="memdesc:a25d0e4960f7980e2f560ef66f6ecab3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Similarly to the above, the interpreter's memory objects contain mp_integers that represent variable-sized struct members.  <br /></td></tr>
 <tr class="memitem:a6ccf8de4cdb7141e753c92b24a02ae3f" id="r_a6ccf8de4cdb7141e753c92b24a02ae3f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a6c1303740ec13725275523971cf1ad57">mp_vectort</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6ccf8de4cdb7141e753c92b24a02ae3f">evaluate</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;)</td></tr>
 <tr class="memdesc:a6ccf8de4cdb7141e753c92b24a02ae3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate an expression.  <br /></td></tr>
 <tr class="memitem:a3741af964753910f238e1423e9908105" id="r_a3741af964753910f238e1423e9908105"><td class="memItemLeft" align="right" valign="top"><a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3741af964753910f238e1423e9908105">evaluate_address</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, bool fail_quietly=false)</td></tr>
@@ -920,8 +920,8 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a id="a3b8e7c8c13c6f943e3bf4bf35dea606b" name="a3b8e7c8c13c6f943e3bf4bf35dea606b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3b8e7c8c13c6f943e3bf4bf35dea606b">&#9670;&#160;</a></span>byte_offset_to_memory_offset()</h2>
+<a id="a3518248bcf9ad5fd8082d3d0260be1bd" name="a3518248bcf9ad5fd8082d3d0260be1bd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3518248bcf9ad5fd8082d3d0260be1bd">&#9670;&#160;</a></span>byte_offset_to_memory_offset()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -937,7 +937,7 @@ Friends</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>offset</em></span>, </td>
+          <td class="paramtype">const <a class="el" href="mp__arith_8h.html#affb72b791a03f9366ccbc15f87ba0ea0">bytest</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>offset</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1634,8 +1634,8 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a id="af0d8b8c7587f3de55e0841c43d729a7f" name="af0d8b8c7587f3de55e0841c43d729a7f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af0d8b8c7587f3de55e0841c43d729a7f">&#9670;&#160;</a></span>memory_offset_to_byte_offset()</h2>
+<a id="a25d0e4960f7980e2f560ef66f6ecab3c" name="a25d0e4960f7980e2f560ef66f6ecab3c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a25d0e4960f7980e2f560ef66f6ecab3c">&#9670;&#160;</a></span>memory_offset_to_byte_offset()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1656,7 +1656,7 @@ Friends</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>result</em></span>&#160;)</td>
+          <td class="paramtype"><a class="el" href="mp__arith_8h.html#affb72b791a03f9366ccbc15f87ba0ea0">bytest</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>result</em></span>&#160;)</td>
         </tr>
       </table>
   </td>
