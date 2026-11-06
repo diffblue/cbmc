@@ -1,0 +1,11 @@
+CORE gcc-only
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Test _Generic selection with pointer-to-array types (issue #8690).
+Pointer to array with specified size should match pointer to array with unspecified size.
