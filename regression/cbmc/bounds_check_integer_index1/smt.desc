@@ -1,0 +1,10 @@
+CORE smt-backend broken-cprover-smt-backend no-new-smt
+main.c
+--bounds-check --smt2
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Verify that bounds checking arrays with mathematical integer element types
+succeeds when using an SMT backend.
