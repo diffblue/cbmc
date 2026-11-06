@@ -103,7 +103,9 @@ void bv_refinementt::arrays_overapproximated()
     case decision_proceduret::resultt::D_SATISFIABLE:
       break;
     case decision_proceduret::resultt::D_UNSATISFIABLE:
+      converting_array_constraints = true;
       prop.l_set_to_true(convert(entry.constraint));
+      converting_array_constraints = false;
       nb_active++;
       lazy_array_constraints.erase(entry.list_it);
       break;
