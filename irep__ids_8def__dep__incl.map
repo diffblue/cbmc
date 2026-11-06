@@ -101,24 +101,24 @@
 <area shape="poly" id="edge52_Node000004_Node000242" title=" " alt="" coords="6043,244,6087,292,6082,290,6041,249"/>
 <area shape="rect" id="Node000248" href="$compute__called__functions_8h.html" title="Query Called Functions." alt="" coords="9852,292,10059,354"/>
 <area shape="poly" id="edge54_Node000004_Node000248" title=" " alt="" coords="6117,212,6890,214,8052,224,8646,233,9176,245,9589,260,9736,270,9833,281,9871,291,9866,291,9832,286,9735,275,9589,266,9176,250,8646,238,8052,229,6890,220,6117,217"/>
-<area shape="rect" id="Node000252" href="$json__expr_8h.html" title="Expressions in JSON." alt="" coords="10084,292,10267,354"/>
+<area shape="rect" id="Node000252" href="$if__conversion_8h.html" title="If&#45;conversion of side&#45;effect&#45;free conditional assignments." alt="" coords="10084,292,10267,354"/>
 <area shape="poly" id="edge55_Node000004_Node000252" title=" " alt="" coords="6117,211,6933,211,8171,218,8804,226,9370,238,9812,256,9968,268,10072,281,10105,292,10100,291,10071,286,9968,273,9812,262,9370,244,8804,231,8171,223,6933,217,6117,217"/>
-<area shape="rect" id="Node000256" href="$rebuild__goto__start__function_8h.html" title="Goto Programs Author: Thomas Kiley, thomas@diffblue.com." alt="" coords="10292,292,10507,354"/>
-<area shape="poly" id="edge56_Node000004_Node000256" title=" " alt="" coords="6117,212,6970,212,8273,220,8941,229,9539,241,10005,258,10170,269,10280,281,10318,292,10312,291,10279,286,10170,274,10005,263,9538,246,8941,234,8273,226,6970,218,6117,217"/>
-<area shape="rect" id="Node000259" href="$remove__returns_8h.html" title="Replace function returns by assignments to global variables." alt="" coords="10532,292,10715,354"/>
-<area shape="poly" id="edge57_Node000004_Node000259" title=" " alt="" coords="6117,212,7053,219,8483,233,9831,253,10294,266,10441,273,10520,281,10553,292,10548,291,10519,286,10440,278,10293,271,9831,258,8483,238,7053,224,6117,218"/>
-<area shape="rect" id="Node000263" href="$remove__unused__functions_8h.html" title="Unused function removal." alt="" coords="10739,292,10948,354"/>
-<area shape="poly" id="edge58_Node000004_Node000263" title=" " alt="" coords="6117,212,7092,219,8590,233,10004,254,10490,267,10645,273,10728,281,10764,291,10759,291,10727,286,10644,279,10490,272,10004,259,8590,239,7092,225,6117,218"/>
-<area shape="rect" id="Node000265" href="$resolve__inherited__component_8h.html" title="Given a class and a component (either field or method), find the closest parent that defines that com..." alt="" coords="10972,292,11203,354"/>
-<area shape="poly" id="edge59_Node000004_Node000265" title=" " alt="" coords="6117,211,7089,211,8607,217,9389,225,10090,238,10638,256,10831,267,10960,281,11000,291,10995,291,10959,286,10831,273,10637,261,10090,243,9389,231,8607,223,7089,216,6117,217"/>
-<area shape="rect" id="Node000274" href="$restrict__function__pointers_8h.html" title="Given goto functions and a list of function parameters or globals that are function pointers with lis..." alt="" coords="11227,292,11430,354"/>
-<area shape="poly" id="edge60_Node000004_Node000274" title=" " alt="" coords="6117,212,7180,218,8838,231,10409,252,10950,265,11122,273,11215,281,11251,291,11245,291,11214,286,11122,278,10950,271,10409,257,8838,237,7180,223,6117,217"/>
-<area shape="rect" id="Node000276" href="$set__properties_8h.html" title="Set the properties to check." alt="" coords="11454,292,11638,354"/>
-<area shape="poly" id="edge61_Node000004_Node000276" title=" " alt="" coords="6117,212,7223,217,8955,229,9833,238,10600,249,11166,264,11346,272,11443,281,11476,291,11470,291,11442,286,11346,277,11166,269,10599,255,9833,243,8955,234,7223,222,6117,217"/>
-<area shape="rect" id="Node000279" href="$show__properties_8h.html" title="Show the properties." alt="" coords="11662,292,11846,354"/>
-<area shape="poly" id="edge62_Node000004_Node000279" title=" " alt="" coords="6117,212,7261,216,9061,228,9975,237,10773,248,11362,263,11550,271,11651,281,11684,291,11678,291,11650,286,11550,277,11362,268,10773,254,9974,242,9061,233,7261,222,6117,217"/>
-<area shape="rect" id="Node000288" href="$system__library__symbols_8h.html" title="Goto Programs." alt="" coords="11869,292,12066,354"/>
-<area shape="poly" id="edge63_Node000004_Node000288" title=" " alt="" coords="6117,212,7298,216,9166,228,10116,237,10945,249,11559,263,11754,271,11859,281,11893,291,11888,291,11858,286,11754,277,11559,268,10945,254,10115,242,9166,233,7297,222,6117,217"/>
+<area shape="rect" id="Node000254" href="$json__expr_8h.html" title="Expressions in JSON." alt="" coords="10292,292,10475,354"/>
+<area shape="poly" id="edge56_Node000004_Node000254" title=" " alt="" coords="6117,212,7009,219,8360,234,9631,254,10067,267,10205,274,10280,281,10313,292,10308,291,10279,286,10205,279,10066,272,9630,259,8360,239,7009,225,6117,218"/>
+<area shape="rect" id="Node000258" href="$rebuild__goto__start__function_8h.html" title="Goto Programs Author: Thomas Kiley, thomas@diffblue.com." alt="" coords="10500,292,10715,354"/>
+<area shape="poly" id="edge57_Node000004_Node000258" title=" " alt="" coords="6117,211,7007,212,8375,219,9078,227,9707,239,10199,257,10373,268,10488,281,10526,291,10520,291,10487,286,10372,273,10198,262,9707,245,9078,232,8375,224,7007,217,6117,217"/>
+<area shape="rect" id="Node000261" href="$remove__returns_8h.html" title="Replace function returns by assignments to global variables." alt="" coords="10740,292,10923,354"/>
+<area shape="poly" id="edge58_Node000004_Node000261" title=" " alt="" coords="6117,212,7092,218,8590,232,10004,252,10490,265,10645,273,10728,281,10761,292,10756,291,10727,286,10644,278,10490,271,10004,258,8590,237,7092,224,6117,218"/>
+<area shape="rect" id="Node000265" href="$remove__unused__functions_8h.html" title="Unused function removal." alt="" coords="10947,292,11156,354"/>
+<area shape="poly" id="edge59_Node000004_Node000265" title=" " alt="" coords="6117,212,7130,219,8696,233,10177,253,10687,266,10849,273,10936,281,10972,291,10967,291,10935,286,10848,279,10686,271,10177,259,8696,238,7130,224,6117,218"/>
+<area shape="rect" id="Node000267" href="$resolve__inherited__component_8h.html" title="Given a class and a component (either field or method), find the closest parent that defines that com..." alt="" coords="11180,292,11411,354"/>
+<area shape="poly" id="edge60_Node000004_Node000267" title=" " alt="" coords="6117,212,7173,219,8815,233,10370,254,10906,267,11076,273,11168,281,11208,291,11203,291,11167,286,11076,279,10906,272,10370,259,8815,239,7173,224,6118,218"/>
+<area shape="rect" id="Node000276" href="$restrict__function__pointers_8h.html" title="Given goto functions and a list of function parameters or globals that are function pointers with lis..." alt="" coords="11435,292,11638,354"/>
+<area shape="poly" id="edge61_Node000004_Node000276" title=" " alt="" coords="6118,212,7220,218,8945,230,10583,251,11147,265,11326,272,11423,281,11459,291,11453,291,11422,286,11326,278,11147,270,10583,257,8945,236,7220,223,6118,217"/>
+<area shape="rect" id="Node000278" href="$set__properties_8h.html" title="Set the properties to check." alt="" coords="11662,292,11846,354"/>
+<area shape="poly" id="edge62_Node000004_Node000278" title=" " alt="" coords="6117,212,7261,216,9061,228,9975,237,10773,248,11362,263,11550,271,11651,281,11684,291,11678,291,11650,286,11550,277,11362,268,10773,254,9974,242,9061,233,7261,222,6117,217"/>
+<area shape="rect" id="Node000281" href="$show__properties_8h.html" title="Show the properties." alt="" coords="11870,292,12054,354"/>
+<area shape="poly" id="edge63_Node000004_Node000281" title=" " alt="" coords="6117,212,7298,216,9166,227,10116,236,10946,248,11559,262,11754,271,11859,281,11892,291,11886,291,11858,286,11754,276,11559,268,10946,253,10116,241,9166,232,7298,221,6117,217"/>
 <area shape="poly" id="edge16_Node000052_Node000005" title=" " alt="" coords="1705,355,1723,359,1898,389,2074,411,2235,424,2369,435,2363,435,2235,430,2073,416,1897,395,1722,365,1704,361"/>
 <area shape="poly" id="edge17_Node000052_Node000044" title=" " alt="" coords="1499,358,1480,365,1326,392,1171,413,909,436,909,431,1170,407,1325,387,1479,359,1494,358"/>
 <area shape="poly" id="edge35_Node000201_Node000209" title=" " alt="" coords="6419,356,6436,359,6574,379,6757,395,6970,408,7198,418,7642,430,7972,439,7967,438,7641,436,7198,423,6970,413,6757,400,6573,384,6435,365,6419,361"/>

@@ -75,20 +75,20 @@
 </a>
 </g>
 </g>
-<!-- Node1500 -->
-<g id="Node001500" class="node">
-<title>Node1500</title>
-<g id="a_Node001500"><a xlink:href="irep__ids_8cpp.html" target="_top" xlink:title="Internal Representation.">
+<!-- Node1502 -->
+<g id="Node001502" class="node">
+<title>Node1502</title>
+<g id="a_Node001502"><a xlink:href="irep__ids_8cpp.html" target="_top" xlink:title="Internal Representation.">
 <polygon fill="white" stroke="#666666" points="4772.94,-210.75 4630.19,-210.75 4630.19,-177.25 4772.94,-177.25 4772.94,-210.75"/>
 <text xml:space="preserve" text-anchor="start" x="4638.19" y="-197.25" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text xml:space="preserve" text-anchor="middle" x="4701.56" y="-184.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/util/irep_ids.cpp</text>
 </a>
 </g>
 </g>
-<!-- Node3&#45;&gt;Node1500 -->
-<g id="edge63_Node000003_Node001500" class="edge">
-<title>Node3&#45;&gt;Node1500</title>
-<g id="a_edge63_Node000003_Node001500"><a xlink:title=" ">
+<!-- Node3&#45;&gt;Node1502 -->
+<g id="edge63_Node000003_Node001502" class="edge">
+<title>Node3&#45;&gt;Node1502</title>
+<g id="a_edge63_Node000003_Node001502"><a xlink:title=" ">
 <path fill="none" stroke="#63b8ff" d="M4649.97,-239.09C4660.77,-229.85 4672.91,-219.48 4682.7,-211.12"/>
 <polygon fill="#63b8ff" stroke="#63b8ff" points="4647.77,-236.36 4642.44,-245.52 4652.31,-241.69 4647.77,-236.36"/>
 </a>
@@ -1037,11 +1037,11 @@
 <!-- Node252 -->
 <g id="Node000252" class="node">
 <title>Node252</title>
-<g id="a_Node000252"><a xlink:href="json__expr_8h.html" target="_top" xlink:title="Expressions in JSON.">
+<g id="a_Node000252"><a xlink:href="if__conversion_8h.html" target="_top" xlink:title="If&#45;conversion of side&#45;effect&#45;free conditional assignments.">
 <polygon fill="#fff0f0" stroke="red" points="7696.31,-134.88 7558.81,-134.88 7558.81,-88.62 7696.31,-88.62 7696.31,-134.88"/>
 <text xml:space="preserve" text-anchor="start" x="7566.81" y="-121.38" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text xml:space="preserve" text-anchor="start" x="7566.81" y="-108.62" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
-<text xml:space="preserve" text-anchor="middle" x="7627.56" y="-95.88" font-family="Helvetica,sans-Serif" font-size="10.00">/json_expr.h</text>
+<text xml:space="preserve" text-anchor="middle" x="7627.56" y="-95.88" font-family="Helvetica,sans-Serif" font-size="10.00">/if_conversion.h</text>
 </a>
 </g>
 </g>
@@ -1054,74 +1054,74 @@
 </a>
 </g>
 </g>
-<!-- Node256 -->
-<g id="Node000256" class="node">
-<title>Node256</title>
-<g id="a_Node000256"><a xlink:href="rebuild__goto__start__function_8h.html" target="_top" xlink:title="Goto Programs Author: Thomas Kiley, thomas@diffblue.com.">
-<polygon fill="#fff0f0" stroke="red" points="7876.31,-134.88 7714.81,-134.88 7714.81,-88.62 7876.31,-88.62 7876.31,-134.88"/>
+<!-- Node254 -->
+<g id="Node000254" class="node">
+<title>Node254</title>
+<g id="a_Node000254"><a xlink:href="json__expr_8h.html" target="_top" xlink:title="Expressions in JSON.">
+<polygon fill="#fff0f0" stroke="red" points="7852.31,-134.88 7714.81,-134.88 7714.81,-88.62 7852.31,-88.62 7852.31,-134.88"/>
 <text xml:space="preserve" text-anchor="start" x="7722.81" y="-121.38" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text xml:space="preserve" text-anchor="start" x="7722.81" y="-108.62" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
-<text xml:space="preserve" text-anchor="middle" x="7795.56" y="-95.88" font-family="Helvetica,sans-Serif" font-size="10.00">/rebuild_goto_start_function.h</text>
+<text xml:space="preserve" text-anchor="middle" x="7783.56" y="-95.88" font-family="Helvetica,sans-Serif" font-size="10.00">/json_expr.h</text>
 </a>
 </g>
 </g>
-<!-- Node4&#45;&gt;Node256 -->
-<g id="edge56_Node000004_Node000256" class="edge">
-<title>Node4&#45;&gt;Node256</title>
-<g id="a_edge56_Node000004_Node000256"><a xlink:title=" ">
-<path fill="none" stroke="#63b8ff" d="M4624.18,-177.21C5011.45,-142.28 7370.68,-195.01 7705.56,-141.25 7714.3,-139.85 7723.36,-137.77 7732.21,-135.36"/>
+<!-- Node4&#45;&gt;Node254 -->
+<g id="edge56_Node000004_Node000254" class="edge">
+<title>Node4&#45;&gt;Node254</title>
+<g id="a_edge56_Node000004_Node000254"><a xlink:title=" ">
+<path fill="none" stroke="#63b8ff" d="M4624.18,-177.21C5011.48,-142.43 7371.93,-202.3 7705.56,-141.25 7713.22,-139.85 7721.12,-137.77 7728.82,-135.36"/>
 <polygon fill="#63b8ff" stroke="#63b8ff" points="4623.9,-173.72 4614.29,-178.18 4624.58,-180.69 4623.9,-173.72"/>
 </a>
 </g>
 </g>
-<!-- Node259 -->
-<g id="Node000259" class="node">
-<title>Node259</title>
-<g id="a_Node000259"><a xlink:href="remove__returns_8h.html" target="_top" xlink:title="Replace function returns by assignments to global variables.">
-<polygon fill="#fff0f0" stroke="red" points="8032.31,-134.88 7894.81,-134.88 7894.81,-88.62 8032.31,-88.62 8032.31,-134.88"/>
-<text xml:space="preserve" text-anchor="start" x="7902.81" y="-121.38" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
-<text xml:space="preserve" text-anchor="start" x="7902.81" y="-108.62" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
-<text xml:space="preserve" text-anchor="middle" x="7963.56" y="-95.88" font-family="Helvetica,sans-Serif" font-size="10.00">/remove_returns.h</text>
+<!-- Node258 -->
+<g id="Node000258" class="node">
+<title>Node258</title>
+<g id="a_Node000258"><a xlink:href="rebuild__goto__start__function_8h.html" target="_top" xlink:title="Goto Programs Author: Thomas Kiley, thomas@diffblue.com.">
+<polygon fill="#fff0f0" stroke="red" points="8032.31,-134.88 7870.81,-134.88 7870.81,-88.62 8032.31,-88.62 8032.31,-134.88"/>
+<text xml:space="preserve" text-anchor="start" x="7878.81" y="-121.38" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
+<text xml:space="preserve" text-anchor="start" x="7878.81" y="-108.62" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
+<text xml:space="preserve" text-anchor="middle" x="7951.56" y="-95.88" font-family="Helvetica,sans-Serif" font-size="10.00">/rebuild_goto_start_function.h</text>
 </a>
 </g>
 </g>
-<!-- Node4&#45;&gt;Node259 -->
-<g id="edge57_Node000004_Node000259" class="edge">
-<title>Node4&#45;&gt;Node259</title>
-<g id="a_edge57_Node000004_Node000259"><a xlink:title=" ">
-<path fill="none" stroke="#63b8ff" d="M4624.23,-177.2C5031.78,-140.49 7532.26,-205.79 7885.56,-141.25 7893.22,-139.85 7901.12,-137.77 7908.82,-135.37"/>
-<polygon fill="#63b8ff" stroke="#63b8ff" points="4623.9,-173.72 4614.29,-178.17 4624.58,-180.69 4623.9,-173.72"/>
+<!-- Node4&#45;&gt;Node258 -->
+<g id="edge57_Node000004_Node000258" class="edge">
+<title>Node4&#45;&gt;Node258</title>
+<g id="a_edge57_Node000004_Node000258"><a xlink:title=" ">
+<path fill="none" stroke="#63b8ff" d="M4624.14,-177.21C5028.74,-140.59 7509.55,-197.66 7861.56,-141.25 7870.3,-139.85 7879.36,-137.77 7888.21,-135.36"/>
+<polygon fill="#63b8ff" stroke="#63b8ff" points="4623.9,-173.72 4614.29,-178.17 4624.58,-180.68 4623.9,-173.72"/>
 </a>
 </g>
 </g>
-<!-- Node263 -->
-<g id="Node000263" class="node">
-<title>Node263</title>
-<g id="a_Node000263"><a xlink:href="remove__unused__functions_8h.html" target="_top" xlink:title="Unused function removal.">
-<polygon fill="#fff0f0" stroke="red" points="8206.69,-134.88 8050.44,-134.88 8050.44,-88.62 8206.69,-88.62 8206.69,-134.88"/>
-<text xml:space="preserve" text-anchor="start" x="8058.44" y="-121.38" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
-<text xml:space="preserve" text-anchor="start" x="8058.44" y="-108.62" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
-<text xml:space="preserve" text-anchor="middle" x="8128.56" y="-95.88" font-family="Helvetica,sans-Serif" font-size="10.00">/remove_unused_functions.h</text>
+<!-- Node261 -->
+<g id="Node000261" class="node">
+<title>Node261</title>
+<g id="a_Node000261"><a xlink:href="remove__returns_8h.html" target="_top" xlink:title="Replace function returns by assignments to global variables.">
+<polygon fill="#fff0f0" stroke="red" points="8188.31,-134.88 8050.81,-134.88 8050.81,-88.62 8188.31,-88.62 8188.31,-134.88"/>
+<text xml:space="preserve" text-anchor="start" x="8058.81" y="-121.38" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
+<text xml:space="preserve" text-anchor="start" x="8058.81" y="-108.62" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
+<text xml:space="preserve" text-anchor="middle" x="8119.56" y="-95.88" font-family="Helvetica,sans-Serif" font-size="10.00">/remove_returns.h</text>
 </a>
 </g>
 </g>
-<!-- Node4&#45;&gt;Node263 -->
-<g id="edge58_Node000004_Node000263" class="edge">
-<title>Node4&#45;&gt;Node263</title>
-<g id="a_edge58_Node000004_Node000263"><a xlink:title=" ">
-<path fill="none" stroke="#63b8ff" d="M4624.13,-177.21C5048.79,-138.67 7670.09,-202.55 8041.56,-141.25 8050.03,-139.85 8058.8,-137.78 8067.36,-135.37"/>
-<polygon fill="#63b8ff" stroke="#63b8ff" points="4623.9,-173.71 4614.29,-178.17 4624.58,-180.68 4623.9,-173.71"/>
+<!-- Node4&#45;&gt;Node261 -->
+<g id="edge58_Node000004_Node000261" class="edge">
+<title>Node4&#45;&gt;Node261</title>
+<g id="a_edge58_Node000004_Node000261"><a xlink:title=" ">
+<path fill="none" stroke="#63b8ff" d="M4624.13,-177.21C5048.81,-138.79 7671.18,-208.81 8041.56,-141.25 8049.22,-139.85 8057.12,-137.78 8064.82,-135.37"/>
+<polygon fill="#63b8ff" stroke="#63b8ff" points="4623.9,-173.72 4614.29,-178.17 4624.58,-180.68 4623.9,-173.72"/>
 </a>
 </g>
 </g>
 <!-- Node265 -->
 <g id="Node000265" class="node">
 <title>Node265</title>
-<g id="a_Node000265"><a xlink:href="resolve__inherited__component_8h.html" target="_top" xlink:title="Given a class and a component (either field or method), find the closest parent that defines that com...">
-<polygon fill="#fff0f0" stroke="red" points="8397.94,-134.88 8225.19,-134.88 8225.19,-88.62 8397.94,-88.62 8397.94,-134.88"/>
-<text xml:space="preserve" text-anchor="start" x="8233.19" y="-121.38" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
-<text xml:space="preserve" text-anchor="start" x="8233.19" y="-108.62" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
-<text xml:space="preserve" text-anchor="middle" x="8311.56" y="-95.88" font-family="Helvetica,sans-Serif" font-size="10.00">/resolve_inherited_component.h</text>
+<g id="a_Node000265"><a xlink:href="remove__unused__functions_8h.html" target="_top" xlink:title="Unused function removal.">
+<polygon fill="#fff0f0" stroke="red" points="8362.69,-134.88 8206.44,-134.88 8206.44,-88.62 8362.69,-88.62 8362.69,-134.88"/>
+<text xml:space="preserve" text-anchor="start" x="8214.44" y="-121.38" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
+<text xml:space="preserve" text-anchor="start" x="8214.44" y="-108.62" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
+<text xml:space="preserve" text-anchor="middle" x="8284.56" y="-95.88" font-family="Helvetica,sans-Serif" font-size="10.00">/remove_unused_functions.h</text>
 </a>
 </g>
 </g>
@@ -1129,27 +1129,27 @@
 <g id="edge59_Node000004_Node000265" class="edge">
 <title>Node4&#45;&gt;Node265</title>
 <g id="a_edge59_Node000004_Node000265"><a xlink:title=" ">
-<path fill="none" stroke="#63b8ff" d="M4624.04,-177.21C5067.8,-136.68 7824.12,-200.13 8215.56,-141.25 8224.85,-139.85 8234.49,-137.78 8243.92,-135.37"/>
+<path fill="none" stroke="#63b8ff" d="M4623.98,-177.22C5065.58,-136.96 7808.94,-205.29 8197.56,-141.25 8206.03,-139.85 8214.8,-137.78 8223.36,-135.37"/>
 <polygon fill="#63b8ff" stroke="#63b8ff" points="4623.9,-173.71 4614.29,-178.17 4624.58,-180.68 4623.9,-173.71"/>
 </a>
 </g>
 </g>
-<!-- Node274 -->
-<g id="Node000274" class="node">
-<title>Node274</title>
-<g id="a_Node000274"><a xlink:href="restrict__function__pointers_8h.html" target="_top" xlink:title="Given goto functions and a list of function parameters or globals that are function pointers with lis...">
-<polygon fill="#fff0f0" stroke="red" points="8568.81,-134.88 8416.31,-134.88 8416.31,-88.62 8568.81,-88.62 8568.81,-134.88"/>
-<text xml:space="preserve" text-anchor="start" x="8424.31" y="-121.38" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
-<text xml:space="preserve" text-anchor="start" x="8424.31" y="-108.62" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
-<text xml:space="preserve" text-anchor="middle" x="8492.56" y="-95.88" font-family="Helvetica,sans-Serif" font-size="10.00">/restrict_function_pointers.h</text>
+<!-- Node267 -->
+<g id="Node000267" class="node">
+<title>Node267</title>
+<g id="a_Node000267"><a xlink:href="resolve__inherited__component_8h.html" target="_top" xlink:title="Given a class and a component (either field or method), find the closest parent that defines that com...">
+<polygon fill="#fff0f0" stroke="red" points="8553.94,-134.88 8381.19,-134.88 8381.19,-88.62 8553.94,-88.62 8553.94,-134.88"/>
+<text xml:space="preserve" text-anchor="start" x="8389.19" y="-121.38" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
+<text xml:space="preserve" text-anchor="start" x="8389.19" y="-108.62" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
+<text xml:space="preserve" text-anchor="middle" x="8467.56" y="-95.88" font-family="Helvetica,sans-Serif" font-size="10.00">/resolve_inherited_component.h</text>
 </a>
 </g>
 </g>
-<!-- Node4&#45;&gt;Node274 -->
-<g id="edge60_Node000004_Node000274" class="edge">
-<title>Node4&#45;&gt;Node274</title>
-<g id="a_edge60_Node000004_Node000274"><a xlink:title=" ">
-<path fill="none" stroke="#63b8ff" d="M4623.94,-177.22C5088.68,-134.7 7995.13,-209.66 8406.56,-141.25 8415.1,-139.83 8423.93,-137.71 8432.55,-135.24"/>
+<!-- Node4&#45;&gt;Node267 -->
+<g id="edge60_Node000004_Node000267" class="edge">
+<title>Node4&#45;&gt;Node267</title>
+<g id="a_edge60_Node000004_Node000267"><a xlink:title=" ">
+<path fill="none" stroke="#63b8ff" d="M4624.18,-177.2C5085.76,-134.99 7963.02,-202.62 8371.56,-141.25 8380.93,-139.84 8390.67,-137.74 8400.18,-135.31"/>
 <polygon fill="#63b8ff" stroke="#63b8ff" points="4623.9,-173.71 4614.29,-178.17 4624.58,-180.68 4623.9,-173.71"/>
 </a>
 </g>
@@ -1157,11 +1157,11 @@
 <!-- Node276 -->
 <g id="Node000276" class="node">
 <title>Node276</title>
-<g id="a_Node000276"><a xlink:href="set__properties_8h.html" target="_top" xlink:title="Set the properties to check.">
-<polygon fill="#fff0f0" stroke="red" points="8724.31,-134.88 8586.81,-134.88 8586.81,-88.62 8724.31,-88.62 8724.31,-134.88"/>
-<text xml:space="preserve" text-anchor="start" x="8594.81" y="-121.38" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
-<text xml:space="preserve" text-anchor="start" x="8594.81" y="-108.62" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
-<text xml:space="preserve" text-anchor="middle" x="8655.56" y="-95.88" font-family="Helvetica,sans-Serif" font-size="10.00">/set_properties.h</text>
+<g id="a_Node000276"><a xlink:href="restrict__function__pointers_8h.html" target="_top" xlink:title="Given goto functions and a list of function parameters or globals that are function pointers with lis...">
+<polygon fill="#fff0f0" stroke="red" points="8724.81,-134.88 8572.31,-134.88 8572.31,-88.62 8724.81,-88.62 8724.81,-134.88"/>
+<text xml:space="preserve" text-anchor="start" x="8580.31" y="-121.38" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
+<text xml:space="preserve" text-anchor="start" x="8580.31" y="-108.62" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
+<text xml:space="preserve" text-anchor="middle" x="8648.56" y="-95.88" font-family="Helvetica,sans-Serif" font-size="10.00">/restrict_function_pointers.h</text>
 </a>
 </g>
 </g>
@@ -1169,26 +1169,26 @@
 <g id="edge61_Node000004_Node000276" class="edge">
 <title>Node4&#45;&gt;Node276</title>
 <g id="a_edge61_Node000004_Node000276"><a xlink:title=" ">
-<path fill="none" stroke="#63b8ff" d="M4624.07,-177.21C5108.31,-132.95 8148.55,-219.19 8577.56,-141.25 8585.37,-139.83 8593.42,-137.71 8601.25,-135.25"/>
-<polygon fill="#63b8ff" stroke="#63b8ff" points="4623.9,-173.71 4614.29,-178.17 4624.58,-180.68 4623.9,-173.71"/>
+<path fill="none" stroke="#63b8ff" d="M4624.03,-177.21C5106.45,-133.01 8134.05,-212.41 8562.56,-141.25 8571.1,-139.83 8579.94,-137.71 8588.55,-135.25"/>
+<polygon fill="#63b8ff" stroke="#63b8ff" points="4623.9,-173.71 4614.29,-178.17 4624.58,-180.67 4623.9,-173.71"/>
 </a>
 </g>
 </g>
-<!-- Node279 -->
-<g id="Node000279" class="node">
-<title>Node279</title>
-<g id="a_Node000279"><a xlink:href="show__properties_8h.html" target="_top" xlink:title="Show the properties.">
+<!-- Node278 -->
+<g id="Node000278" class="node">
+<title>Node278</title>
+<g id="a_Node000278"><a xlink:href="set__properties_8h.html" target="_top" xlink:title="Set the properties to check.">
 <polygon fill="#fff0f0" stroke="red" points="8880.31,-134.88 8742.81,-134.88 8742.81,-88.62 8880.31,-88.62 8880.31,-134.88"/>
 <text xml:space="preserve" text-anchor="start" x="8750.81" y="-121.38" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text xml:space="preserve" text-anchor="start" x="8750.81" y="-108.62" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
-<text xml:space="preserve" text-anchor="middle" x="8811.56" y="-95.88" font-family="Helvetica,sans-Serif" font-size="10.00">/show_properties.h</text>
+<text xml:space="preserve" text-anchor="middle" x="8811.56" y="-95.88" font-family="Helvetica,sans-Serif" font-size="10.00">/set_properties.h</text>
 </a>
 </g>
 </g>
-<!-- Node4&#45;&gt;Node279 -->
-<g id="edge62_Node000004_Node000279" class="edge">
-<title>Node4&#45;&gt;Node279</title>
-<g id="a_edge62_Node000004_Node000279"><a xlink:title=" ">
+<!-- Node4&#45;&gt;Node278 -->
+<g id="edge62_Node000004_Node000278" class="edge">
+<title>Node4&#45;&gt;Node278</title>
+<g id="a_edge62_Node000004_Node000278"><a xlink:title=" ">
 <path fill="none" stroke="#63b8ff" d="M4624.14,-177.2C5125.96,-131.26 8287.51,-222.2 8733.56,-141.25 8741.37,-139.83 8749.42,-137.71 8757.25,-135.25"/>
 <polygon fill="#63b8ff" stroke="#63b8ff" points="4623.9,-173.71 4614.29,-178.16 4624.58,-180.67 4623.9,-173.71"/>
 </a>

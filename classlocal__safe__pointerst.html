@@ -107,7 +107,7 @@ $(function(){initNavTree('classlocal__safe__pointerst.html','','classlocal__safe
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" loading="lazy" frameborder="0" src="classlocal__safe__pointerst__coll__graph.svg" width="2444" height="291"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" loading="lazy" frameborder="0" src="classlocal__safe__pointerst__coll__graph.svg" width="2571" height="334"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
@@ -130,12 +130,14 @@ Public Member Functions</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 id="header-pri-attribs" class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
 <tr class="memitem:afa3d41f7df81efea0386e2cc13320f05" id="r_afa3d41f7df81efea0386e2cc13320f05"><td class="memItemLeft" align="right" valign="top">std::map&lt; unsigned, std::set&lt; <a class="el" href="classexprt.html">exprt</a>, <a class="el" href="structlocal__safe__pointerst_1_1type__comparet.html">type_comparet</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afa3d41f7df81efea0386e2cc13320f05">non_null_expressions</a></td></tr>
+<tr class="memitem:a89a1db617ee1b54e113b0aecfdf96a09" id="r_a89a1db617ee1b54e113b0aecfdf96a09"><td class="memItemLeft" align="right" valign="top">std::map&lt; unsigned, std::unordered_set&lt; <a class="el" href="classexprt.html">exprt</a>, <a class="el" href="structirep__hash.html">irep_hash</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a89a1db617ee1b54e113b0aecfdf96a09">if_guarded_dereferences</a></td></tr>
+<tr class="memdesc:a89a1db617ee1b54e113b0aecfdf96a09"><td class="mdescLeft">&#160;</td><td class="mdescRight">Dereferences that are guarded by a conditional null-check appearing in the same instruction, e.g.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A very simple, cheap analysis to determine when dereference operations are trivially guarded by a check against a null pointer access. </p>
 <p>In the interests of a very cheap analysis we only search for very local guards &ndash; at the moment only <span class="tt">if(x != null) { *x }</span> and <span class="tt">assume(x != null); *x</span> are handled. Control-flow convergence and possibly-aliasing operations are handled pessimistically. </p>
 
-<p class="definition">Definition at line <a class="el" href="local__safe__pointers_8h_source.html#l00027">27</a> of file <a class="el" href="local__safe__pointers_8h_source.html">local_safe_pointers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="local__safe__pointers_8h_source.html#l00028">28</a> of file <a class="el" href="local__safe__pointers_8h_source.html">local_safe_pointers.h</a>.</p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
 <a id="a9ca14da9a8c59d8c22c952bbe41cae92" name="a9ca14da9a8c59d8c22c952bbe41cae92"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9ca14da9a8c59d8c22c952bbe41cae92">&#9670;&#160;</a></span>is_non_null_at_program_point()</h2>
@@ -159,7 +161,7 @@ Private Attributes</h2></td></tr>
 <p>Return true if the local-safe-pointers analysis has determined <span class="tt">expr</span> cannot be null as of <span class="tt">program_point</span> (i.e. </p>
 <p>that <span class="tt">expr</span> is non-null when the <span class="tt">program_point</span> instruction <em>starts</em> executing) </p>
 
-<p class="definition">Definition at line <a class="el" href="local__safe__pointers_8cpp_source.html#l00278">278</a> of file <a class="el" href="local__safe__pointers_8cpp_source.html">local_safe_pointers.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="local__safe__pointers_8cpp_source.html#l00333">333</a> of file <a class="el" href="local__safe__pointers_8cpp_source.html">local_safe_pointers.cpp</a>.</p>
 
 </div>
 </div>
@@ -190,7 +192,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="local__safe__pointers_8h_source.html#l00047">47</a> of file <a class="el" href="local__safe__pointers_8h_source.html">local_safe_pointers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="local__safe__pointers_8h_source.html#l00056">56</a> of file <a class="el" href="local__safe__pointers_8h_source.html">local_safe_pointers.h</a>.</p>
 
 </div>
 </div>
@@ -217,7 +219,7 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="local__safe__pointers_8cpp_source.html#l00082">82</a> of file <a class="el" href="local__safe__pointers_8cpp_source.html">local_safe_pointers.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="local__safe__pointers_8cpp_source.html#l00121">121</a> of file <a class="el" href="local__safe__pointers_8cpp_source.html">local_safe_pointers.cpp</a>.</p>
 
 </div>
 </div>
@@ -255,7 +257,7 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="local__safe__pointers_8cpp_source.html#l00189">189</a> of file <a class="el" href="local__safe__pointers_8cpp_source.html">local_safe_pointers.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="local__safe__pointers_8cpp_source.html#l00244">244</a> of file <a class="el" href="local__safe__pointers_8cpp_source.html">local_safe_pointers.cpp</a>.</p>
 
 </div>
 </div>
@@ -293,11 +295,38 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="local__safe__pointers_8cpp_source.html#l00233">233</a> of file <a class="el" href="local__safe__pointers_8cpp_source.html">local_safe_pointers.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="local__safe__pointers_8cpp_source.html#l00288">288</a> of file <a class="el" href="local__safe__pointers_8cpp_source.html">local_safe_pointers.cpp</a>.</p>
 
 </div>
 </div>
 <a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
+<a id="a89a1db617ee1b54e113b0aecfdf96a09" name="a89a1db617ee1b54e113b0aecfdf96a09"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a89a1db617ee1b54e113b0aecfdf96a09">&#9670;&#160;</a></span>if_guarded_dereferences</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::map&lt;unsigned, std::unordered_set&lt;<a class="el" href="classexprt.html">exprt</a>, <a class="el" href="structirep__hash.html">irep_hash</a>&gt; &gt; local_safe_pointerst::if_guarded_dereferences</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Dereferences that are guarded by a conditional null-check appearing in the same instruction, e.g. </p>
+<p><span class="tt">(p != null) ? *p : x</span> (such conditional expressions are produced by if-conversion in place of <span class="tt">if(p != null) *p</span>). Mapped from instruction location number to the set of safe <span class="tt"><a class="el" href="classdereference__exprt.html" title="Operator to dereference a pointer.">dereference_exprt</a></span>s, matched exactly. </p>
+
+<p class="definition">Definition at line <a class="el" href="local__safe__pointers_8h_source.html#l00048">48</a> of file <a class="el" href="local__safe__pointers_8h_source.html">local_safe_pointers.h</a>.</p>
+
+</div>
+</div>
 <a id="afa3d41f7df81efea0386e2cc13320f05" name="afa3d41f7df81efea0386e2cc13320f05"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#afa3d41f7df81efea0386e2cc13320f05">&#9670;&#160;</a></span>non_null_expressions</h2>
 
@@ -318,7 +347,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="local__safe__pointers_8h_source.html#l00039">39</a> of file <a class="el" href="local__safe__pointers_8h_source.html">local_safe_pointers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="local__safe__pointers_8h_source.html#l00040">40</a> of file <a class="el" href="local__safe__pointers_8h_source.html">local_safe_pointers.h</a>.</p>
 
 </div>
 </div>

@@ -6,5 +6,6 @@ var classlocal__safe__pointerst =
     [ "operator()", "classlocal__safe__pointerst.html#a97b89000f72e43f36a009469ccaa0edf", null ],
     [ "output", "classlocal__safe__pointerst.html#ac1ef12a37a25ec8e8182b76d587f44b1", null ],
     [ "output_safe_dereferences", "classlocal__safe__pointerst.html#a4398387a8058d81b8347e041a9cb1055", null ],
+    [ "if_guarded_dereferences", "classlocal__safe__pointerst.html#a89a1db617ee1b54e113b0aecfdf96a09", null ],
     [ "non_null_expressions", "classlocal__safe__pointerst.html#afa3d41f7df81efea0386e2cc13320f05", null ]
 ];

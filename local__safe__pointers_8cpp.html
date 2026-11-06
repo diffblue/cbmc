@@ -105,11 +105,13 @@ $(function(){initNavTree('local__safe__pointers_8cpp.html','',''); });
 <code>#include &lt;<a class="el" href="expr__iterator_8h_source.html">util/expr_iterator.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="expr__util_8h_source.html">util/expr_util.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="format__expr_8h_source.html">util/format_expr.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="pointer__expr_8h_source.html">util/pointer_expr.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="std__expr_8h_source.html">util/std_expr.h</a>&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return dynsection.toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;"><span class="dynarrow"><span class="arrowhead closed"></span></span>Include dependency graph for local_safe_pointers.cpp:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" loading="lazy" frameborder="0" src="local__safe__pointers_8cpp__incl.svg" width="1986" height="1150"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" loading="lazy" frameborder="0" src="local__safe__pointers_8cpp__incl.svg" width="1923" height="998"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 </div>
 <p><a href="local__safe__pointers_8cpp_source.html">Go to the source code of this file.</a></p>
@@ -123,12 +125,48 @@ Classes</h2></td></tr>
 Functions</h2></td></tr>
 <tr class="memitem:a104671937d5aa4f18a1269163fe4e887" id="r_a104671937d5aa4f18a1269163fe4e887"><td class="memItemLeft" align="right" valign="top">static std::optional&lt; <a class="el" href="structgoto__null__checkt.html">goto_null_checkt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a104671937d5aa4f18a1269163fe4e887">get_null_checked_expr</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
 <tr class="memdesc:a104671937d5aa4f18a1269163fe4e887"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if <span class="tt">expr</span> tests if a pointer is null.  <br /></td></tr>
+<tr class="memitem:a4b472dc71fa420793e8f065106db29b6" id="r_a4b472dc71fa420793e8f065106db29b6"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4b472dc71fa420793e8f065106db29b6">collect_if_guarded_dereferences</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, std::vector&lt; <a class="el" href="classexprt.html">exprt</a> &gt; &amp;result)</td></tr>
+<tr class="memdesc:a4b472dc71fa420793e8f065106db29b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Collect dereferences that are guarded by a conditional null-check in <span class="tt">expr</span>, i.e.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Local safe pointer analysis. </p>
 
 <p class="definition">Definition in file <a class="el" href="local__safe__pointers_8cpp_source.html">local_safe_pointers.cpp</a>.</p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+<a id="a4b472dc71fa420793e8f065106db29b6" name="a4b472dc71fa420793e8f065106db29b6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4b472dc71fa420793e8f065106db29b6">&#9670;&#160;</a></span>collect_if_guarded_dereferences()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void collect_if_guarded_dereferences </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>expr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::vector&lt; <a class="el" href="classexprt.html">exprt</a> &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>result</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Collect dereferences that are guarded by a conditional null-check in <span class="tt">expr</span>, i.e. </p>
+<p>a dereference <span class="tt">*p</span> in the operand of <span class="tt">(p != null) ? ... : ...</span> (the true operand) or <span class="tt">(p == null) ? ... : ...</span> (the false operand) that is only evaluated when <span class="tt">p</span> is known to be non-null. Such conditional expressions are produced by if-conversion in place of <span class="tt">if(p != null) *p</span>. The collected dereferences are appended to <span class="tt">result</span>. </p>
+
+<p class="definition">Definition at line <a class="el" href="local__safe__pointers_8cpp_source.html#l00086">86</a> of file <a class="el" href="local__safe__pointers_8cpp_source.html">local_safe_pointers.cpp</a>.</p>
+
+</div>
+</div>
 <a id="a104671937d5aa4f18a1269163fe4e887" name="a104671937d5aa4f18a1269163fe4e887"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a104671937d5aa4f18a1269163fe4e887">&#9670;&#160;</a></span>get_null_checked_expr()</h2>
 
@@ -161,7 +199,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a <span class="tt"><a class="el" href="structgoto__null__checkt.html" title="Return structure for get_null_checked_expr and get_conditional_checked_expr.">goto_null_checkt</a></span> indicating what expression is tested and whether the check applies on the taken or not-taken branch, or an empty std::optional if this isn't a null check. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="local__safe__pointers_8cpp_source.html#l00036">36</a> of file <a class="el" href="local__safe__pointers_8cpp_source.html">local_safe_pointers.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="local__safe__pointers_8cpp_source.html#l00038">38</a> of file <a class="el" href="local__safe__pointers_8cpp_source.html">local_safe_pointers.cpp</a>.</p>
 
 </div>
 </div>
