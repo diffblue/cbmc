@@ -1,0 +1,13 @@
+CORE no-new-smt broken-smt-backend paths-lifo-expected-failure wide-pointer-encoding
+main.c
+--wide-pointer-encoding --no-standard-checks
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] .* reachable: malloc returned same address after free: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Issue #2117: with wide pointer encoding, malloc can return the same
+address after free. The address-based pointer equality and the
+relaxed non-overlapping constraint for dynamic objects enable this.
