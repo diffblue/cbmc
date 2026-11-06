@@ -91,10 +91,10 @@ static std::string library_models_manifest()
 }
 
 /// The file name of the preprocessed model of \p function: the name with
-/// every character other than a letter, digit, `_`, `-` or `.` written as
-/// `%XX` (its hexadecimal code).  Model names may contain characters that
-/// file systems or archives do not allow (the Java models'
-/// `java::java.io.InputStream.read:()I`).
+/// every character other than a letter, a digit, an underscore, a hyphen
+/// or a dot written as a percent sign and its two-digit hexadecimal code.
+/// Model names may contain characters that file systems or archives do not
+/// allow (the Java models' `java::java.io.InputStream.read:()I`).
 static std::string model_file_name(const std::string &function)
 {
   static const char hex[] = "0123456789ABCDEF";
