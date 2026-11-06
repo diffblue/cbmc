@@ -1,5 +1,6 @@
 var simplify__expr_8cpp =
 [
+    [ "has_refined_string_arguments", "simplify__expr_8cpp.html#a2f0ce93381aa2c5605f91e4fddc501d7", null ],
     [ "lower_case_string_expression", "simplify__expr_8cpp.html#abbafad2ae15f15c637b3f7e038b69f14", null ],
     [ "simplify", "simplify__expr_8cpp.html#a02e7eaea06c1c477751552efb37dd4b1", null ],
     [ "simplify_expr", "simplify__expr_8cpp.html#adebe9c3e4a7aac67777c20e448f6f2bc", null ],

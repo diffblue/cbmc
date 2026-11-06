@@ -130,6 +130,8 @@ $(function(){initNavTree('simplify__expr_8cpp.html','',''); });
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a2f0ce93381aa2c5605f91e4fddc501d7" id="r_a2f0ce93381aa2c5605f91e4fddc501d7"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2f0ce93381aa2c5605f91e4fddc501d7">has_refined_string_arguments</a> (const <a class="el" href="classfunction__application__exprt.html">function_application_exprt</a> &amp;expr, std::size_t n_strings, std::size_t min_arity)</td></tr>
+<tr class="memdesc:a2f0ce93381aa2c5605f91e4fddc501d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">The cprover_string_*_func built-ins are also used with operands other than <a class="el" href="classrefined__string__exprt.html">refined_string_exprt</a>, e.g., SMT-LIB-native (ID_string-typed) ones (see <a class="el" href="classsmt2__convt.html">smt2_convt</a>).  <br /></td></tr>
 <tr class="memitem:a69884ce6405db8102ed8a50132178c3e" id="r_a69884ce6405db8102ed8a50132178c3e"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="structsimplify__exprt_1_1resultt.html">simplify_exprt::resultt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a69884ce6405db8102ed8a50132178c3e">simplify_string_endswith</a> (const <a class="el" href="classfunction__application__exprt.html">function_application_exprt</a> &amp;expr, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
 <tr class="memdesc:a69884ce6405db8102ed8a50132178c3e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Simplify String.endsWith function when arguments are constant.  <br /></td></tr>
 <tr class="memitem:a46bb4b16d333d7f28dd96826e5a928d2" id="r_a46bb4b16d333d7f28dd96826e5a928d2"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="structsimplify__exprt_1_1resultt.html">simplify_exprt::resultt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a46bb4b16d333d7f28dd96826e5a928d2">simplify_string_contains</a> (const <a class="el" href="classfunction__application__exprt.html">function_application_exprt</a> &amp;expr, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
@@ -152,6 +154,45 @@ Functions</h2></td></tr>
 <tr class="memitem:adebe9c3e4a7aac67777c20e448f6f2bc" id="r_adebe9c3e4a7aac67777c20e448f6f2bc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adebe9c3e4a7aac67777c20e448f6f2bc">simplify_expr</a> (<a class="el" href="classexprt.html">exprt</a> src, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
 </table>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+<a id="a2f0ce93381aa2c5605f91e4fddc501d7" name="a2f0ce93381aa2c5605f91e4fddc501d7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2f0ce93381aa2c5605f91e4fddc501d7">&#9670;&#160;</a></span>has_refined_string_arguments()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool has_refined_string_arguments </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classfunction__application__exprt.html">function_application_exprt</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>expr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t</td>          <td class="paramname"><span class="paramname"><em>n_strings</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t</td>          <td class="paramname"><span class="paramname"><em>min_arity</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The cprover_string_*_func built-ins are also used with operands other than <a class="el" href="classrefined__string__exprt.html">refined_string_exprt</a>, e.g., SMT-LIB-native (ID_string-typed) ones (see <a class="el" href="classsmt2__convt.html">smt2_convt</a>). </p>
+<p>Only <a class="el" href="classrefined__string__exprt.html">refined_string_exprt</a> operands can be simplified here. </p><dl class="section return"><dt>Returns</dt><dd>True iff <code class="param">expr</code> has at least <code class="param">min_arity</code> arguments and its first <code class="param">n_strings</code> arguments are <a class="el" href="classrefined__string__exprt.html">refined_string_exprt</a>. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="simplify__expr_8cpp_source.html#l00230">230</a> of file <a class="el" href="simplify__expr_8cpp_source.html">simplify_expr.cpp</a>.</p>
+
+</div>
+</div>
 <a id="abbafad2ae15f15c637b3f7e038b69f14" name="abbafad2ae15f15c637b3f7e038b69f14"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abbafad2ae15f15c637b3f7e038b69f14">&#9670;&#160;</a></span>lower_case_string_expression()</h2>
 
@@ -177,7 +218,7 @@ Functions</h2></td></tr>
 
 <p>Take the passed-in constant string array and lower-case every character. </p>
 
-<p class="definition">Definition at line <a class="el" href="simplify__expr_8cpp_source.html#l00561">561</a> of file <a class="el" href="simplify__expr_8cpp_source.html">simplify_expr.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="simplify__expr_8cpp_source.html#l00596">596</a> of file <a class="el" href="simplify__expr_8cpp_source.html">simplify_expr.cpp</a>.</p>
 
 </div>
 </div>
@@ -201,7 +242,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>returns true if expression unchanged; returns false if changed </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="simplify__expr_8cpp_source.html#l03423">3423</a> of file <a class="el" href="simplify__expr_8cpp_source.html">simplify_expr.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="simplify__expr_8cpp_source.html#l03464">3464</a> of file <a class="el" href="simplify__expr_8cpp_source.html">simplify_expr.cpp</a>.</p>
 
 </div>
 </div>
@@ -224,7 +265,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="simplify__expr_8cpp_source.html#l03428">3428</a> of file <a class="el" href="simplify__expr_8cpp_source.html">simplify_expr.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="simplify__expr_8cpp_source.html#l03469">3469</a> of file <a class="el" href="simplify__expr_8cpp_source.html">simplify_expr.cpp</a>.</p>
 
 </div>
 </div>
@@ -265,7 +306,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>: the modified expression or an unchanged expression </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="simplify__expr_8cpp_source.html#l00521">521</a> of file <a class="el" href="simplify__expr_8cpp_source.html">simplify_expr.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="simplify__expr_8cpp_source.html#l00553">553</a> of file <a class="el" href="simplify__expr_8cpp_source.html">simplify_expr.cpp</a>.</p>
 
 </div>
 </div>
@@ -306,7 +347,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the modified expression or an unchanged expression </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="simplify__expr_8cpp_source.html#l00327">327</a> of file <a class="el" href="simplify__expr_8cpp_source.html">simplify_expr.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="simplify__expr_8cpp_source.html#l00353">353</a> of file <a class="el" href="simplify__expr_8cpp_source.html">simplify_expr.cpp</a>.</p>
 
 </div>
 </div>
@@ -339,7 +380,7 @@ Functions</h2></td></tr>
 
 <p>Simplify String.contains function when arguments are constant. </p>
 
-<p class="definition">Definition at line <a class="el" href="simplify__expr_8cpp_source.html#l00257">257</a> of file <a class="el" href="simplify__expr_8cpp_source.html">simplify_expr.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="simplify__expr_8cpp_source.html#l00280">280</a> of file <a class="el" href="simplify__expr_8cpp_source.html">simplify_expr.cpp</a>.</p>
 
 </div>
 </div>
@@ -380,7 +421,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the modified expression or an unchanged expression </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="simplify__expr_8cpp_source.html#l00229">229</a> of file <a class="el" href="simplify__expr_8cpp_source.html">simplify_expr.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="simplify__expr_8cpp_source.html#l00249">249</a> of file <a class="el" href="simplify__expr_8cpp_source.html">simplify_expr.cpp</a>.</p>
 
 </div>
 </div>
@@ -421,7 +462,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>: the modified expression or an unchanged expression </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="simplify__expr_8cpp_source.html#l00589">589</a> of file <a class="el" href="simplify__expr_8cpp_source.html">simplify_expr.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="simplify__expr_8cpp_source.html#l00624">624</a> of file <a class="el" href="simplify__expr_8cpp_source.html">simplify_expr.cpp</a>.</p>
 
 </div>
 </div>
@@ -468,7 +509,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>: the modified expression or an unchanged expression </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="simplify__expr_8cpp_source.html#l00376">376</a> of file <a class="el" href="simplify__expr_8cpp_source.html">simplify_expr.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="simplify__expr_8cpp_source.html#l00405">405</a> of file <a class="el" href="simplify__expr_8cpp_source.html">simplify_expr.cpp</a>.</p>
 
 </div>
 </div>
@@ -509,7 +550,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the modified expression or an unchanged expression </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="simplify__expr_8cpp_source.html#l00302">302</a> of file <a class="el" href="simplify__expr_8cpp_source.html">simplify_expr.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="simplify__expr_8cpp_source.html#l00328">328</a> of file <a class="el" href="simplify__expr_8cpp_source.html">simplify_expr.cpp</a>.</p>
 
 </div>
 </div>
@@ -550,7 +591,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>: the modified expression or an unchanged expression </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="simplify__expr_8cpp_source.html#l00634">634</a> of file <a class="el" href="simplify__expr_8cpp_source.html">simplify_expr.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="simplify__expr_8cpp_source.html#l00672">672</a> of file <a class="el" href="simplify__expr_8cpp_source.html">simplify_expr.cpp</a>.</p>
 
 </div>
 </div>
