@@ -13,6 +13,7 @@
 #include <util/config.h>
 #include <util/expr_util.h>
 #include <util/namespace.h>
+#include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 #include <util/simplify_utils.h>
@@ -512,6 +513,204 @@ SCENARIO("byte_update_lowering", "[core][util][lowering][byte_update]")
             REQUIRE(lower_bu_s == *r);
           }
         }
+      }
+    }
+  }
+}
+
+bitvector_typet adjust_width(const typet &src, std::size_t new_width);
+
+TEST_CASE(
+  "adjust_width handles c_bool and pointer types",
+  "[core][util][lowering][byte_extract]")
+{
+  // Regression test for issue #8475: adjust_width must map ID_c_bool (and
+  // ID_pointer) to a plain bitvector type rather than hitting its
+  // PRECONDITION(false). ID_c_bool is the type that the heap_iterator.c
+  // reproducer of #8475 actually reaches (a `bool` array is byte-extracted at a
+  // wider width); ID_pointer is handled for the same reason. This is the most
+  // direct check of the fix; the lower_byte_extract SCENARIOs below exercise it
+  // through the surrounding lowering.
+  cmdlinet cmdline;
+  config.set(cmdline);
+
+  const c_bool_typet bool_type{config.ansi_c.char_width};
+  const bitvector_typet from_c_bool = adjust_width(bool_type, 64);
+  REQUIRE(from_c_bool.id() == ID_bv);
+  REQUIRE(from_c_bool.get_width() == 64);
+
+  const pointer_typet ptr_type{signedbv_typet{32}, config.ansi_c.pointer_width};
+  const bitvector_typet from_pointer = adjust_width(ptr_type, 64);
+  REQUIRE(from_pointer.id() == ID_bv);
+  REQUIRE(from_pointer.get_width() == 64);
+}
+
+TEST_CASE(
+  "byte extract from c_bool array",
+  "[core][util][lowering][byte_extract]")
+{
+  // End-to-end-style check at the lowering level for issue #8475: extracting a
+  // value wider than one byte from an array of C Booleans drives
+  // lower_byte_extract down the concatenation path, which calls
+  // adjust_width(*subtype) with subtype == c_bool (C Booleans are byte sized,
+  // so unpacking leaves them in place). Before the fix this aborted at the
+  // adjust_width PRECONDITION; afterwards lowering succeeds.
+  cmdlinet cmdline;
+  config.set(cmdline);
+
+  const namespacet &ns = empty_namespace;
+
+  const c_bool_typet bool_type{config.ansi_c.char_width};
+  const array_typet arr_type{bool_type, from_integer(8, size_type())};
+  const symbol_exprt src{"b", arr_type};
+
+  THEN("lowering a multi-byte read does not crash")
+  {
+    for(const auto &endianness :
+        {ID_byte_extract_little_endian, ID_byte_extract_big_endian})
+    {
+      // a 16-bit read spans two c_bool elements -> width_bytes == 2
+      const byte_extract_exprt be(
+        endianness,
+        src,
+        from_integer(0, c_index_type()),
+        config.ansi_c.char_width,
+        unsignedbv_typet{16});
+
+      const exprt lower_be = lower_byte_extract(be, ns);
+      REQUIRE(!has_subexpr(lower_be, ID_byte_extract_little_endian));
+      REQUIRE(!has_subexpr(lower_be, ID_byte_extract_big_endian));
+      REQUIRE(lower_be.type() == be.type());
+    }
+  }
+}
+
+TEST_CASE("byte extract pointer type", "[core][util][lowering][byte_extract]")
+{
+  cmdlinet cmdline;
+  config.set(cmdline);
+
+  const namespacet &ns = empty_namespace;
+
+  const pointer_typet ptr_type{signedbv_typet{32}, config.ansi_c.pointer_width};
+
+  GIVEN("A byte_extract of pointer type from a bitvector")
+  {
+    const unsignedbv_typet u64{64};
+    const exprt src = from_integer(0, u64);
+
+    THEN("lowering does not crash")
+    {
+      for(const auto &endianness :
+          {ID_byte_extract_little_endian, ID_byte_extract_big_endian})
+      {
+        const byte_extract_exprt be(
+          endianness,
+          src,
+          from_integer(0, c_index_type()),
+          config.ansi_c.char_width,
+          ptr_type);
+
+        const exprt lower_be = lower_byte_extract(be, ns);
+        REQUIRE(!has_subexpr(lower_be, ID_byte_extract_little_endian));
+        REQUIRE(!has_subexpr(lower_be, ID_byte_extract_big_endian));
+        REQUIRE(lower_be.type() == be.type());
+      }
+    }
+  }
+
+  GIVEN("A byte_extract of an array of pointers")
+  {
+    const array_typet arr_type{ptr_type, from_integer(2, size_type())};
+    const auto arr_bits = pointer_offset_bits(arr_type, ns);
+    REQUIRE(arr_bits.has_value());
+    const unsignedbv_typet src_type{
+      numeric_cast_v<std::size_t>(*arr_bits) + 16};
+    const exprt src = from_integer(0, src_type);
+
+    THEN("lowering does not crash")
+    {
+      for(const auto &endianness :
+          {ID_byte_extract_little_endian, ID_byte_extract_big_endian})
+      {
+        const byte_extract_exprt be(
+          endianness,
+          src,
+          from_integer(2, c_index_type()),
+          config.ansi_c.char_width,
+          arr_type);
+
+        const exprt lower_be = lower_byte_extract(be, ns);
+        REQUIRE(!has_subexpr(lower_be, ID_byte_extract_little_endian));
+        REQUIRE(!has_subexpr(lower_be, ID_byte_extract_big_endian));
+        REQUIRE(lower_be.type() == be.type());
+      }
+    }
+  }
+}
+
+TEST_CASE("byte update pointer type", "[core][util][lowering][byte_update]")
+{
+  // Companion to "byte extract pointer type": lowering a byte_update whose
+  // object has pointer (or array-of-pointer) type reconstructs the result via
+  // the same bv_to_expr path that feeds adjust_width with a pointer type.
+  cmdlinet cmdline;
+  config.set(cmdline);
+
+  const namespacet &ns = empty_namespace;
+
+  const pointer_typet ptr_type{signedbv_typet{32}, config.ansi_c.pointer_width};
+  const unsignedbv_typet u8{config.ansi_c.char_width};
+
+  GIVEN("A byte_update overwriting a byte of a pointer")
+  {
+    const symbol_exprt p{"p", ptr_type};
+
+    THEN("lowering does not crash")
+    {
+      for(const auto &endianness :
+          {ID_byte_update_little_endian, ID_byte_update_big_endian})
+      {
+        const byte_update_exprt bu(
+          endianness,
+          p,
+          from_integer(0, c_index_type()),
+          from_integer(0, u8),
+          config.ansi_c.char_width);
+
+        const exprt lower_bu = lower_byte_operators(bu, ns);
+        REQUIRE(!has_subexpr(lower_bu, ID_byte_update_little_endian));
+        REQUIRE(!has_subexpr(lower_bu, ID_byte_update_big_endian));
+        REQUIRE(!has_subexpr(lower_bu, ID_byte_extract_little_endian));
+        REQUIRE(!has_subexpr(lower_bu, ID_byte_extract_big_endian));
+        REQUIRE(lower_bu.type() == bu.type());
+      }
+    }
+  }
+
+  GIVEN("A byte_update overwriting a byte of an array of pointers")
+  {
+    const array_typet arr_type{ptr_type, from_integer(2, size_type())};
+    const symbol_exprt a{"a", arr_type};
+
+    THEN("lowering does not crash")
+    {
+      for(const auto &endianness :
+          {ID_byte_update_little_endian, ID_byte_update_big_endian})
+      {
+        const byte_update_exprt bu(
+          endianness,
+          a,
+          from_integer(2, c_index_type()),
+          from_integer(0, u8),
+          config.ansi_c.char_width);
+
+        const exprt lower_bu = lower_byte_operators(bu, ns);
+        REQUIRE(!has_subexpr(lower_bu, ID_byte_update_little_endian));
+        REQUIRE(!has_subexpr(lower_bu, ID_byte_update_big_endian));
+        REQUIRE(!has_subexpr(lower_bu, ID_byte_extract_little_endian));
+        REQUIRE(!has_subexpr(lower_bu, ID_byte_extract_big_endian));
+        REQUIRE(lower_bu.type() == bu.type());
       }
     }
   }

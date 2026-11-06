@@ -20,6 +20,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "invariant.h"
 #include "std_expr.h"
 
+class bitvector_typet;
+
 /// Expression of type \c type extracted from some object \c op starting at
 /// position \c offset (given in number of bytes).
 /// The object can either be interpreted in big endian or little endian, which
