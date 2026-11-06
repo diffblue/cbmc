@@ -35,25 +35,6 @@ static unsigned long to_integer_or_default(
   return def;
 }
 
-/// Add axioms corresponding to the String.valueOf(J) java function.
-/// \deprecated should use add_axioms_from_int instead
-/// \param f: function application with one long argument
-/// \return a new string expression
-DEPRECATED(SINCE(2017, 10, 5, "use add_axioms_for_string_of_int instead"))
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_from_long(
-  const function_application_exprt &f)
-{
-  PRECONDITION(f.arguments().size() == 3 || f.arguments().size() == 4);
-  const array_string_exprt res =
-    array_pool.find(f.arguments()[1], f.arguments()[0]);
-  if(f.arguments().size() == 4)
-    return add_axioms_for_string_of_int_with_radix(
-      res, f.arguments()[2], f.arguments()[3], 0);
-  else
-    return add_axioms_for_string_of_int(res, f.arguments()[2], 0);
-}
-
 /// Add axioms stating that the returned string equals "true" when the Boolean
 /// expression is true and "false" when it is false.
 /// \deprecated This is Java specific and should be implemented in Java instead
@@ -122,6 +103,35 @@ string_constraint_generatort::add_axioms_for_string_of_int(
   const constant_exprt radix = from_integer(10, input_int.type());
   return add_axioms_for_string_of_int_with_radix(
     res, input_int, radix, max_size);
+}
+
+/// Add axioms enforcing that the result string of the
+/// `__CPROVER_string_of_long` built-in equals the decimal (or radix-`r`)
+/// representation of its long-typed argument.
+///
+/// The body delegates to \ref add_axioms_for_string_of_int (or its
+/// `_with_radix` companion), which is parametric in the bit-width of
+/// `f.arguments()[2].type()`, so the same axioms describe the
+/// representation of `int`-typed and `long`-typed inputs alike. This
+/// helper exists as a discoverable named entry point for
+/// `ID_cprover_string_of_long_func`, mirroring the surviving
+/// `add_axioms_from_*` thunks dispatched by
+/// \ref add_axioms_for_function_application.
+/// \param f: function application with the result-string slot
+///   (arguments 0 and 1), the long-typed value (argument 2) and
+///   optionally a radix (argument 3).
+/// \return code 0 on success
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_string_of_long(
+  const function_application_exprt &f)
+{
+  PRECONDITION(f.arguments().size() == 3 || f.arguments().size() == 4);
+  const array_string_exprt res =
+    array_pool.find(f.arguments()[1], f.arguments()[0]);
+  if(f.arguments().size() == 4)
+    return add_axioms_for_string_of_int_with_radix(
+      res, f.arguments()[2], f.arguments()[3], 0);
+  return add_axioms_for_string_of_int(res, f.arguments()[2], 0);
 }
 
 /// Add axioms enforcing that the string corresponds to the result
