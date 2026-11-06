@@ -96,18 +96,24 @@ jobs:
 
       - name: Profile PR branch (3 runs per benchmark)
         run: |
+          # Run under a finite (hard) address-space limit, which the profiler
+          # must cope with (it may only lower the soft limit).
+          ulimit -v 25165824
           python3 scripts/profile_cbmc.py --auto --runs 3 --timeout 120 \
             --output-dir profile-results
 
       - name: Generate differential summary
         if: always()
+        env:
+          # Branch names are controlled by the pull request's author: pass them
+          # via the environment rather than expanding them into the script.
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
         run: |
           if [ -f base-results/results.json ] && [ -f profile-results/results.json ]; then
             python3 scripts/profile_cbmc.py \
               --compare base-results profile-results \
-              --compare-labels \
-                "${{ github.event.pull_request.base.ref }}" \
-                "${{ github.event.pull_request.head.ref }}" \
+              --compare-labels "$BASE_REF" "$HEAD_REF" \
               --output-dir diff-results
           fi
 
