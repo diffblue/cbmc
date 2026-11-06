@@ -155,23 +155,31 @@ void full_slicert::add_jumps(
       // lex_succ
       goto_programt::const_targett nearest=lex_succ;
       std::size_t post_dom_size=0;
-      for(cfg_dominatorst::target_sett::const_iterator d_it =
-            j_PC_node.dominators.begin();
-          d_it != j_PC_node.dominators.end();
-          ++d_it)
+      // Iterate over the dominators in a deterministic (location-number)
+      // order, since ties on `post_dom_size` below are broken by iteration
+      // order.
+      std::vector<goto_programt::const_targett> sorted_dominators;
+      j_PC_node.dominators.for_each(
+        [&sorted_dominators](const goto_programt::const_targett &dominator)
+        { sorted_dominators.push_back(dominator); });
+      std::sort(
+        sorted_dominators.begin(),
+        sorted_dominators.end(),
+        goto_programt::target_less_than{});
+      for(const auto &dominator : sorted_dominators)
       {
-        const auto &node = cfg.get_node(*d_it);
+        const auto &node = cfg.get_node(dominator);
         if(node.node_required)
         {
           const irep_idt &id2 = node.function_id;
           INVARIANT(id==id2,
                     "goto/jump expected to be within a single function");
 
-          const auto &postdom_node = pd.get_node(*d_it);
+          const auto &postdom_node = pd.get_node(dominator);
 
           if(postdom_node.dominators.size() > post_dom_size)
           {
-            nearest=*d_it;
+            nearest = dominator;
             post_dom_size = postdom_node.dominators.size();
           }
         }
