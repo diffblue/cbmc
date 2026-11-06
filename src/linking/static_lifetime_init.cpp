@@ -20,6 +20,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/goto-conversion/goto_convert_functions.h>
 
+#include "function_priority_order.h"
+
 #include <set>
 
 static std::optional<codet> static_lifetime_init(
@@ -147,7 +149,12 @@ void static_lifetime_init(
         dest.add(std::move(*code));
     }
 
-  // now call designated "initialization" functions
+  // now call designated "initialization" functions; compute the required order
+  // first. GCC runs constructors in ascending priority order with the
+  // unprioritised ones last.
+  std::list<
+    std::pair<std::reference_wrapper<const symbolt>, std::optional<mp_integer>>>
+    constructors;
 
   for(const std::string &id : symbols)
   {
@@ -161,9 +168,29 @@ void static_lifetime_init(
       code_type.return_type().id() == ID_constructor &&
       code_type.parameters().empty())
     {
-      dest.add(code_expressiont{side_effect_expr_function_callt{
-        symbol.symbol_expr(), {}, code_type.return_type(), source_location}});
+      const exprt &priority = static_cast<const exprt &>(
+        code_type.return_type().find(ID_constructor_priority));
+      std::optional<mp_integer> priority_int_opt;
+      if(priority.is_not_nil())
+      {
+        priority_int_opt = numeric_cast<mp_integer>(priority);
+        DATA_INVARIANT(
+          priority_int_opt.has_value() && *priority_int_opt >= 0,
+          "constructor priority expected to be non-negative integer");
+      }
+      constructors.emplace_back(symbol, priority_int_opt);
     }
+  }
+
+  for(const auto &sym_ref : order_functions_by_priority(
+        constructors, function_priority_ordert::ASCENDING))
+  {
+    const code_typet &code_type = to_code_type(sym_ref.get().type);
+    dest.add(code_expressiont{side_effect_expr_function_callt{
+      sym_ref.get().symbol_expr(),
+      {},
+      code_type.return_type(),
+      source_location}});
   }
 }
 
