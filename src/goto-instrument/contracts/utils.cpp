@@ -10,6 +10,7 @@ Date: September 2021
 
 #include "utils.h"
 
+#include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/fresh_symbol.h>
 #include <util/graph.h>
@@ -178,10 +179,13 @@ exprt all_dereferences_are_valid(const exprt &expr, const namespacet &ns)
 
   if(auto deref = expr_try_dynamic_cast<dereference_exprt>(expr))
   {
+    // For incomplete types (e.g. incomplete arrays) size_of_expr() returns an
+    // empty optional; fall back to a minimal size of 1, as is done for void
+    // pointers.
     const auto size_of_expr_opt = size_of_expr(expr.type(), ns);
-    CHECK_RETURN(size_of_expr_opt.has_value());
-
-    validity_checks.push_back(r_ok_exprt{deref->pointer(), *size_of_expr_opt});
+    validity_checks.push_back(r_ok_exprt{
+      deref->pointer(),
+      size_of_expr_opt.value_or(from_integer(1, size_type()))});
   }
 
   for(const auto &op : expr.operands())
