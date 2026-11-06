@@ -21,7 +21,7 @@ class symbol_table_baset;
 class goto_functionst;
 class message_handlert;
 
-bool read_bin_goto_object(
+[[nodiscard]] bool read_bin_goto_object(
   std::istream &in,
   const std::string &filename,
   symbol_table_baset &symbol_table,
