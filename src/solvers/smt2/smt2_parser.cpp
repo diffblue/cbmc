@@ -1240,11 +1240,38 @@ void smt2_parsert::setup_expressions()
   expressions["bvashl"] = [this] { return binary(ID_shl, operands()); };
   expressions["bvshl"] = [this] { return binary(ID_shl, operands()); };
   expressions["bvand"] = [this] { return multi_ary(ID_bitand, operands()); };
-  expressions["bvnand"] = [this] { return multi_ary(ID_bitnand, operands()); };
+  expressions["bvnand"] = [this]
+  {
+    auto op = operands();
+    if(op.size() != 2)
+      throw error("bvnand takes exactly two operands");
+    return multi_ary(ID_bitnand, op);
+  };
   expressions["bvor"] = [this] { return multi_ary(ID_bitor, operands()); };
-  expressions["bvnor"] = [this] { return multi_ary(ID_bitnor, operands()); };
+  expressions["bvnor"] = [this]
+  {
+    auto op = operands();
+    if(op.size() != 2)
+      throw error("bvnor takes exactly two operands");
+    return multi_ary(ID_bitnor, op);
+  };
   expressions["bvxor"] = [this] { return multi_ary(ID_bitxor, operands()); };
-  expressions["bvxnor"] = [this] { return multi_ary(ID_bitxnor, operands()); };
+  expressions["bvxnor"] = [this]
+  {
+    auto op = operands();
+    if(op.size() == 2)
+      return multi_ary(ID_bitxnor, op);
+    else if(op.size() > 2)
+    {
+      // Left-associative folding: (bvxnor a b c) = (bvxnor (bvxnor a b) c)
+      exprt result = multi_ary(ID_bitxnor, {op[0], op[1]});
+      for(std::size_t i = 2; i < op.size(); i++)
+        result = multi_ary(ID_bitxnor, {result, op[i]});
+      return result;
+    }
+    else
+      throw error("bvxnor takes at least two operands");
+  };
   expressions["bvnot"] = [this] { return unary(ID_bitnot, operands()); };
   expressions["bvneg"] = [this] { return unary(ID_unary_minus, operands()); };
   expressions["bvadd"] = [this] { return multi_ary(ID_plus, operands()); };
