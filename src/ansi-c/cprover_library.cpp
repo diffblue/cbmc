@@ -90,6 +90,30 @@ static std::string library_models_manifest()
          "\nprologue\n" + library_prologue();
 }
 
+/// The file name of the preprocessed model of \p function: the name with
+/// every character other than a letter, digit, `_`, `-` or `.` written as
+/// `%XX` (its hexadecimal code).  Model names may contain characters that
+/// file systems or archives do not allow (the Java models'
+/// `java::java.io.InputStream.read:()I`).
+static std::string model_file_name(const std::string &function)
+{
+  static const char hex[] = "0123456789ABCDEF";
+  std::string result;
+  for(const char c : function)
+  {
+    const unsigned char u = static_cast<unsigned char>(c);
+    if(std::isalnum(u) || c == '_' || c == '-' || c == '.')
+      result += c;
+    else
+    {
+      result += '%';
+      result += hex[u >> 4];
+      result += hex[u & 0xf];
+    }
+  }
+  return result + ".i";
+}
+
 bool dump_c_library_models(
   const std::string &directory,
   message_handlert &message_handler)
@@ -130,7 +154,7 @@ bool dump_c_library_models(
       continue;
     }
     std::ofstream out{widen_if_needed(
-      (std::filesystem::path{directory} / (std::string{e->function} + ".i"))
+      (std::filesystem::path{directory} / model_file_name(e->function))
         .string())};
     out << preprocessed.str();
     ++written;
@@ -175,7 +199,8 @@ static void add_preprocessed_library_models(
   {
     const auto old = symbol_table.symbols.find(*it);
     std::ifstream model{widen_if_needed(
-      (std::filesystem::path{directory} / (id2string(*it) + ".i")).string())};
+      (std::filesystem::path{directory} / model_file_name(id2string(*it)))
+        .string())};
     if(
       old == symbol_table.symbols.end() || old->second.value.is_not_nil() ||
       !model)
