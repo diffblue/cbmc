@@ -986,17 +986,44 @@ literalt smt2_convt::convert(const exprt &expr)
   // Note that here we are always converting, so we do not need to consider
   // other literal kinds, only "|B###|"
 
-  // Z3 refuses get-value when a defined symbol contains a quantifier.
+  // Z3 refuses get-value when a defined symbol contains a quantifier, so we
+  // declare the symbol and constrain it separately rather than using
+  // define-fun.
   if(has_quantifier(prepared_expr))
   {
     out << "(declare-fun ";
     convert_literal(l);
     out << " () Bool)\n";
-    out << "(assert (= ";
-    convert_literal(l);
-    out << ' ';
-    convert_expr(prepared_expr);
-    out << "))\n";
+    if(solver == solvert::Z3)
+    {
+      // A single (assert (= B <expr>)) does not help on Z3: its solve_eqs
+      // preprocessor eliminates B by substituting the quantified <expr>, and
+      // then hands the eliminated form back through get-value (see
+      // Z3Prover/z3#7743). Asserting the equivalence as two implications
+      // instead prevents this; a let-binding shares the (possibly large)
+      // quantified expression so that it is emitted only once. Z3 >= 4.15.3
+      // offers the opt-in option smt.solve_eqs.non_ground (default: true),
+      // which avoids this elimination when set to false, but Z3's default
+      // behaviour is unchanged and older versions reject the option, so we
+      // keep this encoding for Z3. It is only used when the solver is known
+      // to be Z3 (--z3): with --external-smt2-solver or --outfile, which use
+      // the generic solver configuration, the single equality is emitted.
+      out << "(assert (let ((?def ";
+      convert_expr(prepared_expr);
+      out << ")) (and (=> ";
+      convert_literal(l);
+      out << " ?def) (=> ?def ";
+      convert_literal(l);
+      out << "))))\n";
+    }
+    else
+    {
+      out << "(assert (= ";
+      convert_literal(l);
+      out << ' ';
+      convert_expr(prepared_expr);
+      out << "))\n";
+    }
   }
   else
   {
