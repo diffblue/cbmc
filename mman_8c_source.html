@@ -205,53 +205,70 @@ $(function(){initNavTree('mman_8c_source.html','',''); });
 <div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>  (void)fd;</div>
 <div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>  (void)offset;</div>
 <div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span> </div>
-<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>  <span class="keywordflow">if</span>(</div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    addr == 0 ||</div>
-<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>    (<a class="code hl_function" href="mman_8c.html#a8cb534abb228896759dded0be6ac4351">__VERIFIER_nondet___CPROVER_bool</a>() &amp;&amp; (flags &amp; <a class="code hl_define" href="mman_8c.html#a387ec707b30c5e78cf20a14517a63b96">MAP_FIXED</a>) == 0))</div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>  {</div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>    <span class="keywordflow">if</span>(flags &amp; <a class="code hl_define" href="mman_8c.html#ae4f86bff73414c5fc08c058f957212f0">MAP_ANONYMOUS</a> &amp;&amp; (flags &amp; <a class="code hl_define" href="mman_8c.html#a14828817b96941a8a2ad71e2bb95143b">MAP_UNINITIALIZED</a>) == 0)</div>
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="ansi-c_2library_2cprover_8h.html#a39d7421bc1364fd1101bef751362f9d6">__CPROVER_allocate</a>(length, 1);</div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>    <span class="keywordflow">else</span></div>
-<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="ansi-c_2library_2cprover_8h.html#a39d7421bc1364fd1101bef751362f9d6">__CPROVER_allocate</a>(length, 0);</div>
-<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>  }</div>
-<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>  <span class="keywordflow">else</span></div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>  <span class="comment">// POSIX.1-2017 mmap: &quot;Upon successful completion [...] mmap() shall</span></div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>  <span class="comment">// return a pointer [...]; otherwise, it shall return a value of</span></div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>  <span class="comment">// MAP_FAILED and set errno to indicate the error.&quot;</span></div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>  __CPROVER_bool error = <a class="code hl_function" href="mman_8c.html#a8cb534abb228896759dded0be6ac4351">__VERIFIER_nondet___CPROVER_bool</a>();</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>  <span class="keywordflow">if</span>(error)</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>    <span class="keywordflow">return</span> MAP_FAILED;</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span> </div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>  <span class="keywordflow">if</span>(</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>    addr == 0 ||</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>    (<a class="code hl_function" href="mman_8c.html#a8cb534abb228896759dded0be6ac4351">__VERIFIER_nondet___CPROVER_bool</a>() &amp;&amp; (flags &amp; <a class="code hl_define" href="mman_8c.html#a387ec707b30c5e78cf20a14517a63b96">MAP_FIXED</a>) == 0))</div>
 <div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>  {</div>
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>    <a class="code hl_function" href="cprover__builtin__headers_8h.html#a61070b4ee324f21f8eed4661f23adff0">__CPROVER_allocated_memory</a>((__CPROVER_size_t)addr, length);</div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>    <span class="keywordflow">return</span> addr;</div>
-<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>  }</div>
-<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>}</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>    <span class="keywordflow">if</span>(flags &amp; <a class="code hl_define" href="mman_8c.html#ae4f86bff73414c5fc08c058f957212f0">MAP_ANONYMOUS</a> &amp;&amp; (flags &amp; <a class="code hl_define" href="mman_8c.html#a14828817b96941a8a2ad71e2bb95143b">MAP_UNINITIALIZED</a>) == 0)</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="ansi-c_2library_2cprover_8h.html#a39d7421bc1364fd1101bef751362f9d6">__CPROVER_allocate</a>(length, 1);</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>    <span class="keywordflow">else</span></div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="ansi-c_2library_2cprover_8h.html#a39d7421bc1364fd1101bef751362f9d6">__CPROVER_allocate</a>(length, 0);</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>  }</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>  <span class="keywordflow">else</span></div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>  {</div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>    <a class="code hl_function" href="cprover__builtin__headers_8h.html#a61070b4ee324f21f8eed4661f23adff0">__CPROVER_allocated_memory</a>((__CPROVER_size_t)addr, length);</div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>    <span class="keywordflow">return</span> addr;</div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>  }</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>}</div>
 </div>
-<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span> </div>
-<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span> </div>
-<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span><span class="comment">/* FUNCTION: munmap */</span></div>
-<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span> </div>
-<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>__CPROVER_bool <a class="code hl_function" href="mman_8c.html#a8cb534abb228896759dded0be6ac4351">__VERIFIER_nondet___CPROVER_bool</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span> </div>
-<div class="foldopen" id="foldopen00132" data-start="{" data-end="}">
-<div class="line"><a id="l00132" name="l00132"></a><span class="lineno"><a class="line" href="mman_8c.html#ab6ed1aed020afdc1da726356098070f9">  132</a></span><span class="keywordtype">int</span> <a class="code hl_function" href="mman_8c.html#ab6ed1aed020afdc1da726356098070f9">munmap</a>(<span class="keywordtype">void</span> *addr, __CPROVER_size_t length)</div>
-<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>{</div>
-<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>  (void)length;</div>
-<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span> </div>
-<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>  <a class="code hl_function" href="ansi-c_2library_2cprover_8h.html#a5ef264d7c09f165e1d72b108c150dd32">__CPROVER_deallocate</a>(addr);</div>
-<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span> </div>
-<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>  <span class="keywordflow">return</span> 0;</div>
-<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>}</div>
-</div>
-<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span> </div>
-<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span><span class="comment">/* FUNCTION: _munmap */</span></div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span> </div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span> </div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span><span class="comment">/* FUNCTION: munmap */</span></div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span> </div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>__CPROVER_bool <a class="code hl_function" href="mman_8c.html#a8cb534abb228896759dded0be6ac4351">__VERIFIER_nondet___CPROVER_bool</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span> </div>
+<div class="foldopen" id="foldopen00139" data-start="{" data-end="}">
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno"><a class="line" href="mman_8c.html#ab6ed1aed020afdc1da726356098070f9">  139</a></span><span class="keywordtype">int</span> <a class="code hl_function" href="mman_8c.html#ab6ed1aed020afdc1da726356098070f9">munmap</a>(<span class="keywordtype">void</span> *addr, __CPROVER_size_t length)</div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>{</div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>  (void)length;</div>
 <div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span> </div>
-<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>__CPROVER_bool <a class="code hl_function" href="mman_8c.html#a8cb534abb228896759dded0be6ac4351">__VERIFIER_nondet___CPROVER_bool</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span> </div>
-<div class="foldopen" id="foldopen00145" data-start="{" data-end="}">
-<div class="line"><a id="l00145" name="l00145"></a><span class="lineno"><a class="line" href="mman_8c.html#a449004606fcb9858f69b7dc9a930a395">  145</a></span><span class="keywordtype">int</span> <a class="code hl_function" href="mman_8c.html#a449004606fcb9858f69b7dc9a930a395">_munmap</a>(<span class="keywordtype">void</span> *addr, __CPROVER_size_t length)</div>
-<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>{</div>
-<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>  (void)length;</div>
+<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>  <span class="comment">// POSIX.1-2017 munmap: &quot;Upon successful completion, munmap() shall</span></div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>  <span class="comment">// return 0; otherwise, it shall return -1.&quot;</span></div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>  __CPROVER_bool error = <a class="code hl_function" href="mman_8c.html#a8cb534abb228896759dded0be6ac4351">__VERIFIER_nondet___CPROVER_bool</a>();</div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>  <span class="keywordflow">if</span>(error)</div>
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>    <span class="keywordflow">return</span> -1;</div>
 <div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span> </div>
 <div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>  <a class="code hl_function" href="ansi-c_2library_2cprover_8h.html#a5ef264d7c09f165e1d72b108c150dd32">__CPROVER_deallocate</a>(addr);</div>
 <div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span> </div>
 <div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>  <span class="keywordflow">return</span> 0;</div>
 <div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>}</div>
+</div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span> </div>
+<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span><span class="comment">/* FUNCTION: _munmap */</span></div>
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span> </div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>__CPROVER_bool <a class="code hl_function" href="mman_8c.html#a8cb534abb228896759dded0be6ac4351">__VERIFIER_nondet___CPROVER_bool</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span> </div>
+<div class="foldopen" id="foldopen00158" data-start="{" data-end="}">
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno"><a class="line" href="mman_8c.html#a449004606fcb9858f69b7dc9a930a395">  158</a></span><span class="keywordtype">int</span> <a class="code hl_function" href="mman_8c.html#a449004606fcb9858f69b7dc9a930a395">_munmap</a>(<span class="keywordtype">void</span> *addr, __CPROVER_size_t length)</div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>{</div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>  (void)length;</div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span> </div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>  __CPROVER_bool error = <a class="code hl_function" href="mman_8c.html#a8cb534abb228896759dded0be6ac4351">__VERIFIER_nondet___CPROVER_bool</a>();</div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>  <span class="keywordflow">if</span>(error)</div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>    <span class="keywordflow">return</span> -1;</div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span> </div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>  <a class="code hl_function" href="ansi-c_2library_2cprover_8h.html#a5ef264d7c09f165e1d72b108c150dd32">__CPROVER_deallocate</a>(addr);</div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span> </div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>  <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>}</div>
 </div>
 <div class="ttc" id="aansi-c_2library_2cprover_8h_html_a39d7421bc1364fd1101bef751362f9d6"><div class="ttname"><a href="ansi-c_2library_2cprover_8h.html#a39d7421bc1364fd1101bef751362f9d6">__CPROVER_allocate</a></div><div class="ttdeci">void * __CPROVER_allocate(__CPROVER_size_t size, __CPROVER_bool zero)</div></div>
 <div class="ttc" id="aansi-c_2library_2cprover_8h_html_a5ef264d7c09f165e1d72b108c150dd32"><div class="ttname"><a href="ansi-c_2library_2cprover_8h.html#a5ef264d7c09f165e1d72b108c150dd32">__CPROVER_deallocate</a></div><div class="ttdeci">void __CPROVER_deallocate(void *)</div><div class="ttdef"><b>Definition</b> <a href="stdlib_8c_source.html#l00670">stdlib.c:670</a></div></div>
@@ -259,10 +276,10 @@ $(function(){initNavTree('mman_8c_source.html','',''); });
 <div class="ttc" id="amman_8c_html_a0a2f2761238739a7551c7ce49262c547"><div class="ttname"><a href="mman_8c.html#a0a2f2761238739a7551c7ce49262c547">_mmap</a></div><div class="ttdeci">void * _mmap(void *addr, __CPROVER_size_t length, int prot, int flags, int fd, off_t offset)</div><div class="ttdef"><b>Definition</b> <a href="#l00062">mman.c:62</a></div></div>
 <div class="ttc" id="amman_8c_html_a14828817b96941a8a2ad71e2bb95143b"><div class="ttname"><a href="mman_8c.html#a14828817b96941a8a2ad71e2bb95143b">MAP_UNINITIALIZED</a></div><div class="ttdeci">#define MAP_UNINITIALIZED</div><div class="ttdef"><b>Definition</b> <a href="#l00019">mman.c:19</a></div></div>
 <div class="ttc" id="amman_8c_html_a387ec707b30c5e78cf20a14517a63b96"><div class="ttname"><a href="mman_8c.html#a387ec707b30c5e78cf20a14517a63b96">MAP_FIXED</a></div><div class="ttdeci">#define MAP_FIXED</div><div class="ttdef"><b>Definition</b> <a href="#l00011">mman.c:11</a></div></div>
-<div class="ttc" id="amman_8c_html_a449004606fcb9858f69b7dc9a930a395"><div class="ttname"><a href="mman_8c.html#a449004606fcb9858f69b7dc9a930a395">_munmap</a></div><div class="ttdeci">int _munmap(void *addr, __CPROVER_size_t length)</div><div class="ttdef"><b>Definition</b> <a href="#l00145">mman.c:145</a></div></div>
+<div class="ttc" id="amman_8c_html_a449004606fcb9858f69b7dc9a930a395"><div class="ttname"><a href="mman_8c.html#a449004606fcb9858f69b7dc9a930a395">_munmap</a></div><div class="ttdeci">int _munmap(void *addr, __CPROVER_size_t length)</div><div class="ttdef"><b>Definition</b> <a href="#l00158">mman.c:158</a></div></div>
 <div class="ttc" id="amman_8c_html_a6353521abf033fa65b92a2d73fd36f09"><div class="ttname"><a href="mman_8c.html#a6353521abf033fa65b92a2d73fd36f09">mmap</a></div><div class="ttdeci">void * mmap(void *addr, __CPROVER_size_t length, int prot, int flags, int fd, off_t offset)</div><div class="ttdef"><b>Definition</b> <a href="#l00025">mman.c:25</a></div></div>
 <div class="ttc" id="amman_8c_html_a8cb534abb228896759dded0be6ac4351"><div class="ttname"><a href="mman_8c.html#a8cb534abb228896759dded0be6ac4351">__VERIFIER_nondet___CPROVER_bool</a></div><div class="ttdeci">__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void)</div></div>
-<div class="ttc" id="amman_8c_html_ab6ed1aed020afdc1da726356098070f9"><div class="ttname"><a href="mman_8c.html#ab6ed1aed020afdc1da726356098070f9">munmap</a></div><div class="ttdeci">int munmap(void *addr, __CPROVER_size_t length)</div><div class="ttdef"><b>Definition</b> <a href="#l00132">mman.c:132</a></div></div>
+<div class="ttc" id="amman_8c_html_ab6ed1aed020afdc1da726356098070f9"><div class="ttname"><a href="mman_8c.html#ab6ed1aed020afdc1da726356098070f9">munmap</a></div><div class="ttdeci">int munmap(void *addr, __CPROVER_size_t length)</div><div class="ttdef"><b>Definition</b> <a href="#l00139">mman.c:139</a></div></div>
 <div class="ttc" id="amman_8c_html_ab7dca6b44eb7b7dc9c88e5284a2b10f3"><div class="ttname"><a href="mman_8c.html#ab7dca6b44eb7b7dc9c88e5284a2b10f3">mmap64</a></div><div class="ttdeci">void * mmap64(void *, __CPROVER_size_t, int, int, int, off_t)</div><div class="ttdef"><b>Definition</b> <a href="#l00098">mman.c:98</a></div></div>
 <div class="ttc" id="amman_8c_html_ae4f86bff73414c5fc08c058f957212f0"><div class="ttname"><a href="mman_8c.html#ae4f86bff73414c5fc08c058f957212f0">MAP_ANONYMOUS</a></div><div class="ttdeci">#define MAP_ANONYMOUS</div><div class="ttdef"><b>Definition</b> <a href="#l00015">mman.c:15</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
