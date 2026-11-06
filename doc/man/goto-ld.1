@@ -1,1 +1,29 @@
-goto-cc.1
+.TH GOTO-LD "1" "March 1, 2026" "goto-ld-6.10.0" "User Commands"
+.SH NAME
+goto\-ld \- GOTO binary linker
+.SH SYNOPSIS
+.B goto\-ld
+.RI [ options ]
+.IR file ...
+.SH DESCRIPTION
+\fBgoto\-ld\fR is an alias for \fBgoto\-cc\fR(1) that only performs the linking
+phase.  It produces an \fBelf\fR(5) object file with an additional
+\fIgoto\-cc\fR section containing the linked GOTO binary.
+.PP
+\fBgoto\-ld\fR accepts all options that \fBgoto\-cc\fR(1) and \fBld\fR(1)
+accept.  See \fBgoto\-cc\fR(1) for full documentation.
+.SH ENVIRONMENT
+.TP
+.B TMPDIR
+All CProver tools honor this variable when creating temporary files and
+directories.
+.SH BUGS
+If you encounter a problem please create an issue at
+.B https://github.com/diffblue/cbmc/issues
+.SH SEE ALSO
+.BR cbmc (1),
+.BR goto\-cc (1),
+.BR goto\-gcc (1),
+.BR ld (1)
+.SH COPYRIGHT
+2006\-2026, Daniel Kroening, Michael Tautschnig, Christoph Wintersteiger
