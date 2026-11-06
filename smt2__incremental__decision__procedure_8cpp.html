@@ -121,11 +121,12 @@ $(function(){initNavTree('smt2__incremental__decision__procedure_8cpp.html','','
 <code>#include &lt;<a class="el" href="type__size__mapping_8h_source.html">solvers/smt2_incremental/type_size_mapping.h</a>&gt;</code><br />
 <code>#include &lt;stack&gt;</code><br />
 <code>#include &lt;unordered_set&gt;</code><br />
+<code>#include &lt;vector&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return dynsection.toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;"><span class="dynarrow"><span class="arrowhead closed"></span></span>Include dependency graph for smt2_incremental_decision_procedure.cpp:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" loading="lazy" frameborder="0" src="smt2__incremental__decision__procedure_8cpp__incl.svg" width="3583" height="948"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" loading="lazy" frameborder="0" src="smt2__incremental__decision__procedure_8cpp__incl.svg" width="3870" height="872"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 </div>
 <p><a href="smt2__incremental__decision__procedure_8cpp_source.html">Go to the source code of this file.</a></p>
@@ -178,7 +179,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00567">567</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00568">568</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
 
 </div>
 </div>
@@ -210,7 +211,7 @@ Functions</h2></td></tr>
 <dl class="section note"><dt>Note</dt><dd>This pass over <code class="param">expr</code> is tightly coupled to the implementation of <span class="tt"><a class="el" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a></span>. This is because any sub expressions which <span class="tt"><a class="el" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a></span> translates into function applications, must also be returned by this<span class="tt"><a class="el" href="#acfe2aeb0c61f909387a6f9ef20066745" title="Find all sub expressions of the given expr which need to be expressed as separate smt commands.">gather_dependent_expressions</a></span> function.</dd></dl>
 <p><span class="tt"><a class="el" href="classsymbol__exprt.html" title="Expression to hold a symbol (variable).">symbol_exprt</a></span>, <span class="tt"><a class="el" href="classarray__exprt.html" title="Array constructor from list of elements.">array_exprt</a></span> and <span class="tt"><a class="el" href="classnondet__symbol__exprt.html" title="Expression to hold a nondeterministic choice.">nondet_symbol_exprt</a></span> add dependant expressions. </p>
 
-<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00074">74</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00075">75</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
 
 </div>
 </div>
@@ -240,7 +241,7 @@ Functions</h2></td></tr>
 <p>Returns a message string describing the problem in the case where the response from the solver is an error status. </p>
 <p>Returns empty otherwise. </p>
 
-<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00048">48</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00049">49</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
 
 </div>
 </div>
@@ -278,7 +279,7 @@ Functions</h2></td></tr>
 
 <p>Issues a command to the solving process which is expected to optionally return a success status followed by the actual response of interest. </p>
 
-<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00032">32</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00033">33</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
 
 </div>
 </div>
@@ -307,7 +308,7 @@ Functions</h2></td></tr>
 
 <p>Check whether an expression or any of its immediate operands has floating-point bitvector type. </p>
 
-<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00314">314</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00315">315</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
 
 </div>
 </div>
@@ -334,7 +335,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00694">694</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00695">695</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
 
 </div>
 </div>
@@ -364,7 +365,7 @@ Functions</h2></td></tr>
 <p>Lower floating-point operations to bitvector expressions. </p>
 <p>Traverses <code class="param">expr</code> bottom-up and replaces float-specific sub-expressions (e.g., ieee_float_equal, floatbv_plus) with their bitvector equivalents using <a class="el" href="classfloat__bvt.html#a8d424487b5116961f7913f99c3997180">float_bvt::convert</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00330">330</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00331">331</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
 
 </div>
 </div>
@@ -395,7 +396,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00282">282</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00283">283</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
 
 </div>
 </div>
@@ -426,7 +427,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00301">301</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00302">302</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
 
 </div>
 </div>
@@ -464,7 +465,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00166">166</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00167">167</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
 
 </div>
 </div>
@@ -497,7 +498,7 @@ Functions</h2></td></tr>
 
 <p>Replaces the sub expressions of <code class="param">expr</code> which have been defined as separate functions in the smt solver, using the <code class="param">expression_identifiers</code> map. </p>
 
-<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00249">249</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00250">250</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
 
 </div>
 </div>
