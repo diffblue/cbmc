@@ -100,9 +100,109 @@ is unknown.
 
 ### Fixed-point Arithmetic
 
-CPROVER also has support for fixed-point types. The `--fixedbv` flag
-switches `float`, `double`, and `long double` to fixed-point types. The
-length of these types is platform specific. The upper half of each type
-is the integer component and the lower half is the fractional part.
+CPROVER supports fixed-point arithmetic through the `__CPROVER_fixedbv` type.
+This type allows you to specify a fixed-point bit vector with arbitrary but
+fixed size. The syntax is:
+
+```C
+__CPROVER_fixedbv[width][fraction_bits]
+```
+
+where `width` is the total size in bits, and `fraction_bits` is the number of
+bits after the radix point. For example, `__CPROVER_fixedbv[32][16]` defines
+a 32-bit fixed-point type with 16 bits for the integer part and 16 bits for
+the fractional part.
+
+#### Using Fixed-point Types
+
+Fixed-point types can be used with typedefs for convenience:
+
+```C
+typedef __CPROVER_fixedbv[32][16] fixed32_t;
+
+fixed32_t x = 10.5;
+fixed32_t y = 3.25;
+fixed32_t z = x + y;
+```
+
+If you need to use fixed-point arithmetic for standard floating-point types
+throughout your code, you can use preprocessor definitions:
+
+```C
+#define float __CPROVER_fixedbv[32][16]
+#define double __CPROVER_fixedbv[64][32]
+```
+
+**Warning**: These macros redefine C keywords and will affect all code
+following the definition, including any subsequently included headers. Place
+them after all `#include` directives. For a safer alternative, use the
+`typedef` approach shown above with a project-specific type name.
+
+**Note**: The `--fixedbv` command-line option that previously provided similar
+functionality was removed in CBMC version 5.9 (see PR #2148). The
+`__CPROVER_fixedbv` type is the current and preferred approach for
+fixed-point arithmetic.
+
+#### Arithmetic Operations
+
+CPROVER supports the standard arithmetic operators for `__CPROVER_fixedbv`
+types:
+
+- **Addition and Subtraction**: Performed directly on the underlying values.
+  CBMC does not automatically insert overflow checks for fixed-point addition
+  and subtraction. The `__CPROVER_overflow_*` built-ins are defined over
+  `unsigned long long` and do not model fixed-point overflow, so if overflow
+  checking is required, add explicit assertions bounding the fixed-point values.
+
+- **Multiplication**: The operands and result share the same
+  `__CPROVER_fixedbv` type. The product is computed at full precision and then
+  reduced back to that type by discarding the extra low-order fractional bits,
+  i.e. truncating toward zero.
+
+- **Division**: The operands and result share the same `__CPROVER_fixedbv`
+  type. The dividend is scaled up by the type's number of fractional bits and an
+  integer division is performed, producing a result in the same fixed-point type
+  (truncated toward zero).
+
+- **Comparison operators**: All standard comparison operators (`<`, `<=`, `>`,
+  `>=`, `==`, `!=`) are supported.
+
+- **Type conversions**: Fixed-point values can be converted to and from
+  integers and other fixed-point types. Conversions to integers truncate
+  toward zero (round-to-zero semantics).
+
+#### Math Library and Special Functions
+
+CPROVER does not currently provide built-in support for mathematical functions
+(such as trigonometric functions, exponentials, logarithms, or square roots)
+for `__CPROVER_fixedbv` types. If you need such functions for your
+verification, you have several options:
+
+1. **Provide your own implementations**: You can write approximations of these
+   functions using fixed-point arithmetic operations.
+
+2. **Use uninterpreted functions**: For abstract reasoning about function
+   behavior without concrete implementations, you can use CPROVER's
+   uninterpreted functions (see [Nondeterminism](../../modeling/nondeterminism/)).
+
+3. **Add function stubs with contracts**: Define function stubs with
+   `__CPROVER_assume` statements to specify the expected behavior of the
+   function for verification purposes.
+
+Example of providing a simple approximation:
+
+```C
+typedef __CPROVER_fixedbv[32][16] fixed32_t;
+
+// User-provided approximation of absolute value
+fixed32_t fixed_abs(fixed32_t x) {
+  return x < 0 ? -x : x;
+}
+```
+
+#### Additional Information
+
+For more details on the `__CPROVER_fixedbv` type and other CPROVER-specific
+types and functions, see the [API Reference](../../api/).
 
 
