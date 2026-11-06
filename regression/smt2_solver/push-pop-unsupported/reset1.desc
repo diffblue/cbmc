@@ -1,0 +1,12 @@
+CORE
+reset1.smt2
+
+^EXIT=20$
+^SIGNAL=0$
+^\(error "line 4: reset-assertions is not supported"\)$
+^unknown$
+--
+^unsat$
+--
+reset-assertions must be explicitly rejected, and as the assertion cannot be
+retracted, the solver must not report unsat.
