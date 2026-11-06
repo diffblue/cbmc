@@ -1,0 +1,11 @@
+CORE smt-backend no-new-smt broken-cprover-smt-backend
+symbolic.c
+--z3
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Arrays of non-constant size are compared using a bounded quantifier. The
+propositional back-end does not yet support this case.

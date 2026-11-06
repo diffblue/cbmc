@@ -1,0 +1,10 @@
+CORE no-new-smt
+nested.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Nested arrays and arrays of structs containing arrays.

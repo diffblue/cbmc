@@ -1,0 +1,12 @@
+CORE no-new-smt broken-cprover-smt-backend
+large.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Arrays larger than MAX_FLATTENED_ARRAY_SIZE. The CPROVER SMT2 solver does not
+support the quantifier this requires, and the fallback compares the entire
+index domain.

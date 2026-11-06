@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/format_expr.h>
 #include <util/ieee_float.h>
 #include <util/invariant.h>
+#include <util/magic.h>
 #include <util/mathematical_expr.h>
 #include <util/namespace.h>
 #include <util/pointer_offset_size.h>
@@ -105,6 +106,7 @@ smt2_convt::smt2_convt(
     break;
 
   case solvert::CVC5:
+    use_quantifiers = true;
     logic = "ALL";
     use_FPA_theory = true;
     use_array_of_bool = true;
@@ -120,6 +122,7 @@ smt2_convt::smt2_convt(
     break;
 
   case solvert::Z3:
+    use_quantifiers = true;
     use_array_of_bool = true;
     // `as const` is disabled because of a soundness issue in Z3,
     // see https://github.com/Z3Prover/z3/issues/9550. Revisit once
@@ -5784,6 +5787,26 @@ exprt smt2_convt::prepare_for_convert_expr(const exprt &expr)
       it.mutate() = lowered;
       it.next_sibling_or_parent();
     }
+    else if(
+      (it->id() == ID_equal || it->id() == ID_notequal) &&
+      (it->operands()[0].type().id() == ID_array ||
+       (use_datatypes && (it->operands()[0].type().id() == ID_struct_tag ||
+                          it->operands()[0].type().id() == ID_struct))))
+    {
+      // SMT-LIB equality of arrays compares the entire index domain, see
+      // lower_equality
+      const auto &relation = to_binary_relation_expr(*it);
+      exprt lowered = lower_equality(relation.lhs(), relation.rhs());
+      if(lowered.id() != ID_equal)
+      {
+        if(relation.id() == ID_notequal)
+          lowered = not_exprt{std::move(lowered)};
+        // process the resulting expression itself in the next iteration
+        it.mutate() = std::move(lowered);
+      }
+      else
+        ++it;
+    }
     else
       ++it;
   }
@@ -6384,6 +6407,97 @@ void smt2_convt::find_symbols(const exprt &expr)
       out << ")\n";              // declare-fun
     }
   }
+}
+
+exprt smt2_convt::lower_equality(const exprt &lhs, const exprt &rhs)
+{
+  // Syntactically equal operands need no lowering. Equalities of this kind are
+  // also used to make sure symbols are declared, see
+  // symex_target_equationt::convert_decls.
+  if(lhs == rhs)
+    return equal_exprt{lhs, rhs};
+
+  const typet &type = lhs.type();
+
+  if(type.id() == ID_array && (use_array_theory(lhs) || use_array_theory(rhs)))
+  {
+    const array_typet &array_type = to_array_type(type);
+    const typet &index_type = array_type.index_type();
+    const exprt size =
+      typecast_exprt::conditional_cast(array_type.size(), index_type);
+
+    auto element_equality = [this, &lhs, &rhs](const exprt &index)
+    {
+      return lower_equality(
+        index_exprt{lhs, index, to_array_type(lhs.type()).element_type()},
+        index_exprt{rhs, index, to_array_type(rhs.type()).element_type()});
+    };
+
+    // Compare element by element where the size is a (not too large)
+    // constant: this keeps the formula quantifier free, which solvers handle
+    // best, in particular when producing models. For nested arrays, the limit
+    // applies to the total number of elements.
+    const auto size_int = numeric_cast<mp_integer>(size);
+    std::optional<mp_integer> total_elements = size_int;
+    for(const typet *t = &array_type.element_type();
+        total_elements.has_value() && t->id() == ID_array;
+        t = &to_array_type(*t).element_type())
+    {
+      const auto inner = numeric_cast<mp_integer>(to_array_type(*t).size());
+      if(inner.has_value())
+        *total_elements *= *inner;
+      else
+        total_elements.reset();
+    }
+    if(
+      total_elements.has_value() && *total_elements <= MAX_FLATTENED_ARRAY_SIZE)
+    {
+      exprt::operandst conjuncts;
+      for(mp_integer i = 0; i < *size_int; ++i)
+        conjuncts.push_back(element_equality(from_integer(i, index_type)));
+      return conjunction(conjuncts);
+    }
+
+    // Otherwise, use a bounded quantifier, if supported. Without quantifiers,
+    // fall back to comparing the entire index domain, which may yield spurious
+    // inequalities.
+    if(!use_quantifiers)
+      return equal_exprt{lhs, rhs};
+
+    const symbol_exprt index{
+      "smt2_convt::array_equality_index$" +
+        std::to_string(array_equality_index_counter++),
+      index_type};
+    exprt in_bounds = binary_relation_exprt{index, ID_lt, size};
+    if(index_type.id() == ID_signedbv)
+    {
+      in_bounds = and_exprt{
+        binary_relation_exprt{index, ID_ge, from_integer(0, index_type)},
+        std::move(in_bounds)};
+    }
+    return forall_exprt{
+      index, implies_exprt{std::move(in_bounds), element_equality(index)}};
+  }
+  else if(
+    use_datatypes && (type.id() == ID_struct_tag || type.id() == ID_struct) &&
+    has_subtype(type, ID_array, ns))
+  {
+    // Structs encoded as datatypes are compared as a whole, which would
+    // compare the entire index domain of any array members. Compare member by
+    // member instead.
+    const struct_typet &struct_type =
+      type.id() == ID_struct_tag ? ns.follow_tag(to_struct_tag_type(type))
+                                 : to_struct_type(type);
+    exprt::operandst conjuncts;
+    for(const auto &component : struct_type.components())
+    {
+      conjuncts.push_back(lower_equality(
+        member_exprt{lhs, component}, member_exprt{rhs, component}));
+    }
+    return conjunction(conjuncts);
+  }
+
+  return equal_exprt{lhs, rhs};
 }
 
 bool smt2_convt::use_array_theory(const exprt &expr)
