@@ -7,6 +7,7 @@
 #include <util/bitvector_expr.h>
 #include <util/bitvector_types.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/ieee_float.h>
 #include <util/invariant.h>
 #include <util/mathematical_expr.h>
@@ -1037,6 +1038,154 @@ TEST_CASE("smt2_convt quantifier definition encoding", "[core][solvers][smt2]")
       REQUIRE(out.find(equality) != std::string::npos);
       // no implication-based workaround
       REQUIRE(out.find("(assert (=> ") == std::string::npos);
+    }
+  }
+}
+
+TEST_CASE(
+  "smt2_convt quantifier nested in another expression",
+  "[core][solvers][smt2]")
+{
+  const unsignedbv_typet bv8{8};
+  const symbol_exprt i{"i", bv8};
+  const exists_exprt quantified{i, equal_exprt{i, from_integer(0, bv8)}};
+  const std::string quant = "(exists ((i (_ BitVec 8))) (= i (_ bv0 8)))";
+
+  GIVEN("a Boolean expression containing a quantifier and the Z3 solver")
+  {
+    const std::string out =
+      convert_handle(not_exprt{quantified}, smt2_convt::solvert::Z3);
+    INFO("SMT2 output:\n" << out);
+
+    THEN("the quantifier is defined by a Boolean variable of its own")
+    {
+      // Only the definition of B0 contains the quantifier, which avoids Z3
+      // returning quantified expressions as values of other symbols.
+      const std::string assertion =
+        "(assert (let ((?def " + quant + ")) (and (=> B0 ?def) (=> ?def B0))))";
+      REQUIRE(out.find(assertion) != std::string::npos);
+      REQUIRE(out.find(quant) == out.rfind(quant));
+      REQUIRE(
+        out.find("(define-fun B1 () Bool (not B0))") != std::string::npos);
+    }
+  }
+
+  GIVEN("a quantifier occurring twice and the Z3 solver")
+  {
+    const std::string out = convert_handle(
+      or_exprt{quantified, not_exprt{quantified}}, smt2_convt::solvert::Z3);
+    INFO("SMT2 output:\n" << out);
+
+    THEN("a single Boolean variable is defined for it")
+    {
+      REQUIRE(out.find(quant) == out.rfind(quant));
+      REQUIRE(
+        out.find("(define-fun B1 () Bool (or B0 (not B0)))") !=
+        std::string::npos);
+    }
+  }
+
+  GIVEN("nested quantifiers and the Z3 solver")
+  {
+    const symbol_exprt j{"j", bv8};
+    const forall_exprt nested{i, exists_exprt{j, equal_exprt{j, i}}};
+    const std::string out =
+      convert_handle(not_exprt{nested}, smt2_convt::solvert::Z3);
+    INFO("SMT2 output:\n" << out);
+
+    THEN("only the outermost quantifier is replaced by a Boolean variable")
+    {
+      // The inner quantifier refers to the variable bound by the outer one.
+      const std::string assertion =
+        "(assert (let ((?def (forall ((i (_ BitVec 8))) "
+        "(exists ((j (_ BitVec 8))) (= j i))))) "
+        "(and (=> B0 ?def) (=> ?def B0))))";
+      REQUIRE(out.find(assertion) != std::string::npos);
+      REQUIRE(out.find("B2") == std::string::npos);
+      REQUIRE(
+        out.find("(define-fun B1 () Bool (not B0))") != std::string::npos);
+    }
+  }
+
+  GIVEN("a quantifier referring to a let-bound variable and the Z3 solver")
+  {
+    const symbol_exprt j{"j", bv8};
+    const let_exprt let{
+      j, from_integer(1, bv8), exists_exprt{i, equal_exprt{i, j}}};
+    const std::string out =
+      convert_handle(not_exprt{let}, smt2_convt::solvert::Z3);
+    INFO("SMT2 output:\n" << out);
+
+    THEN("the quantifier is not replaced by a Boolean variable")
+    {
+      // Replacing it would leave j unbound in the definition of that variable.
+      // The definition of B0 as a whole contains the quantifier instead.
+      const std::string assertion =
+        "(assert (let ((?def (not (let ((j (_ bv1 8))) "
+        "(exists ((i (_ BitVec 8))) (= i j)))))) "
+        "(and (=> B0 ?def) (=> ?def B0))))";
+      REQUIRE(out.find(assertion) != std::string::npos);
+      REQUIRE(out.find("B1") == std::string::npos);
+    }
+  }
+}
+
+TEST_CASE(
+  "smt2_convt quantifier under a binder solved by Z3",
+  "[core][solvers][smt2]")
+{
+  symbol_tablet symbol_table;
+  namespacet ns{symbol_table};
+  null_message_handlert message_handler;
+  smt2_dect smt2_dec{
+    ns, "unit test", "", "ALL", smt2_dect::solvert::Z3, "", message_handler};
+
+  const unsignedbv_typet bv8{8};
+  const symbol_exprt i{"i", bv8};
+  const symbol_exprt x{"x", bv8};
+
+  GIVEN("a quantifier referring to a let-bound variable")
+  {
+    // let x = 0 in exists i. x == 1, which is false
+    smt2_dec << let_exprt{
+      x,
+      from_integer(0, bv8),
+      exists_exprt{i, equal_exprt{x, from_integer(1, bv8)}}};
+
+    THEN("the formula is unsatisfiable")
+    {
+      REQUIRE(smt2_dec() == decision_proceduret::resultt::D_UNSATISFIABLE);
+    }
+  }
+
+  GIVEN("a quantifier referring to the index of an array comprehension")
+  {
+    // arr[j] == (exists k. k == j && k < 1 ? 1 : 0), so arr[0] differs from
+    // arr[1]
+    config.ansi_c.set_LP64();
+    const typet index_type = c_index_type();
+    const symbol_exprt j{"j", index_type};
+    const symbol_exprt k{"k", index_type};
+    const array_typet array_type{bv8, from_integer(2, index_type)};
+    const symbol_exprt arr{"arr", array_type};
+    const exists_exprt quantified{
+      k,
+      and_exprt{
+        equal_exprt{k, j},
+        binary_relation_exprt{k, ID_lt, from_integer(1, index_type)}}};
+    smt2_dec << equal_exprt{
+      arr,
+      array_comprehension_exprt{
+        j,
+        if_exprt{quantified, from_integer(1, bv8), from_integer(0, bv8)},
+        array_type}};
+    smt2_dec << equal_exprt{
+      index_exprt{arr, from_integer(0, index_type)},
+      index_exprt{arr, from_integer(1, index_type)}};
+
+    THEN("the formula is unsatisfiable")
+    {
+      REQUIRE(smt2_dec() == decision_proceduret::resultt::D_UNSATISFIABLE);
     }
   }
 }

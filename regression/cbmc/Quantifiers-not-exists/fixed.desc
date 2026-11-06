@@ -14,3 +14,8 @@ fixed.c
 ^SIGNAL=0$
 --
 ^warning: ignoring
+--
+Z3 uses all available memory on this test during E-matching on the nested,
+alternating quantifiers (Z3 4.8.12: 12 GB within 2 minutes; Z3 4.15.4: the
+16 GiB limit within 1 minute), so do not run it without a memory limit. It
+succeeds with the option smt.ematching=false.

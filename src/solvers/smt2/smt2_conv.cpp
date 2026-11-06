@@ -49,6 +49,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cstdint>
 #include <map>
+#include <unordered_set>
 
 // Mark different kinds of error conditions
 
@@ -5746,6 +5747,55 @@ exprt smt2_convt::lower_byte_operators(const exprt &expr)
   return lowered_expr;
 }
 
+/// The identifiers of the variables bound by binders other than quantifiers
+/// (let, lambda, array comprehension) in \p expr.
+static std::unordered_set<irep_idt>
+non_quantifier_bound_variables(const exprt &expr)
+{
+  std::unordered_set<irep_idt> result;
+  expr.visit_pre(
+    [&result](const exprt &node)
+    {
+      if(can_cast_expr<let_exprt>(node))
+      {
+        for(const auto &variable : to_let_expr(node).variables())
+          result.insert(variable.get_identifier());
+      }
+      else if(
+        can_cast_expr<binding_exprt>(node) &&
+        !can_cast_expr<quantifier_exprt>(node))
+      {
+        for(const auto &variable : to_binding_expr(node).variables())
+          result.insert(variable.get_identifier());
+      }
+    });
+  return result;
+}
+
+/// True if \p expr has a free occurrence of one of \p identifiers.
+static bool has_free_variable_in(
+  const exprt &expr,
+  const std::unordered_set<irep_idt> &identifiers)
+{
+  for(const auto &identifier : identifiers)
+  {
+    if(has_symbol_expr(expr, identifier, false))
+      return true;
+  }
+  return false;
+}
+
+/// A Boolean variable that is equivalent to \p quantifier, defined using the
+/// encoding of \ref convert(const exprt &). The same variable is used for all
+/// occurrences of \p quantifier.
+literalt smt2_convt::lift_quantifier(const quantifier_exprt &quantifier)
+{
+  auto entry = lifted_quantifiers.find(quantifier);
+  if(entry == lifted_quantifiers.end())
+    entry = lifted_quantifiers.emplace(quantifier, convert(quantifier)).first;
+  return entry->second;
+}
+
 /// Perform steps necessary before an expression is passed to \ref convert_expr
 /// 1. Replace byte operators (byte_extract, _update) with equivalent
 ///    expressions
@@ -5762,10 +5812,38 @@ exprt smt2_convt::prepare_for_convert_expr(const exprt &expr)
     !has_byte_operator(lowered_expr),
     "lower_byte_operators should remove all byte operators");
 
+  // With Z3, quantifiers that are not nested within another quantifier are
+  // replaced by a Boolean variable (see below), unless the expression itself
+  // is a quantifier, which is the case when we are asked to define such a
+  // variable.
+  const bool lift_quantifiers =
+    solver == solvert::Z3 && !can_cast_expr<quantifier_exprt>(lowered_expr);
+  // A quantifier that refers to a variable bound by an enclosing binder other
+  // than a quantifier (let, lambda, array comprehension) cannot be replaced
+  // by a variable of its own, as that would unbind the variable.
+  const std::unordered_set<irep_idt> binder_variables =
+    lift_quantifiers ? non_quantifier_bound_variables(lowered_expr)
+                     : std::unordered_set<irep_idt>{};
+
   // Perform rewrites that may introduce new symbols
   for(auto it = lowered_expr.depth_begin(), itend = lowered_expr.depth_end();
       it != itend;) // no ++it
   {
+    if(lift_quantifiers && can_cast_expr<quantifier_exprt>(*it))
+    {
+      // Z3 may report a quantified formula rather than a value for symbols
+      // whose definition contains a quantifier, see convert(const exprt &).
+      // Defining a Boolean variable per quantifier, using the encoding that
+      // works around this, keeps all other definitions quantifier-free.
+      // Quantifiers nested in this one are not lifted, as they may refer to
+      // its bound variables.
+      if(!has_free_variable_in(*it, binder_variables))
+      {
+        it.mutate() = literal_exprt{lift_quantifier(to_quantifier_expr(*it))};
+      }
+      it.next_sibling_or_parent();
+      continue;
+    }
     if(
       auto prophecy_r_or_w_ok =
         expr_try_dynamic_cast<prophecy_r_or_w_ok_exprt>(*it))

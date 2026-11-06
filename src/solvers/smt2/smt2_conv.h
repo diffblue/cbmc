@@ -33,6 +33,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class floatbv_fma_exprt;
 class floatbv_typecast_exprt;
 class ieee_float_op_exprt;
+class quantifier_exprt;
 class floatbv_round_to_integral_exprt;
 class union_typet;
 class update_bit_exprt;
@@ -174,6 +175,7 @@ protected:
 
   // auxiliary methods
   exprt prepare_for_convert_expr(const exprt &expr);
+  literalt lift_quantifier(const quantifier_exprt &quantifier);
   exprt lower_byte_operators(const exprt &expr);
   void find_symbols(const exprt &expr);
   void find_symbols(const typet &type);
@@ -285,6 +287,10 @@ protected:
 
   typedef std::map<exprt, irep_idt> defined_expressionst;
   defined_expressionst defined_expressions;
+
+  /// With Z3, the Boolean variables that replace quantifiers, see
+  /// \ref lift_quantifier.
+  std::map<exprt, literalt> lifted_quantifiers;
   /// The values which boolean identifiers have been `smt2_convt::set_to` or
   /// in other words those which are asserted as true / false in the output
   /// smt2 formula.
