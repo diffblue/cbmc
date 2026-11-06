@@ -174,6 +174,7 @@ public:
   [[nodiscard]] resultt<> simplify_if(const if_exprt &);
   [[nodiscard]] resultt<> simplify_bitnot(const bitnot_exprt &);
   [[nodiscard]] resultt<> simplify_not(const not_exprt &);
+  [[nodiscard]] resultt<> simplify_not_preorder(const not_exprt &);
   [[nodiscard]] resultt<> simplify_boolean(const exprt &);
   [[nodiscard]] virtual resultt<>
   simplify_inequality(const binary_relation_exprt &);
