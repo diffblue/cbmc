@@ -1,0 +1,12 @@
+CORE broken-cprover-smt-backend no-new-smt
+main.c
+--pointer-check --no-pointer-primitive-check --unwind 4 --no-unwinding-assertions --lift-nested-dereferences
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Tests that rw_ok on a struct with pointer members creates a valid
+linked list chain, with depth controlled by --unwind.
+See GitHub issue diffblue/cbmc#7829.

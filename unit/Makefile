@@ -76,6 +76,7 @@ SRC += analyses/ai/ai.cpp \
        goto-programs/if_conversion.cpp \
        goto-programs/is_goto_binary.cpp \
        goto-programs/label_function_pointer_call_sites.cpp \
+       goto-programs/lift_nested_dereferences.cpp \
        goto-programs/osx_fat_reader.cpp \
        goto-programs/restore_argument_evaluation_order.cpp \
        goto-programs/restrict_function_pointers.cpp \

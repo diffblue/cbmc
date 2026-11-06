@@ -1,0 +1,12 @@
+CORE broken-cprover-smt-backend no-new-smt
+main.c
+--pointer-check --no-pointer-primitive-check --unwind 3 --no-unwinding-assertions
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+With --no-lift-nested-dereferences the intermediate pointer head->next is
+dereferenced (and lazily materialised) twice, so the chained dereference is
+reported as a spurious failure. This pins the effect of the lifting pass.

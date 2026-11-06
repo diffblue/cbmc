@@ -23,6 +23,7 @@ class address_of_exprt;
 class function_application_exprt;
 class goto_symex_statet;
 class path_storaget;
+class prophecy_r_or_w_ok_exprt;
 class shadow_memory_field_definitionst;
 class side_effect_exprt;
 class symex_assignt;
@@ -407,6 +408,19 @@ protected:
   /// \param cond: The guard of the assumption
   virtual void symex_assume(statet &state, const exprt &cond);
   void symex_assume_l2(statet &, const exprt &cond);
+
+  /// Helper for \ref symex_assume. When \p rw_ok is a top-level conjunct of an
+  /// assumption and its size argument is a compile-time constant, create a
+  /// concrete backing object (array-typed for multi-element sizes) and assume
+  /// the pointer points to it, so that subsequent dereferences and array
+  /// accesses through the (otherwise nondet) pointer resolve to that object.
+  /// Does nothing if the pointer is not a plain nondet symbol, the size is not
+  /// a constant, or the size is smaller than a single element.
+  /// \param rw_ok: the `r_ok`/`w_ok` expression driving object creation
+  /// \param state: Symbolic execution state for the current instruction
+  void try_create_rw_ok_backing_object(
+    const prophecy_r_or_w_ok_exprt &rw_ok,
+    statet &state);
 
   /// Merge all branches joining at the current program point. Applies
   /// \ref merge_goto for each goto state (each of which corresponds to previous
