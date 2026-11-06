@@ -1,5 +1,7 @@
 var NAVTREEINDEX112 =
 {
+"globals_q.html":[6,1,0,17],
+"globals_r.html":[6,1,0,18],
 "globals_s.html":[6,1,0,19],
 "globals_t.html":[6,1,0,20],
 "globals_type.html":[6,1,3],
@@ -247,7 +249,5 @@ var NAVTREEINDEX112 =
 "goto__instruction__code_8h.html#ae2ea3e9495afcf1891a93e5b713eb395":[6,0,2,16,25,21],
 "goto__instruction__code_8h.html#ae389ee4486951ff66592dfb015dd831d":[6,0,2,16,25,17],
 "goto__instruction__code_8h.html#ae8bf0466bce7cad2dfa854cf6865bb6e":[6,0,2,16,25,15],
-"goto__instruction__code_8h.html#af39becdf41d41920922e5f19ee8a4d77":[6,0,2,16,25,20],
-"goto__instruction__code_8h.html#afd4e1266a8590f9029cdd8785b49b09c":[6,0,2,16,25,30],
-"goto__instruction__code_8h.html#affb9dd3c341c9f852be2b9e60fc02011":[6,0,2,16,25,24]
+"goto__instruction__code_8h.html#af39becdf41d41920922e5f19ee8a4d77":[6,0,2,16,25,20]
 };

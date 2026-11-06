@@ -134,6 +134,8 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:a6219aa2e4fbbf9d5bacb62bac0338548" id="r_a6219aa2e4fbbf9d5bacb62bac0338548"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6219aa2e4fbbf9d5bacb62bac0338548">setup_commands</a> ()</td></tr>
 <tr class="memitem:affddacb389430f5398d91ec3c87df04d" id="r_affddacb389430f5398d91ec3c87df04d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#affddacb389430f5398d91ec3c87df04d">define_constants</a> ()</td></tr>
 <tr class="memitem:a419c83eef1ae682060810beef438ce70" id="r_a419c83eef1ae682060810beef438ce70"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a419c83eef1ae682060810beef438ce70">expand_function_applications</a> (<a class="el" href="classexprt.html">exprt</a> &amp;)</td></tr>
+<tr class="memitem:a3c0ee439f6dbac7e611159c7c4f82dda" id="r_a3c0ee439f6dbac7e611159c7c4f82dda"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3c0ee439f6dbac7e611159c7c4f82dda">report_result</a> (<a class="el" href="classdecision__proceduret.html#a2ed50735d8bf495b7be832fb80b9c8a0">decision_proceduret::resultt</a>)</td></tr>
+<tr class="memdesc:a3c0ee439f6dbac7e611159c7c4f82dda"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print the result of a satisfiability check and record it in <span class="tt"><a class="el" href="#ace76259172636505ef3c73378e756c1a">status</a></span>.  <br /></td></tr>
 <tr class="inherit_header pro_methods_classsmt2__parsert"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pro_methods_classsmt2__parsert')"><span class="dynarrow"><span class="arrowhead closed"></span></span>Protected Member Functions inherited from <a class="el" href="classsmt2__parsert.html">smt2_parsert</a></td></tr>
 <tr class="memitem:ad8b874ac235f5d6a18e4461e8dfa558e inherit pro_methods_classsmt2__parsert" id="r_ad8b874ac235f5d6a18e4461e8dfa558e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classsmt2__tokenizert_1_1tokent.html">smt2_tokenizert::tokent</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsmt2__parsert.html#ad8b874ac235f5d6a18e4461e8dfa558e">next_token</a> ()</td></tr>
 <tr class="memitem:a6cfdd4b1e1b4e1d63e549cba5ed2dc36 inherit pro_methods_classsmt2__parsert" id="r_a6cfdd4b1e1b4e1d63e549cba5ed2dc36"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsmt2__parsert.html#a6cfdd4b1e1b4e1d63e549cba5ed2dc36">add_unique_id</a> (<a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="classexprt.html">exprt</a>)</td></tr>
@@ -174,6 +176,8 @@ Protected Member Functions</h2></td></tr>
 Protected Attributes</h2></td></tr>
 <tr class="memitem:a57265709b6446395bdceff27adf66f2f" id="r_a57265709b6446395bdceff27adf66f2f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classstack__decision__proceduret.html">stack_decision_proceduret</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a57265709b6446395bdceff27adf66f2f">solver</a></td></tr>
 <tr class="memitem:a93e7031b69085567130a9b1244668985" id="r_a93e7031b69085567130a9b1244668985"><td class="memItemLeft" align="right" valign="top">std::set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a93e7031b69085567130a9b1244668985">constants_done</a></td></tr>
+<tr class="memitem:abed2853760f9938974440de787db829d" id="r_abed2853760f9938974440de787db829d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abed2853760f9938974440de787db829d">assertions_may_be_stale</a> = false</td></tr>
+<tr class="memdesc:abed2853760f9938974440de787db829d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set when the input asked for assertions to be retracted, which we do not support.  <br /></td></tr>
 <tr class="memitem:ace76259172636505ef3c73378e756c1a" id="r_ace76259172636505ef3c73378e756c1a"><td class="memItemLeft" align="right" valign="top">enum smt2_solvert:: { ... } &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ace76259172636505ef3c73378e756c1a">status</a></td></tr>
 <tr class="inherit_header pro_attribs_classsmt2__parsert"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pro_attribs_classsmt2__parsert')"><span class="dynarrow"><span class="arrowhead closed"></span></span>Protected Attributes inherited from <a class="el" href="classsmt2__parsert.html">smt2_parsert</a></td></tr>
 <tr class="memitem:aedcdbd543e5bbe61fbf4e1951f9ef326 inherit pro_attribs_classsmt2__parsert" id="r_aedcdbd543e5bbe61fbf4e1951f9ef326"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classsmt2__tokenizert.html">smt2_tokenizert</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsmt2__parsert.html#aedcdbd543e5bbe61fbf4e1951f9ef326">smt2_tokenizer</a></td></tr>
@@ -221,7 +225,7 @@ Additional Inherited Members</h2></td></tr>
 <tr><td class="fieldname"><a id="a72d921df56ae1a8b5d3328326e7c3386adcf89eb1af285084d41ac395eb8550ac" name="a72d921df56ae1a8b5d3328326e7c3386adcf89eb1af285084d41ac395eb8550ac"></a>UNSAT&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="smt2__solver_8cpp_source.html#l00041">41</a> of file <a class="el" href="smt2__solver_8cpp_source.html">smt2_solver.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt2__solver_8cpp_source.html#l00046">46</a> of file <a class="el" href="smt2__solver_8cpp_source.html">smt2_solver.cpp</a>.</p>
 
 </div>
 </div>
@@ -281,7 +285,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt2__solver_8cpp_source.html#l00049">49</a> of file <a class="el" href="smt2__solver_8cpp_source.html">smt2_solver.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt2__solver_8cpp_source.html#l00054">54</a> of file <a class="el" href="smt2__solver_8cpp_source.html">smt2_solver.cpp</a>.</p>
 
 </div>
 </div>
@@ -308,7 +312,37 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt2__solver_8cpp_source.html#l00074">74</a> of file <a class="el" href="smt2__solver_8cpp_source.html">smt2_solver.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt2__solver_8cpp_source.html#l00110">110</a> of file <a class="el" href="smt2__solver_8cpp_source.html">smt2_solver.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a3c0ee439f6dbac7e611159c7c4f82dda" name="a3c0ee439f6dbac7e611159c7c4f82dda"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3c0ee439f6dbac7e611159c7c4f82dda">&#9670;&#160;</a></span>report_result()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void smt2_solvert::report_result </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classdecision__proceduret.html#a2ed50735d8bf495b7be832fb80b9c8a0">decision_proceduret::resultt</a></td>          <td class="paramname"><span class="paramname"><em>result</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Print the result of a satisfiability check and record it in <span class="tt"><a class="el" href="#ace76259172636505ef3c73378e756c1a">status</a></span>. </p>
+<p>Reports "unknown" instead of "unsat" when assertions that should have been retracted are still present. </p>
+
+<p class="definition">Definition at line <a class="el" href="smt2__solver_8cpp_source.html#l00082">82</a> of file <a class="el" href="smt2__solver_8cpp_source.html">smt2_solver.cpp</a>.</p>
 
 </div>
 </div>
@@ -335,11 +369,37 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt2__solver_8cpp_source.html#l00119">119</a> of file <a class="el" href="smt2__solver_8cpp_source.html">smt2_solver.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt2__solver_8cpp_source.html#l00155">155</a> of file <a class="el" href="smt2__solver_8cpp_source.html">smt2_solver.cpp</a>.</p>
 
 </div>
 </div>
 <a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
+<a id="abed2853760f9938974440de787db829d" name="abed2853760f9938974440de787db829d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abed2853760f9938974440de787db829d">&#9670;&#160;</a></span>assertions_may_be_stale</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool smt2_solvert::assertions_may_be_stale = false</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set when the input asked for assertions to be retracted, which we do not support. </p>
+
+<p class="definition">Definition at line <a class="el" href="smt2__solver_8cpp_source.html#l00044">44</a> of file <a class="el" href="smt2__solver_8cpp_source.html">smt2_solver.cpp</a>.</p>
+
+</div>
+</div>
 <a id="a93e7031b69085567130a9b1244668985" name="a93e7031b69085567130a9b1244668985"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a93e7031b69085567130a9b1244668985">&#9670;&#160;</a></span>constants_done</h2>
 
@@ -360,7 +420,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt2__solver_8cpp_source.html#l00039">39</a> of file <a class="el" href="smt2__solver_8cpp_source.html">smt2_solver.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt2__solver_8cpp_source.html#l00040">40</a> of file <a class="el" href="smt2__solver_8cpp_source.html">smt2_solver.cpp</a>.</p>
 
 </div>
 </div>
