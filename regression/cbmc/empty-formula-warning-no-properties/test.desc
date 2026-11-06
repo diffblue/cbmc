@@ -1,0 +1,7 @@
+CORE no-new-smt
+main.c
+--smt2 --outfile formula.smt2
+^EXIT=0$
+^SIGNAL=0$
+--
+will not contain any assertions

@@ -74,6 +74,14 @@ public:
     incremental_goto_checker.report();
   }
 
+  /// Returns the underlying incremental goto checker. Useful for callers that
+  /// need to query checker-specific state after verification, e.g. VCC counts
+  /// when deciding whether to emit a usability warning.
+  const incremental_goto_checkerT &get_checker() const
+  {
+    return incremental_goto_checker;
+  }
+
 protected:
   abstract_goto_modelt &goto_model;
   incremental_goto_checkerT incremental_goto_checker;
