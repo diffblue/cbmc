@@ -852,6 +852,10 @@ void code_contractst::apply_loop_contract(
   if(!may_have_loops)
     return;
 
+  // Functions processed earlier may have been instrumented, and the inliner
+  // relies on the location numbers of the callees it copies, so restore them.
+  goto_functions.update();
+
   inlining_decoratort decorated(log.get_message_handler());
   goto_function_inline(goto_functions, function_name, ns, decorated);
 
@@ -860,7 +864,6 @@ void code_contractst::apply_loop_contract(
   // restore internal invariants
   goto_functions.update();
 
-  local_may_aliast local_may_alias(goto_function);
   natural_loops_mutablet natural_loops(goto_function.body);
 
   // A graph node type that stores information about a loop.
@@ -1095,6 +1098,13 @@ void code_contractst::apply_loop_contract(
 
     goto_functions.update();
     natural_loops_mutablet updated_loops(goto_function.body);
+
+    // The may-alias analysis must be refreshed for the same reason: assigns
+    // clause inference for an outer loop queries it on the instructions of
+    // the loop, which by now may include instructions inserted, or moved to
+    // new list nodes, while instrumenting its inner loops. An analysis
+    // computed before that instrumentation does not know them.
+    local_may_aliast local_may_alias(goto_function);
 
     // We will unwind all transformed loops twice. Store the names of
     // to-unwind-loops here and perform the unwinding after transformation done.
