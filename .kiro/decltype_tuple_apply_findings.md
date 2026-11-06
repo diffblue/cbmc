@@ -16106,3 +16106,37 @@ passes alone and in test.pl), profiles (z3 complex2 flaky), vacuity
 1063/3, unit, lint, whole-PR format, doxygen, per-commit compile,
 platform (gcc11 after the tag, m32, arm64), MSVC .ii 8/8, macOS 142/142.
 Remaining plan items 7-11 not started.
+
+## Round 221 (2026-11-05): variant from a double; plan items 7-11
+
+- variant<int, double> v = 2.5 with GCC 11's headers: libstdc++ 11's
+  __tuple_count chose cnt<T, tup<Ts...>> over cnt<T, tup<F, R...>> for a
+  one-element tup (R empty).  Fixed in the resolver's partial
+  specialization matching (empty nested pack, own packs expanded in the
+  pattern) and in partial ordering (nested pack expansions,
+  [temp.deduct.type]/9).  A first version filled empty top-level packs too
+  and broke GCC 11's <charconv> (__or_<B1, B2, B3, Bn...>); found by the
+  gcc11 platform check, guarded by
+  cpp11_partial_specialization_trailing_pack_empty.
+- 7 subscript pack expansions (m[a...]).
+- the built-in == of two ids beats text_encoding's converting friend
+  (the friend recursed into itself).
+- --cpp26 preprocesses with -std=gnu++2c on GCC 14+ (libstdc++'s C++26
+  headers were empty).  inplace_vector, saturating arithmetic and
+  text_encoding pass with GCC 16.
+- 8 contracts: enforce semantic in C++26 mode (contract_assert, pre at
+  the call sites via instrument_preconditions, post at each return for
+  non-class, non-reference results).
+- 9 structured binding as an if condition; friend-type-specifier lists
+  with packs; <debugging> models.
+- 10 constexpr throw/try (within one function) and placement new into a
+  tracked scalar local.
+- 11 std::print: vprint_nonunicode modelled as the buffered variant, with
+  generic_category/system_category/__throw_system_error models.
+Checks on W202: 13 suites, profiles (z3 complex2 flaky, 3/3 on rerun),
+vacuity 1063/3, unit, lint, whole-PR format, doxygen, help, IWYU gate,
+per-commit compile (12), platform (gcc11, m32, arm64), MSVC .ii, macOS
+142/142, C++26 tests with GCC 14 headers, and the cbmc-cpp CORE set of
+CI's gcc-16 job in the gcc16-gate container: 2099/2107; the 8 failures
+fail the same way with W199 and W200 (container differences, openSUSE).
+Not done: std::thread (#305), coroutines, modules, reflection.
