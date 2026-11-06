@@ -1,0 +1,15 @@
+CORE
+main.c
+--nan-check
+\[main.NaN.1\] line \d+ NaN on / in inf1 / inf2: FAILURE
+\[main.NaN.2\] line \d+ NaN on / in -(\+INFINITY|return_value___builtin_(huge_val|inf)f\$\d+|\(\(float\)1\.000000e\+300\)) / (\+INFINITY|return_value___builtin_(huge_val|inf)f\$\d+|\(float\)1\.000000e\+300): FAILURE
+\[main.NaN.3\] line \d+ NaN on / in (\+INFINITY|return_value___builtin_(huge_val|inf)f\$\d+|\(float\)1\.000000e\+300) / -(\+INFINITY|return_value___builtin_(huge_val|inf)f\$\d+|\(\(float\)1\.000000e\+300\)): FAILURE
+\[main.NaN.4\] line \d+ NaN on / in -(\+INFINITY|return_value___builtin_(huge_val|inf)f\$\d+|\(\(float\)1\.000000e\+300\)) / -(\+INFINITY|return_value___builtin_(huge_val|inf)f\$\d+|\(\(float\)1\.000000e\+300\)): FAILURE
+^\*\* 4 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+This test verifies that inf/inf correctly triggers NaN check failures.
+According to IEEE 754-2019, inf/inf = NaN.
