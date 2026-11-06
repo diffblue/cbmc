@@ -104,7 +104,7 @@ void mm_iot::mm_io(goto_functionst::goto_functiont &goto_function)
         const code_typet &ct = to_code_type(mm_io_r.type());
 
         if_exprt if_expr(
-          integer_address(d.pointer()),
+          is_integer_address(d.pointer()),
           typecast_exprt::conditional_cast(mm_io_r_value, d.type()),
           d);
         replace_expr(d, if_expr, a_rhs);

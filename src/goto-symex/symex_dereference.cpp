@@ -330,7 +330,8 @@ void goto_symext::dereference_rec(
       symex_dereference_state,
       language_mode,
       expr_is_not_null,
-      log.get_message_handler());
+      log.get_message_handler(),
+      symex_config.wide_pointer_encoding);
 
     // std::cout << "**** " << format(tmp1) << '\n';
     exprt tmp2 =

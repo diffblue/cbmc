@@ -1,0 +1,15 @@
+CORE wide-pointer-encoding
+main.c
+--wide-pointer-encoding
+^\[main\.assertion\.1\] line \d+ constant-offset pointer-array byte_extract: SUCCESS$
+^\[main\.assertion\.2\] line \d+ symbolic-offset pointer-array byte_extract: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Reads a pointer back out of an array of pointers via a byte_extract, at both
+a constant and a symbolic byte offset, exercising the wide pointer encoding's
+convert_byte_extract pointer-array handling (constant-offset slice and
+symbolic-offset multiplexer).

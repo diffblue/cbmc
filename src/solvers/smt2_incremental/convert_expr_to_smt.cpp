@@ -1903,6 +1903,21 @@ exprt lower_address_of_array_index(exprt expr)
   return expr;
 }
 
+/// Rewrite `is_integer_address(p)` to its standard-encoding definition
+/// `integer_address(p)`. The incremental SMT backend does not use the wide
+/// pointer encoding's dedicated integer-address objects, so the
+/// `same_object`-based definition is the correct lowering here.
+static exprt lower_is_integer_address(exprt expr)
+{
+  expr.visit_pre(
+    [](exprt &expr)
+    {
+      if(expr.id() == ID_is_integer_address)
+        expr = integer_address(to_unary_expr(expr).op());
+    });
+  return expr;
+}
+
 /// Post order traversal where the children of a node are only visited if
 /// applying the \p filter function to that node returns true. Note that this
 /// function is based on the `visit_post_template` function.
@@ -1961,7 +1976,8 @@ smt_termt convert_expr_to_smt(
   const auto end_conversion = at_scope_exit([&]() { in_conversion = false; });
 #endif
   sub_expression_mapt sub_expression_map;
-  const auto lowered_expr = lower_address_of_array_index(expr);
+  const auto lowered_expr =
+    lower_address_of_array_index(lower_is_integer_address(expr));
   filtered_visit_post(
     lowered_expr,
     [](const exprt &expr) {
