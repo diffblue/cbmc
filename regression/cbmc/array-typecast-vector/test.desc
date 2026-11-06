@@ -1,0 +1,29 @@
+CORE gcc-only broken-smt-backend
+main.c
+
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+End-to-end coverage of the SMT2-incremental backend's array-to-array
+typecast encoding (define_array_typecast_function): a GCC vector cast
+from int32x4 to int64x2 is lowered by the front-end to an
+array-to-array typecast_exprt, which the incremental SMT2 backend
+materialises as a fresh SMT array constrained by per-element concat
+clauses.
+
+The cbmc-CORE / paths-lifo profiles use the SAT/flattening backend
+(boolbvt) and the new-smt-backend profile uses the incremental SMT2
+backend; all pass the assertions. The cprover-smt2 and z3 profiles use
+the legacy SMT2 backend (smt2_conv.cpp), which has a pre-existing
+limitation on array-to-array typecasts (convert_typecast aborts with a
+generic invariant violation; the same behaviour is observed on develop
+without this PR's changes); the test is tagged `broken-smt-backend` to
+skip it on both. Removing that tag would require a separate fix in the
+legacy backend's convert_typecast handler analogous to the change this
+PR makes for the incremental backend.
+
+`gcc-only` is required because the test uses the GCC vector_size
+attribute.
