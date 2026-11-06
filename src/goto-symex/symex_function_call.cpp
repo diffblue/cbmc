@@ -344,7 +344,15 @@ void goto_symext::symex_function_call_post_clean(
   frame.call_lhs = cleaned_lhs;
   frame.end_of_function = --goto_function.body.instructions.end();
   frame.function_identifier=identifier;
+  // The function body's internal steps are hidden iff the function itself is
+  // hidden (a CPROVER_HIDE label); this keeps a hidden function's body hidden
+  // regardless of the caller. The function-call/return *events*, however, are
+  // recorded with the combined caller/callee flag above, so we store it
+  // separately and reuse it for the matching function-return event emitted in
+  // symex_end_of_function. This keeps call and return consistent without
+  // un-hiding the body of a hidden function called from a visible caller.
   frame.hidden_function = goto_function.is_hidden();
+  frame.hidden_function_call = hidden;
 
   // set up the 'return value symbol' when needed
   if(frame.call_lhs.is_not_nil())
@@ -438,7 +446,10 @@ void goto_symext::symex_end_of_function(statet &state)
 {
   PRECONDITION(!state.call_stack().empty());
 
-  const bool hidden = state.call_stack().top().hidden_function;
+  // The function-return event mirrors the function-call event's hidden flag
+  // (see symex_function_call_post_clean), not the body's hidden_function, so
+  // that call and return stay consistent while the body remains hidden.
+  const bool hidden = state.call_stack().top().hidden_function_call;
 
   // first record the return
   target.function_return(
