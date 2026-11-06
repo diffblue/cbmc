@@ -1,0 +1,14 @@
+CORE
+main.c
+--nondet-static --nondet-static-exclude main.c:does_not_exist
+^Invalid User Input$
+^Option: --nondet-static-exclude$
+^Reason: 'main.c:does_not_exist' did not match any symbol$
+^EXIT=1$
+^SIGNAL=0$
+--
+^VERIFICATION
+//
+// Regression test for #8225: a file:variable exclusion that matches no symbol
+// (here a typo in the variable name) must also be reported as an error rather
+// than silently doing nothing.
