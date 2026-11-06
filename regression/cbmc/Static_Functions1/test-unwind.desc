@@ -1,0 +1,20 @@
+CORE
+unwind_main.c
+unwind_a.c unwind_b.c --unwinding-assertions --unwindset 'count.0:4,count$link1.0:2'
+^\[count\.unwind\.0\] file unwind_b\.c line 6 unwinding assertion loop 0: FAILURE$
+^\[main\.assertion\.1\] line 13 assertion a_entry\(3\) == 3: SUCCESS$
+^\[main\.assertion\.2\] line 14 assertion b_entry\(3\) == 6: SUCCESS$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+file unwind_a\.c line 5 unwinding assertion loop 0: FAILURE
+--
+Two translation units define a file-local (static) function count, each with a
+loop. Linking renames the second, giving distinct loop identifiers count.0
+(unwind_a.c) and count$link1.0 (unwind_b.c). --unwindset uses those identifiers
+to bound the loops independently: count.0:4 is sufficient for unwind_a.c (no
+unwinding-assertion failure there), while count$link1.0:2 is too few for
+unwind_b.c and its unwinding assertion fails. This confirms the linker-renamed
+identifier selects the intended loop.
