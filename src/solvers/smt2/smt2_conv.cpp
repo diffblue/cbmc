@@ -5745,10 +5745,29 @@ exprt smt2_convt::prepare_for_convert_expr(const exprt &expr)
     !has_byte_operator(lowered_expr),
     "lower_byte_operators should remove all byte operators");
 
+  // With Z3, quantifiers that are not nested within another quantifier are
+  // replaced by a Boolean variable (see below), unless the expression itself
+  // is a quantifier, which is the case when we are asked to define such a
+  // variable.
+  const bool lift_quantifiers = solver == solvert::Z3 &&
+                                lowered_expr.id() != ID_forall &&
+                                lowered_expr.id() != ID_exists;
+
   // Perform rewrites that may introduce new symbols
   for(auto it = lowered_expr.depth_begin(), itend = lowered_expr.depth_end();
       it != itend;) // no ++it
   {
+    if(lift_quantifiers && (it->id() == ID_forall || it->id() == ID_exists))
+    {
+      // Z3 may report a quantified formula rather than a value for symbols
+      // whose definition contains a quantifier, see convert(const exprt &).
+      // Defining a Boolean variable per quantifier, using the encoding that
+      // works around this, keeps all other definitions quantifier-free.
+      literalt l = convert(*it);
+      it.mutate() = literal_exprt{l};
+      it.next_sibling_or_parent();
+      continue;
+    }
     if(
       auto prophecy_r_or_w_ok =
         expr_try_dynamic_cast<prophecy_r_or_w_ok_exprt>(*it))
