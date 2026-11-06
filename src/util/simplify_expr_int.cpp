@@ -1046,6 +1046,100 @@ simplify_exprt::simplify_zero_extend(const zero_extend_exprt &expr)
 }
 
 simplify_exprt::resultt<>
+simplify_exprt::simplify_shift_of_concatenation(const shift_exprt &expr)
+{
+  // Shifts of a concatenation by an amount that lines up with an operand
+  // boundary can be rewritten by dropping operands and padding with zeros:
+  //   concat(op_0, ..., op_{n-1}) >> d == concat(0_d, op_0, ..., op_{k-1})
+  //   concat(op_0, ..., op_{n-1}) << d == concat(op_{k+1}, ..., op_{n-1}, 0_d)
+  // where k is the unique index for which the widths of op_k..op_{n-1}
+  // (resp. op_0..op_k) sum to d. We only fire when d aligns exactly with an
+  // operand boundary; mis-aligned cases fall through to the caller's other
+  // simplifications.
+  PRECONDITION(expr.op().id() == ID_concatenation);
+  PRECONDITION(expr.id() == ID_lshr || expr.id() == ID_shl);
+
+  const auto distance = numeric_cast<mp_integer>(expr.distance());
+  if(!distance.has_value() || *distance <= 0)
+    return unchanged(expr);
+
+  const mp_integer total_width =
+    to_bitvector_type(expr.op().type()).get_width();
+
+  // A shift by at least the full width discards every operand: collapse to a
+  // bare zero rather than producing the morally-equivalent but ugly
+  // concat(0_W) (simplify_concatenation does not fold single-operand concats).
+  if(*distance >= total_width)
+    return changed(from_integer(0, expr.type()));
+
+  // Walk the operands left-to-right, maintaining two complementary cursors:
+  //   offset: bits remaining to the right of the current operand boundary,
+  //           shrinking from total_width to 0;
+  //   bits_seen: bits already passed on the left, growing from 0 to
+  //              total_width.
+  // The lshr check fires *before* consuming op[i] (so the kept operands
+  // ops[0..i) are still intact), while the shl check fires *after* consuming
+  // op[i] (so the dropped operands ops[0..i] are excluded and ops[i+1..n)
+  // remain). bv_typet is used for the zero pad as the canonical opaque
+  // bit-vector type, mirroring simplify_concatenation's neighbour-merging
+  // logic; it avoids committing to unsignedbv/signedbv when the surviving
+  // siblings might have heterogeneous bitvector types.
+  mp_integer offset = total_width;
+  mp_integer bits_seen = 0;
+  for(std::size_t i = 0; i < expr.op().operands().size(); ++i)
+  {
+    if(expr.id() == ID_lshr && offset == *distance)
+    {
+      // ops[0..i) survive on the right; ops[i..n) are shifted out, replaced
+      // by a zero pad of width d on the left.
+      exprt::operandst new_operands;
+      new_operands.reserve(i + 1);
+      new_operands.push_back(
+        from_integer(0, bv_typet{numeric_cast_v<std::size_t>(*distance)}));
+      new_operands.insert(
+        new_operands.end(),
+        expr.op().operands().begin(),
+        expr.op().operands().begin() + i);
+      concatenation_exprt new_concat = to_concatenation_expr(expr.op());
+      new_concat.operands() = std::move(new_operands);
+      return changed(simplify_concatenation(new_concat));
+    }
+
+    const auto op_width =
+      pointer_offset_bits(expr.op().operands()[i].type(), ns);
+
+    // If we cannot determine an operand width, both cursors become unreliable
+    // from this point onwards (offset for lshr's "ops[0..i) intact" property,
+    // bits_seen for shl's running offset), so abort the whole simplification
+    // rather than guessing.
+    if(!op_width.has_value())
+      return unchanged(expr);
+
+    offset -= *op_width;
+    bits_seen += *op_width;
+
+    if(expr.id() == ID_shl && bits_seen == *distance)
+    {
+      // ops[i+1..n) survive on the left; ops[0..i] are shifted out, replaced
+      // by a zero pad of width d on the right.
+      exprt::operandst new_operands;
+      new_operands.reserve(expr.op().operands().size() - i);
+      new_operands.insert(
+        new_operands.end(),
+        expr.op().operands().begin() + i + 1,
+        expr.op().operands().end());
+      new_operands.push_back(
+        from_integer(0, bv_typet{numeric_cast_v<std::size_t>(*distance)}));
+      concatenation_exprt new_concat = to_concatenation_expr(expr.op());
+      new_concat.operands() = std::move(new_operands);
+      return changed(simplify_concatenation(new_concat));
+    }
+  }
+
+  return unchanged(expr);
+}
+
+simplify_exprt::resultt<>
 simplify_exprt::simplify_shifts(const shift_exprt &expr)
 {
   if(!can_cast_type<bitvector_typet>(expr.type()))
@@ -1058,6 +1152,15 @@ simplify_exprt::simplify_shifts(const shift_exprt &expr)
 
   if(*distance == 0)
     return expr.op();
+
+  if(
+    expr.op().id() == ID_concatenation &&
+    (expr.id() == ID_lshr || expr.id() == ID_shl))
+  {
+    auto r = simplify_shift_of_concatenation(expr);
+    if(r.has_changed())
+      return r;
+  }
 
   auto value = numeric_cast<mp_integer>(expr.op());
 
