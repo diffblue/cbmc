@@ -17,6 +17,7 @@
     <modules>
         <module>string-initializer</module>
         <module>too-many-args</module>
+        <module>nondet-object-new</module>
     </modules>
 
 </project>
