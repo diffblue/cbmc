@@ -180,7 +180,7 @@ void goto_symext::symex_goto(statet &state)
       instruction.targets.size() > 0,
       "Instruction is an unconditional goto with no target: " +
         instruction.code().pretty());
-    symex_transition(state, instruction.get_target(), true);
+    symex_transition(state, instruction.get_target(), backward);
     return;
   }
 
