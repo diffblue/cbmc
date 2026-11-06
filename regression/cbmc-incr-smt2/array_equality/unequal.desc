@@ -1,0 +1,13 @@
+CORE
+unequal.c
+--no-bounds-check
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ a\[2\] and b\[2\] may differ: FAILURE$
+^\[main\.assertion\.2\] line \d+ a\[2\] and b\[2\] may be equal: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Arrays that differ in a single element are not equal, and the solver must be
+able to produce a model in either case.
