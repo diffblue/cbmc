@@ -28,6 +28,27 @@ string_concatenation_builtin_functiont::string_concatenation_builtin_functiont(
   args.insert(args.end(), fun_args.begin() + 4, fun_args.end());
 }
 
+/// Add axioms enforcing that `res` is equal to the concatenation of `s1`
+/// and `s2`. Convenience overload equivalent to
+/// `add_axioms_for_concat_substr(res, s1, s2, 0, |s2|)`.
+/// \param res: string_expression corresponding to the result
+/// \param s1: the string expression to append to
+/// \param s2: the string expression to append to the first one
+/// \return integer expression `0`
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_concat_substr(
+  const array_string_exprt &res,
+  const array_string_exprt &s1,
+  const array_string_exprt &s2)
+{
+  return add_axioms_for_concat_substr(
+    res,
+    s1,
+    s2,
+    from_integer(0, s2.length_type()),
+    array_pool.get_or_create_length(s2));
+}
+
 /// Add axioms enforcing that `res` is the concatenation of `s1` with
 /// the substring of `s2` starting at index `start_index'` and ending
 /// at index `end_index'`.
@@ -148,25 +169,6 @@ exprt length_constraint_for_concat_char(
       array_pool.get_or_create_length(s1), from_integer(1, s1.length_type())));
 }
 
-/// Add axioms enforcing that `res` is equal to the concatenation of `s1` and
-/// `s2`.
-///
-/// \deprecated should use concat_substr instead
-/// \param res: string_expression corresponding to the result
-/// \param s1: the string expression to append to
-/// \param s2: the string expression to append to the first one
-/// \return an integer expression
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_concat(
-  const array_string_exprt &res,
-  const array_string_exprt &s1,
-  const array_string_exprt &s2)
-{
-  exprt index_zero = from_integer(0, s2.length_type());
-  return add_axioms_for_concat_substr(
-    res, s1, s2, index_zero, array_pool.get_or_create_length(s2));
-}
-
 /// Add axioms corresponding to the StringBuilder.appendCodePoint(I) function
 /// \deprecated java specific
 /// \param f: function application with two arguments: a string and a code point
@@ -185,7 +187,7 @@ string_constraint_generatort::add_axioms_for_concat_code_point(
     array_pool.fresh_string(index_type, char_type);
   return combine_results(
     add_axioms_for_code_point(code_point, f.arguments()[3]),
-    add_axioms_for_concat(res, s1, code_point));
+    add_axioms_for_concat_substr(res, s1, code_point));
 }
 
 std::vector<mp_integer> string_concatenation_builtin_functiont::eval(
@@ -216,7 +218,7 @@ string_constraintst string_concatenation_builtin_functiont::constraints(
 {
   auto pair = [&]() -> std::pair<exprt, string_constraintst> {
     if(args.size() == 0)
-      return generator.add_axioms_for_concat(result, input1, input2);
+      return generator.add_axioms_for_concat_substr(result, input1, input2);
     if(args.size() == 2)
     {
       return generator.add_axioms_for_concat_substr(
