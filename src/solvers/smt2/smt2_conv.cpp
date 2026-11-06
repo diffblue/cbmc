@@ -986,17 +986,35 @@ literalt smt2_convt::convert(const exprt &expr)
   // Note that here we are always converting, so we do not need to consider
   // other literal kinds, only "|B###|"
 
-  // Z3 refuses get-value when a defined symbol contains a quantifier.
+  // Z3 refuses get-value when a defined symbol contains a quantifier, so we
+  // declare the symbol and constrain it separately rather than using
+  // define-fun.
   if(has_quantifier(prepared_expr))
   {
     out << "(declare-fun ";
     convert_literal(l);
     out << " () Bool)\n";
-    out << "(assert (= ";
-    convert_literal(l);
-    out << ' ';
-    convert_expr(prepared_expr);
-    out << "))\n";
+    if(solver == solvert::Z3)
+    {
+      // Z3's solve_eqs would eliminate B from (assert (= B <expr>)) and then
+      // return the quantified <expr> from get-value (Z3Prover/z3#7743), which
+      // two implications avoid. The let-binding emits <expr> only once.
+      out << "(assert (let ((?def ";
+      convert_expr(prepared_expr);
+      out << ")) (and (=> ";
+      convert_literal(l);
+      out << " ?def) (=> ?def ";
+      convert_literal(l);
+      out << "))))\n";
+    }
+    else
+    {
+      out << "(assert (= ";
+      convert_literal(l);
+      out << ' ';
+      convert_expr(prepared_expr);
+      out << "))\n";
+    }
   }
   else
   {
