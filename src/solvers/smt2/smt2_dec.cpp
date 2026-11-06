@@ -89,7 +89,12 @@ decision_proceduret::resultt smt2_dect::dec_solve(const exprt &assumption)
 
   case solvert::CVC5:
     argv = {
-      solver_binary_name("cvc5"), "--lang", "smtlib", temp_file_problem()};
+      solver_binary_name("cvc5"),
+      "--lang",
+      "smtlib",
+      "--arrays-exp",
+      "--fp-exp",
+      temp_file_problem()};
     break;
 
   case solvert::MATHSAT:
