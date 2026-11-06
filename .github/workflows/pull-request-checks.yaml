@@ -301,6 +301,28 @@ jobs:
         with:
           path: .ccache
           key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
+
+  # Builds the libcprover-cpp API with an IPASIR solver (CaDiCaL, which is
+  # self-contained and downloaded by CMake) to exercise the static-archive
+  # aggregation over an IMPORTED solver target. This guards against
+  # regressions like #8249, which no minisat2/cadical job would catch.
+  check-ubuntu-24_04-cmake-gcc-ipasir-cadical:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ flex bison patch
+      - name: Configure using CMake with ipasir-cadical
+        run: cmake -S . -Bbuild-ipasir -G Ninja -DCMAKE_BUILD_TYPE=Release -Dsat_impl=ipasir-cadical
+      - name: Build cprover-api-cpp (aggregates the IMPORTED CaDiCaL archive)
+        run: cmake --build build-ipasir --target cprover-api-cpp -j${{env.linux-vcpus}}
+
   # This job takes approximately 20 to 38 minutes
   check-ubuntu-22_04-make-clang:
     runs-on: ubuntu-22.04
