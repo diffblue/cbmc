@@ -20,6 +20,7 @@ Author: Michael Tautschnig
 #include <util/simplify_expr.h>
 #include <util/simplify_utils.h>
 #include <util/std_expr.h>
+#include <util/string_expr.h>
 #include <util/symbol_table.h>
 
 #include <testing-utils/empty_namespace.h>
@@ -742,4 +743,69 @@ TEST_CASE("Simplify complementary pair in nested OR", "[core][util]")
   const or_exprt inner{b, not_exprt{a}};
   const or_exprt expr{a, inner};
   REQUIRE(simplify_expr(expr, empty_namespace) == true_exprt{});
+}
+
+TEST_CASE(
+  "Simplify string built-ins over non-refined-string operands",
+  "[core][util]")
+{
+  const auto application = [](
+                             const irep_idt &function,
+                             exprt::operandst arguments,
+                             const typet &codomain)
+  {
+    mathematical_function_typet::domaint domain;
+    for(const auto &argument : arguments)
+      domain.push_back(argument.type());
+    return function_application_exprt{
+      symbol_exprt{function, mathematical_function_typet{domain, codomain}},
+      std::move(arguments)};
+  };
+
+  SECTION("SMT-LIB-native string operands are left unchanged")
+  {
+    const typet string_type{ID_string};
+    const typet int_type{ID_integer};
+    const symbol_exprt s1{"s1", string_type};
+    const symbol_exprt s2{"s2", string_type};
+
+    const std::vector<function_application_exprt> applications = {
+      application(ID_cprover_string_startswith_func, {s1, s2}, bool_typet{}),
+      application(ID_cprover_string_endswith_func, {s1, s2}, bool_typet{}),
+      application(ID_cprover_string_contains_func, {s1, s2}, bool_typet{}),
+      application(
+        ID_cprover_string_equals_ignore_case_func, {s1, s2}, bool_typet{}),
+      application(ID_cprover_string_is_empty_func, {s1}, bool_typet{}),
+      application(ID_cprover_string_compare_to_func, {s1, s2}, int_type),
+      application(ID_cprover_string_index_of_func, {s1, s2}, int_type),
+      application(ID_cprover_string_last_index_of_func, {s1, s2}, int_type),
+      application(
+        ID_cprover_string_char_at_func,
+        {s1, from_integer(0, int_type)},
+        string_type)};
+
+    for(const auto &a : applications)
+      REQUIRE(simplify_expr(a, empty_namespace) == a);
+  }
+
+  SECTION("index_of with a single (constant) string argument is unchanged")
+  {
+    const signedbv_typet char_type{8};
+    const signedbv_typet index_type{32};
+    const array_typet array_type{char_type, from_integer(2, index_type)};
+    symbolt string_symbol{"str", array_type, ID_C};
+    string_symbol.value = array_exprt{
+      {from_integer('a', char_type), from_integer('b', char_type)}, array_type};
+    symbol_tablet symbol_table;
+    symbol_table.insert(string_symbol);
+    const namespacet ns{symbol_table};
+
+    const refined_string_exprt s{
+      from_integer(2, index_type),
+      address_of_exprt{
+        index_exprt{string_symbol.symbol_expr(), from_integer(0, index_type)}}};
+    const auto index_of =
+      application(ID_cprover_string_index_of_func, {s}, index_type);
+    REQUIRE(simplify_expr(index_of, ns) == index_of);
+  }
 }
