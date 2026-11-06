@@ -425,10 +425,7 @@ void goto_symext::symex_printf(
       if(need_deref && parameter.id() == ID_address_of)
         parameter = to_address_of_expr(parameter).object();
       clean_expr(parameter, state, false);
-      parameter = state.rename(std::move(parameter), ns).get();
-      do_simplify(parameter, state.value_set);
-
-      args.push_back(std::move(parameter));
+      args.push_back(rename_and_simplify(state, std::move(parameter)));
     }
   }
 
@@ -453,9 +450,7 @@ void goto_symext::symex_input(
 
   for(std::size_t i=1; i<code.operands().size(); i++)
   {
-    exprt l2_arg = state.rename(code.operands()[i], ns).get();
-    do_simplify(l2_arg, state.value_set);
-    args.emplace_back(std::move(l2_arg));
+    args.emplace_back(rename_and_simplify(state, code.operands()[i]));
   }
 
   const irep_idt input_id =
@@ -471,17 +466,11 @@ void goto_symext::symex_output(
   PRECONDITION(code.operands().size() >= 2);
   exprt id_arg = state.rename(code.op0(), ns).get();
 
-  std::list<renamedt<exprt, L2>> args;
+  std::list<exprt> args;
 
   for(std::size_t i=1; i<code.operands().size(); i++)
   {
-    renamedt<exprt, L2> l2_arg = state.rename(code.operands()[i], ns);
-    if(symex_config.simplify_opt)
-    {
-      simplify_expr_with_value_sett simp{state.value_set, language_mode, ns};
-      l2_arg.simplify(simp);
-    }
-    args.emplace_back(l2_arg);
+    args.emplace_back(rename_and_simplify(state, code.operands()[i]));
   }
 
   const irep_idt output_id =

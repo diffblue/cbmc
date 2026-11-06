@@ -37,6 +37,13 @@ void goto_symext::do_simplify(exprt &expr, const value_sett &value_set)
   }
 }
 
+exprt goto_symext::rename_and_simplify(statet &state, exprt expr)
+{
+  expr = state.rename(std::move(expr), ns).get();
+  do_simplify(expr, state.value_set);
+  return expr;
+}
+
 void goto_symext::symex_assign(
   statet &state,
   const exprt &o_lhs,
