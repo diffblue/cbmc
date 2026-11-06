@@ -1,0 +1,13 @@
+CORE gcc-only
+main.c
+-fsingle-precision-constant -c -o main.gb
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+With -fsingle-precision-constant an unsuffixed floating-point constant is
+`float` rather than `double`; the _Static_asserts in main.c check this at
+conversion time.  Before the dead-query fix in gcc_mode the flag was
+silently ignored, the constant stayed `double`, and conversion failed --
+so this test fails (CONVERSION ERROR) without the fix.
