@@ -163,6 +163,12 @@ exprt float_bvt::convert(const exprt &expr) const
     const auto &op = to_unary_expr(expr).op();
     return isnormal(op, get_spec(op));
   }
+  else if(expr.id() == ID_floatbv_round_to_integral)
+  {
+    const auto &rti_expr = to_floatbv_round_to_integral_expr(expr);
+    return round_to_integral(
+      rti_expr.op(), rti_expr.rounding_mode(), get_spec(expr));
+  }
   else if(expr.id()==ID_lt)
   {
     const auto &rel_expr = to_binary_relation_expr(expr);
@@ -201,8 +207,12 @@ ieee_float_spect float_bvt::get_spec(const exprt &expr)
 
 exprt float_bvt::abs(const exprt &op, const ieee_float_spect &spec)
 {
-  // we mask away the sign bit, which is the most significant bit
-  const mp_integer v = power(2, spec.width() - 1) - 1;
+  // we clear the sign bit; for x86 extended in padded storage the sign
+  // bit lives at spec.value_width() - 1 rather than at the top of the
+  // storage container.
+  const mp_integer all_ones = power(2, spec.width()) - 1;
+  const mp_integer sign_bit_mask = power(2, spec.value_width() - 1);
+  const mp_integer v = all_ones - sign_bit_mask;
 
   const constant_exprt mask(integer2bvrep(v, spec.width()), op.type());
 
@@ -211,8 +221,10 @@ exprt float_bvt::abs(const exprt &op, const ieee_float_spect &spec)
 
 exprt float_bvt::negation(const exprt &op, const ieee_float_spect &spec)
 {
-  // we flip the sign bit with an xor
-  const mp_integer v = power(2, spec.width() - 1);
+  // we flip the sign bit with an xor; for x86 extended in padded storage
+  // the sign bit lives at spec.value_width() - 1 rather than at the top
+  // of the storage container.
+  const mp_integer v = power(2, spec.value_width() - 1);
 
   constant_exprt mask(integer2bvrep(v, spec.width()), op.type());
 
@@ -234,22 +246,71 @@ exprt float_bvt::is_equal(
   exprt isnan1=isnan(src1, spec);
   const or_exprt nan(isnan0, isnan1);
 
-  const equal_exprt bitwise_equal(src0, src1);
+  // Bitwise equality must ignore any storage padding above the value
+  // bits.  For x86 80-bit extended `long double` in padded 96-/128-bit
+  // storage the padding bits above value_width() are not part of the
+  // numeric value, and for symbolic inputs they are unconstrained --
+  // without this mask a == a could be spuriously false because the
+  // SAT solver could pick different padding for the two operands.
+  const exprt bitwise_equal = canonical_value_bits_equal(src0, src1, spec);
 
   return and_exprt(
     or_exprt(bitwise_equal, both_zero),
     not_exprt(nan));
 }
 
+exprt float_bvt::canonical_value_bits(
+  const exprt &src,
+  const ieee_float_spect &spec)
+{
+  const unsignedbv_typet value_type{spec.value_width()};
+  if(!spec.x86_extended)
+  {
+    return typecast_exprt{
+      typecast_exprt{src, bv_typet{spec.width()}}, value_type};
+  }
+
+  // Drop the storage-padding bits above value_width().
+  const exprt value = extractbits_exprt{src, 0, value_type};
+
+  // A pseudo-denormal (exponent 0, integer bit 1) has the same value as the
+  // encoding with exponent 1.  Setting the least significant exponent bit
+  // when the exponent is zero and the integer bit is set yields that
+  // encoding.
+  const and_exprt pseudo_denormal{
+    exponent_all_zeros(src, spec), extractbit_exprt{src, spec.f}};
+  const exprt exp_lsb_mask = from_integer(power(2, spec.f + 1), value_type);
+  return if_exprt{pseudo_denormal, bitor_exprt{value, exp_lsb_mask}, value};
+}
+
+exprt float_bvt::canonical_value_bits_equal(
+  const exprt &src0,
+  const exprt &src1,
+  const ieee_float_spect &spec)
+{
+  return equal_exprt{
+    canonical_value_bits(src0, spec), canonical_value_bits(src1, spec)};
+}
+
 exprt float_bvt::is_zero(const exprt &src)
 {
-  // we mask away the sign bit, which is the most significant bit
-  const floatbv_typet &type=to_floatbv_type(src.type());
-  std::size_t width=type.get_width();
+  // We test that all value bits except the sign bit are zero.  For x86
+  // 80-bit extended `long double` in padded 96-/128-bit storage, the
+  // padding bits above value_width() are not part of the numeric
+  // value, and for symbolic inputs they are unconstrained.  Building
+  // the mask over value_width()-1 bits (i.e. all of fraction +
+  // explicit-integer + exponent, with the sign bit cleared and any
+  // storage padding cleared as well) ensures padding bits are masked
+  // out of the comparison.
+  const floatbv_typet &type = to_floatbv_type(src.type());
+  const ieee_float_spect spec(type);
+  const std::size_t width = type.get_width();
 
-  const mp_integer v = power(2, width - 1) - 1;
+  // Mask of all-ones in bit positions [0, value_width()-1) and zero
+  // everywhere else (sign bit and any padding above).
+  const mp_integer mask_value = power(2, spec.value_width() - 1) - 1;
 
-  constant_exprt mask(integer2bvrep(v, width), src.type());
+  constant_exprt mask(integer2bvrep(mask_value, width), src.type());
 
   ieee_float_valuet z(type);
   z.make_zero();
@@ -305,9 +366,19 @@ void float_bvt::rounding_mode_bitst::get(const exprt &rm)
 
 exprt float_bvt::sign_bit(const exprt &op)
 {
-  const bitvector_typet &bv_type=to_bitvector_type(op.type());
-  std::size_t width=bv_type.get_width();
-  return extractbit_exprt(op, width-1);
+  // For floatbv operands, the sign bit lives at value_width()-1 (i.e. at
+  // the top of the encoded value, not the top of the storage container
+  // -- which matters for x86 80-bit extended in padded 96-/128-bit
+  // storage).  For non-floatbv bit-vector operands (e.g. when this
+  // helper is reused from from_signed_integer), the sign is the top bit
+  // of the bit-vector.
+  if(op.type().id() == ID_floatbv)
+  {
+    const ieee_float_spect spec(to_floatbv_type(op.type()));
+    return extractbit_exprt(op, spec.value_width() - 1);
+  }
+  const bitvector_typet &bv_type = to_bitvector_type(op.type());
+  return extractbit_exprt(op, bv_type.get_width() - 1);
 }
 
 exprt float_bvt::from_signed_integer(
@@ -525,13 +596,185 @@ exprt float_bvt::conversion(
   }
 }
 
+/// Round a floating-point value to integral.
+///
+/// Strategy: compute `drop = max(0, f - unbiased_exp)` — the number of
+/// trailing fractional bits to discard — and form the rounded result as
+/// `(src >> drop) << drop` plus a conditional `1 << drop` increment
+/// determined by the rounding mode and the round/sticky/lsb bits at
+/// variable position `drop`. Values with `|x| < 1` are handled separately
+/// (result is ±0 or ±1 depending on rounding mode and sign). Special
+/// values (NaN, ±Inf, ±0) and values whose unbiased exponent already
+/// meets or exceeds the fraction width short-circuit to `src`.
+///
+/// The encoding uses a constant number of variable-distance shifts and a
+/// single adder, all at width `spec.width()`.
+///
+/// `float_utilst::round_to_integral` is the bvt-level mirror of this
+/// code; keep the two implementations in lockstep when changing the
+/// rounding logic.
+exprt float_bvt::round_to_integral(
+  const exprt &src,
+  const exprt &rm,
+  const ieee_float_spect &spec) const
+{
+  const unbiased_floatt unpacked = unpack(src, spec);
+  const exprt is_special =
+    or_exprt(unpacked.zero, or_exprt(unpacked.NaN, unpacked.infinity));
+  // The unbiased exponent is compared with, and subtracted from, spec.f,
+  // which need not be representable in spec.e bits (for example, for
+  // __CPROVER_floatbv[28][23]).  Hence sign-extend the exponent first.
+  const signedbv_typet exp_type{std::max(spec.e, address_bits(spec.f)) + 2};
+  const typecast_exprt exponent{unpacked.exponent, exp_type};
+  const exprt exp_ge_f =
+    binary_relation_exprt(exponent, ID_ge, from_integer(spec.f, exp_type));
+
+  const floatbv_typet float_type = spec.to_type();
+  const std::size_t width = spec.width();
+  const unsignedbv_typet uint_type{width};
+  const exprt src_uint = extractbits_exprt{src, 0, uint_type};
+  const exprt zero_uint = from_integer(0, uint_type);
+  const exprt one_uint = from_integer(1, uint_type);
+
+  const rounding_mode_bitst rounding_mode_bits(rm);
+  const exprt biased_exp = get_exponent(src, spec);
+
+  // ±0 and ±1 as unsigned bitvectors
+  ieee_floatt pz{spec, ieee_floatt::ROUND_TO_ZERO, 0};
+  ieee_floatt nz{spec, ieee_floatt::ROUND_TO_ZERO, 0};
+  nz.set_sign(true);
+  ieee_floatt p1{spec, ieee_floatt::ROUND_TO_ZERO, 1};
+  ieee_floatt n1{spec, ieee_floatt::ROUND_TO_ZERO, -1};
+
+  const exprt signed_zero_uint = if_exprt(
+    sign_bit(src),
+    from_integer(nz.pack(), uint_type),
+    from_integer(pz.pack(), uint_type));
+  const exprt signed_one_uint = if_exprt(
+    sign_bit(src),
+    from_integer(n1.pack(), uint_type),
+    from_integer(p1.pack(), uint_type));
+
+  // For |x| < 1 (biased exponent < bias): result is ±0 or ±1.
+  // |x| >= 0.5 iff biased exponent >= bias-1 (for normals).
+  // |x| == 0.5 iff biased exponent == bias-1 AND fraction == 0.
+  const exprt bias_m1 = from_integer(spec.bias() - 1, unsignedbv_typet(spec.e));
+  const exprt exp_ge_bias_m1 =
+    binary_relation_exprt(biased_exp, ID_ge, bias_m1);
+  const exprt exp_eq_bias_m1 = equal_exprt(biased_exp, bias_m1);
+  const exprt frac_zero = fraction_all_zeros(src, spec);
+  const exprt abs_eq_half = and_exprt(exp_eq_bias_m1, frac_zero);
+  const exprt abs_gt_half = and_exprt(exp_ge_bias_m1, not_exprt(abs_eq_half));
+
+  // clang-format off
+  const exprt round_up_lt1 = if_exprt(
+    rounding_mode_bits.round_to_even, abs_gt_half,
+    if_exprt(rounding_mode_bits.round_to_away,
+      or_exprt(abs_gt_half, abs_eq_half),
+    if_exprt(rounding_mode_bits.round_to_plus_inf,
+      not_exprt(unpacked.sign),  // any positive non-zero rounds up
+    if_exprt(rounding_mode_bits.round_to_minus_inf,
+      unpacked.sign,  // any negative non-zero rounds down (to -1)
+      false_exprt()))));
+  // clang-format on
+
+  const exprt result_lt1 =
+    if_exprt(round_up_lt1, signed_one_uint, signed_zero_uint);
+
+  // |x| >= 1 branch: barrel-shifter formulation.
+  //
+  // drop = f - max(0, unbiased_exp). For unbiased_exp >= f, the result is
+  // overridden by the `exp_ge_f -> src` early-out below; for unbiased_exp
+  // < 0, overridden by the |x| < 1 branch above. So in the path where this
+  // matters, drop ∈ [1, f].
+  const exprt unbiased_exp_clamped_lo = if_exprt(
+    binary_relation_exprt(exponent, ID_lt, from_integer(0, exp_type)),
+    from_integer(0, exp_type),
+    exponent);
+  const exprt drop_signed =
+    minus_exprt(from_integer(spec.f, exp_type), unbiased_exp_clamped_lo);
+  const exprt drop = typecast_exprt(drop_signed, uint_type);
+
+  // masked = (src >> drop) << drop
+  const exprt shifted_right = lshr_exprt{src_uint, drop};
+  const exprt masked = shl_exprt{shifted_right, drop};
+
+  // rbit = bit (drop - 1) of src; obtained by shifting right by drop-1
+  // and reading the LSB. When drop == 0 (only on the exp_ge_f path) the
+  // value is irrelevant, since the final select picks `src`.
+  const exprt drop_m1 = minus_exprt(drop, one_uint);
+  const exprt shifted_to_rbit = lshr_exprt{src_uint, drop_m1};
+  const exprt rbit =
+    equal_exprt(bitand_exprt(shifted_to_rbit, one_uint), one_uint);
+
+  // lsb = bit (drop) of src
+  const exprt lsb =
+    equal_exprt(bitand_exprt(shifted_right, one_uint), one_uint);
+
+  // sticky = OR of bits 0..(drop-2)  ≡  (src AND ((1 << (drop-1)) - 1)) != 0
+  const exprt sticky_mask = minus_exprt(shl_exprt{one_uint, drop_m1}, one_uint);
+  const exprt sticky =
+    notequal_exprt(bitand_exprt(src_uint, sticky_mask), zero_uint);
+
+  // clang-format off
+  const exprt inc = if_exprt(
+    rounding_mode_bits.round_to_even,
+      and_exprt(rbit, or_exprt(lsb, sticky)),
+    if_exprt(rounding_mode_bits.round_to_away, rbit,
+    if_exprt(rounding_mode_bits.round_to_plus_inf,
+      and_exprt(not_exprt(unpacked.sign), or_exprt(rbit, sticky)),
+    if_exprt(rounding_mode_bits.round_to_minus_inf,
+      and_exprt(unpacked.sign, or_exprt(rbit, sticky)),
+      false_exprt()))));
+  // clang-format on
+
+  // Increment by `1 << drop`. The add runs on the full packed
+  // representation, so a carry out of the fraction bits increments the
+  // biased exponent, which yields the correctly rounded value.  In the IEEE
+  // formats, where spec.f < bias, the biased exponent then is at most
+  // bias + spec.f and thus finite.  In formats with a narrow exponent (e.g.,
+  // __CPROVER_floatbv[28][23]) rounding up the largest finite values can
+  // carry into an all-ones exponent, yielding infinity, as the integer
+  // result is not representable.
+  const exprt inc_val = shl_exprt{one_uint, drop};
+  exprt result_ge1 = if_exprt(inc, plus_exprt(masked, inc_val), masked);
+  // For x86 80-bit extended, the integer bit is explicit: a carry out of
+  // the fraction bits clears it while incrementing the exponent.  As all
+  // values in this branch are normal, set it again.
+  if(spec.x86_extended)
+  {
+    result_ge1 =
+      bitor_exprt{result_ge1, from_integer(power(2, spec.f), uint_type)};
+  }
+
+  // Select between the two branches by exponent magnitude.
+  const exprt bias_e = from_integer(spec.bias(), unsignedbv_typet(spec.e));
+  const exprt abs_lt_1 = binary_relation_exprt(biased_exp, ID_lt, bias_e);
+  const exprt result_uint = if_exprt(abs_lt_1, result_lt1, result_ge1);
+
+  // Bitwise reinterpret unsigned as float via extractbits
+  const exprt result = extractbits_exprt{result_uint, 0, float_type};
+  return if_exprt(or_exprt(is_special, exp_ge_f), src, result);
+}
+
 exprt float_bvt::isnormal(
   const exprt &src,
   const ieee_float_spect &spec)
 {
+  // For x86 80-bit extended, the explicit integer bit must be set: with a
+  // non-zero exponent, encodings with a cleared integer bit are unnormals,
+  // which x87 hardware rejects as invalid operands, and we treat as NaN.  A
+  // pseudo-denormal (zero exponent, integer bit set) denotes the value
+  // 2^(1-bias) * 1.fraction, which is normal.
+  if(spec.x86_extended)
+  {
+    return and_exprt{
+      extractbit_exprt{src, spec.f}, not_exprt{exponent_all_ones(src, spec)}};
+  }
+
   return and_exprt(
-           not_exprt(exponent_all_zeros(src, spec)),
-           not_exprt(exponent_all_ones(src, spec)));
+    not_exprt(exponent_all_zeros(src, spec)),
+    not_exprt(exponent_all_ones(src, spec)));
 }
 
 /// Subtracts the exponents
@@ -1038,7 +1281,11 @@ exprt float_bvt::relation(
 
   if(rel==relt::LT || rel==relt::LE)
   {
-    const equal_exprt bitwise_equal(src1, src2);
+    // Compare the canonical encodings of the values, which ignore any
+    // storage padding (see canonical_value_bits).
+    const exprt value1 = canonical_value_bits(src1, spec);
+    const exprt value2 = canonical_value_bits(src2, spec);
+    const equal_exprt bitwise_equal(value1, value2);
 
     // signs different? trivial! Unless Zero.
 
@@ -1047,14 +1294,7 @@ exprt float_bvt::relation(
     // as long as the signs match: compare like unsigned numbers
 
     // this works due to the BIAS
-    const binary_relation_exprt less_than1(
-      typecast_exprt(
-        typecast_exprt(src1, bv_typet(spec.width())),
-        unsignedbv_typet(spec.width())),
-      ID_lt,
-      typecast_exprt(
-        typecast_exprt(src2, bv_typet(spec.width())),
-        unsignedbv_typet(spec.width())));
+    const binary_relation_exprt less_than1(value1, ID_lt, value2);
 
     // if both are negative (and not the same), need to turn around!
     const notequal_exprt less_than2(
@@ -1098,9 +1338,14 @@ exprt float_bvt::isinf(
   const exprt &src,
   const ieee_float_spect &spec)
 {
-  return and_exprt(
-    exponent_all_ones(src, spec),
-    fraction_all_zeros(src, spec));
+  exprt result =
+    and_exprt(exponent_all_ones(src, spec), fraction_all_zeros(src, spec));
+  // For x86 80-bit extended, infinity requires the explicit integer bit to
+  // be set; with a cleared integer bit, the encoding is a pseudo-infinity,
+  // which isnan classifies as NaN.
+  if(spec.x86_extended)
+    result = and_exprt(result, extractbit_exprt(src, spec.f));
+  return result;
 }
 
 exprt float_bvt::isfinite(
@@ -1115,7 +1360,11 @@ exprt float_bvt::get_exponent(
   const exprt &src,
   const ieee_float_spect &spec)
 {
-  return extractbits_exprt(src, spec.f, unsignedbv_typet(spec.e));
+  // For IEEE the exponent sits at bits [f, f+e); for x86 80-bit
+  // extended the explicit integer bit occupies bit f, so the exponent
+  // is shifted up by one to bits [f+1, f+1+e).
+  const std::size_t exp_lsb = spec.x86_extended ? spec.f + 1 : spec.f;
+  return extractbits_exprt(src, exp_lsb, unsignedbv_typet(spec.e));
 }
 
 /// Gets the fraction without hidden bit in a floating-point bit-vector src
@@ -1123,6 +1372,8 @@ exprt float_bvt::get_fraction(
   const exprt &src,
   const ieee_float_spect &spec)
 {
+  // The lower f bits of the encoding are the explicit fraction (no
+  // implicit/explicit integer bit) for both IEEE and x86 layouts.
   return extractbits_exprt(src, 0, unsignedbv_typet(spec.f));
 }
 
@@ -1130,8 +1381,21 @@ exprt float_bvt::isnan(
   const exprt &src,
   const ieee_float_spect &spec)
 {
-  return and_exprt(exponent_all_ones(src, spec),
-                   not_exprt(fraction_all_zeros(src, spec)));
+  exprt result = and_exprt(
+    exponent_all_ones(src, spec), not_exprt(fraction_all_zeros(src, spec)));
+  // For x86 80-bit extended, encodings with a cleared integer bit and a
+  // non-zero exponent (pseudo-NaN, pseudo-infinity, and unnormals) are
+  // invalid operands for x87 hardware, which produces the default NaN for
+  // them, and are therefore treated as NaN.
+  if(spec.x86_extended)
+  {
+    result = or_exprt{
+      result,
+      and_exprt{
+        not_exprt{exponent_all_zeros(src, spec)},
+        not_exprt{extractbit_exprt{src, spec.f}}}};
+  }
+  return result;
 }
 
 /// normalize fraction/exponent pair returns 'zero' if fraction is zero
@@ -1606,11 +1870,22 @@ float_bvt::unbiased_floatt float_bvt::unpack(
 
   result.fraction=get_fraction(src, spec);
 
-  // add hidden bit
-  exprt hidden_bit=isnormal(src, spec);
-  result.fraction=
-    concatenation_exprt(hidden_bit, result.fraction,
-      unsignedbv_typet(spec.f+1));
+  if(spec.x86_extended)
+  {
+    // The explicit integer bit lives at position spec.f in the encoding.
+    // Use it directly rather than synthesising a hidden bit.
+    exprt integer_bit = extractbit_exprt(src, spec.f);
+    result.fraction = concatenation_exprt(
+      integer_bit, result.fraction, unsignedbv_typet(spec.f + 1));
+  }
+  else
+  {
+    // add hidden bit
+    exprt hidden_bit=isnormal(src, spec);
+    result.fraction=
+      concatenation_exprt(hidden_bit, result.fraction,
+        unsignedbv_typet(spec.f+1));
+  }
 
   result.exponent=get_exponent(src, spec);
 
@@ -1651,6 +1926,37 @@ exprt float_bvt::pack(
   // do exponent
   const if_exprt exponent(
     infinity_or_NaN, from_integer(-1, src.exponent.type()), src.exponent);
+
+  if(spec.x86_extended)
+  {
+    // Layout (high to low): sign | exponent | integer_bit | fraction.
+    // The explicit integer (J) bit is 1 for normal, infinity, and NaN,
+    // and 0 for zero and denormals (where the biased exponent is zero).
+    // This yields the canonical encoding that x87 hardware produces; in
+    // particular, a result that is rounded into the denormal range is not
+    // encoded as a pseudo-denormal.
+    const equal_exprt exp_zero(exponent, from_integer(0, exponent.type()));
+    exprt integer_bit = or_exprt(infinity_or_NaN, not_exprt(exp_zero));
+
+    // Build the full spec.width()-bit vector in one concatenation.
+    const std::size_t value_bits = spec.f + spec.e + 2;
+    if(spec.width() > value_bits)
+    {
+      const std::size_t pad_bits = spec.width() - value_bits;
+      const constant_exprt pad(
+        integer2bvrep(0, pad_bits), bv_typet(pad_bits));
+      return typecast_exprt(
+        concatenation_exprt(
+          {pad, sign_bit, exponent, integer_bit, fraction},
+          bv_typet(spec.width())),
+        spec.to_type());
+    }
+    return typecast_exprt(
+      concatenation_exprt(
+        {sign_bit, exponent, integer_bit, fraction},
+        bv_typet(spec.width())),
+      spec.to_type());
+  }
 
   // stitch all three together
   return typecast_exprt(

@@ -32,6 +32,22 @@ public:
   static exprt isnormal(const exprt &, const ieee_float_spect &);
   static exprt isfinite(const exprt &, const ieee_float_spect &);
 
+  /// Returns the lowest `spec.value_width()` bits of `src` as an unsigned
+  /// bit-vector, in a canonical encoding that can be compared bit-wise.
+  /// This only differs from the bits of `src` for x86 80-bit extended
+  /// `long double`: the padding of the 96-/128-bit storage is dropped, and
+  /// a pseudo-denormal (zero exponent, integer bit set) is re-encoded with
+  /// exponent 1, which denotes the same value.
+  static exprt
+  canonical_value_bits(const exprt &src, const ieee_float_spect &spec);
+
+  /// Bitwise equality of the canonical encodings of two floatbv values.
+  /// See `canonical_value_bits`.
+  static exprt canonical_value_bits_equal(
+    const exprt &,
+    const exprt &,
+    const ieee_float_spect &);
+
   // add/sub
   exprt add_sub(
     bool subtract,
@@ -92,6 +108,22 @@ public:
     const exprt &rm,
     const ieee_float_spect &src_spec,
     const ieee_float_spect &dest_spec) const;
+
+  /// Round a floating-point value to integral, IEEE 754 semantics.
+  /// \param src: packed bit-vector encoding of an IEEE float of the given
+  ///   `spec`.
+  /// \param rm: rounding mode encoded as `ieee_floatt::rounding_modet`.
+  /// \param spec: target IEEE format.
+  /// \return Packed bit-vector encoding of `roundToIntegral(rm, src)`.
+  ///   Special values (NaN, ±Inf, ±0) and values whose unbiased exponent
+  ///   already meets or exceeds the fraction width short-circuit to `src`.
+  /// \note `float_utilst::round_to_integral` is the bvt-level mirror; keep
+  ///   the two implementations in lockstep when changing the rounding
+  ///   logic.
+  exprt round_to_integral(
+    const exprt &src,
+    const exprt &rm,
+    const ieee_float_spect &spec) const;
 
   // relations
   enum class relt { LT, LE, EQ, GT, GE };
