@@ -1,0 +1,9 @@
+CORE
+write-write.c
+--race-check
+^EXIT=10$
+^SIGNAL=0$
+W/W data race on shared
+^VERIFICATION FAILED$
+--
+^warning: ignoring
