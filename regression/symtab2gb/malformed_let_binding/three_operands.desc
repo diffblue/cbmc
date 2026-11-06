@@ -1,0 +1,9 @@
+CORE
+let3.json_symtab
+
+^EXIT=6$
+^SIGNAL=0$
+^malformed symbol table entry .l.: let binding must have two operands$
+--
+--
+Rejects a let expression whose binding has three operands.
