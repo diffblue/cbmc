@@ -1,0 +1,11 @@
+CORE
+main.c
+--enforce-contract foo _ --enforce-contract foo
+^EXIT=6$
+^SIGNAL=0$
+^.*Only one contract may be enforced at a time per function.*$
+--
+^.*VERIFICATION SUCCESSFUL.*$
+This test enforces a contract on the same function twice in two
+goto-instrument invocations on the same goto binary. The second
+invocation must fail with the per-function error message.

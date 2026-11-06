@@ -9,6 +9,7 @@ Author: Remi Delmas, delmarsd@amazon.com
 #include "dfcc.h"
 
 #include <util/config.h>
+#include <util/exception_utils.h>
 #include <util/prefix.h>
 #include <util/string_utils.h>
 
@@ -19,6 +20,7 @@ Author: Remi Delmas, delmarsd@amazon.com
 #include <ansi-c/c_object_factory_parameters.h>
 #include <ansi-c/cprover_library.h>
 #include <ansi-c/goto-conversion/link_to_library.h>
+#include <goto-instrument/contracts/utils.h>
 #include <goto-instrument/generate_function_bodies.h>
 #include <goto-instrument/nondet_static.h>
 #include <linking/static_lifetime_init.h>
@@ -101,6 +103,41 @@ void dfcc(
   const std::set<std::string> &to_exclude_from_nondet_static,
   message_handlert &message_handler)
 {
+  // Check if DFCC instrumentation has already been applied to this binary.
+  // The marker symbol is created by dfcc_libraryt during normal operation,
+  // so its presence in the input goto model means a previous DFCC pass has
+  // already run. The check fires for any prior DFCC pass, including pure
+  // --replace-call invocations, not just --enforce-contract.
+  if(is_dfcc_instrumented(goto_model))
+  {
+    throw invalid_input_exceptiont(
+      "DFCC instrumentation has already been applied to this binary.\n"
+      "Only one DFCC pass per binary is supported.");
+  }
+
+  // Reject DFCC enforcement of a function that a prior non-DFCC
+  // goto-instrument pass has already enforced: its
+  // __CPROVER_contracts_original_<F> wrapper would otherwise be
+  // re-instrumented. This catches the cross-mode case `--enforce-contract foo`
+  // followed by `--dfcc ... --enforce-contract foo`. (A prior DFCC pass is
+  // already rejected above via the per-binary marker.)
+  if(to_check.has_value())
+  {
+    const irep_idt enforced_function =
+      parse_function_contract_pair(to_check.value()).first;
+    const irep_idt mangled{
+      std::string{CPROVER_PREFIX} + "contracts_original_" +
+      id2string(enforced_function)};
+    if(goto_model.symbol_table.has_symbol(mangled))
+    {
+      throw invalid_input_exceptiont(
+        "Contract enforcement has already been applied to function '" +
+        id2string(enforced_function) +
+        "' by a non-DFCC goto-instrument pass.\nOnly one contract may be "
+        "enforced at a time per function.");
+    }
+  }
+
   std::map<irep_idt, irep_idt> to_replace_map;
   for(const auto &cli_flag : to_replace)
     to_replace_map.insert(parse_function_contract_pair(cli_flag));
