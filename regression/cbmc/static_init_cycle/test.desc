@@ -1,0 +1,11 @@
+CORE
+main.c
+--pointer-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+Regression for mutually-referential static address constants, which form a
+dependency cycle in static initialization (see static_lifetime_init.cpp). The
+cycle is broken deterministically and both pointers are initialized; with
+--pointer-check this also confirms neither is left as an invalid pointer.
