@@ -45,4 +45,10 @@ void json_interface(cmdlinet &, message_handlert &);
   " {y--json-ui} \t use JSON-formatted output\n"                               \
   " {y--json-interface} \t bi-directional JSON interface\n"
 
+#define OPT_SARIF_RESULT "(sarif-result):"
+
+#define HELP_SARIF_RESULT                                                      \
+  " {y--sarif-result} {ufile} \t write SARIF-formatted results to file"        \
+  " (use - for stdout)\n"
+
 #endif // CPROVER_JSON_JSON_INTERFACE_H

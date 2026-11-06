@@ -94,6 +94,10 @@ json(const irep_idt &property_id, const property_infot &property_info);
 /// Write the property info into the given JSON stream object
 void json(json_stream_objectt &, const irep_idt &, const property_infot &);
 
+/// Convert property to SARIF result format
+json_objectt
+sarif_result(const irep_idt &property_id, const property_infot &property_info);
+
 int result_to_exit_code(resultt result);
 
 /// Return the number of properties with given \p status

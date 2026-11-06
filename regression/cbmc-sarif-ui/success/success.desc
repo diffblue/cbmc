@@ -1,0 +1,19 @@
+CORE
+success.c
+--sarif-result -
+activate-multi-line-match
+^EXIT=0$
+^SIGNAL=0$
+"\$schema": "https://json\.schemastore\.org/sarif-2\.1\.0\.json"
+"version": "2\.1\.0"
+"name": "cbmc"
+"informationUri": "https://www\.cprover\.org/cbmc/"
+"ruleId": "main\.assertion\.1"
+"kind": "pass"
+"level": "none"
+"text": "assertion x == 1 \(SUCCESS\)"
+"startLine": 6
+--
+"level": "error"
+--
+Checks that --sarif-result - produces valid SARIF output for successful verification.

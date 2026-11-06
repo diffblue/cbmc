@@ -1,0 +1,16 @@
+CORE
+bounds.c
+--sarif-result - --bounds-check
+activate-multi-line-match
+^EXIT=10$
+^SIGNAL=0$
+"\$schema": "https://json\.schemastore\.org/sarif-2\.1\.0\.json"
+"version": "2\.1\.0"
+"ruleId": "main\.array_bounds\.1"
+"ruleId": "main\.array_bounds\.2"
+"kind": "fail"
+"level": "error"
+"startLine": 5
+--
+--
+Checks that --sarif-result - produces multiple SARIF results for bounds-check failures.
