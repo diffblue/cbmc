@@ -13,3 +13,4 @@ test.c
 --
 This is checking that without the --cover-failed-assertions flag we still get the same result as we did before adding
 it in this example.
+--paths mode explores one path at a time, so individual paths may not cover all blocks.
