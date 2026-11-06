@@ -1,0 +1,13 @@
+CORE
+test.c
+--nondet-volatile-write-model data:observe_data --nondet-volatile-write-model cmd:observe_cmd --mmio-weak
+^EXIT=0$
+^SIGNAL=0$
+data committed before GO: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+An x86 mfence (full memory barrier) written as inline assembly is recognised as
+a barrier and orders the two register writes, so the ordering assertion holds.
+Barriers are recognised by mnemonic across architectures (ARM dmb/dsb, Power
+sync/lwsync, x86 mfence/sfence), so this is independent of --arch.

@@ -1,0 +1,12 @@
+CORE
+main.c
+--mmio-region 0x1000:256:strong _ --no-pointer-check --no-bounds-check
+^EXIT=0$
+^SIGNAL=0$
+value read back from the region: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+A strongly-ordered MMIO region (the default type) is modelled precisely by its
+backing array, so a value written to the region reads back exactly. Compare
+weak.desc.

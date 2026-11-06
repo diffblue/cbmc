@@ -71,7 +71,44 @@ the methods in the API.
 
 *If the device has no API,* meaning that the code refers directly to the address
 in the memory-mapped I/O region for the device without reference to accessor
-functions, use
+functions, there are two approaches available.
+
+#### Per-region object model (recommended)
+
+Use `--mmio-region <address>:<size>` (with `goto-instrument` or `cbmc`) to
+declare each contiguous MMIO region as an individual object. Each region becomes
+a byte array in the symbol table, named `__CPROVER_mmio_region_0x<address>`.
+Reads and writes to addresses within a declared region are redirected to the
+corresponding array element.
+
+This approach avoids the scalability problems of the single-array callback model:
+each write only updates the targeted region object rather than the entire memory
+array.
+
+For example, given firmware that accesses a UART at `0x40000000` (256 bytes) and
+a GPIO controller at `0x40001000` (64 bytes):
+
+```sh
+goto-cc -o firmware.gb firmware.c
+goto-instrument --mmio-region 0x40000000:256 \
+  --mmio-region 0x40001000:64 \
+  firmware.gb firmware-mod.gb
+cbmc --no-pointer-check --no-bounds-check firmware-mod.gb
+```
+
+The `--no-pointer-check` and `--no-bounds-check` flags are needed because
+integer addresses used for MMIO are not valid pointers from CBMC's perspective.
+
+Constant addresses are mapped directly to a specific array element at
+instrumentation time. Symbolic addresses (e.g., a pointer that could refer to
+either region) are handled via a conditional dispatch over all declared regions.
+
+Regions must not overlap; `goto-instrument` will report an error if overlapping
+regions are specified.
+
+#### Callback model
+
+Alternatively, use
 ```C
 __CPROVER_mm_io_r(address, size)
 __CPROVER_mm_io_w(address, size, value)
@@ -89,3 +126,80 @@ char __CPROVER_mm_io_r(void *a, unsigned s) {
 ```
 will return the value 2 upon any access at address 0x1000, and return a
 non-deterministic value in all other cases.
+
+The callback model can be combined with `--mmio-region`: per-region
+instrumentation runs first to give declared regions precise array-backed
+modeling, and the callbacks then handle any remaining dereferences. This is
+useful when some regions need custom read/write behaviour beyond simple
+nondeterministic access.
+
+Note that the callback model uses a single unbounded `__CPROVER_memory` array,
+which means every write implies an update of the entire array. For programs with
+many MMIO regions, the per-region object model described above is preferred.
+
+### Device memory ordering
+
+The models above concern *which values* a device access sees. Real device memory
+also has *ordering* semantics that differ from ordinary memory: depending on the
+region's memory type (for example ARM Device-nGnRnE vs Device-GRE, or x86
+uncacheable vs write-combining) the hardware may reorder, merge or delay writes
+to device registers. Relying on a particular order without the required barrier
+is a common driver bug. The `--mmio` option models this.
+
+#### The sound default
+
+`goto-instrument --mmio`, with no further configuration, applies the *weakest*
+device-memory model to every `volatile` access: reads are non-deterministic (the
+device may have changed the register between accesses) and writes are preserved
+as observable, reorderable side effects. This is a sound over-approximation of
+any real mapping, so a program verified under `--mmio` is correct for any
+mapping. Barriers already present in the program are honoured — an ARM
+`dmb`/`dsb`, a Power `sync`/`lwsync`, an x86 `mfence`/`sfence`,
+`__sync_synchronize`, or `__CPROVER_fence` all stop the modelled reordering
+(barriers are recognised by mnemonic, so this is independent of `--arch`).
+
+To *check* that a driver accesses registers in the order a device requires, give
+the registers a write model, which acts as a device-side observer:
+
+```C
+volatile int data_reg, cmd_reg;
+int data_seen;
+void observe_data(int v) { data_seen = v; }
+void observe_cmd(int v) {
+  if(v == GO)
+    __CPROVER_assert(data_seen == EXPECTED, "data written before command");
+}
+```
+
+```sh
+goto-instrument --mmio \
+  --nondet-volatile-write-model data_reg:observe_data \
+  --nondet-volatile-write-model cmd_reg:observe_cmd \
+  driver.gb driver-mod.gb
+```
+
+Under `--mmio` the two writes may be observed out of order, so the assertion
+fails unless the driver places a barrier between them.
+
+#### Recovering precision
+
+The weakest model can over-report for regions that are in fact strongly ordered.
+Where the memory type is known it can be supplied per region:
+
+* `--mmio-region <addr>:<size>:strong` models the region precisely (ARM
+  Device-nGnRnE, x86 uncacheable); `:weak` returns non-deterministic reads (ARM
+  Device-GRE, x86 write-combining).
+* `--mmio-ioremap` derives the regions and their types automatically from
+  `ioremap`-family calls in the program (`ioremap` → strong, `ioremap_wc` →
+  weak), with no manual declaration.
+
+#### Fine-grained attributes
+
+The individual attributes of weak device memory are available as expert
+overrides: `--mmio-weak` and `--mmio-weak-variable` (reorderable posted writes),
+`--mmio-gather` (write combining), and `--mmio-early-ack` (distinguishing an
+ordering barrier such as ARM `DMB` from a completion barrier such as `DSB`).
+`--mmio-weak-depth <n>` bounds how many writes to a single register may be
+outstanding at once; a longer write burst is reported as a property violation
+rather than silently under-approximated, so the bound is never a hidden source
+of unsoundness.

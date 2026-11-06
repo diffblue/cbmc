@@ -1,0 +1,12 @@
+CORE
+test.c
+--nondet-volatile-write-model A:observe_A --nondet-volatile-write-model B:observe_B --mmio-weak --mmio-early-ack
+^EXIT=0$
+^SIGNAL=0$
+A observed before B: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Even under early acknowledgement, an ordering barrier (DMB) still orders posted
+writes by generation: the write to A is observed before the write to B, so the
+assertion holds. Compare noorder.desc, without the barrier.
