@@ -80,8 +80,7 @@ renamedt<ssa_exprt, L2> goto_symex_statet::assignment(
   const exprt &rhs, // L2
   const namespacet &ns,
   bool rhs_is_simplified,
-  bool record_value,
-  bool allow_pointer_unsoundness)
+  bool record_value)
 {
   // identifier should be l0 or l1, make sure it's l1
   lhs = rename_ssa<L1>(std::move(lhs), ns).get();
@@ -110,11 +109,6 @@ renamedt<ssa_exprt, L2> goto_symex_statet::assignment(
     DATA_INVARIANT(!check_renaming(lhs), "lhs renaming failed on l2");
     DATA_INVARIANT(!check_renaming(rhs), "rhs renaming failed on l2");
   }
-
-  // see #305 on GitHub for a simple example and possible discussion
-  if(is_shared && lhs.type().id() == ID_pointer && !allow_pointer_unsoundness)
-    throw unsupported_operation_exceptiont(
-      "pointer handling for concurrency is unsound");
 
   // Update constant propagation map -- the RHS is L2
   if(!is_shared && record_value && goto_symex_can_forward_propagatet(ns)(rhs))

@@ -13,19 +13,19 @@ void isync()
 
 int __unbuffered_cnt = 0;
 int __unbuffered_p0_r1 = 0;
-int __unbuffered_p0_r3 = 0;
+__CPROVER_thread_local int __unbuffered_p0_r3 = 0;
 int __unbuffered_p0_r4 = 0;
 int __unbuffered_p0_r6 = 0;
-int __unbuffered_p0_r7 = 0;
+__CPROVER_thread_local int __unbuffered_p0_r7 = 0;
 int __unbuffered_p0_r8 = 0;
 int __unbuffered_p1_r1 = 0;
-int __unbuffered_p1_r3 = 0;
+__CPROVER_thread_local int __unbuffered_p1_r3 = 0;
 int __unbuffered_p1_r4 = 0;
 int __unbuffered_p1_r6 = 0;
-int __unbuffered_p1_r7 = 0;
+__CPROVER_thread_local int __unbuffered_p1_r7 = 0;
 int __unbuffered_p1_r8 = 0;
 int __unbuffered_p2_r1 = 0;
-int __unbuffered_p2_r3 = 0;
+__CPROVER_thread_local int __unbuffered_p2_r3 = 0;
 int __unbuffered_p2_r4 = 0;
 int a = 0;
 int b = 0;
