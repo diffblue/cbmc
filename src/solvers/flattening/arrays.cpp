@@ -283,12 +283,16 @@ void arrayst::add_array_constraint(const lazy_constraintt &lazy, bool refine)
   else
   {
     // add the constraint eagerly
+    const bool was_converting = converting_array_constraints;
+    converting_array_constraints = true;
     prop.l_set_to_true(convert(lazy.lazy));
+    converting_array_constraints = was_converting;
   }
 }
 
 void arrayst::add_array_constraints()
 {
+  converting_array_constraints = true;
   collect_indices();
   // at this point all indices should in the index set
 
@@ -335,6 +339,8 @@ void arrayst::add_array_constraints()
 
   // add the Ackermann constraints
   add_array_Ackermann_constraints();
+
+  converting_array_constraints = false;
 }
 
 void arrayst::add_array_Ackermann_constraints()
