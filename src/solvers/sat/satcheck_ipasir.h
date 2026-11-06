@@ -29,7 +29,7 @@ public:
   /// This method returns the truth value for a literal of the current SAT model
   tvt l_get(literalt a) const override final;
 
-  void lcnf(const bvt &bv) override final;
+  void do_lcnf(const bvt &bv) override final;
 
   /* This method is not supported, and currently not called anywhere in CBMC */
   void set_assignment(literalt a, bool value) override;
