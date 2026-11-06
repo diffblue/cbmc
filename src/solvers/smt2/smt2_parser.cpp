@@ -651,6 +651,11 @@ exprt smt2_parsert::function_application()
           if(upper<lower)
             throw error("extract got bad indices");
 
+          auto src_width = to_bitvector_type(op[0].type()).get_width();
+          if(upper >= static_cast<long long>(src_width))
+            throw error() << "extract upper index " << upper
+                          << " exceeds operand width " << src_width;
+
           auto lower_e = from_integer(lower, integer_typet());
 
           unsignedbv_typet t(upper-lower+1);
@@ -906,13 +911,20 @@ exprt smt2_parsert::function_application()
           if(op[1].type().id() != ID_floatbv)
             throw error() << id << " takes a FloatingPoint operand";
 
+          // The bit-blaster only supports RTZ for float-to-integer.
+          // For other rounding modes, first round to integral with the
+          // requested mode, then convert with RTZ.
+          auto rtz =
+            from_integer(ieee_floatt::ROUND_TO_ZERO, unsignedbv_typet(32));
+          auto rounded = floatbv_round_to_integral_exprt{op[1], op[0]};
+
           if(id == "fp.to_sbv")
             return typecast_exprt(
-              floatbv_typecast_exprt(op[1], op[0], signedbv_typet(width)),
+              floatbv_typecast_exprt(rounded, rtz, signedbv_typet(width)),
               unsignedbv_typet(width));
           else
             return floatbv_typecast_exprt(
-              op[1], op[0], unsignedbv_typet(width));
+              rounded, rtz, unsignedbv_typet(width));
         }
         else
         {

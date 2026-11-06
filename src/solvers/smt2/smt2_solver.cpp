@@ -416,6 +416,10 @@ int solver(std::istream &in)
 
   satcheckt satcheck{message_handler};
   boolbvt boolbv{ns, satcheck, message_handler};
+  // Assertions may follow a check-sat command. Freeze all variables so that
+  // the simplifier of the SAT solver does not eliminate variables that later
+  // clauses refer to.
+  boolbv.set_all_frozen();
 
   smt2_solvert smt2_solver{in, boolbv};
   bool error_found = false;
