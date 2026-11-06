@@ -1,0 +1,15 @@
+CORE
+main.c
+--paths lifo --pointer-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^\[main.pointer_dereference.\d+\] .*FAILURE$
+--
+Soundness of if-conversion: the dereference in `if(p) x = *p;` must stay
+guarded by `p != NULL` after being rewritten to a conditional expression, so
+no spurious NULL dereference is reported on the path where p is NULL. goto_check
+guards the operand checks of the generated `?:` by its condition, which this
+test confirms end-to-end under --paths.

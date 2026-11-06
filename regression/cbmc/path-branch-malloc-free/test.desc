@@ -1,0 +1,16 @@
+CORE
+main.c
+--paths lifo
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+This test pins down the `--paths`-friendliness of the CPROVER library's `free`
+and `__CPROVER_deallocate`: the bookkeeping in those two functions emits GOTO
+branches that, under `--paths lifo`, multiplied the symex state space
+exponentially with the number of `free` calls. With if-conversion turning
+those branches into conditional assignments, this test runs in a handful of
+paths instead of 4^N. Without if-conversion it would time out at the harness
+limit, so a regression is observable here.

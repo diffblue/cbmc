@@ -1,0 +1,13 @@
+CORE
+main.c
+--paths lifo
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+If-conversion turns the conditional write `if(c) x = 1;` into the
+unconditional `x = c ? 1 : x`, which would lose the other thread's write to x
+when it happens between the read and the write of x. Hence concurrent
+programs must not be converted.

@@ -1,0 +1,12 @@
+CORE
+main.c
+--paths lifo
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+The branch condition reads s.f through a pointer, and the converted region
+writes s.f. If-conversion must snapshot such a condition: re-evaluating it
+for the second assignment would observe the first assignment and skip it.
