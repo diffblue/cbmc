@@ -297,8 +297,8 @@ static exprt component_value(const exprt &new_value, const typet &type)
 }
 
 /// Where a standard library keeps the classification table of the
-/// ctype<char> facet ([facet.ctype.special]): libstdc++'s `_M_table', libc++'s
-/// `__tab_', the MSVC STL's `_Ctype._Table'.
+/// ctype<char> facet ([facet.ctype.special]): libstdc++'s `_M_table`, libc++'s
+/// `__tab_`, the MSVC STL's `_Ctype._Table`.
 struct ctype_char_layoutt
 {
   irep_idt class_name;
@@ -702,7 +702,7 @@ static exprt provide_classic_ctype_char_model(
 }
 
 /// Set the component of \p value (of type \p type) whose name is or ends in
-/// `::\<name\>', looking into base class components too.  \return whether
+/// `::\<name\>`, looking into base class components too.  \return whether
 /// such a component was found.
 static bool set_struct_component(
   exprt &value,
@@ -2305,7 +2305,7 @@ static void provide_set_terminate_model(symbol_table_baset &symbol_table)
 /// function's name without its parameter list, with its template arguments,
 /// without those of the function itself, or without any.  N5008
 /// [propagation]/12 specifies make_exception_ptr(e) as `try { throw e; }
-/// catch(...) { return current_exception(); }'; libstdc++'s body with RTTI
+/// catch(...) { return current_exception(); }`; libstdc++'s body with RTTI
 /// creates the exception object with __cxa_allocate_exception and
 /// __cxa_init_primary_exception, which remove_cpp_exceptions does not know.
 static const std::map<std::string, std::string> &library_replacing_models()

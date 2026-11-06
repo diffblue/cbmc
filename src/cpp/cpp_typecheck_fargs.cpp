@@ -64,12 +64,12 @@ void cpp_typecheck_fargst::build(
 /// of conversion (default-init / init_list-ctor / aggregate-init),
 /// the actual conversion is the typecheck step's job.
 ///
-/// N5008 [over.ics.list]/7: the empty `{}' is viable for a class with a
+/// N5008 [over.ics.list]/7: the empty `{}` is viable for a class with a
 /// default constructor whatever its name; the former exclusion of
 /// std::chrono, std::ratio and std::__detail classes (a guard against an
 /// elaboration-depth problem in \<chrono\> / \<future\> that the chrono, future
 /// and thread regression tests no longer show) dropped libstdc++'s
-/// __atomic_futex_unsigned::_M_load_and_test (`_M_load_and_test_until({})').
+/// __atomic_futex_unsigned::_M_load_and_test (`_M_load_and_test_until({})`).
 /// N5008 [over.best.ics.general]/4.5: \p operand is the only element, itself a
 /// braced-init-list, of a list in the second phase of [over.match.list] for
 /// class X (recorded as ID_C_no_user_defined_conversion_to); a parameter of
@@ -371,9 +371,9 @@ static bool brace_init_is_viable(
 /// `implicit_typecast(val, elem_type)` per element.
 /// N5008 [over.ics.list]/9: for a parameter of REFERENCE type the
 /// list-initialization rules apply to the referenced type, so
-/// `std::initializer_list<X> &&' (libstdc++'s shape for several
-/// constructors) and `const std::initializer_list<X> &' accept a
-/// brace-init-list like `std::initializer_list<X>' does.
+/// `std::initializer_list<X> &&` (libstdc++'s shape for several
+/// constructors) and `const std::initializer_list<X> &` accept a
+/// brace-init-list like `std::initializer_list<X>` does.
 static const typet &init_list_referent(const typet &type)
 {
   if(is_reference(type) || is_rvalue_reference(type))

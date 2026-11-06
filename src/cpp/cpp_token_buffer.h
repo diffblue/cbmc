@@ -52,10 +52,10 @@ public:
   void Replace(const cpp_tokent &token);
   void Insert(const cpp_tokent &token);
 
-  /// Split the `>>' token at the current position into two `>' tokens (the
+  /// Split the `>>` token at the current position into two `>` tokens (the
   /// closing of two template-argument lists, [temp.names]/4).  A later
   /// Restore to a position before the split undoes it, so that a
-  /// speculative template-argument parse leaves the `>>' of a shift
+  /// speculative template-argument parse leaves the `>>` of a shift
   /// expression intact.
   void split_shift_right();
 
@@ -83,7 +83,7 @@ protected:
 
   post current_pos;
 
-  /// The positions at which split_shift_right split a `>>', with the
+  /// The positions at which split_shift_right split a `>>`, with the
   /// original token, in the order of the splits
   std::vector<std::pair<post, cpp_tokent>> shift_right_splits;
 

@@ -542,7 +542,7 @@ void expand_member_initializer_packs_in_body(
 /// fold over the template parameter pack \p short_name, whose elements
 /// (types as `ID_type` expressions, or non-type values) are \p pack_args.
 /// N5008 [temp.variadic]/14: a fold over a one-element pack is its single
-/// pattern instance -- `(e op ...)' and `(... op e)' are `e', a binary fold
+/// pattern instance -- `(e op ...)` and `(... op e)` are `e`, a binary fold
 /// applies op once with the init operand on its side.  Rewrites every fold
 /// node in \p node whose pack has already been substituted.
 static void reduce_single_element_folds(irept &node)
@@ -568,12 +568,12 @@ static void reduce_single_element_folds(irept &node)
 
 /// N5008 [expr.prim.fold]/1-3, [temp.variadic]/8: with SEVERAL template
 /// parameter packs, a fold in a function template's \p body may be over any
-/// of them -- `(100 + ... + Is)' in `template <class F, class... Vs,
-/// size_t... Is> f(seq<Is...>)'.  The function-parameter-pack expansion
+/// of them -- `(100 + ... + Is)` in `template <class F, class... Vs,
+/// size_t... Is> f(seq<Is...>)`.  The function-parameter-pack expansion
 /// sees only the first pack (or the function parameter pack); expand the
 /// folds over every pack of \p template_type whose elements the deduction
 /// recorded in the template map, so that none reaches the C type-checker's
-/// residual-fold fallback (which makes it `true').  \p single_pack_too: also
+/// residual-fold fallback (which makes it `true`).  \p single_pack_too: also
 /// for a single pack -- the eager conversion of a constexpr member function
 /// template has no other fold expansion ahead of it.
 void cpp_typecheckt::expand_folds_over_template_packs(
@@ -622,7 +622,7 @@ void cpp_typecheckt::expand_folds_over_template_packs(
 /// right-associated tree `pat0 op (pat1 op ... op patN-1)`, a unary left fold
 /// `(... op pat)` the left-associated tree; a binary fold is seeded by its
 /// init operand ([temp.variadic]/14).  An empty pack yields the operator's
-/// identity ([temp.variadic]/14: `&&' -> true, `||' -> false, otherwise 0);
+/// identity ([temp.variadic]/14: `&&` -> true, `||` -> false, otherwise 0);
 /// a single element the sole substituted pattern.  Every bare reference to
 /// the pack inside the pattern (a type position such as `sizeof(Ts)` or
 /// `__is_same(T, Ts)`, or a value position) is replaced by the element.
@@ -3493,8 +3493,8 @@ void cpp_typecheckt::queue_deferred_methods_of_instance(
 #define MAX_DEPTH 50
 
 /// The parameter-list \p params of a function template spelled with the
-/// template's own parameters (\p ttype) normalised to their POSITION (`#0',
-/// `#1', ...), parameter names erased ([dcl.fct]/3) -- so the same
+/// template's own parameters (\p ttype) normalised to their POSITION (`#0`,
+/// `#1`, ...), parameter names erased ([dcl.fct]/3) -- so the same
 /// signature written with differently named template parameters compares
 /// equal.  The first \p skip_first template parameters (an enclosing class
 /// template's, for an out-of-line member template definition) are not part
@@ -3854,8 +3854,8 @@ bool cpp_typecheckt::out_of_line_definition_matches(
 /// N5008 [dcl.fct]/3: parameter names are not part of the type; the body of
 /// the out-of-line definition \p def refers to the definition's names -- give
 /// the instantiated member \p member those names (the in-class declaration
-/// may name them differently, `_M_construct(const _CharT *__c, ...)' vs
-/// `(const _CharT *__str, ...)').
+/// may name them differently, `_M_construct(const _CharT *__c, ...)` vs
+/// `(const _CharT *__str, ...)`).
 void cpp_typecheckt::adopt_definition_parameter_names(
   symbolt &member,
   const cpp_declarationt &def)
@@ -4196,8 +4196,8 @@ irep_idt cpp_typecheckt::existing_function_template_instance(
 /// N5008 [temp.variadic]/5,16: with an EMPTY function parameter pack
 /// \p pack_var_name, every pack expansion over it yields no arguments.
 /// Remove, in the parsed \p node, the pack's call-argument references
-/// (`f(a...)', `f(static_cast<A &&>(a)...)') and new-initializer references
-/// (`\::new (p) T(forward<A>(a)...)').
+/// (`f(a...)`, `f(static_cast<A &&>(a)...)`) and new-initializer references
+/// (`\::new (p) T(forward<A>(a)...)`).
 static void
 strip_empty_pack_references(const irep_idt &pack_var_name, irept &node)
 {
@@ -10613,10 +10613,10 @@ skip_pack_removal_ft:
 /// an atomic constraint of a concept's constraint-expression (the concept
 /// variable's initializer) results in an invalid type or expression, the
 /// constraint is not satisfied -- it is not an error (libc++ evaluates
-/// `common_reference_with<_Tp, _Up>' for types with no
+/// `common_reference_with<_Tp, _Up>` for types with no
 /// common_reference<...>::type).  [temp.constr.normal]/1, [temp.constr.op]:
-/// the top-level `&&' and `||' combine separately satisfied constraints --
-/// `A::simple || A::template simple<Args...>' is satisfied by its second
+/// the top-level `&&` and `||` combine separately satisfied constraints --
+/// `A::simple || A::template simple<Args...>` is satisfied by its second
 /// operand when substitution into the first fails (libstdc++ 16's
 /// views::__adaptor::__adaptor_has_simple_extra_args).
 void cpp_typecheckt::convert_concept_initializer(symbolt &symbol)

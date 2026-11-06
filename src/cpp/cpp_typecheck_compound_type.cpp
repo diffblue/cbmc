@@ -610,7 +610,7 @@ irep_idt cpp_typecheckt::ensure_virtual_table(
 
 /// N5008 [temp.variadic]/9.2, [dcl.fct]/1: expand the pack expansions among
 /// the call arguments of the trailing-return-type of member function type
-/// \p final_type to its replicated parameters `base$k', as the body and the
+/// \p final_type to its replicated parameters `base$k`, as the body and the
 /// mem-initializers are; then turn those names, not yet declared while the
 /// type is checked, into lvalue placeholders of the parameters' types
 /// ([expr.prim.id.unqual]/12: a named parameter is an lvalue, also when its
@@ -3500,7 +3500,7 @@ bool cpp_typecheckt::register_lazy_member(
 /// unqualified class name in a constructor parameter type would also find a
 /// member declared after the constructor -- libc++'s
 /// chrono::year_month_day_last has `year_month_day_last(const
-/// month_day_last &)' and later a member function `month_day_last()'.  (If
+/// month_day_last &)` and later a member function `month_day_last()`.  (If
 /// the two searches differ, the program is ill-formed, no diagnostic
 /// required, [class.member.lookup]/6; Clang and GCC accept it.)  Replace
 /// such a parameter type, at the constructor's position, by the class it
@@ -3559,7 +3559,7 @@ void cpp_typecheckt::pin_constructor_parameter_class_names(
 /// base and member as by a defaulted default constructor of D -- including
 /// D's default member initializers and its virtual table pointers.  Build
 /// the declaration of that constructor of D, `D(P1 a1, ..., Pn an) :
-/// B(static_cast<P1 &&>(a1), ...) {}' (an lvalue reference parameter is
+/// B(static_cast<P1 &&>(a1), ...) {}` (an lvalue reference parameter is
 /// passed as is); full_member_initialization adds the rest.
 /// \param symbol: the class D
 /// \param base: D's base B
@@ -6624,7 +6624,7 @@ void cpp_typecheckt::convert_anon_struct_union_member(
 /// layout.  Such a member keeps its place among the components as a
 /// zero-sized array of its class type (so that the class's size and the
 /// other members' offsets are those of the ABI), with the class type in
-/// the component's `\#nua_type'; place_empty_potentially_overlapping_members
+/// the component's `\#nua_type`; place_empty_potentially_overlapping_members
 /// gives it its offset and get_component reaches it there.
 void cpp_typecheckt::make_empty_potentially_overlapping_members_zero_sized(
   struct_typet &struct_type)
@@ -6832,10 +6832,10 @@ void cpp_typecheckt::place_empty_potentially_overlapping_members(
 
 /// The lvalue of the empty potentially-overlapping member \p component (see
 /// make_empty_potentially_overlapping_members_zero_sized) of \p object, of
-/// its class type, at its offset: `*(T *)((char *)&object + offset)'.  An
+/// its class type, at its offset: `*(T *)((char *)&object + offset)`.  An
 /// empty class has no state, so of an rvalue object (a prvalue, which has
 /// no address) the member's value is that of any object of the class,
-/// after the object's evaluation: `(object, T{})'.
+/// after the object's evaluation: `(object, T{})`.
 static exprt potentially_overlapping_member(
   const exprt &object,
   const struct_typet::componentt &component,
@@ -7423,7 +7423,7 @@ bool cpp_typecheckt::subtype_typecast(
 
 /// N5008 [basic.scope.param]/1, [dcl.fct]/1: a parameter's scope extends
 /// to the end of its declarator, so a trailing-return-type names the
-/// parameters (`static auto _Call(_Callable _Obj) -> decltype(_Obj)', the
+/// parameters (`static auto _Call(_Callable _Obj) -> decltype(_Obj)`, the
 /// MSVC STL's _Invoker1).  The parser moved a member's trailing return type
 /// into \p declaration's type, which the class body type-checks before the
 /// member's parameters exist; type-check it with them bound as local
@@ -7475,7 +7475,7 @@ void cpp_typecheckt::typecheck_member_trailing_return_type(
 /// a constrained one is preferred over an unconstrained one
 /// ([over.match.best.general]/2.6).  The selected destructor becomes the first
 /// destructor component; the definitions of the others are not instantiated
-/// ([temp.inst]/4) -- `~X() requires(!trivial) { destroy(); }' of a
+/// ([temp.inst]/4) -- `~X() requires(!trivial) { destroy(); }` of a
 /// trivially destructible specialization calls a member whose own
 /// constraint fails (libc++'s std::expected::__repr).
 void cpp_typecheckt::select_prospective_destructor(
@@ -7544,7 +7544,7 @@ void cpp_typecheckt::select_prospective_destructor(
 /// \#member_requires by typecheck_compound_declarator), checked with the
 /// parameter mapping of the class: its template parameters bound to the
 /// specialization's arguments, in the class's scope.  The result depends
-/// on the member alone and is cached.  An `it(it<!Const> i) requires Const'
+/// on the member alone and is cached.  An `it(it<!Const> i) requires Const`
 /// converting constructor of iterator<false> is thus not viable for a copy
 /// of an iterator<false> -- considering it recursed through iterator<true>'s
 /// constructor without bound.

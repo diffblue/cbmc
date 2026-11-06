@@ -51,9 +51,9 @@ protected:
 };
 
 /// N5008 [basic.type.qualifier]/3 and Note 2: cv-qualifiers applied to an
-/// array type attach to its element type, so `const T' with T = char[3] (a
-/// substituted template parameter, an alias template's `const T &') is the
-/// array of const char, the same type as `const char[3]'.  Qualify the
+/// array type attach to its element type, so `const T` with T = char[3] (a
+/// substituted template parameter, an alias template's `const T &`) is the
+/// array of const char, the same type as `const char[3]`.  Qualify the
 /// elements as well as the array.
 void cpp_convert_typet::set_attributes(typet &type) const
 {

@@ -83,7 +83,7 @@ public:
   bool use_FPA_theory = false;
   bool use_array_of_bool = false;
   bool use_as_const = false;
-  /// The solver accepts `((as const T) v)' only for a VALUE v (cvc5:
+  /// The solver accepts `((as const T) v)` only for a VALUE v (cvc5:
   /// "expected a value"), not for an arbitrary term.
   bool as_const_requires_value = false;
   bool use_check_sat_assuming = false;
@@ -147,10 +147,10 @@ protected:
   /// emitted (an SMT-LIB logic named `QF_...` admits no quantifiers) -- and
   /// the output held back so far to `final_out`.
   void flush_deferred_output();
-  /// Write the all-zero VALUE of \p type in the SMT sort `unflatten'
-  /// produces for it (a literal usable under `as const').
+  /// Write the all-zero VALUE of \p type in the SMT sort `unflatten`
+  /// produces for it (a literal usable under `as const`).
   void convert_zero_value(const typet &type);
-  /// Whether `array_of' of \p what can be written with `as const'.
+  /// Whether `array_of` of \p what can be written with `as const`.
   bool as_const_admits(const exprt &what) const;
   /// Writes the end of the SMT file to the `smt_convt::out` stream. These parts
   /// of the output may be changed when using multiple rounds of solving. They

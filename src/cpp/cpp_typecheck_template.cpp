@@ -31,8 +31,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <map>
 #include <set>
 
-/// \return the name of template parameter \p parameter (`C' of
-///   `template\::3\::C', or `anon\#1' for an unnamed one)
+/// \return the name of template parameter \p parameter (`C` of
+///   `template\::3\::C`, or `anon\#1` for an unnamed one)
 static irep_idt template_parameter_base_name(const template_parametert &p)
 {
   const irep_idt &identifier =
@@ -43,7 +43,7 @@ static irep_idt template_parameter_base_name(const template_parametert &p)
 }
 
 /// Rename, in the not yet type-checked default argument \p n, each name
-/// that is the first component of a name (`C', `C::type', `X<C>') and a key
+/// that is the first component of a name (`C`, `C::type`, `X<C>`) and a key
 /// of \p renaming.
 static void rename_template_parameters(
   irept &n,
@@ -114,7 +114,7 @@ void cpp_typecheckt::salvage_default_arguments(
 /// Also handles partial specializations per [temp.spec.partial.general]
 /// and explicit specializations per [temp.expl.spec].
 /// N5008 [temp.mem.class]/1, [temp.inst]/4: a member class of a class
-/// template defined outside it, `template \<class C> struct S<C>::N { ... };',
+/// template defined outside it, `template \<class C> struct S<C>::N { ... };`,
 /// is instantiated for a specialization S<X> when the completeness of
 /// S<X>::N is required, from the definition reachable at that point.  The
 /// definition is grafted into the class template's parse tree, which covers
@@ -586,7 +586,7 @@ void cpp_typecheckt::typecheck_template_alias(cpp_declarationt &declaration)
 
 /// N5008 [temp.param]/17: the default template arguments available for a
 /// template are obtained by merging those of all its declarations -- a
-/// definition that follows a declaration with `typename = ...' does not
+/// definition that follows a declaration with `typename = ...` does not
 /// repeat it.  Copy each default of \p declared (the earlier declaration's
 /// template parameters) to the corresponding parameter of \p defined that
 /// has none, renaming the earlier declaration's parameter names to the
@@ -1250,14 +1250,14 @@ bool cpp_typecheckt::member_template_return_types_match(
 /// typecheck class template members; these can be methods or static members
 /// N5008 [temp.mem]/1, [class.mfct]/2: an out-of-line definition of a member
 /// function template of a non-template class (`template \<class E> auto
-/// path::_S_convert(const E *__f, const E *__l) { ... }') completes the
+/// path::_S_convert(const E *__f, const E *__l) { ... }`) completes the
 /// in-class declaration with the same signature ([temp.over.link]/6, the
 /// template parameters compared by position).  The body uses the
 /// DEFINITION's parameter names ([dcl.fct]/3 -- names are not part of the
 /// type) and the definition's template parameter names; both are grafted
 /// onto the declaration.  Previously the body went to the first bodiless
 /// same-named template and kept the declaration's parameter names, so the
-/// instantiated body found `__f' unknown (or a wrong overload got the body).
+/// instantiated body found `__f` unknown (or a wrong overload got the body).
 void cpp_typecheckt::define_member_template_of_class(
   cpp_declarationt &declaration)
 {
@@ -2738,8 +2738,8 @@ void cpp_typecheckt::convert_template_function_or_member_specialization(
 }
 
 /// Whether \p name names a concept ([temp.concept]) visible from the current
-/// scope: the parser records a concept as a template `constexpr bool C = ...'
-/// whose declarator carries `\#concept'.  A qualified name is looked up from
+/// scope: the parser records a concept as a template `constexpr bool C = ...`
+/// whose declarator carries `\#concept`.  A qualified name is looked up from
 /// its scope.
 bool cpp_typecheckt::is_concept_name(const cpp_namet &name)
 {
@@ -2792,14 +2792,14 @@ bool cpp_typecheckt::is_concept_name(const cpp_namet &name)
   return false;
 }
 
-/// N5008 [temp.param]/9: a type-constraint `C T' (or `ns::C T', or
-/// `C<A1, ..., An> T') on a type template parameter introduces the
-/// constraint-expression `C<T>' (`C<T, A1, ..., An>') into the
+/// N5008 [temp.param]/9: a type-constraint `C T` (or `ns::C T`, or
+/// `C<A1, ..., An> T`) on a type template parameter introduces the
+/// constraint-expression `C<T>` (`C<T, A1, ..., An>`) into the
 /// template's associated constraints ([temp.constr.decl]/3, conjoined with
 /// a requires-clause).  Build that expression and record it on the
-/// parameter (`\#C_type_constraint'), so that function overload resolution
+/// parameter (`\#C_type_constraint`), so that function overload resolution
 /// decides satisfaction with the same evaluator as a requires-clause --
-/// `template<Integral T> int g(T)' vs `template<Floating T> int g(T)' picked
+/// `template<Integral T> int g(T)` vs `template<Floating T> int g(T)` picked
 /// the first declared for every call.  (Class template partial
 /// specializations keep ordering by the recorded concept NAME.)
 void cpp_typecheckt::add_type_constraint(

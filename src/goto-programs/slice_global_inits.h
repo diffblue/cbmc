@@ -36,7 +36,7 @@ void slice_global_inits(
   message_handlert &message_handler);
 
 /// Remove the initialization of the C++ virtual tables (symbols named
-/// `virtual_table::...') that no reachable code refers to.  Unlike
+/// `virtual_table::...`) that no reachable code refers to.  Unlike
 /// slice_global_inits this does not require function pointers to have been
 /// removed: a function is reachable if it is named (called or its address
 /// taken) in reachable code or in the initializer of a global that is kept.

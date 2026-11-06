@@ -4690,13 +4690,13 @@ bool cpp_typecheckt::implicit_conversion_sequence(
 }
 
 /// N5008 [dcl.init.list]/5-6: the backing array of a braced-init-list (the
-/// `const E[N]' an initializer_list<E> refers to, or the temporary array a
+/// `const E[N]` an initializer_list<E> refers to, or the temporary array a
 /// reference to array binds to) with \p elements, each already converted to
 /// the element type.  The array is a static-lifetime symbol; its elements
 /// are its static initializer when they are constants, and are otherwise
 /// assigned where the list is evaluated: \p prefix then receives that
 /// assignment, which the caller must sequence before its result (a comma
-/// expression) -- a static initializer naming a local (`{e}' with `E e')
+/// expression) -- a static initializer naming a local (`{e}` with `E e`)
 /// read the local before it existed.
 /// \return the array symbol, an lvalue
 symbol_exprt cpp_typecheckt::initializer_list_backing_array(
@@ -4784,7 +4784,7 @@ symbol_exprt cpp_typecheckt::initializer_list_backing_array(
 }
 
 /// The constructor calls that build each element of \p elements, all of
-/// them temporary objects (`S(args)' on a new object), in place as element
+/// them temporary objects (`S(args)` on a new object), in place as element
 /// \p array [k] instead, as a comma expression; nothing if any element is
 /// of another form.
 std::optional<exprt> cpp_typecheckt::construct_elements_in_place(
@@ -4863,8 +4863,8 @@ exprt cpp_typecheckt::sequence_before(
 }
 
 /// N5008 [dcl.init.list]/3.4 + [dcl.init.list]/3.10: a braced-init-list
-/// for a REFERENCE TO ARRAY parameter (`_Dest (&&)[1]', libc++ variant's
-/// narrowing check `__test_impl<_Dest>({std::declval<_Source>()})')
+/// for a REFERENCE TO ARRAY parameter (`_Dest (&&)[1]`, libc++ variant's
+/// narrowing check `__test_impl<_Dest>({std::declval<_Source>()})`)
 /// aggregate-initializes a temporary array of the element type -- each
 /// element converted ([dcl.init.aggr]), the remaining ones value-initialized
 /// ([dcl.init.aggr]/5.2) -- and binds the reference to it.  The list must
@@ -6197,7 +6197,7 @@ bool cpp_typecheckt::const_typecast(
   return false;
 }
 
-/// `use(v)' where v is \p value; a value with side effects is evaluated
+/// `use(v)` where v is \p value; a value with side effects is evaluated
 /// once, into a local of the enclosing function, by a statement expression
 /// (the run-time check of a dynamic_cast reads its operand more than once).
 exprt cpp_typecheckt::evaluate_once(
@@ -6231,9 +6231,9 @@ exprt cpp_typecheckt::evaluate_once(
   return std::move(result);
 }
 
-/// The run-time check of `dynamic_cast<\p type>(\p operand)' (resolved by
+/// The run-time check of `dynamic_cast<\p type>(\p operand)` (resolved by
 /// resolve_runtime_dynamic_casts).  The check used to be skipped for an
-/// operand with side effects (`dynamic_cast<C *>(std::addressof(e))', a call
+/// operand with side effects (`dynamic_cast<C *>(std::addressof(e))`, a call
 /// in libc++'s rethrow_if_nested), and a cross cast then reinterpreted the
 /// pointer.
 exprt cpp_typecheckt::runtime_dynamic_cast_check(

@@ -45,8 +45,8 @@ void add_library(
 
 /// Preprocesses each model of the C library with this platform's
 /// preprocessor (for the target and options of \ref config) and writes it to
-/// \p directory as `FUNCTION.i', with a manifest, for
-/// `--c-library-models' on another host.  \return true on error
+/// \p directory as `FUNCTION.i`, with a manifest, for
+/// `--c-library-models` on another host.  \return true on error
 bool dump_c_library_models(
   const std::string &directory,
   message_handlert &message_handler);

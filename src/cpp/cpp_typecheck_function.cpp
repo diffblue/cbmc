@@ -101,8 +101,8 @@ void cpp_typecheckt::convert_parameters(
 /// the type T' that replaces T.
 ///
 /// * `decltype(auto)` ([dcl.type.auto.deduct]/4): T is the placeholder alone
-///   and T' is decltype(E).
-/// * `auto` ([dcl.type.auto.deduct]/3): T' is obtained as by template argument
+///   and T` is decltype(E).
+/// * `auto` ([dcl.type.auto.deduct]/3): T` is obtained as by template argument
 ///   deduction from a function call with P = T (the placeholder standing for
 ///   the invented parameter U) and argument E ([temp.deduct.call]/2-3): when P
 ///   is not a reference, an array A decays to a pointer, a function A to a
@@ -330,7 +330,7 @@ void cpp_typecheckt::return_deduction_contextt::finish()
 /// subobjects (direct bases, then non-static data members, arrays element by
 /// element) are compared in order, and the first result that is not equal is
 /// returned, converted to the return type R; otherwise R(equal).  For a
-/// declared `auto', R is the common comparison type of the element results.
+/// declared `auto`, R is the common comparison type of the element results.
 /// \return the body (and \p function_type's return type set to R), or
 ///   nothing if a comparison cannot be formed this way (the caller then uses
 ///   its simpler lowering)

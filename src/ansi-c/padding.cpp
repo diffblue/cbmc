@@ -42,11 +42,11 @@ Author: Daniel Kroening, kroening@kroening.com
 // (the minimum alignment) for a cyclic tag is a safe
 // approximation.
 /// The alignment a member of a packed struct/union keeps: its own
-/// `aligned(n)' attribute.  An alignment that belongs to the member's TYPE
-/// (a typedef's `aligned', marked ID_C_typedef_alignment) is ignored there,
+/// `aligned(n)` attribute.  An alignment that belongs to the member's TYPE
+/// (a typedef's `aligned`, marked ID_C_typedef_alignment) is ignored there,
 /// as GCC ignores the alignment of an aligned class type in a packed struct
 /// (also when that type is defined in place, ID_C_type_alignment).  A
-/// `\#pragma pack(n)' cap in force for the member still applies.
+/// `\#pragma pack(n)` cap in force for the member still applies.
 static std::optional<bytest> explicit_member_alignment(const typet &_type)
 {
   // an alignment specifier on an array member sits on the element type
@@ -82,10 +82,10 @@ static std::optional<bytest> explicit_member_alignment(const typet &_type)
   return result;
 }
 
-/// GCC `\#pragma pack(n)': "The alignment of a member will be on a boundary
+/// GCC `\#pragma pack(n)`: "The alignment of a member will be on a boundary
 /// that is either a multiple of n or a multiple of the size of the member,
 /// whichever is smaller" -- the cap applies after the member's own
-/// `aligned(k)' (which can only increase the natural alignment):
+/// `aligned(k)` (which can only increase the natural alignment):
 /// min(n, max(natural, k)).
 static bytest apply_pragma_pack(const typet &type, bytest alignment)
 {
@@ -429,7 +429,7 @@ underlying_width(const c_bit_field_typet &type, const namespacet &ns)
 
 /// A padding component's name must be unique within the struct: the
 /// components of a (padded) C++ base class are flattened into the derived
-/// class together with their `$pad<N>' components, and the derived class's
+/// class together with their `$pad<N>` components, and the derived class's
 /// own layout may want the same index.
 static irep_idt fresh_padding_name(
   const struct_typet::componentst &components,

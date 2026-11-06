@@ -35,8 +35,8 @@ cpp_declarator_convertert::cpp_declarator_convertert(
 }
 
 /// N5008 [dcl.spec.auto.general]/4: whether \p type is or contains, under
-/// pointer and reference declarators, an undeduced placeholder (`auto',
-/// `auto &&', `const auto *'); [dcl.spec.auto.general]/16: a redeclaration
+/// pointer and reference declarators, an undeduced placeholder (`auto`,
+/// `auto &&`, `const auto *`); [dcl.spec.auto.general]/16: a redeclaration
 /// of a function with a deduced return type uses the placeholder, so its
 /// type does not conflict with the deduced one
 static bool placeholder_return_type(const typet &type)

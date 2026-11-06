@@ -99,7 +99,7 @@ typet cpp_typecheckt::initializer_list_element_type(
 /// The second data member of a `std::initializer_list` over the \p n
 /// elements of \p array.  N5008 [initializer.list.syn]/1 leaves the layout to
 /// the implementation: libstdc++ and libc++ store the size, the MSVC STL a
-/// pointer past the last element (`const _Elem *_First, *_Last;').
+/// pointer past the last element (`const _Elem *_First, *_Last;`).
 exprt cpp_typecheckt::initializer_list_extent(
   const exprt &array,
   const typet &element_type,

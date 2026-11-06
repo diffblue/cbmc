@@ -355,7 +355,7 @@ public:
 
     bool string_abstraction;
     /// A directory of C library models preprocessed by
-    /// `cbmc --dump-c-library-models' (possibly on another platform), used
+    /// `cbmc --dump-c-library-models` (possibly on another platform), used
     /// instead of preprocessing the built-in models on this host.
     std::string c_library_models_dir;
     bool malloc_may_fail = true;

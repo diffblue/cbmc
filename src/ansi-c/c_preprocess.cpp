@@ -494,7 +494,7 @@ static std::string architecture_family(const irep_idt &arch)
   return id2string(arch);
 }
 
-/// The architecture family of the `gcc' that preprocesses, from its
+/// The architecture family of the `gcc` that preprocesses, from its
 /// predefined macros (asked once); empty if unknown.
 static const std::string &host_gcc_architecture_family()
 {
@@ -543,7 +543,7 @@ static const std::string &host_gcc_architecture_family()
 
 /// The architecture macros that gcc for \p family predefines and CBMC's
 /// library models test, to be undefined when preprocessing for another
-/// target (`__aarch64__' selects the AArch64 va_list in stdio.c).
+/// target (`__aarch64__` selects the AArch64 va_list in stdio.c).
 static std::vector<std::string>
 host_architecture_macros(const std::string &family)
 {

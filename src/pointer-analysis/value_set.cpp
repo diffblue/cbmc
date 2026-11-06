@@ -503,8 +503,8 @@ std::optional<irep_idt> value_sett::get_index_of_symbol(
 
 /// Whether \p key_tail, the part of a value-set entry's key after the
 /// object's identifier, names the member or element path \p suffix: a
-/// member `.m' of the suffix may be a field-sensitive symbol `..m' in the key,
-/// and an element `[]' a field-sensitive element `[[i]]'.
+/// member `.m` of the suffix may be a field-sensitive symbol `..m` in the key,
+/// and an element `[]` a field-sensitive element `[[i]]`.
 static bool field_sensitive_suffix_matches(
   const std::string &key_tail,
   const std::string &suffix)

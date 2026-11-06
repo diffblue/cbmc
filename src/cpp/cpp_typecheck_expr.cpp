@@ -192,11 +192,11 @@ void cpp_typecheckt::expand_requires_parameter_packs_in_type(irept &type)
 }
 
 /// N5008 [expr.prim.req.general]/4, [temp.variadic]/9: a parameter of a
-/// requires-expression may be a function parameter pack, `A &&...a'; it
+/// requires-expression may be a function parameter pack, `A &&...a`; it
 /// declares one parameter per element of the template parameter pack A, the
 /// k-th of type A_k &&.  If \p type (in parsed form, with the template map of
 /// the enclosing instantiation) is such a pack expansion, bind one symbol per
-/// element, record them for the expansion of `...' patterns naming \p name
+/// element, record them for the expansion of `...` patterns naming \p name
 /// (expand_type_pack_arguments) and return true; otherwise return false.
 bool cpp_typecheckt::bind_requires_parameter_pack(
   const irep_idt &name,
@@ -623,14 +623,14 @@ bool cpp_typecheckt::has_unique_object_representations(
   return has_member;
 }
 
-/// Clang's trait __is_trivially_equality_comparable(T): `a == b' for two
+/// Clang's trait __is_trivially_equality_comparable(T): `a == b` for two
 /// objects of type T is equivalent to comparing their object
 /// representations.  That holds for the integral types and the object,
 /// function and member pointer types (whose values each have unique object
 /// representations), not for floating-point types, enumerations (operator==
 /// may be overloaded), std::nullptr_t, arrays or references.  A class
 /// (not a union) qualifies when its operator== is defaulted -- a member
-/// `bool operator==(const T &) const = default', the friend form, or the
+/// `bool operator==(const T &) const = default`, the friend form, or the
 /// one a defaulted operator<=> declares -- so that it compares the
 /// subobjects in order ([class.eq]/3), when every base and non-static data
 /// member qualifies itself, and when equal values have equal object
@@ -746,8 +746,8 @@ bool cpp_typecheckt::is_trivially_equality_comparable(
 /// [depr.meta.types]/3 extends both to scalars, arrays and cv-qualified
 /// versions.  N5008 [class.prop], [class.virtual]/1, [class.dtor]/11,
 /// [dcl.init.aggr]/1: the class properties behind the GCC/Clang type traits
-/// `__is_empty', `__is_polymorphic', `__has_virtual_destructor',
-/// `__is_standard_layout', `__is_pod', `__is_aggregate', `__is_literal_type'
+/// `__is_empty`, `__is_polymorphic`, `__has_virtual_destructor`,
+/// `__is_standard_layout`, `__is_pod`, `__is_aggregate`, `__is_literal_type`
 /// for the type \p t.
 bool cpp_typecheckt::class_property(const irep_idt &trait, const typet &t)
 {
@@ -4098,7 +4098,7 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
 }
 
 /// A temporary object of class type built by the front end for a prvalue
-/// (`T(args)', a call result materialized with its constructor call): a
+/// (`T(args)`, a call result materialized with its constructor call): a
 /// temporary_object side effect with an initializer and no operands.
 bool cpp_typecheckt::is_class_prvalue_temporary(const exprt &expr)
 {
@@ -4114,13 +4114,13 @@ void cpp_typecheckt::typecheck_expr_member(exprt &expr)
 }
 
 /// N5008 [temp.variadic]/9: a pack-expansion function-call argument whose
-/// pattern names a TYPE template parameter pack (`declval<Args>()...' in
-/// `decltype(g(declval<Args>()...))') expands to one argument per element of
+/// pattern names a TYPE template parameter pack (`declval<Args>()...` in
+/// `decltype(g(declval<Args>()...))`) expands to one argument per element of
 /// the pack, the k-th substituting the pack's k-th type.  Function bodies are
 /// expanded before type-checking (see cpp_typecheck_method_bodies.cpp); this
 /// covers the other contexts -- member declarations of a class template
 /// instance and partial-specialization patterns -- where the argument kept
-/// its `...' and was type-checked as one argument with the pack's first
+/// its `...` and was type-checked as one argument with the pack's first
 /// type.
 void cpp_typecheckt::expand_type_pack_arguments(
   exprt &arguments,
@@ -4353,7 +4353,7 @@ void cpp_typecheckt::expand_type_pack_arguments(
 
 /// The type arguments of a builtin trait recorded by the parser in
 /// "type_args" (see Parser::rTypePredicate), typechecked, with a pack
-/// expansion `Args...' replaced by the elements of the pack (N5008
+/// expansion `Args...` replaced by the elements of the pack (N5008
 /// [temp.variadic]/9); the pack is the template parameter of that name in
 /// scope, bound in template_map by the enclosing instantiation.
 std::vector<typet> cpp_typecheckt::builtin_trait_type_args(const exprt &expr)
@@ -4457,7 +4457,7 @@ std::vector<typet> cpp_typecheckt::builtin_trait_type_args(const exprt &expr)
   return result;
 }
 
-/// N5008 [meta.rel]/2, [func.require]/1: `__is_invocable(Fn, Args...)'
+/// N5008 [meta.rel]/2, [func.require]/1: `__is_invocable(Fn, Args...)`
 /// (GCC 14's builtin, libstdc++ 16's std::is_invocable) holds iff
 /// INVOKE(declval<Fn>(), declval<Args>()...) is well-formed when treated as
 /// an unevaluated operand: for a pointer to member with at least one
@@ -4557,15 +4557,15 @@ void cpp_typecheckt::typecheck_expr_is_invocable(exprt &expr)
 
 /// N5008 [meta.trans.other]/3-5 (common_type), as computed by Clang's
 /// builtin alias template `__builtin_common_type<BaseTemplate,
-/// HasTypeMember, HasNoTypeMember, Ts...>' (libc++ 21's std::common_type):
+/// HasTypeMember, HasNoTypeMember, Ts...>` (libc++ 21's std::common_type):
 /// the common type C of \p types if there is one.  \p base_template is the
-/// name of `BaseTemplate', an alias template that names the (user
+/// name of `BaseTemplate`, an alias template that names the (user
 /// specializable) common_type_t<D1, D2>; it is used for arguments that are
 /// not their own decayed types (/3.3.1) and for the pairwise fold of three
 /// or more arguments (/3.4).  For two decayed types the type of the
-/// conditional operator `b ? declval<D1>() : declval<D2>()' is decayed
+/// conditional operator `b ? declval<D1>() : declval<D2>()` is decayed
 /// (/3.3.3), or, since C++20, that of `b ? declval<const D1 &>() :
-/// declval<const D2 &>()' with its reference and cv-qualifiers removed
+/// declval<const D2 &>()` with its reference and cv-qualifiers removed
 /// (/3.3.4).
 std::optional<typet> cpp_typecheckt::builtin_common_type(
   const irep_idt &base_template,
@@ -4695,7 +4695,7 @@ std::optional<typet> cpp_typecheckt::builtin_common_type(
 
 /// N5008 [class.access.general]/6: access control for a name is judged in
 /// the context in which the name APPEARS.  The elements of a braced-init-list
-/// argument (`wrapt w({this->member})') are expressions of the call site;
+/// argument (`wrapt w({this->member})`) are expressions of the call site;
 /// typecheck them in the calling member's scope and mark them done.  Deferred
 /// to the conversion machinery (which runs during overload resolution, in the
 /// callee class's scope), the enclosing class's own private members were
@@ -4734,7 +4734,7 @@ void cpp_typecheckt::typecheck_braced_argument_elements(exprt &init_list)
 
 /// The thunk a pointer to the virtual member function \p function
 /// designates ([expr.call]/2): `R C::vf\@virtual(C *this, Ps... ps)
-/// { return this->vf(ps...); }' -- the call in the body dispatches through
+/// { return this->vf(ps...); }` -- the call in the body dispatches through
 /// the object's virtual table, so the final overrider of the object's
 /// dynamic type runs.  Created on first use, in the function's class.
 const symbolt &
@@ -4995,7 +4995,7 @@ void cpp_typecheckt::throw_if_incomplete_dependency(const exprt &expr)
 /// from the data members alone (which the C++ front end used to do) left it
 /// short by the padding components: goto conversion / symex then paired
 /// operands with the wrong components or aborted
-/// (`assign_from_struct: rhs.operands().size() == components.size()').
+/// (`assign_from_struct: rhs.operands().size() == components.size()`).
 /// \return the zero value, or nothing when the type cannot be zero-initialised
 ///   (an incomplete or dependent member type)
 std::optional<struct_exprt> cpp_typecheckt::zero_struct_value(
@@ -5179,8 +5179,8 @@ struct operator_entryt
   {irep_idt(), nullptr}};
 
 /// N5008 [over.match.oper]/3.4 (C++20): the rewritten and reversed
-/// candidates of a comparison `x @ y' -- `(x <=> y) @ 0', `0 @ (y <=> x)',
-/// `!(x == y)', `y == x'.  Rewrites \p expr into the selected candidate and
+/// candidates of a comparison `x @ y` -- `(x <=> y) @ 0`, `0 @ (y <=> x)`,
+/// `!(x == y)`, `y == x`.  Rewrites \p expr into the selected candidate and
 /// returns true; leaves it alone and returns false when there is none.
 bool cpp_typecheckt::rewritten_comparison_candidate(exprt &expr)
 {
@@ -5420,8 +5420,8 @@ bool cpp_typecheckt::nonmember_operator_is_better(
 /// arithmetic, bitwise and relational ones need standard conversions only;
 /// a candidate with parameters \p params that needs a user-defined
 /// conversion for some operand is worse on it ([over.ics.rank]/2.1).
-/// libstdc++ 16's `operator==(const text_encoding &, id)', whose body
-/// `__encoding.mib() == __i' compares two ids, called itself.
+/// libstdc++ 16's `operator==(const text_encoding &, id)`, whose body
+/// `__encoding.mib() == __i` compares two ids, called itself.
 /// \return whether a viable built-in candidate is better than the candidate
 static bool builtin_candidate_is_better(
   const exprt &expr,
@@ -8139,7 +8139,7 @@ void cpp_typecheckt::typecheck_expr_typecast(exprt &)
 }
 
 /// The class denoted by the nested-name-specifier of the qualified name
-/// \p name (`N' in `N::m'), if it names a class.
+/// \p name (`N` in `N::m`), if it names a class.
 std::optional<irep_idt> cpp_typecheckt::naming_class_of(const cpp_namet &name)
 {
   cpp_namet qualifier;
@@ -9008,14 +9008,14 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
 // doc/architectural/cpp-frontend-plan-target-type-threading.md §7.6.
 /// N5008 [class.copy.assign]/2: a class without a user-declared copy
 /// assignment operator has one declared implicitly, and it can be named --
-/// `_List_size::operator=(_List_size())' in libstdc++ 16's
+/// `_List_size::operator=(_List_size())` in libstdc++ 16's
 /// _List_node_header::_M_init assigns the base subobject through it.  The
 /// front end declares that operator only for non-POD classes (a POD is
 /// assigned bitwise), so the qualified name found no function.  When \p expr
-/// is a call `C::operator=(x)' with one argument, `C' a POD class without a
-/// declared assignment operator and `this' available (a member function of
-/// `C' or of a class derived from it), rewrite it to the builtin assignment
-/// `static_cast<C &>(*this) = x' ([expr.assign]).
+/// is a call `C::operator=(x)` with one argument, `C` a POD class without a
+/// declared assignment operator and `this` available (a member function of
+/// `C` or of a class derived from it), rewrite it to the builtin assignment
+/// `static_cast<C &>(*this) = x` ([expr.assign]).
 /// \return true when \p expr was rewritten
 bool cpp_typecheckt::implicit_pod_assignment_call(
   side_effect_expr_function_callt &expr)
@@ -9096,13 +9096,13 @@ bool cpp_typecheckt::implicit_pod_assignment_call(
 }
 
 /// N5008 [lex.ext]/2-4: a user-defined-integer-literal (floating-point
-/// literal) `nX' is a call of the literal operator `operator ""X' found by
-/// unqualified lookup, in one of three forms: `operator ""X(n ULL)' if one
+/// literal) `nX` is a call of the literal operator `operator ""X` found by
+/// unqualified lookup, in one of three forms: `operator ""X(n ULL)` if one
 /// of them has a parameter of type unsigned long long (long double), else
-/// `operator ""X("n")' for a raw literal operator (parameter `const char *')
-/// or `operator ""X<'c1', ..., 'ck'>()' for a numeric literal operator
-/// template ([over.literal]/5) -- libstdc++'s `12h' (chrono_literals).
-/// The parser builds `operator ""X(n)' and records the literal's kind and
+/// `operator ""X("n")` for a raw literal operator (parameter `const char *`)
+/// or `operator ""X<'c1', ..., 'ck'>()` for a numeric literal operator
+/// template ([over.literal]/5) -- libstdc++'s `12h` (chrono_literals).
+/// The parser builds `operator ""X(n)` and records the literal's kind and
 /// spelling; rewrite \p expr into the form the declarations found select.
 /// Nothing is changed when none of the forms applies (the call then fails
 /// to resolve, as [lex.ext]/3 requires a diagnostic).
@@ -9187,11 +9187,11 @@ void cpp_typecheckt::user_defined_numeric_literal(
   }
 }
 
-/// Clang's `__builtin_invoke(f, t1, ..., tN)' is INVOKE(f, t1, ..., tN) of
+/// Clang's `__builtin_invoke(f, t1, ..., tN)` is INVOKE(f, t1, ..., tN) of
 /// N5008 [func.require]/1 (Xcode 26's libc++ implements std::invoke,
 /// std::invoke_result and std::is_invocable with it): for a pointer to
-/// member f of class T, `t1.*f', `t1.get().*f' for a reference_wrapper, or
-/// `(*t1).*f', called with t2, ..., tN for a member function (/1.1-1.3) and
+/// member f of class T, t1.*f, t1.get().*f for a reference_wrapper, or
+/// (\*t1).*f, called with t2, ..., tN for a member function (/1.1-1.3) and
 /// alone for a data member when N = 1 (/1.4-1.6); otherwise f(t1, ..., tN)
 /// (/1.7).  \p expr is replaced by that expression, type-checked.
 void cpp_typecheckt::typecheck_builtin_invoke(
@@ -11898,10 +11898,10 @@ void cpp_typecheckt::typecheck_method_application(
 /// compound assignment or prefix increment/decrement is an lvalue referring
 /// to its left operand.  Goto conversion follows C, where the result is the
 /// assigned VALUE (held in a temporary when the left operand is not a plain
-/// variable, e.g. `*x' for a reference x); it keeps the left operand only when
+/// variable, e.g. `*x` for a reference x); it keeps the left operand only when
 /// the address of the side effect is taken.  When such a side effect is
-/// itself the operand that is modified, `(x += 2) += 3' or `++(++x)', make
-/// that explicit as `*&(x += 2)'.
+/// itself the operand that is modified, `(x += 2) += 3` or `++(++x)`, make
+/// that explicit as `*&(x += 2)`.
 static void use_side_effect_as_lvalue(exprt &operand)
 {
   if(operand.id() != ID_side_effect || !operand.get_bool(ID_C_lvalue))
@@ -12444,8 +12444,8 @@ void cpp_typecheckt::typecheck_expr(exprt &expr, const target_typet &target)
 }
 
 /// N5008 [over.match.oper]/3, [over.over]/1, [temp.deduct.funcaddr]/1: in
-/// `a @ f' with a of class type and f naming a set of functions or function
-/// templates (`o << std::endl'), the target type that selects from the set
+/// `a @ f` with a of class type and f naming a set of functions or function
+/// templates (`o << std::endl`), the target type that selects from the set
 /// is the parameter type of each candidate operator function.  Take it from
 /// the member operator@ functions of a's class: when the ones whose
 /// parameter is a pointer to function deduce the same function, f denotes
@@ -12810,13 +12810,13 @@ void cpp_typecheckt::explicit_typecast_ambiguity(exprt &expr)
   }
 }
 
-/// N5008 [expr.cast]/2, [dcl.ambig.res]: `(x) & m' is a cast only if x
-/// names a type.  The parser took `*(wp) & m' as `*' applied to the cast
-/// `(wp) &m'; when explicit_typecast_ambiguity turns that operand into the
-/// binary `wp & m', the prefix operator -- which binds tighter than any of
-/// the binary operators involved ([expr.unary.general]) -- applies to `(wp)'
-/// only: `(*wp) & m'.  Rotate it into the left operand.  libstdc++'s
-/// bitset::reference `(*(_M_wp) & _Base::_S_maskbit(_M_bpos))'.
+/// N5008 [expr.cast]/2, [dcl.ambig.res]: `(x) & m` is a cast only if x
+/// names a type.  The parser took `*(wp) & m` as `*` applied to the cast
+/// `(wp) &m`; when explicit_typecast_ambiguity turns that operand into the
+/// binary `wp & m`, the prefix operator -- which binds tighter than any of
+/// the binary operators involved ([expr.unary.general]) -- applies to `(wp)`
+/// only: `(*wp) & m`.  Rotate it into the left operand.  libstdc++'s
+/// bitset::reference `(*(_M_wp) & _Base::_S_maskbit(_M_bpos))`.
 void cpp_typecheckt::unary_operand_typecast_ambiguity(exprt &expr)
 {
   static const std::set<irep_idt> prefix_operators{
@@ -12881,7 +12881,7 @@ void cpp_typecheckt::typecheck_expr_index(exprt &expr)
 
 /// N5008 [expr.unary.op]/7: the operand of the unary + operator may also be a
 /// prvalue of pointer type -- after the array-to-pointer conversion of a
-/// string literal (`s + +"__"', CBMC's own contracts.cpp and
+/// string literal (`s + +"__"`, CBMC's own contracts.cpp and
 /// dfcc_instrument_loop.cpp, dog-fooding) or the function-to-pointer
 /// conversion of a function; the result is the pointer.  C (C11 6.5.3.3/1)
 /// allows arithmetic operands only, which c_typecheck_baset implements.
@@ -12941,11 +12941,11 @@ void cpp_typecheckt::typecheck_expr_comma(exprt &expr)
 /// expression, and the type and value of the result are those of the right
 /// operand.  The value of a constant-initialized variable whose initializer
 /// is a comma with a constant left operand is therefore that of the right
-/// operand: `static constexpr type value = (_DecOnly, _S_make_table());' in
+/// operand: `static constexpr type value = (_DecOnly, _S_make_table());` in
 /// libstdc++'s __from_chars_alnum_to_val_table is the folded table, not a
-/// comma expression that reads of `value.__data[c]' cannot fold.  (Done on
+/// comma expression that reads of `value.__data[c]` cannot fold.  (Done on
 /// the finished initializer only: typecheck_expr_comma also sees the
-/// parenthesized argument list of `(f)(a, b)' before it becomes the call's
+/// parenthesized argument list of `(f)(a, b)` before it becomes the call's
 /// arguments.)
 void cpp_typecheckt::discard_constant_comma_operands(exprt &value)
 {
@@ -13065,14 +13065,14 @@ void cpp_typecheckt::typecheck_expr_rel(binary_relation_exprt &expr)
 }
 
 /// N5008 [expr.prim.this]/2, [expr.prim.id.general]/2: in the body \p body
-/// of a lambda that captures `this', an explicit `this' and an unqualified
+/// of a lambda that captures `this`, an explicit `this` and an unqualified
 /// call of a member function of the enclosing class (one of
 /// \p member_functions) refer to the enclosing object.  The closure holds
-/// that pointer in its member lambda_this_capture; rewrite `this' to that
-/// member and `f(...)' to `lambda_this_capture->f(...)'.  Nested lambdas
+/// that pointer in its member lambda_this_capture; rewrite `this` to that
+/// member and `f(...)` to `lambda_this_capture->f(...)`.  Nested lambdas
 /// are not rewritten (they are type-checked on their own), nor are names
-/// after `.' or `->' (component names).
-/// Whether \p callee is a qualified name `Q::f' (f possibly with template
+/// after `.` or `->` (component names).
+/// Whether \p callee is a qualified name `Q::f` (f possibly with template
 /// arguments) where Q is one of \p class_names and f one of \p
 /// member_functions.
 static bool is_qualified_member_call(

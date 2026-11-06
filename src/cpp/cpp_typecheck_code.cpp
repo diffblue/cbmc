@@ -2155,7 +2155,7 @@ void cpp_typecheckt::typecheck_while(code_whilet &code)
 /// N5008 [stmt.switch]/2: a case label is a converted constant expression
 /// ([expr.const]); type-check it in a constant-expression context, so that a
 /// call of a constexpr or consteval function in it is evaluated -- GCC 16's
-/// __should_escape_ascii switches over `case _Esc::_S_tab()[0]:'.
+/// __should_escape_ascii switches over `case _Esc::_S_tab()[0]:`.
 void cpp_typecheckt::typecheck_switch_case(code_switch_caset &code)
 {
   if(code.operands().size() != 2 || code.is_default() || !case_is_allowed)
@@ -2393,7 +2393,7 @@ cpp_typecheckt::subobject_unwind_destructor(const codet &code)
 
 /// N5008 [except.ctor]/3: wrap the statements of the converted constructor
 /// body \p body that follow each subobject initialization carrying an
-/// ID_C_unwind_destructor in `try { ... } catch(...) { destroy; throw; }',
+/// ID_C_unwind_destructor in `try { ... } catch(...) { destroy; throw; }`,
 /// so an exception leaving a later initializer or the compound-statement
 /// destroys that subobject -- the subobjects in reverse order.
 void cpp_typecheckt::add_constructor_unwinding(codet &body)
@@ -3687,14 +3687,14 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
   }
 }
 
-/// N5008 [stmt.ambig]/1: a statement `T(x);' that can be a declaration is a
+/// N5008 [stmt.ambig]/1: a statement `T(x);` that can be a declaration is a
 /// declaration.  The parser decides only for a name it KNOWS to be a type;
 /// a nested class declared later in the class body ([class.mem.general]/9.1:
 /// a member function body is a complete-class context -- libstdc++ 16's
-/// `__location_type (__trans_tmp_3);' in _Hashtable::find) is unknown to it
+/// `__location_type (__trans_tmp_3);` in _Hashtable::find) is unknown to it
 /// and parsed as a call.  When the "function" is an unqualified name that
 /// resolves to a type and the single "argument" is an unqualified name that
-/// resolves to nothing, rewrite the statement into the declaration `T x;'.
+/// resolves to nothing, rewrite the statement into the declaration `T x;`.
 bool cpp_typecheckt::expression_statement_is_declaration(codet &code)
 {
   if(

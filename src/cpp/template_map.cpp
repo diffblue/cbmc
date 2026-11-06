@@ -79,8 +79,8 @@ template_mapt::function_parameter_pack(const typet &param_type) const
   return nullptr;
 }
 
-/// Whether every name in \p node is a class tag identifier (`tag-E',
-/// `n::tag-E<int>'), which no source name can spell: the substituted
+/// Whether every name in \p node is a class tag identifier (`tag-E`,
+/// `n::tag-E<int>`), which no source name can spell: the substituted
 /// element of a type parameter pack, not a pack name.
 static bool names_only_tags(const irept &node)
 {
@@ -2200,8 +2200,8 @@ void template_mapt::apply(typet &type) const
 } // NOLINT(readability/fn_size)
 
 /// \return true when \p n is a node that template_mapt::apply(typet &)
-///   dispatches on (a type, or a component of a `cpp_name': a name, a
-///   `::', a template-argument list, an operator-function-id), false when
+///   dispatches on (a type, or a component of a `cpp_name`: a name, a
+///   `::`, a template-argument list, an operator-function-id), false when
 ///   it is an operand expression.
 static bool is_type_side_node(const irept &n)
 {

@@ -396,12 +396,12 @@ public:
     const namespacet &ns) const;
 
   /// Add to \p dest the values recorded for the member of \p identifier
-  /// named by \p suffix (`.m...') under the member's field-sensitive name
-  /// (`identifier..m', and `identifier..m[[i]]' for the elements of an array
+  /// named by \p suffix (`.m...`) under the member's field-sensitive name
+  /// (`identifier..m`, and `identifier..m[[i]]` for the elements of an array
   /// member).
   /// \param identifier: The identifier for the object, with or without its
   ///   level-1 tag
-  /// \param suffix: The member path, starting with `.'
+  /// \param suffix: The member path, starting with `.`
   /// \param [out] dest: The values found are added here
   /// \return whether any such value was recorded
   bool get_field_sensitive_value_set(

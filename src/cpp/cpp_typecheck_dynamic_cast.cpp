@@ -38,7 +38,7 @@ static const struct_typet::componentt *vtable_pointer_at(
   return nullptr;
 }
 
-/// N5008 [expr.dynamic.cast]/9: `dynamic_cast<C *>(v)' for a pointer v to a
+/// N5008 [expr.dynamic.cast]/9: `dynamic_cast<C *>(v)` for a pointer v to a
 /// polymorphic class A, C not a base of A.  The result depends on the most
 /// derived object v points into.  For each class D of the translation unit
 /// and each of its A subobjects (also within virtual bases: their offsets in
@@ -195,9 +195,9 @@ exprt cpp_typecheckt::runtime_dynamic_cast(const exprt &check)
   return result;
 }
 
-/// Replace every `cpp_runtime_dynamic_cast' in \p expr (see
+/// Replace every `cpp_runtime_dynamic_cast` in \p expr (see
 /// dynamic_typecast) by its run-time check.
-/// Whether \p expr contains a `cpp_runtime_dynamic_cast', also as the
+/// Whether \p expr contains a `cpp_runtime_dynamic_cast`, also as the
 /// deallocated object of a delete-expression
 static bool has_runtime_dynamic_cast(const exprt &expr)
 {

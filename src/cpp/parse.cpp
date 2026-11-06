@@ -1888,12 +1888,12 @@ bool Parser::rTempArgList(irept &args)
 
   C++11 [temp.param] (A.12)
 */
-/// N5008 [temp.param]/5: in a non-type template parameter `int *...P' or
-/// `int &...' the ellipsis makes the parameter a template parameter pack.
+/// N5008 [temp.param]/5: in a non-type template parameter `int *...P` or
+/// `int &...` the ellipsis makes the parameter a template parameter pack.
 /// rDeclarator attaches an ellipsis that follows a ptr-operator to that
 /// pointer or reference type (the form of a function parameter's pack
 /// expansion pattern); move it to the declarator, where a pack is recorded
-/// (as for `int ...P').
+/// (as for `int ...P`).
 void Parser::hoist_template_parameter_pack_ellipsis(
   cpp_declarationt &declaration)
 {
@@ -6031,16 +6031,16 @@ bool Parser::rMemberInit(exprt &init)
 /// less-than, [temp.names]/3.2 requires recognising the concept), so
 /// parse the restricted grammar directly with rName, which does
 /// consume template argument lists for known templates.
-/// N5008 [temp.pre]/1: after `template-head requires-clause' comes the
+/// N5008 [temp.pre]/1: after `template-head requires-clause` comes the
 /// declaration.  Whether \p token can begin it: a decl-specifier
-/// ([dcl.spec.general]), an attribute-specifier ([dcl.attr.grammar]: `[[' or
-/// a GNU `__attribute__'), a `template' / `using' / class-key, or a name.
+/// ([dcl.spec.general]), an attribute-specifier ([dcl.attr.grammar]: `[[` or
+/// a GNU `__attribute__`), a `template` / `using` / class-key, or a name.
 /// The requires-clause parse is accepted only when the next token is such a
 /// start, since the clause parser may have swallowed too much.  libc++ marks
 /// every function `[[nodiscard]] __attribute__((__visibility__("hidden")))
-/// ...' -- the GNU attribute was not on the list, so the requires-clauses of
+/// ...` -- the GNU attribute was not on the list, so the requires-clauses of
 /// its customization-point objects (ranges::iter_move, ranges::begin) fell
-/// back to an atom count and all their `operator()' overloads were kept.
+/// back to an atom count and all their `operator()` overloads were kept.
 bool Parser::starts_declaration_after_requires_clause(int token)
 {
   switch(token)
@@ -7228,7 +7228,7 @@ bool Parser::rArgDeclaration(cpp_declarationt &declaration)
 
   C++11 [dcl.init] (A.7)
 */
-/// N5008 [dcl.init.list]/1: `T x{...}', `T{...}' and `new T{...}' are
+/// N5008 [dcl.init.list]/1: `T x{...}`, `T{...}` and `new T{...}` are
 /// DIRECT-list-initialization, where explicit constructors are candidates
 /// ([over.match.list]/1 excludes them from being chosen only in
 /// copy-list-initialization).  The type checker cannot tell the two forms
@@ -8276,10 +8276,10 @@ bool Parser::rClassMember(cpp_itemt &member)
   }
 }
 
-/// `\#pragma pack(n)' (a GCC/MSVC extension, not N5008) caps the alignment
+/// `\#pragma pack(n)` (a GCC/MSVC extension, not N5008) caps the alignment
 /// of every data member declared while it is in effect.  As the C grammar
 /// does (parser.y member_declaring_list), communicate the cap to the
-/// member's type as a pragma-marked `aligned' node; ansi_c_convert_typet
+/// member's type as a pragma-marked `aligned` node; ansi_c_convert_typet
 /// turns it into ID_C_pragma_pack and padding.cpp applies it.  Only
 /// non-static data members are laid out: skip member functions, static
 /// members and nested type definitions.
@@ -14536,8 +14536,8 @@ Parser::rOtherDeclStatement(cpp_storage_spect &storage_spec, typet &cv_q)
 }
 
 /// Whether the unqualified name a parenthesised nested declarator parsed
-/// (`(x)') is a known type or template name in the parser's scopes, in which
-/// case `T(x)' is a function declaration rather than an object `x' of type T.
+/// (`(x)`) is a known type or template name in the parser's scopes, in which
+/// case `T(x)` is a function declaration rather than an object `x` of type T.
 bool Parser::nested_declarator_names_a_type(const irept &name)
 {
   if(name.id() != ID_cpp_name || name.get_sub().size() != 1)

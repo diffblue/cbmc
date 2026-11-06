@@ -21,7 +21,7 @@ Author: Kiro
 /// the member's offset in its class and the null member pointer value by -1.
 /// A pointer to data member is a value of pointer type in the goto program,
 /// and the back end's pointer encoding does not yet handle arbitrary
-/// integers converted to pointers consistently (`(int *)-1' compares unequal
+/// integers converted to pointers consistently (`(int *)-1` compares unequal
 /// to itself when formed in two ways; an integer-derived pointer added to an
 /// object address fails the bounds check).  Until that is fixed, the front
 /// end uses a WORKAROUND by default: the offset plus one, with the null

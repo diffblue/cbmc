@@ -69,8 +69,8 @@ classes_with_special_member_functions(const symbol_table_baset &symbol_table)
   return result;
 }
 
-/// Is \p code_type that of a destructor taking `this' -- and, for a class
-/// with virtual bases, the hidden `\@most_derived' flag (Itanium C++ ABI
+/// Is \p code_type that of a destructor taking `this` -- and, for a class
+/// with virtual bases, the hidden `\@most_derived` flag (Itanium C++ ABI
 /// 5.1.4: complete-object versus base-object destructor)?
 static bool is_complete_object_destructor_type(const code_typet &code_type)
 {

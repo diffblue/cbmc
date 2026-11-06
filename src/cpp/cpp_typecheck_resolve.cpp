@@ -504,7 +504,7 @@ constraint_normalt member_constraint_normal(
 /// ([temp.constr.order]) is better.  Such twins are members of a class template
 /// specialization that differ only in their trailing requires-clauses
 /// ([basic.scope.scope]/4.4; e.g. libc++'s transform_view::end() and `end()
-/// requires common_range<_View>').  Remove from \p identifiers each candidate a
+/// requires common_range<_View>`).  Remove from \p identifiers each candidate a
 /// same-signature twin is strictly more constrained than.
 void cpp_typecheck_resolvet::prefer_more_constrained_members(
   resolve_identifierst &identifiers)
@@ -617,7 +617,7 @@ std::string constraint_name_string(const cpp_declarationt &decl)
 
 /// The instantiation step of function template overload resolution
 /// ([temp.deduct.general]/5, [temp.inst]/10): when a single candidate remains
-/// and it is a deduced specialization (`template_function_instance'),
+/// and it is a deduced specialization (`template_function_instance`),
 /// instantiate it -- explicit template arguments merged with the deduced ones,
 /// the trailing return type substituted -- and replace the candidate by the
 /// instance's symbol.
@@ -3735,10 +3735,10 @@ exprt cpp_typecheck_resolvet::do_builtin(
 
 /// The name of the class whose tag is \p tag, as a destructor is named
 /// ([class.dtor]/1): the final component of the qualified tag, without
-/// `tag-' and template arguments.  The final component is found
-/// angle-aware, as the arguments hold `::' (`std::tag-basic_string<char,
-/// std::tag-allocator<char>>'); the `->' of a function type among them
-/// (`tag-__bind<ref_(...)->(signed_int),...>') closes no angle bracket.
+/// `tag-` and template arguments.  The final component is found
+/// angle-aware, as the arguments hold `::` (`std::tag-basic_string<char,
+/// std::tag-allocator<char>>`); the `->` of a function type among them
+/// (`tag-__bind<ref_(...)->(signed_int),...>`) closes no angle bracket.
 static std::string destructor_class_name(const std::string &tag)
 {
   std::size_t depth = 0;
@@ -5992,8 +5992,8 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
 /// Whether naming the alias template \p alias leaves the completeness of its
 /// arguments to the aliased type ([temp.inst]/2): the alias denotes a pointer
 /// or reference to one of its parameters (`template \<class U> using rebind =
-/// U *;', pointer_traits<T *>::rebind), or forwards to a member template-id
-/// of another class (`typename pointer_traits<From>::template rebind<To>',
+/// U *;`, pointer_traits<T *>::rebind), or forwards to a member template-id
+/// of another class (`typename pointer_traits<From>::template rebind<To>`,
 /// libc++'s __rebind_pointer_t), whose own alias then decides.
 bool cpp_typecheck_resolvet::alias_leaves_arguments_incomplete(
   const cpp_declarationt &alias)
@@ -6705,8 +6705,8 @@ void cpp_typecheck_resolvet::show_identifiers(
 
 /// The class of which the member \p member_id is a member: the class named
 /// by the member symbol's type (ID_C_member_name), otherwise the
-/// identifier's prefix -- `ns::tag-C' for `ns::C::f', the class symbol is
-/// named with the `tag-' marker before the class's own name.
+/// identifier's prefix -- `ns::tag-C` for `ns::C::f`, the class symbol is
+/// named with the `tag-` marker before the class's own name.
 static const symbolt *member_class_symbol(
   const symbol_table_baset &symbol_table,
   const irep_idt &member_id)
@@ -8766,8 +8766,9 @@ resolved_after_strip:
 } // NOLINT(readability/fn_size)
 
 /// N5008 [temp.type]/1, [dcl.fct]/3: the function type \p code with its
-/// parameters in converted form: a written `void(int)' keeps them as
-/// cpp_declaration, `decltype(cb)' and deduced types have `parameter's.
+/// parameters in converted form: a written `void(int)` keeps them as
+/// cpp_declaration, `decltype(cb)` and deduced types have `parameter`
+/// nodes.
 /// (Parameter names and default arguments are #-attributes, which
 /// comparison ignores.)
 typet cpp_typecheck_resolvet::canonical_function_type(const typet &code)
@@ -8779,10 +8780,10 @@ typet cpp_typecheck_resolvet::canonical_function_type(const typet &code)
 
 /// N5008 [temp.deduct.type]/9: a trailing pack expansion P_i of a partial
 /// specialization's argument list whose pattern is not a bare pack (`const Z
-/// &...') is compared with each remaining argument of A; each comparison
+/// &...`) is compared with each remaining argument of A; each comparison
 /// deduces the next element of every template parameter pack that occurs in
-/// the pattern (`S<T1, const Z &...>' against `S<int, const int &, const int
-/// &>' deduces Z = {int, int}).  Records the packs in the template map; a
+/// the pattern (`S<T1, const Z &...>` against `S<int, const int &, const int
+/// &>` deduces Z = {int, int}).  Records the packs in the template map; a
 /// failed comparison leaves the pack unassigned.
 void cpp_typecheck_resolvet::deduce_trailing_type_pack_pattern(
   const typet &pattern_with_ellipsis,
@@ -9237,8 +9238,8 @@ bool cpp_typecheck_resolvet::guess_template_args_via_alias(
 /// N5008 [temp.deduct.type]/9: each argument Pi of P is compared with the
 /// corresponding argument Ai of A.  When the class template's last
 /// parameter is a pack and P contains no pack expansion, P's arguments
-/// correspond to A's one to one: `tup<A>' does not match `tup<char, char>'
-/// or `tup<>' (the deduced A would not be identical to A,
+/// correspond to A's one to one: `tup<A>` does not match `tup<char, char>`
+/// or `tup<>` (the deduced A would not be identical to A,
 /// [temp.deduct.call]/4).  Without this check the remaining arguments were
 /// ignored and the candidate was made viable by a converting constructor.
 /// \param instance_type: the type of A's class symbol
@@ -9300,7 +9301,7 @@ static const exprt::operandst *deducible_instance_arguments(
 }
 
 /// N5008 [temp.deduct.type]/8, [temp.arg.template]/1, [temp.arg.explicit]/7:
-/// \p tmpl_base_name, the template-name of a pattern `TT<...>', names a
+/// \p tmpl_base_name, the template-name of a pattern `TT<...>`, names a
 /// template template parameter TT.  If TT is not yet deduced, bind it to
 /// the class template \p desired_sym was instantiated from; if TT was given
 /// explicitly, check that \p desired_sym is a specialization of it.
@@ -9386,7 +9387,7 @@ bool cpp_typecheck_resolvet::match_template_template_parameter(
   return is_tt_param;
 }
 
-/// guess_template_args for a template-id pattern `C<args...>' against a
+/// guess_template_args for a template-id pattern `C<args...>` against a
 /// class template specialization ([temp.deduct.type]/8-9, with the
 /// derived-to-base step of [temp.deduct.call]/4.3): each argument of the
 /// pattern is matched against the corresponding argument of the
@@ -10055,7 +10056,7 @@ void cpp_typecheck_resolvet::guess_template_args_template_id(
 }
 
 /// The type arguments of \p template_args from index \p first on, with a
-/// pack expansion `Ts...' replaced by the elements the pack is bound to
+/// pack expansion `Ts...` replaced by the elements the pack is bound to
 /// (N5008 [temp.variadic]/9).  Throws 0 (substitution failure) for an
 /// unbound pack or an argument that is not a type.
 std::vector<typet> cpp_typecheck_resolvet::type_arguments_with_packs_expanded(
@@ -12010,7 +12011,7 @@ void cpp_typecheck_resolvet::expand_function_parameter_pack(
 /// N5008 [temp.variadic]/9, [temp.inst]/3: a member function template of a
 /// class template specialization has the class's parameter packs already
 /// bound, so a function parameter pack whose pattern names only such an
-/// enclosing pack (`static T eval(V..., T *)', a member template over T of
+/// enclosing pack (`static T eval(V..., T *)`, a member template over T of
 /// a class template over the pack V) is a list of ordinary parameters, one
 /// per element; it is neither deduced nor required to be trailing
 /// ([temp.deduct.call]/1 applies to the template's own packs).  Expand it
@@ -12146,7 +12147,7 @@ cpp_declaratort cpp_typecheck_resolvet::expand_enclosing_class_packs(
 
 /// N5008 [temp.variadic]/9, [temp.deduct.call]/1: a function parameter pack
 /// whose pattern names a NON-type template parameter pack (`const char
-/// (&...s)[N]') expands to one parameter per element of that pack, the
+/// (&...s)[N]`) expands to one parameter per element of that pack, the
 /// element's value substituted for the pack's name.  The element values
 /// are those deduce_from_call_arguments recorded in pack_expr_map.
 void cpp_typecheck_resolvet::expand_value_function_parameter_pack(
@@ -13819,7 +13820,7 @@ void cpp_typecheck_resolvet::bind_explicit_template_arguments(
 
 /// N5008 [temp.arg.explicit]/9: template argument deduction can extend the
 /// sequence of template arguments of a pack beyond the explicitly specified
-/// ones (`count<int>(1, 2, 3)' deduces Ts = {int, int, int}).  True when the
+/// ones (`count<int>(1, 2, 3)` deduces Ts = {int, int, int}).  True when the
 /// last explicit argument falls into a type template parameter pack that is
 /// the pattern of a function parameter pack, and the call has more
 /// arguments than the explicit ones account for -- the explicit arguments

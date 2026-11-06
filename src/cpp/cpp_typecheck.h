@@ -174,7 +174,7 @@ public:
   bool cpp_is_pod(const typet &type) const;
 
   /// Convert the parameters of \p code_type that are still in parsed form
-  /// (cpp_declaration) to `parameter's; leave the type unchanged if one of
+  /// (cpp_declaration) to `parameter` nodes; leave the type unchanged if one of
   /// them is a pack expansion or dependent.
   void convert_parsed_parameters(code_typet &code_type);
 
@@ -228,12 +228,12 @@ public:
   /// [dcl.init.list]/3).
   bool array_elements_have_user_constructor(const typet &array_type);
 
-  /// The arguments of a parenthesized initializer `T x(args)'.  N5008
-  /// [dcl.init.general]/16.6.2: `T x({})' passes ONE argument, the empty
+  /// The arguments of a parenthesized initializer `T x(args)`.  N5008
+  /// [dcl.init.general]/16.6.2: `T x({})` passes ONE argument, the empty
   /// braced-init-list, to a constructor of T; it is not the value-
-  /// initialization `T x{}' ([dcl.init.list]/3.5).  The empty list is marked
+  /// initialization `T x{}` ([dcl.init.list]/3.5).  The empty list is marked
   /// (ID_C_paren_init) so that cpp_constructor does not take it as the
-  /// latter: `function_cfg_infot cfg_info({})' found no constructor of a
+  /// latter: `function_cfg_infot cfg_info({})` found no constructor of a
   /// class without a default constructor (CBMC's own contracts.cpp,
   /// dog-fooding).
   static exprt::operandst
@@ -813,10 +813,10 @@ protected:
     struct_typet::componentst &components);
 
   /// Rebuild the bodies of the class's virtual-function thunks once the class
-  /// is laid out (the `this' adjustments are base-subobject offsets).
+  /// is laid out (the `this` adjustments are base-subobject offsets).
   void finalize_virtual_thunks(const symbolt &symbol);
 
-  /// Fill in the `\@vbase_offset::\<V\>' entries of the class's vtable objects
+  /// Fill in the `\@vbase_offset::\<V\>` entries of the class's vtable objects
   /// (Itanium C++ ABI 2.5.2): the position of each virtual base in this
   /// complete object relative to the subobject owning the pointer.  Needs
   /// the final layout, so runs after padding.
@@ -840,7 +840,7 @@ protected:
 
   /// For the base subobject \p base_id of the complete object \p symbol:
   /// each virtual pointer of the subobject with the address of the
-  /// construction vtable (`virtual_table::X\@B\@D') to hold while the base is
+  /// construction vtable (`virtual_table::X\@B\@D`) to hold while the base is
   /// constructed or destroyed.
   std::vector<std::pair<struct_typet::componentt, exprt>>
   construction_vtable_installs(const symbolt &symbol, const irep_idt &base_id)
@@ -848,7 +848,7 @@ protected:
 
   /// For the base subobject \p base_id of the class \p symbol: each virtual
   /// pointer of the subobject with the address of the table the base's own
-  /// complete-object constructor installs (`virtual_table::X\@B'), which
+  /// complete-object constructor installs (`virtual_table::X\@B`), which
   /// has the base's overriders and the base's own virtual-base offsets.
   std::vector<std::pair<struct_typet::componentt, exprt>>
   base_subobject_vtable_pointers(const symbolt &symbol, const irep_idt &base_id)
@@ -857,8 +857,8 @@ protected:
   /// Itanium C++ ABI 2.6.2 without a VTT: expand the statement
   /// \#cpp_base_construction_vtables that full_member_initialization places
   /// before (and, with \#restore, after) the construction of a direct base
-  /// with virtual bases in a constructor of the class of `this'.  When the
-  /// constructor constructs a base subobject (`!\@most_derived'), the
+  /// with virtual bases in a constructor of the class of `this`.  When the
+  /// constructor constructs a base subobject (`!\@most_derived`), the
   /// complete object's offsets are known only from the virtual pointers
   /// installed for this subobject: before the base's construction, declare a
   /// copy of each of the base's own tables, set its virtual-base offsets from
@@ -868,7 +868,7 @@ protected:
 
   /// Build (or rebuild) the body of the thunk \p thunk that a virtual
   /// function \p target (a component of \p derived) is entered through when
-  /// called on the base subobject of class \p base_class: adjust `this' from
+  /// called on the base subobject of class \p base_class: adjust `this` from
   /// the base subobject to the derived object and call \p target directly.
   /// The adjustment is the offset of the base subobject in \p derived's
   /// layout (Itanium C++ ABI 2.5.3 non-virtual thunk); a base sharing the
@@ -881,7 +881,7 @@ protected:
     const struct_typet &derived);
 
   /// The body of the thunk \p thunk: subtract \p base_off (the offset of
-  /// the base subobject the thunk is called on) from `this' and call
+  /// the base subobject the thunk is called on) from `this` and call
   /// \p target directly.
   /// With \p vcall_field, the adjustment is read instead from that field of
   /// the table (of struct \p vcall_table) the subobject's vtable pointer
@@ -1043,7 +1043,7 @@ protected:
   /// function body
   bool coroutine_seen = false;
   void report_unsupported_coroutine(symbolt &);
-  /// The object (`e') of the structured binding declaration type-checked
+  /// The object (`e`) of the structured binding declaration type-checked
   /// last: the decision variable of a structured binding declaration used
   /// as a condition (N5008 [stmt.pre]/4).
   std::optional<exprt> structured_binding_object;
@@ -1110,7 +1110,7 @@ protected:
   /// parameter packs must be matched/deduced rather than substituted with an
   /// (unrelated) enclosing instantiation's pack.
   bool disable_template_arg_pack_expansion = false;
-  /// true while the type of an alias-declaration (`using T = ...;') is
+  /// true while the type of an alias-declaration (`using T = ...;`) is
   /// typechecked; GCC ignores a GNU type attribute applied to a class type
   /// there, but honours it in a typedef
   bool in_alias_declaration = false;
@@ -1327,8 +1327,8 @@ protected:
     bool base_subobject = false);
 
   // expressions
-  /// Whether \p expr is `&C::m' (an unparenthesized qualified-id) in a
-  /// scope that has a `this' ([expr.unary.op]/4).
+  /// Whether \p expr is `&C::m` (an unparenthesized qualified-id) in a
+  /// scope that has a `this` ([expr.unary.op]/4).
   bool is_qualified_member_address(const exprt &expr);
 
   std::optional<irep_idt> naming_class_of(const cpp_namet &name);
@@ -1416,7 +1416,7 @@ protected:
 
   /// N5008 [class.prop], [class.virtual]/1, [class.dtor]/11,
   /// [dcl.init.aggr]/1: the class property named by the GCC/Clang type
-  /// trait \p trait (`__is_empty', `__is_polymorphic', ...) for type \p t
+  /// trait \p trait (`__is_empty`, `__is_polymorphic`, ...) for type \p t
   bool class_property(const irep_idt &trait, const typet &t);
   bool select_pack_element(typet &type);
   bool has_trivial_destructor(const typet &type, int depth);
@@ -1498,7 +1498,7 @@ protected:
   /// a class template, deduce the template arguments from the (not necessarily
   /// type-checked) initializer expressions \p args and return the resulting
   /// type-checked class type (e.g. `Box<int>`); otherwise return {}.
-  /// \p copy_initialization: `C x = e' ([over.match.copy]/1.1), where the
+  /// \p copy_initialization: `C x = e` ([over.match.copy]/1.1), where the
   /// notional constructors formed from explicit constructors are not
   /// candidates ([over.match.class.deduct]/5).
   std::optional<typet> deduce_class_template_arguments(
@@ -1534,7 +1534,7 @@ protected:
     const source_locationt &source_location);
   bool implicit_pod_assignment_call(side_effect_expr_function_callt &expr);
   void user_defined_numeric_literal(side_effect_expr_function_callt &expr);
-  /// The closure member holding a lambda's captured `this'
+  /// The closure member holding a lambda's captured `this`
   static constexpr const char *lambda_this_capture = "__cbmc_lambda_this";
   void rewrite_lambda_this_uses(
     irept &body,
@@ -1895,7 +1895,7 @@ public:
     const struct_tag_typet &class_type,
     std::size_t argument_count);
 
-  /// Build the std::initializer_list<U> argument value for list-
+  /// Build the `std::initializer_list<U>` argument value for list-
   /// initialization of \p target_type from the braced-init-list
   /// \p init_list, per [over.match.list]/1 phase 1.1.  \p target_type
   /// must have a viable initializer-list constructor (see
@@ -1937,8 +1937,8 @@ public:
 
   /// N5008 [conv.general]/4: the contextual conversion to bool (the
   /// condition of if/while/for, the operand of !, &&, ||, ?:, static_assert,
-  /// noexcept) is the direct-initialization `bool t(e)', for which an
-  /// EXPLICIT `operator bool()' is a candidate ([class.conv.fct]/4).  All
+  /// noexcept) is the direct-initialization `bool t(e)`, for which an
+  /// EXPLICIT `operator bool()` is a candidate ([class.conv.fct]/4).  All
   /// callers of implicit_typecast_bool are such contexts.
   void implicit_typecast_bool(exprt &expr) override
   {
@@ -1957,8 +1957,8 @@ public:
   unsigned contextual_bool_conversion = 0;
 
   /// N5008 [over.match.conv]/1: non-zero while converting the single
-  /// initializer of a DIRECT-initialization of a non-class object (`T t(e)',
-  /// `T(e)', `static_cast<T>(e)'), where explicit conversion functions are
+  /// initializer of a DIRECT-initialization of a non-class object (`T t(e)`,
+  /// `T(e)`, `static_cast<T>(e)`), where explicit conversion functions are
   /// candidates too.  RAII guard: direct_initialization_contextt.
   unsigned direct_initialization = 0;
   class direct_initialization_contextt

@@ -2220,7 +2220,7 @@ bool cpp_typecheckt::has_constructor_template_for_arguments(
 }
 
 /// Whether \p symbol has a (user-declared) move constructor: a constructor
-/// whose first parameter is `X &&' (possibly cv-qualified) and whose other
+/// whose first parameter is `X &&` (possibly cv-qualified) and whose other
 /// parameters have default arguments ([class.copy.ctor]/2)
 bool cpp_typecheckt::find_mvctor(const symbolt &symbol) const
 {
@@ -2253,9 +2253,9 @@ bool cpp_typecheckt::find_mvctor(const symbolt &symbol) const
   return false;
 }
 
-/// Turn the `const X &' parameter of an implicit copy constructor or copy
+/// Turn the `const X &` parameter of an implicit copy constructor or copy
 /// assignment operator declarator (default_cpctor, default_assignop) into
-/// the `X &&' of the corresponding move operation
+/// the `X &&` of the corresponding move operation
 void cpp_typecheckt::make_move_parameter(cpp_declaratort &declarator)
 {
   irept &parameters = declarator.type().add(ID_parameters);

@@ -32,14 +32,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <unordered_set>
 
-/// GCC: an `aligned(k)' attribute on a declaration only INCREASES the
+/// GCC: an `aligned(k)` attribute on a declaration only INCREASES the
 /// alignment of the declared object.  When \p type already carries the
 /// alignment of a typedef (which may be below the natural alignment), the
 /// larger of the two applies: `typedef int __attribute__((aligned(16))) T;
-/// T x __attribute__((aligned(4)));' gives x alignment 16, and the typedef's
+/// T x __attribute__((aligned(4)));` gives x alignment 16, and the typedef's
 /// marking (ID_C_typedef_alignment) is kept in that case.
-/// Together with `packed' the attribute sets the alignment EXACTLY (`T m
-/// __attribute__((packed, aligned(1)))' is byte-aligned whatever T's
+/// Together with `packed` the attribute sets the alignment EXACTLY (`T m
+/// __attribute__((packed, aligned(1)))` is byte-aligned whatever T's
 /// typedef says).
 static void
 add_declaration_alignment(typet &type, const exprt &alignment, bool packed)

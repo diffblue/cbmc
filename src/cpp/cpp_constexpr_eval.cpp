@@ -212,7 +212,7 @@ struct array_pointert
 /// storage duration, which is usable in constant expressions (constexpr
 /// declares the object const, [dcl.constexpr]/6, and its initializer is a
 /// constant expression).  The latter is libc++'s `constexpr _CCC
-/// __type_kinds[] = {...}' local passed by reference to the constexpr
+/// __type_kinds[] = {...}` local passed by reference to the constexpr
 /// __compute_comp_type in __get_comp_type.
 static bool constant_array_symbol(const symbolt &symbol)
 {
@@ -269,7 +269,7 @@ is_constant_array_object(const exprt &e, const symbol_table_baset &symbol_table)
 
 /// The array and index a tracked array pointer denotes, or nothing
 /// The value of an integer constant, also through integer conversions
-/// (`(int)1')
+/// (`(int)1`)
 static std::optional<mp_integer> integer_constant(const exprt &e)
 {
   if(e.is_constant())
@@ -338,7 +338,7 @@ make_array_pointer(const array_pointert &ap, const typet &pointer_type)
     to_pointer_type(pointer_type)};
 }
 
-/// `*p' for a tracked array pointer: the element (a string literal's
+/// `*p` for a tracked array pointer: the element (a string literal's
 /// terminating null included, [lex.string]/10), or nothing when the index is
 /// out of range
 static std::optional<exprt> array_pointer_deref(
@@ -363,7 +363,7 @@ static std::optional<exprt> array_pointer_deref(
   return c;
 }
 
-/// `__builtin_strlen(s)' over a constant array, which GCC and clang
+/// `__builtin_strlen(s)` over a constant array, which GCC and clang
 /// evaluate in a constant expression: the number of characters before the
 /// first null one (C17 7.24.6.3); Xcode 26's libc++ computes
 /// char_traits<char>::length with it.  Nil when not evaluable.
@@ -390,7 +390,7 @@ static exprt evaluate_builtin_strlen(
   }
 }
 
-/// `__builtin_memcmp(s1, s2, n)' over constant arrays, which GCC and clang
+/// `__builtin_memcmp(s1, s2, n)` over constant arrays, which GCC and clang
 /// evaluate in a constant expression: libstdc++ 11's
 /// char_traits<char>::compare calls it when __builtin_constant_p(__n),
 /// folded at its definition, is false.  The sign of the first differing
@@ -498,7 +498,7 @@ bool is_constexpr_call_argument(
   return true;
 }
 
-/// A constexpr call; with \p this_value, `this' denotes an object of the
+/// A constexpr call; with \p this_value, `this` denotes an object of the
 /// calling evaluation with that value (a constructor constructs it over its
 /// zero-initialization), and \p final_this receives its value at the end.
 static exprt evaluate_constexpr_call(
@@ -566,7 +566,7 @@ public:
   /// As is_constant_value, also for an aggregate with aggregate members or
   /// members that point into a constant array ([expr.const]/4.1, /5: a pointer
   /// to an element of a string literal is a permitted result) -- the
-  /// `const C *' of a string_view built from a literal.
+  /// `const C *` of a string_view built from a literal.
   static bool
   is_constant_value(const exprt &e, const symbol_table_baset &symbol_table)
   {
@@ -765,10 +765,10 @@ public:
   }
 
   /// The tracked value an lvalue \p e designates: a local variable, a
-  /// member of the object under construction (`this->m'), or an element
-  /// of an array designated so (`this->d[i][j]', `a[i]'), with constant
+  /// member of the object under construction (`this->m`), or an element
+  /// of an array designated so (`this->d[i][j]`, `a[i]`), with constant
   /// in-bounds indices; nullptr otherwise.  An array that is all one value
-  /// (`array_of', from value-initialization) is expanded first.
+  /// (`array_of`, from value-initialization) is expanded first.
   exprt *tracked_object(const exprt &e)
   {
     if(const auto idx = this_member_index(e))
@@ -826,7 +826,7 @@ public:
 
   /// N5008 [expr.const]/10.16 (C++14 relaxed constexpr): a call of a member
   /// function or constructor on an object of this evaluation (a local
-  /// variable, or the object `this' denotes): the key of its tracked value,
+  /// variable, or the object `this` denotes): the key of its tracked value,
   /// or empty
   irep_idt tracked_object_argument(const exprt &call) const
   {
@@ -1141,7 +1141,7 @@ public:
 
   /// A tracked variable's value that is the address of ANOTHER tracked
   /// variable (a reference bound to a local or parameter, `auto &&__range =
-  /// xs' of a range-for) denotes that variable: return its value, else nil
+  /// xs` of a range-for) denotes that variable: return its value, else nil
   exprt referenced_value(const exprt &value) const
   {
     if(
@@ -1156,10 +1156,10 @@ public:
   }
 
   /// Is \p value the address of a subobject of a tracked local -- an element
-  /// `&a[k]' (constant k) or a member `&o.m', also nested -- i.e., a reference
+  /// `&a[k]` (constant k) or a member `&o.m`, also nested -- i.e., a reference
   /// or pointer bound to it?  N5008 [expr.const]/10.9.3, /10.16: such an
   /// object's lifetime began within the evaluation, so reads and writes through
-  /// it are permitted (`for(auto &e : t.data) e = 127;' in libstdc++'s
+  /// it are permitted (`for(auto &e : t.data) e = 127;` in libstdc++'s
   /// __from_chars_alnum_to_val_table<false>::_S_make_table).
   bool is_subobject_alias(const exprt &value)
   {
@@ -1191,9 +1191,9 @@ public:
            referenced_value(value).is_not_nil() || is_subobject_alias(value);
   }
 
-  /// The value to store for `lhs = rhs' / `T x = rhs': a reference bound to
-  /// a tracked variable ([dcl.init.ref]: `auto &&__range = xs' of a
-  /// range-for) is kept as the ALIAS `&xs', not evaluated to a copy, so
+  /// The value to store for `lhs = rhs` / `T x = rhs`: a reference bound to
+  /// a tracked variable ([dcl.init.ref]: `auto &&__range = xs` of a
+  /// range-for) is kept as the ALIAS `&xs`, not evaluated to a copy, so
   /// later reads through it see the variable; anything else is evaluated.
   exprt eval_initializer(const exprt &rhs)
   {
@@ -1205,7 +1205,7 @@ public:
   }
 
   /// \p e as the address of a subobject of a tracked local with its
-  /// indices evaluated to constants (`&d[__range_i]' becomes `&d[2]'), if it
+  /// indices evaluated to constants (`&d[__range_i]` becomes `&d[2]`), if it
   /// is one.
   std::optional<exprt> subobject_address(const exprt &e)
   {

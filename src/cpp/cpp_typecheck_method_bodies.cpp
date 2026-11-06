@@ -1620,7 +1620,7 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
 /// TEMPLATE's specialization was never completed: its bases' default
 /// constructors, the members' default member initializers and the vtable
 /// pointer were missing.  Its mem-initializers are complete only after the
-/// pack expansions of prepare_deferred_method_body (`leaf<I, T>(u)...'),
+/// pack expansions of prepare_deferred_method_body (`leaf<I, T>(u)...`),
 /// so complete the list here, from the leading member-initializer
 /// statements of the body, once.
 void cpp_typecheckt::complete_constructor_template_initializers(
@@ -2377,8 +2377,8 @@ void cpp_typecheckt::drop_unreferenced_held_back_bodies()
 /// the flat argument list), non-overriding.  Used wherever a member of the
 /// instance is type-checked outside the instance's own instantiation: the
 /// deferred method-body drain, and the deduction of a member function
-/// template's arguments at a call (`function<int(int, int)> f = add' with
-/// the constructor template's default argument naming `_ArgTypes...').
+/// template's arguments at a call (`function<int(int, int)> f = add` with
+/// the constructor template's default argument naming `_ArgTypes...`).
 void cpp_typecheckt::bind_class_instance_parameters(
   const symbolt &class_sym,
   template_mapt &map)

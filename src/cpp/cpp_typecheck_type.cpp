@@ -163,7 +163,7 @@ typet cpp_typecheckt::decltype_of(const exprt &e, bool parenthesized)
 
 /// N5008 [expr.rel]/2, [expr.eq]/2, [expr.log.and]/2, [expr.unary.op]/9: a
 /// comparison or logical operator yields a prvalue of type bool.  The front
-/// end represents it with the internal `__CPROVER_bool' (ID_bool); where the
+/// end represents it with the internal `__CPROVER_bool` (ID_bool); where the
 /// type of an expression becomes a C++ type -- a deduced placeholder, decltype,
 /// a deduced template argument -- it is the C++ type bool (ID_c_bool), with
 /// the cv-qualifiers kept.
@@ -180,7 +180,7 @@ typet cpp_bool_type(const typet &type)
 }
 
 /// N5008 [dcl.type.pack.index]/1-2: replace the pack-index-specifier
-/// \p type, `T...[N]' (parsed as an array of T with bound N, marked
+/// \p type, `T...[N]` (parsed as an array of T with bound N, marked
 /// ID_C_pack_index), by the N-th element of the type parameter pack T, once
 /// the pack's elements are known.  The index is a converted constant
 /// expression of type size_t that shall be less than the pack size.
@@ -1640,13 +1640,13 @@ void cpp_typecheckt::evaluate_noexcept_expression(
   }
 }
 
-/// N5008 [dcl.typedef]/2: an alias-declaration `using F = void(int);' has
-/// the same semantics as `typedef void F(int);'.  The type-id's function
+/// N5008 [dcl.typedef]/2: an alias-declaration `using F = void(int);` has
+/// the same semantics as `typedef void F(int);`.  The type-id's function
 /// type comes from the parser with its parameters still in parsed form
 /// (cpp_declaration), which typecheck_type keeps (the partial-specialization
 /// matcher compares that form); the typedef form's declarator is converted to
-/// `parameter's, and its noexcept to #C_noexcept.  Convert them, so that F is
-/// the type of a function declared `void cb(int)' (`F *p = \&cb;').
+/// `parameter` nodes, and its noexcept to ID_C_noexcept.  Convert them, so
+/// that F is the type of a function declared `void cb(int)` (`F *p = \&cb;`).
 void cpp_typecheckt::convert_parsed_parameters(code_typet &code_type)
 {
   code_typet::parameterst converted;

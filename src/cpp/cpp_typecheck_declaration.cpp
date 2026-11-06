@@ -23,10 +23,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 /// N5008 [over.match.class.deduct]/3: class template argument deduction for
 /// an alias template A whose defining-type-id is a simple-template-id
-/// `C<args>' uses guides derived from those of C, restricted by the
+/// `C<args>` uses guides derived from those of C, restricted by the
 /// constraint that A's arguments are deducible from the guide's result
 /// ([over.match.class.deduct]/4).  Implemented as: deduce C's arguments
-/// from \p args, then deduce A's template parameters by matching `C<args>'
+/// from \p args, then deduce A's template parameters by matching `C<args>`
 /// against the result, and accept the result only when A<those arguments>
 /// denotes it.  A guide of C whose result does not have the form of A's
 /// defining-type-id is thereby rejected, as by the constraint; a guide that
@@ -951,11 +951,11 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
   return result;
 }
 
-/// N5008 [dcl.fct]/20: a function declaration with a placeholder (`auto')
+/// N5008 [dcl.fct]/20: a function declaration with a placeholder (`auto`)
 /// parameter type is an abbreviated function template; each such parameter
 /// introduces an invented template type parameter.  Applied to namespace-
 /// scope declarations and to member declarations (a constructor
-/// `subrange(auto __first, _Sent __last)' in libstdc++'s ranges header).
+/// `subrange(auto __first, _Sent __last)` in libstdc++'s ranges header).
 void cpp_typecheckt::make_abbreviated_function_template(
   cpp_declarationt &declaration)
 {
@@ -1044,14 +1044,14 @@ void cpp_typecheckt::convert(cpp_declarationt &declaration)
 }
 
 /// N5008 [temp.explicit]: `template renamedt<ssa_exprt, L0>
-/// goto_symex_statet::rename_ssa<L0>(ssa_exprt, const namespacet &);' (an
+/// goto_symex_statet::rename_ssa<L0>(ssa_exprt, const namespacet &);` (an
 /// explicit instantiation of a function template, possibly a member
 /// template named with a qualifier) instantiates the template for the given
 /// -- or, without a template-argument-list, deduced -- arguments.  Treated
 /// as a plain declaration it re-declared the member with a template-id
 /// name ("found no match for symbol 'L0'", "already declared with different
 /// type").  Instantiate it like an explicit specialization without a body;
-/// anything else (an explicit class instantiation `template class X<int>;',
+/// anything else (an explicit class instantiation `template class X<int>;`,
 /// a function without template arguments) keeps the previous handling.
 /// \return true when the declaration has been handled
 bool cpp_typecheckt::convert_explicit_instantiation(

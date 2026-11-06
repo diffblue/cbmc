@@ -117,7 +117,7 @@ protected:
   /// references of the exception objects counted
   bool uses_exception_ptr = false;
 
-  /// `(void *)&object' of \p site
+  /// `(void *)&object` of \p site
   static exprt object_address(const exception_objectt &site)
   {
     return typecast_exprt{
@@ -161,23 +161,23 @@ public:
   /// __CPROVER_initialize (no-op if that function is not in the model).
   void initialize_globals(goto_functionst &goto_functions);
 
-  /// Lower the handler-exit markers of the goto conversion: `cpp_end_catch'
+  /// Lower the handler-exit markers of the goto conversion: `cpp_end_catch`
   /// destroys the exception object of a handler that is left other than by
-  /// rethrowing it ([except.throw]/4), `cpp_note_rethrow' records the
+  /// rethrowing it ([except.throw]/4), `cpp_note_rethrow` records the
   /// exception being rethrown.
   void lower_handler_exits(goto_functionst &goto_functions);
 
   /// Lower the intrinsics through which the models of std::exception_ptr
   /// ([propagation], cpp_typecheck_stdlib.cpp) reach the exception objects
   /// of this pass:
-  /// - `__CPROVER_cpp_exception_ptr_current()': the exception object currently
+  /// - `__CPROVER_cpp_exception_ptr_current()`: the exception object currently
   ///   handled ([propagation]/9; the most recently entered handler's, also
   ///   after it was left: an approximation), null when none;
-  /// - `__CPROVER_cpp_exception_ptr_addref(p)', `..._release(p)': one more or
+  /// - `__CPROVER_cpp_exception_ptr_addref(p)`, `..._release(p)`: one more or
   ///   one fewer exception_ptr refers to the exception object p.  The last
   ///   release destroys it unless a handler of it is active or it is in
   ///   flight ([except.throw]/4);
-  /// - `__CPROVER_cpp_exception_ptr_rethrow(p)': p becomes the in-flight
+  /// - `__CPROVER_cpp_exception_ptr_rethrow(p)`: p becomes the in-flight
   ///   exception ([propagation]/10), with the type tag of its throw site;
   ///   the dispatch after the call propagates it.
   /// Run after the throws and calls are instrumented.
