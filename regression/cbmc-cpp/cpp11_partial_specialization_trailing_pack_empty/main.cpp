@@ -50,7 +50,7 @@ using is_u = one_of<
   unsigned,
   unsigned long,
   unsigned long long,
-  unsigned __int128>;
+  long double>;
 template <bool, class T>
 struct en
 {
@@ -75,6 +75,6 @@ int main()
 {
   char a, b;
   __CPROVER_assert(
-    g(&a, &b, (unsigned __int128)3, 10).v == 3, "the last alternative");
+    g(&a, &b, (long double)3, 10).v == 3, "the last alternative");
   __CPROVER_assert(false, "WRONG (must FAIL)");
 }
