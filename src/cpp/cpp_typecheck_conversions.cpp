@@ -6081,6 +6081,35 @@ bool cpp_typecheckt::cast_away_constness(const typet &t1, const typet &t2) const
   push_array_qualifiers_to_element(nt1);
   push_array_qualifiers_to_element(nt2);
 
+  // [conv.qual]/1: an array level of one chain whose counterpart in the
+  // other is not an array (`const unsigned char (*)[8]' to `const int *', the
+  // reinterpret_cast of an aligned buffer in libstdc++ 16's <any>) compares
+  // through its element type, which carries the array's cv-qualification
+  // (moved there above).  Comparing `pointer to array' with `pointer to const
+  // int' level by level read as casting const away.
+  {
+    typet *p1 = &nt1;
+    typet *p2 = &nt2;
+    while((p1->id() == ID_pointer || p1->id() == ID_array) &&
+          (p2->id() == ID_pointer || p2->id() == ID_array))
+    {
+      typet &s1 = to_type_with_subtype(*p1).subtype();
+      typet &s2 = to_type_with_subtype(*p2).subtype();
+      while(s1.id() == ID_array && s2.id() != ID_array)
+      {
+        typet element = to_array_type(s1).element_type();
+        s1 = std::move(element);
+      }
+      while(s2.id() == ID_array && s1.id() != ID_array)
+      {
+        typet element = to_array_type(s2).element_type();
+        s2 = std::move(element);
+      }
+      p1 = &s1;
+      p2 = &s2;
+    }
+  }
+
   // substitute final subtypes
   std::vector<typet> snt1;
   snt1.push_back(nt1);
