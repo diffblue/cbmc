@@ -1,0 +1,10 @@
+CORE
+main.c
+--mmio-region xyz:abc
+^EXIT=1$
+^SIGNAL=0$
+invalid number 'xyz' in MMIO region: xyz:abc
+--
+--
+Non-numeric MMIO region fields must be rejected rather than silently parsed as
+0 (which would create a bogus region). See also 0x-prefixed non-hex digits.
