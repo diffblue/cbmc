@@ -163,34 +163,143 @@ bvt float_utilst::build_constant(const ieee_float_valuet &src)
   return pack(bias(result));
 }
 
+/// Round a floating-point value to integral, IEEE 754 semantics.
+///
+/// Bvt-level mirror of `float_bvt::round_to_integral` (see the Doxygen on
+/// that method for the full algorithmic description). Both implement the
+/// same algorithm, using the `exprt` and the `literalt`/`bvt` API,
+/// respectively; keep them in lockstep when changing the rounding logic.
 bvt float_utilst::round_to_integral(const bvt &src)
 {
   PRECONDITION(src.size() == spec.width());
 
-  // Zero? NaN? Infinity?
-  auto unpacked = unpack(src);
-  auto is_special = prop.lor({unpacked.zero, unpacked.NaN, unpacked.infinity});
+  const unbiased_floatt unpacked = unpack(src);
+  const literalt is_special =
+    prop.lor({unpacked.zero, unpacked.NaN, unpacked.infinity});
 
-  // add 2^f, where f is the number of fraction bits,
-  // by adding f to the exponent
-  auto magic_number = ieee_floatt{
-    spec, ieee_floatt::rounding_modet::ROUND_TO_ZERO, power(2, spec.f)};
+  // If unbiased exponent >= f, the number is already integral.  The
+  // exponent is compared with, and subtracted from, spec.f, which need not
+  // be representable in spec.e bits (for example, for
+  // __CPROVER_floatbv[28][23]).  Hence sign-extend the exponent first.
+  const std::size_t exp_width = std::max(spec.e, address_bits(spec.f)) + 2;
+  const bvt exponent = bv_utils.sign_extension(unpacked.exponent, exp_width);
+  const bvt f_const = bv_utils.build_constant(spec.f, exp_width);
+  const literalt exp_ge_f = !bv_utils.signed_less_than(exponent, f_const);
 
-  auto magic_number_bv = build_constant(magic_number);
+  const bvt biased_exp = get_exponent(src);
 
-  // abs(x) >= magic_number? If so, then there is no fractional part.
-  literalt ge_magic_number = relation(abs(src), relt::GE, magic_number_bv);
+  // ±0 and ±1 as packed bitvectors
+  ieee_floatt pz{spec, ieee_floatt::ROUND_TO_ZERO, 0};
+  ieee_floatt nz{spec, ieee_floatt::ROUND_TO_ZERO, 0};
+  nz.set_sign(true);
+  ieee_floatt p1{spec, ieee_floatt::ROUND_TO_ZERO, 1};
+  ieee_floatt n1{spec, ieee_floatt::ROUND_TO_ZERO, -1};
 
-  magic_number_bv.back() = src.back(); // copy sign bit
+  const bvt signed_zero =
+    bv_utils.select(sign_bit(src), build_constant(nz), build_constant(pz));
+  const bvt signed_one =
+    bv_utils.select(sign_bit(src), build_constant(n1), build_constant(p1));
 
-  auto tmp1 = add_sub(src, magic_number_bv, false);
+  // For |x| < 1 (biased exponent < bias): result is ±0 or ±1.
+  // |x| >= 0.5 iff biased exponent >= bias-1.
+  // |x| == 0.5 iff biased exponent == bias-1 AND fraction == 0.
+  const bvt bias_m1 = bv_utils.build_constant(spec.bias() - 1, spec.e);
+  const literalt exp_ge_bm1 = !bv_utils.unsigned_less_than(biased_exp, bias_m1);
+  const literalt exp_eq_bm1 = bv_utils.equal(biased_exp, bias_m1);
+  const literalt frac_zero = fraction_all_zeros(src);
+  const literalt abs_eq_half = prop.land(exp_eq_bm1, frac_zero);
+  const literalt abs_gt_half = prop.land(exp_ge_bm1, !abs_eq_half);
 
-  auto tmp2 = add_sub(tmp1, magic_number_bv, true);
+  // clang-format off
+  const literalt round_up_lt1 = prop.lselect(
+    rounding_mode_bits.round_to_even, abs_gt_half,
+    prop.lselect(rounding_mode_bits.round_to_away,
+      prop.lor(abs_gt_half, abs_eq_half),
+    prop.lselect(rounding_mode_bits.round_to_plus_inf,
+      !unpacked.sign,
+    prop.lselect(rounding_mode_bits.round_to_minus_inf,
+      unpacked.sign,
+      const_literal(false)))));
+  // clang-format on
 
-  // restore the original sign bit
-  tmp2.back() = src.back();
+  const bvt result_lt1 = bv_utils.select(round_up_lt1, signed_one, signed_zero);
 
-  return bv_utils.select(prop.lor(is_special, ge_magic_number), src, tmp2);
+  // |x| >= 1 branch: barrel-shifter formulation.
+  //
+  // drop = f - max(0, unbiased_exp). For unbiased_exp >= f, the result is
+  // overridden by `exp_ge_f -> src`; for unbiased_exp < 0, overridden by
+  // the |x| < 1 branch above. So in the path where this matters,
+  // drop ∈ [1, f].
+  const std::size_t width = spec.width();
+  const literalt unbiased_neg =
+    bv_utils.signed_less_than(exponent, bv_utils.build_constant(0, exp_width));
+  const bvt unbiased_clamped_lo = bv_utils.select(
+    unbiased_neg, bv_utils.build_constant(0, exp_width), exponent);
+  const bvt drop_exp_width = bv_utils.sub(
+    bv_utils.build_constant(spec.f, exp_width), unbiased_clamped_lo);
+  const bvt drop = bv_utils.zero_extension(drop_exp_width, width);
+
+  const bvt one_bv = bv_utils.build_constant(1, width);
+
+  // masked = (src >> drop) << drop
+  const bvt shifted_right =
+    bv_utils.shift(src, bv_utilst::shiftt::SHIFT_LRIGHT, drop);
+  const bvt masked =
+    bv_utils.shift(shifted_right, bv_utilst::shiftt::SHIFT_LEFT, drop);
+
+  // rbit = bit (drop - 1) of src; obtained by shifting right by drop-1
+  // and reading the LSB. When drop == 0 (only on the exp_ge_f path) the
+  // value is irrelevant since the final select picks `src`.
+  const bvt drop_m1 = bv_utils.sub(drop, one_bv);
+  const bvt shifted_to_rbit =
+    bv_utils.shift(src, bv_utilst::shiftt::SHIFT_LRIGHT, drop_m1);
+  const literalt rbit = shifted_to_rbit[0];
+
+  // lsb = bit (drop) of src
+  const literalt lsb = shifted_right[0];
+
+  // sticky = OR of bits 0..(drop-2) of src.
+  // Push those bits into the top of a width-bit value via a left shift
+  // by `width + 1 - drop`, then test for non-zero. The round bit
+  // (position drop-1) is shifted out; bits at and above drop are also
+  // out.
+  const bvt width_p1 = bv_utils.build_constant(width + 1, width);
+  const bvt sticky_shift_amount = bv_utils.sub(width_p1, drop);
+  const bvt sticky_pushed =
+    bv_utils.shift(src, bv_utilst::shiftt::SHIFT_LEFT, sticky_shift_amount);
+  const literalt sticky = !bv_utils.is_zero(sticky_pushed);
+
+  // clang-format off
+  const literalt inc = prop.lselect(
+    rounding_mode_bits.round_to_even,
+      prop.land(rbit, prop.lor(lsb, sticky)),
+    prop.lselect(rounding_mode_bits.round_to_away, rbit,
+    prop.lselect(rounding_mode_bits.round_to_plus_inf,
+      prop.land(!unpacked.sign, prop.lor(rbit, sticky)),
+    prop.lselect(rounding_mode_bits.round_to_minus_inf,
+      prop.land(unpacked.sign, prop.lor(rbit, sticky)),
+      const_literal(false)))));
+  // clang-format on
+
+  // Increment by `1 << drop`. The add runs on the full packed
+  // representation, so a carry out of the fraction bits increments the
+  // biased exponent, which yields the correctly rounded value.  In the IEEE
+  // formats, where spec.f < bias, the biased exponent then is at most
+  // bias + spec.f and thus finite.  In formats with a narrow exponent (e.g.,
+  // __CPROVER_floatbv[28][23]) rounding up the largest finite values can
+  // carry into an all-ones exponent, yielding infinity, as the integer
+  // result is not representable.
+  const bvt inc_val =
+    bv_utils.shift(one_bv, bv_utilst::shiftt::SHIFT_LEFT, drop);
+  const bvt incremented = bv_utils.add(masked, inc_val);
+  const bvt result_ge1 = bv_utils.select(inc, incremented, masked);
+
+  // Select between the two branches by exponent magnitude.
+  const bvt bias_e = bv_utils.build_constant(spec.bias(), spec.e);
+  const literalt abs_lt_1 = bv_utils.unsigned_less_than(biased_exp, bias_e);
+  const bvt result = bv_utils.select(abs_lt_1, result_lt1, result_ge1);
+
+  return bv_utils.select(prop.lor(is_special, exp_ge_f), src, result);
 }
 
 bvt float_utilst::conversion(
