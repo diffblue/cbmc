@@ -1,0 +1,8 @@
+CORE
+dummy.c
+goto-link --help
+^EXIT=0$
+^SIGNAL=0$
+goto-link understands the options of link
+--
+^warning: ignoring
