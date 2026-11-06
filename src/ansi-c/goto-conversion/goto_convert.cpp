@@ -1768,6 +1768,12 @@ void goto_convertt::generate_ifthenelse(
     goto_programt tmp_z;
     goto_programt::targett z = tmp_z.add(goto_programt::make_skip());
     dest.add(goto_programt::make_goto(z, guard, source_location));
+    // Even though the branches appear to be empty (only skip-like
+    // instructions), they may contain instructions that are targets of
+    // switch case or default GOTOs. Splicing them in preserves those
+    // targets; the redundant skips will be cleaned up later.
+    dest.destructive_append(true_case);
+    dest.destructive_append(false_case);
     dest.destructive_append(tmp_z);
     return;
   }
@@ -1787,7 +1793,10 @@ void goto_convertt::generate_ifthenelse(
       is_empty(false_case) ||
       (is_size_one(false_case) &&
        is_skip(false_case, false_case.instructions.begin())))
+    {
+      dest.destructive_append(false_case);
       return;
+    }
   }
 
   // similarly, do guarded assertions directly
@@ -1805,7 +1814,10 @@ void goto_convertt::generate_ifthenelse(
       is_empty(true_case) ||
       (is_size_one(true_case) &&
        is_skip(true_case, true_case.instructions.begin())))
+    {
+      dest.destructive_append(true_case);
       return;
+    }
   }
 
   // a special case for C libraries that use
@@ -1824,6 +1836,7 @@ void goto_convertt::generate_ifthenelse(
     true_case.instructions.erase(--true_case.instructions.end());
     dest.destructive_append(true_case);
     true_case.instructions.clear();
+    dest.destructive_append(false_case);
 
     return;
   }
@@ -1885,6 +1898,12 @@ void goto_convertt::generate_ifthenelse(
   // w: P;
   goto_programt tmp_w;
   tmp_w.swap(true_case);
+
+  // Even when there is no else branch, the false_case program may contain
+  // instructions that are targets of switch case GOTOs. Splice them in to
+  // avoid dangling iterators.
+  if(!has_else)
+    dest.destructive_append(false_case);
 
   // x: goto z;
   CHECK_RETURN(!tmp_w.instructions.empty());
