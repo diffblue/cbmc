@@ -1,0 +1,11 @@
+CORE
+main.c
+module.c
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Test that struct tags in function parameter types are properly updated during
+linking when the tag is renamed due to a conflict between translation units.

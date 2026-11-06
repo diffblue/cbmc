@@ -51,16 +51,21 @@ protected:
     RENAME_NEW
   };
 
-  renamingt
-  needs_renaming_type(const symbolt &old_symbol, const symbolt &new_symbol);
+  renamingt needs_renaming_type(
+    const symbolt &old_symbol,
+    const symbolt &new_symbol,
+    const namespacet &src_ns);
 
   renamingt
   needs_renaming_non_type(const symbolt &old_symbol, const symbolt &new_symbol);
 
-  renamingt needs_renaming(const symbolt &old_symbol, const symbolt &new_symbol)
+  renamingt needs_renaming(
+    const symbolt &old_symbol,
+    const symbolt &new_symbol,
+    const namespacet &src_ns)
   {
     if(new_symbol.is_type)
-      return needs_renaming_type(old_symbol, new_symbol);
+      return needs_renaming_type(old_symbol, new_symbol, src_ns);
     else
       return needs_renaming_non_type(old_symbol, new_symbol);
   }
@@ -114,7 +119,8 @@ protected:
 
   void duplicate_type_symbol(
     symbolt &old_symbol,
-    const symbolt &new_symbol);
+    const symbolt &new_symbol,
+    const namespacet &src_ns);
 
   symbol_table_baset &main_symbol_table;
   namespacet ns;
