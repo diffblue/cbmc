@@ -53,8 +53,8 @@ public:
     const namespacet &_ns,
     propt &_prop,
     message_handlert &message_handler,
-    bool get_array_constraints = false)
-    : arrayst(_ns, _prop, message_handler, get_array_constraints),
+    bool collect_constraint_stats = false)
+    : arrayst(_ns, _prop, message_handler, collect_constraint_stats),
       unbounded_array(unbounded_arrayt::U_NONE),
       bv_width(_ns),
       bv_utils(_prop),
