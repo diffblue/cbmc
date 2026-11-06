@@ -296,12 +296,12 @@ std::string c_type_as_string(const irep_idt &c_type)
     return "";
 }
 
-std::optional<std::pair<struct_union_typet::componentt, mp_integer>>
+std::optional<std::pair<struct_union_typet::componentt, bitst>>
 union_typet::find_widest_union_component(const namespacet &ns) const
 {
   const union_typet::componentst &comps = components();
 
-  std::optional<mp_integer> max_width;
+  std::optional<bitst> max_width;
   typet max_comp_type;
   irep_idt max_comp_name;
 

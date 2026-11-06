@@ -150,7 +150,7 @@ void rw_range_sett::get_objects_byte_extract(
   auto object_size_bits_opt = pointer_offset_bits(be.op().type(), ns);
   const exprt simp_offset=simplify_expr(be.offset(), ns);
 
-  auto index = numeric_cast<mp_integer>(simp_offset);
+  auto index = numeric_cast<bytest>(simp_offset);
   if(
     range_start.is_unknown() || !index.has_value() ||
     !object_size_bits_opt.has_value())
@@ -159,8 +159,8 @@ void rw_range_sett::get_objects_byte_extract(
   }
   else
   {
-    *index *= be.get_bits_per_byte();
-    if(*index >= *object_size_bits_opt)
+    bitst index_bits = bytes_to_bits(*index, be.get_bits_per_byte());
+    if(index_bits >= *object_size_bits_opt)
       return;
 
     endianness_mapt map(
@@ -168,16 +168,16 @@ void rw_range_sett::get_objects_byte_extract(
       be.id()==ID_byte_extract_little_endian,
       ns);
     range_spect offset = range_start;
-    if(*index > 0)
+    if(index_bits > bitst{0})
     {
       offset += range_spect::to_range_spect(
-        map.map_bit(numeric_cast_v<std::size_t>(*index)));
+        bitst{map.map_bit(numeric_cast_v<std::size_t>(index_bits))});
     }
     else
     {
       // outside the bounds of immediate byte-extract operand, might still be in
       // bounds of a parent object
-      offset += range_spect::to_range_spect(*index);
+      offset += range_spect::to_range_spect(index_bits);
     }
     get_objects_rec(mode, be.op(), offset, size);
   }
@@ -197,7 +197,7 @@ void rw_range_sett::get_objects_shift(
                            ? range_spect::to_range_spect(*op_bits)
                            : range_spect::unknown();
 
-  const auto dist = numeric_cast<mp_integer>(simp_distance);
+  const auto dist = numeric_cast<bitst>(simp_distance);
   if(
     range_start.is_unknown() || size.is_unknown() || src_size.is_unknown() ||
     !dist.has_value())
@@ -314,7 +314,7 @@ void rw_range_sett::get_objects_index(
     get_objects_rec(
       mode,
       expr.array(),
-      range_start + range_spect::to_range_spect(*index) * sub_size,
+      range_start + range_spect::to_range_spect(bitst{*index}) * sub_size,
       size);
   }
 }
@@ -344,7 +344,7 @@ void rw_range_sett::get_objects_array(
     range_start.is_unknown() ? range_spect{0} : range_start;
   range_spect full_r_e =
     size.is_unknown()
-      ? sub_size * range_spect::to_range_spect(expr.operands().size())
+      ? sub_size * range_spect::to_range_spect(bitst{expr.operands().size()})
       : full_r_s + size;
 
   for(const auto &op : expr.operands())

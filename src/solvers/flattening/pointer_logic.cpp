@@ -61,7 +61,7 @@ exprt pointer_logict::pointer_expr(
   const mp_integer &object,
   const pointer_typet &type) const
 {
-  return pointer_expr({object, 0}, type);
+  return pointer_expr({object, bytest{0}}, type);
 }
 
 exprt pointer_logict::pointer_expr(
@@ -70,7 +70,7 @@ exprt pointer_logict::pointer_expr(
 {
   if(pointer.object==null_object) // NULL?
   {
-    if(pointer.offset==0)
+    if(pointer.offset == bytest{0})
     {
       return null_pointer_exprt(type);
     }
@@ -106,8 +106,9 @@ exprt pointer_logict::pointer_expr(
 
     // a string constant must be array-typed with fixed size
     const array_typet &array_type = to_array_type(object_expr.type());
-    mp_integer array_size =
-      numeric_cast_v<mp_integer>(to_constant_expr(array_type.size()));
+    // each array element is one byte
+    const bytest array_size =
+      numeric_cast_v<bytest>(to_constant_expr(array_type.size()));
     if(array_size > pointer.offset)
     {
       to_array_type(subtype).size() =
@@ -133,13 +134,13 @@ exprt pointer_logict::pointer_expr(
     return typecast_exprt::conditional_cast(base, type);
 
   const auto object_size = pointer_offset_size(be.op().type(), ns);
-  if(object_size.has_value() && *object_size <= 1)
+  if(object_size.has_value() && *object_size <= bytest{1})
   {
     return typecast_exprt::conditional_cast(
       plus_exprt(base, from_integer(pointer.offset, pointer_diff_type())),
       type);
   }
-  else if(object_size.has_value() && pointer.offset % *object_size == 0)
+  else if(object_size.has_value() && pointer.offset % *object_size == bytest{0})
   {
     return typecast_exprt::conditional_cast(
       plus_exprt(
