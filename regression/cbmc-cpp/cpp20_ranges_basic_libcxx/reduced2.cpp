@@ -200,7 +200,7 @@ namespace __attribute__(()) std
   {
     {
       __lhs = std::forward<_Rhs>(__rhs)
-      } -> same_as<_Lhs>;
+    } -> same_as<_Lhs>;
   };
   template <class>
   constexpr bool is_nothrow_destructible_v =
@@ -240,8 +240,8 @@ namespace __attribute__(()) std
   template <bool, class _Tp = void>
   using enable_if_t = type;
   template <class _Tp>
-  __attribute__(()) __attribute__(()) __attribute__(())
-  __libcpp_remove_reference_t<_Tp>
+  __attribute__(()) __attribute__(())
+  __attribute__(()) __libcpp_remove_reference_t<_Tp>
     move(_Tp);
   namespace ranges
   {
@@ -276,7 +276,7 @@ namespace __attribute__(()) std
   {
     {
       std::forward<_Tp>
-      } -> __boolean_testable_impl;
+    } -> __boolean_testable_impl;
   };
   template <
     class _Tp,
@@ -300,7 +300,7 @@ namespace __attribute__(()) std
   {
     {
       __u != __t
-      } -> __boolean_testable;
+    } -> __boolean_testable;
   };
   template <class _Tp>
   concept equality_comparable = __weakly_equality_comparable_with<_Tp, _Tp>;
@@ -328,8 +328,8 @@ namespace __attribute__(()) std
   template <class _Fn, class... _Args>
   using invoke_result_t = __invoke_result_t<_Fn, _Args...>;
   template <class _Fn, class... _Args>
-  __attribute__(()) __attribute__(()) __attribute__(())
-  invoke_result_t<_Fn, _Args...>
+  __attribute__(()) __attribute__(())
+  __attribute__(()) invoke_result_t<_Fn, _Args...>
   invoke(_Fn, _Args &&...);
   template <class _Fn, class... _Args>
   concept invocable = requires(_Fn __fn, _Args... __args)
@@ -366,7 +366,7 @@ namespace __attribute__(()) std
   {
     {
       __u >= __t
-      } -> __boolean_testable;
+    } -> __boolean_testable;
   };
   template <class _Tp>
   concept totally_ordered =
@@ -400,8 +400,8 @@ namespace __attribute__(()) std
     using type = __type_pack_element<_Ip, _Tp...>;
   };
   template <decltype(sizeof(int)) _Ip, class... _Tp>
-  __attribute__(()) __attribute__(()) __attribute__(())
-  tuple_element<_Ip, tuple<_Tp...>>::type
+  __attribute__(()) __attribute__(())
+  __attribute__(()) tuple_element<_Ip, tuple<_Tp...>>::type
   get(const tuple<_Tp...>);
   template <class>
   struct __cond_value_type;
@@ -445,7 +445,7 @@ namespace __attribute__(()) std
   {
     {
       __t
-      } -> __referenceable;
+    } -> __referenceable;
   };
   template <__dereferenceable _Tp>
   using iter_reference_t = decltype(*std::declval<_Tp>());
@@ -506,7 +506,7 @@ namespace __attribute__(()) std
   {
     {
       ranges::iter_move
-      } -> __referenceable;
+    } -> __referenceable;
   }
   using iter_rvalue_reference_t =
     decltype(ranges::iter_move(std::declval<_Tp>()));
@@ -515,7 +515,7 @@ namespace __attribute__(()) std
   {
     {
       ranges::iter_move(__i)
-      } -> same_as<iter_rvalue_reference_t<_In>>;
+    } -> same_as<iter_rvalue_reference_t<_In>>;
   }
   &&common_reference_with<iter_reference_t<_In>, iter_value_t<_In> &>
     &&common_reference_with<
@@ -548,14 +548,14 @@ namespace __attribute__(()) std
   {
     {
       __i++
-      } -> same_as<_Ip>;
+    } -> same_as<_Ip>;
   };
   template <class _Ip>
   concept input_or_output_iterator = requires(_Ip __i)
   {
     {
       __i
-      } -> __referenceable;
+    } -> __referenceable;
   }
   &&weakly_incrementable<_Ip>;
   template <class _Sp, class _Ip>
@@ -571,7 +571,7 @@ namespace __attribute__(()) std
   {
     {
       __i - __s
-      } -> same_as<iter_difference_t<_Ip>>;
+    } -> same_as<iter_difference_t<_Ip>>;
   };
   template <class _Iter>
   struct __iter_traits_cache
@@ -624,7 +624,7 @@ namespace __attribute__(()) std
   {
     {
       __i--
-      } -> same_as<_Ip>;
+    } -> same_as<_Ip>;
   };
   template <class _Ip>
   concept random_access_iterator =
@@ -635,7 +635,7 @@ namespace __attribute__(()) std
   {
     {
       __j[__n]
-      } -> same_as<iter_reference_t<_Ip>>;
+    } -> same_as<iter_reference_t<_Ip>>;
   };
   template <class _Fp, class _It>
   concept indirectly_regular_unary_invocable =
@@ -672,7 +672,7 @@ namespace __attribute__(()) std
   {
     {
       static_cast<::std::__decay_t<decltype((__t.begin()))>>(__t.begin())
-      } -> input_or_output_iterator;
+    } -> input_or_output_iterator;
   };
   struct Trans_NS___begin___fn
   {
@@ -702,7 +702,7 @@ namespace __attribute__(()) std
   {
     {
       static_cast<::std::__decay_t<decltype((__t.end()))>>(__t.end())
-      } -> sentinel_for<iterator_t<_Tp>>;
+    } -> sentinel_for<iterator_t<_Tp>>;
   };
   struct Trans_NS___end___fn
   {
@@ -783,8 +783,8 @@ namespace __attribute__(()) std
       class = enable_if_t<is_invocable_v<_Op, _BoundArgs..., _Args...>>>
     __attribute__(()) __attribute__(()) __attribute__(()) auto
     operator()(_Args &&...__args) const -> decltype(_Op()(
-      std::get<_Idx>(__bound_args_)...,
-      std::forward<_Args>(__args)...));
+                                          std::get<_Idx>(__bound_args_)...,
+                                          std::forward<_Args>(__args)...));
   };
   template <class _Op, class... _Args>
   using __perfect_forward =
@@ -815,7 +815,7 @@ namespace __attribute__(()) std
   {
     {
       static_cast<::std::__decay_t<decltype(0)>>(__t.size0)
-      } -> __integer_like;
+    } -> __integer_like;
   };
   template <class _Tp>
   concept __unqualified_size = __size_enabled<_Tp> && __member_size<_Tp> &&
@@ -823,7 +823,7 @@ namespace __attribute__(()) std
   {
     {
       static_cast<::std::__decay_t<decltype(0)>>(0)
-      } -> __integer_like;
+    } -> __integer_like;
   };
   template <class _Tp>
   concept __difference =
@@ -832,14 +832,14 @@ namespace __attribute__(()) std
   {
     {
       ranges::end(__t)
-      } -> sized_sentinel_for<decltype(ranges::begin(std::declval<_Tp>()))>;
+    } -> sized_sentinel_for<decltype(ranges::begin(std::declval<_Tp>()))>;
   };
   struct Trans_NS___size___fn
   {
     template <__difference _Tp>
     __attribute__(()) __attribute__(()) __attribute__(()) auto
     operator()(_Tp &&__t) const -> decltype(std::__to_unsigned_like(
-      ranges::end(__t) - ranges::begin(__t)));
+                                  ranges::end(__t) - ranges::begin(__t)));
   };
   inline namespace
   {
@@ -903,7 +903,7 @@ namespace __attribute__(()) std
     {
       ranges::__derived_from_range_adaptor_closure(
         (remove_cvref_t<_Tp> *)nullptr)
-      } -> same_as<remove_cvref_t<_Tp>>;
+    } -> same_as<remove_cvref_t<_Tp>>;
   };
   template <ranges::range _Range, _RangeAdaptorClosure _Closure>
   requires invocable<_Closure, _Range> __attribute__(()) __attribute__(())
@@ -978,11 +978,11 @@ namespace __attribute__(()) std
   {
     template <class _Fn, class _BoundArgs, class... _Args>
     __attribute__(()) __attribute__(()) __attribute__(()) constexpr auto
-    operator()(_Fn &&__f, _BoundArgs &&__bound_args, _Args &&...__args)
-      const noexcept -> decltype(std::invoke(
-        std::forward<_Fn>(__f),
-        std::forward<_Args>(__args)...,
-        std::get<_Ip>(std::forward<_BoundArgs>(__bound_args))...));
+    operator()(_Fn &&__f, _BoundArgs &&__bound_args, _Args &&...__args) const
+      noexcept -> decltype(std::invoke(
+                 std::forward<_Fn>(__f),
+                 std::forward<_Args>(__args)...,
+                 std::get<_Ip>(std::forward<_BoundArgs>(__bound_args))...));
   };
   template <class _Fn, class _BoundArgs>
   struct __bind_back_t : __perfect_forward<

@@ -3,7 +3,10 @@ struct Point
 {
   int x;
   int y;
+  // clang-format 18 splits <=> in C++17 mode
+  // clang-format off
   auto operator<=>(const Point &) const = default;
+  // clang-format on
 };
 
 int main()

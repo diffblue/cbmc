@@ -8,7 +8,7 @@ concept deref_to_int = requires(T t)
 {
   {
     *t
-    } -> same_as_test<int &>;
+  } -> same_as_test<int &>;
 };
 
 struct A

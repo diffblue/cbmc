@@ -4,8 +4,8 @@ struct S
   void f() noexcept;
   void g() noexcept(true);
   void h() throw();
-  int value() const &noexcept;
-  int value() &&noexcept;
+  int value() const & noexcept;
+  int value() && noexcept;
 };
 
 void S::f() noexcept

@@ -7,6 +7,6 @@ void f() noexcept
 int main()
 {
   int *p = nullptr;
-  __CPROVER_assert(p == 0 &&noexcept(f()), "nullptr and noexcept");
+  __CPROVER_assert(p == 0 && noexcept(f()), "nullptr and noexcept");
   __CPROVER_assert(false, "WRONG (must FAIL)");
 }

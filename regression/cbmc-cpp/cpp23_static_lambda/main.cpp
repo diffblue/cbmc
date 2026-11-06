@@ -11,16 +11,10 @@ int apply3(F f)
 }
 int main()
 {
-  auto twice = [](int x) static
-  {
-    return 2 * x;
-  };
+  auto twice = [](int x) static { return 2 * x; };
   __CPROVER_assert(twice(4) == 8, "static lambda");
   __CPROVER_assert(apply3(twice) == 6, "static lambda through a template");
-  auto cx = [](int x) static constexpr
-  {
-    return x + 1;
-  };
+  auto cx = [](int x) static constexpr { return x + 1; };
   __CPROVER_assert(cx(1) == 2, "static constexpr lambda");
   int n = 0;
   auto counter = [n]() mutable { return ++n; };

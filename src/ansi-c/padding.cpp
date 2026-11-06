@@ -95,8 +95,8 @@ static bytest apply_pragma_pack(const typet &type, bytest alignment)
   const typet *t = &type;
   while(t->find(ID_C_pragma_pack).is_nil() && t->id() == ID_array)
     t = &to_array_type(*t).element_type();
-  const auto cap = numeric_cast<bytest>(
-    static_cast<const exprt &>(t->find(ID_C_pragma_pack)));
+  const auto cap =
+    numeric_cast<bytest>(static_cast<const exprt &>(t->find(ID_C_pragma_pack)));
   if(cap.has_value() && *cap > bytest{0} && *cap < alignment)
     return *cap;
   return alignment;
@@ -113,8 +113,7 @@ static bool is_layout_member(const struct_union_typet::componentt &c)
 
 /// \return the alignment of the C++ base-class subobject that starts with
 ///   component \p c (recorded by cpp_typecheck_bases.cpp), 0 otherwise
-static bytest
-base_subobject_alignment(const struct_union_typet::componentt &c)
+static bytest base_subobject_alignment(const struct_union_typet::componentt &c)
 {
   const irep_idt &recorded = c.get(ID_C_base_alignment);
   return recorded.empty() ? bytest{0}

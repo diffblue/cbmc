@@ -60,11 +60,13 @@ struct bbt<tuple<_B>>
   }
 };
 template <class... _Args>
-auto bb(_Args &&...__args) noexcept -> decltype(bbt<tuple<int>>(
-  std::forward_as_tuple(std::forward<_Args>(__args)...)));
+auto bb(_Args &&...__args) noexcept
+  -> decltype(bbt<tuple<int>>(
+    std::forward_as_tuple(std::forward<_Args>(__args)...)));
 template <class... _Args>
-auto bb(_Args &&...__args) noexcept -> decltype(bbt<tuple<int>>(
-  std::forward_as_tuple(std::forward<_Args>(__args)...)))
+auto bb(_Args &&...__args) noexcept
+  -> decltype(bbt<tuple<int>>(
+    std::forward_as_tuple(std::forward<_Args>(__args)...)))
 {
   return bbt<tuple<int>>(std::forward_as_tuple(std::forward<_Args>(__args)...));
 }

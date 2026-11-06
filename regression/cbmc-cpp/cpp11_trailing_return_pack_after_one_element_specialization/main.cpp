@@ -61,9 +61,9 @@ struct inv1<C, T1, R, false> : inv_functor
 // specialization's elements (the shape of the MSVC STL's std::invoke)
 template <class C, class T1, class... T2>
 auto invoke(C &&c, T1 &&a1, T2 &&...a2) -> decltype(inv1<C, T1>::call(
-  static_cast<C &&>(c),
-  static_cast<T1 &&>(a1),
-  static_cast<T2 &&>(a2)...))
+                                          static_cast<C &&>(c),
+                                          static_cast<T1 &&>(a1),
+                                          static_cast<T2 &&>(a2)...))
 {
   return inv1<C, T1>::call(
     static_cast<C &&>(c), static_cast<T1 &&>(a1), static_cast<T2 &&>(a2)...);

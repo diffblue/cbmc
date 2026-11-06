@@ -24,7 +24,7 @@ concept compound_iterator = requires(It it)
 {
   {
     it++
-    } -> can_reference;
+  } -> can_reference;
 };
 // libstdc++'s __normal_iterator over a pointer to an incomplete class
 template <class P>

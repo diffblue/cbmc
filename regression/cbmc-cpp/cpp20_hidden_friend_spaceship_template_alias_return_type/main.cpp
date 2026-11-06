@@ -17,8 +17,11 @@ template <typename T>
 struct iter
 {
   T p;
+  // clang-format 18 splits <=> in C++17 mode
+  // clang-format off
   template <typename U>
   friend detail::three_way_t<T, U> operator<=>(const iter &l, const iter<U> &r)
+  // clang-format on
   {
     return l.p < r.p   ? std::strong_ordering::less
            : r.p < l.p ? std::strong_ordering::greater

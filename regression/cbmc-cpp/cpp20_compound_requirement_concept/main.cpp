@@ -16,7 +16,7 @@ concept has_self_add = requires(_Tp __t)
 {
   {
     __t + __t
-    } -> same_as_<_Tp>;
+  } -> same_as_<_Tp>;
 };
 
 struct vec2

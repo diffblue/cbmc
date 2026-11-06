@@ -11,7 +11,7 @@ concept has_begin = requires(T & t)
 {
   {
     t.begin()
-    } -> pointer_like;
+  } -> pointer_like;
 };
 struct range
 {

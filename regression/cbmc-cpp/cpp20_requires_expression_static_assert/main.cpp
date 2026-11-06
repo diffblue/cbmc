@@ -10,24 +10,16 @@ struct S
   void f();
   S operator+(const S &) const;
 };
-static_assert(
-  requires(S s) { s.x; },
-  "member");
-static_assert(
-  requires(S s) { s.f(); },
-  "member function call");
-static_assert(
-  requires(S a, S b) { a + b; },
-  "two parameters");
+static_assert(requires(S s) { s.x; }, "member");
+static_assert(requires(S s) { s.f(); }, "member function call");
+static_assert(requires(S a, S b) { a + b; }, "two parameters");
 static_assert(
   requires(S s) {
     typename S;
     s.x;
   },
   "type and simple requirement");
-static_assert(
-  requires { typename S; },
-  "no parameters");
+static_assert(requires { typename S; }, "no parameters");
 template <class U>
 concept HasX = requires(U u)
 {
@@ -36,8 +28,7 @@ concept HasX = requires(U u)
 static_assert(HasX<S>, "concept, still");
 int check(S s)
 {
-  static_assert(
-    requires(S t) { t.x; }, "block scope");
+  static_assert(requires(S t) { t.x; }, "block scope");
   return requires(S t)
   {
     t.f();

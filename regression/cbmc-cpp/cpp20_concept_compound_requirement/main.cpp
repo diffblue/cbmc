@@ -12,7 +12,7 @@ concept PreIncReturnsRef = requires(T a)
 {
   {
     ++a
-    } -> SameAs<T &>;
+  } -> SameAs<T &>;
 };
 
 template <class T>
@@ -20,7 +20,7 @@ concept PlusReturnsValue = requires(T a)
 {
   {
     a + a
-    } -> SameAs<T>;
+  } -> SameAs<T>;
 };
 
 int main()

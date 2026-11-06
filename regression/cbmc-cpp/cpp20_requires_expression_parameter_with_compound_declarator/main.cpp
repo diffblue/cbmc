@@ -21,7 +21,6 @@ int main()
     } &&
       requires(int (*fp)(int)) { fp(1); } && callable_with_int<int>,
     "parameters declared");
-  __CPROVER_assert(
-    !requires(int (*fp)(int)) { fp(1); }, "WRONG (must FAIL)");
+  __CPROVER_assert(!requires(int (*fp)(int)) { fp(1); }, "WRONG (must FAIL)");
   return 0;
 }

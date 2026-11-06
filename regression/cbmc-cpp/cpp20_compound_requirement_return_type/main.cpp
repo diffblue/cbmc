@@ -28,7 +28,7 @@ concept has_integral_minus = requires(const T &a, const T &b)
 {
   {
     a - b
-    } -> integral_;
+  } -> integral_;
 };
 struct no_minus
 {

@@ -60,7 +60,10 @@ struct ByValue
 struct Spaceship
 {
   int x;
+  // clang-format 18 splits <=> in C++17 mode
+  // clang-format off
   auto operator<=>(const Spaceship &) const = default;
+  // clang-format on
 };
 struct NestedNoEquality
 {

@@ -28,7 +28,7 @@ concept my_assignable_from = std::common_reference_with<
 {
   {
     __lhs = static_cast<_Rhs &&>(__rhs)
-    } -> std::same_as<_Lhs>;
+  } -> std::same_as<_Lhs>;
 };
 
 int main()

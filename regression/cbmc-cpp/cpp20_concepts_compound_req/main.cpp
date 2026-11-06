@@ -10,7 +10,7 @@ concept HasIntSize = requires(T c)
 {
   {
     c.size()
-    } -> same_as<int>;
+  } -> same_as<int>;
 };
 
 // This should NOT satisfy HasIntSize (size() returns unsigned long)

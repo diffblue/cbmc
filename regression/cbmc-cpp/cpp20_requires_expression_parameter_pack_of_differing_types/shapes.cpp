@@ -13,14 +13,14 @@ concept k_long2 = requires(A && a, B &&b)
 {
   {
     k(static_cast<A &&>(a), static_cast<B &&>(b))
-    } -> same_long;
+  } -> same_long;
 };
 template <class... A>
 concept k_long = requires(A && ...a)
 {
   {
     k(static_cast<A &&>(a)...)
-    } -> same_long;
+  } -> same_long;
 };
 template <class... A>
 concept k_call = requires(A && ...a)

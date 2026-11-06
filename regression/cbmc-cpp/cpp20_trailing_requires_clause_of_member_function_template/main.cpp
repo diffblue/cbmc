@@ -34,11 +34,10 @@ public:
 };
 int main()
 {
-      int a[3] = {1, 2, 3};
-      ref<int[3]> v(a);
-      __CPROVER_assert(
-        v.base()[2] == 3 && ref<int>::size('c') == 1,
-        "constrained members viable");
-      __CPROVER_assert(v.base()[2] == 2, "WRONG (must FAIL)");
-      return 0;
+  int a[3] = {1, 2, 3};
+  ref<int[3]> v(a);
+  __CPROVER_assert(
+    v.base()[2] == 3 && ref<int>::size('c') == 1, "constrained members viable");
+  __CPROVER_assert(v.base()[2] == 2, "WRONG (must FAIL)");
+  return 0;
 }

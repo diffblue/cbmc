@@ -12,7 +12,7 @@ concept __member_begin = requires(_Tp __t)
 {
   {
     __t.begin
-    } -> input_or_output_iterator;
+  } -> input_or_output_iterator;
   __t;
 };
 } // namespace ranges::__cust_access

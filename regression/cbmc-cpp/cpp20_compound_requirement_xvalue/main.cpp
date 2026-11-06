@@ -38,49 +38,49 @@ concept LRef = requires(F f)
 {
   {
     f()
-    } -> same_as<int &>;
+  } -> same_as<int &>;
 };
 template <class F>
 concept RRef = requires(F f)
 {
   {
     f()
-    } -> same_as<int &&>;
+  } -> same_as<int &&>;
 };
 template <class F>
 concept PR = requires(F f)
 {
   {
     f()
-    } -> same_as<int>;
+  } -> same_as<int>;
 };
 template <class P>
 concept DerefLRef = requires(P p)
 {
   {
     *p
-    } -> same_as<int &>;
+  } -> same_as<int &>;
 };
 template <class P>
 concept MoveDeref = requires(P p)
 {
   {
     static_cast<int &&>(*p)
-    } -> same_as<int &&>;
+  } -> same_as<int &&>;
 };
 template <class T>
 concept MemberMove = requires(T t)
 {
   {
     t.mv()
-    } -> same_as<int &&>;
+  } -> same_as<int &&>;
 };
 template <class T>
 concept MemberRead = requires(T t)
 {
   {
     t.m
-    } -> same_as<int &>;
+  } -> same_as<int &>;
 };
 
 static_assert(LRef<int &(*)()>, "lvalue-returning call: int&");
