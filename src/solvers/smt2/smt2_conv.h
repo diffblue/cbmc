@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/pointer_expr.h>
 #include <util/std_expr.h>
-#include <util/threeval.h>
 
 #include <cstdint>
 #include <map>
@@ -73,12 +72,25 @@ public:
 
   exprt handle(const exprt &expr) override;
   void set_to(const exprt &expr, bool value) override;
-  exprt get(const exprt &expr) const override;
   std::string decision_procedure_text() const override;
-  void print_assignment(std::ostream &out) const override;
+
+  // unimplemented
+  exprt get(const exprt &expr) const override
+  {
+    UNIMPLEMENTED;
+  }
+
+  // unimplemented
+  void print_assignment(std::ostream &out) const override
+  {
+    UNIMPLEMENTED;
+  }
 
   /// Unimplemented
-  void push() override;
+  void push() override
+  {
+    UNIMPLEMENTED;
+  }
 
   /// Currently, only implements a single stack element (no nested contexts)
   void push(const std::vector<exprt> &_assumptions) override;
@@ -164,7 +176,6 @@ protected:
   void convert_string_literal(const std::string &);
 
   literalt convert(const exprt &expr);
-  tvt l_get(literalt l) const;
 
   // auxiliary methods
   exprt prepare_for_convert_expr(const exprt &expr);
@@ -251,12 +262,10 @@ protected:
     // `identifier_map`.
     bool is_bound;
     typet type;
-    exprt value;
 
     identifiert(typet type, bool is_bound)
       : is_bound(is_bound), type(std::move(type))
     {
-      value.make_nil();
     }
   };
 
@@ -291,7 +300,6 @@ protected:
 
   // Boolean part
   std::size_t no_boolean_variables;
-  std::vector<bool> boolean_assignment;
 };
 
 #endif // CPROVER_SOLVERS_SMT2_SMT2_CONV_H
