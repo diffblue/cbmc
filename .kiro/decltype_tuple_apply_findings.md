@@ -16140,3 +16140,25 @@ per-commit compile (12), platform (gcc11, m32, arm64), MSVC .ii, macOS
 CI's gcc-16 job in the gcc16-gate container: 2099/2107; the 8 failures
 fail the same way with W199 and W200 (container differences, openSUSE).
 Not done: std::thread (#305), coroutines, modules, reflection.
+
+## Round 222 (2026-11-06): rebase onto develop + feature/bits-bytes
+
+Rebased all 3459 commits from a52190139e onto tautschnig/feature/bits-bytes
+(2de63769c2: two commits on origin/develop 4839902f01).  bits-bytes makes
+pointer_offset_bits/member_offset_bits return bitst, pointer_offset_size/
+member_offset/alignment/compute_pointer_offset bytest, and
+config.ansi_c.alignment a bytest.  Adapted (in the commits that introduced
+the code): padding.cpp (alignment_rec memo, explicit_member_alignment,
+apply_pragma_pack, base_subobject_alignment, union padding in bitst),
+pointer_offset_size.cpp (cycle-guarded _rec variants), lower_byte_operators,
+simplify_expr_struct/int, and the C++ layout code (bases, compound type,
+virtual tables, dynamic_cast, base_subobjectt::offset is bytest,
+[[no_unique_address]] placement).  develop's configt::rounding_mode_identifier
+also needed symex_assign.cpp.  Per-commit compile was checked for the 100
+commits that touch these APIs; three end-of-branch commits: the clang-format
+18.1.8 reformatting (develop's new CI), doxygen 1.15 markup, and (folded into
+its commit) operator_is_overloaded's built-in candidate check as a helper
+(cpplint fn_size).  Checks: 13 suites, profiles, vacuity, unit, platform
+(gcc11/m32/arm64), MSVC, macOS, GCC 14 C++26 set, GCC 16 container (same
+8 container-only failures as round 221), IWYU gate, doxygen 1.15, cpplint,
+clang-format 18.1.8.
