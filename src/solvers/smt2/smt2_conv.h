@@ -236,6 +236,35 @@ protected:
   void flatten2bv(const exprt &);
   void unflatten(wheret, const typet &, unsigned nesting=0);
 
+  /// Cache of pre-declared auxiliary base arrays used by \ref unflatten when
+  /// `use_as_const` is false. Maps array types to SMT2 identifier names.
+  std::map<typet, std::string> unflatten_cache;
+  std::size_t unflatten_counter = 0;
+
+  /// Declare an auxiliary SMT2 array variable for use as the base in
+  /// \ref unflatten when `use_as_const` is false. The declaration is
+  /// emitted to \ref out and cached in \ref unflatten_cache so that
+  /// repeated calls for the same array type reuse the same variable.
+  /// \param array_type: the array type to declare a base variable for
+  /// \return the SMT2 identifier name of the declared variable
+  std::string declare_unflatten_base(const array_typet &array_type);
+
+  /// Emit a single `<idx> <unflattened-element>` pair for index \p i of
+  /// \p array_type, taking the bits at `[offset, offset + subtype_width)`
+  /// from `?ufop<nesting>`. The caller is responsible for emitting the
+  /// surrounding `(store ...)` and any whitespace.
+  /// \param array_type: the array type whose element is being emitted
+  /// \param i: the array index
+  /// \param offset: the bit offset within the flattened bit-vector
+  /// \param subtype_width: the width of the element in bits
+  /// \param nesting: the current `?ufop` let-binding nesting level
+  void unflatten_store_pair(
+    const array_typet &array_type,
+    const mp_integer &i,
+    std::size_t offset,
+    std::size_t subtype_width,
+    unsigned nesting);
+
   // pointers
   pointer_logict pointer_logic;
   void convert_address_of_rec(
