@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "irep.h"
 
 #include <functional>
+#include <optional>
 
 class constant_exprt;
 class exprt;
@@ -111,5 +112,13 @@ constant_exprt make_boolean_expr(bool);
 /// return the other expression. If one is `false` returns `false`.
 DEPRECATED(SINCE(2025, 6, 25, "use conjunction(exprt, exprt) instead"))
 exprt make_and(exprt a, exprt b);
+
+/// Returns an expression that holds iff the arrays \p lhs and \p rhs have the
+/// same size and the same elements. Unlike `equal_exprt`, this permits array
+/// types that differ in their size expressions only, as is the case for two
+/// variable-length arrays declared with the same size.
+/// \return The equality expression, or an empty optional if \p lhs and \p rhs
+///   are not arrays of the same element type and known size.
+std::optional<exprt> make_array_equality(const exprt &lhs, const exprt &rhs);
 
 #endif // CPROVER_UTIL_EXPR_UTIL_H

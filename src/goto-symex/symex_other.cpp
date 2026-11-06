@@ -9,13 +9,14 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution
 
-#include "goto_symex.h"
-
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
+#include <util/expr_util.h>
 #include <util/pointer_offset_size.h>
 #include <util/std_code.h>
+
+#include "goto_symex.h"
 
 void goto_symext::havoc_rec(
   statet &state,
@@ -219,8 +220,8 @@ void goto_symext::symex_other(
     // 2. find the actual array objects/candidates for objects (via
     // process_array_expr)
     // 3. build an assignment where the lhs is the previous third argument, and
-    // the right-hand side is an equality over the arrays, if their types match;
-    // if the types don't match the result trivially is false
+    // the right-hand side is an equality over the arrays, if their types match
+    // (up to their size expressions); otherwise the result trivially is false
     DATA_INVARIANT(
       code.operands().size() == 3,
       "expected array_equal statement to have three operands");
@@ -233,13 +234,9 @@ void goto_symext::symex_other(
     process_array_expr(state, array1);
     process_array_expr(state, array2);
 
-    exprt rhs;
-
-    // Types don't match? Make it 'false'.
-    if(array1.type() != array2.type())
-      rhs = false_exprt();
-    else
-      rhs = equal_exprt(array1, array2);
+    // Types don't match? Make it 'false', unless these are arrays that
+    // differ in their size expressions only.
+    exprt rhs = make_array_equality(array1, array2).value_or(false_exprt{});
 
     symex_assign(state, code.op2(), rhs);
   }

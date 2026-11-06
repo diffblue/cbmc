@@ -2258,18 +2258,20 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
           throw 0;
         }
 
-        if(expr.arguments().front().type() != expr.arguments().back().type())
+        // Arrays may have types that differ in their size expressions only,
+        // e.g., two variable-length arrays declared with the same size.
+        std::optional<exprt> equality_expr = make_array_equality(
+          expr.arguments().front(), expr.arguments().back());
+        if(!equality_expr.has_value())
         {
           error().source_location = f_op.source_location();
           error() << "equal expects two operands of same type" << eom;
           throw 0;
         }
 
-        equal_exprt equality_expr{
-          expr.arguments().front(), expr.arguments().back()};
-        equality_expr.add_source_location() = expr.source_location();
+        equality_expr->add_source_location() = expr.source_location();
 
-        expr.swap(equality_expr);
+        expr.swap(*equality_expr);
         return;
       }
       else if(
