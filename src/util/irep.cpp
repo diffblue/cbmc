@@ -300,6 +300,16 @@ bool irept::ordering(const irept &other) const
 /// comments are ignored
 int irept::compare(const irept &i) const
 {
+  // Fast path: structurally-shared instances compare equal in O(1).
+  // Without this, dictionaries / std::map<exprt> walk the entire
+  // sub-tree even when both keys point to the same node — this is
+  // a hot path under heavy SMT struct flattening (smt2_convt's
+  // defined_expressions / datatype_map lookups).
+#ifdef SHARING
+  if(data == i.data)
+    return 0;
+#endif
+
   int r;
 
   r=id().compare(i.id());
