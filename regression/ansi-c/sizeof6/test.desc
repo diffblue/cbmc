@@ -1,0 +1,17 @@
+CORE
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The conditional operator's type depends on whether a pointer operand is a null
+pointer constant, i.e. an integer constant expression with value 0 (possibly
+cast to void *). An expression that merely simplifies to 0 but is not an
+integer constant expression (because it reads a runtime variable, uses a comma
+operator, ...) is not a null pointer constant; GCC and Clang agree. Conversely
+any integer constant expression evaluating to 0 is a null pointer constant,
+regardless of the operators used to build it (subtraction, division, shifts,
+...). See src/ansi-c/c_typecheck_expr.cpp:typecheck_expr_trinary.
