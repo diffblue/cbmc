@@ -1,0 +1,11 @@
+CORE wide-pointer-encoding
+main.c
+--wide-pointer-encoding --no-malloc-may-fail
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Wide pointer encoding: byte-level operations on pointer arrays
+see the 192-bit encoding instead of the 64-bit flat address.
+Requires endianness map fix for pointer byte representation.
