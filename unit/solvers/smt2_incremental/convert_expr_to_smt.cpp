@@ -1765,3 +1765,202 @@ TEST_CASE(
     CHECK(test.convert(assignment) == expected);
   }
 }
+
+TEST_CASE("popcount_exprt to SMT conversion", "[core][smt2_incremental]")
+{
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
+  const smt_termt foo = smt_identifier_termt{"foo", smt_bit_vector_sortt{2}};
+  const popcount_exprt popcount{
+    symbol_exprt{"foo", unsignedbv_typet{2}}, signedbv_typet{8}};
+  // Sum of each operand bit, zero-extended to the 8-bit result width.
+  const smt_termt expected = smt_bit_vector_theoryt::add(
+    smt_bit_vector_theoryt::add(
+      smt_bit_vector_constant_termt{0, 8},
+      smt_bit_vector_theoryt::zero_extend(7)(
+        smt_bit_vector_theoryt::extract(0, 0)(foo))),
+    smt_bit_vector_theoryt::zero_extend(7)(
+      smt_bit_vector_theoryt::extract(1, 1)(foo)));
+  CHECK(test.convert(popcount) == expected);
+}
+
+TEST_CASE(
+  "count_leading_zeros_exprt to SMT conversion",
+  "[core][smt2_incremental]")
+{
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
+  const smt_termt foo = smt_identifier_termt{"foo", smt_bit_vector_sortt{2}};
+  const count_leading_zeros_exprt clz{
+    symbol_exprt{"foo", unsignedbv_typet{2}}, false, unsignedbv_typet{8}};
+  const auto one_bit = smt_bit_vector_constant_termt{1, 1};
+  // Most-significant-bit check is outermost: result 0 if bit 1 set, else 1 if
+  // bit 0 set, else 2 (the operand width).
+  const smt_termt expected = smt_core_theoryt::if_then_else(
+    smt_core_theoryt::equal(
+      smt_bit_vector_theoryt::extract(1, 1)(foo), one_bit),
+    smt_bit_vector_constant_termt{0, 8},
+    smt_core_theoryt::if_then_else(
+      smt_core_theoryt::equal(
+        smt_bit_vector_theoryt::extract(0, 0)(foo), one_bit),
+      smt_bit_vector_constant_termt{1, 8},
+      smt_bit_vector_constant_termt{2, 8}));
+  CHECK(test.convert(clz) == expected);
+}
+
+TEST_CASE(
+  "count_trailing_zeros_exprt to SMT conversion",
+  "[core][smt2_incremental]")
+{
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
+  const smt_termt foo = smt_identifier_termt{"foo", smt_bit_vector_sortt{2}};
+  const count_trailing_zeros_exprt ctz{
+    symbol_exprt{"foo", unsignedbv_typet{2}}, false, unsignedbv_typet{8}};
+  const auto one_bit = smt_bit_vector_constant_termt{1, 1};
+  // Least-significant-bit check is outermost: result 0 if bit 0 set, else 1 if
+  // bit 1 set, else 2 (the operand width).
+  const smt_termt expected = smt_core_theoryt::if_then_else(
+    smt_core_theoryt::equal(
+      smt_bit_vector_theoryt::extract(0, 0)(foo), one_bit),
+    smt_bit_vector_constant_termt{0, 8},
+    smt_core_theoryt::if_then_else(
+      smt_core_theoryt::equal(
+        smt_bit_vector_theoryt::extract(1, 1)(foo), one_bit),
+      smt_bit_vector_constant_termt{1, 8},
+      smt_bit_vector_constant_termt{2, 8}));
+  CHECK(test.convert(ctz) == expected);
+}
+
+TEST_CASE("find_first_set_exprt to SMT conversion", "[core][smt2_incremental]")
+{
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
+  const smt_termt foo = smt_identifier_termt{"foo", smt_bit_vector_sortt{2}};
+  const find_first_set_exprt ffs{
+    symbol_exprt{"foo", unsignedbv_typet{2}}, unsignedbv_typet{8}};
+  const auto one_bit = smt_bit_vector_constant_termt{1, 1};
+  // 1-based index of the least-significant set bit, outermost first: 1 if bit 0
+  // set, else 2 if bit 1 set, else 0.
+  const smt_termt expected = smt_core_theoryt::if_then_else(
+    smt_core_theoryt::equal(
+      smt_bit_vector_theoryt::extract(0, 0)(foo), one_bit),
+    smt_bit_vector_constant_termt{1, 8},
+    smt_core_theoryt::if_then_else(
+      smt_core_theoryt::equal(
+        smt_bit_vector_theoryt::extract(1, 1)(foo), one_bit),
+      smt_bit_vector_constant_termt{2, 8},
+      smt_bit_vector_constant_termt{0, 8}));
+  CHECK(test.convert(ffs) == expected);
+}
+
+TEST_CASE("bitreverse_exprt to SMT conversion", "[core][smt2_incremental]")
+{
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
+  SECTION("Multi-bit")
+  {
+    const bitreverse_exprt bitrev{symbol_exprt{"foo", unsignedbv_typet{8}}};
+    const auto result = test.convert(bitrev);
+    CHECK(result.get_sort() == smt_bit_vector_sortt{8});
+  }
+  SECTION("Single-bit identity")
+  {
+    const bitreverse_exprt bitrev1{symbol_exprt{"x", unsignedbv_typet{1}}};
+    const smt_termt x = smt_identifier_termt{"x", smt_bit_vector_sortt{1}};
+    CHECK(test.convert(bitrev1) == x);
+  }
+}
+
+TEST_CASE("bswap_exprt to SMT conversion", "[core][smt2_incremental]")
+{
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
+  const bswap_exprt bswap{symbol_exprt{"foo", unsignedbv_typet{32}}, 8};
+  const smt_termt foo = smt_identifier_termt{"foo", smt_bit_vector_sortt{32}};
+  // bswap32 reverses 4 bytes: extract and concat in reverse
+  const smt_termt expected = smt_bit_vector_theoryt::concat(
+    smt_bit_vector_theoryt::concat(
+      smt_bit_vector_theoryt::concat(
+        smt_bit_vector_theoryt::extract(7, 0)(foo),
+        smt_bit_vector_theoryt::extract(15, 8)(foo)),
+      smt_bit_vector_theoryt::extract(23, 16)(foo)),
+    smt_bit_vector_theoryt::extract(31, 24)(foo));
+  CHECK(test.convert(bswap) == expected);
+}
+
+TEST_CASE("rotate expressions to SMT conversion", "[core][smt2_incremental]")
+{
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
+  const typet u8 = unsignedbv_typet{8};
+  const smt_termt foo = smt_identifier_termt{"foo", smt_bit_vector_sortt{8}};
+
+  SECTION("Constant rotate left")
+  {
+    const shift_exprt rol{symbol_exprt{"foo", u8}, ID_rol, from_integer(3, u8)};
+    const auto result = test.convert(rol);
+    CHECK(result == smt_bit_vector_theoryt::rotate_left(3)(foo));
+  }
+  SECTION("Constant rotate right")
+  {
+    const shift_exprt ror{symbol_exprt{"foo", u8}, ID_ror, from_integer(2, u8)};
+    const auto result = test.convert(ror);
+    CHECK(result == smt_bit_vector_theoryt::rotate_right(2)(foo));
+  }
+  SECTION("Dynamic rotate left")
+  {
+    const shift_exprt rol{
+      symbol_exprt{"foo", u8}, ID_rol, symbol_exprt{"bar", u8}};
+    const smt_termt bar = smt_identifier_termt{"bar", smt_bit_vector_sortt{8}};
+    // rotate_left(foo, bar) = (foo << (bar % 8)) | (foo >> (8 - (bar % 8)))
+    const auto width = smt_bit_vector_constant_termt{8, 8};
+    const auto normalized =
+      smt_bit_vector_theoryt::unsigned_remainder(bar, width);
+    const auto complementary =
+      smt_bit_vector_theoryt::subtract(width, normalized);
+    const smt_termt expected = smt_bit_vector_theoryt::make_or(
+      smt_bit_vector_theoryt::shift_left(foo, normalized),
+      smt_bit_vector_theoryt::logical_shift_right(foo, complementary));
+    CHECK(test.convert(rol) == expected);
+  }
+  SECTION("Dynamic rotate left with narrower distance")
+  {
+    const typet u4 = unsignedbv_typet{4};
+    const shift_exprt rol{
+      symbol_exprt{"foo", u8}, ID_rol, symbol_exprt{"bar", u4}};
+    const auto result = test.convert(rol);
+    CHECK(result.get_sort() == smt_bit_vector_sortt{8});
+  }
+  SECTION("Dynamic rotate right with wider distance")
+  {
+    const typet u16 = unsignedbv_typet{16};
+    const shift_exprt ror{
+      symbol_exprt{"foo", u8}, ID_ror, symbol_exprt{"bar", u16}};
+    const auto result = test.convert(ror);
+    CHECK(result.get_sort() == smt_bit_vector_sortt{8});
+  }
+}
+
+TEST_CASE("bitnand_exprt to SMT conversion", "[core][smt2_incremental]")
+{
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
+  const typet u8 = unsignedbv_typet{8};
+  const smt_termt a = smt_identifier_termt{"a", smt_bit_vector_sortt{8}};
+  const smt_termt b = smt_identifier_termt{"b", smt_bit_vector_sortt{8}};
+  const smt_termt c = smt_identifier_termt{"c", smt_bit_vector_sortt{8}};
+  SECTION("Unary is bit-wise not")
+  {
+    const bitnand_exprt nand{exprt::operandst{symbol_exprt{"a", u8}}, u8};
+    CHECK(test.convert(nand) == smt_bit_vector_theoryt::make_not(a));
+  }
+  SECTION("Binary uses the bvnand factory")
+  {
+    const bitnand_exprt nand{symbol_exprt{"a", u8}, symbol_exprt{"b", u8}};
+    CHECK(test.convert(nand) == smt_bit_vector_theoryt::nand(a, b));
+  }
+  SECTION("Three or more operands is not(and(...))")
+  {
+    const bitnand_exprt nand{
+      exprt::operandst{
+        symbol_exprt{"a", u8}, symbol_exprt{"b", u8}, symbol_exprt{"c", u8}},
+      u8};
+    CHECK(
+      test.convert(nand) ==
+      smt_bit_vector_theoryt::make_not(smt_bit_vector_theoryt::make_and(
+        smt_bit_vector_theoryt::make_and(a, b), c)));
+  }
+}
