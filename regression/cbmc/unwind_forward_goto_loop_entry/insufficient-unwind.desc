@@ -1,0 +1,12 @@
+CORE
+main.c
+--unwind 2 --unwinding-assertions
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.unwind\.0\] line 13 unwinding assertion loop 0: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+The inner loop runs 3 times per outer iteration, so --unwind 2 must not
+suffice.
