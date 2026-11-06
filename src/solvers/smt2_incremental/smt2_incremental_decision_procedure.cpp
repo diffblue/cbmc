@@ -7,6 +7,7 @@
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/expr_util.h>
+#include <util/magic.h>
 #include <util/mathematical_expr.h>
 #include <util/range.h>
 #include <util/simplify_expr.h>
@@ -384,6 +385,98 @@ static exprt lower_rw_ok_pointer_in_range(exprt expr, const namespacet &ns)
     }
   });
   return expr;
+}
+
+/// Returns an expression that is equivalent to \p lhs = \p rhs in C. SMT-LIB
+/// equality of arrays compares the entire index domain, whereas C arrays only
+/// have elements at indices below their size. Arrays are thus compared element
+/// by element: for (not too many) elements of constant number, this keeps the
+/// formula quantifier free; otherwise, a bounded quantifier is used.
+/// \param depth: nesting depth of quantifiers introduced by this function,
+///   used to name their bound variables
+static exprt
+lower_array_equality(const exprt &lhs, const exprt &rhs, std::size_t depth)
+{
+  // Syntactically equal operands need no lowering. Equalities of this kind are
+  // also used to make sure symbols are declared.
+  if(lhs == rhs)
+    return equal_exprt{lhs, rhs};
+
+  if(lhs.type().id() != ID_array)
+    return equal_exprt{lhs, rhs};
+
+  const array_typet &array_type = to_array_type(lhs.type());
+  if(array_type.size().is_nil())
+    return equal_exprt{lhs, rhs};
+
+  const typet &index_type = array_type.index_type();
+  const exprt size =
+    typecast_exprt::conditional_cast(array_type.size(), index_type);
+
+  auto element_equality = [&lhs, &rhs, depth](const exprt &index)
+  {
+    return lower_array_equality(
+      index_exprt{lhs, index}, index_exprt{rhs, index}, depth + 1);
+  };
+
+  // For nested arrays, the limit applies to the total number of elements.
+  std::optional<mp_integer> total_elements = numeric_cast<mp_integer>(size);
+  for(const typet *t = &array_type.element_type();
+      total_elements.has_value() && t->id() == ID_array;
+      t = &to_array_type(*t).element_type())
+  {
+    const auto inner = numeric_cast<mp_integer>(to_array_type(*t).size());
+    if(inner.has_value())
+      *total_elements *= *inner;
+    else
+      total_elements.reset();
+  }
+  if(total_elements.has_value() && *total_elements <= MAX_FLATTENED_ARRAY_SIZE)
+  {
+    const mp_integer size_int = *numeric_cast<mp_integer>(size);
+    exprt::operandst conjuncts;
+    for(mp_integer i = 0; i < size_int; ++i)
+      conjuncts.push_back(element_equality(from_integer(i, index_type)));
+    return conjunction(conjuncts);
+  }
+
+  const symbol_exprt index{
+    "smt2_incremental::array_equality_index$" + std::to_string(depth),
+    index_type};
+  exprt in_bounds = binary_relation_exprt{index, ID_lt, size};
+  if(index_type.id() == ID_signedbv)
+  {
+    in_bounds = and_exprt{
+      binary_relation_exprt{index, ID_ge, from_integer(0, index_type)},
+      std::move(in_bounds)};
+  }
+  return forall_exprt{
+    index, implies_exprt{std::move(in_bounds), element_equality(index)}};
+}
+
+/// Lowers all equalities of arrays in \p expr using `lower_array_equality`,
+/// except for an equality at the root of \p expr if \p keep_root_equality is
+/// set, which is the case for equalities that define one array in terms of
+/// another one.
+static exprt lower_array_equalities(exprt expr, bool keep_root_equality)
+{
+  for(auto &operand : expr.operands())
+    operand = lower_array_equalities(std::move(operand), false);
+
+  if(keep_root_equality || (expr.id() != ID_equal && expr.id() != ID_notequal))
+    return expr;
+
+  const auto &relation = to_binary_relation_expr(expr);
+  const typet &type = relation.lhs().type();
+  // Equalities of structs containing arrays still compare the entire index
+  // domain of those arrays.
+  if(type.id() != ID_array)
+    return expr;
+
+  exprt lowered = lower_array_equality(relation.lhs(), relation.rhs(), 0);
+  if(relation.id() == ID_notequal)
+    return not_exprt{std::move(lowered)};
+  return lowered;
 }
 
 static exprt lower_zero_extend(exprt expr, const namespacet &ns)
@@ -786,7 +879,9 @@ void smt2_incremental_decision_proceduret::set_to(
     debug << "`set_to` (" << std::string{value ? "true" : "false"} << ") -\n  "
           << in_expr.pretty(2, 0) << messaget::eom;
   });
-  const exprt lowered_expr = lower(in_expr);
+  // An equality that is set to true defines the left-hand side, which must
+  // be equal to the right-hand side on all indices in case of arrays.
+  const exprt lowered_expr = lower(in_expr, value);
   PRECONDITION(can_cast_type<bool_typet>(lowered_expr.type()));
 
   define_dependent_functions(lowered_expr);
@@ -872,12 +967,16 @@ void smt2_incremental_decision_proceduret::define_object_properties()
   }
 }
 
-exprt smt2_incremental_decision_proceduret::lower(exprt expression) const
+exprt smt2_incremental_decision_proceduret::lower(
+  exprt expression,
+  bool keep_root_equality) const
 {
   const exprt lowered = struct_encoding.encode(lower_zero_extend(
     lower_enum(
-      lower_byte_operators(
-        lower_floatbv(lower_rw_ok_pointer_in_range(expression, ns)), ns),
+      lower_array_equalities(
+        lower_byte_operators(
+          lower_floatbv(lower_rw_ok_pointer_in_range(expression, ns)), ns),
+        keep_root_equality),
       ns),
     ns));
   log.conditional_output(log.debug(), [&](messaget::mstreamt &debug) {

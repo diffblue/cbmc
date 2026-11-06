@@ -122,7 +122,11 @@ protected:
   /// Performs a combination of transformations which reduces the set of
   /// possible expression forms by expressing these in terms of the remaining
   /// language features.
-  exprt lower(exprt expression) const;
+  /// \param expression: expression to lower
+  /// \param keep_root_equality: do not lower an equality of arrays at the
+  ///   root of \p expression, as is the case for equalities that define one
+  ///   array in terms of another one
+  exprt lower(exprt expression, bool keep_root_equality = false) const;
   std::optional<smt_termt> get_identifier(const exprt &expr) const;
 
   /// Namespace for looking up the expressions which symbol_exprts relate to.
