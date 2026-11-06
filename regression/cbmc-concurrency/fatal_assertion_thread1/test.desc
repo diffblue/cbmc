@@ -1,0 +1,17 @@
+CORE
+main.c
+--div-by-zero-check
+^EXIT=10$
+^SIGNAL=0$
+^\[worker\.division-by-zero\.1\] line 8 division by zero in 10 / divisor: FAILURE$
+^\[main\.assertion\.1\] line 19 before any thread: SUCCESS$
+^\[main\.assertion\.2\] line 26 after the spawn: UNKNOWN$
+^\[bystander\.assertion\.1\] line 14 bystander: UNKNOWN$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+A refuted fatal assertion (here: undefined behaviour) in one thread makes
+proven properties in all threads UNKNOWN, including code that does not follow
+it in the control-flow graph: the bystander thread and the code of main after
+the spawn. Code that runs before any thread starts keeps its status.
