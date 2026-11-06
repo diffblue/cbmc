@@ -199,6 +199,8 @@ __CPROVER_HIDE:;
 #  define __CPROVER_STDIO_H_INCLUDED
 #endif
 
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
+
 FILE *freopen64(const char *filename, const char *mode, FILE *f)
 {
   __CPROVER_HIDE:;
@@ -210,7 +212,8 @@ FILE *freopen64(const char *filename, const char *mode, FILE *f)
   (void)*(char*)f;
 #endif
 
-  return f;
+  __CPROVER_bool error = __VERIFIER_nondet___CPROVER_bool();
+  return error ? (FILE *)0 : f;
 }
 
 /* FUNCTION: fclose */
