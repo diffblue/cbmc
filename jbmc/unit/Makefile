@@ -133,6 +133,8 @@ N_CATCH_TESTS = $(shell \
                   cat $$(find . -name "*.cpp" ) | \
                   grep -c -E "(SCENARIO|TEST_CASE)")
 
+LIBS = -lpthread
+
 CLEANFILES = $(CATCH_TEST) java-testing-utils/java-testing-utils$(LIBEXT)
 
 # only add a dependency for libraries to avoid triggering implicit rules, which
