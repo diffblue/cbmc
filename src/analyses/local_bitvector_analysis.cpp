@@ -170,31 +170,16 @@ local_bitvector_analysist::flagst local_bitvector_analysist::get_rec(
   {
     const auto &plus_expr = to_plus_expr(rhs);
 
-    if(plus_expr.operands().size() >= 3)
+    // A pointer-typed sum has exactly one pointer-typed operand (adding two
+    // pointers is not valid); front-ends typically place it at op0, but
+    // simplification may reorder operands, so search all of them.
+    for(const auto &op : plus_expr.operands())
     {
-      DATA_INVARIANT(
-        plus_expr.op0().type().id() == ID_pointer,
-        "pointer in pointer-typed sum must be op0");
-      return get_rec(plus_expr.op0(), loc_info_src) | flagst::mk_uses_offset();
+      if(op.type().id() == ID_pointer)
+        return get_rec(op, loc_info_src) | flagst::mk_uses_offset();
     }
-    else if(plus_expr.operands().size() == 2)
-    {
-      // one must be pointer, one an integer
-      if(plus_expr.op0().type().id() == ID_pointer)
-      {
-        return get_rec(plus_expr.op0(), loc_info_src) |
-               flagst::mk_uses_offset();
-      }
-      else if(plus_expr.op1().type().id() == ID_pointer)
-      {
-        return get_rec(plus_expr.op1(), loc_info_src) |
-               flagst::mk_uses_offset();
-      }
-      else
-        return flagst::mk_unknown();
-    }
-    else
-      return flagst::mk_unknown();
+
+    return flagst::mk_unknown();
   }
   else if(rhs.id()==ID_minus)
   {
