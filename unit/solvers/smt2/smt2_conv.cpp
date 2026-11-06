@@ -1007,3 +1007,32 @@ TEST_CASE("smt2_convt quantifier definition encoding", "[core][solvers][smt2]")
     }
   }
 }
+
+TEST_CASE(
+  "smt2_convt quantifier nested in another expression",
+  "[core][solvers][smt2]")
+{
+  const unsignedbv_typet bv8{8};
+  const symbol_exprt i{"i", bv8};
+  const exists_exprt quantified{i, equal_exprt{i, from_integer(0, bv8)}};
+  const std::string quant = "(exists ((i (_ BitVec 8))) (= i (_ bv0 8)))";
+
+  GIVEN("a Boolean expression containing a quantifier and the Z3 solver")
+  {
+    const std::string out =
+      convert_handle(not_exprt{quantified}, smt2_convt::solvert::Z3);
+    INFO("SMT2 output:\n" << out);
+
+    THEN("the quantifier is defined by a Boolean variable of its own")
+    {
+      // Only the definition of B0 contains the quantifier, which avoids Z3
+      // returning quantified expressions as values of other symbols.
+      const std::string assertion =
+        "(assert (let ((?def " + quant + ")) (and (=> B0 ?def) (=> ?def B0))))";
+      REQUIRE(out.find(assertion) != std::string::npos);
+      REQUIRE(out.find(quant) == out.rfind(quant));
+      REQUIRE(
+        out.find("(define-fun B1 () Bool (not B0))") != std::string::npos);
+    }
+  }
+}
