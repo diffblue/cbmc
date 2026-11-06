@@ -1,0 +1,13 @@
+CORE
+main.c
+
+^EXIT=(1|64)$
+^SIGNAL=0$
+equal expects two operands of same type
+^CONVERSION ERROR$
+--
+Invariant check failed
+--
+__CPROVER_equal must reject operands of different type rather than violate the
+invariant of equal_exprt. Arrays are only accepted when their element types
+match.

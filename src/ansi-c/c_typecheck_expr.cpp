@@ -2258,16 +2258,16 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
           throw 0;
         }
 
-        equal_exprt equality_expr(
-          expr.arguments().front(), expr.arguments().back());
-        equality_expr.add_source_location() = expr.source_location();
-
-        if(equality_expr.lhs().type() != equality_expr.rhs().type())
+        if(expr.arguments().front().type() != expr.arguments().back().type())
         {
           error().source_location = f_op.source_location();
           error() << "equal expects two operands of same type" << eom;
           throw 0;
         }
+
+        equal_exprt equality_expr{
+          expr.arguments().front(), expr.arguments().back()};
+        equality_expr.add_source_location() = expr.source_location();
 
         expr.swap(equality_expr);
         return;
