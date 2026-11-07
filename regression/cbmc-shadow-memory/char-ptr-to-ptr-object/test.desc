@@ -1,0 +1,15 @@
+CORE
+main.c
+--no-standard-checks
+^EXIT=10$
+^SIGNAL=0$
+^\[main.assertion.1\] .* set: SUCCESS$
+^\[main.assertion.2\] .* unset: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+cannot set_field
+--
+Shadow memory of an object of pointer type is accessible through a character
+pointer, as is any object (C11 6.5p7); it used to be skipped as of
+incompatible type.
