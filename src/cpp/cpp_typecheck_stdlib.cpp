@@ -1959,6 +1959,39 @@ static const std::map<std::string, std::string> &library_source_models()
      " const char *name() const noexcept override { return \"system\"; }"
      " string message(int) const override { return string(); } } __c;"
      " return __c; }"},
+    // libstdc++ src/c++11/functexcept.cc: each __throw_X throws an X (the
+    // message of out_of_range_fmt is not formatted).  Declared
+    // __attribute__((__noreturn__)), but CBMC takes a call of a function
+    // without a body to return: libstdc++ 16's
+    // `if(n > max_size()) __throw_bad_alloc(); else return ...;' in
+    // __new_allocator::allocate then fell off its end and returned an
+    // arbitrary pointer.
+    {"std::__throw_bad_exception", "{ throw bad_exception(); }"},
+    {"std::__throw_bad_alloc", "{ throw bad_alloc(); }"},
+    {"std::__throw_bad_array_new_length", "{ throw bad_array_new_length(); }"},
+    {"std::__throw_bad_cast", "{ throw bad_cast(); }"},
+    {"std::__throw_bad_typeid", "{ throw bad_typeid(); }"},
+    {"std::__throw_bad_function_call", "{ throw bad_function_call(); }"},
+    {"std::__throw_logic_error",
+     "{ throw logic_error(" CPROVER_PREFIX "parameter0); }"},
+    {"std::__throw_domain_error",
+     "{ throw domain_error(" CPROVER_PREFIX "parameter0); }"},
+    {"std::__throw_invalid_argument",
+     "{ throw invalid_argument(" CPROVER_PREFIX "parameter0); }"},
+    {"std::__throw_length_error",
+     "{ throw length_error(" CPROVER_PREFIX "parameter0); }"},
+    {"std::__throw_out_of_range",
+     "{ throw out_of_range(" CPROVER_PREFIX "parameter0); }"},
+    {"std::__throw_out_of_range_fmt",
+     "{ throw out_of_range(" CPROVER_PREFIX "parameter0); }"},
+    {"std::__throw_runtime_error",
+     "{ throw runtime_error(" CPROVER_PREFIX "parameter0); }"},
+    {"std::__throw_range_error",
+     "{ throw range_error(" CPROVER_PREFIX "parameter0); }"},
+    {"std::__throw_overflow_error",
+     "{ throw overflow_error(" CPROVER_PREFIX "parameter0); }"},
+    {"std::__throw_underflow_error",
+     "{ throw underflow_error(" CPROVER_PREFIX "parameter0); }"},
     {"std::__throw_system_error",
      "{ throw system_error(error_code(" CPROVER_PREFIX "parameter0,"
      " generic_category())); }"},
