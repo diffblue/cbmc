@@ -1,0 +1,18 @@
+CORE libcxx
+ranges_find.cpp
+--cpp20 --stdlib libc++ --object-bits 12 --unwind 8
+^\[main\.assertion\.1\] line \d+ find: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body of system-header function
+--
+libc++ (LLVM 18) std::ranges::find on an int array.  With <ranges> included
+CBMC took int * for a segmented iterator: the join_view specialization of
+__segmented_iterator_traits matched although its requires-clause cannot be
+substituted (N5008 [temp.constr.atomic]/3), so the call went to
+__find_segment_if, whose body was dropped.

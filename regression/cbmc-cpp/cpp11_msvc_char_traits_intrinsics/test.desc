@@ -1,0 +1,19 @@
+CORE
+main.ii
+--winx64 --cpp17
+^\[main\.assertion\.1\] line \d+ intrinsics: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+is unknown
+no body for callee
+--
+In Visual Studio mode the front end declared __builtin_strlen and
+__builtin_memcmp only; the MSVC STL's char_traits also call
+__builtin_char_memchr, __builtin_wcslen and __builtin_wmemcmp, and
+<cmath> __builtin_copysign ("symbol ... is unknown", the body of
+basic_string_view::find was dropped).

@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ default template argument: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not be evaluated
+--
+The closure's function call operator was not marked constexpr, so the
+constant evaluator did not evaluate its call: "expected constant
+expression, but got '(unsigned int)plus_one(0)'" (also on develop).  In
+libstdc++ 16, <format>'s __do_vformat_to lost its body through
+__literal_encoding_is_unicode.

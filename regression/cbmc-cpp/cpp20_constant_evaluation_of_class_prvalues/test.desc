@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ case labels evaluated: SUCCESS$
+^\[main\.assertion\.2\] line \d+ default label: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not be evaluated
+dropped the body
+--
+The constant evaluator accepted only scalar results of non-constructor
+calls, did not evaluate a temporary returned by a function (`return
+sv(p + pos, len)'), and lost a pointer into a string literal whose index
+was not a plain constant; a case label was not type-checked as a constant
+expression.  should_escape<char> lost its body ("expected constant
+expression").

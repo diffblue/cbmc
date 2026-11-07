@@ -1,4 +1,4 @@
-CORE
+CORE no-vacuity-check
 main.c
 --pointer-check --bounds-check
 ^EXIT=0$
@@ -6,3 +6,8 @@ main.c
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+--
+no-vacuity-check: the test checks that abort() does not return (it is
+[[noreturn]] and terminates the program, N5008 [support.start.term]/4-5,
+with the semantics of the C library), so the assertion and the end of main
+after it are unreachable.

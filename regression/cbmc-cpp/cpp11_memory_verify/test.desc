@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp11 --unwind 2 --no-unwinding-assertions
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+Type-checking succeeds but --validate-goto-model fails due to
+constexpr (is_macro) functions not being in the goto function map.
+No --depth: --depth 80 cut every path before the end of main.

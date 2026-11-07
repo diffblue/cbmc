@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ cast ==: SUCCESS$
+^\[main\.assertion\.2\] line \d+ cast <: SUCCESS$
+^\[main\.assertion\.3\] line \d+ literals: SUCCESS$
+^\[main\.assertion\.4\] line \d+ lvalues: SUCCESS$
+^\[main\.assertion\.5\] line \d+ unequal: SUCCESS$
+^\[main\.assertion\.6\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The relational and equality operators did not dereference operands of
+reference type, so `static_cast<int &>(a) == static_cast<int &>(b)'
+compared the addresses of a and b.

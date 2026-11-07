@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ function template: SUCCESS$
+^\[main\.assertion\.2\] line \d+ lvalue parameters: SUCCESS$
+^\[main\.assertion\.3\] line \d+ forwarding references: SUCCESS$
+^\[main\.assertion\.4\] line \d+ member function template: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The fold reduction in typecheck_type required exactly one pack_size_map
+entry; typecheck_function_template seeds an empty-pack entry for every
+declared function template, so a second template with a pack blocked it (a
+regression since d568a30139).  The pack is now chosen by the current
+template scope, its placeholders are lvalues, and a callee name in the
+pattern is not taken for the pack.  g++ 13 and clang++ 18 accept this
+program, and it fails only its WRONG assertion.

@@ -1,0 +1,15 @@
+CORE gnu-extensions
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ existing name: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+A clang extension, not ISO C++ (g++ 13 rejects the program, as it does not
+implement the attribute).  clang++ 18 accepts this program, and it fails
+only its WRONG assertion.  Found while reducing an invoke_result_t failure
+with libc++ headers.

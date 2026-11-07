@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ parameter types deduced: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The code type of a member function lists the implicit object parameter
+first; deduction compared the pattern's first parameter A against it, so
+A was deduced as the `this' pointer type (or the pack had one element too
+many) and the partial specializations did not match.

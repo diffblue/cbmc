@@ -28,6 +28,13 @@ void rename_symbolt::insert(
 
 bool rename_symbolt::rename(exprt &dest) const
 {
+  // Nothing to rename: do not walk the tree.  Linking the C library into a
+  // goto model calls this on every function of the program once per library
+  // function added (link_goto_model), almost always with empty maps; the
+  // walk -- three named-sub lookups per node -- was half of a C++ run's time.
+  if(expr_map.empty() && type_map.empty())
+    return true;
+
   bool result=true;
 
   for(auto it = dest.depth_begin(), end = dest.depth_end(); it != end; ++it)
@@ -125,6 +132,22 @@ bool rename_symbolt::rename(typet &dest) const
     return true;
 
   bool result=true;
+
+  // a type written with a typedef name records the typedef symbol, which
+  // find_type_symbols reports as a dependency: rename it along with the
+  // symbol
+  {
+    const irep_idt &typedef_name = dest.get(ID_C_typedef);
+    if(!typedef_name.empty())
+    {
+      type_mapt::const_iterator it = type_map.find(typedef_name);
+      if(it != type_map.end())
+      {
+        dest.set(ID_C_typedef, it->second);
+        result = false;
+      }
+    }
+  }
 
   if(dest.has_subtype())
     if(!rename(to_type_with_subtype(dest).subtype()))
@@ -224,6 +247,12 @@ bool rename_symbolt::have_to_rename(const typet &dest) const
 {
   if(expr_map.empty() && type_map.empty())
     return false;
+
+  {
+    const irep_idt &typedef_name = dest.get(ID_C_typedef);
+    if(!typedef_name.empty() && type_map.find(typedef_name) != type_map.end())
+      return true;
+  }
 
   if(dest.has_subtype())
     if(have_to_rename(to_type_with_subtype(dest).subtype()))

@@ -1,0 +1,16 @@
+CORE
+main.cpp
+
+^file main\.cpp line 6: duplicate direct base class 'X'$
+^CONVERSION ERROR$
+^EXIT=6$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+N5008 [class.mi]/3: "A class shall not be specified as a direct base class of
+a derived class more than once" (an indirect one can, see
+cpp_repeated_base_member_access).  The front end reported this through the
+check for repeated bases ("non-virtual base class tag-X inherited multiple
+times"), which is removed.  g++ 13 ("duplicate base type 'X' invalid") and
+clang++ 18 ("base class 'X' specified more than once") reject this program.

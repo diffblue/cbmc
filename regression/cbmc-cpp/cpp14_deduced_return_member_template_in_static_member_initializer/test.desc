@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ called: SUCCESS$
+^\[main\.assertion\.2\] line \d+ deduced: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Fixed: decltype(invoke()) in a static data member's initializer, where
+invoke calls a member template with a deduced return type, was not int
+while the class was instantiated: element<2>'s deferred definition was
+converted on demand, but the call kept the placeholder type, so invoke's
+return type was not deduced (the "template 'element' not found" was a
+later probe of element<N>(1) as a functional cast).

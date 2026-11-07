@@ -1,0 +1,17 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ most derived: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+cbmc aborted: dynamic_typecast (cpp_typecheck_conversions.cpp) reached
+UNREACHABLE ("currently not supported") for a pointer to void.  The cast
+is now the run-time check of runtime_dynamic_cast with the most derived
+object as the target: the operand minus the offset of its subobject in
+the most derived class.

@@ -1,0 +1,25 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ dsize of a non-POD class: SUCCESS$
+^\[main\.assertion\.2\] line \d+ dsize of a POD class: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+static assertion failed
+could not be evaluated
+--
+Clang's `__datasizeof(T)' is the Itanium C++ ABI's dsize(T) (ABI 2.2: "the
+size of O without tail padding"; 2.4-II: a POD for the purpose of layout has
+dsize == sizeof, otherwise dsize is the end of the last non-static data
+member, 0 for an empty class; non-class types: sizeof, N5008 [expr.sizeof]).
+libc++ 18 preprocessed by clang defines `__libcpp_datasizeof<_Tp>::value =
+__datasizeof(_Tp)' and sizes every basic_string copy (`__constexpr_memmove')
+with it; the unknown builtin left the value unresolved, so
+`std::string("abc")[1]' read nondet under libc++.  The static_asserts were
+checked against clang++-18 (g++ 13 does not have the builtin).  Fixed in
+round 163b.

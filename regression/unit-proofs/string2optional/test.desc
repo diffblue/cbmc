@@ -1,0 +1,23 @@
+KNOWNBUG gcc-only libstdcxx13
+harness.cpp
+--cpp17 -I ../../../src --object-bits 12 --unwind 8 --no-unwinding-assertions
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+FAILURE
+--
+Unit proof for string2optional_int: round trip, stoll PREFIX semantics
+(trailing junk ignored) and nullopt for digit-less input, through the
+wrap_string_conversion layer (lambda + catch of std::invalid_argument).
+g++/clang++ accept the harness and it verifies at runtime.
+libstdcxx13: with GCC 11's headers std::from_chars (__from_chars_digit,
+with __builtin_mul_overflow) made the SAT problem exceed 7 GB, also with
+-99..99 and --unwind 5 (Ubuntu 22.04 and 32-bit CI jobs).
+KNOWNBUG (a scaling limit, as for edit_distance): this proof needs about
+10 GB and 270 s (GCC 13 headers); the THOROUGH job's limit is 2.5 GB.  Before
+libstdc++'s __from_chars_alnum_to_val_table was constant-initialized, its
+run-time construction was cut by --unwind 8, the end of main was
+unreachable, and the proof passed in 5 s without verifying anything.

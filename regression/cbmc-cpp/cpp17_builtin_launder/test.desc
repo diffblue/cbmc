@@ -1,0 +1,22 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ launder yields the same pointer: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [ptr.launder]: std::launder(p) returns a pointer to the object at the
+address p represents; GCC and Clang implement it as the builtin
+`__builtin_launder', which returns its argument (value-wise).  The front
+end used to report "symbol '__builtin_launder' is unknown"; the call is
+now type-checked as its (prvalue pointer) argument.
+libc++'s `std::__launder' (new:337) is exactly `return __builtin_launder(__p)'
+and is dropped for the map node value type in cpp20_map_basic_libcxx
+(round-163 audit); libstdc++'s std::launder uses the same builtin.
+Header-free.  Fails on the round-162 snapshot bin51.

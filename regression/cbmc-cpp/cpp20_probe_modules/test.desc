@@ -1,0 +1,21 @@
+KNOWNBUG
+main.cpp
+--cpp20 m.cpp
+^\[main\.assertion\.1\] line \d+ f from the imported module: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Modules ([module]) are not supported: `import m;' is not resolved, and main
+fails to type-check (CONVERSION ERROR).  A module interface unit on its own
+is accepted (its `export module' declaration is ignored).  Supporting
+modules needs the translation units in dependency order, with the exported
+declarations of each imported module (or header unit) visible in its
+importers ([module.import]/2-3, [module.reach]), rather than CBMC's
+preprocessed-source model.  Checked with GCC 16 (g++ -std=c++20 -fmodules
+m.cpp main.cpp): only the WRONG assertion fails.

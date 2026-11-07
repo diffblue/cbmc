@@ -1,8 +1,14 @@
-KNOWNBUG
+CORE
 main.c
---pointer-check --bounds-check
-^EXIT=0$
+--pointer-check --bounds-check --unwind 3 --unwinding-assertions
+^\[main\.assertion\.5\] line \d+ assertion .*: FAILURE$
+^EXIT=10$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
+^VERIFICATION FAILED$
 --
 ^warning: ignoring
+^\[main\.assertion\.[1-4]\] .*: FAILURE$
+^\[.*\] .* dereference failure: .*: FAILURE$
+--
+C23 7.11.2.1: the "C" locale's values.  Before, every string member of the
+result was a null pointer.

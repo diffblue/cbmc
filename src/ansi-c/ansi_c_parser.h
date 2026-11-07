@@ -30,16 +30,23 @@ public:
     : parsert(message_handler),
       tag_following(false),
       asm_block_following(false),
+      no_unique_address_seen(false),
+      msvc_no_unique_address_seen(false),
       parenthesis_counter(0),
       mode(modet::NONE),
       cpp98(false),
       cpp11(false),
+      cpp20(false),
+      c17(false),
+      c23(false),
       for_has_scope(false),
       ts_18661_3_Floatn_types(false),
       __float128_is_keyword(false),
       float16_type(false),
       bf16_type(false),
-      fp16_type(false)
+      fp16_type(false),
+      clang_preprocessor(false),
+      gcc14_builtins(false)
   {
     // set up global scope
     scopes.clear();
@@ -54,15 +61,21 @@ public:
   // internal state of the scanner
   bool tag_following;
   bool asm_block_following;
+  // a C++ [[no_unique_address]] / [[msvc::no_unique_address]] in the
+  // attribute-specifier being skipped
+  bool no_unique_address_seen;
+  bool msvc_no_unique_address_seen;
   unsigned parenthesis_counter;
   std::string string_literal;
+  std::string raw_string_delimiter;
+  std::string raw_string_pending_close;
   std::list<exprt> pragma_pack;
 
   typedef configt::ansi_ct::flavourt modet;
   modet mode;
 
-  // recognize C++98, C++11, C17, C23 keywords
-  bool cpp98, cpp11, c17, c23;
+  // recognize C++98, C++11, C++20, C17, C23 keywords
+  bool cpp98, cpp11, cpp20, c17, c23;
 
   // in C99 and upwards, for(;;) has a scope
   bool for_has_scope;
@@ -73,6 +86,11 @@ public:
   bool float16_type;
   bool bf16_type;
   bool fp16_type;
+  bool clang_preprocessor;
+  // The "revertible" type trait builtins of GCC 13+/14+ and clang
+  // (__remove_cv, __is_array, __is_function, __is_reference, ...): a
+  // builtin when directly followed by '(' (scanner trailing context).
+  bool gcc14_builtins;
 
   typedef ansi_c_identifiert identifiert;
   typedef ansi_c_scopet scopet;

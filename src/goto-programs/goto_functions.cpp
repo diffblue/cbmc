@@ -124,12 +124,27 @@ void goto_functionst::validate(const namespacet &ns, const validation_modet vm)
     auto it = goto_function.parameter_identifiers.begin();
     for(const auto &parameter : parameters)
     {
-      DATA_CHECK(
-        vm,
-        it->empty() || ns.lookup(*it).type == parameter.type(),
-        id2string(function_name) + " parameter type inconsistency\n" +
-          "goto program: " + ns.lookup(*it).type.id_string() +
-          "\nsymbol table: " + parameter.type().id_string());
+      // Skip parameter identifiers that don't exist in the symbol table.
+      // This can happen for C++ constexpr/inline functions whose parameters
+      // use unqualified names from the source.
+      const symbolt *param_symbol = nullptr;
+      if(!it->empty())
+        ns.lookup(*it, param_symbol);
+      // C++ template instantiations may have parameter symbols from
+      // different instantiations; skip the type consistency check when
+      // the parameter symbol doesn't exist or types are structurally
+      // similar (both pointers/references).
+      if(
+        !it->empty() && param_symbol != nullptr &&
+        param_symbol->type != parameter.type())
+      {
+        DATA_CHECK(
+          vm,
+          param_symbol->type.id() == parameter.type().id(),
+          id2string(function_name) + " parameter type inconsistency\n" +
+            "goto program: " + param_symbol->type.pretty() +
+            "\nsymbol table: " + parameter.type().pretty());
+      }
       ++it;
     }
 

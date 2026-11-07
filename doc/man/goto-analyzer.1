@@ -428,8 +428,11 @@ define preprocessor macro (C/C++)
 \fB\-\-c89\fR, \fB\-\-c99\fR, \fB\-\-c11\fR, \fB\-\-c17\fR, \fB\-\-c23\fR
 set C language standard (default: c11)
 .TP
-\fB\-\-cpp98\fR, \fB\-\-cpp03\fR, \fB\-\-cpp11\fR
+\fB\-\-cpp98\fR, \fB\-\-cpp03\fR, \fB\-\-cpp11\fR, \fB\-\-cpp14\fR, \fB\-\-cpp17\fR, \fB\-\-cpp20\fR, \fB\-\-cpp23\fR, \fB\-\-cpp26\fR
 set C++ language standard (default: cpp98)
+.TP
+\fB\-\-stdlib\fR \fIlib\fR
+C++ standard library to use (e.g., libc++)
 .TP
 \fB\-\-unsigned\-char\fR
 make "char" unsigned by default
@@ -592,6 +595,12 @@ enable debug assertions in the cprover contracts library
 \fB\-\-dfcc\-simple\-invalid\-pointer\-model\fR
 use simplified invalid pointer model in the cprover contracts library
 (faster, unsound)
+.TP
+\fB\-\-c\-library\-models\fR dir
+use the C library models preprocessed into \fIdir\fR by
+\fBcbmc \-\-dump\-c\-library\-models\fR, on this or another host, for the
+same target and library options, instead of preprocessing the built-in
+models with this host's headers
 .SS "Standard Checks"
 From version \fB6.0\fR onwards, \fBcbmc\fR, \fBgoto-analyzer\fR and some other tools
 apply some checks to the program by default (called the "standard checks"), with the

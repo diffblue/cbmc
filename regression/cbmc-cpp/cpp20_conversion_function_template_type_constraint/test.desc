@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ only integral targets: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+The deduction of a conversion function template checked its
+requires-clause only, not the type-constraints of its template
+parameters; `operator T()' with T = aggregate was a candidate, its body
+did not type-check and pick(aggregate) was chosen with a nondet value.

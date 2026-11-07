@@ -1,0 +1,26 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ default member initializer: SUCCESS$
+^\[main\.assertion\.2\] line \d+ member default constructor: SUCCESS$
+^\[main\.assertion\.3\] line \d+ virtual table of the derived class: SUCCESS$
+^\[main\.assertion\.4\] line \d+ default argument of the base: SUCCESS$
+^\[main\.assertion\.5\] line \d+ hidden by a constructor of the class: SUCCESS$
+^\[main\.assertion\.6\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [class.inhctor.init]/1: `D a(5)' with `using B::B;' initializes the
+B subobject by B(int) and the rest of D as a defaulted default constructor
+of D would: k from its default member initializer, mm by M(), and D's
+virtual table pointer.  The front end called B's constructor on the D
+object directly, so none of that happened.  It now declares, for each
+inherited constructor, a constructor of D whose mem-initializer forwards
+the arguments to B's ([namespace.udecl]/11: one with the parameter-type-
+list of D's own constructor is hidden).  bin53 rejects the program
+(`D h("x", 9L)' does not uniquely resolve).  g++ 13 and clang++ 18 accept
+this program, and it fails only its WRONG assertion.

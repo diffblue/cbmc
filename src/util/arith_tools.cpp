@@ -70,6 +70,13 @@ bool to_integer(const constant_exprt &expr, mp_integer &int_value)
       int_value = bvrep2integer(value, width, false);
       return false;
     }
+    else if(underlying_type.id() == ID_c_bool)
+    {
+      // C++ `enum class E : bool' (N5008 [dcl.enum]/2)
+      const auto width = to_c_bool_type(underlying_type).get_width();
+      int_value = bvrep2integer(value, width, false);
+      return false;
+    }
   }
   else if(type_id==ID_c_bit_field)
   {
@@ -176,7 +183,13 @@ constant_exprt from_integer(
       to_floatbv_type(type), ieee_floatt::rounding_modet::ROUND_TO_EVEN);
     // always rounds to zero
     ieee_float.from_integer(int_value);
-    return ieee_float.to_expr();
+    // to_expr() rebuilds the type from the format and drops its comments;
+    // keep the requested one, whose #c_type tells double from a 64-bit long
+    // double (C++ overload resolution: `f(double())' is an exact match for
+    // f(double) only)
+    constant_exprt result = ieee_float.to_expr();
+    result.type() = type;
+    return result;
   }
   else if(type_id == ID_rational)
   {

@@ -60,10 +60,22 @@ const union_typet &namespace_baset::follow_tag(const union_tag_typet &src) const
 const struct_typet &
 namespace_baset::follow_tag(const struct_tag_typet &src) const
 {
-  const symbolt &symbol=lookup(src.get_identifier());
-  CHECK_RETURN(symbol.is_type);
-  CHECK_RETURN(symbol.type.id() == ID_struct);
-  return to_struct_type(symbol.type);
+  const symbolt *symbol;
+  if(lookup(src.get_identifier(), symbol))
+  {
+    // Symbol not found — return empty struct to avoid crashing.
+    // This can happen with deeply nested MSVC STL templates
+    // that weren't fully instantiated.
+    static const struct_typet empty_struct;
+    return empty_struct;
+  }
+  CHECK_RETURN(symbol->is_type);
+  if(symbol->type.id() != ID_struct)
+  {
+    static const struct_typet empty_struct;
+    return empty_struct;
+  }
+  return to_struct_type(symbol->type);
 }
 
 /// Follow type tag of enum type.

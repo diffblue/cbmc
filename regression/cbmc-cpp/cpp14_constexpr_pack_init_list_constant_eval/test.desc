@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp14
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [expr.const] + [temp.inst]/5: a constexpr function template whose
+body initialises a local array from a pack expansion and reads it back in a
+loop (libstdc++'s __find_uniq_type_in_pack) is folded when required as a
+constant: directly, through a wrapping template, as an enable_if default
+template argument, and after a prior run-time use queued its body (the
+constant evaluator now converts the queued definition under its recorded
+template map instead of substituting the parsed body into the caller's
+scope).  The constant evaluator executes for-loops, compound assignments,
+increments, and constexpr local arrays.

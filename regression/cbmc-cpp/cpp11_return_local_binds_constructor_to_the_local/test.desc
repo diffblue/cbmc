@@ -1,0 +1,22 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ moved value: SUCCESS$
+^\[main\.assertion\.2\] line \d+ move: SUCCESS$
+^\[main\.assertion\.3\] line \d+ copied value: SUCCESS$
+^\[main\.assertion\.4\] line \d+ copy without move constructor: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [class.copy.elision]/3, [dcl.init.ref]/5.3.1: `return d;' for a
+local d treats d as an rvalue to select the constructor, whose reference
+parameter binds to d.  The front end removed d's lvalue mark instead, so
+the binding materialized a bitwise copy of d as a temporary, passed it to
+the constructor and destroyed it: one destruction too many for each such
+return (bin53).  The operand is now an xvalue denoting d.  g++ 13 and
+clang++ 18 accept this program, and it fails only its WRONG assertion.

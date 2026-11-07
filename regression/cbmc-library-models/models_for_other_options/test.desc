@@ -1,0 +1,17 @@
+CORE
+main.c
+--no-malloc-may-fail
+^the C library models in 'models\.dir' were not preprocessed for this target and these options; using the built-in models$
+^\[main\.assertion\.1\] line \d+ the built-in model is used: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The models are dumped with the default options and loaded with
+--no-malloc-may-fail, which the models depend on (the manifest records the
+target and the prologue of macros for such options): the directory is not
+used, and the built-in strlen gives 2.

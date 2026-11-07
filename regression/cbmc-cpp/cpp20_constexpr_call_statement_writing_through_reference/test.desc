@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ write through reference argument: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The constant evaluator does not model the write through the reference and
+declines; the variable is then initialized at run time, with the same value.

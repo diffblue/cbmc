@@ -1,0 +1,18 @@
+CORE
+main.cpp
+
+^pointer handling for concurrency is unsound$
+^EXIT=6$
+^SIGNAL=0$
+--
+^VERIFICATION
+--
+Today symbolic execution stops with "pointer handling for concurrency is
+unsound" (goto_symex_state.cpp, #305) before any property is checked; the
+test expects that message.  Once cbmc gets past it, update this desc: the
+test is meant to check the _Lockit model, and with today's model (no
+effect) assertion 1, "one index per id", is expected to FAIL (two threads
+each assign a new index); with a model that excludes the second thread it
+holds, and only "WRONG (must FAIL)" fails.  The program declares _Lockit and
+_Id_cnt without defining them, as the MSVC STL's headers do (the runtime
+defines them); g++ and clang++ accept it with those two definitions added.

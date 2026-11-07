@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+^warning: ignoring
+dropped the body
+--
+std::function with a reference-typed parameter must select the
+function-type partial specialization, so its operator bool / operator()
+are available.
+
+Was KNOWNBUG since round 152 (main() partially type-checked, no diagnostic
+before the drop).  Passes since the round-158 std::function fixes (the
+`_Callable' constraint evaluated through a correct std::__and_, the
+converting constructor's rvalue/const-reference ranking); CORE since
+2026-09-23.

@@ -1,0 +1,23 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ no default constructor at run time: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [meta.unary.prop]/9: is_constructible<T, Args...> holds iff the
+variable definition `T t(declval<Args>()...);' is well-formed (only the
+immediate context counts); for an empty Args that is `T t;'.  The
+built-in __is_constructible(T) (behind std::is_default_constructible<T>)
+was always true when no argument type was given, so a class whose only
+constructor takes an argument counted as default-constructible, and
+libstdc++ pair's default constructors, constrained on
+is_default_constructible of their element types, were not removed from
+overload resolution.  The trait is now decided by attempting the
+construction under SFINAE.  Fails on the round-163 build bin52.

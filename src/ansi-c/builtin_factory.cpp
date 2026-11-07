@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ansi_c_parser.h"
 #include "ansi_c_typecheck.h"
 
+#include <set>
 #include <sstream>
 
 static bool find_pattern(
@@ -101,7 +102,7 @@ static bool convert(
 //! Check whether given identifier is a compiler built-in.
 //! If so, add declaration to symbol table.
 //! \return 'true' on error
-bool builtin_factory(
+static bool builtin_factory_search(
   const irep_idt &identifier,
   bool support_float16_type,
   symbol_table_baset &symbol_table,
@@ -227,4 +228,37 @@ bool builtin_factory(
   }
 
   return true;
+}
+
+bool builtin_factory(
+  const irep_idt &identifier,
+  bool support_float16_type,
+  symbol_table_baset &symbol_table,
+  message_handlert &mh)
+{
+  // The C++ front end asks for every name it cannot resolve -- which, with
+  // SFINAE-style probing of library templates, is the same handful of names
+  // over and over -- and each search scans the built-in headers line by line.
+  // Remember the names that are not built-ins for the header selection in
+  // force (target OS, compiler flavour, architecture and the _Float16
+  // setting); a found built-in is inserted into the symbol table by
+  // `convert` and is not asked for again.
+  static std::set<std::string> known_misses;
+
+  const std::string key =
+    id2string(identifier) + '\0' + std::to_string(support_float16_type) + '\0' +
+    std::to_string(static_cast<int>(config.ansi_c.os)) + '\0' +
+    std::to_string(static_cast<int>(config.ansi_c.mode)) + '\0' +
+    id2string(config.ansi_c.arch);
+
+  if(known_misses.find(key) != known_misses.end())
+    return true;
+
+  const bool missed =
+    builtin_factory_search(identifier, support_float16_type, symbol_table, mh);
+
+  if(missed)
+    known_misses.insert(key);
+
+  return missed;
 }

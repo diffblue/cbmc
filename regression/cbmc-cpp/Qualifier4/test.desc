@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 
 ^EXIT=6$
@@ -6,3 +6,5 @@ main.cpp
 ^CONVERSION ERROR$
 --
 ^warning: ignoring
+dropped the body
+--

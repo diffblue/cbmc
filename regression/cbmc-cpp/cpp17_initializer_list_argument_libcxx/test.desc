@@ -1,0 +1,21 @@
+CORE libcxx
+main.cpp
+--cpp17 --stdlib libc++ --unwind 5 --no-unwinding-assertions
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ int list: SUCCESS$
+^\[main\.assertion\.2\] line \d+ enum list: SUCCESS$
+^\[main\.assertion\.3\] line \d+ class list: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+--
+static_assert condition could not be evaluated
+found no match for symbol
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [dcl.init.list]/5, [support.initlist]: a braced-init-list argument for a
+std::initializer_list<E> parameter, with libc++'s layout.  Non-vacuous: the
+last assertion is deliberately wrong and must FAIL.  Before the fix:
+"found no match for symbol 'count'", CONVERSION ERROR.

@@ -1,0 +1,11 @@
+CORE
+reject.cpp
+--cpp11
+^EXIT=6$
+^SIGNAL=0$
+^CONVERSION ERROR$
+'\*q' is constant
+--
+^warning: ignoring
+--
+g++ 13 and clang++ 18 reject reject.cpp (assignment of read-only location).

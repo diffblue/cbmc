@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 
 ^EXIT=0$
@@ -6,3 +6,5 @@ main.cpp
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+dropped the body
+--

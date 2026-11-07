@@ -115,6 +115,9 @@ void instrument_preconditions(
           to_symbol_expr(as_const(*it).call_function()),
           goto_model.goto_functions);
 
+        if(preconditions.empty())
+          continue;
+
         source_locationt source_location = it->source_location();
 
         replace_symbolt r = actuals_replace_map(

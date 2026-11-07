@@ -36,6 +36,7 @@ class optionst;
   OPT_BMC \
   "(no-standard-checks)" \
   "(preprocess)(slice-by-trace):" \
+  "(dump-c-library-models):" \
   OPT_FUNCTIONS \
   "(no-simplify)(full-slice)" \
   OPT_REACHABILITY_SLICER \

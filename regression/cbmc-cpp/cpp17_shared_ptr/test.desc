@@ -1,0 +1,12 @@
+CORE
+main.cpp
+--cpp17 --unwind 5 --no-unwinding-assertions
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+dropped the body
+--
+No --depth: a bound of 20 steps made the end of main unreachable, so the
+test passed vacuously.

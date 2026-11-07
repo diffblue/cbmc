@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp14
+^\[main\.assertion\.1\] line \d+ generic lambda capturing this: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [expr.prim.lambda.closure]/4: a generic lambda passed to a function
+template is called with a double; its call operator is instantiated for
+double.  The function-pointer lowering made the lambda an `int (*)(int &)'
+in a member function, so fmt<int> was instantiated and dropped and the
+result was wrong (bin53).  See cpp14_generic_lambda_by_reference_capture.
+g++ 13 and clang++ 18 accept this program (-std=c++14), and it fails only
+its WRONG assertion.

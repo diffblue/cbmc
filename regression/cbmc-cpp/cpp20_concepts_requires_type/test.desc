@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp20
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+dropped the body
+--
+requires-expression with a type requirement constraining a partial
+specialization ([expr.prim.req.type]/1, [temp.constr]).
+
+Was KNOWNBUG since round 152 (no diagnostic before the drop): the type
+requirement `typename T::value_type` THREW for T = int, the constraint
+evaluation caught the exception and took the constraint as satisfied, so the
+specialization was selected for int and its member typedef failed.  Fixed
+2026-09-23: an invalid type makes the requirement false.

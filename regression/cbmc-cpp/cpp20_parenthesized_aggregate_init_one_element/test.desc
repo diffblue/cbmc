@@ -1,0 +1,23 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ first element: SUCCESS$
+^\[main\.assertion\.2\] line \d+ class template specialization: SUCCESS$
+^\[main\.assertion\.3\] line \d+ copy constructor still preferred: SUCCESS$
+^\[main\.assertion\.4\] line \d+ element of class type: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [dcl.init.general]/16.6.2.2 (C++20, P0960): `point a(4)' initializes
+the aggregate's first element from 4.  With several expressions, or for
+an aggregate that is not a POD, this worked; a POD aggregate with one
+expression that does not convert to it was assigned from it ("invalid
+implicit conversion from 'signed int' to 'struct point'", bin53).  Before
+C++20 the program is ill-formed, which the front end still reports.
+g++ 13 and clang++ 18 accept this program, and it fails only its WRONG
+assertion.

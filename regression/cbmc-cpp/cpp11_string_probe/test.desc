@@ -1,0 +1,12 @@
+CORE
+main.cpp
+--cpp11 --no-unwinding-assertions
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^PARSING ERROR$
+^CONVERSION ERROR$
+dropped the body
+--
+Probe: checks if <string> works on all platforms.

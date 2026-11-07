@@ -390,6 +390,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   // all (other) checks supported by goto_check
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
 
+  if(cmdline.isset("no-body-assertions"))
+    options.set_option("no-body-assertions", true);
+
   if(cmdline.isset("partial-loops"))
   {
     options.set_option("partial-loops", true);
@@ -521,8 +524,6 @@ int cbmc_parse_optionst::doit()
   messaget::eval_verbosity(
     cmdline.get_value("verbosity"), messaget::M_STATUS, ui_message_handler);
 
-  log_version_and_architecture("CBMC");
-
   //
   // Unwinding of transition systems is done by hw-cbmc.
   //
@@ -578,6 +579,20 @@ int cbmc_parse_optionst::doit()
     preprocessing(options);
     return CPROVER_EXIT_SUCCESS;
   }
+
+  if(cmdline.isset("dump-c-library-models"))
+  {
+    return dump_c_library_models(
+             cmdline.get_value("dump-c-library-models"), ui_message_handler)
+             ? CPROVER_EXIT_INTERNAL_ERROR
+             : CPROVER_EXIT_SUCCESS;
+  }
+
+  // Log the banner now that the preprocess-only short-circuits are past:
+  // doing so earlier would write the banner to stdout (via log.status())
+  // and corrupt the output of --preprocess, which has to emit the
+  // preprocessed source on stdout.
+  log_version_and_architecture("CBMC");
 
   if(cmdline.isset("show-parse-tree"))
   {
@@ -1055,6 +1070,8 @@ void cbmc_parse_optionst::help()
     "\n"
     "C/C++ frontend options:\n"
     " {y--preprocess} \t stop after preprocessing\n"
+    " {y--dump-c-library-models} {udir} \t preprocess the C library models "
+    "for this target into {udir} and stop (for {y--c-library-models})\n"
     " {y--test-preprocessor} \t stop after preprocessing, discard output\n"
     HELP_CONFIG_C_CPP
     HELP_ANSI_C_LANGUAGE

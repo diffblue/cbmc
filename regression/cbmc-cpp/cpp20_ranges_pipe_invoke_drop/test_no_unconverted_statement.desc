@@ -1,0 +1,19 @@
+CORE libcxx
+main.cpp
+--cpp20 --stdlib libc++ --show-goto-functions
+^EXIT=0$
+^SIGNAL=0$
+--
+statement="member_initializer"
+statement="default"
+statement="cpp-using"
+dropped the body
+--
+N5008 [temp.inst]/11: tuple's constructor template instantiated for no
+arguments is never odr-used, so its mem-initializer is never converted.
+Its body used to reach goto conversion in parse form and became an OTHER
+instruction `statement="member_initializer"' (on bin53), on which
+symbolic execution aborts (symex_other.cpp "Unreachable") if a path ever
+reaches it.  The front end now drops a body that still holds such a
+statement; a never-converted body is dropped silently, since the member
+is not instantiated at all.  clang++ 18 with libc++ accepts the program.

@@ -29,6 +29,8 @@ Author: CM Wintersteiger, 2006
 #include <util/tempdir.h>
 #include <util/version.h>
 
+#include <ansi-c/c_preprocess.h>
+
 #include "compile.h"
 #include "goto_cc_cmdline.h"
 #include "hybrid_binary.h"
@@ -686,6 +688,19 @@ int gcc_modet::doit()
 
     if(std_string == "gnu++17" || std_string == "c++17")
       config.cpp.set_cpp17();
+
+    if(
+      std_string == "gnu++20" || std_string == "c++20" ||
+      std_string == "gnu++2a" || std_string == "c++2a")
+      config.cpp.set_cpp20();
+
+    if(std_string == "gnu++23" || std_string == "c++23")
+      config.cpp.set_cpp23();
+
+    if(
+      std_string == "gnu++26" || std_string == "c++26" ||
+      std_string == "gnu++2c" || std_string == "c++2c")
+      config.cpp.set_cpp26();
   }
   else
   {
@@ -716,6 +731,14 @@ int gcc_modet::doit()
 
   if(cmdline.isset("nostdinc"))
     config.ansi_c.preprocessor_options.push_back("-nostdinc");
+
+  if(cmdline.isset("-stdlib"))
+  {
+    const std::string stdlib = cmdline.get_value("-stdlib");
+    config.ansi_c.preprocessor_options.push_back("-stdlib=" + stdlib);
+    if(stdlib == "libc++")
+      config.ansi_c.preprocessor = configt::ansi_ct::preprocessort::CLANG;
+  }
 
   if(cmdline.isset('L'))
     compiler.library_paths=cmdline.get_values('L');
@@ -890,8 +913,35 @@ int gcc_modet::preprocess(
       new_argv.push_back(it->arg);
   }
 
+  // C++26 is not yet widely supported by preprocessors; fall back to
+  // C++23 for preprocessing.
+  for(auto &arg : new_argv)
+  {
+    if(
+      arg == "-std=c++26" || arg == "-std=c++2c" || arg == "-std=gnu++26" ||
+      arg == "-std=gnu++2c")
+    {
+      arg = "-std=gnu++23";
+    }
+  }
+
   // We just want to preprocess.
   new_argv.push_back("-E");
+
+  // For C++ translation units, apply the same CBMC-specific feature-macro
+  // flags that `c_preprocess` applies when cbmc preprocesses a `.cpp`
+  // directly.  goto-cc preprocesses to a `.ii` file first and then feeds
+  // the already-preprocessed result to the front-end, so without these
+  // flags here the suppressed library features (notably CTAD deduction
+  // guides) would survive into the `.ii` and reach CBMC's parser — which
+  // does not implement them.  This is what made goto-cc and cbmc disagree
+  // on the same source.  C++ is indicated by a `.ii` destination (the
+  // caller uses `.ii` for C++ and `.i` for C).
+  if(has_suffix(dest, ".ii"))
+  {
+    for(const auto &flag : cprover_cxx_preprocessor_macro_flags())
+      new_argv.push_back(flag);
+  }
 
   // destination file
   std::string stdout_file;

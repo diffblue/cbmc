@@ -1,0 +1,28 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ three levels: SUCCESS$
+^\[main\.assertion\.2\] line \d+ two levels: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [temp.spec.partial.match]/1, [class.static.data]/4, [temp.inst]/16:
+F<W<W<W<int>>>> matches the partial specialization F<W<T>>, whose constant
+member is F<T>::value + 1, so its value is 3.  The front end skipped any
+third nested instantiation of the same template with type arguments (a
+recursion guard), so F<W<int>> was never instantiated, the inner
+initializers stayed unresolved, and both assertions failed silently.  A
+type argument that is a proper part of the enclosing instances' arguments
+converges and is now instantiated.  test_enumerator.desc (an enumerator)
+and test_base_class.desc (the value inherited from a base class) were
+conversion errors ("instantiating 'F' with <struct nil>").  The base-class
+form is libc++'s __find_max_align, the default argument of
+std::aligned_storage: `aligned_storage<24>::type' failed, so std::function's
+__value_func::__buf_ was missing and libc++'s ~__value_func
+(function.h:394) was dropped.  bin53 fails all three.  g++ 13 and clang++ 18
+accept these programs, and they fail only their WRONG assertion.

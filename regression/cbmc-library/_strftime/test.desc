@@ -6,3 +6,9 @@ main.c
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+--
+_strftime is the object-file name of strftime on macOS.  On macOS the
+test relied on <time.h> declaring strftime with the asm label _strftime,
+which cbmc no longer applies (a label that is the name with a leading
+underscore names the function itself); it now declares _strftime
+everywhere.

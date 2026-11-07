@@ -1,0 +1,18 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ through the second base: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+"delete argument must have offset zero" failed: convert_cpp_delete passed
+the operand, a pointer to the Y subobject, to __delete.  The front end now
+attaches the address of the most derived object, computed as for
+dynamic_cast<void *> ([expr.dynamic.cast]/8), to a delete-expression
+whose operand points to a polymorphic class, and goto conversion passes
+it to the deallocation function.

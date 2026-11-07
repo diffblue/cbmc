@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ elements deduced from the pattern: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Each argument for a function parameter pack `T *...' recorded its own type
+(int *) as the next element of T, so the pack was <int *, ...> and the
+expanded parameters `int **' did not match.  `const T &...' lost its const
+when the element replaced the pattern's decl-specifiers.

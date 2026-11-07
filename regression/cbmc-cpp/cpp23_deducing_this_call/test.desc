@@ -1,0 +1,10 @@
+CORE
+main.cpp
+--cpp23
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+dropped the body
+--
+Deducing this: s.get() does not dispatch to get(this S self)

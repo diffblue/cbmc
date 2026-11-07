@@ -1,0 +1,22 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ char \*\* argument binds to a char \*restrict \* parameter: SUCCESS$
+^\[main\.assertion\.2\] line \d+ const char \*\* to const char \*\*restrict: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+found no match for symbol
+dropped the body
+--
+N5008 [conv.qual] concerns the cv-qualifiers const and volatile; GNU
+`__restrict' is not weighed in a qualification conversion by GCC or Clang.
+glibc declares `strtod(const char *__restrict, char **__restrict)' and
+`mbsrtowcs(wchar_t *, const char **__restrict, ...)'; a `char **' argument
+found no viable candidate, so libc++'s __do_strtod<float/double/long double>
+and the __libcpp_*_l locale wrappers were dropped (280 drops over the libc++
+tests of the corpus).

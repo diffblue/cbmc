@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ cast to a same-width pointer type: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+reinterpret_cast<long *> of a `long long *' kept the source type, since
+irept comparison ignores #c_type and conditional_cast left the operand
+alone.  Overload resolution then selected the wrong function or none: with
+the MSVC STL, `__iso_volatile_load32(reinterpret_cast<volatile int *>(&x))'
+for a `long' x (_Incref_nz in <memory>, 26 failures on VS 2022).

@@ -1,0 +1,22 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ wide string literal initializes an unbounded array: SUCCESS$
+^\[main\.assertion\.2\] line \d+ char16_t literal: SUCCESS$
+^\[main\.assertion\.3\] line \d+ char32_t literal: SUCCESS$
+^\[main\.assertion\.4\] line \d+ narrow: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [dcl.init.string]/1: `const wchar_t w[] = L"de";' -- an array of
+character type initialized from a string literal of the matching kind takes
+its bound from the literal.  The C++ front end handled narrow literals only;
+wide/UTF literals (already array expressions) fell to the generic conversion
+and were rejected ("invalid implicit conversion from 'int [3l]' to 'const int
+[]'").

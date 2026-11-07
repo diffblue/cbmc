@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ constrained members viable: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+is unknown
+--
+The trailing requires-clause of a member function template specialization
+was re-checked as that of a non-template member, with only the class's
+parameters bound; O was unknown, the requires-expression false, and the
+specialization not viable.

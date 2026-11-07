@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--winx64 --cpp11
+^\[main\.assertion\.1\] line \d+ 5 is a digit: SUCCESS$
+^\[main\.assertion\.2\] line \d+ a is not a digit: SUCCESS$
+^\[main\.assertion\.3\] line \d+ a is alpha: SUCCESS$
+^\[main\.assertion\.4\] line \d+ newline is space: SUCCESS$
+^\[main\.assertion\.5\] line \d+ z is not upper: SUCCESS$
+^\[main\.assertion\.6\] line \d+ comma is punct: SUCCESS$
+^\[main\.assertion\.7\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The classic ctype<char> model knew only libstdc++'s _M_table and glibc's
+mask encoding; the MSVC STL's _Ctype._Table and enumerator masks were not
+modelled, and locale::_Init (in the runtime library) had no body.

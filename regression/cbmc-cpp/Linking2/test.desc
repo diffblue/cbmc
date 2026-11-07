@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 test_link1.cpp
 test_link2.c
 ^EXIT=0$
@@ -6,3 +6,5 @@ test_link2.c
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+dropped the body
+--

@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ injected-class-name: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+does not uniquely resolve
+--
+In a class template with a constructor template, the injected-class-name
+in sizeof(impl) and alignof(impl) resolved to the class and to its copy
+constructor ("does not uniquely resolve").  Constructors have no names
+([class.ctor.general]/1).  The MSVC STL's _Func_impl_no_alloc::_Delete_this
+(std::function) lost its body this way.

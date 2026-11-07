@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ four levels: SUCCESS$
+^\[main\.assertion\.2\] line \d+ five levels: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+--
+N5008 [temp.alias]/2: the alias cycle guard keyed the nested resolutions of
+ull_constant<...> on irep comments, which irept::compare ignores, so the
+third nested level was taken for a cycle and resolved to an empty type.
+Reduced from libstdc++ 13 <chrono>'s __check_overflow (test_chrono.desc).

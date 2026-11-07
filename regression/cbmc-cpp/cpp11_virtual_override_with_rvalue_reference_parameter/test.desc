@@ -1,0 +1,18 @@
+CORE gnu-extensions
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ called: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+dropped the body
+--
+The line marker places the classes in a system header, where a conversion
+failure in a body drops the body rather than reporting an error.
+build_this_adjusting_thunk_body now passes a parameter of rvalue reference
+type as static_cast<T &&>(a).  Reduced from libc++ 18 <functional>
+(cpp20_libcxx_header_drops/test_functional.desc).  g++ 13 and clang++ 18
+accept this program, and it fails only its WRONG assertion.

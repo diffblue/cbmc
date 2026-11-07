@@ -1,0 +1,11 @@
+CORE
+main.cpp
+--cpp11
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+dropped the body
+--
+Test that relational operators (<, >, <=, >=) are synthesized from
+a defaulted spaceship operator.

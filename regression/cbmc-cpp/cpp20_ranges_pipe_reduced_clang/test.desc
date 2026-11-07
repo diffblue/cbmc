@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp20 --show-goto-functions
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Reduced code: only type-checking matters (its loop does not terminate), so
+the goto program is shown, not verified.  The hidden-friend range | closure
+operator is selected since cpp20_constrained_hidden_friend_per_specialization
+was fixed.  clang++ 18 accepts this program.

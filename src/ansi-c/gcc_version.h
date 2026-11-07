@@ -54,4 +54,10 @@ void configure_gcc(const gcc_versiont &);
 
 std::ostream &operator<<(std::ostream &, const gcc_versiont &);
 
+/// Unless a C++ standard was selected explicitly, make the host compiler's
+/// default C++ dialect (g++/clang++ without -std=) the standard in effect,
+/// as goto-cc's gcc mode does; called by the C++ front-end before
+/// preprocessing or parsing.
+void apply_host_default_cxx_standard();
+
 #endif

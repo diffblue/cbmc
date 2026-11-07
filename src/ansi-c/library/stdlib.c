@@ -141,6 +141,7 @@ __CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
 #ifndef __GNUC__
 _Bool __builtin_mul_overflow();
 #endif
+const void *__CPROVER_new_object;
 __CPROVER_bool __CPROVER_malloc_is_new_array;
 
 void *calloc(__CPROVER_size_t nmemb, __CPROVER_size_t size)
@@ -180,8 +181,10 @@ __CPROVER_HIDE:;
   // and __CPROVER_allocate doesn't, but no one cares
   malloc_res = __CPROVER_allocate(alloc_size, 1);
 
-  // record the object size for non-determistic bounds checking
+  // non-deterministically record the object for delete/delete[] and free
+  // checking: it was not allocated by new[] (see malloc for why and its cost)
   __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
+  __CPROVER_new_object = record_malloc ? malloc_res : __CPROVER_new_object;
   __CPROVER_malloc_is_new_array =
     record_malloc ? 0 : __CPROVER_malloc_is_new_array;
 
@@ -204,6 +207,7 @@ __CPROVER_HIDE:;
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
 #ifndef LIBRARY_CHECK
+const void *__CPROVER_new_object;
 __CPROVER_bool __CPROVER_malloc_is_new_array;
 #endif
 
@@ -243,8 +247,25 @@ __CPROVER_HIDE:;
   void *malloc_res;
   malloc_res = __CPROVER_allocate(malloc_size, 0);
 
-  // record the object size for non-determistic bounds checking
+  // non-deterministically record the object for delete/delete[] and free
+  // checking: it was not allocated by new[]
+  //
+  // Recording the object (not only clearing __CPROVER_malloc_is_new_array)
+  // is needed: otherwise a malloc after `new T[n]' leaves that array as
+  // __CPROVER_new_object with the flag cleared, and its delete[] fails
+  // "delete[] of non-array object" (cpp98_array_delete_after_malloc).  It
+  // also reports delete[] of a malloc'd object.  The cost, measured on the
+  // aws-c-common proofs of perf-benchcomp: aws_byte_buf_append_dynamic has
+  // 2245 instead of 2202 steps and 0.3% more variables and clauses.
+  // MiniSat's run time is very sensitive to such small changes (7.7 s ->
+  // 10.1 s here, 18.8 s -> 32.6 s on CI; the same formula size took 7.5 s
+  // or 18.5 s depending on the goto binary), and over 50 proofs the total
+  // solver time grew by 10%, with some proofs faster.  Leaving the pair
+  // untouched in malloc would also fix the false failure, but loses the
+  // delete[]-of-malloc check and was not faster overall (priority_queue_push
+  // 94 s -> 115 s); clearing __CPROVER_new_object instead was slower.
   __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
+  __CPROVER_new_object = record_malloc ? malloc_res : __CPROVER_new_object;
   __CPROVER_malloc_is_new_array =
     record_malloc ? 0 : __CPROVER_malloc_is_new_array;
 
@@ -264,6 +285,7 @@ __CPROVER_HIDE:;
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
 const void *__CPROVER_alloca_object;
 #ifndef LIBRARY_CHECK
+const void *__CPROVER_new_object;
 __CPROVER_bool __CPROVER_malloc_is_new_array;
 #endif
 
@@ -273,9 +295,12 @@ void *__builtin_alloca(__CPROVER_size_t alloca_size)
   void *res;
   res = __CPROVER_allocate(alloca_size, 0);
 
-  // record the object size for non-determistic bounds checking
-  __CPROVER_bool record_malloc=__VERIFIER_nondet___CPROVER_bool();
-  __CPROVER_malloc_is_new_array=record_malloc?0:__CPROVER_malloc_is_new_array;
+  // non-deterministically record the object for delete/delete[] and free
+  // checking: it was not allocated by new[] (see malloc for why and its cost)
+  __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
+  __CPROVER_new_object = record_malloc ? res : __CPROVER_new_object;
+  __CPROVER_malloc_is_new_array =
+    record_malloc ? 0 : __CPROVER_malloc_is_new_array;
 
   // record alloca to detect invalid free
   __CPROVER_bool record_alloca = __VERIFIER_nondet___CPROVER_bool();
@@ -454,6 +479,594 @@ long strtol(const char *nptr, char **endptr, int base)
 
   return res;
 }
+
+/* FUNCTION: strtoll */
+
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_LIMITS_H_INCLUDED
+#  include <limits.h>
+#  define __CPROVER_LIMITS_H_INCLUDED
+#endif
+
+#undef strtoll
+#undef isdigit
+#undef isspace
+
+int isspace(int);
+int isdigit(int);
+
+#ifndef __GNUC__
+_Bool __builtin_add_overflow();
+_Bool __builtin_mul_overflow();
+#endif
+
+// C23 7.24.1.7: same conversion rules as strtol -- this model mirrors
+// CBMC's strtol model above with the result type adjusted.
+long long strtoll(const char *nptr, char **endptr, int base)
+{
+__CPROVER_HIDE:;
+#ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_precondition(
+    __CPROVER_is_zero_string(nptr), "zero-termination of argument of strtoll");
+#endif
+
+  if(base == 1 || base < 0 || base > 36)
+  {
+    errno = EINVAL;
+    return 0;
+  }
+
+  long long res = 0;
+  _Bool in_number = 0;
+  char sign = 0;
+
+  // 32 chars is an arbitrarily chosen limit
+  int i = 0;
+  for(; i < 31; ++i)
+  {
+    char ch = nptr[i];
+    char sub = 0;
+    if(ch == 0)
+      break;
+    else if(
+      (base == 0 || base == 16) && !in_number && ch == '0' &&
+      (nptr[i + 1] == 'x' || nptr[i + 1] == 'X'))
+    {
+      base = 16;
+      in_number = 1;
+      ++i;
+      continue;
+    }
+    else if(base == 0 && !in_number && ch == '0')
+    {
+      base = 8;
+      in_number = 1;
+      continue;
+    }
+    else if(!in_number && !sign && isspace(ch))
+      continue;
+    else if(!in_number && !sign && (ch == '-' || ch == '+'))
+    {
+      sign = ch;
+      continue;
+    }
+    else if(base > 10 && ch >= 'a' && ch - 'a' < base - 10)
+      sub = 'a' - 10;
+    else if(base > 10 && ch >= 'A' && ch - 'A' < base - 10)
+      sub = 'A' - 10;
+    else if(isdigit(ch))
+    {
+      sub = '0';
+      base = base == 0 ? 10 : base;
+    }
+    else
+      break;
+
+    in_number = 1;
+    _Bool overflow = __builtin_mul_overflow(res, (long long)base, &res);
+    if(overflow || __builtin_add_overflow(res, (long long)(ch - sub), &res))
+    {
+      errno = ERANGE;
+      if(sign == '-')
+        return LLONG_MIN;
+      else
+        return LLONG_MAX;
+    }
+  }
+
+  if(endptr != 0)
+    *endptr = (char *)nptr + i;
+
+  if(sign == '-')
+    res *= -1;
+
+  return res;
+}
+
+/* FUNCTION: strtoul */
+
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_LIMITS_H_INCLUDED
+#  include <limits.h>
+#  define __CPROVER_LIMITS_H_INCLUDED
+#endif
+
+#undef strtoul
+#undef isdigit
+#undef isspace
+
+int isspace(int);
+int isdigit(int);
+
+#ifndef __GNUC__
+_Bool __builtin_add_overflow();
+_Bool __builtin_mul_overflow();
+#endif
+
+// C23 7.24.1.7: same conversion rules as strtol -- this model mirrors
+// CBMC's strtol model above with the result type adjusted.
+unsigned long strtoul(const char *nptr, char **endptr, int base)
+{
+__CPROVER_HIDE:;
+#ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_precondition(
+    __CPROVER_is_zero_string(nptr), "zero-termination of argument of strtoul");
+#endif
+
+  if(base == 1 || base < 0 || base > 36)
+  {
+    errno = EINVAL;
+    return 0;
+  }
+
+  unsigned long res = 0;
+  _Bool in_number = 0;
+  char sign = 0;
+
+  // 32 chars is an arbitrarily chosen limit
+  int i = 0;
+  for(; i < 31; ++i)
+  {
+    char ch = nptr[i];
+    char sub = 0;
+    if(ch == 0)
+      break;
+    else if(
+      (base == 0 || base == 16) && !in_number && ch == '0' &&
+      (nptr[i + 1] == 'x' || nptr[i + 1] == 'X'))
+    {
+      base = 16;
+      in_number = 1;
+      ++i;
+      continue;
+    }
+    else if(base == 0 && !in_number && ch == '0')
+    {
+      base = 8;
+      in_number = 1;
+      continue;
+    }
+    else if(!in_number && !sign && isspace(ch))
+      continue;
+    else if(!in_number && !sign && (ch == '-' || ch == '+'))
+    {
+      sign = ch;
+      continue;
+    }
+    else if(base > 10 && ch >= 'a' && ch - 'a' < base - 10)
+      sub = 'a' - 10;
+    else if(base > 10 && ch >= 'A' && ch - 'A' < base - 10)
+      sub = 'A' - 10;
+    else if(isdigit(ch))
+    {
+      sub = '0';
+      base = base == 0 ? 10 : base;
+    }
+    else
+      break;
+
+    in_number = 1;
+    _Bool overflow = __builtin_mul_overflow(res, (unsigned long)base, &res);
+    if(overflow || __builtin_add_overflow(res, (unsigned long)(ch - sub), &res))
+    {
+      errno = ERANGE;
+      return ULONG_MAX;
+    }
+  }
+
+  if(endptr != 0)
+    *endptr = (char *)nptr + i;
+
+  // C23 7.24.1.7/5: for the unsigned variants a leading '-' negates the
+  // converted (unsigned) value.
+  if(sign == '-')
+    res = -res;
+
+  return res;
+}
+
+/* FUNCTION: strtoull */
+
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_LIMITS_H_INCLUDED
+#  include <limits.h>
+#  define __CPROVER_LIMITS_H_INCLUDED
+#endif
+
+#undef strtoull
+#undef isdigit
+#undef isspace
+
+int isspace(int);
+int isdigit(int);
+
+#ifndef __GNUC__
+_Bool __builtin_add_overflow();
+_Bool __builtin_mul_overflow();
+#endif
+
+// C23 7.24.1.7: same conversion rules as strtol -- this model mirrors
+// CBMC's strtol model above with the result type adjusted.
+unsigned long long strtoull(const char *nptr, char **endptr, int base)
+{
+__CPROVER_HIDE:;
+#ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_precondition(
+    __CPROVER_is_zero_string(nptr), "zero-termination of argument of strtoull");
+#endif
+
+  if(base == 1 || base < 0 || base > 36)
+  {
+    errno = EINVAL;
+    return 0;
+  }
+
+  unsigned long long res = 0;
+  _Bool in_number = 0;
+  char sign = 0;
+
+  // 32 chars is an arbitrarily chosen limit
+  int i = 0;
+  for(; i < 31; ++i)
+  {
+    char ch = nptr[i];
+    char sub = 0;
+    if(ch == 0)
+      break;
+    else if(
+      (base == 0 || base == 16) && !in_number && ch == '0' &&
+      (nptr[i + 1] == 'x' || nptr[i + 1] == 'X'))
+    {
+      base = 16;
+      in_number = 1;
+      ++i;
+      continue;
+    }
+    else if(base == 0 && !in_number && ch == '0')
+    {
+      base = 8;
+      in_number = 1;
+      continue;
+    }
+    else if(!in_number && !sign && isspace(ch))
+      continue;
+    else if(!in_number && !sign && (ch == '-' || ch == '+'))
+    {
+      sign = ch;
+      continue;
+    }
+    else if(base > 10 && ch >= 'a' && ch - 'a' < base - 10)
+      sub = 'a' - 10;
+    else if(base > 10 && ch >= 'A' && ch - 'A' < base - 10)
+      sub = 'A' - 10;
+    else if(isdigit(ch))
+    {
+      sub = '0';
+      base = base == 0 ? 10 : base;
+    }
+    else
+      break;
+
+    in_number = 1;
+    _Bool overflow =
+      __builtin_mul_overflow(res, (unsigned long long)base, &res);
+    if(
+      overflow ||
+      __builtin_add_overflow(res, (unsigned long long)(ch - sub), &res))
+    {
+      errno = ERANGE;
+      return ULLONG_MAX;
+    }
+  }
+
+  if(endptr != 0)
+    *endptr = (char *)nptr + i;
+
+  // C23 7.24.1.7/5: for the unsigned variants a leading '-' negates the
+  // converted (unsigned) value.
+  if(sign == '-')
+    res = -res;
+
+  return res;
+}
+
+/* FUNCTION: strtol_l */
+
+// POSIX.1-2024 (and glibc, macOS): as strtol, with the locale argument; the
+// conversion of integers does not depend on the locale beyond the
+// white-space and digit characters, which the model of strtol takes from the
+// "C" locale.  libc++ converts integers read by num_get with it.
+
+#ifndef _WIN32
+
+#  ifndef __CPROVER_STDLIB_H_INCLUDED
+#    include <stdlib.h>
+#    define __CPROVER_STDLIB_H_INCLUDED
+#  endif
+
+#  ifndef __CPROVER_LOCALE_H_INCLUDED
+#    include <locale.h>
+#    define __CPROVER_LOCALE_H_INCLUDED
+#  endif
+
+#  ifdef __APPLE__
+#    ifndef __CPROVER_XLOCALE_H_INCLUDED
+#      include <xlocale.h>
+#      define __CPROVER_XLOCALE_H_INCLUDED
+#    endif
+#  endif
+
+#  undef strtol_l
+
+long strtol_l(const char *nptr, char **endptr, int base, locale_t loc)
+{
+__CPROVER_HIDE:;
+  (void)loc;
+  return strtol(nptr, endptr, base);
+}
+
+#endif
+
+/* FUNCTION: strtoul_l */
+
+// POSIX.1-2024 (and glibc, macOS): as strtoul, with the locale argument; the
+// conversion of integers does not depend on the locale beyond the
+// white-space and digit characters, which the model of strtoul takes from the
+// "C" locale.  libc++ converts integers read by num_get with it.
+
+#ifndef _WIN32
+
+#  ifndef __CPROVER_STDLIB_H_INCLUDED
+#    include <stdlib.h>
+#    define __CPROVER_STDLIB_H_INCLUDED
+#  endif
+
+#  ifndef __CPROVER_LOCALE_H_INCLUDED
+#    include <locale.h>
+#    define __CPROVER_LOCALE_H_INCLUDED
+#  endif
+
+#  ifdef __APPLE__
+#    ifndef __CPROVER_XLOCALE_H_INCLUDED
+#      include <xlocale.h>
+#      define __CPROVER_XLOCALE_H_INCLUDED
+#    endif
+#  endif
+
+#  undef strtoul_l
+
+unsigned long strtoul_l(const char *nptr, char **endptr, int base, locale_t loc)
+{
+__CPROVER_HIDE:;
+  (void)loc;
+  return strtoul(nptr, endptr, base);
+}
+
+#endif
+
+/* FUNCTION: strtoll_l */
+
+// POSIX.1-2024 (and glibc, macOS): as strtoll, with the locale argument; the
+// conversion of integers does not depend on the locale beyond the
+// white-space and digit characters, which the model of strtoll takes from the
+// "C" locale.  libc++ converts integers read by num_get with it.
+
+#ifndef _WIN32
+
+#  ifndef __CPROVER_STDLIB_H_INCLUDED
+#    include <stdlib.h>
+#    define __CPROVER_STDLIB_H_INCLUDED
+#  endif
+
+#  ifndef __CPROVER_LOCALE_H_INCLUDED
+#    include <locale.h>
+#    define __CPROVER_LOCALE_H_INCLUDED
+#  endif
+
+#  ifdef __APPLE__
+#    ifndef __CPROVER_XLOCALE_H_INCLUDED
+#      include <xlocale.h>
+#      define __CPROVER_XLOCALE_H_INCLUDED
+#    endif
+#  endif
+
+#  undef strtoll_l
+
+long long strtoll_l(const char *nptr, char **endptr, int base, locale_t loc)
+{
+__CPROVER_HIDE:;
+  (void)loc;
+  return strtoll(nptr, endptr, base);
+}
+
+#endif
+
+/* FUNCTION: strtoull_l */
+
+// POSIX.1-2024 (and glibc, macOS): as strtoull, with the locale argument; the
+// conversion of integers does not depend on the locale beyond the
+// white-space and digit characters, which the model of strtoull takes from the
+// "C" locale.  libc++ converts integers read by num_get with it.
+
+#ifndef _WIN32
+
+#  ifndef __CPROVER_STDLIB_H_INCLUDED
+#    include <stdlib.h>
+#    define __CPROVER_STDLIB_H_INCLUDED
+#  endif
+
+#  ifndef __CPROVER_LOCALE_H_INCLUDED
+#    include <locale.h>
+#    define __CPROVER_LOCALE_H_INCLUDED
+#  endif
+
+#  ifdef __APPLE__
+#    ifndef __CPROVER_XLOCALE_H_INCLUDED
+#      include <xlocale.h>
+#      define __CPROVER_XLOCALE_H_INCLUDED
+#    endif
+#  endif
+
+#  undef strtoull_l
+
+unsigned long long
+strtoull_l(const char *nptr, char **endptr, int base, locale_t loc)
+{
+__CPROVER_HIDE:;
+  (void)loc;
+  return strtoull(nptr, endptr, base);
+}
+
+#endif
+
+/* FUNCTION: __isoc23_strtol_l */
+
+// glibc's name for strtol_l in C23 mode (<stdlib.h> defines one as the other)
+
+#ifndef _WIN32
+
+#  ifndef __CPROVER_STDLIB_H_INCLUDED
+#    include <stdlib.h>
+#    define __CPROVER_STDLIB_H_INCLUDED
+#  endif
+
+#  ifndef __CPROVER_LOCALE_H_INCLUDED
+#    include <locale.h>
+#    define __CPROVER_LOCALE_H_INCLUDED
+#  endif
+
+#  undef strtol_l
+
+long strtol_l(const char *nptr, char **endptr, int base, locale_t loc);
+
+long __isoc23_strtol_l(const char *nptr, char **endptr, int base, locale_t loc)
+{
+__CPROVER_HIDE:;
+  return strtol_l(nptr, endptr, base, loc);
+}
+
+#endif
+
+/* FUNCTION: __isoc23_strtoul_l */
+
+// glibc's name for strtoul_l in C23 mode (<stdlib.h> defines one as the other)
+
+#ifndef _WIN32
+
+#  ifndef __CPROVER_STDLIB_H_INCLUDED
+#    include <stdlib.h>
+#    define __CPROVER_STDLIB_H_INCLUDED
+#  endif
+
+#  ifndef __CPROVER_LOCALE_H_INCLUDED
+#    include <locale.h>
+#    define __CPROVER_LOCALE_H_INCLUDED
+#  endif
+
+#  undef strtoul_l
+
+unsigned long
+strtoul_l(const char *nptr, char **endptr, int base, locale_t loc);
+
+unsigned long
+__isoc23_strtoul_l(const char *nptr, char **endptr, int base, locale_t loc)
+{
+__CPROVER_HIDE:;
+  return strtoul_l(nptr, endptr, base, loc);
+}
+
+#endif
+
+/* FUNCTION: __isoc23_strtoll_l */
+
+// glibc's name for strtoll_l in C23 mode (<stdlib.h> defines one as the other)
+
+#ifndef _WIN32
+
+#  ifndef __CPROVER_STDLIB_H_INCLUDED
+#    include <stdlib.h>
+#    define __CPROVER_STDLIB_H_INCLUDED
+#  endif
+
+#  ifndef __CPROVER_LOCALE_H_INCLUDED
+#    include <locale.h>
+#    define __CPROVER_LOCALE_H_INCLUDED
+#  endif
+
+#  undef strtoll_l
+
+long long strtoll_l(const char *nptr, char **endptr, int base, locale_t loc);
+
+long long
+__isoc23_strtoll_l(const char *nptr, char **endptr, int base, locale_t loc)
+{
+__CPROVER_HIDE:;
+  return strtoll_l(nptr, endptr, base, loc);
+}
+
+#endif
+
+/* FUNCTION: __isoc23_strtoull_l */
+
+// glibc's name for strtoull_l in C23 mode (<stdlib.h> defines one as the other)
+
+#ifndef _WIN32
+
+#  ifndef __CPROVER_STDLIB_H_INCLUDED
+#    include <stdlib.h>
+#    define __CPROVER_STDLIB_H_INCLUDED
+#  endif
+
+#  ifndef __CPROVER_LOCALE_H_INCLUDED
+#    include <locale.h>
+#    define __CPROVER_LOCALE_H_INCLUDED
+#  endif
+
+#  undef strtoull_l
+
+unsigned long long
+strtoull_l(const char *nptr, char **endptr, int base, locale_t loc);
+
+unsigned long long
+__isoc23_strtoull_l(const char *nptr, char **endptr, int base, locale_t loc)
+{
+__CPROVER_HIDE:;
+  return strtoull_l(nptr, endptr, base, loc);
+}
+
+#endif
 
 /* FUNCTION: atoi */
 

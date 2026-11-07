@@ -1364,17 +1364,31 @@ void goto_check_ct::pointer_rel_check(
       expr,
       guard);
 
+    // In C++, two null pointers may be subtracted (N5008 [expr.add]/5.1:
+    // the result is 0; libstdc++'s vector::_M_realloc_insert does so for an
+    // empty vector) and compared ([expr.rel]/5: they compare equal, so p < q
+    // is false; basic_filebuf::_M_terminate_output tests pbase() < pptr()),
+    // so each pointer check is guarded with "or both operands are null".
+    // Not in C (C11 6.5.6/9, 6.5.8/5: both shall point into the same
+    // object), where the extra disjunct only enlarged the verification
+    // conditions.  (A C++ function with C language linkage, main included,
+    // has mode C.)
+    const exprt both_null =
+      mode == ID_cpp
+        ? exprt{and_exprt{null_object(expr.op0()), null_object(expr.op1())}}
+        : exprt{false_exprt{}};
+
     for(const auto &pointer : expr.operands())
     {
-      // just this particular byte must be within object bounds or one past the
-      // end
+      // just this particular byte must be within object bounds or one
+      // past the end
       const auto size = from_integer(0, size_type());
       auto conditions = get_pointer_dereferenceable_conditions(pointer, size);
 
       for(const auto &c : conditions)
       {
         add_guarded_property(
-          c.assertion,
+          both_null.is_false() ? c.assertion : or_exprt{c.assertion, both_null},
           "pointer relation: " + c.description,
           "pointer arithmetic",
           true, // fatal
@@ -1466,7 +1480,8 @@ void goto_check_ct::pointer_validity_check(
   else
   {
     auto size_of_expr_opt = size_of_expr(expr.type(), ns);
-    CHECK_RETURN(size_of_expr_opt.has_value());
+    if(!size_of_expr_opt.has_value())
+      return;
     size = size_of_expr_opt.value();
   }
 

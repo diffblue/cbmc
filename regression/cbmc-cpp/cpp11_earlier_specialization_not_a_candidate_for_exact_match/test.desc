@@ -1,0 +1,16 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ deduced per call: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+dropped the body of
+--
+Before the fix, the earlier specialization was checked in the exact-match
+phase of resolve(), and "dropped the body of function 'impl'" was reported.
+g++ 13 and clang++ 18 accept this program, and it fails only its WRONG
+assertion.
