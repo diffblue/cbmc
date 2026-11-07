@@ -16162,3 +16162,18 @@ its commit) operator_is_overloaded's built-in candidate check as a helper
 (gcc11/m32/arm64), MSVC, macOS, GCC 14 C++26 set, GCC 16 container (same
 8 container-only failures as round 221), IWYU gate, doxygen 1.15, cpplint,
 clang-format 18.1.8.
+
+## Round 223 (2026-11-07): GCC 16.2 headers; clang-format c++20
+
+CI's gcc-16 job uses the toolchain PPA's snapshot (16.0.1 20260315).  With
+GCC 16.2's headers 8 tests had failed in the gcc16-gate container: 4 only
+because the container had no clang/libc++ (gcc16-clang image adds them),
+cpp17_probe_std_any was the const-array reinterpret_cast bug fixed in
+ec0fe09033, gcc_attributes1/typedef1 pass, and
+cpp11_ostream_integer_formatting did not finish in 900 s: libstdc++'s
+__noreturn__ __throw_X helpers have no body, CBMC took them to return, and
+16.2's `if(...) __throw_bad_alloc(); else return ...;' in
+__new_allocator::allocate then fell off the end.  6f0b186402 models the
+helpers as throws.  CI's gcc-16 test set passes with both 16.0.1-ppa and
+16.2 (with clang installed).  .clang-format is Standard: c++20
+(84a5cd806f); the `<=>' clang-format off/on guards are gone.
