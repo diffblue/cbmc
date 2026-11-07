@@ -18,6 +18,7 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 #include <goto-programs/elide_cpp_returned_temporaries.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/goto_model.h>
+#include <goto-programs/instrument_cpp_postconditions.h>
 #include <goto-programs/instrument_preconditions.h>
 #include <goto-programs/mm_io.h>
 #include <goto-programs/remove_complex.h>
@@ -69,6 +70,7 @@ bool process_goto_program(
   // Construct C++ returned temporaries directly into caller storage
   // (N5008 [class.copy.elision]); must follow function pointer removal.
   elide_cpp_returned_temporaries(goto_model);
+  instrument_cpp_postconditions(goto_model);
 
   mm_io(goto_model, log.get_message_handler());
 

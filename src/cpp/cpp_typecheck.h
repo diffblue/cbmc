@@ -1060,10 +1060,12 @@ protected:
     const std::optional<exprt> &display = {});
   /// N5008 [basic.contract.eval]/1, [dcl.contract.func]: check the
   /// precondition assertions of the function \p symbol at the start of its
-  /// body and its postcondition assertions where it returns (C++26).
+  /// body; mark \p contract for the check of its postcondition assertions
+  /// when the function exits normally (C++26, done by goto-programs'
+  /// instrument_cpp_postconditions).
   void instrument_function_contract_assertions(
     symbolt &symbol,
-    const code_with_contract_typet &contract);
+    code_with_contract_typet &contract);
   method_bodiest method_bodies;
 
   // Deferred method bodies for lazy template elaboration.

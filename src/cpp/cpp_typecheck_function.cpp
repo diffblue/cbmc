@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/cprover_prefix.h>
-#include <util/fresh_symbol.h>
 #include <util/mathematical_expr.h>
 #include <util/pointer_expr.h>
 #include <util/replace_symbol.h>
@@ -690,12 +689,11 @@ code_blockt cpp_typecheckt::contract_check(
 
 void cpp_typecheckt::instrument_function_contract_assertions(
   symbolt &symbol,
-  const code_with_contract_typet &contract)
+  code_with_contract_typet &contract)
 {
   if(symbol.value.id() != ID_code)
     return;
   const auto &requires_clauses = contract.c_requires();
-  const auto &ensures_clauses = contract.c_ensures();
 
   // [basic.contract.eval]/1, [dcl.contract.func]/5: the precondition
   // assertions are evaluated after the parameters are initialized, before
@@ -723,119 +721,37 @@ void cpp_typecheckt::instrument_function_contract_assertions(
   }
   body.append(assumptions);
 
-  // ... and the postcondition assertions when the function returns, with
-  // the result name denoting the returned object ([dcl.contract.res]/1).
-  // The result is held in a variable: done for non-class return types, as
-  // a class-type result would be copied.
-  const typet &return_type = contract.return_type();
-  const bool checkable_result =
-    return_type.id() == ID_empty ||
-    (return_type.id() != ID_struct_tag && return_type.id() != ID_union_tag &&
-     !is_reference(return_type) && !is_rvalue_reference(return_type));
-  if(!ensures_clauses.empty() && !checkable_result)
+  // ... and the postcondition assertions when the function exits normally
+  // ([expr.call]/9), with the result name denoting the result object
+  // ([dcl.contract.res]/1): goto-programs' instrument_cpp_postconditions
+  // adds them, after guaranteed copy elision is lowered, so that a class
+  // result is not copied and a reference result stays bound.  Here each
+  // clause gets the location of its property.
+  for(auto &clause : contract.c_ensures())
   {
-    warning().source_location = symbol.location;
-    warning() << "postconditions of '" << symbol.display_name()
-              << "' are not checked: its return type is a class or "
-              << "reference type" << eom;
-  }
-  const auto postconditions = [&](const exprt &result)
-  {
-    code_blockt checks;
-    for(const auto &clause : ensures_clauses)
+    exprt &predicate = clause.id() == ID_lambda ? to_lambda_expr(clause).where()
+                                                : static_cast<exprt &>(clause);
+    // the description names the result as written
+    exprt display = predicate;
+    const irep_idt &name = predicate.get("#contract_result_name");
+    if(!name.empty())
     {
-      exprt predicate = clause.id() == ID_lambda
-                          ? to_lambda_expr(clause).where()
-                          : static_cast<const exprt &>(clause);
-      source_locationt location = clause.source_location();
-      location.set_function(function_name);
-      // the description names the result as written ([dcl.contract.res]/1)
-      exprt display = predicate;
-      const irep_idt &name = predicate.get("#contract_result_name");
-      if(!name.empty())
-      {
-        replace_symbolt rename;
-        rename.insert(
-          symbol_exprt{CPROVER_PREFIX "return_value", return_type},
-          symbol_exprt{name, return_type});
-        rename(display);
-      }
-      if(result.is_not_nil())
-      {
-        replace_symbolt replace;
-        replace.insert(
-          symbol_exprt{CPROVER_PREFIX "return_value", return_type}, result);
-        replace(predicate);
-      }
-      code_blockt check =
-        contract_check(predicate, "postcondition", location, display);
-      checks.append(check);
+      replace_symbolt rename;
+      rename.insert(
+        symbol_exprt{CPROVER_PREFIX "return_value", contract.return_type()},
+        symbol_exprt{name, contract.return_type()});
+      rename(display);
     }
-    return checks;
-  };
-
-  codet original = to_code(symbol.value);
-  if(!ensures_clauses.empty() && checkable_result)
-  {
-    std::size_t counter = 0;
-    std::function<void(codet &)> instrument_returns = [&](codet &code)
-    {
-      if(code.get_statement() == ID_return)
-      {
-        auto &ret = to_code_frontend_return(code);
-        code_blockt replacement;
-        replacement.add_source_location() = code.source_location();
-        if(ret.has_return_value() && return_type.id() != ID_empty)
-        {
-          symbolt &result_symbol = get_fresh_aux_symbol(
-            return_type,
-            id2string(symbol.name),
-            "contract_result$" + std::to_string(counter++),
-            code.source_location(),
-            symbol.mode,
-            symbol_table);
-          result_symbol.is_static_lifetime = false;
-          const symbol_exprt result = result_symbol.symbol_expr();
-          code_frontend_declt declaration{result};
-          declaration.add_source_location() = code.source_location();
-          replacement.add(std::move(declaration));
-          code_frontend_assignt assignment{result, ret.return_value()};
-          assignment.add_source_location() = code.source_location();
-          replacement.add(std::move(assignment));
-          replacement.append(postconditions(result));
-          code_frontend_returnt new_return{result};
-          new_return.add_source_location() = code.source_location();
-          replacement.add(std::move(new_return));
-        }
-        else
-        {
-          if(ret.has_return_value())
-          {
-            // a void expression returned from a void function
-            code_expressiont evaluate{ret.return_value()};
-            evaluate.add_source_location() = code.source_location();
-            replacement.add(std::move(evaluate));
-          }
-          replacement.append(postconditions(nil_exprt{}));
-          code_frontend_returnt new_return;
-          new_return.add_source_location() = code.source_location();
-          replacement.add(std::move(new_return));
-        }
-        code = std::move(replacement);
-        return;
-      }
-      for(auto &op : code.operands())
-      {
-        if(op.id() == ID_code)
-          instrument_returns(to_code(op));
-      }
-    };
-    instrument_returns(original);
+    source_locationt location = clause.source_location();
+    location.set_function(function_name);
+    location.set_property_class("postcondition");
+    location.set_comment("postcondition " + to_string(display));
+    clause.add_source_location() = location;
   }
-  body.add(std::move(original));
-  // flowing off the end of a void function returns ([stmt.return]/4)
-  if(!ensures_clauses.empty() && return_type.id() == ID_empty)
-    body.append(postconditions(nil_exprt{}));
+  if(!contract.c_ensures().empty())
+    contract.set("#cpp_enforce_postconditions", true);
+
+  body.add(std::move(to_code(symbol.value)));
   symbol.value = std::move(body);
 }
 
