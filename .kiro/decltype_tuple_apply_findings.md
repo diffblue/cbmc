@@ -16177,3 +16177,19 @@ __new_allocator::allocate then fell off the end.  6f0b186402 models the
 helpers as throws.  CI's gcc-16 test set passes with both 16.0.1-ppa and
 16.2 (with clang installed).  .clang-format is Standard: c++20
 (84a5cd806f); the `<=>' clang-format off/on guards are gone.
+
+## Round 224 (2026-11-07): postconditions of class and reference results
+
+The front end checked postconditions by holding each returned value in a
+local, so class results (an extra copy/move and destructor) and reference
+results (a copy, not a binding) were left unchecked with a warning.  The
+check now runs in goto-programs/instrument_cpp_postconditions, after
+elide_cpp_returned_temporaries: at END_FUNCTION when no exception is in
+flight, on the caller's result object for a class result (the hidden
+#result parameter), else on the returned value; the front end only marks
+the contract symbol (#cpp_enforce_postconditions) and sets each clause's
+property location.  The checks also moved after the local variables'
+destructors ([stmt.return]/5).  A first version declared the result
+variable at the start of the body, which hid the leading precondition
+assertions from instrument_preconditions (cpp26_contract_assertions_enforced
+caught it).
