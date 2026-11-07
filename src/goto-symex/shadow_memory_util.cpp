@@ -661,11 +661,20 @@ are_types_compatible(const typet &expr_type, const typet &shadow_type)
   if(expr_type.id() != ID_pointer || shadow_type.id() != ID_pointer)
     return true;
 
-  // We filter out the particularly annoying case of char ** being definitely
-  // incompatible with char[].
   const typet &expr_subtype = to_pointer_type(expr_type).base_type();
   const typet &shadow_subtype = to_pointer_type(shadow_type).base_type();
 
+  // Any object may be accessed through a character pointer (C11 6.5p7), e.g.,
+  // the shadow memory of a pointer-typed object.
+  if(
+    (expr_subtype.id() == ID_unsignedbv || expr_subtype.id() == ID_signedbv) &&
+    to_bitvector_type(expr_subtype).get_width() == config.ansi_c.char_width)
+  {
+    return true;
+  }
+
+  // We filter out the particularly annoying case of char ** being definitely
+  // incompatible with char[].
   if(
     expr_subtype.id() == ID_pointer &&
     to_pointer_type(expr_subtype).base_type().id() != ID_pointer &&
