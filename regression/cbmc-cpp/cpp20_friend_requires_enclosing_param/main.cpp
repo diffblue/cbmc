@@ -47,8 +47,8 @@ template <class Tp>
 struct closure_base
 {
   template <class View, class Closure>
-  requires same_as_<Tp, Closure> friend decltype(auto)
-  operator|(View &&v, Closure &&c)
+    requires same_as_<Tp, Closure>
+  friend decltype(auto) operator|(View &&v, Closure &&c)
   {
     return c(v);
   }

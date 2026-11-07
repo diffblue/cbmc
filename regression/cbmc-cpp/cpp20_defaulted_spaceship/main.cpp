@@ -3,18 +3,13 @@ struct Point
 {
   int x;
   int y;
-  // clang-format 18 splits <=> in C++17 mode
-  // clang-format off
   auto operator<=>(const Point &) const = default;
-  // clang-format on
 };
 
 int main()
 {
   Point a{1, 2};
   Point b{1, 3};
-  // clang-format off
   __CPROVER_assert((a <=> b) < 0, "defaulted spaceship");
-  // clang-format on
   return 0;
 }

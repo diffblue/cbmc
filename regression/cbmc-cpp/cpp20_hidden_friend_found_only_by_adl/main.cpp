@@ -18,10 +18,7 @@ struct X
 };
 } // namespace ns
 template <class T>
-constexpr bool has_eq = requires(const T &a, const T &b)
-{
-  a == b;
-};
+constexpr bool has_eq = requires(const T &a, const T &b) { a == b; };
 // a class template: the friend is declared by each specialization, and
 // found for an argument whose associated classes include one ([basic.lookup.
 // argdep]/3: a template argument's class)

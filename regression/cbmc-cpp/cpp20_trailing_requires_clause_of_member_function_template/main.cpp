@@ -12,25 +12,21 @@ public:
   // template's own parameter O bound to the deduced argument (the MSVC
   // STL's ranges::ref_view constructor)
   template <class O>
-  ref(O &&o) requires requires
+  ref(O &&o)
+    requires requires { bind(static_cast<O &&>(o)); }
+    : r{&static_cast<R &>(o)}
   {
-    bind(static_cast<O &&>(o));
   }
-      : r{&static_cast<R &>(o)}
-      {
-      }
-      template <class O>
-      static int size(O) requires requires
-      {
-        sizeof(O);
-      }
-      {
-        return sizeof(O);
-      }
-      R &base() const
-      {
-        return *r;
-      }
+  template <class O>
+  static int size(O)
+    requires requires { sizeof(O); }
+  {
+    return sizeof(O);
+  }
+  R &base() const
+  {
+    return *r;
+  }
 };
 int main()
 {

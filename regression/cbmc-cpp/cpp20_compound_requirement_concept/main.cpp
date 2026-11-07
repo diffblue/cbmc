@@ -12,11 +12,8 @@ template <class _Tp, class _Up>
 concept same_as_ = __is_same(_Tp, _Up) && __is_same(_Up, _Tp);
 
 template <class _Tp>
-concept has_self_add = requires(_Tp __t)
-{
-  {
-    __t + __t
-  } -> same_as_<_Tp>;
+concept has_self_add = requires(_Tp __t) {
+  { __t + __t } -> same_as_<_Tp>;
 };
 
 struct vec2

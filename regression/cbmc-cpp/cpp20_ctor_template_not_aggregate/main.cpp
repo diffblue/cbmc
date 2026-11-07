@@ -7,8 +7,8 @@ struct ref
 {
   R *p;
   template <typename T>
-  requires(!__is_same(T, ref)) constexpr ref(T &&t)
-    : p(&static_cast<R &>(static_cast<T &&>(t)))
+    requires(!__is_same(T, ref))
+  constexpr ref(T &&t) : p(&static_cast<R &>(static_cast<T &&>(t)))
   {
   }
   constexpr R &base() const

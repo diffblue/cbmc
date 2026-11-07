@@ -11,10 +11,7 @@ extern "C" void __CPROVER_assert(bool, const char *);
 namespace std
 {
 template <class _From, class>
-concept convertible_to = requires
-{
-  _From();
-};
+concept convertible_to = requires { _From(); };
 template <class>
 using iter_difference_t = int;
 template <class _Rp>

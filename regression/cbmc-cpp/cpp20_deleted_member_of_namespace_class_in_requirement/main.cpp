@@ -9,30 +9,27 @@ namespace rg
 namespace b_
 {
 template <class T>
-concept member_begin = requires(T && t)
-{
-  t.begin();
-};
+concept member_begin = requires(T &&t) { t.begin(); };
 void begin() = delete;
 template <class T>
-concept unq_begin = !member_begin<T> && requires(T && t)
-{
-  begin(t);
-};
+concept unq_begin = !member_begin<T> && requires(T &&t) { begin(t); };
 struct fn
 {
   template <class T, unsigned long N>
-  constexpr auto operator()(T (&t)[N]) const noexcept requires(sizeof(T) >= 0)
+  constexpr auto operator()(T (&t)[N]) const noexcept
+    requires(sizeof(T) >= 0)
   {
     return t + 0;
   }
   template <class T>
-  requires member_begin<T> constexpr auto operator()(T &&t) const
+    requires member_begin<T>
+  constexpr auto operator()(T &&t) const
   {
     return t.begin();
   }
   template <class T>
-  requires unq_begin<T> constexpr auto operator()(T &&t) const
+    requires unq_begin<T>
+  constexpr auto operator()(T &&t) const
   {
     return begin(t);
   }
@@ -45,10 +42,7 @@ inline constexpr auto begin = b_::fn{};
 }
 } // namespace rg
 template <class T>
-concept has_begin = requires(T & t)
-{
-  rg::begin(t);
-};
+concept has_begin = requires(T &t) { rg::begin(t); };
 struct R
 {
   int *begin()

@@ -10,10 +10,7 @@ struct get_inner
 
 // Constrained specialization: only matches when T has value_type
 template <class T>
-requires requires
-{
-  typename T::value_type;
-}
+  requires requires { typename T::value_type; }
 struct get_inner<T>
 {
   typedef typename T::value_type type;

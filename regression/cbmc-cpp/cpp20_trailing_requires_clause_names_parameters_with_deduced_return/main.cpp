@@ -14,11 +14,9 @@ struct third
 // requires-clause names the function parameters l and r (the MSVC STL's
 // range adaptor closure operator|)
 template <class L, class R>
-requires(small<R>) constexpr decltype(auto)
-operator|(L &&l, R &&r) requires requires
-{
-  static_cast<R &&>(r)(static_cast<L &&>(l));
-}
+  requires(small<R>)
+constexpr decltype(auto) operator|(L &&l, R &&r)
+  requires requires { static_cast<R &&>(r)(static_cast<L &&>(l)); }
 {
   return static_cast<R &&>(r)(static_cast<L &&>(l));
 }

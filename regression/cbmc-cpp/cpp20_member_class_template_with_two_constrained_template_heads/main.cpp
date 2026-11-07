@@ -11,20 +11,21 @@ extern "C" void __CPROVER_assert(bool, const char *);
 template <class T>
 concept small = sizeof(T) <= 4;
 template <class V>
-requires small<V> struct view
+  requires small<V>
+struct view
 {
   template <class U>
-  requires small<U> struct box;
+    requires small<U>
+  struct box;
   template <class U>
-  requires requires(U u)
-  {
-    u + 1;
-  }
+    requires requires(U u) { u + 1; }
   struct num;
 };
 template <class V>
-requires small<V> template <class U>
-requires small<U> struct view<V>::box
+  requires small<V>
+template <class U>
+  requires small<U>
+struct view<V>::box
 {
   U u;
   V v;
@@ -34,11 +35,9 @@ requires small<U> struct view<V>::box
   }
 };
 template <class V>
-requires small<V> template <class U>
-requires requires(U u)
-{
-  u + 1;
-}
+  requires small<V>
+template <class U>
+  requires requires(U u) { u + 1; }
 struct view<V>::num
 {
   U u;

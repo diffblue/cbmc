@@ -29,7 +29,8 @@ struct S
 template <typename... Ts>
 concept all_small = ((sizeof(Ts) <= 4) && ...);
 template <typename... Args>
-requires all_small<Args...> constexpr int f(Args...)
+  requires all_small<Args...>
+constexpr int f(Args...)
 {
   return 1;
 }

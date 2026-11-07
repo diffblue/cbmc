@@ -11,7 +11,8 @@ template <int N, typename... Ts>
 concept arity = (sizeof...(Ts) == N);
 
 template <typename... Args>
-requires all_small<Args...> constexpr int f(Args...)
+  requires all_small<Args...>
+constexpr int f(Args...)
 {
   return 1;
 }
@@ -22,7 +23,8 @@ constexpr int f(Args...)
 }
 
 template <typename T, typename... Args>
-requires first_is<T, Args...> constexpr int g(T, Args...)
+  requires first_is<T, Args...>
+constexpr int g(T, Args...)
 {
   return 1;
 }
@@ -33,7 +35,8 @@ constexpr int g(T, Args...)
 }
 
 template <typename... Args>
-requires arity<3, Args...> constexpr int h(Args...)
+  requires arity<3, Args...>
+constexpr int h(Args...)
 {
   return 1;
 }
@@ -48,7 +51,8 @@ struct box
 {
   using value_type = T;
   template <typename U>
-  requires __is_same(U, typename box<T>::value_type) constexpr int same(U) const
+    requires __is_same
+  (U, typename box<T>::value_type) constexpr int same(U) const
   {
     return 1;
   }

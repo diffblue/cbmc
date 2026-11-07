@@ -26,7 +26,9 @@ template <typename T>
 struct Wrapper
 {
   T val;
-  Wrapper(T v) requires SameAs<T, int> : val(v)
+  Wrapper(T v)
+    requires SameAs<T, int>
+    : val(v)
   {
   }
 };

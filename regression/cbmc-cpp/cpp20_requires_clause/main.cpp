@@ -1,6 +1,7 @@
 // C++20 requires clause
 template <typename T>
-requires(__is_same(T, int)) T add(T a, T b)
+  requires(__is_same(T, int))
+T add(T a, T b)
 {
   return a + b;
 }

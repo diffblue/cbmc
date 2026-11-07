@@ -18,7 +18,8 @@ template <class T>
 concept small = sizeof(T) <= 8;
 
 template <class V>
-requires small<V> struct view
+  requires small<V>
+struct view
 {
   template <bool>
   class iterator;
@@ -34,7 +35,8 @@ requires small<V> struct view
 };
 
 template <class V>
-requires small<V> template <bool Const>
+  requires small<V>
+template <bool Const>
 class view<V>::iterator
 {
   using Base = typename maybe_const<Const, V>::type;

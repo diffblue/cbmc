@@ -24,11 +24,8 @@ struct is_int_<int>
 template <class T>
 concept integral_ = is_int_<T>::value;
 template <class T>
-concept has_integral_minus = requires(const T &a, const T &b)
-{
-  {
-    a - b
-  } -> integral_;
+concept has_integral_minus = requires(const T &a, const T &b) {
+  { a - b } -> integral_;
 };
 struct no_minus
 {

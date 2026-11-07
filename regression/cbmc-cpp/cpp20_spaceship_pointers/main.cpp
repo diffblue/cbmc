@@ -7,13 +7,13 @@
 // ("found no match for symbol 'strong_ordering'") -- libstdc++ 16's
 // _Bit_iterator_base::operator<=>, behind every std::vector<bool> use and
 // the gcc16 vector_find KNOWNBUG.  Found by the cvise reduction of that test.
-// clang-format off
 #include <compare>
 extern "C" void __CPROVER_assert(bool, const char *);
 struct It
 {
   unsigned long *p;
-  friend constexpr std::strong_ordering operator<=>(const It &x, const It &y) noexcept
+  friend constexpr std::strong_ordering
+  operator<=>(const It &x, const It &y) noexcept
   {
     if(const auto cmp = x.p <=> y.p; cmp != 0)
       return cmp;

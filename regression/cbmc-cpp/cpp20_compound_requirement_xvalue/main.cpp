@@ -34,53 +34,32 @@ struct S
 };
 
 template <class F>
-concept LRef = requires(F f)
-{
-  {
-    f()
-  } -> same_as<int &>;
+concept LRef = requires(F f) {
+  { f() } -> same_as<int &>;
 };
 template <class F>
-concept RRef = requires(F f)
-{
-  {
-    f()
-  } -> same_as<int &&>;
+concept RRef = requires(F f) {
+  { f() } -> same_as<int &&>;
 };
 template <class F>
-concept PR = requires(F f)
-{
-  {
-    f()
-  } -> same_as<int>;
+concept PR = requires(F f) {
+  { f() } -> same_as<int>;
 };
 template <class P>
-concept DerefLRef = requires(P p)
-{
-  {
-    *p
-  } -> same_as<int &>;
+concept DerefLRef = requires(P p) {
+  { *p } -> same_as<int &>;
 };
 template <class P>
-concept MoveDeref = requires(P p)
-{
-  {
-    static_cast<int &&>(*p)
-  } -> same_as<int &&>;
+concept MoveDeref = requires(P p) {
+  { static_cast<int &&>(*p) } -> same_as<int &&>;
 };
 template <class T>
-concept MemberMove = requires(T t)
-{
-  {
-    t.mv()
-  } -> same_as<int &&>;
+concept MemberMove = requires(T t) {
+  { t.mv() } -> same_as<int &&>;
 };
 template <class T>
-concept MemberRead = requires(T t)
-{
-  {
-    t.m
-  } -> same_as<int &>;
+concept MemberRead = requires(T t) {
+  { t.m } -> same_as<int &>;
 };
 
 static_assert(LRef<int &(*)()>, "lvalue-returning call: int&");
@@ -95,12 +74,14 @@ static_assert(MemberMove<S>, "member call returning int&&");
 static_assert(MemberRead<S>, "member read: int&");
 
 template <class F>
-requires RRef<F> int pick(F)
+  requires RRef<F>
+int pick(F)
 {
   return 2;
 }
 template <class F>
-requires LRef<F> int pick(F)
+  requires LRef<F>
+int pick(F)
 {
   return 1;
 }

@@ -14,7 +14,8 @@ T increment(T x)
 
 // Concept used in requires clause
 template <class T>
-requires SignedIntegral<T> T negate(T x)
+  requires SignedIntegral<T>
+T negate(T x)
 {
   return -x;
 }

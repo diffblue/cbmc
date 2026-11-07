@@ -8,14 +8,15 @@ struct category
 };
 
 template <class T>
-requires(__is_pointer(T)) struct category<T>
+  requires(__is_pointer(T))
+struct category<T>
 {
   static const int value = 1;
 };
 
 template <class T>
-requires(
-  __is_pointer(T) && __is_integral(__remove_pointer(T))) struct category<T>
+  requires(__is_pointer(T) && __is_integral(__remove_pointer(T)))
+struct category<T>
 {
   static const int value = 2;
 };

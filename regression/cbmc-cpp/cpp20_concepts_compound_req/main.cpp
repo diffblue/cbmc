@@ -6,11 +6,8 @@ template <class T, class U>
 concept same_as = __is_same(T, U);
 
 template <class T>
-concept HasIntSize = requires(T c)
-{
-  {
-    c.size()
-  } -> same_as<int>;
+concept HasIntSize = requires(T c) {
+  { c.size() } -> same_as<int>;
 };
 
 // This should NOT satisfy HasIntSize (size() returns unsigned long)

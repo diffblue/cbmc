@@ -45,8 +45,8 @@ struct ref_view : view_interface<ref_view<R>>
 {
   R *p;
   template <typename T>
-  requires(!__is_same(T, ref_view)) constexpr ref_view(T &&t)
-    : p(&static_cast<R &>(static_cast<T &&>(t)))
+    requires(!__is_same(T, ref_view))
+  constexpr ref_view(T &&t) : p(&static_cast<R &>(static_cast<T &&>(t)))
   {
   }
   constexpr auto begin() const

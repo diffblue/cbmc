@@ -1,4 +1,3 @@
-// clang-format off
 // N5008 [class.spaceship]/2-4, [class.eq]/2-3, [class.compare.default]/5:
 // defaulted comparisons compare the expanded list of subobjects -- bases,
 // members, array elements -- and an `auto' operator<=> returns the common
@@ -43,4 +42,3 @@ int main()
     "declared return type");
   __CPROVER_assert(x == y, "WRONG (must FAIL)");
 }
-// clang-format on

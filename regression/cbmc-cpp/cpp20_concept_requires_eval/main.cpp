@@ -17,17 +17,11 @@ struct cond<true, T, F>
 
 // simple-requirement: satisfied iff `a + a` is a valid expression.
 template <class T>
-concept Addable = requires(T a)
-{
-  a + a;
-};
+concept Addable = requires(T a) { a + a; };
 
 // type-requirement: satisfied iff T::value_type names a type.
 template <class T>
-concept HasValueType = requires
-{
-  typename T::value_type;
-};
+concept HasValueType = requires { typename T::value_type; };
 
 struct WithVT
 {

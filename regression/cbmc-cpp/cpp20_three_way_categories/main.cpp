@@ -22,10 +22,7 @@ constexpr strong_ordering strong_ordering::greater(1);
 struct S
 {
   int x;
-  // clang-format 18 splits <=> in C++17 mode
-  // clang-format off
   std::strong_ordering operator<=>(const S &o) const
-  // clang-format on
   {
     if(x < o.x)
       return std::strong_ordering::less;
@@ -37,9 +34,7 @@ struct S
 int main()
 {
   S a{1}, b{2};
-  // clang-format off
   auto r = a <=> b;
-  // clang-format on
   __CPROVER_assert(r == std::strong_ordering::less, "1 <=> 2 is less");
   return 0;
 }

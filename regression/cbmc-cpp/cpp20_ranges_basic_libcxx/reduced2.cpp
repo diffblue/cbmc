@@ -44,8 +44,7 @@ namespace __attribute__(()) std
   __attribute__(()) decltype(std::__declval<_Tp>(0))
   declval();
   template <class _From, class _To>
-  concept convertible_to = is_convertible_v<_From, _To> && requires
-  {
+  concept convertible_to = is_convertible_v<_From, _To> && requires {
     static_cast<_To>(std::declval<_From>());
   };
   template <class _Tp, class _Up>
@@ -133,25 +132,18 @@ namespace __attribute__(()) std
   using __cv_cond_res =
     __cond_res<__copy_cv_t<_Xp, _Yp> &, __copy_cv_t<_Yp, _Xp> &>;
   template <class _Ap, class _Bp, class _Xp, class _Yp>
-  requires requires
-  {
-    typename __cv_cond_res<_Xp, _Yp>;
-  }
-  &&is_reference_v<
-    __cv_cond_res<_Xp, _Yp>> struct __common_ref<_Ap, _Bp &, _Xp, _Yp>
+    requires requires { typename __cv_cond_res<_Xp, _Yp>; } &&
+             is_reference_v<__cv_cond_res<_Xp, _Yp>>
+  struct __common_ref<_Ap, _Bp &, _Xp, _Yp>
   {
     using __type = __cv_cond_res<_Xp, _Yp>;
   };
   template <class _Tp, class _Up>
   using __common_ref_D = __common_ref_t<const _Tp, _Up &>;
   template <class _Ap, class _Bp, class _Xp, class _Yp>
-  requires requires
-  {
-    typename __common_ref_D<_Xp, _Yp>;
-  }
-  &&is_convertible_v<
-    _Ap,
-    __common_ref_D<_Xp, _Yp>> struct __common_ref<_Ap &&, _Bp &, _Xp, _Yp>
+    requires requires { typename __common_ref_D<_Xp, _Yp>; } &&
+             is_convertible_v<_Ap, __common_ref_D<_Xp, _Yp>>
+  struct __common_ref<_Ap &&, _Bp &, _Xp, _Yp>
   {
     using __type = __common_ref_D<_Xp, _Yp>;
   };
@@ -166,18 +158,15 @@ namespace __attribute__(()) std
   {
   };
   template <class _Tp, class _Up>
-  requires is_reference_v<_Tp> &&is_reference_v<_Up> &&requires
-  {
-    typename __common_ref_t<_Tp, _Up>;
-  }
-  &&is_convertible_v<
-    add_pointer_t<_Tp>,
-    add_pointer_t<__common_ref_t<_Tp, _Up>>>
-    &&is_convertible_v<
-      add_pointer_t<_Up>,
-      add_pointer_t<__common_ref_t<
-        _Tp,
-        _Up>>> struct __common_reference_sub_bullet1<_Tp, _Up>
+    requires is_reference_v<_Tp> && is_reference_v<_Up> &&
+             requires { typename __common_ref_t<_Tp, _Up>; } &&
+             is_convertible_v<
+               add_pointer_t<_Tp>,
+               add_pointer_t<__common_ref_t<_Tp, _Up>>> &&
+             is_convertible_v<
+               add_pointer_t<_Up>,
+               add_pointer_t<__common_ref_t<_Tp, _Up>>>
+  struct __common_reference_sub_bullet1<_Tp, _Up>
   {
     using type = __common_ref_t<_Tp, _Up>;
   };
@@ -196,12 +185,11 @@ namespace __attribute__(()) std
                             common_reference_with<
                               __make_const_lvalue_ref<_Lhs>,
                               __make_const_lvalue_ref<_Rhs>> &&
-                            requires(_Lhs __lhs, _Rhs __rhs)
-  {
-    {
-      __lhs = std::forward<_Rhs>(__rhs)
-    } -> same_as<_Lhs>;
-  };
+                            requires(_Lhs __lhs, _Rhs __rhs) {
+                              {
+                                __lhs = std::forward<_Rhs>(__rhs)
+                              } -> same_as<_Lhs>;
+                            };
   template <class>
   constexpr bool is_nothrow_destructible_v =
     integral_constant<bool, __is_nothrow_destructible(int)>::value;
@@ -217,16 +205,11 @@ namespace __attribute__(()) std
   concept constructible_from =
     destructible<_Tp> && is_constructible_v<_Tp, _Args...>;
   template <class _Tp>
-  concept __default_initializable = requires
-  {
-    ::new _Tp;
-  };
+  concept __default_initializable = requires { ::new _Tp; };
   template <class _Tp>
-  concept default_initializable = constructible_from<_Tp> && requires
-  {
+  concept default_initializable = constructible_from<_Tp> && requires {
     _Tp{};
-  }
-  &&__default_initializable<_Tp>;
+  } && __default_initializable<_Tp>;
   template <class _Tp>
   concept move_constructible =
     constructible_from<_Tp, _Tp> && convertible_to<_Tp, _Tp>;
@@ -251,10 +234,7 @@ namespace __attribute__(()) std
   }
   } // namespace ranges
   template <class>
-  concept swappable = requires
-  {
-    ranges::swap;
-  };
+  concept swappable = requires { ranges::swap; };
   template <class _Tp>
   constexpr bool is_object_v = __is_object(_Tp);
   template <class _Tp>
@@ -272,7 +252,8 @@ namespace __attribute__(()) std
   template <class _Tp>
   concept __boolean_testable_impl = convertible_to<_Tp, bool>;
   template <class _Tp>
-  concept __boolean_testable = __boolean_testable_impl<_Tp> && requires()
+  concept __boolean_testable = __boolean_testable_impl<_Tp> &&
+    requires()
   {
     {
       std::forward<_Tp>
@@ -286,21 +267,18 @@ namespace __attribute__(()) std
     same_as<
       common_reference_t<_Tp &, const _Up &>,
       common_reference_t<_Up &, const _Tp &>> &&
-    requires
-  {
-    convertible_to<_Up, _CommonRef> || convertible_to<_Up, _CommonRef>;
-  };
+    requires {
+      convertible_to<_Up, _CommonRef> || convertible_to<_Up, _CommonRef>;
+    };
   template <class _Tp, class _Up>
   concept __comparison_common_type_with = __comparison_common_type_with_impl<
     remove_cvref_t<_Tp>,
     remove_cvref_t<_Up>>;
   template <class _Tp, class _Up>
-  concept __weakly_equality_comparable_with =
-    requires(__make_const_lvalue_ref<_Tp> __t, __make_const_lvalue_ref<_Up> __u)
-  {
-    {
-      __u != __t
-    } -> __boolean_testable;
+  concept __weakly_equality_comparable_with = requires(
+    __make_const_lvalue_ref<_Tp> __t,
+    __make_const_lvalue_ref<_Up> __u) {
+    { __u != __t } -> __boolean_testable;
   };
   template <class _Tp>
   concept equality_comparable = __weakly_equality_comparable_with<_Tp, _Tp>;
@@ -332,8 +310,7 @@ namespace __attribute__(()) std
   __attribute__(()) invoke_result_t<_Fn, _Args...>
   invoke(_Fn, _Args &&...);
   template <class _Fn, class... _Args>
-  concept invocable = requires(_Fn __fn, _Args... __args)
-  {
+  concept invocable = requires(_Fn __fn, _Args... __args) {
     std::invoke(std::forward<_Fn>(__fn), std::forward<_Args>(__args)...);
   };
   template <class _Fn, class... _Args>
@@ -342,15 +319,10 @@ namespace __attribute__(()) std
   concept predicate = regular_invocable<_Fn, _Args...> &&
                       __boolean_testable<invoke_result_t<_Fn, _Args...>>;
   template <class _Tp>
-  concept __primary_template = requires
-  {
-    _IsSame<typename _Tp::__primary_template, _Tp>::value;
-  };
+  concept __primary_template =
+    requires { _IsSame<typename _Tp::__primary_template, _Tp>::value; };
   template <class>
-  concept __referenceable = requires
-  {
-    typename __void_t<>;
-  };
+  concept __referenceable = requires { typename __void_t<>; };
   template <class _Tp>
   concept semiregular = copyable<_Tp> && default_initializable<_Tp>;
   template <class _Tp>
@@ -361,12 +333,10 @@ namespace __attribute__(()) std
   template <class _Rp, class _Tp, class _Up>
   concept strict_weak_order = relation<_Rp, _Tp, _Up>;
   template <class _Tp, class _Up>
-  concept __partially_ordered_with =
-    requires(__make_const_lvalue_ref<_Tp> __t, __make_const_lvalue_ref<_Up> __u)
-  {
-    {
-      __u >= __t
-    } -> __boolean_testable;
+  concept __partially_ordered_with = requires(
+    __make_const_lvalue_ref<_Tp> __t,
+    __make_const_lvalue_ref<_Up> __u) {
+    { __u >= __t } -> __boolean_testable;
   };
   template <class _Tp>
   concept totally_ordered =
@@ -406,15 +376,13 @@ namespace __attribute__(()) std
   template <class>
   struct __cond_value_type;
   template <class _Tp>
-  requires is_object_v<_Tp> struct __cond_value_type<_Tp>
+    requires is_object_v<_Tp>
+  struct __cond_value_type<_Tp>
   {
     using value_type = remove_cv_t<_Tp>;
   };
   template <class _Tp>
-  concept __has_member_value_type = requires
-  {
-    typename _Tp::value_type;
-  };
+  concept __has_member_value_type = requires { typename _Tp::value_type; };
   template <class>
   struct indirectly_readable_traits;
   template <__has_member_value_type _Tp>
@@ -441,11 +409,8 @@ namespace __attribute__(()) std
   using _Or = _OrImpl<sizeof...(_Args) != 0>::
     template _Result<integral_constant<bool, false>, _Args...>;
   template <class _Tp>
-  concept __dereferenceable = requires(_Tp __t)
-  {
-    {
-      __t
-    } -> __referenceable;
+  concept __dereferenceable = requires(_Tp __t) {
+    { __t } -> __referenceable;
   };
   template <__dereferenceable _Tp>
   using iter_reference_t = decltype(*std::declval<_Tp>());
@@ -465,7 +430,8 @@ namespace __attribute__(()) std
   {
   };
   template <class _Tp>
-  requires is_object_v<_Tp> struct iterator_traits<_Tp *>
+    requires is_object_v<_Tp>
+  struct iterator_traits<_Tp *>
   {
     typedef ptrdiff_t difference_type;
     typedef __remove_cv_t<_Tp> value_type;
@@ -479,21 +445,17 @@ namespace __attribute__(()) std
   namespace ranges
   {
   template <class _Tp>
-  concept __unqualified_iter_move =
-    __class_or_enum<remove_cvref_t<_Tp>> && requires
-  {
-    iter_move(std::forward<_Tp>);
-  };
+  concept __unqualified_iter_move = __class_or_enum<remove_cvref_t<_Tp>> &&
+                                    requires { iter_move(std::forward<_Tp>); };
   template <class _Tp>
-  concept __move_deref = !__unqualified_iter_move<_Tp> && requires(_Tp __t)
-  {
+  concept __move_deref = !__unqualified_iter_move<_Tp> && requires(_Tp __t) {
     is_lvalue_reference_v<decltype(__t)>;
   };
   struct Trans_NS___iter_move___fn
   {
     template <class _Ip>
-    requires __move_deref<_Ip> __attribute__(()) __attribute__(())
-    __attribute__(()) auto
+      requires __move_deref<_Ip>
+    __attribute__(()) __attribute__(()) __attribute__(()) auto
     operator()(_Ip __i) const -> decltype(std::move(*std::forward<_Ip>(__i)));
   };
   inline namespace
@@ -502,28 +464,20 @@ namespace __attribute__(()) std
   }
   } // namespace ranges
   template <__dereferenceable _Tp>
-  requires requires
-  {
-    {
-      ranges::iter_move
-    } -> __referenceable;
-  }
+    requires requires {
+      { ranges::iter_move } -> __referenceable;
+    }
   using iter_rvalue_reference_t =
     decltype(ranges::iter_move(std::declval<_Tp>()));
   template <class _In>
-  concept __indirectly_readable_impl = requires(_In __i)
-  {
-    {
-      ranges::iter_move(__i)
-    } -> same_as<iter_rvalue_reference_t<_In>>;
-  }
-  &&common_reference_with<iter_reference_t<_In>, iter_value_t<_In> &>
-    &&common_reference_with<
+  concept __indirectly_readable_impl =
+    requires(_In __i) {
+      { ranges::iter_move(__i) } -> same_as<iter_rvalue_reference_t<_In>>;
+    } && common_reference_with<iter_reference_t<_In>, iter_value_t<_In> &> &&
+    common_reference_with<
       iter_reference_t<_In>,
-      iter_rvalue_reference_t<_In> &&>
-      &&common_reference_with<
-        iter_rvalue_reference_t<_In> &&,
-        iter_value_t<_In> &>;
+      iter_rvalue_reference_t<_In> &&> &&
+    common_reference_with<iter_rvalue_reference_t<_In> &&, iter_value_t<_In> &>;
   template <class _In>
   concept indirectly_readable = __indirectly_readable_impl<remove_cvref_t<_In>>;
   template <class _Tp>
@@ -538,26 +492,17 @@ namespace __attribute__(()) std
   template <class _Tp>
   concept __signed_integer_like = signed_integral<_Tp>;
   template <class _Ip>
-  concept weakly_incrementable = movable<_Ip> && requires
-  {
-    __signed_integer_like<iter_difference_t<_Ip>>;
-  };
+  concept weakly_incrementable =
+    movable<_Ip> && requires { __signed_integer_like<iter_difference_t<_Ip>>; };
   template <class _Ip>
   concept incrementable =
-    regular<_Ip> && weakly_incrementable<_Ip> && requires(_Ip __i)
-  {
-    {
-      __i++
-    } -> same_as<_Ip>;
-  };
+    regular<_Ip> && weakly_incrementable<_Ip> && requires(_Ip __i) {
+      { __i++ } -> same_as<_Ip>;
+    };
   template <class _Ip>
-  concept input_or_output_iterator = requires(_Ip __i)
-  {
-    {
-      __i
-    } -> __referenceable;
-  }
-  &&weakly_incrementable<_Ip>;
+  concept input_or_output_iterator = requires(_Ip __i) {
+    { __i } -> __referenceable;
+  } && weakly_incrementable<_Ip>;
   template <class _Sp, class _Ip>
   concept sentinel_for = semiregular<_Sp> && input_or_output_iterator<_Ip> &&
                          __weakly_equality_comparable_with<_Sp, _Ip>;
@@ -567,12 +512,9 @@ namespace __attribute__(()) std
   concept sized_sentinel_for =
     sentinel_for<_Sp, _Ip> &&
     !disable_sized_sentinel_for<remove_cv_t<_Sp>, remove_cv_t<_Ip>> &&
-    requires(_Ip __i, _Sp __s)
-  {
-    {
-      __i - __s
-    } -> same_as<iter_difference_t<_Ip>>;
-  };
+    requires(_Ip __i, _Sp __s) {
+      { __i - __s } -> same_as<iter_difference_t<_Ip>>;
+    };
   template <class _Iter>
   struct __iter_traits_cache
   {
@@ -606,11 +548,9 @@ namespace __attribute__(()) std
     __iter_concept_cache<_Iter>::type::template _Apply<_Iter>;
   template <class _Ip>
   concept input_iterator =
-    input_or_output_iterator<_Ip> && indirectly_readable<_Ip> && requires
-  {
-    typename _ITER_CONCEPT<_Ip>;
-  }
-  &&derived_from<_ITER_CONCEPT<_Ip>, input_iterator_tag>;
+    input_or_output_iterator<_Ip> && indirectly_readable<_Ip> && requires {
+      typename _ITER_CONCEPT<_Ip>;
+    } && derived_from<_ITER_CONCEPT<_Ip>, input_iterator_tag>;
   template <class _Ip>
   concept forward_iterator =
     input_iterator<_Ip> &&
@@ -620,23 +560,17 @@ namespace __attribute__(()) std
   concept bidirectional_iterator =
     forward_iterator<_Ip> &&
     derived_from<_ITER_CONCEPT<_Ip>, bidirectional_iterator_tag> &&
-    requires(_Ip __i)
-  {
-    {
-      __i--
-    } -> same_as<_Ip>;
-  };
+    requires(_Ip __i) {
+      { __i-- } -> same_as<_Ip>;
+    };
   template <class _Ip>
   concept random_access_iterator =
     bidirectional_iterator<_Ip> &&
     derived_from<_ITER_CONCEPT<_Ip>, random_access_iterator_tag> &&
     totally_ordered<_Ip> && sized_sentinel_for<_Ip, _Ip> &&
-    requires(_Ip, _Ip __j, iter_difference_t<_Ip> __n)
-  {
-    {
-      __j[__n]
-    } -> same_as<iter_reference_t<_Ip>>;
-  };
+    requires(_Ip, _Ip __j, iter_difference_t<_Ip> __n) {
+      { __j[__n] } -> same_as<iter_reference_t<_Ip>>;
+    };
   template <class _Fp, class _It>
   concept indirectly_regular_unary_invocable =
     indirectly_readable<_It> && copy_constructible<_Fp> &&
@@ -657,9 +591,9 @@ namespace __attribute__(()) std
     strict_weak_order<_Fp, iter_reference_t<_It1>, __indirect_value_t<_It2>> &&
     strict_weak_order<_Fp, iter_reference_t<_It1>, iter_reference_t<_It2>>;
   template <class _Fp, class... _Its>
-    requires(indirectly_readable<_Its> &&...) &&
-    invocable<_Fp, iter_reference_t<_Its>...> using indirect_result_t =
-    invoke_result_t<_Fp, iter_reference_t<_Its>...>;
+    requires(indirectly_readable<_Its> && ...) &&
+              invocable<_Fp, iter_reference_t<_Its>...>
+  using indirect_result_t = invoke_result_t<_Fp, iter_reference_t<_Its>...>;
   namespace ranges
   {
   template <class>
@@ -668,8 +602,7 @@ namespace __attribute__(()) std
   concept __can_borrow =
     is_lvalue_reference_v<_Tp> || enable_borrowed_range<remove_cvref_t<_Tp>>;
   template <class _Tp>
-  concept __member_begin = __can_borrow<_Tp> && requires(_Tp __t)
-  {
+  concept __member_begin = __can_borrow<_Tp> && requires(_Tp __t) {
     {
       static_cast<::std::__decay_t<decltype((__t.begin()))>>(__t.begin())
     } -> input_or_output_iterator;
@@ -678,13 +611,14 @@ namespace __attribute__(()) std
   {
     template <class _Tp, decltype(sizeof(int)) _Np>
     __attribute__(()) __attribute__(()) __attribute__(()) auto
-    operator()(_Tp (&__t)[_Np]) const requires(sizeof(_Tp) >= 0)
+    operator()(_Tp (&__t)[_Np]) const
+      requires(sizeof(_Tp) >= 0)
     {
       return __t + 0;
     }
     template <class _Tp>
-    requires __member_begin<_Tp> __attribute__(()) __attribute__(())
-    __attribute__(()) auto
+      requires __member_begin<_Tp>
+    __attribute__(()) __attribute__(()) __attribute__(()) auto
     operator()(_Tp &&__t) const
     {
       return static_cast<::std::__decay_t<decltype((__t.begin()))>>(
@@ -698,8 +632,7 @@ namespace __attribute__(()) std
   template <class _Tp>
   using iterator_t = decltype(ranges::begin(std::declval<_Tp &>()));
   template <class _Tp>
-  concept __member_end = __can_borrow<_Tp> && requires(_Tp __t)
-  {
+  concept __member_end = __can_borrow<_Tp> && requires(_Tp __t) {
     {
       static_cast<::std::__decay_t<decltype((__t.end()))>>(__t.end())
     } -> sentinel_for<iterator_t<_Tp>>;
@@ -708,13 +641,14 @@ namespace __attribute__(()) std
   {
     template <class _Tp, decltype(sizeof(int)) _Np>
     __attribute__(()) __attribute__(()) __attribute__(()) auto
-    operator()(_Tp (&__t)[_Np]) const requires(sizeof(_Tp) >= 0)
+    operator()(_Tp (&__t)[_Np]) const
+      requires(sizeof(_Tp) >= 0)
     {
       return __t + _Np;
     }
     template <class _Tp>
-    requires __member_end<_Tp> __attribute__(()) __attribute__(())
-    __attribute__(()) auto
+      requires __member_end<_Tp>
+    __attribute__(()) __attribute__(()) __attribute__(()) auto
     operator()(_Tp &&__t) const
     {
       return static_cast<::std::__decay_t<decltype((__t.end()))>>(__t.end());
@@ -792,17 +726,13 @@ namespace __attribute__(()) std
   namespace ranges
   {
   template <class _Derived>
-  requires is_class_v<_Derived>
-    &&same_as<_Derived, remove_cv_t<_Derived>> class view_interface;
+    requires is_class_v<_Derived> && same_as<_Derived, remove_cv_t<_Derived>>
+  class view_interface;
   template <class _Op, class _Yp>
-  requires(
-    !same_as<
-      _Op,
-      view_interface<
-        _Yp>>) void __is_derived_from_view_interface(view_interface<_Yp> *);
+    requires(!same_as<_Op, view_interface<_Yp>>)
+  void __is_derived_from_view_interface(view_interface<_Yp> *);
   template <class _Tp>
-  constexpr bool enable_view = derived_from<_Tp, int> || requires
-  {
+  constexpr bool enable_view = derived_from<_Tp, int> || requires {
     ranges::__is_derived_from_view_interface<remove_cv_t<_Tp>>(
       (remove_cv_t<_Tp> *)nullptr);
   };
@@ -811,29 +741,23 @@ namespace __attribute__(()) std
   template <class _Tp>
   concept __size_enabled = disable_sized_range<remove_cvref_t<_Tp>>;
   template <class _Tp>
-  concept __member_size = __size_enabled<_Tp> && requires(_Tp __t)
-  {
-    {
-      static_cast<::std::__decay_t<decltype(0)>>(__t.size0)
-    } -> __integer_like;
+  concept __member_size = __size_enabled<_Tp> && requires(_Tp __t) {
+    { static_cast<::std::__decay_t<decltype(0)>>(__t.size0) } -> __integer_like;
   };
   template <class _Tp>
-  concept __unqualified_size = __size_enabled<_Tp> && __member_size<_Tp> &&
-                               __class_or_enum<remove_cvref_t<_Tp>> && requires
-  {
-    {
-      static_cast<::std::__decay_t<decltype(0)>>(0)
-    } -> __integer_like;
-  };
+  concept __unqualified_size =
+    __size_enabled<_Tp> && __member_size<_Tp> &&
+    __class_or_enum<remove_cvref_t<_Tp>> && requires {
+      { static_cast<::std::__decay_t<decltype(0)>>(0) } -> __integer_like;
+    };
   template <class _Tp>
   concept __difference =
     !__member_size<_Tp> && !__unqualified_size<_Tp> &&
-    __class_or_enum<remove_cvref_t<_Tp>> && requires(_Tp __t)
-  {
-    {
-      ranges::end(__t)
-    } -> sized_sentinel_for<decltype(ranges::begin(std::declval<_Tp>()))>;
-  };
+    __class_or_enum<remove_cvref_t<_Tp>> && requires(_Tp __t) {
+      {
+        ranges::end(__t)
+      } -> sized_sentinel_for<decltype(ranges::begin(std::declval<_Tp>()))>;
+    };
   struct Trans_NS___size___fn
   {
     template <__difference _Tp>
@@ -846,10 +770,7 @@ namespace __attribute__(()) std
   auto size = Trans_NS___size___fn{};
   }
   template <class _Tp>
-  concept range = requires(_Tp & __t)
-  {
-    ranges::end(__t);
-  };
+  concept range = requires(_Tp &__t) { ranges::end(__t); };
   template <class _Tp>
   concept input_range = range<_Tp> && input_iterator<iterator_t<_Tp>>;
   template <range _Rp>
@@ -857,10 +778,7 @@ namespace __attribute__(()) std
   template <range _Rp>
   using range_difference_t = iter_difference_t<iterator_t<_Rp>>;
   template <class _Tp>
-  concept sized_range = range<_Tp> && requires
-  {
-    ranges::size;
-  };
+  concept sized_range = range<_Tp> && requires { ranges::size; };
   template <class _Tp>
   concept view = range<_Tp> && movable<_Tp> && enable_view<_Tp>;
   template <class _Tp>
@@ -882,13 +800,13 @@ namespace __attribute__(()) std
                      (movable<remove_reference_t<_Tp>> &&
                       !__is_std_initializer_list<remove_cvref_t<_Tp>>))));
   template <class _Derived>
-  requires is_class_v<_Derived>
-    &&same_as<_Derived, remove_cv_t<_Derived>> class view_interface
+    requires is_class_v<_Derived> && same_as<_Derived, remove_cv_t<_Derived>>
+  class view_interface
   {
   };
   template <class _Tp>
-  requires is_class_v<_Tp>
-    &&same_as<_Tp, remove_cv_t<_Tp>> struct __range_adaptor_closure
+    requires is_class_v<_Tp> && same_as<_Tp, remove_cv_t<_Tp>>
+  struct __range_adaptor_closure
   {
   };
   template <class _Fn>
@@ -898,16 +816,16 @@ namespace __attribute__(()) std
   template <class _Tp>
   _Tp __derived_from_range_adaptor_closure(__range_adaptor_closure<_Tp> *);
   template <class _Tp>
-  concept _RangeAdaptorClosure = !ranges::range<remove_cvref_t<_Tp>> && requires
-  {
-    {
-      ranges::__derived_from_range_adaptor_closure(
-        (remove_cvref_t<_Tp> *)nullptr)
-    } -> same_as<remove_cvref_t<_Tp>>;
-  };
+  concept _RangeAdaptorClosure =
+    !ranges::range<remove_cvref_t<_Tp>> && requires {
+      {
+        ranges::__derived_from_range_adaptor_closure(
+          (remove_cvref_t<_Tp> *)nullptr)
+      } -> same_as<remove_cvref_t<_Tp>>;
+    };
   template <ranges::range _Range, _RangeAdaptorClosure _Closure>
-  requires invocable<_Closure, _Range> __attribute__(()) __attribute__(())
-  __attribute__(()) constexpr decltype(auto)
+    requires invocable<_Closure, _Range>
+  __attribute__(()) __attribute__(()) __attribute__(()) constexpr decltype(auto)
   operator|(_Range &&__range, _Closure &&__closure) noexcept
   {
     return std::invoke(
@@ -919,18 +837,15 @@ namespace __attribute__(()) std
   namespace ranges
   {
   template <range _Range>
-  requires is_object_v<_Range> struct ref_view
-    : public view_interface<ref_view<_Range>>
+    requires is_object_v<_Range>
+  struct ref_view : public view_interface<ref_view<_Range>>
   {
     static void __fun();
 
   public:
     template <class _Tp>
-    requires __different_from<_Tp, ref_view> &&convertible_to<_Tp, _Range &>
-      &&requires
-    {
-      __fun;
-    }
+      requires __different_from<_Tp, ref_view> &&
+               convertible_to<_Tp, _Range &> && requires { __fun; }
     __attribute__(()) __attribute__(())
     __attribute__(()) constexpr ref_view(_Tp &&__t);
     __attribute__(()) __attribute__(())
@@ -948,10 +863,8 @@ namespace __attribute__(()) std
   struct __fn : __range_adaptor_closure<__fn>
   {
     template <class _Tp>
-      requires(!ranges::view<decay_t<_Tp>>) && requires(_Tp &&__t)
-    {
-      ranges::ref_view{std::forward<_Tp>(__t)};
-    }
+      requires(!ranges::view<decay_t<_Tp>>) &&
+              requires(_Tp &&__t) { ranges::ref_view{std::forward<_Tp>(__t)}; }
     __attribute__(()) __attribute__(()) __attribute__(()) constexpr auto
     operator()(_Tp &&__t) const noexcept
     {
@@ -997,12 +910,13 @@ namespace __attribute__(()) std
   };
   template <class _Fn, class... _Args>
     requires is_constructible_v<decay_t<_Fn>, _Fn> &&
-      is_move_constructible_v<decay_t<_Fn>> &&
-    (is_constructible_v<decay_t<_Args>, _Args> && ...) &&
-    (is_move_constructible_v<decay_t<_Args>> && ...) __attribute__(())
-    __attribute__(()) __attribute__(()) constexpr auto __bind_back(
-      _Fn &&__f,
-      _Args &&...__args) noexcept
+               is_move_constructible_v<decay_t<_Fn>> &&
+               (is_constructible_v<decay_t<_Args>, _Args> && ...) &&
+               (is_move_constructible_v<decay_t<_Args>> && ...)
+  __attribute__(()) __attribute__(())
+  __attribute__(()) constexpr auto __bind_back(
+    _Fn &&__f,
+    _Args &&...__args) noexcept
     -> decltype(__bind_back_t<decay_t<_Fn>, tuple<decay_t<_Args>...>>(
       std::forward<_Fn>(__f),
       std::forward_as_tuple(std::forward<_Args>...)));
@@ -1024,8 +938,8 @@ namespace __attribute__(()) std
   struct less
   {
     template <class _Tp, class _Up>
-    requires totally_ordered_with<_Tp, _Up> __attribute__(()) __attribute__(())
-    __attribute__(()) constexpr bool
+      requires totally_ordered_with<_Tp, _Up>
+    __attribute__(()) __attribute__(()) __attribute__(()) constexpr bool
     operator()(_Tp &&__t, _Up &&__u) const noexcept;
   };
   struct __min
@@ -1054,21 +968,24 @@ namespace __attribute__(()) std
       _View __base,
       range_difference_t<_View> __count);
     __attribute__(()) __attribute__(()) __attribute__(()) constexpr auto
-    begin() const requires range<const _View>
+    begin() const
+      requires range<const _View>
     {
       if constexpr(sized_range<const _View>)
         if constexpr(random_access_range<const _View>)
           return ranges::begin(__base_);
     }
     __attribute__(()) __attribute__(()) __attribute__(()) constexpr auto
-    end() const requires range<const _View>
+    end() const
+      requires range<const _View>
     {
       if constexpr(sized_range<const _View>)
         if constexpr(random_access_range<const _View>)
           return ranges::begin(__base_) + size();
     }
     __attribute__(()) __attribute__(()) __attribute__(()) constexpr auto
-    size() const requires sized_range<const _View>
+    size() const
+      requires sized_range<const _View>
     {
       auto __n = ranges::size(__base_);
       return ranges::min(__n, static_cast<decltype(__n)>(__count_));
@@ -1085,15 +1002,15 @@ namespace __attribute__(()) std
       class _Range,
       convertible_to<range_difference_t<_Range>> _Np,
       class _RawRange = remove_cvref_t<_Range>>
-    requires(!0) __attribute__(()) __attribute__(())
-    __attribute__(()) constexpr auto
+      requires(!0)
+    __attribute__(()) __attribute__(()) __attribute__(()) constexpr auto
     operator()(_Range &&__range, _Np &&__n) const noexcept
       -> decltype(take_view(
         std::forward<_Range>(__range),
         std::forward<_Np>(__n)));
     template <class _Np>
-    requires constructible_from<decay_t<_Np>, _Np> __attribute__(())
-    __attribute__(()) __attribute__(()) constexpr auto
+      requires constructible_from<decay_t<_Np>, _Np>
+    __attribute__(()) __attribute__(()) __attribute__(()) constexpr auto
     operator()(_Np &&__n) const noexcept
     {
       return __pipeable(std::__bind_back(*this, std::forward<_Np>(__n)));

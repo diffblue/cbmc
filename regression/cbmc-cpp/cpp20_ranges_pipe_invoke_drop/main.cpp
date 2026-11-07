@@ -31,10 +31,7 @@ decltype(__declval<_Tp>(0)) declval();
 template <class _From, class _To>
 constexpr bool is_convertible_v = __is_convertible(_From, _To);
 template <class _From, class>
-concept convertible_to = requires
-{
-  _From();
-};
+concept convertible_to = requires { _From(); };
 template <bool, class _If, class>
 using __conditional_t = _If;
 template <class _Dp, class _Bp>
@@ -73,10 +70,7 @@ invoke_result_t<_Fn, _Args...> invoke(_Fn __f, _Args &&...__args)
 template <class>
 using iter_difference_t = int;
 template <class _Ip>
-concept input_or_output_iterator = requires(_Ip __i)
-{
-  __i;
-};
+concept input_or_output_iterator = requires(_Ip __i) { __i; };
 struct
 {
   template <class _Tp, int _Np>
@@ -235,10 +229,7 @@ using __perfect_forward =
 namespace ranges
 {
 template <class>
-constexpr bool enable_view = requires
-{
-  nullptr;
-};
+constexpr bool enable_view = requires { nullptr; };
 template <class _Rp>
 using range_difference_t = iter_difference_t<_Rp>;
 template <class _Tp>

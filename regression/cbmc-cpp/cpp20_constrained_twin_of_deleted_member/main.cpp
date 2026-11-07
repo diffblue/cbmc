@@ -31,7 +31,8 @@ struct pair
     second = p.second;
     return *this;
   }
-  constexpr pair &operator=(pair &&p) requires(assignable<T1, T2>())
+  constexpr pair &operator=(pair &&p)
+    requires(assignable<T1, T2>())
   {
     first = static_cast<T1 &&>(p.first);
     second = static_cast<T2 &&>(p.second);

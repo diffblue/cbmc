@@ -36,12 +36,14 @@ int g(T)
   return 2;
 }
 template <class T>
-requires Integral<T> int h(T)
+  requires Integral<T>
+int h(T)
 {
   return 1;
 }
 template <class T>
-requires Floating<T> int h(T)
+  requires Floating<T>
+int h(T)
 {
   return 2;
 }
@@ -51,7 +53,8 @@ int k(T)
   return 2;
 }
 template <class T>
-requires(sizeof(T) > 2) int k(T)
+  requires(sizeof(T) > 2)
+int k(T)
 {
   return 8;
 }

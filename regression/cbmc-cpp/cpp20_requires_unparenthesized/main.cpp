@@ -2,25 +2,21 @@
 #include <cassert>
 
 template <typename T>
-concept Integral = requires
-{
-  T(0);
-};
+concept Integral = requires { T(0); };
 
 template <typename T>
-concept Signed = requires(T a)
-{
-  -a;
-};
+concept Signed = requires(T a) { -a; };
 
 template <typename T>
-requires Integral<T> T identity(T a)
+  requires Integral<T>
+T identity(T a)
 {
   return a;
 }
 
 template <typename T>
-requires Integral<T> &&Signed<T> T negate(T a)
+  requires Integral<T> && Signed<T>
+T negate(T a)
 {
   return -a;
 }

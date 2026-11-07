@@ -14,14 +14,18 @@ template <class T>
 struct holder
 {
   T v;
-  constexpr ~holder() requires(trivial<T>) = default;
-  constexpr ~holder() requires(!trivial<T>)
+  constexpr ~holder()
+    requires(trivial<T>)
+  = default;
+  constexpr ~holder()
+    requires(!trivial<T>)
   {
     destroy();
   }
 
 private:
-  void destroy() requires(!trivial<T>)
+  void destroy()
+    requires(!trivial<T>)
   {
     ++destroyed;
   }

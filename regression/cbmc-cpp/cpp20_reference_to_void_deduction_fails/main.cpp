@@ -43,21 +43,16 @@ struct decay_copy_t
   }
 } inline constexpr decay_copy{};
 template <class T>
-concept member_begin = requires(T & t)
-{
-  decay_copy(t.begin());
-};
+concept member_begin = requires(T &t) { decay_copy(t.begin()); };
 template <class T>
-concept adl_begin =
-  is_class_t<typename remove_ref<T>::type>::value && requires(T & t)
-{
-  decay_copy(begin(t));
-};
+concept adl_begin = is_class_t<typename remove_ref<T>::type>::value &&
+                    requires(T &t) { decay_copy(begin(t)); };
 struct begin_t
 {
   template <class T>
     requires is_array_t<typename remove_ref<T>::type>::value ||
-    member_begin<T> || adl_begin<T> constexpr auto operator()(T &&t) const
+             member_begin<T> || adl_begin<T>
+  constexpr auto operator()(T &&t) const
   {
     if constexpr(is_array_t<typename remove_ref<T>::type>::value)
       return t + 0;
@@ -69,10 +64,7 @@ struct begin_t
 } inline constexpr rbegin{};
 } // namespace cust
 template <class T>
-concept range = requires(T & t)
-{
-  cust::rbegin(t);
-};
+concept range = requires(T &t) { cust::rbegin(t); };
 template <range R>
 constexpr int first_of(R &&r)
 {

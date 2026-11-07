@@ -25,10 +25,7 @@ struct pr : private pbase
   }
 };
 template <class L, class R>
-concept assignable = requires(L l, R &&r)
-{
-  l = static_cast<R &&>(r);
-};
+concept assignable = requires(L l, R &&r) { l = static_cast<R &&>(r); };
 int main()
 {
   // N5008 [expr.prim.req.general]/5: the requirement is not satisfied

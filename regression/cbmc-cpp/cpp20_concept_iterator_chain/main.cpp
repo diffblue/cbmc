@@ -86,12 +86,10 @@ struct It
   {
     return p == o.p;
   }
-  // clang-format off
   auto operator<=>(const It &o) const
   {
     return p <=> o.p;
   }
-  // clang-format on
 };
 
 // A non-iterator: only dereferenceable, not incrementable.

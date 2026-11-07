@@ -30,10 +30,9 @@ constexpr bool is_constant_evaluated() noexcept
 // N5008 [expr.prim.req.general]/4: the requires-expression's parameters
 // (a pack among them) are in scope in its requirements
 template <class T, class... Types>
-requires requires(T *loc, Types &&..._Args)
-{
-  ::new(static_cast<void *>(loc)) T(forward<Types>(_Args)...);
-}
+  requires requires(T *loc, Types &&..._Args) {
+    ::new(static_cast<void *>(loc)) T(forward<Types>(_Args)...);
+  }
 constexpr T *construct_at(T *const loc, Types &&..._Args)
 {
   return ::new(static_cast<void *>(loc)) T(forward<Types>(_Args)...);

@@ -13,8 +13,8 @@ struct range_adaptor
 {
   // partial application: viable only with arity - 1 arguments
   template <typename... Args>
-  requires partial_app_viable<Derived, Args...> constexpr int
-  operator()(Args &&...) const
+    requires partial_app_viable<Derived, Args...>
+  constexpr int operator()(Args &&...) const
   {
     return 100;
   }

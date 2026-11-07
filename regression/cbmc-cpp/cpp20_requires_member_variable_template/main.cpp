@@ -9,7 +9,8 @@ struct optional
   {
   }
   template <typename _Up = _Tp>
-  requires ok<_Up> optional(_Up v) : val(v)
+    requires ok<_Up>
+  optional(_Up v) : val(v)
   {
   }
 };

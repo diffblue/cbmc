@@ -4,11 +4,8 @@ template <class T, class U>
 concept same_as_test = __is_same(T, U);
 
 template <class T>
-concept deref_to_int = requires(T t)
-{
-  {
-    *t
-  } -> same_as_test<int &>;
+concept deref_to_int = requires(T t) {
+  { *t } -> same_as_test<int &>;
 };
 
 struct A

@@ -28,7 +28,8 @@ template <class T, class U>
 concept common_reference_with = same_as<U, common_reference_t<T, U>>;
 
 template <class T>
-int use(T v) requires common_reference_with<T, T>
+int use(T v)
+  requires common_reference_with<T, T>
 {
   return v;
 }

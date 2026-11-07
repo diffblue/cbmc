@@ -25,15 +25,9 @@ struct convertible
 // satisfied ([expr.prim.req.simple]/1).  A conversion function to an
 // arithmetic type reaches a built-in candidate ([over.built]).
 template <class T>
-constexpr bool has_eq = requires(const T &a, const T &b)
-{
-  a == b;
-};
+constexpr bool has_eq = requires(const T &a, const T &b) { a == b; };
 template <class T>
-constexpr bool has_lt = requires(const T &a, const T &b)
-{
-  a < b;
-};
+constexpr bool has_lt = requires(const T &a, const T &b) { a < b; };
 int main()
 {
   __CPROVER_assert(!has_eq<S> && !has_lt<S>, "class without operators");

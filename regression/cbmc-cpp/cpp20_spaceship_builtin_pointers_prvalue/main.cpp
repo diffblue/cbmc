@@ -38,7 +38,6 @@ int main()
 {
   object a, b;
   object *p = &a, *q = &b;
-  // clang-format off
   // (clang-format 15 with the repository's c++17 setting splits `<=>')
   // [expr.spaceship]/2, /6: a prvalue of type std::strong_ordering, not of
   // the (const) type of the static member it yields
@@ -48,9 +47,12 @@ int main()
   __CPROVER_assert((p <=> p) == std::strong_ordering::equal, "equal pointers");
   // pointers to different objects compare unequal: less or greater, the
   // order being unspecified ([expr.rel]/4), but never equal
-  __CPROVER_assert(!((p <=> q) == std::strong_ordering::equal), "distinct objects");
+  __CPROVER_assert(
+    !((p <=> q) == std::strong_ordering::equal), "distinct objects");
   object arr[2];
-  __CPROVER_assert((&arr[0] <=> &arr[1]) == std::strong_ordering::less, "array elements are ordered");
-  __CPROVER_assert((p <=> q) == std::strong_ordering::equal, "WRONG (must FAIL)");
-  // clang-format on
+  __CPROVER_assert(
+    (&arr[0] <=> &arr[1]) == std::strong_ordering::less,
+    "array elements are ordered");
+  __CPROVER_assert(
+    (p <=> q) == std::strong_ordering::equal, "WRONG (must FAIL)");
 }

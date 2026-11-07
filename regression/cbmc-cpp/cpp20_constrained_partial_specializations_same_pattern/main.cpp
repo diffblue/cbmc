@@ -41,27 +41,26 @@ template <class I>
 struct impl;
 
 template <class I>
-requires requires
-{
-  typename traits_t<I>::iterator_concept;
-}
+  requires requires { typename traits_t<I>::iterator_concept; }
 struct impl<I>
 {
   using type = typename traits_t<I>::iterator_concept;
 };
 
 template <class I>
-requires(
-  !requires { typename traits_t<I>::iterator_concept; } &&
-  requires { typename traits_t<I>::iterator_category; }) struct impl<I>
+  requires(
+    !requires { typename traits_t<I>::iterator_concept; } &&
+    requires { typename traits_t<I>::iterator_category; })
+struct impl<I>
 {
   using type = typename traits_t<I>::iterator_category;
 };
 
 template <class I>
-requires(
-  !requires { typename traits_t<I>::iterator_concept; } &&
-  !requires { typename traits_t<I>::iterator_category; }) struct impl<I>
+  requires(
+    !requires { typename traits_t<I>::iterator_concept; } &&
+    !requires { typename traits_t<I>::iterator_category; })
+struct impl<I>
 {
   using type = rat;
 };

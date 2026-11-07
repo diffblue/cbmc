@@ -1,4 +1,3 @@
-// clang-format off
 #include <compare>
 #include <memory>
 extern "C" void __CPROVER_assert(bool, const char *);
@@ -22,4 +21,3 @@ int main()
   __CPROVER_assert((a <=> b) != 0, "compare_three_way on pointers: distinct");
   __CPROVER_assert((a <=> a) != 0, "WRONG (must FAIL)");
 }
-// clang-format on

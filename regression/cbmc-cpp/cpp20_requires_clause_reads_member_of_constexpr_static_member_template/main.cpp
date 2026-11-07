@@ -13,7 +13,8 @@ struct cpo
   // customization point objects: `requires (_Choice<_Ty &>._Strategy !=
   // _St::_None)')
   template <class T>
-  requires(choice<T>.size == 1) static int call(T)
+    requires(choice<T>.size == 1)
+  static int call(T)
   {
     return 1;
   }

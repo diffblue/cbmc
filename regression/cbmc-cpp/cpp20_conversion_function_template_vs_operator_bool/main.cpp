@@ -13,8 +13,8 @@ struct big
 {
   unsigned __int128 val;
   template <class T>
-    requires integral<T> ||
-    is_int128<T> constexpr explicit operator T() const noexcept
+    requires integral<T> || is_int128<T>
+  constexpr explicit operator T() const noexcept
   {
     return val;
   }

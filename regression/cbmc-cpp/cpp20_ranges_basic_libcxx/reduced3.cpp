@@ -16,10 +16,7 @@ _Tp __declval(int);
 template <class _Tp>
 decltype(__declval<_Tp>(0)) declval();
 template <class _From, class>
-concept convertible_to = requires
-{
-  _From();
-};
+concept convertible_to = requires { _From(); };
 template <class _Tp, class _Up>
 using _IsSame = _BoolConstant<__is_same(_Tp, _Up)>;
 template <class _Tp, class _Up>
@@ -47,10 +44,7 @@ constexpr bool is_lvalue_reference_v = __is_lvalue_reference(_Tp);
 inline namespace
 {
 template <class _Rhs>
-concept assignable_from = requires(_Rhs __rhs)
-{
-  __rhs;
-};
+concept assignable_from = requires(_Rhs __rhs) { __rhs; };
 template <class, class... _Args>
 struct __invoke_result_impl
 {
@@ -65,15 +59,9 @@ using invoke_result_t = __invoke_result_t<_Fn, _Args...>;
 template <class _Fn, class... _Args>
 invoke_result_t<_Fn, _Args...> invoke(_Fn, _Args...);
 template <class _Fn>
-concept invocable = requires(_Fn __fn)
-{
-  __fn;
-};
+concept invocable = requires(_Fn __fn) { __fn; };
 template <class>
-concept __primary_template = requires
-{
-  typename __void_t<>;
-};
+concept __primary_template = requires { typename __void_t<>; };
 template <class>
 struct iterator_traits
 {
@@ -99,22 +87,13 @@ struct tuple_element<_Ip, tuple<_Tp...>>
 template <decltype(sizeof(int)) _Ip, class... _Tp>
 tuple_element<_Ip, tuple<_Tp...>>::type get(tuple<_Tp...>);
 template <class _In>
-concept __indirectly_readable_impl = requires(_In __i)
-{
-  __i;
-};
+concept __indirectly_readable_impl = requires(_In __i) { __i; };
 template <class _Sp>
-concept sized_sentinel_for = requires(_Sp __s)
-{
-  __s;
-};
+concept sized_sentinel_for = requires(_Sp __s) { __s; };
 namespace ranges
 {
 template <class _Tp>
-concept __member_begin = requires(_Tp __t)
-{
-  __t;
-};
+concept __member_begin = requires(_Tp __t) { __t; };
 struct Trans_NS___begin___fn
 {
   template <class _Tp>
@@ -167,15 +146,10 @@ namespace
 template <class _Yp>
 void __is_derived_from_view_interface(_Yp);
 template <class _Tp>
-constexpr bool enable_view = requires
-{
-  __is_derived_from_view_interface<_Tp>(nullptr);
-};
+constexpr bool enable_view =
+  requires { __is_derived_from_view_interface<_Tp>(nullptr); };
 template <class _Tp>
-concept range = requires(_Tp __t)
-{
-  __t;
-};
+concept range = requires(_Tp __t) { __t; };
 template <range _Rp>
 using range_difference_t = iter_difference_t<_Rp>;
 template <class _Tp>
@@ -188,10 +162,7 @@ struct __pipeable : _Fn
 {
 };
 template <class>
-concept _RangeAdaptorClosure = requires
-{
-  nullptr;
-};
+concept _RangeAdaptorClosure = requires { nullptr; };
 template <range _Range, _RangeAdaptorClosure _Closure>
 auto operator|(_Range __range, _Closure __closure)
 {

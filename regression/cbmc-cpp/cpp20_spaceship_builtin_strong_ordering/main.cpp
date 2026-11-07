@@ -32,7 +32,6 @@ constexpr strong_ordering strong_ordering::greater{1};
 int main()
 {
   int a = 1, b = 2;
-  // clang-format off
   // (clang-format 15 with the repository's c++17 setting splits `<=>')
   std::strong_ordering r = a <=> b;
   __CPROVER_assert(r == std::strong_ordering::less, "1 <=> 2 is less");
@@ -40,6 +39,5 @@ int main()
     (5 <=> 5) == std::strong_ordering::equal, "5 <=> 5 is equal");
   __CPROVER_assert(
     (9 <=> 4) == std::strong_ordering::greater, "9 <=> 4 greater");
-  // clang-format on
   return 0;
 }

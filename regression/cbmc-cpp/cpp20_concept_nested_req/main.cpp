@@ -1,13 +1,9 @@
 // Nested requirement: requires { requires has_ref<T>; }
 template <class T>
-concept has_ref = requires
-{
-  typename T::reference;
-};
+concept has_ref = requires { typename T::reference; };
 
 template <class T>
-concept has_all = requires
-{
+concept has_all = requires {
   typename T::value_type;
   requires has_ref<T>;
 };

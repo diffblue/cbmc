@@ -28,10 +28,7 @@ decltype(0) declval();
 template <class _From, class _To>
 constexpr bool is_convertible_v = __is_convertible(_From, _To);
 template <class _From, class>
-concept convertible_to = requires
-{
-  _From();
-};
+concept convertible_to = requires { _From(); };
 template <class _Tp, class _Up>
 concept __same_as_impl = _IsSame<_Tp, _Up>::value;
 template <class _Tp, class _Up>
@@ -61,10 +58,7 @@ invoke_result_t<_Fn, _Args...> invoke(_Fn, _Args...);
 namespace std
 {
 template <class _Ip>
-concept input_or_output_iterator = requires(_Ip __i)
-{
-  __i;
-};
+concept input_or_output_iterator = requires(_Ip __i) { __i; };
 namespace ranges
 {
 auto begin = int{};
@@ -100,10 +94,7 @@ using __perfect_forward =
 namespace ranges
 {
 template <class>
-constexpr bool enable_view = requires
-{
-  end;
-};
+constexpr bool enable_view = requires { end; };
 template <class _Tp>
 concept view = enable_view<_Tp>;
 template <class _Tp>
@@ -123,13 +114,14 @@ template <class _Tp>
 struct __range_adaptor_closure
 {
   template <ranges::viewable_range _View, _RangeAdaptorClosure _Closure>
-  requires same_as<_Tp, _Closure> friend auto
-  operator|(_View &&__view, _Closure __closure)
+    requires same_as<_Tp, _Closure>
+  friend auto operator|(_View &&__view, _Closure __closure)
   {
     return invoke(__closure, __view);
   }
   template <_RangeAdaptorClosure _Closure, _RangeAdaptorClosure _OtherClosure>
-  requires same_as<_Tp, _Closure> friend auto operator|(_Closure, _OtherClosure)
+    requires same_as<_Tp, _Closure>
+  friend auto operator|(_Closure, _OtherClosure)
   {
   }
 };

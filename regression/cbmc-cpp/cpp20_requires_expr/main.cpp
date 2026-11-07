@@ -1,9 +1,6 @@
 // C++20 requires expression in concept
 template <typename T>
-concept Addable = requires(T a, T b)
-{
-  a + b;
-};
+concept Addable = requires(T a, T b) { a + b; };
 
 template <Addable T>
 T add(T a, T b)

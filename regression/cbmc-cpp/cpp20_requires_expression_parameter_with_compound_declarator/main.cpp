@@ -8,18 +8,14 @@ void takes_array(int (&)[5]);
 // form a parameter-declaration-clause; `int (&a)[5]' and `int (*fp)(int)'
 // declare the names a and fp
 template <class T>
-constexpr bool callable_with_int = requires(T(*fp)(int))
-{
-  fp(1);
-};
+constexpr bool callable_with_int = requires(T (*fp)(int)) { fp(1); };
 int main()
 {
   __CPROVER_assert(
     requires(int(&a)[5]) {
       takes_array(a);
       sizeof(a);
-    } &&
-      requires(int (*fp)(int)) { fp(1); } && callable_with_int<int>,
+    } && requires(int (*fp)(int)) { fp(1); } && callable_with_int<int>,
     "parameters declared");
   __CPROVER_assert(!requires(int (*fp)(int)) { fp(1); }, "WRONG (must FAIL)");
   return 0;

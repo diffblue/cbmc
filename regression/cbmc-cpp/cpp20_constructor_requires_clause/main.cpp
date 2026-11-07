@@ -27,7 +27,8 @@ struct S
   {
   }
   template <typename U>
-  requires(!std::is_convertible_v<U, unsigned long>) S(int *, U) : which(2)
+    requires(!std::is_convertible_v<U, unsigned long>)
+  S(int *, U) : which(2)
   {
   }
 };

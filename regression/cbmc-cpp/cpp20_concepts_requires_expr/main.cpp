@@ -2,10 +2,7 @@
 // requires(T x) { x + 1; } checks if x + 1 is a valid expression
 
 template <class T, class U>
-requires requires(T a, U b)
-{
-  a + b;
-}
+  requires requires(T a, U b) { a + b; }
 auto add(T a, U b)
 {
   return a + b;

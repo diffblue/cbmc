@@ -10,15 +10,16 @@ struct category
 
 // Specialization for pointer types
 template <class T>
-requires(__is_pointer(T)) struct category<T>
+  requires(__is_pointer(T))
+struct category<T>
 {
   static const int value = 1;
 };
 
 // More constrained: pointer to integral
 template <class T>
-requires(
-  __is_pointer(T) && __is_integral(__remove_pointer(T))) struct category<T>
+  requires(__is_pointer(T) && __is_integral(__remove_pointer(T)))
+struct category<T>
 {
   static const int value = 2;
 };

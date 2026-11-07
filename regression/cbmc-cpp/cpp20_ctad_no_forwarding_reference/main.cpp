@@ -7,7 +7,8 @@ extern "C" void __CPROVER_assert(bool, const char *);
 #include <utility>
 
 template <typename R>
-requires std::movable<R> struct owning
+  requires std::movable<R>
+struct owning
 {
   R r = R();
   constexpr owning(R &&x) : r(std::move(x))
@@ -16,10 +17,7 @@ requires std::movable<R> struct owning
 };
 
 template <typename R>
-concept can_own = requires
-{
-  owning{std::declval<R>()};
-};
+concept can_own = requires { owning{std::declval<R>()}; };
 
 struct box
 {

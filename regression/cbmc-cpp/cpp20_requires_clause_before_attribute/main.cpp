@@ -17,14 +17,16 @@ concept IsDbl = __is_same(T, double);
 struct fn
 {
   template <class T>
-  requires IsInt<T> [[nodiscard]]
+    requires IsInt<T>
+  [[nodiscard]]
   __attribute__((__visibility__("hidden"))) constexpr int operator()(T) const
     noexcept(noexcept(1))
   {
     return 1;
   }
   template <class T>
-  requires IsDbl<T> [[nodiscard]]
+    requires IsDbl<T>
+  [[nodiscard]]
   __attribute__((__visibility__("hidden"))) constexpr int operator()(T) const
     noexcept(noexcept(1))
   {
@@ -32,14 +34,14 @@ struct fn
   }
 };
 template <class T>
-requires IsInt<T> [[nodiscard]] __attribute__((__visibility__("hidden"))) int
-g(T)
+  requires IsInt<T>
+[[nodiscard]] __attribute__((__visibility__("hidden"))) int g(T)
 {
   return 1;
 }
 template <class T>
-requires IsDbl<T> [[nodiscard]] __attribute__((__visibility__("hidden"))) int
-g(T)
+  requires IsDbl<T>
+[[nodiscard]] __attribute__((__visibility__("hidden"))) int g(T)
 {
   return 2;
 }

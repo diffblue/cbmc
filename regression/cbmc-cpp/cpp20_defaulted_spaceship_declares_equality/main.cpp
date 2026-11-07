@@ -7,26 +7,17 @@ extern "C" void __CPROVER_assert(bool, const char *);
 struct P
 {
   int x, y;
-  // clang-format 18 splits <=> in C++17 mode
-  // clang-format off
   auto operator<=>(const P &) const = default;
-  // clang-format on
 };
 struct F
 {
   int v;
-  // clang-format 18 splits <=> in C++17 mode
-  // clang-format off
   friend auto operator<=>(const F &, const F &) = default;
-  // clang-format on
 };
 struct R
 {
   int v;
-  // clang-format 18 splits <=> in C++17 mode
-  // clang-format off
   auto operator<=>(const R &) const = default;
-  // clang-format on
   bool operator==(const R &o) const
   {
     return v % 10 == o.v % 10;
@@ -35,10 +26,7 @@ struct R
 struct D : P
 {
   int z;
-  // clang-format 18 splits <=> in C++17 mode
-  // clang-format off
   auto operator<=>(const D &) const = default;
-  // clang-format on
 };
 int main()
 {

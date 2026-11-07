@@ -36,10 +36,7 @@ template <typename>
 void forward();
 int end;
 template <typename>
-concept range = requires
-{
-  end;
-};
+concept range = requires { end; };
 template <range _Range>
 using sentinel_t = decltype(end(declval<_Range>()));
 template <typename _Tp>

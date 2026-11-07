@@ -10,14 +10,16 @@ concept SignedIntegral = Integral<T> && __is_signed(T);
 
 // Overload 1: any integral
 template <class T>
-requires Integral<T> int classify(T)
+  requires Integral<T>
+int classify(T)
 {
   return 1;
 }
 
 // Overload 2: signed integral (more constrained, subsumes Overload 1)
 template <class T>
-requires SignedIntegral<T> int classify(T)
+  requires SignedIntegral<T>
+int classify(T)
 {
   return 2;
 }

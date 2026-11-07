@@ -2,10 +2,7 @@
 // requires { requires expr; } — evaluates expr as a boolean constraint.
 
 template <class T>
-concept SmallType = requires
-{
-  requires sizeof(T) <= 4;
-};
+concept SmallType = requires { requires sizeof(T) <= 4; };
 
 template <class T>
 int check(T)

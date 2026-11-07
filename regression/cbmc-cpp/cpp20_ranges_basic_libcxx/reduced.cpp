@@ -6,10 +6,7 @@ constexpr bool is_lvalue_reference_v = __is_lvalue_reference(_Tp);
 template <class _From, class _To>
 constexpr bool is_convertible_v = __is_convertible(_From, _To);
 template <class _From, class>
-concept convertible_to = requires
-{
-  _From();
-};
+concept convertible_to = requires { _From(); };
 template <class _Dp, class _Bp>
 concept derived_from = is_convertible_v<_Dp, _Bp>;
 template <class _Tp, _Tp>

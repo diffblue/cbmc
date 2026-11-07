@@ -1,10 +1,7 @@
 // N5008 [expr.prim.req]: a requires-expression in a variable template.
 extern "C" void __CPROVER_assert(bool, const char *);
 template <class T>
-constexpr bool has_size = requires(T t)
-{
-  t.size();
-};
+constexpr bool has_size = requires(T t) { t.size(); };
 struct S
 {
   int size()

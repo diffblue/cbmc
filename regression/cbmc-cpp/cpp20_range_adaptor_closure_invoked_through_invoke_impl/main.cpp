@@ -76,10 +76,7 @@ template <typename _Tp, typename _Up>
 concept __different_from = !same_as<_Tp, _Up>;
 }
 template <typename _From, typename>
-concept convertible_to = requires
-{
-  _From();
-};
+concept convertible_to = requires { _From(); };
 template <typename _Tp>
 concept copy_constructible = convertible_to<_Tp, _Tp>;
 template <typename>
@@ -89,10 +86,8 @@ void forward()
 namespace ranges::__access
 {
 template <typename _Tp>
-concept __member_begin = requires(_Tp __t)
-{
-  __decay_t<decltype(__t.begin())>();
-};
+concept __member_begin =
+  requires(_Tp __t) { __decay_t<decltype(__t.begin())>(); };
 template <typename _Tp>
 auto __begin(_Tp &__t)
 {
@@ -126,10 +121,7 @@ struct _Begin
   }
 };
 template <typename _Tp>
-concept __member_end = requires(_Tp __t)
-{
-  __decay_t<decltype(__t.end())>();
-};
+concept __member_end = requires(_Tp __t) { __decay_t<decltype(__t.end())>(); };
 struct _End
 {
   template <__maybe_borrowed_range _Tp>
@@ -145,10 +137,7 @@ struct _End
 __access::_Begin begin;
 __access::_End end;
 template <typename>
-concept range = requires
-{
-  end;
-};
+concept range = requires { end; };
 template <typename _Tp>
 using iterator_t = std::__detail::__range_iter_t<_Tp>;
 template <range _Range>
@@ -158,10 +147,8 @@ namespace __detail
 template <typename>
 void __is_derived_from_view_interface_fn();
 template <typename>
-concept __is_derived_from_view_interface = requires
-{
-  __is_derived_from_view_interface_fn;
-};
+concept __is_derived_from_view_interface =
+  requires { __is_derived_from_view_interface_fn; };
 } // namespace __detail
 template <typename _Tp>
 constexpr bool enable_view = __detail::__is_derived_from_view_interface<_Tp>;
@@ -244,8 +231,8 @@ template <typename _Derived>
 struct _RangeAdaptor
 {
   template <typename... _Args>
-  requires __adaptor_partial_app_viable<_Derived, _Args...> auto
-  operator()(_Args...)
+    requires __adaptor_partial_app_viable<_Derived, _Args...>
+  auto operator()(_Args...)
   {
     return _Partial<_Derived, _Args...>{0, forward<_Args>...};
   }

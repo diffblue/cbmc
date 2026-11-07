@@ -1,9 +1,6 @@
 // Type requirement: requires { typename T::value_type; }
 template <class T>
-concept has_value_type = requires
-{
-  typename T::value_type;
-};
+concept has_value_type = requires { typename T::value_type; };
 
 struct A
 {

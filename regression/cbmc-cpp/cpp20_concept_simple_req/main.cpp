@@ -1,9 +1,6 @@
 // Simple requirement: requires(T t) { ++t; }
 template <class T>
-concept incrementable = requires(T t)
-{
-  ++t;
-};
+concept incrementable = requires(T t) { ++t; };
 
 struct A
 {

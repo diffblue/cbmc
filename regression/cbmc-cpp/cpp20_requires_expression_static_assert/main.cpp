@@ -21,19 +21,12 @@ static_assert(
   "type and simple requirement");
 static_assert(requires { typename S; }, "no parameters");
 template <class U>
-concept HasX = requires(U u)
-{
-  u.x;
-};
+concept HasX = requires(U u) { u.x; };
 static_assert(HasX<S>, "concept, still");
 int check(S s)
 {
   static_assert(requires(S t) { t.x; }, "block scope");
-  return requires(S t)
-  {
-    t.f();
-  }
-  ? 1 : 0;
+  return requires(S t) { t.f(); } ? 1 : 0;
 }
 int main()
 {

@@ -24,12 +24,11 @@ template <class _Lhs, class _Rhs>
 concept my_assignable_from = std::common_reference_with<
                                const std::remove_reference_t<_Lhs> &,
                                const std::remove_reference_t<_Rhs> &> &&
-                             requires(_Lhs __lhs, _Rhs &&__rhs)
-{
-  {
-    __lhs = static_cast<_Rhs &&>(__rhs)
-  } -> std::same_as<_Lhs>;
-};
+                             requires(_Lhs __lhs, _Rhs &&__rhs) {
+                               {
+                                 __lhs = static_cast<_Rhs &&>(__rhs)
+                               } -> std::same_as<_Lhs>;
+                             };
 
 int main()
 {
