@@ -16208,3 +16208,37 @@ all.  Such a function is now added directly (link_to_library.cpp): the
 library phase 18 s -> 4 s, std::print 55 s -> 41-44 s, std::format 56 s ->
 42 s, cbmc-cpp CORE total test time 1404 s -> 1321 s.  The remaining cost
 is type checking <format> and goto_check_c over ~3000 functions.
+
+## Round 226 (2026-11-09): type-checking performance
+
+Profiled type checking of std::print (libstdc++ 16, 19.5 s of the total)
+with scoped timers and call counters.  instantiate_template was called
+61,927 times; only 2,674 found an existing instance.  56,102 of the misses
+were alias, variable-template/concept and function-template requests for
+just 10,098 distinct (template, arguments) pairs: `enable_if_t<true, void>'
+689 times, `integral<long>' 567, `__declval<...>' 860.
+
+Root cause: these instances are registered in the instantiation sub-scope
+under the template name plus the template-argument suffix, but the
+existing-instance check looked up the plain name.  Fix: for alias templates
+([temp.alias]/2) and variable templates and concepts, look up the suffixed
+name first and reuse a completed instance (a type, or a variable with a
+value).  Substitution failures make no instance and are still recomputed.
+19,400 requests now hit; type checking 19.5 s -> 14.6 s, std::format
+19.5 s -> 14.4 s.  Reusing instances of declared-only function templates
+(declval) this way crashed (segfault in std::print); not pursued.  Defined
+function templates already hit once they have a body.
+
+release_referenced_held_back_bodies walked every symbol value in each of
+its 10 rounds (1.5 s).  It now caches, per symbol, a shared copy of the
+value it scanned and the identifiers found; an unchanged value (same tree
+node) is not rescanned: 0.2 s.  The same caching for the deferred-body
+rounds in typecheck_method_bodies gained nothing measurable (bodies there
+get rewritten to equal but unshared trees; comparing by value cost as much
+as rescanning) and was dropped.
+
+cbmc-cpp CORE total test time 1321 s -> 1230 s.  New test
+cpp20_alias_and_variable_template_instances_reused guards the cached
+results (it passes on the old binary too, as a pure speed-up should).
+Remaining: resolve/guess_function_template_args (~5.5 s inclusive) and
+repeated SFINAE failures (`enable_if_t<false, void>' 384 times).
