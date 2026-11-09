@@ -5533,6 +5533,42 @@ skip_pack_removal_ft:
   // sub-scope for fixing the prefix
   cpp_scopet &sub_scope = sub_scope_for_instantiation(*template_scope, suffix);
 
+  // N5008 [temp.alias]/2: a specialization of an alias template is the type
+  // obtained by substituting its template arguments; a specialization of a
+  // variable template (a concept, [temp.concept]/1) is likewise determined
+  // by its arguments.  Their instances are registered in the sub-scope
+  // under the template's name with the template-argument suffix (see
+  // below); one made before is reused.  Re-instantiating each time
+  // recomputed the same declaration -- for libstdc++ 16's <format>, 19,000
+  // of 62,000 instantiations (`enable_if_t<true, void>' 689 times,
+  // `integral<long>' 567 times).  A substitution failure makes no instance,
+  // so it is not cached.
+  const bool is_variable_template =
+    !new_decl.declarators().empty() &&
+    new_decl.declarators()[0].type().id() != ID_function_type &&
+    new_decl.type().id() != ID_struct && new_decl.type().id() != ID_union &&
+    !new_decl.is_typedef();
+  if((new_decl.is_typedef() || is_variable_template) && !is_template_method)
+  {
+    const cpp_scopet::id_sett instances = sub_scope.lookup(
+      irep_idt{id2string(template_symbol.base_name) + suffix},
+      cpp_scopet::SCOPE_ONLY);
+    if(instances.size() == 1)
+    {
+      const symbolt *instance =
+        symbol_table.lookup((*instances.begin())->identifier);
+      if(
+        instance != nullptr &&
+        (new_decl.is_typedef()
+           ? instance->is_type
+           : !instance->is_type && instance->type.id() != ID_code &&
+               instance->value.is_not_nil()))
+      {
+        return *instance;
+      }
+    }
+  }
+
   // let's see if we have the instance already
   {
     cpp_scopet::id_sett id_set =
