@@ -1,0 +1,17 @@
+CORE
+main.c
+--bounds-check
+^\[main\.array_bounds\.1\] line 8 array 'a' upper bound in a\[.*i\]: SUCCESS$
+^\[main\.assertion\.1\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of 2 failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^\[main\.array_bounds\.2\]
+i \+ 4
+^warning: ignoring
+--
+goto_check_c kept a constant operand of ||, && or ?: as a guard, so the
+checks of `a[i]' were made again under `!(0 != 0)' and the like, and the
+checks of operands that are not evaluated were made under a false guard.
