@@ -16193,3 +16193,18 @@ destructors ([stmt.return]/5).  A first version declared the result
 variable at the start of the body, which hid the leading precondition
 assertions from instrument_preconditions (cpp26_contract_assertions_enforced
 caught it).
+
+## Round 225 (2026-11-09): std::print performance
+
+std::print (libstdc++ 16) took 55 s: type checking 20 s, "Adding CPROVER
+library" 18 s, function-pointer removal 5 s, goto_check_c 9 s; symex and
+solving under 1 s.  The library phase was the anomaly: this branch makes
+constexpr functions macro symbols, goto_convert skips macros, and
+link_to_library converted each called one on demand (add_one_function's
+second branch) and then ran link_goto_model -- linkingt::link over all ~26k
+symbols plus rename_symbols_in_function over all ~2-3k functions with an
+empty renaming -- once per function: 1215 links, 1197 with no symbols at
+all.  Such a function is now added directly (link_to_library.cpp): the
+library phase 18 s -> 4 s, std::print 55 s -> 41-44 s, std::format 56 s ->
+42 s, cbmc-cpp CORE total test time 1404 s -> 1321 s.  The remaining cost
+is type checking <format> and goto_check_c over ~3000 functions.
