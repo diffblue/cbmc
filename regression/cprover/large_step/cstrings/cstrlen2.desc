@@ -1,0 +1,7 @@
+KNOWNBUG
+cstrlen2.c
+
+^EXIT=0$
+^SIGNAL=0$
+^program is safe / function string_access is safe / line .* property 1: SUCCESS$
+--

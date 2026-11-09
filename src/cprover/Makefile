@@ -2,8 +2,10 @@ SRC = address_taken.cpp \
       axioms.cpp \
       bv_pointers_wide.cpp \
       c_safety_checks.cpp \
+      chc_db.cpp \
       cprover_main.cpp \
       cprover_parse_options.cpp \
+      cutpoint_graph.cpp \
       counterexample_found.cpp \
       endianness_map_wide.cpp \
       equality_propagation.cpp \

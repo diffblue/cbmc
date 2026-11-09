@@ -1,0 +1,8 @@
+CORE
+memcmp1.c
+--safety
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.memcmp\.1\] line \d+ memcmp regions must be valid: SUCCESS$
+^\[main\.memcmp\.2\] line \d+ memcmp regions must be valid: REFUTED$
+--

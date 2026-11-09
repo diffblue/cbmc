@@ -1,0 +1,7 @@
+CORE
+recursive_function1.c
+
+^EXIT=0$
+^SIGNAL=0$
+^\[recursive_function\.precondition\.1] line \d+ recursive_function precondition.*: SUCCESS$
+--

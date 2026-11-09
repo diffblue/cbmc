@@ -1,0 +1,7 @@
+CORE
+recursive_function2.c
+
+^EXIT=0$
+^SIGNAL=0$
+^\[recursive_function\.postcondition\.1] line \d+ postcondition: SUCCESS$
+--

@@ -1,0 +1,8 @@
+CORE
+trace3.c
+--trace
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ property 1: REFUTED$
+^Trace for main\.assertion\.1:$
+--

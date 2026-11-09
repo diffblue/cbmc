@@ -1,0 +1,8 @@
+CORE
+for_loop3.c
+
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ property 1: REFUTED$
+^\[main\.assertion\.2\] line \d+ property 2: SUCCESS$
+--

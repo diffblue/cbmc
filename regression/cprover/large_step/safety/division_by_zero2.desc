@@ -1,0 +1,7 @@
+CORE
+division_by_zero2.c
+--safety
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.division-by-zero\.1\] line \d+ division by zero in .*: SUCCESS$
+--
