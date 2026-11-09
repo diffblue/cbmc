@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <list>
 #include <optional>
 #include <set>
+#include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
@@ -1031,6 +1032,11 @@ protected:
     cpp_typecheckt &cpp_typecheck;
   };
   method_bodiest held_back_bodies;
+  /// For release_referenced_held_back_bodies: per symbol, the value it was
+  /// last scanned with (a shared copy, so that an unchanged value is the
+  /// same tree node) and the identifiers it refers to.
+  std::unordered_map<irep_idt, std::pair<irept, std::vector<irep_idt>>>
+    held_back_reference_cache;
   bool release_referenced_held_back_bodies();
   void drop_unreferenced_held_back_bodies();
 

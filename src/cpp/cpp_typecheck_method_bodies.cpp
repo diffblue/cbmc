@@ -2317,27 +2317,40 @@ bool cpp_typecheckt::release_referenced_held_back_bodies()
     held.insert(mb.method_symbol->name);
 
   // references hide in named sub-trees too (a temporary object's
-  // `#initializer' holds its constructor call), so walk the whole tree
+  // `#initializer' holds its constructor call), so walk the whole tree.
+  // This runs once per round of the method-body drain, over every symbol:
+  // a value that is still the tree it was last scanned as (kept shared in
+  // the cache) is not walked again; the identifiers it refers to are
+  // remembered.
   std::set<irep_idt> referenced;
-  std::function<void(const irept &)> scan = [&](const irept &n)
+  std::function<void(const irept &, std::set<irep_idt> &)> scan =
+    [&](const irept &n, std::set<irep_idt> &ids)
   {
     if(n.id() == ID_symbol)
-    {
-      const irep_idt &id = n.get(ID_identifier);
-      if(held.count(id) != 0)
-        referenced.insert(id);
-    }
+      ids.insert(n.get(ID_identifier));
     for(const auto &sub : n.get_sub())
-      scan(sub);
+      scan(sub, ids);
     for(const auto &ns : n.get_named_sub())
-      scan(ns.second);
+      scan(ns.second, ids);
   };
   for(const auto &entry : symbol_table.symbols)
   {
     const symbolt &sym = entry.second;
     if(sym.value.is_nil() || held.count(sym.name) != 0)
       continue;
-    scan(sym.value);
+    auto &cached = held_back_reference_cache[sym.name];
+    if(&cached.first.read() != &sym.value.read())
+    {
+      std::set<irep_idt> ids;
+      scan(sym.value, ids);
+      cached.first = sym.value;
+      cached.second.assign(ids.begin(), ids.end());
+    }
+    for(const auto &id : cached.second)
+    {
+      if(held.count(id) != 0)
+        referenced.insert(id);
+    }
   }
 
   bool released = false;
