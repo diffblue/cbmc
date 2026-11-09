@@ -679,7 +679,7 @@ void state_encodingt::function_call_symbol(
   const auto &type = to_code_type(function.type());
   auto identifier = function.identifier();
 
-  auto new_annotation = annotation + u8" \u2192 " + id2string(identifier);
+  auto new_annotation = annotation + " \u2192 " + id2string(identifier);
   dest.annotation(new_annotation);
 
   // malloc is special-cased

@@ -388,15 +388,15 @@ const std::string &cmdlinet::option_namest::option_names_iteratort::operator*()
   return command_line->options.at(index).optstring;
 }
 
-bool cmdlinet::option_namest::option_names_iteratort::
-operator==(const cmdlinet::option_namest::option_names_iteratort &other)
+bool cmdlinet::option_namest::option_names_iteratort::operator==(
+  const cmdlinet::option_namest::option_names_iteratort &other) const
 {
   PRECONDITION(command_line != nullptr && command_line == other.command_line);
   return index == other.index;
 }
 
-bool cmdlinet::option_namest::option_names_iteratort::
-operator!=(const cmdlinet::option_namest::option_names_iteratort &other)
+bool cmdlinet::option_namest::option_names_iteratort::operator!=(
+  const cmdlinet::option_namest::option_names_iteratort &other) const
 {
   PRECONDITION(command_line != nullptr && command_line == other.command_line);
   return index != other.index;

@@ -113,7 +113,7 @@ struct nfat
       }
       for(const auto to : transitions[from].epsilon)
       {
-        out << 'S' << from << " -> S" << to << u8"[label=\"ε\"]\n";
+        out << 'S' << from << " -> S" << to << "[label=\"ε\"]\n";
       }
       for(const auto &pair : transitions[from].when)
       {

@@ -104,9 +104,9 @@ public:
   bool operator<=(const bv_arithmetict &other);
   bool operator>(const bv_arithmetict &other);
   bool operator>=(const bv_arithmetict &other);
-  bool operator==(const bv_arithmetict &other);
-  bool operator!=(const bv_arithmetict &other);
-  bool operator==(int i);
+  bool operator==(const bv_arithmetict &other) const;
+  bool operator!=(const bv_arithmetict &other) const;
+  bool operator==(int i) const;
 
   std::ostream &operator<<(std::ostream &out)
   {
