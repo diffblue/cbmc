@@ -46,7 +46,9 @@ void add_library(
 /// Preprocesses each model of the C library with this platform's
 /// preprocessor (for the target and options of \ref config) and writes it to
 /// \p directory as `FUNCTION.i`, with a manifest, for
-/// `--c-library-models` on another host.  \return true on error
+/// `--c-library-models` on another host.  Models that differ for a program
+/// with C++ code are also written, in that variant, to the subdirectory
+/// `cpp-program`.  \return true on error
 bool dump_c_library_models(
   const std::string &directory,
   message_handlert &message_handler);
@@ -59,10 +61,18 @@ void cprover_c_library_factory(
 
 /// Load the requested function symbols from the cprover library
 /// and add them to the symbol table regardless of
-/// the library config flags and usage.
+/// the library config flags and usage.  \p cpp_program: the models are for
+/// a program with C++ code (see \ref has_cpp_code).
 void cprover_c_library_factory_force_load(
   const std::set<irep_idt> &functions,
   symbol_table_baset &symbol_table,
-  message_handlert &message_handler);
+  message_handlert &message_handler,
+  bool cpp_program = false);
+
+/// Whether \p symbol_table has a symbol of C++ code.  The C library models
+/// are then preprocessed with __CPROVER_CPP_PROGRAM defined: only such a
+/// program can use new[] and delete[], whose checks need malloc to record
+/// its object.
+bool has_cpp_code(const symbol_table_baset &symbol_table);
 
 #endif // CPROVER_ANSI_C_CPROVER_LIBRARY_H

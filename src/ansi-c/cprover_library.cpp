@@ -19,13 +19,26 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_preprocess.h"
 
 #include <cctype>
+#include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <sstream>
 
+bool has_cpp_code(const symbol_table_baset &symbol_table)
+{
+  for(const auto &entry : symbol_table.symbols)
+  {
+    if(entry.second.mode == ID_cpp)
+      return true;
+  }
+  return false;
+}
+
 /// The text that precedes the models of the C library: the macros for the
-/// options that the models depend on.
-static std::string library_prologue()
+/// options that the models depend on.  \p cpp_program: the program has C++
+/// code, so the models define __CPROVER_CPP_PROGRAM (malloc then records its
+/// object for the checks of delete and delete[]).
+static std::string library_prologue(const bool cpp_program)
 {
   std::ostringstream library_text;
 
@@ -58,6 +71,9 @@ static std::string library_prologue()
     library_text << "#define " CPROVER_PREFIX
                     "DFCC_SIMPLE_INVALID_POINTER_MODEL\n";
 
+  if(cpp_program)
+    library_text << "#define " CPROVER_PREFIX "CPP_PROGRAM\n";
+
   return library_text.str();
 }
 
@@ -72,22 +88,34 @@ static const struct cprover_library_entryt cprover_library[] =
 static std::string get_cprover_library_text(
   const std::set<irep_idt> &functions,
   const symbol_table_baset &symbol_table,
-  const bool force_load)
+  const bool force_load,
+  const bool cpp_program)
 {
   return get_cprover_library_text(
-    functions, symbol_table, cprover_library, library_prologue(), force_load);
+    functions,
+    symbol_table,
+    cprover_library,
+    library_prologue(cpp_program),
+    force_load);
 }
 
+/// The subdirectory of a directory of preprocessed models with the models
+/// that differ for a program with C++ code (__CPROVER_CPP_PROGRAM).
+static const char cpp_program_models[] = "cpp-program";
+
 /// What the models in a directory of preprocessed models were made for: the
-/// target and the prologue (the options the models depend on).  Models
-/// preprocessed for another target or other options are not used.
+/// target and the prologue (the options the models depend on), as for a C
+/// program; the variants for programs with C++ code are in the
+/// subdirectory \ref cpp_program_models.  Models preprocessed for another
+/// target or other options are not used.
 static std::string library_models_manifest()
 {
   return "os " + configt::ansi_ct::os_to_string(config.ansi_c.os) + "\narch " +
          id2string(config.ansi_c.arch) + "\nmode " +
          std::to_string(static_cast<int>(config.ansi_c.mode)) +
          "\npointer width " + std::to_string(config.ansi_c.pointer_width) +
-         "\nprologue\n" + library_prologue();
+         "\nvariants for C++ programs in " + cpp_program_models +
+         "\nprologue\n" + library_prologue(false);
 }
 
 /// The file name of the preprocessed model of \p function: the name with
@@ -137,8 +165,18 @@ bool dump_c_library_models(
       return true;
     }
   }
+  const std::filesystem::path cpp_directory =
+    std::filesystem::path{directory} / cpp_program_models;
+  std::filesystem::create_directories(cpp_directory, error);
+  if(error)
+  {
+    log.error() << "failed to create directory '" << cpp_directory.string()
+                << "'" << messaget::eom;
+    return true;
+  }
   std::size_t written = 0, failed = 0;
-  const std::string prologue = library_prologue();
+  const std::string prologue = library_prologue(false);
+  const std::string cpp_prologue = library_prologue(true);
   for(const cprover_library_entryt *e = cprover_library; e->function != nullptr;
       e++)
   {
@@ -158,6 +196,17 @@ bool dump_c_library_models(
         .string())};
     out << preprocessed.str();
     ++written;
+    // the variant for programs with C++ code, if it differs
+    if(std::strstr(e->model, CPROVER_PREFIX "CPP_PROGRAM") == nullptr)
+      continue;
+    std::istringstream cpp_in{cpp_prologue + e->model};
+    std::ostringstream cpp_preprocessed;
+    if(!c_preprocess(cpp_in, cpp_preprocessed, quiet))
+    {
+      std::ofstream cpp_out{widen_if_needed(
+        (cpp_directory / model_file_name(e->function)).string())};
+      cpp_out << cpp_preprocessed.str();
+    }
   }
   log.status() << "C library models: " << written << " preprocessed, " << failed
                << " not preprocessed, into '" << directory << "'"
@@ -168,13 +217,16 @@ bool dump_c_library_models(
 /// Adds the models of \p functions found in config.ansi_c.c_library_models_dir
 /// to \p dest_symbol_table, each as a translation unit of its own (each
 /// carries the declarations of the headers it includes), and removes them
-/// from \p functions.  Uses no model if the directory's manifest does not
-/// match the current target and options.
+/// from \p functions.  For a program with C++ code (\p cpp_program) the
+/// variant in \ref cpp_program_models is used where there is one.  Uses no
+/// model if the directory's manifest does not match the current target and
+/// options.
 static void add_preprocessed_library_models(
   std::set<irep_idt> &functions,
   const symbol_table_baset &symbol_table,
   symbol_table_baset &dest_symbol_table,
-  message_handlert &message_handler)
+  message_handlert &message_handler,
+  const bool cpp_program)
 {
   messaget log{message_handler};
   const std::string &directory = config.ansi_c.c_library_models_dir;
@@ -198,9 +250,12 @@ static void add_preprocessed_library_models(
   for(auto it = functions.begin(); it != functions.end();)
   {
     const auto old = symbol_table.symbols.find(*it);
-    std::ifstream model{widen_if_needed(
-      (std::filesystem::path{directory} / model_file_name(id2string(*it)))
-        .string())};
+    const std::string file_name = model_file_name(id2string(*it));
+    std::filesystem::path path =
+      std::filesystem::path{directory} / cpp_program_models / file_name;
+    if(!cpp_program || !std::filesystem::exists(path))
+      path = std::filesystem::path{directory} / file_name;
+    std::ifstream model{widen_if_needed(path.string())};
     if(
       old == symbol_table.symbols.end() || old->second.value.is_not_nil() ||
       !model)
@@ -356,15 +411,16 @@ void cprover_c_library_factory(
   if(config.ansi_c.lib==configt::ansi_ct::libt::LIB_NONE)
     return;
 
+  const bool cpp_program = has_cpp_code(symbol_table);
   std::set<irep_idt> remaining = functions;
   if(!config.ansi_c.c_library_models_dir.empty())
   {
     add_preprocessed_library_models(
-      remaining, symbol_table, dest_symbol_table, message_handler);
+      remaining, symbol_table, dest_symbol_table, message_handler, cpp_program);
   }
 
   std::string library_text =
-    get_cprover_library_text(remaining, symbol_table, false);
+    get_cprover_library_text(remaining, symbol_table, false, cpp_program);
 
   add_library(library_text, dest_symbol_table, message_handler);
 }
@@ -402,9 +458,10 @@ void add_library(
 void cprover_c_library_factory_force_load(
   const std::set<irep_idt> &functions,
   symbol_table_baset &symbol_table,
-  message_handlert &message_handler)
+  message_handlert &message_handler,
+  const bool cpp_program)
 {
   std::string library_text =
-    get_cprover_library_text(functions, symbol_table, true);
+    get_cprover_library_text(functions, symbol_table, true, cpp_program);
   add_library(library_text, symbol_table, message_handler, functions);
 }

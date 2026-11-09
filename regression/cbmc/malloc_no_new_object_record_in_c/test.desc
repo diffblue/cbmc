@@ -1,0 +1,16 @@
+CORE
+main.c
+
+^\[main\.assertion\.1\] line \d+ not recorded: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+malloc recorded its object in __CPROVER_new_object for the delete[] checks
+in C programs too, which cost 5 to 43 symex steps per aws-c-common proof.
+cbmc-cpp/cpp98_array_delete_after_malloc checks that C++ programs still
+record it.

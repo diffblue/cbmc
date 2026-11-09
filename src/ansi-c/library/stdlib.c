@@ -141,7 +141,9 @@ __CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
 #ifndef __GNUC__
 _Bool __builtin_mul_overflow();
 #endif
+#ifdef __CPROVER_CPP_PROGRAM
 const void *__CPROVER_new_object;
+#endif
 __CPROVER_bool __CPROVER_malloc_is_new_array;
 
 void *calloc(__CPROVER_size_t nmemb, __CPROVER_size_t size)
@@ -184,7 +186,9 @@ __CPROVER_HIDE:;
   // non-deterministically record the object for delete/delete[] and free
   // checking: it was not allocated by new[] (see malloc for why and its cost)
   __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
+#ifdef __CPROVER_CPP_PROGRAM
   __CPROVER_new_object = record_malloc ? malloc_res : __CPROVER_new_object;
+#endif
   __CPROVER_malloc_is_new_array =
     record_malloc ? 0 : __CPROVER_malloc_is_new_array;
 
@@ -207,7 +211,9 @@ __CPROVER_HIDE:;
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
 #ifndef LIBRARY_CHECK
+#  ifdef __CPROVER_CPP_PROGRAM
 const void *__CPROVER_new_object;
+#  endif
 __CPROVER_bool __CPROVER_malloc_is_new_array;
 #endif
 
@@ -254,18 +260,16 @@ __CPROVER_HIDE:;
   // is needed: otherwise a malloc after `new T[n]' leaves that array as
   // __CPROVER_new_object with the flag cleared, and its delete[] fails
   // "delete[] of non-array object" (cpp98_array_delete_after_malloc).  It
-  // also reports delete[] of a malloc'd object.  The cost, measured on the
-  // aws-c-common proofs of perf-benchcomp: aws_byte_buf_append_dynamic has
-  // 2245 instead of 2202 steps and 0.3% more variables and clauses.
-  // MiniSat's run time is very sensitive to such small changes (7.7 s ->
-  // 10.1 s here, 18.8 s -> 32.6 s on CI; the same formula size took 7.5 s
-  // or 18.5 s depending on the goto binary), and over 50 proofs the total
-  // solver time grew by 10%, with some proofs faster.  Leaving the pair
-  // untouched in malloc would also fix the false failure, but loses the
-  // delete[]-of-malloc check and was not faster overall (priority_queue_push
-  // 94 s -> 115 s); clearing __CPROVER_new_object instead was slower.
+  // also reports delete[] of a malloc'd object.  Only a program with C++
+  // code can use new[] or delete[]: the library linker defines
+  // __CPROVER_CPP_PROGRAM for such programs only, and C programs keep the
+  // formula without the recording (it cost 5 to 43 symex steps per proof
+  // of aws-c-common, and MiniSat's run time is sensitive to such small
+  // changes: aws_priority_queue_pop 4.5 s -> 7.1 s).
   __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
+#ifdef __CPROVER_CPP_PROGRAM
   __CPROVER_new_object = record_malloc ? malloc_res : __CPROVER_new_object;
+#endif
   __CPROVER_malloc_is_new_array =
     record_malloc ? 0 : __CPROVER_malloc_is_new_array;
 
@@ -285,7 +289,9 @@ __CPROVER_HIDE:;
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
 const void *__CPROVER_alloca_object;
 #ifndef LIBRARY_CHECK
+#  ifdef __CPROVER_CPP_PROGRAM
 const void *__CPROVER_new_object;
+#  endif
 __CPROVER_bool __CPROVER_malloc_is_new_array;
 #endif
 
@@ -298,7 +304,9 @@ void *__builtin_alloca(__CPROVER_size_t alloca_size)
   // non-deterministically record the object for delete/delete[] and free
   // checking: it was not allocated by new[] (see malloc for why and its cost)
   __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
+#ifdef __CPROVER_CPP_PROGRAM
   __CPROVER_new_object = record_malloc ? res : __CPROVER_new_object;
+#endif
   __CPROVER_malloc_is_new_array =
     record_malloc ? 0 : __CPROVER_malloc_is_new_array;
 

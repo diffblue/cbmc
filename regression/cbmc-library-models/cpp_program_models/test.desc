@@ -1,0 +1,17 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ array deleted: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+were not preprocessed for this target
+delete\[\] of non-array object: FAILURE
+^warning: ignoring
+--
+For a C++ program, --c-library-models uses the models preprocessed with
+__CPROVER_CPP_PROGRAM (in the subdirectory cpp-program): malloc records its
+object, and delete[] of an earlier new[] array succeeds.

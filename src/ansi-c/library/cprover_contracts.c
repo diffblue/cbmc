@@ -1347,7 +1347,9 @@ __CPROVER_HIDE:;
 
     // record the object (not new[]-allocated) for delete/free checks
     __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
+#ifdef __CPROVER_CPP_PROGRAM
     __CPROVER_new_object = record_malloc ? ptr : __CPROVER_new_object;
+#endif
     __CPROVER_malloc_is_new_array =
       record_malloc ? 0 : __CPROVER_malloc_is_new_array;
     // do not detect memory leaks when assuming a precondition of a contract
@@ -1406,7 +1408,9 @@ __CPROVER_HIDE:;
 
     // record the object (not new[]-allocated) for delete/free checks
     __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
+#ifdef __CPROVER_CPP_PROGRAM
     __CPROVER_new_object = record_malloc ? ptr : __CPROVER_new_object;
+#endif
     __CPROVER_malloc_is_new_array =
       record_malloc ? 0 : __CPROVER_malloc_is_new_array;
 
