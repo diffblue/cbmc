@@ -1,0 +1,17 @@
+CORE no-new-smt
+main.c
+--pointer-check --pointer-overflow-check
+^\[main\.pointer_arithmetic\.8\] line \d+ .* in src \+ .*i: SUCCESS$
+^\[main\.assertion\.1\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of 20 failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^\[main\.pointer_arithmetic\.(9|10)\]
+^warning: ignoring
+--
+The memcpy model wrote its preconditions as `0 || __CPROVER_r_ok(src, n)'
+outside the Microsoft runtime.  goto_check_c then checked the instantiated
+argument `src + i' again under the guard of the left operand, so each of
+these checks was made twice: 22 properties instead of 20.

@@ -680,18 +680,22 @@ __CPROVER_HIDE:;
   // as C2y does (N3322), and the MSVC STL relies on it: copying an empty
   // vector calls memcpy(dest, nullptr, 0) (_Impl_copy_memmeow_tail).  C17
   // 7.24.1/2 leaves the call undefined, which the other runtimes keep.
+  // Elsewhere the preconditions are not written as `0 || __CPROVER_r_ok(..)':
+  // instantiated at a call site, goto_check_c checks the argument
+  // expressions in the right operand under the guard `!(0 != 0)', which
+  // does not make them equal to the checks already made for the call, so
+  // each such check was made twice.
 #  ifdef _MSC_VER
-#    define __CPROVER_MEMCPY_EMPTY_OK (n == 0)
+  __CPROVER_precondition(
+    n == 0 || __CPROVER_r_ok(src, n), "memcpy source region readable");
+  __CPROVER_precondition(
+    n == 0 || __CPROVER_w_ok(dst, n), "memcpy destination region writeable");
 #  else
-#    define __CPROVER_MEMCPY_EMPTY_OK 0
+  __CPROVER_precondition(
+    __CPROVER_r_ok(src, n), "memcpy source region readable");
+  __CPROVER_precondition(
+    __CPROVER_w_ok(dst, n), "memcpy destination region writeable");
 #  endif
-  __CPROVER_precondition(
-    __CPROVER_MEMCPY_EMPTY_OK || __CPROVER_r_ok(src, n),
-    "memcpy source region readable");
-  __CPROVER_precondition(
-    __CPROVER_MEMCPY_EMPTY_OK || __CPROVER_w_ok(dst, n),
-    "memcpy destination region writeable");
-#  undef __CPROVER_MEMCPY_EMPTY_OK
 
   if(n > 0)
   {
@@ -940,18 +944,22 @@ __CPROVER_HIDE:;
 #else
 // with the Microsoft runtime, a null pointer with a zero length is
 // accepted, as for memcpy
+// Elsewhere the preconditions are not written as `0 || __CPROVER_r_ok(..)':
+// instantiated at a call site, goto_check_c checks the argument
+// expressions in the right operand under the guard `!(0 != 0)', which
+// does not make them equal to the checks already made for the call, so
+// each such check was made twice.
 #  ifdef _MSC_VER
-#    define __CPROVER_MEMMOVE_EMPTY_OK (n == 0)
+  __CPROVER_precondition(
+    n == 0 || __CPROVER_r_ok(src, n), "memmove source region readable");
+  __CPROVER_precondition(
+    n == 0 || __CPROVER_w_ok(dest, n), "memmove destination region writeable");
 #  else
-#    define __CPROVER_MEMMOVE_EMPTY_OK 0
+  __CPROVER_precondition(
+    __CPROVER_r_ok(src, n), "memmove source region readable");
+  __CPROVER_precondition(
+    __CPROVER_w_ok(dest, n), "memmove destination region writeable");
 #  endif
-  __CPROVER_precondition(
-    __CPROVER_MEMMOVE_EMPTY_OK || __CPROVER_r_ok(src, n),
-    "memmove source region readable");
-  __CPROVER_precondition(
-    __CPROVER_MEMMOVE_EMPTY_OK || __CPROVER_w_ok(dest, n),
-    "memmove destination region writeable");
-#  undef __CPROVER_MEMMOVE_EMPTY_OK
 
   if(n > 0)
   {
