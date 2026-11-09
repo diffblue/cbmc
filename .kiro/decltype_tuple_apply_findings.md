@@ -16242,3 +16242,35 @@ cpp20_alias_and_variable_template_instances_reused guards the cached
 results (it passes on the old binary too, as a pure speed-up should).
 Remaining: resolve/guess_function_template_args (~5.5 s inclusive) and
 repeated SFINAE failures (`enable_if_t<false, void>' 384 times).
+
+## Round 227 (2026-11-09): perf-benchcomp differences in C proofs
+
+CI of 1f440f89e4: perf-benchcomp flagged aws_byte_buf_append_dynamic
+(solver 19.5 -> 29.8 s) and aws_priority_queue_pop (7.1 -> 11.5 s); 40 of
+53 proofs had more symex steps, 3 more VCCs.  Reproduced locally with all
+170 aws-c-common proofs, develop 826c1c7390 against the branch.  Swapping
+binaries on the same goto file showed the difference is in cbmc, not
+goto-cc.  Two causes:
+
+1. 2208f5e8f8 wrote memcpy's and memmove's preconditions as
+   `__CPROVER_MEMCPY_EMPTY_OK || __CPROVER_r_ok(src, n)' with the macro
+   `0' outside the Microsoft runtime.  instrument_preconditions copies them
+   to the call site with the arguments substituted; goto_check_c checks the
+   right operand of || under the guard `!(0 != 0)', so every check of the
+   argument expressions was made a second time (as `!(0 != 0) => ...').
+   aws_array_list_back: 405 properties instead of 386, 78 VCCs instead of
+   71.  Fixed by 762804cc99 (the MSVC and other cases written out); test
+   memcpy_argument_checks_not_duplicated (22 -> 20 properties).  After it
+   all 170 proofs have develop's VCCs and properties.
+2. The remaining step difference (+5 to +43 per proof, 154 of 170 proofs)
+   is cf8a92b641 (round 212): malloc records __CPROVER_new_object.  The
+   formulas differ by about 0.01% (aws_priority_queue_pop: 437,298 ->
+   437,336 variables), but MiniSat's time does not follow: 4.45 s -> 7.05 s
+   for that proof, while aws_byte_buf_append_dynamic gets faster
+   (9.57 s -> 9.07 s).  Summed over the 170 proofs: 2,343 s on develop,
+   2,293 s on the branch.  Recording only after a new[] (guarding with
+   __CPROVER_malloc_is_new_array): 2,339 -> 2,288 steps, but 5.2 s,
+   still slower than develop; not kept.
+
+aws_byte_buf_append_dynamic and aws_priority_queue_pop were not affected
+by cause 1; their CI slowdown is the solver's sensitivity to cause 2.
