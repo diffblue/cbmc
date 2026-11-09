@@ -92,6 +92,33 @@ add_one_function(
     }
   }
 
+  // Only a function of goto_model's own symbol table was converted (a
+  // function the language front end left unconverted, e.g. a C++ constexpr
+  // function, which is a macro symbol): there are no symbols to link, and
+  // linking -- a pass over all symbols and all functions of goto_model --
+  // reduces to adding the function.  A program that calls many such
+  // functions otherwise links once per function (1200 times for
+  // std::print), which made linking slower than type checking.
+  if(library_model.symbol_table.symbols.empty())
+  {
+    for(auto &entry : library_model.goto_functions.function_map)
+    {
+      auto dest = goto_model.goto_functions.function_map.find(entry.first);
+      if(dest == goto_model.goto_functions.function_map.end())
+      {
+        goto_model.goto_functions.function_map.emplace(
+          entry.first, std::move(entry.second));
+      }
+      else if(!dest->second.body_available())
+      {
+        dest->second.body.swap(entry.second.body);
+        dest->second.parameter_identifiers.swap(
+          entry.second.parameter_identifiers);
+      }
+    }
+    return {replace_symbolt::expr_mapt{}, init_required};
+  }
+
   return {
     link_goto_model(goto_model, std::move(library_model), message_handler),
     init_required};
