@@ -1037,6 +1037,17 @@ protected:
   /// same tree node) and the identifiers it refers to.
   std::unordered_map<irep_idt, std::pair<irept, std::vector<irep_idt>>>
     held_back_reference_cache;
+  /// For the rounds of typecheck_method_bodies that look for deferred
+  /// members referenced by converted bodies: per body, a shared copy of the
+  /// value it was last scanned as, the identifiers it refers to and the
+  /// classes of the objects it names.
+  struct gathered_referencest
+  {
+    irept value;
+    std::vector<irep_idt> referenced;
+    std::vector<irep_idt> objects_of_class;
+  };
+  std::unordered_map<irep_idt, gathered_referencest> gathered_references;
   bool release_referenced_held_back_bodies();
   void drop_unreferenced_held_back_bodies();
 

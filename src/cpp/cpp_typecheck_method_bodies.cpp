@@ -2042,7 +2042,28 @@ void cpp_typecheckt::typecheck_method_bodies()
         s.second.type.id() == ID_code && s.second.value.is_not_nil() &&
         s.second.value.id() != ID_cpp_not_typechecked &&
         deferred_method_bodies.find(s.first) == deferred_method_bodies.end())
-        gather_referenced(s.second.value, referenced);
+      {
+        // This runs in every round of every call, over all bodies; a body
+        // that is still the tree gathered before (kept shared in the
+        // cache) is not walked again.
+        gathered_referencest &cached = gathered_references[s.first];
+        if(&cached.value.read() != &s.second.value.read())
+        {
+          std::set<irep_idt> body_referenced;
+          std::set<irep_idt> body_objects;
+          objects_of_class.swap(body_objects);
+          gather_referenced(s.second.value, body_referenced);
+          objects_of_class.swap(body_objects);
+          cached.value = s.second.value;
+          cached.referenced.assign(
+            body_referenced.begin(), body_referenced.end());
+          cached.objects_of_class.assign(
+            body_objects.begin(), body_objects.end());
+        }
+        referenced.insert(cached.referenced.begin(), cached.referenced.end());
+        objects_of_class.insert(
+          cached.objects_of_class.begin(), cached.objects_of_class.end());
+      }
     }
 
     std::vector<irep_idt> to_emit;
