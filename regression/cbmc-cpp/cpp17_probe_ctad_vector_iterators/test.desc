@@ -1,0 +1,22 @@
+KNOWNBUG libstdcxx
+main.cpp
+--cpp17 --object-bits 12 --unwind 8 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ vector deduced from an iterator pair: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+`std::vector v(a.begin(), a.end())' uses vector's deduction guide from an
+iterator pair ([vector.overview]: vector(InputIter, InputIter, Allocator =
+Allocator()) -> vector<iter-value-type<InputIter>, Allocator>).  CBMC
+undefined __cpp_deduction_guides when preprocessing, so libstdc++'s guides
+were compiled out, deduced vector<iterator, iterator> by position, and
+v.size() was not 3.  Also needed: a guide parameter with a default
+argument ([over.match.viable]/2.3), and undeduced guide template
+parameters taking their defaults, with substitution failures removing the
+guide ([temp.deduct.general]/5, /8).

@@ -1,0 +1,19 @@
+KNOWNBUG libcxx
+main.cpp
+--cpp17 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ holds int: SUCCESS$
+^\[main\.assertion\.2\] line \d+ get int: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^PARSING ERROR$
+^CONVERSION ERROR$
+dropped the body
+--
+std::variant<int, double> with libc++: holds_alternative and get of the
+held int.  It depends on the expansion of a using-declaration pack, braced
+initialization of an array-reference parameter and constant evaluation in
+libc++'s <variant>.  It also guards against a partially type-checked main:
+an incomplete user function is an error, not a SUCCESSFUL result over a
+truncated body (see test.desc).

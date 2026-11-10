@@ -1,0 +1,20 @@
+KNOWNBUG libstdcxx
+main.cpp
+--cpp17 --object-bits 12 --unwind 8 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ vector<int> deduced from a braced list: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+[over.match.class.deduct]/2, [over.match.list]/1: for a braced list, the
+guide from vector's initializer-list constructor, vector(initializer_list<
+value_type>, const allocator_type & = allocator_type()), is tried first,
+with value_type the class's typedef of T: `std::vector v{1, 2, 3}' is
+vector<int>.  CBMC deduced vector<int, int> (CONVERSION ERROR): it tried
+the guides with the elements as the arguments only, and libstdc++'s guides
+were compiled out, as CBMC undefined __cpp_deduction_guides.

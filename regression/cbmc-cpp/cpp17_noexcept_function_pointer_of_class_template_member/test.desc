@@ -1,0 +1,19 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ noexcept\(true\) member: SUCCESS$
+^\[main\.assertion\.2\] line \d+ noexcept\(false\) member: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Assertion 2 failed: W<int>::f's address converted to `void (*)()
+noexcept' as well as to `void (*)()', and overload resolution chose the
+first.  The cause was not the deferred noexcept-specifier (W<int>::f was
+correctly not noexcept) but the function pointer conversion: noexcept is a
+comment of the function type, which type equality ignores.  See
+cpp17_overloads_on_noexcept_function_pointer_parameters.
