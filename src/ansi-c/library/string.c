@@ -400,29 +400,6 @@ __CPROVER_HIDE:;
 #endif
 }
 
-/* FUNCTION: __builtin_strcmp */
-
-#ifndef __CPROVER_STRING_H_INCLUDED
-#  include <string.h>
-#  define __CPROVER_STRING_H_INCLUDED
-#endif
-
-int __builtin_strcmp(const char *s1, const char *s2)
-{
-__CPROVER_HIDE:;
-  __CPROVER_size_t i = 0;
-  unsigned char ch1, ch2;
-  do
-  {
-    ch1 = s1[i];
-    ch2 = s2[i];
-    if(ch1 != ch2)
-      return ch1 < ch2 ? -1 : 1;
-    i++;
-  } while(ch1 != 0 && ch2 != 0);
-  return 0;
-}
-
 /* FUNCTION: strcasecmp */
 
 #ifndef __CPROVER_STRING_H_INCLUDED
@@ -593,22 +570,6 @@ size_t strlen(const char *s)
   while(s[len]!=0) len++;
   return len;
   #endif
-}
-
-/* FUNCTION: __builtin_strlen */
-
-#ifndef __CPROVER_STRING_H_INCLUDED
-#  include <string.h>
-#  define __CPROVER_STRING_H_INCLUDED
-#endif
-
-__CPROVER_size_t __builtin_strlen(const char *s)
-{
-__CPROVER_HIDE:;
-  __CPROVER_size_t len = 0;
-  while(s[len] != 0)
-    len++;
-  return len;
 }
 
 /* FUNCTION: strdup */
@@ -1078,37 +1039,6 @@ int memcmp(const void *s1, const void *s2, size_t n)
   return res;
 }
 
-/* FUNCTION: __builtin_memcmp */
-
-#ifndef __CPROVER_STRING_H_INCLUDED
-#  include <string.h>
-#  define __CPROVER_STRING_H_INCLUDED
-#endif
-
-int __builtin_memcmp(const void *s1, const void *s2, __CPROVER_size_t n)
-{
-__CPROVER_HIDE:;
-  int res = 0;
-#ifdef __CPROVER_STRING_ABSTRACTION
-  __CPROVER_precondition(
-    __CPROVER_buffer_size(s1) >= n, "memcmp buffer overflow of 1st argument");
-  __CPROVER_precondition(
-    __CPROVER_buffer_size(s2) >= n, "memcmp buffer overflow of 2nd argument");
-#else
-  __CPROVER_precondition(__CPROVER_r_ok(s1, n), "memcmp region 1 readable");
-  __CPROVER_precondition(__CPROVER_r_ok(s2, n), "memcmp region 2 readable");
-
-  const unsigned char *sc1 = s1, *sc2 = s2;
-  for(; n != 0; n--)
-  {
-    res = (*sc1++) - (*sc2++);
-    if(res != 0)
-      return res;
-  }
-#endif
-  return res;
-}
-
 /* FUNCTION: memchr */
 
 #ifndef __CPROVER_STRING_H_INCLUDED
@@ -1133,33 +1063,6 @@ __CPROVER_HIDE:;
   // pointed to by s; return a pointer to it, or a null pointer if absent.
   // The scan returns a pointer INTO s so pointer provenance is preserved
   // (callers subtract the base pointer, e.g. char_traits<char>::find).
-  const unsigned char *sc = s;
-  for(; n != 0; n--, sc++)
-  {
-    if(*sc == (unsigned char)c)
-      return (void *)sc;
-  }
-  return 0;
-}
-
-/* FUNCTION: __builtin_memchr */
-
-#ifndef __CPROVER_STRING_H_INCLUDED
-#  include <string.h>
-#  define __CPROVER_STRING_H_INCLUDED
-#endif
-
-void *__builtin_memchr(const void *s, int c, __CPROVER_size_t n)
-{
-__CPROVER_HIDE:;
-#ifdef __CPROVER_STRING_ABSTRACTION
-  __CPROVER_precondition(
-    __CPROVER_buffer_size(s) >= n, "memchr buffer overflow");
-#else
-  __CPROVER_precondition(__CPROVER_r_ok(s, n), "memchr region readable");
-#endif
-
-  // see memchr above (C23 7.26.5.2)
   const unsigned char *sc = s;
   for(; n != 0; n--, sc++)
   {

@@ -17,6 +17,9 @@ int main()
   assert(__builtin_strchr(s, 'b') == s + 1);
   assert(__builtin_strrchr(s, 'z') == 0);
   assert(__builtin_strncmp(s, "abd", 2) == 0);
+  assert(__builtin_strcmp(s, "abd") < 0);
+  assert(__builtin_strlen(s) == 3);
+  assert(__builtin_memcmp(s, "abd", 2) == 0);
   // a model of its own is still used
   assert(__builtin_fabs(-2.0) == 2.0);
   return 0;
