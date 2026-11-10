@@ -1,0 +1,20 @@
+KNOWNBUG
+main.ii
+other.i --os macos --arch arm64 --no-library
+^\[main\.assertion\.1\] line \d+ the C definition is called: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+On macOS the C front end renamed a function declared with the asm label
+"_" + its name, Darwin's spelling of every C name in object files, to that
+label, while the C++ front end, which does not apply asm labels, kept the
+name.  The C++ call then had no body: Apple's <stdio.h> labels fopen this
+way, so libc++'s basic_filebuf::open got an arbitrary FILE pointer from
+fopen and closed it (cpp11_ofstream_from_string failed on macOS CI).  Such
+a label is now taken to name the function it is attached to.  The files
+are preprocessed (.ii, .i), so that no clang is needed on other hosts.

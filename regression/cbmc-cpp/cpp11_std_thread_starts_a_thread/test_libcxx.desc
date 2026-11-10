@@ -1,0 +1,19 @@
+KNOWNBUG libcxx
+main.cpp
+--cpp11 --stdlib libc++ --object-bits 12 --unwind 4
+^pointer handling for concurrency is unsound$
+^EXIT=6$
+^SIGNAL=0$
+--
+no body for callee
+^warning: ignoring
+--
+The models of the standard library's thread start (libstdc++'s
+_M_start_thread, libc++'s inline pthread_create) and join (both libraries)
+start a second thread: symbolic execution reaches it and stops with
+"pointer handling for concurrency is unsound" (issue #305), as for any C++
+program with two threads whose library code writes a shared pointer.
+With libc++ the thread was started before (its header calls
+pthread_create); join, defined in libc++'s library, is modelled now.  When #305
+is fixed, this test should expect the two assertions' results instead
+(cpp11_probe_std_thread).

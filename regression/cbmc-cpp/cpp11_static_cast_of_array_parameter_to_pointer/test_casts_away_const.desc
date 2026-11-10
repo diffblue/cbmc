@@ -1,0 +1,14 @@
+CORE
+casts_away_const.cpp
+--cpp11
+^EXIT=(1|6)$
+^SIGNAL=0$
+type mismatch on static_cast
+^CONVERSION ERROR$
+--
+^warning: ignoring
+--
+N5008 [expr.static.cast]/1: the array-to-pointer conversion of a reference
+to an array of const char gives `const char *'; static_cast to `char *'
+would cast away constness and is ill-formed.  g++ 13 and clang++ 18 reject
+the program, as the front end must.

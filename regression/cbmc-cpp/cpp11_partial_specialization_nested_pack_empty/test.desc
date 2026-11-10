@@ -1,0 +1,19 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ counts: SUCCESS$
+^\[main\.assertion\.2\] line \d+ more specialized: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+For tup<double>, the specialization for tup<F, R...> (R empty) did not
+match: R stayed unassigned and the pattern was type-checked without
+expanding R..., so tup<Ts...> was chosen.  Partial ordering also treated
+an undeduced pack as a failure.  libstdc++ 11's variant then rejected
+`std::variant<int, double> v = 2.5' (cpp17_probe_std_variant).

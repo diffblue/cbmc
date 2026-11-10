@@ -1,0 +1,18 @@
+KNOWNBUG
+main.cpp
+--winx64 --cpp11
+^\[main\.assertion\.1\] line \d+ the C locale: SUCCESS$
+^\[main\.assertion\.2\] line \d+ another locale is unavailable: SUCCESS$
+^\[main\.assertion\.3\] line \d+ conversions of the C locale: SUCCESS$
+^\[main\.assertion\.4\] line \d+ _Xlength_error throws length_error: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+_Locinfo_ctor, _Locinfo_dtor, _Getcvt and the _X* functions had no model:
+the locale names and conversion data were unknown and _Xlength_error
+returned.

@@ -1,0 +1,18 @@
+KNOWNBUG libstdcxx
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ the generic category: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+no body for callee
+--
+libstdc++ defines generic_category() and system_category() in its
+compiled library, and CBMC had no models: their "no body" checks failed.
+Models are needed for std::print, which throws system_error when writing
+fails (cpp23_probe_std_print).

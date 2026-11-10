@@ -1,0 +1,17 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ run time: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+could not be evaluated
+static assertion failed
+--
+The value of a constexpr object kept the conversions of its initializers,
+`{ .n=(unsigned long)2 }'; a member function called on the object returned
+that conversion, which the constant evaluator did not take as a constant.

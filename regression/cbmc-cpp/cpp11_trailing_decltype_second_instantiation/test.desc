@@ -1,0 +1,14 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+found no match
+dropped the body
+--
+N5008 [basic.scope.param]/1.1, [temp.inst]: each specialization's trailing
+decltype is evaluated against its own parameter types; the shared synthetic
+parameter symbol is retyped per deduction.
