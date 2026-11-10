@@ -1,0 +1,17 @@
+KNOWNBUG
+main.cpp
+--cpp26
+^file main\.cpp line \d+: static assertion failed: f\(\) is 4$
+^CONVERSION ERROR$
+^EXIT=6$
+^SIGNAL=0$
+--
+static_assert condition could not be evaluated
+^VERIFICATION SUCCESSFUL$
+--
+The program is ill-formed: GCC 16 reports "static assertion failed: f() is
+4".  CBMC's constant evaluator did not evaluate throw and try
+(cpp26_constexpr_exception), and a static_assert whose condition it cannot
+evaluate is skipped with the warning "static_assert condition could not be
+evaluated; the assertion is not checked", so verification succeeded.  The
+static_assert is the check that must fail, so there is no WRONG assertion.

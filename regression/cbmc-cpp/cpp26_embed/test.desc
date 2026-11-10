@@ -1,0 +1,19 @@
+KNOWNBUG libstdcxx16
+main.cpp
+--cpp26
+^\[main\.assertion\.1\] line \d+ embedded bytes: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+A probe of the C++26 support census (2026-11-05): #embed ([cpp.embed]) of a
+3-byte file: the preprocessor produces the bytes as a comma-separated list, so
+CBMC sees an ordinary initializer. Needs a preprocessor implementing #embed
+(GCC 15 or later; tagged libstdcxx16 as that tag checks the host gcc's
+version)..  The last assertion is WRONG and must fail, so a pass is not
+vacuous.

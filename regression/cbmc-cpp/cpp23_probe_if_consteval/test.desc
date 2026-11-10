@@ -1,0 +1,18 @@
+KNOWNBUG
+main.cpp
+--cpp23
+^\[main\.assertion\.1\] line \d+ if consteval: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+[stmt.if]/4: the first substatement of `if consteval' is executed in an
+immediate function context or during manifestly constant evaluation.  The
+parser kept only the else branch, so the constant evaluation of
+`constexpr int c = f()' took it too (c was 2).  Both branches are now kept
+(cpp23_if_consteval_forms).

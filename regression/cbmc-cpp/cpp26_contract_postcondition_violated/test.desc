@@ -1,0 +1,15 @@
+KNOWNBUG
+main.cpp
+--cpp26
+^\[main\.assertion\.1\] line \d+ a call satisfying the postcondition: SUCCESS$
+^\[clamp\.postcondition\.\d+\] line \d+ postcondition r >= 0: FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+clamp(-1) returns -1, violating post(r : r >= 0).  Checked with GCC 16
+-fcontracts (the call aborts).

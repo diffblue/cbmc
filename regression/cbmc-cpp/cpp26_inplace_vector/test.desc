@@ -1,0 +1,19 @@
+KNOWNBUG libstdcxx16
+main.cpp
+--cpp26 --object-bits 12 --unwind 4 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ full at its capacity: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+std::inplace_vector ([inplace.vector]).  With GCC 16's headers CBMC failed
+to parse <utility> in C++26 mode (std::constant_wrapper::operator[]
+expands a pack in a subscript, cpp23_subscript_pack_expansion_forms), and
+it preprocessed C++26 as C++23, so <inplace_vector> was empty.  N5008's
+try_push_back returns a pointer, GCC 16's an optional<T&> (a later
+revision); the test uses neither type.  Checked with GCC 16.

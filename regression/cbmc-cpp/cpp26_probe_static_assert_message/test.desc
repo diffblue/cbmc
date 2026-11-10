@@ -1,0 +1,16 @@
+KNOWNBUG
+main.cpp
+--cpp26
+^\[main\.assertion\.1\] line \d+ static_assert with a user-generated message: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+A probe of the C++26 support census (2026-11-05): static_assert with a message
+object providing size() and data().  The last assertion is WRONG and must
+fail, so a pass is not vacuous.

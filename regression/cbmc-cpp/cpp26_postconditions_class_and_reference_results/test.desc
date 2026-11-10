@@ -1,0 +1,31 @@
+KNOWNBUG
+main.cpp
+--cpp26
+^\[make\.postcondition\.1\] line \d+ postcondition r\.v == x: SUCCESS$
+^\[named\.postcondition\.1\] line \d+ postcondition r\.v == x \+ 1: SUCCESS$
+^\[fixed\.postcondition\.1\] line \d+ postcondition r\.v == x: SUCCESS$
+^\[ref\.postcondition\.1\] line \d+ postcondition .*: SUCCESS$
+^\[cref\.postcondition\.1\] line \d+ postcondition .*: SUCCESS$
+^\[rref\.postcondition\.1\] line \d+ postcondition .*: SUCCESS$
+^\[after_locals\.postcondition\.1\] line \d+ postcondition .*: SUCCESS$
+^\[main\.assertion\.1\] line \d+ prvalue: one construction: SUCCESS$
+^\[main\.assertion\.4\] line \d+ named: no extra copy: SUCCESS$
+^\[main\.assertion\.6\] line \d+ non-copyable: SUCCESS$
+^\[main\.assertion\.7\] line \d+ write through returned reference: SUCCESS$
+^\[main\.assertion\.8\] line \d+ const reference binds: SUCCESS$
+^\[main\.assertion\.12\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+are not checked
+--
+The postconditions of functions returning a class or a reference were not
+checked (a warning): the check held the result in a variable, which would
+have copied a class result and copied, not bound, a reference result.  They
+are now checked by goto-programs' instrument_cpp_postconditions on the
+result object.  thrower's postcondition holds vacuously: it is not checked
+when the function throws.  Checked with GCC 16 -fcontracts.
