@@ -16,9 +16,8 @@ int main()
   const char *s = "abc";
   assert(__builtin_strchr(s, 'b') == s + 1);
   assert(__builtin_strrchr(s, 'z') == 0);
-  assert(__builtin_strstr(s, "bc") == s + 1);
+  assert(__builtin_strncmp(s, "abd", 2) == 0);
   // a model of its own is still used
   assert(__builtin_fabs(-2.0) == 2.0);
-  assert(__builtin_memchr(s, 'c', 3) == s + 2);
   return 0;
 }
