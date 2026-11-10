@@ -1,0 +1,18 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ union from first member's type: SUCCESS$
+^\[main\.assertion\.2\] line \d+ with value: SUCCESS$
+^\[main\.assertion\.3\] line \d+ local union: SUCCESS$
+^\[main\.assertion\.4\] line \d+ struct member: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Parenthesized aggregate initialization was implemented for structs only;
+for a union the expression was converted to the union type ("invalid
+implicit conversion from 'struct Short' to 'union Rep'").

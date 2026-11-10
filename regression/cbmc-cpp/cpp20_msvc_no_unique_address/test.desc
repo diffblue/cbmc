@@ -1,0 +1,18 @@
+KNOWNBUG
+main.cpp
+--winx64
+^\[main\.assertion\.1\] line \d+ ignored by Visual Studio: SUCCESS$
+^\[main\.assertion\.2\] line \d+ msvc::no_unique_address: SUCCESS$
+^\[main\.assertion\.3\] line \d+ two members: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+static assertion failed
+could not be evaluated
+--
+Neither attribute changed the layout: [[msvc::no_unique_address]] was
+ignored.

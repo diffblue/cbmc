@@ -1,0 +1,39 @@
+KNOWNBUG
+main.cpp
+--winx64
+^\[main\.assertion\.1\] line \d+ R1: e at 1: SUCCESS$
+^\[main\.assertion\.2\] line \d+ R2: e at 1: SUCCESS$
+^\[main\.assertion\.3\] line \d+ Q: d at 1: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The expected output is clang++ 18's Microsoft ABI layout; no MSVC
+compiler was available to check MSVC itself.  CBMC lays out
+[[msvc::no_unique_address]] members by the Itanium C++ ABI rule used for
+[[no_unique_address]] (offset 0, else the data size of the preceding
+members, then multiples of the alignment): R1::e is at offset 8, and Q is
+16 bytes (see cpp20_no_unique_address_overaligned_empty_member).  R2
+matches.  The program fails the first and third assertions.
+
+Not included: clang's Microsoft layout of `struct { E arr[100];
+[[msvc::no_unique_address]] E e; }' puts e at offset 1, the address of
+arr[1], an object of the same type; N5008 [intro.object]/10 forbids that.
+CBMC puts e at offset 100 (as GCC and Clang do for [[no_unique_address]])
+and should keep doing so.
+
+Why FUTURE and not KNOWNBUG: both layouts conform to N5008 (the
+placement of a potentially-overlapping subobject is implementation-
+defined, [intro.object]/8); only the Microsoft ABI's choice is not
+matched, and the MSVC STL headers we have (Visual Studio 2022) do not use
+the attribute.
+
+What it would take: in Visual Studio mode, search the candidate offsets
+from 0 upwards in steps of the member's alignment
+(place_empty_potentially_overlapping_members), still skipping offsets
+where a subobject of the same type lies, and give the zero-length array
+an alignment of 1 (as for the over-aligned case).
