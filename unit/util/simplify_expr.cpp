@@ -235,6 +235,57 @@ TEST_CASE("Simplify pointer_object equality", "[core][util]")
   REQUIRE(simp == true);
 }
 
+TEST_CASE(
+  "Simplify reading an integer cast to a pointer as a bit vector",
+  "[core][util]")
+{
+  // this test requires a proper architecture to be set up so that pointers have
+  // a width
+  const cmdlinet cmdline;
+  config.set(cmdline);
+
+  // Visual Studio's va_arg reads the immediate value va_start stores in a
+  // pointer-sized slot: (bv)(void *)7, its low 32 bits as an int, or the
+  // whole as a long long
+  const pointer_typet void_pointer = pointer_type(empty_typet{});
+  const bv_typet bv{void_pointer.get_width()};
+  const exprt seven = from_integer(7, signed_int_type());
+  const exprt bits = typecast_exprt{typecast_exprt{seven, void_pointer}, bv};
+  REQUIRE(
+    simplify_expr(
+      extractbits_exprt{bits, 0, signed_int_type()}, empty_namespace) == seven);
+  const exprt nine = from_integer(9, signed_long_long_int_type());
+  const exprt bits9 = typecast_exprt{typecast_exprt{nine, void_pointer}, bv};
+  REQUIRE(
+    simplify_expr(
+      typecast_exprt{bits9, signed_long_long_int_type()}, empty_namespace) ==
+    nine);
+
+  // the bytes of a pointer are not rewritten: (bv)(int *)44, read as a byte
+  const exprt p44 = typecast_exprt{
+    from_integer(44, signed_int_type()), pointer_type(seven.type())};
+  const exprt byte =
+    extractbits_exprt{typecast_exprt{p44, bv}, 8, unsigned_char_type()};
+  REQUIRE_FALSE(simplify_expr(byte, empty_namespace).is_constant());
+
+  // read as another type of the same width, the cast is kept: where int is
+  // as wide as a pointer, memcpy reads (bv)(int *)44 as unsigned int and
+  // casts it back to int *; folding to (int *)44u hid its equality with
+  // (int *)44
+  const unsignedbv_typet same_width_unsigned{void_pointer.get_width()};
+  const signedbv_typet same_width_signed{void_pointer.get_width()};
+  const exprt x = from_integer(44, same_width_signed);
+  const exprt bits44 = typecast_exprt{typecast_exprt{x, void_pointer}, bv};
+  REQUIRE(
+    simplify_expr(
+      extractbits_exprt{bits44, 0, same_width_unsigned}, empty_namespace) !=
+    from_integer(44, same_width_unsigned));
+  REQUIRE(
+    simplify_expr(
+      typecast_exprt{bits44, same_width_unsigned}, empty_namespace) !=
+    from_integer(44, same_width_unsigned));
+}
+
 TEST_CASE("Simplify cast from bool", "[core][util]")
 {
   const namespacet &ns = empty_namespace;
