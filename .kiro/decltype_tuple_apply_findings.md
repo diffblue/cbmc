@@ -16274,3 +16274,42 @@ goto-cc.  Two causes:
 
 aws_byte_buf_append_dynamic and aws_priority_queue_pop were not affected
 by cause 1; their CI slowdown is the solver's sensitivity to cause 2.
+
+## Round 228 (2026-11-09): C-only malloc recording, constant guards, speed
+
+- 38ec620dc7 malloc, calloc, alloca and the contracts library record
+  __CPROVER_new_object only for programs with C++ code.  The models are C,
+  so `__cplusplus' cannot tell; the library prologue now defines
+  __CPROVER_CPP_PROGRAM when the symbol table has a symbol of mode cpp
+  (has_cpp_code, also for dfcc's force-loaded library).
+  --dump-c-library-models writes the models that differ, in the C++
+  variant, to cpp-program/; --c-library-models picks them for C++
+  programs; the manifest names the subdirectory, so older dumps are not
+  used.  All 170 aws-c-common proofs now have develop's steps, VCCs and
+  properties (aws_priority_queue_pop 2,339 -> 2,319 steps, 4.1-4.5 s
+  solver as on develop).  Tests malloc_no_new_object_record_in_c (fails
+  before), cbmc-library-models/cpp_program_models.
+- 815179fe1e goto_check_c: a constant operand of ||, && or the condition
+  of ?: is no longer kept as a guard.  `0 || e' checks e as the unguarded
+  check (equal to, and deduplicated with, the same check elsewhere);
+  after `1 || ...', `false ==> ...' or `0 ? x : y' the operand that is not
+  evaluated is not checked (C17 6.5.13/4, 6.5.14/4, 6.5.15/4); a guard
+  `true => c' is c.  Test checks_under_constant_guards (5 -> 2
+  properties); bool5 10 -> 4 VCCs (memcpy's overlap check behind
+  `pointer_object(dst) != pointer_object(src) ||'), short-circuit-memory-
+  checks (no check after `false ==>'), memcpy_argument_checks_not_
+  duplicated 20 -> 6 properties.
+- ce86b48603 typecheck_method_bodies' deferred-member rounds cache, per
+  body, the references and object classes found, with a shared copy of
+  the value scanned (the round-226 attempt used a cache local to one call
+  and gained nothing: one or two rounds per call, but 7 calls).  std::print
+  type checking 14.5 s -> 13.6 s, std::format 14.4 s -> 13.5 s; cbmc-cpp
+  CORE total 1258 s -> 1214 s.
+- Looked at, not changed: failed instantiations (substitution failures)
+  at the outermost level are 800 calls, 0.9 s in total; caching them
+  would need the context (access, enclosing instantiation) in the key.
+  template_by_first_parameter rescans 25 times (~0.4 s).  Interning
+  string literals (`get_bool("#sizeof_pack")') is ~1%; a static
+  irep_idt measured no difference.  The rest of resolve's time is spread
+  over overload resolution (implicit conversion sequences 9%, constraint
+  satisfaction 6%) without a single repeat to remove.
