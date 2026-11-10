@@ -97,4 +97,7 @@ void __builtin_assume(__CPROVER_bool);
 void __builtin_cpu_init(void);
 _Bool __builtin_cpu_is(const char *);
 _Bool __builtin_cpu_supports(const char *);
+
+// memchr for char objects, returning `char *'
+char* __builtin_char_memchr(const char*, int, __CPROVER_size_t);
 // clang-format on
