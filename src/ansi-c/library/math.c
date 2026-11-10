@@ -258,27 +258,6 @@ int __builtin_isinfl(long double ld)
   return __CPROVER_isinfld(ld);
 }
 
-/* FUNCTION: __builtin_isfinite */
-
-int __builtin_isfinite(double d)
-{
-  return __CPROVER_isfinited(d);
-}
-
-/* FUNCTION: __builtin_isfinitef */
-
-int __builtin_isfinitef(float f)
-{
-  return __CPROVER_isfinitef(f);
-}
-
-/* FUNCTION: __builtin_isfinitel */
-
-int __builtin_isfinitel(long double ld)
-{
-  return __CPROVER_isfiniteld(ld);
-}
-
 /* FUNCTION: __builtin_isnan */
 
 int __builtin_isnan(double d)
