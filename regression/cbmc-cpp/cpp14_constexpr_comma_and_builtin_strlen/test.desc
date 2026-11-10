@@ -1,0 +1,17 @@
+KNOWNBUG gnu-extensions
+main.cpp
+--cpp14
+^\[main\.assertion\.1\] line \d+ run time: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+could not be evaluated
+static assertion failed
+--
+The constant evaluator had no case for a comma expression and gave up,
+and it did not evaluate __builtin_strlen; with Xcode 26's libc++ no
+constexpr string_view from a string literal had a known size.

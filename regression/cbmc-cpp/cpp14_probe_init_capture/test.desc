@@ -1,0 +1,22 @@
+KNOWNBUG libstdcxx
+main.cpp
+--cpp14 --object-bits 12 --unwind 8 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ init-capture by move: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+[expr.prim.lambda.capture]/6, /15: an init-capture `q = std::move(p)'
+declares a member initialized as `auto q = std::move(p)', by unique_ptr's
+move constructor, which leaves p null.  CBMC deduced the member's type
+from the initializer without removing its reference (so the closure held
+the address of p), and initialized class-type members of a closure as a
+value without calling a constructor; p and the closure's member then both
+owned the int, and the second destructor reported "double delete".  Now
+the init-capture's type is deduced as for auto ([dcl.type.auto.deduct]/3)
+and class-type members are direct-initialized by their constructors.

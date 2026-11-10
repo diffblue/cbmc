@@ -1,0 +1,20 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ the init-capture moved: SUCCESS$
+^\[main\.assertion\.2\] line \d+ the capture copied: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The closure's member of class type is direct-initialized by its move
+constructor from the init-capture's xvalue, and by its copy constructor
+for a capture by copy.  CBMC declared the init-capture's member as a
+reference (the type of `static_cast<M &&>(m)') and initialized members
+without constructors: neither counter changed.  C++17 makes the copy of
+the closure into f and g a guaranteed elision, so each counter changes
+once.
