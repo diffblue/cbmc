@@ -221,7 +221,7 @@ bool check_renaming_l1(const exprt &expr)
   {
     const auto &type = expr.type();
     if(!expr.get_bool(ID_C_SSA_symbol))
-      return type.id() != ID_code && type.id() != ID_mathematical_function;
+      return type.id() != ID_code;
     if(!to_ssa_expr(expr).get_level_2().empty())
       return true;
     if(to_ssa_expr(expr).get_original_expr().type() != type)
@@ -262,7 +262,7 @@ bool check_renaming(const exprt &expr)
   {
     const auto &type = expr.type();
     if(!expr.get_bool(ID_C_SSA_symbol))
-      return type.id() != ID_code && type.id() != ID_mathematical_function;
+      return type.id() != ID_code;
     if(to_ssa_expr(expr).get_level_2().empty())
       return true;
     if(to_ssa_expr(expr).get_original_expr().type() != type)
