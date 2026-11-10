@@ -9794,6 +9794,30 @@ bool Parser::rUnaryExpr(exprt &exp)
     set_location(exp, tk);
     return true;
   }
+  else if(t == TOK_BUILTIN_VA_ARG)
+  {
+    // GCC's and Clang's __builtin_va_arg(ap, type-id), what <cstdarg>'s
+    // va_arg expands to ([cstdarg.syn], C17 7.16.1.1)
+    cpp_tokent tk;
+    lex.get_token(tk);
+    if(lex.get_token(tk) != '(')
+      return false;
+    exprt ap;
+    if(!rExpression(ap, false))
+      return false;
+    if(lex.get_token(tk) != ',')
+      return false;
+    typet tname;
+    if(!rTypeName(tname))
+      return false;
+    if(lex.get_token(tk) != ')')
+      return false;
+    exp = exprt(ID_gcc_builtin_va_arg);
+    exp.add_to_operands(std::move(ap));
+    exp.type().swap(tname);
+    set_location(exp, tk);
+    return true;
+  }
   else if(t == TOK_OFFSETOF)
   {
     // __builtin_offsetof(type, member)
