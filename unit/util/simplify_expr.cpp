@@ -925,3 +925,34 @@ TEST_CASE(
     REQUIRE(simplify_expr(index_of, ns) == index_of);
   }
 }
+
+TEST_CASE("Simplify the difference of a pointer and itself", "[core][util]")
+{
+  // this test requires a proper architecture to be set up so that pointers have
+  // a width
+  const cmdlinet cmdline;
+  config.set(cmdline);
+
+  const pointer_typet int_pointer = pointer_type(signed_int_type());
+  const symbol_exprt p{"p", int_pointer};
+  const symbol_exprt q{"q", int_pointer};
+  const null_pointer_exprt null{int_pointer};
+  const auto difference = [](const exprt &lhs, const exprt &rhs)
+  {
+    minus_exprt result{lhs, rhs};
+    result.type() = pointer_diff_type();
+    return result;
+  };
+
+  // p - p and NULL - NULL are 0, whatever p points to
+  REQUIRE(
+    simplify_expr(difference(p, p), empty_namespace) ==
+    from_integer(0, pointer_diff_type()));
+  REQUIRE(
+    simplify_expr(difference(null, null), empty_namespace) ==
+    from_integer(0, pointer_diff_type()));
+
+  // distinct operands: unchanged
+  const minus_exprt p_minus_q = difference(p, q);
+  REQUIRE(simplify_expr(p_minus_q, empty_namespace) == p_minus_q);
+}
