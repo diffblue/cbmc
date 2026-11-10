@@ -2104,8 +2104,17 @@ static exprt evaluate_constexpr_call(
   // Get parameter names
   const auto &func_type = to_code_type(func_sym->type);
   const auto &params = func_type.parameters();
-  if(params.size() != arguments.size())
+  // N5008 [expr.call]/12: arguments beyond the parameters match the
+  // ellipsis.  They are checked to be constant above but bind no
+  // variable: only va_arg could read them, and whether an evaluation
+  // invoking va_start is a core constant expression is unspecified
+  // ([expr.const]/12.2) -- a body that does is not evaluated here.
+  if(
+    params.size() != arguments.size() &&
+    !(func_type.has_ellipsis() && arguments.size() > params.size()))
+  {
     return nil_exprt();
+  }
 
   // Build a variable map: parameter → constant value
   // For reference parameters, unwrap address_of and temporaries.
