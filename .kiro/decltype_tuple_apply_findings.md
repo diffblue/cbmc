@@ -16313,3 +16313,29 @@ by cause 1; their CI slowdown is the solver's sensitivity to cause 2.
   irep_idt measured no difference.  The rest of resolve's time is spread
   over overload resolution (implicit conversion sequences 9%, constraint
   satisfaction 6%) without a single repeat to remove.
+
+## Round 229 (2026-11-10): first upstream PRs (tests)
+
+CI of 62803b6ea2: 39 pass, only the 4 CodeQL jobs fail (as on develop);
+perf-benchcomp passed.
+
+Upstreaming plan (agreed): a tags PR, tests PRs by C++ version, then the
+changes outside src/cpp by topic, then src/cpp in layers; a side branch
+`upstream-stack' stacks them, and .kiro/stack_remaining.sh lists what of
+the working branch is not in it yet (test descriptions that differ only
+in their level counted apart).  Branches, all from develop 826c1c7390:
+- pr/cpp-test-tags: regression/cbmc-cpp and regression/cpp CMake and
+  Makefile tag handling (libcxx, msvc-stl, libstdcxx[12|13|16],
+  broken-libstdcxx16, gnu-extensions, itanium-abi, gcc-only), CORE in 4
+  shards, -t 900, README.  Not included: vacuity check, CBMC_TEST_MEMLIMIT
+  and Windows timeouts in test.pl, the gcc-16 and libc++ CI jobs.
+- pr/cpp-tests-{cpp98,cpp11,cpp14,cpp17,cpp20,cpp23-26}: the 1,910 new
+  test directories of regression/cbmc-cpp and 141 of regression/cpp.
+  Levels from develop's binary (built from the tags branch): CORE if the
+  test passes as CORE (84 of 2,219 descriptions), else KNOWNBUG (crashes
+  and usage errors included); not runnable here (libstdcxx16, msvc-stl):
+  KNOWNBUG.  Verified with develop's binary: CORE, KNOWNBUG (test.pl
+  inverts), libc++ CORE and regression/cpp CORE/KNOWNBUG all pass.
+  Modified existing tests (308 in cbmc-cpp) stay with their code changes.
+- Caveats: CORE tests not checked on macOS/Windows; tests that read
+  ../../../src (dogfooding) depend on the src tree.
