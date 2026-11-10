@@ -1,0 +1,11 @@
+CORE
+main.c
+--string-abstraction
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+memchr searches bytes rather than strings, so string abstraction must not
+cause failures.

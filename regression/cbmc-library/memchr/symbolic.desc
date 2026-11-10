@@ -1,0 +1,10 @@
+CORE
+symbolic.c
+--pointer-check --bounds-check --unwind 5 --unwinding-assertions
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+memchr returns the first occurrence within the first n bytes, or NULL.

@@ -1,0 +1,11 @@
+CORE gcc-only
+main.cpp
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Clang's __builtin_char_memchr, which libc++'s char_traits<char>::find uses, has
+a model, also when called from C++.
