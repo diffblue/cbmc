@@ -927,23 +927,9 @@ void goto_convertt::do_function_call_symbol(
   const symbolt *symbol;
   if(ns.lookup(identifier, symbol))
   {
-    // For C++ template instantiations, the function may not have been
-    // instantiated. Create a stub symbol with an empty body.
-    if(function.type().id() == ID_code)
-    {
-      symbolt new_symbol{identifier, function.type(), mode};
-      new_symbol.base_name = function.get(ID_C_base_name);
-      new_symbol.location = function.find_source_location();
-      new_symbol.type.set(ID_C_incomplete, true);
-      symbol_table.insert(std::move(new_symbol));
-      symbol = symbol_table.lookup(identifier);
-    }
-    else
-    {
-      error().source_location = function.find_source_location();
-      error() << "function '" << identifier << "' not found" << eom;
-      throw 0;
-    }
+    error().source_location = function.find_source_location();
+    error() << "function '" << identifier << "' not found" << eom;
+    throw 0;
   }
 
   if(symbol->type.id() != ID_code)

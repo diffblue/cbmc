@@ -18,7 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/symbol.h>
-#include <util/symbol_table_base.h>
 
 #include <goto-programs/goto_program.h>
 
@@ -155,25 +154,6 @@ void destruct_locals(
 
     if(destructor.is_not_nil())
     {
-      // Check that the destructor symbol exists in the symbol table.
-      // Template instantiations from system headers may list a destructor
-      // in the struct's methods without creating the corresponding symbol.
-      // Create a no-op stub so the goto program remains consistent.
-      const irep_idt &dtor_name =
-        to_symbol_expr(destructor.function()).get_identifier();
-      const symbolt *dtor_sym;
-      if(ns.lookup(dtor_name, dtor_sym))
-      {
-        // Create stub symbol with no body (nil value) so CBMC treats
-        // it as an unmodeled function rather than a no-op.
-        symbolt stub_sym{dtor_name, destructor.function().type(), ID_cpp};
-        stub_sym.base_name =
-          id2string(dtor_name).substr(id2string(dtor_name).rfind("::") + 2);
-        stub_sym.is_type = false;
-        const_cast<symbol_table_baset &>(ns.get_symbol_table())
-          .insert(std::move(stub_sym));
-      }
-
       // add "this" (in front of any hidden flag argument)
       address_of_exprt this_expr(
         symbol.symbol_expr(), pointer_type(symbol.type));

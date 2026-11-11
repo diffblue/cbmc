@@ -55,6 +55,27 @@ static void get_symbols(
         working_set.push_back(sp);
     }
 
+    // a C++ class's destructor runs whenever an object of the class is
+    // destroyed ([class.dtor]/14), which goto conversion makes explicit only
+    // later: keep it with the class, even if no code refers to it yet
+    // (it may have no body here, e.g. defined in a compiled library)
+    if(symbol.is_type && symbol.type.id() == ID_struct)
+    {
+      const exprt &methods =
+        static_cast<const exprt &>(symbol.type.find(ID_methods));
+      for(const auto &method : methods.operands())
+      {
+        const symbolt *s;
+        if(
+          method.type().id() == ID_code &&
+          to_code_type(method.type()).return_type().id() == ID_destructor &&
+          !ns.lookup(method.get(ID_name), s))
+        {
+          working_set.push_back(s);
+        }
+      }
+    }
+
     if(symbol.type.id() == ID_code)
     {
       const code_typet &code_type = to_code_type(symbol.type);
