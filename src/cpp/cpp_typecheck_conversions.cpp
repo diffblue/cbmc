@@ -221,6 +221,79 @@ bool cpp_typecheckt::standard_conversion_qualification(
   return false;
 }
 
+/// The type that a prvalue of unscoped enumeration type \p enum_tag promotes
+/// to (N5008 [conv.prom]/3-4): for a fixed underlying type, that type
+/// (itself promoted if narrower than int); otherwise the first of int,
+/// unsigned int, long, unsigned long, long long and unsigned long long that
+/// can represent the values of all the enumerators.  The underlying type
+/// that typecheck_enum_body chooses for the latter (e.g., unsigned int when
+/// no enumerator is negative, or a narrower type for a `mode' attribute) is
+/// not necessarily that type.
+/// \return the promoted type, or an empty optional for a scoped enumeration
+///   (which does not promote) or if an enumerator value is not known
+static std::optional<typet>
+enum_promotion_type(const c_enum_tag_typet &enum_tag, const namespacet &ns)
+{
+  const c_enum_typet &enum_type = ns.follow_tag(enum_tag);
+  if(enum_type.get_bool(ID_C_class))
+    return {};
+
+  const typet &underlying = enum_type.underlying_type();
+  const std::size_t int_width = config.ansi_c.int_width;
+
+  if(enum_type.get_bool(ID_C_fixed_underlying_type))
+  {
+    if(
+      (underlying.id() == ID_signedbv || underlying.id() == ID_unsignedbv) &&
+      to_bitvector_type(underlying).get_width() < int_width)
+    {
+      return signed_int_type();
+    }
+    return underlying;
+  }
+
+  // the values of the enumerators, which typecheck_enum_body stores in
+  // symbols named <enum>::<enumerator>
+  mp_integer min_value = 0, max_value = 0;
+  for(const auto &member : enum_type.find(ID_body).get_sub())
+  {
+    const symbolt *enumerator = nullptr;
+    if(ns.lookup(
+         id2string(enum_tag.get_identifier()) +
+           "::" + id2string(member.get(ID_name)),
+         enumerator))
+    {
+      return {};
+    }
+    const auto value = numeric_cast<mp_integer>(
+      simplify_expr(typecast_exprt{enumerator->value, underlying}, ns));
+    if(!value.has_value())
+      return {};
+    min_value = std::min(min_value, *value);
+    max_value = std::max(max_value, *value);
+  }
+
+  for(const typet &candidate :
+      {typet{signed_int_type()},
+       typet{unsigned_int_type()},
+       typet{signed_long_int_type()},
+       typet{unsigned_long_int_type()},
+       typet{signed_long_long_int_type()},
+       typet{unsigned_long_long_int_type()}})
+  {
+    const bitvector_typet &bv = to_bitvector_type(candidate);
+    const bool is_signed = candidate.id() == ID_signedbv;
+    const mp_integer low =
+      is_signed ? -power(2, bv.get_width() - 1) : mp_integer{0};
+    const mp_integer high = is_signed ? power(2, bv.get_width() - 1) - 1
+                                      : power(2, bv.get_width()) - 1;
+    if(min_value >= low && max_value <= high)
+      return candidate;
+  }
+
+  return {};
+}
+
 /// Integral-promotion conversion
 ///
 /// An rvalue of type char, signed char, unsigned char, short int,
@@ -322,9 +395,14 @@ bool cpp_typecheckt::standard_conversion_integral_promotion(
     return true;
   }
 
+  // N5008 [conv.prom]/3-4
   if(expr.type().id() == ID_c_enum_tag)
   {
-    new_expr = typecast_exprt(expr, int_type);
+    auto promoted = enum_promotion_type(to_c_enum_tag_type(expr.type()), *this);
+    if(!promoted.has_value())
+      return false;
+    qual_from.write(*promoted);
+    new_expr = typecast_exprt(expr, *promoted);
     return true;
   }
 
@@ -7096,8 +7174,29 @@ static bool single_arithmetic_conversion_target(
   return found;
 }
 
+/// Apply the integral promotion of an unscoped enumeration
+/// (enum_promotion_type) to \p expr.  The C arithmetic conversions would
+/// otherwise use the enumeration's underlying type.
+static void promote_enum(exprt &expr, const namespacet &ns)
+{
+  if(expr.type().id() != ID_c_enum_tag)
+    return;
+
+  auto promoted = enum_promotion_type(to_c_enum_tag_type(expr.type()), ns);
+  if(!promoted.has_value())
+    return;
+
+  c_qualifierst qualifiers;
+  qualifiers.read(expr.type());
+  qualifiers.write(*promoted);
+  expr = typecast_exprt{expr, *promoted};
+}
+
 void cpp_typecheckt::implicit_typecast_arithmetic(exprt &expr1, exprt &expr2)
 {
+  promote_enum(expr1, *this);
+  promote_enum(expr2, *this);
+
   auto try_class_to_arith = [this](exprt &op)
   {
     typet t = op.type();
@@ -7127,6 +7226,8 @@ void cpp_typecheckt::implicit_typecast_arithmetic(exprt &expr1, exprt &expr2)
 
 void cpp_typecheckt::implicit_typecast_arithmetic(exprt &expr)
 {
+  promote_enum(expr, *this);
+
   typet t = expr.type();
   if(is_reference(t))
     t = to_reference_type(t).base_type();

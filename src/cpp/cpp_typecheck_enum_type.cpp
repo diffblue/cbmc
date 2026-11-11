@@ -47,7 +47,15 @@ void cpp_typecheckt::typecheck_enum_body(
       // [dcl.enum]: an enumerator value is a constant expression.
       constant_expression_contextt constant_expression_guard{*this};
       typecheck_expr(value);
-      implicit_typecast(value, c_enum_type.underlying_type());
+      // N5008 [dcl.enum]/5: with a fixed underlying type, the value is
+      // converted to that type; otherwise an integer keeps its value (the
+      // underlying type is chosen to hold it below)
+      if(
+        !underlying_defaulted || (value.type().id() != ID_signedbv &&
+                                  value.type().id() != ID_unsignedbv))
+      {
+        implicit_typecast(value, c_enum_type.underlying_type());
+      }
       make_constant(value);
       if(to_integer(to_constant_expr(value), i))
       {
@@ -120,20 +128,21 @@ void cpp_typecheckt::typecheck_enum_body(
     ++i;
   }
 
-  // GCC's `enum __attribute__((__packed__))` extension, honoured by
-  // the C front end (c_typecheck_type.cpp): with no enumeration-base
-  // written, the underlying type is the SMALLEST sufficient integer
-  // type.  N5008 [dcl.enum]/7 leaves the underlying type
-  // implementation-defined in that case, and matching the platform
-  // compiler is what makes sizeof agree (user-reported: 1-byte
-  // instruction fields via packed enums in packed structs).  The
-  // enumerator symbols were created against the provisional `int` so
+  // N5008 [dcl.enum]/7: with no enumeration-base written, the underlying
+  // type is an implementation-defined integral type that can represent all
+  // the enumerator values.  Like the C front end (c_typecheck_type.cpp), and
+  // GCC and Clang, use unsigned int unless an enumerator is negative, and,
+  // for GCC's `enum __attribute__((__packed__))` extension, the smallest
+  // sufficient type.  Matching the platform compiler is what makes sizeof,
+  // bit-fields of enumeration type and `__attribute__((mode(...)))' on
+  // enumerations agree (an unsigned one-bit bit-field holds the value 1).
+  // The enumerator symbols were created against the provisional `int` so
   // that later enumerators can reference earlier ones ([dcl.enum]/5);
-  // re-type their stored values to the final width.
-  if(underlying_defaulted && c_enum_type.get_bool(ID_C_packed))
+  // re-type their stored values to the final type.
+  if(underlying_defaulted)
   {
-    to_type_with_subtype(c_enum_type).subtype() =
-      enum_underlying_type(min_value, max_value, true);
+    to_type_with_subtype(c_enum_type).subtype() = enum_underlying_type(
+      min_value, max_value, c_enum_type.get_bool(ID_C_packed));
     for(const auto &e : made_enumerators)
     {
       symbolt &esym = symbol_table.get_writeable_ref(e.first);
