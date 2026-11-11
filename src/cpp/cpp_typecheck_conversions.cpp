@@ -846,10 +846,19 @@ bool cpp_typecheckt::standard_conversion_sequence(
 
   exprt curr_expr = expr;
 
-  // bit fields are converted like their underlying type
+  // bit fields are converted like their underlying type; the result then
+  // has the bit-field type itself ([class.bit]/1: a bit-field holds a value
+  // of its underlying type in its width), as the caller asked for
   if(type.id() == ID_c_bit_field)
-    return standard_conversion_sequence(
-      expr, to_c_bit_field_type(type).underlying_type(), new_expr, rank);
+  {
+    if(!standard_conversion_sequence(
+         expr, to_c_bit_field_type(type).underlying_type(), new_expr, rank))
+    {
+      return false;
+    }
+    new_expr = typecast_exprt::conditional_cast(new_expr, type);
+    return true;
+  }
 
   // we turn bit fields into their underlying type
   if(curr_expr.type().id() == ID_c_bit_field)
