@@ -326,39 +326,19 @@ void goto_convert_functionst::convert_function(
   // we have a body, make sure all parameter names are valid
   for(const auto &p : f.parameter_identifiers)
   {
-    // Empty parameter identifiers can arise from incomplete C++ template
-    // instantiations; skip converting such functions.
-    if(p.empty())
-      return;
+    DATA_INVARIANT_WITH_DIAGNOSTICS(
+      !p.empty(),
+      "parameter identifier should not be empty",
+      "function:",
+      identifier);
 
-    if(!symbol_table.has_symbol(p))
-    {
-      // Create a missing parameter symbol (can happen for C++ template
-      // instantiations where 'this' parameter symbols are not generated).
-      const auto &code_type = to_code_type(symbol.type);
-      for(const auto &param : code_type.parameters())
-      {
-        if(param.get_identifier() == p)
-        {
-          symbolt param_symbol{p, param.type(), symbol.mode};
-          param_symbol.base_name = param.get_base_name();
-          param_symbol.is_parameter = true;
-          param_symbol.is_lvalue = true;
-          param_symbol.location = symbol.location;
-          symbol_table.insert(std::move(param_symbol));
-          break;
-        }
-      }
-    }
-    else
-    {
-      // Ensure existing parameter symbols have is_parameter set.
-      // C++ destructor code generation may create parameter symbols
-      // (e.g., base class 'this' pointers) without this flag.
-      symbolt &existing = symbol_table.get_writeable_ref(p);
-      if(!existing.is_parameter)
-        existing.is_parameter = true;
-    }
+    DATA_INVARIANT_WITH_DIAGNOSTICS(
+      symbol_table.has_symbol(p),
+      "parameter identifier must be a known symbol",
+      "function:",
+      identifier,
+      "parameter:",
+      p);
   }
 
   lifetimet parent_lifetime = lifetime;

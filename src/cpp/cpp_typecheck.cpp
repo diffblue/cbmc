@@ -1074,31 +1074,31 @@ void cpp_typecheckt::clean_up()
     }
     else if(symbol.type.id() == ID_code)
     {
-      // N5008 [dcl.fct]/17 + [basic.scope.param]: a parameter's name is
-      // local to its function.  A member of a class template instance
-      // that was never odr-used keeps its PARSE-level parameter names
-      // ("_m") in its function type; goto conversion would then
-      // materialise stub parameter symbols under those bare names,
-      // which collide across instantiations (my_template<int>::set and
-      // my_template<unsigned char>::set both claiming "_m", tripping
-      // the goto-model parameter-type validation).  Qualify them with
-      // the function's own name, as convert_parameter does for
-      // converted bodies.
-      code_typet &code_type = to_code_type(cur_it.get_writeable_symbol().type);
-      for(auto &parameter : code_type.parameters())
-      {
-        const irep_idt &id = parameter.get_identifier();
-        if(
-          !id.empty() && id2string(id).find("::") == std::string::npos &&
-          !symbol_table.has_symbol(id))
-        {
-          parameter.set_identifier(
-            id2string(symbol.name) + "::" + id2string(id));
-        }
-      }
       if(deferred_typechecking.find(symbol.name) != deferred_typechecking.end())
       {
         symbol_table.get_writeable_ref(symbol.name).value.make_nil();
+      }
+      // N5008 [dcl.fct]/17 + [basic.scope.param]: a parameter's name is
+      // local to its function definition.  A function left without a body
+      // (declared only, or a member of a class template instance that was
+      // never odr-used) has no parameter objects: as for a declaration
+      // (cpp_declarator_convertert), its parameters need no identifiers,
+      // and one without a symbol (a parse-level name such as "_m") is
+      // removed -- the goto program's parameter identifiers must name
+      // symbols ([goto_functionst::validate]).
+      if(cur_it->second.value.is_nil())
+      {
+        code_typet &code_type =
+          to_code_type(cur_it.get_writeable_symbol().type);
+        for(auto &parameter : code_type.parameters())
+        {
+          if(
+            !parameter.get_identifier().empty() &&
+            !symbol_table.has_symbol(parameter.get_identifier()))
+          {
+            parameter.set_identifier(irep_idt());
+          }
+        }
       }
       continue;
     }
