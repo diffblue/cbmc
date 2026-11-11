@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 #include <util/expr_initializer.h>
 #include <util/expr_util.h>
+#include <util/floatbv_expr.h>
 #include <util/fresh_symbol.h>
 #include <util/mathematical_expr.h>
 #include <util/mathematical_types.h>
@@ -1442,62 +1443,59 @@ void goto_convertt::do_function_call_symbol(
     identifier == "__builtin_islessgreater" ||
     identifier == "__builtin_isunordered")
   {
-    // these support two double or two float arguments; we call the
-    // appropriate internal version
+    // C17 7.12.14: the comparison macros, for any real floating types
+    // (libstdc++'s <cmath> calls them for float, double and long double).
+    // They do not raise the invalid floating-point exception for unordered
+    // arguments, which CBMC does not model; so they are the relations.
     if(
-      arguments.size() != 2 ||
-      (arguments[0].type() != double_type() &&
-       arguments[0].type() != float_type()) ||
-      (arguments[1].type() != double_type() &&
-       arguments[1].type() != float_type()))
+      arguments.size() != 2 || arguments[0].type().id() != ID_floatbv ||
+      arguments[1].type().id() != ID_floatbv)
     {
       error().source_location = function.find_source_location();
       error() << "'" << identifier
-              << "' expected to have two float/double arguments" << eom;
+              << "' expected to have two floating-point arguments" << eom;
       throw 0;
     }
 
-    exprt::operandst new_arguments = arguments;
-
-    bool use_double = arguments[0].type() == double_type();
-    if(arguments[0].type() != arguments[1].type())
+    exprt x = arguments[0];
+    exprt y = arguments[1];
+    // the usual arithmetic conversions: to the wider of the two types
+    if(x.type() != y.type())
     {
-      if(use_double)
+      if(
+        to_floatbv_type(x.type()).get_width() >=
+        to_floatbv_type(y.type()).get_width())
       {
-        new_arguments[1] =
-          typecast_exprt(new_arguments[1], arguments[0].type());
+        y = typecast_exprt{y, x.type()};
       }
       else
-      {
-        new_arguments[0] =
-          typecast_exprt(new_arguments[0], arguments[1].type());
-        use_double = true;
-      }
+        x = typecast_exprt{x, y.type()};
     }
 
-    code_typet f_type = to_code_type(function.type());
-    f_type.remove_ellipsis();
-    const typet &a_t = new_arguments[0].type();
-    f_type.parameters() =
-      code_typet::parameterst(2, code_typet::parametert(a_t));
+    exprt result;
+    if(identifier == "__builtin_isgreater")
+      result = binary_relation_exprt{x, ID_gt, y};
+    else if(identifier == "__builtin_isgreaterequal")
+      result = binary_relation_exprt{x, ID_ge, y};
+    else if(identifier == "__builtin_isless")
+      result = binary_relation_exprt{x, ID_lt, y};
+    else if(identifier == "__builtin_islessequal")
+      result = binary_relation_exprt{x, ID_le, y};
+    else if(identifier == "__builtin_islessgreater")
+    {
+      result = or_exprt{
+        binary_relation_exprt{x, ID_lt, y}, binary_relation_exprt{x, ID_gt, y}};
+    }
+    else
+      result = or_exprt{isnan_exprt{x}, isnan_exprt{y}};
 
-    // replace __builtin_ by CPROVER_PREFIX
-    std::string name = CPROVER_PREFIX + id2string(identifier).substr(10);
-    // append d or f for double/float
-    name += use_double ? 'd' : 'f';
-
-    DATA_INVARIANT(
-      ns.lookup(name).type == f_type,
-      "builtin declaration should match constructed type");
-
-    symbol_exprt new_function = function;
-    new_function.identifier(name);
-    new_function.type() = f_type;
-
-    code_function_callt function_call(lhs, new_function, new_arguments);
-    function_call.add_source_location() = function.source_location();
-
-    copy(function_call, FUNCTION_CALL, dest);
+    if(lhs.is_not_nil())
+    {
+      dest.add(goto_programt::make_assignment(
+        lhs,
+        typecast_exprt::conditional_cast(result, lhs.type()),
+        function.source_location()));
+    }
   }
   else if(identifier == "alloca" || identifier == "__builtin_alloca")
   {
