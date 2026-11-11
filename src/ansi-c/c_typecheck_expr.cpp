@@ -3283,10 +3283,12 @@ exprt c_typecheck_baset::do_special_functions(
     identifier == CPROVER_PREFIX "inf" || identifier == "__builtin_inf" ||
     identifier == "__builtin_huge_val")
   {
-    constant_exprt inf_expr=
-      ieee_floatt::plus_infinity(
-        ieee_float_spect::double_precision()).to_expr();
-    inf_expr.add_source_location()=source_location;
+    constant_exprt inf_expr =
+      ieee_floatt::plus_infinity(ieee_float_spect{double_type()}).to_expr();
+    // to_expr() yields a floatbv type without the C type that distinguishes
+    // double from other floating-point types of the same format
+    inf_expr.type() = double_type();
+    inf_expr.add_source_location() = source_location;
 
     return std::move(inf_expr);
   }
@@ -3294,10 +3296,10 @@ exprt c_typecheck_baset::do_special_functions(
     identifier == CPROVER_PREFIX "inff" || identifier == "__builtin_inff" ||
     identifier == "__builtin_huge_valf")
   {
-    constant_exprt inff_expr=
-      ieee_floatt::plus_infinity(
-        ieee_float_spect::single_precision()).to_expr();
-    inff_expr.add_source_location()=source_location;
+    constant_exprt inff_expr =
+      ieee_floatt::plus_infinity(ieee_float_spect{float_type()}).to_expr();
+    inff_expr.type() = float_type();
+    inff_expr.add_source_location() = source_location;
 
     return std::move(inff_expr);
   }
@@ -3308,6 +3310,7 @@ exprt c_typecheck_baset::do_special_functions(
     floatbv_typet type=to_floatbv_type(long_double_type());
     constant_exprt infl_expr=
       ieee_floatt::plus_infinity(ieee_float_spect(type)).to_expr();
+    infl_expr.type() = type;
     infl_expr.add_source_location()=source_location;
 
     return std::move(infl_expr);
