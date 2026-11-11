@@ -16380,3 +16380,50 @@ Not fixed yet:
   not handle constant"), in C too, on develop.
 Verified on binW212: 13 suites, profiles (z3 complex2 flaky), vacuity
 1063/3, MSVC, macOS 142/142, GCC 16 image, unit.
+
+## Round 231 (2026-11-11): constexpr flag, va_start, audit of fallbacks
+
+- a97a417467 va_start: `__builtin_va_start(ap, 0)' (C23's va_start(ap)
+  through GCC's <stdarg.h>) aborted symex ("address_arithmetic does not
+  handle constant"); an object that is not a parameter left the va_list
+  empty.  Now the va_list starts after the named parameter if given, else
+  after the last named parameter.  Also on develop.
+- 36c8cd58c8 __builtin_isless & co. were lowered to calls of
+  __CPROVER_isless{f,d}, undeclared unless the program names them
+  (std::isless failed on develop too), and long double was rejected; now
+  the relations.  Surfaced by the constexpr change (<cmath>'s constexpr
+  isless now goto-converted).
+- a7a2174d80 constexpr functions recorded in
+  cpp_typecheckt::constexpr_functions instead of is_macro; goto_convert
+  converts them like any function; the symex workaround for functions
+  missing from the goto program (eec9f52b10) removed.
+  cpp17_trailing_decltype_pack_redecl called declared-only functions
+  silently; it defines them now.
+- f2cf0cef95 `inline constexpr auto x = cls{};' stayed a named constant
+  (deduced class type); now an object with static storage.  The
+  finalize_linking skip of macros with non-symbol values stays (scalar
+  constexpr locals), comment corrected.
+- Audit: every fallback outside SFINAE instrumented (209 catch(...)
+  handlers, 74 error-count rollbacks, 9 named fallbacks), cbmc-cpp
+  (libstdc++, libc++), cbmc, systemc run.  Never reached, removed
+  (f908aaf840): stub tag types, make_constant nil skip, cpp_name skip in
+  C initializers, invalid-conversion downgrade, goto_convert stripping
+  statements with unresolved names and skipping non-code values.
+  Reached: goto_functions::validate's relaxed parameter check (2042
+  outputs) -- bodyless functions had parameter identifiers without
+  symbols; 46e1669a2b clears them in clean_up and restores develop's
+  checks in goto_convert and validate.  A library model was applied to
+  members of the modelled function's local classes (42 tests,
+  <system_error>), 8bcd5fe726.  catch(...) sites reached: 71; 31 probes
+  (failure = alternative/false), 8 cleanup-and-rethrow, 5 translate to a
+  specific exception, 13 empty handlers in probes, 14 other.  Open:
+  `<nil_default>' template suffix (6 std::optional tests: a defaulted
+  non-type parameter after a deduced pack in _Optional_base's base
+  initializer stays nil; not reduced), explicit(cond) kept explicit when
+  cond is not evaluable (13 outputs, all in headers).  System-header
+  suppression drops one body in practice (shared_ptr's
+  _Sp_counted_ptr_inplace copy constructor, 3 tests).
+Verified on binW217: 13 suites, profiles (z3 complex2 flaky), vacuity
+1063/3, MSVC, macOS 142/142, GCC 16 image, unit, lint, format, doxygen,
+iwyu (changed files).  std::print 33.9 -> 34.6 s (constexpr functions
+now converted eagerly); cbmc-cpp total 1222 -> 1242 s.
