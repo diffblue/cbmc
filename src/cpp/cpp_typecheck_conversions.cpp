@@ -5092,6 +5092,32 @@ bool cpp_typecheckt::aggregate_list_initialization_is_viable(
   }
 }
 
+/// Whether \p op, an element of a braced-init-list, is a
+/// designated-initializer-clause ([dcl.init.general]/1), possibly marked as
+/// type-checked already.
+static bool is_designated_element(const exprt &op)
+{
+  return op.id() == ID_designated_initializer ||
+         (op.id() == ID_already_typechecked && op.operands().size() == 1 &&
+          to_unary_expr(op).op().id() == ID_designated_initializer);
+}
+
+/// \p list with the designated-initializer-clauses among its elements
+/// unwrapped from their already_typechecked marks (do_initializer expects
+/// them bare).
+static exprt unwrap_designated_elements(exprt list)
+{
+  for(auto &op : list.operands())
+  {
+    if(op.id() == ID_already_typechecked && is_designated_element(op))
+    {
+      exprt inner = to_unary_expr(op).op();
+      op.swap(inner);
+    }
+  }
+  return list;
+}
+
 void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
 {
   const exprt orig_expr = expr;
@@ -5134,9 +5160,7 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
     (type.id() == ID_array ||
      (type.id() == ID_struct_tag && cpp_is_pod(type))) &&
     std::none_of(
-      e.operands().begin(),
-      e.operands().end(),
-      [](const exprt &op) { return op.id() == ID_designated_initializer; }))
+      e.operands().begin(), e.operands().end(), is_designated_element))
   {
     bool from_element = false;
     if(e.operands().size() == 1 && type.id() == ID_struct_tag)
@@ -5390,16 +5414,43 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
       ((type.id() == ID_struct_tag && std::any_of(
                                         orig_expr.operands().begin(),
                                         orig_expr.operands().end(),
-                                        [](const exprt &op) {
-                                          return op.id() ==
-                                                 ID_designated_initializer;
-                                        })) ||
+                                        is_designated_element)) ||
        type.id() == ID_union_tag))
     {
-      exprt value = orig_expr;
+      exprt value = unwrap_designated_elements(orig_expr);
       do_initializer(value, type, false);
       expr = std::move(value);
       return;
+    }
+    // [dcl.init.list]/3.10: a reference to such an aggregate binds to a
+    // temporary initialized from the designated-initializer-list
+    // (`push_back({.a = i, .b = 2})', the `T &&' overload)
+    if(
+      orig_expr.id() == ID_initializer_list && is_reference(type) &&
+      to_reference_type(type).base_type().id() == ID_struct_tag &&
+      cpp_is_pod(to_reference_type(type).base_type()) &&
+      std::any_of(
+        orig_expr.operands().begin(),
+        orig_expr.operands().end(),
+        is_designated_element))
+    {
+      typet object_type = to_reference_type(type).base_type();
+      const bool is_const = object_type.get_bool(ID_C_constant);
+      object_type.remove(ID_C_constant);
+      if(is_const || is_rvalue_reference(type))
+      {
+        exprt value = unwrap_designated_elements(orig_expr);
+        do_initializer(value, object_type, false);
+        exprt temporary;
+        new_temporary(
+          orig_expr.source_location(),
+          object_type,
+          {already_typechecked_exprt{value}},
+          temporary);
+        reference_initializer(temporary, to_reference_type(type));
+        expr = std::move(temporary);
+        return;
+      }
     }
 
     // C++11 [dcl.init.list]/3.7: non-empty brace-init list to a
