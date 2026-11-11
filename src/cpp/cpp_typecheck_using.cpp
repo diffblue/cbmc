@@ -126,13 +126,7 @@ void cpp_typecheckt::convert(cpp_usingt &cpp_using)
 
   if(id_set.empty())
   {
-    // In system headers (e.g., libc++ <cstdlib>), using declarations may
-    // reference identifiers not available on all platforms (e.g.,
-    // at_quick_exit on macOS). Silently skip rather than fail.
     const auto &loc = cpp_using.name().source_location();
-    const std::string file = id2string(loc.get_file());
-    if(is_system_header_file(file))
-      return;
     // clang's __attribute__((using_if_exists)): the declaration is ignored
     // when the name does not exist; only a later use is an error
     if(cpp_using.get_bool("using_if_exists"))

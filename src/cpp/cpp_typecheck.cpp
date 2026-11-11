@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_typecheck.h"
 
-#include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/cprover_prefix.h>
@@ -170,37 +169,13 @@ void cpp_typecheckt::typecheck()
 
   for(auto &item : cpp_parse_tree.items)
   {
-    const auto &loc = item.source_location();
-    const std::string file = id2string(loc.get_file());
-    const bool is_system = is_system_header_file(file);
-
-    if(is_system)
+    try
     {
-      // System-header item: analogous to SFINAE — a failure to
-      // type-check an item from a system header (typically a
-      // built-in or implementation-defined construct we don't
-      // model) should not be a compilation error against user code.
-      // Suppress diagnostics and roll the error count back.
-      try
-      {
-        sfinae_contextt sfinae_guard{*this};
-        convert(item);
-      }
-      catch(...)
-      {
-        report_dropped_system_item(item);
-      }
+      convert(item);
     }
-    else
+    catch(int)
     {
-      try
-      {
-        convert(item);
-      }
-      catch(int)
-      {
-        // diagnostics were emitted; the error count fails the translation
-      }
+      // diagnostics were emitted; the error count fails the translation
     }
   }
 
@@ -208,24 +183,6 @@ void cpp_typecheckt::typecheck()
   // declarations to process, the error count may have been
   // incremented. We don't re-throw here; errors will be detected
   // by typecheck_main via the error count.
-
-  // Fold __safe_multiply::__c before static initialization.
-  // __c = uintmax_t(1) << (sizeof(intmax_t) * 4) = 2^32 on 64-bit.
-  // CBMC's constexpr evaluation may fail for this shift inside
-  // template classes on older GCC, causing division-by-zero in <ratio>.
-  for(auto &entry : symbol_table.symbols)
-  {
-    symbolt &sym = symbol_table.get_writeable_ref(entry.first);
-    if(
-      id2string(sym.base_name) == "__c" &&
-      id2string(sym.name).find("__safe_multiply") != std::string::npos)
-    {
-      typet t = sym.type;
-      t.remove(ID_C_constant);
-      sym.value = from_integer(mp_integer(1) << 32, t);
-      sym.is_macro = true;
-    }
-  }
 
   // N5008 [except.spec]/9: a deallocation function without an explicit
   // noexcept-specifier is non-throwing (class members:
@@ -461,110 +418,6 @@ void cpp_typecheckt::typecheck()
   // the variables instantiated by the bodies finished since
   if(!dynamic_initializations.empty())
     static_and_dynamic_initialization();
-
-  // Final soundness sweep (N5008 [stmt.return]/2, [conv.ptr]/1): a body
-  // may survive with a HALF-type-checked statement when an inner recovery
-  // swallowed the failure without any catch clearing the value -- e.g. a
-  // `return nullptr;` whose conversion to the function's return type
-  // never ran (the libstdc++ <regex>
-  // _Sp_counted_ptr_inplace::_M_get_deleter shape: the RTTI branch fails,
-  // the tail survives raw, goto conversion emits a type-inconsistent
-  // assignment, and symbolic execution aborts).  A partially-converted
-  // body is neither the program's semantics nor an over-approximation;
-  // demote SYSTEM-HEADER bodies with return/return-type mismatches to
-  // the clean no-body state, whose call-site havoc IS sound.
-  for(const auto &entry : symbol_table)
-  {
-    const symbolt &sym = entry.second;
-    if(
-      sym.type.id() != ID_code || sym.value.id() != ID_code ||
-      sym.mode != ID_cpp || sym.is_type)
-      continue;
-    const std::string sym_file = id2string(sym.location.get_file());
-    if(!is_system_header_file(sym_file))
-      continue;
-    const typet &expect = to_code_type(sym.type).return_type();
-    if(
-      expect.id() == ID_constructor || expect.id() == ID_destructor ||
-      expect.id() == ID_empty || expect.id() == ID_auto ||
-      expect.id() == ID_decltype)
-      continue;
-    std::function<bool(const irept &)> consistent = [&](const irept &n) -> bool
-    {
-      if(
-        n.id() == ID_code && n.get(ID_statement) == ID_return &&
-        !n.get_sub().empty())
-      {
-        const exprt &v = static_cast<const exprt &>(n.get_sub().front());
-        if(
-          v.type().is_not_nil() && !v.type().id().empty() && v.type() != expect)
-          return false;
-      }
-      for(const auto &sn : n.get_sub())
-        if(!consistent(sn))
-          return false;
-      for(const auto &ns : n.get_named_sub())
-        if(!consistent(ns.second))
-          return false;
-      return true;
-    };
-    if(!consistent(sym.value))
-    {
-      warning().source_location = sym.location;
-      warning() << "C++ front-end left an inconsistent return in '"
-                << sym.base_name << "'; its body is dropped" << eom;
-      symbol_table.get_writeable_ref(entry.first).value.make_nil();
-    }
-  }
-
-  // A body that still holds a statement only the C++ type-checker consumes
-  // (a mem-initializer, `= default', a using-declaration or `= 0' left in
-  // parse form) was not fully converted.  Goto conversion would copy it
-  // as an OTHER instruction, on which symbolic execution aborts
-  // (symex_other.cpp "Unreachable").  Such a body is not the function's
-  // semantics ([class.base.init], [dcl.fct.def.default]); drop it, like
-  // any other unconvertible body, so that calls havoc soundly.
-  for(const auto &entry : symbol_table)
-  {
-    const symbolt &sym = entry.second;
-    if(
-      sym.type.id() != ID_code || sym.value.id() != ID_code ||
-      sym.mode != ID_cpp || sym.is_type)
-    {
-      continue;
-    }
-    std::function<bool(const irept &)> has_parse_only_statement =
-      [&](const irept &n) -> bool
-    {
-      if(n.id() == ID_code)
-      {
-        const irep_idt &statement = n.get(ID_statement);
-        if(
-          statement == ID_member_initializer || statement == ID_default ||
-          statement == "cpp-using" || statement == "cpp-pure-virtual")
-        {
-          return true;
-        }
-      }
-      for(const auto &sub : n.get_sub())
-        if(has_parse_only_statement(sub))
-          return true;
-      for(const auto &named_sub : n.get_named_sub())
-        if(has_parse_only_statement(named_sub.second))
-          return true;
-      return false;
-    };
-    if(!has_parse_only_statement(sym.value))
-      continue;
-    // A body never converted belongs to a member that was never odr-used,
-    // which is not instantiated at all ([temp.inst]/11): nothing is lost.
-    // A converted body that kept such a statement is a front-end gap.
-    if(sym.value.get_bool("#cpp_converted"))
-    {
-      report_dropped_body(sym, "unconverted statement");
-    }
-    symbol_table.get_writeable_ref(entry.first).value.make_nil();
-  }
 
   // N5008 [basic.start.static]/2, [dcl.init.general]/6: a variable with
   // static storage duration is zero-initialized.  Without a value, linking

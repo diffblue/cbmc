@@ -126,17 +126,14 @@ void cpp_typecheckt::convert(cpp_static_assertt &cpp_static_assert)
   // N5008 [dcl.pre]/13: the condition is a constant expression; if our
   // constant evaluation falls short the check is dropped.  Say so for the
   // user's own code, as the block-scope form (typecheck_code) does -- a
-  // silently skipped assertion hid several evaluation gaps.  Library
-  // headers are full of assertions over traits we do not model; those, and
-  // assertions inside a template instantiation (which may be a "no valid
-  // specialization" guard, [temp.res.general]/6), stay quiet.
+  // silently skipped assertion hid several evaluation gaps.  Assertions
+  // inside a template instantiation (which may be a "no valid
+  // specialization" guard, [temp.res.general]/6) stay quiet.
   if(!cpp_static_assert.op0().is_constant())
   {
     const std::string file =
       id2string(cpp_static_assert.source_location().get_file());
-    if(
-      instantiation_stack.empty() && !file.empty() &&
-      !is_library_body_file(file) && file.find("<built") != 0)
+    if(instantiation_stack.empty() && !file.empty() && file.find("<built") != 0)
     {
       warning().source_location = cpp_static_assert.source_location();
       warning() << "static_assert condition could not be evaluated; the "

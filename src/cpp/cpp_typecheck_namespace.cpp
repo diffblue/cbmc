@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/source_location.h>
 #include <util/symbol_table_base.h>
 
-#include "cpp_sfinae_context.h"
 #include "cpp_typecheck.h"
 
 void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
@@ -100,36 +99,7 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
   {
     // do the declarations
     for(auto &item : namespace_spec.items())
-    {
-      const auto &loc = item.source_location();
-      std::string file = id2string(loc.get_file());
-      // Fall back to namespace location when item has no source location
-      if(file.empty())
-        file = id2string(namespace_spec.source_location().get_file());
-      bool is_system = file.find("/include/") != std::string::npos ||
-                       file.find("\\include\\") != std::string::npos ||
-                       file.find("/usr/lib/") == 0 ||
-                       file.find("/Applications/") == 0;
-
-      if(is_system)
-      {
-        // System-header item inside a namespace: treat as SFINAE
-        // (see cpp_typecheck.cpp for the sibling code path).
-        try
-        {
-          sfinae_contextt sfinae_guard{*this};
-          convert(item);
-        }
-        catch(...)
-        {
-          report_dropped_system_item(item);
-        }
-      }
-      else
-      {
-        convert(item);
-      }
-    }
+      convert(item);
 
     // C++11: inline namespaces make their names visible in the parent
     if(namespace_spec.get_is_inline())
