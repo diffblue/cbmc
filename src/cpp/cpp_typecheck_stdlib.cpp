@@ -2473,6 +2473,24 @@ static const std::map<std::string, std::string> &library_replacing_models()
   return models;
 }
 
+/// Whether \p name, a symbol name, names a member of a class local to a
+/// function: the function's name, its parameter list, then `::`.
+static bool is_member_of_local_class(const std::string &name)
+{
+  const std::string::size_type open = name.find('(');
+  if(open == std::string::npos)
+    return false;
+  int depth = 0;
+  for(std::string::size_type i = open; i < name.size(); ++i)
+  {
+    if(name[i] == '(')
+      ++depth;
+    else if(name[i] == ')' && --depth == 0)
+      return name.compare(i + 1, 2, "::") == 0;
+  }
+  return false;
+}
+
 void cpp_typecheckt::provide_library_source_models()
 {
   // libc++'s exception_ptr is std::exception_ptr with member __ptr_
@@ -2517,6 +2535,10 @@ void cpp_typecheckt::provide_library_source_models()
       continue;
     }
     const std::string name = id2string(symbol.name);
+    // a member of a class local to a function is named after that function
+    // (`f()::1::local::member(...)'): no model of f is a model of it
+    if(is_member_of_local_class(name))
+      continue;
     if(symbol.value.is_not_nil())
     {
       // keyed by the name with its template arguments, or without them
