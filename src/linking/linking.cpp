@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/find_symbols.h>
 #include <util/message.h>
 #include <util/pointer_offset_size.h>
+#include <util/prefix.h>
 #include <util/simplify_expr.h>
 #include <util/symbol_table_base.h>
 
@@ -23,6 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "linking_diagnostics.h"
 
+#include <cstring>
 #include <deque>
 
 static const typet &follow_tags_symbols(
@@ -951,6 +953,11 @@ static void do_type_dependencies(
   }
 }
 
+/// Prefix of the identifiers of C tag types.
+static const char tag_prefix[] = "tag-";
+/// Prefix of the identifiers the C front-end generates for anonymous tag types.
+static const char anon_tag_prefix[] = "tag-#anon#";
+
 std::unordered_map<irep_idt, irep_idt> linkingt::rename_symbols(
   const symbol_table_baset &src_symbol_table,
   const std::unordered_set<irep_idt> &needs_to_be_renamed)
@@ -965,7 +972,18 @@ std::unordered_map<irep_idt, irep_idt> linkingt::rename_symbols(
     irep_idt new_identifier;
 
     if(new_symbol.is_type)
-      new_identifier=type_to_name(src_ns, id, new_symbol.type);
+    {
+      // Anonymous tag types keep the naming convention of the C front-end
+      // (see c_typecheck_baset::typecheck_compound_type) so that they remain
+      // recognisable as anonymous.
+      if(has_prefix(id2string(id), anon_tag_prefix))
+      {
+        new_identifier =
+          anon_tag_prefix + type_to_name(src_ns, id, new_symbol.type);
+      }
+      else
+        new_identifier = type_to_name(src_ns, id, new_symbol.type);
+    }
     else
       new_identifier = rename(src_symbol_table, id);
 
@@ -1000,7 +1018,14 @@ void linkingt::copy_symbols(
     rename_new_symbol(symbol.value);
     auto it = new_identifiers.find(named_symbol.first);
     if(it != new_identifiers.end())
+    {
       symbol.name = it->second;
+      // The base name of an anonymous tag type is its name without the
+      // tag_prefix, which must be kept consistent with the new name.
+      if(symbol.is_type && has_prefix(id2string(symbol.name), anon_tag_prefix))
+        symbol.base_name =
+          id2string(symbol.name).substr(std::strlen(tag_prefix));
+    }
 
     src_symbols.emplace(named_symbol.first, std::move(symbol));
   }

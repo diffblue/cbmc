@@ -1,0 +1,13 @@
+CORE
+main.c
+module.c --validate-goto-model
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^Invariant check failed
+--
+Linking renames the anonymous union nested in struct S in one of the two files.
+The renamed type must keep the naming convention for anonymous tag types, with
+a base name that is consistent with its new name, for the symbol table to be
+well formed.
