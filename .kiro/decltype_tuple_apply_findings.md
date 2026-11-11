@@ -16339,3 +16339,44 @@ in their level counted apart).  Branches, all from develop 826c1c7390:
   Modified existing tests (308 in cbmc-cpp) stay with their code changes.
 - Caveats: CORE tests not checked on macOS/Windows; tests that read
   ../../../src (dogfooding) depend on the src tree.
+
+## Round 230 (2026-11-10): front-end defects behind workarounds
+
+Each workaround outside src/cpp was undone on its own (W1-W8) and cbmc-cpp,
+cbmc and systemc run.  W1 (boolbv casts), W2 (fatal_assertions), W4
+(static_assert skip), W5 (destructor stub in destruct_locals) and W7
+(initializer cast): no failure in those suites; W6 (stub for a missing
+function symbol): 52 failures, W3 (symex skipping functions missing from
+the goto map): 4, W8 (layout-compatible struct arguments): 1.  Undoing
+them all and running everything found the defects; fixed:
+- fd276fb9c9 constant evaluation of a call with arguments for the
+  ellipsis (`constexpr int f(...)', f(1.0)): such static_asserts were
+  dropped, true or false.
+- 534f197a0f the C++ parser had no rule for __builtin_va_arg: every
+  va_arg in C++ was a parse error (also on develop).
+- 8eeae6f4bb a class returned by value (constructed through inherited
+  constructors) had its deferred destructor never instantiated: the
+  temporary was destroyed by a bodiless stub (wrong verdict).
+- 3077475759 `Outer<args>::Nested::~Nested' defined out of class was
+  dropped (libc++ basic_ostream::sentry::~sentry; also on develop).
+- 079c184fbe a conversion to a bit-field type ended in the underlying
+  type (`matching types' invariant, hidden by W7).
+- 70d7eb077f remove_internal_symbols removed bodyless destructors of kept
+  classes (defined in compiled libraries, locale::_Impl::~_Impl), which
+  only goto conversion calls; W5 and W6 removed.
+- a114e1c7b4 (W1), e8f70059c2 (W2), 85ebe57f50 (W4) removed.
+Not fixed yet:
+- W3: constexpr functions are is_macro symbols (cpp_declarator_converter,
+  this branch; develop marks only typedefs).  goto_convert skips macros,
+  so a declared-only constexpr function (forward_as_tuple declared only)
+  is missing from the goto functions; link_to_library converts the
+  defined ones on demand (the round-225 cost).  Needs a constexpr flag of
+  its own instead of is_macro.
+- W8: the C and C++ front ends name the members of an anonymous nested
+  struct differently, so a struct passed by value to a C function has
+  another type in C++ (AArch64's va_list); symex reinterprets
+  layout-compatible structs.  Kept.
+- va_start(ap, 0) (not a parameter) aborts symex ("address_arithmetic does
+  not handle constant"), in C too, on develop.
+Verified on binW212: 13 suites, profiles (z3 complex2 flaky), vacuity
+1063/3, MSVC, macOS 142/142, GCC 16 image, unit.
