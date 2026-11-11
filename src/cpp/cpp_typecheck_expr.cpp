@@ -4485,8 +4485,9 @@ std::vector<typet> cpp_typecheckt::builtin_trait_type_args(const exprt &expr)
 /// an unevaluated operand: for a pointer to member with at least one
 /// argument the member is applied to the first argument (an object, a
 /// reference or a pointer to it), otherwise Fn is called with the arguments.
-/// The nothrow form is treated as the plain form: the front-end does not
-/// model exception specifications of calls.
+/// The nothrow form (`__is_nothrow_invocable`, [meta.rel]/2: is_invocable
+/// and the expression is known not to throw, [expr.unary.noexcept]/3) also
+/// requires the probe not to be potentially-throwing ([except.spec]/5).
 void cpp_typecheckt::typecheck_expr_is_invocable(exprt &expr)
 {
   const std::vector<typet> args = builtin_trait_type_args(expr);
@@ -4563,12 +4564,14 @@ void cpp_typecheckt::typecheck_expr_is_invocable(exprt &expr)
   // failure, not an error of the program
   const std::size_t errors_before =
     get_message_handler().get_message_count(messaget::M_ERROR);
+  const bool nothrow = expr.id() == "__is_nothrow_invocable";
   bool invocable = false;
   try
   {
     sfinae_contextt sfinae_guard{*this};
+    unevaluated_operandt unevaluated_guard{*this};
     typecheck_expr(probe);
-    invocable = true;
+    invocable = !nothrow || !expression_is_potentially_throwing(probe, 16);
   }
   catch(...)
   {
