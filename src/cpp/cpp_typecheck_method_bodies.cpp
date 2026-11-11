@@ -2024,6 +2024,19 @@ void cpp_typecheckt::typecheck_method_bodies()
         objects_of_class.insert(
           to_struct_tag_type(object_type).get_identifier());
     }
+    else if(
+      n.id() == ID_side_effect && (n.get(ID_statement) == ID_function_call ||
+                                   n.get(ID_statement) == ID_temporary_object))
+    {
+      // a call returning a class prvalue, or a temporary, materializes an
+      // object whose destructor is potentially invoked ([class.dtor]/14,
+      // [class.temporary]/2) -- `make(...).member' names no variable of
+      // the class, and goto conversion destroys the temporary
+      const typet &object_type = static_cast<const exprt &>(n).type();
+      if(object_type.id() == ID_struct_tag)
+        objects_of_class.insert(
+          to_struct_tag_type(object_type).get_identifier());
+    }
     for(const auto &s : n.get_sub())
       gather_referenced(s, referenced);
     for(const auto &ns : n.get_named_sub())
