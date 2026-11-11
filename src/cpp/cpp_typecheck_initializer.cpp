@@ -595,6 +595,33 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
       return;
     }
 
+    // N5008 [dcl.constexpr]/6: a constexpr variable whose deduced type is
+    // an array or a class is an object, as cpp_declarator_convertert makes
+    // one declared with that type: `inline constexpr auto take = __fn{};'
+    // (libc++'s customization point objects) stayed a named constant
+    // (is_macro) whose uses were folded to the value.  One declared outside
+    // a function has static storage duration ([basic.stc.static]/1).
+    if(
+      symbol.is_macro && !symbol.is_type &&
+      (symbol.type.id() == ID_array || symbol.type.id() == ID_struct_tag ||
+       symbol.type.id() == ID_union_tag))
+    {
+      symbol.is_macro = false;
+      constexpr_objects.insert(symbol.name);
+      if(symbol.type.id() == ID_array)
+        to_array_type(symbol.type).element_type().set(ID_C_constant, true);
+      else
+        symbol.type.set(ID_C_constant, true);
+      if(symbol.location.get_function().empty())
+      {
+        symbol.is_static_lifetime = true;
+        symbol.is_thread_local = false;
+        // initialized as declarator-declared static objects are
+        // ([basic.start.static], [basic.start.dynamic])
+        dynamic_initializations.push_back(symbol.name);
+      }
+    }
+
     // the type deduced for `auto' is never a reference ([expr.type]/1): the
     // front end represents a reference-typed expression as a marked
     // pointer; read the referent before initializing the object
