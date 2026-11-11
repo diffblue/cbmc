@@ -153,7 +153,16 @@ void contracts_wranglert::mangle(
   ansi_c_parser.cpp11 = false; // it's not C++
   ansi_c_parser.mode = config.ansi_c.mode;
   ansi_c_scanner_init(ansi_c_parser);
-  ansi_c_parser.parse();
+
+  // The clauses are user input: a syntax error leaves the parse tree empty,
+  // which must be reported rather than dereferenced.
+  if(ansi_c_parser.parse() || ansi_c_parser.parse_tree.items.empty())
+  {
+    throw invalid_input_exceptiont{
+      "failed to parse the loop contracts for loop " +
+      loop_contracts.identifier + " of function " + id2string(function_id) +
+      " given in the loop contracts file"};
+  }
 
   // Extract the invariants from prase_tree.
   exprt &inv_expr(static_cast<exprt &>(ansi_c_parser.parse_tree.items.front()
