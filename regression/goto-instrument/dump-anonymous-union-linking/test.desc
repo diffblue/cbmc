@@ -1,0 +1,16 @@
+CORE
+main.c
+module.c --dump-c
+^\s*union \{ struct A\$0 \*p; \} u;$
+^\s*union \{ struct A \*p; \} u;$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^\s*union anonymous.* u;$
+^warning: ignoring
+--
+Linking renames the struct types of one of the files, including an anonymous
+union (see regression/cbmc/Linking10). The union must remain recognisable as
+anonymous for dump-c to emit the member u of either struct S with an inline
+union type rather than with a named one.

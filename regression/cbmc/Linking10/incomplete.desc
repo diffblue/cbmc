@@ -1,0 +1,14 @@
+CORE
+main_incomplete.c
+module_incomplete.c --validate-goto-model
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^Invariant check failed
+--
+struct A is incomplete where the anonymous union nested in struct S is
+declared, so the front-end names the union in both files without the body of
+struct A, and linking renames the union of one file. The renamed type must keep
+the naming convention for anonymous tag types, with a base name that is
+consistent with its new name, for the symbol table to be well formed.
