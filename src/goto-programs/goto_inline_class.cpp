@@ -15,11 +15,34 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #endif
 
+#include <util/arith_tools.h>
+#include <util/byte_operators.h>
+#include <util/c_types.h>
 #include <util/cprover_prefix.h>
 #include <util/invariant.h>
 #include <util/namespace.h>
 #include <util/std_code.h>
 #include <util/symbol.h>
+
+/// \return True if goto_symext::parameter_assignments reinterprets the bits
+///   of an argument of type \p argument_type that is bound to a parameter of
+///   the different type \p parameter_type.
+static bool can_reinterpret_argument(
+  const typet &parameter_type,
+  const typet &argument_type)
+{
+  const auto is_reinterpretable = [](const typet &type)
+  {
+    return type.id() == ID_signedbv || type.id() == ID_unsignedbv ||
+           type.id() == ID_c_enum_tag || type.id() == ID_bool ||
+           type.id() == ID_pointer || type.id() == ID_union ||
+           type.id() == ID_union_tag;
+  };
+
+  return is_reinterpretable(parameter_type) &&
+         (is_reinterpretable(argument_type) ||
+          argument_type.id() == ID_c_bit_field);
+}
 
 void goto_inlinet::parameter_assignments(
   const goto_programt::targett target,
@@ -99,9 +122,26 @@ void goto_inlinet::parameter_assignments(
         {
           actual = typecast_exprt(actual, f_partype);
         }
+        else if(can_reinterpret_argument(f_partype, f_acttype))
+        {
+          // Reinterpret the bits, as goto_symext::parameter_assignments does,
+          // so that inlining does not change the result of the analysis.
+          actual = make_byte_extract(
+            actual, from_integer(0, c_index_type()), f_partype);
+        }
         else
         {
-          UNREACHABLE;
+          // An argument that symbolic execution would reject, for example a
+          // floating-point or struct argument bound to an integer parameter
+          // when no prototype was in scope: over-approximate it by a
+          // non-deterministic value.
+          log.warning().source_location = source_location;
+          log.warning() << "call to '" << function_name << "': "
+                        << "argument type does not match parameter '"
+                        << symbol.base_name << "', "
+                        << "inserting non-deterministic value" << messaget::eom;
+
+          actual = side_effect_expr_nondett(parameter_type, source_location);
         }
       }
 

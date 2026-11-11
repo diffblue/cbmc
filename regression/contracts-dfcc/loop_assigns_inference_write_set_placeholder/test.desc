@@ -1,0 +1,14 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^\[printf\.assigns\.\d+\] line \d+ Check that \*p is assignable: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^Invariant check failed
+--
+Loop assigns inference inlines the callees of loop_fn before loop_fn's calls
+are instrumented. When printf has already been instrumented, the arguments of
+the call need a placeholder for its write set parameter: otherwise &a binds to
+the write set parameter and 0 to p, so that the inferred loop assigns miss a.
