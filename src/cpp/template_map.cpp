@@ -2768,7 +2768,15 @@ void template_mapt::build(
       if(pid.empty())
         continue;
       new_full_ids.insert(pid);
-      new_short_names.insert(short_name(pid));
+      // an unnamed parameter (named "anon#N" by typecheck_template_parameters)
+      // cannot be referred to ([temp.param]/2), so it shadows nothing: the
+      // unnamed `enable_if_t<...> = false' of a member template must not
+      // erase the deduction placeholder of the same-numbered unnamed
+      // parameter of the enclosing class template, or vice versa
+      const std::string short_id = short_name(pid);
+      if(short_id.compare(0, 5, "anon#") == 0)
+        continue;
+      new_short_names.insert(short_id);
     }
     auto shadow = [&](auto &m)
     {
