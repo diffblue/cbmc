@@ -1,4 +1,6 @@
 // C++20 defaulted three-way comparison operator
+// [expr.spaceship]/8: the comparison category types come from <compare>
+#include <compare>
 struct Point
 {
   int x;

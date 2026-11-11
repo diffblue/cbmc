@@ -519,29 +519,6 @@ std::optional<code_blockt> cpp_typecheckt::defaulted_three_way_comparison(
     return {};
   const source_locationt &location = symbol.location;
 
-  // the element comparisons xi <=> yi
-  std::vector<exprt> comparisons;
-  const std::size_t errors_before =
-    get_message_handler().get_message_count(messaget::M_ERROR);
-  try
-  {
-    for(const auto &element : elements)
-    {
-      exprt comparison{ID_spaceship};
-      comparison.add_to_operands(
-        already_typechecked_exprt{element.first},
-        already_typechecked_exprt{element.second});
-      comparison.add_source_location() = location;
-      typecheck_expr(comparison);
-      comparisons.push_back(std::move(comparison));
-    }
-  }
-  catch(...)
-  {
-    get_message_handler().set_message_count(messaget::M_ERROR, errors_before);
-    return {};
-  }
-
   // R: declared, or the common comparison type ([class.spaceship]/4)
   const auto category_of = [](const typet &t) -> int
   {
@@ -557,6 +534,107 @@ std::optional<code_blockt> cpp_typecheckt::defaulted_three_way_comparison(
     return -1;
   };
   typet result_type = function_type.return_type();
+  typet declared_category = result_type;
+  declared_category.remove(ID_C_constant);
+  const int declared =
+    has_auto(result_type) ? -1 : category_of(declared_category);
+
+  // the static data member \p name of the comparison category type R
+  const auto category_value = [&](const char *name) -> std::optional<exprt>
+  {
+    const struct_typet &category_class =
+      follow_tag(to_struct_tag_type(declared_category));
+    for(const auto &c : category_class.components())
+    {
+      if(c.get_base_name() != name)
+        continue;
+      const symbolt *member = symbol_table.lookup(c.get_name());
+      if(member == nullptr)
+        break;
+      return member->symbol_expr();
+    }
+    return {};
+  };
+
+  // the element comparisons: xi <=> yi, or (for a declared R) the
+  // synthesized three-way comparison of type R
+  std::vector<exprt> comparisons;
+  const std::size_t errors_before =
+    get_message_handler().get_message_count(messaget::M_ERROR);
+  try
+  {
+    for(const auto &element : elements)
+    {
+      exprt comparison{ID_spaceship};
+      comparison.add_to_operands(
+        already_typechecked_exprt{element.first},
+        already_typechecked_exprt{element.second});
+      comparison.add_source_location() = location;
+      bool usable = true;
+      try
+      {
+        sfinae_contextt sfinae_guard{*this};
+        typecheck_expr(comparison);
+      }
+      catch(...)
+      {
+        usable = false;
+      }
+      if(usable)
+      {
+        comparisons.push_back(std::move(comparison));
+        continue;
+      }
+      // N5008 [class.spaceship]/1.3-1.6: without a usable `a <=> b', the
+      // comparison of type R is formed from `a == b' and `a < b'
+      if(declared < 0)
+        throw 0;
+      const auto relation =
+        [&](const irep_idt &id, const exprt &lhs, const exprt &rhs) -> exprt
+      {
+        exprt result{id};
+        result.add_to_operands(
+          already_typechecked_exprt{lhs}, already_typechecked_exprt{rhs});
+        result.add_source_location() = location;
+        typecheck_expr(result);
+        implicit_typecast_bool(result);
+        return result;
+      };
+      const exprt equal = relation(ID_equal, element.first, element.second);
+      const exprt less = relation(ID_lt, element.first, element.second);
+      const auto less_value = category_value("less");
+      const auto greater_value = category_value("greater");
+      const auto equal_value =
+        category_value(declared == 2 ? "equal" : "equivalent");
+      if(!less_value || !greater_value || !equal_value)
+        throw 0;
+      exprt otherwise = *greater_value;
+      if(declared == 0)
+      {
+        const auto unordered_value = category_value("unordered");
+        if(!unordered_value)
+          throw 0;
+        otherwise = if_exprt{
+          relation(ID_lt, element.second, element.first),
+          *greater_value,
+          *unordered_value,
+          declared_category};
+      }
+      if_exprt synthesized{
+        equal,
+        *equal_value,
+        if_exprt{less, *less_value, otherwise, declared_category},
+        declared_category};
+      synthesized.add_source_location() = location;
+      comparisons.push_back(std::move(synthesized));
+    }
+  }
+  catch(...)
+  {
+    get_message_handler().set_message_count(messaget::M_ERROR, errors_before);
+    return {};
+  }
+
   if(has_auto(result_type))
   {
     int common = 2;
@@ -1084,74 +1162,16 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
       declared_return_type = return_type;
       deducing_function_type = nullptr;
     }
-  }
-  if(
-    symbol.base_name == "operator<=>" && symbol.value.id() == ID_code &&
-    to_code(symbol.value).get_statement() == ID_block &&
-    !to_code_block(to_code(symbol.value)).has_operands())
-  {
-    const irep_idt &class_id = symbol.type.get(ID_C_member_name);
-    if(!class_id.empty())
+    else
     {
-      const symbolt &class_sym = lookup(class_id);
-      const auto &fn_params = to_code_type(symbol.type).parameters();
-      // Find the parameter name (second param after this)
-      irep_idt arg_name;
-      if(fn_params.size() >= 2)
-        arg_name = fn_params[1].get_base_name();
-      if(arg_name.empty())
-        arg_name = "#anon_arg0";
-
-      source_locationt loc = symbol.location;
-      code_blockt body;
-      body.add_source_location() = loc;
-
-      for(const auto &c : to_struct_type(class_sym.type).components())
-      {
-        // N5008 [class.compare.default]/5, [class.eq]/2: the expanded list
-        // of subobjects is the base classes and the non-static data
-        // MEMBERS; padding inserted by the layout is neither and has no
-        // name (comparing it yielded "symbol '' is unknown" for every class
-        // whose members are not tightly packed, `char *ptr; errc ec;').
-        if(
-          c.get_bool(ID_from_base) || c.get_bool(ID_is_type) ||
-          c.get_bool(ID_is_static) || c.get_is_padding() ||
-          c.type().id() == ID_code)
-          continue;
-
-        const irep_idt &mem = c.get_base_name();
-        cpp_namet lhs(mem, loc);
-        exprt rhs(ID_member);
-        rhs.add(ID_component_cpp_name, cpp_namet(mem, loc));
-        rhs.copy_to_operands(cpp_namet(arg_name, loc).as_expr());
-        rhs.add_source_location() = loc;
-
-        typet int_type = signed_int_type();
-        binary_relation_exprt lt(lhs.as_expr(), ID_lt, rhs);
-        lt.add_source_location() = loc;
-        binary_relation_exprt gt(lhs.as_expr(), ID_gt, rhs);
-        gt.add_source_location() = loc;
-        if_exprt inner(
-          std::move(gt), from_integer(1, int_type), from_integer(0, int_type));
-        inner.add_source_location() = loc;
-        if_exprt cmp(
-          std::move(lt), from_integer(-1, int_type), std::move(inner));
-        cmp.add_source_location() = loc;
-
-        notequal_exprt ne(cmp, from_integer(0, int_type));
-        ne.add_source_location() = loc;
-        code_frontend_returnt ret(cmp);
-        ret.add_source_location() = loc;
-        code_ifthenelset ifs(std::move(ne), std::move(ret));
-        ifs.add_source_location() = loc;
-        body.add(std::move(ifs));
-      }
-
-      code_frontend_returnt ret0(from_integer(0, signed_int_type()));
-      ret0.add_source_location() = loc;
-      body.add(std::move(ret0));
-
-      symbol.value = std::move(body);
+      // N5008 [class.spaceship]/2: a defaulted operator<=> whose return
+      // type cannot be deduced, or whose element comparisons are not
+      // usable, is defined as deleted -- this one is odr-used.  Without
+      // <compare> the comparison category types are not declared
+      // ([expr.spaceship]/8).
+      error().source_location = symbol.location;
+      error() << "defaulted 'operator<=>' is defined as deleted" << eom;
+      throw 0;
     }
   }
 

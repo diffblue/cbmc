@@ -1,4 +1,6 @@
 // C++20: relational operators derived from defaulted spaceship
+// [expr.spaceship]/8: the comparison category types come from <compare>
+#include <compare>
 struct Point
 {
   int x, y;

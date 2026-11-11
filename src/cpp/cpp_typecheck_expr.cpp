@@ -1763,9 +1763,13 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     // lowering in the C front-end is wrong for C++: `std::strong_ordering r =
     // a <=> b;` then fails with "invalid implicit conversion from int".)  We
     // lower to a conditional selecting the library's comparison-category
-    // constants, which is what the result is specified to equal.  When the
-    // <compare> header (hence the category type) is not available we fall back
-    // to the C int lowering, preserving the existing lenient behaviour.
+    // constants, which is what the result is specified to equal.  Without
+    // <compare> the category type is not declared, and the program is
+    // ill-formed ([expr.spaceship]/8).
+    // [expr.type]/1: an operand of reference type denotes the referenced
+    // object (`static_cast<_Tp &&>(__t) <=> ...' in std::compare_three_way)
+    add_implicit_dereference(to_binary_expr(expr).op0());
+    add_implicit_dereference(to_binary_expr(expr).op1());
     const exprt &op0 = to_binary_expr(expr).op0();
     const exprt &op1 = to_binary_expr(expr).op1();
     const typet &t0 = op0.type();
@@ -1907,10 +1911,27 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
         }
         lowered = true;
       }
+      else
+      {
+        // N5008 [expr.spaceship]/8: the comparison category types are not
+        // predefined; a use of the built-in operator without a preceding
+        // declaration of its result type (from <compare>) is ill-formed
+        error().source_location = expr.source_location();
+        error() << "built-in operator <=> requires 'std::" << category
+                << "'; include <compare>" << eom;
+        throw 0;
+      }
     }
 
     if(!lowered)
-      c_typecheck_baset::typecheck_expr_main(expr);
+    {
+      // N5008 [expr.spaceship]/7: operands of other types (a class
+      // without a usable operator<=>, [over.match.oper]/3) are ill-formed
+      error().source_location = expr.source_location();
+      error() << "no match for 'operator<=>' with operands of type '"
+              << to_string(t0) << "' and '" << to_string(t1) << "'" << eom;
+      throw 0;
+    }
   }
   else if(expr.id() == "explicit-typecast")
     typecheck_expr_explicit_typecast(expr);

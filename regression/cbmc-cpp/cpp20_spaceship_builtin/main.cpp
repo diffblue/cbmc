@@ -1,4 +1,6 @@
 // C++20 built-in spaceship operator on primitive types
+// [expr.spaceship]/8: the comparison category types come from <compare>
+#include <compare>
 int main()
 {
   int a = 1, b = 2;
