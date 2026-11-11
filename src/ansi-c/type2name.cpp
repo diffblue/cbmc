@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/invariant.h>
 #include <util/namespace.h>
 #include <util/pointer_offset_size.h>
+#include <util/prefix.h>
 #include <util/std_expr.h>
 #include <util/symbol.h>
 
@@ -23,15 +24,25 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 typedef std::unordered_map<irep_idt, std::pair<size_t, bool>> symbol_numbert;
 
+/// Whether a named struct or union tag is described by its name only, rather
+/// than by its name and its body.
+enum class named_tag_bodiest
+{
+  INCLUDE,
+  OMIT
+};
+
 static std::string type2name(
   const typet &type,
   const namespacet &ns,
-  symbol_numbert &symbol_number);
+  symbol_numbert &symbol_number,
+  named_tag_bodiest named_tag_bodies);
 
 static std::string type2name_tag(
   const tag_typet &type,
   const namespacet &ns,
-  symbol_numbert &symbol_number)
+  symbol_numbert &symbol_number,
+  named_tag_bodiest named_tag_bodies)
 {
   const irep_idt &identifier = type.get_identifier();
 
@@ -45,7 +56,17 @@ static std::string type2name_tag(
 
   if(symbol->type.id()!=ID_struct &&
      symbol->type.id()!=ID_union)
-    return type2name(symbol->type, ns, symbol_number);
+    return type2name(symbol->type, ns, symbol_number, named_tag_bodies);
+
+  // A named tag denotes the same type whether or not its body is known here
+  // (C11 6.2.7): its name suffices.
+  if(
+    named_tag_bodies == named_tag_bodiest::OMIT &&
+    !to_struct_union_type(symbol->type).get_tag().empty() &&
+    !has_prefix(id2string(identifier), "tag-#anon#"))
+  {
+    return "SYM#" + id2string(identifier) + "#";
+  }
 
   // assign each symbol a number when seen for the first time
   std::pair<symbol_numbert::iterator, bool> entry=
@@ -61,7 +82,7 @@ static std::string type2name_tag(
   if(entry.second)
   {
     result+="={";
-    result+=type2name(symbol->type, ns, symbol_number);
+    result += type2name(symbol->type, ns, symbol_number, named_tag_bodies);
     result+='}';
 
     entry.first->second.second=false;
@@ -82,7 +103,8 @@ static std::string pointer_offset_bits_as_string(
 static std::string type2name(
   const typet &type,
   const namespacet &ns,
-  symbol_numbert &symbol_number)
+  symbol_numbert &symbol_number,
+  named_tag_bodiest named_tag_bodies)
 {
   std::string result;
 
@@ -141,7 +163,8 @@ static std::string type2name(
   {
     const code_typet &t=to_code_type(type);
     const code_typet::parameterst parameters=t.parameters();
-    result+=type2name(t.return_type(), ns, symbol_number)+"(";
+    result +=
+      type2name(t.return_type(), ns, symbol_number, named_tag_bodies) + "(";
 
     for(code_typet::parameterst::const_iterator
         it=parameters.begin();
@@ -150,7 +173,7 @@ static std::string type2name(
     {
       if(it!=parameters.begin())
         result+='|';
-      result+=type2name(it->type(), ns, symbol_number);
+      result += type2name(it->type(), ns, symbol_number, named_tag_bodies);
     }
 
     if(t.has_ellipsis())
@@ -161,7 +184,7 @@ static std::string type2name(
     }
 
     result+=")->";
-    result+=type2name(t.return_type(), ns, symbol_number);
+    result += type2name(t.return_type(), ns, symbol_number, named_tag_bodies);
   }
   else if(type.id()==ID_array)
   {
@@ -183,7 +206,8 @@ static std::string type2name(
     type.id() == ID_c_enum_tag || type.id() == ID_struct_tag ||
     type.id() == ID_union_tag)
   {
-    result += type2name_tag(to_tag_type(type), ns, symbol_number);
+    result +=
+      type2name_tag(to_tag_type(type), ns, symbol_number, named_tag_bodies);
   }
   else if(type.id()==ID_struct ||
           type.id()==ID_union)
@@ -212,7 +236,7 @@ static std::string type2name(
         else
           first = false;
 
-        result += type2name(c.type(), ns, symbol_number);
+        result += type2name(c.type(), ns, symbol_number, named_tag_bodies);
         const irep_idt &component_name = c.get_name();
         CHECK_RETURN(!component_name.empty());
         result += "'" + id2string(component_name) + "'";
@@ -256,8 +280,11 @@ static std::string type2name(
   if(type.has_subtype())
   {
     result+='{';
-    result +=
-      type2name(to_type_with_subtype(type).subtype(), ns, symbol_number);
+    result += type2name(
+      to_type_with_subtype(type).subtype(),
+      ns,
+      symbol_number,
+      named_tag_bodies);
     result+='}';
   }
   else if(type.has_subtypes())
@@ -265,7 +292,7 @@ static std::string type2name(
     result+='$';
     for(const typet &subtype : to_type_with_subtypes(type).subtypes())
     {
-      result += type2name(subtype, ns, symbol_number);
+      result += type2name(subtype, ns, symbol_number, named_tag_bodies);
       result+='|';
     }
     result[result.size()-1]='$';
@@ -277,7 +304,13 @@ static std::string type2name(
 std::string type2name(const typet &type, const namespacet &ns)
 {
   symbol_numbert symbol_number;
-  return type2name(type, ns, symbol_number);
+  return type2name(type, ns, symbol_number, named_tag_bodiest::INCLUDE);
+}
+
+std::string anonymous_tag_name(const typet &type, const namespacet &ns)
+{
+  symbol_numbert symbol_number;
+  return type2name(type, ns, symbol_number, named_tag_bodiest::OMIT);
 }
 
 /// type2name generates strings that aren't valid C identifiers
