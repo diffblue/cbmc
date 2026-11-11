@@ -1,0 +1,13 @@
+CORE
+unused.c
+
+^EXIT=0$
+^SIGNAL=0$
+^field sensitivity was not applied to 1 array of structs, unions or pointers with more than 64 elements:$
+^  used_global \(100 elements\)$
+^VERIFICATION SUCCESSFUL$
+--
+unused_global
+unused_local
+--
+Arrays that are declared but never indexed are not reported.

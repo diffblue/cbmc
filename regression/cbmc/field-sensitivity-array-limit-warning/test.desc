@@ -1,0 +1,16 @@
+CORE
+main.c
+--unwind 5
+^EXIT=0$
+^SIGNAL=0$
+^field sensitivity was not applied to 1 array of structs, unions or pointers with more than 64 elements:$
+^  adapter\.rings \(65 elements\)$
+^.*Use --max-field-sensitivity-array-size 65 to apply field sensitivity to all of them; this limit applies to arrays of any element type
+^VERIFICATION SUCCESSFUL$
+--
+^  scalar_buffer \(
+--
+An array of 65 structs holding a pointer exceeds the default field-sensitivity
+limit of 64 and is reported, naming the array and the limit that would cover
+it.  The 4096-element char array is also over the limit but holds no fields or
+pointers, so it is not reported.

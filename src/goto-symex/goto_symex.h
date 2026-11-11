@@ -201,6 +201,11 @@ protected:
     statet &state,
     const get_goto_functiont &get_goto_function);
 
+  /// Warn about arrays that were left without field sensitivity because they
+  /// exceed --max-field-sensitivity-array-size; see
+  /// \ref field_sensitivityt::arrays_over_limit.
+  void report_arrays_over_field_sensitivity_limit(const statet &state) const;
+
   /// \brief Called for each step in the symbolic execution
   /// This calls \ref print_symex_step to print symex's current instruction if
   /// required, then \ref execute_next_instruction to execute the actual
