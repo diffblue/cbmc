@@ -320,6 +320,9 @@ void configt::ansi_ct::set_arch_spec_arm(const irep_idt &subarch)
 
   endianness=endiannesst::IS_LITTLE_ENDIAN;
   char_is_unsigned=true;
+  // The procedure call standards for both 32-bit and 64-bit Arm (AAPCS and
+  // AAPCS64) make wchar_t an unsigned integer type.
+  wchar_t_is_unsigned = true;
   NULL_is_zero=true;
 
   switch(mode)
@@ -1142,6 +1145,7 @@ bool configt::set(const cmdlinet &cmdline)
     // https://developer.apple.com/documentation/xcode/
     // writing_arm64_code_for_apple_platforms#//apple_ref/doc/uid/TP40013702-SW1
     ansi_c.char_is_unsigned = false;
+    ansi_c.wchar_t_is_unsigned = false;
     ansi_c.long_double_width = 8 * 8;
   }
   else if(
