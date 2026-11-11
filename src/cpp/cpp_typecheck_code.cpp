@@ -3520,6 +3520,11 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
                    to_struct_tag_type(inner_a.type()).get_identifier() ||
                  subtype_typecast(follow_tag(to_struct_tag_type(ot)), mt)))
                 copyish = true;
+              // N5008 [dcl.init.general]/16.6.2: `m({1, 2})' initializes m
+              // by its copy/move constructor from a braced temporary, it is
+              // not the parenthesized aggregate initialization `m(1, 2)'
+              if(op0.id() == ID_initializer_list)
+                copyish = true;
             }
             if(!has_user_ctor && !copyish)
             {
@@ -3532,6 +3537,8 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
               std::optional<exprt> agg;
               try
               {
+                // a probe: another initialization applies if this fails
+                sfinae_contextt sfinae_guard{*this};
                 agg = braced_return_aggregate_value(member_type, init_list);
               }
               catch(...)
