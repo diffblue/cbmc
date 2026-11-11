@@ -1,0 +1,11 @@
+CORE dfcc-only
+main.c
+--dfcc main --enforce-contract callee
+^\[my_log\.assigns\.\d+\] line 6 Check that g is assignable: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+The assignment to g in the variadic callee is still checked against the write
+set of callee, whose assigns clause is empty.
