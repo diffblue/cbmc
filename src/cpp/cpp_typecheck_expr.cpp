@@ -9744,6 +9744,13 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       exprt probe_fn = expr.function();
       try
       {
+        // N5008 [basic.def.odr]/3, [temp.inst]/11: naming the callee to
+        // read its parameter types is no odr-use of it.  Without fargs the
+        // explicit template arguments are applied to every candidate
+        // (`fwd<A>' names both std::forward overloads); their definitions
+        // are held back until a call selects one (speculative_instances) --
+        // the rvalue overload's static_assert failed for an lvalue A.
+        unevaluated_operandt not_odr_used{*this};
         probe_fn = resolve(
           to_cpp_name(probe_fn),
           cpp_typecheck_resolvet::wantt::VAR,
