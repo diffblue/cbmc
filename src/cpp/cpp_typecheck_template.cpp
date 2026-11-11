@@ -1493,6 +1493,19 @@ void cpp_typecheckt::typecheck_class_template_member(
     cpp_name.get_sub()[1].id() == ID_template_args &&
     cpp_name.get_sub()[2].id() == ID_scope_resolution &&
     cpp_name.get_sub()[3].id() == ID_name &&
+    cpp_name.get_sub()[4].id() == ID_scope_resolution &&
+    cpp_name.get_sub()[5].id() == "~" && cpp_name.get_sub()[6].id() == ID_name)
+  {
+    // the same for the nested class's destructor: Outer<args>::Nested::~Nested
+    // (basic_ostream<C,T>::sentry::~sentry, which flushes the stream when
+    // unitbuf is set, [ostream.sentry]/4).  This shape, too, fell into the
+    // silent-return branch: the destructor of every such object had no body.
+  }
+  else if(
+    cpp_name.get_sub().size() == 7 && cpp_name.get_sub()[0].id() == ID_name &&
+    cpp_name.get_sub()[1].id() == ID_template_args &&
+    cpp_name.get_sub()[2].id() == ID_scope_resolution &&
+    cpp_name.get_sub()[3].id() == ID_name &&
     cpp_name.get_sub()[4].id() == ID_template_args &&
     cpp_name.get_sub()[5].id() == ID_scope_resolution &&
     cpp_name.get_sub()[6].id() == ID_name)

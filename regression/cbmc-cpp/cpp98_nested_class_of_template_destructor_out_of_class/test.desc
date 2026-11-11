@@ -1,0 +1,20 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ member function: SUCCESS$
+^\[main\.assertion\.2\] line \d+ constructor ran: SUCCESS$
+^\[main\.assertion\.3\] line \d+ member function ran: SUCCESS$
+^\[main\.assertion\.4\] line \d+ destructor ran: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+no body for callee
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The definition of the destructor (Outer<args>::Nested::~Nested) fell into
+the branch that ignores unrecognised qualified names, unlike those of the
+constructor and the member function.
