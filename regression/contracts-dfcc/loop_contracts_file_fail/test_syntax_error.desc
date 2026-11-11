@@ -1,0 +1,13 @@
+CORE
+main.c
+--loop-contracts-file test_syntax_error.json --dfcc main --apply-loop-contracts
+^file <predicate> line 1 function _fn: syntax error
+^failed to parse the loop contracts for loop 0 of function foo given in the loop contracts file$
+^EXIT=6$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+A loop contract that does not parse, here because of a cast to a type name the
+parser does not know, is reported as an error. It used to crash goto-instrument
+with a segmentation fault, as the empty parse tree was dereferenced.
