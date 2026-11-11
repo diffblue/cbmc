@@ -1,0 +1,18 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts _ --unwindset callee.0:4 --unwinding-assertions
+^\[callee.assigns.\d+\] line \d+ Check that h is assignable: FAILURE$
+^\[callee.assigns.\d+\] line \d+ Check that g\[.*0\] is assignable: SUCCESS$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+Check that a is assignable
+Check that b is assignable
+Check that k is assignable
+--
+Locals of a callee that are declared or assigned inside a loop without a
+contract must not be checked against the write set of the caller's loop, while
+the callee's writes to globals must still be checked against it. Unlike
+loop_contracts_callee_with_loop, this test fails if checks inside the
+uncontracted loop are suppressed altogether.
