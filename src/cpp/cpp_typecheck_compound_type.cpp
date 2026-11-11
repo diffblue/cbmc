@@ -3178,7 +3178,19 @@ void cpp_typecheckt::typecheck_friend_declaration(
       }
       else
       {
-        typecheck_type(ftype);
+        // [temp.inst]/2, see below
+        const bool old_skip = skip_typechecking_elaborate;
+        skip_typechecking_elaborate = true;
+        try
+        {
+          typecheck_type(ftype);
+        }
+        catch(...)
+        {
+          skip_typechecking_elaborate = old_skip;
+          throw;
+        }
+        skip_typechecking_elaborate = old_skip;
         friends.push_back(ftype);
       }
     }
@@ -3226,7 +3238,23 @@ void cpp_typecheckt::typecheck_friend_declaration(
     // parameters are visible there ([temp.local]/1).
     if(ftype.id() != ID_cpp_name)
       cpp_scopes.go_to_global_scope();
-    typecheck_type(ftype);
+    // N5008 [temp.inst]/2: a friend declaration does not require the class
+    // to be complete, so a class template specialization it names is not
+    // instantiated (libstdc++'s `friend _Sp_atomic<shared_ptr<_Tp>>;' in
+    // __shared_ptr: _Sp_atomic's members name __shared_ptr's members, which
+    // are not declared yet)
+    const bool old_skip = skip_typechecking_elaborate;
+    skip_typechecking_elaborate = true;
+    try
+    {
+      typecheck_type(ftype);
+    }
+    catch(...)
+    {
+      skip_typechecking_elaborate = old_skip;
+      throw;
+    }
+    skip_typechecking_elaborate = old_skip;
     symbol.type.add(ID_C_friends).move_to_sub(ftype);
 
     return;
