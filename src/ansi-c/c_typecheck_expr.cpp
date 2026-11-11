@@ -5265,16 +5265,6 @@ void c_typecheck_baset::make_constant(exprt &expr)
               !lookup(to_symbol_expr(e).get_identifier(), s) &&
               (s->is_macro || s->type.get_bool(ID_C_constant)))
             {
-              // Skip the replacement if the symbol has no
-              // initializer; replacing with nil would propagate up
-              // and later fail as "expected constant expression,
-              // but got '<<expr:nil>>'".  This happens for default
-              // template arguments referring to a static member
-              // that is not present on the template argument type
-              // (e.g. `template <class T, const T &empty = T::blank>`
-              // instantiated with T lacking ::blank).
-              if(s->value.is_nil())
-                return;
               exprt val = s->value;
               simplify(val, *this);
               e = val;
