@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ not reached: at\(\) throws: SUCCESS$
+^\[main\.assertion\.2\] line \d+ caught as std::exception: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+no body for callee
+--
+The model of __throw_out_of_range_fmt did not type-check without
+<stdexcept>; the function stayed bodyless and at() returned.

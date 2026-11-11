@@ -2594,9 +2594,41 @@ void cpp_typecheckt::provide_library_source_models()
 
   for(const auto &item : to_define)
   {
+    if(define_by_model(item.first, *item.second))
+      continue;
+    // libstdc++'s __throw_X throws an X, a class declared in <stdexcept>,
+    // <new>, <typeinfo>, <functional> or <system_error>.  When the program
+    // does not declare X, no handler can name it ([except.handle]/3); X is
+    // derived from std::exception ([std.exceptions]/1, [bad.alloc]/1, ...),
+    // so throwing a std::exception is caught by the same handlers (only
+    // what() and the typeid differ).  The call is never left to return
+    // as that of a function without a body.
+    if(
+      id2string(item.first).rfind("std::__throw_", 0) == 0 &&
+      lookup_exception_class())
+    {
+      define_by_model(item.first, "{ throw exception(); }");
+    }
+  }
+}
+
+/// Whether std::exception is declared, as a class.
+bool cpp_typecheckt::lookup_exception_class() const
+{
+  const symbolt *exception = symbol_table.lookup("std::tag-exception");
+  return exception != nullptr && exception->type.id() == ID_struct;
+}
+
+/// Type-check \p model, the text of a function body, as the body of the
+/// library function \p identifier.
+/// \return whether it type-checked; if not, the function keeps its value
+bool cpp_typecheckt::define_by_model(
+  const irep_idt &identifier,
+  const std::string &model)
+{
+  {
     // the body, parsed as that of a function definition
-    std::istringstream in{
-      "void " CPROVER_PREFIX "library_model() " + *item.second};
+    std::istringstream in{"void " CPROVER_PREFIX "library_model() " + model};
     cpp_parsert parser{get_message_handler()};
     parser.set_file(ID_built_in);
     parser.in = &in;
@@ -2605,15 +2637,15 @@ void cpp_typecheckt::provide_library_source_models()
       parser.parse() || parser.parse_tree.items.size() != 1 ||
       !parser.parse_tree.items.front().is_declaration())
     {
-      continue;
+      return false;
     }
     cpp_declarationt &declaration =
       parser.parse_tree.items.front().get_declaration();
     if(declaration.declarators().size() != 1)
-      continue;
+      return false;
     exprt body = declaration.declarators().front().value();
 
-    symbolt &symbol = symbol_table.get_writeable_ref(item.first);
+    symbolt &symbol = symbol_table.get_writeable_ref(identifier);
     // a parameter the declaration leaves unnamed (libstdc++'s
     // `rethrow_exception(exception_ptr)') is __CPROVER_parameter<n> in the
     // model
@@ -2653,7 +2685,7 @@ void cpp_typecheckt::provide_library_source_models()
                 to_struct_tag_type(class_tag).get_identifier())
             : nullptr;
         if(class_symbol == nullptr || class_symbol->type.id() != ID_struct)
-          continue;
+          throw 0;
         const struct_typet &class_type = to_struct_type(class_symbol->type);
         irept initializers{ID_member_initializers};
         cpp_save_scopet save_scope{cpp_scopes};
@@ -2672,8 +2704,10 @@ void cpp_typecheckt::provide_library_source_models()
     {
       symbol.value.make_nil();
     }
-    if(!symbol.value.get_bool("#cpp_converted"))
-      symbol.value = original_value;
+    if(symbol.value.get_bool("#cpp_converted"))
+      return true;
+    symbol.value = original_value;
+    return false;
   }
 }
 

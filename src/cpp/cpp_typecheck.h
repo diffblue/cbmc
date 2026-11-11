@@ -779,6 +779,8 @@ protected:
   void clear_not_typechecked();
   void clean_up();
   void provide_stdlib_bodies();
+  bool define_by_model(const irep_idt &identifier, const std::string &model);
+  bool lookup_exception_class() const;
   /// Give bodies, written in C++ and type-checked like any other, to
   /// functions that libc++ declares in its headers but defines only in its
   /// compiled library.
