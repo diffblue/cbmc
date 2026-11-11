@@ -16427,3 +16427,52 @@ Verified on binW217: 13 suites, profiles (z3 complex2 flaky), vacuity
 1063/3, MSVC, macOS 142/142, GCC 16 image, unit, lint, format, doxygen,
 iwyu (changed files).  std::print 33.9 -> 34.6 s (constexpr functions
 now converted eagerly); cbmc-cpp total 1222 -> 1242 s.
+
+## Round 232 (2026-11-11): rest of the fallback audit
+
+- a7a9d4bd55 `<nil_default>': template_mapt::build's short-name shadowing
+  treated unnamed parameters ("anon#N") as names; the class template's
+  unnamed `bool = ...' erased the member template's unnamed
+  `enable_if_t<..., bool> = false' placeholder, so the constraint was
+  never checked.  Fallback removed.
+- 52d1061ca6 <=> without <compare>, on reference operands, on class
+  operands without operator<=>, and failed defaulted operator<=> all fell
+  back to an int lowering.  Now [expr.spaceship]/7-8 errors, references
+  dereferenced, synthesized three-way comparison ([class.spaceship]/1).
+- c23ed1f8c4 __throw_X models failed when X is not declared (294 tests;
+  vector::at returned); now throw std::exception then.
+  provide_library_source_models factored (define_by_model).
+- System-header suppressions, instrumented over cbmc-cpp (libstdc++ 13,
+  libc++), systemc, macOS .ii, MSVC: never reached -> removed (40f0866029):
+  top-level and namespace-scope SFINAE guard of
+  system items, inconsistent-return and parse-only-statement sweeps,
+  using-declaration and class-template-not-found skips, static_assert
+  library exemption, __safe_multiply::__c.  The namespace guard did hide
+  non-throwing errors: macOS SDK `_Float16' with --os macos off a Mac
+  (f7de0ca24c, the parser followed the host).
+  Kept (by design): end-of-unit finishing of half-converted system bodies
+  ([temp.inst]/5, 373 tests), library explicit specializations without a
+  definition use the primary template (156), the drop-and-warn of a
+  system body that fails twice.
+- Making a failed static_assert in an instantiation an error (instead of
+  the warning) found: the [temp.deduct.funcaddr] callee probe
+  instantiating every candidate's body (362fe6282e, libc++ forward
+  rvalue overload), __is_nothrow_invocable == __is_invocable
+  (052d410d7d, GCC 16 ~_Hashtable).  It still fails on GCC 16 <format>:
+  formatter<monostate>'s range partial specialization evaluates
+  format_kind<monostate> (ranges::input_range not decided; the
+  type-constraints are also checked after the requires-clause, against
+  [temp.constr.decl]/3), and the error then hits an invariant
+  (to_lambda_expr).  The warning stays.
+- catch(...) review: constraint probes ([temp.constr.atomic]/3),
+  candidate filters, brace-elision and operator-lookup probes are SFINAE;
+  the spaceship category lookup (expr.cpp:1812) fed the int lowering
+  (fixed); explicit(cond) unevaluable stays explicit (13, headers);
+  out-of-class definition matching treats an unresolvable parameter type
+  as matching (6, headers).
+- Bodies still dropped: libc++ sto*(wstring) (models need wcsto*, 80
+  tests, documented), libc++ thread::join/detach, shared_ptr<mutex>'s
+  _Sp_counted_ptr_inplace copy ctor, transform_view iterator ctor (2).
+Verified on binW218: 13 suites, profiles (z3 complex2 flaky), vacuity
+1063/3, MSVC 3 (libstdcxx-tagged excluded), macOS 142/142, GCC 16 image,
+unit, lint, format, doxygen, iwyu (changed files).
