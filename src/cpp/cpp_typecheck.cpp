@@ -270,7 +270,8 @@ void cpp_typecheckt::typecheck()
     const std::string base = id2string(sym.base_name);
     if(
       (base == "_S_nothrow_relocate" || base == "_S_use_relocate") &&
-      name.find("vector") != std::string::npos && sym.is_macro)
+      name.find("vector") != std::string::npos &&
+      is_constexpr_function(sym.name))
     {
       code_blockt block;
       block.add(code_frontend_returnt(true_exprt()));

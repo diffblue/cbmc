@@ -88,7 +88,7 @@ void cpp_typecheckt::propagate_constants(
       [this](const irep_idt &callee) -> bool
       {
         const symbolt *csym = this->symbol_table.lookup(callee);
-        if(csym == nullptr || !csym->is_macro)
+        if(csym == nullptr || !is_constexpr_function(callee))
           return false;
         if(csym->value.type().id() == ID_code)
           return true;

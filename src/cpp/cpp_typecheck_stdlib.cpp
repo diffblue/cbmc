@@ -3153,11 +3153,11 @@ void cpp_typecheckt::provide_stdlib_bodies()
       {
         // Override: return true so the _S_relocate path is taken
         // (which we model) instead of __uninitialized_move_if_noexcept_a.
-        // Clear is_macro so the function is called at runtime using
+        // No longer a constexpr function: it is called at run time using
         // our model body, not evaluated as constexpr (which may
         // produce nondet on older GCC).
         ensure_parameter_symbols(symbol, symbol_table);
-        symbol.is_macro = false;
+        constexpr_functions.erase(symbol.name);
         code_blockt block;
         block.add(code_frontend_returnt(true_exprt()));
         symbol.value = std::move(block);
@@ -3295,7 +3295,7 @@ void cpp_typecheckt::provide_stdlib_bodies()
       name.find("vector") != std::string::npos)
     {
       ensure_parameter_symbols(symbol, symbol_table);
-      symbol.is_macro = false;
+      constexpr_functions.erase(symbol.name);
       code_blockt block;
       block.add(code_frontend_returnt(true_exprt()));
       symbol.value = std::move(block);

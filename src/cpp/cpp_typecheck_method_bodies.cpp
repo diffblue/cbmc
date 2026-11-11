@@ -2682,7 +2682,8 @@ void cpp_typecheckt::add_method_body(symbolt *_method_symbol)
     // ([temp.dep.candidate]), so they are left alone
     if(
       instantiation_stack.empty() && method_map.type_map.empty() &&
-      method_map.expr_map.empty() && !_method_symbol->is_macro &&
+      method_map.expr_map.empty() &&
+      !is_constexpr_function(_method_symbol->name) &&
       _method_symbol->type.find("#fn_template_type").is_nil())
     {
       body.limit_lookup_to_source_order = true;

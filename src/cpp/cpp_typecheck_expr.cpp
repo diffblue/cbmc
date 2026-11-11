@@ -863,7 +863,8 @@ bool cpp_typecheckt::class_property(const irep_idt &trait, const typet &t)
         if(
           !copy_or_move && (code_type.get_bool("#is_implicit_ctor") ||
                             code_type.get_bool("#explicitly_defaulted") ||
-                            (ctor_symbol != nullptr && ctor_symbol->is_macro)))
+                            (ctor_symbol != nullptr &&
+                             is_constexpr_function(ctor_symbol->name))))
         {
           has_constexpr_ctor = true;
         }
@@ -10687,7 +10688,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     // template map and convert it now; on failure it stays queued and the call
     // a run-time one.
     if(
-      symbol_ptr != nullptr && symbol_ptr->is_macro &&
+      symbol_ptr != nullptr && is_constexpr_function(symbol_ptr->name) &&
       constant_expression_context != 0 &&
       deferred_typechecking.count(sym_expr->get_identifier()) != 0 &&
       symbol_ptr->value.id() == ID_code &&
@@ -10709,7 +10710,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
                                 symbol_ptr->value.id() == ID_code);
     bool eligible_constexpr =
       symbol_ptr != nullptr &&
-      (symbol_ptr->is_macro ||
+      (is_constexpr_function(symbol_ptr->name) ||
        lambda_functions.count(sym_expr->get_identifier()) != 0) &&
       constant_expression_context != 0 &&
       !functions_being_typechecked.count(sym_expr->get_identifier()) &&
@@ -10870,7 +10871,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       // on demand under its recorded template map (the callback), exactly as
       // the call site above did for the outermost callee.  When the
       // evaluation cannot produce a constant the call stays a run-time
-      // invocation (is_macro is deliberately kept: the same function may be
+      // invocation (it stays a constexpr function: the same function may be
       // evaluable with other, constant, arguments later).
       exprt r = try_evaluate_constexpr(
         expr,
@@ -10880,8 +10881,8 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
         {
           const symbolt *csym = symbol_table.lookup(callee);
           if(
-            csym == nullptr ||
-            (!csym->is_macro && lambda_functions.count(callee) == 0))
+            csym == nullptr || (!is_constexpr_function(callee) &&
+                                lambda_functions.count(callee) == 0))
           {
             return false;
           }

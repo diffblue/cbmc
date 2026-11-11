@@ -864,8 +864,12 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
     static_cast<exprt &>(symbol.type.add(ID_C_alignment))
       .set(ID_C_typedef_alignment, true);
   }
-  symbol.is_macro =
-    (is_typedef && !is_template_parameter) || storage_spec.is_constexpr();
+  // a constexpr variable is a named constant (its uses are replaced by its
+  // value); a constexpr function is recorded as such, see below
+  symbol.is_macro = (is_typedef && !is_template_parameter) ||
+                    (storage_spec.is_constexpr() && !is_code);
+  if(storage_spec.is_constexpr() && is_code && !is_typedef)
+    cpp_typecheck.constexpr_functions.insert(symbol.name);
   // N5008 [dcl.constexpr]/6: a constexpr VARIABLE is still an object;
   // for an ARRAY the object identity is essential -- its elements are
   // lvalues ([expr.sub]) and libc++ takes their address
@@ -1041,9 +1045,9 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
         // class may not be fully type-checked yet.
         cpp_typecheck.add_method_body(new_symbol);
       }
-      else if(new_symbol->is_macro)
+      else if(cpp_typecheck.is_constexpr_function(new_symbol->name))
       {
-        // A `constexpr` function is marked is_macro.  Per N5008 [temp.point]/1
+        // A `constexpr` function.  Per N5008 [temp.point]/1
         // and [temp.inst]/5, convert its definition eagerly *only* when this
         // instantiation was reached from a constant-expression context (so the
         // constant can be folded now -- e.g. a `constexpr` specialization used

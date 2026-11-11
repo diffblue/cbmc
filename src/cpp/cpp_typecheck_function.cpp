@@ -884,7 +884,7 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   // a$0)`).
   //
   // The same applies to a `constexpr` function-template instance reached from
-  // a constant-expression context (is_macro), which cpp_declarator_convertert
+  // a constant-expression context, which cpp_declarator_convertert
   // converts eagerly for the same reason, and to a TYPE parameter pack of two
   // or more elements: `{__is_same(_Tp, _Types)...}` in libstdc++'s
   // __find_uniq_type_in_pack (std::variant's __exactly_once) otherwise
@@ -903,7 +903,7 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     if(ps.second == 0)
       has_empty_pack = true;
   if(
-    (has_auto(symbol.type) || symbol.is_macro) &&
+    (has_auto(symbol.type) || is_constexpr_function(symbol.name)) &&
     (!template_map.pack_expr_map.empty() || has_multi_element_type_pack ||
      has_empty_pack))
   {

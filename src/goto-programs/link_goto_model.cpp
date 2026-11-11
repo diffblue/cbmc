@@ -181,8 +181,9 @@ void finalize_linking(
     {
       const symbolt &symbol = symbol_pair.second;
 
-      // C++ constexpr functions may be marked as macros but have
-      // code bodies rather than symbol aliases — skip those.
+      // a macro whose value is an object of the same type (a symbol) is an
+      // alias to apply; a named constant (a C++ constexpr variable of scalar
+      // type, whose uses the front end replaced by its value) is not
       if(symbol.value.id() != ID_symbol)
         continue;
       const irep_idt &id = to_symbol_expr(symbol.value).identifier();

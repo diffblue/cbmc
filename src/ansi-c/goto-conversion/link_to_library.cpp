@@ -93,8 +93,8 @@ add_one_function(
   }
 
   // Only a function of goto_model's own symbol table was converted (a
-  // function the language front end left unconverted, e.g. a C++ constexpr
-  // function, which is a macro symbol): there are no symbols to link, and
+  // function brought in by a header that the language front end left
+  // unconverted): there are no symbols to link, and
   // linking -- a pass over all symbols and all functions of goto_model --
   // reduces to adding the function.  A program that calls many such
   // functions otherwise links once per function (1200 times for

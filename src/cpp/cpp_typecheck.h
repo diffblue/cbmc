@@ -1005,6 +1005,15 @@ protected:
   /// keeps them real objects (not macros), but their initializers are still
   /// manifestly constant-evaluated (N5008 [dcl.constexpr]/6, [expr.const]).
   std::set<irep_idt> constexpr_objects;
+  /// N5008 [dcl.constexpr]/1: the functions declared constexpr (or
+  /// consteval), which a constant expression may call
+  /// ([expr.const]/10.3).  They are ordinary functions otherwise: called at
+  /// run time, goto-converted like any other.
+  std::unordered_set<irep_idt> constexpr_functions;
+  bool is_constexpr_function(const irep_idt &identifier) const
+  {
+    return constexpr_functions.count(identifier) != 0;
+  }
 
   /// N5008 [expr.context]/1, [basic.def.odr]/3, 8, [temp.inst]/5: a function
   /// named in an unevaluated operand (the operand of decltype, sizeof,

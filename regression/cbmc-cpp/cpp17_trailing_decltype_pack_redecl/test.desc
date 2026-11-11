@@ -7,6 +7,7 @@ main.cpp
 ^SIGNAL=0$
 --
 dropped the body
+no body for callee
 --
 A function template DECLARATION followed by its DEFINITION
 ([temp.over.link]/6), with a parameter pack expanded inside the
@@ -17,3 +18,6 @@ are purged on merge (b79138d38c), and the trailing-return temporary
 parameter registrations are quarantined in a block scope so they
 cannot leak into the enclosing namespace and make the parameter
 lookup ambiguous (7a2694d606).
+std::forward and std::forward_as_tuple are defined: the test called them
+declared only, which was silent while symbolic execution skipped calls
+of functions missing from the goto program.

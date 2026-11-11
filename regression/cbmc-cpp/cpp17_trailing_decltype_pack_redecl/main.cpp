@@ -26,16 +26,25 @@ using decay_t = typename decay<_Tp>::type;
 namespace std
 {
 template <class _Tp>
-constexpr _Tp &&forward(remove_reference_t<_Tp> &__t) noexcept;
+constexpr _Tp &&forward(remove_reference_t<_Tp> &__t) noexcept
+{
+  return static_cast<_Tp &&>(__t);
+}
 template <class _Tp>
-constexpr _Tp &&forward(remove_reference_t<_Tp> &&__t) noexcept;
+constexpr _Tp &&forward(remove_reference_t<_Tp> &&__t) noexcept
+{
+  return static_cast<_Tp &&>(__t);
+}
 template <class... _Ts>
 struct tuple
 {
   int first;
 };
 template <class... _Ts>
-constexpr tuple<_Ts...> forward_as_tuple(_Ts &&...) noexcept;
+constexpr tuple<_Ts...> forward_as_tuple(_Ts &&...) noexcept
+{
+  return tuple<_Ts...>{0};
+}
 template <class _B>
 struct bbt
 {
