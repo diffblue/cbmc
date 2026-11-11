@@ -6537,6 +6537,49 @@ typet cpp_typecheck_resolvet::resolve_template_alias(
       source_location, *template_sym, explicit_args_tc);
   }
 
+  // N5008 [temp.names]/9: a simple-template-id naming a constrained alias
+  // template is valid only if the constraints are satisfied by the
+  // arguments; otherwise it is a substitution failure in the immediate
+  // context ([temp.deduct.general]/8).  libstdc++ (C++20) constrains the
+  // return types of its overloads of make_shared by
+  // `template<class T> requires (extent_v<T> != 0) using _BoundedArray = T;';
+  // the constraint was ignored, and make_shared<mutex>() selected the
+  // bounded-array overload.
+  {
+    const template_typet &alias_template =
+      to_cpp_declaration(template_sym->type).template_type();
+    const exprt &requires_clause =
+      static_cast<const exprt &>(alias_template.find(ID_C_requires_clause));
+    std::vector<exprt> constraints;
+    if(requires_clause.is_not_nil() && requires_clause.id() != ID_nil)
+      constraints.push_back(requires_clause);
+    for(const auto &parameter : alias_template.template_parameters())
+    {
+      const exprt &type_constraint =
+        static_cast<const exprt &>(parameter.find("#C_type_constraint"));
+      if(type_constraint.is_not_nil() && type_constraint.id() != ID_nil)
+        constraints.push_back(type_constraint);
+    }
+    if(!constraints.empty())
+    {
+      cpp_saved_template_mapt saved_map(cpp_typecheck.template_map);
+      cpp_typecheck.template_map.build(alias_template, template_args_tc);
+      for(exprt constraint : constraints)
+      {
+        cpp_typecheck.template_map.apply(constraint);
+        const auto satisfied = cpp_typecheck.evaluate_constraint(constraint);
+        if(satisfied.has_value() && !*satisfied)
+        {
+          cpp_typecheck.error().source_location = source_location;
+          cpp_typecheck.error()
+            << "constraints of alias template '" << template_sym->base_name
+            << "' not satisfied" << messaget::eom;
+          throw 0;
+        }
+      }
+    }
+  }
+
   const symbolt &instance = cpp_typecheck.instantiate_template(
     source_location, *template_sym, template_args_tc, template_args_tc);
 
