@@ -807,8 +807,15 @@ void cpp_typecheckt::typecheck_type(typet &type)
       // see if there is a default value
       if(param.has_default_value())
       {
+        // ... but only for a member declared in the class itself: a
+        // member function template instantiated while some class is being
+        // defined (std::basic_string's `basic_string(const _CharT *, const
+        // _Alloc & = _Alloc())', a constructor template since C++20,
+        // instantiated for std::map<std::string, int>'s members) is
+        // declared in its instantiation scope, which does not outlive the
+        // instantiation: deferred, `_Alloc' was later unknown at the call
         if(
-          compound_body_depth > 0 &&
+          compound_body_depth > 0 && cpp_scopes.current_scope().is_class() &&
           param.default_value().id() != ID_cpp_deferred_default_argument)
         {
           // N5008 [class.mem.general]/9.2: a default argument within the
