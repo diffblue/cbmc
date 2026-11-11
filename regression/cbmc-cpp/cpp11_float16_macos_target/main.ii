@@ -1,0 +1,12 @@
+// The macOS SDK's math.h declares __fabsf16 & co. with Clang's _Float16;
+// with --os macos it is a type, whatever the host.
+extern "C" void __CPROVER_assert(bool, const char *);
+extern _Float16 __fabsf16(_Float16);
+int main()
+{
+  _Float16 h = 2;
+  __CPROVER_assert(sizeof(h) == 2, "_Float16 has two bytes");
+  __CPROVER_assert(h + h == 4, "arithmetic");
+  __CPROVER_assert(false, "WRONG (must FAIL)");
+  return 0;
+}

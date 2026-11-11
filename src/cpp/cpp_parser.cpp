@@ -31,14 +31,12 @@ bool cpp_parsert::parse()
     else if(
       config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::CLANG)
     {
-      // Apple Clang supports _Float16 natively. On macOS, system headers
-      // use _Float16 without typedefs. On Linux with clang, glibc headers
-      // typedef _Float32 etc., which conflicts with keyword mode.
-#ifdef __APPLE__
-      support_float16 = true;
-#else
-      support_float16 = false;
-#endif
+      // Apple Clang supports _Float16 natively. The macOS SDK's headers use
+      // _Float16 without typedefs (math.h's __fabsf16 & co.). On Linux with
+      // clang, glibc headers typedef _Float32 etc., which conflicts with
+      // keyword mode.  The target's headers decide, not the host's (the
+      // SDK's preprocessed headers analysed with --os macos elsewhere).
+      support_float16 = config.ansi_c.os == configt::ansi_ct::ost::OS_MACOS;
     }
     else
       support_float16 = false;
