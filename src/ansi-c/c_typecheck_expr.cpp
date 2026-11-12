@@ -4398,6 +4398,25 @@ void c_typecheck_baset::typecheck_arithmetic_pointer(exprt &expr)
   }
 }
 
+/// GCC's arithmetic on `void *' (an extension, "Pointer Arith" in the GCC
+/// manual) computes with a size of 1, and the result has the pointer's type:
+/// `p + 8' for a `void *' p is a `void *'.  typecheck_arithmetic_pointer
+/// computes it on `char *'; cast the result \p expr of the pointer
+/// arithmetic back to \p pointer_type, the type of the pointer operand.  A
+/// compound assignment (`p += 8') is cast by the assignment itself.
+static void keep_void_pointer_type(exprt &expr, const typet &pointer_type)
+{
+  if(
+    expr.id() == ID_side_effect ||
+    to_pointer_type(pointer_type).base_type().id() != ID_empty ||
+    expr.type() == pointer_type)
+  {
+    return;
+  }
+  typecast_exprt result{expr, pointer_type};
+  expr.swap(result);
+}
+
 void c_typecheck_baset::typecheck_expr_pointer_arithmetic(exprt &expr)
 {
   auto &binary_expr = to_binary_expr(expr);
@@ -4432,9 +4451,11 @@ void c_typecheck_baset::typecheck_expr_pointer_arithmetic(exprt &expr)
         type1.id()==ID_c_bit_field ||
         type1.id()==ID_c_enum_tag))
     {
+      const typet pointer_type = type0;
       typecheck_arithmetic_pointer(op0);
       make_index_type(op1);
       expr.type() = op0.type();
+      keep_void_pointer_type(expr, pointer_type);
       return;
     }
   }
@@ -4468,9 +4489,11 @@ void c_typecheck_baset::typecheck_expr_pointer_arithmetic(exprt &expr)
        int_op_type.id()==ID_c_bit_field ||
        int_op_type.id()==ID_c_enum_tag)
     {
+      const typet pointer_type = p_op->type();
       typecheck_arithmetic_pointer(*p_op);
       make_index_type(*int_op);
       expr.type()=p_op->type();
+      keep_void_pointer_type(expr, pointer_type);
       return;
     }
   }
