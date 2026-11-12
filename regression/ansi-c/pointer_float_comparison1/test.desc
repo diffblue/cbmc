@@ -1,0 +1,11 @@
+CORE
+main.c
+
+^.*error: operator '=' not defined for types 'signed int \*' and 'double'$
+^CONVERSION ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--
+GCC and Clang reject comparisons of pointers with floating-point numbers.
+CBMC used to convert the floating-point number to a pointer.

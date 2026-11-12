@@ -1471,14 +1471,32 @@ void c_typecheck_baset::typecheck_expr_rel(
   }
   else
   {
+    // Only integers (including enumerations and _Bool), but not
+    // floating-point numbers, can be compared with a pointer, and a null
+    // pointer constant is an integer zero, possibly converted to void *
+    // (C11 6.3.2.3p3).
+    const auto is_integer = [](const typet &type)
+    {
+      return type.id() == ID_signedbv || type.id() == ID_unsignedbv ||
+             type.id() == ID_c_enum_tag || type.id() == ID_c_enum ||
+             type.id() == ID_c_bool || type.id() == ID_integer ||
+             type.id() == ID_natural;
+    };
+
     // pointer and zero
-    if(type0.id() == ID_pointer && simplify_expr(op1, *this) == 0)
+    if(
+      type0.id() == ID_pointer &&
+      (is_integer(type1) || type1.id() == ID_pointer) &&
+      simplify_expr(op1, *this) == 0)
     {
       op1 = null_pointer_exprt{to_pointer_type(type0)};
       return;
     }
 
-    if(type1.id() == ID_pointer && simplify_expr(op0, *this) == 0)
+    if(
+      type1.id() == ID_pointer &&
+      (is_integer(type0) || type0.id() == ID_pointer) &&
+      simplify_expr(op0, *this) == 0)
     {
       op0 = null_pointer_exprt{to_pointer_type(type1)};
       return;
@@ -1486,7 +1504,7 @@ void c_typecheck_baset::typecheck_expr_rel(
 
     // pointer and integer: a constraint violation (C11 6.5.8p2, 6.5.9p2),
     // which GCC and Clang accept with a warning
-    if(type0.id()==ID_pointer && is_number(type1))
+    if(type0.id() == ID_pointer && is_integer(type1))
     {
       warning().source_location = expr.source_location();
       warning() << "comparison between pointer and integer" << eom;
@@ -1494,7 +1512,7 @@ void c_typecheck_baset::typecheck_expr_rel(
       return;
     }
 
-    if(type1.id()==ID_pointer && is_number(type0))
+    if(type1.id() == ID_pointer && is_integer(type0))
     {
       warning().source_location = expr.source_location();
       warning() << "comparison between pointer and integer" << eom;

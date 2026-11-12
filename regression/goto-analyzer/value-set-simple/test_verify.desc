@@ -10,7 +10,7 @@ main.c
 ^\[main.assertion.7\] line 31 assertion local_double > 0.0: SUCCESS$
 ^\[main.assertion.8\] line 32 assertion local_double > 3.0: FAILURE \(if reachable\)$
 ^\[main.assertion.9\] line 44 assertion local_double_ptr == &d2: UNKNOWN$
-^\[main.assertion.10\] line 45 assertion local_double_ptr == &d1 \|\| local_double == &d2: SUCCESS$
+^\[main.assertion.10\] line 45 assertion local_double_ptr == &d1 \|\| local_double_ptr == &d2: SUCCESS$
 ^\[main.assertion.11\] line 46 assertion \*local_double_ptr > 0.0: SUCCESS$
 ^\[main.assertion.12\] line 47 assertion \*local_double_ptr > 3.0: FAILURE \(if reachable\)$
 ^Summary: 6 pass, 3 fail if reachable, 3 unknown$

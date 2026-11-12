@@ -12,5 +12,15 @@ int main()
 
   // a null pointer constant does not warrant a warning
   __CPROVER_assert(p != 0, "null pointer constant");
+
+  // enumerations and _Bool are integer types
+  enum E
+  {
+    A
+  } e = A;
+  _Bool b = 0;
+  int *q = 0;
+  __CPROVER_assert(q == e, "enum");
+  __CPROVER_assert(q == b, "_Bool");
   return 0;
 }
