@@ -34,6 +34,7 @@ protected:
   void slice(SSA_stept &SSA_step);
   void slice_assignment(SSA_stept &SSA_step);
   void slice_decl(SSA_stept &SSA_step);
+  void ignore_gotos_over_sliced_assignments(symex_target_equationt &equation);
 };
 
 #endif // CPROVER_GOTO_SYMEX_SYMEX_SLICE_CLASS_H
