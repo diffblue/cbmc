@@ -459,6 +459,13 @@ std::string expr2cppt::convert_with_precedence(
     precedence = 15;
     return convert_extractbit(src);
   }
+  else if(src.id() == ID_lambda && src.find("#lambda_uid").is_not_nil())
+  {
+    // a C++ lambda-expression not type-checked yet ([expr.prim.lambda]),
+    // which shares its id with the mathematical lambda_exprt
+    precedence = 16;
+    return "[](...) { ... }";
+  }
   else if(src.id()==ID_side_effect &&
           (src.get(ID_statement)==ID_cpp_new ||
            src.get(ID_statement)==ID_cpp_new_array))
