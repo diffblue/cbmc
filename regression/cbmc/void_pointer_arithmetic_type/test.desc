@@ -1,0 +1,12 @@
+CORE gcc-only
+main.c
+
+^\[main\.assertion\.7\] line \d+ assertion a - \(b \+ 8\) == 5: FAILURE$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+pointer subtraction over different types
+--
+The other assertions hold.
