@@ -227,7 +227,7 @@ bool cpp_typecheckt::standard_conversion_qualification(
 /// unsigned int, long, unsigned long, long long and unsigned long long that
 /// can represent the values of all the enumerators.  The underlying type
 /// that typecheck_enum_body chooses for the latter (e.g., unsigned int when
-/// no enumerator is negative, or a narrower type for a `mode' attribute) is
+/// no enumerator is negative, or a narrower type for a `mode` attribute) is
 /// not necessarily that type.
 /// \return the promoted type, or an empty optional for a scoped enumeration
 ///   (which does not promote) or if an enumerator value is not known
@@ -253,7 +253,7 @@ enum_promotion_type(const c_enum_tag_typet &enum_tag, const namespacet &ns)
   }
 
   // the values of the enumerators, which typecheck_enum_body stores in
-  // symbols named <enum>::<enumerator>
+  // symbols named after the enumeration and the enumerator (`E::e`)
   mp_integer min_value = 0, max_value = 0;
   for(const auto &member : enum_type.find(ID_body).get_sub())
   {
