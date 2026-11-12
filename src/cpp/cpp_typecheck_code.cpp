@@ -591,17 +591,9 @@ void cpp_typecheckt::typecheck_code(codet &code)
       std::string message;
       if(code.operands().size() == 2 && code.op1().id() == ID_string_constant)
         message = ": " + id2string(to_string_constant(code.op1()).value());
-      if(instantiation_stack.empty())
-      {
-        error().source_location = code.source_location();
-        error() << "static assertion failed" << message << eom;
-        throw 0;
-      }
-      warning().source_location = code.source_location();
-      warning() << "static assertion failed in a template instantiation"
-                << message << " (ignored, [temp.res.general]/6)" << eom;
-      code = codet{ID_skip};
-      return;
+      error().source_location = code.source_location();
+      error() << "static assertion failed" << message << eom;
+      throw 0;
     }
     if(!code.op0().is_constant())
     {

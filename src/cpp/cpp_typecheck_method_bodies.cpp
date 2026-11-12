@@ -1788,7 +1788,6 @@ void cpp_typecheckt::typecheck_method_bodies()
       // headers, suppress error messages so that failures (e.g.,
       // unsupported standard library constructs) do not increment
       // the error count.
-      bool suppress = !instantiation_stack.empty();
       const std::string body_file =
         id2string(method_symbol.location.get_file());
       // Only suppress for system headers (paths under /usr/include,
@@ -1796,8 +1795,12 @@ void cpp_typecheckt::typecheck_method_bodies()
       const bool is_library_body =
         body_file.find("/include/") != std::string::npos ||
         is_library_body_file(body_file);
-      if(!suppress)
-        suppress = is_library_body;
+      // N5008 [temp.inst]/11, [temp.res.general]/6: the definition of a
+      // specialization of the program's own template that is instantiated
+      // must be well-formed; its failure is diagnosed like that of any
+      // other function of the program (a failed static_assert in it was
+      // reported as a warning, the body dropped, and the program verified)
+      const bool suppress = is_library_body;
       if(suppress)
       {
         // Save/restore error count instead of using null_handler.

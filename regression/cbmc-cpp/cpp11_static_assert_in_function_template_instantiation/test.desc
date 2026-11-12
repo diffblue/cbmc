@@ -1,0 +1,11 @@
+CORE
+main.cpp
+--cpp11
+^file main\.cpp line \d+ function size_of: static assertion failed: T must be one byte$
+^CONVERSION ERROR$
+^EXIT=6$
+^SIGNAL=0$
+--
+^VERIFICATION SUCCESSFUL$
+--
+The program is ill-formed, so there is no WRONG assertion.
