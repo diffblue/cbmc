@@ -14,11 +14,13 @@ Date: June 2023
 #include "contracts_wrangler.h"
 
 #include <util/c_types.h>
+#include <util/exception_utils.h>
 #include <util/expr_iterator.h>
 #include <util/format_expr.h>
 #include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
 #include <util/std_types.h>
+#include <util/typecheck.h>
 
 #include <goto-programs/remove_unused_functions.h>
 
@@ -164,55 +166,20 @@ void contracts_wranglert::mangle(
       " given in the loop contracts file"};
   }
 
-  // Extract the invariants from prase_tree.
-  exprt &inv_expr(static_cast<exprt &>(ansi_c_parser.parse_tree.items.front()
-                                         .declarator()
-                                         .value()
-                                         .operands()[0]
-                                         .add(ID_C_spec_loop_invariant))
-                    .operands()[0]);
-
-  log.debug() << "Extracted loop invariants: " << inv_expr.pretty() << "\n"
-              << log.eom;
-
-  // Extract the assigns from parse_tree.
-  std::optional<exprt> assigns_expr;
-  if(!loop_contracts.assigns.empty())
-  {
-    assigns_expr = static_cast<exprt &>(ansi_c_parser.parse_tree.items.front()
-                                          .declarator()
-                                          .value()
-                                          .operands()[0]
-                                          .add(ID_C_spec_assigns))
-                     .operands()[0];
-  }
-
-  // Extract the decreases from parse_tree.
-  exprt::operandst decreases_exprs;
-  if(!loop_contracts.decreases.empty())
-  {
-    for(auto op : static_cast<exprt &>(ansi_c_parser.parse_tree.items.front()
-                                         .declarator()
-                                         .value()
-                                         .operands()[0]
-                                         .add(ID_C_spec_decreases))
-                    .operands())
-    {
-      decreases_exprs.emplace_back(op);
-    }
-  }
+  // The loop of the fake function, which carries the clauses.
+  codet &loop = static_cast<codet &>(
+    ansi_c_parser.parse_tree.items.front().declarator().value().operands()[0]);
 
   // Replace symbols in the clauses with the symbols in the symbol table.
   log.debug() << "Start to replace symbols" << log.eom;
-  loop_contracts.replace_symbol(inv_expr);
-  if(assigns_expr.has_value())
-  {
-    loop_contracts.replace_symbol(assigns_expr.value());
-  }
-  for(exprt &decrease_expr : decreases_exprs)
-  {
-    loop_contracts.replace_symbol(decrease_expr);
-  }
+  loop_contracts.replace_symbol(
+    static_cast<exprt &>(loop.add(ID_C_spec_loop_invariant)));
+  if(!loop_contracts.assigns.empty())
+    loop_contracts.replace_symbol(
+      static_cast<exprt &>(loop.add(ID_C_spec_assigns)));
+  if(!loop_contracts.decreases.empty())
+    loop_contracts.replace_symbol(
+      static_cast<exprt &>(loop.add(ID_C_spec_decreases)));
 
   // Add builtin functions that might be used in contracts to the symbol table.
   add_builtin_pointer_function_symbol("loop_entry", 1);
@@ -221,52 +188,85 @@ void contracts_wranglert::mangle(
   add_builtin_pointer_function_symbol("POINTER_OBJECT", 1);
   add_builtin_pointer_function_symbol("POINTER_OFFSET", 1);
 
-  // Typecheck clauses.
+  // Typecheck the clauses as the C front-end does for loop contracts given in
+  // the source code: this converts the invariant to Boolean and the
+  // components of the decreases clause to arithmetic types, and rejects
+  // __CPROVER_old in the invariant.  The type checker reports errors via the
+  // message handler and then throws.
   ansi_c_typecheckt ansi_c_typecheck(
     ansi_c_parser.parse_tree,
     symbol_table,
     symbol_table.lookup_ref(function_id).module.c_str(),
     log.get_message_handler());
 
-  // Typecheck and annotate invariants.
+  const auto typecheck_error = [&loop_contracts, &function_id]()
   {
-    log.debug() << "Start to typecheck invariants." << log.eom;
-    ansi_c_typecheck.typecheck_expr(inv_expr);
-    if(has_subexpr(inv_expr, ID_old))
-      throw invalid_input_exceptiont(CPROVER_PREFIX
-                                     "old is not allowed in loop invariants.");
+    return invalid_input_exceptiont{
+      "failed to typecheck the loop contracts for loop " +
+      loop_contracts.identifier + " of function " + id2string(function_id) +
+      " given in the loop contracts file"};
+  };
 
-    invariant_mapt inv_map;
-    inv_map[loop_idt(function_id, std::stoi(loop_contracts.identifier))] =
-      and_exprt(simplify_expr(inv_expr, ns), true_exprt());
-    annotate_invariants(inv_map, goto_model);
+  try
+  {
+    log.debug() << "Start to typecheck the clauses." << log.eom;
+    ansi_c_typecheck.typecheck_spec_loop_invariant(loop);
+    if(!loop_contracts.assigns.empty())
+    {
+      ansi_c_typecheck.typecheck_spec_assigns(
+        static_cast<unary_exprt &>(loop.add(ID_C_spec_assigns))
+          .op()
+          .operands());
+    }
+    ansi_c_typecheck.typecheck_spec_decreases(loop);
+  }
+  catch(int)
+  {
+    throw typecheck_error();
+  }
+  catch(const typecheckt::errort &e)
+  {
+    if(!e.what().empty())
+    {
+      log.error().source_location = e.source_location();
+      log.error() << e.what() << messaget::eom;
+    }
+    throw typecheck_error();
+  }
+  catch(const invalid_source_file_exceptiont &e)
+  {
+    log.error().source_location = e.get_source_location();
+    log.error() << e.get_reason() << messaget::eom;
+    throw typecheck_error();
   }
 
-  // Typecheck and annotate assigns.
-  log.debug() << "Start to typecheck assigns." << log.eom;
-  if(assigns_expr.has_value())
-  {
-    ansi_c_typecheck.typecheck_spec_assigns(assigns_expr.value().operands());
+  const loop_idt loop_id(function_id, std::stoi(loop_contracts.identifier));
 
+  // Annotate the invariant.
+  const exprt &inv_expr =
+    static_cast<const exprt &>(loop.find(ID_C_spec_loop_invariant))
+      .operands()[0];
+  log.debug() << "Extracted loop invariants: " << inv_expr.pretty() << "\n"
+              << log.eom;
+  invariant_mapt inv_map;
+  inv_map[loop_id] = and_exprt(simplify_expr(inv_expr, ns), true_exprt());
+  annotate_invariants(inv_map, goto_model);
+
+  // Annotate the assigns clause.
+  if(!loop_contracts.assigns.empty())
+  {
     invariant_mapt assigns_map;
-    assigns_map[loop_idt(function_id, std::stoi(loop_contracts.identifier))] =
-      assigns_expr.value();
+    assigns_map[loop_id] =
+      static_cast<const exprt &>(loop.find(ID_C_spec_assigns)).operands()[0];
     annotate_assigns(assigns_map, goto_model);
   }
 
-  // Typecheck an annotate decreases.
-  log.debug() << "Start to typecheck decreases." << log.eom;
-  if(!decreases_exprs.empty())
+  // Annotate the decreases clause.
+  if(!loop_contracts.decreases.empty())
   {
     std::map<loop_idt, std::vector<exprt>> decreases_map;
-    decreases_map[loop_idt(function_id, std::stoi(loop_contracts.identifier))] =
-      std::vector<exprt>();
-    for(exprt &decrease_expr : decreases_exprs)
-    {
-      ansi_c_typecheck.typecheck_expr(decrease_expr);
-      decreases_map[loop_idt(function_id, std::stoi(loop_contracts.identifier))]
-        .emplace_back(decrease_expr);
-    }
+    decreases_map[loop_id] =
+      static_cast<const exprt &>(loop.find(ID_C_spec_decreases)).operands();
     annotate_decreases(decreases_map, goto_model);
   }
 

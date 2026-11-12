@@ -1,0 +1,12 @@
+CORE
+main.c
+--loop-contracts-file test_non_boolean.json --dfcc main --apply-loop-contracts
+^\[foo\.[^]]+\] line \d+ Check (loop )?invariant before entry.*: SUCCESS$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+Invariant check failed
+--
+A loop invariant of scalar type is converted to Boolean, as it is when given in
+the source code. It used to fail an invariant in conjunction.

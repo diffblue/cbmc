@@ -1,0 +1,13 @@
+{
+    "functions": [
+      {
+        "foo": [
+            {
+              "loop_id": "0",
+              "invariants": "*b",
+              "symbol_map": "i, foo::1::1::i; b, foo::1::b"
+            }
+          ]
+      }
+    ]
+  }
