@@ -2190,8 +2190,8 @@ static const std::map<std::string, std::string> &library_source_models()
     // the value does not fit the return type (checked for stoi).  The
     // out_of_range of an ERANGE result is not modelled: errno is a macro,
     // which these unpreprocessed bodies cannot use.  The models are keyed by
-    // the name, so they also meet the wstring overloads, which then do not
-    // type-check (they would need wcsto*) and remain without a body.
+    // the name, so they also meet the wstring overloads, which convert a
+    // narrowed copy (provide_library_source_models).
     {"std::__1::stoi",
      "{ const char *__p = __str.c_str(); char *__e = nullptr;"
      " long __r = strtol(__p, &__e, __base);"
@@ -2596,6 +2596,28 @@ void cpp_typecheckt::provide_library_source_models()
   {
     if(define_by_model(item.first, *item.second))
       continue;
+    // libc++'s stoi ... stoull have overloads for wstring
+    // ([string.conversions]/1-3 use wcstol ... wcstoull for them); the
+    // models, keyed by name, read the string as `const char *'.  The
+    // characters strtol and friends accept are the basic ones, the same
+    // in both encodings ([lex.charset]/3), and any other character ends
+    // the conversion in both: convert a copy narrowed to char.
+    const std::string narrow = "const char *__p = __str.c_str();";
+    const std::string::size_type at = item.second->find(narrow);
+    if(at != std::string::npos)
+    {
+      std::string widened = *item.second;
+      widened.replace(
+        at,
+        narrow.size(),
+        "string __b(__str.size(), char(0));"
+        " for(size_t __i = 0; __i < __str.size(); ++__i)"
+        " __b[__i] = __str[__i] > 0 && __str[__i] < 128 ? char(__str[__i])"
+        " : char(127);"
+        " const char *__p = __b.c_str();");
+      if(define_by_model(item.first, widened))
+        continue;
+    }
     // libstdc++'s __throw_X throws an X, a class declared in <stdexcept>,
     // <new>, <typeinfo>, <functional> or <system_error>.  When the program
     // does not declare X, no handler can name it ([except.handle]/3); X is
