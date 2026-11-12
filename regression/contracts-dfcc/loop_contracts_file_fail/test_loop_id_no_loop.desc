@@ -1,0 +1,12 @@
+CORE
+main.c
+--loop-contracts-file test_loop_id_no_loop.json --dfcc main --apply-loop-contracts
+^function foo has no loop 1, as given in the loop contracts file$
+^EXIT=6$
+^SIGNAL=0$
+--
+^warning: ignoring
+Invariant check failed
+--
+A loop contract for a loop that does not exist (foo only has loop 0) is
+reported as an error. It used to fail an invariant in get_loop_head_or_end.

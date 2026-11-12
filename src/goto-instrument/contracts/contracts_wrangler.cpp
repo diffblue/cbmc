@@ -20,10 +20,12 @@ Date: June 2023
 #include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
 #include <util/std_types.h>
+#include <util/string2int.h>
 #include <util/typecheck.h>
 
 #include <goto-programs/remove_unused_functions.h>
 
+#include <analyses/natural_loops.h>
 #include <ansi-c/ansi_c_parser.h>
 #include <ansi-c/ansi_c_typecheck.h>
 #include <goto-instrument/contracts/utils.h>
@@ -99,11 +101,51 @@ void contracts_wranglert::add_builtin_pointer_function_symbol(
   symbol_table.add(fun_symbol);
 }
 
+/// \return True if \p function has a natural loop numbered \p loop_number,
+///   which is what annotating loop contracts requires.
+static bool has_loop(const goto_functiont &function, const unsigned loop_number)
+{
+  natural_loopst natural_loops;
+  natural_loops(function.body);
+  for(const auto &loop : natural_loops.loop_map)
+  {
+    if(
+      get_loop_end_from_loop_head_and_content(loop.first, loop.second)
+        ->loop_number == loop_number)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
 void contracts_wranglert::mangle(
   const loop_contracts_clauset &loop_contracts,
   const irep_idt &function_id)
 {
   messaget log(message_handler);
+
+  const std::optional<unsigned> loop_number =
+    string2optional_unsigned(loop_contracts.identifier);
+  if(!loop_number.has_value())
+  {
+    throw invalid_input_exceptiont{
+      "loop identifier '" + loop_contracts.identifier + "' of function " +
+      id2string(function_id) +
+      " given in the loop contracts file is not a loop number"};
+  }
+  const auto function_it =
+    goto_model.goto_functions.function_map.find(function_id);
+  if(
+    function_it == goto_model.goto_functions.function_map.end() ||
+    !has_loop(function_it->second, *loop_number))
+  {
+    throw invalid_input_exceptiont{
+      "function " + id2string(function_id) + " has no loop " +
+      loop_contracts.identifier + ", as given in the loop contracts file"};
+  }
+  const loop_idt loop_id{function_id, *loop_number};
+
   // Loop contracts mangling consists of four steps.
   //
   // 1. Construct a fake function with a fake loop that contains the loop
@@ -239,8 +281,6 @@ void contracts_wranglert::mangle(
     log.error() << e.get_reason() << messaget::eom;
     throw typecheck_error();
   }
-
-  const loop_idt loop_id(function_id, std::stoi(loop_contracts.identifier));
 
   // Annotate the invariant.
   const exprt &inv_expr =

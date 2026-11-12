@@ -1,0 +1,13 @@
+CORE
+main.c
+--loop-contracts-file test_loop_id_not_number.json --dfcc main --apply-loop-contracts
+^loop identifier '-1' of function foo given in the loop contracts file is not a loop number$
+^EXIT=6$
+^SIGNAL=0$
+--
+^warning: ignoring
+Invariant check failed
+--
+A loop identifier that is not a loop number is reported as an error. A
+negative number used to fail an invariant in get_loop_head_or_end, and a
+non-numeric one was reported only as "stoi".
