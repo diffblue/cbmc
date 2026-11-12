@@ -72,6 +72,23 @@ add_one_function(
     // should the goto binary be reloaded
     goto_model.symbol_table.get_writeable_ref(missing_function).set_compiled();
   }
+  // A function that only a library model declares and that has no model of
+  // its own (OpenBSD's <math.h> makes the model of copysign call
+  // __signbit): it is in the symbol table now, but not in the goto program,
+  // whose calls must all name a function of it.  It has no body.
+  else if(
+    goto_model.symbol_table.symbols.find(missing_function) !=
+      goto_model.symbol_table.symbols.end() &&
+    goto_model.symbol_table.lookup_ref(missing_function).type.id() == ID_code &&
+    goto_model.goto_functions.function_map.find(missing_function) ==
+      goto_model.goto_functions.function_map.end())
+  {
+    goto_convert(
+      missing_function,
+      goto_model.symbol_table,
+      library_model.goto_functions,
+      message_handler);
+  }
 
   // check whether additional initialization may be required
   bool init_required = false;
