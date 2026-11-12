@@ -24,6 +24,7 @@ Date: June 2023
 
 #include <json/json_parser.h>
 
+#include <optional>
 #include <regex>
 
 struct loop_contracts_clauset
@@ -88,7 +89,9 @@ protected:
   /// @brief Add builtin function symbol with `function_name` into symbol table.
   /// @param function_name Name of the function to add.
   /// @param num_of_args Number of arguments of the added symbol.
-  void add_builtin_pointer_function_symbol(
+  /// @return The name of the added symbol, or an empty optional if the symbol
+  ///   table already has a symbol of that name.
+  std::optional<irep_idt> add_builtin_pointer_function_symbol(
     std::string function_name,
     const std::size_t num_of_args);
 };

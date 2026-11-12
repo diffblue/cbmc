@@ -1,0 +1,13 @@
+CORE
+simple.c
+--loop-contracts-file test_scalar_invariant.json --dfcc main --apply-loop-contracts
+^\[foo\.[^]]+\] line \d+ Check (loop )?invariant before entry.*: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+Invariant check failed
+--
+The scalar invariant i is converted to i != 0, which does not hold before the
+loop is entered.

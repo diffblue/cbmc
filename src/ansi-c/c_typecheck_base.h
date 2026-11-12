@@ -68,6 +68,12 @@ public:
   virtual void typecheck()=0;
   virtual void typecheck_expr(exprt &expr);
   virtual void typecheck_spec_assigns(exprt::operandst &targets);
+  /// Typecheck the loop invariants attached to \p code and convert each of
+  /// them to Boolean; reject __CPROVER_old.
+  virtual void typecheck_spec_loop_invariant(codet &code);
+  /// Typecheck the components of the decreases clause attached to \p code and
+  /// apply the usual arithmetic conversions.
+  virtual void typecheck_spec_decreases(codet &code);
 
 protected:
   symbol_table_baset &symbol_table;
@@ -171,8 +177,6 @@ protected:
   virtual void typecheck_spec_condition(exprt &condition);
   virtual void typecheck_spec_assigns_target(exprt &target);
   virtual void typecheck_spec_frees_target(exprt &target);
-  virtual void typecheck_spec_loop_invariant(codet &code);
-  virtual void typecheck_spec_decreases(codet &code);
   virtual void throw_on_side_effects(const exprt &expr);
 
   bool break_is_allowed;
