@@ -145,12 +145,58 @@ $(function(){initNavTree('c__typecheck__expr_8cpp.html','',''); });
 Classes</h2></td></tr>
 <tr class="memitem:is_5Fcompile_5Ftime_5Fconstantt" id="r_is_5Fcompile_5Ftime_5Fconstantt"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classis__compile__time__constantt.html">is_compile_time_constantt</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Architecturally similar to <a class="el" href="classcan__forward__propagatet.html">can_forward_propagatet</a>, but specialized for what is a constexpr, i.e., an expression that can be fully evaluated at compile time.  <a href="classis__compile__time__constantt.html#details">More...</a><br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a26119ae97d185de2f11df38714e30fa0" id="r_a26119ae97d185de2f11df38714e30fa0"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a26119ae97d185de2f11df38714e30fa0">keep_void_pointer_type</a> (<a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classtypet.html">typet</a> &amp;<a class="el" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a>)</td></tr>
+<tr class="memdesc:a26119ae97d185de2f11df38714e30fa0"><td class="mdescLeft">&#160;</td><td class="mdescRight">GCC's arithmetic on <span class="tt">void *' (an extension, "Pointer Arith" in the GCC
+manual) computes with a size of 1, and the result has the pointer's type:
+</span>p + 8' for a <span class="tt">void *' p is a </span>void *'.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>ANSI-C Language Type Checking. </p>
 
 <p class="definition">Definition in file <a class="el" href="c__typecheck__expr_8cpp_source.html">c_typecheck_expr.cpp</a>.</p>
-</div></div><!-- contents -->
+</div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+<a id="a26119ae97d185de2f11df38714e30fa0" name="a26119ae97d185de2f11df38714e30fa0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a26119ae97d185de2f11df38714e30fa0">&#9670;&#160;</a></span>keep_void_pointer_type()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void keep_void_pointer_type </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classexprt.html">exprt</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>expr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classtypet.html">typet</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>pointer_type</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>GCC's arithmetic on <span class="tt">void *' (an extension, "Pointer Arith" in the GCC
+manual) computes with a size of 1, and the result has the pointer's type:
+</span>p + 8' for a <span class="tt">void *' p is a </span>void *'. </p>
+<p>typecheck_arithmetic_pointer computes it on <span class="tt">char *'; cast the result \p expr of the pointer
+arithmetic back to \p <a class="el" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a>, the type of the pointer operand.  A
+compound assignment (</span>p += 8') is cast by the assignment itself. </p>
+
+<p class="definition">Definition at line <a class="el" href="c__typecheck__expr_8cpp_source.html#l04407">4407</a> of file <a class="el" href="c__typecheck__expr_8cpp_source.html">c_typecheck_expr.cpp</a>.</p>
+
+</div>
+</div>
+</div><!-- contents -->
 </div><!-- doc-content -->
 <div id="page-nav" class="page-nav-panel">
 <div id="page-nav-resize-handle"></div>

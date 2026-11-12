@@ -1,5 +1,6 @@
 var NAVTREEINDEX142 =
 {
+"structconfigt_1_1ansi__ct.html#af99b387514e0ddd836e51215554c886c":[5,0,266,0,18],
 "structconfigt_1_1ansi__ct.html#afe21d3d7527d2cff80d0e4847fd6fe0a":[5,0,266,0,15],
 "structconfigt_1_1bv__encodingt.html":[5,0,266,4],
 "structconfigt_1_1bv__encodingt.html#ada43196c3d3787b84e2aa9c1424cbcd6":[5,0,266,4,0],
@@ -248,6 +249,5 @@ var NAVTREEINDEX142 =
 "structfault__location__infot.html":[5,0,480],
 "structfault__location__infot.html#a91705e9a0f517dd86519a3e780a04fb8":[5,0,480,1],
 "structfault__location__infot.html#afff0755985c155e28f117a83458158e2":[5,0,480,0],
-"structfloat__bvt_1_1biased__floatt.html":[5,0,496,2],
-"structfloat__bvt_1_1rounding__mode__bitst.html":[5,0,496,0]
+"structfloat__bvt_1_1biased__floatt.html":[5,0,496,2]
 };
