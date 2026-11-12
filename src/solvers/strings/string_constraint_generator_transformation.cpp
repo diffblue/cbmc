@@ -182,6 +182,74 @@ string_constraint_generatort::add_axioms_for_trim(
   return {from_integer(0, f.type()), std::move(constraints)};
 }
 
+/// Remove leading and/or trailing white space, as Java's `String.strip`,
+/// `String.stripLeading` and `String.stripTrailing` do.
+///
+/// White space is what `Character.isWhitespace` accepts: U+0009 to U+000D,
+/// U+001C to U+0020, U+1680, U+2000 to U+2006, U+2008 to U+200A, U+2028,
+/// U+2029, U+205F and U+3000. Ranges that cannot be represented in the
+/// character type of the string are left out. See add_axioms_for_strip for
+/// the axioms.
+/// \param f: function application with arguments integer `|res|`, character
+///   pointer `&res[0]`, refined_string `str`, and an integer constant
+///   selecting the end(s) to strip: 0 for both, 1 for the front only (as
+///   `stripLeading`), 2 for the back only (as `stripTrailing`)
+/// \return integer expression which is different from 0 when there is an
+///   exception to signal
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_strip(
+  const function_application_exprt &f)
+{
+  PRECONDITION(f.arguments().size() == 4);
+  const array_string_exprt &str = get_string_expr(array_pool, f.arguments()[2]);
+  const array_string_exprt &res =
+    array_pool.find(f.arguments()[1], f.arguments()[0]);
+  const auto mode = numeric_cast<mp_integer>(f.arguments()[3]);
+  PRECONDITION(mode.has_value() && *mode >= 0 && *mode <= 2);
+  const strip_endst ends = *mode == 0   ? strip_endst::BOTH
+                           : *mode == 1 ? strip_endst::FRONT
+                                        : strip_endst::BACK;
+
+  const typet &char_type = to_type_with_subtype(str.content().type()).subtype();
+  const std::size_t char_width = to_bitvector_type(char_type).get_width();
+  const std::vector<std::pair<unsigned, unsigned>> white_space = {
+    {0x09, 0x0d},
+    {0x1c, 0x20},
+    {0x1680, 0x1680},
+    {0x2000, 0x2006},
+    {0x2008, 0x200a},
+    {0x2028, 0x2029},
+    {0x205f, 0x205f},
+    {0x3000, 0x3000}};
+
+  string_constraintst constraints = add_axioms_for_strip(
+    str,
+    res,
+    [&](const exprt &c) -> exprt
+    {
+      exprt::operandst disjuncts;
+      for(const auto &range : white_space)
+      {
+        if(char_width < 32 && range.second >= (1u << char_width))
+          continue;
+        if(range.first == range.second)
+          disjuncts.push_back(
+            equal_exprt{c, from_integer(range.first, char_type)});
+        else
+        {
+          disjuncts.push_back(and_exprt{
+            binary_relation_exprt{
+              c, ID_ge, from_integer(range.first, char_type)},
+            binary_relation_exprt{
+              c, ID_le, from_integer(range.second, char_type)}});
+        }
+      }
+      return disjunction(disjuncts);
+    },
+    ends);
+  return {from_integer(0, f.type()), std::move(constraints)};
+}
+
 /// Remove a maximal run of characters satisfying \p is_strippable from the
 /// front and/or the back of \p str.
 ///

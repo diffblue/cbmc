@@ -266,6 +266,8 @@ string_constraint_generatort::add_axioms_for_function_application(
     return add_axioms_for_substring(expr);
   else if(id == ID_cprover_string_trim_func)
     return add_axioms_for_trim(expr);
+  else if(id == ID_cprover_string_strip_func)
+    return add_axioms_for_strip(expr);
   else if(id == ID_cprover_string_empty_string_func)
     return add_axioms_for_empty_string(expr);
   else if(id == ID_cprover_string_copy_func)

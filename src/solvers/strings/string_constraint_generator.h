@@ -266,6 +266,9 @@ public:
   std::pair<exprt, string_constraintst>
   add_axioms_for_trim(const function_application_exprt &f);
 
+  std::pair<exprt, string_constraintst>
+  add_axioms_for_strip(const function_application_exprt &f);
+
   /// Which end(s) of a string add_axioms_for_strip removes characters from.
   enum class strip_endst
   {
