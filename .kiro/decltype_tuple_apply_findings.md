@@ -16520,3 +16520,32 @@ Open items of round 232:
 Verified on binW220: 13 suites, profiles (z3 complex2 flaky), vacuity
 1063/3, MSVC 3/3 (4 libstdcxx-tagged skipped), macOS 142/142, GCC 16
 image, unit, lint, format, doxygen, iwyu (changed files).
+
+## Round 234 (2026-11-12): upstreaming, CI failures of the open PRs
+
+No PR merged since #9414.  CI of #9407-#9444 (36 PRs), by job:
+- CodeQL `Analyze` (4 jobs, every PR and develop): ubuntu-latest is
+  26.04, JDK 25 cannot build java-models-library (-source 8, flexible
+  constructors; checked with maven:3-eclipse-temurin-25 vs -21).  New
+  branch pr/codeql-jdk21 (setup-java temurin 21).
+- CompileLinux (#9408, #9411, #9417, #9421): on a kernel cache miss the
+  whole kernel goes through goto-cc and net/ethtool/ioctl.c fails
+  "pointer subtraction over different types" (void * + n was char *).
+  New branch pr/void-pointer-arithmetic-type (also on the working
+  branch, 082656ded0).
+- OpenBSD (#9434): copysign's model calls __signbit (OpenBSD <math.h>),
+  declared only by the model -> callee missing from the function map.
+  New branch pr/link-library-declared-callee (working branch
+  090039e163); #9434 should Depends-on it.  #9434's doxygen warning
+  (`#include' quote) fixed in the branch (3dc97abef8).
+- ARM (#9442): --winx64 test from main.c ran aarch64 gcc -m64; the test
+  now uses main.i (b40a872399).  a57ca4e4b7 (data-model options per gcc
+  family) is the general fix, not yet a PR (conflicts: test tags).
+- Windows (#9438): vsnprintf/exact.desc, unwinding loop 90 (line 346,
+  locally the `-' padding loop) fails with --unwind 30 on MSVC only;
+  not reproducible without UCRT headers.  Open.
+- #9432 vs-2022: Maven download failure (rerun).  perf-benchcomp (5
+  PRs): aws_priority_queue_push solver time noise.
+New PRs-to-be from the working branch, both broken on develop:
+pr/va-start-without-parameter, pr/float-comparison-macros.
+upstream-stack rebuilt on origin/develop (107a1e504c): 41 commits.
