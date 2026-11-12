@@ -6526,22 +6526,33 @@ void smt2_convt::convert_type(const typet &type)
 void smt2_convt::find_symbols(const typet &type)
 {
   std::set<irep_idt> recstack;
-  find_symbols_rec(type, recstack);
+  std::vector<typet> pointee_types;
+  find_symbols_rec(type, recstack, pointee_types);
+
+  // Types reached through a pointer are only processed once the types that
+  // contain the pointer have been declared, see find_symbols_rec.
+  while(!pointee_types.empty())
+  {
+    const typet pointee_type = std::move(pointee_types.back());
+    pointee_types.pop_back();
+    find_symbols_rec(pointee_type, recstack, pointee_types);
+  }
 }
 
 void smt2_convt::find_symbols_rec(
   const typet &type,
-  std::set<irep_idt> &recstack)
+  std::set<irep_idt> &recstack,
+  std::vector<typet> &pointee_types)
 {
   if(type.id()==ID_array)
   {
     const array_typet &array_type=to_array_type(type);
     find_symbols(array_type.size());
-    find_symbols_rec(array_type.element_type(), recstack);
+    find_symbols_rec(array_type.element_type(), recstack, pointee_types);
   }
   else if(type.id()==ID_complex)
   {
-    find_symbols_rec(to_complex_type(type).subtype(), recstack);
+    find_symbols_rec(to_complex_type(type).subtype(), recstack, pointee_types);
 
     if(use_datatypes &&
        datatype_map.find(type)==datatype_map.end())
@@ -6581,7 +6592,7 @@ void smt2_convt::find_symbols_rec(
       to_struct_type(type).components();
 
     for(const auto &component : components)
-      find_symbols_rec(component.type(), recstack);
+      find_symbols_rec(component.type(), recstack, pointee_types);
 
     // Declare the corresponding SMT type if we haven't already.
     if(need_decl)
@@ -6672,20 +6683,28 @@ void smt2_convt::find_symbols_rec(
       to_union_type(type).components();
 
     for(const auto &component : components)
-      find_symbols_rec(component.type(), recstack);
+      find_symbols_rec(component.type(), recstack, pointee_types);
   }
   else if(type.id()==ID_code)
   {
     const code_typet::parameterst &parameters=
       to_code_type(type).parameters();
     for(const auto &param : parameters)
-      find_symbols_rec(param.type(), recstack);
+      find_symbols_rec(param.type(), recstack, pointee_types);
 
-    find_symbols_rec(to_code_type(type).return_type(), recstack);
+    find_symbols_rec(to_code_type(type).return_type(), recstack, pointee_types);
   }
   else if(type.id()==ID_pointer)
   {
-    find_symbols_rec(to_pointer_type(type).base_type(), recstack);
+    // A pointer is a bit-vector, so the type it points to need not be
+    // declared before the type containing the pointer. Processing it right
+    // away would be wrong, though: struct declarations are emitted when their
+    // components have been processed, and a struct reached through a pointer
+    // may contain, by value, a struct whose declaration is still in progress
+    // further up (struct A { struct B *b; }; struct B { struct A a[2]; }).
+    // Its declaration would then refer to a datatype that is not declared
+    // yet, or not even named. Defer it until the current type is done.
+    pointee_types.push_back(to_pointer_type(type).base_type());
   }
   else if(type.id() == ID_struct_tag)
   {
@@ -6696,7 +6715,7 @@ void smt2_convt::find_symbols_rec(
     {
       const auto &base_struct = ns.follow_tag(struct_tag);
       recstack.insert(id);
-      find_symbols_rec(base_struct, recstack);
+      find_symbols_rec(base_struct, recstack, pointee_types);
       datatype_map[type] = datatype_map[base_struct];
     }
   }
@@ -6708,7 +6727,7 @@ void smt2_convt::find_symbols_rec(
     if(recstack.find(id) == recstack.end())
     {
       recstack.insert(id);
-      find_symbols_rec(ns.follow_tag(union_tag), recstack);
+      find_symbols_rec(ns.follow_tag(union_tag), recstack, pointee_types);
     }
   }
   else if(type.id() == ID_state)
@@ -6724,9 +6743,10 @@ void smt2_convt::find_symbols_rec(
     const auto &mathematical_function_type =
       to_mathematical_function_type(type);
     for(auto &d_type : mathematical_function_type.domain())
-      find_symbols_rec(d_type, recstack);
+      find_symbols_rec(d_type, recstack, pointee_types);
 
-    find_symbols_rec(mathematical_function_type.codomain(), recstack);
+    find_symbols_rec(
+      mathematical_function_type.codomain(), recstack, pointee_types);
   }
 }
 

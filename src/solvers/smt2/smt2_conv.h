@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <map>
 #include <set>
 #include <sstream>
+#include <vector>
 
 #if !HASH_CODE
 #  include <util/irep_hash_container.h>
@@ -171,7 +172,15 @@ protected:
   exprt lower_byte_operators(const exprt &expr);
   void find_symbols(const exprt &expr);
   void find_symbols(const typet &type);
-  void find_symbols_rec(const typet &type, std::set<irep_idt> &recstack);
+  /// Declare the types that \p type depends on, and \p type itself.
+  /// \param type: the type to declare
+  /// \param recstack: identifiers of the tagged types already visited
+  /// \param [out] pointee_types: types reached through a pointer, which the
+  ///   caller has to process after \p type
+  void find_symbols_rec(
+    const typet &type,
+    std::set<irep_idt> &recstack,
+    std::vector<typet> &pointee_types);
 
   // letification
   letifyt letify;

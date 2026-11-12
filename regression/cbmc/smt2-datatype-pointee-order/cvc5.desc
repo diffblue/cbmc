@@ -1,0 +1,16 @@
+CORE smt-backend broken-cprover-smt-backend no-new-smt
+main.c
+--cvc5
+^\[main\.assertion\.1\] line 29 holds: SUCCESS$
+^\[main\.assertion\.2\] line 30 nondeterministic: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+map::at
+^warning: ignoring
+--
+Datatype declarations for structs reached through pointers are deferred until
+the struct containing the pointer has been declared. Declaring them right
+away let the declaration of adapter refer to the datatype of ring, which was
+not named yet (map::at) or, once named, not declared yet (unknown sort).
