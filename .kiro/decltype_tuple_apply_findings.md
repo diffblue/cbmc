@@ -16476,3 +16476,47 @@ now converted eagerly); cbmc-cpp total 1222 -> 1242 s.
 Verified on binW218: 13 suites, profiles (z3 complex2 flaky), vacuity
 1063/3, MSVC 3 (libstdcxx-tagged excluded), macOS 142/142, GCC 16 image,
 unit, lint, format, doxygen, iwyu (changed files).
+
+## Round 233 (2026-11-11): open items, user report (8c7b0b7217)
+
+User report, four gaps; reproduced 2-4 (also on binZ2 = 806dcb0324):
+- e6d45100f7 push_back({.a = ..}) with T&& / const T& overloads: the
+  designated list to a reference had no do_initializer path, and the
+  elements arrive already_typechecked-wrapped.
+- b74a4120ce `addr({0, 0})' mem-initializer: tried parenthesized
+  aggregate init with the list as first element, printing errors from a
+  probe that only rolled back the count (goto-cc still exited 0).
+- 6fa9a683ed "lvalue string to &&" turned out to be `std::string("h")'
+  after any std::map<std::string, int> in C++20: the constructor
+  template basic_string(const _CharT *, const _Alloc & = _Alloc()),
+  instantiated during map's class body, deferred its default argument
+  with the transient instantiation scope -> "_Alloc unknown".
+- Gap 1 (std::map<an enumeration, uint32_t>, "_M_t unknown") not
+  reproduced with enum/typedef/extern "C"/member-init variants.
+Found while reproducing:
+- 531f0ed62e `friend _Sp_atomic<shared_ptr<_Tp>>;' instantiated the
+  class (C++20 <memory> + <condition_variable> rejected) -- a REGRESSION
+  of round 232's removal of the system-header suppression; the suites
+  never combined those headers.
+- 2a1979f089 constrained alias templates (libstdc++ C++20 _BoundedArray)
+  ignored their requires-clause: make_shared<mutex>() picked the array
+  overload, nondet result.
+Open items of round 232:
+- a8a2105c05 failed static_assert in an instantiation is an error; user
+  templates' bodies no longer converted with suppressed diagnostics.
+  Needed a3ac16e90f (expr2cpp printed a C++ lambda as lambda_exprt,
+  invariant).  KNOWNBUG cpp20_lambda_in_diagnostic/test_rejected: a hard
+  error in a constraint's instantiation is taken as unsatisfied.
+- 783faa213b _Sp_counted_ptr_inplace copy ctor drop: pre-C++17
+  direct-init via a converting constructor template built a temporary
+  and copied it.
+- a8fd28526c, ff836185e8 sto*(wstring): C library wcslen, wmem*,
+  wcsto*; libc++ models narrow the wstring.
+- thread::join/detach, transform_view iterator: no longer dropped.
+- [temp.constr.decl]/3.3 order (type-constraints before requires-clause):
+  tried, no observable effect on tests, reverted.  explicit(cond) and
+  out-of-class matching fallbacks unchanged.
+- 378c371ee2 Doxygen warnings in f669e3f4cd's comments.
+Verified on binW220: 13 suites, profiles (z3 complex2 flaky), vacuity
+1063/3, MSVC 3/3 (4 libstdcxx-tagged skipped), macOS 142/142, GCC 16
+image, unit, lint, format, doxygen, iwyu (changed files).
