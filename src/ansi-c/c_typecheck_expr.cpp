@@ -1484,15 +1484,20 @@ void c_typecheck_baset::typecheck_expr_rel(
       return;
     }
 
-    // pointer and integer
+    // pointer and integer: a constraint violation (C11 6.5.8p2, 6.5.9p2),
+    // which GCC and Clang accept with a warning
     if(type0.id()==ID_pointer && is_number(type1))
     {
+      warning().source_location = expr.source_location();
+      warning() << "comparison between pointer and integer" << eom;
       op1 = typecast_exprt(op1, type0);
       return;
     }
 
     if(type1.id()==ID_pointer && is_number(type0))
     {
+      warning().source_location = expr.source_location();
+      warning() << "comparison between pointer and integer" << eom;
       op0 = typecast_exprt(op0, type1);
       return;
     }
