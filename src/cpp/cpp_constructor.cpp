@@ -842,7 +842,17 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
         {
           converts = false;
         }
-        if(converts && converted.is_not_nil())
+        // [dcl.init.general]/16.6.2.1: if the conversion found is a
+        // constructor of T itself (a converting constructor template such
+        // as libstdc++'s `_Sp_counted_ptr_inplace(_Alloc, _Args &&...)'),
+        // the object is initialized by that constructor -- the overload
+        // resolution below selects it.  Taking the temporary it built and
+        // copying it into the object needed T's copy constructor (deleted
+        // there) before C++17's guaranteed elision.
+        const bool by_own_constructor =
+          converted.id() == ID_side_effect &&
+          converted.get(ID_statement) == ID_temporary_object;
+        if(converts && converted.is_not_nil() && !by_own_constructor)
         {
           already_typechecked_exprt::make_already_typechecked(converted);
           return cpp_constructor(source_location, object, {converted});
