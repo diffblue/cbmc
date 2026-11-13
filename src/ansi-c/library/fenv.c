@@ -27,18 +27,27 @@ __CPROVER_HIDE:;
 int fesetround(int rounding_mode)
 {
 __CPROVER_HIDE:;
-  // CPROVER uses the x86 numbering of the rounding modes
-  __CPROVER_rounding_mode=
-    #ifdef FE_DOWNWARD
-    rounding_mode==FE_DOWNWARD?1:
-    #endif
-    rounding_mode==FE_TONEAREST?0:
-    rounding_mode==FE_TOWARDZERO?3:
-    #ifdef FE_UPWARD
-    rounding_mode==FE_UPWARD?2:
-    #endif
-    0;
-  return 0; // we never fail
+  // CPROVER uses the x86 numbering of the rounding modes.
+  // C11 7.6.3.2p2: "If the argument is not equal to the value of a
+  // rounding direction macro, the rounding direction is not changed."
+  // C11 7.6.3.2p3: "The fesetround function returns zero if and only
+  // if the requested rounding direction was established."
+  int cprover_mode =
+#ifdef FE_DOWNWARD
+    rounding_mode == FE_DOWNWARD ? 1 :
+#endif
+    rounding_mode == FE_TONEAREST    ? 0
+    : rounding_mode == FE_TOWARDZERO ? 3
+    :
+#ifdef FE_UPWARD
+    rounding_mode == FE_UPWARD ? 2
+                               :
+#endif
+                               -1;
+  if(cprover_mode < 0)
+    return -1;
+  __CPROVER_rounding_mode = cprover_mode;
+  return 0;
 }
 
 /* FUNCTION: feraiseexcept */
