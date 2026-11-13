@@ -4391,6 +4391,27 @@ const symbolt &cpp_typecheckt::instantiate_template(
   std::cout << "instantiate_template: " << template_symbol.name << '\n';
 #endif
 
+  // N5008 [temp.pre]/6: a template (hence each of its specializations) has
+  // C++ language linkage; the language linkage of the point of
+  // instantiation ([dcl.link]/5, `extern "C" { struct S { box<int> b; }; }')
+  // does not apply to the declarations it instantiates.  Under C linkage the
+  // out-of-line definition of a member function became a function of that
+  // name without `this', and calls of the member did not resolve.
+  struct linkage_guardt
+  {
+    irep_idt &linkage;
+    const irep_idt saved;
+    explicit linkage_guardt(irep_idt &_linkage)
+      : linkage(_linkage), saved(_linkage)
+    {
+      linkage = ID_auto;
+    }
+    ~linkage_guardt()
+    {
+      linkage = saved;
+    }
+  } linkage_guard{current_linkage_spec};
+
   if(instantiation_stack.size() == MAX_DEPTH)
   {
     show_instantiation_stack(error());
