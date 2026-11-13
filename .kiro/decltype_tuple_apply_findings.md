@@ -16549,3 +16549,24 @@ No PR merged since #9414.  CI of #9407-#9444 (36 PRs), by job:
 New PRs-to-be from the working branch, both broken on develop:
 pr/va-start-without-parameter, pr/float-comparison-macros.
 upstream-stack rebuilt on origin/develop (107a1e504c): 41 commits.
+
+## Round 235 (2026-11-12): user report, std::map in an extern "C" struct
+
+Reproducers from the reporter (C header used from C++, std::map member
+of a typedef'd struct in an extern "C" block):
+- e6d00ba6d7 instantiate_template runs with C++ linkage
+  ([temp.pre]/6): out-of-line members of class templates first
+  instantiated inside extern "C" lost `this' (7 of 9 errors of the TU).
+- 300846eb94 a variable hides a class of the same name
+  ([basic.lookup.general]/4): `typedef struct cfg {...} cfg_t; cfg_t cfg;'.
+- 5ef7e2b35b a designated clause in a braced call argument was checked
+  twice ("basic_string & to basic_string &&"; in C++20 shown as a
+  std::vector instantiation failure).
+All reproducers now compile with goto-cc in C++17 and C++20 and verify.
+Not fixed: a mechanically reduced file without <new> calls the sized
+::operator delete, which [basic.stc.dynamic.general]/2 declares
+implicitly; only operator new(size_t) and operator delete(void *) are.
+#9434 got Depends-on: #9463.
+Verified on binW221: 13 suites, profiles (z3 complex2 flaky), vacuity
+1063/3, MSVC 3/3, macOS 142/142, GCC 16 image, unit, lint, format,
+doxygen, iwyu (changed files).
