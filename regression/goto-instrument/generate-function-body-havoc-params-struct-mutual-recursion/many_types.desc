@@ -1,0 +1,12 @@
+CORE
+many_types.c
+--generate-function-body make --generate-function-body-options havoc --max-dynamic-object-instances 100
+^EXIT=0$
+^SIGNAL=0$
+nondet initialisation reached the limit of 100 dynamic objects \(--max-dynamic-object-instances\); further pointers are null$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Without a limit on the number of objects, generating the body of make does
+not finish.

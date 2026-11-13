@@ -26,7 +26,8 @@ exprt::operandst build_function_environment(
   const code_typet::parameterst &parameters,
   code_blockt &init_code,
   symbol_table_baset &symbol_table,
-  const c_object_factory_parameterst &object_factory_parameters)
+  const c_object_factory_parameterst &object_factory_parameters,
+  message_handlert &message_handler)
 {
   exprt::operandst main_arguments;
   main_arguments.resize(parameters.size());
@@ -46,7 +47,8 @@ exprt::operandst build_function_environment(
       p.type(),
       p.source_location(),
       object_factory_parameters,
-      lifetimet::AUTOMATIC_LOCAL);
+      lifetimet::AUTOMATIC_LOCAL,
+      message_handler);
   }
 
   return main_arguments;
@@ -502,7 +504,11 @@ bool generate_ansi_c_start_function(
   {
     // produce nondet arguments
     call_main.arguments() = build_function_environment(
-      parameters, init_code, symbol_table, object_factory_parameters);
+      parameters,
+      init_code,
+      symbol_table,
+      object_factory_parameters,
+      message_handler);
   }
 
   init_code.add(std::move(call_main));

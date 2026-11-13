@@ -16,6 +16,8 @@ Author: Diffblue Ltd.
 
 #include <set>
 
+class message_handlert;
+
 struct c_object_factory_parameterst;
 
 class symbol_factoryt
@@ -28,6 +30,16 @@ class symbol_factoryt
   allocate_objectst allocate_objects;
 
   const lifetimet lifetime;
+
+  /// Number of dynamic objects this factory has allocated.  A fresh
+  /// `symbol_factoryt` is constructed for each nondet-init root, so comparing
+  /// this with `object_factory_params.max_dynamic_object_instances` limits
+  /// the number of objects per root.
+  std::size_t dynamic_object_instance_count = 0;
+
+  /// Whether a pointer was initialised to NULL because of
+  /// `object_factory_params.max_dynamic_object_instances`.
+  bool dynamic_object_limit_reached = false;
 
 public:
   typedef std::set<irep_idt> recursion_sett;
@@ -53,6 +65,17 @@ public:
     const std::size_t depth = 0,
     recursion_sett recursion_set = recursion_sett(),
     const bool assign_const = true);
+
+  /// Whether any pointer was initialised to NULL, rather than to a fresh
+  /// object, because the limit on the number of dynamic objects
+  /// (`--max-dynamic-object-instances`) was reached.
+  bool limit_reached() const
+  {
+    return dynamic_object_limit_reached;
+  }
+
+  /// Warn, via \p message_handler, if limit_reached().
+  void warn_if_limit_reached(message_handlert &message_handler) const;
 
   void add_created_symbol(const symbolt &symbol)
   {
@@ -90,6 +113,7 @@ symbol_exprt c_nondet_symbol_factory(
   const typet &type,
   const source_locationt &,
   const c_object_factory_parameterst &object_factory_parameters,
-  const lifetimet lifetime);
+  const lifetimet lifetime,
+  message_handlert &message_handler);
 
 #endif // CPROVER_ANSI_C_C_NONDET_SYMBOL_FACTORY_H
