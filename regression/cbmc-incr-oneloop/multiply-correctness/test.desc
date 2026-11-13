@@ -1,0 +1,18 @@
+CORE
+main.c
+--no-standard-checks
+\[test_factor_narrow\.assertion\.1\].*narrow factor.*FAILURE
+\[test_prime_narrow\.assertion\.1\].*narrow prime.*SUCCESS
+\[test_factor_wide\.assertion\.1\].*wide factor.*FAILURE
+\[test_prime_wide\.assertion\.1\].*wide prime.*SUCCESS
+\[test_commutativity\.assertion\.1\].*commutativity.*SUCCESS
+\[test_not_equal\.assertion\.1\].*mul != add.*FAILURE
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Multiplication correctness: verifies that factoring composites finds factors,
+factoring primes does not, commutativity holds, and mul != add.
+Tests both narrow (same-width) and wide (double-width) multiplication.
