@@ -280,7 +280,7 @@ replace_expr_copy(const union_find_replacet &symbol_resolve, exprt expr)
 /// the boolean is true and false otherwise.
 /// \param expr: an expression of type `bool`
 /// \param value: the boolean value to set it to
-void string_refinementt::set_to(const exprt &expr, bool value)
+void string_refinementt::do_set_to(const exprt &expr, bool value)
 {
   PRECONDITION(expr.is_boolean());
   PRECONDITION(equality_propagation);
@@ -735,7 +735,7 @@ string_refinementt::dec_solve(const exprt &assumption)
 #ifdef DEBUG
     log.debug() << "dec_solve: set_to " << format(eq) << messaget::eom;
 #endif
-    supert::set_to(eq, true);
+    supert::do_set_to(eq, true);
   }
 
   std::transform(

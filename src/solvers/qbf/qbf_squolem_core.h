@@ -34,7 +34,7 @@ public:
 
   void set_debug_filename(const std::string &str);
 
-  void lcnf(const bvt &bv) override;
+  void do_lcnf(const bvt &bv) override;
   void add_quantifier(const quantifiert &quantifier) override;
   void set_quantifier(const quantifiert::typet type, const literalt l) override;
   void set_no_variables(size_t no) override;

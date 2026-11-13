@@ -119,7 +119,7 @@ void satcheck_minisat1_baset::add_variables()
     solver->newVar();
 }
 
-void satcheck_minisat1_baset::lcnf(const bvt &bv)
+void satcheck_minisat1_baset::do_lcnf(const bvt &bv)
 {
   bvt new_bv;
 

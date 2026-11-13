@@ -48,7 +48,7 @@ std::string satcheck_picosatt::solver_text() const
   return "PicoSAT";
 }
 
-void satcheck_picosatt::lcnf(const bvt &bv)
+void satcheck_picosatt::do_lcnf(const bvt &bv)
 {
   bvt new_bv;
 

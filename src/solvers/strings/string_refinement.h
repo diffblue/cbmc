@@ -83,7 +83,7 @@ public:
   }
 
   exprt get(const exprt &expr) const override;
-  void set_to(const exprt &expr, bool value) override;
+  void do_set_to(const exprt &expr, bool value) override;
 
 protected:
   decision_proceduret::resultt dec_solve(const exprt &) override;

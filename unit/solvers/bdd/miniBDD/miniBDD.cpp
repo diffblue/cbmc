@@ -130,7 +130,7 @@ public:
     return to_literal((to_bdd(!c) | to_bdd(t)) & (to_bdd(c) | to_bdd(f)));
   }
 
-  void lcnf(const bvt &) override
+  void do_lcnf(const bvt &) override
   {
     UNREACHABLE;
   }
