@@ -35,6 +35,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_util.h"
 #include "itanium_abi_cpp_zero_initializer.h"
 
+#include <algorithm>
+
 /// N5008 [stmt.return]/2 + [dcl.init.list]/3.4 + [dcl.init.aggr]: decide
 /// whether a braced-init-list return operand aggregate-initializes the
 /// (class) return type, and if so build the initialization.
@@ -68,6 +70,42 @@ std::optional<exprt> cpp_typecheckt::braced_return_aggregate_value(
     if(c.type().get_bool("#is_implicit_ctor"))
       continue;
     return {};
+  }
+
+  // [dcl.init.aggr]/3.1: a designated-initializer-list names the elements
+  // it initializes, the others are initialized from their default member
+  // initializers or value-initialized (/5).  The element-wise assignment
+  // below is positional (it converted `.e = v' as a whole to the first
+  // member's type); aggregate_member_initialization pairs the designators
+  // with the members and constructs the class-type members in place.
+  if(struct_type.bases().empty())
+  {
+    const bool designated = std::any_of(
+      init_list.operands().begin(),
+      init_list.operands().end(),
+      [](const exprt &op)
+      {
+        const exprt &element =
+          op.id() == ID_already_typechecked ? to_unary_expr(op).op() : op;
+        return element.id() == ID_designated_initializer;
+      });
+    if(designated)
+    {
+      const exprt::operandst ops = init_list.operands();
+      const struct_typet struct_copy = struct_type;
+      exprt new_object{ID_new_object, return_type};
+      new_object.set(ID_C_lvalue, true);
+      new_object.add_source_location() = init_list.source_location();
+      code_blockt block;
+      aggregate_member_initialization(
+        new_object, struct_copy, ops, init_list.source_location(), block);
+      side_effect_exprt temporary{
+        ID_temporary_object, return_type, init_list.source_location()};
+      temporary.set(ID_mode, ID_cpp);
+      temporary.set(ID_C_lvalue, true);
+      temporary.add(ID_initializer) = std::move(block);
+      return std::move(temporary);
+    }
   }
 
   for(auto &op : init_list.operands())
