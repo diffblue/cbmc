@@ -126,6 +126,9 @@ protected:
   const namespacet &ns;
   /// The number of times `dec_solve()` has been called.
   size_t number_of_solver_calls;
+  /// The number of currently active pushed solver contexts. Used to
+  /// validate that pop() is not called on an empty stack.
+  std::size_t number_of_pushed_contexts = 0;
   /// \brief For handling the lifetime of and communication with the separate
   ///   SMT solver process.
   /// \note This may be mocked for unit testing purposes.
