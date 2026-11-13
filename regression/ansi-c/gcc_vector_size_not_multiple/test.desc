@@ -1,0 +1,13 @@
+CORE gcc-only
+main.c
+
+^EXIT=1$
+^SIGNAL=0$
+error: vector size \(3\) expected to be multiple of base type size \(4\)$
+^CONVERSION ERROR$
+--
+^warning: ignoring
+^VERIFICATION
+--
+vector_size in bytes must be a multiple of the base type size; this guards the
+byte-size branch shared with the neon_vector_type lane-count handling.

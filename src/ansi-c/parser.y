@@ -168,6 +168,7 @@ int yyansi_cerror(const std::string &error);
 %token TOK_GCC_ATTRIBUTE_TRANSPARENT_UNION "transparent_union"
 %token TOK_GCC_ATTRIBUTE_PACKED "packed"
 %token TOK_GCC_ATTRIBUTE_VECTOR_SIZE "vector_size"
+%token TOK_GCC_ATTRIBUTE_NEON_VECTOR_TYPE "neon_vector_type"
 %token TOK_GCC_ATTRIBUTE_MODE "mode"
 %token TOK_GCC_ATTRIBUTE_GNU_INLINE "__gnu_inline__"
 %token TOK_GCC_ATTRIBUTE_WEAK "weak"
@@ -1704,6 +1705,8 @@ gcc_type_attribute:
         { $$=$1; set($$, ID_transparent_union); }
         | TOK_GCC_ATTRIBUTE_VECTOR_SIZE '(' comma_expression ')'
         { $$=$1; set($$, ID_frontend_vector); parser_stack($$).add(ID_size)=parser_stack($3); }
+        | TOK_GCC_ATTRIBUTE_NEON_VECTOR_TYPE '(' comma_expression ')'
+        { $$=$1; set($$, ID_frontend_vector); parser_stack($$).add(ID_size)=parser_stack($3); parser_stack($$).set(ID_C_vector_size_is_lanes, true); }
         | TOK_GCC_ATTRIBUTE_ALIGNED
         { $$=$1; set($$, ID_aligned); }
         | TOK_GCC_ATTRIBUTE_ALIGNED '(' comma_expression ')'
