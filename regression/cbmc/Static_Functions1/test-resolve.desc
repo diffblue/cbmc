@@ -1,0 +1,16 @@
+CORE
+resolve_main.c
+resolve_a.c resolve_b.c
+^\[main\.assertion\.1\] line 18 assertion fa\(\) == 1: SUCCESS$
+^\[main\.assertion\.2\] line 19 assertion fb\(\) == 2: SUCCESS$
+^\[main\.assertion\.3\] line 20 assertion f\(\) == 3: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Two translation units define a file-local (static) function named f, and a
+third defines a global f. Each call must resolve to the definition mandated
+by the C standard: the file-local calls stay within their unit, and the call
+from the unit defining the global f reaches that global.
