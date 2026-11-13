@@ -1,0 +1,12 @@
+CORE
+main.cpp
+--cpp11
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+dropped the body
+--
+Character literal types per [lex.ccon]: ordinary is char, multichar is int,
+and L/u/U yield wchar_t/char16_t/char32_t.

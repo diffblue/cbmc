@@ -7,6 +7,7 @@ use File::Basename;
 use Term::ANSIColor;
 
 use Cwd;
+use POSIX qw(:sys_wait_h);
 
 my $has_thread_pool = eval
 {
@@ -56,7 +57,11 @@ sub run($$$$$$) {
       # timeout, then exec the test command.
       setpgrp(0, 0);
       # see https://github.com/git-for-windows/msys2-runtime/pull/11/files
-      exec("bash", "-c", "cd '$name' ; MSYS_NO_PATHCONV=1 $cmdline");
+      my $memlimit_prefix = "";
+      if($ENV{CBMC_TEST_MEMLIMIT}) {
+        $memlimit_prefix = "ulimit -v $ENV{CBMC_TEST_MEMLIMIT} ; ";
+      }
+      exec("bash", "-c", "${memlimit_prefix}cd '$name' ; MSYS_NO_PATHCONV=1 $cmdline");
       die "exec failed: $!";
     }
 
@@ -78,7 +83,31 @@ sub run($$$$$$) {
   } else {
     # Windows or no timeout: use simple system() call.
     # see https://github.com/git-for-windows/msys2-runtime/pull/11/files
-    system("bash", "-c", "cd '$name' ; MSYS_NO_PATHCONV=1 $cmdline");
+    my $memlimit_prefix = "";
+    if($ENV{CBMC_TEST_MEMLIMIT}) {
+      $memlimit_prefix = "ulimit -v $ENV{CBMC_TEST_MEMLIMIT} ; ";
+    }
+    my @command =
+      ("bash", "-c", "${memlimit_prefix}cd '$name' ; MSYS_NO_PATHCONV=1 $cmdline");
+    # Native Windows perl cannot fork: start the test asynchronously
+    # (perlport: system(1, LIST) returns the process ID), poll for it, and
+    # once the timeout expires end the whole process tree -- bash and the
+    # tool it started -- with taskkill.
+    my $pid = ($timeout && $^O eq 'MSWin32') ? system(1, @command) : -1;
+    if($pid > 0) {
+      my $deadline = time() + $timeout;
+      while(waitpid($pid, WNOHANG) == 0) {
+        if(time() >= $deadline) {
+          $timed_out = 1;
+          system("taskkill /T /F /PID $pid >NUL 2>&1");
+          waitpid($pid, 0);
+          last;
+        }
+        select(undef, undef, undef, 0.25);
+      }
+    } else {
+      system(@command);
+    }
   }
 
   $exit_value = $? >> 8;

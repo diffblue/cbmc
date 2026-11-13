@@ -1,0 +1,22 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ specialization: SUCCESS$
+^\[main\.assertion\.2\] line \d+ its bound: SUCCESS$
+^\[main\.assertion\.3\] line \d+ primary: SUCCESS$
+^\[main\.assertion\.4\] line \d+ static storage duration: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+already declared with different type
+--
+An explicit specialization of a variable template got the flags of a local
+variable (its declaring scope is the template scope of `template <>'), so
+it was never initialized; and the implicit instantiation of the primary
+template for the same arguments, with an array of unknown bound, was
+rejected as a conflicting redeclaration.  The MSVC STL's from_chars
+(__DIGIT_TABLE) failed on VS 2022.

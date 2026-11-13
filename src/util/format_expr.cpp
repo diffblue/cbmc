@@ -185,7 +185,15 @@ static std::ostream &format_rec(std::ostream &os, const constant_exprt &src)
   else if(
     type == ID_unsignedbv || type == ID_signedbv || type == ID_c_bool ||
     type == ID_c_bit_field)
-    return os << *numeric_cast<mp_integer>(src);
+  {
+    if(const auto int_value = numeric_cast<mp_integer>(src))
+      return os << *int_value;
+    // to_integer cannot interpret a bit-field whose underlying type is an
+    // enumeration tag (C++ [class.bit]/4) without a namespace; print the
+    // bits as an unsigned value
+    const std::size_t width = to_bitvector_type(src.type()).get_width();
+    return os << bvrep2integer(src.get_value(), width, false);
+  }
   else if(type == ID_bv)
   {
     // These do not have a numerical interpretation.

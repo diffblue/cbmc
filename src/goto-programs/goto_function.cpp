@@ -41,9 +41,13 @@ void goto_functiont::validate(const namespacet &ns, const validation_modet vm)
 {
   for(const auto &identifier : parameter_identifiers)
   {
+    const symbolt *param_symbol = nullptr;
+    if(!identifier.empty())
+      ns.lookup(identifier, param_symbol);
     DATA_CHECK_WITH_DIAGNOSTICS(
       vm,
-      identifier.empty() || ns.lookup(identifier).is_parameter,
+      identifier.empty() || param_symbol == nullptr ||
+        param_symbol->is_parameter,
       "parameter should be marked 'is_parameter' in the symbol table",
       "affected parameter: ",
       identifier);

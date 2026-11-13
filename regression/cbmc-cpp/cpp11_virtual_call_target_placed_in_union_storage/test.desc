@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ call: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dereference failure: .*: FAILURE$
+--
+The virtual pointer of an object placement-constructed in a union with a
+pointer-array member was read back with an unknown target: the value set
+of the union's field-sensitive members was looked up under the plain
+member name.  MSVC's std::function failed its dereference checks in _Tidy
+and the call operator (cpp11_std_function_zero_argument on VS 2022).

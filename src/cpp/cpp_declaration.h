@@ -54,9 +54,16 @@ public:
 
   bool is_class_template() const
   {
-    return is_template() &&
-           type().id()==ID_struct &&
+    const typet *t = &type();
+    while(t->id() == ID_merged_type)
+      t = &to_type_with_subtypes(*t).subtypes().back();
+    return is_template() && (t->id() == ID_struct || t->id() == ID_union) &&
            declarators().empty();
+  }
+
+  bool is_template_alias() const
+  {
+    return is_template() && is_typedef();
   }
 
   const declaratorst &declarators() const

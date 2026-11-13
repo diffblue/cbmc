@@ -85,7 +85,11 @@ exprt is_not_zero(
   irep_idt id=
     src_type.id()==ID_floatbv?ID_ieee_float_notequal:ID_notequal;
 
-  exprt zero=from_integer(0, src_type);
+  exprt zero;
+  if(src_type.id() == ID_pointer)
+    zero = null_pointer_exprt(to_pointer_type(src_type));
+  else
+    zero = from_integer(0, src_type);
   // Use tag type if applicable:
   zero.type() = src.type();
 
@@ -103,8 +107,13 @@ exprt boolean_negate(const exprt &src)
     return false_exprt();
   else if(src == false)
     return true_exprt();
-  else
+  else if(src.is_boolean())
     return not_exprt(src);
+  else
+  {
+    // Cast non-boolean expressions to bool before negating.
+    return not_exprt(typecast_exprt(src, bool_typet()));
+  }
 }
 
 bool has_subexpr(

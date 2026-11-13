@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ assignment operator template defined: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+no body for callee
+--
+Among the out-of-class definitions of same-named member templates, the one
+with the most template parameters was preferred before the owning class
+was compared, so another class template's operator= hid fn's own
+definition and fn<int>::operator=<F> had no body.  libc++'s
+std::unordered_multimap::operator= hid that of std::function.

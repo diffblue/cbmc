@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--pointer-check
+^\[main\.assertion\.1\] line \d+ temporary alive: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+dead object in .*: FAILURE$
+--
+N5008 [class.temporary]/4: goto conversion destroyed the temporaries of a
+function call's operands right after the call, also when the call was the
+initializer of a temporary object (view's constructor here) that the
+enclosing full-expression still uses.  g++ 13 and clang++ 18 accept this
+program, and it fails only its WRONG assertion.

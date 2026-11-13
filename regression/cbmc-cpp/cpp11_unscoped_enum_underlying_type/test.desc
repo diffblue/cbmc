@@ -1,0 +1,18 @@
+CORE gnu-extensions
+main.cpp
+--cpp11
+^\[main\.assertion\.6\] line \d+ unsigned one-bit bit-field: SUCCESS$
+^\[main\.assertion\.7\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The underlying type of an unscoped enumeration without enum-base was always
+int, so (F)-1 was negative, a one-bit bit-field of enumeration type could not
+hold the value 1, and a mode(byte) enumeration was a signed char: an array of
+size (M)255 had size -1, which failed an invariant in static_lifetime_init.
+Integral promotion of such enumerations was always to int.

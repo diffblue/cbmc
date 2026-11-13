@@ -1,0 +1,24 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ first template: SUCCESS$
+^\[main\.assertion\.2\] line \d+ second template: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [temp.over.link]/6-7: function templates whose template-heads are
+not equivalent -- here they differ only in the condition of the
+enable_if type of a defaulted constant template parameter -- are
+distinct overloads, and [temp.deduct.general]/5,8: substituting the
+explicitly specified arguments (and the defaults) into one of them may
+fail, which only removes that candidate.  The front end keeps the
+second template as the `#sfinae_alt' of the first and tried it only for
+calls deducing from function arguments; with explicit template
+arguments (`f<char>()') the first failed and the call had no candidate
+("found no match for symbol 'f'").  Fails on the round-163 build bin52.

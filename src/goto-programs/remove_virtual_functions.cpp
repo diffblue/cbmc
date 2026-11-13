@@ -308,6 +308,13 @@ static goto_programt::targett replace_virtual_function_with_dispatch_table(
 
   code_function_callt code(
     target->call_lhs(), target->call_function(), target->call_arguments());
+  // A call-site unwind cleanup emitted by the C++ goto conversion follows the
+  // original call; the C++ exception lowering must not add its own dispatch
+  // after the per-candidate concrete calls either (it would jump to a handler
+  // before the cleanup's destructors run).  Every branch jumps to t_final,
+  // which precedes the cleanup, so the cleanup still guards all of them.
+  if(target->code().get_bool("#cpp_unwind_cleanup_follows"))
+    code.set("#cpp_unwind_cleanup_follows", true);
   goto_programt new_code_for_this_argument;
 
   process_this_argument(

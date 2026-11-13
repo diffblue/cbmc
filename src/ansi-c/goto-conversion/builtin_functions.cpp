@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 #include <util/expr_initializer.h>
 #include <util/expr_util.h>
+#include <util/floatbv_expr.h>
 #include <util/fresh_symbol.h>
 #include <util/mathematical_expr.h>
 #include <util/mathematical_types.h>
@@ -518,7 +519,93 @@ void goto_convertt::cpp_new_initializer(
   {
     if(rhs.get_statement() == "cpp_new[]")
     {
-      // build loop
+      // Per [expr.new]/24: for an array new-expression with N elements,
+      // the constructor is invoked on each element in turn.  Expand the
+      // per-element initializer into a loop over the N elements:
+      //
+      //   size_t __i = 0;
+      // top: if(__i >= count) goto done;
+      //   <initializer on *(lhs + __i)>
+      //   __i = __i + 1;
+      //   goto top;
+      // done:
+      const pointer_typet &ptr_type = to_pointer_type(rhs.type());
+      const typet &element_type = ptr_type.base_type();
+
+      exprt count = static_cast<const exprt &>(rhs.find(ID_size));
+      if(count.is_nil())
+        UNREACHABLE;
+
+      const typet count_type = count.type();
+
+      const symbolt &index_symbol = get_fresh_aux_symbol(
+        count_type,
+        tmp_symbol_prefix,
+        "new_array_index",
+        rhs.find_source_location(),
+        ID_cpp,
+        symbol_table);
+      const symbol_exprt index_expr = index_symbol.symbol_expr();
+
+      // N5008 [expr.new]/24, [dcl.init.aggr]/4: the elements given by a
+      // braced-init-list (`new T[n]{e1, ..., ek}') are initialized from
+      // them; the loop below initializes the remaining ones
+      const irept &element_initializers = rhs.find("#element_initializers");
+      std::size_t listed = 0;
+      for(const auto &element_initializer : element_initializers.get_sub())
+      {
+        const plus_exprt element_address{
+          typecast_exprt::conditional_cast(lhs, pointer_type(element_type)),
+          from_integer(listed, count_type)};
+        exprt code = static_cast<const exprt &>(element_initializer);
+        replace_new_object(
+          dereference_exprt{element_address, element_type}, code);
+        if(code.id() == ID_code)
+          convert(to_code(code), dest, ID_cpp);
+        ++listed;
+      }
+
+      dest.add(goto_programt::make_decl(index_expr, rhs.source_location()));
+      dest.add(goto_programt::make_assignment(
+        index_expr, from_integer(listed, count_type), rhs.source_location()));
+
+      // Pre-create the targets of the loop
+      goto_programt loop;
+      goto_programt::targett loop_top =
+        loop.add(goto_programt::make_skip(rhs.source_location()));
+
+      // condition: if(__i >= count) goto done
+      auto cond_goto = goto_programt::make_incomplete_goto(
+        binary_relation_exprt{index_expr, ID_ge, count}, rhs.source_location());
+      goto_programt::targett cond = loop.add(std::move(cond_goto));
+
+      // body: <initializer on *(lhs + __i)>
+      const plus_exprt element_address{
+        typecast_exprt::conditional_cast(lhs, pointer_type(element_type)),
+        index_expr};
+      const dereference_exprt element_deref{element_address, element_type};
+
+      exprt per_element = initializer;
+      replace_new_object(element_deref, per_element);
+      if(per_element.id() == ID_code)
+        convert(to_code(per_element), loop, ID_cpp);
+
+      // ++__i; goto loop_top
+      loop.add(goto_programt::make_assignment(
+        index_expr,
+        plus_exprt{index_expr, from_integer(1, count_type)},
+        rhs.source_location()));
+      loop.add(goto_programt::make_goto(
+        loop_top, true_exprt{}, rhs.source_location()));
+
+      goto_programt::targett loop_end =
+        loop.add(goto_programt::make_skip(rhs.source_location()));
+
+      // now rewire the conditional jump to loop_end
+      cond->complete_goto(loop_end);
+
+      dest.destructive_append(loop);
+      dest.add(goto_programt::make_dead(index_expr, rhs.source_location()));
     }
     else if(rhs.get_statement() == ID_cpp_new)
     {
@@ -527,7 +614,8 @@ void goto_convertt::cpp_new_initializer(
         lhs, to_pointer_type(rhs.type()).base_type());
 
       replace_new_object(deref_lhs, initializer);
-      convert(to_code(initializer), dest, ID_cpp);
+      if(initializer.id() == ID_code)
+        convert(to_code(initializer), dest, ID_cpp);
     }
     else
       UNREACHABLE;
@@ -872,6 +960,19 @@ void goto_convertt::do_function_call_symbol(
       lhs.is_not_nil() &&
       to_code_type(symbol->type).return_type().id() == ID_empty)
     {
+      function_call.lhs().make_nil();
+    }
+
+    // For constructor calls used as values (e.g., return Foo(args)),
+    // the lhs is the temporary object. Transform to:
+    // constructor(address_of(lhs), args) with nil lhs.
+    if(
+      lhs.is_not_nil() &&
+      to_code_type(symbol->type).return_type().id() == ID_constructor)
+    {
+      exprt this_arg = address_of_exprt(function_call.lhs());
+      function_call.arguments().insert(
+        function_call.arguments().begin(), std::move(this_arg));
       function_call.lhs().make_nil();
     }
 
@@ -1400,8 +1501,23 @@ void goto_convertt::do_function_call_symbol(
 
     side_effect_exprt rhs{
       ID_va_start, dest_expr.type(), function.source_location()};
-    rhs.add_to_operands(
-      typecast_exprt{address_of_exprt{arguments[1]}, dest_expr.type()});
+    // C23 7.16.1.4 (and C++26 [cstdarg.syn]): va_start(ap, ...) ignores any
+    // argument after ap, and GCC's <stdarg.h> then expands it to
+    // __builtin_va_start(ap, 0).  For an argument that is not an object
+    // (a null pointer here) symex starts the variadic arguments after the
+    // last named parameter, as it does for an object that is not a
+    // parameter.
+    const exprt &parm_n = skip_typecast(arguments[1]);
+    if(parm_n.id() == ID_symbol)
+    {
+      rhs.add_to_operands(
+        typecast_exprt{address_of_exprt{arguments[1]}, dest_expr.type()});
+    }
+    else
+    {
+      rhs.add_to_operands(typecast_exprt{
+        null_pointer_exprt{pointer_type(empty_typet{})}, dest_expr.type()});
+    }
 
     dest.add(goto_programt::make_assignment(
       std::move(dest_expr), std::move(rhs), function.source_location()));
@@ -1442,62 +1558,59 @@ void goto_convertt::do_function_call_symbol(
     identifier == "__builtin_islessgreater" ||
     identifier == "__builtin_isunordered")
   {
-    // these support two double or two float arguments; we call the
-    // appropriate internal version
+    // C17 7.12.14: the comparison macros, for any real floating types
+    // (libstdc++'s <cmath> calls them for float, double and long double).
+    // They do not raise the invalid floating-point exception for unordered
+    // arguments, which CBMC does not model; so they are the relations.
     if(
-      arguments.size() != 2 ||
-      (arguments[0].type() != double_type() &&
-       arguments[0].type() != float_type()) ||
-      (arguments[1].type() != double_type() &&
-       arguments[1].type() != float_type()))
+      arguments.size() != 2 || arguments[0].type().id() != ID_floatbv ||
+      arguments[1].type().id() != ID_floatbv)
     {
       error().source_location = function.find_source_location();
       error() << "'" << identifier
-              << "' expected to have two float/double arguments" << eom;
+              << "' expected to have two floating-point arguments" << eom;
       throw 0;
     }
 
-    exprt::operandst new_arguments = arguments;
-
-    bool use_double = arguments[0].type() == double_type();
-    if(arguments[0].type() != arguments[1].type())
+    exprt x = arguments[0];
+    exprt y = arguments[1];
+    // the usual arithmetic conversions: to the wider of the two types
+    if(x.type() != y.type())
     {
-      if(use_double)
+      if(
+        to_floatbv_type(x.type()).get_width() >=
+        to_floatbv_type(y.type()).get_width())
       {
-        new_arguments[1] =
-          typecast_exprt(new_arguments[1], arguments[0].type());
+        y = typecast_exprt{y, x.type()};
       }
       else
-      {
-        new_arguments[0] =
-          typecast_exprt(new_arguments[0], arguments[1].type());
-        use_double = true;
-      }
+        x = typecast_exprt{x, y.type()};
     }
 
-    code_typet f_type = to_code_type(function.type());
-    f_type.remove_ellipsis();
-    const typet &a_t = new_arguments[0].type();
-    f_type.parameters() =
-      code_typet::parameterst(2, code_typet::parametert(a_t));
+    exprt result;
+    if(identifier == "__builtin_isgreater")
+      result = binary_relation_exprt{x, ID_gt, y};
+    else if(identifier == "__builtin_isgreaterequal")
+      result = binary_relation_exprt{x, ID_ge, y};
+    else if(identifier == "__builtin_isless")
+      result = binary_relation_exprt{x, ID_lt, y};
+    else if(identifier == "__builtin_islessequal")
+      result = binary_relation_exprt{x, ID_le, y};
+    else if(identifier == "__builtin_islessgreater")
+    {
+      result = or_exprt{
+        binary_relation_exprt{x, ID_lt, y}, binary_relation_exprt{x, ID_gt, y}};
+    }
+    else
+      result = or_exprt{isnan_exprt{x}, isnan_exprt{y}};
 
-    // replace __builtin_ by CPROVER_PREFIX
-    std::string name = CPROVER_PREFIX + id2string(identifier).substr(10);
-    // append d or f for double/float
-    name += use_double ? 'd' : 'f';
-
-    DATA_INVARIANT(
-      ns.lookup(name).type == f_type,
-      "builtin declaration should match constructed type");
-
-    symbol_exprt new_function = function;
-    new_function.identifier(name);
-    new_function.type() = f_type;
-
-    code_function_callt function_call(lhs, new_function, new_arguments);
-    function_call.add_source_location() = function.source_location();
-
-    copy(function_call, FUNCTION_CALL, dest);
+    if(lhs.is_not_nil())
+    {
+      dest.add(goto_programt::make_assignment(
+        lhs,
+        typecast_exprt::conditional_cast(result, lhs.type()),
+        function.source_location()));
+    }
   }
   else if(identifier == "alloca" || identifier == "__builtin_alloca")
   {

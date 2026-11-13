@@ -1,0 +1,23 @@
+KNOWNBUG libstdcxx
+main.cpp
+--cpp11 --object-bits 12 --unwind 8 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ the thread ran before join returned: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+libstdc++ defines std::thread::_M_start_thread (which starts the thread)
+and join in its compiled library (thread.cc), and libc++ join and detach
+(thread.cpp); cpp_typecheck_stdlib.cpp now models them with CBMC's
+pthread_create and pthread_join.  Symbolic execution then stops with
+"pointer handling for concurrency is unsound" (goto_symex_state.cpp,
+issue #305) before any property is checked: in the new thread, the
+destructor of the thread's state writes its `this', a local whose address
+is taken (so taken to be shared), and symex does not track pointers shared
+between threads.  cpp11_std_thread_starts_a_thread checks that the thread
+is started.  Fixing #305 makes this test pass.

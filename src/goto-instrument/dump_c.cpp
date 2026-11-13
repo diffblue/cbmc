@@ -16,7 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/expr_initializer.h>
-#include <util/expr_util.h>
 #include <util/find_symbols.h>
 #include <util/get_base_name.h>
 #include <util/invariant.h>
@@ -1353,6 +1352,10 @@ void dump_ct::cleanup_expr(exprt &expr)
     cleanup_expr(*it);
 
   cleanup_type(expr.type());
+
+  // __CPROVER_fma is printed as a call of C's fma, which <math.h> declares
+  if(expr.id() == ID_floatbv_fma)
+    system_headers.insert("math.h");
 
   if(expr.id()==ID_struct)
   {

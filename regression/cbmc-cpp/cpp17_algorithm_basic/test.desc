@@ -1,0 +1,12 @@
+CORE
+main.cpp
+--cpp17 --unwind 3 --no-unwinding-assertions
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+dropped the body
+--
+std::sort in C++17 mode.
+No --depth: --depth 200 cut every path before the end of main.

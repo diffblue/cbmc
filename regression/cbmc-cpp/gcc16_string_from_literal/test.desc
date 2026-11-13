@@ -1,0 +1,24 @@
+CORE gcc-only gcc16 libstdcxx16
+main.cpp
+--cpp17 --unwind 6 --no-unwinding-assertions
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ string from a literal: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+Was KNOWNBUG with the headers of libstdc++ 16 (gcc 16) only: basic_string's
+four same-named `_M_construct' members got each other's out-of-line bodies
+(matched by base name), `_M_local_buf[__len++] = *__beg' in an anonymous union
+was "not an lvalue", and a definition renaming a parameter (`__str') left the
+body with an unknown symbol.  Fixed in round 161
+(cpp11_out_of_line_member_template_overloads,
+cpp11_anonymous_union_array_member_lvalue).  Runs where the host gcc is >= 16
+(tag libstdcxx16).  Round 162: no system-header body is dropped any more
+(the `basic_string(const _CharT *, const _Alloc &)' constructors of the other
+character types converted once out-of-line member templates of a class were
+matched by signature and speculative constructor-template instances stopped
+being converted).

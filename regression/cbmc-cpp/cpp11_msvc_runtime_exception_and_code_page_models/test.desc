@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--winx64 --cpp17 --pointer-check --malloc-may-fail --malloc-fail-null
+^\[main\.assertion\.1\] line \d+ an owned copy: SUCCESS$
+^\[main\.assertion\.2\] line \d+ a fresh copy: SUCCESS$
+^\[main\.assertion\.3\] line \d+ the same string: SUCCESS$
+^\[main\.assertion\.4\] line \d+ destroyed: SUCCESS$
+^\[main\.assertion\.5\] line \d+ shared: SUCCESS$
+^\[main\.assertion\.6\] line \d+ a code page: SUCCESS$
+^\[main\.assertion\.7\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Models of __std_exception_copy, __std_exception_destroy and
+__std_fs_code_page, which the MSVC runtime library defines.  Natively, the
+test runs with stand-ins for them.

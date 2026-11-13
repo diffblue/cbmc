@@ -1,0 +1,17 @@
+// libc++'s basic_filebuf calls fopen, which the C library models define
+extern "C" {
+struct file
+{
+  int fd;
+};
+struct file *open_file(const char *name) __asm("_" "open_file");
+void __CPROVER_assert(bool, const char *);
+}
+
+int main()
+{
+  file *f = open_file("x");
+  __CPROVER_assert(f != nullptr && f->fd == 'x', "the C definition is called");
+  __CPROVER_assert(f == nullptr, "WRONG (must FAIL)");
+  return 0;
+}

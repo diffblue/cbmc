@@ -1,0 +1,22 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ rvalue: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [over.match.class.deduct]/1.1, [temp.deduct.call]/3: the guide formed
+from the constructor P(W<T> &&) deduces T = short from the prvalue
+W<short>{3}.  The front end reported "missing type in template argument"
+(bin53): deduce_class_template_arguments took an argument whose type was
+still in parsed form (a cpp_name, possibly under a reference) as already
+type-checked.  test_arguments.desc: a call result, an xvalue, functional
+casts.
+The lvalue-reference forms work (cpp17_ctad_constructor_reference_to_
+template_id).  g++ 13 and clang++ 18 accept this
+program, and it fails only its WRONG assertion.

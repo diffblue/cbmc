@@ -1,0 +1,17 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ four levels: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The runaway-recursion guard in elaborate_class_template counted every
+enclosing instance of the same template; it now counts only those whose
+arguments the new ones grow from (template_args_may_recurse: an argument
+contains the enclosing one, or one argument list is a prefix or suffix of
+the other).  g++ 13 and clang++ 18 accept this program, and it fails only
+its WRONG assertion.

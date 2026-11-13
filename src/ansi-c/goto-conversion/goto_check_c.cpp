@@ -420,6 +420,10 @@ private:
 
 static exprt implication(exprt lhs, exprt rhs)
 {
+  // a check under a guard that holds is the unguarded check, so that it
+  // equals (and is not added again as) the same check made elsewhere
+  if(lhs == true)
+    return rhs;
   // rewrite a => (b => c) to (a && b) => c
   if(rhs.id() == ID_implies)
   {
@@ -1364,17 +1368,31 @@ void goto_check_ct::pointer_rel_check(
       expr,
       guard);
 
+    // In C++, two null pointers may be subtracted (N5008 [expr.add]/5.1:
+    // the result is 0; libstdc++'s vector::_M_realloc_insert does so for an
+    // empty vector) and compared ([expr.rel]/5: they compare equal, so p < q
+    // is false; basic_filebuf::_M_terminate_output tests pbase() < pptr()),
+    // so each pointer check is guarded with "or both operands are null".
+    // Not in C (C11 6.5.6/9, 6.5.8/5: both shall point into the same
+    // object), where the extra disjunct only enlarged the verification
+    // conditions.  (A C++ function with C language linkage, main included,
+    // has mode C.)
+    const exprt both_null =
+      mode == ID_cpp
+        ? exprt{and_exprt{null_object(expr.op0()), null_object(expr.op1())}}
+        : exprt{false_exprt{}};
+
     for(const auto &pointer : expr.operands())
     {
-      // just this particular byte must be within object bounds or one past the
-      // end
+      // just this particular byte must be within object bounds or one
+      // past the end
       const auto size = from_integer(0, size_type());
       auto conditions = get_pointer_dereferenceable_conditions(pointer, size);
 
       for(const auto &c : conditions)
       {
         add_guarded_property(
-          c.assertion,
+          both_null.is_false() ? c.assertion : or_exprt{c.assertion, both_null},
           "pointer relation: " + c.description,
           "pointer arithmetic",
           true, // fatal
@@ -1466,7 +1484,8 @@ void goto_check_ct::pointer_validity_check(
   else
   {
     auto size_of_expr_opt = size_of_expr(expr.type(), ns);
-    CHECK_RETURN(size_of_expr_opt.has_value());
+    if(!size_of_expr_opt.has_value())
+      return;
     size = size_of_expr_opt.value();
   }
 
@@ -1854,7 +1873,21 @@ void goto_check_ct::check_rec_logical_op(const exprt &expr, const guardt &guard)
 
     check_rec(op, new_guard, false);
 
-    constraints.push_back(expr.id() == ID_or ? boolean_negate(op) : op);
+    // An operand is evaluated only if the ones before it did not decide
+    // the result (C17 6.5.13/4, 6.5.14/4).  A constant constraint is not
+    // kept as a guard: `0 || e' checks e as if it stood alone, so that its
+    // checks equal those of the same expression elsewhere (the instantiated
+    // preconditions of a library model, say) instead of being added again
+    // under the guard `!(0 != 0)'; after `1 || ...' the remaining operands
+    // are not evaluated and not checked.
+    exprt constraint = expr.id() == ID_or ? boolean_negate(op) : op;
+    const exprt simplified =
+      enable_simplify ? simplify_expr(constraint, ns) : constraint;
+    if(simplified == true)
+      continue;
+    if(simplified == false)
+      break;
+    constraints.push_back(std::move(constraint));
   }
 }
 
@@ -1866,16 +1899,30 @@ void goto_check_ct::check_rec_if(const if_exprt &if_expr, const guardt &guard)
 
   check_rec(if_expr.cond(), guard, false);
 
+  // with a constant condition only one operand is evaluated (C17 6.5.15/4),
+  // and it is checked as if it stood alone (see check_rec_logical_op)
+  const exprt cond =
+    enable_simplify ? simplify_expr(if_expr.cond(), ns) : if_expr.cond();
+
+  if(cond != false)
   {
-    auto new_guard = [&guard, &if_expr](exprt expr) {
-      return guard(implication(if_expr.cond(), std::move(expr)));
+    auto new_guard = [&guard, &if_expr, &cond](exprt expr)
+    {
+      return guard(
+        cond == true ? std::move(expr)
+                     : implication(if_expr.cond(), std::move(expr)));
     };
     check_rec(if_expr.true_case(), new_guard, false);
   }
 
+  if(cond != true)
   {
-    auto new_guard = [&guard, &if_expr](exprt expr) {
-      return guard(implication(not_exprt(if_expr.cond()), std::move(expr)));
+    auto new_guard = [&guard, &if_expr, &cond](exprt expr)
+    {
+      return guard(
+        cond == false
+          ? std::move(expr)
+          : implication(not_exprt(if_expr.cond()), std::move(expr)));
     };
     check_rec(if_expr.false_case(), new_guard, false);
   }

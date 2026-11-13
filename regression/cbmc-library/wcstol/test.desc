@@ -1,0 +1,13 @@
+CORE
+main.c
+--pointer-check --bounds-check --unwind 33
+^\[main\.assertion\.1\] line \d+ assertion .*: SUCCESS$
+^\[main\.assertion\.2\] line \d+ assertion .*: SUCCESS$
+^\[main\.assertion\.3\] line \d+ assertion .*: SUCCESS$
+^\[main\.assertion\.4\] line \d+ assertion .*: FAILURE$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--

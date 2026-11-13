@@ -1,0 +1,53 @@
+CORE libcxx
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ ranges::upper_bound on a built-in array: SUCCESS$
+^\[main\.assertion\.2\] line \d+ before first: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [upper.bound] + [range.access]: `std::ranges::upper_bound(array,
+value)' -- the range overload of the niebloid on a built-in array, as
+libc++'s <format> tables use it (`__estimated_width', `__get_property').
+With libstdc++ 13 the result is right but bodies are dropped.  Round 163
+fixed the range-access CPO `_Decay_copy::operator()' drop
+(bits/iterator_concepts.h:971): it was instantiated with `_Tp = void'
+from `__decay_copy(begin(__t))' over the poison pill, see
+cpp20_reference_to_void_deduction_fails.  Still dropped: `declval<auto()>'
+& co. (type_traits:2386).  Diagnosis (round 163): the range overload of
+upper_bound is checked with `forward_range<const uint32_t *>'; its
+`iterator_t<const uint32_t *>' = `decltype(__begin(declval<_Tp &>()))'
+should be a substitution failure, but `_Begin::operator()' / `__begin'
+(constexpr auto, `requires is_array_v<_Tp> || __member_begin<_Tp &> ||
+__adl_begin<_Tp &>') is instantiated for the pointer anyway because the
+parser's single-compound-requirement fast path (parse.cpp, "Try compound
+requirement: { { expr } -> concept<type>; }") records only the method
+name and no operand, and the typecheck treats the operand-less
+`compound_requirement' as satisfied.  Removing the fast path makes the
+`__member_begin' checks real, and then cpp20_ranges_basic (`arr |
+views::take(3)') fails: `__t.begin()' on take_view / ref_view is
+evaluated while the class is still being elaborated (view_interface CRTP
+base members convert eagerly) and finds the namespace-scope CPO `begin'
+instead ("'std::ranges::__cust::begin' is not static member of class
+'struct take_view'"), so the whole adaptor pipeline is rejected.  The two
+have to be fixed together.  The second half cannot be a KNOWNBUG of its
+own against the current parser, which masks it; its reduction (the
+interestingness test requires the current front end to verify
+`arr | views::take(3)' and a front end built without the fast path to
+fail with the take_view / ref_view member lookup error) runs in
+/tmp/r163/red/constraint_incomplete_class (round 163c).  With libc++ 18
+(`--stdlib libc++') the call itself fails ("found no match for symbol
+'operator()'" at __algorithm/ranges_upper_bound.h:54) and the unit is
+rejected.  Audit residue items 4 and 10 (round 162); the `__estimated_width'
+/ `__get_property' drops of every libc++ C++20 test are this shape.
+Round 163m: passes.  The parser's compound-requirement fast path is removed
+(a single `{ expr } -> concept;' requirement is parsed like any other
+requirement body), member-qualified names are looked up in the object's
+class only ([basic.lookup.qual.general]/2), and deduced-return members of
+class template specializations are instantiated on use.  Fails on bin53.

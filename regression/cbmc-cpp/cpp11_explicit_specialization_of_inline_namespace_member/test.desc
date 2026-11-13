@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ specialization selected: SUCCESS$
+^\[main\.assertion\.2\] line \d+ same specialization: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+An explicit specialization declared in the namespace enclosing an inline
+namespace did not find the primary template ("class template 'hash' not
+found"): libc++ declares std::hash in std::__1, and
+`namespace std { template <> struct hash<K> ... }' failed on macOS.

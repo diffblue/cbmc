@@ -1,0 +1,24 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ reference to function: SUCCESS$
+^\[main\.assertion\.2\] line \d+ pointer to function: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [temp.spec.partial.match]/1, [temp.deduct.type]/10,
+[temp.spec.partial.order]: `R (&)(A...)' matches `int (&)(int, int)' with
+A = {int, int} and is more specialized than `T &'.  The front end deduced
+only the first element of a function parameter pack in a function type
+written as a template argument and did not expand the pack in the pattern
+of a pointer or reference to function, so `R (&)(A...)' compared unequal
+and `T &' was selected (bin53: an invariant violation declaring a
+variable of function type; `d<int (*)(int, int)>::arity' a conversion
+error).  [dcl.ref]/1: `R (*)(B...)' must not match a reference to function
+(the comparison ignored the reference attribute).  g++ 13 and clang++ 18
+accept this program, and it fails only its WRONG assertion.

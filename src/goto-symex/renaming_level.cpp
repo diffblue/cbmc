@@ -48,6 +48,7 @@ void symex_level1t::insert(
   const renamedt<ssa_exprt, L0> &ssa,
   std::size_t index)
 {
+  ++generation;
   current_names.insert(
     ssa.get().identifier(), std::make_pair(ssa.get(), index));
 }
@@ -57,6 +58,7 @@ symex_level1t::insert_or_replace(
   const renamedt<ssa_exprt, L0> &ssa,
   std::size_t index)
 {
+  ++generation;
   const irep_idt &identifier = ssa.get().identifier();
   const auto old_value = current_names.find(identifier);
   if(old_value)
@@ -74,8 +76,8 @@ bool symex_level1t::has(const renamedt<ssa_exprt, L0> &ssa) const
   return current_names.has_key(ssa.get().identifier());
 }
 
-renamedt<ssa_exprt, L1> symex_level1t::
-operator()(renamedt<ssa_exprt, L0> l0_expr) const
+renamedt<ssa_exprt, L1>
+symex_level1t::operator()(renamedt<ssa_exprt, L0> l0_expr) const
 {
   if(
     !l0_expr.get().get_level_1().empty() ||
@@ -98,8 +100,8 @@ operator()(renamedt<ssa_exprt, L0> l0_expr) const
   return renamedt<ssa_exprt, L1>{std::move(l0_expr.value())};
 }
 
-renamedt<ssa_exprt, L2> symex_level2t::
-operator()(renamedt<ssa_exprt, L1> l1_expr) const
+renamedt<ssa_exprt, L2>
+symex_level2t::operator()(renamedt<ssa_exprt, L1> l1_expr) const
 {
   if(!l1_expr.get().get_level_2().empty())
     return renamedt<ssa_exprt, L2>{std::move(l1_expr.value())};
@@ -109,6 +111,7 @@ operator()(renamedt<ssa_exprt, L1> l1_expr) const
 
 void symex_level1t::restore_from(const symex_level1t &other)
 {
+  ++generation;
   symex_renaming_levelt::delta_viewt delta_view;
   other.current_names.get_delta_view(current_names, delta_view, false);
 

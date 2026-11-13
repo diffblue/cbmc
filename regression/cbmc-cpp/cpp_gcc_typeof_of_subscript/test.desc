@@ -1,0 +1,20 @@
+CORE gcc-only
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ typeof subscript: SUCCESS$
+^\[main\.assertion\.2\] line \d+ typeof array type-id: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+GCC's typeof extension: `__typeof__(a[0])' names the type of the expression
+a[0], but the parser reads it as the type-id "array of 0 a" and the front
+end reported "found no match for symbol 'a'" (bin53).  As for sizeof
+([dcl.ambig.res]/2), a name that does not denote a type makes the operand
+the expression a[0]; `__typeof__(T[2])' with T a type stays a type-id.
+g++ 13 and clang++ 18 accept this program, and it fails only its WRONG
+assertion.

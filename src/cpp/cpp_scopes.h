@@ -27,7 +27,8 @@ public:
   }
 
   typedef std::set<cpp_scopet *> scope_sett;
-  typedef std::set<cpp_idt *> id_sett;
+  // Deterministically ordered (see cpp_scopet::id_sett).
+  typedef cpp_scopet::id_sett id_sett;
 
   cpp_scopet &current_scope()
   {
@@ -48,8 +49,15 @@ public:
 
   cpp_scopet &new_namespace(const irep_idt &new_scope_name)
   {
-    return new_scope(new_scope_name, cpp_idt::id_classt::NAMESPACE);
+    cpp_scopet &n = new_scope(new_scope_name, cpp_idt::id_classt::NAMESPACE);
+    namespaces_by_base_name.emplace(n.base_name, &n);
+    return n;
   }
+
+  /// The namespace scopes created by new_namespace, by base name (the
+  /// resolver's fallback search for a namespace not reachable from the
+  /// current scope used to walk all of id_map)
+  std::unordered_multimap<irep_idt, cpp_scopet *> namespaces_by_base_name;
 
   cpp_scopet &new_block_scope();
 

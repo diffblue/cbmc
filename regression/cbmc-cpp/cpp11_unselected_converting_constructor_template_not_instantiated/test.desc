@@ -1,0 +1,28 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ operator== of point, not a conversion to count: SUCCESS$
+^\[main\.assertion\.2\] line \d+ built-in enum comparison: SUCCESS$
+^\[main\.assertion\.3\] line \d+ count's own operator== and the explicit constructor: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [temp.inst]/10-11: overload resolution instantiates only the
+DECLARATION of a function template specialization; its definition is
+instantiated only when the specialization is selected and odr-used.
+Resolving `p == q` considers `count`'s friend `operator==(const count &,
+const count &)`, which probes a user-defined conversion of `point` to
+`count` through the constructor template `explicit count(P)`.  That
+candidate is never viable ([over.match.copy]/1: only converting, i.e.
+non-explicit, constructors), yet the end-of-translation-unit sweeps
+converted the speculative instance `count<point>`'s body, which is
+ill-formed for a non-pointer P, and reported it as a dropped system-header
+function.  libstdc++'s `__shared_count(_Ptr)` produced this for every
+`operator==` operand type in a translation unit including <memory>
+(`delete __p` on a non-pointer).

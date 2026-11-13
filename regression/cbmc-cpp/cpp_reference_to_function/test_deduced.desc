@@ -1,0 +1,17 @@
+CORE
+deduced.cpp
+
+^\[main\.assertion\.1\] line \d+ deduced parameter: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [temp.deduct.call]/2-3: for P = T & the argument type is the
+function type, without the function-to-pointer conversion, so
+T = void(int).  The front end deduced from the decayed pointer and found
+no match for call_deduced (bin53).  g++ 13 and clang++ 18 accept this
+program (-std=c++98), and it fails only its WRONG assertion.

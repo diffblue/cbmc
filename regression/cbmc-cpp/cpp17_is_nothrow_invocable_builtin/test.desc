@@ -1,0 +1,14 @@
+CORE libstdcxx16
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ may throw: SUCCESS$
+^\[main\.assertion\.2\] line \d+ does not throw: SUCCESS$
+^\[main\.assertion\.3\] line \d+ invocable: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The builtin's probe of the call is now also checked for being
+potentially-throwing.

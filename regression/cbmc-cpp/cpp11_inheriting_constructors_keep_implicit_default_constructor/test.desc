@@ -1,0 +1,17 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ base without constructors: SUCCESS$
+^\[main\.assertion\.2\] line \d+ base with constructors: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The inheriting using-declaration set found_ctor, which suppressed the
+implicit default constructor, and a POD-like class got none at all; now
+neither does ([dcl.init.aggr]/1.1: such a class is not an aggregate).  g++
+13 and clang++ 18 accept this program, and it fails only its WRONG
+assertion.

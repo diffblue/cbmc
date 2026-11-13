@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ f\(\): SUCCESS$
+^\[main\.assertion\.2\] line \d+ f<>\(\): SUCCESS$
+^\[main\.assertion\.3\] line \d+ call: SUCCESS$
+^\[main\.assertion\.4\] line \d+ non-empty pointer pack: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+In `template <int &...>' and `template <int *... P>' the parser attached
+the ellipsis to the reference or pointer type, so the parameter was not a
+pack and `f()' found no match.  libc++'s std::pair default constructor is
+constrained by `_CheckArgs::__enable_implicit_default<>()', declared with
+`template <int &...>'.

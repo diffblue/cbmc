@@ -110,7 +110,7 @@ public:
   {
     for(const auto &irep : get_sub())
     {
-      if(irep.id() == "::")
+      if(irep.id() == ID_scope_resolution)
         return true;
     }
     return false;

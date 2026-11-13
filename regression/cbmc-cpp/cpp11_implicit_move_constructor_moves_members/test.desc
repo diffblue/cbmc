@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ member moved: SUCCESS$
+^\[main\.assertion\.2\] line \d+ move is non-throwing: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The implicit move constructor was declared only when a subobject was
+move-only (declare_implicit_move in cpp_typecheck_compound_type.cpp), so
+Holder(std::move(a)) called the implicit copy constructor, which copied
+the member, and the noexcept operator read the copy constructor's
+specification.  It is now declared, under the conditions of
+[class.copy.ctor]/8, when a base or member has a move constructor; for
+the other classes the memberwise move is the memberwise copy.

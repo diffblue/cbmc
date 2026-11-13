@@ -1,0 +1,12 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ array member in default member initializer: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+dropped the body
+--
+Currently: "direct assignments to arrays not permitted" CONVERSION
+ERROR.

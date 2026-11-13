@@ -1,0 +1,14 @@
+CORE unix
+main.c
+--unwind 8 --no-unwinding-assertions
+^\[main\.assertion\.5\] line \d+ assertion .*: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+^\[main\.assertion\.[1-4]\] .*: FAILURE$
+--
+strtoull_l converts as strtoull does; the locale argument is not read.
+strtoull_l and locale_t are POSIX (<stdlib.h>, <locale.h>); Windows has
+_strtoull_l with _locale_t instead, hence the unix tag.

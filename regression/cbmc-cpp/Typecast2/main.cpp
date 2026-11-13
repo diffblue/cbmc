@@ -1,3 +1,4 @@
+#include <cassert>
 struct myA
 {
   int i;

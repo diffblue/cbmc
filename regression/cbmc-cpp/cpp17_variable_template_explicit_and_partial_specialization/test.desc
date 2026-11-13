@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ explicit specialization: SUCCESS$
+^\[main\.assertion\.2\] line \d+ partial specialization: SUCCESS$
+^\[main\.assertion\.3\] line \d+ primary template: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The explicit specialization of a variable template that also has a
+matching partial specialization was converted as an instance of the
+partial specialization, with the latter's initializer.  The MSVC STL's
+three_way_comparable failed (cpp20_rewritten_comparison_candidates on
+VS 2022).

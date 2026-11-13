@@ -1,0 +1,21 @@
+CORE
+capture_this.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ second specialization: SUCCESS$
+^\[main\.assertion\.2\] line \d+ first specialization: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+^Invariant check failed$
+--
+As test.desc, with a lambda capturing `this' in a virtual member function
+of a class template: formatting_scanner<long long>::format_arg uses the closure
+of formatting_scanner<char>, whose captured pointer has the other type, and
+symex stops with an invariant violation (equal_exprt operand types, bin53
+too).  Found by reducing libstdc++'s <format> with cvise in 41 lines.
+g++ 13 and clang++ 18 accept this program, and it fails only its WRONG
+assertion.

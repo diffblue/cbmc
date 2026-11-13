@@ -1,0 +1,25 @@
+CORE libstdcxx
+chrono.cpp
+--cpp20 --object-bits 12
+^\[main\.assertion\.1\] line \d+ duration: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+could not fully type-check
+--
+libstdc++ 13 <chrono>: `12h' (chrono_literals) is fixed
+(cpp11_user_defined_literal_call_forms), as are __check_overflow (the
+_Number_help recursion, cpp11_alias_template_in_recursive_class_template)
+and default_delete<time_zone::_Impl>::operator() (bits/unique_ptr.h:93),
+instantiated for the incomplete _Impl by time_zone's unused defaulted special
+members (cpp98_implicit_default_constructor_defined_only_when_odr_used).
+g++ 13 accepts this program, and it fails only its WRONG assertion.
+With libstdc++ 16 (16-20260315) the test passes: the drops of
+<format>'s _Seq_sink::_M_reserve and _M_span were fixed with
+cpp20_hidden_friend_spaceship_template_alias_return_type (it was tagged
+broken-libstdcxx16).

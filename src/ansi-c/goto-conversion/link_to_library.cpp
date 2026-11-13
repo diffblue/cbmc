@@ -72,6 +72,23 @@ add_one_function(
     // should the goto binary be reloaded
     goto_model.symbol_table.get_writeable_ref(missing_function).set_compiled();
   }
+  // A function that only a library model declares and that has no model of
+  // its own (OpenBSD's <math.h> makes the model of copysign call
+  // __signbit): it is in the symbol table now, but not in the goto program,
+  // whose calls must all name a function of it.  It has no body.
+  else if(
+    goto_model.symbol_table.symbols.find(missing_function) !=
+      goto_model.symbol_table.symbols.end() &&
+    goto_model.symbol_table.lookup_ref(missing_function).type.id() == ID_code &&
+    goto_model.goto_functions.function_map.find(missing_function) ==
+      goto_model.goto_functions.function_map.end())
+  {
+    goto_convert(
+      missing_function,
+      goto_model.symbol_table,
+      library_model.goto_functions,
+      message_handler);
+  }
 
   // check whether additional initialization may be required
   bool init_required = false;
@@ -90,6 +107,33 @@ add_one_function(
         break;
       }
     }
+  }
+
+  // Only a function of goto_model's own symbol table was converted (a
+  // function brought in by a header that the language front end left
+  // unconverted): there are no symbols to link, and
+  // linking -- a pass over all symbols and all functions of goto_model --
+  // reduces to adding the function.  A program that calls many such
+  // functions otherwise links once per function (1200 times for
+  // std::print), which made linking slower than type checking.
+  if(library_model.symbol_table.symbols.empty())
+  {
+    for(auto &entry : library_model.goto_functions.function_map)
+    {
+      auto dest = goto_model.goto_functions.function_map.find(entry.first);
+      if(dest == goto_model.goto_functions.function_map.end())
+      {
+        goto_model.goto_functions.function_map.emplace(
+          entry.first, std::move(entry.second));
+      }
+      else if(!dest->second.body_available())
+      {
+        dest->second.body.swap(entry.second.body);
+        dest->second.parameter_identifiers.swap(
+          entry.second.parameter_identifiers);
+      }
+    }
+    return {replace_symbolt::expr_mapt{}, init_required};
   }
 
   return {

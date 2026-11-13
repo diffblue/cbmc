@@ -1,0 +1,14 @@
+CORE unix
+main.c
+
+^\[main\.assertion\.5\] line \d+ assertion .*: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+^\[main\.assertion\.[1-4]\] .*: FAILURE$
+--
+uselocale returns the locale in effect before the call, LC_GLOBAL_LOCALE
+at first; (locale_t)0 only queries it.
+uselocale and locale_t are POSIX; Windows has none, hence the unix tag.

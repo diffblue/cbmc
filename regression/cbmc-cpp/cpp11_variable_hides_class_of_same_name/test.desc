@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.\d+\] line \d+ the variable: SUCCESS$
+^\[main\.assertion\.\d+\] line \d+ the class, elaborated: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+does not uniquely resolve
+already declared
+invalid implicit conversion
+--
+Variables and data members hide a class name, as functions did.

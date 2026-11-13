@@ -1,0 +1,28 @@
+CORE
+main.cpp
+--cpp14
+^\[main\.assertion\.1\] line \d+ by-ref capture, generic: SUCCESS$
+^\[main\.assertion\.2\] line \d+ reference return: SUCCESS$
+^\[main\.assertion\.3\] line \d+ member, two instantiations: SUCCESS$
+^\[main\.assertion\.4\] line \d+ member by-ref mutation: SUCCESS$
+^\[main\.assertion\.5\] line \d+ member reference return: SUCCESS$
+^\[main\.assertion\.6\] line \d+ \[=\] member array: SUCCESS$
+^\[main\.assertion\.7\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [expr.prim.lambda.closure]/4, [expr.prim.lambda.capture]: a generic
+lambda's call operator is a member function template.  A generic lambda with
+a by-reference capture or in a member function was kept on the
+function-pointer lowering, with every `auto' fixed to `signed int'; this
+program crashed the front end (bin53).  Such lambdas are now lowered to a
+closure with a template operator() (typecheck_expr_lambda,
+generic_closure_eligible), like other generic lambdas.  Lambdas that use
+`this' explicitly or call member functions stay on the function-pointer
+lowering.  g++ 13 and clang++ 18 accept this program (-std=c++14), and it
+fails only its WRONG assertion.

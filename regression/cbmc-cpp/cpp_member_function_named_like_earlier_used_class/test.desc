@@ -1,0 +1,24 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ member function: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [class.member.lookup]/3: outside a complete-class context the search
+for a name is from its point of use, so the constructor's parameter
+`const month_day_last &' names the class, not the member function
+month_day_last() declared after it.  The front end type-checks constructors
+after all other members (typecheck_compound_body) and found the member
+function ("found no match for symbol 'month_day_last'", bin53); a
+constructor parameter's unqualified class name is now resolved at the
+constructor's position (pin_constructor_parameter_class_names).  Reduced
+(cvise, /tmp/r163/red/kb_V_chrono_c) from libc++ 18's
+chrono::year_month_day_last, whose operator+= and friends were dropped
+(cpp20_libcxx_header_drops/test_chrono.desc).  g++ 13 and clang++ 18 accept
+this program, and it fails only its WRONG assertion.

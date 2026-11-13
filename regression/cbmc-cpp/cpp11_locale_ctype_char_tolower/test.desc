@@ -1,0 +1,17 @@
+CORE gcc-only
+main.cpp
+--cpp11 --object-bits 12
+^\[main\.assertion\.1\] line \d+ tolower: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+no body for callee
+--
+The classic ctype<char> facet model had no vtable pointer, and libstdc++
+defines ctype<char>::do_tolower in the shared library: "dereference
+failure: pointer NULL in ...do_tolower" (regex_traits::translate_nocase
+in cpp11_regex_construct and cpp11_regex_match).

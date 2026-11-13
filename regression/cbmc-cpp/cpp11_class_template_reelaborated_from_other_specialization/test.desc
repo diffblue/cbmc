@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+--
+N5008 [temp.inst]/2-3: renamedt<ssa_exprt, L0> is named (by-value return type of
+a declaration) while ssa_exprt is still incomplete, so its first elaboration
+drops the base; once ssa_exprt is complete, the friend declaration inside
+renamedt<exprt, L2> re-elaborates it NESTED in that instantiation.  The
+re-elaboration arrived with empty specialization arguments, build() skipped
+the arity mismatch and the body was substituted with the enclosing
+instantiation's `underlyingt` = exprt, so get() returned const exprt& (the
+goto-symex renaming_level.cpp "symbol 'identifier' is unknown").  For a
+primary template the full arguments are the specialization arguments.

@@ -1,0 +1,17 @@
+CORE
+main.ii
+--winx64 --cpp20
+^\[main\.assertion\.1\] line \d+ bit cast: SUCCESS$
+^\[main\.assertion\.2\] line \d+ round trip: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+__builtin_bit_cast was a keyword in GCC and clang modes only; in Visual
+Studio mode it was an unknown symbol, and the MSVC STL's _Bit_cast lost its
+body (44 cbmc-cpp failures on VS 2022).  Preprocessed, as cbmc on Linux
+would otherwise use the host's (GNU) preprocessor.

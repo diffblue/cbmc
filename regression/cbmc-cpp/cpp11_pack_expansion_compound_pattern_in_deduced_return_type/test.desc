@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ A &&\.\.\.: SUCCESS$
+^\[main\.assertion\.2\] line \d+ A \*\.\.\.: SUCCESS$
+^\[main\.assertion\.3\] line \d+ const A\.\.\.: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+A pack expansion whose pattern is a compound type around the pack
+(`A &&...', `A *...', `const A...') in a template argument of the return
+type was not expanded while deducing the function template's arguments: it
+became one element and the candidate was discarded.  libc++'s std::bind
+has `__bind_return<..., tuple<_Args &&...>>' as operator()'s return type.

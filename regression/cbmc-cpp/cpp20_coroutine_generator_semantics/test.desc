@@ -1,0 +1,37 @@
+KNOWNBUG
+main.cpp
+--cpp20 --unwind 4
+^\[main\.assertion\.1\] .* coroutine: SUCCESS$
+^\[main\.assertion\.2\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+g++ 13 (-fsanitize=address,undefined) and clang++ 18 accept this program,
+and it fails only its WRONG assertion.  CBMC fails the first assertion:
+coroutines are parsed but not implemented.  The parser keeps only the
+operand of `co_await e' and `co_yield e' and turns `co_return [e];' into a
+skip, so count() runs as an ordinary function that evaluates 1 and 2 and
+returns an unconstrained gen; resume, destroy and promise call
+__builtin_coro_resume, _destroy and _promise, which have no body.  None
+of the promise's members (get_return_object, initial_suspend,
+yield_value, final_suspend) is called.
+
+A fix implements N5008 [dcl.fct.def.coroutine]/5-11 (the replacement
+body with the promise object, the initial and final await expressions,
+the coroutine state allocated with operator new and freed on destroy),
+[expr.await]/3-5 (await_ready, await_suspend, await_resume around a
+suspend point), [expr.yield]/1 (co_yield e as co_await
+promise.yield_value(e)), [stmt.return.coroutine] (return_value or
+return_void, then the final suspend point), and the coroutine_handle
+builtins ([coroutine.handle.resumption]).  Suspension needs the coroutine
+lowered to a state machine: a frame holding the promise, the parameters,
+the locals live across a suspend point and a resume index, and a resume
+function that dispatches on the index.  It is KNOWNBUG, not FUTURE, as
+the program is accepted and its coroutine semantics silently dropped.
+
+Since coroutines are reported as unsupported, the call of the coroutine
+also fails the property "coroutines are not supported" and ends the path.

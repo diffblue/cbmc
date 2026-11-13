@@ -1,0 +1,20 @@
+CORE libstdcxx
+libstdcxx.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ invoke: SUCCESS$
+^\[main\.assertion\.2\] line \d+ mem_fn: SUCCESS$
+^\[main\.assertion\.3\] line \d+ namespace-scope pointer to member: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [func.require]/1.4-1.6, [func.memfn]: std::invoke and std::mem_fn of a
+pointer to data member, and a namespace-scope pointer to data member.  On
+bin53 libstdc++'s __invoke_impl for member objects (invoke.h:79/84) was
+dropped and two of the assertions disappeared from the program.  g++ 13
+accepts the program.

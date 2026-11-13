@@ -1,0 +1,24 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ array to pointer in static_cast: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [expr.static.cast]/7 with [conv.array]: `static_cast<E *>(arr)' for
+an array lvalue `arr' of type E[N] applies the array-to-pointer
+conversion. In a function template with a reference-to-array parameter (`E
+(&arr)[N]', here spelled with type_identity_t as libstdc++ does) the front
+end reported "type mismatch on static_cast" and dropped the constructor:
+its constness check compared the pointer to the whole array (the
+reference) with the target instead of the element pointer. This is
+libstdc++'s span(type_identity_t<element_type> (&)[N]) constructor
+(span:189), dropped in the <format> descs; test_libstdcxx.desc constructs
+a std::span from an array and forbids only that drop. g++ 13 and clang++
+18 accept both programs. Fails on bin53.

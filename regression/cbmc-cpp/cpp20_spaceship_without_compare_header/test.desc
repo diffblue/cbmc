@@ -1,0 +1,12 @@
+CORE
+main.cpp
+--cpp20
+built-in operator <=> requires 'std::strong_ordering'; include <compare>$
+^CONVERSION ERROR$
+^EXIT=6$
+^SIGNAL=0$
+--
+^VERIFICATION SUCCESSFUL$
+--
+The front end lowered the comparison to an int (the C lowering) instead.
+The program is rejected, so there is no WRONG assertion.

@@ -1,0 +1,24 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ direct initialization: SUCCESS$
+^\[main\.assertion\.2\] line \d+ base initializer: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [over.match.ctor]/1, [over.match.viable]/2: os() takes no argument, so
+for os(&s) only os(buf *) is viable.  The constructors of a class with a
+virtual base carry an extra, front-end-internal parameter (a __CPROVER_bool
+flag, Itanium C++ ABI 5.1.4), and overload resolution counted it as a
+real parameter: os() became os(bool = true) and &s converts to bool, so the
+call "did not uniquely resolve" (bin53).  The flag is no longer matched
+against arguments.  This drops
+libc++'s basic_ostringstream constructors (sstream:901, `basic_ostream<
+_CharT, _Traits>(&__sb_)'; cpp20_libcxx_header_drops/test_sstream.desc).
+Pre-existing (bin53).  g++ 13 and clang++ 18 accept this program, and it
+fails only its WRONG assertion.

@@ -1,0 +1,17 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ array deleted: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+delete\[\] of non-array object: FAILURE
+--
+Fixed: CBMC's C library malloc (also calloc, alloca and the contracts
+library's fresh objects) cleared __CPROVER_malloc_is_new_array but left
+__CPROVER_new_object, the object of the last new-expression, so delete[]
+saw that object recorded as not an array (develop too, 8fcda33365).  Seen
+in libc++'s ~basic_filebuf for std::ofstream (cvise reduction).

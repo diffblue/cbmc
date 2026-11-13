@@ -1,0 +1,14 @@
+KNOWNBUG
+main.cpp
+--cpp20
+static assertion failed: primary template of kind$
+^CONVERSION ERROR$
+^EXIT=6$
+^SIGNAL=0$
+--
+^VERIFICATION SUCCESSFUL$
+--
+The static_assert fails while kind<int> is instantiated for the
+requires-clause; that is not in the immediate context of the constraint
+([temp.constr.atomic]/3, [temp.deduct.general]/8), so g++ and clang++
+reject the program.  CBMC takes the constraint as not satisfied.

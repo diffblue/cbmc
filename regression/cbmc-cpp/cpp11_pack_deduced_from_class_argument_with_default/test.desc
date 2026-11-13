@@ -1,0 +1,18 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ two elements: SUCCESS$
+^\[main\.assertion\.2\] line \d+ empty: SUCCESS$
+^\[main\.assertion\.3\] line \d+ converting constructor: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+apply_default_template_arguments took the pack's size from the function
+parameter pack expansion only (pack_expansion_size); for a pack deduced
+from a parameter type it now uses the elements recorded in pack_args_map.
+g++ 13 and clang++ 18 accept this program, and it fails only its WRONG
+assertion.

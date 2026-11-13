@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ non-template class: SUCCESS$
+^\[main\.assertion\.2\] line \d+ pointer: SUCCESS$
+^\[main\.assertion\.3\] line \d+ char: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The second in-class declaration was taken for a redeclaration of the
+first (the return types were not compared), and the out-of-line
+definitions were matched on their parameters only, so one put had no
+declaration and the call found no match.

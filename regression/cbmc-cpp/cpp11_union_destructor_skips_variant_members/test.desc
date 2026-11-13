@@ -1,0 +1,14 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] .* anonymous union member not destroyed: SUCCESS$
+^\[main\.assertion\.2\] .* union member not destroyed: SUCCESS$
+^\[main\.assertion\.3\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+N5008 [class.dtor]/13: a union's destructor, including an anonymous union's,
+destroys none of its (variant) members.

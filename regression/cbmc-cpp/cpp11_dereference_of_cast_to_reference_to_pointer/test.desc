@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ dereference of a reference to a pointer: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+A cast to a reference type is the address of its operand typed as the
+reference; `*' was applied to that address, so `*static_cast<int *&>(p)'
+was p itself rather than the int it points to.

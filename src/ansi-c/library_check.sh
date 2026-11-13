@@ -45,14 +45,17 @@ perl -p -i -e 's/^_setjmp\n//' __functions # pipe, macOS
 perl -p -i -e 's/^_time(32|64)\n//' __functions # time, Windows
 perl -p -i -e 's/^__builtin___snprintf_chk\n//' __functions # snprintf, macOS
 perl -p -i -e 's/^__builtin___vsnprintf_chk\n//' __functions # vsnprintf, macOS
+perl -p -i -e 's/^v?snprintf_l\n//' __functions # snprintf, macOS
 perl -p -i -e 's/^__fcntl_time64\n//' __functions # fcntl, Linux
 perl -p -i -e 's/^__inet_(addr|aton|ntoa|network)\n//' __functions # inet_*, FreeBSD
 perl -p -i -e 's/^__isoc99_v?fscanf\n//' __functions # fscanf, Linux
 perl -p -i -e 's/^__isoc99_v?scanf\n//' __functions # scanf, Linux
 perl -p -i -e 's/^__isoc99_v?sscanf\n//' __functions # sscanf, Linux
+perl -p -i -e 's/^__isoc23_strtou?ll?_l\n//' __functions # strto*_l, Linux
 perl -p -i -e 's/^__sigsetjmp\n//' __functions # sigsetjmp, Linux
 perl -p -i -e 's/^__stdio_common_vfscanf\n//' __functions # fscanf, Windows
 perl -p -i -e 's/^__stdio_common_vsprintf\n//' __functions # snprintf, Windows
+perl -p -i -e 's/^__stdio_common_vsprintf_s\n//' __functions # sprintf_s, Windows
 perl -p -i -e 's/^__stdio_common_vsscanf\n//' __functions # sscanf, Windows
 perl -p -i -e 's/^__srget\n//' __functions # gets, FreeBSD
 perl -p -i -e 's/^__swbuf\n//' __functions # putc, FreeBSD
@@ -64,16 +67,24 @@ perl -p -i -e 's/^__CPROVER_(creat|fcntl|open|openat)\n//' __functions # creat, 
 perl -p -i -e 's/^__CPROVER_(tolower|toupper)\n//' __functions # tolower, toupper
 perl -p -i -e 's/^(creat|fcntl|open|openat)64\n//' __functions # same as creat, fcntl, open, openat
 perl -p -i -e 's/^__CPROVER_deallocate\n//' __functions # free-01
+perl -p -i -e 's/^__CPROVER_vsnprintf\n//' __functions # vsnprintf
 perl -p -i -e 's/^__builtin_alloca\n//' __functions # alloca-01
 perl -p -i -e 's/^fclose_cleanup\n//' __functions # fopen
 perl -p -i -e 's/^fopen64\n//' __functions # fopen
 perl -p -i -e 's/^freopen64\n//' __functions # freopen
+perl -p -i -e 's/^isinf[fl]\n//' __functions # isinf
+perl -p -i -e 's/^isnan[fl]\n//' __functions # isnan
 perl -p -i -e 's/^mmap64\n//' __functions # mmap
 perl -p -i -e 's/^munmap\n//' __functions # mmap-01
 perl -p -i -e 's/^__fgets_chk\n//' __functions # fgets/__fgets_chk.desc
 perl -p -i -e 's/^__fprintf_chk\n//' __functions # fprintf/__fprintf_chk.desc
 perl -p -i -e 's/^__fread_chk\n//' __functions # fread/__fread_chk.desc
+perl -p -i -e 's/^__isfinite[fl]?\n//' __functions # isfinite
+perl -p -i -e 's/^__isinf[fl]?\n//' __functions # isinf
+perl -p -i -e 's/^__isnan[dfl]?\n//' __functions # isnan
+perl -p -i -e 's/^__isnormal[fl]?\n//' __functions # isnormal
 perl -p -i -e 's/^__printf_chk\n//' __functions # printf/__printf_chk.desc
+perl -p -i -e 's/^__signbit[fl]?\n//' __functions # signbit, __signbitd
 perl -p -i -e 's/^__syslog_chk\n//' __functions # syslog/__syslog_chk.desc
 perl -p -i -e 's/^_syslog\$DARWIN_EXTSN\n//' __functions # syslog/test.desc
 perl -p -i -e 's/^__time64\n//' __functions # time
@@ -101,7 +112,7 @@ perl -p -i -e 's/^_mm_setr_epi(16|32)\n//' __functions # cbmc/SIMD1
 perl -p -i -e 's/^_mm_setr_pi16\n//' __functions # cbmc/SIMD1
 perl -p -i -e 's/^_mm_subs_ep[iu]16\n//' __functions # cbmc/SIMD1
 
-ls -1 ../../regression/cbmc-library/ | egrep -v '(Makefile|CMakeLists.txt)' | LC_ALL=C sort -u > __tests
+ls -1 ../../regression/cbmc-library/ | egrep -v '(Makefile|CMakeLists.txt|tests.log)' | LC_ALL=C sort -u > __tests
 diff -u __tests __functions
 ec="${?}"
 rm __functions __tests

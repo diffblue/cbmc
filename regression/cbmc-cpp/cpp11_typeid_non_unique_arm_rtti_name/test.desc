@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--os macos --arch arm64 --cpp17
+^\[main\.assertion\.1\] line \d+ same type: SUCCESS$
+^\[main\.assertion\.2\] line \d+ different types: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The integer name held the address of the name string, whose most
+significant bit symbolic execution cannot determine, so the strcmp branch
+was explored and its loop unwound without bound (cpp17_typeid_basic timed
+out on macOS 14).

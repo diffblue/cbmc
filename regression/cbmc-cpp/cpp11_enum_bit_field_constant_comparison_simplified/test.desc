@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp11 --verbosity 9
+^\[main\.assertion\.1\] line \d+ branch not taken: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^Unwinding loop main\.0
+--
+N5008 [class.bit]/4: simplify_typecast did not fold a constant of a
+bit-field type whose underlying type is an enumeration tag (to_integer
+needs the namespace for it), so the guard `(int)s.type == 7' stayed
+symbolic and symbolic execution unwound the 1000 iterations of the untaken
+loop.  g++ 13 and clang++ 18 accept this program, and it fails only its
+WRONG assertion.

@@ -1,0 +1,52 @@
+// The MSVC runtime's type_info (vcruntime_typeinfo.h, shortened): a class in
+// the global namespace whose comparison calls a runtime function
+typedef unsigned long long size_t;
+extern "C" {
+struct __std_type_info_data
+{
+  const char *_UndecoratedName;
+  const char _DecoratedName[1];
+};
+int __cdecl __std_type_info_compare(
+  const __std_type_info_data *_Lhs,
+  const __std_type_info_data *_Rhs);
+size_t __cdecl __std_type_info_hash(const __std_type_info_data *_Data);
+}
+class type_info
+{
+public:
+  size_t hash_code() const noexcept
+  {
+    return __std_type_info_hash(&_Data);
+  }
+  bool operator==(const type_info &_Other) const noexcept
+  {
+    return __std_type_info_compare(&_Data, &_Other._Data) == 0;
+  }
+  bool operator!=(const type_info &_Other) const noexcept
+  {
+    return __std_type_info_compare(&_Data, &_Other._Data) != 0;
+  }
+  virtual ~type_info() noexcept;
+
+private:
+  mutable __std_type_info_data _Data;
+};
+namespace std
+{
+using ::type_info;
+}
+extern "C" void __CPROVER_assert(bool, const char *);
+struct S
+{
+};
+int main()
+{
+  // N5008 [expr.typeid]/1, [type.info]/2: equal iff the same type
+  __CPROVER_assert(typeid(int) == typeid(int), "same type");
+  __CPROVER_assert(typeid(int) != typeid(S), "different types");
+  __CPROVER_assert(
+    typeid(S).hash_code() == typeid(S).hash_code(), "hash of the same type");
+  __CPROVER_assert(typeid(int) == typeid(S), "WRONG (must FAIL)");
+  return 0;
+}

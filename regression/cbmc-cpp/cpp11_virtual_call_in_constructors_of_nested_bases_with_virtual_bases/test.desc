@@ -1,0 +1,28 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ A under construction: SUCCESS$
+^\[main\.assertion\.2\] line \d+ A under construction, second base: SUCCESS$
+^\[main\.assertion\.3\] line \d+ B under construction: SUCCESS$
+^\[main\.assertion\.4\] line \d+ M under construction: SUCCESS$
+^\[main\.assertion\.5\] line \d+ after construction: SUCCESS$
+^\[main\.assertion\.6\] line \d+ M complete: SUCCESS$
+^\[main\.assertion\.7\] line \d+ B complete: SUCCESS$
+^\[main\.assertion\.8\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+A base-object constructor now gives each direct base with virtual bases
+tables with that base's overriders and the offsets of the complete object
+being constructed, copied from the base's own tables and patched from the
+virtual pointers in place, and restores the pointers afterwards (the
+Itanium C++ ABI passes a VTT instead).  It also saves and restores the
+pointers around a dynamic base without virtual bases (Pad), whose
+constructor installs its own tables.  The construction table
+virtual_table::V@M@D was missing: do_virtual_table inserted the tables
+while iterating over the symbol table.  With the W188 build, assertions 1,
+3, 4 and 6 failed.

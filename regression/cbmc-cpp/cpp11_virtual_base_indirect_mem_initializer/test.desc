@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+The most derived class's mem-initializer for an indirect virtual base is
+the one used (N5008 [class.base.init]/7, /13); the intermediate bases'
+initializers for it are ignored, and their base-object constructors and
+destructors (hidden `@most_derived' parameter false, Itanium C++ ABI 5.1.4)
+neither construct nor destroy it.

@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp14
+^\[main\.assertion\.1\] line \d+ forwarded: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+static assertion failed
+dropped the body
+--
+Only the lvalue overload of fwd<L &> is instantiated.

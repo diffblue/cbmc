@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp11
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [temp.deduct.type]/20, the accepting side of
+cpp11_deduced_nontype_kind_mismatch: deduction of a non-type template
+parameter from a template-id argument succeeds when the declared parameter
+types agree (also through a typedef and for enumerations), when the
+argument is explicitly specified (Example 13: `f<1>(a)` is OK), and
+cv-qualifiers on the parameter types are ignored (`template <const short
+cs> class B; template <short s> void g(B<s>)`).

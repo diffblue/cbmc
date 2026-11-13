@@ -1,3 +1,4 @@
+#include <cassert>
 class A
 {
   friend void inc(A &);

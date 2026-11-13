@@ -1,0 +1,18 @@
+CORE gnu-extensions
+main.cpp
+--cpp20
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ member: SUCCESS$
+^\[main\.assertion\.2\] line \d+ free: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [temp.pre]/1, [dcl.attr.grammar], [temp.constr.decl]: a requires-clause
+followed by `[[nodiscard]] __attribute__((visibility("hidden")))'.
+Non-vacuous: the last assertion is deliberately wrong and must FAIL.  Before
+the fix: "member: FAILURE", "free: FAILURE" (g(1.0) returned 1).

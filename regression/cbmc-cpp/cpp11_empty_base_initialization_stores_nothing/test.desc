@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ copy-initialized empty base: SUCCESS$
+^\[main\.assertion\.2\] line \d+ constructor template: SUCCESS$
+^\[main\.assertion\.3\] line \d+ value-initialized empty base: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+An empty base subobject shares its storage with the derived object's
+other subobjects.  Its initialization by a mem-initializer was lowered to
+an assignment of the class's one-byte representation, which overwrote the
+first byte of the pointer stored there.  libc++'s std::bind(&S::f, &s, _1)
+stores _1 in such a base, next to the bound &s.

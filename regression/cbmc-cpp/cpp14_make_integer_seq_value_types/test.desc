@@ -1,0 +1,10 @@
+CORE
+main.cpp
+--cpp14
+^\[main\.assertion\.1\] line \d+ make_integer_seq values keep the declared type: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+dropped the body
+--

@@ -1,3 +1,4 @@
+#include <cassert>
 struct ostream
 {
   ostream(int id) : id(id)

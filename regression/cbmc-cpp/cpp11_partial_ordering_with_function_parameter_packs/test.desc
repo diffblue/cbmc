@@ -1,0 +1,22 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ f\(\): #1: SUCCESS$
+^\[main\.assertion\.2\] line \d+ f\(1, 2, 3\): #2: SUCCESS$
+^\[main\.assertion\.3\] line \d+ f\(1, 2\): #3: SUCCESS$
+^\[main\.assertion\.4\] line \d+ g\(T \*, U\.\.\.\) over g\(T\): SUCCESS$
+^\[main\.assertion\.5\] line \d+ h\(T\) over h\(T, U\.\.\.\): SUCCESS$
+^\[main\.assertion\.6\] line \d+ using-declaration: SUCCESS$
+^\[main\.assertion\.7\] line \d+ using-declaration, one argument: SUCCESS$
+^\[main\.assertion\.8\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Partial ordering lost the `...' of function parameter packs (the
+declarator's ellipsis does not survive cpp_convert_plain_type) and did not
+compare parameter-type-lists of different lengths, so f(1, 2), h(1) and
+Derived()(1, 2) were ambiguous ("does not uniquely resolve").

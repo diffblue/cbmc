@@ -1,0 +1,30 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ rebound pointer: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [temp.names]/3.4: a `<' after a name is the start of a
+template-argument-list if the name is "a terminal name ... in a type-only
+context other than a nested-name-specifier"; [temp.res.general]/4.1: the
+terminal name of a typename-specifier is in a type-only context.  So in
+`typename traits<A>::rebind<int>', `rebind' names a member template
+without the `template' keyword (P1787, applied to C++20; GCC accepts it
+in every language mode, as here with --cpp11).  The front end reported
+"found no match for symbol 'rebind'" and rejected the unit: the parser
+consumed `typename' before reading the name, so the name was not known
+to be in a type-only context, and `<int>' became a separate declarator.
+Reference compilers: g++ 13 accepts it, and the program fails only its
+WRONG assertion.  clang++ 18 and the clang 23 of the cxx23-gate image
+reject it ("use 'template' keyword to treat 'rebind' as a dependent
+template name"): Clang has not implemented this part of P1787.  Found
+while reducing cpp11_map_of_move_only_mapped_type: cvise removed
+libstdc++'s `template' from `::template rebind_alloc<'.  Fails on the round-163
+build bin52.

@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [temp.mem]/1 + [temp.arg]: a member alias template's default
+template argument evaluated against the enclosing class template
+instance's pack (`enable_if_t<(N < sizeof...(Types))>`, std::variant's
+__to_type).  The enclosing instance's parameters are pre-bound when the
+alias is resolved (previously only in clang-preprocessor mode).

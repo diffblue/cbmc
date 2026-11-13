@@ -1,0 +1,10 @@
+CORE
+main.cpp
+--cpp20
+^EXIT=(0|6|10)$
+^SIGNAL=0$
+--
+^Invariant check failed
+--
+Printing the constraint, which holds the lambda-expression, in a
+diagnostic of the constraint check failed an invariant of expr2c.
