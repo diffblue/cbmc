@@ -291,6 +291,16 @@ switch_to_thread(goto_symex_statet &state, const unsigned int thread_nb)
   state.source.pc = state.threads[thread_nb].pc;
   state.source.function_id = state.threads[thread_nb].function_id;
 
+  // level1 now lives in goto_statet and can be overwritten by merge_goto, so
+  // on a thread switch we reinstate the target thread's start-of-thread
+  // snapshot. Unlike pc/atomic_section_id (saved back into the outgoing thread
+  // above), level1 -- like guard -- is only ever restored, never saved: under
+  // CBMC's run-to-completion thread model a thread is entered once (when the
+  // previous call stack is empty). restore_from (a union that never deletes)
+  // is safe because L1 keys carry the L0 thread tag and cannot alias across
+  // threads.
+  state.level1.restore_from(state.threads[thread_nb].level1);
+
   state.guard = state.threads[thread_nb].guard;
   // A thread's initial state is certainly reachable:
   state.reachable = true;
