@@ -20,6 +20,9 @@
 #include <solvers/smt2/smt2_dec.h>
 #include <testing-utils/use_catch.h>
 
+#include <functional>
+#include <sstream>
+
 TEST_CASE(
   "smt2_convt::convert_identifier character escaping.",
   "[core][solvers][smt2]")
@@ -34,15 +37,26 @@ TEST_CASE(
   CHECK(smt2_convt::convert_identifier("&") == "&");
 }
 
+/// Helper: the SMT2 output that \p action produces when applied to a converter
+/// for \p solver.
+static std::string smt2_output(
+  smt2_convt::solvert solver,
+  const std::function<void(smt2_convt &)> &action)
+{
+  symbol_tablet symbol_table;
+  namespacet ns{symbol_table};
+  std::ostringstream out;
+  smt2_convt conv{ns, "test", "", "QF_BV", solver, out};
+  action(conv);
+  return out.str();
+}
+
 /// Helper: extract the "(assert ...)" line from SMT2 output of set_to
 static std::string get_assert(const exprt &red_expr)
 {
-  symbol_tablet symbol_table;
-  namespacet ns(symbol_table);
-  std::ostringstream out;
-  smt2_convt conv(ns, "test", "", "QF_BV", smt2_convt::solvert::GENERIC, out);
-  conv.set_to(red_expr, true);
-  std::string result = out.str();
+  const std::string result = smt2_output(
+    smt2_convt::solvert::GENERIC,
+    [&red_expr](smt2_convt &conv) { conv.set_to(red_expr, true); });
   auto pos = result.find("(assert ");
   REQUIRE(pos != std::string::npos);
   // strip trailing newline
@@ -119,12 +133,9 @@ TEST_CASE("smt2_convt reduction operators", "[core][solvers][smt2]")
 /// enables SMT-LIB datatypes (Z3/CVC5), so structs are *not* flattened.
 static std::string get_assert_with_datatypes(const exprt &expr)
 {
-  symbol_tablet symbol_table;
-  namespacet ns(symbol_table);
-  std::ostringstream out;
-  smt2_convt conv(ns, "test", "", "QF_BV", smt2_convt::solvert::Z3, out);
-  conv.set_to(expr, true);
-  std::string result = out.str();
+  const std::string result = smt2_output(
+    smt2_convt::solvert::Z3,
+    [&expr](smt2_convt &conv) { conv.set_to(expr, true); });
   auto pos = result.rfind("(assert ");
   REQUIRE(pos != std::string::npos);
   auto end = result.find_last_not_of('\n');
@@ -940,5 +951,137 @@ TEST_CASE(
     smt2_dec << extractbit_exprt{src, idx};
 
     REQUIRE(smt2_dec() == decision_proceduret::resultt::D_UNSATISFIABLE);
+  }
+}
+
+/// Helper: full SMT2 emitted by converting (handling) a Boolean expression
+static std::string convert_handle(const exprt &expr, smt2_convt::solvert solver)
+{
+  return smt2_output(solver, [&expr](smt2_convt &conv) { conv.handle(expr); });
+}
+
+TEST_CASE("smt2_convt quantifier definition encoding", "[core][solvers][smt2]")
+{
+  // A Boolean handle whose definition contains a quantifier cannot be emitted
+  // as a `define-fun` (Z3 rejects `get-value` on such a symbol), so it is
+  // declared and constrained separately.
+  const unsignedbv_typet bv8{8};
+  const symbol_exprt i{"i", bv8};
+  const exists_exprt quantified{i, equal_exprt{i, from_integer(0, bv8)}};
+  const std::string quant = "(exists ((i (_ BitVec 8))) (= i (_ bv0 8)))";
+
+  GIVEN("a quantified Boolean expression and the Z3 solver")
+  {
+    const std::string out = convert_handle(quantified, smt2_convt::solvert::Z3);
+    INFO("SMT2 output:\n" << out);
+
+    THEN("it is declared and constrained by a let-bound equivalence")
+    {
+      // A single `(assert (= B0 <quantifier>))` would be undone by Z3's
+      // solve_eqs preprocessor (Z3Prover/z3#7743), so the equivalence is
+      // emitted as two implications. A let-binding shares the quantified
+      // expression so that it is written only once.
+      const std::string declare = "(declare-fun B0 () Bool)";
+      const std::string assertion =
+        "(assert (let ((?def " + quant + ")) (and (=> B0 ?def) (=> ?def B0))))";
+
+      REQUIRE(out.find(declare) != std::string::npos);
+      REQUIRE(out.find(assertion) != std::string::npos);
+      // the quantified expression is emitted exactly once
+      REQUIRE(out.find(quant) == out.rfind(quant));
+      // no plain equality definition
+      REQUIRE(out.find("(assert (= B0 ") == std::string::npos);
+    }
+  }
+
+  GIVEN("a quantified Boolean expression and a generic solver")
+  {
+    const std::string out =
+      convert_handle(quantified, smt2_convt::solvert::GENERIC);
+    INFO("SMT2 output:\n" << out);
+
+    THEN("it is declared and constrained by a single equality")
+    {
+      // The Z3-specific solve_eqs workaround is not applied to other solvers.
+      const std::string declare = "(declare-fun B0 () Bool)";
+      const std::string equality = "(assert (= B0 " + quant + "))";
+
+      REQUIRE(out.find(declare) != std::string::npos);
+      REQUIRE(out.find(equality) != std::string::npos);
+      // no implication-based workaround
+      REQUIRE(out.find("(assert (=> ") == std::string::npos);
+    }
+  }
+}
+
+TEST_CASE("smt2_convt symbol defined by a quantifier", "[core][solvers][smt2]")
+{
+  // A symbol defined by a quantifier via set_to is subject to the same
+  // solve_eqs elimination on Z3 as a Boolean handle, see above.
+  const unsignedbv_typet bv8{8};
+  const symbol_exprt i{"i", bv8};
+  const exists_exprt quantified{i, equal_exprt{i, from_integer(0, bv8)}};
+  const std::string quant = "(exists ((i (_ BitVec 8))) (= i (_ bv0 8)))";
+  const symbol_exprt b{"b", bool_typet{}};
+
+  GIVEN("a Boolean symbol defined by a quantifier and the Z3 solver")
+  {
+    const std::string out = smt2_output(
+      smt2_convt::solvert::Z3,
+      [&](smt2_convt &conv) { conv.set_to_true(equal_exprt{b, quantified}); });
+    INFO("SMT2 output:\n" << out);
+
+    THEN("the symbol is defined via a Boolean variable for the quantifier")
+    {
+      REQUIRE(
+        out.find(
+          "(assert (let ((?def " + quant +
+          ")) (and (=> B0 ?def) (=> ?def B0))))") != std::string::npos);
+      REQUIRE(out.find("(assert (= b B0))") != std::string::npos);
+      REQUIRE(out.find(quant) == out.rfind(quant));
+    }
+  }
+
+  GIVEN("a Boolean symbol defined by a quantifier and a generic solver")
+  {
+    const std::string out = smt2_output(
+      smt2_convt::solvert::GENERIC,
+      [&](smt2_convt &conv) { conv.set_to_true(equal_exprt{b, quantified}); });
+    INFO("SMT2 output:\n" << out);
+
+    THEN("the symbol is defined by the quantifier")
+    {
+      REQUIRE(
+        out.find("(define-fun b () Bool " + quant + ")") != std::string::npos);
+    }
+  }
+}
+
+TEST_CASE(
+  "smt2_convt quantifier nested in another expression",
+  "[core][solvers][smt2]")
+{
+  const unsignedbv_typet bv8{8};
+  const symbol_exprt i{"i", bv8};
+  const exists_exprt quantified{i, equal_exprt{i, from_integer(0, bv8)}};
+  const std::string quant = "(exists ((i (_ BitVec 8))) (= i (_ bv0 8)))";
+
+  GIVEN("a Boolean expression containing a quantifier and the Z3 solver")
+  {
+    const std::string out =
+      convert_handle(not_exprt{quantified}, smt2_convt::solvert::Z3);
+    INFO("SMT2 output:\n" << out);
+
+    THEN("the quantifier is defined by a Boolean variable of its own")
+    {
+      // Only the definition of B0 contains the quantifier, which avoids Z3
+      // returning quantified expressions as values of other symbols.
+      const std::string assertion =
+        "(assert (let ((?def " + quant + ")) (and (=> B0 ?def) (=> ?def B0))))";
+      REQUIRE(out.find(assertion) != std::string::npos);
+      REQUIRE(out.find(quant) == out.rfind(quant));
+      REQUIRE(
+        out.find("(define-fun B1 () Bool (not B0))") != std::string::npos);
+    }
   }
 }

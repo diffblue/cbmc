@@ -986,17 +986,44 @@ literalt smt2_convt::convert(const exprt &expr)
   // Note that here we are always converting, so we do not need to consider
   // other literal kinds, only "|B###|"
 
-  // Z3 refuses get-value when a defined symbol contains a quantifier.
+  // Z3 refuses get-value when a defined symbol contains a quantifier, so we
+  // declare the symbol and constrain it separately rather than using
+  // define-fun.
   if(has_quantifier(prepared_expr))
   {
     out << "(declare-fun ";
     convert_literal(l);
     out << " () Bool)\n";
-    out << "(assert (= ";
-    convert_literal(l);
-    out << ' ';
-    convert_expr(prepared_expr);
-    out << "))\n";
+    if(solver == solvert::Z3)
+    {
+      // A single (assert (= B <expr>)) does not help on Z3: its solve_eqs
+      // preprocessor eliminates B by substituting the quantified <expr>, and
+      // then hands the eliminated form back through get-value (see
+      // Z3Prover/z3#7743). Asserting the equivalence as two implications
+      // instead prevents this; a let-binding shares the (possibly large)
+      // quantified expression so that it is emitted only once. Z3 >= 4.15.3
+      // offers the opt-in option smt.solve_eqs.non_ground (default: true),
+      // which avoids this elimination when set to false, but Z3's default
+      // behaviour is unchanged and older versions reject the option, so we
+      // keep this encoding for Z3. It is only used when the solver is known
+      // to be Z3 (--z3): with --external-smt2-solver or --outfile, which use
+      // the generic solver configuration, the single equality is emitted.
+      out << "(assert (let ((?def ";
+      convert_expr(prepared_expr);
+      out << ")) (and (=> ";
+      convert_literal(l);
+      out << " ?def) (=> ?def ";
+      convert_literal(l);
+      out << "))))\n";
+    }
+    else
+    {
+      out << "(assert (= ";
+      convert_literal(l);
+      out << ' ';
+      convert_expr(prepared_expr);
+      out << "))\n";
+    }
   }
   else
   {
@@ -5547,7 +5574,16 @@ void smt2_convt::set_to(const exprt &expr, bool value)
         CHECK_RETURN(id_entry.second);
 
         find_symbols(id_entry.first->second.type);
-        exprt prepared_rhs = prepare_for_convert_expr(equal_expr.rhs());
+        // With Z3, prepare_for_convert_expr replaces each quantifier by a
+        // Boolean variable, except for a quantifier at the top level (see
+        // there). Z3's solve_eqs would eliminate a symbol defined by such a
+        // quantifier just like any other (see convert(const exprt &)), so
+        // define the symbol via a Boolean variable for the quantifier.
+        const bool rhs_is_quantifier = equal_expr.rhs().id() == ID_forall ||
+                                       equal_expr.rhs().id() == ID_exists;
+        exprt prepared_rhs = solver == solvert::Z3 && rhs_is_quantifier
+                               ? literal_exprt{convert(equal_expr.rhs())}
+                               : prepare_for_convert_expr(equal_expr.rhs());
 
         std::string smt2_identifier=convert_identifier(identifier);
         smt2_identifiers.insert(smt2_identifier);
@@ -5720,10 +5756,29 @@ exprt smt2_convt::prepare_for_convert_expr(const exprt &expr)
     !has_byte_operator(lowered_expr),
     "lower_byte_operators should remove all byte operators");
 
+  // With Z3, quantifiers that are not nested within another quantifier are
+  // replaced by a Boolean variable (see below), unless the expression itself
+  // is a quantifier, which is the case when we are asked to define such a
+  // variable (set_to separately handles a symbol defined by a quantifier).
+  const bool lift_quantifiers = solver == solvert::Z3 &&
+                                lowered_expr.id() != ID_forall &&
+                                lowered_expr.id() != ID_exists;
+
   // Perform rewrites that may introduce new symbols
   for(auto it = lowered_expr.depth_begin(), itend = lowered_expr.depth_end();
       it != itend;) // no ++it
   {
+    if(lift_quantifiers && (it->id() == ID_forall || it->id() == ID_exists))
+    {
+      // Z3 may report a quantified formula rather than a value for symbols
+      // whose definition contains a quantifier, see convert(const exprt &).
+      // Defining a Boolean variable per quantifier, using the encoding that
+      // works around this, keeps all other definitions quantifier-free.
+      literalt l = convert(*it);
+      it.mutate() = literal_exprt{l};
+      it.next_sibling_or_parent();
+      continue;
+    }
     if(
       auto prophecy_r_or_w_ok =
         expr_try_dynamic_cast<prophecy_r_or_w_ok_exprt>(*it))
