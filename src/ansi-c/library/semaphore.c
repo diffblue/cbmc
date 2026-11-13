@@ -118,18 +118,26 @@ int sem_post_multiple(sem_t *sem, int number)
 
 #include <semaphore.h>
 
+int __VERIFIER_nondet_int(void);
+
 int sem_getvalue(sem_t *sem, int *sval)
 {
   __CPROVER_HIDE:;
   (void)sem;
-  (void)sval;
 
-  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+#ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_assert(__CPROVER_get_must(sem, "sem-init"),
                    "semaphore must be initialized");
   __CPROVER_assert(!__CPROVER_get_may(sem, "sem-destroyed"),
                    "semaphore must not be destroyed");
   #endif
+
+  // POSIX.1-2017 sem_getvalue(): "shall update the location referenced
+  // by the sval argument to have the value of the semaphore". If the
+  // semaphore is locked, the value may be zero or a negative number whose
+  // absolute value is the number of waiting threads. We do not track the
+  // count, so store a nondeterministic value.
+  *sval = __VERIFIER_nondet_int();
 
   return 0;
 }
