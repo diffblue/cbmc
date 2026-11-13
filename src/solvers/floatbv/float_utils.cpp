@@ -37,7 +37,10 @@ bvt float_utilst::from_signed_integer(const bvt &src)
   unbiased_floatt result;
 
   // we need to convert negative integers
-  result.sign=sign_bit(src);
+  // Note: src is an integer bitvector, not a float, so the sign is at
+  // the top bit of the integer (src.back()), not at the float sign
+  // position.
+  result.sign = src.back();
 
   result.fraction=bv_utils.absolute_value(src);
 
@@ -163,34 +166,148 @@ bvt float_utilst::build_constant(const ieee_float_valuet &src)
   return pack(bias(result));
 }
 
+/// Round a floating-point value to integral, IEEE 754 semantics.
+///
+/// Bvt-level mirror of `float_bvt::round_to_integral` (see the Doxygen on
+/// that method for the full algorithmic description). Both implement the
+/// same algorithm, using the `exprt` and the `literalt`/`bvt` API,
+/// respectively; keep them in lockstep when changing the rounding logic.
 bvt float_utilst::round_to_integral(const bvt &src)
 {
   PRECONDITION(src.size() == spec.width());
 
-  // Zero? NaN? Infinity?
-  auto unpacked = unpack(src);
-  auto is_special = prop.lor({unpacked.zero, unpacked.NaN, unpacked.infinity});
+  const unbiased_floatt unpacked = unpack(src);
+  const literalt is_special =
+    prop.lor({unpacked.zero, unpacked.NaN, unpacked.infinity});
 
-  // add 2^f, where f is the number of fraction bits,
-  // by adding f to the exponent
-  auto magic_number = ieee_floatt{
-    spec, ieee_floatt::rounding_modet::ROUND_TO_ZERO, power(2, spec.f)};
+  // If unbiased exponent >= f, the number is already integral.  The
+  // exponent is compared with, and subtracted from, spec.f, which need not
+  // be representable in spec.e bits (for example, for
+  // __CPROVER_floatbv[28][23]).  Hence sign-extend the exponent first.
+  const std::size_t exp_width = std::max(spec.e, address_bits(spec.f)) + 2;
+  const bvt exponent = bv_utils.sign_extension(unpacked.exponent, exp_width);
+  const bvt f_const = bv_utils.build_constant(spec.f, exp_width);
+  const literalt exp_ge_f = !bv_utils.signed_less_than(exponent, f_const);
 
-  auto magic_number_bv = build_constant(magic_number);
+  const bvt biased_exp = get_exponent(src);
 
-  // abs(x) >= magic_number? If so, then there is no fractional part.
-  literalt ge_magic_number = relation(abs(src), relt::GE, magic_number_bv);
+  // ±0 and ±1 as packed bitvectors
+  ieee_floatt pz{spec, ieee_floatt::ROUND_TO_ZERO, 0};
+  ieee_floatt nz{spec, ieee_floatt::ROUND_TO_ZERO, 0};
+  nz.set_sign(true);
+  ieee_floatt p1{spec, ieee_floatt::ROUND_TO_ZERO, 1};
+  ieee_floatt n1{spec, ieee_floatt::ROUND_TO_ZERO, -1};
 
-  magic_number_bv.back() = src.back(); // copy sign bit
+  const bvt signed_zero =
+    bv_utils.select(sign_bit(src), build_constant(nz), build_constant(pz));
+  const bvt signed_one =
+    bv_utils.select(sign_bit(src), build_constant(n1), build_constant(p1));
 
-  auto tmp1 = add_sub(src, magic_number_bv, false);
+  // For |x| < 1 (biased exponent < bias): result is ±0 or ±1.
+  // |x| >= 0.5 iff biased exponent >= bias-1.
+  // |x| == 0.5 iff biased exponent == bias-1 AND fraction == 0.
+  const bvt bias_m1 = bv_utils.build_constant(spec.bias() - 1, spec.e);
+  const literalt exp_ge_bm1 = !bv_utils.unsigned_less_than(biased_exp, bias_m1);
+  const literalt exp_eq_bm1 = bv_utils.equal(biased_exp, bias_m1);
+  const literalt frac_zero = fraction_all_zeros(src);
+  const literalt abs_eq_half = prop.land(exp_eq_bm1, frac_zero);
+  const literalt abs_gt_half = prop.land(exp_ge_bm1, !abs_eq_half);
 
-  auto tmp2 = add_sub(tmp1, magic_number_bv, true);
+  // clang-format off
+  const literalt round_up_lt1 = prop.lselect(
+    rounding_mode_bits.round_to_even, abs_gt_half,
+    prop.lselect(rounding_mode_bits.round_to_away,
+      prop.lor(abs_gt_half, abs_eq_half),
+    prop.lselect(rounding_mode_bits.round_to_plus_inf,
+      !unpacked.sign,
+    prop.lselect(rounding_mode_bits.round_to_minus_inf,
+      unpacked.sign,
+      const_literal(false)))));
+  // clang-format on
 
-  // restore the original sign bit
-  tmp2.back() = src.back();
+  const bvt result_lt1 = bv_utils.select(round_up_lt1, signed_one, signed_zero);
 
-  return bv_utils.select(prop.lor(is_special, ge_magic_number), src, tmp2);
+  // |x| >= 1 branch: barrel-shifter formulation.
+  //
+  // drop = f - max(0, unbiased_exp). For unbiased_exp >= f, the result is
+  // overridden by `exp_ge_f -> src`; for unbiased_exp < 0, overridden by
+  // the |x| < 1 branch above. So in the path where this matters,
+  // drop ∈ [1, f].
+  const std::size_t width = spec.width();
+  const literalt unbiased_neg =
+    bv_utils.signed_less_than(exponent, bv_utils.build_constant(0, exp_width));
+  const bvt unbiased_clamped_lo = bv_utils.select(
+    unbiased_neg, bv_utils.build_constant(0, exp_width), exponent);
+  const bvt drop_exp_width = bv_utils.sub(
+    bv_utils.build_constant(spec.f, exp_width), unbiased_clamped_lo);
+  const bvt drop = bv_utils.zero_extension(drop_exp_width, width);
+
+  const bvt one_bv = bv_utils.build_constant(1, width);
+
+  // masked = (src >> drop) << drop
+  const bvt shifted_right =
+    bv_utils.shift(src, bv_utilst::shiftt::SHIFT_LRIGHT, drop);
+  const bvt masked =
+    bv_utils.shift(shifted_right, bv_utilst::shiftt::SHIFT_LEFT, drop);
+
+  // rbit = bit (drop - 1) of src; obtained by shifting right by drop-1
+  // and reading the LSB. When drop == 0 (only on the exp_ge_f path) the
+  // value is irrelevant since the final select picks `src`.
+  const bvt drop_m1 = bv_utils.sub(drop, one_bv);
+  const bvt shifted_to_rbit =
+    bv_utils.shift(src, bv_utilst::shiftt::SHIFT_LRIGHT, drop_m1);
+  const literalt rbit = shifted_to_rbit[0];
+
+  // lsb = bit (drop) of src
+  const literalt lsb = shifted_right[0];
+
+  // sticky = OR of bits 0..(drop-2) of src.
+  // Push those bits into the top of a width-bit value via a left shift
+  // by `width + 1 - drop`, then test for non-zero. The round bit
+  // (position drop-1) is shifted out; bits at and above drop are also
+  // out.
+  const bvt width_p1 = bv_utils.build_constant(width + 1, width);
+  const bvt sticky_shift_amount = bv_utils.sub(width_p1, drop);
+  const bvt sticky_pushed =
+    bv_utils.shift(src, bv_utilst::shiftt::SHIFT_LEFT, sticky_shift_amount);
+  const literalt sticky = !bv_utils.is_zero(sticky_pushed);
+
+  // clang-format off
+  const literalt inc = prop.lselect(
+    rounding_mode_bits.round_to_even,
+      prop.land(rbit, prop.lor(lsb, sticky)),
+    prop.lselect(rounding_mode_bits.round_to_away, rbit,
+    prop.lselect(rounding_mode_bits.round_to_plus_inf,
+      prop.land(!unpacked.sign, prop.lor(rbit, sticky)),
+    prop.lselect(rounding_mode_bits.round_to_minus_inf,
+      prop.land(unpacked.sign, prop.lor(rbit, sticky)),
+      const_literal(false)))));
+  // clang-format on
+
+  // Increment by `1 << drop`. The add runs on the full packed
+  // representation, so a carry out of the fraction bits increments the
+  // biased exponent, which yields the correctly rounded value.  In the IEEE
+  // formats, where spec.f < bias, the biased exponent then is at most
+  // bias + spec.f and thus finite.  In formats with a narrow exponent (e.g.,
+  // __CPROVER_floatbv[28][23]) rounding up the largest finite values can
+  // carry into an all-ones exponent, yielding infinity, as the integer
+  // result is not representable.
+  const bvt inc_val =
+    bv_utils.shift(one_bv, bv_utilst::shiftt::SHIFT_LEFT, drop);
+  const bvt incremented = bv_utils.add(masked, inc_val);
+  bvt result_ge1 = bv_utils.select(inc, incremented, masked);
+  // For x86 80-bit extended, the integer bit is explicit: a carry out of
+  // the fraction bits clears it while incrementing the exponent.  As all
+  // values in this branch are normal, set it again.
+  if(spec.x86_extended)
+    result_ge1[spec.f] = const_literal(true);
+
+  // Select between the two branches by exponent magnitude.
+  const bvt bias_e = bv_utils.build_constant(spec.bias(), spec.e);
+  const literalt abs_lt_1 = bv_utils.unsigned_less_than(biased_exp, bias_e);
+  const bvt result = bv_utils.select(abs_lt_1, result_lt1, result_ge1);
+
+  return bv_utils.select(prop.lor(is_special, exp_ge_f), src, result);
 }
 
 bvt float_utilst::conversion(
@@ -266,9 +383,36 @@ bvt float_utilst::conversion(
 
 literalt float_utilst::is_normal(const bvt &src)
 {
-  return prop.land(
-           !exponent_all_zeros(src),
-           !exponent_all_ones(src));
+  // For x86 80-bit extended, the explicit integer bit must be set: with a
+  // non-zero exponent, encodings with a cleared integer bit are unnormals,
+  // which x87 hardware rejects as invalid operands, and we treat as NaN.  A
+  // pseudo-denormal (zero exponent, integer bit set) denotes the value
+  // 2^(1-bias) * 1.fraction, which is normal.
+  if(spec.x86_extended)
+    return prop.land(src[spec.f], !exponent_all_ones(src));
+
+  return prop.land(!exponent_all_zeros(src), !exponent_all_ones(src));
+}
+
+bvt float_utilst::canonical_value_bits(const bvt &src)
+{
+  PRECONDITION(src.size() == spec.width());
+  bvt result(src.begin(), src.begin() + spec.value_width());
+
+  if(spec.x86_extended)
+  {
+    // A pseudo-denormal (exponent 0, integer bit 1) has the same value as
+    // the encoding with exponent 1.  Setting the least significant exponent
+    // bit when the exponent is zero and the integer bit is set yields that
+    // encoding.
+    const std::size_t exp_lsb = spec.f + 1;
+    bvt exponent(result.begin() + exp_lsb, result.begin() + exp_lsb + spec.e);
+    literalt pseudo_denormal =
+      prop.land(bv_utils.is_zero(exponent), src[spec.f]);
+    result[exp_lsb] = prop.lor(result[exp_lsb], pseudo_denormal);
+  }
+
+  return result;
 }
 
 /// Subtracts the exponents
@@ -731,17 +875,21 @@ bvt float_utilst::rem(const bvt &src1, const bvt &src2)
 bvt float_utilst::negate(const bvt &src)
 {
   PRECONDITION(!src.empty());
-  bvt result=src;
-  literalt &sign_bit=result[result.size()-1];
-  sign_bit=!sign_bit;
+  bvt result = src;
+  // For x86 80-bit extended in padded storage the sign bit lives at the
+  // top of the 80-bit value (spec.value_width()-1), not at the top of
+  // the 96-/128-bit storage container.
+  const std::size_t sign_pos = spec.value_width() - 1;
+  result[sign_pos] = !result[sign_pos];
   return result;
 }
 
 bvt float_utilst::abs(const bvt &src)
 {
   PRECONDITION(!src.empty());
-  bvt result=src;
-  result[result.size()-1]=const_literal(false);
+  bvt result = src;
+  const std::size_t sign_pos = spec.value_width() - 1;
+  result[sign_pos] = const_literal(false);
   return result;
 }
 
@@ -769,7 +917,17 @@ literalt float_utilst::relation(
 
   if(rel==relt::LT || rel==relt::LE)
   {
-    literalt bitwise_equal=bv_utils.equal(src1, src2);
+    // Bitwise equality and unsigned comparison must ignore any storage
+    // padding above the value bits.  For x86 80-bit extended `long
+    // double` in 96-/128-bit storage the padding bits above
+    // value_width() are not part of the numeric value, and for
+    // symbolic inputs they are unconstrained -- without this mask the
+    // SAT solver could pick different padding for the two operands
+    // and make a < b or a == b false for two values that are
+    // mathematically equal.
+    const bvt v1 = canonical_value_bits(src1);
+    const bvt v2 = canonical_value_bits(src2);
+    literalt bitwise_equal = bv_utils.equal(v1, v2);
 
     // signs different? trivial! Unless Zero.
 
@@ -779,7 +937,7 @@ literalt float_utilst::relation(
     // as long as the signs match: compare like unsigned numbers
 
     // this works due to the BIAS
-    literalt less_than1=bv_utils.unsigned_less_than(src1, src2);
+    literalt less_than1 = bv_utils.unsigned_less_than(v1, v2);
 
     // if both are negative (and not the same), need to turn around!
     literalt less_than2=
@@ -814,7 +972,9 @@ literalt float_utilst::relation(
   }
   else if(rel==relt::EQ)
   {
-    literalt bitwise_equal=bv_utils.equal(src1, src2);
+    // See the LT/LE case above for why padding is masked off.
+    literalt bitwise_equal =
+      bv_utils.equal(canonical_value_bits(src1), canonical_value_bits(src2));
 
     return prop.land(
       prop.lor(bitwise_equal, both_zero),
@@ -829,32 +989,43 @@ literalt float_utilst::relation(
 literalt float_utilst::is_zero(const bvt &src)
 {
   PRECONDITION(!src.empty());
-  bvt all_but_sign;
-  all_but_sign=src;
-  all_but_sign.resize(all_but_sign.size()-1);
+  // Check all value bits except the sign bit are zero.  For x86 80-bit
+  // extended `long double` in padded storage we must first drop the
+  // padding bits above value_width(); padding bits are not part of the
+  // numeric value, and for symbolic inputs they are unconstrained, so
+  // including them would let the solver pick non-zero padding and
+  // spuriously make is_zero false.
+  bvt all_but_sign = src;
+  if(all_but_sign.size() > spec.value_width())
+    all_but_sign.resize(spec.value_width());
+  // The sign bit is now the top bit; drop it.
+  all_but_sign.pop_back();
   return bv_utils.is_zero(all_but_sign);
 }
 
 literalt float_utilst::is_plus_inf(const bvt &src)
 {
-  bvt and_bv;
-  and_bv.push_back(!sign_bit(src));
-  and_bv.push_back(exponent_all_ones(src));
-  and_bv.push_back(fraction_all_zeros(src));
-  return prop.land(and_bv);
+  return prop.land(!sign_bit(src), is_infinity(src));
 }
 
 literalt float_utilst::is_infinity(const bvt &src)
 {
-  return prop.land(
-    exponent_all_ones(src),
-    fraction_all_zeros(src));
+  literalt result = prop.land(exponent_all_ones(src), fraction_all_zeros(src));
+  // For x86 80-bit extended, infinity requires the explicit integer bit to
+  // be set; with a cleared integer bit, the encoding is a pseudo-infinity,
+  // which is_NaN classifies as NaN.
+  if(spec.x86_extended)
+    result = prop.land(result, src[spec.f]);
+  return result;
 }
 
 /// Gets the unbiased exponent in a floating-point bit-vector
 bvt float_utilst::get_exponent(const bvt &src)
 {
-  return bv_utils.extract(src, spec.f, spec.f+spec.e-1);
+  // For x86 extended the explicit integer bit sits at spec.f, so the
+  // exponent starts one position higher.
+  const std::size_t exp_lsb = spec.x86_extended ? spec.f + 1 : spec.f;
+  return bv_utils.extract(src, exp_lsb, exp_lsb + spec.e - 1);
 }
 
 /// Gets the fraction without hidden bit in a floating-point bit-vector src
@@ -865,43 +1036,30 @@ bvt float_utilst::get_fraction(const bvt &src)
 
 literalt float_utilst::is_minus_inf(const bvt &src)
 {
-  bvt and_bv;
-  and_bv.push_back(sign_bit(src));
-  and_bv.push_back(exponent_all_ones(src));
-  and_bv.push_back(fraction_all_zeros(src));
-  return prop.land(and_bv);
+  return prop.land(sign_bit(src), is_infinity(src));
 }
 
 literalt float_utilst::is_NaN(const bvt &src)
 {
-  return prop.land(exponent_all_ones(src),
-                   !fraction_all_zeros(src));
+  literalt result = prop.land(exponent_all_ones(src), !fraction_all_zeros(src));
+  // For x86 80-bit extended, encodings with a cleared integer bit and a
+  // non-zero exponent (pseudo-NaN, pseudo-infinity, and unnormals) are
+  // invalid operands for x87 hardware, which produces the default NaN for
+  // them, and are therefore treated as NaN.
+  if(spec.x86_extended)
+    result =
+      prop.lor(result, prop.land(!exponent_all_zeros(src), !src[spec.f]));
+  return result;
 }
 
 literalt float_utilst::exponent_all_ones(const bvt &src)
 {
-  bvt exponent=src;
-
-  // removes the fractional part
-  exponent.erase(exponent.begin(), exponent.begin()+spec.f);
-
-  // removes the sign
-  exponent.resize(spec.e);
-
-  return bv_utils.is_all_ones(exponent);
+  return bv_utils.is_all_ones(get_exponent(src));
 }
 
 literalt float_utilst::exponent_all_zeros(const bvt &src)
 {
-  bvt exponent=src;
-
-  // removes the fractional part
-  exponent.erase(exponent.begin(), exponent.begin()+spec.f);
-
-  // removes the sign
-  exponent.resize(spec.e);
-
-  return bv_utils.is_zero(exponent);
+  return bv_utils.is_zero(get_exponent(src));
 }
 
 literalt float_utilst::fraction_all_zeros(const bvt &src)
@@ -1405,7 +1563,16 @@ float_utilst::unbiased_floatt float_utilst::unpack(const bvt &src)
   result.sign=sign_bit(src);
 
   result.fraction=get_fraction(src);
-  result.fraction.push_back(is_normal(src)); // add hidden bit
+
+  if(spec.x86_extended)
+  {
+    // The explicit integer bit is at position spec.f in the encoding.
+    result.fraction.push_back(src[spec.f]);
+  }
+  else
+  {
+    result.fraction.push_back(is_normal(src)); // add hidden bit
+  }
 
   result.exponent=get_exponent(src);
   CHECK_RETURN(result.exponent.size() == spec.e);
@@ -1435,8 +1602,8 @@ bvt float_utilst::pack(const biased_floatt &src)
 
   // do sign
   // we make this 'false' for NaN
-  result[result.size()-1]=
-    prop.lselect(src.NaN, const_literal(false), src.sign);
+  const std::size_t sign_pos = spec.value_width() - 1;
+  result[sign_pos] = prop.lselect(src.NaN, const_literal(false), src.sign);
 
   literalt infinity_or_NaN=
     prop.lor(src.NaN, src.infinity);
@@ -1447,11 +1614,25 @@ bvt float_utilst::pack(const biased_floatt &src)
 
   result[0]=prop.lor(result[0], src.NaN);
 
+  // For x86 extended, set the explicit integer bit at position spec.f.
+  // It is 1 for normal, infinity, and NaN, and 0 for zero and denormals
+  // (where the biased exponent is zero).  This yields the canonical
+  // encoding that x87 hardware produces; in particular, a result that is
+  // rounded into the denormal range is not encoded as a pseudo-denormal.
+  if(spec.x86_extended)
+  {
+    literalt exp_zero = bv_utils.is_zero(src.exponent);
+    result[spec.f] = prop.lor(infinity_or_NaN, !exp_zero);
+  }
+
   // do exponent
+  const std::size_t exp_lsb = spec.x86_extended ? spec.f + 1 : spec.f;
   for(std::size_t i=0; i<spec.e; i++)
-    result[i+spec.f]=prop.lor(
-      src.exponent[i],
-      infinity_or_NaN);
+    result[i + exp_lsb] = prop.lor(src.exponent[i], infinity_or_NaN);
+
+  // Zero out padding bits above the value
+  for(std::size_t i = spec.value_width(); i < spec.width(); i++)
+    result[i] = const_literal(false);
 
   return result;
 }
