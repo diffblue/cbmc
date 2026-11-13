@@ -5,6 +5,7 @@
 #include <util/exception_utils.h> // IWYU pragma: keep
 #include <util/journalling_symbol_table.h>
 #include <util/symbol_table.h>
+#include <util/symbol_table_builder.h>
 
 #include <testing-utils/invariant.h>
 #include <testing-utils/use_catch.h>
@@ -449,4 +450,108 @@ TEST_CASE("symbol_tablet::lookup_ref invariant", "[core][utils][symbol_tablet]")
     symbol_table.lookup_ref("bar"),
     invariant_failedt,
     invariant_failure_containing("`bar' must exist in the symbol table."));
+}
+
+TEST_CASE("symbol_tablet::next_unused_suffix", "[core][utils][symbol_tablet]")
+{
+  symbol_tablet symbol_table;
+
+  auto add = [&symbol_table](const std::string &name)
+  {
+    symbolt symbol;
+    symbol.name = name;
+    symbol_table.insert(symbol);
+  };
+
+  SECTION("repeated allocation returns distinct, increasing suffixes")
+  {
+    const std::string prefix = "tmp";
+
+    const std::size_t s0 = symbol_table.next_unused_suffix(prefix);
+    add(prefix + std::to_string(s0));
+    const std::size_t s1 = symbol_table.next_unused_suffix(prefix);
+    add(prefix + std::to_string(s1));
+    const std::size_t s2 = symbol_table.next_unused_suffix(prefix);
+
+    // the monotonically-advancing hint hands out strictly increasing suffixes
+    REQUIRE(s0 < s1);
+    REQUIRE(s1 < s2);
+  }
+
+  SECTION("uniqueness still holds after erase and re-allocation")
+  {
+    const std::string prefix = "x";
+
+    const std::size_t a = symbol_table.next_unused_suffix(prefix);
+    add(prefix + std::to_string(a));
+    const std::size_t b = symbol_table.next_unused_suffix(prefix);
+    add(prefix + std::to_string(b));
+
+    // erase the lower-suffixed symbol, creating a gap below the hint
+    symbol_table.erase(symbol_table.symbols.find(prefix + std::to_string(a)));
+
+    // the next suffix is still guaranteed unused (it must not collide with the
+    // surviving symbol), even though -- as documented -- the gap left by the
+    // erased symbol is not necessarily rediscovered
+    const std::size_t c = symbol_table.next_unused_suffix(prefix);
+    REQUIRE(c != b);
+    REQUIRE(
+      symbol_table.symbols.find(prefix + std::to_string(c)) ==
+      symbol_table.symbols.end());
+  }
+
+  SECTION("clear() resets the suffix hint")
+  {
+    const std::string prefix = "c";
+
+    const std::size_t s0 = symbol_table.next_unused_suffix(prefix);
+    add(prefix + std::to_string(s0));
+    const std::size_t s1 = symbol_table.next_unused_suffix(prefix);
+    add(prefix + std::to_string(s1));
+    REQUIRE(s1 > s0);
+
+    symbol_table.clear();
+
+    // After clear() the table is empty; the cached hint must be reset too, so
+    // allocation restarts from 0 rather than handing out a suffix relative to
+    // the now-discarded symbols.
+    REQUIRE(symbol_table.next_unused_suffix(prefix) == 0);
+  }
+}
+
+TEST_CASE(
+  "symbol_table_buildert::next_unused_suffix",
+  "[core][utils][symbol_tablet]")
+{
+  // The builder has no next_unused_suffix override of its own; it relies on
+  // the inherited symbol_table_baset implementation, whose `symbols` reference
+  // aliases the wrapped table.  This exercises that path and the cache reset
+  // on the builder's clear().
+  symbol_tablet symbol_table;
+  symbol_table_buildert builder = symbol_table_buildert::wrap(symbol_table);
+
+  auto add = [&builder](const std::string &name)
+  {
+    symbolt symbol;
+    symbol.name = name;
+    builder.insert(symbol);
+  };
+
+  const std::string prefix = "tmp";
+
+  const std::size_t s0 = builder.next_unused_suffix(prefix);
+  add(prefix + std::to_string(s0));
+  const std::size_t s1 = builder.next_unused_suffix(prefix);
+  add(prefix + std::to_string(s1));
+
+  // distinct, increasing suffixes via the inherited implementation
+  REQUIRE(s0 < s1);
+
+  // the builder's symbols alias the wrapped table
+  REQUIRE(symbol_table.has_symbol(prefix + std::to_string(s0)));
+  REQUIRE(symbol_table.has_symbol(prefix + std::to_string(s1)));
+
+  // clear() resets the hint so allocation restarts at 0
+  builder.clear();
+  REQUIRE(builder.next_unused_suffix(prefix) == 0);
 }
