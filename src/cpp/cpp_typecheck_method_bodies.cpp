@@ -123,262 +123,39 @@ void cpp_typecheckt::remove_empty_pack_expansion_args(exprt &body)
   strip(static_cast<irept &>(body));
 }
 
-/// Drain the deferred method-body queue.
-///
-/// Standard mapping (N5008 [temp.point]/1, [temp.point]/7, [temp.inst]/5):
-/// this is CBMC's approximation of the *point of instantiation* model.  A
-/// referenced function-template specialization needs only its *declaration*
-/// instantiated at the reference ([temp.inst]/10); its *definition* is
-/// instantiated at the POI that "immediately follows the namespace scope
-/// declaration or definition that refers to the specialization".  Running this
-/// drain *after* the namespace-scope `convert` loop (see
-/// `cpp_typecheckt::typecheck`), with `while(!method_bodies.empty())` so that
-/// bodies queued while converting another body are processed in a later
-/// iteration, gives those definitions a clean, top-level context -- effectively
-/// a "POI at end of translation unit".  Both member-function-template *and*
-/// free-function-template specializations reach this queue (the latter via
-/// `convert_non_template_declaration` -> `cpp_declarator_convertert` ->
-/// `add_method_body` for non-`auto` bodies); the only definitions converted
-/// inline are `auto`-return and `constexpr` ones that must fold/deduce
-/// eagerly.
-///
-/// OPEN ISSUE (see doc/architectural/cpp-frontend-review-2026-06-23-
-/// instantiation-context.md, "Correction"): definition *deferral* works.  The
-/// remaining "nested body conversion" degradation (e.g. the
-/// `cpp11_derived_to_base_pack_call_in_body` KNOWNBUG) is in *call resolution*
-/// performed while a body is being drained here: a derived-to-base
-/// ([temp.deduct.call]/4.3) call whose callee has a trailing parameter pack is
-/// dropped (the callee instance is left unbindable) for every enclosing body
-/// except `main`'s -- an as-yet-unexplained `main`-specific exemption that is
-/// the key clue for the real fix.
-/// Shared preprocessing for a deferred method body about to be converted:
-/// restore an instantiated member function template's template map
-/// ([temp.inst]/4, from `\#fn_template_type` / `\#fn_template_args`), expand
-/// the
-/// body's uses of replicated function parameter packs ([temp.variadic]/9)
-/// and drop zero-length pack expansions ([temp.variadic]/16).  Used by BOTH
-/// the main typecheck_method_bodies drain and the deferred-member fixpoint
-/// drain; the latter previously skipped all of this, so a member function
-/// template instance drained there (e.g. via the odr-use requeue) failed to
-/// convert ("symbol '__args' is unknown") and was silently left bodyless.
-void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
+/// N5008 [expr.prim.fold]/1-3: reduce a fold expression over this member
+/// function template's parameter pack.  The free-function-template body
+/// expander in cpp_instantiate_template already handles folds; a MEMBER
+/// function template body is prepared here instead, so without this the
+/// fold's bare pack reference (e.g. `a` in `(a + ...)`) is left
+/// unexpanded, fails to resolve, and the whole body is dropped ("no body
+/// for callee").  A unary right fold `(pat op ...)` over an N-element pack
+/// becomes the right-associated tree `pat0 op (pat1 op ... op patN-1)`; a
+/// unary left fold `(... op pat)` the left-associated tree
+/// `((pat0 op pat1) op ...) op patN-1`; a binary fold `(init op ... op pat)`
+/// is a left fold seeded by `init` ([expr.prim.fold]/3).  An empty pack
+/// yields the operator identity ([temp.variadic]/14: && -> true,
+/// || -> false, comma -> void(), approximated as 0); a single element
+/// yields the sole substituted pattern.  Runs for every arity (0, 1, N),
+/// independent of the pack-count-driven expansion of
+/// prepare_deferred_method_body; also run before the eager conversion of a
+/// constexpr member function template instance.
+/// \param method_symbol: the member function template instance whose
+///   body (its value) is rewritten
+void cpp_typecheckt::reduce_parameter_pack_folds(symbolt &method_symbol)
 {
   exprt &body = method_symbol.value;
-
-  // N5008 [temp.spec.partial.match]: for a member of a PARTIAL
-  // specialization instance, the enclosing class's parameters were bound
-  // by deduction against the argument pattern; replay the deduction-time
-  // pack bindings persisted on the class symbol (#spec_template_packs),
-  // non-overriding.  Without them a CLASS-level pack reference in the
-  // body -- e.g. the `get<_Idx>()...` call-argument expansion in libc++
-  // __perfect_forward's `operator()` -- has no binding at drain time,
-  // and the fn-param-driven expansion below drops the argument as an
-  // empty pack ([temp.variadic]/16 misapplied), silently truncating the
-  // call.
+  // For an N>=2 pack, typecheck_compound_declarator replicated the pack
+  // parameter into `base$0..base$N-1`; recover N per base from those
+  // names.  (#expanded_param_packs records the same when present.)
+  std::map<irep_idt, std::size_t> dollar_counts;
+  const irept &eprec_f =
+    method_symbol.type.find(irep_idt{"#expanded_param_packs"});
+  if(eprec_f.is_not_nil() && !eprec_f.get_sub().empty())
   {
-    const irep_idt &class_id = method_symbol.type.get(ID_C_member_name);
-    const symbolt *class_sym =
-      class_id.empty() ? nullptr : symbol_table.lookup(class_id);
-    if(class_sym != nullptr)
-    {
-      const irept &bindings =
-        class_sym->type.find(irep_idt{"#spec_template_packs"});
-      for(const auto &entry : bindings.get_sub())
-      {
-        const irep_idt pid = entry.get(ID_identifier);
-        if(pid.empty())
-          continue;
-        if(entry.id() == irep_idt{"pack_types"})
-        {
-          if(
-            template_map.pack_size_map.find(pid) !=
-            template_map.pack_size_map.end())
-            continue;
-          std::vector<typet> elems;
-          for(const auto &t : entry.get_sub())
-            elems.push_back(static_cast<const typet &>(t));
-          template_map.set_pack_size(pid, elems.size());
-          if(!elems.empty())
-          {
-            if(elems.size() == 1)
-              template_map.type_map.emplace(pid, elems.front());
-            template_map.pack_args_map[pid] = std::move(elems);
-          }
-        }
-        else if(entry.id() == irep_idt{"pack_exprs"})
-        {
-          if(
-            template_map.pack_size_map.find(pid) !=
-            template_map.pack_size_map.end())
-            continue;
-          std::vector<exprt> vals;
-          for(const auto &v : entry.get_sub())
-            vals.push_back(static_cast<const exprt &>(v));
-          template_map.set_pack_size(pid, vals.size());
-          if(!vals.empty())
-          {
-            if(vals.size() == 1)
-              template_map.expr_map.emplace(pid, vals.front());
-            template_map.pack_expr_map[pid] = std::move(vals);
-          }
-        }
-      }
-    }
-  }
-
-  // Per [temp.inst]/4: restore function template map if this
-  // is an instantiated member function template.
-  if(method_symbol.type.find(irep_idt{"#fn_template_type"}).is_not_nil())
-  {
-    template_map.build(
-      static_cast<const template_typet &>(
-        method_symbol.type.find(irep_idt{"#fn_template_type"})),
-      static_cast<const cpp_template_args_tct &>(
-        method_symbol.type.find(irep_idt{"#fn_template_args"})));
-
-    // N5008 [temp.variadic]/5,8: with MULTIPLE parameter packs the flat
-    // #fn_template_args list cannot encode the split between the packs
-    // (std::pair's piecewise delegation target, two type packs + two
-    // non-type index packs).  Replay the deduction-time pack bindings
-    // persisted by instantiate_template.
-    const irept &packs =
-      method_symbol.type.find(irep_idt{"#fn_template_packs"});
-    for(const auto &entry : packs.get_sub())
-    {
-      const irep_idt pid = entry.get(ID_identifier);
-      if(entry.id() == ID_expression)
-      {
-        std::vector<exprt> vals;
-        for(const auto &v : entry.get_sub())
-          vals.push_back(static_cast<const exprt &>(v));
-        template_map.set_pack_size(pid, vals.size());
-        if(!vals.empty())
-        {
-          template_map.pack_expr_map[pid] = vals;
-          template_map.expr_map[pid] = vals.front();
-        }
-        continue;
-      }
-      std::vector<typet> elems;
-      for(const auto &t : entry.get_sub())
-        elems.push_back(static_cast<const typet &>(t));
-      template_map.set_pack_size(pid, elems.size());
-      template_map.pack_args_map[pid] = elems;
-      if(!elems.empty())
-        template_map.type_map[pid] = elems.front();
-    }
-
-    // N5008 [temp.variadic]/16: an expansion over an EMPTY pack produces an
-    // empty list.  With the pack bindings replayed above, drop
-    // member-initializer arguments that reference an empty pack outside
-    // `sizeof...` (which is just 0, [temp.variadic]/10) -- e.g.
-    // `second(std::forward<_Args2>(std::get<_Indexes2>(__tuple2))...)` in
-    // std::pair's piecewise delegation target with _Args2/_Indexes2 empty
-    // becomes `second()`.  Left in place, the unsubstitutable pack
-    // reference fails the body's conversion and the member is dropped.
-    if(!packs.get_sub().empty())
-    {
-      std::set<std::string> empty_pack_shorts;
-      for(const auto &entry : packs.get_sub())
-      {
-        if(!entry.get_sub().empty())
-          continue;
-        const std::string f = id2string(entry.get(ID_identifier));
-        auto p = f.rfind("::");
-        empty_pack_shorts.insert(p != std::string::npos ? f.substr(p + 2) : f);
-      }
-      if(!empty_pack_shorts.empty())
-      {
-        // an argument that merely contains an expansion of the empty pack
-        // nested in a template argument list or a call (`sizes(list<T1...>{},
-        // list<T2...>{}, 0)', the MSVC STL pair's `index_sequence_for<
-        // _Types2...>{}') is kept: the nested expansion is empty there
-        const irept *current_arg = nullptr;
-        std::function<bool(const irept &)> refs_ep = [&](const irept &n)
-        {
-          if(n.get_bool("#sizeof_pack"))
-            return false;
-          if(&n != current_arg && n.get_bool(ID_ellipsis))
-            return false;
-          if(
-            n.id() == ID_name &&
-            empty_pack_shorts.count(id2string(n.get(ID_identifier))))
-            return true;
-          for(const auto &sn : n.get_sub())
-            if(refs_ep(sn))
-              return true;
-          for(const auto &ns : n.get_named_sub())
-            if(refs_ep(ns.second))
-              return true;
-          return false;
-        };
-        std::function<void(irept &)> drop = [&](irept &n)
-        {
-          if(n.id() == ID_code && n.get(ID_statement) == ID_member_initializer)
-          {
-            irept::subt &args = n.get_sub();
-            args.erase(
-              std::remove_if(
-                args.begin(),
-                args.end(),
-                [&](const irept &a)
-                {
-                  current_arg = &a;
-                  return refs_ep(a);
-                }),
-              args.end());
-            return;
-          }
-          for(auto &sn : n.get_sub())
-            drop(sn);
-          for(auto &ns : n.get_named_sub())
-            drop(ns.second);
-        };
-        drop(static_cast<irept &>(body));
-      }
-    }
-
-    // N5008 [temp.variadic]/9: expand the remaining (non-empty)
-    // pack-expansion mem-initializer arguments with the replayed pack
-    // bindings -- `first(std::forward<_Args1>(std::get<_Indexes1>(
-    // __tuple1))...)` in std::pair's piecewise delegation target mixes
-    // a reference-type pack with a non-type index pack, which the
-    // scalar convenience entries alone cannot expand; the unexpanded
-    // ellipsis failed the body's conversion and the member was
-    // dropped (std::map's piecewise-constructed key was havocked).
-    expand_member_initializer_packs_in_body(
-      static_cast<irept &>(body),
-      template_map.pack_args_map,
-      template_map.pack_expr_map);
-  }
-
-  // N5008 [expr.prim.fold]/1-3: reduce a fold expression over this member
-  // function template's parameter pack.  The free-function-template body
-  // expander in cpp_instantiate_template already handles folds; a MEMBER
-  // function template body is prepared here instead, so without this the
-  // fold's bare pack reference (e.g. `a` in `(a + ...)`) is left
-  // unexpanded, fails to resolve, and the whole body is dropped ("no body
-  // for callee").  A unary right fold `(pat op ...)` over an N-element pack
-  // becomes the right-associated tree `pat0 op (pat1 op ... op patN-1)`; a
-  // unary left fold `(... op pat)` the left-associated tree
-  // `((pat0 op pat1) op ...) op patN-1`; a binary fold `(init op ... op pat)`
-  // is a left fold seeded by `init` ([expr.prim.fold]/3).  An empty pack
-  // yields the operator identity ([temp.variadic]/14: && -> true,
-  // || -> false, comma -> void(), approximated as 0); a single element
-  // yields the sole substituted pattern.  Runs for every arity (0, 1, N),
-  // independent of the pack-count-driven expansion below.
-  {
-    // For an N>=2 pack, typecheck_compound_declarator replicated the pack
-    // parameter into `base$0..base$N-1`; recover N per base from those
-    // names.  (#expanded_param_packs records the same when present.)
-    std::map<irep_idt, std::size_t> dollar_counts;
-    const irept &eprec_f =
-      method_symbol.type.find(irep_idt{"#expanded_param_packs"});
-    if(eprec_f.is_not_nil() && !eprec_f.get_sub().empty())
-    {
-      for(const auto &e : eprec_f.get_sub())
-        if(e.get_size_t(ID_size) >= 2)
-          dollar_counts[e.id()] = e.get_size_t(ID_size);
+    for(const auto &e : eprec_f.get_sub())
+      if(e.get_size_t(ID_size) >= 2)
+        dollar_counts[e.id()] = e.get_size_t(ID_size);
     }
     if(method_symbol.type.id() == ID_code)
     {
@@ -476,6 +253,54 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
       return from_integer(0, signed_int_type());
     };
 
+    // N5008 [temp.variadic]/9: the k-th element of the expansion
+    // substitutes the k-th element of EVERY pack the pattern references.
+    // Besides the function parameter pack (renamed to base$k), a deduced
+    // template pack of the same length -- the `A' in `(f<A>(a), ...)' --
+    // becomes its k-th element.  Left in place, its name resolved to the
+    // pack's FIRST element in every instance of the pattern.
+    auto substitute_template_pack_elements =
+      [this](irept &pattern, std::size_t n, std::size_t k)
+    {
+      auto short_name = [](const irep_idt &id)
+      {
+        const std::string s = id2string(id);
+        const auto p = s.rfind("::");
+        return p != std::string::npos ? s.substr(p + 2) : s;
+      };
+      std::function<void(irept &)> substitute = [&](irept &t)
+      {
+        if(
+          t.id() == ID_cpp_name && t.get_sub().size() == 1 &&
+          t.get_sub().front().id() == ID_name)
+        {
+          const std::string name =
+            short_name(t.get_sub().front().get(ID_identifier));
+          for(const auto &pe : template_map.pack_args_map)
+          {
+            if(pe.second.size() == n && short_name(pe.first) == name)
+            {
+              t = pe.second[k];
+              return;
+            }
+          }
+          for(const auto &pe : template_map.pack_expr_map)
+          {
+            if(pe.second.size() == n && short_name(pe.first) == name)
+            {
+              t = pe.second[k];
+              return;
+            }
+          }
+        }
+        for(auto &sub : t.get_sub())
+          substitute(sub);
+        for(auto &ns : t.get_named_sub())
+          substitute(ns.second);
+      };
+      substitute(pattern);
+    };
+
     std::function<void(irept &)> reduce_folds = [&](irept &node)
     {
       const bool is_right = node.id() == irep_idt("cpp_right_fold");
@@ -556,6 +381,7 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
           {
             irept c = pat;
             fold_rename(c, base, id2string(base) + "$" + std::to_string(k));
+            substitute_template_pack_elements(c, n, k);
             reduce_folds(c);
             return c;
           };
@@ -867,239 +693,476 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
       };
       reduce_sizeof_packs(static_cast<irept &>(body));
     }
-  }
+}
 
-  // N5008 [temp.variadic]/9: expand the body / member-initializer uses of a
-  // function parameter pack that typecheck_compound_declarator replicated
-  // into N parameters `base$0..base$N-1`.  Each pack-expansion use `pat...`
-  // (a list element carrying ID_ellipsis that mentions the pack `base`) is
-  // replaced by N copies of `pat`, the k-th with `base` renamed to `base$k`
-  // and the ellipsis removed.  This must run before the single-element
-  // substitution below, which strips ID_ellipsis unconditionally.  Acts only
-  // when a multi-element expansion was recorded, so single-element/empty
-  // bodies are untouched.
+/// N5008 [temp.variadic]/9: expand the body / member-initializer uses of a
+/// function parameter pack that typecheck_compound_declarator replicated
+/// into N parameters `base$0..base$N-1`.  Each pack-expansion use `pat...`
+/// (a list element carrying ID_ellipsis that mentions the pack `base`) is
+/// replaced by N copies of `pat`, the k-th with `base` renamed to `base$k`
+/// and the ellipsis removed.  This must run before the single-element
+/// substitution below, which strips ID_ellipsis unconditionally.  Acts only
+/// when a multi-element expansion was recorded, so single-element/empty
+/// bodies are untouched.
+/// \param method_symbol: the member function template instance whose
+///   body (its value) is rewritten
+void cpp_typecheckt::expand_replicated_parameter_pack_uses(
+  symbolt &method_symbol)
+{
+  exprt &body = method_symbol.value;
+  const irept &eprec =
+    method_symbol.type.find(irep_idt{"#expanded_param_packs"});
+  std::map<irep_idt, std::size_t> pack_counts;
+  if(eprec.is_not_nil() && !eprec.get_sub().empty())
   {
-    const irept &eprec =
-      method_symbol.type.find(irep_idt{"#expanded_param_packs"});
-    std::map<irep_idt, std::size_t> pack_counts;
-    if(eprec.is_not_nil() && !eprec.get_sub().empty())
+    for(const auto &e : eprec.get_sub())
+      pack_counts[e.id()] = e.get_size_t(ID_size);
+  }
+  else if(method_symbol.type.id() == ID_code)
+  {
+    // N5008 [temp.variadic]/9: when a member of a class template partial
+    // specialization `C<R(A...)>` is instantiated, the member's parameter
+    // pack `A... a` is expanded into distinct parameters `a$0..a$k` by
+    // `template_mapt` during instantiation, which -- unlike the in-class
+    // `compound_type` path -- does not leave an `#expanded_param_packs`
+    // record.  Recover the per-pack counts from the already-expanded
+    // parameter names so the body's pack-expansion uses (`a...`, e.g. the
+    // libstdc++ `function<R(A...)>::operator()` body
+    // `_M_invoker(_M_functor, std::forward<A>(__args)...)`) expand to the
+    // full arity instead of collapsing to one argument.  A replicated
+    // parameter is named `base$k`; group by base and count.
+    std::map<irep_idt, std::size_t> counts;
+    for(const auto &p : to_code_type(method_symbol.type).parameters())
     {
-      for(const auto &e : eprec.get_sub())
-        pack_counts[e.id()] = e.get_size_t(ID_size);
+      const std::string bn = id2string(p.get_base_name());
+      const auto dollar = bn.rfind('$');
+      if(dollar == std::string::npos || dollar + 1 >= bn.size())
+        continue;
+      if(bn.find_first_not_of("0123456789", dollar + 1) != std::string::npos)
+        continue;
+      ++counts[irep_idt{bn.substr(0, dollar)}];
     }
-    else if(method_symbol.type.id() == ID_code)
+    // Only treat as a pack expansion when more than one element was
+    // produced; a single `base$0` is an ordinary case handled by the
+    // single-element substitution below.
+    for(const auto &c : counts)
+      if(c.second >= 2)
+        pack_counts[c.first] = c.second;
+  }
+  if(!pack_counts.empty())
+  {
+    // The recorded pack base (if any) that a pack-expansion pattern node
+    // mentions.
+    // [temp.variadic]/8: a pack name is expanded by the innermost pack
+    // expansion that contains it -- a nested pattern with its own `...'
+    // (the `ls...' in `one(seq<Js>{}, ls...)...') is not searched
+    std::function<irep_idt(const irept &, bool)> ref_base_rec =
+      [&](const irept &n, bool root) -> irep_idt
     {
-      // N5008 [temp.variadic]/9: when a member of a class template partial
-      // specialization `C<R(A...)>` is instantiated, the member's parameter
-      // pack `A... a` is expanded into distinct parameters `a$0..a$k` by
-      // `template_mapt` during instantiation, which -- unlike the in-class
-      // `compound_type` path -- does not leave an `#expanded_param_packs`
-      // record.  Recover the per-pack counts from the already-expanded
-      // parameter names so the body's pack-expansion uses (`a...`, e.g. the
-      // libstdc++ `function<R(A...)>::operator()` body
-      // `_M_invoker(_M_functor, std::forward<A>(__args)...)`) expand to the
-      // full arity instead of collapsing to one argument.  A replicated
-      // parameter is named `base$k`; group by base and count.
-      std::map<irep_idt, std::size_t> counts;
-      for(const auto &p : to_code_type(method_symbol.type).parameters())
-      {
-        const std::string bn = id2string(p.get_base_name());
-        const auto dollar = bn.rfind('$');
-        if(dollar == std::string::npos || dollar + 1 >= bn.size())
-          continue;
-        if(bn.find_first_not_of("0123456789", dollar + 1) != std::string::npos)
-          continue;
-        ++counts[irep_idt{bn.substr(0, dollar)}];
-      }
-      // Only treat as a pack expansion when more than one element was
-      // produced; a single `base$0` is an ordinary case handled by the
-      // single-element substitution below.
-      for(const auto &c : counts)
-        if(c.second >= 2)
-          pack_counts[c.first] = c.second;
-    }
-    if(!pack_counts.empty())
-    {
-      // The recorded pack base (if any) that a pack-expansion pattern node
-      // mentions.
-      // [temp.variadic]/8: a pack name is expanded by the innermost pack
-      // expansion that contains it -- a nested pattern with its own `...'
-      // (the `ls...' in `one(seq<Js>{}, ls...)...') is not searched
-      std::function<irep_idt(const irept &, bool)> ref_base_rec =
-        [&](const irept &n, bool root) -> irep_idt
-      {
-        if(!root && n.get_bool(ID_ellipsis))
-          return irep_idt{};
-        if(n.id() == ID_name && pack_counts.count(n.get(ID_identifier)))
-          return n.get(ID_identifier);
-        for(const auto &s : n.get_sub())
-          if(irep_idt r = ref_base_rec(s, false); !r.empty())
-            return r;
-        for(const auto &ns : n.get_named_sub())
-          if(irep_idt r = ref_base_rec(ns.second, false); !r.empty())
-            return r;
+      if(!root && n.get_bool(ID_ellipsis))
         return irep_idt{};
-      };
-      const auto ref_base = [&](const irept &n)
-      { return ref_base_rec(n, true); };
+      if(n.id() == ID_name && pack_counts.count(n.get(ID_identifier)))
+        return n.get(ID_identifier);
+      for(const auto &s : n.get_sub())
+        if(irep_idt r = ref_base_rec(s, false); !r.empty())
+          return r;
+      for(const auto &ns : n.get_named_sub())
+        if(irep_idt r = ref_base_rec(ns.second, false); !r.empty())
+          return r;
+      return irep_idt{};
+    };
+    const auto ref_base = [&](const irept &n) { return ref_base_rec(n, true); };
 
-      std::function<void(irept &, const irep_idt &, const irep_idt &)> rename =
-        [&](irept &n, const irep_idt &base, const irep_idt &repl)
-      {
-        if(n.id() == ID_name && n.get(ID_identifier) == base)
-          n.set(ID_identifier, repl);
-        for(auto &s : n.get_sub())
-          rename(s, base, repl);
-        for(auto &ns : n.get_named_sub())
-          rename(ns.second, base, repl);
-      };
+    std::function<void(irept &, const irep_idt &, const irep_idt &)> rename =
+      [&](irept &n, const irep_idt &base, const irep_idt &repl)
+    {
+      if(n.id() == ID_name && n.get(ID_identifier) == base)
+        n.set(ID_identifier, repl);
+      for(auto &s : n.get_sub())
+        rename(s, base, repl);
+      for(auto &ns : n.get_named_sub())
+        rename(ns.second, base, repl);
+    };
 
-      std::function<void(irept &)> expand = [&](irept &node)
+    std::function<void(irept &)> expand = [&](irept &node)
+    {
+      const bool is_arg_list = node.id() == ID_arguments;
+      irept::subt &sub = node.get_sub();
+      irept::subt newsub;
+      for(auto &child : sub)
       {
-        const bool is_arg_list = node.id() == ID_arguments;
-        irept::subt &sub = node.get_sub();
-        irept::subt newsub;
-        for(auto &child : sub)
+        // A pack-expansion use is detected either by a preserved
+        // ID_ellipsis marker on the pattern (brace-init / member-init
+        // contexts) or, in a function-call argument list -- where the
+        // parser may drop the `...` -- by a *bare* reference to the pack
+        // base name (a parameter pack may only legally appear in a pack
+        // expansion, so a bare use of the base name is one).  The
+        // bare-cpp_name restriction is essential: an argument that merely
+        // *contains* the pack nested inside a larger expression -- e.g.
+        // `fsum(rest...)` as the initializer expression of a member
+        // initializer `sum(fsum(rest...))` -- is a *single* argument whose
+        // own pack expansion sits on the inner call's argument (and carries
+        // its own ID_ellipsis); expanding the outer argument per element
+        // here would wrongly turn `sum(fsum(rest...))` into
+        // `sum(fsum(rest$0), fsum(rest$1))`.  Such nested expansions are
+        // reached by the recursion below and expanded at their own level.
+        irep_idt base;
+        if(
+          child.get_bool(ID_ellipsis) ||
+          (is_arg_list && child.id() == ID_cpp_name))
+          base = ref_base(child);
+        if(!base.empty())
         {
-          // A pack-expansion use is detected either by a preserved
-          // ID_ellipsis marker on the pattern (brace-init / member-init
-          // contexts) or, in a function-call argument list -- where the
-          // parser may drop the `...` -- by a *bare* reference to the pack
-          // base name (a parameter pack may only legally appear in a pack
-          // expansion, so a bare use of the base name is one).  The
-          // bare-cpp_name restriction is essential: an argument that merely
-          // *contains* the pack nested inside a larger expression -- e.g.
-          // `fsum(rest...)` as the initializer expression of a member
-          // initializer `sum(fsum(rest...))` -- is a *single* argument whose
-          // own pack expansion sits on the inner call's argument (and carries
-          // its own ID_ellipsis); expanding the outer argument per element
-          // here would wrongly turn `sum(fsum(rest...))` into
-          // `sum(fsum(rest$0), fsum(rest$1))`.  Such nested expansions are
-          // reached by the recursion below and expanded at their own level.
-          irep_idt base;
-          if(
-            child.get_bool(ID_ellipsis) ||
-            (is_arg_list && child.id() == ID_cpp_name))
-            base = ref_base(child);
-          if(!base.empty())
+          const std::size_t n = pack_counts[base];
+          for(std::size_t k = 0; k < n; ++k)
           {
-            const std::size_t n = pack_counts[base];
-            for(std::size_t k = 0; k < n; ++k)
+            irept copy = child;
+            copy.remove(ID_ellipsis);
+            rename(copy, base, id2string(base) + "$" + std::to_string(k));
+            // N5008 [temp.variadic]/9: the k-th element of the expansion
+            // substitutes the k-th element of EVERY pack the pattern
+            // references.  Besides the function-parameter pack renamed
+            // above, a bare reference to a deduced TEMPLATE type pack --
+            // e.g. the explicit argument in `forward<A>(a)...` -- must
+            // become that pack's k-th deduced type; leaving the whole
+            // pack name in place makes the per-element call unresolvable
+            // (deduction fails for every `forward` overload and the
+            // enclosing body is dropped, the _Rb_tree
+            // _M_emplace_hint_unique shape).
+            std::function<void(irept &)> subst_type_pack = [&](irept &t)
             {
-              irept copy = child;
-              copy.remove(ID_ellipsis);
-              rename(copy, base, id2string(base) + "$" + std::to_string(k));
-              // N5008 [temp.variadic]/9: the k-th element of the expansion
-              // substitutes the k-th element of EVERY pack the pattern
-              // references.  Besides the function-parameter pack renamed
-              // above, a bare reference to a deduced TEMPLATE type pack --
-              // e.g. the explicit argument in `forward<A>(a)...` -- must
-              // become that pack's k-th deduced type; leaving the whole
-              // pack name in place makes the per-element call unresolvable
-              // (deduction fails for every `forward` overload and the
-              // enclosing body is dropped, the _Rb_tree
-              // _M_emplace_hint_unique shape).
-              std::function<void(irept &)> subst_type_pack = [&](irept &t)
+              if(
+                t.id() == ID_cpp_name && t.get_sub().size() == 1 &&
+                t.get_sub().front().id() == ID_name)
               {
-                if(
-                  t.id() == ID_cpp_name && t.get_sub().size() == 1 &&
-                  t.get_sub().front().id() == ID_name)
+                const std::string nm =
+                  id2string(t.get_sub().front().get(ID_identifier));
+                const auto p = nm.rfind("::");
+                const std::string suf =
+                  p != std::string::npos ? nm.substr(p + 2) : nm;
+                for(const auto &pe : template_map.pack_args_map)
                 {
-                  const std::string nm =
-                    id2string(t.get_sub().front().get(ID_identifier));
-                  const auto p = nm.rfind("::");
-                  const std::string suf =
-                    p != std::string::npos ? nm.substr(p + 2) : nm;
-                  for(const auto &pe : template_map.pack_args_map)
+                  const std::string key = id2string(pe.first);
+                  const auto q = key.rfind("::");
+                  const std::string ksuf =
+                    q != std::string::npos ? key.substr(q + 2) : key;
+                  if(ksuf == suf && pe.second.size() == n && k < n)
                   {
-                    const std::string key = id2string(pe.first);
-                    const auto q = key.rfind("::");
-                    const std::string ksuf =
-                      q != std::string::npos ? key.substr(q + 2) : key;
-                    if(ksuf == suf && pe.second.size() == n && k < n)
-                    {
-                      t = pe.second[k];
-                      return;
-                    }
+                    t = pe.second[k];
+                    return;
                   }
                 }
-                for(auto &s : t.get_sub())
-                  subst_type_pack(s);
-                for(auto &ns : t.get_named_sub())
-                  subst_type_pack(ns.second);
-              };
-              subst_type_pack(copy);
-              // ... and a NON-type template pack of the same length, e.g.
-              // the enclosing class template's `Is' in `get<Is>(vs)...'
-              // (libc++'s __dispatcher<_Is...>::__dispatch): its k-th
-              // value, not the scalar convenience binding (the first).  A
-              // nested pattern with its own `...' expands its packs itself.
-              for(const auto &pe : template_map.pack_expr_map)
-              {
-                if(pe.second.size() != n || n < 2)
-                  continue;
-                const std::string key = id2string(pe.first);
-                const auto q = key.rfind("::");
-                const std::string short_name =
-                  q != std::string::npos ? key.substr(q + 2) : key;
-                const auto is_ref = [&short_name](const irept &t)
-                {
-                  if(
-                    t.id() != ID_cpp_name || t.get_sub().size() != 1 ||
-                    t.get_sub().front().id() != ID_name)
-                  {
-                    return false;
-                  }
-                  const std::string nm =
-                    id2string(t.get_sub().front().get(ID_identifier));
-                  const auto p = nm.rfind("::");
-                  return (p != std::string::npos ? nm.substr(p + 2) : nm) ==
-                         short_name;
-                };
-                // replace_value_pack_ref's shapes: a bare name, or a
-                // template argument the parser left `ambiguous'
-                std::function<void(irept &)> subst_value_pack = [&](irept &t)
-                {
-                  for(auto &c : t.get_sub())
-                  {
-                    if(c.get_bool(ID_ellipsis))
-                      continue;
-                    if(
-                      is_ref(c) ||
-                      (c.id() == ID_ambiguous && is_ref(c.find(ID_type))))
-                    {
-                      c = pe.second[k];
-                    }
-                    else
-                      subst_value_pack(c);
-                  }
-                  for(auto &ns : t.get_named_sub())
-                  {
-                    if(is_ref(ns.second))
-                      ns.second = pe.second[k];
-                    else if(!ns.second.get_bool(ID_ellipsis))
-                      subst_value_pack(ns.second);
-                  }
-                };
-                subst_value_pack(copy);
               }
-              expand(copy);
-              newsub.push_back(copy);
+              for(auto &s : t.get_sub())
+                subst_type_pack(s);
+              for(auto &ns : t.get_named_sub())
+                subst_type_pack(ns.second);
+            };
+            subst_type_pack(copy);
+            // ... and a NON-type template pack of the same length, e.g.
+            // the enclosing class template's `Is' in `get<Is>(vs)...'
+            // (libc++'s __dispatcher<_Is...>::__dispatch): its k-th
+            // value, not the scalar convenience binding (the first).  A
+            // nested pattern with its own `...' expands its packs itself.
+            for(const auto &pe : template_map.pack_expr_map)
+            {
+              if(pe.second.size() != n || n < 2)
+                continue;
+              const std::string key = id2string(pe.first);
+              const auto q = key.rfind("::");
+              const std::string short_name =
+                q != std::string::npos ? key.substr(q + 2) : key;
+              const auto is_ref = [&short_name](const irept &t)
+              {
+                if(
+                  t.id() != ID_cpp_name || t.get_sub().size() != 1 ||
+                  t.get_sub().front().id() != ID_name)
+                {
+                  return false;
+                }
+                const std::string nm =
+                  id2string(t.get_sub().front().get(ID_identifier));
+                const auto p = nm.rfind("::");
+                return (p != std::string::npos ? nm.substr(p + 2) : nm) ==
+                       short_name;
+              };
+              // replace_value_pack_ref's shapes: a bare name, or a
+              // template argument the parser left `ambiguous'
+              std::function<void(irept &)> subst_value_pack = [&](irept &t)
+              {
+                for(auto &c : t.get_sub())
+                {
+                  if(c.get_bool(ID_ellipsis))
+                    continue;
+                  if(
+                    is_ref(c) ||
+                    (c.id() == ID_ambiguous && is_ref(c.find(ID_type))))
+                  {
+                    c = pe.second[k];
+                  }
+                  else
+                    subst_value_pack(c);
+                }
+                for(auto &ns : t.get_named_sub())
+                {
+                  if(is_ref(ns.second))
+                    ns.second = pe.second[k];
+                  else if(!ns.second.get_bool(ID_ellipsis))
+                    subst_value_pack(ns.second);
+                }
+              };
+              subst_value_pack(copy);
             }
-          }
-          else
-          {
-            expand(child);
-            newsub.push_back(child);
+            expand(copy);
+            newsub.push_back(copy);
           }
         }
-        sub.swap(newsub);
-        for(auto &ns : node.get_named_sub())
-          expand(ns.second);
-      };
-      expand(static_cast<irept &>(body));
+        else
+        {
+          expand(child);
+          newsub.push_back(child);
+        }
+      }
+      sub.swap(newsub);
+      for(auto &ns : node.get_named_sub())
+        expand(ns.second);
+    };
+    expand(static_cast<irept &>(body));
+  }
+}
+
+/// Drain the deferred method-body queue.
+///
+/// Standard mapping (N5008 [temp.point]/1, [temp.point]/7, [temp.inst]/5):
+/// this is CBMC's approximation of the *point of instantiation* model.  A
+/// referenced function-template specialization needs only its *declaration*
+/// instantiated at the reference ([temp.inst]/10); its *definition* is
+/// instantiated at the POI that "immediately follows the namespace scope
+/// declaration or definition that refers to the specialization".  Running this
+/// drain *after* the namespace-scope `convert` loop (see
+/// `cpp_typecheckt::typecheck`), with `while(!method_bodies.empty())` so that
+/// bodies queued while converting another body are processed in a later
+/// iteration, gives those definitions a clean, top-level context -- effectively
+/// a "POI at end of translation unit".  Both member-function-template *and*
+/// free-function-template specializations reach this queue (the latter via
+/// `convert_non_template_declaration` -> `cpp_declarator_convertert` ->
+/// `add_method_body` for non-`auto` bodies); the only definitions converted
+/// inline are `auto`-return and `constexpr` ones that must fold/deduce
+/// eagerly.
+///
+/// OPEN ISSUE (see doc/architectural/cpp-frontend-review-2026-06-23-
+/// instantiation-context.md, "Correction"): definition *deferral* works.  The
+/// remaining "nested body conversion" degradation (e.g. the
+/// `cpp11_derived_to_base_pack_call_in_body` KNOWNBUG) is in *call resolution*
+/// performed while a body is being drained here: a derived-to-base
+/// ([temp.deduct.call]/4.3) call whose callee has a trailing parameter pack is
+/// dropped (the callee instance is left unbindable) for every enclosing body
+/// except `main`'s -- an as-yet-unexplained `main`-specific exemption that is
+/// the key clue for the real fix.
+/// Shared preprocessing for a deferred method body about to be converted:
+/// restore an instantiated member function template's template map
+/// ([temp.inst]/4, from `\#fn_template_type` / `\#fn_template_args`), expand
+/// the
+/// body's uses of replicated function parameter packs ([temp.variadic]/9)
+/// and drop zero-length pack expansions ([temp.variadic]/16).  Used by BOTH
+/// the main typecheck_method_bodies drain and the deferred-member fixpoint
+/// drain; the latter previously skipped all of this, so a member function
+/// template instance drained there (e.g. via the odr-use requeue) failed to
+/// convert ("symbol '__args' is unknown") and was silently left bodyless.
+void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
+{
+  exprt &body = method_symbol.value;
+
+  // N5008 [temp.spec.partial.match]: for a member of a PARTIAL
+  // specialization instance, the enclosing class's parameters were bound
+  // by deduction against the argument pattern; replay the deduction-time
+  // pack bindings persisted on the class symbol (#spec_template_packs),
+  // non-overriding.  Without them a CLASS-level pack reference in the
+  // body -- e.g. the `get<_Idx>()...` call-argument expansion in libc++
+  // __perfect_forward's `operator()` -- has no binding at drain time,
+  // and the fn-param-driven expansion below drops the argument as an
+  // empty pack ([temp.variadic]/16 misapplied), silently truncating the
+  // call.
+  {
+    const irep_idt &class_id = method_symbol.type.get(ID_C_member_name);
+    const symbolt *class_sym =
+      class_id.empty() ? nullptr : symbol_table.lookup(class_id);
+    if(class_sym != nullptr)
+    {
+      const irept &bindings =
+        class_sym->type.find(irep_idt{"#spec_template_packs"});
+      for(const auto &entry : bindings.get_sub())
+      {
+        const irep_idt pid = entry.get(ID_identifier);
+        if(pid.empty())
+          continue;
+        if(entry.id() == irep_idt{"pack_types"})
+        {
+          if(
+            template_map.pack_size_map.find(pid) !=
+            template_map.pack_size_map.end())
+            continue;
+          std::vector<typet> elems;
+          for(const auto &t : entry.get_sub())
+            elems.push_back(static_cast<const typet &>(t));
+          template_map.set_pack_size(pid, elems.size());
+          if(!elems.empty())
+          {
+            if(elems.size() == 1)
+              template_map.type_map.emplace(pid, elems.front());
+            template_map.pack_args_map[pid] = std::move(elems);
+          }
+        }
+        else if(entry.id() == irep_idt{"pack_exprs"})
+        {
+          if(
+            template_map.pack_size_map.find(pid) !=
+            template_map.pack_size_map.end())
+            continue;
+          std::vector<exprt> vals;
+          for(const auto &v : entry.get_sub())
+            vals.push_back(static_cast<const exprt &>(v));
+          template_map.set_pack_size(pid, vals.size());
+          if(!vals.empty())
+          {
+            if(vals.size() == 1)
+              template_map.expr_map.emplace(pid, vals.front());
+            template_map.pack_expr_map[pid] = std::move(vals);
+          }
+        }
+      }
     }
   }
+
+  // Per [temp.inst]/4: restore function template map if this
+  // is an instantiated member function template.
+  if(method_symbol.type.find(irep_idt{"#fn_template_type"}).is_not_nil())
+  {
+    template_map.build(
+      static_cast<const template_typet &>(
+        method_symbol.type.find(irep_idt{"#fn_template_type"})),
+      static_cast<const cpp_template_args_tct &>(
+        method_symbol.type.find(irep_idt{"#fn_template_args"})));
+
+    // N5008 [temp.variadic]/5,8: with MULTIPLE parameter packs the flat
+    // #fn_template_args list cannot encode the split between the packs
+    // (std::pair's piecewise delegation target, two type packs + two
+    // non-type index packs).  Replay the deduction-time pack bindings
+    // persisted by instantiate_template.
+    const irept &packs =
+      method_symbol.type.find(irep_idt{"#fn_template_packs"});
+    for(const auto &entry : packs.get_sub())
+    {
+      const irep_idt pid = entry.get(ID_identifier);
+      if(entry.id() == ID_expression)
+      {
+        std::vector<exprt> vals;
+        for(const auto &v : entry.get_sub())
+          vals.push_back(static_cast<const exprt &>(v));
+        template_map.set_pack_size(pid, vals.size());
+        if(!vals.empty())
+        {
+          template_map.pack_expr_map[pid] = vals;
+          template_map.expr_map[pid] = vals.front();
+        }
+        continue;
+      }
+      std::vector<typet> elems;
+      for(const auto &t : entry.get_sub())
+        elems.push_back(static_cast<const typet &>(t));
+      template_map.set_pack_size(pid, elems.size());
+      template_map.pack_args_map[pid] = elems;
+      if(!elems.empty())
+        template_map.type_map[pid] = elems.front();
+    }
+
+    // N5008 [temp.variadic]/16: an expansion over an EMPTY pack produces an
+    // empty list.  With the pack bindings replayed above, drop
+    // member-initializer arguments that reference an empty pack outside
+    // `sizeof...` (which is just 0, [temp.variadic]/10) -- e.g.
+    // `second(std::forward<_Args2>(std::get<_Indexes2>(__tuple2))...)` in
+    // std::pair's piecewise delegation target with _Args2/_Indexes2 empty
+    // becomes `second()`.  Left in place, the unsubstitutable pack
+    // reference fails the body's conversion and the member is dropped.
+    if(!packs.get_sub().empty())
+    {
+      std::set<std::string> empty_pack_shorts;
+      for(const auto &entry : packs.get_sub())
+      {
+        if(!entry.get_sub().empty())
+          continue;
+        const std::string f = id2string(entry.get(ID_identifier));
+        auto p = f.rfind("::");
+        empty_pack_shorts.insert(p != std::string::npos ? f.substr(p + 2) : f);
+      }
+      if(!empty_pack_shorts.empty())
+      {
+        // an argument that merely contains an expansion of the empty pack
+        // nested in a template argument list or a call (`sizes(list<T1...>{},
+        // list<T2...>{}, 0)', the MSVC STL pair's `index_sequence_for<
+        // _Types2...>{}') is kept: the nested expansion is empty there
+        const irept *current_arg = nullptr;
+        std::function<bool(const irept &)> refs_ep = [&](const irept &n)
+        {
+          if(n.get_bool("#sizeof_pack"))
+            return false;
+          if(&n != current_arg && n.get_bool(ID_ellipsis))
+            return false;
+          if(
+            n.id() == ID_name &&
+            empty_pack_shorts.count(id2string(n.get(ID_identifier))))
+            return true;
+          for(const auto &sn : n.get_sub())
+            if(refs_ep(sn))
+              return true;
+          for(const auto &ns : n.get_named_sub())
+            if(refs_ep(ns.second))
+              return true;
+          return false;
+        };
+        std::function<void(irept &)> drop = [&](irept &n)
+        {
+          if(n.id() == ID_code && n.get(ID_statement) == ID_member_initializer)
+          {
+            irept::subt &args = n.get_sub();
+            args.erase(
+              std::remove_if(
+                args.begin(),
+                args.end(),
+                [&](const irept &a)
+                {
+                  current_arg = &a;
+                  return refs_ep(a);
+                }),
+              args.end());
+            return;
+          }
+          for(auto &sn : n.get_sub())
+            drop(sn);
+          for(auto &ns : n.get_named_sub())
+            drop(ns.second);
+        };
+        drop(static_cast<irept &>(body));
+      }
+    }
+
+    // N5008 [temp.variadic]/9: expand the remaining (non-empty)
+    // pack-expansion mem-initializer arguments with the replayed pack
+    // bindings -- `first(std::forward<_Args1>(std::get<_Indexes1>(
+    // __tuple1))...)` in std::pair's piecewise delegation target mixes
+    // a reference-type pack with a non-type index pack, which the
+    // scalar convenience entries alone cannot expand; the unexpanded
+    // ellipsis failed the body's conversion and the member was
+    // dropped (std::map's piecewise-constructed key was havocked).
+    expand_member_initializer_packs_in_body(
+      static_cast<irept &>(body),
+      template_map.pack_args_map,
+      template_map.pack_expr_map);
+  }
+
+  reduce_parameter_pack_folds(method_symbol);
+
+  expand_replicated_parameter_pack_uses(method_symbol);
 
   // N5008 [temp.variadic]/9: expand a call-argument pack expansion in the
   // body (e.g. `add(I...)` over a non-type parameter pack) to one argument

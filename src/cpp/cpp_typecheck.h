@@ -1269,6 +1269,11 @@ protected:
   /// ([temp.inst]/4, [temp.variadic]/9,16); used by both drains in
   /// typecheck_method_bodies.
   void prepare_deferred_method_body(symbolt &method_symbol);
+  /// The steps of prepare_deferred_method_body that expand the folds over
+  /// and the pack expansions of a function parameter pack; also used by the
+  /// eager conversion of a constexpr member function template instance.
+  void reduce_parameter_pack_folds(symbolt &method_symbol);
+  void expand_replicated_parameter_pack_uses(symbolt &method_symbol);
   void complete_constructor_template_initializers(symbolt &method_symbol);
   cpp_declarationt inherited_constructor_declaration(
     const symbolt &symbol,

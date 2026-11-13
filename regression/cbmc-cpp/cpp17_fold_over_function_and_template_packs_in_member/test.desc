@@ -1,0 +1,17 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] .* constexpr member template: SUCCESS$
+^\[main\.assertion\.2\] .* member template: SUCCESS$
+^\[main\.assertion\.3\] .* call argument expansion: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+not found
+--
+The fold `(f<A>(a), ...)' and the call `g(f<A>(a)...)' in a member
+function template expand both the function parameter pack and the template
+parameter pack per element ([temp.variadic]/9).  In the fold the template
+pack kept its first element in every instance, and the body of a constexpr
+member was converted without expanding `a'.

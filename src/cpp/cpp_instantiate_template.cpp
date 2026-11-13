@@ -8448,9 +8448,16 @@ skip_pack_removal_ft:
           // the constant eagerly while deferring the runtime (GOTO) definition
           // to
           // the queue; on failure we already fall back to `add_method_body`.
-          expand_folds_over_template_packs(ws.value, template_type, true);
           try
           {
+            // expand the uses of the function parameter packs, folds and
+            // pack expansions, as the deferred drain does ([expr.prim.fold],
+            // [temp.variadic]/9): left in place, `a' in `(f<A>(a), ...)' or
+            // `g(f<A>(a)...)' did not resolve, and the template-pack fold
+            // expansion below substituted `A' only
+            reduce_parameter_pack_folds(ws);
+            expand_replicated_parameter_pack_uses(ws);
+            expand_folds_over_template_packs(ws.value, template_type, true);
             convert_function(ws);
             // Prevent the deferred pass from converting it a second time.
             methods_seen.insert(ws.name);
