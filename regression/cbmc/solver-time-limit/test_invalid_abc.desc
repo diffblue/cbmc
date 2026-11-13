@@ -1,0 +1,10 @@
+CORE
+main.c
+--solver-time-limit abc
+^EXIT=1$
+^SIGNAL=0$
+expected a positive integer number of seconds, got 'abc'
+--
+^VERIFICATION
+--
+The time limit must be a positive integer number of seconds.

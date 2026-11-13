@@ -1,0 +1,12 @@
+CORE broken-cprover-smt-backend no-new-smt
+main_timeout.c
+--solver-time-limit 1
+^EXIT=6$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ not factored: ERROR$
+^VERIFICATION ERROR$
+--
+^VERIFICATION (SUCCESSFUL|FAILED)$
+--
+The solver call exceeds the time limit of one second and ends in an error.
+The CPROVER SMT2 solver and the incremental SMT2 back-end ignore the limit.

@@ -293,6 +293,17 @@ but it can be helpful to find program bugs. The various command line
 options that CBMC offers for loop unwinding are described in the section
 on [understanding loop unwinding](../../cbmc/unwinding/).
 
+## Limiting Solver Time
+
+The option `--solver-time-limit N` limits each call of the SAT or SMT
+solver to N seconds of wall-clock time. When a solver call exceeds the
+limit, the properties it is meant to decide are reported as ERROR. As the
+limit applies to each solver call, options that cause several solver calls,
+such as `--all-properties` with failing properties or `--cover`, may run for
+longer than N seconds in total. The limit is honoured by the MiniSat 2 (the
+default), CaDiCaL, and IPASIR SAT back-ends, and by Z3 (`--z3`) and cvc5
+(`--cvc5`). Other back-ends print a warning and ignore it.
+
 ## A Note About Compilers and the ANSI-C Library
 
 Most C programs make use of functions provided by a library; instances

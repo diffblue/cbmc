@@ -1,0 +1,11 @@
+CORE broken-smt-backend no-new-smt paths-lifo-expected-failure
+main.c
+--smt2 --outfile - --solver-time-limit 1
+^EXIT=0$
+^SIGNAL=0$
+^solver time limit is not supported when writing the SMT2 formula to a file and will be ignored$
+^\(set-logic 
+--
+--
+Writing an SMT2 formula involves no solver call, so the time limit is
+ignored, which the user is told about.

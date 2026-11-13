@@ -1,0 +1,15 @@
+CORE
+main_multi.c
+--all-properties --solver-time-limit 60
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ a is not 1: FAILURE$
+^\[main\.assertion\.2\] line \d+ a is not 2: FAILURE$
+^\[main\.assertion\.3\] line \d+ holds: SUCCESS$
+^\*\* 2 of 3 failed \(3 iterations\)$
+^VERIFICATION FAILED$
+--
+--
+Exercises --solver-time-limit on the multi-property path, which makes several
+solver calls on the same solver instance: one for each failing property, plus
+a final one. A time limit that is not reached must not affect any of them.

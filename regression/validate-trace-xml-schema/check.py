@@ -16,6 +16,9 @@ ExcludedTests = list(map(lambda s: os.path.join(test_base_dir, s[0], s[1]), [
     ['array_of_bool_as_bitvec', 'test-smt2-outfile.desc'],
     ['deterministic-smt-output', 'test.desc'],
     ['z3-lambda-unflatten', 'test.desc'],
+    ['solver-time-limit', 'test_smt2_outfile.desc'],
+    # this one dumps a DIMACS formula
+    ['solver-time-limit', 'test_dimacs.desc'],
     # these tests expect input from stdin
     ['json-interface1', 'test_wrong_option.desc'],
     ['json-interface1', 'test.desc'],
