@@ -24,6 +24,13 @@ int yyxmlerror(xml_parsert &xml_parser, void *scanner, const std::string &error)
 // unreachable code
 #pragma warning(disable:4702)
 #endif
+
+// Bison-generated yydestruct only handles symbols with %destructor;
+// suppress the warning about unhandled enum values in that switch.
+#if defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wswitch-enum"
+#endif
 %}
 
 %parse-param {xml_parsert &xml_parser}
@@ -33,9 +40,12 @@ int yyxmlerror(xml_parsert &xml_parser, void *scanner, const std::string &error)
 %union {char *s;}
 
 %token STARTXMLDECL
-%token VERSION STARTPI ENDPI EQ SLASH CLOSE END
-%token <s> ENCODING NAME VALUE DATA COMMENT START
+%token ENDPI EQ SLASH CLOSE END
+%token <s> NAME VALUE DATA COMMENT START STARTPI
 %type <s> name_opt
+
+// Memory management: ensure allocated string tokens are freed during error recovery
+%destructor { free($$); } NAME VALUE DATA COMMENT START STARTPI name_opt
 
 %%
 
@@ -68,18 +78,18 @@ misc
 
 PI
  : STARTPI NAME
-   { free($2); xml_parser.stack.push_back(&xml_parser.parse_tree.xml); }
+   { xml_parser.stack.push_back(&xml_parser.parse_tree.xml); }
    attribute_seq_opt
    { xml_parser.stack.pop_back(); }
    ENDPI
+   { free($1); free($2); }
  ;
 
 element
- : START   { xml_parser.current().name=$1;
-                                  free($1);
-           }
+ : START   { xml_parser.current().name=$1; }
    attribute_seq_opt
    empty_or_content
+   { free($1); }
  ;
 
 empty_or_content
@@ -114,3 +124,9 @@ attribute
                                   free($1); free($3);}
  ;
 
+
+%%
+
+#if defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
