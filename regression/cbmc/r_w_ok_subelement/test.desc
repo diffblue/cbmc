@@ -1,0 +1,14 @@
+CORE broken-cprover-smt-backend no-new-smt
+main.c
+--pointer-check --no-pointer-primitive-check --lift-nested-dereferences
+^.*has size 1 smaller than one element of size 4; no backing object created
+^.*pointer outside object bounds in \*p: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Pins the size < sizeof(*ptr) limitation: a sub-element rw_ok emits a warning
+and creates no backing object, so the dereference is still reported.
+See GitHub issue diffblue/cbmc#7829.

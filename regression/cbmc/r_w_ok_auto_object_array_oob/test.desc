@@ -1,0 +1,13 @@
+CORE broken-cprover-smt-backend no-new-smt
+main.c
+--pointer-check --bounds-check --no-pointer-primitive-check --lift-nested-dereferences
+^.*pointer outside object bounds in a\[.*: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Tests that out-of-bounds access of an rw_ok-backed array is still reported as
+a bounds-check failure (the soundness guarantee from memory-primitives.md).
+See GitHub issue diffblue/cbmc#7829.
