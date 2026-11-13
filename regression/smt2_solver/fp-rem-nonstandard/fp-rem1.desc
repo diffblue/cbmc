@@ -1,0 +1,8 @@
+CORE
+fp-rem1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^unsat$
+--
+Z3#2381: fp.rem(3.0, 2.0) == -1.0 (IEEE 754 remainder tie-breaking).

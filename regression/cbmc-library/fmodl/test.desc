@@ -1,8 +1,10 @@
-KNOWNBUG
+FUTURE
 main.c
---pointer-check --bounds-check
+--float-overflow-check --nan-check
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+--
+long double fmod produces very large formulas; requires excessive memory.
