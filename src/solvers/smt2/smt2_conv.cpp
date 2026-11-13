@@ -789,6 +789,16 @@ exprt smt2_convt::parse_rec(const irept &src, const typet &type)
   {
     return parse_literal(src, type);
   }
+  else if(type.id() == ID_c_bit_field)
+  {
+    // bit-fields are bit vectors of their width: parse them using the
+    // corresponding integer type
+    exprt result = parse_rec(
+      src, c_bit_field_replacement_type(to_c_bit_field_type(type), ns));
+    if(result.is_not_nil())
+      result.type() = type;
+    return result;
+  }
   else if(type.id()==ID_bool)
   {
     if(src.id()==ID_1 || src.id()==ID_true)
