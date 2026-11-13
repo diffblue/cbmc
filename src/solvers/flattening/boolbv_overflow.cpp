@@ -171,6 +171,14 @@ literalt boolbvt::convert_binary_overflow(const binary_overflow_exprt &expr)
                : bv_utilst::representationt::UNSIGNED)
       .back();
   }
+  else if(expr_try_dynamic_cast<div_overflow_exprt>(expr))
+  {
+    // overflow on signed division: dividend == INT_MIN && divisor == -1
+    if(rep == bv_utilst::representationt::SIGNED)
+      return prop.land(bv_utils.is_int_min(bv0), bv_utils.is_all_ones(bv1));
+    else
+      return const_literal(false);
+  }
 
   return SUB::convert_rest(expr);
 }
