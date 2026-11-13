@@ -401,6 +401,7 @@ void dfcc_utilst::wrap_function(
   goto_functiont &wrapper_fun = goto_functions.function_map[function_id];
   wrapper_fun.set_parameter_identifiers(new_code_type);
   wrapper_fun.body.add(goto_programt::make_end_function(sl));
+  goto_functions.update(wrapper_fun.body);
 }
 
 const exprt dfcc_utilst::make_null_check_expr(const exprt &ptr)
@@ -454,7 +455,8 @@ void dfcc_utilst::inline_function(
   decorated.throw_on_missing_function(log, 0);
   decorated.throw_on_not_enough_arguments(log, 0);
 
-  goto_model.goto_functions.update();
+  goto_model.goto_functions.update(
+    goto_model.goto_functions.function_map.at(function_id).body);
 }
 
 void dfcc_utilst::inline_function(
@@ -481,7 +483,8 @@ void dfcc_utilst::inline_function(
     decorated.get_not_enough_arguments_set().begin(),
     decorated.get_not_enough_arguments_set().end());
 
-  goto_model.goto_functions.update();
+  goto_model.goto_functions.update(
+    goto_model.goto_functions.function_map.at(function_id).body);
 }
 
 void dfcc_utilst::inline_program(
@@ -507,5 +510,5 @@ void dfcc_utilst::inline_program(
   not_enough_arguments.insert(
     decorated.get_not_enough_arguments_set().begin(),
     decorated.get_not_enough_arguments_set().end());
-  goto_model.goto_functions.update();
+  goto_model.goto_functions.update(goto_program);
 }

@@ -1,0 +1,15 @@
+CORE dfcc-only
+main.c
+--dfcc main --enforce-contract f --replace-call-with-contract g --apply-loop-contracts
+^\[f.loop_assigns.\d+\] line \d+ Check assigns clause inclusion for loop f.0: SUCCESS$
+^\[f.loop_invariant_step.\d+\] line \d+ Check invariant after step for loop f.0: SUCCESS$
+^\[g.precondition.\d+\] line \d+ Check requires clause of contract contract::g for function g: SUCCESS$
+^\[g.assigns.\d+\] line \d+ Check that the assigns clause of contract\:\:g is included in the caller\'s assigns clause: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that a function replaced by its contract (g) can be called,
+through h, in a loop whose contract has no assigns clause. DFCC then infers the
+loop's assigns clause by inlining h, and with it the body that replaces g.
