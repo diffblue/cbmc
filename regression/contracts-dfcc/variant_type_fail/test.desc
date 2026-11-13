@@ -1,0 +1,13 @@
+CORE
+main.c
+--dfcc main --apply-loop-contracts
+^main.c.*error: decreases clause component must have arithmetic type, but has type 'signed int \*'$
+^CONVERSION ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--
+A decreases clause is compared with the strict arithmetic order (or, for
+several components, the lexicographic order), so each of its components must
+have arithmetic type. A pointer component used to be accepted, and the
+comparison then did not express termination.

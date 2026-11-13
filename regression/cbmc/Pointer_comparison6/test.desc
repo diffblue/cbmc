@@ -1,0 +1,16 @@
+CORE
+main.c
+
+^file main.c line 10 function main: comparison between pointer and integer$
+^file main.c line 11 function main: comparison between pointer and integer$
+^file main.c line 23 function main: comparison between pointer and integer$
+^file main.c line 24 function main: comparison between pointer and integer$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^file main.c line 14 function main: comparison between pointer and integer$
+^warning: ignoring
+--
+A comparison between a pointer and an integer, including an enumeration or a
+_Bool, is accepted, as with GCC and Clang, but warned about.
