@@ -786,11 +786,29 @@ exprt float_bvt::div(
 
   std::size_t fraction_width=
     to_unsignedbv_type(unpacked1.fraction.type()).get_width();
-  std::size_t div_width=fraction_width*2+1;
+  // The quotient needs spec.f + 2 significant bits (the significand plus a
+  // guard bit) above the remainder, which provides the sticky bit.  Padding
+  // the dividend with spec.f + 2 zeros achieves this for a normal dividend.
+  // A subnormal dividend, however, has up to spec.f leading zeros, each of
+  // which would cost one significant bit of the quotient.  Rather than
+  // padding with spec.f more zeros, which makes every division more
+  // expensive, normalize the dividend: shift out the leading zeros and
+  // decrease the exponent accordingly, which preserves the value.
+  // The exponent of a normalized subnormal can be as small as
+  // 1 - bias - spec.f, which also needs to be representable once we have
+  // subtracted the exponents and added spec.f below.  Hence extend the
+  // exponent to the width used for this exponent arithmetic first.
+  exprt dividend_fraction = unpacked1.fraction;
+  exprt dividend_exponent = typecast_exprt{
+    unpacked1.exponent,
+    signedbv_typet{std::max(spec.e, address_bits(spec.f)) + 2}};
+  normalization_shift(dividend_fraction, dividend_exponent);
+
+  std::size_t div_width = fraction_width * 2 + 1;
 
   // pad fraction1 with zeros
   const concatenation_exprt fraction1(
-    unpacked1.fraction,
+    dividend_fraction,
     from_integer(0, unsignedbv_typet(div_width - fraction_width)),
     unsignedbv_typet(div_width));
 
@@ -814,12 +832,13 @@ exprt float_bvt::div(
     concatenation_exprt(
       result.fraction, have_remainder, unsignedbv_typet(div_width+1));
 
-  // We will subtract the exponents;
-  // to account for overflow, we add a bit.
-  const typecast_exprt exponent1(
-    unpacked1.exponent, signedbv_typet(spec.e + 1));
-  const typecast_exprt exponent2(
-    unpacked2.exponent, signedbv_typet(spec.e + 1));
+  // We will subtract the exponents and then add spec.f.  The result lies in
+  // [1 - 2 * bias, 2 * bias - 1 + spec.f], which fits into the width of the
+  // (extended) exponent of the normalized dividend.
+  const signedbv_typet &exponent_type =
+    to_signedbv_type(dividend_exponent.type());
+  const exprt &exponent1 = dividend_exponent;
+  const typecast_exprt exponent2{unpacked2.exponent, exponent_type};
 
   // subtract exponents
   const minus_exprt added_exponent(exponent1, exponent2);
