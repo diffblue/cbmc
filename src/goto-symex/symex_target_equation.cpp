@@ -380,6 +380,21 @@ void symex_target_equationt::convert_assignments(
   }
 }
 
+/// Make \p decision_procedure aware of each field of the (possibly
+/// field-sensitive) declared object \p expr, recursing into struct and array
+/// expressions as built by \ref field_sensitivityt::apply.
+static void
+handle_decl_leaves(decision_proceduret &decision_procedure, const exprt &expr)
+{
+  if(expr.id() == ID_struct || expr.id() == ID_array)
+  {
+    for(const auto &op : expr.operands())
+      handle_decl_leaves(decision_procedure, op);
+  }
+  else
+    decision_procedure.handle(equal_exprt{expr, expr});
+}
+
 void symex_target_equationt::convert_decls(
   decision_proceduret &decision_procedure)
 {
@@ -388,11 +403,18 @@ void symex_target_equationt::convert_decls(
   {
     if(step.is_decl() && !step.ignore && !step.converted)
     {
-      // The result is not used, these have no impact on
-      // the satisfiability of the formula.
-      decision_procedure.handle(step.cond_expr);
-      decision_procedure.handle(
-        equal_exprt{step.ssa_full_lhs, step.ssa_full_lhs});
+      // The result is not used, these have no impact on the satisfiability of
+      // the formula: they make the decision procedure aware of the declared
+      // symbols for the purpose of trace generation, which uses
+      // ssa_full_lhs. With field sensitivity, ssa_full_lhs is a struct or
+      // array expression of the individual fields, and only those fields are
+      // used in any other step: do not convert the whole object, which
+      // back-ends may be unable to represent (e.g., a struct with an array
+      // member of non-constant size).
+      if(step.ssa_full_lhs.is_nil())
+        decision_procedure.handle(step.cond_expr);
+      else
+        handle_decl_leaves(decision_procedure, step.ssa_full_lhs);
       step.converted = true;
       with_solver_hardness(
         decision_procedure, hardness_register_ssa(step_index, step));
