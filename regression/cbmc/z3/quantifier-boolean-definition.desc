@@ -1,0 +1,18 @@
+CORE smt-backend broken-cprover-smt-backend no-new-smt
+quantifier-boolean-definition.c
+--z3 --trace
+^\[main\.assertion\.1\] line 13 can find 7: FAILURE$
+^\[main\.assertion\.2\] line 19 differ: FAILURE$
+^  b=(TRUE|FALSE) \(\d\)$
+^  c=(TRUE|FALSE) \(\d\)$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+non-constant value
+^VERIFICATION ERROR$
+--
+Z3's solve_eqs preprocessor eliminates a symbol that is defined by a
+quantifier, and then returns the quantifier rather than a value from
+get-value (see Z3Prover/z3#7743). This must also be worked around for Boolean
+symbols that set_to defines directly by a quantifier.
