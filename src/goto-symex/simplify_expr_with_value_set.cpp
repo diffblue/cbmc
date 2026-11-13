@@ -10,6 +10,7 @@ Author: Michael Tautschnig
 
 #include <util/expr_util.h>
 #include <util/pointer_expr.h>
+#include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 #include <util/ssa_expr.h>
 
@@ -188,10 +189,22 @@ simplify_expr_with_value_sett::simplify_inequality_pointer_object(
           objects.clear();
           break;
         }
-
-        objects.insert(
-          to_object_descriptor_expr(value_set_element).root_object());
+        else if(value_set_element.id() == ID_null_object)
+        {
+          // make sure all NULL objects being considered look the same
+          objects.insert(exprt{ID_null_object, empty_typet{}});
+        }
+        else
+        {
+          objects.insert(
+            to_object_descriptor_expr(value_set_element).root_object());
+        }
       }
+    }
+    else if(
+      pointer.is_constant() && to_constant_expr(pointer).is_null_pointer())
+    {
+      objects.insert(exprt{ID_null_object, empty_typet{}});
     }
     return objects;
   };
@@ -280,4 +293,100 @@ simplify_expr_with_value_sett::simplify_pointer_offset(
 
   return changed(
     simplify_rec(typecast_exprt::conditional_cast(*offset, expr.type())));
+}
+
+simplify_exprt::resultt<> simplify_expr_with_value_sett::simplify_object_size(
+  const object_size_exprt &expr)
+{
+  const exprt &ptr = expr.pointer();
+
+  if(ptr.type().id() != ID_pointer)
+    return unchanged(expr);
+
+  const ssa_exprt *ssa_symbol_expr = expr_try_dynamic_cast<ssa_exprt>(ptr);
+
+  if(!ssa_symbol_expr)
+    return simplify_exprt::simplify_object_size(expr);
+
+  ssa_exprt l1_expr{*ssa_symbol_expr};
+  l1_expr.remove_level_2();
+  const std::vector<exprt> value_set_elements =
+    value_set.get_value_set(l1_expr, ns);
+
+  std::optional<exprt> object_size;
+
+  for(const auto &value_set_element : value_set_elements)
+  {
+    if(
+      value_set_element.id() == ID_unknown ||
+      value_set_element.id() == ID_invalid ||
+      is_failed_symbol(
+        to_object_descriptor_expr(value_set_element).root_object()) ||
+      to_object_descriptor_expr(value_set_element).offset().id() == ID_unknown)
+    {
+      object_size.reset();
+      break;
+    }
+
+    auto this_object_size_opt = size_of_expr(
+      to_object_descriptor_expr(value_set_element).root_object().type(), ns);
+    if(
+      !this_object_size_opt.has_value() ||
+      (object_size.has_value() && *this_object_size_opt != *object_size))
+    {
+      object_size.reset();
+      break;
+    }
+    else if(!object_size.has_value())
+    {
+      object_size = this_object_size_opt;
+    }
+  }
+
+  if(!object_size.has_value())
+    return simplify_exprt::simplify_object_size(expr);
+
+  return changed(
+    simplify_rec(typecast_exprt::conditional_cast(*object_size, expr.type())));
+}
+
+simplify_exprt::resultt<>
+simplify_expr_with_value_sett::simplify_is_invalid_pointer(
+  const unary_exprt &expr)
+{
+  const exprt &ptr = expr.op();
+
+  if(ptr.type().id() != ID_pointer)
+    return unchanged(expr);
+
+  const ssa_exprt *ssa_symbol_expr = expr_try_dynamic_cast<ssa_exprt>(ptr);
+
+  if(!ssa_symbol_expr)
+    return simplify_exprt::simplify_is_invalid_pointer(expr);
+
+  ssa_exprt l1_expr{*ssa_symbol_expr};
+  l1_expr.remove_level_2();
+  const std::vector<exprt> value_set_elements =
+    value_set.get_value_set(l1_expr, ns);
+
+  bool all_valid = !value_set_elements.empty();
+
+  for(const auto &value_set_element : value_set_elements)
+  {
+    if(
+      value_set_element.id() == ID_unknown ||
+      value_set_element.id() == ID_invalid ||
+      is_failed_symbol(
+        to_object_descriptor_expr(value_set_element).root_object()) ||
+      to_object_descriptor_expr(value_set_element).offset().id() == ID_unknown)
+    {
+      all_valid = false;
+      break;
+    }
+  }
+
+  if(all_valid)
+    return changed(static_cast<exprt>(false_exprt{}));
+  else
+    return simplify_exprt::simplify_is_invalid_pointer(expr);
 }

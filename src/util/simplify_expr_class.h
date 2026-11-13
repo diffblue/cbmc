@@ -193,9 +193,11 @@ public:
   [[nodiscard]] resultt<> simplify_pointer_object(const pointer_object_exprt &);
   [[nodiscard]] resultt<>
   simplify_unary_pointer_predicate_preorder(const unary_exprt &);
-  [[nodiscard]] resultt<> simplify_object_size(const object_size_exprt &);
+  [[nodiscard]] virtual resultt<>
+  simplify_object_size(const object_size_exprt &);
   [[nodiscard]] resultt<> simplify_is_dynamic_object(const unary_exprt &);
-  [[nodiscard]] resultt<> simplify_is_invalid_pointer(const unary_exprt &);
+  [[nodiscard]] virtual resultt<>
+  simplify_is_invalid_pointer(const unary_exprt &);
   [[nodiscard]] resultt<> simplify_object(const exprt &);
   [[nodiscard]] resultt<> simplify_unary_minus(const unary_minus_exprt &);
   [[nodiscard]] resultt<> simplify_unary_plus(const unary_plus_exprt &);
