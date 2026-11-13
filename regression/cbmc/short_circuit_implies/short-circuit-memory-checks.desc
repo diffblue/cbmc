@@ -3,12 +3,14 @@ short-circuit-memory-checks.c
 
 ^EXIT=10$
 ^SIGNAL=0$
-line 11 dereference failure: pointer NULL in \*c: SUCCESS
 line 12 dereference failure: pointer NULL in \*c: FAILURE
 VERIFICATION FAILED
 --
 ^warning: ignoring
+line 11 dereference failure
 --
 Test that side effects on the right hand side of the ==> operator are correctly
 short-circuited or not where the side effect is a pointer check. Note that this
 test is based upon the originally reported github issue 6319.
+After `false ==>' the right-hand side is not evaluated, so its dereference
+is not checked at all (it was checked under the guard `false').

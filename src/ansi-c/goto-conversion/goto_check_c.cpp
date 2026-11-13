@@ -420,6 +420,10 @@ private:
 
 static exprt implication(exprt lhs, exprt rhs)
 {
+  // a check under a guard that holds is the unguarded check, so that it
+  // equals (and is not added again as) the same check made elsewhere
+  if(lhs == true)
+    return rhs;
   // rewrite a => (b => c) to (a && b) => c
   if(rhs.id() == ID_implies)
   {
@@ -1854,7 +1858,21 @@ void goto_check_ct::check_rec_logical_op(const exprt &expr, const guardt &guard)
 
     check_rec(op, new_guard, false);
 
-    constraints.push_back(expr.id() == ID_or ? boolean_negate(op) : op);
+    // An operand is evaluated only if the ones before it did not decide
+    // the result (C17 6.5.13/4, 6.5.14/4).  A constant constraint is not
+    // kept as a guard: `0 || e' checks e as if it stood alone, so that its
+    // checks equal those of the same expression elsewhere (the instantiated
+    // preconditions of a library model, say) instead of being added again
+    // under the guard `!(0 != 0)'; after `1 || ...' the remaining operands
+    // are not evaluated and not checked.
+    exprt constraint = expr.id() == ID_or ? boolean_negate(op) : op;
+    const exprt simplified =
+      enable_simplify ? simplify_expr(constraint, ns) : constraint;
+    if(simplified == true)
+      continue;
+    if(simplified == false)
+      break;
+    constraints.push_back(std::move(constraint));
   }
 }
 
@@ -1866,16 +1884,30 @@ void goto_check_ct::check_rec_if(const if_exprt &if_expr, const guardt &guard)
 
   check_rec(if_expr.cond(), guard, false);
 
+  // with a constant condition only one operand is evaluated (C17 6.5.15/4),
+  // and it is checked as if it stood alone (see check_rec_logical_op)
+  const exprt cond =
+    enable_simplify ? simplify_expr(if_expr.cond(), ns) : if_expr.cond();
+
+  if(cond != false)
   {
-    auto new_guard = [&guard, &if_expr](exprt expr) {
-      return guard(implication(if_expr.cond(), std::move(expr)));
+    auto new_guard = [&guard, &if_expr, &cond](exprt expr)
+    {
+      return guard(
+        cond == true ? std::move(expr)
+                     : implication(if_expr.cond(), std::move(expr)));
     };
     check_rec(if_expr.true_case(), new_guard, false);
   }
 
+  if(cond != true)
   {
-    auto new_guard = [&guard, &if_expr](exprt expr) {
-      return guard(implication(not_exprt(if_expr.cond()), std::move(expr)));
+    auto new_guard = [&guard, &if_expr, &cond](exprt expr)
+    {
+      return guard(
+        cond == false
+          ? std::move(expr)
+          : implication(not_exprt(if_expr.cond()), std::move(expr)));
     };
     check_rec(if_expr.false_case(), new_guard, false);
   }
