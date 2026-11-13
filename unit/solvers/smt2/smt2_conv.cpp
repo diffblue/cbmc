@@ -20,6 +20,9 @@
 #include <solvers/smt2/smt2_dec.h>
 #include <testing-utils/use_catch.h>
 
+#include <functional>
+#include <sstream>
+
 TEST_CASE(
   "smt2_convt::convert_identifier character escaping.",
   "[core][solvers][smt2]")
@@ -34,15 +37,26 @@ TEST_CASE(
   CHECK(smt2_convt::convert_identifier("&") == "&");
 }
 
+/// Helper: the SMT2 output that \p action produces when applied to a converter
+/// for \p solver.
+static std::string smt2_output(
+  smt2_convt::solvert solver,
+  const std::function<void(smt2_convt &)> &action)
+{
+  symbol_tablet symbol_table;
+  namespacet ns{symbol_table};
+  std::ostringstream out;
+  smt2_convt conv{ns, "test", "", "QF_BV", solver, out};
+  action(conv);
+  return out.str();
+}
+
 /// Helper: extract the "(assert ...)" line from SMT2 output of set_to
 static std::string get_assert(const exprt &red_expr)
 {
-  symbol_tablet symbol_table;
-  namespacet ns(symbol_table);
-  std::ostringstream out;
-  smt2_convt conv(ns, "test", "", "QF_BV", smt2_convt::solvert::GENERIC, out);
-  conv.set_to(red_expr, true);
-  std::string result = out.str();
+  const std::string result = smt2_output(
+    smt2_convt::solvert::GENERIC,
+    [&red_expr](smt2_convt &conv) { conv.set_to(red_expr, true); });
   auto pos = result.find("(assert ");
   REQUIRE(pos != std::string::npos);
   // strip trailing newline
@@ -119,12 +133,9 @@ TEST_CASE("smt2_convt reduction operators", "[core][solvers][smt2]")
 /// enables SMT-LIB datatypes (Z3/CVC5), so structs are *not* flattened.
 static std::string get_assert_with_datatypes(const exprt &expr)
 {
-  symbol_tablet symbol_table;
-  namespacet ns(symbol_table);
-  std::ostringstream out;
-  smt2_convt conv(ns, "test", "", "QF_BV", smt2_convt::solvert::Z3, out);
-  conv.set_to(expr, true);
-  std::string result = out.str();
+  const std::string result = smt2_output(
+    smt2_convt::solvert::Z3,
+    [&expr](smt2_convt &conv) { conv.set_to(expr, true); });
   auto pos = result.rfind("(assert ");
   REQUIRE(pos != std::string::npos);
   auto end = result.find_last_not_of('\n');
@@ -946,12 +957,7 @@ TEST_CASE(
 /// Helper: full SMT2 emitted by converting (handling) a Boolean expression
 static std::string convert_handle(const exprt &expr, smt2_convt::solvert solver)
 {
-  symbol_tablet symbol_table;
-  namespacet ns(symbol_table);
-  std::ostringstream out;
-  smt2_convt conv(ns, "test", "", "QF_BV", solver, out);
-  conv.handle(expr);
-  return out.str();
+  return smt2_output(solver, [&expr](smt2_convt &conv) { conv.handle(expr); });
 }
 
 TEST_CASE("smt2_convt quantifier definition encoding", "[core][solvers][smt2]")
