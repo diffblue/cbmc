@@ -1309,6 +1309,42 @@ TEST_CASE(
       smt_bit_vector_theoryt::concat(smt_id_1, smt_id_2), smt_id_3);
     CHECK(test.convert(concatenation) == expected);
   }
+  SECTION("Boolean and bit vector operands")
+  {
+    const exprt sign = symbol_exprt{"sign", bool_typet{}};
+    const exprt rest = symbol_exprt{"rest", unsignedbv_typet{7}};
+    const concatenation_exprt concatenation{{sign, rest}, bv_typet{8}};
+    INFO("Expression being converted: " + concatenation.pretty(2, 0));
+    const smt_termt expected = smt_bit_vector_theoryt::concat(
+      smt_core_theoryt::if_then_else(
+        smt_identifier_termt{"sign", smt_bool_sortt{}},
+        smt_bit_vector_constant_termt{1, 1},
+        smt_bit_vector_constant_termt{0, 1}),
+      smt_identifier_termt{"rest", smt_bit_vector_sortt{7}});
+    CHECK(test.convert(concatenation) == expected);
+  }
+}
+
+TEST_CASE(
+  "expr to smt conversion for sign expressions",
+  "[core][smt2_incremental]")
+{
+  auto test =
+    expr_to_smt_conversion_test_environmentt::make(test_archt::x86_64);
+  SECTION("Signed bit vector")
+  {
+    const sign_exprt is_negative{symbol_exprt{"x", signedbv_typet{8}}};
+    const smt_termt expected = smt_core_theoryt::equal(
+      smt_bit_vector_theoryt::extract(7, 7)(
+        smt_identifier_termt{"x", smt_bit_vector_sortt{8}}),
+      smt_bit_vector_constant_termt{1, 1});
+    CHECK(test.convert(is_negative) == expected);
+  }
+  SECTION("Unsigned bit vector")
+  {
+    const sign_exprt is_negative{symbol_exprt{"x", unsignedbv_typet{8}}};
+    CHECK(test.convert(is_negative) == smt_bool_literal_termt{false});
+  }
 }
 
 TEST_CASE(
@@ -1343,6 +1379,28 @@ TEST_CASE(
       symbol_exprt{"bar", operand_type},
       unsignedbv_typet{3}}));
   }
+}
+
+TEST_CASE(
+  "expr to smt conversion for extract bit expressions",
+  "[core][smt2_incremental]")
+{
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
+  const typet operand_type = unsignedbv_typet{8};
+  const smt_termt expected_result = smt_core_theoryt::equal(
+    smt_bit_vector_theoryt::extract(5, 5)(
+      smt_identifier_termt{"foo", smt_bit_vector_sortt{8}}),
+    smt_bit_vector_constant_termt{1, 1});
+  CHECK(
+    test.convert(extractbit_exprt{
+      symbol_exprt{"foo", operand_type}, from_integer(5, operand_type)}) ==
+    expected_result);
+  CHECK(
+    test.convert(extractbit_exprt{symbol_exprt{"foo", operand_type}, 5}) ==
+    expected_result);
+  const cbmc_invariants_should_throwt invariants_throw;
+  CHECK_THROWS(test.convert(extractbit_exprt{
+    symbol_exprt{"foo", operand_type}, symbol_exprt{"bar", operand_type}}));
 }
 
 TEST_CASE("expr to smt conversion for type casts", "[core][smt2_incremental]")
