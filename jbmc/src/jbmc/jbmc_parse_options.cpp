@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/exit_codes.h>
 #include <util/help_formatter.h>
 #include <util/invariant.h>
+#include <util/suffix.h>
 #include <util/version.h>
 #include <util/xml.h>
 
@@ -433,6 +434,11 @@ int jbmc_parse_optionst::doit()
   if((cmdline.args.size() == 1) && !cmdline.isset("show-parse-tree"))
   {
     std::string main_class = cmdline.args[0];
+
+    // Strip .class suffix if present
+    if(has_suffix(main_class, ".class"))
+      main_class.resize(main_class.size() - 6);
+
     // `java` accepts slashes and dots as package separators
     std::replace(main_class.begin(), main_class.end(), '/', '.');
     config.java.main_class = main_class;
