@@ -186,6 +186,11 @@ int _close(int fildes)
 #define size_type size_t
 #endif
 
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
 extern struct __CPROVER_pipet __CPROVER_pipes[__CPROVER_constant_infinity_uint];
 // offset to make sure we don't collide with other fds
 extern const int __CPROVER_pipe_offset;
@@ -199,6 +204,13 @@ ret_type write(int fildes, const void *buf, size_type nbyte)
   {
     ret_type retval=__VERIFIER_nondet_ret_type();
     __CPROVER_assume(retval>=-1 && retval<=(ret_type)nbyte);
+    if(retval == -1)
+    {
+      // POSIX.1-2017: on error, return -1 and set errno
+      int errno_val = __VERIFIER_nondet_ret_type();
+      __CPROVER_assume(errno_val > 0);
+      errno = errno_val;
+    }
     return retval;
   }
 
@@ -264,6 +276,11 @@ ret_type _write(int fildes, const void *buf, size_type nbyte)
 #define size_type size_t
 #endif
 
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
 extern struct __CPROVER_pipet __CPROVER_pipes[__CPROVER_constant_infinity_uint];
 // offset to make sure we don't collide with other fds
 extern const int __CPROVER_pipe_offset;
@@ -295,13 +312,22 @@ ret_type read(int fildes, void *buf, size_type nbyte)
       __CPROVER_assume(error ? str_length<=nbyte : str_length==nbyte);
       // check that the memory is accessible
       (void)*(char *)buf;
-      (void)*(((const char *)buf) + str_length - 1);
+      if(str_length > 0)
+        (void)*(((const char *)buf) + str_length - 1);
       char contents_nondet[str_length];
       __CPROVER_array_replace((char*)buf, contents_nondet);
     }
 #endif
 
-    return error ? -1 : nread;
+    if(error)
+    {
+      // POSIX.1-2017: on error, return -1 and set errno
+      int errno_val = __VERIFIER_nondet_ret_type();
+      __CPROVER_assume(errno_val > 0);
+      errno = errno_val;
+      return -1;
+    }
+    return nread;
   }
 
   __CPROVER_assume(__CPROVER_pipe_offset >= 0);

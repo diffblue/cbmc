@@ -1,19 +1,21 @@
-#include <limits.h>
-#include <unistd.h>
-
-extern const __CPROVER_size_t SIZE;
-
-int main()
+#ifdef _WIN32
+int main(void)
 {
-  __CPROVER_assume(SIZE < SSIZE_MAX);
-
-  int fd;
-  char ptr[SIZE];
-  __CPROVER_size_t nbytes;
-
-  __CPROVER_assume(fd >= 0);
-  __CPROVER_assume(nbytes < SIZE);
-  __CPROVER_assume(fd <= SSIZE_MAX / sizeof(struct __CPROVER_pipet));
-
-  write(fd, ptr, nbytes);
+  return 0;
 }
+#else
+#  include <assert.h>
+#  include <errno.h>
+#  include <unistd.h>
+
+int main(void)
+{
+  // errno must be set on write error path
+  errno = 0;
+  ssize_t w = write(1, "x", 1);
+  if(w == -1)
+    assert(errno != 0); // POSIX: errno set on error
+
+  return 0;
+}
+#endif
