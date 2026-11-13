@@ -15,6 +15,8 @@ ExcludedTests = list(map(lambda s: os.path.join(test_base_dir, s[0], s[1]), [
     # these tests dump the raw SMT2 output (using --outfile)
     ['array_of_bool_as_bitvec', 'test-smt2-outfile.desc'],
     ['deterministic-smt-output', 'test.desc'],
+    # this test prints the goto program (--program-only), not a trace
+    ['alloca_sizeof_char_times_sizeof_constant', 'test.desc'],
     ['z3-lambda-unflatten', 'test.desc'],
     # these tests expect input from stdin
     ['json-interface1', 'test_wrong_option.desc'],
