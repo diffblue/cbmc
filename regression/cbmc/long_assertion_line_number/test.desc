@@ -1,0 +1,12 @@
+CORE
+main.c
+
+^\[main.assertion.1\] line 10 assertion: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+This test verifies that CBMC correctly reports line numbers for assertions in
+very long expressions.
