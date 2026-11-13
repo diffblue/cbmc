@@ -44,7 +44,7 @@ public:
 class hardness_collectort
 {
 public:
-  std::unique_ptr<clause_hardness_collectort> solver_hardness;
+  std::shared_ptr<clause_hardness_collectort> solver_hardness;
 };
 
 #endif // CPROVER_SOLVERS_HARDNESS_COLLECTOR_H

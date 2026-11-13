@@ -50,6 +50,10 @@ public:
   /// Returns the solver instance
   boolbvt &get_boolbv_decision_procedure() const;
 
+  /// Returns a pointer to the hardness collector or `nullptr` when hardness
+  /// collection is not set up.
+  solver_hardnesst *get_hardness_collector() const;
+
   /// Return the equation associated with this instance
   symex_target_equationt &get_equation() const;
 
