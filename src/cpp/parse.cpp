@@ -764,11 +764,10 @@ bool Parser::isTypeSpecifier()
 {
   int t=lex.LookAhead(0);
 
-  return is_identifier(t) || t == TOK_SCOPE || t == TOK_CONSTEXPR ||
-         t == TOK_CONST || t == TOK_VOLATILE || t == TOK_RESTRICT ||
-         t == TOK_CHAR || t == TOK_INT || t == TOK_SHORT || t == TOK_LONG ||
-         t == TOK_CHAR16_T || t == TOK_CHAR32_T || t == TOK_WCHAR_T ||
-         t == TOK_COMPLEX // new !!!
+  return is_identifier(t) || t == TOK_SCOPE || t == TOK_CONST ||
+         t == TOK_VOLATILE || t == TOK_RESTRICT || t == TOK_CHAR ||
+         t == TOK_INT || t == TOK_SHORT || t == TOK_LONG || t == TOK_CHAR16_T ||
+         t == TOK_CHAR32_T || t == TOK_WCHAR_T || t == TOK_COMPLEX // new !!!
          || t == TOK_SIGNED || t == TOK_UNSIGNED || t == TOK_FLOAT ||
          t == TOK_DOUBLE || t == TOK_INT8 || t == TOK_INT16 || t == TOK_INT32 ||
          t == TOK_INT64 || t == TOK_GCC_INT128 || t == TOK_PTR32 ||
@@ -2018,7 +2017,7 @@ bool Parser::optMemberSpec(cpp_member_spect &member_spec)
 
 /*
   storage.spec : STATIC | EXTERN | AUTO | REGISTER | MUTABLE | ASM |
-                 THREAD_LOCAL
+                 THREAD_LOCAL | CONSTEXPR
 */
 bool Parser::optStorageSpec(cpp_storage_spect &storage_spec)
 {
@@ -2027,7 +2026,7 @@ bool Parser::optStorageSpec(cpp_storage_spect &storage_spec)
   if(
     t == TOK_STATIC || t == TOK_EXTERN || (t == TOK_AUTO && !cpp11) ||
     t == TOK_REGISTER || t == TOK_MUTABLE || t == TOK_GCC_ASM ||
-    t == TOK_THREAD_LOCAL)
+    t == TOK_THREAD_LOCAL || t == TOK_CONSTEXPR)
   {
     cpp_tokent tk;
     lex.get_token(tk);
@@ -2041,6 +2040,9 @@ bool Parser::optStorageSpec(cpp_storage_spect &storage_spec)
     case TOK_MUTABLE: storage_spec.set_mutable(); break;
     case TOK_GCC_ASM: storage_spec.set_asm(); break;
     case TOK_THREAD_LOCAL: storage_spec.set_thread_local(); break;
+    case TOK_CONSTEXPR:
+      storage_spec.set_constexpr();
+      break;
     default: UNREACHABLE;
     }
 
@@ -2051,17 +2053,17 @@ bool Parser::optStorageSpec(cpp_storage_spect &storage_spec)
 }
 
 /*
-  cv.qualify : (CONSTEXPR | CONST | VOLATILE | RESTRICT)+
+  cv.qualify : (CONST | VOLATILE | RESTRICT)+
 */
 bool Parser::optCvQualify(typet &cv)
 {
   for(;;)
   {
     int t=lex.LookAhead(0);
-    if(t==TOK_CONSTEXPR ||
-       t==TOK_CONST || t==TOK_VOLATILE || t==TOK_RESTRICT ||
-       t==TOK_PTR32 || t==TOK_PTR64 ||
-       t==TOK_GCC_ATTRIBUTE || t==TOK_GCC_ASM)
+    if(
+      t == TOK_CONST || t == TOK_VOLATILE || t == TOK_RESTRICT ||
+      t == TOK_PTR32 || t == TOK_PTR64 || t == TOK_GCC_ATTRIBUTE ||
+      t == TOK_GCC_ASM)
     {
       cpp_tokent tk;
       lex.get_token(tk);
@@ -2069,12 +2071,6 @@ bool Parser::optCvQualify(typet &cv)
 
       switch(t)
       {
-      case TOK_CONSTEXPR:
-        p=typet(ID_constexpr);
-        set_location(p, tk);
-        merge_types(p, cv);
-        break;
-
       case TOK_CONST:
         p=typet(ID_const);
         set_location(p, tk);
