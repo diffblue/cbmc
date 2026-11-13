@@ -115,19 +115,21 @@ void dfcc_swap_and_wrapt::get_swapped_functions(std::set<irep_idt> &dest) const
 ///
 /// Adds the following instructions in the wrapper function body:
 /// ```c
-/// IF __contract_check_in_progress GOTO replace;
-/// ASSERT !__contract_checked_once "only a single top-level called allowed";
+/// IF __contract_check_in_progress GOTO recursion;
+/// IF __contract_checked_once GOTO replace;
 /// __contract_check_in_progress = true;
 /// <contract_handler.add_contract_checking_instructions(...)>;
 /// __contract_checked_once = true;
 /// __contract_check_in_progress = false;
 /// GOTO end;
-/// replace:
-/// // if allow_recursive_calls
-/// <contract_handler.add_contract_replacement_instructions(...)>;
+/// recursion:
 /// // if !allow_recursive_calls
 /// ASSERT false, "no recursive calls";
 /// ASSUME false;
+/// replace:
+/// // sequential top-level re-invocations (and, if allow_recursive_calls,
+/// // recursive calls) are summarised by contract replacement
+/// <contract_handler.add_contract_replacement_instructions(...)>;
 /// end:
 /// END_FUNCTION;
 /// ```
@@ -175,19 +177,21 @@ void dfcc_swap_and_wrapt::check_contract(
   auto check_started_goto = body.add(goto_programt::make_incomplete_goto(
     check_started, wrapper_symbol.location));
 
-  // At most a single top level call to the checked function in any execution
+  // At most a single top level call to the checked function is checked
+  // against the contract in any execution.
 
   // Recursive calls within a contract check correspond to
-  // `check_started && !check_completed` and are allowed.
+  // `check_started && !check_completed` and are allowed if
+  // `allow_recursive_calls` is set.
 
-  // Any other call occuring with `check_completed` true is forbidden.
-  source_locationt sl(wrapper_symbol.location);
-  sl.set_function(wrapper_symbol.name);
-  sl.set_property_class("single_top_level_call");
-  sl.set_comment(
-    "Only a single top-level call to function " + id2string(function_id) +
-    " when checking contract " + id2string(contract_id));
-  body.add(goto_programt::make_assertion(not_exprt(check_completed), sl));
+  // Any other call occurring with `check_completed` true is a sequential
+  // top-level re-invocation. Such calls are sound to summarise by contract
+  // replacement (their preconditions are asserted in the caller's context,
+  // their write set is havocked, and their postconditions are assumed), so
+  // jump to a replacement section instead of failing an assertion.
+  auto check_completed_goto = body.add(goto_programt::make_incomplete_goto(
+    check_completed, wrapper_symbol.location));
+
   body.add(goto_programt::make_assignment(
     check_started, true_exprt(), wrapper_symbol.location));
 
@@ -215,23 +219,12 @@ void dfcc_swap_and_wrapt::check_contract(
   auto goto_end_function =
     body.add(goto_programt::make_incomplete_goto(wrapper_symbol.location));
 
-  // Jump to the replacement section if check already in progress
-  auto contract_replacement_label =
+  // Jump here if a check is already in progress (recursive call)
+  auto recursion_label =
     body.add(goto_programt::make_skip(wrapper_symbol.location));
-  check_started_goto->complete_goto(contract_replacement_label);
+  check_started_goto->complete_goto(recursion_label);
 
-  if(allow_recursive_calls)
-  {
-    contract_handler.add_contract_instructions(
-      dfcc_contract_modet::REPLACE,
-      wrapper_id,
-      wrapped_id,
-      contract_id,
-      write_set_symbol,
-      body,
-      function_pointer_contracts);
-  }
-  else
+  if(!allow_recursive_calls)
   {
     source_locationt sl(wrapper_symbol.location);
     sl.set_function(wrapper_symbol.name);
@@ -243,6 +236,21 @@ void dfcc_swap_and_wrapt::check_contract(
     body.add(
       goto_programt::make_assumption(false_exprt(), wrapper_symbol.location));
   }
+
+  // Jump here for sequential top-level re-invocations after a completed
+  // check; allowed recursive calls fall through to the same replacement.
+  auto sequential_label =
+    body.add(goto_programt::make_skip(wrapper_symbol.location));
+  check_completed_goto->complete_goto(sequential_label);
+
+  contract_handler.add_contract_instructions(
+    dfcc_contract_modet::REPLACE,
+    wrapper_id,
+    wrapped_id,
+    contract_id,
+    write_set_symbol,
+    body,
+    function_pointer_contracts);
 
   auto end_function_label =
     body.add(goto_programt::make_end_function(wrapper_symbol.location));
