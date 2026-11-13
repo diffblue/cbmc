@@ -1,0 +1,18 @@
+KNOWNBUG
+main.cpp
+--cpp14
+^\[main\.assertion\.1\] line \d+ run time: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+could not be evaluated
+static assertion failed
+--
+The copy constructor making the by-value argument had no definition yet
+(an implicit or defaulted one is defined only when odr-used), and the
+address of the constexpr object it copies was not a constant argument:
+none of the static_asserts could be evaluated.

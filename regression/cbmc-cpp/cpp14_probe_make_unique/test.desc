@@ -1,0 +1,15 @@
+KNOWNBUG libstdcxx
+main.cpp
+--cpp14 --object-bits 12 --unwind 8 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ make_unique: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+A probe of the C++14 support census (2026-11-05): std::make_unique.  The last
+assertion is WRONG and must fail, so a pass is not vacuous.
