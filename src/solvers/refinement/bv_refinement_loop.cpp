@@ -25,7 +25,7 @@ decision_proceduret::resultt bv_refinementt::dec_solve(const exprt &assumption)
 {
   // do the usual post-processing
   log.progress() << "BV-Refinement: post-processing" << messaget::eom;
-  finish_eager_conversion();
+  finish_eager_conversion_in_root_context();
 
   log.debug() << "Solving with " << prop.solver_text() << messaget::eom;
 
