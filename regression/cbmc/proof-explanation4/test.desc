@@ -1,0 +1,8 @@
+CORE
+main.c
+--cover location --proof-explanation
+^EXIT=0$
+^SIGNAL=0$
+Proof explanation:
+--
+^warning: ignoring
