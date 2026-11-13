@@ -1,0 +1,15 @@
+CORE broken-z3-smt-backend broken-cprover-smt-backend no-new-smt
+float.c
+--cvc5 --fpa --unwind 201
+^\[main\.assertion\.[0-9]+\] line \d+ fails: FAILURE$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Conversions between mathematical integers and bit-vectors or floats with the
+SMT2 back-end. All assertions but the one labelled "fails" hold. Z3 4.8 cannot
+decide int2bv and to_fp of a non-constant real in reasonable time (or answers
+unknown), hence this uses CVC5.
