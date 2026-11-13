@@ -1,0 +1,13 @@
+CORE
+main.c
+--full-slice
+^\[main.assertion.1\] line \d+ before the assumption: SUCCESS$
+^\[main.assertion.2\] line \d+ only reachable with i != 2: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+The full slicer must not remove an ASSUME false: it has no successors in the
+control-flow graph, so that no instruction is control dependent on it, but
+removing it makes the second assertion reachable with i == 2.

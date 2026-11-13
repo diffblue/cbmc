@@ -1,0 +1,13 @@
+CORE
+main.c
+--generate-function-body stop --generate-function-body-options assume-false --full-slice
+^\[main.assertion.1\] line \d+ before the call: SUCCESS$
+^\[main.assertion.2\] line \d+ only reachable with i != 2: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+The full slicer must keep the call of a function that does not return, here
+because its body is ASSUME false: removing the call makes the second assertion
+reachable with i == 2.
