@@ -167,27 +167,6 @@ string_constraint_generatort::add_axioms_for_concat(
     res, s1, s2, index_zero, array_pool.get_or_create_length(s2));
 }
 
-/// Add axioms corresponding to the StringBuilder.appendCodePoint(I) function
-/// \deprecated java specific
-/// \param f: function application with two arguments: a string and a code point
-/// \return an expression
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_concat_code_point(
-  const function_application_exprt &f)
-{
-  PRECONDITION(f.arguments().size() == 4);
-  const array_string_exprt res =
-    array_pool.find(f.arguments()[1], f.arguments()[0]);
-  const array_string_exprt s1 = get_string_expr(array_pool, f.arguments()[2]);
-  const typet &char_type = to_type_with_subtype(s1.content().type()).subtype();
-  const typet &index_type = s1.length_type();
-  const array_string_exprt code_point =
-    array_pool.fresh_string(index_type, char_type);
-  return combine_results(
-    add_axioms_for_code_point(code_point, f.arguments()[3]),
-    add_axioms_for_concat(res, s1, code_point));
-}
-
 std::vector<mp_integer> string_concatenation_builtin_functiont::eval(
   const std::vector<mp_integer> &input1_value,
   const std::vector<mp_integer> &input2_value,
