@@ -2799,6 +2799,10 @@ void smt2_convt::convert_expr(const exprt &expr)
     //   from_int(n)                -> (str.from_int n)  : Int operand; ""
     //                                 for n < 0 (unlike of_int, which
     //                                 produces a leading '-')
+    //   of_int(n[, 10])            -> (ite (>= n 0) (str.from_int n)
+    //                                   (str.++ "-" (str.from_int (- n))))
+    //                                 : Int operand, decimal only
+    //   empty_string()             -> ""
     //   equal(s, t)                -> (= s t)
     //   index_of(s, sub[, off])    -> (str.indexof s sub off) : off defaults 0
     //   startswith(s, prefix)      -> (str.prefixof prefix s)
@@ -2807,9 +2811,11 @@ void smt2_convt::convert_expr(const exprt &expr)
     // and the regex operators map to str.to_re / str.in_re and the re.* family
     // (re.range, re.++, re.*, re.+, re.opt, re.loop, re.union, re.inter,
     // re.comp, re.diff, re.all, re.allchar, re.none). Built-ins without an
-    // exact SMT-LIB theory-of-strings counterpart (e.g. compare_to, of_int,
-    // parse_int, format, case folding, trim) are intentionally not lowered and
-    // fall through to the generic function-application handling below.
+    // exact SMT-LIB theory-of-strings counterpart (e.g. compare_to, of_int with
+    // a radix other than 10, parse_int, format, case folding, trim) are
+    // intentionally not lowered and fall through to the generic
+    // function-application handling below, which makes them uninterpreted
+    // functions.
     //
     // Note: this lowering is specific to the (non-incremental) smt2_convt
     // back-end. The incremental SMT back-end uses a separate converter
@@ -2870,10 +2876,17 @@ void smt2_convt::convert_expr(const exprt &expr)
     const bool is_endswith = fn_id == ID_cprover_string_endswith_func;
     const bool is_is_empty = fn_id == ID_cprover_string_is_empty_func;
     const bool is_regex_loop = fn_id == ID_cprover_regex_loop_func;
+    const bool is_empty_string = fn_id == ID_cprover_string_empty_string_func;
+    // of_int with a radix other than 10 has no SMT-LIB counterpart.
+    const bool is_of_int =
+      fn_id == ID_cprover_string_of_int_func &&
+      (args.size() == 1 ||
+       (args.size() == 2 && args[1].is_constant() &&
+        numeric_cast<mp_integer>(to_constant_expr(args[1])) == mp_integer{10}));
 
     if(
       !smt_name.empty() || is_index_of || is_startswith || is_endswith ||
-      is_is_empty || is_regex_loop)
+      is_is_empty || is_regex_loop || is_empty_string || is_of_int)
     {
       // Soundness guard: this native lowering expects SMT-LIB-native operands.
       // The same cprover_string_*_func ids are also used with the
@@ -2897,18 +2910,19 @@ void smt2_convt::convert_expr(const exprt &expr)
       // reject operands or results of any other sort (e.g. bit-vectors)
       // instead of emitting SMT-LIB that the solver rejects.
       const bool int_operand = fn_id == ID_cprover_string_from_code_func ||
-                               fn_id == ID_cprover_string_from_int_func;
+                               fn_id == ID_cprover_string_from_int_func ||
+                               is_of_int;
       const bool int_result = fn_id == ID_cprover_string_to_code_func;
       if(
         (int_operand || int_result) &&
-        (args.size() != 1 ||
+        ((!is_of_int && args.size() != 1) ||
          (int_operand && args[0].type().id() != ID_integer) ||
          (int_result && expr.type().id() != ID_integer)))
       {
         throw unsupported_operation_exceptiont{
           "string built-in '" + id2string(fn_id) +
-          "' expects exactly one operand and an Int-sorted (integer) "
-          "operand or result in the SMT-LIB string lowering"};
+          "' expects a single Int-sorted (integer) operand or an "
+          "Int-sorted result in the SMT-LIB string lowering"};
       }
 
       if(is_index_of)
@@ -2937,6 +2951,30 @@ void smt2_convt::convert_expr(const exprt &expr)
         out << ' ';
         convert_expr(args[0]);
         out << ')';
+      }
+      else if(is_empty_string)
+      {
+        // empty_string() -> ""
+        if(!args.empty() || expr.type().id() != ID_string)
+        {
+          throw unsupported_operation_exceptiont{
+            "string built-in '" + id2string(fn_id) +
+            "' expects no operands and a String result in the SMT-LIB "
+            "string lowering"};
+        }
+        out << "\"\"";
+      }
+      else if(is_of_int)
+      {
+        // of_int(n[, 10]): the decimal representation of n, with a leading
+        // '-' for negative n, whereas str.from_int yields "" for n < 0.
+        out << "(ite (>= ";
+        convert_expr(args[0]);
+        out << " 0) (str.from_int ";
+        convert_expr(args[0]);
+        out << ") (str.++ \"-\" (str.from_int (- ";
+        convert_expr(args[0]);
+        out << "))))";
       }
       else if(is_is_empty)
       {

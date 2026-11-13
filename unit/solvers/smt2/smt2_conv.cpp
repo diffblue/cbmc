@@ -686,6 +686,25 @@ TEST_CASE(
     const auto tc_bv =
       string_builtin_app(ID_cprover_string_to_code_func, {s2}, s32);
     REQUIRE_THROWS(get_assert(equal_exprt{tc_bv, from_integer(102, s32)}));
+
+    const auto oi_bv = string_builtin_app(
+      ID_cprover_string_of_int_func, {from_integer(102, s32)}, string_type);
+    REQUIRE_THROWS(get_assert(equal_exprt{oi_bv, s1}));
+
+    const auto es_arg = string_builtin_app(
+      ID_cprover_string_empty_string_func, {s1}, string_type);
+    REQUIRE_THROWS(get_assert(equal_exprt{es_arg, s1}));
+  }
+
+  SECTION("of_int with a radix other than 10 is not lowered")
+  {
+    const auto oi_hex = string_builtin_app(
+      ID_cprover_string_of_int_func,
+      {from_integer(102, integer_typet{}), from_integer(16, integer_typet{})},
+      string_type);
+    REQUIRE(
+      get_assert(equal_exprt{oi_hex, s1}) ==
+      "(assert (= (cprover_string_of_int_func 102 16) s1))");
   }
 }
 
@@ -770,6 +789,28 @@ TEST_CASE(
     z3_disproves(
       string_builtin_app(
         ID_cprover_string_from_int_func, {num(-5)}, string_type),
+      str("")) == unsat);
+
+  // of_int: decimal digits, with a leading '-' for negative values.
+  for(const auto &[n, digits] : std::vector<std::pair<long, const char *>>{
+        {42, "42"}, {0, "0"}, {-5, "-5"}, {-120, "-120"}})
+  {
+    REQUIRE(
+      z3_disproves(
+        string_builtin_app(
+          ID_cprover_string_of_int_func, {num(n)}, string_type),
+        str(digits)) == unsat);
+    REQUIRE(
+      z3_disproves(
+        string_builtin_app(
+          ID_cprover_string_of_int_func, {num(n), num(10)}, string_type),
+        str(digits)) == unsat);
+  }
+
+  // empty_string is ""
+  REQUIRE(
+    z3_disproves(
+      string_builtin_app(ID_cprover_string_empty_string_func, {}, string_type),
       str("")) == unsat);
 }
 
