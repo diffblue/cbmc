@@ -6,6 +6,7 @@
 #include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
+#include <util/expr_util.h>
 #include <util/range.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
@@ -24,6 +25,7 @@
 #include <solvers/smt2_incremental/theories/smt_core_theory.h>
 #include <solvers/smt2_incremental/type_size_mapping.h>
 
+#include <functional>
 #include <stack>
 #include <unordered_set>
 #include <vector>
@@ -78,11 +80,16 @@ static std::vector<exprt> gather_dependent_expressions(const exprt &root_expr)
 
   std::stack<const exprt *> stack;
   stack.push(&root_expr);
+  // Lowered expressions may share sub-expressions extensively (see
+  // define_shared_subexpressions), so visit each node only once.
+  std::unordered_set<const void *> visited;
 
   while(!stack.empty())
   {
     const exprt &expr_node = *stack.top();
     stack.pop();
+    if(!visited.insert(&expr_node.read()).second)
+      continue;
     if(
       can_cast_expr<symbol_exprt>(expr_node) ||
       can_cast_expr<array_exprt>(expr_node) ||
@@ -299,6 +306,36 @@ static exprt lower_rw_ok_pointer_in_range(exprt expr, const namespacet &ns)
   return expr;
 }
 
+/// Lower zero-extension in \p expr, visiting each node of \p expr once and
+/// thereby preserving the sharing of sub-expressions.
+static exprt lower_zero_extend_shared(
+  const exprt &expr,
+  std::unordered_map<const void *, exprt> &lowered)
+{
+  const auto entry = lowered.find(&expr.read());
+  if(entry != lowered.end())
+    return entry->second;
+
+  exprt result = expr;
+  bool changed = false;
+  for(auto &op : result.operands())
+  {
+    exprt lowered_op = lower_zero_extend_shared(op, lowered);
+    if(&lowered_op.read() != &op.read())
+    {
+      op = std::move(lowered_op);
+      changed = true;
+    }
+  }
+  if(!changed)
+    result = expr;
+  if(auto zero_extend = expr_try_dynamic_cast<zero_extend_exprt>(result))
+    result = zero_extend->lower();
+
+  lowered.emplace(&expr.read(), result);
+  return result;
+}
+
 static exprt lower_zero_extend(exprt expr, const namespacet &ns)
 {
   expr.visit_pre([](exprt &expr) {
@@ -346,6 +383,86 @@ static exprt lower_floatbv(exprt expr)
   return expr;
 }
 
+static bool has_floatbv_subexpression(const exprt &expr)
+{
+  return has_subexpr(
+    expr, [](const exprt &e) { return e.type().id() == ID_floatbv; });
+}
+
+exprt smt2_incremental_decision_proceduret::define_shared_subexpressions(
+  const exprt &expr)
+{
+  // Count the references to each node, visiting each node once.
+  std::unordered_map<const void *, std::size_t> references;
+  std::stack<const exprt *> stack;
+  stack.push(&expr);
+  while(!stack.empty())
+  {
+    const exprt &node = *stack.top();
+    stack.pop();
+    if(++references[&node.read()] > 1)
+      continue;
+    // Bound variables must not escape their binders, so do not share
+    // sub-expressions of binding expressions.
+    if(can_cast_expr<binding_exprt>(node))
+      continue;
+    for(const auto &op : node.operands())
+      stack.push(&op);
+  }
+
+  // Rebuild the expression bottom-up, replacing each shared sub-expression by
+  // a function that is defined in terms of its rebuilt operands.
+  std::unordered_map<const void *, exprt> rebuilt;
+  std::function<exprt(const exprt &)> rebuild = [&](const exprt &node) -> exprt
+  {
+    const auto entry = rebuilt.find(&node.read());
+    if(entry != rebuilt.end())
+      return entry->second;
+
+    exprt result = node;
+    if(node.has_operands() && !can_cast_expr<binding_exprt>(node))
+    {
+      bool changed = false;
+      for(auto &op : result.operands())
+      {
+        exprt rebuilt_op = rebuild(op);
+        if(&rebuilt_op.read() != &op.read())
+        {
+          op = std::move(rebuilt_op);
+          changed = true;
+        }
+      }
+      if(!changed)
+        result = node;
+
+      const typet &type = node.type();
+      if(
+        references.at(&node.read()) > 1 &&
+        (type.id() == ID_bool || (can_cast_type<bitvector_typet>(type) &&
+                                  !can_cast_type<pointer_typet>(type))))
+      {
+        define_dependent_functions(result);
+        const smt_define_function_commandt definition{
+          "shared_" + std::to_string(shared_sequence()),
+          {},
+          convert_expr_to_smt(result)};
+        const symbol_exprt shared_symbol{
+          definition.identifier().identifier(), type};
+        identifier_table.emplace(
+          definition.identifier().identifier(), definition.identifier());
+        expression_identifiers.emplace(shared_symbol, definition.identifier());
+        solver_process->send(definition);
+        result = shared_symbol;
+      }
+    }
+
+    rebuilt.emplace(&node.read(), result);
+    return result;
+  };
+
+  return rebuild(expr);
+}
+
 void smt2_incremental_decision_proceduret::ensure_handle_for_expr_defined(
   const exprt &in_expr)
 {
@@ -356,7 +473,9 @@ void smt2_incremental_decision_proceduret::ensure_handle_for_expr_defined(
     return;
   }
 
-  const exprt lowered_expr = lower(in_expr);
+  exprt lowered_expr = lower(in_expr);
+  if(has_floatbv_subexpression(in_expr))
+    lowered_expr = define_shared_subexpressions(lowered_expr);
 
   define_dependent_functions(lowered_expr);
   smt_define_function_commandt function{
@@ -653,8 +772,10 @@ void smt2_incremental_decision_proceduret::set_to(
     debug << "`set_to` (" << std::string{value ? "true" : "false"} << ") -\n  "
           << in_expr.pretty(2, 0) << messaget::eom;
   });
-  const exprt lowered_expr = lower(in_expr);
+  exprt lowered_expr = lower(in_expr);
   PRECONDITION(can_cast_type<bool_typet>(lowered_expr.type()));
+  if(has_floatbv_subexpression(in_expr))
+    lowered_expr = define_shared_subexpressions(lowered_expr);
 
   define_dependent_functions(lowered_expr);
   auto converted_term = [&]() -> smt_termt {
@@ -740,12 +861,18 @@ void smt2_incremental_decision_proceduret::define_object_properties()
 
 exprt smt2_incremental_decision_proceduret::lower(exprt expression) const
 {
-  const exprt lowered = struct_encoding.encode(lower_zero_extend(
-    lower_enum(
-      lower_byte_operators(
-        lower_floatbv(lower_rw_ok_pointer_in_range(expression, ns)), ns),
-      ns),
-    ns));
+  // Floating-point operations are lowered last: their bit-vector encoding
+  // shares sub-expressions extensively, and the preceding passes would copy
+  // each of these as often as it is referenced. The encoding contains
+  // zero-extensions, which are lowered without losing the sharing.
+  std::unordered_map<const void *, exprt> lowered_zero_extend;
+  const exprt lowered = lower_zero_extend_shared(
+    lower_floatbv(struct_encoding.encode(lower_zero_extend(
+      lower_enum(
+        lower_byte_operators(lower_rw_ok_pointer_in_range(expression, ns), ns),
+        ns),
+      ns))),
+    lowered_zero_extend);
   log.conditional_output(log.debug(), [&](messaget::mstreamt &debug) {
     if(lowered != expression)
       debug << "lowered to -\n  " << lowered.pretty(2, 0) << messaget::eom;
