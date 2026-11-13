@@ -8185,6 +8185,36 @@ resolved_after_strip:
           identifiers.end());
       }
 
+      // ... and likewise by a variable or a data member: the C idiom
+      // `typedef struct cfg { ... } cfg_t; cfg_t cfg;' names the variable by
+      // `cfg'.  The class's constructors, found under its name, are hidden
+      // with it.
+      const auto is_hiding_object = [this](const exprt &e)
+      {
+        if(e.id() != ID_symbol || e.type().id() == ID_code)
+          return false;
+        const symbolt *symbol =
+          cpp_typecheck.symbol_table.lookup(to_symbol_expr(e).get_identifier());
+        return symbol != nullptr && !symbol->is_type &&
+               !symbol->type.get_bool(ID_is_template) &&
+               symbol->type.id() != ID_cpp_declaration;
+      };
+      if(std::any_of(identifiers.begin(), identifiers.end(), is_hiding_object))
+      {
+        identifiers.erase(
+          std::remove_if(
+            identifiers.begin(),
+            identifiers.end(),
+            [](const exprt &e)
+            {
+              return e.id() == ID_type ||
+                     (e.type().id() == ID_code &&
+                      to_code_type(e.type()).return_type().id() ==
+                        ID_constructor);
+            }),
+          identifiers.end());
+      }
+
       // N5008 [temp.inst]/2: constructing an object of a class template
       // specialization is a context that requires a completely-defined type,
       // which implicitly instantiates the specialization.  An identifier here
