@@ -1,0 +1,30 @@
+# Runs the unit tests for the repository's Python helper scripts.
+#
+# This is the start of automated test coverage for scripts/*.py
+# (ci_analysis.py being the first script with tests). Add further
+# scripts/test_*.py modules and they will be picked up automatically.
+#
+# The job is path-filtered so it only runs on pull requests that touch a
+# Python script under scripts/ (or this workflow itself), keeping it off the
+# critical path of unrelated PRs.
+name: Python script checks
+on:
+  pull_request:
+    branches: [develop]
+    paths:
+      - 'scripts/**/*.py'
+      - 'scripts/*.py'
+      - '.github/workflows/python-checks.yaml'
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Install test dependencies
+        run: pip install pytest
+      - name: Run Python script unit tests
+        run: python3 -m pytest scripts/ -v
