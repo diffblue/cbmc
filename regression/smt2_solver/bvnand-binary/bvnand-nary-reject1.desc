@@ -1,0 +1,8 @@
+CORE
+bvnand-nary-reject1.smt2
+
+^EXIT=20$
+^SIGNAL=0$
+bvnand takes exactly two operands
+--
+bvnand is a binary operator; n-ary use must be rejected.
