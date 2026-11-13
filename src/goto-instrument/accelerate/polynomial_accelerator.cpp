@@ -341,6 +341,26 @@ bool polynomial_acceleratort::fit_polynomial_sliced(
     symbolt coeff=utils.fresh_symbol("polynomial::coeff",
         signedbv_typet(width));
     coefficients.insert(std::make_pair(*it, coeff.symbol_expr()));
+
+    // Constrain the coefficient to a moderate magnitude. The fitting
+    // constraints only pin the coefficients modulo 2^width, and because 2 is
+    // not invertible modulo 2^width an under-determined coefficient has
+    // multiple solutions that differ by 2^(width-1) (e.g. 2*c == -4 is solved
+    // by both c == -2 and c == 2^(width-1) - 2). Without bounding the
+    // magnitude, different SAT back-ends may return different solutions, some
+    // of which are not inductive and hence get rejected -- making acceleration
+    // depend on the solver. Bounding the magnitude selects the canonical
+    // small-coefficient solution and makes the fit solver-independent. This
+    // mirrors the constraint already used by
+    // disjunctive_polynomial_accelerationt.
+    program.assume(binary_relation_exprt(
+      from_integer(-(1 << 10), signedbv_typet(width)),
+      ID_lt,
+      coeff.symbol_expr()));
+    program.assume(binary_relation_exprt(
+      coeff.symbol_expr(),
+      ID_lt,
+      from_integer(1 << 10, signedbv_typet(width))));
   }
 
   // Build a set of values for all the parameters that allow us to fit a
@@ -589,7 +609,8 @@ void polynomial_acceleratort::assert_for_values(
   exprt overflow_expr;
   overflow.overflow_expr(rhs, overflow_expr);
 
-  program.add(goto_programt::make_assumption(not_exprt(overflow_expr)));
+  if(target.type().id() != ID_unsignedbv)
+    program.add(goto_programt::make_assumption(not_exprt(overflow_expr)));
 
   rhs=typecast_exprt(rhs, target.type());
 
