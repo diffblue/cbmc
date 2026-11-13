@@ -1,0 +1,11 @@
+CORE
+test.c
+--xml-ui
+activate-multi-line-match
+^EXIT=10$
+^SIGNAL=0$
+<function_call hidden="false" step_nr="\d+" thread="0">\n\s*<function display_name="hidden_helper" identifier="hidden_helper"
+<function_return hidden="false" step_nr="\d+" thread="0">\n\s*<function display_name="hidden_helper" identifier="hidden_helper"
+<assignment[^>]*hidden="true"[^>]*>\n\s*<location file="test.c" function="hidden_helper"
+--
+^warning: ignoring
