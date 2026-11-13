@@ -1,0 +1,12 @@
+CORE
+Test
+--function Test.objectReceiver -cp `../../../../scripts/format_classpath.sh target/classes ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Objects whose runtime type is java.lang.Object use the model of
+Object.getClass, which calls Class.forName; their Class object must be the
+class literal of java.lang.Object, and differ from those of other classes.

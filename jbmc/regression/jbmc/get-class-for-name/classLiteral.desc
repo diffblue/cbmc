@@ -1,0 +1,14 @@
+CORE
+Test
+--function Test.classLiteral -cp `../../../../scripts/format_classpath.sh target/classes ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Object.getClass must return the same java.lang.Class object as
+Class.forName, also for classes whose class literal the program does not
+refer to, irrespective of which of the two is called first. JBMC obtains the
+Class object of such a class from cproverGetClassObject of the model of
+java.lang.Class on the first call of getClass for that class.

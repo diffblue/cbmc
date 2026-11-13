@@ -49,7 +49,11 @@ enum class synthetic_method_typet
   INVOKEDYNAMIC_METHOD,
   /// Our internal implementation of CProver.createArrayWithType, which needs to
   /// access internal type-id fields
-  CREATE_ARRAY_WITH_TYPE
+  CREATE_ARRAY_WITH_TYPE,
+  /// An override of java.lang.Object.getClass in a class C, which returns the
+  /// class literal of C. Virtual method dispatch then makes getClass return
+  /// the unique java.lang.Class object of the runtime type of the receiver.
+  GET_CLASS
 };
 
 /// Maps method names on to a synthetic method kind.

@@ -2236,8 +2236,19 @@ void java_bytecode_convert_methodt::convert_invoke(
   exprt::operandst &results)
 {
   const bool use_this(statement != "invokestatic");
+  // Object.getClass is final, so that getClass always returns the Class object
+  // of the runtime type of the receiver, also when called via invokespecial
+  // (super.getClass()). Bind such calls dynamically, so that they reach the
+  // override of the runtime type that java_bytecode_languaget creates, rather
+  // than that of the class that invokespecial names (javac names
+  // java.lang.Object, other compilers may name the superclass).
+  const bool is_get_class_call =
+    statement == "invokespecial" &&
+    class_method_descriptor.mangled_method_name() ==
+      "getClass:()Ljava/lang/Class;";
   const bool is_virtual(
-    statement == "invokevirtual" || statement == "invokeinterface");
+    statement == "invokevirtual" || statement == "invokeinterface" ||
+    is_get_class_call);
 
   const irep_idt &invoked_method_id = class_method_descriptor.get_identifier();
   INVARIANT(
@@ -2292,7 +2303,7 @@ void java_bytecode_convert_methodt::convert_invoke(
           needed_lazy_methods->add_needed_class(class_id);
         method_type.set_is_constructor();
       }
-      else
+      else if(!is_get_class_call)
         method_type.set(ID_java_super_method_call, true);
     }
   }

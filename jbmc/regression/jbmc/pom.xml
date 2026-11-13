@@ -69,6 +69,7 @@
         <module>char1</module>
         <module>class-fields</module>
         <module>class-literals</module>
+        <module>class-literals-static-state</module>
         <module>class-loading-annotations</module>
         <module>class_hierarchy</module>
         <module>Class_method1</module>
@@ -163,6 +164,9 @@
         <module>function3</module>
         <module>function4</module>
         <module>generic_base_type</module>
+        <module>get-class</module>
+        <module>get-class-for-name</module>
+        <module>get-class-invokespecial</module>
         <module>generic_class_bound1</module>
         <module>generic_function_parameter</module>
         <module>generic_static_field</module>
