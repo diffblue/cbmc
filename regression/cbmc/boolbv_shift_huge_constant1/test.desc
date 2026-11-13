@@ -1,0 +1,12 @@
+CORE broken-smt-backend
+main.c
+--no-standard-checks
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Constant shift distances of 2^31 or more must shift out all bits. The SMT2
+back end truncates shift distances that are wider than the shifted operand,
+which https://github.com/diffblue/cbmc/pull/9178 addresses.
