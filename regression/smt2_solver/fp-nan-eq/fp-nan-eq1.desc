@@ -1,0 +1,8 @@
+CORE
+fp-nan-eq1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^unsat$
+--
+SMT-LIB = on FloatingPoint treats all NaN bit patterns as one value.

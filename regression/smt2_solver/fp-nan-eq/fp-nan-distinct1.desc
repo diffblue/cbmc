@@ -1,0 +1,8 @@
+CORE
+fp-nan-distinct1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^unsat$
+--
+distinct on FloatingPoint must not distinguish NaN bit patterns.
