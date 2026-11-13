@@ -1,0 +1,173 @@
+{
+ "symbolTable": {
+  "l": {
+   "type": {
+    "id": "unsignedbv",
+    "sub": [],
+    "namedSub": {
+     "width": {
+      "id": "32",
+      "sub": [],
+      "namedSub": {}
+     }
+    }
+   },
+   "value": {
+    "id": "let",
+    "sub": [
+     {
+      "id": "let_binding",
+      "sub": [
+       {
+        "id": "tuple",
+        "sub": [
+         {
+          "id": "symbol",
+          "sub": [],
+          "namedSub": {
+           "type": {
+            "id": "unsignedbv",
+            "sub": [],
+            "namedSub": {
+             "width": {
+              "id": "32",
+              "sub": [],
+              "namedSub": {}
+             }
+            }
+           },
+           "identifier": {
+            "id": "qq",
+            "sub": [],
+            "namedSub": {}
+           }
+          }
+         }
+        ],
+        "namedSub": {}
+       },
+       {
+        "id": "constant",
+        "sub": [],
+        "namedSub": {
+         "type": {
+          "id": "unsignedbv",
+          "sub": [],
+          "namedSub": {
+           "width": {
+            "id": "32",
+            "sub": [],
+            "namedSub": {}
+           }
+          }
+         },
+         "value": {
+          "id": "1",
+          "sub": [],
+          "namedSub": {}
+         }
+        }
+       },
+       {
+        "id": "constant",
+        "sub": [],
+        "namedSub": {
+         "type": {
+          "id": "unsignedbv",
+          "sub": [],
+          "namedSub": {
+           "width": {
+            "id": "32",
+            "sub": [],
+            "namedSub": {}
+           }
+          }
+         },
+         "value": {
+          "id": "2",
+          "sub": [],
+          "namedSub": {}
+         }
+        }
+       }
+      ],
+      "namedSub": {
+       "type": {
+        "id": "unsignedbv",
+        "sub": [],
+        "namedSub": {
+         "width": {
+          "id": "32",
+          "sub": [],
+          "namedSub": {}
+         }
+        }
+       }
+      }
+     },
+     {
+      "id": "symbol",
+      "sub": [],
+      "namedSub": {
+       "type": {
+        "id": "unsignedbv",
+        "sub": [],
+        "namedSub": {
+         "width": {
+          "id": "32",
+          "sub": [],
+          "namedSub": {}
+         }
+        }
+       },
+       "identifier": {
+        "id": "qq",
+        "sub": [],
+        "namedSub": {}
+       }
+      }
+     }
+    ],
+    "namedSub": {
+     "type": {
+      "id": "unsignedbv",
+      "sub": [],
+      "namedSub": {
+       "width": {
+        "id": "32",
+        "sub": [],
+        "namedSub": {}
+       }
+      }
+     }
+    }
+   },
+   "location": {
+    "id": "nil",
+    "sub": [],
+    "namedSub": {}
+   },
+   "name": "l",
+   "module": "",
+   "baseName": "l",
+   "mode": "C",
+   "prettyName": "l",
+   "isType": false,
+   "isMacro": false,
+   "isExported": false,
+   "isInput": false,
+   "isOutput": false,
+   "isStateVar": false,
+   "isProperty": false,
+   "isStaticLifetime": true,
+   "isThreadLocal": false,
+   "isLvalue": true,
+   "isFileLocal": false,
+   "isExtern": false,
+   "isVolatile": false,
+   "isParameter": false,
+   "isAuxiliary": false,
+   "isWeak": false
+  }
+ }
+}

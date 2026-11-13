@@ -1,0 +1,9 @@
+CORE
+pointer.json_symtab
+
+^EXIT=6$
+^SIGNAL=0$
+^malformed symbol table entry .p.: type must have one type parameter$
+--
+--
+Rejects a pointer type without a subtype.

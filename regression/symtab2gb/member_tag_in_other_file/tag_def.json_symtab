@@ -1,0 +1,76 @@
+{
+ "symbolTable": {
+  "tag-S": {
+   "type": {
+    "id": "struct",
+    "sub": [],
+    "namedSub": {
+     "tag": {
+      "id": "S",
+      "sub": [],
+      "namedSub": {}
+     },
+     "components": {
+      "id": "",
+      "sub": [
+       {
+        "id": "",
+        "sub": [],
+        "namedSub": {
+         "name": {
+          "id": "x",
+          "sub": [],
+          "namedSub": {}
+         },
+         "type": {
+          "id": "signedbv",
+          "sub": [],
+          "namedSub": {
+           "width": {
+            "id": "32",
+            "sub": [],
+            "namedSub": {}
+           }
+          }
+         }
+        }
+       }
+      ],
+      "namedSub": {}
+     }
+    }
+   },
+   "value": {
+    "id": "nil",
+    "sub": [],
+    "namedSub": {}
+   },
+   "location": {
+    "id": "nil",
+    "sub": [],
+    "namedSub": {}
+   },
+   "name": "tag-S",
+   "module": "",
+   "baseName": "tag-S",
+   "mode": "C",
+   "prettyName": "tag-S",
+   "isType": true,
+   "isMacro": false,
+   "isExported": false,
+   "isInput": false,
+   "isOutput": false,
+   "isStateVar": false,
+   "isProperty": false,
+   "isStaticLifetime": true,
+   "isThreadLocal": false,
+   "isLvalue": true,
+   "isFileLocal": false,
+   "isExtern": false,
+   "isVolatile": false,
+   "isParameter": false,
+   "isAuxiliary": false,
+   "isWeak": false
+  }
+ }
+}
