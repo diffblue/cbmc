@@ -1,0 +1,13 @@
+CORE
+main.c
+
+^EXIT=(64|1)$
+^SIGNAL=0$
+'x' is constant
+^CONVERSION ERROR$
+--
+^warning: ignoring
+--
+Tests that const within array brackets in parameter declarators
+is preserved on the adjusted pointer type (C11 6.7.6.3p7),
+rejecting increment of the parameter.
