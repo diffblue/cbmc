@@ -1,0 +1,12 @@
+CORE no-new-smt
+main.c
+--64
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Conversions between enum and floating-point types must be done via the
+underlying type of the enum. The incremental SMT2 back end lowers
+floating-point operations before it lowers enums, and still fails on this
+input.
