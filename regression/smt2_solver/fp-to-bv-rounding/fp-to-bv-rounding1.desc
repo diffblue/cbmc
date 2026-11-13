@@ -1,0 +1,8 @@
+CORE
+fp-to-bv-rounding1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+--
+fp.to_sbv with RTP rounding mode must not crash.
