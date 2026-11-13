@@ -52,6 +52,46 @@ exprt simplify_evaluate_update(
 
   const auto &update_state_expr = to_update_state_expr(evaluate_expr.state());
 
+  // Reading a field or element of an object that was updated with a whole
+  // (struct or array) value:
+  //   (ς[A := V])(field_address(A, f))   --> member(V, f)
+  //   (ς[A := V])(element_address(A, i)) --> V[i]
+  // The may-alias dispatch below compares the sub-component address against
+  // the whole-object update address, finds them to be different addresses,
+  // and would therefore incorrectly skip the update. Handle this overlap
+  // explicitly first. This only fires when the update wrote exactly the
+  // object whose component is being read (single level of nesting).
+  if(evaluate_expr.address().id() == ID_field_address)
+  {
+    const auto &field_address = to_field_address_expr(evaluate_expr.address());
+    auto base_alias = ::may_alias(
+      field_address.base(), update_state_expr.address(), address_taken, ns);
+    if(base_alias.has_value() && base_alias->is_true())
+    {
+      const member_exprt member{
+        update_state_expr.new_value(),
+        field_address.component_name(),
+        evaluate_expr.type()};
+      return simplify_state_expr_node(member, address_taken, ns);
+    }
+  }
+  else if(evaluate_expr.address().id() == ID_element_address)
+  {
+    const auto &element_address =
+      to_element_address_expr(evaluate_expr.address());
+    auto base_alias = ::may_alias(
+      element_address.base(), update_state_expr.address(), address_taken, ns);
+    if(base_alias.has_value() && base_alias->is_true())
+    {
+      const index_exprt index{
+        update_state_expr.new_value(), element_address.index()};
+      return simplify_state_expr_node(
+        typecast_exprt::conditional_cast(index, evaluate_expr.type()),
+        address_taken,
+        ns);
+    }
+  }
+
 #if 0
   std::cout << "U: " << format(update_state_expr) << "\n";
   std::cout << "u: " << format(update_state_expr.address()) << "\n";
@@ -1078,6 +1118,75 @@ exprt simplify_state_expr_node(
         else
           return false_exprt();
       }
+    }
+  }
+  else if(src.id() == ID_member)
+  {
+    const auto &member_expr = to_member_expr(src);
+    const exprt &compound = member_expr.struct_op();
+    const irep_idt &component = member_expr.get_component_name();
+    if(compound.id() == ID_evaluate)
+    {
+      // Bridge the datatype view of a whole-object read and the field-address
+      // scalar view, so both representations of a struct field agree:
+      //   member(evaluate(s, A), f) --> evaluate(s, field_address(A, f))
+      const auto &evaluate_expr = to_evaluate_expr(compound);
+      field_address_exprt field_address{
+        evaluate_expr.address(), component, pointer_type(member_expr.type())};
+      return simplify_state_expr_node(
+        evaluate_exprt{
+          evaluate_expr.state(), std::move(field_address), member_expr.type()},
+        address_taken,
+        ns);
+    }
+    else if(compound.id() == ID_if)
+    {
+      // distribute member over if, so the bridge above applies to each arm
+      const auto &if_expr = to_if_expr(compound);
+      return if_exprt{
+        if_expr.cond(),
+        simplify_state_expr_node(
+          member_exprt{if_expr.true_case(), component, member_expr.type()},
+          address_taken,
+          ns),
+        simplify_state_expr_node(
+          member_exprt{if_expr.false_case(), component, member_expr.type()},
+          address_taken,
+          ns)};
+    }
+  }
+  else if(src.id() == ID_index)
+  {
+    const auto &index_expr = to_index_expr(src);
+    const exprt &array = index_expr.array();
+    if(array.id() == ID_evaluate)
+    {
+      // as for member: index(evaluate(s, A), i) -->
+      //   evaluate(s, element_address(A, i))
+      const auto &evaluate_expr = to_evaluate_expr(array);
+      element_address_exprt element_address{
+        evaluate_expr.address(),
+        index_expr.index(),
+        pointer_type(index_expr.type())};
+      return simplify_state_expr_node(
+        evaluate_exprt{
+          evaluate_expr.state(), std::move(element_address), index_expr.type()},
+        address_taken,
+        ns);
+    }
+    else if(array.id() == ID_if)
+    {
+      const auto &if_expr = to_if_expr(array);
+      return if_exprt{
+        if_expr.cond(),
+        simplify_state_expr_node(
+          index_exprt{if_expr.true_case(), index_expr.index()},
+          address_taken,
+          ns),
+        simplify_state_expr_node(
+          index_exprt{if_expr.false_case(), index_expr.index()},
+          address_taken,
+          ns)};
     }
   }
 

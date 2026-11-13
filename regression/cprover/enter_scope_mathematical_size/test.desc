@@ -1,0 +1,7 @@
+CORE
+main.c
+--smt2 --inline
+^EXIT=0$
+^SIGNAL=0$
+\(enter-scope-state-p\d+ \|ς\| \(object-address "main::1::x"\) \(_ bv1 \d+\)\)
+--

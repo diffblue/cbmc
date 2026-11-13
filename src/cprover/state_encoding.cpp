@@ -10,6 +10,7 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/expr_util.h>
 #include <util/mathematical_expr.h>
 #include <util/pointer_expr.h>
 #include <util/prefix.h>
@@ -204,6 +205,31 @@ exprt state_encodingt::replace_nondet_rec(
   }
 }
 
+/// Returns the base expression of a (possibly nested) member/index access
+/// chain, i.e. the first operand that is neither a member nor an index
+/// expression.
+static const exprt &member_index_base(const exprt &expr)
+{
+  const exprt *e = &expr;
+  while(e->id() == ID_member || e->id() == ID_index)
+  {
+    e = e->id() == ID_member ? &to_member_expr(*e).struct_op()
+                             : &to_index_expr(*e).array();
+  }
+  return *e;
+}
+
+/// True if a struct-typed assignment RHS denotes a complete computed value (a
+/// function application or if-then-else, possibly behind typecasts) that must
+/// be assigned as a whole. Splitting such an RHS into per-field assignments
+/// would re-evaluate the computed value (e.g. re-apply the function) once per
+/// field.
+static bool is_whole_struct_value(const exprt &rhs)
+{
+  const exprt &skipped = skip_typecast(rhs);
+  return skipped.id() == ID_function_application || skipped.id() == ID_if;
+}
+
 exprt state_encodingt::evaluate_expr_rec(
   loct loc,
   const exprt &state,
@@ -222,6 +248,12 @@ exprt state_encodingt::evaluate_expr_rec(
       return evaluate_exprt(
         state, address_rec(loc, state, new_symbol), what.type());
     }
+    else if(symbol_expr.type().id() == ID_mathematical_function)
+    {
+      // Pure function symbols (uninterpreted functions) are not state
+      // variables — leave them as-is.
+      return what;
+    }
     else if(bound_symbols.find(symbol_expr) == bound_symbols.end())
     {
       return evaluate_exprt(state, address_rec(loc, state, what), what.type());
@@ -229,11 +261,32 @@ exprt state_encodingt::evaluate_expr_rec(
     else
       return what; // leave as is
   }
-  else if(
-    what.id() == ID_dereference || what.id() == ID_member ||
-    what.id() == ID_index)
+  else if(what.id() == ID_dereference)
   {
     return evaluate_exprt(state, address_rec(loc, state, what), what.type());
+  }
+  else if(what.id() == ID_member || what.id() == ID_index)
+  {
+    // Find the base of the member/index access chain. If the base is an
+    // addressable lvalue (symbol, dereference, or string constant -- all of
+    // which address_rec handles), use the address-based evaluation path.
+    // Otherwise (e.g. a function_application returning a struct), evaluate the
+    // operands directly.
+    const exprt &base = member_index_base(what);
+
+    if(
+      base.id() == ID_symbol || base.id() == ID_dereference ||
+      base.id() == ID_string_constant)
+    {
+      return evaluate_exprt(state, address_rec(loc, state, what), what.type());
+    }
+    else
+    {
+      exprt tmp = what;
+      for(auto &op : tmp.operands())
+        op = evaluate_expr_rec(loc, state, op, bound_symbols);
+      return tmp;
+    }
   }
   else if(what.id() == ID_forall || what.id() == ID_exists)
   {
@@ -533,9 +586,11 @@ exprt state_encodingt::assignment_constraint_rec(
   exprt rhs,
   std::vector<symbol_exprt> &nondet_symbols) const
 {
-  if(lhs.type().id() == ID_struct_tag)
+  if(lhs.type().id() == ID_struct_tag && !is_whole_struct_value(rhs))
   {
     // split up into fields, recursively
+    // (but not when the RHS is a computed whole-struct value such as a
+    // function_application or if-then-else -- see is_whole_struct_value)
     const namespacet ns(goto_model.symbol_table);
     const auto &struct_type = ns.follow_tag(to_struct_tag_type(lhs.type()));
     exprt new_state = state;
