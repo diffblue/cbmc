@@ -1445,7 +1445,9 @@ bvt float_utilst::pack(const biased_floatt &src)
   for(std::size_t i=0; i<spec.f; i++)
     result[i]=prop.land(src.fraction[i], !infinity_or_NaN);
 
-  result[0]=prop.lor(result[0], src.NaN);
+  // a NaN result is the default NaN, which is quiet: set the most
+  // significant fraction bit
+  result[spec.f - 1] = prop.lor(result[spec.f - 1], src.NaN);
 
   // do exponent
   for(std::size_t i=0; i<spec.e; i++)

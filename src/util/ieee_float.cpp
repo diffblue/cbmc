@@ -342,7 +342,11 @@ void ieee_float_valuet::unpack(const mp_integer &i)
   // NaN?
   if(exponent==spec.max_exponent() && fraction!=0)
   {
-    make_NaN();
+    // Keep the sign and the fraction field (the payload, including the
+    // quiet bit) so that pack() reproduces the bit pattern.
+    NaN_flag = true;
+    infinity_flag = false;
+    exponent = 0;
   }
   else if(exponent==spec.max_exponent() && fraction==0) // Infinity
   {
@@ -385,7 +389,13 @@ mp_integer ieee_float_valuet::pack() const
   if(NaN_flag)
   {
     result+=power(2, spec.f)*spec.max_exponent();
-    result+=1;
+    // The fraction field holds the payload, which is non-zero for a NaN.
+    // Fall back to the default (quiet) NaN should it ever be zero, which
+    // would otherwise yield an infinity.
+    if(fraction != 0)
+      result += fraction;
+    else if(spec.f != 0)
+      result += power(2, spec.f - 1);
   }
   else if(infinity_flag)
   {
@@ -668,7 +678,7 @@ bool ieee_float_valuet::operator==(const ieee_float_valuet &other) const
 
   // packed equality!
   if(NaN_flag && other.NaN_flag)
-    return true;
+    return pack() == other.pack();
   else if(NaN_flag || other.NaN_flag)
     return false;
 
@@ -823,9 +833,7 @@ void ieee_floatt::align()
   // NaN?
   if(NaN_flag)
   {
-    fraction=0;
-    exponent=0;
-    sign_flag=false;
+    make_NaN();
     return;
   }
 
@@ -1024,12 +1032,9 @@ ieee_floatt &ieee_floatt::operator/=(const ieee_floatt &other)
 {
   PRECONDITION(other.spec.f == spec.f);
 
-  // NaN/x = NaN
-  if(NaN_flag)
-    return *this;
-
-  // x/NaN = NaN
-  if(other.NaN_flag)
+  // NaN/x = x/NaN = NaN; like the solver, return the default NaN rather
+  // than propagating a payload
+  if(NaN_flag || other.NaN_flag)
   {
     make_NaN();
     return *this;
@@ -1098,10 +1103,13 @@ ieee_floatt &ieee_floatt::operator*=(const ieee_floatt &other)
 {
   PRECONDITION(other.spec.f == spec.f);
 
-  if(other.NaN_flag)
+  // like the solver, return the default NaN rather than propagating a
+  // payload
+  if(NaN_flag || other.NaN_flag)
+  {
     make_NaN();
-  if(NaN_flag)
     return *this;
+  }
 
   if(infinity_flag || other.infinity_flag)
   {
@@ -1135,10 +1143,13 @@ ieee_floatt &ieee_floatt::operator+=(const ieee_floatt &other)
   PRECONDITION(other.spec == spec);
   ieee_floatt _other=other;
 
-  if(other.NaN_flag)
+  // like the solver, return the default NaN rather than propagating a
+  // payload
+  if(NaN_flag || other.NaN_flag)
+  {
     make_NaN();
-  if(NaN_flag)
     return *this;
+  }
 
   if(infinity_flag && other.infinity_flag)
   {
@@ -1230,6 +1241,14 @@ ieee_floatt &ieee_floatt::operator-=(const ieee_floatt &other)
 
 void ieee_floatt::change_spec(const ieee_float_spect &dest_spec)
 {
+  if(NaN_flag)
+  {
+    // The payload is not carried over, the result is the default NaN.
+    spec = dest_spec;
+    make_NaN();
+    return;
+  }
+
   mp_integer _exponent=exponent-spec.f;
   mp_integer _fraction=fraction;
 
@@ -1324,11 +1343,15 @@ void ieee_float_valuet::from_float(const float f)
 
 void ieee_float_valuet::make_NaN()
 {
-  NaN_flag=true;
-  // sign=false;
-  exponent=0;
-  fraction=0;
-  infinity_flag=false;
+  // The default NaN: positive, quiet (the most significant fraction bit
+  // is set), with no further payload. This is what float_utilst::pack and
+  // float_bvt::pack produce for NaN results.
+  NaN_flag = true;
+  sign_flag = false;
+  exponent = 0;
+  // A default-constructed spec has no fraction bits.
+  fraction = spec.f == 0 ? mp_integer{0} : power(2, spec.f - 1);
+  infinity_flag = false;
 }
 
 void ieee_float_valuet::make_fltmax()

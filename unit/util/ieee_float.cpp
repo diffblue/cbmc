@@ -214,3 +214,71 @@ TEST_CASE(
     REQUIRE(ieee_float_valuet::minus_infinity(dp).to_integer() == 0);
   }
 }
+
+TEST_CASE("ieee_float_valuet NaN encodings", "[core][util][ieee_float]")
+{
+  const auto sp = ieee_float_spect::single_precision();
+
+  auto unpacked = [&sp](const mp_integer &bits) -> ieee_float_valuet
+  {
+    ieee_float_valuet v{sp};
+    v.unpack(bits);
+    return v;
+  };
+
+  SECTION("unpack and pack keep the sign and the payload")
+  {
+    for(const mp_integer &bits :
+        {mp_integer{0x7FC00000},
+         mp_integer{0x7FC00001},
+         mp_integer{0xFFC00001},
+         mp_integer{0x7F800001},
+         mp_integer{0xFFBFFFFF}})
+    {
+      const auto v = unpacked(bits);
+      REQUIRE(v.is_NaN());
+      REQUIRE(v.pack() == bits);
+    }
+  }
+
+  SECTION("set_sign only changes the sign bit")
+  {
+    auto v = unpacked(0xFFC00001);
+    v.set_sign(false);
+    REQUIRE(v.pack() == 0x7FC00001);
+    v.negate();
+    REQUIRE(v.pack() == 0xFFC00001);
+  }
+
+  SECTION("the default NaN is positive and quiet")
+  {
+    REQUIRE(ieee_float_valuet::NaN(sp).pack() == 0x7FC00000);
+    REQUIRE(
+      ieee_float_valuet::NaN(ieee_float_spect::double_precision()).pack() ==
+      mp_integer{0x7FF8000000000000});
+  }
+
+  SECTION("arithmetic yields the default NaN")
+  {
+    ieee_floatt zero{sp, ieee_floatt::rounding_modet::ROUND_TO_EVEN};
+    zero.make_zero();
+    ieee_floatt quotient = zero;
+    quotient /= zero;
+    REQUIRE(quotient.pack() == 0x7FC00000);
+
+    ieee_floatt one{sp, ieee_floatt::rounding_modet::ROUND_TO_EVEN};
+    one.from_integer(1);
+    ieee_floatt sum{sp, ieee_floatt::rounding_modet::ROUND_TO_EVEN};
+    sum.unpack(0xFFC00001);
+    sum += one;
+    REQUIRE(sum.pack() == 0x7FC00000);
+  }
+
+  SECTION("packed equality distinguishes NaN encodings")
+  {
+    REQUIRE(unpacked(0x7FC00001) == unpacked(0x7FC00001));
+    REQUIRE_FALSE(unpacked(0x7FC00001) == unpacked(0xFFC00001));
+    REQUIRE_FALSE(unpacked(0x7FC00001) == unpacked(0x7FC00002));
+    REQUIRE_FALSE(unpacked(0x7FC00001).ieee_equal(unpacked(0x7FC00001)));
+  }
+}
