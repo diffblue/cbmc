@@ -54,8 +54,11 @@ public:
 
   bool is_class_template() const
   {
+    const typet * t = &type();
+    while(t->id() == ID_merged_type)
+      t = &to_type_with_subtypes(*t).subtypes().back();
     return is_template() &&
-           type().id()==ID_struct &&
+           t->id()==ID_struct &&
            declarators().empty();
   }
 
