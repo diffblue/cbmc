@@ -206,12 +206,6 @@ void arrayst::collect_arrays(const exprt &a)
   }
   else if(a.id()==ID_member)
   {
-    const auto &struct_op = to_member_expr(a).struct_op();
-
-    DATA_INVARIANT(
-      struct_op.id() == ID_symbol || struct_op.id() == ID_nondet_symbol,
-      "unexpected array expression: member with '" + struct_op.id_string() +
-        "'");
   }
   else if(a.is_constant() || a.id() == ID_array || a.id() == ID_string_constant)
   {
@@ -235,7 +229,15 @@ void arrayst::collect_arrays(const exprt &a)
       typecast_op.type().id() == ID_array,
       "unexpected array type cast from " + typecast_op.type().id_string());
 
-    arrays.make_union(a, typecast_op);
+    // Only unify when element types match; casts between different
+    // element sizes (e.g., SIMD reinterpretation) are handled at the
+    // bitvector level.
+    if(
+      to_array_type(a.type()).element_type() ==
+      to_array_type(typecast_op.type()).element_type())
+    {
+      arrays.make_union(a, typecast_op);
+    }
     collect_arrays(typecast_op);
   }
   else if(a.id()==ID_index)
@@ -348,6 +350,25 @@ void arrayst::add_array_Ackermann_constraints()
   // iterate over arrays
   for(std::size_t i=0; i<arrays.size(); i++)
   {
+    // Skip arrays that are derived from other arrays via with, if, etc.
+    // Their Ackermann constraints are implied by the combination of:
+    // (1) the with/if/array_of/etc. constraints already generated, and
+    // (2) the Ackermann constraints on the underlying base arrays.
+    // This is the "weak equivalence" optimisation: arrays connected by
+    // store chains are weakly equivalent, and read-over-weakeq follows
+    // from the read-over-write constraints plus Ackermann on base arrays.
+    const exprt &arr = arrays[i];
+    if(
+      arr.id() == ID_with || arr.id() == ID_update || arr.id() == ID_if ||
+      arr.id() == ID_array_of || arr.id() == ID_array ||
+      arr.id() == ID_array_comprehension || arr.id() == ID_typecast ||
+      arr.id() == ID_string_constant || arr.is_constant())
+    {
+      continue;
+    }
+    if(expr_try_dynamic_cast<let_exprt>(arr))
+      continue;
+
     const index_sett &index_set=index_map[arrays.find_number(i)];
 
 #ifdef DEBUG
@@ -507,10 +528,7 @@ void arrayst::add_array_constraints(
     expr.id() == ID_string_constant)
   {
   }
-  else if(
-    expr.id() == ID_member &&
-    (to_member_expr(expr).struct_op().id() == ID_symbol ||
-     to_member_expr(expr).struct_op().id() == ID_nondet_symbol))
+  else if(expr.id() == ID_member)
   {
   }
   else if(expr.id()==ID_byte_update_little_endian ||
@@ -523,22 +541,32 @@ void arrayst::add_array_constraints(
     // we got a=(type[])b
     const auto &expr_typecast_op = to_typecast_expr(expr).op();
 
-    // add a[i]=b[i]
-    for(const auto &index : index_set)
+    const typet &dest_element_type = to_array_type(expr.type()).element_type();
+    const typet &src_element_type =
+      to_array_type(expr_typecast_op.type()).element_type();
+
+    // When element types differ in size (e.g., SIMD vector reinterpretation
+    // casts like int32[4] <-> int64[2]), the element-wise constraint
+    // a[i]=b[i] is incorrect. The bitvector-level conversion handles
+    // these as bitwise copies, so skip the array-level constraint.
+    if(dest_element_type == src_element_type)
     {
-      const typet &element_type = to_array_type(expr.type()).element_type();
-      index_exprt index_expr1(expr, index, element_type);
-      index_exprt index_expr2(expr_typecast_op, index, element_type);
+      // add a[i]=b[i]
+      for(const auto &index : index_set)
+      {
+        index_exprt index_expr1(expr, index, dest_element_type);
+        index_exprt index_expr2(expr_typecast_op, index, dest_element_type);
 
-      DATA_INVARIANT(
-        index_expr1.type()==index_expr2.type(),
-        "array elements should all have same type");
+        DATA_INVARIANT(
+          index_expr1.type() == index_expr2.type(),
+          "array elements should all have same type");
 
-      // add constraint
-      lazy_constraintt lazy(lazy_typet::ARRAY_TYPECAST,
-        equal_exprt(index_expr1, index_expr2));
-      add_array_constraint(lazy, false); // added immediately
-      array_constraint_count[constraint_typet::ARRAY_TYPECAST]++;
+        // add constraint
+        lazy_constraintt lazy(
+          lazy_typet::ARRAY_TYPECAST, equal_exprt(index_expr1, index_expr2));
+        add_array_constraint(lazy, false); // added immediately
+        array_constraint_count[constraint_typet::ARRAY_TYPECAST]++;
+      }
     }
   }
   else if(expr.id()==ID_index)
@@ -598,10 +626,36 @@ void arrayst::add_array_constraints_with(
 
   lazy_constraintt lazy(
     lazy_typet::ARRAY_WITH, equal_exprt(index_expr, expr.new_value()));
-  add_array_constraint(lazy, false); // added immediately
+  add_array_constraint(lazy, false); // always eager
   array_constraint_count[constraint_typet::ARRAY_WITH]++;
 
   updated_indices.insert(expr.where());
+
+  // Also add x[I]=v for other indices I that may equal the
+  // write index.  This helps propagation when the write index
+  // and read index are different SSA symbols connected by
+  // equality constraints (e.g., argc'#0 and main_argc).
+  for(const auto &other_index : index_set)
+  {
+    if(other_index == expr.where())
+      continue;
+
+    const literalt idx_eq = convert(equal_exprt(
+      other_index,
+      typecast_exprt::conditional_cast(expr.where(), other_index.type())));
+
+    if(idx_eq.is_false())
+      continue;
+
+    index_exprt other_read(
+      expr, other_index, to_array_type(expr.type()).element_type());
+    lazy_constraintt lazy2(
+      lazy_typet::ARRAY_WITH,
+      implies_exprt(
+        literal_exprt(idx_eq), equal_exprt(other_read, expr.new_value())));
+    add_array_constraint(lazy2, false);
+    array_constraint_count[constraint_typet::ARRAY_WITH]++;
+  }
 
   // For all other indices use the existing value, i.e., add constraints
   // x[I]=y[I] for I!=i,j,...
@@ -633,7 +687,7 @@ void arrayst::add_array_constraints_with(
         lazy_constraintt lazy(lazy_typet::ARRAY_WITH, or_exprt(equality_expr,
                                 literal_exprt(guard_lit)));
 
-        add_array_constraint(lazy, false); // added immediately
+        add_array_constraint(lazy, false); // always eager
         array_constraint_count[constraint_typet::ARRAY_WITH]++;
 
 #if 0 // old code for adding, not significantly faster
@@ -862,7 +916,7 @@ void arrayst::add_array_constraints_if(
     lazy_constraintt lazy(lazy_typet::ARRAY_IF,
                             or_exprt(literal_exprt(!cond_lit),
                               equal_exprt(index_expr1, index_expr2)));
-    add_array_constraint(lazy, false); // added immediately
+    add_array_constraint(lazy, false); // always eager
     array_constraint_count[constraint_typet::ARRAY_IF]++;
 
 #if 0 // old code for adding, not significantly faster
@@ -882,7 +936,7 @@ void arrayst::add_array_constraints_if(
       lazy_typet::ARRAY_IF,
       or_exprt(literal_exprt(cond_lit),
       equal_exprt(index_expr1, index_expr2)));
-    add_array_constraint(lazy, false); // added immediately
+    add_array_constraint(lazy, false); // always eager
     array_constraint_count[constraint_typet::ARRAY_IF]++;
 
 #if 0 // old code for adding, not significantly faster

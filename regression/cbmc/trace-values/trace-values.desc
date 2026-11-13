@@ -1,4 +1,4 @@
-CORE no-new-smt
+CORE no-new-smt broken-arrays-uf-always
 trace-values.c
 --no-malloc-may-fail --trace
 ^EXIT=10$

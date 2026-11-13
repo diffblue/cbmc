@@ -1,0 +1,14 @@
+CORE
+main.c
+--arrays-uf-always --no-standard-checks
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+With --arrays-uf-always, indexing an array of structs containing array members
+with 65+ elements through a nondeterministic index must produce correct results.
+The bitvector solver connects the array symbol's map literals to the array
+theory's element-wise constraints so that struct-level equalities properly
+constrain the array elements.
