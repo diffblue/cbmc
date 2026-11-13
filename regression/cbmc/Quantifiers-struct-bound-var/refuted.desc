@@ -1,0 +1,11 @@
+CORE
+refuted.c
+
+^\[main\.assertion\.\d+\] .* does not hold for every struct-typed bound variable: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+Confirms the struct-typed quantifier body is genuinely evaluated: a property
+that does not hold for all struct points must be refuted.
