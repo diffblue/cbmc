@@ -16570,3 +16570,31 @@ implicitly; only operator new(size_t) and operator delete(void *) are.
 Verified on binW221: 13 suites, profiles (z3 complex2 flaky), vacuity
 1063/3, MSVC 3/3, macOS 142/142, GCC 16 image, unit, lint, format,
 doxygen, iwyu (changed files).
+
+## Round 236 (2026-11-13): upstream batch 5, three front-end items
+
+New PR branches off develop (each test fails on develop):
+pr/remove-complex-code-types, pr/field-sensitivity-union-widest-member,
+pr/value-set-field-sensitive-member (without its cbmc-cpp test, which
+needs the C++ front end), pr/fma-print-dump-c,
+pr/goto-check-constant-guards (without memcpy_argument_checks_not_duplicated,
+not on develop), pr/c-wchar-models (Depends-on #9415 for wide literal
+object sizes, #9439 for strtoll & co.).  upstream-stack: 47 commits.
+Not taken: the Darwin asm label fix (no C-only reproducer: the C models
+handle _fopen), duplicates of #9421 and #9432.
+Front end:
+- a3366ced12 all global allocation functions declared implicitly
+  ([basic.stc.dynamic.general]/2); `throw()' before C++11.
+- 7bad26182c static_assert with a non-constant condition is an error;
+  instrumented first: no test (libstdc++ 13/16, libc++, MSVC, macOS)
+  reached the warning.
+- 742a7f5408 a failed static_assert inside a SFINAE context is reported
+  when the outermost context ends (not in the immediate context,
+  [temp.deduct.general]/8); KNOWNBUG cpp20_lambda_in_diagnostic now
+  CORE.  Exposed: type-constraints must be checked before the
+  requires-clause ([temp.constr.decl]/3.3) in elaborate_class_template
+  and the resolver's specialization guessing (GCC 16 format_kind, 24
+  tests).
+Verified on binW222: 13 suites, profiles (z3 complex2 flaky), vacuity
+1063/3, MSVC 3/3, macOS 142/142, GCC 16 image, unit, lint, format,
+doxygen, iwyu (changed files).

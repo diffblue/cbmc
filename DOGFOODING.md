@@ -2299,3 +2299,7 @@ No dog-food change.  See .kiro/decltype_tuple_apply_findings.md, "Round 232".
 ## Round 233 2026-11-11
 
 No dog-food change.  See .kiro/decltype_tuple_apply_findings.md, "Round 233".
+
+## Round 236 2026-11-13
+
+No dog-food change.  See .kiro/decltype_tuple_apply_findings.md, "Round 236".
