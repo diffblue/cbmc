@@ -45,7 +45,6 @@ jobs:
             ccache -p
             echo "Build with gmake"
             # don't do JBMC as to keep the overall time in check
-            gmake -C src minisat2-download
             gmake -C src -j2 CXX="ccache clang++"
             # gmake -C jbmc/src setup-submodules
             # gmake -C jbmc/src -j2 CXX="ccache clang++"
@@ -116,7 +115,6 @@ jobs:
             ccache -p
             echo "Build with gmake"
             # don't do JBMC so as to keep the overall time in check
-            gmake -C src minisat2-download
             gmake -C src -j2 CXX="ccache clang++"
             # gmake -C jbmc/src setup-submodules
             # gmake -C jbmc/src -j2 CXX="ccache clang++"
@@ -185,7 +183,6 @@ jobs:
             ccache -p
             echo "Build with gmake"
             # don't do JBMC so as to keep the overall time in check
-            gmake -C src minisat2-download
             gmake -C src -j2 CXX="ccache g++"
             # gmake -C jbmc/src setup-submodules
             # gmake -C jbmc/src -j2 CXX="ccache g++"

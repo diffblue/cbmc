@@ -10,7 +10,7 @@ Author: Diffblue Ltd
 #include <stdexcept>
 #include <string>
 #define _LARGEFILE64_SOURCE 1
-#include <miniz/miniz.h>
+#include <miniz-3.0.2/miniz.h>
 
 // Original struct is an anonymous struct with a typedef, This is
 // required to remove internals from the header file
