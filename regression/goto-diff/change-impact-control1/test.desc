@@ -1,0 +1,17 @@
+CORE
+a.c
+b.c --change-impact
+^EXIT=0$
+^SIGNAL=0$
+\*\* helper \*\*
+^-.*function helper
+^\+.*function helper
+^C.*function helper
+^D.*function helper
+--
+^warning: ignoring
+//
+// The only change here is the if-condition (v > 0 vs v > 1). Besides the
+// syntactic-diff (-/+) and data-dependence (D) markers, this pins the C
+// (control-dependence) prefix on the instruction guarded by the changed
+// condition -- the only mode/marker not covered by the other tests.

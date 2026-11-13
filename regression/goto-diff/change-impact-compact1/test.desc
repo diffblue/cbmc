@@ -1,0 +1,17 @@
+CORE
+a.c
+b.c --change-impact --compact-output
+^EXIT=0$
+^SIGNAL=0$
+^- .* 3$
+^\+ .* 3$
+^D .* 4$
+--
+^warning: ignoring
+\*\* helper \*\*
+//
+// --compact-output omits the per-function header and prints one compact line
+// per impacted instruction as "<prefix> <file> <line>". Assert those
+// syntactic-diff (-/+) and data-dependence (D) lines, and that the verbose
+// "** helper **" header is absent (disallowed) -- exercising the
+// header-omission branch and the compact instruction formatting.
