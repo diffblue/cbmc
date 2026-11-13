@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "cbmc_parse_options.h"
 
 #include <util/config.h>
+#include <util/exception_utils.h>
 #include <util/exit_codes.h>
 #include <util/help_formatter.h>
 #include <util/invariant.h>
@@ -401,6 +402,25 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   // remove unused equations
   if(cmdline.isset("slice-formula"))
     options.set_option("slice-formula", true);
+
+  if(cmdline.isset("isolate-properties"))
+  {
+    if(cmdline.isset("incremental-smt2-solver"))
+    {
+      throw invalid_command_line_argument_exceptiont(
+        "--isolate-properties is not supported with --incremental-smt2-solver",
+        "--isolate-properties --incremental-smt2-solver");
+    }
+    if(cmdline.isset("refine-strings"))
+    {
+      // The string refinement converts the string equations when the solver
+      // is first run, and thus does not support solving under assumptions.
+      throw invalid_command_line_argument_exceptiont(
+        "--isolate-properties is not supported with string refinement",
+        "--isolate-properties --refine-strings");
+    }
+    options.set_option("isolate-properties", true);
+  }
 
   if(cmdline.isset("arrays-uf-always"))
     options.set_option("arrays-uf", "always");

@@ -278,6 +278,25 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
     "slice-formula",
     cmdline.isset("slice-formula"));
 
+  if(cmdline.isset("isolate-properties"))
+  {
+    if(cmdline.isset("incremental-smt2-solver"))
+    {
+      throw invalid_command_line_argument_exceptiont(
+        "--isolate-properties is not supported with --incremental-smt2-solver",
+        "--isolate-properties --incremental-smt2-solver");
+    }
+    if(!cmdline.isset("no-refine-strings"))
+    {
+      // The string refinement converts the string equations when the solver
+      // is first run, and thus does not support solving under assumptions.
+      throw invalid_command_line_argument_exceptiont(
+        "--isolate-properties is not supported with string refinement",
+        "--isolate-properties (use --no-refine-strings)");
+    }
+    options.set_option("isolate-properties", true);
+  }
+
   if(cmdline.isset("arrays-uf-always"))
     options.set_option("arrays-uf", "always");
   else if(cmdline.isset("arrays-uf-never"))

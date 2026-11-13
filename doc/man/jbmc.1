@@ -345,6 +345,11 @@ show the verification conditions
 \fB\-\-slice\-formula\fR
 remove assignments unrelated to property
 .TP
+\fB\-\-isolate\-properties\fR
+decide each property in a solver call of its own, under the assumption that
+it fails, instead of solving for all properties at once; not supported with
+string refinement or the incremental SMT2 solver
+.TP
 \fB\-\-unwinding\-assertions\fR
 generate unwinding assertions (which are enabled by default; overrides
 \fB\-\-no\-unwinding\-assertions\fR when both of these are given); cannot be
