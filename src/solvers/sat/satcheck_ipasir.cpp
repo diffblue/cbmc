@@ -10,7 +10,6 @@ Author: Norbert Manthey, nmanthey@amazon.com
 
 #  include "satcheck_ipasir.h"
 
-#  include <util/exception_utils.h>
 #  include <util/invariant.h>
 #  include <util/threeval.h>
 
@@ -135,8 +134,26 @@ propt::resultt satcheck_ipasirt::do_prop_solve(const bvt &assumptions)
         ipasir_assume(solver, literal.dimacs());
     }
 
+    // The terminate callback stays registered once a time limit has been
+    // set: IPASIR does not specify that a null callback disables termination,
+    // and this way an exception thrown by ipasir_solve cannot leave a stale
+    // deadline behind. Without a limit, the deadline is never reached.
+    if(time_limit_milliseconds != 0)
+    {
+      deadline = std::chrono::steady_clock::now() +
+                 std::chrono::milliseconds{time_limit_milliseconds};
+      if(!terminate_callback_registered)
+      {
+        ipasir_set_terminate(solver, this, &terminate_callback);
+        terminate_callback_registered = true;
+      }
+    }
+    else
+      deadline = std::chrono::steady_clock::time_point::max();
+
     // solve the formula, and handle the return code (10=SAT, 20=UNSAT)
-    int solver_state = ipasir_solve(solver);
+    const int solver_state = ipasir_solve(solver);
+
     if(10 == solver_state)
     {
       log.status() << "SAT checker: instance is SATISFIABLE" << messaget::eom;
@@ -149,15 +166,25 @@ propt::resultt satcheck_ipasirt::do_prop_solve(const bvt &assumptions)
     }
     else
     {
-      log.status() << "SAT checker: solving returned without solution"
+      // Solving was interrupted; this is the path taken when our
+      // terminate_callback signals that the configured time limit has
+      // passed. We return P_ERROR (matching the MiniSat 2 backend) so
+      // that callers can recognise a timeout, instead of throwing.
+      log.status() << "SAT checker: solving was interrupted (e.g. timeout)"
                    << messaget::eom;
-      throw analysis_exceptiont(
-        "solving inside IPASIR SAT solver has been interrupted");
+      status = statust::ERROR;
+      return resultt::P_ERROR;
     }
   }
 
   status=statust::UNSAT;
   return resultt::P_UNSATISFIABLE;
+}
+
+int satcheck_ipasirt::terminate_callback(void *data)
+{
+  const auto *self = static_cast<const satcheck_ipasirt *>(data);
+  return std::chrono::steady_clock::now() >= self->deadline ? 1 : 0;
 }
 
 void satcheck_ipasirt::set_assignment(literalt a, bool value)

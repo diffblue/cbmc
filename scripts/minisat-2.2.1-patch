@@ -280,3 +280,39 @@ diff --git a/minisat/mtl/XAlloc.h b/minisat/mtl/XAlloc.h
          throw OutOfMemoryException();
      }else
          return mem;
+diff --git a/minisat/core/Solver.h b/minisat/core/Solver.h
+--- a/minisat/core/Solver.h
++++ b/minisat/core/Solver.h
+@@ -21,6 +21,8 @@
+ #ifndef Minisat_Solver_h
+ #define Minisat_Solver_h
+ 
++#include <atomic>
++
+ #include "minisat/mtl/Vec.h"
+ #include "minisat/mtl/Heap.h"
+ #include "minisat/mtl/Alg.h"
+@@ -209,7 +211,7 @@
+     //
+     int64_t             conflict_budget;    // -1 means no budget.
+     int64_t             propagation_budget; // -1 means no budget.
+-    bool                asynch_interrupt;
++    std::atomic<bool>   asynch_interrupt;
+ 
+     // Main internal methods:
+     //
+@@ -339,11 +341,11 @@
+ }
+ inline void     Solver::setConfBudget(int64_t x){ conflict_budget    = conflicts    + x; }
+ inline void     Solver::setPropBudget(int64_t x){ propagation_budget = propagations + x; }
+-inline void     Solver::interrupt(){ asynch_interrupt = true; }
+-inline void     Solver::clearInterrupt(){ asynch_interrupt = false; }
++inline void     Solver::interrupt(){ asynch_interrupt.store(true, std::memory_order_relaxed); }
++inline void     Solver::clearInterrupt(){ asynch_interrupt.store(false, std::memory_order_relaxed); }
+ inline void     Solver::budgetOff(){ conflict_budget = propagation_budget = -1; }
+ inline bool     Solver::withinBudget() const {
+-    return !asynch_interrupt &&
++    return !asynch_interrupt.load(std::memory_order_relaxed) &&
+            (conflict_budget    < 0 || conflicts < (uint64_t)conflict_budget) &&
+            (propagation_budget < 0 || propagations < (uint64_t)propagation_budget); }
+ 
