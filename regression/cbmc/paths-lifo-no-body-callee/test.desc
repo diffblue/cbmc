@@ -1,0 +1,16 @@
+CORE
+main.c
+--paths lifo
+^\[main\.no-body\.no_body\] line 11 no body for callee no_body: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+//
+// Regression test for the soundness fix: the only failing property here is the
+// dynamically generated "no body for callee" assertion, which is absent from
+// the initial properties map. Before paths-symex-explore-all was defaulted in
+// lock-step with unwinding-assertions, --paths lifo reported VERIFICATION
+// SUCCESSFUL because has_finished_exploration terminated before exploring any
+// path. It must now report VERIFICATION FAILED.
