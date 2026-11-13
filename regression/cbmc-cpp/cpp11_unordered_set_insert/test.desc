@@ -1,0 +1,20 @@
+KNOWNBUG
+main.cpp
+--cpp11 --object-bits 12
+^\[main\.assertion\.1\] line \d+ inserted element is found: SUCCESS$
+^\[main\.assertion\.2\] line \d+ absent element is not found: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+dropped the body
+--
+std::unordered_set<int>::insert, then count() of the inserted and of an
+absent element (found dog-fooding src/util/find_symbols.cpp).  The insert
+path needed fixes for: deferred members of the _Insert CRTP mixin not
+instantiated ([temp.inst]/4); conversion to a private base in a friend of
+the derived class ([class.access.base]/4-5,
+cpp98_friend_private_base_conversion); the scope of a name declared in an
+if condition ([basic.scope.block]/1, cpp98_condition_decl_scope); and
+models of _Prime_rehash_policy::_M_next_bkt and _M_need_rehash, which
+libstdc++ defines in its compiled library (cpp_typecheck_stdlib.cpp).

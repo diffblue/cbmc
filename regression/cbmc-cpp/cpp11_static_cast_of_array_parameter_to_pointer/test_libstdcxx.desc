@@ -1,0 +1,14 @@
+KNOWNBUG
+libstdcxx.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ span of an array: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+span line 189: C\+\+ front-end dropped the body
+--
+libstdc++'s span from an array (span:189), see test.desc.  g++ 13
+accepts the program.

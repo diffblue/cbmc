@@ -1,0 +1,17 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ destructor called: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+dropped the body
+--
+The destructor name was taken from the class's tag up to the first '>'
+outside an angle bracket pair; the '->' of the function type argument
+`int (&)(int, int)' closed one, the name came out wrong, and the body of
+destroy() was dropped.

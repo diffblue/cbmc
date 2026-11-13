@@ -1,0 +1,22 @@
+KNOWNBUG libstdcxx
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ throwing conversion: SUCCESS$
+^\[main\.assertion\.2\] line \d+ noexcept conversion: SUCCESS$
+^\[main\.assertion\.3\] line \d+ direct binding: SUCCESS$
+^\[main\.assertion\.4\] line \d+ temporary of scalar: SUCCESS$
+^\[main\.assertion\.5\] line \d+ temporary through throwing conversion: SUCCESS$
+^\[main\.assertion\.6\] line \d+ derived to base: SUCCESS$
+^\[main\.assertion\.7\] line \d+ not constructible: SUCCESS$
+^\[main\.assertion\.8\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+__is_nothrow_constructible(T &, U) was __is_constructible: a reference
+binding through a potentially-throwing conversion function counted as
+non-throwing.  The binding is now formed (implicit_typecast, in a
+substitution context) and analyzed as the noexcept operator does.

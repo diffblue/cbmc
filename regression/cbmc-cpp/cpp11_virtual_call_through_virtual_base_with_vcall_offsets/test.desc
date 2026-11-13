@@ -1,0 +1,19 @@
+KNOWNBUG
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ B under construction: SUCCESS$
+^\[main\.assertion\.2\] line \d+ M under construction: SUCCESS$
+^\[main\.assertion\.3\] line \d+ after construction: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Each vtable slot has a `@vcall_offset' field.  A thunk through which a
+virtual base's table enters an overrider reads it instead of subtracting
+the base's offset in the overrider's complete class; set_virtual_base_offsets
+fills it in for the complete object's and the construction tables, and a
+base-object constructor for the tables it builds at run time.

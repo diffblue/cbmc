@@ -1,0 +1,18 @@
+KNOWNBUG
+main.cpp
+--cpp11 --unwind 5 --unwinding-assertions
+^\[main\.assertion\.1\] line \d+ read through the cast: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+type mismatch on reinterpret_cast
+--
+The check whether a cast casts away constness compared the pointer-to-array
+level by level with the pointer to const int and rejected the cast.  With
+CI's GCC 16 snapshot, std::any's _S_manage lost its body
+(cpp17_probe_std_any).

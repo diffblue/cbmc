@@ -1,0 +1,17 @@
+KNOWNBUG
+main.cpp
+--cpp11 --unwind 3 --unwinding-assertions
+^\[main\.assertion\.1\] line \d+ built-in operators: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+recursion unwinding assertion: FAILURE
+--
+`e.mib() == i' (two ids) called the friend operator==(const E &, id),
+converting its first operand through E(id), so the friend called itself
+and every path was cut by the recursion bound.
