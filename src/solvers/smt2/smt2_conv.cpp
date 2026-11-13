@@ -3251,14 +3251,23 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     }
     else if(src_type.id() == ID_integer || src_type.id() == ID_natural)
     {
-      // from integer to bit-vector, must be constant
+      // from integer to bit-vector: the value modulo 2^to_width
       if(src.is_constant())
       {
-        mp_integer i = numeric_cast_v<mp_integer>(to_constant_expr(src));
+        const mp_integer modulus = power(2, to_width);
+        mp_integer i =
+          numeric_cast_v<mp_integer>(to_constant_expr(src)) % modulus;
+        if(i < 0)
+          i += modulus;
         out << "(_ bv" << i << " " << to_width << ")";
       }
       else
-        SMT2_TODO("can't convert non-constant integer to bitvector");
+      {
+        // int2bv is not part of SMT-LIB 2.6, but supported by Z3 and CVC5
+        out << "((_ int2bv " << to_width << ") ";
+        convert_expr(src);
+        out << ')';
+      }
     }
     else if(
       src_type.id() == ID_struct ||
@@ -3574,6 +3583,27 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       convert_expr(src);
       out <<" 1 0)";
     }
+    else if(
+      src_type.id() == ID_unsignedbv || src_type.id() == ID_c_bool ||
+      (src_type.id() == ID_signedbv && dest_type.id() == ID_integer))
+    {
+      // bv2nat is not part of SMT-LIB 2.6, but supported by Z3 and CVC5
+      if(src_type.id() == ID_signedbv)
+      {
+        const std::size_t width = to_signedbv_type(src_type).get_width();
+        out << "(let ((?tcop ";
+        convert_expr(src);
+        out << ")) (ite (bvslt ?tcop (_ bv0 " << width << ")) "
+            << "(- (bv2nat ?tcop) " << power(2, width) << ") "
+            << "(bv2nat ?tcop)))";
+      }
+      else
+      {
+        out << "(bv2nat ";
+        convert_expr(src);
+        out << ')';
+      }
+    }
     else
       UNEXPECTEDCASE("Unknown typecast "+src_type.id_string()+" -> integer");
   }
@@ -3713,6 +3743,19 @@ void smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
       tmp.op() = typecast_exprt(
         src, ns.follow_tag(to_c_enum_tag_type(src_type)).underlying_type());
       convert_floatbv_typecast(tmp);
+    }
+    else if(
+      (src_type.id() == ID_integer || src_type.id() == ID_natural) &&
+      use_FPA_theory)
+    {
+      // integer to float: to_real embeds the integer into the reals exactly
+      // (without FPA, prepare_for_convert_expr rewrites this cast)
+      const floatbv_typet &dst = to_floatbv_type(dest_type);
+      out << "((_ to_fp " << dst.get_e() << " " << dst.get_f() + 1 << ") ";
+      convert_rounding_mode_FPA(expr.op1());
+      out << " (to_real ";
+      convert_expr(src);
+      out << "))";
     }
     else
       UNEXPECTEDCASE(
@@ -5711,6 +5754,39 @@ exprt smt2_convt::lower_byte_operators(const exprt &expr)
 ///    expressions.
 /// \param expr: expression to prepare
 /// \return equivalent expression suitable for convert_expr.
+/// Without the FPA theory, floats are encoded as bit-vectors, and the
+/// bit-vector encoding of conversions to float (float_bvt) requires a
+/// bit-vector operand. Rewrite a conversion from a mathematical integer \p x
+/// to a conversion from a signed bit-vector that is wide enough to hold any
+/// integer whose magnitude does not exceed twice the largest finite value of
+/// the float type, after clamping \p x to that range: every integer beyond
+/// it rounds to the same result as the clamped value, in every rounding mode.
+/// \param expr: conversion from an integer to a float
+/// \return equivalent conversion from a signed bit-vector
+static floatbv_typecast_exprt
+lower_integer_to_float(const floatbv_typecast_exprt &expr)
+{
+  const ieee_float_spect spec{to_floatbv_type(expr.type())};
+  // The largest finite value is below 2^(bias + 1) = 2^(2^(e-1)).
+  const std::size_t width = power(2, spec.e - 1).to_ulong() + 2;
+  const typet &integer_type = expr.op().type();
+  const constant_exprt bound =
+    from_integer(power(2, width - 1) - 1, integer_type);
+  const exprt clamped_above =
+    if_exprt{binary_relation_exprt{expr.op(), ID_gt, bound}, bound, expr.op()};
+  const exprt clamped =
+    integer_type.id() == ID_natural
+      ? clamped_above
+      : if_exprt{
+          binary_relation_exprt{expr.op(), ID_lt, unary_minus_exprt{bound}},
+          unary_minus_exprt{bound},
+          clamped_above};
+
+  floatbv_typecast_exprt result = expr;
+  result.op() = typecast_exprt{clamped, signedbv_typet{width}};
+  return result;
+}
+
 exprt smt2_convt::prepare_for_convert_expr(const exprt &expr)
 {
   // First, replace byte operators, because they may introduce new array
@@ -5725,6 +5801,14 @@ exprt smt2_convt::prepare_for_convert_expr(const exprt &expr)
       it != itend;) // no ++it
   {
     if(
+      !use_FPA_theory && it->id() == ID_floatbv_typecast &&
+      (to_floatbv_typecast_expr(*it).op().type().id() == ID_integer ||
+       to_floatbv_typecast_expr(*it).op().type().id() == ID_natural))
+    {
+      it.mutate() = lower_integer_to_float(to_floatbv_typecast_expr(*it));
+      // the operands of the lowered expression remain to be processed
+    }
+    else if(
       auto prophecy_r_or_w_ok =
         expr_try_dynamic_cast<prophecy_r_or_w_ok_exprt>(*it))
     {
