@@ -2786,6 +2786,19 @@ void smt2_convt::convert_expr(const exprt &expr)
     //   is_prefix(prefix, s)       -> (str.prefixof prefix s)
     //   is_suffix(suffix, s)       -> (str.suffixof suffix s)
     //   replace(s, old, new)       -> (str.replace s old new) : first match
+    //                                 only; note that symex constant
+    //                                 propagation and the SAT string solver
+    //                                 give replace replace-every-match
+    //                                 semantics
+    //   replace_all(s, old, new)   -> (str.replace_all s old new) : every
+    //                                 match; s unchanged if old is ""
+    //   from_code(i)               -> (str.from_code i) : Int operand; ""
+    //                                 unless 0 <= i <= 196607
+    //   to_code(s)                 -> (str.to_code s)   : Int result; -1
+    //                                 unless |s| = 1
+    //   from_int(n)                -> (str.from_int n)  : Int operand; ""
+    //                                 for n < 0 (unlike of_int, which
+    //                                 produces a leading '-')
     //   equal(s, t)                -> (= s t)
     //   index_of(s, sub[, off])    -> (str.indexof s sub off) : off defaults 0
     //   startswith(s, prefix)      -> (str.prefixof prefix s)
@@ -2826,6 +2839,10 @@ void smt2_convt::convert_expr(const exprt &expr)
       {ID_cprover_string_is_prefix_func, "str.prefixof"},
       {ID_cprover_string_is_suffix_func, "str.suffixof"},
       {ID_cprover_string_replace_func, "str.replace"},
+      {ID_cprover_string_replace_all_func, "str.replace_all"},
+      {ID_cprover_string_from_code_func, "str.from_code"},
+      {ID_cprover_string_to_code_func, "str.to_code"},
+      {ID_cprover_string_from_int_func, "str.from_int"},
       {ID_cprover_string_equal_func, "="},
       // regex operators
       {ID_cprover_string_to_regex_func, "str.to_re"},
@@ -2874,6 +2891,24 @@ void smt2_convt::convert_expr(const exprt &expr)
             "(array/pointer) operand; the refined-string representation "
             "requires the SAT string solver (--refine-strings)");
         }
+      }
+
+      // The code-point and integer conversions are Int-sorted in SMT-LIB;
+      // reject operands or results of any other sort (e.g. bit-vectors)
+      // instead of emitting SMT-LIB that the solver rejects.
+      const bool int_operand = fn_id == ID_cprover_string_from_code_func ||
+                               fn_id == ID_cprover_string_from_int_func;
+      const bool int_result = fn_id == ID_cprover_string_to_code_func;
+      if(
+        (int_operand || int_result) &&
+        (args.size() != 1 ||
+         (int_operand && args[0].type().id() != ID_integer) ||
+         (int_result && expr.type().id() != ID_integer)))
+      {
+        throw unsupported_operation_exceptiont{
+          "string built-in '" + id2string(fn_id) +
+          "' expects exactly one operand and an Int-sorted (integer) "
+          "operand or result in the SMT-LIB string lowering"};
       }
 
       if(is_index_of)
