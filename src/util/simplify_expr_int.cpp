@@ -1419,6 +1419,46 @@ simplify_exprt::simplify_inequality(const binary_relation_exprt &expr)
     return simplify_inequality_address_of(expr);
   }
 
+  // A relational comparison of pointers to distinct objects is undefined in
+  // C and unspecified in C++; the back end decides it false
+  // (bv_pointerst::convert_rest).  Do the same when the objects are
+  // evidently distinct: the null pointer and a named object, or two named
+  // objects.  Otherwise symbolic execution keeps both outcomes of, e.g.,
+  // libc++'s `if(__hm_ < pptr())' in stringbuf::underflow with no put area.
+  if(
+    tmp0.type().id() == ID_pointer &&
+    (expr.id() == ID_lt || expr.id() == ID_le || expr.id() == ID_gt ||
+     expr.id() == ID_ge))
+  {
+    const auto named_object = [this](const exprt &pointer) -> irep_idt
+    {
+      const exprt object_pointer = skip_typecast(simplify_object(pointer).expr);
+      if(object_pointer.id() != ID_address_of)
+        return irep_idt{};
+      const exprt *object = &to_address_of_expr(object_pointer).object();
+      while(object->id() == ID_member || object->id() == ID_index)
+        object = &to_multi_ary_expr(*object).op0();
+      return object->id() == ID_symbol
+               ? to_symbol_expr(*object).get_identifier()
+               : irep_idt{};
+    };
+    const auto is_null = [](const exprt &pointer)
+    {
+      const exprt &p = skip_typecast(pointer);
+      return p.is_constant() && p.type().id() == ID_pointer &&
+             to_constant_expr(p).is_null_pointer();
+    };
+    const irep_idt object0 = named_object(tmp0);
+    const irep_idt object1 = named_object(tmp1);
+    if(
+      (!object0.empty() && !object1.empty() && object0 != object1) ||
+      (!object0.empty() && is_null(tmp1)) ||
+      (is_null(tmp0) && !object1.empty()))
+    {
+      return false_exprt{};
+    }
+  }
+
   if(tmp0.id()==ID_pointer_object &&
      tmp1.id()==ID_pointer_object &&
      (expr.id()==ID_equal || expr.id()==ID_notequal))
