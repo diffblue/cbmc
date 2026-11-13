@@ -1,0 +1,12 @@
+CORE
+main.cpp
+
+^regression/cpp-linter/abort-exit-nolint/main\.cpp:18:  exit\(\) should not be used. Normal termination should be via return from main. Abnormal termination should use invariant.h macros. If this use is justified, mark with NOLINT. See https://github.com/diffblue/cbmc/issues/1902  \[runtime/termination\] \[4\]
+^regression/cpp-linter/abort-exit-nolint/main\.cpp:19:  abort\(\) should not be used. Normal termination should be via return from main. Abnormal termination should use invariant.h macros. If this use is justified, mark with NOLINT. See https://github.com/diffblue/cbmc/issues/1902  \[runtime/termination\] \[4\]
+^regression/cpp-linter/abort-exit-nolint/main\.cpp:22:  exit\(\) should not be used. Normal termination should be via return from main. Abnormal termination should use invariant.h macros. If this use is justified, mark with NOLINT. See https://github.com/diffblue/cbmc/issues/1902  \[runtime/termination\] \[4\]
+^regression/cpp-linter/abort-exit-nolint/main\.cpp:30:  exit\(\) should not be used. Normal termination should be via return from main. Abnormal termination should use invariant.h macros. If this use is justified, mark with NOLINT. See https://github.com/diffblue/cbmc/issues/1902  \[runtime/termination\] \[4\]
+^regression/cpp-linter/abort-exit-nolint/main\.cpp:32:  exit\(\) should not be used. Normal termination should be via return from main. Abnormal termination should use invariant.h macros. If this use is justified, mark with NOLINT. See https://github.com/diffblue/cbmc/issues/1902  \[runtime/termination\] \[4\]
+^regression/cpp-linter/abort-exit-nolint/main\.cpp:41:  abort\(\) should not be used. Normal termination should be via return from main. Abnormal termination should use invariant.h macros. If this use is justified, mark with NOLINT. See https://github.com/diffblue/cbmc/issues/1902  \[runtime/termination\] \[4\]
+^# Total errors found: 6$
+^EXIT=1$
+^SIGNAL=0$
