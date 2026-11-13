@@ -1400,8 +1400,23 @@ void goto_convertt::do_function_call_symbol(
 
     side_effect_exprt rhs{
       ID_va_start, dest_expr.type(), function.source_location()};
-    rhs.add_to_operands(
-      typecast_exprt{address_of_exprt{arguments[1]}, dest_expr.type()});
+    // C23 7.16.1.4 (and C++26 [cstdarg.syn]): va_start(ap, ...) ignores any
+    // argument after ap, and GCC's <stdarg.h> then expands it to
+    // __builtin_va_start(ap, 0).  For an argument that is not an object
+    // (a null pointer here) symex starts the variadic arguments after the
+    // last named parameter, as it does for an object that is not a
+    // parameter.
+    const exprt &parm_n = skip_typecast(arguments[1]);
+    if(parm_n.id() == ID_symbol)
+    {
+      rhs.add_to_operands(
+        typecast_exprt{address_of_exprt{arguments[1]}, dest_expr.type()});
+    }
+    else
+    {
+      rhs.add_to_operands(typecast_exprt{
+        null_pointer_exprt{pointer_type(empty_typet{})}, dest_expr.type()});
+    }
 
     dest.add(goto_programt::make_assignment(
       std::move(dest_expr), std::move(rhs), function.source_location()));
