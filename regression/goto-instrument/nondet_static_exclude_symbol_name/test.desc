@@ -1,0 +1,9 @@
+CORE
+main.c
+--nondet-static --nondet-static-exclude f::1::bar --nondet-static-exclude foo
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Test that --nondet-static-exclude works with symbol names like f::1::bar and with global variable names like foo
