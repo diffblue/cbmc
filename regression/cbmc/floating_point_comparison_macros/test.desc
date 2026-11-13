@@ -1,0 +1,17 @@
+CORE gcc-only
+main.c
+
+^\[main\.assertion\.1\] line \d+ assertion .*isless.*: SUCCESS$
+^\[main\.assertion\.4\] line \d+ assertion .*isunordered.*: SUCCESS$
+^\[main\.assertion\.5\] line \d+ assertion __builtin_isless\(a, l\): SUCCESS$
+^\[main\.assertion\.6\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Goto conversion called __CPROVER_isless{f,d} and friends, which were not
+declared ("identifier __CPROVER_islessd was not found"), and rejected a
+long double argument.  The macros are now the relations they denote.
