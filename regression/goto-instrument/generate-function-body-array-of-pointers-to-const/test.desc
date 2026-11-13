@@ -1,0 +1,16 @@
+CORE
+main.c
+--generate-function-body havoc_array_of_pointers_to_const --generate-function-body-options havoc,params:.*
+^EXIT=10$
+^SIGNAL=0$
+^\[main.assertion.1\] .* assertion a == 10: SUCCESS$
+^\[main.assertion.2\] .* assertion b == 20: SUCCESS$
+^\[main.assertion.3\] .* assertion c == 30: SUCCESS$
+^\[main.assertion.4\] .* assertion \*arr\[0\] == 10: SUCCESS$
+^\[main.assertion.5\] .* assertion \*arr\[1\] == 20: SUCCESS$
+^\[main.assertion.6\] .* assertion \*arr\[2\] == 30: SUCCESS$
+^\[main.assertion.7\] .* assertion a == 10: SUCCESS$
+^\[main.assertion.8\] .* assertion b == 20: SUCCESS$
+^\[main.assertion.9\] .* assertion c == 30: SUCCESS$
+^\[main.assertion.10\] .* assertion \*arr\[0\] == 10: FAILURE$
+--
