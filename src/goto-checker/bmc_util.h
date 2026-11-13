@@ -171,6 +171,7 @@ void run_property_decider(
   "(show-goto-symex-steps)"                                                    \
   "(show-points-to-sets)"                                                      \
   "(slice-formula)"                                                            \
+  "(isolate-properties)"                                                       \
   "(unwinding-assertions)"                                                     \
   "(no-unwinding-assertions)"                                                  \
   "(no-self-loops-to-assumptions)"                                             \
@@ -219,6 +220,8 @@ void run_property_decider(
   "{y--incremental-loop}\n"                                                    \
   " {y--show-vcc} \t show the verification conditions\n"                       \
   " {y--slice-formula} \t remove assignments unrelated to property\n"          \
+  " {y--isolate-properties} \t decide each property in a solver call of its "  \
+  "own\n"                                                                      \
   " {y--unwinding-assertions} \t generate unwinding assertions (cannot be "    \
   "used with {y--cover})\n"                                                    \
   " {y--partial-loops} \t permit paths with partial loops\n"                   \

@@ -1,0 +1,14 @@
+CORE no-new-smt
+main.c
+--isolate-properties
+^\[main\.assertion\.1\] line \d+ not one: FAILURE$
+^\[main\.assertion\.2\] line \d+ functional consistency: SUCCESS$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+The constraints for the functional consistency of uninterpreted functions are
+added when the solver is first run, which is under the assumption that the
+first property fails. They must nevertheless hold for all later solver calls.
