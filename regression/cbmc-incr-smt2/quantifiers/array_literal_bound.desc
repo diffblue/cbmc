@@ -1,0 +1,11 @@
+CORE
+array_literal_bound.c
+
+Reason: Reached unimplemented Generation of SMT formula for array expression depending on a quantified variable
+--
+must fail: SUCCESS
+^VERIFICATION SUCCESSFUL$
+--
+The array literal depends on the quantified variable. It must not be replaced by
+a single array defined outside the quantifier, which yielded an unsound result.
+Such array literals are not yet supported.
