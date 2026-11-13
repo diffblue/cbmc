@@ -1,0 +1,21 @@
+KNOWNBUG
+main.cpp
+--cpp26
+^\[main\.assertion\.1\] line \d+ a call satisfying the precondition: SUCCESS$
+^\[main\.precondition_instance\.2\] line \d+ precondition x > 0: FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+With the enforce evaluation semantic ([basic.contract.eval]/4: a contract
+violation invokes the contract-violation handler, then the program is
+terminated), as GCC 16 -fcontracts uses by default, f(0) violates its
+precondition and the program ends there: the precondition is the one
+property that fails.  CBMC ignored pre() and post(); in C++26 mode it now
+enforces them (the precondition is checked at each call site, by
+goto-programs' instrument_preconditions).  Checked with GCC 16 -fcontracts
+(f(0) aborts).

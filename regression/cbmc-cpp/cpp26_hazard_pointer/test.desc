@@ -1,0 +1,18 @@
+KNOWNBUG
+main.cpp
+--cpp26 --object-bits 12
+^\[main\.assertion\.1\] line \d+ a non-empty hazard pointer: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Hazard pointers ([saferecl.hp]): make_hazard_pointer returns a non-empty
+one.  No standard library implements it yet (libstdc++ 16, libc++ 18), so the
+test is written to N5008 and not checked with a compiler; it is FUTURE
+until a library provides the header.  Then it is a KNOWNBUG or CORE
+test of CBMC's support of that library code.

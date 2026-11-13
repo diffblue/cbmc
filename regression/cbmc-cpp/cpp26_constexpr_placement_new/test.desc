@@ -1,0 +1,18 @@
+KNOWNBUG libstdcxx
+main.cpp
+--cpp26
+^\[main\.assertion\.1\] line \d+ placement new in a constant expression: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+C++26 permits a placement new-expression in a constant expression when the
+placement argument points to an object of a similar type whose lifetime
+began in the evaluation ([expr.const]/10.18.2).  CBMC's constant evaluator
+did not evaluate it: W<f()> failed to type-check (CONVERSION ERROR).
+Checked with GCC 16.
