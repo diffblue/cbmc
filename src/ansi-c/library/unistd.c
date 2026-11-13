@@ -132,15 +132,36 @@ __CPROVER_HIDE:;
 
 /* FUNCTION: close */
 
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
 extern struct __CPROVER_pipet __CPROVER_pipes[__CPROVER_constant_infinity_uint];
 // offset to make sure we don't collide with other fds
 extern const int __CPROVER_pipe_offset;
 
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
+
 int close(int fildes)
 {
   __CPROVER_HIDE:;
-  if((fildes>=0 && fildes<=2) || fildes < __CPROVER_pipe_offset)
+  if(fildes < 0)
+  {
+    errno = EBADF;
+    return -1;
+  }
+  if(fildes <= 2 || fildes < __CPROVER_pipe_offset)
+  {
+    // POSIX: close can fail even on valid file descriptors (EINTR, EIO)
+    __CPROVER_bool error = __VERIFIER_nondet___CPROVER_bool();
+    if(error)
+    {
+      errno = EIO;
+      return -1;
+    }
     return 0;
+  }
 
   __CPROVER_assume(__CPROVER_pipe_offset >= 0);
 

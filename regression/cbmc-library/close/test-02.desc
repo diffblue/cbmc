@@ -1,0 +1,9 @@
+CORE gcc-only
+main2.c
+
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+\[main\.assertion\.2\] .*error path of close\(\) reached.*: FAILURE
+--
+^warning: ignoring
