@@ -1,0 +1,13 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] .* members initialized: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+not accessible
+--
+A user-provided constructor initializes a private member whose class type
+has default member initializers.  The member access to apply them was
+checked in that class's scope instead of the constructor's, and failed.

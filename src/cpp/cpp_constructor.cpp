@@ -355,8 +355,14 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
               else
                 init_ops.push_back(std::move(init_val));
 
+              // the object is type-checked already, in the scope of the
+              // construction: checked again in the member's class scope, the
+              // access to a private member of the enclosing class
+              // (`owner::space' in `this->space.x') was denied
+              exprt member_tc = member;
+              already_typechecked_exprt::make_already_typechecked(member_tc);
               auto member_init =
-                cpp_constructor(source_location, member, init_ops);
+                cpp_constructor(source_location, member_tc, init_ops);
               if(member_init.has_value())
                 block.add(std::move(*member_init));
             }
@@ -377,9 +383,12 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
               to_struct_tag_type(object_tc.type()).get_identifier());
             member_exprt member(object_tc, comp.get_name(), comp.type());
             member.set(ID_C_lvalue, true);
+            exprt member_tc = member;
+            // see above: the object is type-checked already
+            already_typechecked_exprt::make_already_typechecked(member_tc);
             exprt::operandst no_operands;
             auto member_init =
-              cpp_constructor(source_location, member, no_operands);
+              cpp_constructor(source_location, member_tc, no_operands);
             if(member_init.has_value())
               block.add(std::move(*member_init));
           }
