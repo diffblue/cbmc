@@ -1,0 +1,12 @@
+CORE
+missed.c
+--no-standard-checks
+^\[main.assertion.1\] line \d+ assertion w.v.c != 2: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+Copying a union whose first widest member is _Bool must preserve the bytes.
+A typecast to _Bool would turn the byte value 2 into 1, and the failing
+assertion would be reported as passing.

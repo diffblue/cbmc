@@ -1,0 +1,12 @@
+CORE
+main.c
+--no-standard-checks
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^VERIFICATION FAILED$
+--
+Copying a union whose first widest member is _Bool must preserve the raw
+bytes.  Before the fix, byte_extract lowering used a normalising typecast
+to c_bool, turning any non-zero byte into 1.
