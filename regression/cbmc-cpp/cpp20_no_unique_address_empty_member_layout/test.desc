@@ -1,0 +1,31 @@
+KNOWNBUG itanium-abi
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ S1: SUCCESS$
+^\[main\.assertion\.2\] line \d+ storing the member writes nothing: SUCCESS$
+^\[main\.assertion\.3\] line \d+ S2: SUCCESS$
+^\[main\.assertion\.4\] line \d+ S3: SUCCESS$
+^\[main\.assertion\.5\] line \d+ S4: SUCCESS$
+^\[main\.assertion\.6\] line \d+ S5: SUCCESS$
+^\[main\.assertion\.7\] line \d+ S6: SUCCESS$
+^\[main\.assertion\.8\] line \d+ S9: SUCCESS$
+^\[main\.assertion\.9\] line \d+ S10: SUCCESS$
+^\[main\.assertion\.10\] line \d+ sizeof the member: SUCCESS$
+^\[main\.assertion\.11\] line \d+ R1: SUCCESS$
+^\[main\.assertion\.12\] line \d+ R2: SUCCESS$
+^\[main\.assertion\.13\] line \d+ BigArr: SUCCESS$
+^\[main\.assertion\.14\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+static assertion failed
+could not be evaluated
+--
+An empty member declared [[no_unique_address]] occupied a byte of the class
+as any other member: sizeof(S1) was 5, not 4.
+Tagged itanium-abi: Visual Studio ignores [[no_unique_address]] (it has
+[[msvc::no_unique_address]]), which [intro.object]/8 permits, and so does
+cbmc's Visual Studio mode.

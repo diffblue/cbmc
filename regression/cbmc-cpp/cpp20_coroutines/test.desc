@@ -1,0 +1,19 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[unsupported\.1\] file main\.cpp line \d+ coroutines are not supported: f\(\): FAILURE$
+^\[unsupported\.2\] file main\.cpp line \d+ coroutines are not supported: g\(signed int\): SUCCESS$
+^file main\.cpp line \d+: C\+\+20 coroutines are not supported: calls of 'f\(\)' fail a property$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+dropped the body
+--
+co_return, co_await and co_yield are parsed ([dcl.fct.def.coroutine]/1:
+f and g are coroutines).  Coroutines are not supported: each coroutine
+gets a property that fails when it is called, and the path ends there, so
+that verification does not report results for a program whose coroutines
+ran as ordinary functions (cpp20_coroutine_generator_semantics).  g is
+not called, so its property holds.

@@ -1,0 +1,16 @@
+KNOWNBUG libstdcxx
+main.cpp
+--cpp20
+^\[unsupported\.1\] file main\.cpp line \d+ coroutines are not supported: coro\(\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+dropped the body
+--
+A coroutine with co_return, its promise type from libstdc++'s <coroutine>.
+Coroutines are not supported: the call of coro() fails the property that
+says so (see cpp20_coroutines); verification used to succeed with the
+coroutine run as an ordinary function.  Tagged libstdcxx: the program
+falls back to an empty main where <coroutine> is not usable with cl.

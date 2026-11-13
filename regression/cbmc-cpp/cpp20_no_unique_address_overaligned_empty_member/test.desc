@@ -1,0 +1,29 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ at offset 0: SUCCESS$
+^\[main\.assertion\.2\] line \d+ d follows c: SUCCESS$
+^\[main\.assertion\.3\] line \d+ size 8: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The expected output is that of g++ 13 and clang++ 18.  CBMC places the
+member at offset 0 too, but keeps it in the sequence of the components as
+a zero-length array of A8 (make_empty_potentially_overlapping_members_
+zero_sized), which add_padding aligns to 8: d moves to offset 8 and
+sizeof(Q) is 16.  The program fails the second and third assertions.
+
+Why FUTURE and not KNOWNBUG: the layout conforms to N5008 (the size and
+the offsets of members are implementation-defined, [intro.object]/8,
+[class.mem.general]); only GCC's and Clang's Itanium C++ ABI layout is not
+matched.
+
+What it would take: give the zero-length array component an alignment of
+1 (so that it does not pad the sequence) while the class keeps the
+member's alignment, e.g. by recording it as the class's ID_C_alignment;
+or not keep the member among the sequential components at all.

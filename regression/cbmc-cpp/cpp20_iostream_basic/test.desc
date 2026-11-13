@@ -1,0 +1,11 @@
+KNOWNBUG
+main.cpp
+--cpp20 --object-bits 12
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+dropped the body
+--
+--object-bits 12: with the MSVC 14.44 STL (VS 2022) and its C library
+models the program has more than the 256 objects of --object-bits 8.
