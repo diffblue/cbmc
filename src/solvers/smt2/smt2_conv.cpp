@@ -676,15 +676,84 @@ exprt smt2_convt::parse_union(
   const irept &src,
   const union_typet &type)
 {
-  // these are always flat
+  // These are always flat: re-interpret the low bits as a value of the type
+  // of the first member.
   PRECONDITION(!type.components().empty());
-  const union_typet::componentt &first=type.components().front();
-  std::size_t width=boolbv_width(type);
-  exprt value = parse_rec(src, unsignedbv_typet(width));
+  const union_typet::componentt &first = type.components().front();
+  const std::size_t width = boolbv_width(type);
+  const std::size_t member_width = boolbv_width(first.type());
+  const auto l = parse_literal(src, unsignedbv_typet{width});
+  const std::string binary =
+    id2string(integer2binary(numeric_cast_v<mp_integer>(l), width));
+  const irept member_bits{"#b" + binary.substr(width - member_width)};
+
+  exprt value;
+  // A struct member is flattened even when structs are otherwise encoded as
+  // datatypes.
+  if(first.type().id() == ID_struct_tag)
+  {
+    value = parse_flattened_struct(
+      member_bits, ns.follow_tag(to_struct_tag_type(first.type())));
+    value.type() = first.type();
+  }
+  else if(first.type().id() == ID_struct)
+    value = parse_flattened_struct(member_bits, to_struct_type(first.type()));
+  else
+    value = parse_rec(member_bits, first.type());
+
   if(value.is_nil())
     return nil_exprt();
-  const typecast_exprt converted(value, first.type());
-  return union_exprt(first.get_name(), converted, type);
+  return union_exprt(first.get_name(), value, type);
+}
+
+/// Parse the value of a struct encoded as a single bit vector.
+/// \param src: bit-vector literal holding the value
+/// \param type: the struct type
+/// \return struct expression with the values of all non-zero-width
+///   components; zero-width components are nil
+struct_exprt
+smt2_convt::parse_flattened_struct(const irept &src, const struct_typet &type)
+{
+  const struct_typet::componentst &components = type.components();
+
+  struct_exprt result(exprt::operandst(components.size(), nil_exprt()), type);
+
+  if(components.empty())
+    return result;
+
+  // These are just flattened, i.e., we expect to see a monster bit vector.
+  std::size_t total_width = boolbv_width(type);
+  const auto l = parse_literal(src, unsignedbv_typet(total_width));
+
+  const irep_idt binary =
+    integer2binary(numeric_cast_v<mp_integer>(l), total_width);
+
+  CHECK_RETURN(binary.size() == total_width);
+
+  std::size_t offset = 0;
+
+  for(std::size_t i = 0; i < components.size(); i++)
+  {
+    if(is_zero_width(components[i].type(), ns))
+      continue;
+
+    std::size_t component_width = boolbv_width(components[i].type());
+
+    INVARIANT(
+      offset + component_width <= total_width,
+      "struct component bits shall be within struct bit vector");
+
+    std::string component_binary =
+      "#b" + id2string(binary).substr(
+               total_width - offset - component_width, component_width);
+
+    result.operands()[i] =
+      parse_rec(irept(component_binary), components[i].type());
+
+    offset += component_width;
+  }
+
+  return result;
 }
 
 struct_exprt
@@ -720,39 +789,7 @@ smt2_convt::parse_struct(const irept &src, const struct_typet &type)
     }
   }
   else
-  {
-    // These are just flattened, i.e., we expect to see a monster bit vector.
-    std::size_t total_width=boolbv_width(type);
-    const auto l = parse_literal(src, unsignedbv_typet(total_width));
-
-    const irep_idt binary =
-      integer2binary(numeric_cast_v<mp_integer>(l), total_width);
-
-    CHECK_RETURN(binary.size() == total_width);
-
-    std::size_t offset=0;
-
-    for(std::size_t i=0; i<components.size(); i++)
-    {
-      if(is_zero_width(components[i].type(), ns))
-        continue;
-
-      std::size_t component_width=boolbv_width(components[i].type());
-
-      INVARIANT(
-        offset + component_width <= total_width,
-        "struct component bits shall be within struct bit vector");
-
-      std::string component_binary=
-        "#b"+id2string(binary).substr(
-          total_width-offset-component_width, component_width);
-
-      result.operands()[i]=
-        parse_rec(irept(component_binary), components[i].type());
-
-      offset+=component_width;
-    }
-  }
+    result = parse_flattened_struct(src, type);
 
   return result;
 }
