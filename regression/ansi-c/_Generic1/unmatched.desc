@@ -1,0 +1,9 @@
+CORE gcc-only
+unmatched.c
+
+^.*error: unmatched generic selection: signed int \*$
+^CONVERSION ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--

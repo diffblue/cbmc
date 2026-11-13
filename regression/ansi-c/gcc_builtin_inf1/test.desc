@@ -1,0 +1,13 @@
+CORE gcc-only
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The infinity built-ins must have type float, double and long double,
+respectively, including the C type that distinguishes them from other types
+of the same floating-point format (e.g., _Float32), as type compatibility and
+generic selection distinguish those.

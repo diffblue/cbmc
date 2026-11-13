@@ -1,0 +1,12 @@
+CORE gcc-only
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+_Generic distinguishes pointee const-qualification (int* vs const int*),
+as required by C11 and by the kernel's container_of_const()/inet_sk().
