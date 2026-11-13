@@ -1,0 +1,15 @@
+CORE
+multibyte.c
+--little-endian --no-simplify
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Non-byte-aligned updates wider than one byte (9-bit and 17-bit). These
+exercise the regime where the whole value must be shifted up by
+byte_width - tail_bits to match lower_byte_update; placing only the
+trailing partial byte (the earlier behaviour) would yield 0xFFFF7F00 /
+0xFF7F0000 instead of 0xFFFF007F / 0xFF00007F. --no-simplify exercises
+the boolbv convert_byte_update path with a constant offset.
