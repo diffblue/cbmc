@@ -1,0 +1,15 @@
+CORE broken-smt-backend no-new-smt
+main.c
+--smt2 --fpa --outfile -
+^\(set-logic ALL\)$
+\(_ FloatingPoint 8 24\)
+^EXIT=0$
+^SIGNAL=0$
+--
+QF_AUFBV
+--
+With the FPA theory, the formula uses floating-point sorts, which the
+quantifier-free logic of arrays, uninterpreted functions and bit vectors
+(QF_AUFBV) does not include: Z3 and cvc5 rejected the file ("unknown sort
+'FloatingPoint'").
+broken-smt-backend: the test inspects the generic output only.
