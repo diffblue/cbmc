@@ -793,8 +793,13 @@ void dfcc_wrapper_programt::encode_checked_function_call()
     call.arguments().push_back(parameter_symbol.symbol_expr());
   }
 
-  // pass write set to check against
-  call.arguments().push_back(addr_of_contract_write_set);
+  // pass write set to check against, at the position of the write set
+  // parameter, see dfcc_utilst::add_parameter
+  if(wrapper_code_type.has_ellipsis())
+    call.arguments().insert(
+      call.arguments().begin(), addr_of_contract_write_set);
+  else
+    call.arguments().push_back(addr_of_contract_write_set);
 
   function_call.add(goto_programt::make_function_call(call, wrapper_sl));
 }

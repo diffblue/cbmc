@@ -1,0 +1,14 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^\[loop_fn\.loop_invariant_step\.\d+\] line \d+ Check invariant after step for loop loop_fn\.0: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^Invariant check failed
+--
+Loop assigns inference inlines the callees of loop_fn before loop_fn's calls
+are instrumented. When printf has already been instrumented, the arguments of
+the call do not match its parameters any more, which made the inliner fail an
+invariant on the argument of type unsigned short.

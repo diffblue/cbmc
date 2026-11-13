@@ -1,0 +1,14 @@
+CORE dfcc-only
+main.c
+--dfcc main --enforce-contract my_log
+^\[my_log\.assigns\.\d+\] line 9 Check that g is assignable: SUCCESS$
+^\[my_log\.assertion\.1\] line 10 body is reachable: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+The wrapper of a variadic function under contract has to pass the write set
+where the wrapped function has its write set parameter, and the harness has to
+pass it where the wrapper has it. Otherwise n binds to the write set, the
+requires clause cannot hold, and the body of my_log is unreachable.
