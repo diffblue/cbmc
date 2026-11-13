@@ -68,6 +68,8 @@ public:
   virtual void typecheck()=0;
   virtual void typecheck_expr(exprt &expr);
   virtual void typecheck_spec_assigns(exprt::operandst &targets);
+  virtual void typecheck_spec_loop_invariant(codet &code);
+  virtual void typecheck_spec_decreases(codet &code);
 
 protected:
   symbol_table_baset &symbol_table;
@@ -171,8 +173,6 @@ protected:
   virtual void typecheck_spec_condition(exprt &condition);
   virtual void typecheck_spec_assigns_target(exprt &target);
   virtual void typecheck_spec_frees_target(exprt &target);
-  virtual void typecheck_spec_loop_invariant(codet &code);
-  virtual void typecheck_spec_decreases(codet &code);
   virtual void throw_on_side_effects(const exprt &expr);
 
   bool break_is_allowed;
