@@ -666,6 +666,19 @@ are_types_compatible(const typet &expr_type, const typet &shadow_type)
   const typet &expr_subtype = to_pointer_type(expr_type).base_type();
   const typet &shadow_subtype = to_pointer_type(shadow_type).base_type();
 
+  // Any object may be accessed through a character pointer (C11 6.5p7), e.g.,
+  // the shadow memory of a pointer-typed object; as may its bytes as an
+  // array of characters.
+  const typet &accessed = expr_subtype.id() == ID_array
+                            ? to_array_type(expr_subtype).element_type()
+                            : expr_subtype;
+  if(
+    (accessed.id() == ID_unsignedbv || accessed.id() == ID_signedbv) &&
+    to_bitvector_type(accessed).get_width() == config.ansi_c.char_width)
+  {
+    return true;
+  }
+
   if(
     expr_subtype.id() == ID_pointer &&
     to_pointer_type(expr_subtype).base_type().id() != ID_pointer &&
