@@ -1,0 +1,12 @@
+CORE
+trace_values.c
+--trace
+d=-2\.5
+f=1\.25f
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Floating-point values in traces must be the reinterpreted bit pattern, not the
+integer value of the bit vector. Previously from_integer was used for all
+bitvector types, which produced the wrong value for floatbv_typet.
