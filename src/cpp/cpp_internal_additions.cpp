@@ -53,9 +53,37 @@ void cpp_internal_additions(std::ostream &out)
       << " __CPROVER::ssize_t;" << '\n';
   out << "typedef __CPROVER::ssize_t " CPROVER_PREFIX "ssize_t;" << '\n';
 
-  // new and delete are in the root namespace!
-  out << "void operator delete(void *);" << '\n';
+  // N5008 [basic.stc.dynamic.general]/2: the global allocation and
+  // deallocation functions are implicitly declared in each translation unit
+  // (in the root namespace), the sized forms since C++14 and the aligned
+  // ones, with std::align_val_t ([new.syn]), since C++17.  As with g++,
+  // std::align_val_t is then declared as well (opaque; <new> defines it).
   out << "void *operator new(__CPROVER::size_t);" << '\n';
+  out << "void *operator new[](__CPROVER::size_t);" << '\n';
+  // [except.spec]/9: a deallocation function is non-throwing (`throw()'
+  // before C++11)
+  const char *const nothrow =
+    config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP11 ? " noexcept"
+                                                                   : " throw()";
+  out << "void operator delete(void *)" << nothrow << ";\n";
+  out << "void operator delete[](void *)" << nothrow << ";\n";
+  if(config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP14)
+  {
+    out << "void operator delete(void *, __CPROVER::size_t) noexcept;\n";
+    out << "void operator delete[](void *, __CPROVER::size_t) noexcept;\n";
+  }
+  if(config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP17)
+  {
+    out << "namespace std { enum class align_val_t : __CPROVER::size_t; }\n";
+    out << "void *operator new(__CPROVER::size_t, std::align_val_t);\n";
+    out << "void *operator new[](__CPROVER::size_t, std::align_val_t);\n";
+    out << "void operator delete(void *, std::align_val_t) noexcept;\n";
+    out << "void operator delete[](void *, std::align_val_t) noexcept;\n";
+    out << "void operator delete(void *, __CPROVER::size_t, std::align_val_t)"
+           " noexcept;\n";
+    out << "void operator delete[](void *, __CPROVER::size_t,"
+           " std::align_val_t) noexcept;\n";
+  }
 
   out << "extern \"C\" {" << '\n';
 
