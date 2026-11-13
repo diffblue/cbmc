@@ -632,8 +632,20 @@ void value_sett::get_value_set_rec(
     else if(
       expr.type().id() == ID_unsignedbv || expr.type().id() == ID_signedbv)
     {
-      // an integer constant got turned into a pointer
-      insert(dest, exprt(ID_integer_address, unsigned_char_type()));
+      if(expr == 0)
+      {
+        // e.g., a byte of a null pointer stored into an untyped object; treat
+        // it as the typecast case below treats a cast of zero
+        insert(
+          dest,
+          exprt(ID_null_object, empty_typet{}),
+          from_integer(0, c_index_type()));
+      }
+      else
+      {
+        // an integer constant got turned into a pointer
+        insert(dest, exprt(ID_integer_address, unsigned_char_type()));
+      }
     }
     else
       insert(dest, exprt(ID_unknown, original_type));
