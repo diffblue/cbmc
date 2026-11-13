@@ -1,0 +1,14 @@
+CORE
+main.c
+--dfcc main --replace-call-with-contract foo _ --dfcc main --replace-call-with-contract bar
+^EXIT=6$
+^SIGNAL=0$
+^.*DFCC instrumentation has already been applied to this binary.*$
+^.*Only one DFCC pass per binary is supported.*$
+--
+^.*VERIFICATION SUCCESSFUL.*$
+This test runs two pure --replace-call-with-contract DFCC passes, no
+--enforce-contract on either invocation, on the same goto binary.
+The second invocation must still fail with the per-binary DFCC error
+message: the marker is set by *any* DFCC pass, not just contract
+enforcement, and the new error wording reflects that.

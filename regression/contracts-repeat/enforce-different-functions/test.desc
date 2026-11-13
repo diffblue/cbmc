@@ -1,0 +1,17 @@
+CORE
+main.c
+--enforce-contract foo _ --enforce-contract bar _ --pointer-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^.*Only one contract may be enforced at a time.*$
+^.*DFCC instrumentation has already been applied.*$
+This test enforces contracts on two different functions across two
+separate goto-instrument invocations on the same goto binary. This
+case is intentionally allowed for the non-DFCC path: each function
+gets its own __CPROVER_contracts_original_<F> wrapper, so the wrappers
+do not conflict and the per-function guard does not fire. The final
+cbmc run confirms the twice-enforced binary still verifies, i.e.
+enforcing distinct functions across invocations yields a correct goto
+binary -- equivalent to enforcing both in a single invocation.
