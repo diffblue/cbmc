@@ -3675,6 +3675,7 @@ array_abstract_declarator:
           set($1, ID_array);
           stack_type($1).add_subtype()=typet(ID_abstract);
           stack_type($1).add(ID_size).make_nil();
+          stack_type($1).set(ID_C_array_fpm_qualifier, true);
           $$=merge($2, $1);
         }
         | '[' '*' ']'
@@ -3684,6 +3685,8 @@ array_abstract_declarator:
           set($$, ID_array);
           stack_type($$).add_subtype()=typet(ID_abstract);
           stack_type($$).add(ID_size).make_nil();
+          stack_type($$).set(ID_C_array_fpm_qualifier, true);
+          stack_type($$).set(ID_C_array_vla_unspecified, true);
         }
         | '[' constant_expression ']'
         {
@@ -3699,6 +3702,7 @@ array_abstract_declarator:
           set($1, ID_array);
           stack_type($1).add(ID_size).swap(parser_stack($3));
           stack_type($1).add_subtype()=typet(ID_abstract);
+          stack_type($1).set(ID_C_array_fpm_qualifier, true);
           $$=merge($2, $1); // dest=$2
         }
         | array_abstract_declarator '[' constant_expression ']'
@@ -3718,6 +3722,8 @@ array_abstract_declarator:
           set($2, ID_array);
           stack_type($2).add(ID_size).make_nil();
           stack_type($2).add_subtype()=typet(ID_abstract);
+          stack_type($2).set(ID_C_array_fpm_qualifier, true);
+          stack_type($2).set(ID_C_array_vla_unspecified, true);
           make_subtype($1, $2);
         }
         ;
