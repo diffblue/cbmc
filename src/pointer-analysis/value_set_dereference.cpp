@@ -36,7 +36,53 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "dereference_callback.h"
 
+#include <algorithm>
 #include <deque>
+
+/// Return true if \p type has no byte layout: it is, or contains, a struct
+/// with a member of non-constant size that is not the last member. The
+/// lowering of byte operators supports a single trailing member of
+/// non-constant size (as for C99 flexible array members), but such a member
+/// followed by further members leaves the offsets of the latter undefined.
+/// \param type: type to check
+/// \param ns: namespace to resolve tags
+/// \return true if \p type cannot be represented as a sequence of bytes
+static bool has_no_byte_layout(const typet &type, const namespacet &ns)
+{
+  if(type.id() == ID_struct_tag)
+    return has_no_byte_layout(ns.follow_tag(to_struct_tag_type(type)), ns);
+  else if(type.id() == ID_union_tag)
+    return has_no_byte_layout(ns.follow_tag(to_union_tag_type(type)), ns);
+  else if(type.id() == ID_struct)
+  {
+    const auto &components = to_struct_type(type).components();
+    for(auto it = components.begin(); it != components.end(); ++it)
+    {
+      if(has_no_byte_layout(it->type(), ns))
+        return true;
+      if(
+        std::next(it) != components.end() &&
+        !pointer_offset_size(it->type(), ns).has_value())
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+  else if(type.id() == ID_union)
+  {
+    const auto &components = to_union_type(type).components();
+    return std::any_of(
+      components.begin(),
+      components.end(),
+      [&ns](const union_typet::componentt &component)
+      { return has_no_byte_layout(component.type(), ns); });
+  }
+  else if(type.id() == ID_array || type.id() == ID_vector)
+    return has_no_byte_layout(to_type_with_subtype(type).subtype(), ns);
+  else
+    return false;
+}
 
 /// Returns true if \p expr is complicated enough that a local definition (using
 /// a let expression) is preferable to repeating it, potentially many times.
@@ -559,6 +605,11 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       if(config.ansi_c.endianness==configt::ansi_ct::endiannesst::NO_ENDIANNESS)
         return {};
 
+      // Without a byte layout there is no value to extract; the caller then
+      // uses the failure value.
+      if(has_no_byte_layout(dereference_type, ns))
+        return {};
+
       valuet result;
       result.value = make_byte_extract(
         symbol_expr, pointer_offset(pointer_expr), dereference_type);
@@ -761,6 +812,9 @@ bool value_set_dereferencet::memory_model_bytes(
 
   // We simply refuse to convert to/from code.
   if(from_type.id()==ID_code || to_type.id()==ID_code)
+    return false;
+
+  if(has_no_byte_layout(from_type, ns) || has_no_byte_layout(to_type, ns))
     return false;
 
   // We won't do this without a commitment to an endianness.
