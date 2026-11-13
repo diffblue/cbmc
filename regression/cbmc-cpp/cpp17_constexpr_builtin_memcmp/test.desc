@@ -1,0 +1,18 @@
+KNOWNBUG gnu-extensions libstdcxx
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ run time: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+could not be evaluated
+static assertion failed
+^warning: ignoring
+--
+GCC evaluates __builtin_memcmp in a constant expression, as libstdc++ 11's
+char_traits<char>::compare does in a constexpr function.  The constant
+evaluator now evaluates it over constant arrays (string literals, constexpr
+arrays), comparing bytes as unsigned char.
