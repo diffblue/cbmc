@@ -54,7 +54,9 @@ We won't explain the properties in detail. Most of them
 relate to behaviors that are left undefined by the respective language
 semantics. For a discussion on why these behaviors are usually very
 undesirable, read [this](http://blog.regehr.org/archives/213) blog post
-by John Regehr.
+by John Regehr. For a complete list of C11 undefined behaviors and which
+ones CBMC checks, see
+[List of C11 undefined behaviors](../c11-undefined-behavior/).
 
 All the properties described above are *reachability* properties. They
 are always of the form
