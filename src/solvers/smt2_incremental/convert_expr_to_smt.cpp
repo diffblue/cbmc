@@ -1219,6 +1219,21 @@ static smt_termt convert_expr_to_smt(
   const abs_exprt &absolute_value_of,
   const sub_expression_mapt &converted)
 {
+  const typet &op_type = absolute_value_of.op().type();
+  const smt_termt &operand = converted.at(absolute_value_of.op());
+  if(can_cast_type<unsignedbv_typet>(op_type))
+    return operand;
+  if(can_cast_type<signedbv_typet>(op_type))
+  {
+    // As in two's complement arithmetic, the absolute value of the minimum
+    // value is the minimum value itself.
+    const std::size_t width = to_signedbv_type(op_type).get_width();
+    return smt_core_theoryt::if_then_else(
+      smt_bit_vector_theoryt::signed_less_than(
+        operand, smt_bit_vector_constant_termt{0, width}),
+      smt_bit_vector_theoryt::negate(operand),
+      operand);
+  }
   UNIMPLEMENTED_FEATURE(
     "Generation of SMT formula for absolute value of expression: " +
     absolute_value_of.pretty());

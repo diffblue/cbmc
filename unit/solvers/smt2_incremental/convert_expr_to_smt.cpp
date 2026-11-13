@@ -1823,3 +1823,29 @@ TEST_CASE(
     CHECK(test.convert(assignment) == expected);
   }
 }
+
+TEST_CASE(
+  "expr to smt conversion for absolute value expressions",
+  "[core][smt2_incremental]")
+{
+  auto test =
+    expr_to_smt_conversion_test_environmentt::make(test_archt::x86_64);
+  SECTION("Signed bit vector")
+  {
+    const abs_exprt absolute_value{symbol_exprt{"x", signedbv_typet{8}}};
+    const smt_identifier_termt x{"x", smt_bit_vector_sortt{8}};
+    const smt_termt expected = smt_core_theoryt::if_then_else(
+      smt_bit_vector_theoryt::signed_less_than(
+        x, smt_bit_vector_constant_termt{0, 8}),
+      smt_bit_vector_theoryt::negate(x),
+      x);
+    CHECK(test.convert(absolute_value) == expected);
+  }
+  SECTION("Unsigned bit vector")
+  {
+    const abs_exprt absolute_value{symbol_exprt{"x", unsignedbv_typet{8}}};
+    CHECK(
+      test.convert(absolute_value) ==
+      smt_identifier_termt{"x", smt_bit_vector_sortt{8}});
+  }
+}
