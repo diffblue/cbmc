@@ -578,10 +578,11 @@ void c_typecastt::implicit_typecast_followed(
 
   if(dest_type.id()==ID_pointer)
   {
-    // special case: 0 == NULL
+    // special case: 0 == NULL; an expression with side effects is converted as
+    // any other integer below, as replacing it would lose the side effects
 
     if(
-      simplify_expr(expr, ns) == 0 &&
+      !has_subexpr(expr, ID_side_effect) && simplify_expr(expr, ns) == 0 &&
       (src_type.id() == ID_unsignedbv || src_type.id() == ID_signedbv ||
        src_type.id() == ID_natural || src_type.id() == ID_integer))
     {
