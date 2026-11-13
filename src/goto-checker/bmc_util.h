@@ -171,6 +171,7 @@ void run_property_decider(
   "(show-goto-symex-steps)"                                                    \
   "(show-points-to-sets)"                                                      \
   "(slice-formula)"                                                            \
+  "(wide-pointer-encoding)"                                                    \
   "(unwinding-assertions)"                                                     \
   "(no-unwinding-assertions)"                                                  \
   "(no-self-loops-to-assumptions)"                                             \
@@ -233,6 +234,8 @@ void run_property_decider(
   " {y--graphml-witness} {ufilename} \t write the witness in GraphML format "  \
   "to {ufilename}\n"                                                           \
   " {y--symex-cache-dereferences} \t enable caching of repeated "              \
-  "dereferences\n"
+  "dereferences\n"                                                             \
+  " {y--wide-pointer-encoding} \t use flat addresses for pointer "             \
+  "comparison and integer-to-pointer casts\n"
 
 #endif // CPROVER_GOTO_CHECKER_BMC_UTIL_H
