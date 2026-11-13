@@ -4730,6 +4730,38 @@ void cpp_typecheckt::typecheck_braced_argument_elements(exprt &init_list)
 {
   for(auto &element : init_list.operands())
   {
+    // a designated-initializer-clause (`.tag = f(s + "x")'): its initializer
+    // is the expression to check, once -- an earlier pass over the call's
+    // arguments may have checked it already, leaving the clause itself
+    // untyped; checking it again converted the arguments of a call in it a
+    // second time (an `&&' parameter then saw an lvalue)
+    if(
+      element.id() == ID_designated_initializer &&
+      element.operands().size() == 1)
+    {
+      exprt &initializer = to_unary_expr(element).op();
+      if(
+        initializer.id() == ID_initializer_list ||
+        initializer.id() == ID_already_typechecked)
+      {
+        continue;
+      }
+      try
+      {
+        if(initializer.type().id().empty() || initializer.type().is_nil())
+        {
+          exprt tmp = initializer;
+          typecheck_expr(tmp);
+          initializer.swap(tmp);
+        }
+        already_typechecked_exprt::make_already_typechecked(initializer);
+      }
+      catch(...)
+      {
+        // leave the element for the conversion machinery
+      }
+      continue;
+    }
     if(
       element.id() == ID_initializer_list ||
       element.id() == ID_already_typechecked ||
