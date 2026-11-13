@@ -556,6 +556,54 @@ void cpp_declarator_convertert::combine_types(
         }
       }
 
+      // N5008 [dcl.fct.default]/4: a later declaration of a function in the
+      // same scope (its out-of-line definition, say) may add default
+      // arguments; the function then has those of all its declarations
+      bool added_default = false;
+      for(std::size_t i = 0; i < decl_code_type.parameters().size(); i++)
+      {
+        const code_typet::parametert &decl_parameter =
+          decl_code_type.parameters()[i];
+        code_typet::parametert &symbol_parameter =
+          symbol_code_type.parameters()[i];
+        if(
+          decl_parameter.has_default_value() &&
+          !symbol_parameter.has_default_value())
+        {
+          symbol_parameter.default_value() = decl_parameter.default_value();
+          added_default = true;
+        }
+      }
+      // ... and so has the member of the class, which calls resolve to
+      const irep_idt &class_id = symbol_code_type.get(ID_C_member_name);
+      if(added_default && !class_id.empty())
+      {
+        symbolt *class_symbol =
+          cpp_typecheck.symbol_table.get_writeable(class_id);
+        if(
+          class_symbol != nullptr && (class_symbol->type.id() == ID_struct ||
+                                      class_symbol->type.id() == ID_union))
+        {
+          for(auto &component :
+              to_struct_union_type(class_symbol->type).components())
+          {
+            if(component.get_name() != symbol.name)
+              continue;
+            auto &parameters = to_code_type(component.type()).parameters();
+            for(std::size_t i = 0; i < parameters.size() &&
+                                   i < symbol_code_type.parameters().size();
+                i++)
+            {
+              if(!parameters[i].has_default_value())
+              {
+                parameters[i].default_value() =
+                  symbol_code_type.parameters()[i].default_value();
+              }
+            }
+          }
+        }
+      }
+
       // ok
       return;
     }
