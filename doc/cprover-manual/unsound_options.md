@@ -31,7 +31,8 @@ The following options will produce a warning when used with CBMC or JBMC:
 
 * Use of `--unwind` or `--unwindset` without `--unwinding-assertions`, or the
   use of `--partial-loops`.
-* Depth or complexity-limited analysis (`--depth`, `--symex-complexity-limit`).
+* Depth-limited analysis using `--depth` with `--no-depth-assertions`, or
+  complexity-limited analysis (`--symex-complexity-limit`).
 
 See [Understanding Loop Unwinding](../cbmc/unwinding/) for an elaboration of
 these options.
