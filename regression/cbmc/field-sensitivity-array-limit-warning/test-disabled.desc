@@ -1,0 +1,11 @@
+CORE
+main.c
+--unwind 5 --no-array-field-sensitivity
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^field sensitivity was not applied
+--
+When the user has switched array field sensitivity off there is nothing to
+warn about.
