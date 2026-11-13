@@ -1,0 +1,14 @@
+CORE
+main.c
+--instrument out.gb --instrument-targets after_goto_not_taken --verbosity 9 --vsd
+activate-multi-line-match
+^EXIT=0$
+^SIGNAL=0$
+^Instrumenting example_function\nInstruction \d+ because after_goto_not_taken... single history... condition is example_function::argument = 1 ∧ true_from_calling_context = 1... added as assumption$
+--
+^warning: ignoring
+--
+Testing instrumenting at after gotos that are not taken (i.e. the "other" branch that is not a goto_target)
+
+
+

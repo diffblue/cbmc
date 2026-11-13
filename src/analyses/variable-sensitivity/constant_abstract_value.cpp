@@ -139,7 +139,9 @@ abstract_value_pointert constant_abstract_valuet::constrain(
   return as_value(mutable_clone());
 }
 
-exprt constant_abstract_valuet::to_predicate_internal(const exprt &name) const
+exprt constant_abstract_valuet::to_predicate_internal(
+  const exprt &name,
+  const std::set<exprt> &) const
 {
   return equal_exprt(name, value);
 }

@@ -122,7 +122,8 @@ protected:
 
   bool has_been_modified(const abstract_object_pointert &before) const override;
 
-  exprt to_predicate_internal(const exprt &name) const override;
+  exprt to_predicate_internal(const exprt &name, const std::set<exprt> &scope)
+    const override;
 
   typedef std::set<locationt, goto_programt::target_less_than> locationst;
 

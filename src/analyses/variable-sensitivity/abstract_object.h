@@ -158,13 +158,14 @@ public:
   /// Converts to an invariant expression
   ///
   /// \param name - the variable name to substitute into the expression
+  /// \param scope - the set of exprt which can be used to build the predicate
   /// \return Returns an exprt representing the object as an invariant.
   ///
-  /// The the abstract element represents a single value the expression will
+  /// If the abstract element represents a single value the expression will
   /// have the form _name = value_, if the value is an interval it will have the
   /// the form _lower <= name <= upper_, etc.
   /// If the value is bottom returns false, if top returns true.
-  exprt to_predicate(const exprt &name) const;
+  exprt to_predicate(const exprt &name, const std::set<exprt> &scope) const;
 
   /**
    * A helper function to evaluate writing to a component of an
@@ -361,8 +362,10 @@ public:
 
   /// to_predicate implementation - derived classes will override
   /// \param name - the variable name to substitute into the expression
+  /// \param scope - the set of expressions that can be used
   /// \return Returns an exprt representing the object as an invariant.
-  virtual exprt to_predicate_internal(const exprt &name) const;
+  virtual exprt
+  to_predicate_internal(const exprt &name, const std::set<exprt> &scope) const;
 
 private:
   /// To enforce copy-on-write these are private and have read-only accessors

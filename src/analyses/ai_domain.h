@@ -45,6 +45,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ai_history.h"
 
+#include <set>
+
 // forward reference the abstract interpreter interface
 class ai_baset;
 
@@ -155,14 +157,36 @@ public:
   /// Simplifies the expression but keeps it as an l-value
   virtual bool ai_simplify_lhs(exprt &condition, const namespacet &ns) const;
 
-  /// Gives a Boolean condition that is true for all values represented by the
-  /// domain.  This allows domains to be converted into program invariants.
-  virtual exprt to_predicate(void) const
+  /// Gives a Boolean condition involving expression from the set that
+  /// is true for all of the states represented by the domain.  If the
+  /// set is empty then the domain can use any expressions in building
+  /// the condition.  This allows domains to be converted into program
+  /// invariants.
+  virtual exprt
+  to_predicate(const std::set<exprt> &, const namespacet &ns) const
   {
+    // Without knowing what the domain records this is the best that
+    // can be done.
     if(is_bottom())
       return false_exprt();
     else
       return true_exprt();
+  }
+
+  /// A utility function to convert to generate a predicate without
+  /// grammar restrictions.
+  virtual exprt to_predicate(const namespacet &ns) const
+  {
+    std::set<exprt> empty;
+    return to_predicate(empty, ns);
+  }
+
+  /// to_predicate for a single expression.
+  virtual exprt to_predicate(const exprt &e, const namespacet &ns) const
+  {
+    std::set<exprt> single;
+    single.insert(e);
+    return to_predicate(single, ns);
   }
 };
 

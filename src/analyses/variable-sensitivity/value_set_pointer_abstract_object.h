@@ -95,7 +95,8 @@ protected:
     const abstract_object_pointert &other,
     const widen_modet &widen_mode) const override;
 
-  exprt to_predicate_internal(const exprt &name) const override;
+  exprt to_predicate_internal(const exprt &name, const std::set<exprt> &scope)
+    const override;
 
 private:
   /// Update the set of stored values to \p new_values. Build a new abstract

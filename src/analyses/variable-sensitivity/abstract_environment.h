@@ -222,7 +222,7 @@ public:
   /// environment.
   ///
   /// \return An exprt describing the environment
-  exprt to_predicate() const;
+  exprt to_predicate(const std::set<exprt> &scope, const namespacet &ns) const;
 
   /// Check the structural invariants are maintained.
   /// In this case this is checking there aren't any null pointer mapped values
