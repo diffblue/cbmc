@@ -94,16 +94,16 @@ modinv (const BigInt &a, const BigInt &m)
 {
   BigInt j (1), i (0);
   BigInt b (m), c (a);
-  BigInt x, y;
+  BigInt y;
   while (!c.is_zero())
     {
-      BigInt::div (b, c, x, y);
+      BigInt::divisiont qr = BigInt::div(b, c);
       b = c;
-      c = y;
+      c = qr.remainder;
       y = j;
 
-      // j = i - j * x; trading clarity for efficiency.
-      j *= x;
+      // j = i - j * qr.quotient; trading clarity for efficiency.
+      j *= qr.quotient;
       j -= i;
       j.negate();
 
