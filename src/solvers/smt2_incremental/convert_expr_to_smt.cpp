@@ -1111,6 +1111,14 @@ static smt_termt convert_expr_to_smt(
   const extractbit_exprt &extract_bit,
   const sub_expression_mapt &converted)
 {
+  const smt_termt &from = converted.at(extract_bit.src());
+  const auto index_value = numeric_cast<std::size_t>(extract_bit.index());
+  if(index_value)
+  {
+    return smt_core_theoryt::equal(
+      smt_bit_vector_theoryt::extract(*index_value, *index_value)(from),
+      smt_bit_vector_constant_termt{1, 1});
+  }
   UNIMPLEMENTED_FEATURE(
     "Generation of SMT formula for extract bit expression: " +
     extract_bit.pretty());
