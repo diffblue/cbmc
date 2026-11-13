@@ -1,0 +1,11 @@
+CORE
+priority.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Constructors with a priority given as a constant expression run in ascending
+priority order; an explicit priority of 65535 is the same as no priority.

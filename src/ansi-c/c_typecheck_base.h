@@ -261,6 +261,7 @@ protected:
   virtual void typecheck_c_enum_type(typet &type);
   virtual void typecheck_c_enum_tag_type(c_enum_tag_typet &type);
   virtual void typecheck_code_type(code_typet &type);
+  void typecheck_constructor_priority(typet &type);
   virtual void typecheck_typedef_type(typet &type);
   virtual void typecheck_c_bit_field_type(c_bit_field_typet &type);
   virtual void typecheck_typeof_type(typet &type);

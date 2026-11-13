@@ -228,9 +228,23 @@ void ansi_c_convert_typet::read_rec(const typet &type)
   else if(type.id()==ID_noreturn)
     c_qualifiers.is_noreturn=true;
   else if(type.id()==ID_constructor)
+  {
     constructor=true;
+
+    // may come with priority
+    const irept &priority_opt = type.find(ID_priority);
+    if(priority_opt.is_not_nil())
+      priority = static_cast<const exprt &>(priority_opt);
+  }
   else if(type.id()==ID_destructor)
+  {
     destructor=true;
+
+    // may come with priority
+    const irept &priority_opt = type.find(ID_priority);
+    if(priority_opt.is_not_nil())
+      priority = static_cast<const exprt &>(priority_opt);
+  }
   else if(
     type.id() == ID_alias && type.has_subtype() &&
     to_type_with_subtype(type).subtype().id() == ID_string_constant)
@@ -364,6 +378,8 @@ void ansi_c_convert_typet::write(typet &type)
       }
 
       type_p->id(constructor ? ID_constructor : ID_destructor);
+      if(priority.is_not_nil())
+        type_p->add(ID_priority, priority);
     }
   }
   else if(constructor || destructor)

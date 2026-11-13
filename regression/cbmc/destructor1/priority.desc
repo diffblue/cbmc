@@ -1,0 +1,16 @@
+CORE gcc-only
+priority.c
+
+^EXIT=10$
+^SIGNAL=0$
+^\[a_101\.assertion\.1\] line \d+ assertion n == 5: SUCCESS$
+^\[a_101\.assertion\.2\] line \d+ assertion order\[i\] == i \+ 1: SUCCESS$
+^\[a_101\.assertion\.3\] line \d+ assertion 0: FAILURE$
+^\[main\.assertion\.1\] line \d+ assertion n == 0: SUCCESS$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Destructors with a priority run in descending priority order, the exact reverse
+of constructors; the failing assertion shows that the last destructor runs.
