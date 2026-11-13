@@ -1,0 +1,11 @@
+CORE smt-backend no-new-smt
+long-double.c
+--cvc5
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^VERIFICATION ERROR$
+--
+cvc5 requires --fp-exp for floating-point widths other than single and double
+precision, such as x86's 80-bit long double.
