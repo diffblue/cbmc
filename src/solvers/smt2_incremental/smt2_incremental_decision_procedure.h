@@ -105,6 +105,12 @@ protected:
   /// \note This function is non-const because it mutates the object_map.
   smt_termt convert_expr_to_smt(const exprt &expr);
   void define_index_identifiers(const exprt &expr);
+  /// Defines a Boolean function for each quantifier in \p expr that is not
+  /// nested within another quantifier, and records it in
+  /// `expression_identifiers`. Other definitions then refer to these
+  /// functions rather than containing quantifiers, which enables getting
+  /// their values from the solver.
+  void define_quantifier_identifiers(const exprt &expr);
   /// In the case where lowering passes insert instances of the anonymous
   /// `nondet_padding_exprt`, these need functions declaring for each instance.
   /// These instances are then substituted for the function identifier in order
@@ -116,7 +122,11 @@ protected:
   /// Performs a combination of transformations which reduces the set of
   /// possible expression forms by expressing these in terms of the remaining
   /// language features.
-  exprt lower(exprt expression) const;
+  /// \param expression: expression to lower
+  /// \param keep_root_equality: do not lower an equality of arrays at the
+  ///   root of \p expression, as is the case for equalities that define one
+  ///   array in terms of another one
+  exprt lower(exprt expression, bool keep_root_equality = false) const;
   std::optional<smt_termt> get_identifier(const exprt &expr) const;
 
   /// Namespace for looking up the expressions which symbol_exprts relate to.
