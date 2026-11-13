@@ -1,0 +1,14 @@
+CORE
+main.c
+--solver-time-limit 60
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line 4 trivially true: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+A solve that completes well within the budget should not be affected
+by `--solver-time-limit`. This pins down that the option is parsed
+and passed through to the solver layer without breaking the happy
+path.

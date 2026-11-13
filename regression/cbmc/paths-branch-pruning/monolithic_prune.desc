@@ -1,0 +1,12 @@
+CORE
+monolithic_prune.c
+
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Tests branch pruning in monolithic (non-paths) mode. The comparator
+branches are determined by the assume constraints, so the solver
+prunes infeasible branches and avoids exponential path encoding.

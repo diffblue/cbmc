@@ -1,7 +1,7 @@
 CORE
 main.c
 --verbosity 8
-^Generated \d+ VCC\(s\), 1 remaining after simplification$
+^Generated \d+ VCC\(s\), [01] remaining after simplification$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$

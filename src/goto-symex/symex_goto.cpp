@@ -17,12 +17,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 
 #include <langapi/language_util.h>
+#include <solvers/decision_procedure.h>
+#include <solvers/prop/solver_resource_limits.h>
+#include <solvers/stack_decision_procedure.h>
 
 #include "goto_symex.h"
 #include "path_storage.h"
 #include "simplify_expr_with_value_set.h"
 
 #include <algorithm>
+#include <chrono> // IWYU pragma: keep
 #include <map>
 
 void goto_symext::apply_goto_condition(
@@ -243,6 +247,131 @@ void goto_symext::symex_goto(statet &state)
   }
   else if(symex_config.doing_path_exploration)
   {
+    // Try to prune infeasible branches using the solver.
+    // If the solver determines that the guard (or its negation) is
+    // implied by the path condition, we can skip the infeasible branch
+    // entirely, avoiding path explosion.
+    if(branch_worklist_solver != nullptr && !branch_pruning_disabled)
+    {
+      const auto prune_start = std::chrono::steady_clock::now();
+
+      // Try to bound the cost of each individual SAT call so that one
+      // pathologically slow check cannot blow through the cumulative
+      // budget by itself. Backends that natively support time-limit
+      // interruption (MiniSat 2 via watchdog thread, IPASIR via
+      // ipasir_set_terminate, CaDiCaL via Terminator) will return
+      // D_ERROR if a check exceeds this budget; backends without that
+      // support log a warning the first time and then ignore the
+      // limit, leaving the cumulative-budget post-mortem below as the
+      // backstop.
+      constexpr uint32_t per_check_ms = 200;
+      auto *limits =
+        dynamic_cast<solver_resource_limitst *>(branch_worklist_solver);
+      if(limits != nullptr)
+        limits->set_time_limit_milliseconds(per_check_ms);
+
+      // Use push/pop to scope the equation constraints.
+      branch_worklist_solver->push({});
+
+      // Re-assert the equation into the pruning solver from scratch.
+      // We deliberately do NOT call convert_without_assertions /
+      // mutate step.converted here: the property-checking solver
+      // does its own incremental conversion later, and we do not
+      // want the pruning solver's bookkeeping to interfere with
+      // that. Each branch check re-asserts the entire equation
+      // inside its own push/pop scope, so no flag is needed.
+      for(const auto &step : target.SSA_steps)
+      {
+        if(step.ignore)
+          continue;
+        if(step.is_assignment() || step.is_constraint())
+          branch_worklist_solver->set_to_true(step.cond_expr);
+        else if(step.is_assume())
+          branch_worklist_solver->set_to_true(
+            implies_exprt{step.guard, step.cond_expr});
+      }
+
+      // Assert the current path condition explicitly so the SAT
+      // solver does not satisfy new_guard by setting earlier guards
+      // false (which would vacuously satisfy the equation regardless
+      // of the actual path leading to this branch).
+      const exprt path_cond_expr = state.guard.as_expr();
+      const exprt path_handle = branch_worklist_solver->handle(path_cond_expr);
+
+      const exprt guard_handle = branch_worklist_solver->handle(new_guard);
+      branch_worklist_solver->push({path_handle, guard_handle});
+      auto guard_result = (*branch_worklist_solver)();
+      branch_worklist_solver->pop();
+
+      bool guard_infeasible =
+        (guard_result == decision_proceduret::resultt::D_UNSATISFIABLE);
+      bool any_timed_out =
+        (guard_result == decision_proceduret::resultt::D_ERROR);
+
+      bool neg_infeasible = false;
+      if(!guard_infeasible && !any_timed_out)
+      {
+        const exprt neg_handle =
+          branch_worklist_solver->handle(boolean_negate(new_guard));
+        branch_worklist_solver->push({path_handle, neg_handle});
+        auto neg_result = (*branch_worklist_solver)();
+        branch_worklist_solver->pop();
+        neg_infeasible =
+          (neg_result == decision_proceduret::resultt::D_UNSATISFIABLE);
+        if(neg_result == decision_proceduret::resultt::D_ERROR)
+          any_timed_out = true;
+      }
+
+      branch_worklist_solver->pop();
+
+      if(any_timed_out && !branch_pruning_disabled)
+      {
+        log.statistics() << "Branch pruning disabled (per-check budget "
+                         << per_check_ms << "ms exceeded)" << messaget::eom;
+        branch_pruning_disabled = true;
+      }
+
+      // Adaptive pruning: track cumulative time spent on pruning checks
+      // as a backstop for backends that do not honour the per-check
+      // budget natively. Lowered to 1000ms now that runaway individual
+      // checks are caught above.
+      cumulative_pruning_ms +=
+        std::chrono::duration_cast<std::chrono::milliseconds>(
+          std::chrono::steady_clock::now() - prune_start)
+          .count();
+      if(cumulative_pruning_ms > 1000 && !branch_pruning_disabled)
+      {
+        log.statistics() << "Branch pruning disabled (cumulative "
+                         << cumulative_pruning_ms << "ms)" << messaget::eom;
+        branch_pruning_disabled = true;
+      }
+
+      if(guard_infeasible)
+      {
+        log.statistics() << "Branch pruned (guard infeasible) at "
+                         << state.source.pc->source_location() << messaget::eom;
+        symex_transition(state, state_pc, backward);
+        state.apply_condition(boolean_negate(new_guard), state, ns);
+        symex_assume_l2(state, boolean_negate(new_guard));
+        return;
+      }
+
+      if(neg_infeasible)
+      {
+        // NOT(guard) is infeasible: take only the guard branch
+        log.statistics() << "Branch pruned (negation infeasible) at "
+                         << state.source.pc->source_location() << messaget::eom;
+        symex_transition(state, new_state_pc, !backward);
+        state.apply_condition(new_guard, state, ns);
+        symex_assume_l2(state, new_guard);
+        return;
+      }
+
+      // Both branches are feasible (or one or both checks timed out
+      // and we leave them feasible by default): fall through to
+      // normal forking.
+    }
+
     // We should save both the instruction after this goto, and the target of
     // the goto.
 
@@ -376,6 +505,89 @@ void goto_symext::symex_goto(statet &state)
       {
         state.guard.add(guard_expr);
         new_state.guard.add(boolean_negate(guard_expr));
+      }
+    }
+
+    // In monolithic mode, try to prune infeasible branches using the
+    // solver. If a branch's guard is UNSAT (infeasible under all
+    // possible histories), mark it unreachable so symex skips it.
+    if(
+      !symex_config.doing_path_exploration &&
+      branch_worklist_solver != nullptr && !state.has_saved_jump_target &&
+      state.atomic_section_id == 0 && !branch_pruning_disabled)
+    {
+      const auto prune_start = std::chrono::steady_clock::now();
+
+      // Bound each individual SAT call. See the matching comment in
+      // the --paths-mode pruning block above for rationale.
+      constexpr uint32_t per_check_ms = 200;
+      auto *limits =
+        dynamic_cast<solver_resource_limitst *>(branch_worklist_solver);
+      if(limits != nullptr)
+        limits->set_time_limit_milliseconds(per_check_ms);
+
+      // Convert new steps incrementally
+      for(auto &step : target.SSA_steps)
+      {
+        if(step.ignore || step.converted_for_pruning)
+          continue;
+        step.converted_for_pruning = true;
+        if(step.is_assignment() || step.is_constraint())
+          branch_worklist_solver->set_to_true(step.cond_expr);
+        else if(step.is_assume())
+          branch_worklist_solver->set_to_true(
+            implies_exprt{step.guard, step.cond_expr});
+      }
+
+      bool any_timed_out = false;
+
+      // Check fall-through branch (state)
+      exprt fall_guard = state.guard.as_expr();
+      branch_worklist_solver->push(
+        {branch_worklist_solver->handle(fall_guard)});
+      const auto fall_result = (*branch_worklist_solver)();
+      if(fall_result == decision_proceduret::resultt::D_UNSATISFIABLE)
+      {
+        log.statistics() << "Branch pruned (fall-through infeasible) at "
+                         << state.source.pc->source_location() << messaget::eom;
+        state.reachable = false;
+      }
+      else if(fall_result == decision_proceduret::resultt::D_ERROR)
+        any_timed_out = true;
+      branch_worklist_solver->pop();
+
+      // Check jump-target branch
+      goto_statet &jump_state = goto_state_list.back().second;
+      exprt jump_guard = jump_state.guard.as_expr();
+      branch_worklist_solver->push(
+        {branch_worklist_solver->handle(jump_guard)});
+      const auto jump_result = (*branch_worklist_solver)();
+      if(jump_result == decision_proceduret::resultt::D_UNSATISFIABLE)
+      {
+        log.statistics() << "Branch pruned (jump-target infeasible) at "
+                         << state.source.pc->source_location() << messaget::eom;
+        jump_state.reachable = false;
+      }
+      else if(jump_result == decision_proceduret::resultt::D_ERROR)
+        any_timed_out = true;
+      branch_worklist_solver->pop();
+
+      if(any_timed_out)
+      {
+        log.statistics() << "Branch pruning disabled (per-check budget "
+                         << per_check_ms << "ms exceeded)" << messaget::eom;
+        branch_pruning_disabled = true;
+      }
+
+      cumulative_pruning_ms +=
+        std::chrono::duration_cast<std::chrono::milliseconds>(
+          std::chrono::steady_clock::now() - prune_start)
+          .count();
+      if(cumulative_pruning_ms > 1000 && !branch_pruning_disabled)
+      {
+        log.statistics() << "Branch pruning disabled (cumulative "
+                         << cumulative_pruning_ms << "ms)" << messaget::eom;
+        branch_pruning_disabled = true;
       }
     }
   }
