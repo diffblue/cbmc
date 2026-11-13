@@ -597,10 +597,10 @@ void cpp_typecheckt::typecheck_code(codet &code)
     }
     if(!code.op0().is_constant())
     {
-      // our constant evaluation fell short; the check is dropped
-      warning().source_location = code.source_location();
-      warning() << "static_assert condition could not be evaluated; the "
-                << "assertion is not checked" << eom;
+      // [dcl.pre]/13, see convert(cpp_static_assertt &)
+      error().source_location = code.source_location();
+      error() << "static_assert condition is not a constant expression" << eom;
+      throw 0;
     }
     code = codet{ID_skip};
     return;

@@ -9,7 +9,7 @@ main.cpp
 --
 ^warning: ignoring
 static assertion
-static_assert condition could not be evaluated
+static_assert condition is not a constant expression
 --
 g++ 13 and clang++ 18 accept this program, and it fails only its WRONG
 assertion.

@@ -8,7 +8,7 @@ main.cpp
 ^VERIFICATION FAILED$
 --
 static assertion failed
-static_assert condition could not be evaluated
+static_assert condition is not a constant expression
 ^warning: ignoring
 dropped the body
 --

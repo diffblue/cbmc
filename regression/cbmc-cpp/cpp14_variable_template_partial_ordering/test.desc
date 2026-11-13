@@ -8,7 +8,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
-static_assert condition could not be evaluated
+static_assert condition is not a constant expression
 dropped the body
 --
 N5008 [temp.spec.partial.order]/1: libstdc++'s extent_v has both

@@ -8,7 +8,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
-static_assert condition could not be evaluated
+static_assert condition is not a constant expression
 dropped the body
 --
 N5008 [temp.param]/12 + [temp.arg.nontype]/1: class-type non-type template

@@ -11,7 +11,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
-static_assert condition could not be evaluated
+static_assert condition is not a constant expression
 --
 CBMC's constant evaluator did not evaluate throw-expressions and
 try-blocks: W<nested(5)> did not type-check, and the static_asserts were

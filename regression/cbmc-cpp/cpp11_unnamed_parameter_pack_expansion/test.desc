@@ -8,7 +8,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
-static_assert condition could not be evaluated
+static_assert condition is not a constant expression
 dropped the body
 --
 An UNNAMED function parameter pack (`Args...`) was not expanded when the

@@ -10,7 +10,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
-static_assert condition could not be evaluated
+static_assert condition is not a constant expression
 --
 CBMC re-instantiated an alias, concept or variable template specialization
 at each use; it now reuses the instance (25% less type-checking time for

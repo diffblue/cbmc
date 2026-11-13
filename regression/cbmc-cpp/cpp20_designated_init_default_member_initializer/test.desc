@@ -14,7 +14,7 @@ main.cpp
 ^\[main\.assertion\.9\] line \d+ WRONG \(must FAIL\): FAILURE$
 ^VERIFICATION FAILED$
 --
-static_assert condition could not be evaluated
+static_assert condition is not a constant expression
 static assertion failed
 ignoring initializer_list
 Invariant check failed

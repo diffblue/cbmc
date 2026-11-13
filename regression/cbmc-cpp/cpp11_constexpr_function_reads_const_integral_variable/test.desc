@@ -10,7 +10,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
-static_assert condition could not be evaluated
+static_assert condition is not a constant expression
 --
 A constexpr function that reads a namespace-scope `const int' could not be
 evaluated, so its call was rejected as a template argument ("expected

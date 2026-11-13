@@ -123,23 +123,18 @@ void cpp_typecheckt::convert(cpp_static_assertt &cpp_static_assert)
 
   simplify(cpp_static_assert.op0(), *this);
 
-  // N5008 [dcl.pre]/13: the condition is a constant expression; if our
-  // constant evaluation falls short the check is dropped.  Say so for the
-  // user's own code, as the block-scope form (typecheck_code) does -- a
-  // silently skipped assertion hid several evaluation gaps.  Assertions
-  // inside a template instantiation (which may be a "no valid
-  // specialization" guard, [temp.res.general]/6) stay quiet.
+  // N5008 [dcl.pre]/13: the condition is a contextually converted
+  // constant expression of type bool; a static_assert whose condition is
+  // not a constant expression is ill-formed ([expr.const]/12) -- `f(1) ==
+  // 1' with f not constexpr, `g == 3' with g a variable that is not
+  // constant.  (The check used to be skipped with a warning, which no test
+  // with libstdc++ 13 and 16, libc++, the MSVC STL or the macOS SDK
+  // reaches any more.)
   if(!cpp_static_assert.op0().is_constant())
   {
-    const std::string file =
-      id2string(cpp_static_assert.source_location().get_file());
-    if(instantiation_stack.empty() && !file.empty() && file.find("<built") != 0)
-    {
-      warning().source_location = cpp_static_assert.source_location();
-      warning() << "static_assert condition could not be evaluated; the "
-                << "assertion is not checked" << eom;
-    }
-    return;
+    error().source_location = cpp_static_assert.source_location();
+    error() << "static_assert condition is not a constant expression" << eom;
+    throw 0;
   }
 
   if(cpp_static_assert.op0() == false_exprt())

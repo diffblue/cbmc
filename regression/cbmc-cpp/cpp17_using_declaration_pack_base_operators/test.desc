@@ -11,7 +11,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
-static_assert condition could not be evaluated
+static_assert condition is not a constant expression
 dropped the body
 --
 N5008 [namespace.udecl]/1: `using Bases::operator()...;' names each base's

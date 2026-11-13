@@ -10,7 +10,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
-static_assert condition could not be evaluated
+static_assert condition is not a constant expression
 --
 The parser kept only the run-time branch of `if consteval' (and of `if
 !consteval'), so constant evaluation took it too: the static assertions
