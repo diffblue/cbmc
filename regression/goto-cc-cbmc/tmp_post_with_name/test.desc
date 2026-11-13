@@ -3,7 +3,7 @@ main.c
 --no-malloc-may-fail --pointer-check
 ^EXIT=10$
 ^SIGNAL=0$
-^\[main\.pointer_dereference\.5\] line 8 dereference failure: pointer outside object bounds in \*tmp_post_ptr: FAILURE
+^\[main\.pointer_dereference\.\d+\] line 8 dereference failure: pointer outside dynamic object bounds in \*tmp_post_ptr: FAILURE
 \*\* 1 of [0-9]* failed 
 ^VERIFICATION FAILED$
 --
