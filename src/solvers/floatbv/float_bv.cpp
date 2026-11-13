@@ -1639,11 +1639,11 @@ exprt float_bvt::pack(
   // do sign -- we make this 'false' for NaN
   const if_exprt sign_bit(src.NaN, false_exprt(), src.sign);
 
-  // the fraction is zero in case of infinity,
-  // and one in case of NaN
+  // the fraction is zero in case of infinity; a NaN result is the default
+  // NaN, which is quiet: only the most significant fraction bit is set
   const if_exprt fraction(
     src.NaN,
-    from_integer(1, src.fraction.type()),
+    from_integer(power(2, spec.f - 1), src.fraction.type()),
     if_exprt(src.infinity, from_integer(0, src.fraction.type()), src.fraction));
 
   const or_exprt infinity_or_NaN(src.NaN, src.infinity);
