@@ -1,0 +1,10 @@
+CORE gcc-only
+auto_type.c
+
+redeclaration of 'main::1::b' with no linkage$
+CONVERSION ERROR
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+Two declarations of the same local with __auto_type must be rejected as a
+redeclaration, even though the initializer of each is type checked only once.
