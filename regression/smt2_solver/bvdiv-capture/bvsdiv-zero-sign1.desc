@@ -1,0 +1,9 @@
+CORE
+bvsdiv-zero-sign1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+^\(\(r \(_ bv1 8\)\)\)$
+--
+bvsdiv of a negative dividend by zero must return 1, not all-ones.
