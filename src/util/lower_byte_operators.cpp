@@ -55,22 +55,36 @@ static boundst map_bounds(
   return result;
 }
 
-/// changes the width of the given bitvector type
+/// Returns a bitvector type of width \p new_width that mirrors the shape of
+/// \p src. Accepted source type ids are ID_unsignedbv, ID_signedbv, ID_bv,
+/// ID_c_enum and ID_c_bit_field (resolved via their underlying type), and
+/// ID_pointer and ID_c_bool (both mapped to ID_bv, matching the treatment of
+/// these types in unpack_rec). Floating-point types (ID_floatbv, ID_fixedbv)
+/// are intentionally unsupported: reinterpreting them at a different width as a
+/// raw bitvector would be meaningless, so callers must not pass them.
+/// Not marked `static` to make unit-testing possible (regression for #8475).
+/// \param src: source type whose id selects the kind of the result
+/// \param new_width: width of the returned bitvector type
+/// \return a bitvector type of width \p new_width
 bitvector_typet adjust_width(const typet &src, std::size_t new_width)
 {
   if(src.id() == ID_unsignedbv)
     return unsignedbv_typet(new_width);
-  else if(src.id() == ID_signedbv)
+  if(src.id() == ID_signedbv)
     return signedbv_typet(new_width);
-  else if(src.id() == ID_bv)
+  if(src.id() == ID_bv)
     return bv_typet(new_width);
-  else if(src.id() == ID_c_enum) // we use the underlying type
+  if(src.id() == ID_c_enum) // we use the underlying type
     return adjust_width(to_c_enum_type(src).underlying_type(), new_width);
-  else if(src.id() == ID_c_bit_field)
+  if(src.id() == ID_c_bit_field)
     return c_bit_field_typet(
       to_c_bit_field_type(src).underlying_type(), new_width);
-  else
-    PRECONDITION(false);
+  // Pointers and C Booleans are stored as plain bitvectors; reinterpret their
+  // raw bits at the requested width, as unpack_rec does for these types.
+  if(src.id() == ID_pointer || src.id() == ID_c_bool)
+    return bv_typet(new_width);
+
+  PRECONDITION(false);
 }
 
 /// Convert a bitvector-typed expression \p bitvector_expr to a struct-typed
