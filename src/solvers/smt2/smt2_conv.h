@@ -234,6 +234,11 @@ protected:
   // unflatten() does the opposite.
   enum class wheret { BEGIN, END };
   void flatten2bv(const exprt &);
+  /// With the FPA theory, flattening a non-constant float to a bit-vector
+  /// requires a bit-vector variable that is declared, and constrained to
+  /// encode the float, before the expression is converted. Declare these for
+  /// all the floats that \ref flatten2bv reaches when flattening \p expr.
+  void find_symbols_flatten2bv(const exprt &expr);
   void unflatten(wheret, const typet &, unsigned nesting=0);
 
   // pointers
