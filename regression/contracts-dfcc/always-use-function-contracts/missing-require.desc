@@ -1,0 +1,9 @@
+CORE dfcc-only
+missing.c
+--dfcc main --enforce-contract foo --always-require-function-contracts
+^Functions without a contract reached with --always-require-function-contracts: 'callee'\. Add a contract or retain the body with --keep-function-body\.$
+^EXIT=6$
+^SIGNAL=0$
+--
+--
+Required contracts reject a missing contract rather than use the body.

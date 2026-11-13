@@ -59,6 +59,30 @@ class optionst;
   "activate dynamic frame condition checking for contracts using the given "   \
   "harness as entry point\n"
 
+#define FLAG_ALWAYS_USE_FUNCTION_CONTRACTS "always-use-function-contracts"
+#define OPT_ALWAYS_USE_FUNCTION_CONTRACTS                                      \
+  "(" FLAG_ALWAYS_USE_FUNCTION_CONTRACTS ")"
+#define HELP_ALWAYS_USE_FUNCTION_CONTRACTS                                     \
+  " {y--always-use-function-contracts} \t "                                    \
+  "with --dfcc, replace each reachable callee that has a contract with that "  \
+  "contract; callees without contracts keep their bodies\n"
+
+#define FLAG_ALWAYS_REQUIRE_FUNCTION_CONTRACTS                                 \
+  "always-require-function-contracts"
+#define OPT_ALWAYS_REQUIRE_FUNCTION_CONTRACTS                                  \
+  "(" FLAG_ALWAYS_REQUIRE_FUNCTION_CONTRACTS ")"
+#define HELP_ALWAYS_REQUIRE_FUNCTION_CONTRACTS                                 \
+  " {y--always-require-function-contracts} \t "                                \
+  "like --always-use-function-contracts, but reject reachable callees "        \
+  "that have a body but no contract\n"
+
+#define FLAG_KEEP_FUNCTION_BODY "keep-function-body"
+#define OPT_KEEP_FUNCTION_BODY "(" FLAG_KEEP_FUNCTION_BODY "):"
+#define HELP_KEEP_FUNCTION_BODY                                                \
+  " {y--keep-function-body} {ufunction} \t "                                   \
+  "with --always-use-function-contracts, retain the body of {ufunction} "      \
+  "(repeatable)\n"
+
 #define FLAG_ENFORCE_CONTRACT_REC "enforce-contract-rec"
 #define OPT_ENFORCE_CONTRACT_REC "(" FLAG_ENFORCE_CONTRACT_REC "):"
 #define HELP_ENFORCE_CONTRACT_REC                                              \
@@ -145,6 +169,8 @@ public:
   /// actual contract symbol to exist as `contract::bar` in the symbol table.
   ///
   /// Transformation steps:
+  /// - if requested, select contract replacements by following calls from
+  /// the harness and checked function.
   /// - check preconditions on existence and absence of clash between harness,
   /// functions and contract symbols parameters.
   /// - link the goto model to the standard library
@@ -169,7 +195,7 @@ protected:
   const irep_idt &harness_id;
   const std::optional<std::pair<irep_idt, irep_idt>> &to_check;
   const bool allow_recursive_calls;
-  const std::map<irep_idt, irep_idt> &to_replace;
+  std::map<irep_idt, irep_idt> to_replace;
   const loop_contract_configt loop_contract_config;
   const std::set<std::string> &to_exclude_from_nondet_static;
   message_handlert &message_handler;
@@ -194,6 +220,16 @@ protected:
   std::set<irep_idt> pure_contract_symbols;
   std::set<irep_idt> other_symbols;
   std::set<irep_idt> function_pointer_contracts;
+
+  /// Validate body exceptions and collect them with the harness and checked
+  /// function, whose bodies must also be retained.
+  std::set<irep_idt> get_functions_to_keep() const;
+
+  /// Select contract replacements by following calls through retained bodies.
+  /// A callee with a body but no contract keeps its body and is followed; with
+  /// `--always-require-function-contracts` it is an error.
+  /// Do not inspect the bodies of replaced functions or contract expressions.
+  void select_contract_replacements();
 
   /// Checks preconditions on arguments of \ref transform_goto_model.
   ///

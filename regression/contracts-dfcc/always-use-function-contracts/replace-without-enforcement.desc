@@ -1,0 +1,11 @@
+CORE dfcc-only
+main.c
+--dfcc main --always-use-function-contracts
+^Wrapping 'foo' with contract 'foo' in REPLACE mode$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^Wrapping 'callee'.*in REPLACE mode$
+--
+Without an enforced function, replacement stops at the harness's callee.

@@ -9,6 +9,7 @@ Author: Remi Delmas, delmarsd@amazon.com
 #include "dfcc.h"
 
 #include <util/config.h>
+#include <util/options.h>
 #include <util/prefix.h>
 #include <util/string_utils.h>
 
@@ -25,6 +26,8 @@ Author: Remi Delmas, delmarsd@amazon.com
 
 #include "dfcc_lift_memory_predicates.h"
 #include "dfcc_utils.h"
+
+#include <sstream>
 
 invalid_function_contract_pair_exceptiont::
   invalid_function_contract_pair_exceptiont(
@@ -167,6 +170,121 @@ dfcct::dfcct(
     max_assigns_clause_size(0)
 {
   transform_goto_model();
+}
+
+std::set<irep_idt> dfcct::get_functions_to_keep() const
+{
+  const auto &exceptions = options.get_list_option(FLAG_KEEP_FUNCTION_BODY);
+  std::set<irep_idt> to_keep(exceptions.begin(), exceptions.end());
+  for(const auto &function_id : to_keep)
+  {
+    if(!dfcc_utilst::function_symbol_exists(goto_model, function_id))
+    {
+      throw invalid_command_line_argument_exceptiont(
+        "Function '" + id2string(function_id) + "' not found",
+        "--" FLAG_KEEP_FUNCTION_BODY);
+    }
+    if(to_replace.find(function_id) != to_replace.end())
+    {
+      throw invalid_command_line_argument_exceptiont(
+        "Function '" + id2string(function_id) +
+          "' cannot both retain its body and be replaced with a contract",
+        "--" FLAG_KEEP_FUNCTION_BODY);
+    }
+  }
+
+  to_keep.insert(harness_id);
+  if(to_check.has_value())
+    to_keep.insert(to_check->first);
+  return to_keep;
+}
+
+void dfcct::select_contract_replacements()
+{
+  const bool require_contracts =
+    options.get_bool_option(FLAG_ALWAYS_REQUIRE_FUNCTION_CONTRACTS);
+  const auto to_keep = get_functions_to_keep();
+  std::set<irep_idt> pending{harness_id};
+  if(to_check.has_value())
+    pending.insert(to_check->first);
+  std::set<irep_idt> visited;
+  std::set<irep_idt> without_contract;
+
+  while(!pending.empty())
+  {
+    const auto function_id = *pending.begin();
+    pending.erase(pending.begin());
+    if(!visited.insert(function_id).second)
+      continue;
+
+    const auto found = goto_model.goto_functions.function_map.find(function_id);
+    if(found == goto_model.goto_functions.function_map.end())
+      continue;
+
+    for(const auto &instruction : found->second.body.instructions)
+    {
+      if(!instruction.is_function_call())
+        continue;
+
+      const auto &callee_id =
+        to_symbol_expr(instruction.call_function()).identifier();
+      if(instrument.do_not_instrument(callee_id))
+        continue;
+
+      if(to_keep.find(callee_id) != to_keep.end())
+      {
+        pending.insert(callee_id);
+        continue;
+      }
+
+      // an explicit --replace-call-with-contract mapping takes precedence
+      if(to_replace.find(callee_id) != to_replace.end())
+        continue;
+
+      const std::string contract_id = "contract::" + id2string(callee_id);
+      if(goto_model.symbol_table.has_symbol(contract_id))
+      {
+        to_replace.emplace(callee_id, callee_id);
+        continue;
+      }
+
+      // keep library models, linked now or later, and bodyless functions,
+      // which get an assert(false) stub
+      if(
+        !dfcc_utilst::function_symbol_with_body_exists(goto_model, callee_id) ||
+        has_prefix(
+          id2string(ns.lookup(callee_id).location.get_file()),
+          "<builtin-library"))
+      {
+        continue;
+      }
+
+      without_contract.insert(callee_id);
+      pending.insert(callee_id);
+    }
+  }
+
+  if(require_contracts && !without_contract.empty())
+  {
+    std::ostringstream message;
+    message << "Functions without a contract reached with --"
+            << FLAG_ALWAYS_REQUIRE_FUNCTION_CONTRACTS << ": ";
+    join_strings(
+      message,
+      without_contract.begin(),
+      without_contract.end(),
+      ", ",
+      [](const irep_idt &id) { return "'" + id2string(id) + "'"; });
+    message << ". Add a contract or retain the body with --"
+            << FLAG_KEEP_FUNCTION_BODY << ".";
+    throw invalid_input_exceptiont(message.str());
+  }
+
+  for(const auto &function_id : without_contract)
+  {
+    log.status() << "Keeping body of '" << function_id
+                 << "', which has no contract" << messaget::eom;
+  }
 }
 
 void dfcct::check_transform_goto_model_preconditions()
@@ -451,6 +569,9 @@ void dfcct::instrument_other_functions()
 
 void dfcct::transform_goto_model()
 {
+  if(options.get_bool_option(FLAG_ALWAYS_USE_FUNCTION_CONTRACTS))
+    select_contract_replacements();
+
   check_transform_goto_model_preconditions();
   link_model_and_load_dfcc_library();
   lift_memory_predicates();

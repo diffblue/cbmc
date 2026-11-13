@@ -1,0 +1,11 @@
+CORE dfcc-only
+indirect.c
+--dfcc main --enforce-contract foo --always-use-function-contracts
+^Wrapping 'callee' with contract 'callee' in REPLACE mode$
+^\[foo.postcondition.\d+\].*Check ensures clause.*: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Function pointer targets use their contracts by default too.

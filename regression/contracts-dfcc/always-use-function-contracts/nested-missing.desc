@@ -1,0 +1,9 @@
+CORE dfcc-only
+nested.c
+--dfcc main --enforce-contract foo --always-require-function-contracts --keep-function-body callee
+^Functions without a contract reached with --always-require-function-contracts: 'private_helper'\..*$
+^EXIT=6$
+^SIGNAL=0$
+--
+--
+Retaining a caller's body does not implicitly retain its callee's body.
