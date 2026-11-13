@@ -1,0 +1,13 @@
+CORE
+main.c
+--validate-ssa-equation --program-only
+^EXIT=0$
+^SIGNAL=0$
+--
+^Invariant check failed
+--
+The fields of a struct with a member of non-constant size (a GCC extension) are
+SSA expressions whose original expression is a member expression. Renaming the
+type of the field must also rename the type of the struct in the original
+expression, else the member expression's type does not match the type of the
+struct component.

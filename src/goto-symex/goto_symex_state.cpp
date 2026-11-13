@@ -91,7 +91,7 @@ renamedt<ssa_exprt, L2> goto_symex_statet::assignment(
   rename<L2>(lhs.type(), l1_identifier, ns);
   if(rhs_is_simplified)
     simplify_expr_with_value_sett{value_set, language_mode, ns}.simplify(lhs);
-  lhs.update_type();
+  update_type<L2>(lhs, ns);
   if(run_validation_checks)
   {
     DATA_INVARIANT(!check_renaming_l1(lhs), "lhs renaming failed on l1");
@@ -148,7 +148,7 @@ goto_symex_statet::rename_ssa(ssa_exprt ssa, const namespacet &ns)
     "rename_ssa can only be used for levels L0 and L1");
   ssa = set_indices<level>(std::move(ssa), ns).get();
   rename<level>(ssa.type(), ssa.identifier(), ns);
-  ssa.update_type();
+  update_type<level>(ssa, ns);
   return renamedt<ssa_exprt, level>{ssa};
 }
 
@@ -188,7 +188,7 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
     {
       ssa = set_indices<L1>(std::move(ssa), ns).get();
       rename<level>(expr.type(), ssa.identifier(), ns);
-      ssa.update_type();
+      update_type<level>(ssa, ns);
 
       // renaming taken care of by l2_thread_encoding, or already at L2
       if(l2_thread_read_encoding(ssa, ns) || !ssa.get_level_2().empty())
@@ -578,7 +578,7 @@ void goto_symex_statet::rename_address(exprt &expr, const namespacet &ns)
     ssa = set_indices<L1>(std::move(ssa), ns).get();
 
     rename<level>(expr.type(), ssa.identifier(), ns);
-    ssa.update_type();
+    update_type<level>(ssa, ns);
   }
   else if(expr.id()==ID_symbol)
   {
@@ -694,6 +694,30 @@ static bool requires_renaming(const typet &type, const namespacet &ns)
   }
 
   return false;
+}
+
+template <levelt level>
+void goto_symex_statet::update_type(ssa_exprt &ssa, const namespacet &ns)
+{
+  ssa.update_type();
+
+  const irep_idt &original_id = ssa.get_original_expr().id();
+  if(
+    (original_id != ID_member && original_id != ID_index) ||
+    !requires_renaming(ssa.type(), ns))
+  {
+    return;
+  }
+
+  exprt original = ssa.get_original_expr();
+  for(exprt *e = &original; e->id() == ID_member || e->id() == ID_index;)
+  {
+    exprt &compound = e->id() == ID_member ? to_member_expr(*e).compound()
+                                           : to_index_expr(*e).array();
+    rename<level>(compound.type(), irep_idt{}, ns);
+    e = &compound;
+  }
+  ssa.set_expression(std::move(original));
 }
 
 template <levelt level>
@@ -832,7 +856,7 @@ ssa_exprt goto_symex_statet::declare(ssa_exprt ssa, const namespacet &ns)
 
   // rename type to L2
   rename(ssa.type(), l1_identifier, ns);
-  ssa.update_type();
+  update_type<L2>(ssa, ns);
 
   // in case of pointers, put something into the value set
   if(ssa.type().id() == ID_pointer)
