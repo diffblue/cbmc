@@ -1810,6 +1810,364 @@ int __builtin___snprintf_chk(
   return result;
 }
 
+/* FUNCTION: __CPROVER_vsnprintf */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#  include <stdio.h>
+#  define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDARG_H_INCLUDED
+#  include <stdarg.h>
+#  define __CPROVER_STDARG_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDDEF_H_INCLUDED
+#  include <stddef.h>
+#  define __CPROVER_STDDEF_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDINT_H_INCLUDED
+#  include <stdint.h>
+#  define __CPROVER_STDINT_H_INCLUDED
+#endif
+
+char __VERIFIER_nondet_char(void);
+int __VERIFIER_nondet_int(void);
+
+// C23 7.23.6.12, 7.23.6.1, for vsnprintf and the C libraries' variants of
+// it (which may be defined in the headers, as the Universal CRT's are, and
+// call one of the models below): the output of the integer conversions (d, i, u,
+// o, x, X, with the flags, field width, precision and length modifiers),
+// of c, s and %% is computed exactly; the characters produced by any other
+// conversion (floating-point, p, n, wide characters) and from there on are
+// unknown.  Digits are produced by straight-line code: 22 octal digits
+// represent any 64-bit value.
+#define __CPROVER_VSNPRINTF_EMIT(c)                                            \
+  do                                                                           \
+  {                                                                            \
+    if(out + 1 < size)                                                         \
+      str[out] = (c);                                                          \
+    ++out;                                                                     \
+  } while(0)
+#define __CPROVER_VSNPRINTF_DIGIT                                              \
+  do                                                                           \
+  {                                                                            \
+    if(m != 0)                                                                 \
+    {                                                                          \
+      buf[n] = digits[m % base];                                               \
+      ++n;                                                                     \
+      m /= base;                                                               \
+    }                                                                          \
+  } while(0)
+#define __CPROVER_VSNPRINTF_DIGIT_OUT(k)                                       \
+  do                                                                           \
+  {                                                                            \
+    if(n > (k))                                                                \
+      __CPROVER_VSNPRINTF_EMIT(buf[k]);                                        \
+  } while(0)
+
+int __CPROVER_vsnprintf(char *str, size_t size, const char *fmt, va_list ap)
+{
+__CPROVER_HIDE:;
+  size_t out = 0;
+  const char *p = fmt;
+  while(*p != 0)
+  {
+    if(*p != '%')
+    {
+      __CPROVER_VSNPRINTF_EMIT(*p);
+      ++p;
+      continue;
+    }
+    ++p;
+    _Bool left = 0, plus = 0, space = 0, alt = 0, zero = 0;
+    for(;; ++p)
+    {
+      if(*p == '-')
+        left = 1;
+      else if(*p == '+')
+        plus = 1;
+      else if(*p == ' ')
+        space = 1;
+      else if(*p == '#')
+        alt = 1;
+      else if(*p == '0')
+        zero = 1;
+      else
+        break;
+    }
+    long width = 0;
+    if(*p == '*')
+    {
+      int w = va_arg(ap, int);
+      if(w < 0)
+      {
+        left = 1;
+        width = -(long)w;
+      }
+      else
+        width = w;
+      ++p;
+    }
+    else
+    {
+      for(; *p >= '0' && *p <= '9'; ++p)
+        width = width * 10 + (*p - '0');
+    }
+    long precision = -1;
+    if(*p == '.')
+    {
+      ++p;
+      precision = 0;
+      if(*p == '*')
+      {
+        int q = va_arg(ap, int);
+        precision = q < 0 ? -1 : q;
+        ++p;
+      }
+      else
+      {
+        for(; *p >= '0' && *p <= '9'; ++p)
+          precision = precision * 10 + (*p - '0');
+      }
+    }
+    // 1 hh, 2 h, 3 l, 4 ll, 5 j, 6 z, 7 t, 8 L
+    int length = 0;
+    if(*p == 'h')
+    {
+      ++p;
+      length = 2;
+      if(*p == 'h')
+      {
+        ++p;
+        length = 1;
+      }
+    }
+    else if(*p == 'l')
+    {
+      ++p;
+      length = 3;
+      if(*p == 'l')
+      {
+        ++p;
+        length = 4;
+      }
+    }
+    else if(*p == 'j' || *p == 'z' || *p == 't' || *p == 'L')
+    {
+      length = *p == 'j' ? 5 : *p == 'z' ? 6 : *p == 't' ? 7 : 8;
+      ++p;
+    }
+    const char conv = *p;
+    if(conv == 0)
+      break;
+    ++p;
+    if(conv == '%')
+    {
+      __CPROVER_VSNPRINTF_EMIT('%');
+      continue;
+    }
+    long pad = 0;
+    if(
+      conv == 'd' || conv == 'i' || conv == 'u' || conv == 'o' || conv == 'x' ||
+      conv == 'X')
+    {
+      unsigned long long m;
+      _Bool negative = 0;
+      if(conv == 'd' || conv == 'i')
+      {
+        long long v;
+        if(length == 1)
+          v = (signed char)va_arg(ap, int);
+        else if(length == 2)
+          v = (short)va_arg(ap, int);
+        else if(length == 3)
+          v = va_arg(ap, long);
+        else if(length == 4)
+          v = va_arg(ap, long long);
+        else if(length == 5)
+          v = va_arg(ap, intmax_t);
+        else if(length == 6 || length == 7)
+          v = va_arg(ap, ptrdiff_t);
+        else
+          v = va_arg(ap, int);
+        negative = v < 0;
+        m = negative ? 0ull - (unsigned long long)v : (unsigned long long)v;
+      }
+      else
+      {
+        if(length == 1)
+          m = (unsigned char)va_arg(ap, int);
+        else if(length == 2)
+          m = (unsigned short)va_arg(ap, int);
+        else if(length == 3)
+          m = va_arg(ap, unsigned long);
+        else if(length == 4)
+          m = va_arg(ap, unsigned long long);
+        else if(length == 5)
+          m = va_arg(ap, uintmax_t);
+        else if(length == 6 || length == 7)
+          m = va_arg(ap, size_t);
+        else
+          m = va_arg(ap, unsigned);
+      }
+      const _Bool nonzero = m != 0;
+      const unsigned base = conv == 'o'                                 ? 8
+                            : conv == 'u' || conv == 'd' || conv == 'i' ? 10
+                                                                        : 16;
+      const char *digits =
+        conv == 'X' ? "0123456789ABCDEF" : "0123456789abcdef";
+      char buf[22];
+      int n = 0;
+      __CPROVER_VSNPRINTF_DIGIT;
+      __CPROVER_VSNPRINTF_DIGIT;
+      __CPROVER_VSNPRINTF_DIGIT;
+      __CPROVER_VSNPRINTF_DIGIT;
+      __CPROVER_VSNPRINTF_DIGIT;
+      __CPROVER_VSNPRINTF_DIGIT;
+      __CPROVER_VSNPRINTF_DIGIT;
+      __CPROVER_VSNPRINTF_DIGIT;
+      __CPROVER_VSNPRINTF_DIGIT;
+      __CPROVER_VSNPRINTF_DIGIT;
+      __CPROVER_VSNPRINTF_DIGIT;
+      __CPROVER_VSNPRINTF_DIGIT;
+      __CPROVER_VSNPRINTF_DIGIT;
+      __CPROVER_VSNPRINTF_DIGIT;
+      __CPROVER_VSNPRINTF_DIGIT;
+      __CPROVER_VSNPRINTF_DIGIT;
+      __CPROVER_VSNPRINTF_DIGIT;
+      __CPROVER_VSNPRINTF_DIGIT;
+      __CPROVER_VSNPRINTF_DIGIT;
+      __CPROVER_VSNPRINTF_DIGIT;
+      __CPROVER_VSNPRINTF_DIGIT;
+      __CPROVER_VSNPRINTF_DIGIT;
+      // the minimum number of digits is the precision, 1 by default; a value
+      // of 0 with precision 0 has none
+      const long minimum = precision < 0 ? 1 : precision;
+      long zeros = minimum > n ? minimum - n : 0;
+      // # with o: the first digit is a 0
+      if(alt && base == 8 && zeros == 0)
+        zeros = 1;
+      const char sign = (conv == 'd' || conv == 'i') ? (negative ? '-'
+                                                        : plus   ? '+'
+                                                        : space  ? ' '
+                                                                 : 0)
+                                                     : 0;
+      // # with x and X: a nonzero value gets the prefix 0x or 0X
+      const int prefix = alt && base == 16 && nonzero ? 2 : 0;
+      const long len = (sign != 0) + prefix + zeros + n;
+      pad = width > len ? width - len : 0;
+      // the 0 flag is ignored with -, and with a precision
+      const _Bool zero_pad = zero && !left && precision < 0;
+      if(!left && !zero_pad)
+      {
+        for(; pad > 0; --pad)
+          __CPROVER_VSNPRINTF_EMIT(' ');
+      }
+      if(sign != 0)
+        __CPROVER_VSNPRINTF_EMIT(sign);
+      if(prefix != 0)
+      {
+        __CPROVER_VSNPRINTF_EMIT('0');
+        __CPROVER_VSNPRINTF_EMIT(conv);
+      }
+      if(zero_pad)
+      {
+        for(; pad > 0; --pad)
+          __CPROVER_VSNPRINTF_EMIT('0');
+      }
+      for(; zeros > 0; --zeros)
+        __CPROVER_VSNPRINTF_EMIT('0');
+      __CPROVER_VSNPRINTF_DIGIT_OUT(21);
+      __CPROVER_VSNPRINTF_DIGIT_OUT(20);
+      __CPROVER_VSNPRINTF_DIGIT_OUT(19);
+      __CPROVER_VSNPRINTF_DIGIT_OUT(18);
+      __CPROVER_VSNPRINTF_DIGIT_OUT(17);
+      __CPROVER_VSNPRINTF_DIGIT_OUT(16);
+      __CPROVER_VSNPRINTF_DIGIT_OUT(15);
+      __CPROVER_VSNPRINTF_DIGIT_OUT(14);
+      __CPROVER_VSNPRINTF_DIGIT_OUT(13);
+      __CPROVER_VSNPRINTF_DIGIT_OUT(12);
+      __CPROVER_VSNPRINTF_DIGIT_OUT(11);
+      __CPROVER_VSNPRINTF_DIGIT_OUT(10);
+      __CPROVER_VSNPRINTF_DIGIT_OUT(9);
+      __CPROVER_VSNPRINTF_DIGIT_OUT(8);
+      __CPROVER_VSNPRINTF_DIGIT_OUT(7);
+      __CPROVER_VSNPRINTF_DIGIT_OUT(6);
+      __CPROVER_VSNPRINTF_DIGIT_OUT(5);
+      __CPROVER_VSNPRINTF_DIGIT_OUT(4);
+      __CPROVER_VSNPRINTF_DIGIT_OUT(3);
+      __CPROVER_VSNPRINTF_DIGIT_OUT(2);
+      __CPROVER_VSNPRINTF_DIGIT_OUT(1);
+      __CPROVER_VSNPRINTF_DIGIT_OUT(0);
+    }
+    else if(conv == 'c' && length == 0)
+    {
+      const char c = (char)(unsigned char)va_arg(ap, int);
+      pad = width > 1 ? width - 1 : 0;
+      if(!left)
+      {
+        for(; pad > 0; --pad)
+          __CPROVER_VSNPRINTF_EMIT(' ');
+      }
+      __CPROVER_VSNPRINTF_EMIT(c);
+    }
+    else if(conv == 's' && length == 0)
+    {
+      const char *s = va_arg(ap, const char *);
+      long len = 0;
+      while((precision < 0 || len < precision) && s[len] != 0)
+        ++len;
+      pad = width > len ? width - len : 0;
+      if(!left)
+      {
+        for(; pad > 0; --pad)
+          __CPROVER_VSNPRINTF_EMIT(' ');
+      }
+      for(long k = 0; k < len; ++k)
+        __CPROVER_VSNPRINTF_EMIT(s[k]);
+    }
+    else
+    {
+      // not modelled exactly: the output from here on is unknown (its
+      // arguments are not read, which only matters for %n).  If it ends
+      // within the buffer, the result is its length; otherwise the buffer
+      // holds a prefix and the result is at least as long.
+      if(size == 0 || out + 1 >= size)
+      {
+        if(size > 0)
+          str[size - 1] = '\0';
+        int result = __VERIFIER_nondet_int();
+        __CPROVER_assume(result >= 0 && (size_t)result >= out);
+        return result;
+      }
+      size_t i = out;
+      for(; i + 1 < size; ++i)
+      {
+        char c = __VERIFIER_nondet_char();
+        str[i] = c;
+        if(c == '\0')
+          return (int)i;
+      }
+      str[i] = '\0';
+      int result = __VERIFIER_nondet_int();
+      __CPROVER_assume(result >= 0 && (size_t)result >= i);
+      return result;
+    }
+    // a - flag: the padding follows
+    for(; pad > 0; --pad)
+      __CPROVER_VSNPRINTF_EMIT(' ');
+  }
+  if(size > 0)
+    str[out < size ? out : size - 1] = '\0';
+  return (int)out;
+}
+
+#undef __CPROVER_VSNPRINTF_EMIT
+#undef __CPROVER_VSNPRINTF_DIGIT
+#undef __CPROVER_VSNPRINTF_DIGIT_OUT
+
 /* FUNCTION: vsnprintf */
 
 #ifndef __CPROVER_STDIO_H_INCLUDED
@@ -1824,44 +2182,12 @@ int __builtin___snprintf_chk(
 
 #undef vsnprintf
 
-char __VERIFIER_nondet_char(void);
+int __CPROVER_vsnprintf(char *str, size_t size, const char *fmt, va_list ap);
 
 int vsnprintf(char *str, size_t size, const char *fmt, va_list ap)
 {
-  (void)*fmt;
-
-#if(defined(__aarch64__) || defined(_M_ARM64)) && !defined(__APPLE__)
-  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(ap.__stack) <
-        __CPROVER_OBJECT_SIZE(ap.__stack))
-
-  {
-    (void)va_arg(ap, int);
-    __CPROVER_precondition(
-      __CPROVER_POINTER_OBJECT(str) != __CPROVER_POINTER_OBJECT(ap.__stack),
-      "vsnprintf object overlap");
-  }
-#else
-  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(ap) <
-        __CPROVER_OBJECT_SIZE(ap))
-
-  {
-    (void)va_arg(ap, int);
-    __CPROVER_precondition(
-      __CPROVER_POINTER_OBJECT(str) != __CPROVER_POINTER_OBJECT(ap),
-      "vsnprintf object overlap");
-  }
-#endif
-
-  size_t i = 0;
-  for(; i < size; ++i)
-  {
-    char c = __VERIFIER_nondet_char();
-    str[i] = c;
-    if(c == '\0')
-      break;
-  }
-
-  return i;
+__CPROVER_HIDE:;
+  return __CPROVER_vsnprintf(str, size, fmt, ap);
 }
 
 /* FUNCTION: __builtin___vsnprintf_chk */
@@ -1876,8 +2202,10 @@ int vsnprintf(char *str, size_t size, const char *fmt, va_list ap)
 #  define __CPROVER_STDARG_H_INCLUDED
 #endif
 
-char __VERIFIER_nondet_char(void);
+int __CPROVER_vsnprintf(char *str, size_t size, const char *fmt, va_list ap);
 
+// the fortified vsnprintf (GCC's object size checking, macOS's _FORTIFY_SOURCE):
+// the destination must hold size characters
 int __builtin___vsnprintf_chk(
   char *str,
   size_t size,
@@ -1886,43 +2214,88 @@ int __builtin___vsnprintf_chk(
   const char *fmt,
   va_list ap)
 {
+__CPROVER_HIDE:;
   (void)flag;
-  (void)bufsize;
-  (void)*fmt;
+  __CPROVER_precondition(
+    bufsize == (size_t)-1 || size <= bufsize, "vsnprintf buffer overflow");
+  return __CPROVER_vsnprintf(str, size, fmt, ap);
+}
 
-#if(defined(__aarch64__) || defined(_M_ARM64)) && !defined(__APPLE__)
-  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(ap.__stack) <
-        __CPROVER_OBJECT_SIZE(ap.__stack))
+/* FUNCTION: snprintf_l */
 
-  {
-    (void)va_arg(ap, int);
-    __CPROVER_precondition(
-      __CPROVER_POINTER_OBJECT(str) != __CPROVER_POINTER_OBJECT(ap.__stack),
-      "vsnprintf object overlap");
-  }
-#else
-  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(ap) <
-        __CPROVER_OBJECT_SIZE(ap))
+// macOS and FreeBSD (<xlocale.h>): snprintf with an explicit locale, which
+// the integer conversions do not depend on
 
-  {
-    (void)va_arg(ap, int);
-    __CPROVER_precondition(
-      __CPROVER_POINTER_OBJECT(str) != __CPROVER_POINTER_OBJECT(ap),
-      "vsnprintf object overlap");
-  }
+#if defined(__APPLE__) || defined(__FreeBSD__)
+
+#  ifndef __CPROVER_STDIO_H_INCLUDED
+#    include <stdio.h>
+#    define __CPROVER_STDIO_H_INCLUDED
+#  endif
+
+#  ifndef __CPROVER_STDARG_H_INCLUDED
+#    include <stdarg.h>
+#    define __CPROVER_STDARG_H_INCLUDED
+#  endif
+
+#  ifndef __CPROVER_XLOCALE_H_INCLUDED
+#    include <xlocale.h>
+#    define __CPROVER_XLOCALE_H_INCLUDED
+#  endif
+
+#  undef snprintf_l
+
+int __CPROVER_vsnprintf(char *str, size_t size, const char *fmt, va_list ap);
+
+int snprintf_l(char *str, size_t size, locale_t loc, const char *fmt, ...)
+{
+__CPROVER_HIDE:;
+  (void)loc;
+  va_list list;
+  va_start(list, fmt);
+  int result = __CPROVER_vsnprintf(str, size, fmt, list);
+  va_end(list);
+  return result;
+}
+
 #endif
 
-  size_t i = 0;
-  for(; i < size; ++i)
-  {
-    char c = __VERIFIER_nondet_char();
-    str[i] = c;
-    if(c == '\0')
-      break;
-  }
+/* FUNCTION: vsnprintf_l */
 
-  return i;
+#if defined(__APPLE__) || defined(__FreeBSD__)
+
+#  ifndef __CPROVER_STDIO_H_INCLUDED
+#    include <stdio.h>
+#    define __CPROVER_STDIO_H_INCLUDED
+#  endif
+
+#  ifndef __CPROVER_STDARG_H_INCLUDED
+#    include <stdarg.h>
+#    define __CPROVER_STDARG_H_INCLUDED
+#  endif
+
+#  ifndef __CPROVER_XLOCALE_H_INCLUDED
+#    include <xlocale.h>
+#    define __CPROVER_XLOCALE_H_INCLUDED
+#  endif
+
+#  undef vsnprintf_l
+
+int __CPROVER_vsnprintf(char *str, size_t size, const char *fmt, va_list ap);
+
+int vsnprintf_l(
+  char *str,
+  size_t size,
+  locale_t loc,
+  const char *fmt,
+  va_list ap)
+{
+__CPROVER_HIDE:;
+  (void)loc;
+  return __CPROVER_vsnprintf(str, size, fmt, ap);
 }
+
+#endif
 
 /* FUNCTION: __acrt_iob_func */
 
@@ -1999,8 +2372,11 @@ int __stdio_common_vfprintf(
 #    define __CPROVER_STDARG_H_INCLUDED
 #  endif
 
-char __VERIFIER_nondet_char(void);
+int __CPROVER_vsnprintf(char *str, size_t size, const char *fmt, va_list ap);
 
+// the Universal CRT's sprintf family: with
+// _CRT_INTERNAL_PRINTF_STANDARD_SNPRINTF_BEHAVIOR (bit 1 of options) as C's
+// vsnprintf; without it (_vsnprintf), a result that does not fit gives -1
 int __stdio_common_vsprintf(
   unsigned __int64 options,
   char *str,
@@ -2009,21 +2385,49 @@ int __stdio_common_vsprintf(
   _locale_t locale,
   va_list args)
 {
-  (void)options;
-  (void)*fmt;
+__CPROVER_HIDE:;
   (void)locale;
-  (void)args;
+  int result = __CPROVER_vsnprintf(str, size, fmt, args);
+  if((options & 2) == 0 && result >= 0 && (size_t)result >= size)
+    return -1;
+  return result;
+}
 
-  size_t i = 0;
-  for(; i < size; ++i)
-  {
-    char c = __VERIFIER_nondet_char();
-    str[i] = c;
-    if(c == '\0')
-      break;
-  }
+#endif
 
-  return i;
+/* FUNCTION: __stdio_common_vsprintf_s */
+
+#ifdef _WIN32
+
+#  ifndef __CPROVER_STDIO_H_INCLUDED
+#    include <stdio.h>
+#    define __CPROVER_STDIO_H_INCLUDED
+#  endif
+
+#  ifndef __CPROVER_STDARG_H_INCLUDED
+#    include <stdarg.h>
+#    define __CPROVER_STDARG_H_INCLUDED
+#  endif
+
+int __CPROVER_vsnprintf(char *str, size_t size, const char *fmt, va_list ap);
+
+// the Universal CRT's sprintf_s family (C23 K.3.5.3.6): the output must fit
+// the buffer, terminator included -- otherwise a runtime-constraint violation
+int __stdio_common_vsprintf_s(
+  unsigned __int64 options,
+  char *str,
+  size_t size,
+  char const *fmt,
+  _locale_t locale,
+  va_list args)
+{
+__CPROVER_HIDE:;
+  (void)options;
+  (void)locale;
+  int result = __CPROVER_vsnprintf(str, size, fmt, args);
+  __CPROVER_precondition(
+    result >= 0 && (size_t)result < size, "sprintf_s buffer too small");
+  return result;
 }
 
 #endif
