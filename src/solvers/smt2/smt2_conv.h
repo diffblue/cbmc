@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <map>
 #include <set>
 #include <sstream>
+#include <utility>
 
 #if !HASH_CODE
 #  include <util/irep_hash_container.h>
@@ -171,7 +172,18 @@ protected:
   exprt lower_byte_operators(const exprt &expr);
   void find_symbols(const exprt &expr);
   void find_symbols(const typet &type);
-  void find_symbols_rec(const typet &type, std::set<irep_idt> &recstack);
+  /// Pointer targets need type expressions (e.g. array sizes), but their
+  /// datatypes are only needed when a value of that type is converted.
+  enum class type_discoveryt
+  {
+    SORTS_AND_EXPRESSIONS,
+    EXPRESSIONS_ONLY
+  };
+  using type_visitsett = std::set<std::pair<irep_idt, type_discoveryt>>;
+  void find_symbols_rec(
+    const typet &type,
+    type_visitsett &visited,
+    type_discoveryt discovery);
 
   // letification
   letifyt letify;
