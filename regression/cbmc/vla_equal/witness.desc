@@ -1,0 +1,11 @@
+CORE broken-smt-backend no-new-smt
+witness.c
+--no-bounds-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Arrays whose elements are all equal must be equal, even when the size of the
+arrays is not a constant.

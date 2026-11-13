@@ -1,0 +1,11 @@
+CORE broken-smt-backend no-new-smt
+main.c
+--unwind 3
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+__CPROVER_equal and __CPROVER_array_equal compare variable-length arrays,
+whose types use different size symbols, by their size and their elements.
