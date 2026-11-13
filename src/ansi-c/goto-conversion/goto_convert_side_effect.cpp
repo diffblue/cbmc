@@ -651,12 +651,77 @@ goto_convertt::clean_expr_resultt goto_convertt::remove_overflow(
     // the is-there-an-overflow result may be used
     if(result_is_used)
     {
-      binary_overflow_exprt overflow_check{
-        typecast_exprt::conditional_cast(lhs, result.type()),
-        statement,
-        typecast_exprt::conditional_cast(rhs, result.type())};
-      overflow_check.add_source_location() = expr.source_location();
-      expr.swap(overflow_check);
+      // GCC documents that the operation is performed in infinite precision
+      // and the result is then checked against the result type.  When the
+      // operand types differ from the result type (e.g. signed char and
+      // unsigned char into unsigned int), casting the operands to the result
+      // type first can itself overflow and produce a wrong flag.  When all
+      // types already agree, the binary_overflow_exprt is correct and more
+      // efficient.
+      const typet &result_type = result.type();
+      if(lhs.type() == result_type && rhs.type() == result_type)
+      {
+        binary_overflow_exprt overflow_check{lhs, statement, rhs};
+        overflow_check.add_source_location() = expr.source_location();
+        expr.swap(overflow_check);
+      }
+      else
+      {
+        // Compute in a signed type wide enough to hold the exact
+        // mathematical result, then check whether it fits in result_type.
+        const std::size_t lhs_width = to_bitvector_type(lhs.type()).get_width();
+        const std::size_t rhs_width = to_bitvector_type(rhs.type()).get_width();
+        const std::size_t result_width =
+          to_bitvector_type(result_type).get_width();
+
+        std::size_t wide_width;
+        if(statement == ID_overflow_mult)
+          wide_width = lhs_width + rhs_width + 1;
+        else
+          wide_width = std::max(lhs_width, rhs_width) + 2;
+
+        // The wide type must also be wider than the result type so that
+        // the range check is non-trivial.
+        wide_width = std::max(wide_width, result_width + 1);
+        const signedbv_typet wide_type{wide_width};
+
+        const irep_idt arith_op = statement == ID_overflow_plus    ? ID_plus
+                                  : statement == ID_overflow_minus ? ID_minus
+                                                                   : ID_mult;
+
+        const exprt wide_result = binary_exprt{
+          typecast_exprt{lhs, wide_type},
+          arith_op,
+          typecast_exprt{rhs, wide_type},
+          wide_type};
+
+        // Overflow iff the wide result is outside the representable
+        // range of result_type.
+        exprt overflow;
+        if(result_type.id() == ID_signedbv)
+        {
+          // result_min <= wide_result <= result_max
+          const auto min_val = to_signedbv_type(result_type).smallest_expr();
+          const auto max_val = to_signedbv_type(result_type).largest_expr();
+          overflow = or_exprt{
+            binary_relation_exprt{
+              wide_result, ID_lt, typecast_exprt{min_val, wide_type}},
+            binary_relation_exprt{
+              wide_result, ID_gt, typecast_exprt{max_val, wide_type}}};
+        }
+        else
+        {
+          // 0 <= wide_result <= result_max  (unsigned)
+          const auto max_val = to_unsignedbv_type(result_type).largest_expr();
+          overflow = or_exprt{
+            binary_relation_exprt{
+              wide_result, ID_lt, from_integer(0, wide_type)},
+            binary_relation_exprt{
+              wide_result, ID_gt, typecast_exprt{max_val, wide_type}}};
+        }
+        overflow.add_source_location() = expr.source_location();
+        expr.swap(overflow);
+      }
     }
     else
       expr.make_nil();
@@ -669,40 +734,111 @@ goto_convertt::clean_expr_resultt goto_convertt::remove_overflow(
                                     : statement == ID_overflow_mult  ? ID_mult
                                                                      : ID_nil;
     CHECK_RETURN(arithmetic_operation != ID_nil);
-    exprt overflow_with_result = overflow_result_exprt{
-      typecast_exprt::conditional_cast(lhs, arith_type),
-      arithmetic_operation,
-      typecast_exprt::conditional_cast(rhs, arith_type)};
-    overflow_with_result.add_source_location() = expr.source_location();
 
-    if(result_is_used)
+    // When the operand types differ from the result type, we must compute
+    // in a wider signed type and then check the range (see GCC docs:
+    // the operation is performed in infinite precision).
+    const bool types_match =
+      lhs.type() == arith_type && rhs.type() == arith_type;
+
+    if(types_match)
     {
-      side_effects.add_temporary(make_temp_symbol(
-        overflow_with_result,
-        "overflow_result",
-        side_effects.side_effects,
-        mode));
-    }
+      exprt overflow_with_result =
+        overflow_result_exprt{lhs, arithmetic_operation, rhs};
+      overflow_with_result.add_source_location() = expr.source_location();
 
-    const struct_typet::componentst &result_comps =
-      to_struct_type(overflow_with_result.type()).components();
-    CHECK_RETURN(result_comps.size() == 2);
-    code_assignt result_assignment{
-      dereference_exprt{result},
-      typecast_exprt::conditional_cast(
-        member_exprt{overflow_with_result, result_comps[0]}, arith_type),
-      expr.source_location()};
-    convert_assign(result_assignment, side_effects.side_effects, mode);
+      if(result_is_used)
+      {
+        side_effects.add_temporary(make_temp_symbol(
+          overflow_with_result,
+          "overflow_result",
+          side_effects.side_effects,
+          mode));
+      }
 
-    if(result_is_used)
-    {
-      member_exprt overflow_check{overflow_with_result, result_comps[1]};
-      overflow_check.add_source_location() = expr.source_location();
+      const struct_typet::componentst &result_comps =
+        to_struct_type(overflow_with_result.type()).components();
+      CHECK_RETURN(result_comps.size() == 2);
+      code_assignt result_assignment{
+        dereference_exprt{result},
+        typecast_exprt::conditional_cast(
+          member_exprt{overflow_with_result, result_comps[0]}, arith_type),
+        expr.source_location()};
+      convert_assign(result_assignment, side_effects.side_effects, mode);
 
-      expr.swap(overflow_check);
+      if(result_is_used)
+      {
+        member_exprt overflow_check{overflow_with_result, result_comps[1]};
+        overflow_check.add_source_location() = expr.source_location();
+
+        expr.swap(overflow_check);
+      }
+      else
+        expr.make_nil();
     }
     else
-      expr.make_nil();
+    {
+      // Compute in a signed type wide enough for the exact result.
+      const std::size_t lhs_width = to_bitvector_type(lhs.type()).get_width();
+      const std::size_t rhs_width = to_bitvector_type(rhs.type()).get_width();
+      const std::size_t arith_width = to_bitvector_type(arith_type).get_width();
+
+      std::size_t wide_width;
+      if(arithmetic_operation == ID_mult)
+        wide_width = lhs_width + rhs_width + 1;
+      else
+        wide_width = std::max(lhs_width, rhs_width) + 2;
+
+      wide_width = std::max(wide_width, arith_width + 1);
+      const signedbv_typet wide_type{wide_width};
+
+      exprt wide_result = binary_exprt{
+        typecast_exprt{lhs, wide_type},
+        arithmetic_operation,
+        typecast_exprt{rhs, wide_type},
+        wide_type};
+      wide_result.add_source_location() = expr.source_location();
+
+      if(result_is_used)
+      {
+        side_effects.add_temporary(make_temp_symbol(
+          wide_result, "overflow_result", side_effects.side_effects, mode));
+      }
+
+      // Store the truncated result into *result.
+      code_assignt result_assignment{
+        dereference_exprt{result},
+        typecast_exprt{wide_result, arith_type},
+        expr.source_location()};
+      convert_assign(result_assignment, side_effects.side_effects, mode);
+
+      // Build the overflow flag: wide_result outside [min, max].
+      exprt overflow;
+      if(arith_type.id() == ID_signedbv)
+      {
+        const auto min_val = to_signedbv_type(arith_type).smallest_expr();
+        const auto max_val = to_signedbv_type(arith_type).largest_expr();
+        overflow = or_exprt{
+          binary_relation_exprt{
+            wide_result, ID_lt, typecast_exprt{min_val, wide_type}},
+          binary_relation_exprt{
+            wide_result, ID_gt, typecast_exprt{max_val, wide_type}}};
+      }
+      else
+      {
+        const auto max_val = to_unsignedbv_type(arith_type).largest_expr();
+        overflow = or_exprt{
+          binary_relation_exprt{wide_result, ID_lt, from_integer(0, wide_type)},
+          binary_relation_exprt{
+            wide_result, ID_gt, typecast_exprt{max_val, wide_type}}};
+      }
+      overflow.add_source_location() = expr.source_location();
+
+      if(result_is_used)
+        expr.swap(overflow);
+      else
+        expr.make_nil();
+    }
   }
 
   return side_effects;
