@@ -1,4 +1,4 @@
-CORE no-new-smt
+CORE
 main.c
 
 ^\[main.precondition_instance.1\] line .* memset destination region writeable: FAILURE$
