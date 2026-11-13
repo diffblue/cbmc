@@ -7,9 +7,11 @@ Author: Diffblue Ltd
 \*******************************************************************/
 
 #include <util/arith_tools.h>
+#include <util/bitvector_types.h>
 #include <util/c_types.h>
 #include <util/mathematical_types.h>
 #include <util/prefix.h>
+#include <util/std_expr.h>
 
 #include <analyses/constant_propagator.h>
 #include <ansi-c/goto-conversion/goto_convert_functions.h>
@@ -327,6 +329,98 @@ SCENARIO("constant_propagator", "[core][analyses][constant_propagator]")
 
           REQUIRE(c_bool_local == expected);
         }
+      }
+    }
+  }
+}
+
+SCENARIO(
+  "constant_propagator_rounding_mode",
+  "[core][analyses][constant_propagator]")
+{
+  GIVEN(
+    "A GOTO program with floating-point operations and rounding mode changes")
+  {
+    goto_modelt goto_model;
+    namespacet ns(goto_model.symbol_table);
+
+    // Create the program:
+    // __CPROVER_rounding_mode = 0;
+    // float f1 = 1.0f / 10.0f;
+    // __CPROVER_rounding_mode = 1;
+    // float f2 = 1.0f / 10.0f;
+
+    symbolt rounding_mode{"__CPROVER_rounding_mode", integer_typet(), ID_C};
+    symbolt local_f1{"f1", float_type(), ID_C};
+    symbolt local_f2{"f2", float_type(), ID_C};
+
+    code_blockt code(
+      {code_declt(local_f1.symbol_expr()),
+       code_declt(local_f2.symbol_expr()),
+       code_assignt(
+         rounding_mode.symbol_expr(), constant_exprt("0", integer_typet())),
+       code_assignt(
+         local_f1.symbol_expr(),
+         div_exprt(
+           constant_exprt("1", float_type()),
+           constant_exprt("10", float_type()))),
+       code_assignt(
+         rounding_mode.symbol_expr(), constant_exprt("1", integer_typet())),
+       code_assignt(
+         local_f2.symbol_expr(),
+         div_exprt(
+           constant_exprt("1", float_type()),
+           constant_exprt("10", float_type())))});
+
+    symbolt main_function_symbol{"main", code_typet({}, empty_typet()), ID_C};
+    main_function_symbol.value = code;
+
+    goto_model.symbol_table.add(rounding_mode);
+    goto_model.symbol_table.add(local_f1);
+    goto_model.symbol_table.add(local_f2);
+    goto_model.symbol_table.add(main_function_symbol);
+
+    goto_convert(goto_model, null_message_handler);
+
+    const goto_functiont &main_function = goto_model.get_goto_function("main");
+
+    // Find the instruction after the second rounding mode assignment
+    goto_programt::const_targett test_instruction =
+      main_function.body.instructions.begin();
+    int rounding_mode_assignments = 0;
+    while(test_instruction != main_function.body.instructions.end())
+    {
+      if(
+        test_instruction->is_assign() &&
+        test_instruction->assign_lhs() == rounding_mode.symbol_expr())
+      {
+        ++rounding_mode_assignments;
+        if(rounding_mode_assignments == 2)
+        {
+          ++test_instruction;
+          break;
+        }
+      }
+      ++test_instruction;
+    }
+
+    REQUIRE(test_instruction != main_function.body.instructions.end());
+
+    WHEN("We apply constant propagation")
+    {
+      constant_propagator_ait constant_propagator(main_function);
+      constant_propagator(main_function_symbol.name, main_function, ns);
+
+      THEN(
+        "The propagator should NOT have f1 as a constant, because "
+        "the rounding mode changed")
+      {
+        const auto &final_domain = constant_propagator[test_instruction];
+
+        // f1 should not be constant at this point because the rounding
+        // mode changed after it was computed
+        REQUIRE_FALSE(
+          final_domain.values.is_constant(local_f1.symbol_expr(), ns));
       }
     }
   }
