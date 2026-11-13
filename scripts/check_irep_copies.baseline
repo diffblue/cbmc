@@ -1,0 +1,22 @@
+# Baseline of known false positives for the irep-copies checker.
+#
+# scripts/run_irep_copies_check.sh scans the whole tree and fails on any
+# finding that is NOT listed here. Each entry below has been reviewed and is a
+# genuine false positive of the "copy-initialized but never modified" heuristic,
+# which cannot see that the copy is required for correctness.
+#
+# Lines are "<relative path>:<line>: warning: ...", matching the checker output
+# with the repository root stripped. Comment (#) and blank lines are ignored.
+# Regenerate by re-running the script and re-reviewing any new entries.
+#
+# cpp_typecheck_conversions.cpp:1783 / :2015 -- `exprt tmp(e)` is copied so that
+#   standard_conversion_lvalue_to_rvalue(tmp, e) can read `tmp` while writing
+#   its output parameter `e`; aliasing the two via `const exprt &` would break
+#   the conversion.
+src/cpp/cpp_typecheck_conversions.cpp:1783: warning: 'tmp' (type exprt) is copy-initialized but never modified; use const reference [cprover-unmodified-irep-copy]
+src/cpp/cpp_typecheck_conversions.cpp:2015: warning: 'tmp' (type exprt) is copy-initialized but never modified; use const reference [cprover-unmodified-irep-copy]
+#
+# disjunctive_polynomial_acceleration.cpp:244 -- `pre_guard` snapshots `guard`
+#   before the following loop mutates `guard`; a `const exprt &` alias would
+#   observe the mutated value instead of the intended pre-loop snapshot.
+src/goto-instrument/accelerate/disjunctive_polynomial_acceleration.cpp:244: warning: 'pre_guard' (type exprt) is copy-initialized but never modified; use const reference [cprover-unmodified-irep-copy]

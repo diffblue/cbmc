@@ -404,7 +404,7 @@ static void extract_bytes_of_expr(
   element = conditional_cast_floatbv_to_unsignedbv(element);
   if(element.type().id() == ID_unsignedbv || element.type().id() == ID_signedbv)
   {
-    exprt value = element;
+    const auto &value = element;
     if(is_union)
     {
       extract_bytes_of_bv(value, element.type(), field_type, values);
