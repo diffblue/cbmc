@@ -125,6 +125,25 @@ simplify_exprt::simplify_member(const member_exprt &expr)
       return op.operands()[number];
     }
   }
+  else if(
+    op.id() == ID_compound_literal &&
+    !has_subexpr(to_unary_expr(op).op(), ID_side_effect))
+  {
+    // member(compound_literal(v), .m) -> member(v, .m): read as an rvalue, a
+    // compound literal `(TYPE){ ... }` has the value of its initializer v, a
+    // struct/union/array expression.  Unwrap it and recurse so that the
+    // struct/union member-extraction rules above can fold the access.  This
+    // is needed for constant static initializers that nest a compound literal
+    // (e.g. the kernel's dynamic-debug _ddebug descriptor, whose .key field is
+    // initialised from the STATIC_KEY_FALSE_INIT compound literal).  Do not
+    // unwrap when v has side effects: those rules keep only the selected
+    // member and would discard the side effects of the other initializers.
+    DATA_INVARIANT(
+      op.operands().size() == 1, "ID_compound_literal has a single operand");
+    auto new_expr = expr;
+    new_expr.struct_op() = to_unary_expr(op).op();
+    return changed(simplify_member(new_expr));
+  }
   else if(op.id()==ID_byte_extract_little_endian ||
           op.id()==ID_byte_extract_big_endian)
   {

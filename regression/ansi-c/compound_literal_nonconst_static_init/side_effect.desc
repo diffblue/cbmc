@@ -1,0 +1,10 @@
+CORE
+side_effect.c
+
+^EXIT=(64|1)$
+^SIGNAL=0$
+error: expected constant expression
+--
+--
+A compound literal whose initializers have side effects is not a constant
+expression, even when the member read from it is a constant.
