@@ -20,6 +20,7 @@ DIRS = cbmc-shadow-memory \
        array-refinement-with-incr \
        goto-instrument-chc \
        goto-instrument-json \
+       goto-instrument-dump-c-symtab \
        goto-instrument-wmm-core \
        goto-instrument-typedef \
        goto-inspect \
