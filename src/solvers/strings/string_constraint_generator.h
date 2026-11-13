@@ -152,9 +152,6 @@ public:
   add_axioms_for_empty_string(const function_application_exprt &f);
 
   std::pair<exprt, string_constraintst>
-  add_axioms_for_copy(const function_application_exprt &f);
-
-  std::pair<exprt, string_constraintst>
   add_axioms_for_concat_code_point(const function_application_exprt &f);
   std::pair<exprt, string_constraintst> add_axioms_for_constant(
     const array_string_exprt &res,
