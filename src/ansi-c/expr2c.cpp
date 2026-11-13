@@ -3560,6 +3560,12 @@ std::string expr2ct::convert_sizeof(
 
 std::string expr2ct::convert_conditional_target_group(const exprt &src)
 {
+  if(src.operands().size() != 2)
+  {
+    unsigned p;
+    return convert_norep(src, p);
+  }
+
   std::string dest;
   unsigned p;
   const auto &cond = src.operands().front();
