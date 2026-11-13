@@ -55,6 +55,13 @@ void get_assigns_lhs(
 {
   assignst new_assigns;
 
+  // The targets built below from the may-alias information are new
+  // expressions. Give them the source location of the assignment they come
+  // from, as the instrumentation of the inferred write set relies on it.
+  const source_locationt &location = lhs.source_location().is_not_nil()
+                                       ? lhs.source_location()
+                                       : t->source_location();
+
   if(lhs.id() == ID_symbol || lhs.id() == ID_index)
   {
     // All variables `v` and their indexing expressions `v[idx]` are assigns.
@@ -98,6 +105,7 @@ void get_assigns_lhs(
             component_name,
             lhs.type());
         }
+        to_insert.add_source_location() = location;
         new_assigns.insert(to_insert);
       }
     }
@@ -119,6 +127,7 @@ void get_assigns_lhs(
         to_insert = dereference_exprt{typed_mod};
       else
         to_insert = dereference_exprt{plus_exprt{typed_mod, ptr.offset}};
+      to_insert.add_source_location() = location;
       new_assigns.insert(std::move(to_insert));
     }
   }

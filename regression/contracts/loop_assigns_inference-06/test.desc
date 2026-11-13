@@ -1,0 +1,10 @@
+CORE
+main.c
+--apply-loop-contracts _ --no-standard-checks
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Same as loop_assigns_inference-05 for a write through a plain pointer: the
+inferred target *(&s) of the inner loop must carry a source location.
