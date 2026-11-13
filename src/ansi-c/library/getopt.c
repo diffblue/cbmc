@@ -22,8 +22,16 @@ __CPROVER_HIDE:;
   if(optind >= argc)
     return -1;
   char *const arg = argv[optind];
-  if(arg[0] != '-' || arg[1] == '\0' || (arg[1] == '-' && arg[2] == '\0'))
+  if(arg[0] != '-' || arg[1] == '\0')
     return -1;
+
+  // POSIX: "If it encounters \"--\", getopt() shall return -1
+  // after incrementing optind."
+  if(arg[1] == '-' && arg[2] == '\0')
+  {
+    ++optind;
+    return -1;
+  }
 
   // test whether the option is in optstring at all
   size_t optstring_len = strlen(optstring);
@@ -35,7 +43,10 @@ __CPROVER_HIDE:;
     i<optstring_len ==> optstring[i] != arg[1]
   };
   if(not_found)
+  {
+    ++optind;
     return '?';
+  }
 #endif
 
   // option is in optstring, find the exact index
@@ -51,6 +62,8 @@ __CPROVER_HIDE:;
   // is an argument required?
   if(result_index + 1 == optstring_len || optstring[result_index + 1] != ':')
   {
+    // POSIX: optind points to the next argv element after processing.
+    ++optind;
     optarg = NULL;
     return arg[1];
   }
@@ -58,17 +71,21 @@ __CPROVER_HIDE:;
   // test whether a required argument can be found
   if(arg[2] != '\0')
   {
+    // Option-argument in the same element (e.g. -ofile).
+    ++optind;
     optarg = &arg[2];
     return arg[1];
   }
   else if(optind + 1 < argc)
   {
+    // Option-argument in the next element (e.g. -o file).
     optarg = argv[optind + 1];
-    ++optind;
+    optind += 2;
     return arg[1];
   }
   else
   {
+    ++optind;
     optarg = NULL;
     return optstring[0] == ':' ? ':' : '?';
   }
