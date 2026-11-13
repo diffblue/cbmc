@@ -32,6 +32,17 @@ add_test_pl_profile(
   "CORE"
 )
 
+# Run the whole suite with the 192-bit flat-address pointer encoding. Tests
+# whose output legitimately differs (or that are intractable) under this
+# encoding are tagged `no-wide-pointer-encoding`; thorough tests are excluded
+# as for the other solver variants.
+add_test_pl_profile(
+  "cbmc-wide-pointer-encoding"
+  "$<TARGET_FILE:cbmc> --wide-pointer-encoding"
+  "-C;-X;smt-backend;-X;no-wide-pointer-encoding;-X;thorough-paths;-X;thorough-smt-backend;-X;thorough-cprover-smt-backend;-X;thorough-z3-smt-backend;${gcc_only_string}-s;wide-pointer-encoding"
+  "CORE"
+)
+
 # solver appears on the PATH in Windows already
 if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
   set_property(

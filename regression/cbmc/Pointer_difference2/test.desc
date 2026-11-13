@@ -1,4 +1,4 @@
-CORE broken-smt-backend no-new-smt
+CORE broken-smt-backend no-new-smt no-wide-pointer-encoding
 main.c
 
 ^\[main.assertion.1\] line 6 correct: SUCCESS

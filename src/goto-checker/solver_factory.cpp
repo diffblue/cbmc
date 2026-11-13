@@ -12,6 +12,7 @@ Author: Daniel Kroening, Peter Schrammel
 #include "solver_factory.h"
 
 #include <util/cmdline.h>
+#include <util/config.h>
 #include <util/exception_utils.h>
 #include <util/exit_codes.h>
 #include <util/message.h>
@@ -361,6 +362,14 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
   auto bv_pointers = std::make_unique<bv_pointerst>(
     ns, *sat_solver, message_handler, get_array_constraints);
 
+  if(options.get_bool_option("wide-pointer-encoding"))
+  {
+    bv_pointers->set_wide_pointer_encoding(true);
+  }
+
+  if(options.get_bool_option("model-stack-layout"))
+    bv_pointers->model_stack_layout = true;
+
   if(options.get_option("arrays-uf") == "never")
     bv_pointers->unbounded_array = bv_pointerst::unbounded_arrayt::U_NONE;
   else if(options.get_option("arrays-uf") == "always")
@@ -431,8 +440,12 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_bv_refinement()
   info.refine_arithmetic = options.get_bool_option("refine-arithmetic");
   info.message_handler = &message_handler;
 
-  std::unique_ptr<boolbvt> decision_procedure =
-    std::make_unique<bv_refinementt>(info);
+  auto bv_refinement = std::make_unique<bv_refinementt>(info);
+  if(options.get_bool_option("wide-pointer-encoding"))
+  {
+    bv_refinement->set_wide_pointer_encoding(true);
+  }
+  std::unique_ptr<boolbvt> decision_procedure = std::move(bv_refinement);
   set_decision_procedure_time_limit(*decision_procedure);
   return std::make_unique<solvert>(
     std::move(decision_procedure), std::move(prop));
@@ -457,8 +470,12 @@ solver_factoryt::get_string_refinement()
   info.refine_arithmetic = options.get_bool_option("refine-arithmetic");
   info.message_handler = &message_handler;
 
-  std::unique_ptr<boolbvt> decision_procedure =
-    std::make_unique<string_refinementt>(info);
+  auto string_refinement = std::make_unique<string_refinementt>(info);
+  if(options.get_bool_option("wide-pointer-encoding"))
+  {
+    string_refinement->set_wide_pointer_encoding(true);
+  }
+  std::unique_ptr<boolbvt> decision_procedure = std::move(string_refinement);
   set_decision_procedure_time_limit(*decision_procedure);
   return std::make_unique<solvert>(
     std::move(decision_procedure), std::move(prop));
@@ -802,5 +819,26 @@ void parse_solver_options(const cmdlinet &cmdline, optionst &options)
   {
     options.set_option(
       "max-node-refinement", cmdline.get_value("max-node-refinement"));
+  }
+
+  if(cmdline.isset("wide-pointer-encoding"))
+  {
+    options.set_option("wide-pointer-encoding", true);
+    // Wide pointer encoding models address reuse after free, so dynamic
+    // objects may share an address. Set this here (during option processing,
+    // before symex) rather than in the solver factory, as the simplifier
+    // reads it during symex (see goto_symex_can_forward_propagate /
+    // simplify_expr_with_value_set).
+    config.bv_encoding.malloc_may_alias = true;
+  }
+  if(cmdline.isset("model-stack-layout"))
+  {
+    if(!cmdline.isset("wide-pointer-encoding"))
+    {
+      throw invalid_command_line_argument_exceptiont(
+        "--model-stack-layout requires --wide-pointer-encoding",
+        "--model-stack-layout");
+    }
+    options.set_option("model-stack-layout", true);
   }
 }

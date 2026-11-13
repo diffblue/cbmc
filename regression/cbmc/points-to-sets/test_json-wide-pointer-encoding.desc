@@ -1,0 +1,11 @@
+CORE wide-pointer-encoding
+main.c
+--wide-pointer-encoding --show-points-to-sets --json-ui --no-standard-checks
+activate-multi-line-match
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Wide pointer encoding: the address-based dereference dispatch adds
+extra entries to the Value field in the JSON output, changing the
+expected format.
