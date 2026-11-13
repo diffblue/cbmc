@@ -4,8 +4,11 @@ This document outlines the current release process in a summary form.
 
 ## Part I
 
-1. PR with version label change to `src/config.inc` and `src/libcprover-rust/Cargo.toml`.
-   To be merged after CI has run.
+1. PR with version label change to `src/config.inc` and `src/libcprover-rust/Cargo.toml`,
+   and release notes added to `CHANGELOG`. To be merged after CI has run.
+   * On the 14th and 28th of each month, `.github/workflows/release-timetabled.yaml`
+     creates such a PR proposing a new minor version, unless `develop` has not changed
+     since the latest release.
    * We update both with the same version after a decision had been made to keep both
      projects to the same version number. For more info on versioning, please take a look at
      `doc/ADR/release_process.md`
