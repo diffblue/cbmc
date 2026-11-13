@@ -1,0 +1,14 @@
+CORE
+main.cpp
+other.cpp
+^\[main\.assertion\.1\] .* values: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+conflicting types
+--
+An opaque-enum-declaration in one translation unit and the definition of
+the enumeration in another declare the same type ([dcl.enum]/3).  The
+linker reported the types of the objects and functions using it as
+different, or renamed the class types that contain a member of that type.

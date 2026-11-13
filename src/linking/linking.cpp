@@ -39,6 +39,25 @@ static const typet &follow_tags_symbols(
     return type;
 }
 
+/// N5008 [dcl.enum]/3: an opaque-enum-declaration (`enum E : int;`)
+/// redeclares the enumeration that another translation unit defines with
+/// its enumerator list; with the same underlying type the two are the same
+/// type, as an incomplete struct is the same type as its definition.  The
+/// declaration has no enumerator list (no body), unlike the definition of
+/// an enumeration without enumerators.
+/// \return true if \p declaration is such a declaration of \p definition
+static bool
+is_opaque_enum_declaration_of(const typet &declaration, const typet &definition)
+{
+  return declaration.id() == ID_c_enum && definition.id() == ID_c_enum &&
+         declaration.find(ID_body).is_nil() &&
+         definition.find(ID_body).is_not_nil() &&
+         !to_c_enum_type(declaration).is_incomplete() &&
+         !to_c_enum_type(definition).is_incomplete() &&
+         to_c_enum_type(declaration).underlying_type() ==
+           to_c_enum_type(definition).underlying_type();
+}
+
 irep_idt
 linkingt::rename(const symbol_table_baset &src_symbol_table, const irep_idt &id)
 {
@@ -791,6 +810,16 @@ void linkingt::duplicate_type_symbol(
     return;
   }
 
+  if(is_opaque_enum_declaration_of(old_symbol.type, new_symbol.type))
+  {
+    old_symbol.type = new_symbol.type;
+    old_symbol.location = new_symbol.location;
+    return;
+  }
+
+  if(is_opaque_enum_declaration_of(new_symbol.type, old_symbol.type))
+    return; // ok, keep old
+
   if(
     old_symbol.type.id() == ID_struct &&
     !to_struct_type(old_symbol.type).is_incomplete() &&
@@ -863,6 +892,13 @@ linkingt::renamingt linkingt::needs_renaming_type(
 
   if(old_symbol.type==new_symbol.type)
     return renamingt::NO_RENAMING;
+
+  if(
+    is_opaque_enum_declaration_of(old_symbol.type, new_symbol.type) ||
+    is_opaque_enum_declaration_of(new_symbol.type, old_symbol.type))
+  {
+    return renamingt::NO_RENAMING; // not different
+  }
 
   if(
     old_symbol.type.id() == ID_struct &&
