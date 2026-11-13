@@ -2,7 +2,7 @@
 
 int main()
 {
-  unsigned x;
+  unsigned x = __VERIFIER_nondet_unsigned();
   unsigned y = x;
   x /= 2;
   y /= 2;

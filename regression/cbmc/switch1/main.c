@@ -1,6 +1,6 @@
 int main()
 {
-  int i;
+  int i = __VERIFIER_nondet_int();
 
   switch(i)
   {

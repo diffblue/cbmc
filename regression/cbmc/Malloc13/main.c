@@ -1,7 +1,7 @@
 void *malloc(__CPROVER_size_t);
 
 int main(int argc, char* argv[]) {
-  unsigned short len;
+  unsigned short len = __VERIFIER_nondet_short();
   char * str;
   __CPROVER_assume(len > 0);
   str = malloc(len);

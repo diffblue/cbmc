@@ -8,10 +8,10 @@ int f(int);
 int a[1];
 
 int main() {
-	int x, y;
+  int x, y = __VERIFIER_nondet_int();
 
-	a[0] = y;
-	a[0] = f(a[0]);
+  a[0] = y;
+  a[0] = f(a[0]);
 
-	assert(a[0] == y+1);
+  assert(a[0] == y + 1);
 }

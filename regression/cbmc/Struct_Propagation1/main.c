@@ -24,7 +24,7 @@ int main()
 
   __CPROVER_assert(works.inner.x == 0, "");
 
-  _Bool b;
+  _Bool b = __VERIFIER_nondet__Bool();
   if(b)
   {
     struct S s = {42, {42}};

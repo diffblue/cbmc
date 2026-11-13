@@ -9,7 +9,7 @@ struct str
 
 int main (void)
 {
-  int q;
+  int q = __VERIFIER_nondet_int();
   struct str s;
 
   s.x = q;

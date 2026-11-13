@@ -1,8 +1,8 @@
 int main()
 {
-  float f;
+  float f = __VERIFIER_nondet_float();
   double d;
-  unsigned char x;
+  unsigned char x = __VERIFIER_nondet_char();
 
   d=f;
 

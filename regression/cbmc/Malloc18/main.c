@@ -1,6 +1,6 @@
 unsigned char* init()
 {
-  unsigned long buffer_size;
+  unsigned long buffer_size = __VERIFIER_nondet_long();
   if(buffer_size!=1) return 0;
 
   unsigned char* buffer=__CPROVER_allocate(buffer_size, 0);

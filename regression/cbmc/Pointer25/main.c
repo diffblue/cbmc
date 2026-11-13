@@ -1,6 +1,6 @@
 int main()
 {
-  int x;
+  int x = __VERIFIER_nondet_int();
   void *p;
 
   // from integer 0 to NULL

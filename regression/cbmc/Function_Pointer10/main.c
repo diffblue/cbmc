@@ -4,7 +4,7 @@ void fun(int a)
 
 int test1()
 {
-  char i;
+  char i = __VERIFIER_nondet_char();
   void (*fp)()=fun;
   // this requires a type conversion for i
   fp(i);

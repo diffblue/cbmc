@@ -4,7 +4,7 @@
 
 int main()
 {
-  double d;
+  double d = __VERIFIER_nondet_double();
 
 #ifndef _MSC_VER
 

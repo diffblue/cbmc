@@ -2,7 +2,7 @@ int mem[__CPROVER_constant_infinity_uint];
 
 int main()
 {
-  int i, j, mem_j;
+  int i = __VERIFIER_nondet_int(), j = __VERIFIER_nondet_int(), mem_j;
 
   mem[0] = 0;
   mem[1] = 1;

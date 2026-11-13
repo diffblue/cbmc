@@ -13,7 +13,7 @@ int main()
 
   assert(p1 != p2);
 
-  _Bool nondet;
+  _Bool nondet = __VERIFIER_nondet__Bool();
   // In the current implementation, CBMC always produces "false" for a
   // comparison over different objects. This could change at any time, which
   // would require updating this test.

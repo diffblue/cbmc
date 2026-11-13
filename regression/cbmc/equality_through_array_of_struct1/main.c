@@ -13,7 +13,7 @@ struct str a[SIZE];
 
 int main (void)
 {
-  int q;
+  int q = __VERIFIER_nondet_int();
 
   a[0].x = q;
   a[1].y = a[0].x;

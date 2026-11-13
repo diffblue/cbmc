@@ -3,7 +3,7 @@
 
 int main(void)
 {
-  int src[8], dst[8], delta;
+  int src[8], dst[8], delta = __VERIFIER_nondet_int();
   if(delta == 3 || delta == 4)
   {
     memcpy(dst, src, sizeof(int) * delta);

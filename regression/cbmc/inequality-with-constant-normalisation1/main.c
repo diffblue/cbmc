@@ -2,7 +2,7 @@
 
 int main()
 {
-  _Bool b1, b2;
+  _Bool b1 = __VERIFIER_nondet__Bool(), b2 = __VERIFIER_nondet__Bool();
 
   int nc = (b1 ? 1 : 2) == (b2 ? 1 : 2);
   assert(b1 != b2 || nc != 0);

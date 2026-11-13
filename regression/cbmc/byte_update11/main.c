@@ -5,7 +5,7 @@ struct S
 
 int main()
 {
-  int x;
+  int x = __VERIFIER_nondet_int();
   __CPROVER_assume(x >= 0);
   __CPROVER_assume(x % sizeof(int) == 0);
   struct S A[x];

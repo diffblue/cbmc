@@ -3,7 +3,7 @@ __CPROVER_bool __CPROVER_uninterpreted_g(int, int);
 
 main()
 {
-  int a, b;
+  int a = __VERIFIER_nondet_int(), b = __VERIFIER_nondet_int();
 
   int inst1 = __CPROVER_uninterpreted_f(1, a);
   int inst2 = __CPROVER_uninterpreted_f(1, b);

@@ -1,6 +1,6 @@
 int main()
 {
-  double a, b;
+  double a = __VERIFIER_nondet_double(), b = __VERIFIER_nondet_double();
 
   union {
     double f;

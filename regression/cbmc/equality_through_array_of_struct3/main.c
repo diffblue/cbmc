@@ -23,7 +23,7 @@ void pass_through_array_of_struct (int q)
 
 int main (void)
 {
-  int q;
+  int q = __VERIFIER_nondet_int();
 
   pass_through_array_of_struct(q);
 

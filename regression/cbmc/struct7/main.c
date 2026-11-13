@@ -16,7 +16,7 @@ void f(int *p)
 
 int main()
 {
-  int ind, x;
+  int ind, x = __VERIFIER_nondet_int();
   ind=x;
   int *p=&s.array[ind];
 

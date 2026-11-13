@@ -5,7 +5,7 @@ int foo(int x)
 
 int main()
 {
-  int m, n;
+  int m, n = __VERIFIER_nondet_int();
 
 #pragma CPROVER check push
 #pragma CPROVER check enable "signed-overflow"

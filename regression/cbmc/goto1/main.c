@@ -1,6 +1,6 @@
 int main()
 {
-  int i, j;
+  int i = __VERIFIER_nondet_int(), j = __VERIFIER_nondet_int();
 
   if(i)
     goto l;

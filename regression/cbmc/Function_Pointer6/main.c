@@ -18,7 +18,7 @@ int main(void)
 {
   int (*ppp)();
   struct S * ps = (struct S *) malloc(sizeof(struct S));
-  int x, y;
+  int x = __VERIFIER_nondet_int(), y;
 
   ps->func = x?ten:twenty;
 

@@ -15,7 +15,7 @@ int pass_through_array (int x)
 }
 
 int main (void) {
-  int x;
+  int x = __VERIFIER_nondet_int();
 
   assert(x == pass_through_array(x));
 
