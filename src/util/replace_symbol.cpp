@@ -71,47 +71,25 @@ bool replace_symbolt::replace(exprt &dest) const
     if(!replace(dest.type()))
       result=false;
 
-  // now do expression itself
-
-  if(!have_to_replace(dest))
-    return result;
-
-  if(dest.id()==ID_member)
+  // Handle expression replacement directly (no have_to_replace pre-check)
+  if(dest.id() == ID_symbol)
   {
-    member_exprt &me=to_member_expr(dest);
-
-    if(!replace(me.struct_op()))
-      result=false;
-  }
-  else if(dest.id()==ID_index)
-  {
-    index_exprt &ie=to_index_expr(dest);
-
-    if(!replace(ie.array()))
-      result=false;
-
-    if(!replace(ie.index()))
-      result=false;
-  }
-  else if(dest.id()==ID_address_of)
-  {
-    address_of_exprt &aoe=to_address_of_expr(dest);
-
-    if(!replace(aoe.object()))
-      result=false;
-  }
-  else if(dest.id()==ID_symbol)
-  {
-    if(!replace_symbol_expr(to_symbol_expr(dest)))
+    if(
+      bindings.find(to_symbol_expr(dest).get_identifier()) == bindings.end() &&
+      !replace_symbol_expr(to_symbol_expr(dest)))
+    {
       return false;
+    }
   }
   else if(dest.id() == ID_let)
   {
+    if(!have_to_replace(dest))
+      return result;
     auto &let_expr = to_let_expr(dest);
 
     // first replace the assigned value expressions
     for(auto &op : let_expr.values())
-      if(replace(op))
+      if(!replace(op))
         result = false;
 
     // now set up the binding
@@ -129,6 +107,8 @@ bool replace_symbolt::replace(exprt &dest) const
     dest.id() == ID_array_comprehension || dest.id() == ID_exists ||
     dest.id() == ID_forall || dest.id() == ID_lambda)
   {
+    if(!have_to_replace(dest))
+      return result;
     auto &binding_expr = to_binding_expr(dest);
 
     auto old_bindings = bindings;
@@ -140,7 +120,7 @@ bool replace_symbolt::replace(exprt &dest) const
 
     bindings = std::move(old_bindings);
   }
-  else
+  else if(have_to_replace(dest))
   {
     Forall_operands(it, dest)
       if(!replace(*it))
@@ -363,8 +343,6 @@ bool address_of_aware_replace_symbolt::replace(exprt &dest) const
     if(!unchecked_replace_symbolt::replace(dest.type()))
       result = false;
   }
-
-  // now do expression itself
 
   if(!have_to_replace(dest))
     return result;
