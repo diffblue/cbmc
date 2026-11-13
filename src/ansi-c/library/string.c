@@ -17,13 +17,19 @@ __CPROVER_HIDE:;
   __CPROVER_is_zero_string(dst) = 1;
   __CPROVER_zero_string_length(dst) = __CPROVER_zero_string_length(src);
 #else
-  __CPROVER_precondition(
-    __CPROVER_POINTER_OBJECT(dst) != __CPROVER_POINTER_OBJECT(src),
-    "strcpy src/dst overlap");
   __CPROVER_size_t i = 0;
   char ch;
   do
   {
+    // C17 7.24.2.3: the behaviour is undefined if the objects overlap, i.e.,
+    // if any of the bytes [src, src + i] and [dst, dst + i] coincide. Checking
+    // this in each iteration avoids computing the length of src upfront.
+    __CPROVER_precondition(
+      __CPROVER_POINTER_OBJECT(dst) != __CPROVER_POINTER_OBJECT(src) ||
+        ((const char *)dst > src
+           ? (__CPROVER_size_t)((const char *)dst - src)
+           : (__CPROVER_size_t)(src - (const char *)dst)) > i,
+      "strcpy src/dst overlap");
     ch = src[i];
     dst[i] = ch;
     i++;
@@ -58,9 +64,6 @@ __CPROVER_HIDE:;
   __CPROVER_is_zero_string(dst) = 1;
   __CPROVER_zero_string_length(dst) = new_size;
 #else
-  __CPROVER_precondition(
-    __CPROVER_POINTER_OBJECT(dst) != __CPROVER_POINTER_OBJECT(src),
-    "strcat src/dst overlap");
   __CPROVER_size_t i = 0;
   while(dst[i] != 0)
     i++;
@@ -69,6 +72,14 @@ __CPROVER_HIDE:;
   char ch = 1;
   for(; i < s && ch != (char)0; ++i, ++j)
   {
+    // C17 7.24.3.1: the behaviour is undefined if the objects overlap, i.e.,
+    // if any of the bytes [src, src + j] and [dst, dst + i] coincide.
+    __CPROVER_precondition(
+      __CPROVER_POINTER_OBJECT(dst) != __CPROVER_POINTER_OBJECT(src) ||
+        ((const char *)dst > src
+           ? (__CPROVER_size_t)((const char *)dst - src) > j
+           : (__CPROVER_size_t)(src - (const char *)dst) > i),
+      "strcat src/dst overlap");
     ch = src[j];
     dst[i] = ch;
   }
@@ -149,13 +160,19 @@ __CPROVER_HIDE:;
   __CPROVER_is_zero_string(dst) = 1;
   __CPROVER_zero_string_length(dst) = __CPROVER_zero_string_length(src);
 #else
-  __CPROVER_precondition(
-    __CPROVER_POINTER_OBJECT(dst) != __CPROVER_POINTER_OBJECT(src),
-    "strcpy src/dst overlap");
   __CPROVER_size_t i = 0;
   char ch;
   do
   {
+    // C17 7.24.2.3: the behaviour is undefined if the objects overlap, i.e.,
+    // if any of the bytes [src, src + i] and [dst, dst + i] coincide. Checking
+    // this in each iteration avoids computing the length of src upfront.
+    __CPROVER_precondition(
+      __CPROVER_POINTER_OBJECT(dst) != __CPROVER_POINTER_OBJECT(src) ||
+        ((const char *)dst > src
+           ? (__CPROVER_size_t)((const char *)dst - src)
+           : (__CPROVER_size_t)(src - (const char *)dst)) > i,
+      "strcpy src/dst overlap");
     ch = src[i];
     dst[i] = ch;
     i++;
@@ -278,9 +295,6 @@ __CPROVER_HIDE:;
   __CPROVER_is_zero_string(dst)=1;
   __CPROVER_zero_string_length(dst)=new_size;
 #else
-  __CPROVER_precondition(
-    __CPROVER_POINTER_OBJECT(dst) != __CPROVER_POINTER_OBJECT(src),
-    "strcat src/dst overlap");
   __CPROVER_size_t i = 0;
   while(dst[i] != 0)
     i++;
@@ -289,6 +303,14 @@ __CPROVER_HIDE:;
   char ch = 1;
   for(; ch != (char)0; ++i, ++j)
   {
+    // C17 7.24.3.1: the behaviour is undefined if the objects overlap, i.e.,
+    // if any of the bytes [src, src + j] and [dst, dst + i] coincide.
+    __CPROVER_precondition(
+      __CPROVER_POINTER_OBJECT(dst) != __CPROVER_POINTER_OBJECT(src) ||
+        ((const char *)dst > src
+           ? (__CPROVER_size_t)((const char *)dst - src) > j
+           : (__CPROVER_size_t)(src - (const char *)dst) > i),
+      "strcat src/dst overlap");
     ch = src[j];
     dst[i] = ch;
   }
