@@ -1,0 +1,8 @@
+CORE
+main.c
+--chain chain.sh
+^EXIT=0$
+^SIGNAL=0$
+^[0-9]+$
+^[0-9]+$
+^[0-9]+$

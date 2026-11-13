@@ -1,0 +1,10 @@
+CORE
+test_modified.c
+--show-loops
+^EXIT=0$
+^SIGNAL=0$
+^Loop main\.[0-9]+: \(hash main\.hash_[0-9]+\)$
+--
+^warning: ignoring
+--
+Loops should have hash-based identifiers even with pseudo-loops present.
