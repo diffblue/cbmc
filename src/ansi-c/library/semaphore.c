@@ -60,6 +60,13 @@ int sem_timedwait(sem_t *sem, const struct timespec *abstime)
 
 #include <semaphore.h>
 
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+int __VERIFIER_nondet_int(void);
+
 int sem_trywait(sem_t *sem)
 {
   __CPROVER_HIDE:;
@@ -72,6 +79,15 @@ int sem_trywait(sem_t *sem)
                    "semaphore must not be destroyed");
   #endif
 
+  // POSIX.1-2017 sem_trywait(): the call may succeed (return 0) or fail
+  // with EAGAIN (return -1, errno=EAGAIN) when the semaphore is already
+  // locked.  Nondeterministic choice is a sound over-approximation.
+  int result = __VERIFIER_nondet_int();
+  if(result)
+  {
+    errno = EAGAIN;
+    return -1;
+  }
   return 0;
 }
 
