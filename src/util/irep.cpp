@@ -300,6 +300,14 @@ bool irept::ordering(const irept &other) const
 /// comments are ignored
 int irept::compare(const irept &i) const
 {
+  // Fast path: instances sharing the same node are equal (comments are part
+  // of that node and ignored by compare anyway), so skip the recursive walk.
+  // This also short-cuts shared sub-trees of otherwise distinct keys.
+#ifdef SHARING
+  if(data == i.data)
+    return 0;
+#endif
+
   int r;
 
   r=id().compare(i.id());
