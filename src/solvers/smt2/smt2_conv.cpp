@@ -5574,7 +5574,16 @@ void smt2_convt::set_to(const exprt &expr, bool value)
         CHECK_RETURN(id_entry.second);
 
         find_symbols(id_entry.first->second.type);
-        exprt prepared_rhs = prepare_for_convert_expr(equal_expr.rhs());
+        // With Z3, prepare_for_convert_expr replaces each quantifier by a
+        // Boolean variable, except for a quantifier at the top level (see
+        // there). Z3's solve_eqs would eliminate a symbol defined by such a
+        // quantifier just like any other (see convert(const exprt &)), so
+        // define the symbol via a Boolean variable for the quantifier.
+        const bool rhs_is_quantifier = equal_expr.rhs().id() == ID_forall ||
+                                       equal_expr.rhs().id() == ID_exists;
+        exprt prepared_rhs = solver == solvert::Z3 && rhs_is_quantifier
+                               ? literal_exprt{convert(equal_expr.rhs())}
+                               : prepare_for_convert_expr(equal_expr.rhs());
 
         std::string smt2_identifier=convert_identifier(identifier);
         smt2_identifiers.insert(smt2_identifier);
@@ -5750,7 +5759,7 @@ exprt smt2_convt::prepare_for_convert_expr(const exprt &expr)
   // With Z3, quantifiers that are not nested within another quantifier are
   // replaced by a Boolean variable (see below), unless the expression itself
   // is a quantifier, which is the case when we are asked to define such a
-  // variable.
+  // variable (set_to separately handles a symbol defined by a quantifier).
   const bool lift_quantifiers = solver == solvert::Z3 &&
                                 lowered_expr.id() != ID_forall &&
                                 lowered_expr.id() != ID_exists;

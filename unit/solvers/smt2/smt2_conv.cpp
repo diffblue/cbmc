@@ -1014,6 +1014,49 @@ TEST_CASE("smt2_convt quantifier definition encoding", "[core][solvers][smt2]")
   }
 }
 
+TEST_CASE("smt2_convt symbol defined by a quantifier", "[core][solvers][smt2]")
+{
+  // A symbol defined by a quantifier via set_to is subject to the same
+  // solve_eqs elimination on Z3 as a Boolean handle, see above.
+  const unsignedbv_typet bv8{8};
+  const symbol_exprt i{"i", bv8};
+  const exists_exprt quantified{i, equal_exprt{i, from_integer(0, bv8)}};
+  const std::string quant = "(exists ((i (_ BitVec 8))) (= i (_ bv0 8)))";
+  const symbol_exprt b{"b", bool_typet{}};
+
+  GIVEN("a Boolean symbol defined by a quantifier and the Z3 solver")
+  {
+    const std::string out = smt2_output(
+      smt2_convt::solvert::Z3,
+      [&](smt2_convt &conv) { conv.set_to_true(equal_exprt{b, quantified}); });
+    INFO("SMT2 output:\n" << out);
+
+    THEN("the symbol is defined via a Boolean variable for the quantifier")
+    {
+      REQUIRE(
+        out.find(
+          "(assert (let ((?def " + quant +
+          ")) (and (=> B0 ?def) (=> ?def B0))))") != std::string::npos);
+      REQUIRE(out.find("(assert (= b B0))") != std::string::npos);
+      REQUIRE(out.find(quant) == out.rfind(quant));
+    }
+  }
+
+  GIVEN("a Boolean symbol defined by a quantifier and a generic solver")
+  {
+    const std::string out = smt2_output(
+      smt2_convt::solvert::GENERIC,
+      [&](smt2_convt &conv) { conv.set_to_true(equal_exprt{b, quantified}); });
+    INFO("SMT2 output:\n" << out);
+
+    THEN("the symbol is defined by the quantifier")
+    {
+      REQUIRE(
+        out.find("(define-fun b () Bool " + quant + ")") != std::string::npos);
+    }
+  }
+}
+
 TEST_CASE(
   "smt2_convt quantifier nested in another expression",
   "[core][solvers][smt2]")
