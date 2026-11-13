@@ -116,8 +116,7 @@ public:
     const exprt &rhs, // L2
     const namespacet &ns,
     bool rhs_is_simplified,
-    bool record_value,
-    bool allow_pointer_unsoundness = false);
+    bool record_value);
 
   field_sensitivityt field_sensitivity;
 

@@ -217,8 +217,7 @@ void symex_assignt::assign_non_struct_symbol(
                                assignment.rhs,
                                ns,
                                symex_config.simplify_opt,
-                               symex_config.constant_propagation,
-                               symex_config.allow_pointer_unsoundness)
+                               symex_config.constant_propagation)
                              .get();
 
   state.record_events.push(false);
@@ -254,12 +253,7 @@ void symex_assignt::assign_non_struct_symbol(
   {
     // Split composite symbol lhs into its components
     state.field_sensitivity.field_assignments(
-      ns,
-      state,
-      l1_lhs,
-      assignment.rhs,
-      target,
-      symex_config.allow_pointer_unsoundness);
+      ns, state, l1_lhs, assignment.rhs, target);
   }
 }
 
