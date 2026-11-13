@@ -47,6 +47,10 @@ TEST_CASE("Visiting smt_bool_sortt.", "[core][smt2_incremental]")
     {
       array_visited = true;
     }
+
+    void visit(const smt_int_sortt &) override
+    {
+    }
   } visitor;
   smt_bool_sortt{}.accept(visitor);
   REQUIRE(visitor.bool_visited);
@@ -78,6 +82,10 @@ TEST_CASE("Visiting smt_bit_vec_sortt.", "[core][smt2_incremental]")
     {
       array_visited = true;
     }
+
+    void visit(const smt_int_sortt &) override
+    {
+    }
   } visitor;
   smt_bit_vector_sortt{8}.accept(visitor);
   REQUIRE_FALSE(visitor.bool_visited);
@@ -107,6 +115,10 @@ TEST_CASE("Visiting smt_array_sort.", "[core][smt2_incremental]")
     void visit(const smt_array_sortt &) override
     {
       array_visited = true;
+    }
+
+    void visit(const smt_int_sortt &) override
+    {
     }
   } visitor, visitor_second;
 
