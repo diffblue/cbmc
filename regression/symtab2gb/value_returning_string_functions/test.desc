@@ -1,0 +1,17 @@
+CORE
+main.json_symtab
+_ --function main --program-only
+^EXIT=0$
+^SIGNAL=0$
+^\(\d+\) r!0@1#\d+ == cprover_string_concat_func\("ab", "cd"\)$
+^\(\d+\) r2!0@1#\d+ == cprover_string_substring_func\("ab", 0, 1\)$
+^\(\d+\) r3!0@1#\d+ == cprover_string_replace_func\("ab", "a", "x"\)$
+--
+^Invariant check failed
+_M_range_check
+--
+Value-returning (SMT-LIB-convention) applications of the string built-ins
+have a String-typed result and no (length, content) output arguments. Symex's
+string constant propagation must leave them alone rather than fail a
+precondition of the refined-string convention. --program-only keeps this test
+independent of the availability of an SMT solver.

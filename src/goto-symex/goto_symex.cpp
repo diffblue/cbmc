@@ -209,6 +209,15 @@ bool goto_symext::constant_propagate_assignment_with_side_effects(
 
     if(f_l1.function().id() == ID_symbol)
     {
+      // The handlers below assume the refined-string convention: the first
+      // two arguments are the output length and char array, and the
+      // application returns a bit-vector status code. Applications returning
+      // a String (the SMT-LIB-native form that smt2_convt::convert_expr
+      // lowers to the theory of strings) have no output arguments, so there
+      // are no side effects to propagate.
+      if(f_l1.type().id() == ID_string)
+        return false;
+
       const irep_idt &func_id = to_symbol_expr(f_l1.function()).identifier();
 
       if(func_id == ID_cprover_string_concat_func)
