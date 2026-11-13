@@ -1,4 +1,4 @@
-CORE no-new-smt
+CORE
 main.c
 --big-endian
 ^\[main.bit_count.\d+\] line 46 count trailing zeros is undefined for value zero in __builtin_ctz\(0u\): FAILURE$
