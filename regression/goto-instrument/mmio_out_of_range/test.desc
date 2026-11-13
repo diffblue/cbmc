@@ -1,0 +1,10 @@
+CORE
+main.c
+--mmio --mmio-region 0x1000:256 --no-pointer-check --no-bounds-check
+^EXIT=10$
+^SIGNAL=0$
+MMIO write address must be within a declared region: FAILURE
+MMIO read address must be within a declared region: FAILURE
+^VERIFICATION FAILED$
+--
+^warning: ignoring

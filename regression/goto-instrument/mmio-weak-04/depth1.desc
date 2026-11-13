@@ -1,0 +1,14 @@
+CORE
+test.c
+--nondet-volatile-write-model A:observe_A --nondet-volatile-write-model B:observe_B --mmio-weak --mmio-weak-depth 1
+^EXIT=10$
+^SIGNAL=0$
+MMIO write burst exceeds the modelled reorder depth
+^VERIFICATION FAILED$
+--
+--
+With a depth-1 buffer the two writes to A form a burst longer than the buffer,
+which the bounded model cannot represent. Rather than silently
+under-approximating (and missing the reordering bug that --mmio-weak-depth 2
+exposes, see test.desc), the model reports "MMIO write burst exceeds the
+modelled reorder depth" and tells the user to increase the depth.

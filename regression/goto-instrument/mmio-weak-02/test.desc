@@ -1,0 +1,13 @@
+CORE
+test.c
+--nondet-volatile-write-model data:observe_data --nondet-volatile-write-model cmd:observe_cmd --mmio-weak
+^EXIT=0$
+^SIGNAL=0$
+data committed before GO: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Weak device memory (--mmio-weak) with a full barrier between the two register
+writes: the barrier flushes the posted write to the data register before the
+command is observed, so the ordering assertion holds. Compare mmio-weak-01,
+where the same model without the barrier fails.

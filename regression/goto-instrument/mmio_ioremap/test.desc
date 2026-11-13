@@ -1,0 +1,14 @@
+CORE
+main.c
+--mmio-ioremap _ --no-pointer-check --no-bounds-check
+^EXIT=0$
+^SIGNAL=0$
+Derived MMIO region from ioremap: 0x1000 size 256
+value read back from strong region: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+The device-memory type is derived automatically from the ioremap variant, with
+no region declaration or command-line type: ioremap maps strongly-ordered
+memory, so the region is modelled precisely and the value read back round-trips.
+Compare wc.desc.
