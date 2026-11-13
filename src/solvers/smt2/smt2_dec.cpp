@@ -33,6 +33,19 @@ std::string smt2_dect::decision_procedure_text() const
   // clang-format on
 }
 
+void smt2_dect::set_time_limit_milliseconds(uint32_t lim)
+{
+  time_limit_milliseconds = lim;
+
+  if(lim != 0 && solver != solvert::Z3 && solver != solvert::CVC5)
+  {
+    messaget{message_handler}.warning()
+      << "solver time limit is not supported by this SMT2 solver and will be "
+         "ignored"
+      << messaget::eom;
+  }
+}
+
 decision_proceduret::resultt smt2_dect::dec_solve(const exprt &assumption)
 {
   ++number_of_solver_calls;
@@ -130,6 +143,20 @@ decision_proceduret::resultt smt2_dect::dec_solve(const exprt &assumption)
     PRECONDITION(!solver_binary_or_empty.empty());
     argv = {solver_binary_or_empty, temp_file_problem()};
     break;
+  }
+
+  if(time_limit_milliseconds != 0)
+  {
+    if(solver == solvert::Z3)
+    {
+      // z3: soft per-query timeout in milliseconds.
+      argv.push_back("-t:" + std::to_string(time_limit_milliseconds));
+    }
+    else if(solver == solvert::CVC5)
+    {
+      // cvc5: per-query time limit in milliseconds.
+      argv.push_back("--tlimit-per=" + std::to_string(time_limit_milliseconds));
+    }
   }
 
   int res =
