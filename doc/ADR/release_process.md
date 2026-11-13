@@ -10,23 +10,18 @@
 The current process we follow through to make a new release is the following:
 
 1. At the point in time we want to make the release, we make a change to
-   two files: `src/config.inc`, wherein we update the configuration variable
-   `CBMC_VERSION`, and `src/libcprover-rust/Cargo.toml`, wherein we update
+   three files: `src/config.inc`, wherein we update the configuration variable
+   `CBMC_VERSION`, src/libcprover-rust/Cargo.toml`, wherein we update
    the `version` variable to be the same as `CBMC_VERSION` (e.g. set both
-   to `5.80.0`).
+   to `5.80.0`), and CHANGELOG.
 
-   This is important as it informs the various tools of the current version
-   of CBMC.
+   This is important as it informs the various tools of the current version of
+   CBMC. These changes need to be pushed as a PR. Once that PR is merged into
+   `develop`, a Git tag of the form `cbmc-<version>` (where `<version>` is the
+   value of `CBMC_VERSION`) is automatically created. This tag then triggers
+   further automatic steps, see below.
 
-   (This needs to be pushed as a PR, and after it gets merged we move on to:)
-
-2. Then we make a `git tag` out of that commit, and push it to github. The
-   tag needs to be of the form `cbmc-<version>` with version being a version
-   number of the form of `x.y.z`, with `x` denoting the major version, `y`
-   denoting the minor version, and `z` identifying the patch version (useful
-   for a hotfix or patch.)
-
-3. Pushing the Rust crate, which is documented [here](https://doc.rust-lang.org/cargo/commands/cargo-publish.html)
+2. Pushing the Rust crate, which is documented [here](https://doc.rust-lang.org/cargo/commands/cargo-publish.html)
    but effectively entails logging in with an API token generated from
    https://crates.io with `cargo login`, and then issuing `cargo publish`.
 
