@@ -1,0 +1,10 @@
+CORE smt-backend broken-cprover-smt-backend no-new-smt
+constant.c
+--z3 --no-simplify
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+A negative integer constant converted to a bit-vector is emitted modulo 2^width.
