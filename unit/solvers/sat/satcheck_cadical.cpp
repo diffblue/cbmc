@@ -11,11 +11,13 @@ Author: Peter Schrammel, Michael Tautschnig
 
 #ifdef HAVE_CADICAL
 
-#  include <testing-utils/use_catch.h>
+#  include <util/cout_message.h>
 
 #  include <solvers/prop/literal.h>
 #  include <solvers/sat/satcheck_cadical.h>
-#  include <util/cout_message.h>
+#  include <testing-utils/use_catch.h>
+
+#  include "sat_time_limit_test.h"
 
 SCENARIO("satcheck_cadical", "[core][solvers][sat][satcheck_cadical]")
 {
@@ -79,6 +81,16 @@ SCENARIO("satcheck_cadical", "[core][solvers][sat][satcheck_cadical]")
       bvt assumptions;
       REQUIRE(
         satcheck.prop_solve(assumptions) == propt::resultt::P_SATISFIABLE);
+    }
+  }
+
+  GIVEN("A pigeonhole formula PHP(20) and a 200-millisecond time limit")
+  {
+    satcheck_cadical_no_preprocessingt satcheck(message_handler);
+
+    THEN("the solver is interrupted by the time limit")
+    {
+      check_time_limit(satcheck);
     }
   }
 }

@@ -16,6 +16,7 @@ Author: Daniel Kroening, Peter Schrammel
 #include <util/exit_codes.h>
 #include <util/message.h>
 #include <util/options.h>
+#include <util/string2int.h>
 #include <util/unicode.h>
 #include <util/version.h>
 
@@ -102,8 +103,8 @@ boolbvt &solver_factoryt::solvert::boolbv_decision_procedure() const
 void solver_factoryt::set_decision_procedure_time_limit(
   solver_resource_limitst &decision_procedure)
 {
-  const int timeout_seconds =
-    options.get_signed_int_option("solver-time-limit");
+  const unsigned timeout_seconds =
+    options.get_unsigned_int_option("solver-time-limit");
 
   if(timeout_seconds > 0)
     decision_procedure.set_time_limit_seconds(timeout_seconds);
@@ -386,6 +387,7 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_dimacs()
     std::unique_ptr<boolbvt> bv_dimacs =
       std::make_unique<bv_dimacst>(ns, *prop, message_handler, std::cout);
 
+    set_decision_procedure_time_limit(*bv_dimacs);
     return std::make_unique<solvert>(std::move(bv_dimacs), std::move(prop));
   }
 
@@ -394,6 +396,7 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_dimacs()
   std::unique_ptr<boolbvt> bv_dimacs =
     std::make_unique<bv_dimacst>(ns, *prop, message_handler, *outfile);
 
+  set_decision_procedure_time_limit(*bv_dimacs);
   return std::make_unique<solvert>(
     std::move(bv_dimacs), std::move(prop), std::move(outfile));
 }
@@ -410,6 +413,7 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_external_sat()
   std::unique_ptr<boolbvt> bv_pointers =
     std::make_unique<bv_pointerst>(ns, *prop, message_handler);
 
+  set_decision_procedure_time_limit(*bv_pointers);
   return std::make_unique<solvert>(std::move(bv_pointers), std::move(prop));
 }
 
@@ -504,6 +508,14 @@ solver_factoryt::get_incremental_smt2(std::string solver_command)
         out_filename, message_handler, "--dump-smt-formula"));
   }
 
+  if(options.get_unsigned_int_option("solver-time-limit") > 0)
+  {
+    messaget{message_handler}.warning()
+      << "solver time limit is not supported by the incremental SMT2 "
+         "back-end and will be ignored"
+      << messaget::eom;
+  }
+
   return std::make_unique<solvert>(
     std::make_unique<smt2_incremental_decision_proceduret>(
       ns, std::move(solver_process), message_handler));
@@ -515,6 +527,16 @@ solver_factoryt::get_smt2(smt2_dect::solvert solver)
   no_beautification();
 
   const std::string &filename = options.get_option("outfile");
+
+  if(
+    !filename.empty() &&
+    options.get_unsigned_int_option("solver-time-limit") > 0)
+  {
+    messaget{message_handler}.warning()
+      << "solver time limit is not supported when writing the SMT2 formula "
+         "to a file and will be ignored"
+      << messaget::eom;
+  }
 
   if(filename.empty())
   {
@@ -538,6 +560,7 @@ solver_factoryt::get_smt2(smt2_dect::solvert solver)
     if(options.get_bool_option("fpa"))
       smt2_dec->use_FPA_theory = true;
 
+    set_decision_procedure_time_limit(*smt2_dec);
     return std::make_unique<solvert>(std::move(smt2_dec));
   }
   else if(filename == "-")
@@ -802,5 +825,18 @@ void parse_solver_options(const cmdlinet &cmdline, optionst &options)
   {
     options.set_option(
       "max-node-refinement", cmdline.get_value("max-node-refinement"));
+  }
+
+  if(cmdline.isset("solver-time-limit"))
+  {
+    const std::string value = cmdline.get_value("solver-time-limit");
+    const auto seconds = string2optional_unsigned(value);
+    if(!seconds.has_value() || *seconds == 0)
+    {
+      throw invalid_command_line_argument_exceptiont(
+        "expected a positive integer number of seconds, got '" + value + "'",
+        "--solver-time-limit");
+    }
+    options.set_option("solver-time-limit", value);
   }
 }

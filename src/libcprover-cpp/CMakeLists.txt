@@ -60,7 +60,10 @@ target_link_libraries(cprover-api-cpp
 # Here we prepare a space-separated list of cmake generators that will resolved in  absolute paths.
 set(DEPENDENCY_TARGETS "")
 foreach(dep ${LIBRARY_DEPENDENCIES})
-    if(TARGET ${dep})
+    if("${dep}" MATCHES "^-")
+        # a link flag, such as -pthread, rather than a library
+        continue()
+    elseif(TARGET ${dep})
         list(APPEND DEPENDENCY_TARGETS "$<TARGET_FILE:${dep}>")
     else()
         find_library(dep_path ${dep})

@@ -1,0 +1,11 @@
+CORE smt-backend broken-cprover-smt-backend no-new-smt
+main_timeout.c
+--z3 --solver-time-limit 1
+^EXIT=6$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ not factored: ERROR$
+^VERIFICATION ERROR$
+--
+^VERIFICATION (SUCCESSFUL|FAILED)$
+--
+The time limit is passed to Z3, which gives up after one second.

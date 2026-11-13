@@ -62,16 +62,15 @@ public:
     return true;
   }
 
-  void set_time_limit_seconds(uint32_t lim) override
+  void set_time_limit_milliseconds(uint32_t lim) override
   {
-    time_limit_seconds=lim;
+    time_limit_milliseconds = lim;
   }
 
 protected:
   resultt do_prop_solve(const bvt &) override;
 
   std::unique_ptr<T> solver;
-  uint32_t time_limit_seconds;
 
   void add_variables();
 };

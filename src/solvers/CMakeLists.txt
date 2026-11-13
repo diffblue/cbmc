@@ -59,6 +59,17 @@ list(REMOVE_ITEM sources
 
 add_library(solvers ${sources})
 
+# satcheck_minisat2.cpp uses std::thread (a watchdog for the per-solve time
+# limit), so the solvers library needs to link against the host's threads
+# library on platforms where that is not implicit (e.g., FreeBSD, or glibc
+# before 2.34). We avoid the imported Threads::Threads target because
+# libcprover-cpp's archive-aggregation loop in src/libcprover-cpp/CMakeLists.txt
+# resolves each dependency to a .a file, and Threads::Threads has no such file
+# (that loop skips link flags such as -pthread).
+if(NOT WIN32)
+    target_link_libraries(solvers -pthread)
+endif()
+
 include("${CBMC_SOURCE_DIR}/cmake/DownloadProject.cmake")
 
 foreach(SOLVER ${sat_impl})

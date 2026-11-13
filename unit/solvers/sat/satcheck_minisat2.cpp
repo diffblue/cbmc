@@ -11,11 +11,13 @@ Author: Peter Schrammel
 
 #ifdef HAVE_MINISAT2
 
-#  include <testing-utils/use_catch.h>
+#  include <util/cout_message.h>
 
 #  include <solvers/prop/literal.h>
 #  include <solvers/sat/satcheck_minisat2.h>
-#  include <util/cout_message.h>
+#  include <testing-utils/use_catch.h>
+
+#  include "sat_time_limit_test.h"
 
 SCENARIO("satcheck_minisat2", "[core][solvers][sat][satcheck_minisat2]")
 {
@@ -80,6 +82,31 @@ SCENARIO("satcheck_minisat2", "[core][solvers][sat][satcheck_minisat2]")
       bvt assumptions;
       REQUIRE(
         satcheck.prop_solve(assumptions) == propt::resultt::P_SATISFIABLE);
+    }
+  }
+
+  GIVEN("A satisfiable formula f and an interrupted solver")
+  {
+    satcheck_minisat_no_simplifiert satcheck(message_handler);
+    literalt f = satcheck.new_variable();
+    satcheck.l_set_to_true(f);
+    satcheck.interrupt();
+
+    THEN("solving is interrupted until the interrupt is cleared")
+    {
+      REQUIRE(satcheck.prop_solve() == propt::resultt::P_ERROR);
+      satcheck.clear_interrupt();
+      REQUIRE(satcheck.prop_solve() == propt::resultt::P_SATISFIABLE);
+    }
+  }
+
+  GIVEN("A pigeonhole formula PHP(20) and a 200-millisecond time limit")
+  {
+    satcheck_minisat_no_simplifiert satcheck(message_handler);
+
+    THEN("the solver is interrupted by the time limit")
+    {
+      check_time_limit(satcheck);
     }
   }
 }
