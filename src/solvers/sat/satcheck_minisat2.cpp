@@ -308,8 +308,12 @@ propt::resultt satcheck_minisat2_baset<T>::do_prop_solve(const bvt &assumptions)
       return resultt::P_UNSATISFIABLE;
     }
 
-    log.status() << "SAT checker: timed out or other error" << messaget::eom;
-    status = statust::ERROR;
+    // We do not set any budgets, so MiniSat stops without a result only when
+    // interrupted (by the watchdog, or by a call of interrupt()). The solver
+    // can then be used again.
+    log.status() << "SAT checker: solving was interrupted (e.g. timeout)"
+                 << messaget::eom;
+    status = statust::INIT;
     return resultt::P_ERROR;
   }
   catch(const Minisat::OutOfMemoryException &)

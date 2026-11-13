@@ -22,7 +22,8 @@ public:
   /// milliseconds. A value of 0 disables the time limit. Granularity
   /// is best-effort: back-ends may round up or, where the underlying
   /// solver does not support timeouts, log a warning and ignore the
-  /// limit.
+  /// limit. A solver call that is interrupted because of the time limit
+  /// reports an error; the solver remains usable for further calls.
   /// \note This replaces the former pure virtual `set_time_limit_seconds`:
   ///   implementations of this interface must override this method instead.
   virtual void set_time_limit_milliseconds(uint32_t) = 0;

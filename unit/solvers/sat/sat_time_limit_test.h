@@ -51,10 +51,11 @@ inline std::vector<bvt> add_pigeonhole(propt &solver, std::size_t holes)
 }
 
 /// Check that a 200-millisecond time limit interrupts \p solver when solving
-/// PHP(20), shortly after the limit has passed.
+/// PHP(20), shortly after the limit has passed, and that \p solver can be used
+/// again once the time limit has been removed.
 inline void check_time_limit(propt &solver)
 {
-  add_pigeonhole(solver, 20);
+  const std::vector<bvt> in_hole = add_pigeonhole(solver, 20);
   solver.set_time_limit_milliseconds(200);
 
   const auto start = std::chrono::steady_clock::now();
@@ -69,6 +70,15 @@ inline void check_time_limit(propt &solver)
   REQUIRE(result == propt::resultt::P_ERROR);
   REQUIRE(elapsed_ms >= 200);
   REQUIRE(elapsed_ms < 5000);
+
+  // Without a time limit, solving PHP(20) under the assumption that the first
+  // pigeon is in no hole at all is trivial, and must not be affected by the
+  // interrupted solver call.
+  solver.set_time_limit_milliseconds(0);
+  bvt assumptions;
+  for(const auto &l : in_hole.front())
+    assumptions.push_back(!l);
+  REQUIRE(solver.prop_solve(assumptions) == propt::resultt::P_UNSATISFIABLE);
 }
 
 #endif // CPROVER_SOLVERS_SAT_SAT_TIME_LIMIT_TEST_H

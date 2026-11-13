@@ -166,13 +166,12 @@ propt::resultt satcheck_ipasirt::do_prop_solve(const bvt &assumptions)
     }
     else
     {
-      // Solving was interrupted; this is the path taken when our
-      // terminate_callback signals that the configured time limit has
-      // passed. We return P_ERROR (matching the MiniSat 2 backend) so
-      // that callers can recognise a timeout, instead of throwing.
+      // Solving was interrupted, which happens when our terminate_callback
+      // signals that the time limit has passed. Report an error, so that
+      // callers can recognise a timeout. The solver can be used again.
       log.status() << "SAT checker: solving was interrupted (e.g. timeout)"
                    << messaget::eom;
-      status = statust::ERROR;
+      status = statust::INIT;
       return resultt::P_ERROR;
     }
   }

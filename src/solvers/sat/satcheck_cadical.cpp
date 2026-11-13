@@ -166,13 +166,12 @@ propt::resultt satcheck_cadical_baset::do_prop_solve(const bvt &assumptions)
     log.status() << "SAT checker: instance is UNSATISFIABLE" << messaget::eom;
     break;
   default:
-    // Solving was interrupted; this is the path taken when our
-    // terminator signals that the configured time limit has passed.
-    // We return P_ERROR (matching the MiniSat 2 and IPASIR back-ends)
-    // so that callers can recognise a timeout, instead of throwing.
+    // Solving was interrupted, which happens when our terminator
+    // signals that the time limit has passed. Report an error, so that
+    // callers can recognise a timeout. The solver can be used again.
     log.status() << "SAT checker: solving was interrupted (e.g. timeout)"
                  << messaget::eom;
-    status = statust::ERROR;
+    status = statust::INIT;
     return resultt::P_ERROR;
   }
 
