@@ -1,0 +1,11 @@
+CORE
+main.c
+--unwind 3 --unwinding-assertions
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+An unconditional forward goto into a loop head must reset that loop's
+unwinding counter, as entry by fallthrough does.
