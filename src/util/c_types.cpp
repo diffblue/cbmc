@@ -193,28 +193,57 @@ floatbv_typet double_type()
 floatbv_typet long_double_type()
 {
   floatbv_typet result;
-  if(config.ansi_c.long_double_width==128)
-    result=ieee_float_spect::quadruple_precision().to_type();
-  else if(config.ansi_c.long_double_width==64)
-    result=ieee_float_spect::double_precision().to_type();
-  else if(config.ansi_c.long_double_width==80)
+  // x86_64 typically stores `long double` as the x87 80-bit extended
+  // format in 16 bytes (Linux, macOS, FreeBSD).  i386 stores it in 12
+  // bytes.  Accurate modelling matters because programs (notably the
+  // Apple SDK's <math.h> inline helpers) read the bytes via union-based
+  // bit twiddling.
+  //
+  // The decision is driven primarily by `long_double_width`:
+  //   - 96 bits is exclusively the i386 (32-bit x86) ABI: the x87
+  //     80-bit extended value in a 12-byte container.  This also arises
+  //     when running a non-x86 build with `--32` (set_ILP32 changes the
+  //     widths but leaves `arch` at the host value, e.g. "arm64"), so
+  //     we accept width 96 regardless of `arch`.
+  //   - 128 bits is ambiguous: x86_64 uses the x87 80-bit extended
+  //     value in a 16-byte container, while non-x86 targets (ppc64le,
+  //     AArch64 Linux configured that way) use true IEEE 754 binary128.
+  //     Here `arch` is the tie-breaker.
+  //   - 80 bits is the bare x87 extended value with no padding.
+  //   - 64 bits is `long double == double` (AArch64 macOS, MSVC, ...).
+  const auto &c = config.ansi_c;
+  if(c.long_double_width == 96)
   {
-    // x86 extended precision has 80 bits in total, and
-    // deviating from IEEE, does not use a hidden bit.
-    // We use the closest we have got, but the below isn't accurate.
-    result=ieee_float_spect(63, 15).to_type();
+    result = ieee_float_spect::x86_96().to_type();
   }
-  else if(config.ansi_c.long_double_width==96)
+  else if(c.long_double_width == 128 && c.arch == "x86_64")
   {
-    result=ieee_float_spect(80, 15).to_type();
-    // not quite right. The extra bits beyond 80 are usually padded.
+    // 16-byte storage container is x86_64-specific; i386 uses the 96-bit
+    // container handled above, so this branch deliberately excludes it.
+    result = ieee_float_spect::x86_128().to_type();
   }
+  else if(c.long_double_width == 80)
+  {
+    result = ieee_float_spect::x86_80().to_type();
+  }
+  else if(c.long_double_width == 128)
+  {
+    // Non-x86 128-bit long double: IEEE 754 binary128 (PowerPC, AArch64
+    // when configured that way, etc.).
+    result = ieee_float_spect::quadruple_precision().to_type();
+  }
+  else if(c.long_double_width == 64)
+    result = ieee_float_spect::double_precision().to_type();
   else
     INVARIANT(false, "width of long double");
 
   result.set(ID_C_c_type, ID_long_double);
-
   return result;
+}
+
+bool long_double_is_x86_extended()
+{
+  return long_double_type().get_bool(ID_x86_extended);
 }
 
 signedbv_typet pointer_diff_type()
