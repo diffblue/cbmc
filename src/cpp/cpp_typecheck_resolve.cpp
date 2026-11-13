@@ -5836,13 +5836,41 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
                   messaget::M_ERROR);
               bool satisfied = true;
               bool evaluated = false;
+              // N5008 [temp.constr.decl]/3.3: the type-constraints of the
+              // parameters come before the requires-clause in the
+              // associated constraints, and are instantiated first: an
+              // unsatisfied one leaves the requires-clause uninstantiated
+              // (libstdc++ 16's range formatter, `template<
+              // ranges::input_range _Rg, ...> requires (format_kind<_Rg> !=
+              // range_format::disabled) && ...', whose format_kind<_Rg> is
+              // ill-formed when _Rg is no range)
+              for(const auto &parameter :
+                  cpp_declaration.template_type().template_parameters())
+              {
+                const irept &type_constraint =
+                  parameter.find("#C_type_constraint");
+                if(type_constraint.is_nil() || type_constraint.id() == ID_nil)
+                  continue;
+                exprt constraint_copy =
+                  static_cast<const exprt &>(type_constraint);
+                cpp_typecheck.template_map.apply(constraint_copy);
+                const auto r =
+                  cpp_typecheck.evaluate_constraint(constraint_copy);
+                if(r.has_value() && !*r)
+                {
+                  evaluated = true;
+                  satisfied = false;
+                  break;
+                }
+              }
               // Only attempt evaluation for simple type predicates
               // and boolean combinations. Skip complex expressions
               // that might trigger invariant violations.
               if(
-                req_copy.id() == ID_and || req_copy.id() == ID_or ||
-                id2string(req_copy.id()).find("__is_") == 0 ||
-                id2string(req_copy.id()).find("__has_") == 0)
+                !evaluated &&
+                (req_copy.id() == ID_and || req_copy.id() == ID_or ||
+                 id2string(req_copy.id()).find("__is_") == 0 ||
+                 id2string(req_copy.id()).find("__has_") == 0))
               {
                 // [temp.constr.op]: short-circuiting evaluation
                 const auto r = cpp_typecheck.evaluate_constraint(req_copy);

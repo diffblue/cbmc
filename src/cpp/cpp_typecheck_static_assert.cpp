@@ -140,11 +140,23 @@ void cpp_typecheckt::convert(cpp_static_assertt &cpp_static_assert)
   if(cpp_static_assert.op0() == false_exprt())
   {
     // failed
-    error().source_location=cpp_static_assert.source_location();
-    error() << "static assertion failed";
-    if(cpp_static_assert.op1().id()==ID_string_constant)
-      error() << ": " << to_string_constant(cpp_static_assert.op1()).value();
-    error() << eom;
+    std::string message = "static assertion failed";
+    if(cpp_static_assert.op1().id() == ID_string_constant)
+    {
+      message +=
+        ": " + id2string(to_string_constant(cpp_static_assert.op1()).value());
+    }
+    // a member of a class template specialization instantiated from a SFINAE
+    // context (failure_outside_immediate_context)
+    if(
+      sfinae_context_depth > 0 &&
+      !failure_outside_immediate_context.has_value())
+    {
+      failure_outside_immediate_context.emplace(
+        cpp_static_assert.source_location(), message);
+    }
+    error().source_location = cpp_static_assert.source_location();
+    error() << message << eom;
     throw 0;
   }
 }

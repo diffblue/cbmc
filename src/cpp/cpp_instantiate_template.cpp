@@ -2306,27 +2306,14 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
             const cpp_declarationt &spec_decl = to_cpp_declaration(s.type);
             const exprt &req_clause = static_cast<const exprt &>(
               spec_decl.template_type().find(ID_C_requires_clause));
-            if(req_clause.is_not_nil() && req_clause.id() != ID_nil)
-            {
-              exprt req_copy = req_clause;
-              template_map.apply(req_copy);
-              // A clause that cannot be evaluated is treated as satisfied
-              // (backward compatibility), see evaluate_constraint -- except
-              // that N5008 [temp.constr.atomic]/3, [temp.spec.partial.match]/2:
-              // an atomic constraint whose substitution fails is not
-              // satisfied, and the specialization does not match
-              // (`requires(T::is_special)' with T = int *).
-              const auto satisfied = evaluate_constraint(req_copy);
-              if(satisfied.has_value() && !*satisfied)
-                continue;
-              if(
-                !satisfied.has_value() &&
-                constraint_satisfaction(req_copy).is_false())
-              {
-                continue;
-              }
-            }
-
+            // N5008 [temp.constr.decl]/3.3: the associated constraints are
+            // the type-constraints of the parameters, in order, then the
+            // requires-clause -- a conjunction, whose operands are
+            // instantiated in that order ([temp.constr.op]/3): an
+            // unsatisfied type-constraint leaves the requires-clause
+            // uninstantiated (libstdc++'s range formatter, `template<
+            // ranges::input_range _Rg, ...> requires (format_kind<_Rg> !=
+            // ...)', whose format_kind<_Rg> is ill-formed for a non-range).
             // Check concept constraints on individual parameters.
             {
               const auto &spec_params =
@@ -2615,6 +2602,27 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
               }
               if(!params_ok)
                 continue;
+            }
+
+            if(req_clause.is_not_nil() && req_clause.id() != ID_nil)
+            {
+              exprt req_copy = req_clause;
+              template_map.apply(req_copy);
+              // A clause that cannot be evaluated is treated as satisfied
+              // (backward compatibility), see evaluate_constraint -- except
+              // that N5008 [temp.constr.atomic]/3, [temp.spec.partial.match]/2:
+              // an atomic constraint whose substitution fails is not
+              // satisfied, and the specialization does not match
+              // (`requires(T::is_special)' with T = int *).
+              const auto satisfied = evaluate_constraint(req_copy);
+              if(satisfied.has_value() && !*satisfied)
+                continue;
+              if(
+                !satisfied.has_value() &&
+                constraint_satisfaction(req_copy).is_false())
+              {
+                continue;
+              }
             }
           }
 
@@ -8756,10 +8764,9 @@ skip_pack_removal_ft:
                 template_map.apply(copy);
                 return evaluate_constraint(copy);
               };
-              const auto requires_clause =
-                evaluate(spec_decl.template_type().find(ID_C_requires_clause));
-              bool unsatisfied =
-                requires_clause.has_value() && !*requires_clause;
+              // [temp.constr.decl]/3.3: the type-constraints first, in
+              // order, then the requires-clause
+              bool unsatisfied = false;
               for(const auto &p :
                   spec_decl.template_type().template_parameters())
               {
@@ -8769,6 +8776,12 @@ skip_pack_removal_ft:
                 if(satisfied.has_value() && !*satisfied)
                   unsatisfied = true;
                 type_constraint_decided.push_back(satisfied.has_value());
+              }
+              if(!unsatisfied)
+              {
+                const auto requires_clause = evaluate(
+                  spec_decl.template_type().find(ID_C_requires_clause));
+                unsatisfied = requires_clause.has_value() && !*requires_clause;
               }
               if(unsatisfied)
                 continue;

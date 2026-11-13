@@ -293,6 +293,16 @@ protected:
   /// an ordinary context where an unresolved call is a genuine, diagnosable
   /// error.  Maintained by `sfinae_contextt` (a friend).
   unsigned sfinae_context_depth = 0;
+  /// N5008 [temp.deduct.general]/8, [temp.constr.atomic]/3: only a failure in
+  /// the immediate context of a substitution is a substitution failure.  A
+  /// static_assert fails while a definition is instantiated (a function
+  /// body, a class, a variable's initializer), which is never the immediate
+  /// context: the program is ill-formed even when the instantiation was
+  /// reached from a SFINAE context.  Such a failure is recorded here (its
+  /// location and message) and reported when the outermost SFINAE context
+  /// ends.
+  std::optional<std::pair<source_locationt, std::string>>
+    failure_outside_immediate_context;
 
   // Nonzero while a partial-specialization argument PATTERN is being
   // matched/typechecked ([temp.spec.partial.match]); gates the

@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ primary template: SUCCESS$
+^\[main\.assertion\.2\] line \d+ partial specialization: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+static assertion failed
+--
+The type-constraint is satisfied (or not) before the requires-clause.

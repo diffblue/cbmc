@@ -80,6 +80,12 @@ sfinae_contextt::~sfinae_contextt()
   typecheck.copy_init_ctor_exploration = saved_copy_init_ctor_exploration;
   if(typecheck.sfinae_context_depth > 0)
     --typecheck.sfinae_context_depth;
+  // [temp.deduct.general]/8: an error outside the immediate context makes the
+  // program ill-formed, whatever the substitution decides; report it once the
+  // outermost SFINAE context is left (and so the real handler is active)
+  const bool report_failure =
+    typecheck.sfinae_context_depth == 0 &&
+    typecheck.failure_outside_immediate_context.has_value();
   // Roll the error count back to the pre-guard value.  Any errors
   // emitted inside the guarded region were either absorbed by the
   // null handler (visible nowhere) or counted against the real
@@ -88,4 +94,11 @@ sfinae_contextt::~sfinae_contextt()
   // SFINAE context.
   typecheck.get_message_handler().set_message_count(
     messaget::M_ERROR, saved_error_count);
+  if(report_failure)
+  {
+    const auto failure = *typecheck.failure_outside_immediate_context;
+    typecheck.failure_outside_immediate_context.reset();
+    typecheck.error().source_location = failure.first;
+    typecheck.error() << failure.second << messaget::eom;
+  }
 }

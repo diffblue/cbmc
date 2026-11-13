@@ -591,6 +591,13 @@ void cpp_typecheckt::typecheck_code(codet &code)
       std::string message;
       if(code.operands().size() == 2 && code.op1().id() == ID_string_constant)
         message = ": " + id2string(to_string_constant(code.op1()).value());
+      if(
+        sfinae_context_depth > 0 &&
+        !failure_outside_immediate_context.has_value())
+      {
+        failure_outside_immediate_context.emplace(
+          code.source_location(), "static assertion failed" + message);
+      }
       error().source_location = code.source_location();
       error() << "static assertion failed" << message << eom;
       throw 0;

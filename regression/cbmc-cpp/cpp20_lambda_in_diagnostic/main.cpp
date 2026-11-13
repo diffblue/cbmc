@@ -1,7 +1,9 @@
 // A C++ lambda-expression has the id of the mathematical lambda_exprt;
 // printing the constraint below in a diagnostic failed an invariant of
 // expr2c ("lambda must have two operands").  kind<int> is ill-formed: its
-// lambda's static_assert fails (g++ 13 and clang++ 18 reject the program).
+// lambda's static_assert fails (g++ 13 and clang++ 18 reject the program),
+// and the failure is outside the immediate context of the constraint, so it
+// makes the program ill-formed instead of the constraint unsatisfied.
 template <class T>
 constexpr auto kind = []
 {
