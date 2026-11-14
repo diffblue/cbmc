@@ -16598,3 +16598,41 @@ Front end:
 Verified on binW222: 13 suites, profiles (z3 complex2 flaky), vacuity
 1063/3, MSVC 3/3, macOS 142/142, GCC 16 image, unit, lint, format,
 doxygen, iwyu (changed files).
+
+## Round 237 (2026-11-13): user reports, five front-end and linker defects
+
+Reproduced on the reporters' translation units, reduced to generic tests
+(each fails on binW222 and on develop):
+- 443550fb90 default arguments added by a later declaration, e.g. only
+  on the out-of-line member definition ([dcl.fct.default]/4): merged
+  into the function symbol and the class member.
+- 9477d6087d `class C { rec r; ... C(int) {} };' with rec having
+  default member initializers and r private: cpp_constructor applied
+  them in rec's scope and type-checked `this->r' again there, failing
+  the access check.  Old (binW212 too); has nothing to do with `= {}'.
+- 990b8ef7e1 `(T){.m = v}' and `return {.m = v};' for a non-POD
+  aggregate: braced_return_aggregate_value assigned the clauses by
+  position.  Designated lists now use aggregate_member_initialization.
+  (Declining there instead fell through to the constructor path:
+  invariant in boolbv_width.)
+- 2c74347a20 `(f<A>(a), ...)' / `g(f<A>(a)...)' in a member function
+  template: the deferred fold reduction left `A' at its first element
+  (silent wrong result for mixed types); the eager conversion of a
+  constexpr member with non-void return type did not expand `a' at all
+  ("template 'f' not found").  Fold reduction and replicated-pack
+  expansion factored out of prepare_deferred_method_body and run before
+  the eager conversion.  Running ALL of prepare_deferred_method_body
+  there broke libc++ std::visit (cpp20_libcxx_header_drops/test_visit,
+  caught by the binW223 run).
+- d05056a607 lead (no reproducer given): `enum E : int;' in one TU and
+  the definition in another.  Not the reported invariant, but the
+  linker treated the enum types as different: "conflicting types" for
+  objects of a class with an E member, or the class type renamed and
+  then a parameter type mismatch in symex.  The opaque declaration is
+  now merged with the definition (same underlying type), as for an
+  incomplete struct.  The simplify_member invariant itself did not
+  reproduce.
+Verified on binW224: 13 suites, profiles (z3 complex2 flaky), vacuity
+1063/3, MSVC, macOS 142/142, GCC 16 image, unit, lint, format, doxygen,
+iwyu (changed files); all reporter translation units convert with 0
+errors.
