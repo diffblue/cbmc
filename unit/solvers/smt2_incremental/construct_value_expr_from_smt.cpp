@@ -157,6 +157,20 @@ TEST_CASE("Value expr construction from smt.", "[core][smt2_incremental]")
     const auto &float_const = to_constant_expr(float_result);
     REQUIRE(float_const.get_value() == integer2bvrep(one_25_bits, 32));
   }
+  SECTION("Fixed-point values.")
+  {
+    // 1.5 with 16 fraction bits has bit pattern 0x00018000.
+    fixedbv_typet fixed_type;
+    fixed_type.set_width(32);
+    fixed_type.set_integer_bits(16);
+    const mp_integer one_5_bits{0x00018000u};
+    const smt_bit_vector_constant_termt smt_fixed{one_5_bits, 32};
+    const exprt fixed_result =
+      construct_value_expr_from_smt(smt_fixed, fixed_type, ns);
+    REQUIRE(fixed_result.type() == fixed_type);
+    const auto &fixed_const = to_constant_expr(fixed_result);
+    REQUIRE(fixed_const.get_value() == integer2bvrep(one_5_bits, 32));
+  }
 }
 
 TEST_CASE(
