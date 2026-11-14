@@ -210,6 +210,28 @@ TEST_CASE(
 }
 
 TEST_CASE(
+  "Send a message to a sub process that is larger than the pipe's buffer",
+  "[core][util][piped_process]")
+{
+  std::vector<std::string> commands;
+  commands.push_back("z3");
+  commands.push_back("-in");
+  piped_processt process(commands, null_message_handler);
+
+  // A comment of 1 MB followed by a command: the pipe to the sub process does
+  // not hold the whole message, which must therefore be written in parts.
+  const std::string message =
+    "; " + std::string(1024 * 1024, 'x') + "\n(echo \"done\")\n";
+  REQUIRE(process.send(message) == piped_processt::send_responset::SUCCEEDED);
+
+  std::string response = strip_string(process.wait_receive());
+  REQUIRE(response == "done");
+
+  REQUIRE(
+    process.send("(exit)\n") == piped_processt::send_responset::SUCCEEDED);
+}
+
+TEST_CASE(
   "Use a created piped process instance of z3 to test wait_receivable",
   "[core][util][piped_process]")
 {
