@@ -1,0 +1,17 @@
+CORE no-new-smt
+main.c
+
+^\[main\.assertion\.29\] line \d+ reachable: FAILURE$
+^\*\* 1 of 29 failed
+^EXIT=10$
+^SIGNAL=0$
+--
+bits, .*: FAILURE$
+--
+Converting an integer to floating-point must be exact when the integer has at
+most as many bits as the significand. For widths 3, 5, 9, 17 and 33 (one more
+than a power of two), the bit-vector encodings of the conversion used an
+exponent too narrow to hold the width minus one, and a normalisation shifter
+that could not shift by the width minus one, so that even 1 and -1 converted
+to wrong values. The last assertion
+checks that the assumptions are satisfiable.
