@@ -178,10 +178,12 @@ extension_for_type(const typet &type)
     return smt_bit_vector_theoryt::sign_extend;
   if(can_cast_type<unsignedbv_typet>(type))
     return smt_bit_vector_theoryt::zero_extend;
-  if(can_cast_type<bv_typet>(type))
+  if(can_cast_type<bv_typet>(type) || can_cast_type<c_bool_typet>(type))
     return smt_bit_vector_theoryt::zero_extend;
   if(can_cast_type<pointer_typet>(type))
     return smt_bit_vector_theoryt::zero_extend;
+  if(const auto bit_field = type_try_dynamic_cast<c_bit_field_typet>(type))
+    return extension_for_type(bit_field->underlying_type());
   // Integer constants are converted to unsigned bit vectors of the minimal
   // width that holds their value, see the conversion of constants below. Such
   // constants occur as shift distances in the bit-vector encoding of

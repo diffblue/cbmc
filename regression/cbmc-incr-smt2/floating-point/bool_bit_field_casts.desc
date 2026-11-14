@@ -1,0 +1,21 @@
+CORE
+bool_bit_field_casts.c
+
+^\[main\.assertion\.1\] line 12 bool to double: SUCCESS$
+^\[main\.assertion\.2\] line 13 false is zero: SUCCESS$
+^\[main\.assertion\.3\] line 14 can be one: FAILURE$
+^\[main\.assertion\.4\] line 19 negative zero is false: SUCCESS$
+^\[main\.assertion\.5\] line 23 one half is true: SUCCESS$
+^\[main\.assertion\.6\] line 28 signed bit-field to float: SUCCESS$
+^\[main\.assertion\.7\] line 29 unsigned bit-field to float: SUCCESS$
+^\[main\.assertion\.8\] line 33 float to signed bit-field: SUCCESS$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Conversions between floating-point numbers and Booleans or bit-fields, which
+float_bvt does not support: they reached UNREACHABLE (extension of _Bool and
+bit-field operands), failed (unlowered floatbv_typecast), or gave wrong
+results (a _Bool converted to the float with bit pattern 1, and -0.0 converted
+to true). The results match those of the SAT back-end.

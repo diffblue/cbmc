@@ -7,6 +7,8 @@
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/expr_util.h>
+#include <util/floatbv_expr.h>
+#include <util/ieee_float.h>
 #include <util/range.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
@@ -361,12 +363,79 @@ static bool has_floatbv_type(const exprt &expr)
   return false;
 }
 
+/// The integer type that represents values of the bit-field type \p type.
+static typet bit_field_integer_type(const c_bit_field_typet &type)
+{
+  if(can_cast_type<signedbv_typet>(type.underlying_type()))
+    return signedbv_typet{type.get_width()};
+  return unsignedbv_typet{type.get_width()};
+}
+
+/// Rewrite conversions between floating-point numbers and Booleans or
+/// bit-fields, which \ref float_bvt does not support, using conversions
+/// that it does support.
+/// \return The rewritten expression, or an empty optional if \p expr is no
+///   such conversion.
+static std::optional<exprt> rewrite_float_typecast(const exprt &expr)
+{
+  if(
+    (expr.id() != ID_typecast && expr.id() != ID_floatbv_typecast) ||
+    !expr.has_operands())
+  {
+    return {};
+  }
+  // the first operand of both kinds of conversion is the converted value
+  const exprt &op = expr.operands().front();
+  const typet &src_type = op.type();
+  const typet &dest_type = expr.type();
+
+  if(dest_type.id() == ID_floatbv)
+  {
+    const floatbv_typet &float_type = to_floatbv_type(dest_type);
+    // bool and _Bool to float: zero or one
+    if(src_type.id() == ID_bool || src_type.id() == ID_c_bool)
+    {
+      const exprt condition =
+        src_type.id() == ID_bool ? op : typecast_exprt{op, bool_typet{}};
+      return if_exprt{
+        condition,
+        ieee_floatt::one(float_type).to_expr(),
+        ieee_floatt::zero(float_type).to_expr()};
+    }
+    // bit-field to float: via the integer type of the bit-field
+    if(src_type.id() == ID_c_bit_field && expr.id() == ID_floatbv_typecast)
+    {
+      floatbv_typecast_exprt result = to_floatbv_typecast_expr(expr);
+      result.op() = typecast_exprt{
+        op, bit_field_integer_type(to_c_bit_field_type(src_type))};
+      return std::move(result);
+    }
+  }
+  else if(src_type.id() == ID_floatbv)
+  {
+    // float to _Bool: via bool, as -0.0 converts to false
+    if(dest_type.id() == ID_c_bool)
+      return typecast_exprt{typecast_exprt{op, bool_typet{}}, dest_type};
+    // float to bit-field: via the integer type of the bit-field
+    if(dest_type.id() == ID_c_bit_field && expr.id() == ID_floatbv_typecast)
+    {
+      floatbv_typecast_exprt result = to_floatbv_typecast_expr(expr);
+      result.type() = bit_field_integer_type(to_c_bit_field_type(dest_type));
+      return typecast_exprt{std::move(result), dest_type};
+    }
+  }
+  return {};
+}
+
 /// \brief Lower floating-point operations to bitvector expressions.
 /// Traverses \p expr bottom-up and replaces float-specific sub-expressions
 /// (e.g., ieee_float_equal, floatbv_plus) with their bitvector equivalents
 /// using \ref float_bvt::convert.
 static exprt lower_floatbv(exprt expr)
 {
+  if(auto rewritten = rewrite_float_typecast(expr))
+    expr = std::move(*rewritten);
+
   // Recurse into operands first (bottom-up)
   for(auto &op : expr.operands())
     op = lower_floatbv(op);
