@@ -1,0 +1,10 @@
+CORE dfcc-only
+nested.c
+--dfcc main --enforce-contract foo --always-require-function-contracts --keep-function-body callee --keep-function-body private_helper
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^Wrapping 'callee'.*in REPLACE mode$
+--
+Repeated exceptions allow both implementations to be used.

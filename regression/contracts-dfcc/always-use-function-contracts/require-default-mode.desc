@@ -1,0 +1,10 @@
+CORE dfcc-only
+main.c
+--dfcc main --enforce-contract foo --keep-function-body callee
+^Option: --keep-function-body$
+^Reason: Requires --always-use-function-contracts or --always-require-function-contracts$
+^EXIT=1$
+^SIGNAL=0$
+--
+--
+Body exceptions require one of the default replacement modes.

@@ -1,0 +1,11 @@
+CORE dfcc-only
+nested.c
+--dfcc main --enforce-contract foo --always-use-function-contracts
+^Wrapping 'callee' with contract 'callee' in REPLACE mode$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^Keeping body of 'private_helper'
+--
+Neither unused functions nor helpers behind replaced bodies are selected.
