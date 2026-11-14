@@ -38,10 +38,10 @@ endif
   CP_CFLAGS = -MMD -MP
   CXXFLAGS ?= -Wall -O2
 ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
-  CP_CXXFLAGS += -MMD -MP -mmacosx-version-min=10.15 -std=c++17 -stdlib=libc++
-  CP_CFLAGS += -mmacosx-version-min=10.15
-  LINKFLAGS += -mmacosx-version-min=10.15 -stdlib=libc++
-  LINKNATIVE += -mmacosx-version-min=10.15 -stdlib=libc++
+  CP_CXXFLAGS += -MMD -MP -mmacosx-version-min=11.0 -std=c++17 -stdlib=libc++
+  CP_CFLAGS += -mmacosx-version-min=11.0
+  LINKFLAGS += -mmacosx-version-min=11.0 -stdlib=libc++
+  LINKNATIVE += -mmacosx-version-min=11.0 -stdlib=libc++
 else
   CP_CXXFLAGS += -MMD -MP -std=c++17
 endif
