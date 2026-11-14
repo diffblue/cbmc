@@ -240,6 +240,7 @@ protected:
   // unflatten() does the opposite.
   enum class wheret { BEGIN, END };
   void flatten2bv(const exprt &);
+  void find_symbols_flatten2bv(const exprt &expr);
   void unflatten(wheret, const typet &, unsigned nesting=0);
 
   // pointers

@@ -5365,7 +5365,8 @@ void smt2_convt::flatten2bv(const exprt &expr)
       else
       {
         // Non-constant float under FPA theory: look up the bvfromfloat
-        // auxiliary that find_symbols pre-created for this expression.
+        // auxiliary that find_symbols_flatten2bv pre-created for this
+        // expression.
         const auto &floatbv_type = to_floatbv_type(type);
         const typecast_exprt tc{expr, bv_typet{floatbv_type.width()}};
 
@@ -5778,6 +5779,55 @@ exprt smt2_convt::prepare_for_convert_expr(const exprt &expr)
   return lowered_expr;
 }
 
+/// With the FPA theory, flattening a non-constant float to a bit-vector
+/// requires a bit-vector variable that is declared, and constrained to encode
+/// the float, before the expression is converted. Declare these for all the
+/// floats that \ref flatten2bv reaches when flattening \p expr.
+/// \param expr: expression that is going to be flattened
+void smt2_convt::find_symbols_flatten2bv(const exprt &expr)
+{
+  if(!use_FPA_theory)
+    return;
+
+  const typet &type = expr.type();
+
+  if(type.id() == ID_floatbv)
+  {
+    // the typecast to a bit-vector is converted using a bvfromfloat
+    // auxiliary, which flatten2bv then refers to
+    if(!expr.is_constant())
+      find_symbols(typecast_exprt{expr, bv_typet{boolbv_width(type)}});
+  }
+  else if(type.id() == ID_array)
+  {
+    // mirrors flatten2bv
+    const array_typet &array_type = to_array_type(type);
+    if(use_array_theory(expr) && array_type.size().is_constant())
+    {
+      const mp_integer size =
+        numeric_cast_v<mp_integer>(to_constant_expr(array_type.size()));
+      for(mp_integer i = 0; i < size; ++i)
+      {
+        find_symbols_flatten2bv(
+          index_exprt{expr, from_integer(i, array_type.index_type())});
+      }
+    }
+  }
+  else if(
+    (type.id() == ID_struct || type.id() == ID_struct_tag) && use_datatypes)
+  {
+    // mirrors flatten2bv
+    const struct_typet &struct_type =
+      type.id() == ID_struct_tag ? ns.follow_tag(to_struct_tag_type(type))
+                                 : to_struct_type(type);
+    for(const auto &component : struct_type.components())
+    {
+      if(!is_zero_width(component.type(), ns))
+        find_symbols_flatten2bv(member_exprt{expr, component});
+    }
+  }
+}
+
 /// Find and declare symbols used in an expression
 /// This function traverses the expression tree and creates SMT2 declarations
 /// for all symbols (variables) found. Symbols are added to identifier_map to
@@ -5827,6 +5877,29 @@ void smt2_convt::find_symbols(const exprt &expr)
   // recursive call on operands
   for(const auto &op : expr.operands())
     find_symbols(op);
+
+  // the conversion of these expressions uses flatten2bv on their operands
+  if(use_FPA_theory)
+  {
+    const irep_idt &id = expr.id();
+    const auto is_aggregate = [](const typet &type)
+    {
+      return type.id() == ID_struct || type.id() == ID_struct_tag ||
+             type.id() == ID_union || type.id() == ID_union_tag;
+    };
+    if(
+      id == ID_union || id == ID_concatenation || id == ID_replication ||
+      id == ID_extractbit || id == ID_extractbits || id == ID_bitand ||
+      id == ID_bitor || id == ID_bitxor || id == ID_bitxnor ||
+      id == ID_bitnand || id == ID_bitnor || id == ID_reduction_xor ||
+      (id == ID_struct && !use_datatypes) ||
+      (id == ID_with && is_aggregate(expr.type())) ||
+      (id == ID_typecast && is_aggregate(to_typecast_expr(expr).op().type())))
+    {
+      for(const auto &op : expr.operands())
+        find_symbols_flatten2bv(op);
+    }
+  }
 
   if(expr.id()==ID_symbol ||
      expr.id()==ID_nondet_symbol)
@@ -6153,37 +6226,6 @@ void smt2_convt::find_symbols(const exprt &expr)
       out << ')' << '\n';
 
       defined_expressions[expr] = id;
-    }
-  }
-  else if(
-    use_FPA_theory && !expr.is_constant() &&
-    expr.type().id() == ID_floatbv)
-  {
-    // Pre-create a bvfromfloat auxiliary for non-constant floatbv
-    // expressions that may be passed to flatten2bv (e.g. when stored
-    // into a union or flattened as part of a struct).  The SMT-LIB FP
-    // theory has no fp-to-bitvector operator, so the round-trip
-    // (declare fresh BV, assert to_fp(BV) == float) must be emitted at
-    // the top level, before flatten2bv is called mid-expression.
-    const auto &floatbv_type = to_floatbv_type(expr.type());
-    const typecast_exprt tc{expr, bv_typet{floatbv_type.width()}};
-
-    if(defined_expressions.find(tc) == defined_expressions.end())
-    {
-      const irep_idt id =
-        "bvfromfloat." + std::to_string(defined_expressions.size());
-      out << "(declare-fun " << id << " () ";
-      convert_type(tc.type());
-      out << ')' << '\n';
-
-      out << "(assert (= ";
-      out << "((_ to_fp " << floatbv_type.get_e() << " "
-          << floatbv_type.get_f() + 1 << ") " << id << ')';
-      convert_expr(expr);
-      out << ')'; // =
-      out << ')' << '\n';
-
-      defined_expressions[tc] = id;
     }
   }
   else if(expr.id() == ID_initial_state)
