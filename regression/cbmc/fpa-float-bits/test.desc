@@ -1,0 +1,17 @@
+CORE smt-backend broken-cprover-smt-backend no-new-smt
+main.c
+--z3 --fpa
+^\[main\.assertion\.1\] line \d+ bits of 1\.0f: SUCCESS$
+^\[main\.assertion\.2\] line \d+ bits of a NaN: SUCCESS$
+^\[main\.assertion\.3\] line \d+ fails for -0\.0f: FAILURE$
+^\[main\.assertion\.4\] line \d+ bits of a struct: SUCCESS$
+^\[main\.assertion\.5\] line \d+ bits of an array: SUCCESS$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+With the FPA theory, reading the bits of a non-constant float that is a member
+of a union (or of a struct or an array in a union) failed an invariant in
+flatten2bv (issues #8147, #9101).

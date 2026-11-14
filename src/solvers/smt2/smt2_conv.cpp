@@ -3837,7 +3837,9 @@ void smt2_convt::convert_struct(const struct_exprt &expr)
       // may need to flatten array-theory arrays in there
       if(op.type().id() == ID_array && use_array_theory(op))
         flatten_array(op);
-      else if(op.type().id() == ID_bool)
+      else if(
+        op.type().id() == ID_bool ||
+        (op.type().id() == ID_floatbv && use_FPA_theory))
         flatten2bv(op);
       else
         convert_expr(op);
@@ -5007,7 +5009,9 @@ void smt2_convt::convert_with(const with_exprt &expr)
         // may need to flatten array-theory arrays in there
         if(op.type().id() == ID_array && use_array_theory(op))
           flatten_array(op);
-        else if(op.type().id() == ID_bool)
+        else if(
+          op.type().id() == ID_bool ||
+          (op.type().id() == ID_floatbv && use_FPA_theory))
           flatten2bv(op);
         else
           convert_expr(op);
@@ -5512,6 +5516,18 @@ void smt2_convt::unflatten(
     {
       // nop, already a bv
     }
+  }
+  else if(type.id() == ID_floatbv && use_FPA_theory)
+  {
+    // reinterpret the bits as a floating-point number
+    if(where == wheret::BEGIN)
+    {
+      const floatbv_typet &floatbv_type = to_floatbv_type(type);
+      out << "((_ to_fp " << floatbv_type.get_e() << " "
+          << floatbv_type.get_f() + 1 << ") ";
+    }
+    else
+      out << ')';
   }
   else
   {
