@@ -274,7 +274,9 @@ void goto_convertt::finish_gotos(goto_programt &dest, const irep_idt &mode)
     }
     else if(i.is_incomplete_goto())
     {
-      const irep_idt &goto_label = i.code().get(ID_destination);
+      // a copy, not a reference: complete_goto below nils the instruction's
+      // code, which would leave a reference dangling
+      const irep_idt goto_label = i.code().get(ID_destination);
       const auto l_it = targets.labels.find(goto_label);
 
       if(l_it == targets.labels.end())
