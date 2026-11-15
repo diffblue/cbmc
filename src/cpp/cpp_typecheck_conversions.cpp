@@ -4888,7 +4888,42 @@ std::optional<exprt> cpp_typecheckt::construct_elements_in_place(
     const exprt &e = elements[k];
     if(e.id() != ID_side_effect || e.get(ID_statement) != ID_temporary_object)
     {
-      return {};
+      // [dcl.init.list]/5: an element of a class type copy-initialized from
+      // an object (`{*p}' with `const S *p') is constructed by the copy
+      // constructor where the list is evaluated.  In the array's static
+      // initializer it read the object in __CPROVER_initialize, before the
+      // function (and its parameter) existed.
+      const typet &element_type = array_type.element_type();
+      if(element_type.id() != ID_struct_tag || cpp_is_pod(element_type))
+        return {};
+      symbol_exprt assignable = array;
+      assignable.type() = array_type;
+      index_exprt element{
+        std::move(assignable), from_integer(k, c_index_type()), element_type};
+      element.set(ID_C_lvalue, true);
+      already_typechecked_exprt::make_already_typechecked(element);
+      // the conversion to the element type may leave the object designated
+      // without its value category; a named object, a member or element of
+      // one, or an indirection is an lvalue ([basic.lval], [expr.unary.op]/1:
+      // is_lvalue_expression tells an rvalue reference's xvalue apart), to
+      // be copied, not moved from
+      exprt source = e;
+      if(
+        source.id() == ID_symbol || source.id() == ID_member ||
+        source.id() == ID_index || source.id() == ID_dereference)
+      {
+        source.set(ID_C_lvalue, true);
+      }
+      const auto copy = cpp_constructor(
+        source_location, element, {already_typechecked_exprt{source}});
+      if(
+        !copy.has_value() || copy->get_statement() != ID_expression ||
+        copy->operands().size() != 1)
+      {
+        return {};
+      }
+      calls.push_back(to_code_expression(*copy).expression());
+      continue;
     }
     const exprt &init = static_cast<const exprt &>(e.find(ID_initializer));
     if(
