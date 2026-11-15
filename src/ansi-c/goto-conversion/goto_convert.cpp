@@ -1169,7 +1169,18 @@ void goto_convertt::convert_assign(
     copy(new_assign, ASSIGN, dest);
   }
 
-  destruct_locals(side_effects.temporaries, dest, ns);
+  // as in convert_expression: the initialization of a temporary object (an
+  // assignment to it, e.g. of a std::initializer_list from its backing
+  // array) is part of the enclosing full-expression, which destroys the
+  // temporaries ([class.temporary]/4); destroying them here ended the
+  // backing array's elements before the list was used
+  if(nested_call_temporaries != nullptr)
+  {
+    nested_call_temporaries->splice(
+      nested_call_temporaries->begin(), side_effects.temporaries);
+  }
+  else
+    destruct_locals(side_effects.temporaries, dest, ns);
 }
 
 void goto_convertt::convert_cpp_delete(const codet &code, goto_programt &dest)

@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "destructor.h"
 
+#include <set>
 #include <unordered_map>
 
 static symbol_exprt find_base_symbol(const exprt &expr)
@@ -742,6 +743,16 @@ goto_convertt::clean_expr_resultt goto_convertt::clean_expr(
 
       expr = nil_exprt();
     }
+
+    // the elements of a longer list are constructed by nested comma
+    // expressions, each of which records the backing array: destroy it once
+    std::set<irep_idt> seen;
+    side_effects.temporaries.remove_if(
+      [&seen](const irep_idt &id)
+      {
+        return id2string(id).rfind("__init_list_arr$", 0) == 0 &&
+               !seen.insert(id).second;
+      });
 
     return side_effects;
   }
