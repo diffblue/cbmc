@@ -16636,3 +16636,42 @@ Verified on binW224: 13 suites, profiles (z3 complex2 flaky), vacuity
 1063/3, MSVC, macOS 142/142, GCC 16 image, unit, lint, format, doxygen,
 iwyu (changed files); all reporter translation units convert with 0
 errors.
+
+## Round 238 (2026-11-15): user reports, four tool defects and three found on the way
+
+Reported (generic tests, each failing on binW224 and develop):
+- 4be73273cc `x = {}' / `f({})' with a POD class: the temporary was
+  default-initialized (indeterminate); now value-initialized
+  ([dcl.init.list]/3.5, [dcl.init.general]/9.1).  Keep ID_C_paren_init off
+  the list: `T x({})' (cpp11_paren_init_with_empty_braced_argument) broke
+  otherwise.
+- f39c9dcf35 `new (std::nothrow) T[n]': every new-expression with an
+  operand was lowered as the void* placement form, so the object was
+  "allocated" at &std::nothrow; nothrow_t / align_val_t arguments are now
+  dropped.  Also: an array placement argument decays; the
+  __placement_new_array model was missing (library test added).
+- 9fbfb00ee7 __CPROVER_cover (and set/clear_must/may, cleanup) without
+  instrumentation: failed "no body for callee" (develop too, C as well).
+- K: `std::vector<S>{*p}' in a member function: elements of a non-POD
+  class type copied from an object were the backing array's STATIC
+  initializer, read in __CPROVER_initialize.  Reproduced on the
+  reporter's harness TU (rebuilt from the earlier copy of the TU);
+  not reproduced small by the reporter because the bad reads only show
+  with --pointer-check.  Fixed by cbd1c530c0 (copy-construct in place;
+  the element must be an lvalue, else the move constructor was chosen).
+Found while checking K (each on binW224 too):
+- 808cb40f7e the array_replace model of __uninitialized_copy_a was used
+  for non-trivially-copyable elements: copying vector<S> shared S's
+  storage, double delete.
+- 7af0640579 backing array elements destroyed before the callee read
+  them (convert_assign did not hand temporaries to the enclosing
+  full-expression), and twice for lists of 3+ (nested commas).
+Not changed: allocation function selection.  `new (arena) T' with a
+user-declared `operator new(size_t, arena &)', and a class-specific
+operator new, are still lowered as the void* placement form / __new
+(pre-existing; reported to the user).
+Open-PR search: no candidate fix for any of these.
+Verified: binW225 (13 suites; cbmc-cpp paren-init regression found and
+fixed), binW226 (cbmc-cpp, libc++, KNOWNBUG profiles, GCC 16 image, macOS
+142/142); post on binW225: profiles (z3 complex2 flaky), vacuity 1063/3,
+MSVC; unit, lint, format, doxygen, iwyu (changed files).
