@@ -17,6 +17,7 @@ Date:   December 2014
 
 #include <util/c_types.h>
 #include <util/message.h>
+#include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/prefix.h>
 #include <util/range.h>
@@ -27,11 +28,13 @@ Date:   December 2014
 #include <goto-programs/goto_model.h>
 #include <goto-programs/remove_skip.h>
 
+#include "asm_approximation.h"
 #include "assembler_parser.h"
 
 #include <cctype>
 #include <functional>
 #include <optional>
+#include <set>
 
 class remove_asmt
 {
@@ -43,7 +46,8 @@ public:
     : symbol_table(_symbol_table),
       goto_functions(_goto_functions),
       message_handler(message_handler),
-      log(message_handler)
+      log(message_handler),
+      approximate(_symbol_table)
   {
   }
 
@@ -58,6 +62,10 @@ protected:
   goto_functionst &goto_functions;
   message_handlert &message_handler;
   messaget log;
+  asm_approximationt approximate;
+
+  /// The address-taken local variables of the function being processed.
+  std::vector<symbol_exprt> address_taken_locals;
 
   using instructionst = std::list<assembler_parsert::instructiont>;
 
@@ -74,7 +82,10 @@ protected:
     goto_programt::instructiont &instruction,
     goto_programt &dest);
 
-  void process_instruction_gcc(const code_asm_gcct &, goto_programt &dest);
+  void process_instruction_gcc(
+    const irep_idt &function_id,
+    const code_asm_gcct &,
+    goto_programt &dest);
 
   void process_instruction_msc(
     const irep_idt &function_id,
@@ -89,7 +100,14 @@ protected:
     goto_programt &dest,
     const handle_commandt &handle_command);
 
-  void warn_dropped(const code_asmt &code);
+  void approximate_asm(
+    const irep_idt &function_id,
+    const code_asmt &code,
+    const irep_idt &unknown_command,
+    const asm_footprintt &footprint,
+    const std::string &writes_description,
+    const std::string &addresses_description,
+    goto_programt &dest);
 
   bool handle_gcc_command(
     const irep_idt &command,
@@ -186,7 +204,7 @@ void remove_asmt::process_instruction(
   const irep_idt &flavor = code.get_flavor();
 
   if(flavor == ID_gcc)
-    process_instruction_gcc(to_code_asm_gcc(code), dest);
+    process_instruction_gcc(function_id, to_code_asm_gcc(code), dest);
   else if(flavor == ID_msc)
     process_instruction_msc(function_id, code, dest);
   else
@@ -322,28 +340,74 @@ std::optional<irep_idt> remove_asmt::process_asm(
   return {};
 }
 
-/// Warns that the inline assembly statement \p code is dropped.
+/// Appends the conservative approximation of the inline assembly statement
+/// \p code (see \ref asm_approximationt) to \p dest and warns about it.
+///
+/// \param function_id: Name of function being processed
 /// \param code: The inline assembly code statement
-void remove_asmt::warn_dropped(const code_asmt &code)
+/// \param unknown_command: The first command in \p code that is not modeled
+/// \param footprint: What \p code may read and write
+/// \param writes_description: Description of the writes in \p footprint,
+///   for the warning
+/// \param addresses_description: Description of the objects the addresses
+///   in \p footprint point to, for the warning
+/// \param dest: The goto program to append the new instructions to
+void remove_asmt::approximate_asm(
+  const irep_idt &function_id,
+  const code_asmt &code,
+  const irep_idt &unknown_command,
+  const asm_footprintt &footprint,
+  const std::string &writes_description,
+  const std::string &addresses_description,
+  goto_programt &dest)
 {
-  // The entire inline-assembly statement is dropped when any of its
-  // instructions is not recognized; warn so that the user is not left
-  // silently relying on un-modeled assembly.
-  log.warning() << "dropping inline assembly statement at "
-                << code.source_location()
-                << ": it contains an instruction that is not modeled, so the "
-                   "whole statement (including any modeled instructions) is "
-                   "removed"
+  approximate(
+    footprint, address_taken_locals, function_id, code.source_location(), dest);
+
+  std::vector<std::string> parts;
+  if(!footprint.writes.empty())
+    parts.push_back(writes_description);
+  if(!footprint.addresses.empty())
+    parts.push_back(addresses_description);
+  if(footprint.arbitrary_memory)
+  {
+    parts.push_back(
+      "all objects of static lifetime and the objects their pointers point "
+      "to");
+    parts.push_back(
+      "the address-taken local variables of " + id2string(function_id));
+  }
+  parts.push_back("the rounding mode");
+
+  std::string havocked;
+  for(std::size_t i = 0; i < parts.size(); ++i)
+  {
+    if(i > 0)
+      havocked += i + 1 == parts.size() ? (i > 1 ? ", and " : " and ") : ", ";
+    havocked += parts[i];
+  }
+
+  log.warning() << "approximating inline assembly statement at "
+                << code.source_location() << ": "
+                << (unknown_command.empty()
+                      ? std::string{"an instruction"}
+                      : "instruction '" + id2string(unknown_command) + "'")
+                << " is not modeled, so " << havocked
+                << (parts.size() == 1 ? " is assigned a nondeterministic value"
+                                      : " are assigned nondeterministic values")
+                << "; other objects are assumed to be unchanged"
                 << messaget::eom;
 }
 
 /// Translates the given inline assembly code (in gcc style) to non-assembly
-/// goto program instructions, dropping it if it contains an instruction
-/// that is not modeled.
+/// goto program instructions, approximating it conservatively if it
+/// contains an instruction that is not modeled.
 ///
+/// \param function_id: Name of function being processed
 /// \param code: The inline assembly code statement to translate
 /// \param dest: The goto program to append the new instructions to
 void remove_asmt::process_instruction_gcc(
+  const irep_idt &function_id,
   const code_asm_gcct &code,
   goto_programt &dest)
 {
@@ -361,8 +425,68 @@ void remove_asmt::process_instruction_gcc(
       goto_programt &tmp_dest)
     { return handle_gcc_command(command, pos, instruction, code, tmp_dest); });
 
-  if(unknown.has_value())
-    warn_dropped(code);
+  if(!unknown.has_value())
+    return;
+
+  const namespacet ns{symbol_table};
+  asm_footprintt footprint;
+
+  for(const auto &output : code.outputs().operands())
+  {
+    if(output.operands().size() != 2)
+      continue;
+    const exprt &constraint = to_binary_expr(output).op0();
+    const exprt &lvalue = to_binary_expr(output).op1();
+    footprint.writes.push_back(lvalue);
+    // in-out operands are also read, and may be addresses
+    if(
+      constraint.id() == ID_string_constant &&
+      id2string(to_string_constant(constraint).value()).find('+') !=
+        std::string::npos)
+    {
+      footprint.reads.push_back(lvalue);
+      asm_approximationt::collect_addresses(lvalue, ns, footprint.addresses);
+    }
+  }
+
+  for(const auto &input : code.inputs().operands())
+  {
+    if(input.operands().size() != 2)
+      continue;
+    const exprt &expr = to_binary_expr(input).op1();
+    footprint.reads.push_back(expr);
+    asm_approximationt::collect_addresses(expr, ns, footprint.addresses);
+  }
+
+  for(const auto &clobber : code.clobbers().operands())
+  {
+    const exprt &name = clobber.id() == ID_gcc_asm_clobbered_register
+                          ? to_unary_expr(clobber).op()
+                          : clobber;
+    if(
+      name.id() == ID_string_constant &&
+      to_string_constant(name).value() == "memory")
+    {
+      footprint.arbitrary_memory = true;
+    }
+  }
+
+  // basic assembly (without operands) may access any memory
+  if(
+    code.outputs().operands().empty() && code.inputs().operands().empty() &&
+    code.clobbers().operands().empty())
+  {
+    footprint.arbitrary_memory = true;
+  }
+
+  approximate_asm(
+    function_id,
+    code,
+    *unknown,
+    footprint,
+    "its output operands",
+    "the objects its operands point to",
+    dest);
 }
 
 /// \return The operand of \p code referred to as `%N` by the tokens of
@@ -502,8 +626,8 @@ bool remove_asmt::handle_gcc_command(
 }
 
 /// Translates the given inline assembly code (in msc style) to non-assembly
-/// goto program instructions, dropping it if it contains an instruction
-/// that is not modeled.
+/// goto program instructions, approximating it conservatively if it
+/// contains an instruction that is not modeled.
 ///
 /// \param function_id: Name of function being processed
 /// \param code: The inline assembly code statement to translate
@@ -530,8 +654,54 @@ void remove_asmt::process_instruction_msc(
         command, pos, instruction, function_id, code, tmp_dest);
     });
 
-  if(unknown.has_value())
-    warn_dropped(code);
+  if(!unknown.has_value())
+    return;
+
+  // MSVC-style blocks have no operand interface: any variable named in the
+  // block may be read or written, and so may any memory. As C names may be
+  // shadowed, every local variable of the function with that name is
+  // considered.
+  const namespacet ns{symbol_table};
+  asm_footprintt footprint;
+  footprint.arbitrary_memory = true;
+
+  const std::string local_prefix = id2string(function_id) + "::";
+  std::set<irep_idt> names;
+  for(const auto &instruction : instructions)
+  {
+    for(const auto &token : instruction)
+    {
+      if(token.id() == ID_symbol)
+        names.insert(token.get(ID_identifier));
+    }
+  }
+
+  for(const auto &name : names)
+  {
+    for(const auto &entry : equal_range(symbol_table.symbol_base_map, name))
+    {
+      const symbolt &symbol = symbol_table.lookup_ref(entry.second);
+      if(
+        !symbol.is_lvalue || symbol.is_type || symbol.is_macro ||
+        symbol.type.id() == ID_code || symbol.is_static_lifetime ||
+        !has_prefix(id2string(symbol.name), local_prefix))
+      {
+        continue;
+      }
+      footprint.writes.push_back(symbol.symbol_expr());
+      asm_approximationt::collect_addresses(
+        symbol.symbol_expr(), ns, footprint.addresses);
+    }
+  }
+
+  approximate_asm(
+    function_id,
+    code,
+    *unknown,
+    footprint,
+    "the local variables it names",
+    "the objects these point to",
+    dest);
 }
 
 /// Translates a single recognized msc-style command into \p tmp_dest.
@@ -613,11 +783,20 @@ void remove_asmt::process_function(
   goto_functionst::goto_functiont &goto_function)
 {
   bool did_something = false;
+  bool locals_computed = false;
 
   Forall_goto_program_instructions(it, goto_function.body)
   {
     if(it->is_other() && it->get_other().get_statement() == ID_asm)
     {
+      // compute before any of the statements is replaced
+      if(!locals_computed)
+      {
+        address_taken_locals = asm_approximationt::address_taken_locals(
+          goto_function.body, namespacet{symbol_table});
+        locals_computed = true;
+      }
+
       goto_programt tmp_dest;
       process_instruction(function_id, *it, tmp_dest);
       it->turn_into_skip();
@@ -651,9 +830,9 @@ void remove_asm(
 /// Replaces inline assembly instructions in the goto program (i.e.,
 /// instructions of kind `OTHER` with a `code` member of type `code_asmt`) with
 /// an appropriate (sequence of) non-assembly goto program instruction(s).
-/// At present only a small number of x86, ARM, and Power instructions are
-/// supported. Statements that contain an unrecognised instruction are
-/// removed.
+/// Statements that contain an instruction that is not modeled are
+/// approximated conservatively: everything they may change is assigned a
+/// nondeterministic value (see \ref asm_approximationt).
 ///
 /// \param goto_model: The goto model
 /// \param message_handler: Message handler
