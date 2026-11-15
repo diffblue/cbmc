@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--unwind 5 --pointer-check
+^\[main\.assertion\.1\] .* copy owns its storage: SUCCESS$
+^\[main\.assertion\.2\] .* source intact: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+double delete: FAILURE$
+--
+Copying a std::vector copies each element by its copy constructor
+([uninitialized.copy]/1).  The model of libstdc++'s __uninitialized_copy_a
+copied the bytes also for elements that are not trivially copyable, so the
+copy shared the source's storage, which was then deallocated twice.

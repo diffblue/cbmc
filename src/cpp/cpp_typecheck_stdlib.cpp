@@ -3312,10 +3312,19 @@ void cpp_typecheckt::provide_stdlib_bodies()
           // _Deque_iterator, whose position is _M_cur) keep the library's own
           // element-wise body -- an array_replace of the iterator objects
           // violated symex's pointer precondition (`std::deque<bool> e(d)')
+          // N5008 [basic.types.general]/2-3: copying the bytes of an object
+          // is a copy of it only for a trivially copyable type; for any
+          // other element type (one owning storage, e.g. a class with a
+          // std::vector member) the library's body constructs each element
+          // by its copy or move constructor ([uninitialized.copy]/1).  The
+          // byte copy shared the source's storage, which both objects'
+          // destructors then deallocated ("double delete").
           if(
             first_ptr.type().id() == ID_pointer &&
             last_ptr.type().id() == ID_pointer &&
-            result.type().id() == ID_pointer && !is_reference(result.type()))
+            result.type().id() == ID_pointer && !is_reference(result.type()) &&
+            is_trivially_copyable_type(
+              to_pointer_type(result.type()).base_type(), false, 16))
           {
             minus_exprt count{last_ptr, first_ptr};
             count.type() = pointer_diff_type();
