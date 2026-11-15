@@ -354,7 +354,19 @@ void goto_symext::symex_function_call_post_clean(
     // bodyless call is otherwise modelled as "assign nondet to the lhs
     // and change nothing else", which proves vacuously that state
     // reachable through the callee is unchanged.
-    if(symex_config.unwinding_assertions || symex_config.no_body_assertions)
+    // The annotation built-ins __CPROVER_cover (instrumented by --cover)
+    // and those of the must/may analyses (goto-instrument, goto-analyzer)
+    // have no body by design: elsewhere they do nothing, so a call to one is
+    // not a gap in the model (goto_inline ignores them likewise).
+    const bool is_annotation = identifier == CPROVER_PREFIX "cover" ||
+                               identifier == CPROVER_PREFIX "cleanup" ||
+                               identifier == CPROVER_PREFIX "set_must" ||
+                               identifier == CPROVER_PREFIX "set_may" ||
+                               identifier == CPROVER_PREFIX "clear_must" ||
+                               identifier == CPROVER_PREFIX "clear_may";
+    if(
+      (symex_config.unwinding_assertions || symex_config.no_body_assertions) &&
+      !is_annotation)
     {
       const auto &symbol = ns.lookup(identifier);
       const std::string property_id =
