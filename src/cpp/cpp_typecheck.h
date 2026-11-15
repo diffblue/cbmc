@@ -2026,6 +2026,10 @@ public:
   void implicit_typecast_arithmetic(exprt &expr1, exprt &expr2) override;
 
   void implicit_typecast_arithmetic(exprt &expr) override;
+  /// Set by typecheck_switch for the promotion of the switch condition
+  /// that c_typecheck_baset::typecheck_switch performs next, which leaves a
+  /// scoped enumeration unchanged ([stmt.switch]/2).
+  bool keep_scoped_enumeration_switch_condition = false;
 
   void get_bases(const struct_typet &type,
      std::set<irep_idt> &set_bases) const;

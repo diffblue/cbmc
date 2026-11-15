@@ -47,6 +47,17 @@ void cpp_typecheckt::typecheck_enum_body(
       // [dcl.enum]: an enumerator value is a constant expression.
       constant_expression_contextt constant_expression_guard{*this};
       typecheck_expr(value);
+      // N5008 [dcl.enum]/5: prior to the closing brace an enumerator of a
+      // fixed underlying type has the underlying type (`native = little'
+      // in a scoped enumeration, libc++'s std::endian); the symbols of the
+      // preceding enumerators have the enumeration type already
+      if(
+        value.type().id() == ID_c_enum_tag &&
+        to_c_enum_tag_type(value.type()).get_identifier() == enum_symbol.name &&
+        !underlying_defaulted)
+      {
+        value = typecast_exprt{value, c_enum_type.underlying_type()};
+      }
       // N5008 [dcl.enum]/5: with a fixed underlying type, the value is
       // converted to that type; otherwise an integer keeps its value (the
       // underlying type is chosen to hold it below)

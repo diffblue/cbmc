@@ -1,0 +1,13 @@
+CORE
+implicit.cpp
+
+^file implicit\.cpp line 10 function main: found no match for symbol 'f'
+^CONVERSION ERROR$
+^EXIT=6$
+^SIGNAL=0$
+--
+^Invariant check failed
+^VERIFICATION
+--
+g++ and clang++ reject the program: [conv.integral]/1 converts unscoped
+enumerations only ([dcl.enum]/10).

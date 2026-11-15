@@ -294,6 +294,16 @@ enum_promotion_type(const c_enum_tag_typet &enum_tag, const namespacet &ns)
   return {};
 }
 
+/// \return whether \p type is a scoped enumeration type, which N5008
+///   [dcl.enum]/10 does not convert implicitly to an integer, a
+///   floating-point type or bool ([conv.integral]/1, [conv.fpint]/2,
+///   [conv.bool]/1 name only unscoped enumerations)
+static bool is_scoped_enumeration(const typet &type, const namespacet &ns)
+{
+  return type.id() == ID_c_enum_tag &&
+         ns.follow_tag(to_c_enum_tag_type(type)).get_bool(ID_C_class);
+}
+
 /// Integral-promotion conversion
 ///
 /// An rvalue of type char, signed char, unsigned char, short int,
@@ -486,6 +496,9 @@ bool cpp_typecheckt::standard_conversion_integral_conversion(
     return false;
   }
 
+  if(is_scoped_enumeration(expr.type(), *this))
+    return false;
+
   if(expr.get_bool(ID_C_lvalue))
     return false;
 
@@ -531,7 +544,8 @@ bool cpp_typecheckt::standard_conversion_floating_integral_conversion(
   }
   else if(
     expr.type().id() == ID_signedbv || expr.type().id() == ID_unsignedbv ||
-    expr.type().id() == ID_c_enum_tag)
+    (expr.type().id() == ID_c_enum_tag &&
+     !is_scoped_enumeration(expr.type(), *this)))
   {
     if(type.id() != ID_fixedbv && type.id() != ID_floatbv)
       return false;
@@ -870,6 +884,9 @@ bool cpp_typecheckt::standard_conversion_boolean(
   {
     return false;
   }
+
+  if(is_scoped_enumeration(expr.type(), *this))
+    return false;
 
   c_qualifierst qual_from;
   qual_from.read(expr.type());
@@ -7017,6 +7034,23 @@ bool cpp_typecheckt::static_typecast(
     return true;
   }
 
+  // N5008 [expr.static.cast]/8: a scoped enumeration explicitly converts to
+  // an integral type (via its underlying type) and to a floating-point type
+  // -- not by the implicit conversions ([conv.integral]/1, [conv.fpint]/2)
+  if(
+    is_scoped_enumeration(e.type(), *this) &&
+    (type.id() == ID_signedbv || type.id() == ID_unsignedbv ||
+     type.id() == ID_c_bool || type.id() == ID_bool ||
+     type.id() == ID_floatbv || type.id() == ID_fixedbv))
+  {
+    const typet &underlying =
+      follow_tag(to_c_enum_tag_type(e.type())).underlying_type();
+    new_expr = typecast_exprt::conditional_cast(
+      typecast_exprt::conditional_cast(e, underlying), type);
+    new_expr.remove(ID_C_lvalue);
+    return true;
+  }
+
   // int/enum to enum
   if(
     type.id() == ID_c_enum_tag &&
@@ -7322,6 +7356,25 @@ void cpp_typecheckt::implicit_typecast_arithmetic(exprt &expr1, exprt &expr2)
 
 void cpp_typecheckt::implicit_typecast_arithmetic(exprt &expr)
 {
+  // N5008 [stmt.switch]/2: a switch condition is converted to its promoted
+  // type if it is subject to integral promotions, which a scoped
+  // enumeration is not ([conv.prom]/4); its case labels are converted
+  // constant expressions of the enumeration type
+  if(keep_scoped_enumeration_switch_condition)
+  {
+    keep_scoped_enumeration_switch_condition = false;
+    // (also a bit-field of the enumeration type, read as that type)
+    const typet &type = expr.type().id() == ID_c_bit_field
+                          ? to_c_bit_field_type(expr.type()).underlying_type()
+                          : expr.type();
+    if(is_scoped_enumeration(type, *this))
+    {
+      if(expr.type() != type)
+        expr = typecast_exprt{expr, type};
+      return;
+    }
+  }
+
   promote_enum(expr, *this);
 
   typet t = expr.type();

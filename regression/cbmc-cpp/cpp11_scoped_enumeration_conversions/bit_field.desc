@@ -1,0 +1,12 @@
+CORE
+bit_field.cpp
+--cpp20
+^\[main\.assertion\.1\] .* bit-field: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+A switch condition that is a bit-field of scoped enumeration type has that
+type ([stmt.switch]/2; libstdc++ 16's std::format: `_Pres_type _M_type : 4').

@@ -2235,13 +2235,21 @@ void cpp_typecheckt::typecheck_switch(codet &code)
     // replace declaration by its symbol
     value = to_code_frontend_decl(to_code(to_unary_expr(decl).op())).symbol();
 
+    keep_scoped_enumeration_switch_condition = true;
     c_typecheck_baset::typecheck_switch(code);
+    keep_scoped_enumeration_switch_condition = false;
 
     code_blockt code_block({to_code(decl.op0()), code});
     code.swap(code_block);
   }
   else
+  {
+    // see implicit_typecast_arithmetic: c_typecheck_baset::typecheck_switch
+    // promotes the condition right after type-checking it
+    keep_scoped_enumeration_switch_condition = true;
     c_typecheck_baset::typecheck_switch(code);
+    keep_scoped_enumeration_switch_condition = false;
+  }
 }
 
 void cpp_typecheckt::check_default_constructor_access(
