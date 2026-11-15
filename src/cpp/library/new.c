@@ -70,6 +70,20 @@ inline void *__placement_new(__typeof__(sizeof(int)) malloc_size, void *p)
   return p;
 }
 
+/* FUNCTION: __placement_new_array */
+
+inline void *
+__placement_new_array(__CPROVER_size_t count, __CPROVER_size_t size, void *p)
+{
+// The constructor calls are done by the front-end.
+// The allocation is done by the user ([new.delete.placement]/5). So this
+// does nothing.
+__CPROVER_HIDE:;
+  (void)count;
+  (void)size;
+  return p;
+}
+
 /* FUNCTION: __delete */
 
 void __CPROVER_deallocate(void *);

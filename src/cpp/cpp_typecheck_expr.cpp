@@ -6655,8 +6655,59 @@ bool cpp_typecheckt::throw_operand_is_move_eligible(const exprt &operand)
   return true;
 }
 
+/// N5008 [new.syn], [new.delete.single], [new.delete.array]: whether
+/// \p type is std::nothrow_t or std::align_val_t, which as new-placement
+/// arguments select the non-throwing or the aligned form of the replaceable
+/// allocation functions rather than the reserved placement form.
+static bool is_allocation_function_selector(const typet &type)
+{
+  const typet &t =
+    is_reference(type) ? to_reference_type(type).base_type() : type;
+  const irep_idt &id = t.id() == ID_struct_tag || t.id() == ID_c_enum_tag
+                         ? to_tag_type(t).get_identifier()
+                         : irep_idt{};
+  return id == "std::tag-nothrow_t" || id == "std::tag-align_val_t";
+}
+
 void cpp_typecheckt::typecheck_expr_new(exprt &expr)
 {
+  // N5008 [expr.new]/19-20: the new-placement arguments are passed to the
+  // allocation function after the size.  With arguments of type
+  // std::nothrow_t and std::align_val_t only (`new (std::nothrow) T[n]'),
+  // that is one of the replaceable allocation functions, which allocates
+  // storage as `operator new(std::size_t)' does ([new.delete.single]/5,
+  // /10, [new.delete.array]); only the reserved placement form `operator
+  // new(std::size_t, void *)' ([new.delete.placement]/2) returns its
+  // argument.  Goto conversion lowers a new-expression with an operand as
+  // that placement form, which made `std::nothrow' the address of the new
+  // object.  Drop such arguments, so the expression allocates.
+  if(
+    !expr.operands().empty() &&
+    std::all_of(
+      expr.operands().begin(),
+      expr.operands().end(),
+      [](const exprt &op)
+      {
+        // (the operands are type-checked already)
+        return is_allocation_function_selector(op.type()) &&
+               !has_subexpr(op, ID_side_effect);
+      }))
+  {
+    expr.operands().clear();
+  }
+  // [expr.new]/19, [conv.array]: the argument of the reserved placement
+  // form `operator new(std::size_t, void *)' is converted to its parameter
+  // type: an array (`new (buffer) T') decays to a pointer to its first
+  // element.  The array itself was cast to void *, an invalid pointer.
+  else if(
+    expr.operands().size() == 1 &&
+    expr.operands().front().type().id() == ID_array)
+  {
+    exprt &placement = expr.operands().front();
+    const typet element_type = to_array_type(placement.type()).element_type();
+    implicit_typecast(placement, pointer_type(element_type));
+  }
+
   // next, find out if we do an array
 
   if(expr.type().id() == ID_array)

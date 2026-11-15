@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--pointer-check --bounds-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+no body for callee
+--
+The reserved placement form of operator new[] ([new.delete.placement]/5)
+returns its pointer argument: the elements are constructed in the given
+storage.  The model was missing.
