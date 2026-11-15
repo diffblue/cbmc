@@ -1,0 +1,12 @@
+CORE
+inaccessible.cpp
+
+^file inaccessible\.cpp line 11 function main: .* is not accessible$
+^CONVERSION ERROR$
+^EXIT=6$
+^SIGNAL=0$
+--
+^Invariant check failed
+^VERIFICATION
+--
+g++ and clang++ reject the program: the allocation function is private.

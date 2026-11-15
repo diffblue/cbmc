@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/cprover_prefix.h>
 #include <util/exception_utils.h>
 #include <util/expr_util.h>
@@ -1183,6 +1184,21 @@ void goto_convertt::convert_assign(
     destruct_locals(side_effects.temporaries, dest, ns);
 }
 
+/// N5008 [expr.new]/21: the number of elements of the array \p pointer
+/// points to, which the array cookie in front of the first element holds
+/// (goto_convertt::do_cpp_new_allocation_call)
+static exprt array_cookie_count(const exprt &pointer)
+{
+  const exprt address = typecast_exprt{
+    minus_exprt{
+      typecast_exprt{pointer, pointer_type(char_type())},
+      from_integer(
+        size_type().get_width() / config.ansi_c.char_width,
+        signed_size_type())},
+    pointer_type(size_type())};
+  return dereference_exprt{address};
+}
+
 void goto_convertt::convert_cpp_delete(const codet &code, goto_programt &dest)
 {
   // C++11 deleted function marker (= delete) has no operands
@@ -1227,6 +1243,7 @@ void goto_convertt::convert_cpp_delete(const codet &code, goto_programt &dest)
   // we call the destructor, and then free
   const exprt &destructor =
     static_cast<const exprt &>(code.find(ID_destructor));
+  const exprt &cookie = static_cast<const exprt &>(code.find("#array_cookie"));
 
   irep_idt delete_identifier;
 
@@ -1270,10 +1287,15 @@ void goto_convertt::convert_cpp_delete(const codet &code, goto_programt &dest)
         throw 0;
       }
 
-      // count = object_size(ptr) / sizeof(T)
-      exprt count = div_exprt(
-        object_size(tmp_op),
-        typecast_exprt::conditional_cast(size_of_opt.value(), size_type()));
+      // count = object_size(ptr) / sizeof(T), or the number that the array
+      // cookie holds when the class's allocation function stored one
+      // (do_cpp_new_allocation_call)
+      exprt count = cookie.is_not_nil()
+                      ? array_cookie_count(tmp_op)
+                      : exprt{div_exprt(
+                          object_size(tmp_op),
+                          typecast_exprt::conditional_cast(
+                            size_of_opt.value(), size_type()))};
 
       const symbolt &index_symbol = get_fresh_aux_symbol(
         size_type(),
@@ -1339,6 +1361,64 @@ void goto_convertt::convert_cpp_delete(const codet &code, goto_programt &dest)
     goto_programt::targett after_destructor =
       dest.add(goto_programt::make_skip(code.source_location()));
     skip_destructor->complete_goto(after_destructor);
+  }
+
+  // N5008 [expr.delete]/9-10: the class-specific deallocation function that
+  // the C++ front end selected, called with the address of the deleted
+  // object (that of the allocated block, for an array with a cookie) and
+  // the further arguments it takes; [expr.delete]/6: not called for a null
+  // pointer value (it is unspecified whether it is)
+  const irept &deallocation_function = code.find(ID_deallocation_function);
+  if(deallocation_function.is_not_nil())
+  {
+    const symbol_exprt &function =
+      to_symbol_expr(static_cast<const exprt &>(deallocation_function));
+    const auto &parameters = to_code_type(function.type()).parameters();
+    exprt pointer = code.get_bool("#destroying_delete") ? tmp_op : deallocated;
+    if(cookie.is_not_nil())
+    {
+      pointer = minus_exprt{
+        typecast_exprt{tmp_op, pointer_type(char_type())},
+        typecast_exprt::conditional_cast(cookie, signed_size_type())};
+    }
+    exprt::operandst arguments{
+      typecast_exprt::conditional_cast(pointer, parameters.front().type())};
+    for(const auto &argument : code.find(ID_arguments).get_sub())
+      arguments.push_back(static_cast<const exprt &>(argument));
+    // [expr.delete]/10: the size of an array plus the allocation overhead
+    if(
+      code.get_bool("#deallocation_sized") &&
+      code.get_statement() == ID_cpp_delete_array)
+    {
+      const std::size_t size_index =
+        code.get_bool("#destroying_delete") ? 2 : 1;
+      const typet &element_type = to_pointer_type(tmp_op.type()).base_type();
+      const auto element_size = size_of_expr(element_type, ns);
+      exprt size = object_size(tmp_op);
+      if(cookie.is_not_nil() && element_size.has_value())
+      {
+        size = plus_exprt{
+          mult_exprt{
+            array_cookie_count(tmp_op),
+            typecast_exprt::conditional_cast(*element_size, size_type())},
+          typecast_exprt::conditional_cast(cookie, size_type())};
+      }
+      arguments[size_index] =
+        typecast_exprt::conditional_cast(size, parameters[size_index].type());
+    }
+
+    goto_programt::targett skip_deallocation =
+      dest.add(goto_programt::make_incomplete_goto(
+        equal_exprt{tmp_op, null_pointer_exprt{to_pointer_type(tmp_op.type())}},
+        code.source_location()));
+    code_function_callt deallocation_call{function, std::move(arguments)};
+    deallocation_call.add_source_location() = code.source_location();
+    convert(deallocation_call, dest, ID_cpp);
+    skip_deallocation->complete_goto(
+      dest.add(goto_programt::make_skip(code.source_location())));
+
+    destruct_locals(side_effects.temporaries, dest, ns);
+    return;
   }
 
   // now do "free"

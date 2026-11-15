@@ -243,6 +243,14 @@ protected:
 
   static void replace_new_object(const exprt &object, exprt &dest);
 
+  void do_cpp_new_allocation_call(
+    const exprt &lhs,
+    const side_effect_exprt &rhs,
+    side_effect_expr_function_callt call,
+    const exprt &count,
+    const exprt &object_size,
+    clean_expr_resultt &side_effects,
+    goto_programt &dest);
   void cpp_new_initializer(
     const exprt &lhs,
     const side_effect_exprt &rhs,

@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/mathematical_expr.h>
 #include <util/mathematical_types.h>
 #include <util/pointer_expr.h>
+#include <util/pointer_offset_size.h>
 #include <util/rational.h>
 #include <util/rational_tools.h>
 #include <util/simplify_expr.h>
@@ -416,6 +417,24 @@ void goto_convertt::do_cpp_new(
 
   exprt tmp_symbol_expr;
 
+  // N5008 [expr.new]/12-22: a call of the allocation function that the C++
+  // front end selected, other than a replaceable global one (whose call is
+  // omitted, [expr.new]/14) and the reserved placement form (both below)
+  const irept &allocation_function = rhs.find(ID_allocation_function);
+  if(allocation_function.is_not_nil())
+  {
+    do_cpp_new_allocation_call(
+      lhs,
+      rhs,
+      to_side_effect_expr_function_call(
+        static_cast<const exprt &>(allocation_function)),
+      count,
+      object_size,
+      side_effects,
+      dest);
+    return;
+  }
+
   // is this a placement new?
   if(rhs.operands().empty()) // no, "regular" one
   {
@@ -505,6 +524,191 @@ void goto_convertt::do_cpp_new(
   cpp_new_initializer(lhs, rhs, tmp_initializer);
 
   dest.destructive_append(tmp_initializer);
+}
+
+/// The part of do_cpp_new that calls the allocation function \p call
+/// selected by the C++ front end (its first argument being a placeholder
+/// for the size), then initializes the object.  \p count is the number of
+/// elements of an array, \p object_size the size of an element (of the
+/// object, for a non-array).
+void goto_convertt::do_cpp_new_allocation_call(
+  const exprt &lhs,
+  const side_effect_exprt &rhs,
+  side_effect_expr_function_callt call,
+  const exprt &count,
+  const exprt &object_size,
+  clean_expr_resultt &side_effects,
+  goto_programt &dest)
+{
+  const source_locationt &source_location = rhs.source_location();
+  const bool new_array = rhs.get(ID_statement) == ID_cpp_new_array;
+  const typet &size_type = object_size.type();
+
+  // N5008 [expr.new]/17, /21: the amount of space requested -- for an array
+  // the elements and the overhead, the array cookie, that holds their
+  // number (see cpp_typecheckt::resolve_allocation_function)
+  const exprt &cookie = static_cast<const exprt &>(rhs.find("#array_cookie"));
+  const bool with_cookie = new_array && cookie.is_not_nil();
+  exprt size = new_array ? exprt{mult_exprt{count, object_size}} : object_size;
+  if(with_cookie)
+    size =
+      plus_exprt{size, typecast_exprt::conditional_cast(cookie, size_type)};
+  call.arguments().front() =
+    typecast_exprt::conditional_cast(size, call.arguments().front().type());
+
+  // N5008 [expr.new]/30: a placement deallocation function receives the
+  // same placement arguments: evaluate those with side effects once
+  const irept &deallocation_function = rhs.find(ID_deallocation_function);
+  const bool placement_deallocation = deallocation_function.is_not_nil() &&
+                                      rhs.get_bool("#deallocation_placement");
+  std::list<symbol_exprt> placement_values;
+  if(placement_deallocation)
+  {
+    for(std::size_t i = 1; i < call.arguments().size(); ++i)
+    {
+      exprt &argument = call.arguments()[i];
+      if(!has_subexpr(argument, ID_side_effect))
+        continue;
+      const symbolt &value = new_tmp_symbol(
+        argument.type(), "placement", dest, source_location, ID_cpp);
+      code_frontend_assignt evaluation{value.symbol_expr(), argument};
+      evaluation.add_source_location() = source_location;
+      convert(evaluation, dest, ID_cpp);
+      argument = value.symbol_expr();
+      placement_values.push_back(value.symbol_expr());
+    }
+  }
+
+  const symbolt &tmp_symbol =
+    new_tmp_symbol(call.type(), "new", dest, source_location, ID_cpp);
+  const symbol_exprt tmp_symbol_expr = tmp_symbol.symbol_expr();
+  exprt::operandst call_arguments;
+  {
+    // the temporaries of the placement arguments belong to the enclosing
+    // full-expression ([class.temporary]/4)
+    std::list<irep_idt> argument_temporaries;
+    std::list<irep_idt> *const saved = nested_call_temporaries;
+    nested_call_temporaries = &argument_temporaries;
+    call_arguments = call.arguments();
+    code_frontend_assignt allocation{tmp_symbol_expr, std::move(call)};
+    allocation.add_source_location() = source_location;
+    convert(allocation, dest, ID_cpp);
+    nested_call_temporaries = saved;
+    side_effects.temporaries.splice(
+      side_effects.temporaries.begin(), argument_temporaries);
+  }
+
+  // [expr.new]/22: a non-throwing allocation function returns null to
+  // indicate failure; then the object is not initialized and the value of
+  // the new-expression is null
+  const bool may_return_null = rhs.get_bool("#allocation_noexcept");
+  const typet char_pointer = pointer_type(char_type());
+  if(with_cookie)
+  {
+    goto_programt::targett skip_cookie;
+    if(may_return_null)
+    {
+      skip_cookie = dest.add(goto_programt::make_incomplete_goto(
+        equal_exprt{
+          tmp_symbol_expr,
+          null_pointer_exprt{to_pointer_type(tmp_symbol_expr.type())}},
+        source_location));
+    }
+    const exprt cookie_offset =
+      typecast_exprt::conditional_cast(cookie, signed_size_type());
+    const exprt block = typecast_exprt{tmp_symbol_expr, char_pointer};
+    // the number of elements, just before the first of them
+    const exprt count_address = typecast_exprt{
+      plus_exprt{
+        block,
+        minus_exprt{
+          cookie_offset,
+          from_integer(
+            pointer_offset_size(size_type, ns).value(), signed_size_type())}},
+      pointer_type(size_type)};
+    dest.add(goto_programt::make_assignment(
+      dereference_exprt{count_address}, count, source_location));
+    dest.add(goto_programt::make_assignment(
+      tmp_symbol_expr,
+      typecast_exprt{plus_exprt{block, cookie_offset}, tmp_symbol_expr.type()},
+      source_location));
+    if(may_return_null)
+    {
+      skip_cookie->complete_goto(
+        dest.add(goto_programt::make_skip(source_location)));
+    }
+  }
+
+  dest.add(goto_programt::make_assignment(
+    lhs, typecast_exprt(tmp_symbol_expr, lhs.type()), source_location));
+
+  // N5008 [expr.new]/27, /30: if the initialization terminates by throwing
+  // an exception, the deallocation function is called with the value the
+  // allocation function returned (in front of the array cookie) -- code on
+  // the destructor stack that only the exceptional unwind path runs
+  const node_indext stack_before_initialization =
+    targets.scope_stack.get_current_node();
+  if(deallocation_function.is_not_nil())
+  {
+    const symbol_exprt &function =
+      to_symbol_expr(static_cast<const exprt &>(deallocation_function));
+    const auto &parameters = to_code_type(function.type()).parameters();
+    exprt returned = lhs;
+    if(with_cookie)
+    {
+      returned = minus_exprt{
+        typecast_exprt{lhs, char_pointer},
+        typecast_exprt::conditional_cast(cookie, signed_size_type())};
+    }
+    exprt::operandst arguments{
+      typecast_exprt::conditional_cast(returned, parameters.front().type())};
+    if(placement_deallocation)
+    {
+      for(std::size_t i = 1; i < call_arguments.size(); ++i)
+        arguments.push_back(call_arguments[i]);
+    }
+    else
+    {
+      for(const auto &argument : rhs.find(ID_arguments).get_sub())
+        arguments.push_back(static_cast<const exprt &>(argument));
+      // [expr.delete]/10: the size requested
+      if(rhs.get_bool("#deallocation_sized") && arguments.size() >= 2)
+      {
+        arguments[1] =
+          typecast_exprt::conditional_cast(size, parameters[1].type());
+      }
+    }
+    code_function_callt deallocation{function, std::move(arguments)};
+    deallocation.add_source_location() = source_location;
+    targets.scope_stack.add(deallocation, {});
+  }
+
+  goto_programt::targett skip_initialization;
+  if(may_return_null)
+  {
+    skip_initialization = dest.add(goto_programt::make_incomplete_goto(
+      equal_exprt{lhs, null_pointer_exprt{to_pointer_type(lhs.type())}},
+      source_location));
+  }
+
+  goto_programt tmp_initializer;
+  cpp_new_initializer(lhs, rhs, tmp_initializer);
+  dest.destructive_append(tmp_initializer);
+
+  // the initialization completed: not deallocated
+  targets.scope_stack.set_current_node(stack_before_initialization);
+
+  if(may_return_null)
+  {
+    skip_initialization->complete_goto(
+      dest.add(goto_programt::make_skip(source_location)));
+  }
+
+  // the temporaries of the placement arguments live until here at least
+  side_effects.add_temporary(tmp_symbol_expr.get_identifier());
+  destruct_locals(side_effects.temporaries, dest, ns);
+  for(const auto &value : placement_values)
+    dest.add(goto_programt::make_dead(value, source_location));
 }
 
 /// builds a goto program for object initialization after new

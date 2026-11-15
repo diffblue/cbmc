@@ -1,0 +1,13 @@
+CORE
+placement_without_declaration.cpp
+
+^file placement_without_declaration\.cpp line 9 function main: found no match
+^CONVERSION ERROR$
+^EXIT=6$
+^SIGNAL=0$
+--
+^Invariant check failed
+^VERIFICATION
+--
+g++ and clang++ reject the program: the reserved placement form is not
+implicitly declared ([basic.stc.dynamic.general]/2, [new.syn]).

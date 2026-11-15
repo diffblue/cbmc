@@ -1569,6 +1569,37 @@ protected:
   void typecheck_expr_this(exprt &);
   void typecheck_expr_typeid(exprt &);
   void typecheck_expr_new(exprt &);
+  /// N5008 [expr.new]/12-30: select the allocation function of the
+  /// new-expression \p expr and the deallocation function it calls if the
+  /// initialization throws (see cpp_typecheck_allocation.cpp).
+  void resolve_allocation_function(exprt &expr, const typet &allocated_type);
+  /// N5008 [expr.delete]/7-10: select the deallocation function of the
+  /// delete-expression \p expr.
+  void resolve_deallocation_function(exprt &expr, const typet &deleted_type);
+  /// \return whether the search for \p base_name in the scope of the class
+  ///   \p class_id finds a declaration ([class.member.lookup])
+  bool
+  class_scope_declares(const irep_idt &class_id, const irep_idt &base_name);
+  /// A usual deallocation function ([basic.stc.dynamic.deallocation]/3)
+  /// and the parameters it has after the pointer.
+  struct usual_deallocationt
+  {
+    const symbolt *symbol;
+    bool destroying, sized, aligned;
+  };
+  std::optional<usual_deallocationt> select_usual_deallocation_function(
+    const cpp_scopet::id_sett &found,
+    const typet &element_type,
+    bool allow_destroying,
+    const source_locationt &source_location);
+  exprt::operandst usual_deallocation_arguments(
+    const usual_deallocationt &selected,
+    const typet &element_type,
+    const source_locationt &source_location);
+  void resolve_new_expression_deallocation(
+    exprt &expr,
+    const symbolt &allocation_function,
+    const typet &element_type);
   void typecheck_expr_sizeof(exprt &) override;
   void typecheck_expr_is_invocable(exprt &expr);
   const symbolt &virtual_dispatch_thunk(const irep_idt &function_identifier);

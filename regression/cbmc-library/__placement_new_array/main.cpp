@@ -1,3 +1,5 @@
+#include <new>
+
 struct P
 {
   int x;

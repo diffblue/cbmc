@@ -24,6 +24,7 @@ SRC = cpp_base_subobjects.cpp \
       cpp_token_buffer.cpp \
       cpp_type2name.cpp \
       cpp_typecheck.cpp \
+      cpp_typecheck_allocation.cpp \
       cpp_typecheck_bases.cpp \
       cpp_typecheck_code.cpp \
       cpp_typecheck_compound_type.cpp \

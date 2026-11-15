@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] .* alignment argument: SUCCESS$
+^\[main\.assertion\.2\] .* aligned deallocation: SUCCESS$
+^\[main\.assertion\.3\] .* destroying operator delete: SUCCESS$
+^\[main\.assertion\.4\] .* sized deallocation: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+An over-aligned type passes its alignment to the allocation function
+([expr.new]/20); the deallocation function of a delete-expression is
+selected among the usual ones ([expr.delete]/9): a destroying operator
+delete, which runs no destructor, else by alignment, else the unsized one
+of a class.  It receives the size or alignment it takes ([expr.delete]/10).

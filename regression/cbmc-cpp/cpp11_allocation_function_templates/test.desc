@@ -1,0 +1,14 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] .* allocation function template: SUCCESS$
+^\[main\.assertion\.2\] .* member of a class template: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Overload resolution for the allocation function ([expr.new]/20) considers
+function templates, in a new-expression that is itself in a template, and
+the allocation functions of a class template specialization.

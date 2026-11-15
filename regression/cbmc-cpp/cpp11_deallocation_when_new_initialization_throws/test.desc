@@ -1,0 +1,16 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] .* deallocated after throwing constructor: SUCCESS$
+^\[main\.assertion\.2\] .* not deallocated: SUCCESS$
+^\[main\.assertion\.3\] .* placement deallocation: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+If the initialization of the object of a new-expression throws, the
+matching deallocation function is called ([expr.new]/27-30): the usual one
+for a non-placement allocation function, the placement one with the same
+further parameter types, given the same placement arguments.

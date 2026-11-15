@@ -478,6 +478,18 @@ goto_convertt::remove_cpp_delete(side_effect_exprt &expr)
   tmp.set(ID_destructor, expr.find(ID_destructor));
   if(expr.find("#deallocated_object").is_not_nil())
     tmp.add("#deallocated_object") = expr.find("#deallocated_object");
+  // the deallocation function selected by the C++ front end
+  // (cpp_typecheckt::resolve_deallocation_function)
+  for(const irep_idt &id :
+      {ID_deallocation_function,
+       ID_arguments,
+       irep_idt{"#array_cookie"},
+       irep_idt{"#deallocation_sized"},
+       irep_idt{"#destroying_delete"}})
+  {
+    if(expr.find(id).is_not_nil())
+      tmp.add(id) = expr.find(id);
+  }
 
   clean_expr_resultt side_effects;
   convert_cpp_delete(tmp, side_effects.side_effects);

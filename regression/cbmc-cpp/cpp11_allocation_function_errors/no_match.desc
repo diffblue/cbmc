@@ -1,0 +1,12 @@
+CORE
+no_match.cpp
+
+^file no_match\.cpp line 10 function main: found no match for symbol
+^CONVERSION ERROR$
+^EXIT=6$
+^SIGNAL=0$
+--
+^Invariant check failed
+^VERIFICATION
+--
+g++ and clang++ reject the program ([expr.new]/13, /20).

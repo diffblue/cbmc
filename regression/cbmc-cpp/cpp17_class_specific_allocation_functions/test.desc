@@ -1,0 +1,25 @@
+CORE
+main.cpp
+--cpp17 --pointer-check --bounds-check
+^\[main\.assertion\.1\] .* global placement: SUCCESS$
+^\[main\.assertion\.2\] .* class allocation function: SUCCESS$
+^\[main\.assertion\.3\] .* class deallocation function: SUCCESS$
+^\[main\.assertion\.4\] .* inherited allocation: SUCCESS$
+^\[main\.assertion\.5\] .* ::new uses the global: SUCCESS$
+^\[main\.assertion\.6\] .* ::delete uses the global: SUCCESS$
+^\[main\.assertion\.7\] .* array with cookie: SUCCESS$
+^\[main\.assertion\.8\] .* array deleted: SUCCESS$
+^\[main\.assertion\.9\] .* non-throwing allocation failed: SUCCESS$
+^\[main\.assertion\.10\] .* non-throwing allocation: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The allocation function of a new-expression is found in the scope of the
+class (also a base), else in the global scope, by overload resolution with
+the placement arguments ([expr.new]/13, /20); `::new' and `::delete' search
+the global scope only.  A non-throwing allocation function returning null
+skips the initialization ([expr.new]/22).  Class-specific and global
+placement allocation functions were ignored.

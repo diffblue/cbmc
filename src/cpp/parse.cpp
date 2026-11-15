@@ -10216,12 +10216,12 @@ bool Parser::rAllocateExpr(exprt &exp)
   std::cout << std::string(__indent, ' ') << "Parser::rAllocateExpr 0\n";
 #endif
 
+  // N5008 [expr.new]/13, [expr.delete]/8: a unary `::' restricts the
+  // search for the allocation or deallocation function to the global scope
   int t=lex.LookAhead(0);
-  if(t==TOK_SCOPE)
-  {
+  const bool global_scope = t == TOK_SCOPE;
+  if(global_scope)
     lex.get_token(tk);
-    // TODO one can put 'new'/'delete' into a namespace!
-  }
 
 #ifdef DEBUG
   std::cout << std::string(__indent, ' ') << "Parser::rAllocateExpr 1\n";
@@ -10259,6 +10259,8 @@ bool Parser::rAllocateExpr(exprt &exp)
        return false;
 
     exp.add_to_operands(std::move(obj));
+    if(global_scope)
+      exp.set(ID_C_global_scope, true);
 
     return true;
   }
@@ -10283,6 +10285,8 @@ bool Parser::rAllocateExpr(exprt &exp)
 
     exp.add(ID_initializer).swap(initializer);
     exp.operands().swap(arguments.operands());
+    if(global_scope)
+      exp.set(ID_C_global_scope, true);
     return true;
   }
   else

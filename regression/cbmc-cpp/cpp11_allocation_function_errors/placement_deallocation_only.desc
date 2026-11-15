@@ -1,0 +1,12 @@
+CORE
+placement_deallocation_only.cpp
+
+line 10 function main: no usual deallocation function 'operator delete'
+^CONVERSION ERROR$
+^EXIT=6$
+^SIGNAL=0$
+--
+^Invariant check failed
+^VERIFICATION
+--
+g++ and clang++ reject the program ([expr.delete]/8, Note 5).
