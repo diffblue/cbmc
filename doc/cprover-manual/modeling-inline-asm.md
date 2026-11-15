@@ -3,16 +3,20 @@
 ## Modeling Inline Assembly
 
 CBMC supports GCC-style (`asm`/`__asm__`) and MSVC-style (`__asm {}`)
-inline assembly syntax. During verification, the `remove_asm` pass
-translates recognized instructions into equivalent goto-program
-operations.
+inline assembly syntax. Before verification, the `remove_asm` pass replaces
+each inline-assembly statement by goto-program instructions:
 
-**If an inline-assembly statement contains any unrecognized instruction, the
-entire statement is replaced with `skip` — including any sibling instructions
-in the same statement that would otherwise be translated.** For example, an
-asm statement containing both an `mfence` and an `addl` loses *both*. This may
-lead to unsound results if the assembly has side effects that matter for the
-property being verified.
+- If CBMC models every instruction of the statement (see the tables below),
+  the statement is translated into the corresponding fences or calls to
+  library functions.
+- Otherwise the statement is **approximated conservatively**: everything the
+  statement may change, as far as CBMC can tell from its operands, is
+  assigned a nondeterministic value, and a warning that names the first
+  instruction that is not modeled is printed. The modeled instructions of
+  such a statement are not translated either.
+
+A statement with an empty assembly template, such as the compiler barrier
+`asm volatile("" ::: "memory")`, does nothing.
 
 ### Supported Instructions
 
@@ -23,58 +27,89 @@ property being verified.
 | `mfence` | Full memory fence |
 | `lfence` | Full memory fence (currently modeled identically to `mfence`) |
 | `sfence` | Full memory fence (currently modeled identically to `mfence`) |
-| `fstcw` / `fnstcw` | Store FP control word (maps to `__CPROVER_rounding_mode`) |
-| `fldcw` | Load FP control word (maps to `__CPROVER_rounding_mode`) |
-| `lock` prefix | Only effective when followed by another recognized instruction (e.g. `lock; mfence`); the recognized instruction is wrapped in an atomic section with a full fence. The read-modify-write/exchange value itself is not modeled. |
-| `xchg` / `xchgl` | Not modeled: the inline-assembly statement is dropped (treated as unrecognized). |
+| `fstcw` / `fnstcw` | Stores the rounding mode (`__CPROVER_rounding_mode`) to bits 10 and 11 of the operand; the other bits of the control word are zero |
+| `fldcw` | Sets the rounding mode from bits 10 and 11 of the operand |
+| `nop`, `pause` | No effect |
+
+For GCC-style statements, the operand of `fstcw`, `fnstcw`, and `fldcw` must
+be an operand reference (`%0`, `%1`, ...); for MSVC-style blocks, it must be
+the name of a variable. None of the read-modify-write instructions that
+take a `lock` prefix is modeled, and neither is `xchg`, so statements using
+them are approximated.
 
 #### ARM
 
 | Instruction | Effect in CBMC |
 |---|---|
-| `dmb` | Data memory barrier (full fence) |
-| `dsb` | Data synchronization barrier (full fence) |
+| `dmb`, `dsb` | Full fence without an option or with option `sy`, `ish`, `osh`, or `nsh`; with an option ending in `ld` (such as `ishld`), loads are ordered before later loads and stores; with an option ending in `st` (such as `ishst`), stores are ordered before later stores |
 | `isb` | Empty fence; no observable effect unless combined with a branch |
+| `nop`, `yield` | No effect |
 
 #### Power
 
 | Instruction | Effect in CBMC |
 |---|---|
-| `sync` | Full memory barrier |
+| `sync`, `hwsync` | Full memory barrier |
 | `lwsync` | Lightweight sync (all fences except write-after-read) |
+| `eieio` | Orders stores before later stores |
 | `isync` | Empty fence; no observable effect unless combined with a branch |
+| `nop` | No effect |
 
-### Operand Handling
+Only the x86 fences, `fstcw`, `fnstcw`, `fldcw`, `nop`, and `pause` are
+modeled in MSVC-style blocks.
 
-For GCC extended assembly, CBMC parses the output (`=r`, `+r`) and input
-(`r`, `m`) operand lists, but in most cases the operand list does not
-influence the generated goto program. For recognized fence instructions (for
-example `mfence`, `lfence`, `sfence`, `dmb`, `dsb`, `sync`), the inline
-assembly is replaced by a fence and the C-level output operands are not
-written. For unrecognized instructions, the entire statement is replaced with
-`skip`; output operands are **not** assigned nondeterministic values. Output
-operands are only written when the modeled helper for a particular instruction
-reads or writes through a pointer associated with that operand — currently
-only `fstcw` / `fnstcw` / `fldcw`, which read or write `__CPROVER_rounding_mode`.
-Clobber lists are parsed but do not affect verification.
+### Conservative Approximation
+
+The operands of a GCC-style statement are evaluated before the statement,
+including any side effects they have. If the statement contains an
+instruction that is not modeled, then
+
+1. the input operands (and the in-out operands, those with a `+`
+   constraint) are read, which makes them subject to the checks that CBMC
+   performs, for example `--pointer-check`;
+2. the objects that the input and in-out operands point to are assigned
+   nondeterministic values. This includes operands of pointer type, arrays
+   (which decay to pointers), pointers cast to integer types (as in
+   `(uintptr_t)&x`), and the pointer members of operands of struct or union
+   type;
+3. if the statement has a `"memory"` clobber, or no operands and no clobbers
+   at all (basic assembly), all objects of static lifetime, the objects that
+   those of them that are pointers (or structs or unions with pointer
+   members) point to, and all local variables of the enclosing function whose
+   address is taken are assigned nondeterministic values;
+4. the output operands are assigned nondeterministic values, at the
+   addresses they had before the statement;
+5. the rounding mode is assigned a nondeterministic value.
+
+MSVC-style blocks have no operand interface. If a block contains an
+instruction that is not modeled, each local variable of the enclosing
+function that the block names (all of them, if a name is shadowed) is
+treated like an output operand and like an input operand of pointer type,
+and the block is treated as having a `"memory"` clobber.
 
 ### Limitations
 
-- Only the instructions listed above are modeled. Any inline-assembly
-  statement that contains an unrecognized instruction is replaced with `skip`
-  in its entirety, **including any recognized instructions in the same
-  statement**. This can be unsound if the dropped assembly has side effects
-  relevant to the property being verified.
-- When an inline-assembly statement is dropped, CBMC emits a warning
-  identifying its source location. You can also use
-  `goto-instrument --show-goto-functions` (or `cbmc --show-goto-functions`) to
-  inspect whether an inline-assembly statement was translated or dropped.
-- For GCC-style inline assembly, complex atomic operations beyond the basic
-  `lock; <recognized instruction>` pattern listed above are not modeled as
-  single atomic operations; in particular `xchg` and `lock`-prefixed
-  read-modify-write instructions (e.g. `lock addl`, `lock cmpxchgl`) are
-  dropped.
-- MSVC-style `__asm` blocks are parsed, but only the x86
-  `mfence` / `lfence` / `sfence`, `fstcw` / `fnstcw`, and `fldcw` instructions
-  are modeled. ARM and Power instructions and `lock` / `xchg` patterns are
-  **not** modeled for MSVC-style inline assembly.
+- The approximation only reaches the objects listed above. Objects that the
+  statement can reach only through other pointers, for example heap objects
+  or local variables of a caller that are not pointed to by an operand or an
+  object of static lifetime, keep their values. Objects of static lifetime
+  that are added when linking the CPROVER library are not changed.
+- Constant objects and the objects that pointers to constant types point to
+  are not changed.
+- Control flow out of a statement is not modeled: `asm goto` statements
+  always continue with the next statement.
+- Atomicity and memory ordering of instructions that are not modeled are not
+  modeled; such statements are not atomic and do not act as fences.
+- A loop that retries an approximated statement until it succeeds, such as a
+  spin lock that is acquired with `xchg` or `cmpxchg`, may retry arbitrarily
+  often, as the result of each attempt is nondeterministic. Symbolic
+  execution thus unwinds such loops up to the unwinding bound, and their
+  unwinding assertions fail. Replace the functions that contain such loops
+  by C models (for example, with `goto-instrument --remove-function-body`
+  and a definition of the function without inline assembly).
+- CBMC does not check whether the instructions are valid for the target
+  architecture: for example, `sync` is modeled as a Power barrier regardless
+  of the `--arch` option.
+- You can use `goto-instrument --show-goto-functions` (or
+  `cbmc --show-goto-functions`) to inspect how an inline-assembly statement
+  was translated.
