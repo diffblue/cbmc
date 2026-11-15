@@ -1547,6 +1547,15 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
   // NOLINTNEXTLINE(readability/identifiers)
   bool is_method = !is_typedef && final_type.id() == ID_code;
+  // N5008 [class.free]/1, /3: any allocation or deallocation function for a
+  // class is a static member, even if not explicitly declared static
+  if(
+    is_method &&
+    (base_name == "operatorcpp_new" || base_name == "operatorcpp_new[]" ||
+     base_name == "operatorcpp_delete" || base_name == "operatorcpp_delete[]"))
+  {
+    is_static = true;
+  }
   bool is_constructor = declaration.is_constructor();
   bool is_destructor = declaration.is_destructor();
   bool is_virtual = declaration.member_spec().is_virtual();

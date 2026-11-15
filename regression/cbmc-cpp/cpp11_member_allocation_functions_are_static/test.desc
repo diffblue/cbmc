@@ -1,0 +1,13 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] .* direct calls: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+An allocation or deallocation function of a class is a static member even
+if not declared static ([class.free]/1, /3).  It was given an implicit
+object parameter, so `C::operator new(4)' had too few arguments.
