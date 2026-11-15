@@ -22,13 +22,16 @@ Date:   December 2014
 #include <util/range.h>
 #include <util/std_code.h>
 #include <util/string_constant.h>
+#include <util/suffix.h>
 
 #include <goto-programs/goto_model.h>
 #include <goto-programs/remove_skip.h>
 
 #include "assembler_parser.h"
 
+#include <cctype>
 #include <functional>
+#include <optional>
 
 class remove_asmt
 {
@@ -56,6 +59,14 @@ protected:
   message_handlert &message_handler;
   messaget log;
 
+  using instructionst = std::list<assembler_parsert::instructiont>;
+
+  using handle_commandt = std::function<bool(
+    const irep_idt &command,
+    std::size_t pos,
+    const assembler_parsert::instructiont &instruction,
+    goto_programt &tmp_dest)>;
+
   void process_function(const irep_idt &, goto_functionst::goto_functiont &);
 
   void process_instruction(
@@ -66,34 +77,27 @@ protected:
   void process_instruction_gcc(const code_asm_gcct &, goto_programt &dest);
 
   void process_instruction_msc(
-    const irep_idt &,
+    const irep_idt &function_id,
     const code_asmt &,
     goto_programt &dest);
 
-  // Shared scaffolding for the gcc and msc flavors: parse the assembly text,
-  // handle the lock prefix and xchg, wrap locked instructions in an atomic
-  // section with a full fence, and either append the translation to \p dest or
-  // drop the whole statement (emitting a warning) if \p handle_command reports
-  // an unrecognized instruction.
-  void process_asm(
-    const code_asmt &code,
-    const irep_idt &assembly,
-    goto_programt &dest,
-    const std::function<bool(
-      const irep_idt &command,
-      std::size_t pos,
-      const assembler_parsert::instructiont &instruction,
-      goto_programt &tmp_dest)> &handle_command);
+  instructionst parse(const irep_idt &assembly);
 
-  // Translates a single recognized gcc-style command, returning false if the
-  // command is not modeled.
+  std::optional<irep_idt> process_asm(
+    const code_asmt &code,
+    const instructionst &instructions,
+    goto_programt &dest,
+    const handle_commandt &handle_command);
+
+  void warn_dropped(const code_asmt &code);
+
   bool handle_gcc_command(
     const irep_idt &command,
+    std::size_t pos,
+    const assembler_parsert::instructiont &instruction,
     const code_asm_gcct &code,
     goto_programt &tmp_dest);
 
-  // Translates a single recognized msc-style command, returning false if the
-  // command is not modeled.
   bool handle_msc_command(
     const irep_idt &command,
     std::size_t pos,
@@ -102,81 +106,48 @@ protected:
     const code_asmt &code,
     goto_programt &tmp_dest);
 
-  void gcc_asm_function_call(
-    const irep_idt &function_base_name,
-    const code_asm_gcct &code,
-    std::size_t n_args,
-    goto_programt &dest);
-
-  void msc_asm_function_call(
+  void asm_function_call(
     const irep_idt &function_base_name,
     const exprt::operandst &operands,
-    const code_asmt &code,
+    const source_locationt &source_location,
     goto_programt &dest);
 };
 
-/// Adds a call to a library function that implements the given gcc-style inline
-/// assembly statement
+/// Adds a call to a library function that implements an inline assembly
+/// instruction. The function is declared if it does not exist yet; the
+/// library provides its body.
 ///
 /// \param function_base_name: Name of the function to call
-/// \param code: gcc-style inline assembly statement to translate to function
-///   call
-/// \param n_args: Number of arguments required by \p function_base_name
+/// \param operands: Arguments to be passed to the function, each of which is
+///   converted to `void *`
+/// \param source_location: Location of the inline assembly statement
 /// \param dest: Goto program to append the function call to
-void remove_asmt::gcc_asm_function_call(
+void remove_asmt::asm_function_call(
   const irep_idt &function_base_name,
-  const code_asm_gcct &code,
-  std::size_t n_args,
+  const exprt::operandst &operands,
+  const source_locationt &source_location,
   goto_programt &dest)
 {
-  irep_idt function_identifier = function_base_name;
+  const irep_idt &function_identifier = function_base_name;
 
   code_function_callt::argumentst arguments;
 
-  const typet void_pointer = pointer_type(empty_typet());
+  const typet void_pointer = pointer_type(empty_typet{});
 
-  // outputs
-  forall_operands(it, code.outputs())
-  {
-    if(it->operands().size() == 2)
-    {
-      arguments.push_back(typecast_exprt(
-        address_of_exprt(to_binary_expr(*it).op1()), void_pointer));
-    }
-  }
-
-  // inputs
-  forall_operands(it, code.inputs())
-  {
-    if(it->operands().size() == 2)
-    {
-      arguments.push_back(typecast_exprt(
-        address_of_exprt(to_binary_expr(*it).op1()), void_pointer));
-    }
-  }
-
-  // An inline asm statement may consist of multiple commands, not all of which
-  // use all of the inputs/outputs of the inline asm statement.
-  DATA_INVARIANT_WITH_DIAGNOSTICS(
-    arguments.size() >= n_args,
-    "insufficient number of arguments for calling " +
-      id2string(function_identifier),
-    "required arguments: " + std::to_string(n_args),
-    code.pretty());
-  arguments.resize(n_args);
+  for(const auto &op : operands)
+    arguments.push_back(typecast_exprt::conditional_cast(op, void_pointer));
 
   code_typet fkt_type{
     code_typet::parameterst{
       arguments.size(), code_typet::parametert{void_pointer}},
-    empty_typet()};
+    empty_typet{}};
 
   auto fkt = symbol_exprt{function_identifier, fkt_type}.with_source_location(
-    code.source_location());
+    source_location);
 
-  code_function_callt function_call(std::move(fkt), std::move(arguments));
-
-  dest.add(
-    goto_programt::make_function_call(function_call, code.source_location()));
+  dest.add(goto_programt::make_function_call(
+    code_function_callt{std::move(fkt), std::move(arguments)},
+    source_location));
 
   // do we have it?
   if(!symbol_table.has_symbol(function_identifier))
@@ -193,62 +164,8 @@ void remove_asmt::gcc_asm_function_call(
     DATA_INVARIANT_WITH_DIAGNOSTICS(
       symbol_table.lookup_ref(function_identifier).type == fkt_type,
       "types of function " + id2string(function_identifier) + " should match",
-      code.pretty(),
       symbol_table.lookup_ref(function_identifier).type.pretty(),
       fkt_type.pretty());
-  }
-}
-
-/// Adds a call to a library function that implements the given msc-style inline
-/// assembly statement
-///
-/// \param function_base_name: Name of the function to call
-/// \param operands: Arguments to be passed to function
-/// \param code: msc-style inline assembly statement to translate to function
-///   call
-/// \param dest: Goto program to append the function call to
-void remove_asmt::msc_asm_function_call(
-  const irep_idt &function_base_name,
-  const exprt::operandst &operands,
-  const code_asmt &code,
-  goto_programt &dest)
-{
-  irep_idt function_identifier = function_base_name;
-
-  code_function_callt::argumentst arguments;
-
-  const typet void_pointer = pointer_type(empty_typet());
-
-  for(const auto &op : operands)
-    arguments.push_back(typecast_exprt::conditional_cast(op, void_pointer));
-
-  code_typet fkt_type{
-    code_typet::parameterst{
-      arguments.size(), code_typet::parametert{void_pointer}},
-    empty_typet()};
-
-  auto fkt = symbol_exprt{function_identifier, fkt_type}.with_source_location(
-    code.source_location());
-  code_function_callt function_call(std::move(fkt), std::move(arguments));
-
-  dest.add(
-    goto_programt::make_function_call(function_call, code.source_location()));
-
-  // do we have it?
-  if(!symbol_table.has_symbol(function_identifier))
-  {
-    symbolt symbol{function_identifier, fkt_type, ID_C};
-    symbol.base_name = function_base_name;
-
-    symbol_table.add(symbol);
-
-    goto_functions.function_map.emplace(function_identifier, goto_functiont());
-  }
-  else
-  {
-    DATA_INVARIANT(
-      symbol_table.lookup_ref(function_identifier).type == fkt_type,
-      "function types should match");
   }
 }
 
@@ -276,19 +193,22 @@ void remove_asmt::process_instruction(
     DATA_INVARIANT(false, "unexpected assembler flavor");
 }
 
-/// Builds a `fence` codet with the requested ordering and cumulativity flags.
-/// Only the flags set to true are added, matching the ireps that the individual
-/// fence instructions used to construct by hand.
+/// Builds a `fence` codet with the requested orderings.
+/// \param source_location: Location of the fence
+/// \param ww: Whether writes are ordered before later writes
+/// \param rr: Whether reads are ordered before later reads
+/// \param rw: Whether reads are ordered before later writes
+/// \param wr: Whether writes are ordered before later reads
+/// \param cumulative: Whether each of the requested orderings is cumulative,
+///   i.e., also applies to the accesses of other threads that were observed
+///   before the fence
 static codet make_fence(
   const source_locationt &source_location,
   bool ww,
   bool rr,
   bool rw,
   bool wr,
-  bool ww_cumul = false,
-  bool rw_cumul = false,
-  bool rr_cumul = false,
-  bool wr_cumul = false)
+  bool cumulative)
 {
   codet code_fence{ID_fence};
   code_fence.add_source_location() = source_location;
@@ -300,50 +220,56 @@ static codet make_fence(
     code_fence.set(ID_RWfence, true);
   if(wr)
     code_fence.set(ID_WRfence, true);
-  if(ww_cumul)
-    code_fence.set(ID_WWcumul, true);
-  if(rw_cumul)
-    code_fence.set(ID_RWcumul, true);
-  if(rr_cumul)
-    code_fence.set(ID_RRcumul, true);
-  if(wr_cumul)
-    code_fence.set(ID_WRcumul, true);
+  if(cumulative)
+  {
+    if(ww)
+      code_fence.set(ID_WWcumul, true);
+    if(rw)
+      code_fence.set(ID_RWcumul, true);
+    if(rr)
+      code_fence.set(ID_RRcumul, true);
+    if(wr)
+      code_fence.set(ID_WRcumul, true);
+  }
   return code_fence;
 }
 
-/// Shared scaffolding for translating gcc-style and msc-style inline assembly.
-/// Parses \p assembly, and for each parsed instruction handles the `lock`
-/// prefix and `xchg` (which start an atomic section containing a full fence),
-/// delegates the actual command translation to \p handle_command, and closes
-/// the atomic section. If any instruction is not recognized by
-/// \p handle_command, the whole statement is dropped (a warning is emitted and
-/// nothing is appended to \p dest); otherwise the translation is appended.
-///
-/// \param code: The inline assembly code statement being translated
-/// \param assembly: The assembly text to parse
-/// \param dest: The goto program to append the new instructions to
-/// \param handle_command: Translates a single command into \p tmp_dest and
-///   returns whether the command was recognized
-void remove_asmt::process_asm(
-  const code_asmt &code,
-  const irep_idt &assembly,
-  goto_programt &dest,
-  const std::function<bool(
-    const irep_idt &command,
-    std::size_t pos,
-    const assembler_parsert::instructiont &instruction,
-    goto_programt &tmp_dest)> &handle_command)
+/// Parses the text of an inline assembly statement.
+/// \param assembly: The assembly text
+/// \return The instructions, each a sequence of tokens
+remove_asmt::instructionst remove_asmt::parse(const irep_idt &assembly)
 {
   std::istringstream str(id2string(assembly));
   assembler_parsert assembler_parser{message_handler};
   assembler_parser.in = &str;
   assembler_parser.parse();
+  return std::move(assembler_parser.instructions);
+}
 
+/// Shared scaffolding for translating gcc-style and msc-style inline assembly.
+/// For each instruction in \p instructions, handles the `lock` prefix and
+/// `xchg` (which start an atomic section containing a full fence), delegates
+/// the actual command translation to \p handle_command, and closes the atomic
+/// section. The translation is appended to \p dest only if all instructions
+/// are recognized by \p handle_command.
+///
+/// \param code: The inline assembly code statement being translated
+/// \param instructions: The parsed assembly text
+/// \param dest: The goto program to append the new instructions to
+/// \param handle_command: Translates a single command into \p tmp_dest and
+///   returns whether the command was recognized
+/// \return The first command that is not recognized, if any; nothing is
+///   appended to \p dest in this case.
+std::optional<irep_idt> remove_asmt::process_asm(
+  const code_asmt &code,
+  const instructionst &instructions,
+  goto_programt &dest,
+  const handle_commandt &handle_command)
+{
   goto_programt tmp_dest;
-  bool unknown = false;
   bool x86_32_locked_atomic = false;
 
-  for(const auto &instruction : assembler_parser.instructions)
+  for(const auto &instruction : instructions)
   {
     if(instruction.empty())
       continue;
@@ -377,12 +303,12 @@ void remove_asmt::process_asm(
     {
       tmp_dest.add(goto_programt::make_atomic_begin(code.source_location()));
       tmp_dest.add(goto_programt::make_other(
-        make_fence(code.source_location(), true, true, true, true),
+        make_fence(code.source_location(), true, true, true, true, false),
         code.source_location()));
     }
 
     if(!handle_command(command, pos, instruction, tmp_dest))
-      unknown = true; // give up
+      return command;
 
     if(x86_32_locked_atomic)
     {
@@ -392,24 +318,28 @@ void remove_asmt::process_asm(
     }
   }
 
-  if(unknown)
-  {
-    // The entire inline-assembly statement is dropped (turned into skip below)
-    // when any of its instructions is not recognized; warn so that the user is
-    // not left silently relying on un-modeled assembly.
-    log.warning() << "dropping inline assembly statement at "
-                  << code.source_location()
-                  << ": it contains an instruction that is not modeled, so the "
-                     "whole statement (including any modeled instructions) is "
-                     "removed"
-                  << messaget::eom;
-  }
-  else
-    dest.destructive_append(tmp_dest);
+  dest.destructive_append(tmp_dest);
+  return {};
+}
+
+/// Warns that the inline assembly statement \p code is dropped.
+/// \param code: The inline assembly code statement
+void remove_asmt::warn_dropped(const code_asmt &code)
+{
+  // The entire inline-assembly statement is dropped when any of its
+  // instructions is not recognized; warn so that the user is not left
+  // silently relying on un-modeled assembly.
+  log.warning() << "dropping inline assembly statement at "
+                << code.source_location()
+                << ": it contains an instruction that is not modeled, so the "
+                   "whole statement (including any modeled instructions) is "
+                   "removed"
+                << messaget::eom;
 }
 
 /// Translates the given inline assembly code (in gcc style) to non-assembly
-/// goto program instructions
+/// goto program instructions, dropping it if it contains an instruction
+/// that is not modeled.
 ///
 /// \param code: The inline assembly code statement to translate
 /// \param dest: The goto program to append the new instructions to
@@ -417,83 +347,163 @@ void remove_asmt::process_instruction_gcc(
   const code_asm_gcct &code,
   goto_programt &dest)
 {
-  process_asm(
+  const instructionst instructions =
+    parse(to_string_constant(code.asm_text()).value());
+
+  const auto unknown = process_asm(
     code,
-    to_string_constant(code.asm_text()).value(),
+    instructions,
     dest,
     [this, &code](
       const irep_idt &command,
-      std::size_t,
-      const assembler_parsert::instructiont &,
+      std::size_t pos,
+      const assembler_parsert::instructiont &instruction,
       goto_programt &tmp_dest)
-    { return handle_gcc_command(command, code, tmp_dest); });
+    { return handle_gcc_command(command, pos, instruction, code, tmp_dest); });
+
+  if(unknown.has_value())
+    warn_dropped(code);
+}
+
+/// \return The operand of \p code referred to as `%N` by the tokens of
+///   \p instruction starting at \p pos, if these are the only remaining
+///   tokens. Operands are numbered as in gcc: outputs first, then inputs.
+static std::optional<exprt> gcc_operand(
+  const code_asm_gcct &code,
+  std::size_t pos,
+  const assembler_parsert::instructiont &instruction)
+{
+  if(pos + 1 >= instruction.size() || instruction[pos].id() != "%")
+    return {};
+
+  std::size_t index = 0;
+  for(++pos; pos < instruction.size(); ++pos)
+  {
+    const std::string &digit = id2string(instruction[pos].id());
+    if(digit.size() != 1 || !isdigit(digit[0]))
+      return {};
+    index = index * 10 + static_cast<std::size_t>(digit[0] - '0');
+  }
+
+  for(const auto *list : {&code.outputs(), &code.inputs()})
+  {
+    for(const auto &operand : list->operands())
+    {
+      if(operand.operands().size() != 2)
+        return {};
+      if(index == 0)
+        return to_binary_expr(operand).op1();
+      --index;
+    }
+  }
+
+  return {};
 }
 
 /// Translates a single recognized gcc-style command into \p tmp_dest.
 ///
 /// \param command: The instruction mnemonic to translate
+/// \param pos: Index of the token following the command in \p instruction
+/// \param instruction: The parsed instruction tokens
 /// \param code: The inline assembly code statement being translated
 /// \param tmp_dest: The goto program to append the translation to
 /// \return Whether the command was recognized (and hence modeled)
 bool remove_asmt::handle_gcc_command(
   const irep_idt &command,
+  std::size_t pos,
+  const assembler_parsert::instructiont &instruction,
   const code_asm_gcct &code,
   goto_programt &tmp_dest)
 {
   const source_locationt &source_location = code.source_location();
+  const bool no_operands = pos == instruction.size();
+
+  auto fence = [&](bool ww, bool rr, bool rw, bool wr, bool cumulative)
+  {
+    tmp_dest.add(goto_programt::make_other(
+      make_fence(source_location, ww, rr, rw, wr, cumulative),
+      source_location));
+    return true;
+  };
 
   if(command == "fstcw" || command == "fnstcw" || command == "fldcw") // x86
   {
-    gcc_asm_function_call("__asm_" + id2string(command), code, 1, tmp_dest);
+    const auto operand = gcc_operand(code, pos, instruction);
+    if(!operand.has_value())
+      return false;
+    asm_function_call(
+      "__asm_" + id2string(command),
+      {address_of_exprt{*operand}},
+      source_location,
+      tmp_dest);
+    return true;
   }
-  else if(
-    command == "mfence" || command == "lfence" || command == "sfence") // x86
+
+  if(command == "dmb" || command == "dsb") // ARM
   {
-    gcc_asm_function_call("__asm_" + id2string(command), code, 0, tmp_dest);
+    if(no_operands)
+      return fence(true, true, true, true, true);
+
+    // the barrier option selects the accesses being ordered
+    if(pos + 1 != instruction.size() || instruction[pos].id() != ID_symbol)
+      return false;
+    const std::string &option = id2string(instruction[pos].get(ID_identifier));
+    if(option == "sy" || option == "ish" || option == "osh" || option == "nsh")
+      return fence(true, true, true, true, true);
+    else if(has_suffix(option, "ld")) // loads before loads and stores
+      return fence(false, true, true, false, true);
+    else if(has_suffix(option, "st")) // stores before stores
+      return fence(true, false, false, false, true);
+    else
+      return false;
   }
-  else if(command == ID_sync) // Power
+
+  if(command == "isb") // ARM
   {
-    tmp_dest.add(goto_programt::make_other(
-      make_fence(
-        source_location, true, true, true, true, true, true, true, true),
-      source_location));
+    if(
+      !no_operands &&
+      (pos + 1 != instruction.size() || instruction[pos].id() != ID_symbol ||
+       instruction[pos].get(ID_identifier) != "sy"))
+    {
+      return false;
+    }
+    // doesn't do anything by itself, needs to be combined with branch
+    return fence(false, false, false, false, false);
   }
-  else if(command == ID_lwsync) // Power
+
+  // all other modeled instructions have no operands
+  if(!no_operands)
+    return false;
+
+  if(command == "mfence" || command == "lfence" || command == "sfence") // x86
   {
-    tmp_dest.add(goto_programt::make_other(
-      make_fence(
-        source_location, true, true, true, false, true, true, true, false),
-      source_location));
+    asm_function_call(
+      "__asm_" + id2string(command), {}, source_location, tmp_dest);
+    return true;
   }
+  else if(command == "nop" || command == "pause" || command == "yield")
+  {
+    // no effect on the C program state
+    return true;
+  }
+  else if(command == ID_sync || command == "hwsync") // Power
+    return fence(true, true, true, true, true);
+  else if(command == ID_lwsync) // Power: everything but store-load
+    return fence(true, true, true, false, true);
+  else if(command == "eieio") // Power: orders stores
+    return fence(true, false, false, false, true);
   else if(command == ID_isync) // Power
   {
     // doesn't do anything by itself, needs to be combined with branch
-    tmp_dest.add(goto_programt::make_other(
-      make_fence(source_location, false, false, false, false),
-      source_location));
-  }
-  else if(command == "dmb" || command == "dsb") // ARM
-  {
-    tmp_dest.add(goto_programt::make_other(
-      make_fence(
-        source_location, true, true, true, true, true, true, true, true),
-      source_location));
-  }
-  else if(command == "isb") // ARM
-  {
-    // doesn't do anything by itself, needs to be combined with branch
-    tmp_dest.add(goto_programt::make_other(
-      make_fence(source_location, false, false, false, false),
-      source_location));
+    return fence(false, false, false, false, false);
   }
   else
     return false;
-
-  return true;
 }
 
 /// Translates the given inline assembly code (in msc style) to non-assembly
-/// goto program instructions
+/// goto program instructions, dropping it if it contains an instruction
+/// that is not modeled.
 ///
 /// \param function_id: Name of function being processed
 /// \param code: The inline assembly code statement to translate
@@ -503,9 +513,12 @@ void remove_asmt::process_instruction_msc(
   const code_asmt &code,
   goto_programt &dest)
 {
-  process_asm(
+  const instructionst instructions =
+    parse(to_string_constant(code.op0()).value());
+
+  const auto unknown = process_asm(
     code,
-    to_string_constant(code.op0()).value(),
+    instructions,
     dest,
     [this, &code, &function_id](
       const irep_idt &command,
@@ -516,6 +529,9 @@ void remove_asmt::process_instruction_msc(
       return handle_msc_command(
         command, pos, instruction, function_id, code, tmp_dest);
     });
+
+  if(unknown.has_value())
+    warn_dropped(code);
 }
 
 /// Translates a single recognized msc-style command into \p tmp_dest.
@@ -535,36 +551,51 @@ bool remove_asmt::handle_msc_command(
   const code_asmt &code,
   goto_programt &tmp_dest)
 {
+  const bool no_operands = pos == instruction.size();
+
   if(command == "fstcw" || command == "fnstcw" || command == "fldcw") // x86
   {
-    exprt::operandst args{null_pointer_exprt{pointer_type(empty_typet{})}};
-    // try to typecheck the argument
-    if(pos != instruction.size() && instruction[pos].id() == ID_symbol)
+    if(pos + 1 != instruction.size() || instruction[pos].id() != ID_symbol)
+      return false;
+
+    // a local variable (or parameter) takes precedence over a global one;
+    // if several local variables of that name exist (shadowing), it is not
+    // known which one is meant
+    const irep_idt &name = instruction[pos].get(ID_identifier);
+    const std::string local_prefix = id2string(function_id) + "::";
+    std::optional<irep_idt> global, local;
+    for(const auto &entry : equal_range(symbol_table.symbol_base_map, name))
     {
-      const irep_idt &name = instruction[pos].get(ID_identifier);
-      for(const auto &entry : equal_range(symbol_table.symbol_base_map, name))
+      if(entry.second == name)
+        global = entry.second;
+      else if(has_prefix(id2string(entry.second), local_prefix))
       {
-        // global scope symbol, don't replace a local one
-        if(entry.second == name && args[0].id() != ID_address_of)
-        {
-          args[0] =
-            address_of_exprt{symbol_table.lookup_ref(name).symbol_expr()};
-        }
-        // parameter or symbol in local scope
-        else if(has_prefix(
-                  id2string(entry.second), id2string(function_id) + "::"))
-        {
-          args[0] = address_of_exprt{
-            symbol_table.lookup_ref(entry.second).symbol_expr()};
-        }
+        if(local.has_value())
+          return false;
+        local = entry.second;
       }
     }
-    msc_asm_function_call("__asm_" + id2string(command), args, code, tmp_dest);
+
+    if(!local.has_value() && !global.has_value())
+      return false;
+
+    const exprt arg = address_of_exprt{
+      symbol_table.lookup_ref(local.has_value() ? *local : *global)
+        .symbol_expr()};
+
+    asm_function_call(
+      "__asm_" + id2string(command), {arg}, code.source_location(), tmp_dest);
   }
   else if(
-    command == "mfence" || command == "lfence" || command == "sfence") // x86
+    no_operands &&
+    (command == "mfence" || command == "lfence" || command == "sfence")) // x86
   {
-    msc_asm_function_call("__asm_" + id2string(command), {}, code, tmp_dest);
+    asm_function_call(
+      "__asm_" + id2string(command), {}, code.source_location(), tmp_dest);
+  }
+  else if(no_operands && (command == "nop" || command == "pause"))
+  {
+    // no effect on the C program state
   }
   else
     return false;
@@ -619,9 +650,10 @@ void remove_asm(
 
 /// Replaces inline assembly instructions in the goto program (i.e.,
 /// instructions of kind `OTHER` with a `code` member of type `code_asmt`) with
-/// an appropriate (sequence of) non-assembly goto program instruction(s). At
-/// present only a small number of x86 and Power instructions are supported.
-/// Unrecognised assembly instructions are ignored.
+/// an appropriate (sequence of) non-assembly goto program instruction(s).
+/// At present only a small number of x86, ARM, and Power instructions are
+/// supported. Statements that contain an unrecognised instruction are
+/// removed.
 ///
 /// \param goto_model: The goto model
 /// \param message_handler: Message handler

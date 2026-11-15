@@ -11,23 +11,30 @@ int main(void)
   asm volatile("lfence");
   asm volatile("sfence");
 
-  // ARM barriers: dmb/dsb are full fences, isb is an empty fence.
+  // ARM barriers: dmb/dsb are full fences unless the option restricts them
+  // to loads (ld) or stores (st); isb is an empty fence.
   asm volatile("dmb");
-  asm volatile("dsb");
+  asm volatile("dsb sy");
+  asm volatile("dmb ish" ::: "memory");
+  asm volatile("dmb ishld");
+  asm volatile("dsb ishst");
   asm volatile("isb");
 
   // Power barriers: sync is a full fence, lwsync omits write-after-read,
-  // isync is an empty fence.
+  // eieio orders stores, isync is an empty fence.
   asm volatile("sync");
   asm volatile("lwsync");
+  asm volatile("eieio");
   asm volatile("isync");
+
+  // Instructions without effect on the C program state.
+  asm volatile("nop");
+  asm volatile("pause");
+  asm volatile("yield");
 
   // x86 FP control word: writes/reads __CPROVER_rounding_mode via the operand.
   asm volatile("fstcw %0" : "=m"(cw));
   asm volatile("fldcw %0" : : "m"(cw));
-
-  // lock prefix followed by a recognized instruction: atomic section + fence.
-  asm volatile("lock; mfence");
 
   return 0;
 }
