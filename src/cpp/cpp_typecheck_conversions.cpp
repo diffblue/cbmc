@@ -5374,12 +5374,22 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
         {
           try
           {
-            // Default-construct via cpp_constructor on a marker
-            // new_object so any user-defined default ctor (or the
-            // POD zero-init path) is honoured uniformly.
+            // Value-initialize via cpp_constructor on a marker new_object,
+            // passing the empty list itself: [dcl.init.list]/3.5 and
+            // [dcl.init.general]/9.1 zero-initialize the object before any
+            // non-user-provided default constructor runs.  Without operands
+            // this was default-initialization, which leaves a POD class
+            // indeterminate (`t = {};').
+            // (a list that is the parenthesized argument `T x({})' is still
+            // an empty braced-init-list for this conversion)
+            exprt empty_list = orig_expr;
+            empty_list.remove(ID_C_paren_init);
             exprt temp;
             new_temporary(
-              orig_expr.source_location(), base_type, exprt::operandst{}, temp);
+              orig_expr.source_location(),
+              base_type,
+              exprt::operandst{std::move(empty_list)},
+              temp);
             if(target_is_reference)
             {
               address_of_exprt addr{temp, pointer_type(base_type)};
