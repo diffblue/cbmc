@@ -158,6 +158,30 @@ simplify_exprt::resultt<> simplify_exprt::simplify_floatbv_round_to_integral(
 }
 
 simplify_exprt::resultt<>
+simplify_exprt::simplify_floatbv_sqrt(const floatbv_sqrt_exprt &expr)
+{
+  auto &op = expr.op();
+  auto &rounding_mode = expr.rounding_mode();
+
+  // constant folding
+  if(op.is_constant() && rounding_mode.is_constant())
+  {
+    const auto rounding_mode_index =
+      numeric_cast<std::size_t>(to_constant_expr(rounding_mode));
+    if(rounding_mode_index.has_value())
+    {
+      ieee_floatt op_value{
+        to_constant_expr(op),
+        static_cast<ieee_floatt::rounding_modet>(*rounding_mode_index)};
+
+      return op_value.sqrt().to_expr();
+    }
+  }
+
+  return unchanged(expr);
+}
+
+simplify_exprt::resultt<>
 simplify_exprt::simplify_floatbv_typecast(const floatbv_typecast_exprt &expr)
 {
   // These casts usually reduce precision, and thus, usually round.
