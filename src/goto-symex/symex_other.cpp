@@ -257,6 +257,10 @@ void goto_symext::symex_other(
   {
     target.memory_barrier(state.guard.as_expr(), state.source);
   }
+  else if(statement == ID_havoc_reachable)
+  {
+    symex_havoc_reachable(state, code);
+  }
   else if(statement==ID_havoc_object)
   {
     DATA_INVARIANT(

@@ -840,6 +840,15 @@ static void goto_rw_other(
     rw_set.get_array_objects(
       function, target, rw_range_sett::get_modet::LHS_W, code.op0());
   }
+  else if(statement == ID_havoc_reachable)
+  {
+    // at least the objects the operands point to are written
+    for(const auto &op : code.operands())
+    {
+      rw_set.get_array_objects(
+        function, target, rw_range_sett::get_modet::LHS_W, op);
+    }
+  }
 }
 
 static void goto_rw(
