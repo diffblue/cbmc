@@ -97,6 +97,9 @@ int __CPROVER_isunorderedd(double f, double g);
 float __CPROVER_round_to_integralf(float, int);
 double __CPROVER_round_to_integrald(double, int);
 long double __CPROVER_round_to_integralld(long double, int);
+float __CPROVER_sqrtf(float, int);
+double __CPROVER_sqrtd(double, int);
+long double __CPROVER_sqrtld(long double, int);
 
 // absolute value
 int __CPROVER_abs(int x);

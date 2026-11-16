@@ -3734,6 +3734,27 @@ std::string expr2ct::convert_with_precedence(
       return convert_function(src, "SIGN");
   }
 
+  else if(src.id() == ID_floatbv_sqrt)
+  {
+    // Print the built-in that the C front-end turns into this expression.
+    // Printing "sqrt" would instead turn the library model of sqrt into a
+    // self-recursive function.
+    const auto &sqrt_expr = to_floatbv_sqrt_expr(src);
+    std::string name = CPROVER_PREFIX "sqrt";
+    if(sqrt_expr.type() == float_type())
+      name += 'f';
+    else if(
+      sqrt_expr.type() != double_type() &&
+      sqrt_expr.type() == long_double_type())
+    {
+      name += "ld";
+    }
+    else
+      name += 'd';
+    return name + "(" + convert(sqrt_expr.op()) + ", " +
+           convert(sqrt_expr.rounding_mode()) + ")";
+  }
+
   else if(src.id() == ID_floatbv_fma && src.operands().size() >= 3)
   {
     // Print the built-in that the C front-end turns into this expression,
