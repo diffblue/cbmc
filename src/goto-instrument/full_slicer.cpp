@@ -259,8 +259,9 @@ void full_slicert::operator()(
   message_handlert &message_handler)
 {
   // The objects that havoc_reachable (from the approximation of inline
-  // assembly) changes, and hence the instructions it depends on, are only
-  // known during symbolic execution.
+  // assembly) changes are reachable through heap objects, which the
+  // dependence graph does not track: the instructions that link heap objects
+  // would be sliced away, making these objects unreachable.
   for(const auto &gf_entry : goto_functions.function_map)
   {
     for(const auto &instruction : gf_entry.second.body.instructions)

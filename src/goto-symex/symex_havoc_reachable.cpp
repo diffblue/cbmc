@@ -12,10 +12,10 @@ Author: Michael Tautschnig
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
-#include <util/cprover_prefix.h>
 #include <util/pointer_expr.h>
 #include <util/std_code.h>
-#include <util/symbol_table_base.h>
+
+#include <pointer-analysis/reachable_objects.h>
 
 #include "goto_symex.h"
 #include "path_storage.h"
@@ -61,25 +61,6 @@ static bool is_constant_type(const typet &type)
   if(type.id() == ID_array)
     return is_constant_type(to_array_type(type).element_type());
   return false;
-}
-
-/// \return True iff objects of type \p type can be assigned a value as a
-///   whole.
-static bool is_complete_type(const typet &type, const namespacet &ns)
-{
-  if(type.id() == ID_code || type.id() == ID_empty)
-    return false;
-  if(type.id() == ID_array)
-  {
-    const array_typet &array_type = to_array_type(type);
-    return array_type.size().is_not_nil() &&
-           is_complete_type(array_type.element_type(), ns);
-  }
-  if(type.id() == ID_struct_tag)
-    return !ns.follow_tag(to_struct_tag_type(type)).is_incomplete();
-  if(type.id() == ID_union_tag)
-    return !ns.follow_tag(to_union_tag_type(type)).is_incomplete();
-  return true;
 }
 
 /// \return True iff \p type is a pointer to data.
@@ -151,22 +132,6 @@ static void split_lvalue(
   }
   else
     others.push_back(lvalue);
-}
-
-/// \return True iff a pointer of type \p candidate may be stored in a pointer
-///   of type \p location without changing what kind of object it points to.
-static bool is_compatible_pointer(const typet &location, const typet &candidate)
-{
-  const typet &location_base = to_pointer_type(location).base_type();
-  const typet &candidate_base = to_pointer_type(candidate).base_type();
-  auto is_generic = [](const typet &base)
-  {
-    return base.id() == ID_empty ||
-           ((base.id() == ID_signedbv || base.id() == ID_unsignedbv) &&
-            to_bitvector_type(base).get_width() == 8);
-  };
-  return location_base == candidate_base || is_generic(location_base) ||
-         is_generic(candidate_base);
 }
 
 /// \return The type of the part of an object of type \p type that \p path
@@ -267,29 +232,8 @@ void goto_symext::symex_havoc_reachable(statet &state, const codet &code)
   // all functions on the call stack
   if(code.get_bool(ID_arbitrary_memory))
   {
-    std::vector<irep_idt> statics;
-    for(const auto &entry : outer_symbol_table.symbols)
-    {
-      const symbolt &symbol = entry.second;
-      if(
-        symbol.is_static_lifetime && !symbol.is_type && !symbol.is_macro &&
-        symbol.is_lvalue && symbol.type.id() != ID_code &&
-        symbol.type.id() != ID_empty && is_complete_type(symbol.type, ns) &&
-        !symbol.name.starts_with(CPROVER_PREFIX) &&
-        !symbol.base_name.starts_with(CPROVER_PREFIX))
-      {
-        statics.push_back(symbol.name);
-      }
-    }
-    std::sort(
-      statics.begin(),
-      statics.end(),
-      [](const irep_idt &a, const irep_idt &b)
-      { return id2string(a) < id2string(b); });
-    for(const auto &name : statics)
-    {
-      add_object(state.rename<L1>(ns.lookup(name).symbol_expr(), ns).get());
-    }
+    for(const auto &object : static_lifetime_objects(outer_symbol_table, ns))
+      add_object(state.rename<L1>(object, ns).get());
 
     for(const auto &frame : state.call_stack())
     {
