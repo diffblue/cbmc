@@ -16675,3 +16675,43 @@ Verified: binW225 (13 suites; cbmc-cpp paren-init regression found and
 fixed), binW226 (cbmc-cpp, libc++, KNOWNBUG profiles, GCC 16 image, macOS
 142/142); post on binW225: profiles (z3 complex2 flaky), vacuity 1063/3,
 MSVC; unit, lint, format, doxygen, iwyu (changed files).
+
+## Round 239 (2026-11-16): allocation-function overload resolution
+
+New-expressions and delete-expressions now use the allocation and
+deallocation functions N5008 [expr.new]/12-30 and [expr.delete]/7-10
+select (src/cpp/cpp_typecheck_allocation.cpp):
+- lookup: class scope of the (element) class unless `::new'/`::delete'
+  (parser now records the `::'), else global; overload resolution on
+  (size, [align_val_t,] placement...) with the [expr.new]/20 retry;
+- replaceable global function selected: call omitted ([expr.new]/14),
+  built-in __new/__new_array kept; reserved placement form: placement
+  lowering kept; otherwise the selected function is CALLED
+  (ID_allocation_function, size placeholder filled by goto conversion);
+- non-throwing allocation returning null skips initialization (/22);
+- array cookie (Itanium style, max(sizeof(size_t), alignof)) only when
+  the class's own operator new[] allocates elements with a non-trivial
+  destructor, read by delete[] when the class's operator delete[] is
+  used and the class declares operator new[] -- the two conditions
+  agree for the non-`::' forms;
+- /27-30: deallocation if initialization throws, as code on the
+  destructor stack (only the exceptional unwind runs it); placement args
+  with side effects are hoisted so they are evaluated once;
+- delete: usual deallocation selection per /9 (destroying, alignment,
+  unsized), size/alignment arguments, destroying delete runs no
+  destructor.  Global usual ones keep __delete.
+Not modelled: [expr.delete]/8.1 (deallocation chosen by the dynamic
+type's virtual destructor; static type used); a user REPLACEMENT of a
+global replaceable function is never called (allowed by /14 and
+[expr.delete]/6.3).
+Prerequisites found on the way (separate commits):
+- 47fe2025fa scoped enumerations converted implicitly to integers
+  ([dcl.enum]/10); keeping [expr.static.cast]/8, [stmt.switch]/2 (incl.
+  a scoped-enum bit-field condition: libstdc++ 16 std::format) and
+  [dcl.enum]/5 (`native = little', libc++ std::endian) working;
+- df3a7abc23 [class.free]/1: class operator new/delete implicitly static.
+`new (buf) T' without <new> is now rejected, as by g++/clang++.
+Verified: binW229 (13 suites, profiles (z3 complex2 flaky), vacuity
+1063/3, MSVC, macOS 142/142; GCC 16 image: 6 std::format/chrono failures
+-> scoped-enum bit-field switch fix), binW230 (cbmc-cpp, libc++, KNOWNBUG,
+GCC 16 image, macOS 142/142); unit, lint, format, doxygen, iwyu.
