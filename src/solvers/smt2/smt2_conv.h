@@ -34,6 +34,7 @@ class floatbv_fma_exprt;
 class floatbv_typecast_exprt;
 class ieee_float_op_exprt;
 class floatbv_round_to_integral_exprt;
+class floatbv_sqrt_exprt;
 class union_typet;
 class update_bit_exprt;
 class update_bits_exprt;
@@ -154,6 +155,7 @@ protected:
   void convert_floatbv_fma(const floatbv_fma_exprt &expr);
   void
   convert_floatbv_round_to_integral(const floatbv_round_to_integral_exprt &);
+  void convert_floatbv_sqrt(const floatbv_sqrt_exprt &);
   void convert_mod(const mod_exprt &expr);
   void convert_euclidean_mod(const euclidean_mod_exprt &expr);
   void convert_index(const index_exprt &expr);

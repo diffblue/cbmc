@@ -10,13 +10,20 @@ Author: Daniel Kroening
 #include <testing-utils/use_catch.h>
 
 // for debug output in case of failure
+#include <util/arith_tools.h>
+#include <util/bitvector_types.h>
+#include <util/namespace.h>
+#include <util/symbol_table.h>
+
+#include <solvers/flattening/boolbv.h>
+#include <solvers/floatbv/float_approximation.h>
+#include <solvers/floatbv/float_bv.h>
+#include <solvers/floatbv/float_utils.h>
+#include <solvers/sat/satcheck.h>
+
 #include <iostream>
 #include <limits>
 #include <random>
-
-#include <solvers/floatbv/float_approximation.h>
-#include <solvers/floatbv/float_utils.h>
-#include <solvers/sat/satcheck.h>
 
 typedef std::uniform_int_distribution<unsigned> distt;
 
@@ -416,6 +423,158 @@ SCENARIO("float_utils_fma", "[core][solvers][floatbv][float_utils]")
       // x - 5*y with separate ops: 0x1.55555p-3 (two roundings)
       // fma(-5, y, x): 0x1.555554p-3 (single rounding, more precise)
       check_fma(-5.0f, 0x1.555556p-2f, 0x1.d55556p+0f, 0x1.555554p-3f);
+    }
+  }
+}
+
+static ieee_float_valuet
+float_utils_sqrt(const ieee_float_valuet &op, ieee_floatt::rounding_modet rm)
+{
+  satcheckt satcheck(null_message_handler);
+  float_utilst float_utils(satcheck);
+  float_utils.rounding_mode_bits.set(rm);
+  float_utils.spec = op.spec;
+
+  bvt result_bv = float_utils.sqrt(float_utils.build_constant(op));
+
+  const auto result = satcheck.prop_solve();
+  REQUIRE(result == satcheckt::resultt::P_SATISFIABLE);
+
+  return float_utils.get(result_bv);
+}
+
+static ieee_float_valuet
+float_bv_sqrt(const ieee_float_valuet &op, ieee_floatt::rounding_modet rm)
+{
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+  const float_bvt float_bv;
+  const exprt result = float_bv.sqrt(
+    op.to_expr(), from_integer(rm, unsignedbv_typet{32}), op.spec);
+
+  // The expression is a DAG with lots of sharing, which the propositional
+  // back-end, unlike the simplifier, converts in linear time.
+  satcheckt satcheck(null_message_handler);
+  boolbvt solver{ns, satcheck, null_message_handler};
+  const symbol_exprt result_symbol{"result", result.type()};
+  solver.set_to_true(equal_exprt{result_symbol, result});
+  REQUIRE(solver() == decision_proceduret::resultt::D_SATISFIABLE);
+  const exprt value = solver.get(result_symbol);
+  REQUIRE(value.is_constant());
+  // float_bv uses bit-vector types
+  return ieee_float_valuet{
+    constant_exprt{to_constant_expr(value).get_value(), op.spec.to_type()}};
+}
+
+SCENARIO("float_utils_sqrt", "[core][solvers][floatbv][float_utils][sqrt]")
+{
+  const ieee_floatt::rounding_modet rounding_modes[] = {
+    ieee_floatt::ROUND_TO_EVEN,
+    ieee_floatt::ROUND_TO_MINUS_INF,
+    ieee_floatt::ROUND_TO_PLUS_INF,
+    ieee_floatt::ROUND_TO_ZERO,
+    ieee_floatt::ROUND_TO_AWAY};
+
+  GIVEN("all values of a small format")
+  {
+    // 1 sign bit, 4 exponent bits, 6 fraction bits; includes the special
+    // values and negative numbers
+    const ieee_float_spect spec{6, 4};
+    for(mp_integer bits = 0; bits < power(2, spec.width()); ++bits)
+    {
+      ieee_float_valuet x{spec};
+      x.unpack(bits);
+      for(const auto rm : rounding_modes)
+      {
+        INFO("bits: " << bits << ", rounding mode: " << rm);
+        const auto expected = ieee_floatt{x, rm}.sqrt();
+        const auto result = float_utils_sqrt(x, rm);
+        REQUIRE(eq(result, expected));
+        const auto result_bv = float_bv_sqrt(x, rm);
+        REQUIRE(eq(result_bv, expected));
+        // the sign of zero matters, the sign of NaN does not
+        if(!expected.is_NaN())
+        {
+          REQUIRE(result.get_sign() == expected.get_sign());
+          REQUIRE(result_bv.get_sign() == expected.get_sign());
+        }
+      }
+    }
+  }
+
+  GIVEN("random single-precision values")
+  {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    distt dist(0, std::numeric_limits<unsigned>::max());
+
+    for(std::size_t i = 0; i < 100; ++i)
+    {
+      ieee_float_valuet x;
+      x.from_float(random_float(dist, gen));
+      for(const auto rm : rounding_modes)
+      {
+        INFO("x: " << x << ", rounding mode: " << rm);
+        REQUIRE(eq(float_utils_sqrt(x, rm), ieee_floatt{x, rm}.sqrt()));
+      }
+    }
+  }
+}
+
+/// Prove that sqrt(y) * sqrt(y) <= y * (1 + k * epsilon) for all non-negative
+/// finite y, with all operations rounded according to \p rm.
+/// \return true iff the property holds
+static bool square_of_sqrt_is_bounded(
+  const ieee_float_spect &spec,
+  ieee_floatt::rounding_modet rm,
+  unsigned k)
+{
+  satcheckt satcheck(null_message_handler);
+  float_utilst float_utils(satcheck);
+  float_utils.rounding_mode_bits.set(rm);
+  float_utils.spec = spec;
+
+  const bvt y = satcheck.new_variables(spec.width());
+  satcheck.l_set_to_false(float_utils.is_NaN(y));
+  satcheck.l_set_to_false(float_utils.is_infinity(y));
+  satcheck.l_set_to_false(float_utils.sign_bit(y));
+
+  // 1 + k * epsilon
+  ieee_floatt bound{spec, ieee_floatt::ROUND_TO_EVEN};
+  bound.build(power(2, spec.f) + k, -mp_integer{spec.f});
+
+  const bvt root = float_utils.sqrt(y);
+  const bvt square = float_utils.mul(root, root);
+  const bvt limit = float_utils.mul(y, float_utils.build_constant(bound));
+  satcheck.l_set_to_false(
+    float_utils.relation(square, float_utilst::relt::LE, limit));
+
+  return satcheck.prop_solve() == satcheckt::resultt::P_UNSATISFIABLE;
+}
+
+SCENARIO(
+  "float_utils_sqrt_symbolic",
+  "[core][solvers][floatbv][float_utils][sqrt]")
+{
+  // The tightest bounds on sqrt(y) * sqrt(y) in multiples of epsilon. Proving
+  // these for all values is fast for 16-bit formats, but not for single
+  // precision.
+  const std::pair<ieee_floatt::rounding_modet, unsigned> bounds[] = {
+    {ieee_floatt::ROUND_TO_EVEN, 1},
+    {ieee_floatt::ROUND_TO_MINUS_INF, 0},
+    {ieee_floatt::ROUND_TO_PLUS_INF, 2},
+    {ieee_floatt::ROUND_TO_ZERO, 0}};
+
+  // bfloat16 (8 exponent bits, 7 fraction bits) and IEEE binary16
+  for(const auto &spec :
+      {ieee_float_spect{7, 8}, ieee_float_spect::half_precision()})
+  {
+    for(const auto &[rm, k] : bounds)
+    {
+      INFO("f: " << spec.f << ", rounding mode: " << rm);
+      REQUIRE(square_of_sqrt_is_bounded(spec, rm, k));
+      if(k > 0)
+        REQUIRE(!square_of_sqrt_is_bounded(spec, rm, k - 1));
     }
   }
 }

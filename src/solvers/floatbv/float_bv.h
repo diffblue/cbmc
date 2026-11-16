@@ -55,6 +55,11 @@ public:
   /// \param addend: value added to the product
   /// \param rm: IEEE 754 rounding mode
   /// \param spec: floating-point format specification
+  /// IEEE 754 squareRoot: the square root of \p src, correctly rounded
+  /// according to \p rm.
+  exprt
+  sqrt(const exprt &src, const exprt &rm, const ieee_float_spect &spec) const;
+
   exprt fma(
     const exprt &multiply_lhs,
     const exprt &multiply_rhs,

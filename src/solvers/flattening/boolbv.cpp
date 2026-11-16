@@ -165,6 +165,8 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
   else if(expr.id() == ID_floatbv_round_to_integral)
     return convert_floatbv_round_to_integral(
       to_floatbv_round_to_integral_expr(expr));
+  else if(expr.id() == ID_floatbv_sqrt)
+    return convert_floatbv_sqrt(to_floatbv_sqrt_expr(expr));
   else if(expr.id()==ID_concatenation)
     return convert_concatenation(to_concatenation_expr(expr));
   else if(expr.id()==ID_replication)
