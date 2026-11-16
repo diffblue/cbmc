@@ -1,6 +1,6 @@
 CORE
 main.c
---verify --constants
+--arch riscv64 --verify --constants
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main\.assertion\.1\] line 14 global: UNKNOWN$

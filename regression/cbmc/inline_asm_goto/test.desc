@@ -1,6 +1,6 @@
 CORE gcc-only
 main.c
---validate-goto-model --validate-ssa-equation
+--arch riscv64 --validate-goto-model --validate-ssa-equation
 ^EXIT=10$
 ^SIGNAL=0$
 approximating inline assembly statement at .* function branch: instruction 'testl' is not modeled, so the choice of the label it jumps to \(if any\)

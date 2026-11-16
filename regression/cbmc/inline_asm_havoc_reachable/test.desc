@@ -1,6 +1,6 @@
 CORE gcc-only
 main.c
-
+--arch riscv64
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main\.assertion\.1\] line 37 heap object reachable from static: FAILURE$

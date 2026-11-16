@@ -1,6 +1,6 @@
 CORE gcc-only
 main.c
---full-slice
+--arch riscv64 --full-slice
 ^EXIT=10$
 ^SIGNAL=0$
 ^not slicing, as the program contains inline assembly that may change any reachable object$

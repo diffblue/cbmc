@@ -1,6 +1,6 @@
 CORE gcc-only no-new-smt
 main.c
-
+--arch riscv64
 ^EXIT=10$
 ^SIGNAL=0$
 approximating inline assembly statement at .* line 6 function main: instruction 'fxrstor' is not modeled, so the objects reachable from its operands

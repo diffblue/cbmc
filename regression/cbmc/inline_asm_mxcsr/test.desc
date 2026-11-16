@@ -1,6 +1,6 @@
 CORE gcc-only no-new-smt
 main.c
-
+--arch riscv64
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main\.assertion\.1\] line 7 initial rounding mode: SUCCESS$

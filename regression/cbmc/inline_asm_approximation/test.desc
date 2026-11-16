@@ -1,6 +1,6 @@
 CORE gcc-only
 main.c
---no-standard-checks
+--arch riscv64 --no-standard-checks
 ^EXIT=10$
 ^SIGNAL=0$
 approximating inline assembly statement at .* line 27 function main: instruction 'xchg' is not modeled, so its output operands and the rounding mode are assigned nondeterministic values

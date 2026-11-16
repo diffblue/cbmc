@@ -1,6 +1,6 @@
 CORE gcc-only
 main.c
---show-goto-functions
+--arch riscv64 --show-goto-functions
 ^EXIT=0$
 ^SIGNAL=0$
 ^ *CALL __asm_mfence\(\)$
