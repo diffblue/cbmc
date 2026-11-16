@@ -38,7 +38,8 @@ The interpretation of a statement has these parts:
   block-local temporaries), labels, and helpers to read and write registers
   and memory, branch, and fence.
 - `asm_semanticst` is the interface of the per-architecture semantics;
-  `asm_x86.cpp` implements x86 (i386, x86-64, x32).
+  `asm_x86.cpp` implements x86 (i386, x86-64, x32), `asm_aarch64.cpp`
+  implements AArch64; `asm_arm_flags.h` has the ARM condition flags.
 
 The code of a statement consists of a prologue that evaluates the inputs, the
 code of the instructions, and an epilogue that assigns the register outputs.
@@ -84,6 +85,15 @@ instructions and `xchg` with a memory operand) is an atomic section of its
 own, with a full fence; see `asm_lowering_contextt::mark_atomic`. Making the
 whole statement atomic would hide races on the statement's other
 instructions.
+
+A load-exclusive followed by a store-exclusive is an atomic section from the
+load to the store (`asm_lowering_contextt::begin_exclusive`, `end_exclusive`)
+if there is no other memory access, branch, or label in between; otherwise
+the statement is not interpreted. The store-exclusive succeeds
+nondeterministically: the architecture permits spurious failures, and a
+store-exclusive without a load-exclusive in the same statement may succeed if
+a load-exclusive executed before. After `clrex` or a store-exclusive, a
+store-exclusive fails.
 
 For `asm goto`, goto conversion creates a variable that selects the label to
 jump to (`code_asm_gcct::goto_target`) and dispatches on it after the

@@ -119,8 +119,43 @@ public:
   void begin_instruction();
 
   /// Finish lowering an instruction: if it was marked atomic (see
-  /// \ref mark_atomic), wrap its code in an atomic section.
+  /// \ref mark_atomic), wrap its code in an atomic section, and likewise
+  /// for an exclusive access region that the instruction ends (see
+  /// \ref end_exclusive).
   void end_instruction();
+
+  /// \name Load-exclusive/store-exclusive sequences
+  /// A load-exclusive (AArch64 `ldxr`, AArch32 `ldrex`) followed, in the same
+  /// statement and without other memory accesses, branches, or labels in
+  /// between, by a store-exclusive is modeled as an atomic section that
+  /// spans both instructions. The store-exclusive succeeds
+  /// nondeterministically (the architecture permits spurious failures).
+  /// \{
+
+  /// Start an exclusive access region at the current instruction (a
+  /// load-exclusive).
+  void begin_exclusive();
+
+  /// \return True iff an exclusive access region is open.
+  bool exclusive_open() const
+  {
+    return exclusive_start.has_value();
+  }
+
+  /// End the open exclusive access region with the current instruction (a
+  /// store-exclusive), which makes the region an atomic section.
+  void end_exclusive();
+
+  /// The exclusive monitor is cleared (by `clrex`, or by a
+  /// store-exclusive): a later store-exclusive in this statement fails.
+  void clear_exclusive();
+
+  /// \return True iff the exclusive monitor is known to be cleared.
+  bool exclusive_cleared() const
+  {
+    return monitor_cleared;
+  }
+  /// \}
 
   /// A call to a library function taking `void *` arguments
   void call(const irep_idt &function, const exprt::operandst &arguments);
@@ -219,6 +254,15 @@ protected:
   bool atomic = false;
   /// the last instruction of body before the current instruction, if any
   std::optional<goto_programt::targett> instruction_start;
+  /// for an open exclusive access region: the last instruction of body
+  /// before the load-exclusive, if any
+  std::optional<std::optional<goto_programt::targett>> exclusive_start;
+  /// whether the current instruction ends an exclusive access region
+  bool exclusive_ends = false;
+  /// where the exclusive access region ended by the current instruction
+  /// started
+  std::optional<goto_programt::targett> ended_exclusive_start;
+  bool monitor_cleared = false;
   /// the canonical names of the hardware registers that are written
   std::set<std::string> written_registers;
 

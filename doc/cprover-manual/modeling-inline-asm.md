@@ -6,11 +6,12 @@ CBMC supports GCC-style (`asm`/`__asm__`) and MSVC-style (`__asm {}`)
 inline assembly syntax. Before verification, the `remove_asm` pass replaces
 each inline-assembly statement by goto-program instructions:
 
-- On x86 (`--arch i386` or `--arch x86_64`, the default on x86 hosts), a
-  GCC-style statement is **interpreted** if CBMC's x86 instruction semantics
-  support all of its instructions (see "x86 Instruction Semantics" below):
-  it is translated into goto-program instructions with the same effect on the
-  C program state.
+- On x86 (`--arch i386` or `--arch x86_64`) and AArch64 (`--arch arm64`),
+  the default being the host architecture, a GCC-style statement is
+  **interpreted** if CBMC's instruction semantics for the architecture
+  support all of its instructions (see "x86 Instruction Semantics" and
+  "AArch64 Instruction Semantics" below): it is translated into goto-program
+  instructions with the same effect on the C program state.
 - Otherwise, if CBMC models every instruction of the statement (see
   "Supported Instructions" below, on any architecture), the statement is
   translated into the corresponding fences or calls to library functions.
@@ -78,6 +79,41 @@ instructions are listed in the tables below) if it:
 A lock-prefixed instruction (or `xchg` with a memory operand) is an atomic
 section with a full fence; the other instructions of the statement are not
 part of that atomic section.
+
+### AArch64 Instruction Semantics
+
+The AArch64 semantics cover:
+
+- data movement and processing on general-purpose registers, with the
+  condition flags: `mov`, `mvn`, `movz`, `movk`, `movn`, `neg`, `negs`,
+  `add`, `adds`, `sub`, `subs`, `and`, `ands`, `orr`, `eor`, `bic`, `bics`,
+  `orn`, `eon`, `lsl`, `lsr`, `asr`, `ror`, `cmp`, `cmn`, `tst`, and the
+  conditional selects (`csel`, `csinc`, `csinv`, `csneg`, `cset`, `csetm`);
+- loads and stores of single registers (including acquire/release
+  variants), the LSE atomics
+  (`ldadd`, `ldclr`, `ldeor`, `ldset`, `ldsmax`, `ldsmin`, `ldumax`,
+  `ldumin`, their `st` forms, `swp`, `cas`), and load-exclusive/
+  store-exclusive (`ldxr`, `ldaxr`, `stxr`, `stlxr`, `clrex`);
+- branches within the statement and to the labels of `asm goto`, and flag
+  outputs (`=@cc<cc>`);
+- barriers (`dmb`, `dsb`, `isb`), `mrs` and `msr` of the flags (`nzcv`),
+  `msr` of the interrupt masks (`daif`, `daifset`, `daifclr`), and hints
+  (`nop`, `yield`, `wfe`, ...); `mrs` of other system registers produces a
+  nondeterministic value, and `msr` of other system registers (such as
+  `fpcr`, which sets the rounding mode) is not modeled.
+
+A load-exclusive followed by a store-exclusive in the same statement, with
+no other memory access, branch, or label in between, is an atomic section.
+The store-exclusive succeeds or fails nondeterministically, as the
+architecture permits spurious failures, and so does a store-exclusive
+without a preceding load-exclusive in the statement (a load-exclusive may
+have executed before). Hence symbolic execution needs an unwinding bound for
+the loop that retries the sequence until the store succeeds, and unwinding
+assertions for that loop fail. If the retried code has no effect when the
+store fails (it only computes registers that the next attempt computes
+again), the executions with more retries reach the same states, so that
+bounding the loop (with `--unwindset`, without unwinding assertions) does not
+miss any state.
 
 ### Supported Instructions
 

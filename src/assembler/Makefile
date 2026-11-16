@@ -1,4 +1,5 @@
-SRC = asm_approximation.cpp \
+SRC = asm_aarch64.cpp \
+      asm_approximation.cpp \
       asm_lowering.cpp \
       asm_operands.cpp \
       asm_semantics.cpp \

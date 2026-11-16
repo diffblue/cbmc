@@ -212,15 +212,41 @@ void asm_lowering_contextt::begin_instruction()
 
 void asm_lowering_contextt::end_instruction()
 {
-  if(!atomic)
-    return;
+  std::optional<std::optional<goto_programt::targett>> start;
+  if(exclusive_ends)
+    start = ended_exclusive_start;
+  else if(atomic)
+    start = instruction_start;
+  exclusive_ends = false;
   atomic = false;
 
-  const goto_programt::targett first = instruction_start.has_value()
-                                         ? std::next(*instruction_start)
-                                         : body.instructions.begin();
+  if(!start.has_value())
+    return;
+
+  const goto_programt::targett first =
+    start->has_value() ? std::next(**start) : body.instructions.begin();
   body.insert_before(first, goto_programt::make_atomic_begin(location));
   body.add(goto_programt::make_atomic_end(location));
+}
+
+void asm_lowering_contextt::begin_exclusive()
+{
+  exclusive_start = instruction_start;
+  monitor_cleared = false;
+}
+
+void asm_lowering_contextt::end_exclusive()
+{
+  PRECONDITION(exclusive_open());
+  ended_exclusive_start = *exclusive_start;
+  exclusive_ends = true;
+  exclusive_start.reset();
+}
+
+void asm_lowering_contextt::clear_exclusive()
+{
+  exclusive_start.reset();
+  monitor_cleared = true;
 }
 
 void asm_lowering_contextt::assume(const exprt &condition)
@@ -511,6 +537,9 @@ bool asm_lowering_contextt::prepare(
 
 void asm_lowering_contextt::define_label(const std::string &name)
 {
+  // a jump into an exclusive access region would bypass its start
+  if(exclusive_open())
+    fail("label between load-exclusive and store-exclusive");
   const auto t = body.add(goto_programt::make_skip(location));
   // Join the forward branches to the label lowered so far. Backward branches,
   // lowered later, are checked against the result (check_unknown_at_target).
@@ -539,6 +568,9 @@ bool asm_lowering_contextt::branch(
   const asm_tokent &target,
   const exprt &condition)
 {
+  if(exclusive_open())
+    return fail("branch between load-exclusive and store-exclusive");
+
   if(target.kind == asm_tokent::kindt::C_LABEL)
   {
     if(goto_target.is_nil())
