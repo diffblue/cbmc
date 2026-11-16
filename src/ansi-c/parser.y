@@ -2888,6 +2888,9 @@ gcc_asm_output:
         {
           $$=$5;
           parser_stack($$).id(ID_gcc_asm_output);
+          // the symbolic name, for %[name] references
+          parser_stack($$).set(
+            ID_identifier, parser_stack($2).get(ID_C_base_name));
           parser_stack($$).add_to_operands(std::move(parser_stack($4)), std::move(parser_stack($6)));
         }
         ;
@@ -2925,6 +2928,9 @@ gcc_asm_input:
         {
           $$=$5;
           parser_stack($$).id(ID_gcc_asm_input);
+          // the symbolic name, for %[name] references
+          parser_stack($$).set(
+            ID_identifier, parser_stack($2).get(ID_C_base_name));
           parser_stack($$).add_to_operands(std::move(parser_stack($4)), std::move(parser_stack($6)));
         }
         ;
