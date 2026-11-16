@@ -1,0 +1,24 @@
+CORE gcc-only
+main.c
+
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line 37 heap object reachable from static: FAILURE$
+^\[main\.assertion\.2\] line 38 pointer in static: FAILURE$
+^\[main\.assertion\.3\] line 39 pointers are restricted to known values: SUCCESS$
+^\[main\.assertion\.4\] line 50 escaped local of caller: FAILURE$
+^\[main\.assertion\.5\] line 51 local without address: SUCCESS$
+^\[main\.assertion\.6\] line 59 heap object reachable from operand: FAILURE$
+^\[main\.assertion\.7\] line 60 unreachable heap object: SUCCESS$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+dereference failure.*: FAILURE$
+--
+The havoc_reachable statement that the approximation of inline assembly emits
+is implemented in symbolic execution using the value set: all objects
+reachable from the pointer operands (and, with a "memory" clobber, from the
+objects of static lifetime and the address-taken local variables of all
+functions on the call stack) are assigned nondeterministic values. The
+pointers stored in these objects are restricted to previously stored pointers,
+the addresses of the reachable objects, and null.

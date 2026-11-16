@@ -64,9 +64,6 @@ protected:
   messaget log;
   asm_approximationt approximate;
 
-  /// The address-taken local variables of the function being processed.
-  std::vector<symbol_exprt> address_taken_locals;
-
   using instructionst = std::list<assembler_parsert::instructiont>;
 
   using handle_commandt = std::function<bool(
@@ -361,8 +358,7 @@ void remove_asmt::approximate_asm(
   const std::string &addresses_description,
   goto_programt &dest)
 {
-  approximate(
-    footprint, address_taken_locals, function_id, code.source_location(), dest);
+  approximate(footprint, function_id, code.source_location(), dest);
 
   std::vector<std::string> parts;
   if(!footprint.writes.empty())
@@ -371,11 +367,10 @@ void remove_asmt::approximate_asm(
     parts.push_back(addresses_description);
   if(footprint.arbitrary_memory)
   {
+    parts.push_back("all objects of static lifetime");
     parts.push_back(
-      "all objects of static lifetime and the objects their pointers point "
-      "to");
-    parts.push_back(
-      "the address-taken local variables of " + id2string(function_id));
+      "the address-taken local variables of the functions on the call stack");
+    parts.push_back("the objects reachable from any of these");
   }
   parts.push_back("the rounding mode");
 
@@ -485,7 +480,7 @@ void remove_asmt::process_instruction_gcc(
     *unknown,
     footprint,
     "its output operands",
-    "the objects its operands point to",
+    "the objects reachable from its operands",
     dest);
 }
 
@@ -702,7 +697,7 @@ void remove_asmt::process_instruction_msc(
     *unknown,
     footprint,
     "the local variables it names",
-    "the objects these point to",
+    "the objects reachable from these",
     dest);
 }
 
@@ -787,20 +782,11 @@ void remove_asmt::process_function(
   goto_functionst::goto_functiont &goto_function)
 {
   bool did_something = false;
-  bool locals_computed = false;
 
   Forall_goto_program_instructions(it, goto_function.body)
   {
     if(it->is_other() && it->get_other().get_statement() == ID_asm)
     {
-      // compute before any of the statements is replaced
-      if(!locals_computed)
-      {
-        address_taken_locals = asm_approximationt::address_taken_locals(
-          goto_function.body, namespacet{symbol_table});
-        locals_computed = true;
-      }
-
       goto_programt tmp_dest;
       process_instruction(function_id, *it, tmp_dest);
       it->turn_into_skip();

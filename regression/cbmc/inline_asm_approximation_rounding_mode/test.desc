@@ -3,7 +3,7 @@ main.c
 
 ^EXIT=10$
 ^SIGNAL=0$
-approximating inline assembly statement at .* line 6 function main: instruction 'fxrstor' is not modeled, so the objects its operands point to
+approximating inline assembly statement at .* line 6 function main: instruction 'fxrstor' is not modeled, so the objects reachable from its operands
 ^\[main\.assertion\.1\] line 8 rounding mode: FAILURE$
 ^VERIFICATION FAILED$
 --

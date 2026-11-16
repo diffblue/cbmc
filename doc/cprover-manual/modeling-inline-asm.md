@@ -69,19 +69,28 @@ instruction that is not modeled, then
 1. the input operands (and the in-out operands, those with a `+`
    constraint) are read, which makes them subject to the checks that CBMC
    performs, for example `--pointer-check`;
-2. the objects that the input and in-out operands point to are assigned
-   nondeterministic values. This includes operands of pointer type, arrays
-   (which decay to pointers), pointers cast to integer types (as in
-   `(uintptr_t)&x`), and the pointer members of operands of struct or union
-   type;
+2. the objects that the input and in-out operands point to, and all objects
+   reachable from these, are assigned nondeterministic values. This includes
+   operands of pointer type, arrays (which decay to pointers), pointers cast
+   to integer types (as in `(uintptr_t)&x`), and the pointer members of
+   operands of struct or union type;
 3. if the statement has a `"memory"` clobber, or no operands and no clobbers
-   at all (basic assembly), all objects of static lifetime, the objects that
-   those of them that are pointers (or structs or unions with pointer
-   members) point to, and all local variables of the enclosing function whose
-   address is taken are assigned nondeterministic values;
+   at all (basic assembly), all objects of static lifetime, all local
+   variables whose address is taken of all functions on the call stack, and
+   all objects reachable from these are assigned nondeterministic values;
 4. the output operands are assigned nondeterministic values, at the
    addresses they had before the statement;
 5. the rounding mode is assigned a nondeterministic value.
+
+Symbolic execution computes the reachable objects from the value sets of the
+pointers stored in the objects (following pointers transitively), so this
+includes, for example, all nodes of a linked list whose head is stored in a
+variable of static lifetime. The pointers stored in the objects that are
+changed are not made arbitrary: each of them is assigned a nondeterministic
+choice among the pointers previously stored in these objects, the addresses
+of the reachable objects (of a compatible type), and null. The statement can
+thus relink a list, and dereferencing the pointers afterwards remains
+precise.
 
 MSVC-style blocks have no operand interface. If a block contains an
 instruction that is not modeled, each local variable of the enclosing
@@ -92,12 +101,18 @@ and the block is treated as having a `"memory"` clobber.
 ### Limitations
 
 - The approximation only reaches the objects listed above. Objects that the
-  statement can reach only through other pointers, for example heap objects
-  or local variables of a caller that are not pointed to by an operand or an
-  object of static lifetime, keep their values. Objects of static lifetime
-  that are added when linking the CPROVER library are not changed.
-- Constant objects and the objects that pointers to constant types point to
-  are not changed.
+  statement can reach only through pointers that CBMC does not track (for
+  example, addresses computed from integers, or pointers stored in local
+  variables of a caller whose address is not taken) keep their values.
+- A pointer stored in a changed object takes one of at most 64 of the
+  candidate values described above (its own previous value first); a warning
+  is printed if there are more candidates. Pointers in unions and in arrays
+  of more than 64 elements, or of a size that is not constant, are assigned
+  arbitrary values.
+- Constant objects are not changed.
+- The reachable objects are only changed by symbolic execution (`cbmc`):
+  other tools, such as `goto-analyzer`, only see the changes to the output
+  operands and the rounding mode.
 - Control flow out of a statement is not modeled: `asm goto` statements
   always continue with the next statement.
 - Atomicity and memory ordering of instructions that are not modeled are not
