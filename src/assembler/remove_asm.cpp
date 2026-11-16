@@ -15,6 +15,7 @@ Date:   December 2014
 
 #include "remove_asm.h"
 
+#include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/message.h>
 #include <util/namespace.h>
@@ -365,6 +366,8 @@ void remove_asmt::approximate_asm(
     parts.push_back(writes_description);
   if(!footprint.addresses.empty())
     parts.push_back(addresses_description);
+  if(footprint.goto_target.has_value())
+    parts.push_back("the choice of the label it jumps to (if any)");
   if(footprint.arbitrary_memory)
   {
     parts.push_back("all objects of static lifetime");
@@ -421,10 +424,21 @@ void remove_asmt::process_instruction_gcc(
     { return handle_gcc_command(command, pos, instruction, code, tmp_dest); });
 
   if(!unknown.has_value())
+  {
+    // none of the modeled instructions jumps
+    if(code.has_goto_target())
+    {
+      const exprt &target = code.goto_target();
+      dest.add(goto_programt::make_assignment(
+        target, from_integer(0, target.type()), code.source_location()));
+    }
     return;
+  }
 
   const namespacet ns{symbol_table};
   asm_footprintt footprint;
+  if(code.has_goto_target())
+    footprint.goto_target = code.goto_target();
 
   for(const auto &output : code.outputs().operands())
   {

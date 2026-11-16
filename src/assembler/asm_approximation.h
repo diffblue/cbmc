@@ -17,6 +17,7 @@ Author: Michael Tautschnig
 #include <util/expr.h>
 #include <util/irep.h>
 
+#include <optional>
 #include <vector>
 
 class goto_programt;
@@ -45,6 +46,11 @@ struct asm_footprintt
   /// Whether the statement may access memory not described by its operands
   /// (a "memory" clobber, basic assembly, or an MSVC-style block).
   bool arbitrary_memory = false;
+
+  /// For an `asm goto` statement: the variable that selects the label the
+  /// statement jumps to (see \ref code_asm_gcct::goto_target). The statement
+  /// may jump to any of its labels, or not jump.
+  std::optional<exprt> goto_target;
 };
 
 /// Builds the instructions that conservatively approximate an inline assembly
@@ -66,7 +72,7 @@ public:
   ///    local variables of all functions on the call stack (a
   ///    `havoc_reachable` statement, which symbolic execution implements
   ///    using the value set);
-  /// 4. assign nondeterministic values to the writes;
+  /// 4. assign nondeterministic values to the writes and to the goto target;
   /// 5. assign a nondeterministic rounding mode.
   /// \param footprint: What the statement may read and write
   /// \param function_id: Name of the enclosing function, which temporaries

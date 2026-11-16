@@ -172,9 +172,11 @@ void asm_approximationt::operator()(
     dest.add(goto_programt::make_other(havoc, source_location));
   }
 
-  // 4. the outputs
+  // 4. the outputs, and whether and where the statement jumps
   for(const auto &write : writes)
     havoc_lvalue(write, source_location, dest);
+  if(footprint.goto_target.has_value())
+    havoc_lvalue(*footprint.goto_target, source_location, dest);
 
   // 5. the floating-point rounding mode, which the statement may change via
   // the control registers of the floating-point unit

@@ -11,7 +11,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_convert_class.h"
 
+#include <util/arith_tools.h>
+#include <util/c_types.h>
+#include <util/symbol.h>
+
 #include "destructor.h"
+
+#include <optional>
 
 void goto_convertt::convert_asm(
   const code_asmt &code,
@@ -44,7 +50,53 @@ void goto_convertt::convert_asm(
   }
   dest.destructive_append(side_effects.side_effects);
 
+  // asm goto: the translation of the statement (see remove_asm) records the
+  // label it jumps to in a variable, which is dispatched on below
+  std::vector<irep_idt> labels;
+  for(const auto &label : new_code.labels().operands())
+    labels.push_back(label.get(ID_identifier));
+
+  std::optional<symbol_exprt> goto_target;
+  if(!labels.empty())
+  {
+    goto_target = new_tmp_symbol(
+                    unsigned_int_type(),
+                    "asm_goto_target",
+                    dest,
+                    code.source_location(),
+                    mode)
+                    .symbol_expr();
+    new_code.add_goto_target(*goto_target);
+  }
+
   copy(new_code, OTHER, dest);
 
+  // the operands are no longer needed once the statement has executed
   destruct_locals(side_effects.temporaries, dest, ns);
+
+  if(!goto_target.has_value())
+    return;
+
+  // Jump to the label with the (1-based) index the statement chose, if any.
+  // These are ordinary gotos, converted as such so that leaving scopes is
+  // handled like for any other goto.
+  code_deadt dead{*goto_target};
+  dead.add_source_location() = code.source_location();
+  for(std::size_t i = 0; i < labels.size(); ++i)
+  {
+    code_gotot code_goto{labels[i]};
+    code_goto.add_source_location() = code.source_location();
+
+    code_blockt then_case{{dead, std::move(code_goto)}};
+    then_case.add_source_location() = code.source_location();
+
+    code_ifthenelset if_goto{
+      equal_exprt{*goto_target, from_integer(i + 1, goto_target->type())},
+      std::move(then_case)};
+    if_goto.add_source_location() = code.source_location();
+
+    convert(if_goto, dest, mode);
+  }
+
+  dest.add(goto_programt::make_dead(*goto_target, code.source_location()));
 }

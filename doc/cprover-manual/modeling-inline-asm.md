@@ -15,6 +15,9 @@ each inline-assembly statement by goto-program instructions:
   instruction that is not modeled is printed. The modeled instructions of
   such a statement are not translated either.
 
+None of the modeled instructions jumps, so an `asm goto` statement whose
+instructions are all modeled continues with the next statement.
+
 A statement with an empty assembly template, such as the compiler barrier
 `asm volatile("" ::: "memory")`, does nothing.
 
@@ -79,7 +82,8 @@ instruction that is not modeled, then
    variables whose address is taken of all functions on the call stack, and
    all objects reachable from these are assigned nondeterministic values;
 4. the output operands are assigned nondeterministic values, at the
-   addresses they had before the statement;
+   addresses they had before the statement, and an `asm goto` statement
+   jumps to any of its labels, or continues with the next statement;
 5. the rounding mode is assigned a nondeterministic value.
 
 Symbolic execution computes the reachable objects from the value sets of the
@@ -120,8 +124,6 @@ and the block is treated as having a `"memory"` clobber.
   address-taken variables). `--full-slice` does not slice programs that
   contain approximated inline assembly with pointer operands, a `"memory"`
   clobber, or no operands (basic assembly).
-- Control flow out of a statement is not modeled: `asm goto` statements
-  always continue with the next statement.
 - Atomicity and memory ordering of instructions that are not modeled are not
   modeled; such statements are not atomic and do not act as fences.
 - A loop that retries an approximated statement until it succeeds, such as a
