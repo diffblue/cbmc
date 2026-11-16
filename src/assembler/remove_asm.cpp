@@ -17,6 +17,7 @@ Date:   December 2014
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/message.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
@@ -30,6 +31,7 @@ Date:   December 2014
 #include <goto-programs/remove_skip.h>
 
 #include "asm_approximation.h"
+#include "asm_semantics.h"
 #include "assembler_parser.h"
 
 #include <cctype>
@@ -48,7 +50,8 @@ public:
       goto_functions(_goto_functions),
       message_handler(message_handler),
       log(message_handler),
-      approximate(_symbol_table)
+      approximate(_symbol_table),
+      semantics(make_asm_semantics(config.ansi_c.arch))
   {
   }
 
@@ -64,6 +67,8 @@ protected:
   message_handlert &message_handler;
   messaget log;
   asm_approximationt approximate;
+  /// The instruction semantics of the architecture, if there are any
+  std::unique_ptr<asm_semanticst> semantics;
 
   using instructionst = std::list<assembler_parsert::instructiont>;
 
@@ -92,6 +97,17 @@ protected:
 
   instructionst parse(const irep_idt &assembly);
 
+  bool lower_gcc(
+    const irep_idt &function_id,
+    const code_asm_gcct &code,
+    goto_programt &dest,
+    std::string &failure);
+
+  bool lower_instructions(
+    const std::vector<asm_instructiont> &instructions,
+    asm_lowering_contextt &ctx,
+    std::string &failure);
+
   std::optional<irep_idt> process_asm(
     const code_asmt &code,
     const instructionst &instructions,
@@ -102,6 +118,7 @@ protected:
     const irep_idt &function_id,
     const code_asmt &code,
     const irep_idt &unknown_command,
+    const std::string &reason,
     const asm_footprintt &footprint,
     const std::string &writes_description,
     const std::string &addresses_description,
@@ -344,6 +361,9 @@ std::optional<irep_idt> remove_asmt::process_asm(
 /// \param function_id: Name of function being processed
 /// \param code: The inline assembly code statement
 /// \param unknown_command: The first command in \p code that is not modeled
+/// \param reason: Why the instruction semantics of the architecture do not
+///   model \p code, if they were tried; replaces the mention of
+///   \p unknown_command in the warning
 /// \param footprint: What \p code may read and write
 /// \param writes_description: Description of the writes in \p footprint,
 ///   for the warning
@@ -354,6 +374,7 @@ void remove_asmt::approximate_asm(
   const irep_idt &function_id,
   const code_asmt &code,
   const irep_idt &unknown_command,
+  const std::string &reason,
   const asm_footprintt &footprint,
   const std::string &writes_description,
   const std::string &addresses_description,
@@ -387,14 +408,190 @@ void remove_asmt::approximate_asm(
 
   log.warning() << "approximating inline assembly statement at "
                 << code.source_location() << ": "
-                << (unknown_command.empty()
-                      ? std::string{"an instruction"}
-                      : "instruction '" + id2string(unknown_command) + "'")
-                << " is not modeled, so " << havocked
+                << (!reason.empty() ? reason
+                    : unknown_command.empty()
+                      ? std::string{"an instruction is not modeled"}
+                      : "instruction '" + id2string(unknown_command) +
+                          "' is not modeled")
+                << ", so " << havocked
                 << (parts.size() == 1 ? " is assigned a nondeterministic value"
                                       : " are assigned nondeterministic values")
                 << "; other objects are assumed to be unchanged"
                 << messaget::eom;
+}
+
+/// Translates the gcc-style statement \p code using the instruction semantics
+/// of the architecture.
+///
+/// \param function_id: Name of function being processed
+/// \param code: The inline assembly code statement to translate
+/// \param dest: The goto program to append the translation to
+/// \param [out] failure: Why \p code is not modeled, if it is not
+/// \return Whether all of \p code is modeled
+bool remove_asmt::lower_gcc(
+  const irep_idt &function_id,
+  const code_asm_gcct &code,
+  goto_programt &dest,
+  std::string &failure)
+{
+  PRECONDITION(semantics != nullptr);
+
+  if(code.asm_text().id() != ID_string_constant)
+  {
+    failure = "the template is not a string";
+    return false;
+  }
+
+  asm_operandst operands;
+  if(!operands.parse(code, semantics.get(), failure))
+    return false;
+
+  std::vector<asm_instructiont> instructions;
+  if(!split_asm_template(
+       id2string(to_string_constant(code.asm_text()).value()),
+       semantics->syntax(),
+       operands.is_basic ? nullptr : &operands,
+       instructions,
+       failure))
+  {
+    return false;
+  }
+
+  asm_lowering_contextt ctx{
+    symbol_table, function_id, code.source_location(), operands, *semantics};
+  if(code.has_goto_target())
+    ctx.goto_target = code.goto_target();
+
+  if(!ctx.prepare(instructions))
+  {
+    failure = ctx.failure;
+    return false;
+  }
+
+  if(!lower_instructions(instructions, ctx, failure))
+    return false;
+
+  if(!ctx.finish(dest))
+  {
+    failure = ctx.failure;
+    return false;
+  }
+
+  for(const auto &function : ctx.called_functions)
+    goto_functions.function_map.emplace(function, goto_functiont{});
+
+  return true;
+}
+
+/// Lowers each of \p instructions into \p ctx.
+///
+/// Code in other sections (`.pushsection`/`.section` until `.popsection`/
+/// `.previous`) is not executed in sequence; data there (as in the Linux
+/// kernel's jump tables) is ignored, but instructions there (such as
+/// exception fixups, which run when an instruction faults) are not modeled.
+///
+/// \param instructions: The instructions of the statement
+/// \param ctx: The lowering context of the statement
+/// \param [out] failure: Why an instruction is not modeled, if one is not
+/// \return Whether all \p instructions are modeled
+bool remove_asmt::lower_instructions(
+  const std::vector<asm_instructiont> &instructions,
+  asm_lowering_contextt &ctx,
+  std::string &failure)
+{
+  static const std::set<std::string> no_effect = {
+    ".arch_extension",
+    ".arch",
+    ".cpu",
+    ".align",
+    ".balign",
+    ".p2align",
+    ".syntax",
+    ".att_syntax"};
+
+  std::vector<std::string> pending_prefixes;
+  std::size_t section_depth = 0;
+
+  for(const auto &original : instructions)
+  {
+    asm_instructiont instruction = original;
+    const std::string &m = instruction.mnemonic;
+
+    if(m == ".pushsection" || m == ".section")
+    {
+      ++section_depth;
+      continue;
+    }
+    if(m == ".popsection" || m == ".previous")
+    {
+      if(section_depth == 0)
+      {
+        failure = "unbalanced " + m;
+        return false;
+      }
+      --section_depth;
+      continue;
+    }
+    if(section_depth != 0)
+    {
+      if(m.empty() || instruction.is_directive())
+        continue;
+      failure = "instruction '" + instruction.text +
+                "' in another section (such as an exception fixup)";
+      return false;
+    }
+
+    for(const auto &label : instruction.labels)
+      ctx.define_label(label);
+
+    if(m.empty())
+    {
+      // a prefix on its own, as in "lock; orq ..."
+      pending_prefixes.insert(
+        pending_prefixes.end(),
+        instruction.prefixes.begin(),
+        instruction.prefixes.end());
+      continue;
+    }
+
+    instruction.prefixes.insert(
+      instruction.prefixes.begin(),
+      pending_prefixes.begin(),
+      pending_prefixes.end());
+    pending_prefixes.clear();
+
+    if(instruction.is_directive())
+    {
+      if(no_effect.count(m) != 0)
+        continue;
+      failure = "unsupported directive '" + instruction.text + "'";
+      return false;
+    }
+
+    ctx.begin_instruction();
+    if(!semantics->lower(instruction, ctx))
+    {
+      failure = ctx.failure.empty()
+                  ? "unsupported instruction '" + instruction.text + "'"
+                  : ctx.failure + " in '" + instruction.text + "'";
+      return false;
+    }
+    ctx.end_instruction();
+  }
+
+  if(!pending_prefixes.empty())
+  {
+    failure = "prefix without instruction";
+    return false;
+  }
+
+  if(section_depth != 0)
+  {
+    failure = "unterminated section";
+    return false;
+  }
+
+  return true;
 }
 
 /// Translates the given inline assembly code (in gcc style) to non-assembly
@@ -409,6 +606,18 @@ void remove_asmt::process_instruction_gcc(
   const code_asm_gcct &code,
   goto_programt &dest)
 {
+  // with the instruction semantics of the architecture
+  std::string lowering_failure;
+  if(semantics != nullptr)
+  {
+    goto_programt lowered;
+    if(lower_gcc(function_id, code, lowered, lowering_failure))
+    {
+      dest.destructive_append(lowered);
+      return;
+    }
+  }
+
   const instructionst instructions =
     parse(to_string_constant(code.asm_text()).value());
 
@@ -492,6 +701,7 @@ void remove_asmt::process_instruction_gcc(
     function_id,
     code,
     *unknown,
+    lowering_failure,
     footprint,
     "its output operands",
     "the objects reachable from its operands",
@@ -709,6 +919,7 @@ void remove_asmt::process_instruction_msc(
     function_id,
     code,
     *unknown,
+    "",
     footprint,
     "the local variables it names",
     "the objects reachable from these",

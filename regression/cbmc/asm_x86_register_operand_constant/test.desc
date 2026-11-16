@@ -1,0 +1,13 @@
+CORE gcc-only
+main.i
+--arch x86_64 --unwind 5 --unwinding-assertions
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+approximating inline assembly
+--
+The outer loop is fully unwound (five iterations cover the four lock/unlock
+pairs), so a failing unwinding assertion could only come from a spin loop that
+symbolic execution cannot resolve because the lock word is not a constant.

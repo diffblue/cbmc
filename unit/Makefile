@@ -48,6 +48,7 @@ SRC += analyses/ai/ai.cpp \
        analyses/variable-sensitivity/value_set_pointer_abstract_object/to_predicate.cpp \
        analyses/variable-sensitivity/variable_sensitivity_domain/to_predicate.cpp \
        analyses/variable-sensitivity/variable_sensitivity_test_helpers.cpp \
+       assembler/asm_template.cpp \
        ansi-c/allocate_objects.cpp \
        ansi-c/expr2c.cpp \
        ansi-c/file_converter.cpp \

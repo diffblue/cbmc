@@ -1,0 +1,454 @@
+// x86 inline assembly that is interpreted exactly. The expected values were
+// observed on x86-64 hardware.
+
+// x86 lock-or sets a bit (atomic_set_long)
+void asm_case_0(unsigned long long *io)
+{
+  unsigned long m = (unsigned long)io[0];
+  unsigned long v = (unsigned long)io[1];
+  __asm__ __volatile__("lock; orq %1,%0" : "+m"(m) : "ir"(v) : "cc");
+  io[0] = (unsigned long long)m;
+  io[1] = (unsigned long long)v;
+}
+
+// x86 lock-and clears bits (atomic_clear_long)
+void asm_case_1(unsigned long long *io)
+{
+  unsigned long m = (unsigned long)io[0];
+  unsigned long v = (unsigned long)io[1];
+  __asm__ __volatile__("lock; andq %1,%0" : "+m"(m) : "ir"(v) : "cc");
+  io[0] = (unsigned long long)m;
+  io[1] = (unsigned long long)v;
+}
+
+// x86 lock-add (atomic_add_long)
+void asm_case_2(unsigned long long *io)
+{
+  unsigned long m = (unsigned long)io[0];
+  unsigned long v = (unsigned long)io[1];
+  __asm__ __volatile__("lock; addq %1,%0" : "+m"(m) : "ir"(v) : "cc");
+  io[0] = (unsigned long long)m;
+  io[1] = (unsigned long long)v;
+}
+
+// x86 lock-xadd returns the previous value (atomic_fetchadd)
+void asm_case_3(unsigned long long *io)
+{
+  unsigned int v = (unsigned int)io[0];
+  unsigned int m = (unsigned int)io[1];
+  __asm__ __volatile__("lock; xaddl %0,%1" : "+r"(v), "+m"(m) : : "cc");
+  io[0] = (unsigned long long)v;
+  io[1] = (unsigned long long)m;
+}
+
+// x86 lock-bts sets a bit and reports its old value
+void asm_case_4(unsigned long long *io)
+{
+  unsigned int m = (unsigned int)io[0];
+  unsigned int c = (unsigned int)io[1];
+  unsigned int n = (unsigned int)io[2];
+  __asm__ __volatile__("lock; btsl %2,%0"
+                       : "+m"(m), "=@ccc"(c)
+                       : "Ir"(n)
+                       : "cc");
+  io[0] = (unsigned long long)m;
+  io[1] = (unsigned long long)c;
+  io[2] = (unsigned long long)n;
+}
+
+// x86 bsr finds the highest set bit
+void asm_case_5(unsigned long long *io)
+{
+  unsigned long r = (unsigned long)io[0];
+  unsigned long v = (unsigned long)io[1];
+  __asm__("bsrq %1,%0" : "=r"(r) : "rm"(v));
+  io[0] = (unsigned long long)r;
+  io[1] = (unsigned long long)v;
+}
+
+// x86 add sets the carry flag
+void asm_case_6(unsigned long long *io)
+{
+  unsigned int a = (unsigned int)io[0];
+  unsigned int c = (unsigned int)io[1];
+  unsigned int b = (unsigned int)io[2];
+  __asm__("addl %2,%0; setc %b1" : "+r"(a), "+q"(c) : "r"(b) : "cc");
+  io[0] = (unsigned long long)a;
+  io[1] = (unsigned long long)c;
+  io[2] = (unsigned long long)b;
+}
+
+// x86 shld-free shift: shr by cl
+void asm_case_7(unsigned long long *io)
+{
+  unsigned long a = (unsigned long)io[0];
+  unsigned long n = (unsigned long)io[1];
+  __asm__("shrq %%cl,%0" : "+r"(a) : "c"(n) : "cc");
+  io[0] = (unsigned long long)a;
+  io[1] = (unsigned long long)n;
+}
+
+// x86 bswap reverses byte order
+void asm_case_8(unsigned long long *io)
+{
+  unsigned long a = (unsigned long)io[0];
+  __asm__("bswapq %0" : "+r"(a));
+  io[0] = (unsigned long long)a;
+}
+
+// x86 cmpxchg exchanges on a match (atomic_cmpset)
+void asm_case_9(unsigned long long *io)
+{
+  unsigned int ok = (unsigned int)io[0];
+  unsigned int m = (unsigned int)io[1];
+  unsigned int expected = (unsigned int)io[2];
+  unsigned int desired = (unsigned int)io[3];
+  __asm__ __volatile__("lock; cmpxchgl %3,%1"
+                       : "=@ccz"(ok), "+m"(m), "+a"(expected)
+                       : "r"(desired)
+                       : "cc");
+  io[0] = (unsigned long long)ok;
+  io[1] = (unsigned long long)m;
+  io[2] = (unsigned long long)expected;
+  io[3] = (unsigned long long)desired;
+}
+
+// x86 xchg swaps a register and memory
+void asm_case_10(unsigned long long *io)
+{
+  unsigned int r = (unsigned int)io[0];
+  unsigned int m = (unsigned int)io[1];
+  __asm__ __volatile__("xchgl %0,%1" : "+r"(r), "+m"(m));
+  io[0] = (unsigned long long)r;
+  io[1] = (unsigned long long)m;
+}
+
+// x86 and masks and sets the sign flag
+void asm_case_11(unsigned long long *io)
+{
+  unsigned int a = (unsigned int)io[0];
+  unsigned int s = (unsigned int)io[1];
+  unsigned int b = (unsigned int)io[2];
+  __asm__("andl %2,%0; sets %b1" : "+r"(a), "+q"(s) : "r"(b) : "cc");
+  io[0] = (unsigned long long)a;
+  io[1] = (unsigned long long)s;
+  io[2] = (unsigned long long)b;
+}
+
+// x86 memory operand with a struct field offset
+void asm_case_12(unsigned long long *io)
+{
+  unsigned int lo = (unsigned int)io[0];
+  unsigned int hi = (unsigned int)io[1];
+  unsigned int v = (unsigned int)io[2];
+  struct
+  {
+    unsigned int lo, hi;
+  } s = {(unsigned)io[0], (unsigned)io[1]};
+  __asm__ __volatile__("orl %1,%0" : "+m"(s.hi) : "r"(v) : "cc");
+  io[0] = (unsigned long long)lo;
+  io[1] = (unsigned long long)hi;
+  io[2] = (unsigned long long)v;
+}
+
+int main(void)
+{
+  {
+    unsigned long long io[2] = {0xc2a7af9eab79b005ULL, 0xffULL};
+    asm_case_0(io);
+    __CPROVER_assert(
+      io[0] == 0xc2a7af9eab79b0ffULL && io[1] == 0xffULL,
+      "x86 lock-or sets a bit (atomic_set_long), vector 0");
+  }
+  {
+    unsigned long long io[2] = {0x2ULL, 0x6ffe6666fa72766dULL};
+    asm_case_0(io);
+    __CPROVER_assert(
+      io[0] == 0x6ffe6666fa72766fULL && io[1] == 0x6ffe6666fa72766dULL,
+      "x86 lock-or sets a bit (atomic_set_long), vector 1");
+  }
+  {
+    unsigned long long io[2] = {0x8000000000000000ULL, 0x8000000000000000ULL};
+    asm_case_0(io);
+    __CPROVER_assert(
+      io[0] == 0x8000000000000000ULL && io[1] == 0x8000000000000000ULL,
+      "x86 lock-or sets a bit (atomic_set_long), vector 2");
+  }
+  {
+    unsigned long long io[2] = {0xc2b9546e0f0220f3ULL, 0xf1d5effedcda26fbULL};
+    asm_case_1(io);
+    __CPROVER_assert(
+      io[0] == 0xc091446e0c0220f3ULL && io[1] == 0xf1d5effedcda26fbULL,
+      "x86 lock-and clears bits (atomic_clear_long), vector 0");
+  }
+  {
+    unsigned long long io[2] = {0x7fffffffULL, 0xb8d3af23681c2889ULL};
+    asm_case_1(io);
+    __CPROVER_assert(
+      io[0] == 0x681c2889ULL && io[1] == 0xb8d3af23681c2889ULL,
+      "x86 lock-and clears bits (atomic_clear_long), vector 1");
+  }
+  {
+    unsigned long long io[2] = {0xc60f8fe0a6269527ULL, 0x32f6ffa49275dc84ULL};
+    asm_case_1(io);
+    __CPROVER_assert(
+      io[0] == 0x2068fa082249404ULL && io[1] == 0x32f6ffa49275dc84ULL,
+      "x86 lock-and clears bits (atomic_clear_long), vector 2");
+  }
+  {
+    unsigned long long io[2] = {0xe638bca46bd70d89ULL, 0x2ULL};
+    asm_case_2(io);
+    __CPROVER_assert(
+      io[0] == 0xe638bca46bd70d8bULL && io[1] == 0x2ULL,
+      "x86 lock-add (atomic_add_long), vector 0");
+  }
+  {
+    unsigned long long io[2] = {0x2ULL, 0x17d967b89f01d73dULL};
+    asm_case_2(io);
+    __CPROVER_assert(
+      io[0] == 0x17d967b89f01d73fULL && io[1] == 0x17d967b89f01d73dULL,
+      "x86 lock-add (atomic_add_long), vector 1");
+  }
+  {
+    unsigned long long io[2] = {0x82974e236f761b03ULL, 0x7fULL};
+    asm_case_2(io);
+    __CPROVER_assert(
+      io[0] == 0x82974e236f761b82ULL && io[1] == 0x7fULL,
+      "x86 lock-add (atomic_add_long), vector 2");
+  }
+  {
+    unsigned long long io[2] = {0x38b1f9a35c2855baULL, 0x8a0cb201725c5338ULL};
+    asm_case_3(io);
+    __CPROVER_assert(
+      io[0] == 0x725c5338ULL && io[1] == 0xce84a8f2ULL,
+      "x86 lock-xadd returns the previous value (atomic_fetchadd), vector 0");
+  }
+  {
+    unsigned long long io[2] = {0xb0652c5806a310a8ULL, 0x808332e379bd40dbULL};
+    asm_case_3(io);
+    __CPROVER_assert(
+      io[0] == 0x79bd40dbULL && io[1] == 0x80605183ULL,
+      "x86 lock-xadd returns the previous value (atomic_fetchadd), vector 1");
+  }
+  {
+    unsigned long long io[2] = {0xe586f6e1167ff12eULL, 0xffULL};
+    asm_case_3(io);
+    __CPROVER_assert(
+      io[0] == 0xffULL && io[1] == 0x167ff22dULL,
+      "x86 lock-xadd returns the previous value (atomic_fetchadd), vector 2");
+  }
+  {
+    unsigned long long io[3] = {
+      0xb8004092f9e22b92ULL, 0xab4d6d46b16b38cbULL, 0x5ULL};
+    asm_case_4(io);
+    __CPROVER_assert(
+      io[0] == 0xf9e22bb2ULL && io[1] == 0x0ULL && io[2] == 0x5ULL,
+      "x86 lock-bts sets a bit and reports its old value, vector 0");
+  }
+  {
+    unsigned long long io[3] = {
+      0xc662866ad84cf328ULL, 0x8000000000000000ULL, 0x1fULL};
+    asm_case_4(io);
+    __CPROVER_assert(
+      io[0] == 0xd84cf328ULL && io[1] == 0x1ULL && io[2] == 0x1fULL,
+      "x86 lock-bts sets a bit and reports its old value, vector 1");
+  }
+  {
+    unsigned long long io[3] = {
+      0xd85ee36626a12990ULL, 0x816ffbff11966d8bULL, 0x0ULL};
+    asm_case_4(io);
+    __CPROVER_assert(
+      io[0] == 0x26a12991ULL && io[1] == 0x0ULL && io[2] == 0x0ULL,
+      "x86 lock-bts sets a bit and reports its old value, vector 2");
+  }
+  {
+    unsigned long long io[2] = {0x0ULL, 0x1ULL};
+    asm_case_5(io);
+    __CPROVER_assert(
+      io[0] == 0x0ULL && io[1] == 0x1ULL,
+      "x86 bsr finds the highest set bit, vector 0");
+  }
+  {
+    unsigned long long io[2] = {0x0ULL, 0x8000000000000000ULL};
+    asm_case_5(io);
+    __CPROVER_assert(
+      io[0] == 0x3fULL && io[1] == 0x8000000000000000ULL,
+      "x86 bsr finds the highest set bit, vector 1");
+  }
+  {
+    unsigned long long io[2] = {0x0ULL, 0x1234ULL};
+    asm_case_5(io);
+    __CPROVER_assert(
+      io[0] == 0xcULL && io[1] == 0x1234ULL,
+      "x86 bsr finds the highest set bit, vector 2");
+  }
+  {
+    unsigned long long io[3] = {
+      0x71985eb13a883919ULL, 0x7fffffffffffffffULL, 0xc42192ad002d93dcULL};
+    asm_case_6(io);
+    __CPROVER_assert(
+      io[0] == 0x3ab5ccf5ULL && io[1] == 0xffffff00ULL && io[2] == 0x2d93dcULL,
+      "x86 add sets the carry flag, vector 0");
+  }
+  {
+    unsigned long long io[3] = {
+      0xffffffffULL, 0x4f18c672fa42fe7cULL, 0x120984629605b44fULL};
+    asm_case_6(io);
+    __CPROVER_assert(
+      io[0] == 0x9605b44eULL && io[1] == 0xfa42fe01ULL &&
+        io[2] == 0x9605b44fULL,
+      "x86 add sets the carry flag, vector 1");
+  }
+  {
+    unsigned long long io[3] = {
+      0x4eb832d5079a2474ULL, 0x0ULL, 0xfd64b9e5bd0edb5aULL};
+    asm_case_6(io);
+    __CPROVER_assert(
+      io[0] == 0xc4a8ffceULL && io[1] == 0x0ULL && io[2] == 0xbd0edb5aULL,
+      "x86 add sets the carry flag, vector 2");
+  }
+  {
+    unsigned long long io[2] = {0xd6bc0d35ccec83e4ULL, 0x3fULL};
+    asm_case_7(io);
+    __CPROVER_assert(
+      io[0] == 0x1ULL && io[1] == 0x3fULL,
+      "x86 shld-free shift: shr by cl, vector 0");
+  }
+  {
+    unsigned long long io[2] = {0x2d65a8a1cf4ce48eULL, 0x0ULL};
+    asm_case_7(io);
+    __CPROVER_assert(
+      io[0] == 0x2d65a8a1cf4ce48eULL && io[1] == 0x0ULL,
+      "x86 shld-free shift: shr by cl, vector 1");
+  }
+  {
+    unsigned long long io[2] = {0xdae98f58edaf5ddULL, 0xcULL};
+    asm_case_7(io);
+    __CPROVER_assert(
+      io[0] == 0xdae98f58edafULL && io[1] == 0xcULL,
+      "x86 shld-free shift: shr by cl, vector 2");
+  }
+  {
+    unsigned long long io[1] = {0x71f2223ff559a0f9ULL};
+    asm_case_8(io);
+    __CPROVER_assert(
+      io[0] == 0xf9a059f53f22f271ULL,
+      "x86 bswap reverses byte order, vector 0");
+  }
+  {
+    unsigned long long io[1] = {0xc447a6fbb54b9c52ULL};
+    asm_case_8(io);
+    __CPROVER_assert(
+      io[0] == 0x529c4bb5fba647c4ULL,
+      "x86 bswap reverses byte order, vector 1");
+  }
+  {
+    unsigned long long io[1] = {0xf34de6440ce23540ULL};
+    asm_case_8(io);
+    __CPROVER_assert(
+      io[0] == 0x4035e20c44e64df3ULL,
+      "x86 bswap reverses byte order, vector 2");
+  }
+  {
+    unsigned long long io[4] = {
+      0x80000000ULL, 0x85c6eecdbd37c64dULL, 0xe051fbafdcfbbb5eULL, 0x7fULL};
+    asm_case_9(io);
+    __CPROVER_assert(
+      io[0] == 0x0ULL && io[1] == 0xbd37c64dULL && io[2] == 0xbd37c64dULL &&
+        io[3] == 0x7fULL,
+      "x86 cmpxchg exchanges on a match (atomic_cmpset), vector 0");
+  }
+  {
+    unsigned long long io[4] = {
+      0x1ULL, 0x7fULL, 0x7e0269edac79ca6eULL, 0xffffffffffffffffULL};
+    asm_case_9(io);
+    __CPROVER_assert(
+      io[0] == 0x0ULL && io[1] == 0x7fULL && io[2] == 0x7fULL &&
+        io[3] == 0xffffffffULL,
+      "x86 cmpxchg exchanges on a match (atomic_cmpset), vector 1");
+  }
+  {
+    unsigned long long io[4] = {
+      0xffULL,
+      0xfc5d96cc82bdb472ULL,
+      0x7fffffffffffffffULL,
+      0x2355aca2a0edf46dULL};
+    asm_case_9(io);
+    __CPROVER_assert(
+      io[0] == 0x0ULL && io[1] == 0x82bdb472ULL && io[2] == 0x82bdb472ULL &&
+        io[3] == 0xa0edf46dULL,
+      "x86 cmpxchg exchanges on a match (atomic_cmpset), vector 2");
+  }
+  {
+    unsigned long long io[2] = {0xd29b8652db47179aULL, 0x1ULL};
+    asm_case_10(io);
+    __CPROVER_assert(
+      io[0] == 0x1ULL && io[1] == 0xdb47179aULL,
+      "x86 xchg swaps a register and memory, vector 0");
+  }
+  {
+    unsigned long long io[2] = {0x2a12166c6984b1c3ULL, 0xffffffffffffffffULL};
+    asm_case_10(io);
+    __CPROVER_assert(
+      io[0] == 0xffffffffULL && io[1] == 0x6984b1c3ULL,
+      "x86 xchg swaps a register and memory, vector 1");
+  }
+  {
+    unsigned long long io[2] = {0xd57e59721b5c3f00ULL, 0x8161ebbba4c1b5daULL};
+    asm_case_10(io);
+    __CPROVER_assert(
+      io[0] == 0xa4c1b5daULL && io[1] == 0x1b5c3f00ULL,
+      "x86 xchg swaps a register and memory, vector 2");
+  }
+  {
+    unsigned long long io[3] = {
+      0x6a08e48807e06ce6ULL, 0x80000000ULL, 0x715314e0aeb3b1f3ULL};
+    asm_case_11(io);
+    __CPROVER_assert(
+      io[0] == 0x6a020e2ULL && io[1] == 0x80000000ULL && io[2] == 0xaeb3b1f3ULL,
+      "x86 and masks and sets the sign flag, vector 0");
+  }
+  {
+    unsigned long long io[3] = {
+      0x2dac4420420cf8f6ULL, 0x8000000000000000ULL, 0xffffffffffffffffULL};
+    asm_case_11(io);
+    __CPROVER_assert(
+      io[0] == 0x420cf8f6ULL && io[1] == 0x0ULL && io[2] == 0xffffffffULL,
+      "x86 and masks and sets the sign flag, vector 1");
+  }
+  {
+    unsigned long long io[3] = {
+      0xff19d85a9e12e041ULL, 0x7fULL, 0x7fffffffffffffffULL};
+    asm_case_11(io);
+    __CPROVER_assert(
+      io[0] == 0x9e12e041ULL && io[1] == 0x1ULL && io[2] == 0xffffffffULL,
+      "x86 and masks and sets the sign flag, vector 2");
+  }
+  {
+    unsigned long long io[3] = {
+      0x67474bfe2512affeULL, 0x0ULL, 0xd9b9851fa699e71cULL};
+    asm_case_12(io);
+    __CPROVER_assert(
+      io[0] == 0x2512affeULL && io[1] == 0x0ULL && io[2] == 0xa699e71cULL,
+      "x86 memory operand with a struct field offset, vector 0");
+  }
+  {
+    unsigned long long io[3] = {
+      0x32c9fc24972fa9f7ULL, 0x6a5b23a370b4c97bULL, 0x80000000ULL};
+    asm_case_12(io);
+    __CPROVER_assert(
+      io[0] == 0x972fa9f7ULL && io[1] == 0x70b4c97bULL &&
+        io[2] == 0x80000000ULL,
+      "x86 memory operand with a struct field offset, vector 1");
+  }
+  {
+    unsigned long long io[3] = {
+      0x9c5bc4ac7a21b60aULL, 0x63ce12b6f4f5b47cULL, 0xd2f4c3415c4eb1fdULL};
+    asm_case_12(io);
+    __CPROVER_assert(
+      io[0] == 0x7a21b60aULL && io[1] == 0xf4f5b47cULL &&
+        io[2] == 0x5c4eb1fdULL,
+      "x86 memory operand with a struct field offset, vector 2");
+  }
+  return 0;
+}

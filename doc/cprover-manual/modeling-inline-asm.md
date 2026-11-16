@@ -6,20 +6,73 @@ CBMC supports GCC-style (`asm`/`__asm__`) and MSVC-style (`__asm {}`)
 inline assembly syntax. Before verification, the `remove_asm` pass replaces
 each inline-assembly statement by goto-program instructions:
 
-- If CBMC models every instruction of the statement (see the tables below),
-  the statement is translated into the corresponding fences or calls to
-  library functions.
+- On x86 (`--arch i386` or `--arch x86_64`, the default on x86 hosts), a
+  GCC-style statement is **interpreted** if CBMC's x86 instruction semantics
+  support all of its instructions (see "x86 Instruction Semantics" below):
+  it is translated into goto-program instructions with the same effect on the
+  C program state.
+- Otherwise, if CBMC models every instruction of the statement (see
+  "Supported Instructions" below, on any architecture), the statement is
+  translated into the corresponding fences or calls to library functions.
 - Otherwise the statement is **approximated conservatively**: everything the
   statement may change, as far as CBMC can tell from its operands, is
-  assigned a nondeterministic value, and a warning that names the first
-  instruction that is not modeled is printed. The modeled instructions of
-  such a statement are not translated either.
+  assigned a nondeterministic value, and a warning that says why the
+  statement is not modeled is printed. The modeled instructions of such a
+  statement are not translated either.
 
-None of the modeled instructions jumps, so an `asm goto` statement whose
-instructions are all modeled continues with the next statement.
+None of the instructions in the tables below jumps, so an `asm goto`
+statement whose instructions are all listed there continues with the next
+statement. An interpreted `asm goto` statement jumps to the label that its
+instructions jump to.
 
 A statement with an empty assembly template, such as the compiler barrier
 `asm volatile("" ::: "memory")`, does nothing.
+
+### x86 Instruction Semantics
+
+The x86 semantics cover the instructions that kernel and library code
+commonly uses in inline assembly, with AT&T syntax:
+
+- data movement: `mov`, `movabs`, `movzx`/`movz*`, `movsx`/`movs*`, `lea`,
+  `xchg`, `bswap`, `cmov<cc>`, `set<cc>`, sign extensions of the accumulator
+  (`cltq`, `cwtl`, `cltd`, `cqto`, ...);
+- arithmetic and logic, with the flags they set: `add`, `adc`, `sub`, `sbb`,
+  `and`, `or`, `xor`, `not`, `neg`, `inc`, `dec`, `cmp`, `test`;
+- shifts and rotates (`shl`, `sal`, `shr`, `sar`, `rol`, `ror`), bit tests
+  (`bt`, `bts`, `btr`, `btc`), and bit scans and counts (`bsf`, `bsr`,
+  `tzcnt`, `lzcnt`, `popcnt`);
+- atomics: the `lock` prefix, `xchg` with a memory operand, `xadd`,
+  `cmpxchg`;
+- control flow within the statement: `jmp`, `j<cc>` to local and C labels
+  (`asm goto`), and flag outputs (`=@cc<cc>`);
+- fences (`mfence`, `lfence`, `sfence`), the x87 control word (`fstcw`,
+  `fnstcw`, `fldcw`), and instructions without effect on the C program state
+  (`nop`, `pause`, `cli`, `sti`, `hlt`, `wrmsr`); `cpuid`, `rdtsc`,
+  `rdtscp`, `rdmsr`, and `in` produce nondeterministic values.
+
+Operands follow GCC's rules: inputs are evaluated before the first
+instruction (and are subject to the checks CBMC performs), register outputs
+are assigned after the last instruction, and memory operands are accessed in
+place. Values that the architecture leaves undefined (such as some flags, or
+the destination of `bsf` with a zero source) are nondeterministic. The
+checks for undefined behaviour of C (such as `--signed-overflow-check`) do
+not apply to the instructions, which have defined results on the hardware;
+the checks of memory accesses do.
+
+A statement is not interpreted (and hence approximated, unless all of its
+instructions are listed in the tables below) if it:
+
+- contains an instruction, operand, prefix, or directive that the semantics
+  do not support, or instructions in another section (such as exception
+  fixups, which run when an instruction faults); data in other sections (such
+  as the Linux kernel's jump tables) is ignored;
+- writes a register that is neither bound to an operand nor clobbered: as
+  CBMC does not track register variables (`register long x asm("rax")`),
+  such a write may change a C variable.
+
+A lock-prefixed instruction (or `xchg` with a memory operand) is an atomic
+section with a full fence; the other instructions of the statement are not
+part of that atomic section.
 
 ### Supported Instructions
 
