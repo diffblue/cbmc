@@ -190,3 +190,35 @@ bool is_compatible_pointer(const typet &location, const typet &candidate)
   return location_base == candidate_base || is_generic(location_base) ||
          is_generic(candidate_base);
 }
+
+exprt reachable_pointer_value(
+  const exprt &pointer,
+  const reachable_objectst &reachable)
+{
+  const typet &type = pointer.type();
+  const nondet_symbol_exprt choice{"value_set::havoc_reachable", bool_typet{}};
+
+  std::vector<exprt> candidates;
+  for(const auto &object : reachable.objects)
+  {
+    exprt address =
+      object.type().id() == ID_array
+        ? address_of_exprt{index_exprt{object, from_integer(0, c_index_type())}}
+        : address_of_exprt{object};
+    if(is_compatible_pointer(type, address.type()))
+    {
+      // Value sets with this many objects make the analyses slow (each of
+      // the pointers may point to each of the objects); an unknown target is
+      // a sound and compact alternative.
+      if(candidates.size() == max_reachable_pointer_candidates)
+        return if_exprt{choice, pointer, exprt{ID_unknown, type}};
+      candidates.push_back(typecast_exprt::conditional_cast(address, type));
+    }
+  }
+
+  exprt value = null_pointer_exprt{to_pointer_type(type)};
+  for(auto it = candidates.rbegin(); it != candidates.rend(); ++it)
+    value = if_exprt{choice, *it, value};
+
+  return if_exprt{choice, pointer, value};
+}

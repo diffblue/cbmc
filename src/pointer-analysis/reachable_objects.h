@@ -67,6 +67,21 @@ std::vector<symbol_exprt> static_lifetime_objects(
   const symbol_table_baset &symbol_table,
   const namespacet &ns);
 
+/// The maximum number of objects \ref reachable_pointer_value lists
+/// explicitly.
+const std::size_t max_reachable_pointer_candidates = 64;
+
+/// \return An expression whose value set is what the pointer \p pointer,
+///   stored in one of the objects of \p reachable, may point to after these
+///   objects have been changed: its previous value, the address of any of the
+///   reachable objects of a compatible type, or null. With more than
+///   \ref max_reachable_pointer_candidates such objects, the pointer may point
+///   to any (unknown) object instead. This is a nondeterministic choice, and
+///   only meaningful to pointer analyses.
+exprt reachable_pointer_value(
+  const exprt &pointer,
+  const reachable_objectst &reachable);
+
 /// \return True iff a pointer of type \p candidate may be stored in a pointer
 ///   of type \p location without changing what kind of object it points to:
 ///   the pointed-to types are the same, or one of them is `void` or a byte.

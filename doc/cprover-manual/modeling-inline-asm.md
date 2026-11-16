@@ -110,9 +110,16 @@ and the block is treated as having a `"memory"` clobber.
   of more than 64 elements, or of a size that is not constant, are assigned
   arbitrary values.
 - Constant objects are not changed.
-- The reachable objects are only changed by symbolic execution (`cbmc`):
-  other tools, such as `goto-analyzer`, only see the changes to the output
-  operands and the rounding mode.
+- Symbolic execution (`cbmc`) computes the reachable objects most
+  precisely. The static analyses use their own pointer analyses: the value
+  set analyses (as used by `goto-instrument`) and the reaching definitions and
+  dependence graph (as used by `goto-analyzer`) follow pointers using their
+  value sets, but do not track the contents of heap objects. The other
+  abstract domains of `goto-analyzer` treat the statement as changing all
+  variables (constant propagation: all objects of static lifetime and all
+  address-taken variables). `--full-slice` does not slice programs that
+  contain approximated inline assembly with pointer operands, a `"memory"`
+  clobber, or no operands (basic assembly).
 - Control flow out of a statement is not modeled: `asm goto` statements
   always continue with the next statement.
 - Atomicity and memory ordering of instructions that are not modeled are not

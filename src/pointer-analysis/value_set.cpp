@@ -28,11 +28,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol.h>
 #include <util/xml.h>
 
+#include <set>
+
 #ifdef DEBUG
 #  include <iostream>
 #endif
 
 #include "add_failed_symbols.h"
+#include "reachable_objects.h"
 
 // Due to a large number of functions defined inline, `value_sett` and
 // associated types are documented in its header file, `value_set.h`.
@@ -1841,6 +1844,46 @@ void value_sett::do_end_function(
   assign(lhs, rhs, ns, false, false);
 }
 
+void value_sett::havoc_reachable(const codet &code, const namespacet &ns)
+{
+  std::vector<exprt> roots;
+  if(code.get_bool(ID_arbitrary_memory))
+  {
+    for(const auto &object : static_lifetime_objects(ns.get_symbol_table(), ns))
+      roots.push_back(object);
+
+    // The address-taken local variables of the functions on the call stack:
+    // without a call stack, all variables whose address is stored anywhere.
+    std::set<exprt> stored;
+    values.iterate(
+      [this, &stored](const irep_idt &, const entryt &entry)
+      {
+        for(const auto &target : entry.object_map.read())
+        {
+          const exprt object = to_expr(target);
+          if(object.id() != ID_object_descriptor)
+            continue;
+          const exprt &root = to_object_descriptor_expr(object).root_object();
+          if(root.id() == ID_symbol && root.type().id() != ID_code)
+            stored.insert(root);
+        }
+      });
+    roots.insert(roots.end(), stored.begin(), stored.end());
+  }
+
+  const reachable_objectst reachable = find_reachable_objects(
+    code.operands(),
+    roots,
+    [this, &ns](const exprt &pointer) { return get_value_set(pointer, ns); },
+    ns);
+
+  for(const auto &pointer : reachable.pointers)
+  {
+    assign(
+      pointer, reachable_pointer_value(pointer, reachable), ns, false, false);
+  }
+}
+
 void value_sett::apply_code_rec(
   const codet &code,
   const namespacet &ns)
@@ -1951,8 +1994,12 @@ void value_sett::apply_code_rec(
   {
     // Ignore by default; could prune the value set.
   }
-  else if(statement == ID_havoc_object || statement == ID_havoc_reachable)
+  else if(statement == ID_havoc_object)
   {
+  }
+  else if(statement == ID_havoc_reachable)
+  {
+    havoc_reachable(code, ns);
   }
   else
   {
