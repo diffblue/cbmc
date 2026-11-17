@@ -208,6 +208,12 @@ void smt2_incremental_decision_proceduret::define_dependent_functions(
   while(!to_be_defined.empty())
   {
     const exprt current = to_be_defined.top();
+    // already defined via another path
+    if(expression_identifiers.find(current) != expression_identifiers.end())
+    {
+      to_be_defined.pop();
+      continue;
+    }
     if(push_dependencies_needed(current))
       continue;
     const auto symbol_expr = expr_try_dynamic_cast<symbol_exprt>(current);
@@ -216,9 +222,23 @@ void smt2_incremental_decision_proceduret::define_dependent_functions(
                   : shared_definitions.end();
     if(shared_definition != shared_definitions.end())
     {
-      // an intermediate result of lowering floating-point operations
+      // An intermediate result of lowering floating-point operations. Its
+      // dependencies must be defined first, even when they have already been
+      // pushed (but not yet defined) for some other expression.
       const exprt definition = lower(shared_definition->second);
-      if(push_dependencies_needed(definition))
+      bool pushed = false;
+      for(const auto &dependency : gather_dependent_expressions(definition))
+      {
+        if(
+          expression_identifiers.find(dependency) ==
+          expression_identifiers.end())
+        {
+          seen_expressions.insert(dependency);
+          to_be_defined.push(dependency);
+          pushed = true;
+        }
+      }
+      if(pushed)
         continue;
       const smt_define_function_commandt function{
         symbol_expr->identifier(), {}, convert_expr_to_smt(definition)};
