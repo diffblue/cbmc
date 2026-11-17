@@ -3734,14 +3734,19 @@ std::string expr2ct::convert_with_precedence(
       return convert_function(src, "SIGN");
   }
 
-  else if(src.id() == ID_floatbv_fma)
+  else if(src.id() == ID_floatbv_fma && src.operands().size() >= 3)
   {
-    // Print only the 3 mathematical operands, omitting the rounding mode
-    // (4th operand) to produce valid C syntax: fma(a, b, c)
-    const auto &fma_expr = to_floatbv_fma_expr(src);
-    return "fma(" + convert(fma_expr.op_multiply_lhs()) + ", " +
-           convert(fma_expr.op_multiply_rhs()) + ", " +
-           convert(fma_expr.op_add()) + ")";
+    // Print the built-in that the C front-end turns into this expression,
+    // omitting the rounding mode (4th operand, if adjust_float_expressions
+    // has been run), which the front-end re-introduces. Printing "fma" would
+    // instead turn the library model of fma into a self-recursive function.
+    std::string name = CPROVER_PREFIX "fma";
+    if(src.type() == float_type())
+      name += 'f';
+    else if(src.type() != double_type() && src.type() == long_double_type())
+      name += 'l';
+    return name + "(" + convert(src.operands()[0]) + ", " +
+           convert(src.operands()[1]) + ", " + convert(src.operands()[2]) + ")";
   }
 
   else if(src.id()==ID_popcount)
