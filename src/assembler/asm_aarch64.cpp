@@ -623,6 +623,52 @@ bool asm_aarch64_semanticst::lower_memory(
     }
   }
 
+  // pairs: Rt, Rt2, [Xn, #imm], accessing two adjacent elements
+  if(m == "ldp" || m == "ldnp" || m == "ldpsw" || m == "stp" || m == "stnp")
+  {
+    if(
+      ops.size() != 3 || !register_operand(0) || !register_operand(1) ||
+      !memory_operand(2) || ops[0].width != ops[1].width ||
+      (m == "ldpsw" && ops[0].width != 64))
+    {
+      return ctx.fail("unsupported operands of " + m);
+    }
+    const bool load = m[0] == 'l';
+    const std::size_t size = m == "ldpsw" ? 32 : ops[0].width;
+    // the elements, at the address and size/8 bytes after it
+    std::vector<a64_operandt> elements{2, ops[2]};
+    for(std::size_t i = 0; i < 2; ++i)
+    {
+      elements[i].lvalue = nil_exprt{};
+      elements[i].address = plus_exprt{
+        typecast_exprt::conditional_cast(
+          ops[2].address, pointer_type(char_type())),
+        from_integer(i * size / 8, signed_size_type())};
+    }
+    if(!load)
+    {
+      const symbol_exprt first = temp(read(ctx, ops[0], size), "first");
+      const symbol_exprt second = temp(read(ctx, ops[1], size), "second");
+      return write(ctx, elements[0], size, first) &&
+             write(ctx, elements[1], size, second);
+    }
+    // a load of the same register twice is unpredictable
+    if(
+      ops[0].zero_register == ops[1].zero_register &&
+      (ops[0].zero_register || ops[0].storage == ops[1].storage))
+    {
+      return ctx.fail("ldp of the same register twice");
+    }
+    // both loads use the address before either register is written
+    const symbol_exprt first = temp(read(ctx, elements[0], size), "first");
+    const symbol_exprt second = temp(read(ctx, elements[1], size), "second");
+    const std::size_t rw = ops[0].width;
+    auto extend = [&](const exprt &v)
+    { return m == "ldpsw" ? sign_extend(v, size, rw) : resize(v, rw); };
+    return write(ctx, ops[0], rw, extend(first)) &&
+           write(ctx, ops[1], rw, extend(second));
+  }
+
   // store-exclusive: Ws, Rt, [Xn]
   {
     static const std::map<std::string, std::size_t> stores = {

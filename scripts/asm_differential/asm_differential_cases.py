@@ -140,6 +140,26 @@ AARCH64 = [
     Case('aarch64 movz/movk build a constant',
          '__asm__("movz %0, #0x1234\\n movk %0, #0xabcd, lsl #16" : "=r"(r));',
          [(U64, 'r', None)], vectors=1),
+    Case('aarch64 ldp loads two adjacent doublewords',
+         '__asm__ __volatile__("ldp %0, %1, [%2]" : "=r"(a), "=r"(b) : '
+         '"r"(m) : "memory");',
+         [(U64, 'm', 2), (U64, 'a', None), (U64, 'b', None)]),
+    Case('aarch64 stp stores two adjacent doublewords',
+         '__asm__ __volatile__("stp %1, %2, [%0]" : : "r"(m), "r"(a), '
+         '"r"(b) : "memory");',
+         [(U64, 'm', 2), (U64, 'a', None), (U64, 'b', None)]),
+    Case('aarch64 ldp of words with an offset',
+         '__asm__ __volatile__("ldp %w0, %w1, [%2, #4]" : "=r"(a), "=r"(b) : '
+         '"r"(m) : "memory");',
+         [(U32, 'm', 3), (U32, 'a', None), (U32, 'b', None)]),
+    Case('aarch64 ldpsw sign-extends two words',
+         '__asm__ __volatile__("ldpsw %0, %1, [%2]" : "=r"(a), "=r"(b) : '
+         '"r"(m) : "memory");',
+         [(U32, 'm', 2), (U64, 'a', None), (U64, 'b', None)]),
+    Case('aarch64 ldp into the base register',
+         '__asm__ __volatile__("ldp %0, %1, [%0]" : "+r"(p), "=r"(b) : : '
+         '"memory");',
+         [(U64, 'm', 2), (U64, 'b', None)], prologue='unsigned long *p = m;'),
 ]
 
 # cas needs its compare value to sometimes match memory; supply fixed vectors

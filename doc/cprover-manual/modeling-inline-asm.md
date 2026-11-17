@@ -92,10 +92,11 @@ The AArch64 semantics cover:
   `orn`, `eon`, `lsl`, `lsr`, `asr`, `ror`, `cmp`, `cmn`, `tst`, and the
   conditional selects (`csel`, `csinc`, `csinv`, `csneg`, `cset`, `csetm`);
 - loads and stores of single registers (including acquire/release
-  variants), the LSE atomics
-  (`ldadd`, `ldclr`, `ldeor`, `ldset`, `ldsmax`, `ldsmin`, `ldumax`,
-  `ldumin`, their `st` forms, `swp`, `cas`), and load-exclusive/
-  store-exclusive (`ldxr`, `ldaxr`, `stxr`, `stlxr`, `clrex`);
+  variants) and of register pairs (`ldp`, `ldnp`, `ldpsw`, `stp`, `stnp`),
+  without writeback, the LSE atomics (`ldadd`, `ldclr`, `ldeor`, `ldset`,
+  `ldsmax`, `ldsmin`, `ldumax`, `ldumin`, their `st` forms, `swp`, `cas`),
+  and load-exclusive/store-exclusive (`ldxr`, `ldaxr`, `stxr`, `stlxr`,
+  `clrex`); the two accesses of a pair are not one atomic access;
 - branches within the statement and to the labels of `asm goto`, and flag
   outputs (`=@cc<cc>`);
 - barriers (`dmb`, `dsb`, `isb`), `mrs` and `msr` of the flags (`nzcv`),

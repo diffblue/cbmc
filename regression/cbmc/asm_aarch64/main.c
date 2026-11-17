@@ -178,6 +178,94 @@ void asm_case_11(unsigned long long *io)
   io[0] = (unsigned long long)r;
 }
 
+// aarch64 ldp loads two adjacent doublewords
+void asm_case_12(unsigned long long *io)
+{
+  unsigned long m[2];
+  m[0] = (unsigned long)io[0];
+  m[1] = (unsigned long)io[1];
+  unsigned long a = (unsigned long)io[2];
+  unsigned long b = (unsigned long)io[3];
+  __asm__ __volatile__("ldp %0, %1, [%2]"
+                       : "=r"(a), "=r"(b)
+                       : "r"(m)
+                       : "memory");
+  io[0] = (unsigned long long)m[0];
+  io[1] = (unsigned long long)m[1];
+  io[2] = (unsigned long long)a;
+  io[3] = (unsigned long long)b;
+}
+
+// aarch64 stp stores two adjacent doublewords
+void asm_case_13(unsigned long long *io)
+{
+  unsigned long m[2];
+  m[0] = (unsigned long)io[0];
+  m[1] = (unsigned long)io[1];
+  unsigned long a = (unsigned long)io[2];
+  unsigned long b = (unsigned long)io[3];
+  __asm__ __volatile__("stp %1, %2, [%0]"
+                       :
+                       : "r"(m), "r"(a), "r"(b)
+                       : "memory");
+  io[0] = (unsigned long long)m[0];
+  io[1] = (unsigned long long)m[1];
+  io[2] = (unsigned long long)a;
+  io[3] = (unsigned long long)b;
+}
+
+// aarch64 ldp of words with an offset
+void asm_case_14(unsigned long long *io)
+{
+  unsigned int m[3];
+  m[0] = (unsigned int)io[0];
+  m[1] = (unsigned int)io[1];
+  m[2] = (unsigned int)io[2];
+  unsigned int a = (unsigned int)io[3];
+  unsigned int b = (unsigned int)io[4];
+  __asm__ __volatile__("ldp %w0, %w1, [%2, #4]"
+                       : "=r"(a), "=r"(b)
+                       : "r"(m)
+                       : "memory");
+  io[0] = (unsigned long long)m[0];
+  io[1] = (unsigned long long)m[1];
+  io[2] = (unsigned long long)m[2];
+  io[3] = (unsigned long long)a;
+  io[4] = (unsigned long long)b;
+}
+
+// aarch64 ldpsw sign-extends two words
+void asm_case_15(unsigned long long *io)
+{
+  unsigned int m[2];
+  m[0] = (unsigned int)io[0];
+  m[1] = (unsigned int)io[1];
+  unsigned long a = (unsigned long)io[2];
+  unsigned long b = (unsigned long)io[3];
+  __asm__ __volatile__("ldpsw %0, %1, [%2]"
+                       : "=r"(a), "=r"(b)
+                       : "r"(m)
+                       : "memory");
+  io[0] = (unsigned long long)m[0];
+  io[1] = (unsigned long long)m[1];
+  io[2] = (unsigned long long)a;
+  io[3] = (unsigned long long)b;
+}
+
+// aarch64 ldp into the base register
+void asm_case_16(unsigned long long *io)
+{
+  unsigned long m[2];
+  m[0] = (unsigned long)io[0];
+  m[1] = (unsigned long)io[1];
+  unsigned long b = (unsigned long)io[2];
+  unsigned long *p = m;
+  __asm__ __volatile__("ldp %0, %1, [%0]" : "+r"(p), "=r"(b) : : "memory");
+  io[0] = (unsigned long long)m[0];
+  io[1] = (unsigned long long)m[1];
+  io[2] = (unsigned long long)b;
+}
+
 int main(void)
 {
   {
@@ -493,6 +581,178 @@ int main(void)
     asm_case_11(io);
     __CPROVER_assert(
       io[0] == 0xabcd1234ULL, "aarch64 movz/movk build a constant, vector 0");
+  }
+  {
+    unsigned long long io[4] = {
+      0x67474bfe2512affeULL,
+      0x0ULL,
+      0xd9b9851fa699e71cULL,
+      0x32c9fc24972fa9f7ULL};
+    asm_case_12(io);
+    __CPROVER_assert(
+      io[0] == 0x67474bfe2512affeULL && io[1] == 0x0ULL &&
+        io[2] == 0x67474bfe2512affeULL && io[3] == 0x0ULL,
+      "aarch64 ldp loads two adjacent doublewords, vector 0");
+  }
+  {
+    unsigned long long io[4] = {
+      0x6a5b23a370b4c97bULL,
+      0x80000000ULL,
+      0x9c5bc4ac7a21b60aULL,
+      0x63ce12b6f4f5b47cULL};
+    asm_case_12(io);
+    __CPROVER_assert(
+      io[0] == 0x6a5b23a370b4c97bULL && io[1] == 0x80000000ULL &&
+        io[2] == 0x6a5b23a370b4c97bULL && io[3] == 0x80000000ULL,
+      "aarch64 ldp loads two adjacent doublewords, vector 1");
+  }
+  {
+    unsigned long long io[4] = {
+      0xd2f4c3415c4eb1fdULL,
+      0x7fffffffffffffffULL,
+      0x8f6b402bd0d62394ULL,
+      0xa34ba2d37b54dc20ULL};
+    asm_case_12(io);
+    __CPROVER_assert(
+      io[0] == 0xd2f4c3415c4eb1fdULL && io[1] == 0x7fffffffffffffffULL &&
+        io[2] == 0xd2f4c3415c4eb1fdULL && io[3] == 0x7fffffffffffffffULL,
+      "aarch64 ldp loads two adjacent doublewords, vector 2");
+  }
+  {
+    unsigned long long io[4] = {
+      0x414e0d53c3fd25cdULL,
+      0xc2419663b9c3f00dULL,
+      0x2f0044d6b297f10dULL,
+      0x6269dc3d06f39618ULL};
+    asm_case_13(io);
+    __CPROVER_assert(
+      io[0] == 0x2f0044d6b297f10dULL && io[1] == 0x6269dc3d06f39618ULL &&
+        io[2] == 0x2f0044d6b297f10dULL && io[3] == 0x6269dc3d06f39618ULL,
+      "aarch64 stp stores two adjacent doublewords, vector 0");
+  }
+  {
+    unsigned long long io[4] = {
+      0x627a2dc40e3b9e5aULL, 0x80ULL, 0xffULL, 0x80000000ULL};
+    asm_case_13(io);
+    __CPROVER_assert(
+      io[0] == 0xffULL && io[1] == 0x80000000ULL && io[2] == 0xffULL &&
+        io[3] == 0x80000000ULL,
+      "aarch64 stp stores two adjacent doublewords, vector 1");
+  }
+  {
+    unsigned long long io[4] = {
+      0x35d1dd8f11de1b36ULL,
+      0xffffffffffffffffULL,
+      0x64213bdf295fa7abULL,
+      0xa075d926532fb08dULL};
+    asm_case_13(io);
+    __CPROVER_assert(
+      io[0] == 0x64213bdf295fa7abULL && io[1] == 0xa075d926532fb08dULL &&
+        io[2] == 0x64213bdf295fa7abULL && io[3] == 0xa075d926532fb08dULL,
+      "aarch64 stp stores two adjacent doublewords, vector 2");
+  }
+  {
+    unsigned long long io[5] = {
+      0x4107a0603d40960aULL,
+      0x7fffffffULL,
+      0x9f389f989e267f72ULL,
+      0xffffffffULL,
+      0xb358d371cf123e51ULL};
+    asm_case_14(io);
+    __CPROVER_assert(
+      io[0] == 0x3d40960aULL && io[1] == 0x7fffffffULL &&
+        io[2] == 0x9e267f72ULL && io[3] == 0x7fffffffULL &&
+        io[4] == 0x9e267f72ULL,
+      "aarch64 ldp of words with an offset, vector 0");
+  }
+  {
+    unsigned long long io[5] = {
+      0x1a45527e7835f76aULL,
+      0x7fULL,
+      0x25e5bf65b96f18deULL,
+      0x2ULL,
+      0x868aac5454c3cd50ULL};
+    asm_case_14(io);
+    __CPROVER_assert(
+      io[0] == 0x7835f76aULL && io[1] == 0x7fULL && io[2] == 0xb96f18deULL &&
+        io[3] == 0x7fULL && io[4] == 0xb96f18deULL,
+      "aarch64 ldp of words with an offset, vector 1");
+  }
+  {
+    unsigned long long io[5] = {
+      0x2f9e118a3edb74c3ULL,
+      0xc2257f5d0e04ac3aULL,
+      0x8000000000000000ULL,
+      0x6c2abfb9825b0341ULL,
+      0xffULL};
+    asm_case_14(io);
+    __CPROVER_assert(
+      io[0] == 0x3edb74c3ULL && io[1] == 0xe04ac3aULL && io[2] == 0x0ULL &&
+        io[3] == 0xe04ac3aULL && io[4] == 0x0ULL,
+      "aarch64 ldp of words with an offset, vector 2");
+  }
+  {
+    unsigned long long io[4] = {
+      0x80ULL,
+      0x7c923e8bf724e295ULL,
+      0xc29563a4ce21629fULL,
+      0x6fb9eec747852fd7ULL};
+    asm_case_15(io);
+    __CPROVER_assert(
+      io[0] == 0x80ULL && io[1] == 0xf724e295ULL && io[2] == 0x80ULL &&
+        io[3] == 0xfffffffff724e295ULL,
+      "aarch64 ldpsw sign-extends two words, vector 0");
+  }
+  {
+    unsigned long long io[4] = {
+      0x4e794b8fd3415364ULL,
+      0x9f9fe266e5391903ULL,
+      0xe81bd75796170b1eULL,
+      0x6988bebfdb954dcaULL};
+    asm_case_15(io);
+    __CPROVER_assert(
+      io[0] == 0xd3415364ULL && io[1] == 0xe5391903ULL &&
+        io[2] == 0xffffffffd3415364ULL && io[3] == 0xffffffffe5391903ULL,
+      "aarch64 ldpsw sign-extends two words, vector 1");
+  }
+  {
+    unsigned long long io[4] = {
+      0x694f0df1e249a224ULL,
+      0xa5288feea0dd6dedULL,
+      0x3b5ccfa5b7d38265ULL,
+      0x9c6db6df3add95e3ULL};
+    asm_case_15(io);
+    __CPROVER_assert(
+      io[0] == 0xe249a224ULL && io[1] == 0xa0dd6dedULL &&
+        io[2] == 0xffffffffe249a224ULL && io[3] == 0xffffffffa0dd6dedULL,
+      "aarch64 ldpsw sign-extends two words, vector 2");
+  }
+  {
+    unsigned long long io[3] = {
+      0x8bb0203c63f4822eULL, 0x2bc27e528f6dfd28ULL, 0x105c864ba75fa96aULL};
+    asm_case_16(io);
+    __CPROVER_assert(
+      io[0] == 0x8bb0203c63f4822eULL && io[1] == 0x2bc27e528f6dfd28ULL &&
+        io[2] == 0x2bc27e528f6dfd28ULL,
+      "aarch64 ldp into the base register, vector 0");
+  }
+  {
+    unsigned long long io[3] = {
+      0x8f43bdf7e2b5b16ULL, 0xc301696ae878eea2ULL, 0x653e09f78221d081ULL};
+    asm_case_16(io);
+    __CPROVER_assert(
+      io[0] == 0x8f43bdf7e2b5b16ULL && io[1] == 0xc301696ae878eea2ULL &&
+        io[2] == 0xc301696ae878eea2ULL,
+      "aarch64 ldp into the base register, vector 1");
+  }
+  {
+    unsigned long long io[3] = {
+      0x7fd174cb93801745ULL, 0x7fffffffffffffffULL, 0xffULL};
+    asm_case_16(io);
+    __CPROVER_assert(
+      io[0] == 0x7fd174cb93801745ULL && io[1] == 0x7fffffffffffffffULL &&
+        io[2] == 0x7fffffffffffffffULL,
+      "aarch64 ldp into the base register, vector 2");
   }
   return 0;
 }
