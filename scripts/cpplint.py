@@ -51,11 +51,11 @@ import codecs
 import copy
 import getopt
 import glob
+import io
 import itertools
 import math  # for log
 import os
 import re
-import sre_compile
 import string
 import sys
 import sysconfig
@@ -1048,7 +1048,7 @@ def Match(pattern, s):
   # performance reasons; factoring it out into a separate function turns out
   # to be noticeably expensive.
   if pattern not in _regexp_compile_cache:
-    _regexp_compile_cache[pattern] = sre_compile.compile(pattern)
+    _regexp_compile_cache[pattern] = re.compile(pattern)
   return _regexp_compile_cache[pattern].match(s)
 
 
@@ -1066,14 +1066,14 @@ def ReplaceAll(pattern, rep, s):
     string with replacements made (or original string if no replacements)
   """
   if pattern not in _regexp_compile_cache:
-    _regexp_compile_cache[pattern] = sre_compile.compile(pattern)
+    _regexp_compile_cache[pattern] = re.compile(pattern)
   return _regexp_compile_cache[pattern].sub(rep, s)
 
 
 def Search(pattern, s):
   """Searches the string for the pattern, caching the compiled regexp."""
   if pattern not in _regexp_compile_cache:
-    _regexp_compile_cache[pattern] = sre_compile.compile(pattern)
+    _regexp_compile_cache[pattern] = re.compile(pattern)
   return _regexp_compile_cache[pattern].search(s)
 
 
@@ -1614,7 +1614,7 @@ class FileInfo(object):
           root_dir = os.path.dirname(root_dir)
           one_up_dir = os.path.dirname(one_up_dir)
 
-        prefix = os.path.commonprefix([root_dir, project_dir])
+        prefix = os.path.commonpath([root_dir, project_dir])
         return fullname[len(prefix) + 1:]
 
       # Not SVN <= 1.6? Try to find a git, hg, or svn top level directory by
@@ -1631,7 +1631,7 @@ class FileInfo(object):
       if (os.path.exists(os.path.join(root_dir, ".git")) or
           os.path.exists(os.path.join(root_dir, ".hg")) or
           os.path.exists(os.path.join(root_dir, ".svn"))):
-        prefix = os.path.commonprefix([root_dir, project_dir])
+        prefix = os.path.commonpath([root_dir, project_dir])
         return fullname[len(prefix) + 1:]
 
     # Don't know what to do; header guard warnings may be wrong...
@@ -2049,7 +2049,7 @@ def IsTemplateArgumentList_DB(clean_lines, linenum, pos):
         start_pos = 0
       inbetween_string += clean_lines.elided[linenum][0:pos]
 
-    is_simple_template_params = Match('^[<>(::),\w\s]*$', inbetween_string)
+    is_simple_template_params = Match(r'^[<>(::),\w\s]*$', inbetween_string)
     if is_simple_template_params:
         return True
 
@@ -3780,7 +3780,7 @@ def CheckForFunctionCommentHeaders(filename, raw_lines, error):
     linenum += 1
 
 def CheckForFunctionCommentHeader(filename, raw_lines, linenum, function_name, error):
-    """ Check each function has a comment header
+    r""" Check each function has a comment header
 
     Rules for function comment header:
     1. Header demarked by /*{67}\ at the top
@@ -6566,7 +6566,7 @@ def FilesBelongToSameModule(filename_cc, filename_h):
   return files_belong_to_same_module, common_path
 
 
-def UpdateIncludeState(filename, include_dict, io=codecs):
+def UpdateIncludeState(filename, include_dict, io=io):
   """Fill up the include_dict with new includes found from the file.
 
   Args:
@@ -6579,7 +6579,7 @@ def UpdateIncludeState(filename, include_dict, io=codecs):
   """
   headerfile = None
   try:
-    with io.open(filename, 'r', 'utf8', 'replace') as headerfile:
+    with io.open(filename, 'r', encoding='utf8', errors='replace') as headerfile:
       linenum = 0
       for line in headerfile:
         linenum += 1
@@ -6595,7 +6595,7 @@ def UpdateIncludeState(filename, include_dict, io=codecs):
 
 
 def CheckForIncludeWhatYouUse(filename, clean_lines, include_state, error,
-                              io=codecs):
+                              io=io):
   """Reports for missing stl includes.
 
   This function will output warnings to make sure you are including the headers
@@ -7215,10 +7215,10 @@ def ProcessFile(filename, vlevel, extra_check_functions=None):
   crlf_lines = []
   try:
     # Support the UNIX convention of using "-" for stdin.  Note that
-    # we are not opening the file with universal newline support
-    # (which codecs doesn't support anyway), so the resulting lines do
-    # contain trailing '\r' characters if we are reading a file that
-    # has CRLF endings.
+    # we deliberately do not open the file with universal newline support
+    # (newline=''), so the resulting lines do contain trailing '\r'
+    # characters if we are reading a file that has CRLF endings. The
+    # whitespace/newline check below depends on this.
     # If after the split a trailing '\r' is present, it is removed
     # below.
     if filename == '-':
@@ -7227,7 +7227,8 @@ def ProcessFile(filename, vlevel, extra_check_functions=None):
                                         codecs.getwriter('utf8'),
                                         'replace').read().split('\n')
     else:
-      with codecs.open(filename, 'r', 'utf8', 'replace') as target_file:
+      with open(filename, 'r', encoding='utf8', errors='replace',
+                newline='') as target_file:
         lines = target_file.read().split('\n')
 
     # Remove trailing '\r'.
@@ -7470,14 +7471,11 @@ def _IsParentOrSame(parent, child):
   if parent == child:
     return True
 
-  prefix = os.path.commonprefix([parent, child])
-  if prefix != parent:
+  # Compare complete path components rather than character prefixes.
+  try:
+    return os.path.commonpath([parent, child]) == os.path.commonpath([parent])
+  except ValueError:  # e.g., different drives on Windows
     return False
-  # Note: os.path.commonprefix operates on character basis, so
-  # take extra care of situations like '/foo/ba' and '/foo/bar/baz'
-  child_suffix = child[len(prefix):]
-  child_suffix = child_suffix.lstrip(os.sep)
-  return child == os.path.join(prefix, child_suffix)
 
 def main():
   filenames = ParseArguments(sys.argv[1:])
