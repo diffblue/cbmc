@@ -69,7 +69,6 @@ perl -p -i -e 's/^fclose_cleanup\n//' __functions # fopen
 perl -p -i -e 's/^fopen64\n//' __functions # fopen
 perl -p -i -e 's/^freopen64\n//' __functions # freopen
 perl -p -i -e 's/^mmap64\n//' __functions # mmap
-perl -p -i -e 's/^munmap\n//' __functions # mmap-01
 perl -p -i -e 's/^__fgets_chk\n//' __functions # fgets/__fgets_chk.desc
 perl -p -i -e 's/^__fprintf_chk\n//' __functions # fprintf/__fprintf_chk.desc
 perl -p -i -e 's/^__fread_chk\n//' __functions # fread/__fread_chk.desc

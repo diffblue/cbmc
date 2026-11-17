@@ -1,0 +1,15 @@
+CORE unix
+main.c
+--pointer-check
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^\[main\.assertion\.1\] line \d+ assertion r0 == -1 && errno == EINVAL: SUCCESS$
+^\[main\.assertion\.2\] line \d+ assertion r == 0: SUCCESS$
+^\[main\.pointer_dereference\.\d+\] line \d+ dereference failure: deallocated dynamic object in \*\(\(char \*\)p\): FAILURE$
+^\*\* 1 of \d+ failed
+--
+^warning: ignoring
+--
+munmap only fails for invalid arguments, and a successful munmap releases the
+mapping.
