@@ -1,0 +1,11 @@
+CORE
+main5.c
+--pointer-check --memory-leak-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+No memory is leaked on either path: when opening fails, freopen has closed the
+stream, and otherwise the program closes the stream that freopen returned.

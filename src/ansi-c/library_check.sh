@@ -35,6 +35,7 @@ perl -p -i -e 's/^__CPROVER_contracts_library\n//' __functions
 perl -p -i -e 's/^_creat\n//' __functions # creat, macOS
 perl -p -i -e 's/^_fcntl\n//' __functions # fcntl, macOS
 perl -p -i -e 's/^_fopen\n//' __functions # fopen, macOS
+perl -p -i -e 's/^_freopen\n//' __functions # freopen, macOS
 perl -p -i -e 's/^_getopt\n//' __functions # getopt, macOS
 perl -p -i -e 's/^_mmap\n//' __functions # mmap, macOS
 perl -p -i -e 's/^_munmap\n//' __functions # mumap, macOS

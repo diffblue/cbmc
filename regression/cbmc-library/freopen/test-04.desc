@@ -1,0 +1,11 @@
+CORE
+main4.c
+--pointer-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+The filename may be a null pointer, in which case only the mode of the stream is
+changed.

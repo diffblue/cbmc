@@ -1,0 +1,12 @@
+CORE
+main3.c
+--pointer-check
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^\[fclose\.precondition_instance\.\d+\] line \d+ double free: FAILURE$
+--
+^warning: ignoring
+--
+When opening the file fails, freopen has nevertheless closed the stream, which
+must not be closed again.
