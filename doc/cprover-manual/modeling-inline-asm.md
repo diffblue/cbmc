@@ -6,12 +6,14 @@ CBMC supports GCC-style (`asm`/`__asm__`) and MSVC-style (`__asm {}`)
 inline assembly syntax. Before verification, the `remove_asm` pass replaces
 each inline-assembly statement by goto-program instructions:
 
-- On x86 (`--arch i386` or `--arch x86_64`) and AArch64 (`--arch arm64`),
-  the default being the host architecture, a GCC-style statement is
-  **interpreted** if CBMC's instruction semantics for the architecture
-  support all of its instructions (see "x86 Instruction Semantics" and
-  "AArch64 Instruction Semantics" below): it is translated into goto-program
-  instructions with the same effect on the C program state.
+- On x86 (`--arch i386` or `--arch x86_64`), AArch64 (`--arch arm64`), and
+  AArch32 (`--arch arm`, `armel`, or `armhf`), the default being the host
+  architecture, a GCC-style statement is **interpreted** if CBMC's
+  instruction semantics for the architecture support all of its
+  instructions (see "x86 Instruction Semantics", "AArch64 Instruction
+  Semantics", and "AArch32 Instruction Semantics" below): it is translated
+  into goto-program instructions with the same effect on the C program
+  state.
 - Otherwise, if CBMC models every instruction of the statement (see
   "Supported Instructions" below, on any architecture), the statement is
   translated into the corresponding fences or calls to library functions.
@@ -114,6 +116,42 @@ store fails (it only computes registers that the next attempt computes
 again), the executions with more retries reach the same states, so that
 bounding the loop (with `--unwindset`, without unwinding assertions) does not
 miss any state.
+
+### AArch32 Instruction Semantics
+
+The AArch32 semantics cover A32 and T32 (Thumb) code in unified or divided
+syntax:
+
+- data processing on general-purpose registers, with the condition flags
+  (`s` suffix) and conditional execution (condition suffixes, and `it`
+  blocks): `mov`, `mvn`, `movw`, `movt`, `add`, `adc`, `sub`, `sbc`, `rsb`,
+  `neg`, `and`, `orr`, `eor`, `bic`, `lsl`, `lsr`, `asr`, `ror`, `mul`,
+  `cmp`, `cmn`, `tst`, `teq`, `clz`, `rev`, `rev16`, `rbit`, `uxtb`, `uxth`,
+  `sxtb`, `sxth`, with register or immediate operands (not shifted
+  registers);
+- loads and stores of single registers (`ldr`, `ldrb`, `ldrh`, `ldrsb`,
+  `ldrsh`, `str`, `strb`, `strh`) with an immediate or register offset (not
+  with writeback), and load-exclusive/store-exclusive (`ldrex`, `strex`,
+  their byte and halfword forms, and `clrex`), as on AArch64 (see above);
+  a conditional store-exclusive that does not execute leaves the exclusive
+  monitor as it was;
+- branches within the statement and to the labels of `asm goto` (`b`,
+  `b<cc>`, `cbz`, `cbnz`), and flag outputs (`=@cc<cc>`);
+- barriers (`dmb`, `dsb`, `isb`, and their CP15 forms), `mrs` and `msr` of
+  the flags (`apsr`, `cpsr`), the interrupt masks (`msr` of `cpsr_c`,
+  `cpsid`, `cpsie`), hints (`nop`, `yield`, `wfe`, `pld`, ...), and CP15
+  cache and TLB maintenance and thread ID registers (`mcr`); `mrs` of other
+  special registers and `mrc` produce nondeterministic values.
+
+In divided syntax, which GCC uses for inline assembly in A32 code and for
+Thumb-1 targets, Thumb-1 instructions such as `add` set the flags without an
+`s` suffix. Unless the statement starts with `.syntax unified`, or uses an
+instruction or form that Thumb-1 does not have (such as conditional
+execution, `it`, or `ldrex`), the flags are nondeterministic after a
+data-processing instruction without `s` suffix. A statement that changes the
+interrupt masks or the processor mode with `msr` and names any of the
+registers r8 to r14, which are banked by mode, is not interpreted. Reading or
+writing `pc` is not modeled.
 
 ### Supported Instructions
 

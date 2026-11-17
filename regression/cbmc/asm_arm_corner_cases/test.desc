@@ -1,0 +1,39 @@
+CORE gcc-only no-new-smt
+main.c
+--arch arm --unwind 3 --no-unwinding-assertions
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line 31 msr clears Z: SUCCESS$
+^\[main\.assertion\.2\] line 34 mrs after equality: SUCCESS$
+^\[main\.assertion\.3\] line 44 it block: SUCCESS$
+^\[main\.assertion\.4\] line 48 ll/sc result: SUCCESS$
+^\[main\.assertion\.5\] line 49 ll/sc stored: SUCCESS$
+^\[main\.assertion\.6\] line 58 store-exclusive stores: FAILURE$
+^\[main\.assertion\.7\] line 59 store-exclusive fails: FAILURE$
+^\[main\.assertion\.8\] line 60 status matches the store: SUCCESS$
+^\[main\.assertion\.9\] line 68 store-exclusive after clrex: SUCCESS$
+^\[main\.assertion\.10\] line 79 conditional store-exclusive: FAILURE$
+^\[main\.assertion\.11\] line 80 status matches the conditional store: SUCCESS$
+^\[main\.assertion\.12\] line 89 shifts: SUCCESS$
+^\[main\.assertion\.13\] line 98 subs/sbc: SUCCESS$
+^\[main\.assertion\.14\] line 107 rev16 rbit clz: SUCCESS$
+^\[main\.assertion\.15\] line 109 ext movw: SUCCESS$
+^\[main\.assertion\.16\] line 119 ldrsb ldrh strb: SUCCESS$
+^\[main\.assertion\.17\] line 124 pc: FAILURE$
+^\[main\.assertion\.18\] line 133 flags after add in divided syntax: FAILURE$
+^\[main\.assertion\.19\] line 140 flags after add in unified syntax: SUCCESS$
+^\[main\.assertion\.20\] line 149 store via register variable: FAILURE$
+^\[main\.assertion\.21\] line 154 register variable: FAILURE$
+approximating inline assembly statement at .* line 123 function main: unsupported operands of mov
+approximating inline assembly statement at .* line 147 function main: memory access at an address computed from a value that is not modeled
+approximating inline assembly statement at .* line 153 function main: writes register r0, which is neither an operand nor clobbered
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+approximating inline assembly statement at .* function add_ll_sc
+--
+The properties marked "fails" in main.c may be violated on hardware; all
+others hold on hardware. The results were validated with qemu-arm, for A32
+and T32 code compiled by GCC and Clang. "flags after add in divided syntax"
+holds in A32 and T32 code, but is violated for Thumb-1 targets, where the add
+sets the flags.

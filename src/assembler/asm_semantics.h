@@ -32,6 +32,14 @@ Author: Michael Tautschnig
 class symbol_table_baset;
 class asm_semanticst;
 
+/// State of the instruction semantics for one statement, for semantics that
+/// depend on the statement as a whole (see \ref asm_semanticst::make_state)
+class asm_semantics_statet
+{
+public:
+  virtual ~asm_semantics_statet() = default;
+};
+
 /// The state of lowering one inline assembly statement: the goto code being
 /// built, the storage of register operands, hardware registers and flags, and
 /// labels. Architecture semantics use it to emit the effect of instructions.
@@ -225,6 +233,10 @@ public:
   /// for label k), or nil if the statement has no labels
   exprt goto_target;
 
+  /// The state of the semantics for this statement, created by \ref prepare
+  /// (see \ref asm_semanticst::make_state); may be nullptr
+  std::unique_ptr<asm_semantics_statet> semantics_state;
+
   /// \name Conversion between C values and bit-vectors
   /// \{
 
@@ -404,6 +416,16 @@ public:
   virtual bool lower(
     const asm_instructiont &instruction,
     asm_lowering_contextt &ctx) const = 0;
+
+  /// \return The state of the semantics for a statement with \p
+  ///   instructions, available to \ref lower as
+  ///   \ref asm_lowering_contextt::semantics_state, or nullptr if the
+  ///   semantics need none
+  virtual std::unique_ptr<asm_semantics_statet>
+  make_state(const std::vector<asm_instructiont> &instructions) const
+  {
+    return nullptr;
+  }
 };
 
 /// \return The instruction semantics for architecture \p arch (as in

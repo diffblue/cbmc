@@ -39,7 +39,10 @@ The interpretation of a statement has these parts:
   and memory, branch, and fence.
 - `asm_semanticst` is the interface of the per-architecture semantics;
   `asm_x86.cpp` implements x86 (i386, x86-64, x32), `asm_aarch64.cpp`
-  implements AArch64; `asm_arm_flags.h` has the ARM condition flags.
+  implements AArch64, `asm_arm.cpp` implements AArch32; `asm_arm_flags.h`
+  has the ARM condition flags and barriers. Semantics that depend on the
+  statement as a whole create an `asm_semantics_statet` (`make_state`), which
+  `lower` reads from `asm_lowering_contextt::semantics_state`.
 
 The code of a statement consists of a prologue that evaluates the inputs, the
 code of the instructions, and an epilogue that assigns the register outputs.
@@ -94,6 +97,21 @@ nondeterministically: the architecture permits spurious failures, and a
 store-exclusive without a load-exclusive in the same statement may succeed if
 a load-exclusive executed before. After `clrex` or a store-exclusive, a
 store-exclusive fails.
+
+AArch32 needs two statement-wide properties (`make_a32_state` in
+`asm_arm.cpp`). In divided syntax, which GCC uses for inline assembly in A32
+code and for Thumb-1 targets, the Thumb-1 data-processing instructions set
+the flags without an `s` suffix (`add r0, r1, #1` is `adds`), depending on
+their registers. Unless the statement starts with `.syntax unified` or uses
+an instruction or form that Thumb-1 lacks (conditional execution other than
+of branches, `it`, `s` suffixes other than `movs`, `ldrex`, `teq`, ...), the
+flags are nondeterministic after such an instruction. And `msr` of the
+control field may change the processor mode, which banks r8 to r14, so a
+statement that does so and names any of these registers is not interpreted.
+An `it` instruction has no effect: the instructions of the IT block carry
+their conditions as suffixes, which the assemblers check against it.
+A conditional store-exclusive may not execute, so it does not clear the
+exclusive monitor.
 
 For `asm goto`, goto conversion creates a variable that selects the label to
 jump to (`code_asm_gcct::goto_target`) and dispatches on it after the

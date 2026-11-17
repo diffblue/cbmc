@@ -412,6 +412,8 @@ bool asm_lowering_contextt::prepare(
 {
   const std::size_t register_width = semantics.register_width();
 
+  semantics_state = semantics.make_state(instructions);
+
   // Which input operands are read above their natural width by some
   // reference: those must keep non-deterministic upper bits (see below).
   std::set<std::size_t> widened;
