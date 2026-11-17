@@ -68,7 +68,12 @@ instructions are listed in the tables below) if it:
   as the Linux kernel's jump tables) is ignored;
 - writes a register that is neither bound to an operand nor clobbered: as
   CBMC does not track register variables (`register long x asm("rax")`),
-  such a write may change a C variable.
+  such a write may change a C variable;
+- accesses memory at an address that may be computed from a value that CBMC
+  does not model, such as a register that the statement does not initialise
+  (which may hold a register variable) or a value that is nondeterministic
+  (such as one produced by `rdtsc`): CBMC could not tell which object the
+  access changes.
 
 A lock-prefixed instruction (or `xchg` with a memory operand) is an atomic
 section with a full fence; the other instructions of the statement are not

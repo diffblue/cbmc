@@ -543,6 +543,11 @@ bool remove_asmt::lower_instructions(
 
     for(const auto &label : instruction.labels)
       ctx.define_label(label);
+    if(!ctx.failure.empty())
+    {
+      failure = ctx.failure;
+      return false;
+    }
 
     if(m.empty())
     {
@@ -569,7 +574,8 @@ bool remove_asmt::lower_instructions(
     }
 
     ctx.begin_instruction();
-    if(!semantics->lower(instruction, ctx))
+    // semantics may also report a problem via ctx.fail and carry on
+    if(!semantics->lower(instruction, ctx) || !ctx.failure.empty())
     {
       failure = ctx.failure.empty()
                   ? "unsupported instruction '" + instruction.text + "'"

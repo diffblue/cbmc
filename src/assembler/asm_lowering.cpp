@@ -14,6 +14,7 @@ Author: Michael Tautschnig
 #include <util/bitvector_types.h>
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/expr_util.h>
 #include <util/fresh_symbol.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
@@ -85,7 +86,60 @@ asm_lowering_contextt::hardware_register(const std::string &canonical)
   const symbol_exprt reg =
     temporary(unsignedbv_typet{semantics.register_width()}, canonical);
   registers.emplace(canonical, reg);
+  // unless an operand initialises it (see prepare); it was unknown at all
+  // positions lowered so far
+  mark_unknown(reg.identifier());
+  for(auto &branch : pending)
+    branch.unknown.insert(reg.identifier());
+  for(auto &label : unknown_at_label)
+    label.second.insert(reg.identifier());
   return reg;
+}
+
+const irep_idt asm_lowering_contextt::unknown_memory = "asm::memory";
+
+void asm_lowering_contextt::mark_unknown(const irep_idt &identifier)
+{
+  unknown.insert(identifier);
+  ever_unknown.insert(identifier);
+}
+
+bool asm_lowering_contextt::depends_on_unknown(const exprt &expr) const
+{
+  return has_subexpr(
+    expr,
+    [this](const exprt &e)
+    {
+      if(e.id() == ID_symbol)
+        return unknown.count(to_symbol_expr(e).identifier()) != 0;
+      // nondeterministic Booleans (such as undefined flags) cannot be
+      // addresses
+      if(e.id() == ID_side_effect)
+        return to_side_effect_expr(e).get_statement() == ID_nondet &&
+               e.type().id() != ID_bool;
+      if(e.id() == ID_dereference)
+        return unknown.count(unknown_memory) != 0;
+      return false;
+    });
+}
+
+bool asm_lowering_contextt::check_unknown_at_target(
+  goto_programt::const_targett target,
+  const std::set<irep_idt> &at_branch)
+{
+  const auto entry = unknown_at_label.find(&*target);
+  INVARIANT(
+    entry != unknown_at_label.end(), "branch targets are label definitions");
+  if(!std::includes(
+       entry->second.begin(),
+       entry->second.end(),
+       at_branch.begin(),
+       at_branch.end()))
+  {
+    return fail(
+      "branch with values that are not modeled to code that relies on them");
+  }
+  return true;
 }
 
 symbol_exprt asm_lowering_contextt::flag(const std::string &name)
@@ -128,6 +182,22 @@ void asm_lowering_contextt::assign(const exprt &lhs, const exprt &rhs)
     if(lhs == entry.second)
       written_registers.insert(entry.first);
   }
+
+  const bool unknown_value = depends_on_unknown(rhs);
+  if(lhs.id() == ID_symbol)
+  {
+    const irep_idt &identifier = to_symbol_expr(lhs).identifier();
+    if(unknown_value)
+      mark_unknown(identifier);
+    else if(conditional_depth == 0)
+      unknown.erase(identifier);
+  }
+  else if(unknown_value)
+  {
+    // memory, which is never known again
+    mark_unknown(unknown_memory);
+  }
+
   body.add(goto_programt::make_assignment(lhs, rhs, location));
 }
 
@@ -229,8 +299,14 @@ exprt asm_lowering_contextt::nondet(const typet &type) const
   return side_effect_expr_nondett{type, location};
 }
 
-exprt asm_lowering_contextt::memory(const exprt &address, std::size_t w) const
+exprt asm_lowering_contextt::memory(const exprt &address, std::size_t w)
 {
+  if(depends_on_unknown(address))
+    fail(
+      "memory access at an address computed from a value that is not "
+      "modeled (such as a register that the statement does not "
+      "initialise, which may hold a register variable)");
+
   const pointer_typet target = pointer_type(unsignedbv_typet{w});
   exprt pointer = address;
   if(address.type().id() != ID_pointer)
@@ -362,7 +438,13 @@ bool asm_lowering_contextt::prepare(
               unsignedbv_typet{register_width}, "op" + std::to_string(i));
       storage.emplace(i, s);
 
-      if(operand.is_read)
+      if(!operand.is_read)
+      {
+        // until the instructions write it; if an input is tied to it, it is
+        // initialised with that input below
+        mark_unknown(s.identifier());
+      }
+      else
       {
         // evaluate the C expression, with the checks that apply to it
         code_expressiont evaluate{operand.expr};
@@ -385,6 +467,7 @@ bool asm_lowering_contextt::prepare(
                 s, from_integer(power(2, register_width) - 1 - mask, s.type())},
               value},
             location));
+          mark_unknown(s.identifier());
         }
         else
         {
@@ -396,6 +479,7 @@ bool asm_lowering_contextt::prepare(
           // written through the operand symbolic, forcing symex to unwind the
           // lock's spin loops to the unwinding bound.)
           prologue.add(goto_programt::make_assignment(s, value, location));
+          unknown.erase(s.identifier());
         }
       }
       break;
@@ -428,13 +512,25 @@ bool asm_lowering_contextt::prepare(
 void asm_lowering_contextt::define_label(const std::string &name)
 {
   const auto t = body.add(goto_programt::make_skip(location));
-  if(
+  // Join the forward branches to the label lowered so far. Backward branches,
+  // lowered later, are checked against the result (check_unknown_at_target).
+  const bool numeric =
     !name.empty() &&
     std::all_of(
-      name.begin(), name.end(), [](char c) { return c >= '0' && c <= '9'; }))
+      name.begin(), name.end(), [](char c) { return c >= '0' && c <= '9'; });
+  const std::size_t definitions = numeric ? numeric_labels[name].size() : 0;
+  for(const auto &branch : pending)
   {
-    numeric_labels[name].push_back(t);
+    if(
+      branch.label == name && branch.numeric == numeric &&
+      (!numeric || branch.definitions_before == definitions))
+    {
+      unknown.insert(branch.unknown.begin(), branch.unknown.end());
+    }
   }
+  unknown_at_label[&*t] = unknown;
+  if(numeric)
+    numeric_labels[name].push_back(t);
   else
     label_definitions[name] = t;
 }
@@ -466,6 +562,8 @@ bool asm_lowering_contextt::branch(
     {
       if(definitions.empty())
         return fail("undefined label " + target.text + "b");
+      if(!check_unknown_at_target(definitions.back(), unknown))
+        return false;
       body.add(
         goto_programt::make_goto(definitions.back(), condition, location));
       return true;
@@ -476,7 +574,8 @@ bool asm_lowering_contextt::branch(
        target.text,
        definitions.size(),
        true,
-       true});
+       true,
+       unknown});
     return true;
   }
 
@@ -487,7 +586,8 @@ bool asm_lowering_contextt::branch(
        target.text,
        0,
        true,
-       false});
+       false,
+       unknown});
     return true;
   }
 
@@ -497,12 +597,15 @@ bool asm_lowering_contextt::branch(
 goto_programt::targett
 asm_lowering_contextt::begin_conditional(const exprt &condition)
 {
+  ++conditional_depth;
   return body.add(
     goto_programt::make_incomplete_goto(not_exprt{condition}, location));
 }
 
 void asm_lowering_contextt::end_conditional(goto_programt::targett begin)
 {
+  PRECONDITION(conditional_depth > 0);
+  --conditional_depth;
   begin->complete_goto(body.add(goto_programt::make_skip(location)));
 }
 
@@ -527,6 +630,8 @@ bool asm_lowering_contextt::finish(goto_programt &dest)
         return fail("undefined label " + branch.label);
       target = it->second;
     }
+    if(!check_unknown_at_target(target, branch.unknown))
+      return false;
     branch.instruction->complete_goto(target);
   }
 

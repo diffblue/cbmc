@@ -132,8 +132,26 @@ public:
   exprt nondet(const typet &type) const;
 
   /// A memory location of \p width bits at \p address (any pointer or
-  /// integer type), as an lvalue of type unsignedbv(width)
-  exprt memory(const exprt &address, std::size_t width) const;
+  /// integer type), as an lvalue of type unsignedbv(width). Records a failure
+  /// if \p address may depend on a value that is not modeled (see
+  /// \ref depends_on_unknown).
+  exprt memory(const exprt &address, std::size_t width);
+  /// \}
+
+  /// \name Values that are not modeled
+  /// Some values are modeled as nondeterministic: those of hardware registers
+  /// that the statement does not initialise (which may hold a register
+  /// variable, `register int *p asm("r1")`, that CBMC does not track), of
+  /// system registers, and of output operands that are read before they are
+  /// written. This over-approximates the value, but CBMC cannot relate a
+  /// nondeterministic address to the objects it may point to, so memory
+  /// accessed at such an address would not change any object. Hence such
+  /// accesses make the lowering fail.
+  /// \{
+
+  /// \return True iff \p expr may depend on a value that is not modeled at
+  ///   the current position of the statement
+  bool depends_on_unknown(const exprt &expr) const;
   /// \}
 
   /// \name Control flow
@@ -204,6 +222,30 @@ protected:
   /// the canonical names of the hardware registers that are written
   std::set<std::string> written_registers;
 
+  /// The symbols that may hold a value that is not modeled at the current
+  /// position, and \ref unknown_memory if memory may hold such a value
+  std::set<irep_idt> unknown;
+  /// all symbols that held a value that is not modeled at some position
+  /// lowered so far, a superset of \ref unknown at any of these positions
+  std::set<irep_idt> ever_unknown;
+  /// \ref unknown at each label definition
+  std::map<const goto_programt::instructiont *, std::set<irep_idt>>
+    unknown_at_label;
+  /// the number of conditional regions (\ref begin_conditional) that are
+  /// open: an assignment in one of them does not make its target known
+  std::size_t conditional_depth = 0;
+  /// stands for memory in \ref unknown
+  static const irep_idt unknown_memory;
+
+  void mark_unknown(const irep_idt &identifier);
+
+  /// Fail if a branch to \p target with \ref unknown being \p at_branch
+  /// would make a value unknown at \p target that was taken as known when
+  /// lowering the code at \p target.
+  bool check_unknown_at_target(
+    goto_programt::const_targett target,
+    const std::set<irep_idt> &at_branch);
+
   std::map<std::string, symbol_exprt> registers;
   std::map<std::string, symbol_exprt> flags;
   std::map<std::size_t, symbol_exprt> storage;
@@ -223,6 +265,8 @@ protected:
     std::size_t definitions_before;
     bool forward;
     bool numeric;
+    /// \ref unknown at the branch
+    std::set<irep_idt> unknown;
   };
   std::vector<pending_brancht> pending;
   goto_programt::targett exit_label;

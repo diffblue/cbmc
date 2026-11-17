@@ -66,6 +66,17 @@ one of them is not interpreted:
 - A write to a hardware register that is neither bound to an operand by its
   constraint nor clobbered may be a write to a register variable
   (`register long x asm("rax")`), which the front end does not record.
+- A memory access must not use an address that may depend on a value that
+  is not modeled: a hardware register that the statement does not
+  initialise (which may hold a register variable), a nondeterministic value
+  (such as a system register, or `rdtsc`), an output operand read before it
+  is written, or memory that such a value was stored to. CBMC cannot relate
+  such an address to the objects it may point to, so the access would change
+  no object. `asm_lowering_contextt::depends_on_unknown` tracks these values
+  per position: an unconditional assignment of a known value makes its
+  target known; a label joins the states of the fall-through and of the
+  forward branches to it; a backward branch must not make a value unknown
+  that its target took as known.
 - An input tied to a memory output must be the same object.
 
 An instruction that is atomic on the hardware (on x86: lock-prefixed
