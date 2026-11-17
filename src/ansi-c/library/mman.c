@@ -134,17 +134,25 @@ void *mmap64(
 
 /* FUNCTION: munmap */
 
-__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
 
 int munmap(void *addr, __CPROVER_size_t length)
 {
-  (void)length;
-
+__CPROVER_HIDE:;
   // POSIX.1-2017 munmap: "Upon successful completion, munmap() shall
-  // return 0; otherwise, it shall return -1."
-  __CPROVER_bool error = __VERIFIER_nondet___CPROVER_bool();
-  if(error)
+  // return 0; otherwise, it shall return -1 and set errno to indicate the
+  // error." The only errors POSIX specifies are EINVAL for a length of zero,
+  // an address that is not a multiple of the page size, or addresses outside
+  // the valid range of the address space. Of these, only the first one is
+  // modelled: unmapping a valid mapping does not fail.
+  if(length == 0)
+  {
+    errno = EINVAL;
     return -1;
+  }
 
   __CPROVER_deallocate(addr);
 
@@ -153,17 +161,10 @@ int munmap(void *addr, __CPROVER_size_t length)
 
 /* FUNCTION: _munmap */
 
-__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
+int munmap(void *addr, __CPROVER_size_t length);
 
 int _munmap(void *addr, __CPROVER_size_t length)
 {
-  (void)length;
-
-  __CPROVER_bool error = __VERIFIER_nondet___CPROVER_bool();
-  if(error)
-    return -1;
-
-  __CPROVER_deallocate(addr);
-
-  return 0;
+__CPROVER_HIDE:;
+  return munmap(addr, length);
 }
