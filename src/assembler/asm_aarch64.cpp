@@ -15,7 +15,6 @@ Author: Michael Tautschnig
 #include <util/config.h>
 #include <util/mathematical_types.h>
 #include <util/pointer_expr.h>
-#include <util/suffix.h>
 
 #include "asm_arm_flags.h"
 #include "asm_bv_util.h"
@@ -188,11 +187,6 @@ protected:
     const asm_instructiont &instruction,
     asm_lowering_contextt &ctx) const;
 
-  bool lower_barrier(
-    const std::string &m,
-    const asm_instructiont &instruction,
-    asm_lowering_contextt &ctx) const;
-
 public:
   std::string canonical_register(const std::string &name) const override;
 };
@@ -224,46 +218,6 @@ asm_aarch64_semanticst::canonical_register(const std::string &raw) const
     }
   }
   return {};
-}
-
-bool asm_aarch64_semanticst::lower_barrier(
-  const std::string &m,
-  const asm_instructiont &instruction,
-  asm_lowering_contextt &ctx) const
-{
-  std::string option = "sy";
-  if(!instruction.operands.empty())
-  {
-    if(
-      instruction.operands.size() != 1 || instruction.operands[0].size() != 1 ||
-      !instruction.operands[0][0].is_identifier())
-    {
-      return ctx.fail("unsupported option of " + m);
-    }
-    option = instruction.operands[0][0].text;
-    for(auto &c : option)
-      c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
-  }
-
-  if(m == "isb")
-  {
-    if(option != "sy")
-      return ctx.fail("unsupported option of isb");
-    // orders nothing by itself, needs to be combined with a branch
-    ctx.fence(false, false, false, false, false);
-    return true;
-  }
-
-  // the option selects the accesses being ordered
-  if(option == "sy" || option == "ish" || option == "osh" || option == "nsh")
-    ctx.fence(true, true, true, true, true);
-  else if(has_suffix(option, "ld")) // loads before loads and stores
-    ctx.fence(false, true, true, false, true);
-  else if(has_suffix(option, "st")) // stores before stores
-    ctx.fence(true, false, false, false, true);
-  else
-    return ctx.fail("unsupported option of " + m);
-  return true;
 }
 
 bool asm_aarch64_semanticst::parse_register_name(
@@ -851,7 +805,7 @@ bool asm_aarch64_semanticst::lower(
   }
 
   if(m == "dmb" || m == "dsb" || m == "isb")
-    return lower_barrier(m, instruction, ctx);
+    return asm_arm::lower_barrier(m, instruction, ctx);
 
   // branches: the target is the last operand
   if(

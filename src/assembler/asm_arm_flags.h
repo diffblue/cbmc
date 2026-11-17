@@ -7,14 +7,18 @@ Author: Michael Tautschnig
 \*******************************************************************/
 
 /// \file
-/// The NZCV condition flags and condition codes shared by AArch64 and AArch32
+/// The NZCV condition flags, condition codes, and barriers shared by AArch64
+/// and AArch32
 
 #ifndef CPROVER_ASSEMBLER_ASM_ARM_FLAGS_H
 #define CPROVER_ASSEMBLER_ASM_ARM_FLAGS_H
 
+#include <util/suffix.h>
+
 #include "asm_bv_util.h"
 #include "asm_semantics.h"
 
+#include <cctype>
 #include <set>
 
 namespace asm_arm // NOLINT
@@ -127,6 +131,49 @@ inline void set_logic_flags(
   set_nz(ctx, result, width);
   ctx.assign(ctx.flag("c"), false_exprt{});
   ctx.assign(ctx.flag("v"), false_exprt{});
+}
+
+/// Lower the barrier \p m (`dmb`, `dsb`, or `isb`) of \p instruction, whose
+/// option (if any) selects the accesses that are ordered.
+/// \return false if the option is not understood
+inline bool lower_barrier(
+  const std::string &m,
+  const asm_instructiont &instruction,
+  asm_lowering_contextt &ctx)
+{
+  std::string option = "sy";
+  if(!instruction.operands.empty())
+  {
+    if(
+      instruction.operands.size() != 1 || instruction.operands[0].size() != 1 ||
+      !instruction.operands[0][0].is_identifier())
+    {
+      return ctx.fail("unsupported option of " + m);
+    }
+    option = instruction.operands[0][0].text;
+    for(auto &c : option)
+      c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+  }
+
+  if(m == "isb")
+  {
+    if(option != "sy")
+      return ctx.fail("unsupported option of isb");
+    // orders nothing by itself, needs to be combined with a branch
+    ctx.fence(false, false, false, false, false);
+    return true;
+  }
+
+  // the option selects the accesses being ordered
+  if(option == "sy" || option == "ish" || option == "osh" || option == "nsh")
+    ctx.fence(true, true, true, true, true);
+  else if(has_suffix(option, "ld")) // loads before loads and stores
+    ctx.fence(false, true, true, false, true);
+  else if(has_suffix(option, "st")) // stores before stores
+    ctx.fence(true, false, false, false, true);
+  else
+    return ctx.fail("unsupported option of " + m);
+  return true;
 }
 } // namespace asm_arm
 
