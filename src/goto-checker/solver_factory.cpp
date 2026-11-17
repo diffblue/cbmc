@@ -209,8 +209,13 @@ make_satcheck_prop(message_handlert &message_handler, const optionst &options)
 static std::unique_ptr<propt>
 get_sat_solver(message_handlert &message_handler, const optionst &options)
 {
+  // The refinement loops call the solver repeatedly, and repeat the
+  // post-processing (which adds array constraints) on each call. Constraints
+  // added after the first call may then refer to variables that the
+  // simplifier has eliminated.
   const bool no_simplifier = options.get_bool_option("beautify") ||
                              !options.get_bool_option("sat-preprocessor") ||
+                             options.get_bool_option("refine") ||
                              options.get_bool_option("refine-strings");
 
   if(options.is_set("sat-solver"))
