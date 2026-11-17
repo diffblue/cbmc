@@ -1,0 +1,14 @@
+CORE
+main.c
+--dump-c _ --no-standard-checks
+^EXIT=0$
+^SIGNAL=0$
+f\.f = 1\.4210855e-14f;$
+f\.f = 3\.1415927f;$
+d\.d = 0\.5;$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Floating-point constants must be dumped with enough digits to be read back as
+the same value.

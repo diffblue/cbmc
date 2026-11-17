@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/find_symbols.h>
 #include <util/fixedbv.h>
 #include <util/floatbv_expr.h>
+#include <util/ieee_float.h>
 #include <util/lispexpr.h>
 #include <util/lispirep.h>
 #include <util/namespace.h>
@@ -33,6 +34,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <algorithm>
 #include <map>
 #include <sstream>
+
+#include "literals/parse_float.h"
 
 // clang-format off
 
@@ -1787,6 +1790,43 @@ build_sizeof_expr(const constant_exprt &expr, const namespacet &ns)
   return typecast_exprt::conditional_cast(result, expr.type());
 }
 
+/// Determine whether the C front-end turns the decimal floating-point
+/// literal \p literal (without type suffix) back into \p value.
+static bool float_literal_round_trips(
+  const ieee_float_valuet &value,
+  const std::string &literal)
+{
+  const bool negative = !literal.empty() && literal[0] == '-';
+  parse_floatt parsed{negative ? literal.substr(1) : literal};
+  if(parsed.exponent_base != 10)
+    return false;
+
+  // convert_float_literal uses round-to-nearest-even
+  ieee_floatt parsed_value{
+    value.spec, ieee_floatt::rounding_modet::ROUND_TO_EVEN};
+  parsed_value.from_base10(parsed.significand, parsed.exponent);
+  if(negative)
+    parsed_value.negate();
+
+  return parsed_value == value;
+}
+
+/// Print a finite, non-zero floating-point value as a decimal literal
+/// (without type suffix) that the C front-end will read back as exactly
+/// this value. Uses the printf-style "%g" representation with the smallest
+/// precision (but at least the default precision of 6) that is exact.
+static std::string float_to_exact_decimal(const ieee_float_valuet &value)
+{
+  // The decimal expansion of a binary floating-point number is finite, and
+  // printing all of its digits is exact. Hence this loop terminates.
+  for(format_spect format_spec;; ++format_spec.precision)
+  {
+    std::string result = value.format(format_spec);
+    if(float_literal_round_trips(value, result))
+      return result;
+  }
+}
+
 std::string expr2ct::convert_constant(
   const constant_exprt &src,
   unsigned &precedence)
@@ -1945,7 +1985,11 @@ std::string expr2ct::convert_constant(
   }
   else if(type.id()==ID_floatbv)
   {
-    dest = ieee_float_valuet(to_constant_expr(src)).to_ansi_c_string();
+    const ieee_float_valuet value{to_constant_expr(src)};
+    if(value.is_NaN() || value.is_infinity() || value.is_zero())
+      dest = value.to_ansi_c_string();
+    else
+      dest = float_to_exact_decimal(value);
 
     if(!dest.empty() && isdigit(dest[dest.size() - 1]))
     {
