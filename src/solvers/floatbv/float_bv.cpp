@@ -326,10 +326,8 @@ exprt float_bvt::from_signed_integer(
     typecast_exprt(abs_exprt(src), unsignedbv_typet(src_width));
 
   // build an exponent (unbiased) -- this is signed!
-  result.exponent=
-    from_integer(
-      src_width-1,
-      signedbv_typet(address_bits(src_width - 1) + 1));
+  result.exponent =
+    from_integer(src_width - 1, signedbv_typet(address_bits(src_width) + 1));
 
   return rounder(result, rm, spec);
 }
@@ -346,10 +344,8 @@ exprt float_bvt::from_unsigned_integer(
   std::size_t src_width=to_unsignedbv_type(src.type()).get_width();
 
   // build an exponent (unbiased) -- this is signed!
-  result.exponent=
-    from_integer(
-      src_width-1,
-      signedbv_typet(address_bits(src_width - 1) + 1));
+  result.exponent =
+    from_integer(src_width - 1, signedbv_typet(address_bits(src_width) + 1));
 
   result.sign=false_exprt();
 
@@ -1146,7 +1142,7 @@ void float_bvt::normalization_shift(
   std::size_t exponent_bits=to_signedbv_type(exponent.type()).get_width();
   PRECONDITION(fraction_bits != 0);
 
-  std::size_t depth = address_bits(fraction_bits - 1);
+  std::size_t depth = address_bits(fraction_bits);
 
   exponent = typecast_exprt(
     exponent, signedbv_typet(std::max(depth, exponent_bits + 1)));
