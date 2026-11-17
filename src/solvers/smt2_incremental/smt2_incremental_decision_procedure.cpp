@@ -24,6 +24,7 @@
 #include <solvers/smt2_incremental/theories/smt_core_theory.h>
 #include <solvers/smt2_incremental/type_size_mapping.h>
 
+#include <functional>
 #include <stack>
 #include <unordered_set>
 #include <vector>
@@ -209,7 +210,24 @@ void smt2_incremental_decision_proceduret::define_dependent_functions(
     const exprt current = to_be_defined.top();
     if(push_dependencies_needed(current))
       continue;
-    if(const auto symbol_expr = expr_try_dynamic_cast<symbol_exprt>(current))
+    const auto symbol_expr = expr_try_dynamic_cast<symbol_exprt>(current);
+    const auto shared_definition =
+      symbol_expr ? shared_definitions.find(symbol_expr->identifier())
+                  : shared_definitions.end();
+    if(shared_definition != shared_definitions.end())
+    {
+      // an intermediate result of lowering floating-point operations
+      const exprt definition = lower(shared_definition->second);
+      if(push_dependencies_needed(definition))
+        continue;
+      const smt_define_function_commandt function{
+        symbol_expr->identifier(), {}, convert_expr_to_smt(definition)};
+      expression_identifiers.emplace(*symbol_expr, function.identifier());
+      identifier_table.emplace(
+        symbol_expr->identifier(), function.identifier());
+      solver_process->send(function);
+    }
+    else if(symbol_expr)
     {
       send_function_definition(
         *symbol_expr,
@@ -324,11 +342,67 @@ static bool has_floatbv_type(const exprt &expr)
   return false;
 }
 
+exprt smt2_incremental_decision_proceduret::share_subexpressions(
+  const exprt &root) const
+{
+  // Count the number of parents of each distinct sub-expression. Each
+  // distinct sub-expression is visited once, so this is linear in the size of
+  // the expression as a DAG.
+  std::unordered_map<exprt, std::size_t, irep_hash> parents;
+  {
+    std::stack<const exprt *> stack;
+    stack.push(&root);
+    std::unordered_set<exprt, irep_hash> visited{root};
+    while(!stack.empty())
+    {
+      const exprt &node = *stack.top();
+      stack.pop();
+      for(const auto &op : node.operands())
+      {
+        ++parents[op];
+        if(visited.insert(op).second)
+          stack.push(&op);
+      }
+    }
+  }
+
+  // Rebuild bottom-up, replacing sub-expressions with more than one parent by
+  // symbols. Symbols and constants are not worth replacing.
+  std::unordered_map<exprt, exprt, irep_hash> rebuilt;
+  std::function<exprt(const exprt &)> rebuild = [&](const exprt &node) -> exprt
+  {
+    if(!node.has_operands())
+      return node;
+    const auto cached = rebuilt.find(node);
+    if(cached != rebuilt.end())
+      return cached->second;
+    exprt result = node;
+    for(auto &op : result.operands())
+      op = rebuild(op);
+    const auto parents_entry = parents.find(node);
+    if(parents_entry != parents.end() && parents_entry->second > 1)
+    {
+      const symbol_exprt symbol{
+        "float_bv::shared$" + std::to_string(shared_definitions.size()),
+        result.type()};
+      shared_definitions.emplace(symbol.identifier(), std::move(result));
+      result = symbol;
+    }
+    rebuilt.emplace(node, result);
+    return result;
+  };
+
+  return rebuild(root);
+}
+
 /// \brief Lower floating-point operations to bitvector expressions.
 /// Traverses \p expr bottom-up and replaces float-specific sub-expressions
 /// (e.g., ieee_float_equal, floatbv_plus) with their bitvector equivalents
-/// using \ref float_bvt::convert.
-static exprt lower_floatbv(exprt expr)
+/// using \ref float_bvt::convert. The encodings share sub-expressions, which
+/// are replaced by symbols defined as SMT functions (see
+/// `share_subexpressions`), as the conversion would otherwise yield terms of
+/// exponential size.
+exprt smt2_incremental_decision_proceduret::lower_floatbv(exprt expr) const
 {
   // Recurse into operands first (bottom-up)
   for(auto &op : expr.operands())
@@ -337,10 +411,18 @@ static exprt lower_floatbv(exprt expr)
   // Only attempt float_bv conversion on expressions involving floats
   if(has_floatbv_type(expr))
   {
+    const auto cached = lowered_floatbv_cache.find(expr);
+    if(cached != lowered_floatbv_cache.end())
+      return cached->second;
+
     const float_bvt float_bv;
     const exprt converted = float_bv.convert(expr);
     if(!converted.is_nil())
-      return converted;
+    {
+      const exprt shared = share_subexpressions(converted);
+      lowered_floatbv_cache.emplace(expr, shared);
+      return shared;
+    }
   }
 
   return expr;

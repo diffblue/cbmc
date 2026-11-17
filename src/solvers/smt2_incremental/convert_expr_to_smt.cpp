@@ -374,6 +374,29 @@ static smt_termt convert_expr_to_smt(
     return convert_multiary_operator_to_terms(
       concatenation, converted, smt_bit_vector_theoryt::concat);
   }
+  // Boolean operands are single bits
+  if(std::all_of(
+       concatenation.operands().begin(),
+       concatenation.operands().end(),
+       [](const exprt &op) {
+         return can_cast_type<bitvector_typet>(op.type()) || op.is_boolean();
+       }))
+  {
+    std::optional<smt_termt> result;
+    for(const auto &op : concatenation.operands())
+    {
+      smt_termt term = converted.at(op);
+      if(op.is_boolean())
+      {
+        term = smt_core_theoryt::if_then_else(
+          term,
+          smt_bit_vector_constant_termt{1, 1},
+          smt_bit_vector_constant_termt{0, 1});
+      }
+      result = result ? smt_bit_vector_theoryt::concat(*result, term) : term;
+    }
+    return *result;
+  }
   UNIMPLEMENTED_FEATURE(
     "Generation of SMT formula for concatenation expression: " +
     concatenation.pretty());
@@ -474,6 +497,15 @@ static smt_termt convert_expr_to_smt(
   const sign_exprt &is_negative,
   const sub_expression_mapt &converted)
 {
+  if(can_cast_type<signedbv_typet>(is_negative.op().type()))
+  {
+    const std::size_t width =
+      to_signedbv_type(is_negative.op().type()).get_width();
+    return smt_bit_vector_theoryt::signed_less_than(
+      converted.at(is_negative.op()), smt_bit_vector_constant_termt{0, width});
+  }
+  if(can_cast_type<unsignedbv_typet>(is_negative.op().type()))
+    return smt_bool_literal_termt{false};
   UNIMPLEMENTED_FEATURE(
     "Generation of SMT formula for \"is negative\" expression: " +
     is_negative.pretty());
@@ -954,6 +986,20 @@ static smt_termt convert_to_smt_shift(
   const sub_expression_mapt &converted)
 {
   const smt_termt &first_operand = converted.at(shift.op0());
+  // Constant shift distances may be of (unbounded) integer type, e.g., when
+  // created via the shift_exprt constructor taking a std::size_t.
+  if(!can_cast_type<bitvector_typet>(shift.op1().type()))
+  {
+    const auto distance = numeric_cast<mp_integer>(shift.op1());
+    const auto first_sort =
+      first_operand.get_sort().cast<smt_bit_vector_sortt>();
+    if(distance.has_value() && first_sort)
+    {
+      return factory(
+        first_operand,
+        smt_bit_vector_constant_termt{*distance, first_sort->bit_width()});
+    }
+  }
   const smt_termt &second_operand = converted.at(shift.op1());
   const auto first_bit_vector_sort =
     first_operand.get_sort().cast<smt_bit_vector_sortt>();
@@ -1111,6 +1157,14 @@ static smt_termt convert_expr_to_smt(
   const extractbit_exprt &extract_bit,
   const sub_expression_mapt &converted)
 {
+  const smt_termt &from = converted.at(extract_bit.src());
+  const auto index_value = numeric_cast<std::size_t>(extract_bit.index());
+  if(index_value)
+  {
+    return smt_core_theoryt::equal(
+      smt_bit_vector_theoryt::extract(*index_value, *index_value)(from),
+      smt_bit_vector_constant_termt{1, 1});
+  }
   UNIMPLEMENTED_FEATURE(
     "Generation of SMT formula for extract bit expression: " +
     extract_bit.pretty());
@@ -1165,6 +1219,19 @@ static smt_termt convert_expr_to_smt(
   const abs_exprt &absolute_value_of,
   const sub_expression_mapt &converted)
 {
+  if(
+    const auto signed_type =
+      type_try_dynamic_cast<signedbv_typet>(absolute_value_of.op().type()))
+  {
+    const smt_termt &operand = converted.at(absolute_value_of.op());
+    return smt_core_theoryt::if_then_else(
+      smt_bit_vector_theoryt::signed_less_than(
+        operand, smt_bit_vector_constant_termt{0, signed_type->get_width()}),
+      smt_bit_vector_theoryt::negate(operand),
+      operand);
+  }
+  if(can_cast_type<unsignedbv_typet>(absolute_value_of.op().type()))
+    return converted.at(absolute_value_of.op());
   UNIMPLEMENTED_FEATURE(
     "Generation of SMT formula for absolute value of expression: " +
     absolute_value_of.pretty());
