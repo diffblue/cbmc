@@ -1,6 +1,6 @@
 CORE gcc-only no-new-smt
 main.c
---arch arm --unwind 3 --no-unwinding-assertions
+--arch arm
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main\.assertion\.1\] line 31 msr clears Z: SUCCESS$

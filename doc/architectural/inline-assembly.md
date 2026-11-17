@@ -96,7 +96,13 @@ the statement is not interpreted. The store-exclusive succeeds
 nondeterministically: the architecture permits spurious failures, and a
 store-exclusive without a load-exclusive in the same statement may succeed if
 a load-exclusive executed before. After `clrex` or a store-exclusive, a
-store-exclusive fails.
+store-exclusive fails. A store-exclusive records itself
+(`asm_lowering_contextt::record_store_exclusive`), and the semantics lower
+conditional branches with `retry_branch`: a backward branch that is taken
+only if the recorded store failed (checked by substituting the code after the
+store into the condition and simplifying it with the store succeeding), and
+whose loop is restartable (`restartable`), becomes the assumption that it is
+not taken.
 
 AArch32 needs two statement-wide properties (`make_a32_state` in
 `asm_arm.cpp`). In divided syntax, which GCC uses for inline assembly in A32

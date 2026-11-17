@@ -707,8 +707,16 @@ bool asm_aarch64_semanticst::lower_memory(
         return false;
       ctx.end_conditional(store);
       ctx.clear_exclusive();
-      return write(
-        ctx, ops[0], 32, if_exprt{success, constant(0, 32), constant(1, 32)});
+      if(!write(
+           ctx,
+           ops[0],
+           32,
+           if_exprt{success, constant(0, 32), constant(1, 32)}))
+      {
+        return false;
+      }
+      ctx.record_store_exclusive(success);
+      return true;
     }
   }
 
@@ -870,7 +878,7 @@ bool asm_aarch64_semanticst::lower(
       const exprt cond = asm_arm::condition(m.substr(2), ctx);
       if(cond.is_nil())
         return ctx.fail("unsupported condition " + m);
-      return ctx.branch(target, cond);
+      return ctx.retry_branch(target, cond);
     }
 
     asm_token_listt reg_tokens = instruction.operands[0];
@@ -887,7 +895,8 @@ bool asm_aarch64_semanticst::lower(
       if(instruction.operands.size() != 2)
         return ctx.fail("unsupported " + m);
       const exprt zero = is_zero(read(ctx, reg, reg.width));
-      return ctx.branch(target, m == "cbz" ? zero : exprt{not_exprt{zero}});
+      return ctx.retry_branch(
+        target, m == "cbz" ? zero : exprt{not_exprt{zero}});
     }
 
     // tbz/tbnz Rt, #bit, label
@@ -902,7 +911,7 @@ bool asm_aarch64_semanticst::lower(
     }
     const exprt set =
       extractbit_exprt{lshr_exprt{read(ctx, reg, 64), read(ctx, bit, 64)}, 0};
-    return ctx.branch(target, m == "tbnz" ? set : exprt{not_exprt{set}});
+    return ctx.retry_branch(target, m == "tbnz" ? set : exprt{not_exprt{set}});
   }
 
   std::vector<a64_operandt> ops;

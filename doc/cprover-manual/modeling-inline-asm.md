@@ -110,13 +110,21 @@ no other memory access, branch, or label in between, is an atomic section.
 The store-exclusive succeeds or fails nondeterministically, as the
 architecture permits spurious failures, and so does a store-exclusive
 without a preceding load-exclusive in the statement (a load-exclusive may
-have executed before). Hence symbolic execution needs an unwinding bound for
-the loop that retries the sequence until the store succeeds, and unwinding
-assertions for that loop fail. If the retried code has no effect when the
-store fails (it only computes registers that the next attempt computes
-again), the executions with more retries reach the same states, so that
-bounding the loop (with `--unwindset`, without unwinding assertions) does not
-miss any state.
+have executed before).
+
+A statement usually retries the sequence until the store succeeds, as in
+`1: ldxr x0, [x2]; add x0, x0, #1; stxr w1, x0, [x2]; cbnz w1, 1b`. If a
+failed attempt has no effect (the loop writes memory only with the
+store-exclusive, does not read a register or flag before writing it, and
+writes the same registers and flags in every attempt), the executions that
+retry reach the same states as the one whose last attempt succeeds. CBMC then
+replaces the branch that retries by the assumption that it is not taken
+(which implies that the store succeeded), so that the statement contains no
+loop. This requires the branch to be taken
+only when the store fails (`cbnz` of the status, or `bne` after `teq` or
+`cmp` of the status with 0) and the loop to contain no other label or branch.
+Other retry loops remain loops: symbolic execution needs an unwinding bound
+for them, and their unwinding assertions fail.
 
 ### AArch32 Instruction Semantics
 

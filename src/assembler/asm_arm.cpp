@@ -1036,7 +1036,8 @@ bool asm_arm_semanticst::lower(
     {
       if(instruction.operands.size() != 1)
         return ctx.fail("unsupported branch");
-      return ctx.branch(target, asm_arm::condition(decoded.condition, ctx));
+      return ctx.retry_branch(
+        target, asm_arm::condition(decoded.condition, ctx));
     }
     a32_operandt reg;
     if(
@@ -1047,7 +1048,7 @@ bool asm_arm_semanticst::lower(
       return ctx.fail("unsupported " + decoded.base);
     }
     const exprt zero = is_zero(read(ctx, reg, 32));
-    return ctx.branch(
+    return ctx.retry_branch(
       target, decoded.base == "cbz" ? zero : exprt{not_exprt{zero}});
   }
 
@@ -1458,8 +1459,15 @@ bool asm_arm_semanticst::lower_memory(
     // keeps its state.
     if(!conditional)
       ctx.clear_exclusive();
-    return write(
-      ctx, ops[0], 32, if_exprt{success, constant(0, 32), constant(1, 32)});
+    if(!write(
+         ctx, ops[0], 32, if_exprt{success, constant(0, 32), constant(1, 32)}))
+    {
+      return false;
+    }
+    // the status of a conditional store-exclusive may be unchanged
+    if(!conditional)
+      ctx.record_store_exclusive(success);
+    return true;
   }
 
   return ctx.fail("unsupported instruction " + instruction.mnemonic);

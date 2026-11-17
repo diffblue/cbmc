@@ -1,6 +1,6 @@
 CORE gcc-only
 main.c
---arch arm64 --unwind 3 --no-unwinding-assertions
+--arch arm64
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main\.assertion\.1\] line 27 msr nzcv clears Z: SUCCESS$

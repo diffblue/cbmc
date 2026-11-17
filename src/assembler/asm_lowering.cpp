@@ -15,9 +15,12 @@ Author: Michael Tautschnig
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/expr_util.h>
+#include <util/find_symbols.h>
 #include <util/fresh_symbol.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
+#include <util/replace_symbol.h>
+#include <util/simplify_expr.h>
 #include <util/std_code.h>
 #include <util/symbol_table_base.h>
 
@@ -560,10 +563,189 @@ void asm_lowering_contextt::define_label(const std::string &name)
     }
   }
   unknown_at_label[&*t] = unknown;
+  label_instructions.insert(&*t);
   if(numeric)
     numeric_labels[name].push_back(t);
   else
     label_definitions[name] = t;
+}
+
+void asm_lowering_contextt::record_store_exclusive(const symbol_exprt &success)
+{
+  const goto_programt::targett first = instruction_start.has_value()
+                                         ? std::next(*instruction_start)
+                                         : body.instructions.begin();
+  last_store_exclusive =
+    store_exclusivet{first, std::prev(body.instructions.end()), success};
+}
+
+bool asm_lowering_contextt::implies_store_failure(const exprt &condition) const
+{
+  if(!last_store_exclusive.has_value())
+    return false;
+
+  // Express the condition in terms of the values after the store-exclusive,
+  // substituting the assignments of the straight-line code after it.
+  exprt e = condition;
+  for(auto it = body.instructions.end();
+      it != std::next(last_store_exclusive->last);)
+  {
+    --it;
+    if(it->is_assign())
+    {
+      if(it->assign_lhs().id() == ID_symbol)
+      {
+        replace_symbolt replace;
+        replace.insert(to_symbol_expr(it->assign_lhs()), it->assign_rhs());
+        replace(e);
+      }
+    }
+    else if(!it->is_skip() && !it->is_other() && !it->is_atomic_end())
+      return false;
+  }
+  // and of the store-exclusive's own code, which ends with the status
+  for(auto it = std::next(last_store_exclusive->last);
+      it != last_store_exclusive->first;)
+  {
+    --it;
+    if(
+      it->is_assign() && it->assign_lhs().id() == ID_symbol &&
+      it->assign_lhs() != last_store_exclusive->success)
+    {
+      replace_symbolt replace;
+      replace.insert(to_symbol_expr(it->assign_lhs()), it->assign_rhs());
+      replace(e);
+    }
+  }
+
+  // with a successful store, the branch must not be taken
+  replace_symbolt success;
+  success.insert(last_store_exclusive->success, true_exprt{});
+  success(e);
+  return simplify_expr(e, ns) == false;
+}
+
+bool asm_lowering_contextt::restartable(goto_programt::targett label) const
+{
+  if(!last_store_exclusive.has_value())
+    return false;
+
+  // the instructions in conditionally executed code, up to its end
+  std::set<const goto_programt::instructiont *> conditional_ends;
+  bool store_seen = false, in_store = false;
+  std::set<irep_idt> read_first, written, conditionally_written;
+  auto reads = [&](const exprt &expr)
+  {
+    find_symbols_sett symbols;
+    find_symbols(expr, symbols);
+    for(const auto &id : symbols)
+    {
+      if(written.count(id) == 0)
+        read_first.insert(id);
+    }
+  };
+
+  for(auto it = std::next(label); it != body.instructions.end(); ++it)
+  {
+    const goto_programt::instructiont *const instruction = &*it;
+    if(it == last_store_exclusive->first)
+    {
+      store_seen = true;
+      in_store = true;
+    }
+    conditional_ends.erase(instruction);
+    const bool conditional = !conditional_ends.empty();
+
+    if(
+      label_instructions.count(instruction) != 0 ||
+      branch_instructions.count(instruction) != 0 || it->is_function_call())
+    {
+      return false;
+    }
+
+    if(it->is_goto())
+    {
+      // conditionally executed code within an instruction, which skips
+      // forward
+      reads(it->condition());
+      conditional_ends.insert(&*it->get_target());
+    }
+    else if(it->is_assign())
+    {
+      reads(it->assign_rhs());
+      const exprt &lhs = it->assign_lhs();
+      if(lhs.id() == ID_symbol)
+      {
+        const irep_idt &id = to_symbol_expr(lhs).identifier();
+        (conditional ? conditionally_written : written).insert(id);
+      }
+      else
+      {
+        // only the store-exclusive writes memory, and only when it succeeds
+        if(!in_store)
+          return false;
+        reads(lhs);
+      }
+    }
+    else if(it->is_assume() || it->is_assert())
+      reads(it->condition());
+    else if(
+      !it->is_skip() && !it->is_atomic_begin() && !it->is_atomic_end() &&
+      !(it->is_other() && it->get_other().get_statement() == ID_fence))
+    {
+      return false;
+    }
+
+    if(it == last_store_exclusive->last)
+      in_store = false;
+  }
+
+  if(!store_seen || !conditional_ends.empty())
+    return false;
+
+  // Every attempt writes all it writes, and does not depend on what an
+  // earlier attempt wrote.
+  for(const auto &id : conditionally_written)
+  {
+    if(written.count(id) == 0)
+      return false;
+  }
+  for(const auto &id : read_first)
+  {
+    if(written.count(id) != 0 || conditionally_written.count(id) != 0)
+      return false;
+  }
+  return true;
+}
+
+bool asm_lowering_contextt::retry_branch(
+  const asm_tokent &target,
+  const exprt &condition)
+{
+  std::optional<goto_programt::targett> label;
+  if(
+    target.kind == asm_tokent::kindt::LOCAL_LABEL && target.backward &&
+    !numeric_labels[target.text].empty())
+  {
+    label = numeric_labels[target.text].back();
+  }
+  else if(target.kind == asm_tokent::kindt::IDENTIFIER)
+  {
+    auto it = label_definitions.find(target.text);
+    if(it != label_definitions.end())
+      label = it->second;
+  }
+
+  if(
+    !label.has_value() || exclusive_open() || !restartable(*label) ||
+    !implies_store_failure(condition))
+  {
+    return branch(target, condition);
+  }
+
+  // The attempts that fail have no effect: consider the one that succeeds.
+  assume(not_exprt{condition});
+  return true;
 }
 
 bool asm_lowering_contextt::branch(
@@ -586,6 +768,7 @@ bool asm_lowering_contextt::branch(
         goto_target});
     exit_branches.push_back(
       body.add(goto_programt::make_incomplete_goto(condition, location)));
+    branch_instructions.insert(&*exit_branches.back());
     return true;
   }
 
@@ -598,8 +781,8 @@ bool asm_lowering_contextt::branch(
         return fail("undefined label " + target.text + "b");
       if(!check_unknown_at_target(definitions.back(), unknown))
         return false;
-      body.add(
-        goto_programt::make_goto(definitions.back(), condition, location));
+      branch_instructions.insert(&*body.add(
+        goto_programt::make_goto(definitions.back(), condition, location)));
       return true;
     }
 
@@ -610,6 +793,7 @@ bool asm_lowering_contextt::branch(
        true,
        true,
        unknown});
+    branch_instructions.insert(&*pending.back().instruction);
     return true;
   }
 
@@ -622,6 +806,7 @@ bool asm_lowering_contextt::branch(
        true,
        false,
        unknown});
+    branch_instructions.insert(&*pending.back().instruction);
     return true;
   }
 

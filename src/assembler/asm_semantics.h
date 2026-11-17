@@ -163,6 +163,26 @@ public:
   {
     return monitor_cleared;
   }
+
+  /// Record that the code lowered for the current instruction is a
+  /// store-exclusive that succeeds iff \p success holds.
+  void record_store_exclusive(const symbol_exprt &success);
+
+  /// Lower a backward branch to \p target taken iff \p condition holds.
+  /// When the branch closes the retry loop of a store-exclusive, as in
+  /// `1: ldxr ...; stxr w1, ...; cbnz w1, 1b`, symbolic execution would have
+  /// to unwind the loop, which may retry arbitrarily often. Instead, if
+  /// - \p condition implies that the store-exclusive recorded last
+  ///   (\ref record_store_exclusive) failed, and
+  /// - the code from \p target to the branch is restartable: it has no
+  ///   other labels or branches, no calls, no writes to memory other than
+  ///   the store-exclusive's, writes the registers and temporaries it writes
+  ///   unconditionally, and does not read any of them before writing it,
+  /// then an attempt that takes the branch has no effect, and the
+  /// executions that retry reach the same states as one that succeeds at
+  /// the last attempt. The branch is then replaced by the assumption that it
+  /// is not taken. Otherwise, it is lowered as by \ref branch.
+  bool retry_branch(const asm_tokent &target, const exprt &condition);
   /// \}
 
   /// A call to a library function taking `void *` arguments
@@ -277,6 +297,23 @@ protected:
   bool monitor_cleared = false;
   /// the canonical names of the hardware registers that are written
   std::set<std::string> written_registers;
+
+  /// the code of the store-exclusive recorded last
+  struct store_exclusivet
+  {
+    goto_programt::targett first, last;
+    symbol_exprt success;
+  };
+  std::optional<store_exclusivet> last_store_exclusive;
+  /// the instructions of branches (\ref branch) and of label definitions
+  std::set<const goto_programt::instructiont *> branch_instructions,
+    label_instructions;
+  /// whether the code after \p label is restartable (see
+  /// \ref retry_branch)
+  bool restartable(goto_programt::targett label) const;
+  /// whether \p condition, at the end of the code lowered so far, implies
+  /// that the store-exclusive recorded last failed
+  bool implies_store_failure(const exprt &condition) const;
 
   /// The symbols that may hold a value that is not modeled at the current
   /// position, and \ref unknown_memory if memory may hold such a value
