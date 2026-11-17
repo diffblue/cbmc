@@ -550,7 +550,9 @@ bool remove_asmt::handle_gcc_command(
     return true;
   };
 
-  if(command == "fstcw" || command == "fnstcw" || command == "fldcw") // x86
+  if(
+    command == "fstcw" || command == "fnstcw" || command == "fldcw" ||
+    command == "stmxcsr" || command == "ldmxcsr") // x86
   {
     const auto operand = gcc_operand(code, pos, instruction);
     if(!operand.has_value())
@@ -723,7 +725,9 @@ bool remove_asmt::handle_msc_command(
 {
   const bool no_operands = pos == instruction.size();
 
-  if(command == "fstcw" || command == "fnstcw" || command == "fldcw") // x86
+  if(
+    command == "fstcw" || command == "fnstcw" || command == "fldcw" ||
+    command == "stmxcsr" || command == "ldmxcsr") // x86
   {
     if(pos + 1 != instruction.size() || instruction[pos].id() != ID_symbol)
       return false;

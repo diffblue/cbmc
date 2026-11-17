@@ -29,13 +29,15 @@ A statement with an empty assembly template, such as the compiler barrier
 | `sfence` | Full memory fence (currently modeled identically to `mfence`) |
 | `fstcw` / `fnstcw` | Stores the rounding mode (`__CPROVER_rounding_mode`) to bits 10 and 11 of the operand; the other bits of the control word are zero |
 | `fldcw` | Sets the rounding mode from bits 10 and 11 of the operand |
+| `stmxcsr` | Stores the rounding mode to bits 13 and 14 of the operand; the other bits of the SSE control and status register are nondeterministic |
+| `ldmxcsr` | Sets the rounding mode from bits 13 and 14 of the operand |
 | `nop`, `pause` | No effect |
 
-For GCC-style statements, the operand of `fstcw`, `fnstcw`, and `fldcw` must
-be an operand reference (`%0`, `%1`, ...); for MSVC-style blocks, it must be
-the name of a variable. None of the read-modify-write instructions that
-take a `lock` prefix is modeled, and neither is `xchg`, so statements using
-them are approximated.
+For GCC-style statements, the operand of `fstcw`, `fnstcw`, `fldcw`,
+`stmxcsr`, and `ldmxcsr` must be an operand reference (`%0`, `%1`, ...); for
+MSVC-style blocks, it must be the name of a variable. None of the
+read-modify-write instructions that take a `lock` prefix is modeled, and
+neither is `xchg`, so statements using them are approximated.
 
 #### ARM
 
@@ -55,8 +57,8 @@ them are approximated.
 | `isync` | Empty fence; no observable effect unless combined with a branch |
 | `nop` | No effect |
 
-Only the x86 fences, `fstcw`, `fnstcw`, `fldcw`, `nop`, and `pause` are
-modeled in MSVC-style blocks.
+Only the x86 fences, `fstcw`, `fnstcw`, `fldcw`, `stmxcsr`, `ldmxcsr`,
+`nop`, and `pause` are modeled in MSVC-style blocks.
 
 ### Conservative Approximation
 
