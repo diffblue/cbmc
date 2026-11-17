@@ -915,6 +915,20 @@ configt::bv_encodingt parse_object_bits_encoding(
   return bv_encoding;
 }
 
+void check_object_bits_bound(
+  const mp_integer &object_id,
+  std::size_t object_bits)
+{
+  const mp_integer max_objects = power(2, object_bits);
+  if(object_id >= max_objects)
+  {
+    throw analysis_exceptiont{
+      "too many addressed objects: maximum number of objects is set to 2^n=" +
+      integer2string(max_objects) + " (with n=" + std::to_string(object_bits) +
+      "); use the `--object-bits n` option to increase the maximum number"};
+  }
+}
+
 bool configt::set(const cmdlinet &cmdline)
 {
   // defaults -- we match the architecture we have ourselves
