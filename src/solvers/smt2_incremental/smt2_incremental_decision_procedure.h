@@ -117,6 +117,16 @@ protected:
   /// possible expression forms by expressing these in terms of the remaining
   /// language features.
   exprt lower(exprt expression) const;
+  exprt lower_floatbv(exprt expression) const;
+  /// Replace the sub-expressions of \p root that have more than one parent by
+  /// symbols, which are recorded in `shared_definitions`.
+  exprt share_subexpressions(const exprt &root) const;
+  /// Definitions of the symbols that share_subexpressions introduces, by
+  /// identifier of the symbol.
+  mutable std::unordered_map<irep_idt, exprt> shared_definitions;
+  /// Results of lower_floatbv, to avoid introducing new symbols when lowering
+  /// the same expression again.
+  mutable std::unordered_map<exprt, exprt, irep_hash> lowered_floatbv_cache;
   std::optional<smt_termt> get_identifier(const exprt &expr) const;
 
   /// Namespace for looking up the expressions which symbol_exprts relate to.
