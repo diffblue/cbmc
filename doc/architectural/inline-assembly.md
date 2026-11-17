@@ -111,7 +111,12 @@ statement that does so and names any of these registers is not interpreted.
 An `it` instruction has no effect: the instructions of the IT block carry
 their conditions as suffixes, which the assemblers check against it.
 A conditional store-exclusive may not execute, so it does not clear the
-exclusive monitor.
+exclusive monitor. `push` and `pop` use a stack in the statement's state
+(`a32_statet::stack`) rather than memory, and do not change `sp`.
+`make_a32_state` checks that they are balanced in straight-line code and that
+`sp` is not used while registers are pushed, and `lower` fails on memory
+operands while registers are pushed, as the compiler may address them
+relative to `sp`.
 
 For `asm goto`, goto conversion creates a variable that selects the label to
 jump to (`code_asm_gcct::goto_target`) and dispatches on it after the

@@ -82,14 +82,18 @@ const std::vector<std::string> &operations()
   static const std::vector<std::string> result = []
   {
     std::vector<std::string> b = {
-      "mov",   "mvn",    "add",    "adc",   "sub",    "sbc",    "rsb",  "and",
-      "orr",   "eor",    "bic",    "cmp",   "cmn",    "tst",    "teq",  "lsl",
-      "lsr",   "asr",    "ror",    "neg",   "mul",    "b",      "cbz",  "cbnz",
-      "ldr",   "ldrb",   "ldrh",   "ldrsb", "ldrsh",  "str",    "strb", "strh",
-      "ldrex", "ldrexb", "ldrexh", "strex", "strexb", "strexh", "clz",  "rev",
-      "rev16", "rbit",   "uxtb",   "uxth",  "sxtb",   "sxth",   "movw", "movt",
-      "mrs",   "msr",    "mrc",    "mcr",   "nop",    "yield",  "wfe",  "wfi",
-      "sev",   "sevl"};
+      "mov",   "mvn",    "add",    "adc",   "sub",   "sbc",    "rsb",
+      "and",   "orr",    "eor",    "bic",   "cmp",   "cmn",    "tst",
+      "teq",   "lsl",    "lsr",    "asr",   "ror",   "neg",    "mul",
+      "b",     "cbz",    "cbnz",   "ldr",   "ldrb",  "ldrh",   "ldrsb",
+      "ldrsh", "str",    "strb",   "strh",  "ldrex", "ldrexb", "ldrexh",
+      "strex", "strexb", "strexh", "clz",   "rev",   "rev16",  "rbit",
+      "uxtb",  "uxth",   "sxtb",   "sxth",  "movw",  "movt",   "mrs",
+      "msr",   "mrc",    "mcr",    "nop",   "yield", "wfe",    "wfi",
+      "sev",   "sevl",   "push",   "pop",   "ldm",   "ldmia",  "ldmib",
+      "ldmda", "ldmdb",  "ldmfd",  "ldmfa", "ldmed", "ldmea",  "stm",
+      "stmia", "stmib",  "stmda",  "stmdb", "stmfd", "stmfa",  "stmed",
+      "stmea"};
     std::stable_sort(
       b.begin(),
       b.end(),
@@ -157,18 +161,6 @@ bool decode(const std::string &m, a32_mnemonict &result)
   return false;
 }
 
-/// What the instruction semantics need to know about the statement as a
-/// whole
-class a32_statet : public asm_semantics_statet
-{
-public:
-  /// Whether the statement may be in divided syntax for a Thumb-1 target
-  /// (see \ref make_a32_state)
-  bool maybe_thumb1_divided = true;
-  /// If not empty, why the statement is not modeled
-  std::string failure;
-};
-
 /// \return The canonical name of the general-purpose register \p raw, or the
 ///   empty string if \p raw is not one (`pc` is not modeled)
 std::string canonical_a32_register(const std::string &raw)
@@ -203,6 +195,136 @@ std::string canonical_a32_register(const std::string &raw)
   }
   return {};
 }
+
+/// A load or store of multiple registers (ldm, stm, push, pop)
+struct a32_multiplet
+{
+  bool load = false;
+  /// the first address is the base (increment after), the base plus 4
+  /// (increment before), or the base minus 4 times the number of registers
+  /// plus 4 (decrement after) or without the plus 4 (decrement before)
+  enum class modet
+  {
+    INCREMENT_AFTER,
+    INCREMENT_BEFORE,
+    DECREMENT_AFTER,
+    DECREMENT_BEFORE
+  } mode = modet::INCREMENT_AFTER;
+  /// push and pop, which have the stack pointer as implicit base with
+  /// writeback
+  bool push_pop = false;
+};
+
+/// \return Whether \p base is a load or store of multiple registers, which
+///   is then described by \p result.
+bool multiple(const std::string &base, a32_multiplet &result)
+{
+  using modet = a32_multiplet::modet;
+  static const std::map<std::string, std::pair<bool, modet>> forms = {
+    {"ldm", {true, modet::INCREMENT_AFTER}},
+    {"ldmia", {true, modet::INCREMENT_AFTER}},
+    {"ldmfd", {true, modet::INCREMENT_AFTER}},
+    {"ldmib", {true, modet::INCREMENT_BEFORE}},
+    {"ldmed", {true, modet::INCREMENT_BEFORE}},
+    {"ldmda", {true, modet::DECREMENT_AFTER}},
+    {"ldmfa", {true, modet::DECREMENT_AFTER}},
+    {"ldmdb", {true, modet::DECREMENT_BEFORE}},
+    {"ldmea", {true, modet::DECREMENT_BEFORE}},
+    {"stm", {false, modet::INCREMENT_AFTER}},
+    {"stmia", {false, modet::INCREMENT_AFTER}},
+    {"stmea", {false, modet::INCREMENT_AFTER}},
+    {"stmib", {false, modet::INCREMENT_BEFORE}},
+    {"stmfa", {false, modet::INCREMENT_BEFORE}},
+    {"stmda", {false, modet::DECREMENT_AFTER}},
+    {"stmed", {false, modet::DECREMENT_AFTER}},
+    {"stmdb", {false, modet::DECREMENT_BEFORE}},
+    {"stmfd", {false, modet::DECREMENT_BEFORE}},
+    {"pop", {true, modet::INCREMENT_AFTER}},
+    {"push", {false, modet::DECREMENT_BEFORE}}};
+  auto it = forms.find(base);
+  if(it == forms.end())
+    return false;
+  result.load = it->second.first;
+  result.mode = it->second.second;
+  result.push_pop = base == "push" || base == "pop";
+  return true;
+}
+
+/// One register of a register list: its number (-1 for an operand
+/// reference, whose register is not known) and its tokens
+struct a32_list_entryt
+{
+  int number;
+  asm_token_listt tokens;
+};
+
+/// Parse the register list \p tokens (`{r4, r6-r8}`).
+/// \return false if \p tokens is not a register list
+bool register_list(
+  const asm_token_listt &tokens,
+  std::vector<a32_list_entryt> &entries)
+{
+  if(
+    tokens.size() < 3 || !tokens.front().is_punctuation('{') ||
+    !tokens.back().is_punctuation('}'))
+  {
+    return false;
+  }
+  auto number = [](const asm_tokent &token)
+  {
+    if(!token.is_identifier())
+      return -1;
+    const std::string canonical = canonical_a32_register(token.text);
+    return canonical.empty() ? -1 : std::stoi(canonical.substr(1));
+  };
+  for(std::size_t i = 1; i + 1 < tokens.size(); ++i)
+  {
+    const asm_tokent &token = tokens[i];
+    if(token.is_punctuation(','))
+      continue;
+    if(token.kind == asm_tokent::kindt::OPERAND)
+    {
+      entries.push_back({-1, {token}});
+      continue;
+    }
+    const int first = number(token);
+    if(first < 0)
+      return false;
+    if(i + 2 < tokens.size() - 1 && tokens[i + 1].is_punctuation('-'))
+    {
+      // a range rA-rB
+      const int last = number(tokens[i + 2]);
+      if(last < first)
+        return false;
+      for(int n = first; n <= last; ++n)
+      {
+        entries.push_back(
+          {n, {{asm_tokent::kindt::IDENTIFIER, "r" + std::to_string(n)}}});
+      }
+      i += 2;
+    }
+    else
+      entries.push_back({first, {token}});
+  }
+  return !entries.empty();
+}
+
+/// What the instruction semantics need to know about the statement as a
+/// whole
+class a32_statet : public asm_semantics_statet
+{
+public:
+  /// Whether the statement may be in divided syntax for a Thumb-1 target
+  /// (see \ref make_a32_state)
+  bool maybe_thumb1_divided = true;
+  /// If not empty, why the statement is not modeled
+  std::string failure;
+  /// The registers pushed by push (and stmdb sp!) and not yet popped, the top
+  /// (lowest address) last. The stack memory below the stack pointer belongs
+  /// to no C object, so a statement whose pushes and pops are balanced in
+  /// straight-line code (see \ref make_a32_state) can keep them here.
+  std::vector<symbol_exprt> stack;
+};
 
 /// The fields of the special register \p target of `msr`.
 /// \param target: the special register, in lower case, e.g. `cpsr_fc`
@@ -257,6 +379,25 @@ void msr_fields(
   known = false;
 }
 
+/// \return Whether \p instruction, a load or store of multiple registers
+///   of the form \p form, pushes registers to or pops them from the stack:
+///   push, pop, or stmdb/stmfd (ldmia/ldmfd) of sp with writeback.
+bool is_stack_operation(
+  const asm_instructiont &instruction,
+  const a32_multiplet &form)
+{
+  if(form.push_pop)
+    return instruction.operands.size() == 1;
+  using modet = a32_multiplet::modet;
+  return instruction.operands.size() == 2 &&
+         instruction.operands[0].size() == 2 &&
+         instruction.operands[0][0].is_identifier() &&
+         canonical_a32_register(instruction.operands[0][0].text) == "r13" &&
+         instruction.operands[0][1].is_punctuation('!') &&
+         (form.load ? form.mode == modet::INCREMENT_AFTER
+                    : form.mode == modet::DECREMENT_BEFORE);
+}
+
 /// The statement-wide properties of \p instructions:
 /// - In divided syntax, which GCC uses for inline assembly in A32 code and
 ///   for Thumb-1 targets, Thumb-1 data-processing instructions without an `s`
@@ -265,6 +406,10 @@ void msr_fields(
 ///   uses an instruction or form that Thumb-1 does not have.
 /// - `msr` of the control field may change the processor mode, and with it
 ///   the registers r8 to r14 that are named, which is not modeled.
+/// - push and pop (and stmdb/ldmia of sp with writeback) are modeled with a
+///   stack of their own (\ref a32_statet::stack), which requires the pushes
+///   and pops to be balanced, unconditional, and in straight-line code: no
+///   label or branch while registers are pushed.
 std::unique_ptr<a32_statet>
 make_a32_state(const std::vector<asm_instructiont> &instructions)
 {
@@ -285,13 +430,31 @@ make_a32_state(const std::vector<asm_instructiont> &instructions)
     "strexb",
     "strexh",
     "mrc",
-    "mcr"};
+    "mcr",
+    // Thumb-1 has only the increment-after forms of ldm and stm
+    "ldmib",
+    "ldmed",
+    "ldmda",
+    "ldmfa",
+    "ldmdb",
+    "ldmea",
+    "stmib",
+    "stmfa",
+    "stmda",
+    "stmed",
+    "stmdb",
+    "stmfd"};
 
   bool unified_at_start = false, before_first_instruction = true;
   bool divided = false, changes_mode = false, names_banked = false;
+  // the number of registers pushed
+  std::size_t depth = 0;
+  std::string stack_failure;
   for(const auto &instruction : instructions)
   {
     const std::string &m = instruction.mnemonic;
+    if(depth != 0 && !instruction.labels.empty())
+      stack_failure = "label while registers are pushed";
     if(m == ".syntax")
     {
       const bool unified = instruction.operands.size() == 1 &&
@@ -331,6 +494,51 @@ make_a32_state(const std::vector<asm_instructiont> &instructions)
     a32_mnemonict decoded;
     if(!decode(m, decoded))
       continue;
+
+    if(
+      depth != 0 &&
+      (decoded.base == "b" || decoded.base == "cbz" || decoded.base == "cbnz"))
+    {
+      stack_failure = "branch while registers are pushed";
+    }
+    a32_multiplet form;
+    const bool stack_operation =
+      multiple(decoded.base, form) && is_stack_operation(instruction, form);
+    if(depth != 0 && !stack_operation)
+    {
+      // push and pop do not change the stack pointer in the model
+      for(const auto &operand : instruction.operands)
+      {
+        for(const auto &token : operand)
+        {
+          if(
+            token.is_identifier() &&
+            canonical_a32_register(token.text) == "r13")
+          {
+            stack_failure = "sp used while registers are pushed";
+          }
+        }
+      }
+    }
+    if(stack_operation)
+    {
+      std::vector<a32_list_entryt> entries;
+      if(
+        decoded.condition != "al" ||
+        !register_list(instruction.operands.back(), entries))
+      {
+        stack_failure =
+          "push or pop that is conditional or of registers that are not "
+          "modeled (such as pc)";
+      }
+      else if(!form.load)
+        depth += entries.size();
+      else if(entries.size() > depth)
+        stack_failure = "pop of registers that were not pushed";
+      else
+        depth -= entries.size();
+    }
+
     if(
       not_thumb1.count(decoded.base) != 0 ||
       (decoded.condition != "al" && decoded.base != "b") ||
@@ -362,6 +570,10 @@ make_a32_state(const std::vector<asm_instructiont> &instructions)
       "msr of the processor mode with named registers r8 to r14, which may be "
       "banked";
   }
+  else if(depth != 0)
+    state->failure = "registers pushed and not popped";
+  else if(!stack_failure.empty())
+    state->failure = stack_failure;
 
   return state;
 }
@@ -499,6 +711,27 @@ protected:
   bool lower_system(
     const a32_mnemonict &decoded,
     std::vector<a32_operandt> &ops,
+    asm_lowering_contextt &ctx) const;
+
+  /// Parse the register list \p tokens into \p registers, in ascending
+  /// order of register numbers (which is the order in memory).
+  /// \return false if the list is not modeled
+  bool parse_register_list(
+    const asm_token_listt &tokens,
+    asm_lowering_contextt &ctx,
+    std::vector<a32_operandt> &registers,
+    std::vector<std::string> &canonical) const;
+
+  bool lower_multiple(
+    const a32_multiplet &form,
+    const asm_instructiont &instruction,
+    const a32_statet &state,
+    asm_lowering_contextt &ctx) const;
+
+  bool lower_stack(
+    const a32_multiplet &form,
+    const asm_instructiont &instruction,
+    a32_statet &state,
     asm_lowering_contextt &ctx) const;
 };
 
@@ -722,8 +955,7 @@ bool asm_arm_semanticst::lower(
   const asm_instructiont &instruction,
   asm_lowering_contextt &ctx) const
 {
-  const auto *state =
-    dynamic_cast<const a32_statet *>(ctx.semantics_state.get());
+  auto *state = dynamic_cast<a32_statet *>(ctx.semantics_state.get());
   INVARIANT(state != nullptr, "the state is created by make_state");
   if(!state->failure.empty())
     return ctx.fail(state->failure);
@@ -817,6 +1049,40 @@ bool asm_arm_semanticst::lower(
     const exprt zero = is_zero(read(ctx, reg, 32));
     return ctx.branch(
       target, decoded.base == "cbz" ? zero : exprt{not_exprt{zero}});
+  }
+
+  // The compiler may address a memory operand relative to sp, which push and
+  // pop do not change in the model.
+  if(!state->stack.empty())
+  {
+    for(const auto &operand : instruction.operands)
+    {
+      for(const auto &token : operand)
+      {
+        if(
+          token.kind == asm_tokent::kindt::OPERAND &&
+          ctx.operands.operands.at(token.index).kind ==
+            asm_operandt::kindt::MEMORY)
+        {
+          return ctx.fail("memory operand used while registers are pushed");
+        }
+      }
+    }
+  }
+
+  a32_multiplet form;
+  if(multiple(decoded.base, form))
+  {
+    if(is_stack_operation(instruction, form))
+      return lower_stack(form, instruction, *state, ctx);
+    if(decoded.condition == "al")
+      return lower_multiple(form, instruction, *state, ctx);
+    const auto skip =
+      ctx.begin_conditional(asm_arm::condition(decoded.condition, ctx));
+    if(!lower_multiple(form, instruction, *state, ctx))
+      return false;
+    ctx.end_conditional(skip);
+    return true;
   }
 
   std::vector<a32_operandt> ops;
@@ -1322,6 +1588,190 @@ bool asm_arm_semanticst::lower_system(
     return true;
 
   return ctx.fail("unsupported coprocessor operation");
+}
+
+bool asm_arm_semanticst::parse_register_list(
+  const asm_token_listt &tokens,
+  asm_lowering_contextt &ctx,
+  std::vector<a32_operandt> &registers,
+  std::vector<std::string> &canonical) const
+{
+  std::vector<a32_list_entryt> entries;
+  if(!register_list(tokens, entries))
+    return ctx.fail("unsupported register list");
+  // The registers are stored in the order of their numbers, which is not
+  // known for operand references.
+  if(entries.size() > 1)
+  {
+    for(const auto &entry : entries)
+    {
+      if(entry.number < 0)
+        return ctx.fail("operand reference in a register list");
+    }
+  }
+  std::stable_sort(
+    entries.begin(),
+    entries.end(),
+    [](const a32_list_entryt &a, const a32_list_entryt &b)
+    { return a.number < b.number; });
+  for(std::size_t i = 0; i < entries.size(); ++i)
+  {
+    if(i > 0 && entries[i].number == entries[i - 1].number)
+      return ctx.fail("register listed twice");
+    // sp and pc (a load of which is a branch) are not modeled
+    if(entries[i].number == 13)
+      return ctx.fail("sp in a register list");
+    a32_operandt reg;
+    if(
+      !parse_operand(entries[i].tokens, ctx, reg) ||
+      reg.kind != a32_operandt::kindt::REGISTER)
+    {
+      return ctx.fail("unsupported register in a register list");
+    }
+    registers.push_back(reg);
+    canonical.push_back(
+      entries[i].number < 0 ? std::string{}
+                            : "r" + std::to_string(entries[i].number));
+  }
+  return true;
+}
+
+bool asm_arm_semanticst::lower_multiple(
+  const a32_multiplet &form,
+  const asm_instructiont &instruction,
+  const a32_statet &state,
+  asm_lowering_contextt &ctx) const
+{
+  // Rn[!], {registers}
+  if(form.push_pop || instruction.operands.size() != 2)
+    return ctx.fail("unsupported operands of " + instruction.mnemonic);
+  asm_token_listt base_tokens = instruction.operands[0];
+  const bool writeback =
+    !base_tokens.empty() && base_tokens.back().is_punctuation('!');
+  if(writeback)
+    base_tokens.pop_back();
+  // In divided syntax for Thumb-1, ldmia and stmia without ! are assembled
+  // with writeback (with a warning).
+  else if(state.maybe_thumb1_divided)
+    return ctx.fail("ldm or stm without writeback, which may be Thumb-1");
+  a32_operandt base;
+  if(
+    !parse_operand(base_tokens, ctx, base) ||
+    base.kind != a32_operandt::kindt::REGISTER)
+  {
+    return ctx.fail("unsupported base register");
+  }
+
+  std::vector<a32_operandt> registers;
+  std::vector<std::string> canonical;
+  if(!parse_register_list(instruction.operands[1], ctx, registers, canonical))
+    return false;
+  const std::size_t n = registers.size();
+  bool base_listed = false;
+  for(const auto &reg : registers)
+    base_listed = base_listed || reg.storage == base.storage;
+  // unpredictable, or (for stores) storing an unknown value
+  if(writeback && base_listed)
+    return ctx.fail("base register in the list with writeback");
+
+  using modet = a32_multiplet::modet;
+  const symbol_exprt address = ctx.temporary(bv(32), "base");
+  ctx.assign(address, read(ctx, base, 32));
+  long long first = 0;
+  switch(form.mode)
+  {
+  case modet::INCREMENT_AFTER:
+    first = 0;
+    break;
+  case modet::INCREMENT_BEFORE:
+    first = 4;
+    break;
+  case modet::DECREMENT_AFTER:
+    first = 4 - 4 * static_cast<long long>(n);
+    break;
+  case modet::DECREMENT_BEFORE:
+    first = -4 * static_cast<long long>(n);
+    break;
+  }
+  auto element = [&](std::size_t i)
+  {
+    a32_operandt memory;
+    memory.kind = a32_operandt::kindt::MEMORY;
+    memory.address = typecast_exprt{
+      resize(
+        plus_exprt{
+          address, constant(first + 4 * static_cast<long long>(i), 32)},
+        config.ansi_c.pointer_width),
+      pointer_type(char_type())};
+    return memory;
+  };
+
+  // all values are read before any register or memory is written
+  std::vector<symbol_exprt> values;
+  for(std::size_t i = 0; i < n; ++i)
+  {
+    const exprt value =
+      form.load ? read(ctx, element(i), 32) : read(ctx, registers[i], 32);
+    values.push_back(ctx.temporary(bv(32), "value"));
+    ctx.assign(values.back(), value);
+  }
+  for(std::size_t i = 0; i < n; ++i)
+  {
+    if(!write(ctx, form.load ? registers[i] : element(i), 32, values[i]))
+      return false;
+  }
+  if(writeback)
+  {
+    const long long delta = (form.mode == modet::INCREMENT_AFTER ||
+                             form.mode == modet::INCREMENT_BEFORE)
+                              ? 4 * static_cast<long long>(n)
+                              : -4 * static_cast<long long>(n);
+    return write(ctx, base, 32, plus_exprt{address, constant(delta, 32)});
+  }
+  return true;
+}
+
+bool asm_arm_semanticst::lower_stack(
+  const a32_multiplet &form,
+  const asm_instructiont &instruction,
+  a32_statet &state,
+  asm_lowering_contextt &ctx) const
+{
+  // The pushes and pops are balanced and in straight-line code
+  // (make_a32_state), so that the stack memory they use is the statement's
+  // own, below the stack pointer, where no C object is.
+  if(ctx.exclusive_open())
+    return ctx.fail("memory access between load-exclusive and store-exclusive");
+  std::vector<a32_operandt> registers;
+  std::vector<std::string> canonical;
+  if(!parse_register_list(
+       instruction.operands.back(), ctx, registers, canonical))
+  {
+    return false;
+  }
+
+  if(!form.load)
+  {
+    // the lowest register ends up at the lowest address, the top
+    for(std::size_t i = registers.size(); i-- > 0;)
+    {
+      const symbol_exprt slot = ctx.temporary(bv(32), "stack");
+      ctx.assign(slot, read(ctx, registers[i], 32));
+      state.stack.push_back(slot);
+    }
+    return true;
+  }
+
+  if(registers.size() > state.stack.size())
+    return ctx.fail("pop of registers that were not pushed");
+  for(std::size_t i = 0; i < registers.size(); ++i)
+  {
+    const symbol_exprt slot = state.stack.back();
+    state.stack.pop_back();
+    if(!write(ctx, registers[i], 32, slot))
+      return false;
+  }
+  return true;
 }
 } // namespace
 

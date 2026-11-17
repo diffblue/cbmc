@@ -212,6 +212,28 @@ ARM = [
     Case('arm rsb reverse-subtracts',
          '__asm__("rsb %0, %1, %2" : "=r"(r) : "r"(a), "r"(b));',
          [(U32, 'r', None), (U32, 'a', None), (U32, 'b', None)]),
+    Case('arm ldm loads consecutive words',
+         '__asm__ __volatile__(".syntax unified\\n ldm %2, {r4, r5}\\n'
+         ' mov %0, r4\\n'
+         ' mov %1, r5" : "=r"(a), "=r"(b) : "r"(m) : "r4", "r5", "memory");',
+         [(U32, 'm', 2), (U32, 'a', None), (U32, 'b', None)]),
+    Case('arm ldmib and ldmda',
+         '__asm__ __volatile__("ldmib %2, {r4, r5}\\n ldmda %3, {r6, r7}\\n'
+         ' sub %0, r4, r6\\n sub %1, r5, r7" : "=r"(a), "=r"(b) : "r"(m), '
+         '"r"(m + 3) : "r4", "r5", "r6", "r7", "memory");',
+         [(U32, 'm', 4), (U32, 'a', None), (U32, 'b', None)]),
+    Case('arm stmdb with writeback',
+         '__asm__ __volatile__("mov r4, %2\\n mov r5, %3\\n'
+         ' stmdb %0!, {r4, r5}\\n ldr %1, [%0, #4]" : "+r"(p), "=r"(c) : '
+         '"r"(a), "r"(b) : "r4", "r5", "memory");',
+         [(U32, 'm', 2), (U32, 'a', None), (U32, 'b', None),
+          (U32, 'c', None)],
+         prologue='unsigned int *p = m + 2;'),
+    Case('arm push and pop move values through the stack',
+         '__asm__ __volatile__("mov r4, %1\\n mov r5, %2\\n'
+         ' push {r4, r5}\\n pop {r6}\\n pop {r7}\\n sub %0, r6, r7" : '
+         '"=r"(r) : "r"(a), "r"(b) : "r4", "r5", "r6", "r7", "memory");',
+         [(U32, 'r', None), (U32, 'a', None), (U32, 'b', None)]),
 ]
 
 CASES = {'x86_64': X86_64, 'aarch64': AARCH64, 'arm': ARM}

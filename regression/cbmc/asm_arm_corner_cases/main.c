@@ -155,3 +155,12 @@ int main(void)
 
   return 0;
 }
+
+// Statements whose use of the stack is not modeled. They are not executed,
+// as they would break the program.
+void unbalanced(void)
+{
+  __asm__ volatile("push {r4}");
+  __asm__ volatile("push {r4}\n1: pop {r4}");
+  __asm__ volatile("pop {pc}");
+}

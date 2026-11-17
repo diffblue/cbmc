@@ -149,6 +149,87 @@ void asm_case_8(unsigned long long *io)
   io[2] = (unsigned long long)b;
 }
 
+// arm ldm loads consecutive words
+void asm_case_9(unsigned long long *io)
+{
+  unsigned int m[2];
+  m[0] = (unsigned int)io[0];
+  m[1] = (unsigned int)io[1];
+  unsigned int a = (unsigned int)io[2];
+  unsigned int b = (unsigned int)io[3];
+  __asm__ __volatile__(
+    ".syntax unified\n ldm %2, {r4, r5}\n mov %0, r4\n mov %1, r5"
+    : "=r"(a), "=r"(b)
+    : "r"(m)
+    : "r4", "r5", "memory");
+  io[0] = (unsigned long long)m[0];
+  io[1] = (unsigned long long)m[1];
+  io[2] = (unsigned long long)a;
+  io[3] = (unsigned long long)b;
+}
+
+// arm ldmib and ldmda
+void asm_case_10(unsigned long long *io)
+{
+  unsigned int m[4];
+  m[0] = (unsigned int)io[0];
+  m[1] = (unsigned int)io[1];
+  m[2] = (unsigned int)io[2];
+  m[3] = (unsigned int)io[3];
+  unsigned int a = (unsigned int)io[4];
+  unsigned int b = (unsigned int)io[5];
+  __asm__ __volatile__(
+    "ldmib %2, {r4, r5}\n ldmda %3, {r6, r7}\n sub %0, r4, r6\n sub %1, r5, r7"
+    : "=r"(a), "=r"(b)
+    : "r"(m), "r"(m + 3)
+    : "r4", "r5", "r6", "r7", "memory");
+  io[0] = (unsigned long long)m[0];
+  io[1] = (unsigned long long)m[1];
+  io[2] = (unsigned long long)m[2];
+  io[3] = (unsigned long long)m[3];
+  io[4] = (unsigned long long)a;
+  io[5] = (unsigned long long)b;
+}
+
+// arm stmdb with writeback
+void asm_case_11(unsigned long long *io)
+{
+  unsigned int m[2];
+  m[0] = (unsigned int)io[0];
+  m[1] = (unsigned int)io[1];
+  unsigned int a = (unsigned int)io[2];
+  unsigned int b = (unsigned int)io[3];
+  unsigned int c = (unsigned int)io[4];
+  unsigned int *p = m + 2;
+  __asm__ __volatile__(
+    "mov r4, %2\n mov r5, %3\n stmdb %0!, {r4, r5}\n ldr %1, [%0, #4]"
+    : "+r"(p), "=r"(c)
+    : "r"(a), "r"(b)
+    : "r4", "r5", "memory");
+  io[0] = (unsigned long long)m[0];
+  io[1] = (unsigned long long)m[1];
+  io[2] = (unsigned long long)a;
+  io[3] = (unsigned long long)b;
+  io[4] = (unsigned long long)c;
+}
+
+// arm push and pop move values through the stack
+void asm_case_12(unsigned long long *io)
+{
+  unsigned int r = (unsigned int)io[0];
+  unsigned int a = (unsigned int)io[1];
+  unsigned int b = (unsigned int)io[2];
+  __asm__ __volatile__(
+    "mov r4, %1\n mov r5, %2\n push {r4, r5}\n pop {r6}\n pop {r7}\n sub %0, "
+    "r6, r7"
+    : "=r"(r)
+    : "r"(a), "r"(b)
+    : "r4", "r5", "r6", "r7", "memory");
+  io[0] = (unsigned long long)r;
+  io[1] = (unsigned long long)a;
+  io[2] = (unsigned long long)b;
+}
+
 int main(void)
 {
   {
@@ -433,6 +514,148 @@ int main(void)
       io[0] == 0x4751d07cULL && io[1] == 0x42044392ULL &&
         io[2] == 0x8956140eULL,
       "arm rsb reverse-subtracts, vector 2");
+  }
+  {
+    unsigned long long io[4] = {
+      0x80000000ULL, 0x85c6eecdbd37c64dULL, 0xe051fbafdcfbbb5eULL, 0x7fULL};
+    asm_case_9(io);
+    __CPROVER_assert(
+      io[0] == 0x80000000ULL && io[1] == 0xbd37c64dULL &&
+        io[2] == 0x80000000ULL && io[3] == 0xbd37c64dULL,
+      "arm ldm loads consecutive words, vector 0");
+  }
+  {
+    unsigned long long io[4] = {
+      0x1ULL, 0x7fULL, 0x7e0269edac79ca6eULL, 0xffffffffffffffffULL};
+    asm_case_9(io);
+    __CPROVER_assert(
+      io[0] == 0x1ULL && io[1] == 0x7fULL && io[2] == 0x1ULL &&
+        io[3] == 0x7fULL,
+      "arm ldm loads consecutive words, vector 1");
+  }
+  {
+    unsigned long long io[4] = {
+      0xffULL,
+      0xfc5d96cc82bdb472ULL,
+      0x7fffffffffffffffULL,
+      0x2355aca2a0edf46dULL};
+    asm_case_9(io);
+    __CPROVER_assert(
+      io[0] == 0xffULL && io[1] == 0x82bdb472ULL && io[2] == 0xffULL &&
+        io[3] == 0x82bdb472ULL,
+      "arm ldm loads consecutive words, vector 2");
+  }
+  {
+    unsigned long long io[6] = {
+      0xd29b8652db47179aULL,
+      0x1ULL,
+      0x2a12166c6984b1c3ULL,
+      0xffffffffffffffffULL,
+      0xd57e59721b5c3f00ULL,
+      0x8161ebbba4c1b5daULL};
+    asm_case_10(io);
+    __CPROVER_assert(
+      io[0] == 0xdb47179aULL && io[1] == 0x1ULL && io[2] == 0x6984b1c3ULL &&
+        io[3] == 0xffffffffULL && io[4] == 0x967b4e3eULL &&
+        io[5] == 0x6984b1c4ULL,
+      "arm ldmib and ldmda, vector 0");
+  }
+  {
+    unsigned long long io[6] = {
+      0x935751a544d88a1aULL,
+      0x7a41298a64568e24ULL,
+      0x5e4c1de7ba5f33e2ULL,
+      0x870cf5c903adeee9ULL,
+      0x4913351bbe5f646dULL,
+      0x25f4ba50fe38643eULL};
+    asm_case_10(io);
+    __CPROVER_assert(
+      io[0] == 0x44d88a1aULL && io[1] == 0x64568e24ULL &&
+        io[2] == 0xba5f33e2ULL && io[3] == 0x3adeee9ULL &&
+        io[4] == 0xa9f75a42ULL && io[5] == 0xb6b144f9ULL,
+      "arm ldmib and ldmda, vector 1");
+  }
+  {
+    unsigned long long io[6] = {
+      0x2ULL,
+      0xd59b3a6ec98b8b59ULL,
+      0x6830ad2bbf10bb2ULL,
+      0x7fffffffULL,
+      0x0ULL,
+      0xed1f3299a142c10eULL};
+    asm_case_10(io);
+    __CPROVER_assert(
+      io[0] == 0x2ULL && io[1] == 0xc98b8b59ULL && io[2] == 0xbbf10bb2ULL &&
+        io[3] == 0x7fffffffULL && io[4] == 0xd9a7fa7ULL &&
+        io[5] == 0x3bf10bb3ULL,
+      "arm ldmib and ldmda, vector 2");
+  }
+  {
+    unsigned long long io[5] = {
+      0x6a08e48807e06ce6ULL,
+      0x80000000ULL,
+      0x715314e0aeb3b1f3ULL,
+      0x2dac4420420cf8f6ULL,
+      0x8000000000000000ULL};
+    asm_case_11(io);
+    __CPROVER_assert(
+      io[0] == 0xaeb3b1f3ULL && io[1] == 0x420cf8f6ULL &&
+        io[2] == 0xaeb3b1f3ULL && io[3] == 0x420cf8f6ULL &&
+        io[4] == 0x420cf8f6ULL,
+      "arm stmdb with writeback, vector 0");
+  }
+  {
+    unsigned long long io[5] = {
+      0xffffffffffffffffULL,
+      0xff19d85a9e12e041ULL,
+      0x7fULL,
+      0x7fffffffffffffffULL,
+      0x4fb5e44fdd1fc0bULL};
+    asm_case_11(io);
+    __CPROVER_assert(
+      io[0] == 0x7fULL && io[1] == 0xffffffffULL && io[2] == 0x7fULL &&
+        io[3] == 0xffffffffULL && io[4] == 0xffffffffULL,
+      "arm stmdb with writeback, vector 1");
+  }
+  {
+    unsigned long long io[5] = {
+      0xd3f4de8fd7d4ac31ULL,
+      0x0ULL,
+      0x8a2e574287b8a8fcULL,
+      0xffffffffffffffffULL,
+      0xef565c1b436863dfULL};
+    asm_case_11(io);
+    __CPROVER_assert(
+      io[0] == 0x87b8a8fcULL && io[1] == 0xffffffffULL &&
+        io[2] == 0x87b8a8fcULL && io[3] == 0xffffffffULL &&
+        io[4] == 0xffffffffULL,
+      "arm stmdb with writeback, vector 2");
+  }
+  {
+    unsigned long long io[3] = {
+      0x67474bfe2512affeULL, 0x0ULL, 0xd9b9851fa699e71cULL};
+    asm_case_12(io);
+    __CPROVER_assert(
+      io[0] == 0x596618e4ULL && io[1] == 0x0ULL && io[2] == 0xa699e71cULL,
+      "arm push and pop move values through the stack, vector 0");
+  }
+  {
+    unsigned long long io[3] = {
+      0x32c9fc24972fa9f7ULL, 0x6a5b23a370b4c97bULL, 0x80000000ULL};
+    asm_case_12(io);
+    __CPROVER_assert(
+      io[0] == 0xf0b4c97bULL && io[1] == 0x70b4c97bULL &&
+        io[2] == 0x80000000ULL,
+      "arm push and pop move values through the stack, vector 1");
+  }
+  {
+    unsigned long long io[3] = {
+      0x9c5bc4ac7a21b60aULL, 0x63ce12b6f4f5b47cULL, 0xd2f4c3415c4eb1fdULL};
+    asm_case_12(io);
+    __CPROVER_assert(
+      io[0] == 0x98a7027fULL && io[1] == 0xf4f5b47cULL &&
+        io[2] == 0x5c4eb1fdULL,
+      "arm push and pop move values through the stack, vector 2");
   }
   return 0;
 }

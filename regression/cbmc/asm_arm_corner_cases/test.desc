@@ -27,6 +27,9 @@ main.c
 approximating inline assembly statement at .* line 123 function main: unsupported operands of mov
 approximating inline assembly statement at .* line 147 function main: memory access at an address computed from a value that is not modeled
 approximating inline assembly statement at .* line 153 function main: writes register r0, which is neither an operand nor clobbered
+approximating inline assembly statement at .* line 163 function unbalanced: registers pushed and not popped
+approximating inline assembly statement at .* line 164 function unbalanced: label while registers are pushed
+approximating inline assembly statement at .* line 165 function unbalanced: push or pop that is conditional or of registers that are not modeled
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring

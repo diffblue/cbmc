@@ -363,16 +363,25 @@ bool split_asm_template(
       return false;
     }
 
-    // operands, split at top-level commas
+    // operands, split at top-level commas (not those in register lists
+    // such as ARM's {r4, r5})
     int depth = 0;
     asm_token_listt current;
     for(; pos < tokens.size(); ++pos)
     {
       const auto &token = tokens[pos];
-      if(token.is_punctuation('(') || token.is_punctuation('['))
+      if(
+        token.is_punctuation('(') || token.is_punctuation('[') ||
+        token.is_punctuation('{'))
+      {
         ++depth;
-      else if(token.is_punctuation(')') || token.is_punctuation(']'))
+      }
+      else if(
+        token.is_punctuation(')') || token.is_punctuation(']') ||
+        token.is_punctuation('}'))
+      {
         --depth;
+      }
 
       if(depth == 0 && token.is_punctuation(','))
       {

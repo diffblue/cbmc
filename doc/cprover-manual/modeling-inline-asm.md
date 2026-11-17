@@ -136,6 +136,10 @@ syntax:
   their byte and halfword forms, and `clrex`), as on AArch64 (see above);
   a conditional store-exclusive that does not execute leaves the exclusive
   monitor as it was;
+- loads and stores of multiple registers (`ldm`, `stm`, with the address
+  modes `ia`, `ib`, `da`, `db` and their stack aliases, with or without
+  writeback) of registers named in the list, or of a single operand
+  reference, and `push` and `pop` (also as `stmdb sp!` and `ldmia sp!`);
 - branches within the statement and to the labels of `asm goto` (`b`,
   `b<cc>`, `cbz`, `cbnz`), and flag outputs (`=@cc<cc>`);
 - barriers (`dmb`, `dsb`, `isb`, and their CP15 forms), `mrs` and `msr` of
@@ -153,6 +157,18 @@ data-processing instruction without `s` suffix. A statement that changes the
 interrupt masks or the processor mode with `msr` and names any of the
 registers r8 to r14, which are banked by mode, is not interpreted. Reading or
 writing `pc` is not modeled.
+
+The registers that `push` saves are kept on a stack of the statement's own:
+the memory below the stack pointer belongs to no C object. This requires the
+pushes and pops of a statement to be balanced, unconditional, and without a
+label or branch between a push and its pop, and the statement not to use `sp`
+or a memory operand (which the compiler may address relative to `sp`) while
+registers are pushed; other statements with `push` or `pop` are not
+interpreted. A register that is saved and restored must still be clobbered
+if the statement writes it in between, as the compiler may place an operand
+in it. Without `.syntax unified` or another sign that the statement is not
+Thumb-1 code, `ldm` and `stm` without writeback are not interpreted: in
+divided syntax for Thumb-1, `ldmia r0, {r1}` is assembled with writeback.
 
 ### Supported Instructions
 
