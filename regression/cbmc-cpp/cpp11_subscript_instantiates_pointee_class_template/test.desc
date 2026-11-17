@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ empty table: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+pointer arithmetic with unknown object size
+--
+iter<int> was named only through a member alias used as a template
+argument, so it was still an incomplete placeholder when `v.first[b]' was
+type-checked; pointer arithmetic rejected it and count's body was dropped.

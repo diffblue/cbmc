@@ -1,0 +1,25 @@
+CORE
+main.cpp
+--cpp98
+^\[main\.assertion\.1\] line \d+ downcast from a virtual base: SUCCESS$
+^\[main\.assertion\.2\] line \d+ failing downcast: SUCCESS$
+^\[main\.assertion\.3\] line \d+ repeated base: SUCCESS$
+^\[main\.assertion\.4\] line \d+ containing subobject: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [expr.dynamic.cast]/9: the run-time check applies to an operand in
+a virtual base subobject (A of D : B, C with `virtual A') and to a most
+derived object with several subobjects of the operand's class (two X of
+M : L, R); /9.1 selects the C object derived from the subobject the
+operand points to.  runtime_dynamic_cast gave up on these layouts,
+leaving the nondeterministic model (bin53 rejected the program).  In a
+complete object every subobject, also in a virtual base, has a fixed
+offset, so each A subobject is now a case of its own, recognized by the
+value its vtable pointer holds.  g++ 13 and clang++ 18 accept this
+program, and it fails only its WRONG assertion.

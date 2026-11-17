@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ default template argument: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not be evaluated
+--
+The constant evaluator evaluated `&"..."[0]' as a value (the address of
+the first character), and an assignment to a pointer variable accepted
+only scalar constants.

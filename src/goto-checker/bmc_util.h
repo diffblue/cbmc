@@ -172,6 +172,7 @@ void run_property_decider(
   "(show-points-to-sets)"                                                      \
   "(slice-formula)"                                                            \
   "(unwinding-assertions)"                                                     \
+  "(no-body-assertions)"                                                       \
   "(no-unwinding-assertions)"                                                  \
   "(no-self-loops-to-assumptions)"                                             \
   "(partial-loops)"                                                            \
@@ -221,6 +222,8 @@ void run_property_decider(
   " {y--slice-formula} \t remove assignments unrelated to property\n"          \
   " {y--unwinding-assertions} \t generate unwinding assertions (cannot be "    \
   "used with {y--cover})\n"                                                    \
+  " {y--no-body-assertions} \t generate a failing assertion when a called "    \
+  "function has no body, regardless of the unwinding-assertions setting\n"     \
   " {y--partial-loops} \t permit paths with partial loops\n"                   \
   " {y--no-self-loops-to-assumptions} \t do not simplify while(1){ {}} to "    \
   "assume(0)\n"                                                                \

@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp17 --pointer-check
+^\[main\.assertion\.1\] .* nothrow new\[\]: SUCCESS$
+^\[main\.assertion\.2\] .* nothrow new: SUCCESS$
+^\[main\.assertion\.3\] .* aligned nothrow new\[\]: SUCCESS$
+^\[main\.assertion\.4\] .* placement new into an array: SUCCESS$
+^\[main\.assertion\.5\] .* placement new\[\] into an array: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+no body for callee
+--
+The new-placement arguments std::nothrow and std::align_val_t select the
+non-throwing and aligned replaceable allocation functions, which allocate
+([new.delete.single], [new.delete.array]); they were taken as the address
+of the reserved placement form.  An array placement argument decays to a
+pointer ([expr.new]/19).

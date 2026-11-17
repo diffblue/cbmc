@@ -1,0 +1,18 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ primary, declared: SUCCESS$
+^\[main\.assertion\.2\] line \d+ primary, defined: SUCCESS$
+^\[main\.assertion\.3\] line \d+ partial specialization: SUCCESS$
+^\[main\.assertion\.4\] line \d+ invoked through a base: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+typecheck_type now expands the template packs among the call arguments of a
+decltype operand (template_mapt::expand_call_argument_packs, only_nontype)
+before checking it.  g++ 13 and clang++ 18 accept this program, and it
+fails only its WRONG assertion.

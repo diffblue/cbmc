@@ -1,0 +1,18 @@
+CORE libstdcxx
+main.cpp
+--cpp11 --object-bits 12 --unwind 12 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ no read error: SUCCESS$
+^\[main\.assertion\.2\] line \d+ failed: 0, a limit, or nothing extracted: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Fixed: the num_get facet was not modelled (a nondeterministic facet
+pointer; __check_facet called std::__throw_bad_cast, which has no
+body), so cin.fail() always held.  The "C" locale's num_get facet is
+now provided like num_put (classic_num_put), and libstdc++'s own
+do_get parses the unknown input.

@@ -1,0 +1,15 @@
+CORE gnu-extensions
+main.cpp
+--cpp17 --64
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+Member typedefs, static data members and member functions occupy no storage;
+the layout used to treat them as data (user Issues 5 and 7).
+`--64': the expected values are those of the LP64 data model (the 32-bit CI
+build otherwise computes ILP32 layouts/types).

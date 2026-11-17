@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp14
+^\[main\.assertion\.1\] line 33 at least 16: SUCCESS$
+^\[main\.assertion\.2\] line 34 the type's: SUCCESS$
+^\[main\.assertion\.3\] line 35 WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+dropped the body
+--
+The parser builds `(f)(a, b)' with a comma expression for the argument
+list; rewriting a constant-initializer's commas to their right operand
+must not see it before it becomes the call's arguments.

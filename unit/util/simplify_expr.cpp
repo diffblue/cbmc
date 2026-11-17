@@ -35,14 +35,14 @@ TEST_CASE("Simplify pointer_offset(address of array index)", "[core][util]")
   index_exprt index(array, from_integer(1, c_index_type()));
   address_of_exprt address_of(index);
 
-  exprt p_o=pointer_offset(address_of);
+  exprt p_o = pointer_offset(address_of);
 
   exprt simp = simplify_expr(p_o, empty_namespace);
 
   REQUIRE(simp.is_constant());
   const mp_integer offset_value =
     numeric_cast_v<mp_integer>(to_constant_expr(simp));
-  REQUIRE(offset_value==1);
+  REQUIRE(offset_value == 1);
 }
 
 TEST_CASE("Simplify byte extract", "[core][util]")
@@ -86,10 +86,11 @@ TEST_CASE("expr2bits and bits2expr respect bit order", "[core][util]")
   REQUIRE(deadbeef == *should_be_deadbeef2);
 
   c_bit_field_typet four_bits{unsignedbv_typet{8}, 4};
-  struct_typet st{{{"s", unsignedbv_typet{16}},
-                   {"bf1", four_bits},
-                   {"bf2", four_bits},
-                   {"b", unsignedbv_typet{8}}}};
+  struct_typet st{
+    {{"s", unsignedbv_typet{16}},
+     {"bf1", four_bits},
+     {"bf2", four_bits},
+     {"b", unsignedbv_typet{8}}}};
 
   const auto fill_struct_le = bits2expr(*le, st, true, ns);
   REQUIRE(fill_struct_le.has_value());
@@ -212,8 +213,8 @@ TEST_CASE("Simplify dynamic object comparison", "[core][util]")
   symbol_exprt s{"foo", signedbv_typet{8}};
   address_of_exprt address_of_symbol{s};
 
-  equal_exprt compare_symbol_dynamic{address_of_dynamic_object,
-                                     address_of_symbol};
+  equal_exprt compare_symbol_dynamic{
+    address_of_dynamic_object, address_of_symbol};
 
   REQUIRE(simplify_expr(compare_symbol_dynamic, ns) == false_exprt{});
 }
@@ -233,6 +234,98 @@ TEST_CASE("Simplify pointer_object equality", "[core][util]")
   exprt simp = simplify_expr(equal_exprt{p_o_void, p_o_int}, empty_namespace);
 
   REQUIRE(simp == true);
+}
+
+TEST_CASE("Simplify relations of pointers to distinct objects", "[core][util]")
+{
+  // this test requires a proper architecture to be set up so that pointers have
+  // a width
+  const cmdlinet cmdline;
+  config.set(cmdline);
+
+  const signedbv_typet int_type{32};
+  const pointer_typet int_pointer = pointer_type(int_type);
+  const symbol_exprt a{"a", int_type};
+  const symbol_exprt b{"b", int_type};
+  const exprt address_a = address_of_exprt{a};
+  const exprt address_b = address_of_exprt{b};
+  const exprt a_plus_one =
+    plus_exprt{address_a, from_integer(1, signed_size_type())};
+  const exprt null = null_pointer_exprt{int_pointer};
+
+  // the back end decides a relation of pointers to distinct objects false
+  REQUIRE(simplify_expr(
+            binary_relation_exprt{address_a, ID_lt, null}, empty_namespace)
+            .is_false());
+  REQUIRE(simplify_expr(
+            binary_relation_exprt{null, ID_le, address_a}, empty_namespace)
+            .is_false());
+  REQUIRE(
+    simplify_expr(
+      binary_relation_exprt{a_plus_one, ID_ge, address_b}, empty_namespace)
+      .is_false());
+
+  // the same object: the offsets are compared
+  REQUIRE(
+    simplify_expr(
+      binary_relation_exprt{address_a, ID_lt, a_plus_one}, empty_namespace)
+      .is_true());
+
+  // unknown objects: unchanged
+  const symbol_exprt p{"p", int_pointer};
+  const exprt p_lt_a = binary_relation_exprt{p, ID_lt, address_a};
+  REQUIRE(simplify_expr(p_lt_a, empty_namespace) == p_lt_a);
+}
+
+TEST_CASE(
+  "Simplify reading an integer cast to a pointer as a bit vector",
+  "[core][util]")
+{
+  // this test requires a proper architecture to be set up so that pointers have
+  // a width
+  const cmdlinet cmdline;
+  config.set(cmdline);
+
+  // Visual Studio's va_arg reads the immediate value va_start stores in a
+  // pointer-sized slot: (bv)(void *)7, its low 32 bits as an int, or the
+  // whole as a long long
+  const pointer_typet void_pointer = pointer_type(empty_typet{});
+  const bv_typet bv{void_pointer.get_width()};
+  const exprt seven = from_integer(7, signed_int_type());
+  const exprt bits = typecast_exprt{typecast_exprt{seven, void_pointer}, bv};
+  REQUIRE(
+    simplify_expr(
+      extractbits_exprt{bits, 0, signed_int_type()}, empty_namespace) == seven);
+  const exprt nine = from_integer(9, signed_long_long_int_type());
+  const exprt bits9 = typecast_exprt{typecast_exprt{nine, void_pointer}, bv};
+  REQUIRE(
+    simplify_expr(
+      typecast_exprt{bits9, signed_long_long_int_type()}, empty_namespace) ==
+    nine);
+
+  // the bytes of a pointer are not rewritten: (bv)(int *)44, read as a byte
+  const exprt p44 = typecast_exprt{
+    from_integer(44, signed_int_type()), pointer_type(seven.type())};
+  const exprt byte =
+    extractbits_exprt{typecast_exprt{p44, bv}, 8, unsigned_char_type()};
+  REQUIRE_FALSE(simplify_expr(byte, empty_namespace).is_constant());
+
+  // read as another type of the same width, the cast is kept: where int is
+  // as wide as a pointer, memcpy reads (bv)(int *)44 as unsigned int and
+  // casts it back to int *; folding to (int *)44u hid its equality with
+  // (int *)44
+  const unsignedbv_typet same_width_unsigned{void_pointer.get_width()};
+  const signedbv_typet same_width_signed{void_pointer.get_width()};
+  const exprt x = from_integer(44, same_width_signed);
+  const exprt bits44 = typecast_exprt{typecast_exprt{x, void_pointer}, bv};
+  REQUIRE(
+    simplify_expr(
+      extractbits_exprt{bits44, 0, same_width_unsigned}, empty_namespace) !=
+    from_integer(44, same_width_unsigned));
+  REQUIRE(
+    simplify_expr(
+      typecast_exprt{bits44, same_width_unsigned}, empty_namespace) !=
+    from_integer(44, same_width_unsigned));
 }
 
 TEST_CASE("Simplify cast from bool", "[core][util]")
@@ -393,9 +486,11 @@ TEST_CASE("simplify_expr boolean expressions", "[core][util]")
     INFO("((!true) || (false => false)) && true)")
     REQUIRE(
       simplify_expr(
-        and_exprt{or_exprt{not_exprt{true_exprt{}},
-                           implies_exprt{false_exprt{}, false_exprt{}}},
-                  true_exprt{}},
+        and_exprt{
+          or_exprt{
+            not_exprt{true_exprt{}},
+            implies_exprt{false_exprt{}, false_exprt{}}},
+          true_exprt{}},
         ns) == true_exprt{});
   }
   SECTION("Numeric comparisons")
@@ -426,11 +521,13 @@ TEST_CASE("simplify_expr boolean expressions", "[core][util]")
       {ID_gt, 1, -1, true_exprt()},
     };
 
-    const auto binary_relation_from = [](const test_entryt &entry) {
+    const auto binary_relation_from = [](const test_entryt &entry)
+    {
       const signedbv_typet int_type(32);
-      return binary_relation_exprt{from_integer(entry.lhs, int_type),
-                                   entry.comparison,
-                                   from_integer(entry.rhs, int_type)};
+      return binary_relation_exprt{
+        from_integer(entry.lhs, int_type),
+        entry.comparison,
+        from_integer(entry.rhs, int_type)};
     };
 
     for(const test_entryt &test_entry : comparisons)
@@ -466,8 +563,9 @@ TEST_CASE("Simplifying cast expressions", "[core][util]")
   SECTION("Simplifying a[(signed long int)0]")
   {
     // a[(signed long int)0]
-    index_exprt expr{symbol_exprt{"a", array_type},
-                     typecast_exprt{from_integer(0, int_type), long_type}};
+    index_exprt expr{
+      symbol_exprt{"a", array_type},
+      typecast_exprt{from_integer(0, int_type), long_type}};
     // cast is applied on the constant
     const auto simplified_expr = simplify_expr(expr, ns);
     REQUIRE(
@@ -477,8 +575,9 @@ TEST_CASE("Simplifying cast expressions", "[core][util]")
   SECTION("Simplifying a[(signed long int)i]")
   {
     // a[(signed long int)0]
-    index_exprt expr{symbol_exprt{"a", array_type},
-                     typecast_exprt{i_symbol.symbol_expr(), long_type}};
+    index_exprt expr{
+      symbol_exprt{"a", array_type},
+      typecast_exprt{i_symbol.symbol_expr(), long_type}};
     // Cast is not removed as up casting a symbol
     const auto simplified_expr = simplify_expr(expr, ns);
     REQUIRE(simplified_expr == expr);
@@ -486,8 +585,9 @@ TEST_CASE("Simplifying cast expressions", "[core][util]")
   SECTION("Simplifying a[(signed int)i]")
   {
     // a[(signed int)i]
-    index_exprt expr{symbol_exprt{"a", array_type},
-                     typecast_exprt{i_symbol.symbol_expr(), int_type}};
+    index_exprt expr{
+      symbol_exprt{"a", array_type},
+      typecast_exprt{i_symbol.symbol_expr(), int_type}};
 
     const auto simplified_expr = simplify_expr(expr, ns);
     REQUIRE(
@@ -497,8 +597,9 @@ TEST_CASE("Simplifying cast expressions", "[core][util]")
   SECTION("Simplifying a[(signed short)0]")
   {
     // a[(signed short)0]
-    index_exprt expr{symbol_exprt{"a", array_type},
-                     typecast_exprt{from_integer(0, int_type), short_type}};
+    index_exprt expr{
+      symbol_exprt{"a", array_type},
+      typecast_exprt{from_integer(0, int_type), short_type}};
 
     // Can be simplified as the number is a constant
     const auto simplified_expr = simplify_expr(expr, ns);
@@ -509,8 +610,9 @@ TEST_CASE("Simplifying cast expressions", "[core][util]")
   SECTION("Simplifying a[(signed short)i]")
   {
     // a[(signed short)i]
-    index_exprt expr{symbol_exprt{"a", array_type},
-                     typecast_exprt{i_symbol.symbol_expr(), short_type}};
+    index_exprt expr{
+      symbol_exprt{"a", array_type},
+      typecast_exprt{i_symbol.symbol_expr(), short_type}};
 
     // No simplification as the cast may have an effect
     const auto simplified_expr = simplify_expr(expr, ns);
@@ -665,6 +767,20 @@ TEST_CASE("Simplify all-zero constant in bitand", "[core][util]")
   REQUIRE(simplify_expr(band, empty_namespace) == zero);
 }
 
+TEST_CASE("Simplify merges constants behind a non-constant", "[core][util]")
+{
+  const unsignedbv_typet u8{8};
+  const symbol_exprt x{"x", u8};
+  // (x & 0x7f) & 0x80, flattened to x & 0x7f & 0x80, is 0
+  multi_ary_exprt band{ID_bitand, {x, from_integer(0x7f, u8)}, u8};
+  band.add_to_operands(from_integer(0x80, u8));
+  REQUIRE(simplify_expr(band, empty_namespace) == from_integer(0, u8));
+  // x | 0x0f | 0xf0 is all ones
+  multi_ary_exprt bor{ID_bitor, {x, from_integer(0x0f, u8)}, u8};
+  bor.add_to_operands(from_integer(0xf0, u8));
+  REQUIRE(simplify_expr(bor, empty_namespace) == from_integer(0xff, u8));
+}
+
 TEST_CASE("Simplify all-ones constant in bitor", "[core][util]")
 {
   const unsignedbv_typet u8{8};
@@ -808,4 +924,35 @@ TEST_CASE(
       application(ID_cprover_string_index_of_func, {s}, index_type);
     REQUIRE(simplify_expr(index_of, ns) == index_of);
   }
+}
+
+TEST_CASE("Simplify the difference of a pointer and itself", "[core][util]")
+{
+  // this test requires a proper architecture to be set up so that pointers have
+  // a width
+  const cmdlinet cmdline;
+  config.set(cmdline);
+
+  const pointer_typet int_pointer = pointer_type(signed_int_type());
+  const symbol_exprt p{"p", int_pointer};
+  const symbol_exprt q{"q", int_pointer};
+  const null_pointer_exprt null{int_pointer};
+  const auto difference = [](const exprt &lhs, const exprt &rhs)
+  {
+    minus_exprt result{lhs, rhs};
+    result.type() = pointer_diff_type();
+    return result;
+  };
+
+  // p - p and NULL - NULL are 0, whatever p points to
+  REQUIRE(
+    simplify_expr(difference(p, p), empty_namespace) ==
+    from_integer(0, pointer_diff_type()));
+  REQUIRE(
+    simplify_expr(difference(null, null), empty_namespace) ==
+    from_integer(0, pointer_diff_type()));
+
+  // distinct operands: unchanged
+  const minus_exprt p_minus_q = difference(p, q);
+  REQUIRE(simplify_expr(p_minus_q, empty_namespace) == p_minus_q);
 }

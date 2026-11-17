@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.[0-9]*\] .* direct: SUCCESS$
+^\[main\.assertion\.[0-9]*\] .* nested: SUCCESS$
+^\[main\.assertion\.[0-9]*\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Only folds over the first pack or the function parameter pack were
+expanded.  g++ 13 and clang++ 18 accept this program, and it fails only
+its WRONG assertion.

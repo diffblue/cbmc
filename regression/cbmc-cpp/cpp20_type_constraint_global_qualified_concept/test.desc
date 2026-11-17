@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ constrained template chosen: SUCCESS$
+^\[main\.assertion\.2\] line \d+ unconstrained template chosen: SUCCESS$
+^\[main\.assertion\.3\] line \d+ non-type parameter: SUCCESS$
+^\[main\.assertion\.4\] line \d+ constrained deduction guide: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^PARSING ERROR$
+^CONVERSION ERROR$
+--
+A type-constraint whose nested-name-specifier starts with `::' was a parse
+error: the parser took the concept path only for a name that starts with
+an identifier.  The MSVC STL constrains std::span's deduction guide with
+`::std::ranges::contiguous_range'.

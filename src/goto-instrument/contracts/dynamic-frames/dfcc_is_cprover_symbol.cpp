@@ -132,6 +132,7 @@ static void init_static_symbols(std::unordered_set<irep_idt> &static_symbols)
     static_symbols.insert(CPROVER_PREFIX "malloc_is_new_array");
     static_symbols.insert(CPROVER_PREFIX "max_malloc_size");
     static_symbols.insert(CPROVER_PREFIX "memory_leak");
+    static_symbols.insert(CPROVER_PREFIX "new_object");
     static_symbols.insert(CPROVER_PREFIX "pipe_offset");
     static_symbols.insert(CPROVER_PREFIX "pipes");
     static_symbols.insert(CPROVER_PREFIX "rounding_mode");

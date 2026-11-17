@@ -1,0 +1,19 @@
+CORE
+main.cpp
+
+^\[difference\.pointer_arithmetic\.\d+\] .*: SUCCESS$
+^\[less\.pointer_arithmetic\.\d+\] .*: SUCCESS$
+^\[main\.assertion\.1\] line \d+ null minus null: SUCCESS$
+^\[main\.assertion\.2\] line \d+ null less than null: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+^\[(difference|less)\.pointer_arithmetic\.\d+\] .*: FAILURE$
+--
+The pointer checks of a subtraction or relation accept two null pointers in
+C++ only; in C (C11 6.5.6/9, 6.5.8/5) they still fail
+(regression/cbmc/ptr_arithmetic_on_null).

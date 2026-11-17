@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] .* 8-byte argument: SUCCESS$
+^\[main\.assertion\.2\] .* 1-byte argument: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The enable_if of each constructor template is checked; the unnamed
+parameter of the class template no longer erased that of the members.

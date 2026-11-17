@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ bound from the initializer: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+For a class template specialization the initializer of a static data
+member is checked by do_initializer on the value only; the member's array
+type of unknown bound was never completed, so sizeof rejected it as
+incomplete.

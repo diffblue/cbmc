@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ constrained overload: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Two function templates that partial ordering leaves equally specialized
+(T && and U &&) were ambiguous although only one is constrained.  libc++'s
+customization point objects pair a constrained operator() with a deleted
+unconstrained fallback.

@@ -1,0 +1,15 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ pack expansion: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+static assertion failed
+--
+The static assertions are checked at compile time; a wrong evaluation
+reports "static assertion failed" and a CONVERSION ERROR.  g++ 13 and
+clang++ 18 accept this program, and it fails only its WRONG assertion.

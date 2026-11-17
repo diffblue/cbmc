@@ -13,6 +13,7 @@ Author: Daniel Kroening, 2018
 #include <util/string_utils.h>
 #include <util/tempfile.h>
 
+#include <cctype>
 #include <fstream>
 
 void gcc_versiont::get(const std::string &executable)
@@ -126,6 +127,14 @@ void gcc_versiont::get(const std::string &executable)
               default_cxx_standard = configt::cppt::cpp_standardt::CPP14;
             else if(split[1] == "201703L")
               default_cxx_standard = configt::cppt::cpp_standardt::CPP17;
+            else if(split[1] == "202002L")
+              default_cxx_standard = configt::cppt::cpp_standardt::CPP20;
+            else if(split[1] == "202302L")
+              default_cxx_standard = configt::cppt::cpp_standardt::CPP23;
+            else if(
+              split[1].size() >= 7 && isdigit(split[1][0]) &&
+              split[1] > "202302L")
+              default_cxx_standard = configt::cppt::cpp_standardt::CPP26;
           }
         }
       }
@@ -191,4 +200,40 @@ void configure_gcc(const gcc_versiont &gcc_version)
      (config.ansi_c.arch == "arm" || config.ansi_c.arch == "arm64")) ||
     (gcc_version.flavor == gcc_versiont::flavort::CLANG &&
      gcc_version.is_at_least(6u));
+}
+
+void apply_host_default_cxx_standard()
+{
+  // Only the built-in default is replaced: a standard selected on the
+  // command line, by goto-cc's -std= handling (gcc_modet::doit) or by a
+  // platform rule (configt::set) is final.
+  if(!config.cpp.standard_is_default)
+    return;
+
+  std::string executable;
+  switch(config.ansi_c.preprocessor)
+  {
+  case configt::ansi_ct::preprocessort::GCC:
+    executable = "gcc";
+    break;
+  case configt::ansi_ct::preprocessort::CLANG:
+    executable = "clang";
+    break;
+  case configt::ansi_ct::preprocessort::VISUAL_STUDIO:
+  case configt::ansi_ct::preprocessort::CODEWARRIOR:
+  case configt::ansi_ct::preprocessort::ARM:
+  case configt::ansi_ct::preprocessort::NONE:
+    return;
+  }
+
+  // Like g++/clang++ without -std=: the dialect the host compiler defaults
+  // to (gnu++17 for g++ 11 and later, gnu++14 for g++ 6 to 10; the same
+  // compiler CBMC preprocesses with, so the headers and the parser agree).
+  gcc_versiont gcc_version;
+  gcc_version.get(executable);
+  if(gcc_version.flavor == gcc_versiont::flavort::UNKNOWN)
+    return;
+
+  config.cpp.cpp_standard = gcc_version.default_cxx_standard;
+  config.cpp.standard_is_default = false;
 }

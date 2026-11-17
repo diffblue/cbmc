@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ call through binder: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The function type of a candidate formed during deduction type-checked the
+return type before the parameters, so call_binder's trailing return type
+`decltype(Ret::call(obj, I...))' failed with "symbol 'obj' is unknown".

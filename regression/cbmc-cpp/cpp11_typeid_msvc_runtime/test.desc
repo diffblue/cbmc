@@ -1,0 +1,19 @@
+CORE
+main.ii
+--winx64 --cpp11
+^\[main\.assertion\.1\] line \d+ same type: SUCCESS$
+^\[main\.assertion\.2\] line \d+ different types: SUCCESS$
+^\[main\.assertion\.3\] line \d+ hash of the same type: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+no body for callee
+--
+With the MSVC runtime, typeid was rejected ("typeid requires <typeinfo>"):
+type_info is declared in the global namespace.  Its comparison calls the
+runtime's __std_type_info_compare, now modelled: cbmc gives each type one
+type_info object, so they compare equal iff they are the same object.

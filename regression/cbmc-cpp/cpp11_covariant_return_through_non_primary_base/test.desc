@@ -1,0 +1,18 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ pointer result converted to B \*: SUCCESS$
+^\[main\.assertion\.2\] line \d+ converted result designates d: SUCCESS$
+^\[main\.assertion\.3\] line \d+ null result stays null: SUCCESS$
+^\[main\.assertion\.4\] line \d+ reference result converted: SUCCESS$
+^\[main\.assertion\.5\] line \d+ direct call: SUCCESS$
+^\[main\.assertion\.6\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The thunks of B's vtable slots now have B's return types and convert the
+overriders' results; before, D's virtual table was not created.

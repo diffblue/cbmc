@@ -1,0 +1,19 @@
+CORE
+parameter.cpp
+
+^\[main\.assertion\.1\] line \d+ refers to the left operand: SUCCESS$
+^\[main\.assertion\.2\] line \d+ both assignments: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+address_arithmetic does not handle side_effect
+--
+See test.desc.  Through a reference parameter, returned by reference,
+symbolic execution aborts: "goto_symext::address_arithmetic does not handle
+side_effect".  Found with the folds over assignment operators
+(cpp17_fold_over_assignment_operator, `(x += ... += v)' with two elements).
+Pre-existing (bin53).

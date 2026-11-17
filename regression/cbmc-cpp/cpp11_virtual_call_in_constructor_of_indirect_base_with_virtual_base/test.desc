@@ -1,0 +1,20 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ A under construction: SUCCESS$
+^\[main\.assertion\.2\] line \d+ M under construction: SUCCESS$
+^\[main\.assertion\.3\] line \d+ after construction: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+During A's constructor the call reached M::id: only the complete object's
+direct bases with virtual bases got construction vtables (Itanium C++ ABI
+2.6.2), and M's base-object constructor left the tables its caller had
+installed.  M's base-object constructor now builds A's tables from the
+pointers in place: a copy of A's own tables with the virtual-base offsets
+of the complete object (the ABI passes a VTT for this).

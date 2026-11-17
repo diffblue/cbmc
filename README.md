@@ -8,7 +8,8 @@ About
 
 CBMC is a Bounded Model Checker for C and C++ programs.  It supports C89,
 C99, most of C11, C17, C23 and most compiler extensions provided by gcc and
-Visual Studio.  It also supports SystemC using Scoot.  It allows verifying
+Visual Studio.  For C++, it supports C++98, C++03, C++11, C++14, and C++17.
+It also supports SystemC using Scoot.  It allows verifying
 array bounds (buffer overflows), pointer safety, exceptions and
 user-specified assertions.  Furthermore, it can check C and C++ for
 consistency with other languages, such as Verilog.  The verification is

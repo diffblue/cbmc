@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--unwindset 'fill<signed_int,3>(ptr_signed_int).0:1' --unwinding-assertions --partial-loops
+^\[fill<signed_int,3>\(ptr_signed_int\)\.unwind\.0\] line \d+ unwinding assertion loop 0: FAILURE$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+--unwindset split its argument at every comma
+(cmdline.get_comma_separated_values), so a loop identifier with commas, as
+C++ template arguments and parameter types spell them, fell apart: the
+pieces matched no loop (the bound was silently not applied) or were rejected
+with "invalid loop identifier".  unwindsett joins the pieces up to the one
+ending in `:<limit>'.  --partial-loops lets the WRONG assertion be reached
+past the bound.

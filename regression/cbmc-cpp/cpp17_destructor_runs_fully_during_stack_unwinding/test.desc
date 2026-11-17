@@ -1,0 +1,20 @@
+CORE libstdcxx
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ destructor body completes: SUCCESS$
+^\[main\.assertion\.2\] line \d+ one uncaught exception: SUCCESS$
+^\[main\.assertion\.3\] line \d+ inner exception caught: SUCCESS$
+^\[main\.assertion\.4\] line \d+ outer exception caught: SUCCESS$
+^\[main\.assertion\.5\] line \d+ none after the handler: SUCCESS$
+^\[main\.assertion\.6\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+A destructor called during stack unwinding saw the unwound exception as
+in flight after each call in its body and left it early.  The exception
+lowering now saves and clears the in-flight exception around such a call
+and counts the exception for std::uncaught_exceptions.

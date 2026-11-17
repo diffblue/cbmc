@@ -1,0 +1,25 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ A's L: SUCCESS$
+^\[main\.assertion\.2\] line \d+ direct L: SUCCESS$
+^\[main\.assertion\.3\] line \d+ qualified member: SUCCESS$
+^\[main\.assertion\.4\] line \d+ copy assignment: SUCCESS$
+^\[main\.assertion\.5\] line \d+ copy construction: SUCCESS$
+^\[main\.assertion\.6\] line \d+ two L subobjects: SUCCESS$
+^\[main\.assertion\.7\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [class.mi]/3 (Example 2: `class D : public A, public L'): a class
+can be a direct and an indirect base; D has two L subobjects.  The
+mem-initializer `L(3)' names the direct one ([class.base.init]/2), `A::next'
+the member of A's one ([class.mi]/5), and the implicit copy constructor and
+copy assignment operator copy both ([class.copy.ctor]/14,
+[class.copy.assign]/12).  The front end rejected the class.  g++ 13 and
+clang++ 18 accept this program (warning: direct base 'L' inaccessible due to
+ambiguity), and it fails only its WRONG assertion.

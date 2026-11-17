@@ -1,0 +1,17 @@
+CORE
+member.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ member alias: SUCCESS$
+^\[main\.assertion\.2\] line \d+ member alias of a class template: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [dcl.typedef]/2, [except.spec]; see test.desc.  Pack expansions:
+cpp11_alias_declaration_of_function_type_pack.  g++ 13
+and clang++ 18 accept this program (-std=c++17), and it fails only its
+WRONG assertion.

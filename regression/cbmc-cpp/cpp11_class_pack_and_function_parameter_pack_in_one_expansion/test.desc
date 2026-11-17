@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.[0-9]*\] .* dispatch: SUCCESS$
+^\[main\.assertion\.[0-9]*\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Is was replaced by its first element in every copy (get<1> twice).
+g++ 13 and clang++ 18 accept this program, and it fails only its WRONG
+assertion.

@@ -97,4 +97,32 @@ void __builtin_assume(__CPROVER_bool);
 void __builtin_cpu_init(void);
 _Bool __builtin_cpu_is(const char *);
 _Bool __builtin_cpu_supports(const char *);
+
+// Clang provides __builtin_operator_new/delete as intrinsics that have
+// the same semantics as operator new/delete but can be used in constant
+// evaluation and with special handling in libc++. They take the same
+// arguments as the operator versions.
+void *__builtin_operator_new(__CPROVER_size_t);
+void __builtin_operator_delete(void *);
+
+// memchr for char objects, returning `char *'
+char* __builtin_char_memchr(const char*, int, __CPROVER_size_t);
+
+// Clang provides __c11_atomic_* intrinsics that libc++'s <atomic> and
+// <stdatomic.h> use to implement the C11/C++11 atomic primitives.  They
+// take a pointer to a _Atomic qualified object plus memory order
+// arguments.  __c11_atomic_load/store/exchange/fetch_{add,sub,and,or,xor,
+// nand} are polymorphic in the atomic object's type and are typed and
+// implemented as the corresponding GCC __atomic_* builtins
+// (c_typecheck_gcc_polymorphic_builtins.cpp); they must not be declared
+// here, a declaration returning void would take precedence.  The rest is
+// declared with type-compatible signatures (results nondet).
+void __c11_atomic_thread_fence(int);
+void __c11_atomic_signal_fence(int);
+void __c11_atomic_init(volatile void *, ...);
+__CPROVER_bool __c11_atomic_compare_exchange_strong(volatile void *, void *, ...);
+__CPROVER_bool __c11_atomic_compare_exchange_weak(volatile void *, void *, ...);
+void __c11_atomic_fetch_max(volatile void *, ...);
+void __c11_atomic_fetch_min(volatile void *, ...);
+__CPROVER_bool __c11_atomic_is_lock_free(__CPROVER_size_t);
 // clang-format on

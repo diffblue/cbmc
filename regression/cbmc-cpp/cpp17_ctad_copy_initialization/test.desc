@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ from an lvalue: SUCCESS$
+^\[main\.assertion\.2\] line \d+ from a call: SUCCESS$
+^\[main\.assertion\.3\] line \d+ from a constructor argument: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [dcl.type.class.deduct]/1, [over.match.class.deduct]/5: class template
+argument deduction uses the declaration's initializer whatever its form.
+The front end deduced only from `(...)' and `{...}' initializers; `sp b = a;'
+was "found no match for symbol 'sp'" (bin53).  libstdc++ 13's
+_Sink::_M_write declares `span __to = _M_unused();', so its body was
+dropped (format:2456) in every program using std::format.  g++ 13 and
+clang++ 18 accept this program, and it fails only its WRONG assertion.

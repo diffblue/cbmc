@@ -1,0 +1,13 @@
+CORE libcxx
+main.cpp
+--cpp11 --stdlib libc++ --unwind 6
+^\[main\.assertion\.\d+\] line \d+ stoi: SUCCESS$
+^\[main\.assertion\.\d+\] line \d+ stoll: SUCCESS$
+^\[main\.assertion\.\d+\] line \d+ stoul: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+no body for callee
+--

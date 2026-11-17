@@ -1,3 +1,4 @@
+#include <cassert>
 int g1;
 int g2;
 

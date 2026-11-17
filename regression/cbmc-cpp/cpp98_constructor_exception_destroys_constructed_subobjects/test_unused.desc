@@ -1,0 +1,16 @@
+CORE
+unused.cpp
+
+^\[main\.assertion\.1\] line \d+ no zone: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+dropped the body
+--
+The destructor call for the unwinding is built only when a later
+initialization or the constructor body follows.  This passes on bin53 (which
+has no constructor unwinding); a first version of the unwinding built the
+destructor call for every subobject and dropped deleter<impl>::operator().

@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ T deduced after the class pack: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+`V...' in the parameter list of a member function template names the pack
+of the enclosing class template specialization, which is bound; it was
+treated as a function parameter pack of the member template, so the
+parameters after it did not line up with their arguments.

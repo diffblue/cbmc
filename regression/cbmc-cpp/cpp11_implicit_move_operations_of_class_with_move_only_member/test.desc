@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] .* moved out: SUCCESS$
+^\[main\.assertion\.2\] .* move assignment: SUCCESS$
+^\[main\.assertion\.3\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+g++ 13 (-fsanitize=address,undefined) and clang++ 18 accept this program,
+and it fails only its WRONG assertion.  An implicitly declared copy
+operation that would be deleted is left without a body (do_not_typechecked)
+instead of being diagnosed when it is merely a candidate.

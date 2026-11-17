@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ complete object: V constructed once: SUCCESS$
+^\[main\.assertion\.2\] line \d+ complete object: target ran: SUCCESS$
+^\[main\.assertion\.3\] line \d+ base subobject: one more V: SUCCESS$
+^\[main\.assertion\.4\] line \d+ base subobject: target ran: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+N5008 [class.base.init]/6-7: the target of a delegating constructor gets
+the delegating constructor's hidden most-derived flag, not false as for a
+base subobject; it used to skip the virtual bases' construction and read
+their offset through vtable pointers not yet installed.

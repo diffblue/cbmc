@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--unwind 5 --pointer-check
+^\[main\.assertion\.1\] .* element copied from a parameter: SUCCESS$
+^\[main\.assertion\.2\] .* evaluated per call: SUCCESS$
+^\[main\.assertion\.3\] .* mixed elements: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+__CPROVER_initialize
+--
+An element of a class type copy-initialized from an object (`{*p}' with a
+pointer parameter p) is constructed by the copy constructor where the list
+is evaluated ([dcl.init.list]/5).  It was the static initializer of the
+backing array, which read the parameter in __CPROVER_initialize.

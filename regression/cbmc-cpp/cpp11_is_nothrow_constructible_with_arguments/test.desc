@@ -1,0 +1,18 @@
+CORE libstdcxx
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ copy throws: SUCCESS$
+^\[main\.assertion\.2\] line \d+ noexcept\(int\): SUCCESS$
+^\[main\.assertion\.3\] line \d+ throwing \(long\): SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The built-in __is_nothrow_constructible(T, Args...) with arguments was
+true for every T.  It now constructs T from the arguments, as
+__is_constructible does, and checks the exception specification of the
+selected constructor.

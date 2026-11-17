@@ -162,6 +162,14 @@ public:
     const irep_idt &component_name) const;
 
   std::size_t component_number(const irep_idt &component_name) const;
+
+  /// The position of component \p component_name among the components that
+  /// occupy storage -- the operands of a struct_exprt of this type.  A C++
+  /// class type also lists its member functions, member types and static
+  /// data members as components, which a struct constant has no operand
+  /// for; component_number counts those too.
+  std::size_t data_component_number(const irep_idt &component_name) const;
+
   const typet &component_type(const irep_idt &component_name) const;
 
   irep_idt get_tag() const { return get(ID_tag); }

@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp98
+^\[main\.assertion\.1\] line \d+ final overrider: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+As test.desc, verifying the program; bin53 passes this desc (the extra
+candidates of the virtual call are infeasible).  g++ 13 and clang++ 18
+accept this program, and it fails only its WRONG assertion.

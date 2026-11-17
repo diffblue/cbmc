@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ direct: SUCCESS$
+^\[main\.assertion\.2\] line \d+ return: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+A class whose only user-declared constructor is a template was taken for
+an aggregate when a braced-init-list initialized a reference to it, so its
+copy constructor was viable for `holder h({true, 4})' and was chosen ("no
+match for holder" with arguments bool, int).  This is the shape of
+`return {{b, e}};' for an optional<chk> with a converting constructor
+template.

@@ -493,6 +493,7 @@ bitvector_typet char_type();
 unsignedbv_typet unsigned_char_type();
 signedbv_typet signed_char_type();
 bitvector_typet wchar_t_type();
+unsignedbv_typet char8_t_type();
 unsignedbv_typet char16_t_type();
 unsignedbv_typet char32_t_type();
 floatbv_typet float_type();

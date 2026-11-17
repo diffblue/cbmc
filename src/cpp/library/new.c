@@ -12,6 +12,10 @@ inline void *__new(__typeof__(sizeof(int)) malloc_size)
   void *res;
   res = __CPROVER_allocate(malloc_size, 0);
 
+  // C++ operator new (throwing version) never returns NULL —
+  // it throws std::bad_alloc on failure.
+  __CPROVER_assume(res != 0);
+
   // non-deterministically record the object for delete/delete[] checking
   __CPROVER_bool record_malloc=__VERIFIER_nondet___CPROVER_bool();
   __CPROVER_new_object = record_malloc ? res : __CPROVER_new_object;
@@ -40,6 +44,9 @@ inline void *__new_array(__CPROVER_size_t count, __CPROVER_size_t size)
   void *res;
   res = __CPROVER_allocate(size*count, 0);
 
+  // C++ operator new[] (throwing version) never returns NULL.
+  __CPROVER_assume(res != 0);
+
   // non-deterministically record the object for delete/delete[] checking
   __CPROVER_bool record_malloc=__VERIFIER_nondet___CPROVER_bool();
   __CPROVER_new_object = record_malloc ? res : __CPROVER_new_object;
@@ -60,6 +67,20 @@ inline void *__placement_new(__typeof__(sizeof(int)) malloc_size, void *p)
   // The allocation is done by the user. So this does nothing.
   __CPROVER_HIDE:;
   (void)malloc_size;
+  return p;
+}
+
+/* FUNCTION: __placement_new_array */
+
+inline void *
+__placement_new_array(__CPROVER_size_t count, __CPROVER_size_t size, void *p)
+{
+// The constructor calls are done by the front-end.
+// The allocation is done by the user ([new.delete.placement]/5). So this
+// does nothing.
+__CPROVER_HIDE:;
+  (void)count;
+  (void)size;
   return p;
 }
 

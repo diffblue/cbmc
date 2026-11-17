@@ -1,0 +1,25 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ extent from the variable template: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [temp.pre]/1, [basic.pre]/7: `v<E>', an instance of the variable
+template `template <long N> constexpr integral_constant<N> v{};', names
+an object of class type; initializing an int from it calls the
+conversion function on that object.  The front end replaced the
+instance by its initializer value, which has no object to call the
+conversion function on, and dropped the constructor.  cvise reduction
+(/tmp/r163/red/kb_L16span) of libstdc++ 16's span constructor
+`span(type_identity_t<element_type> (&)[_ArrayExtent]) : _M_ptr(__arr),
+_M_extent(__v<_ArrayExtent>)' (span:201,
+cpp11_static_cast_of_array_parameter_to_pointer/test_libstdcxx.desc with
+GCC 16's headers).  Fails on bin53.  g++ 13 and clang++ 18 accept the
+program.

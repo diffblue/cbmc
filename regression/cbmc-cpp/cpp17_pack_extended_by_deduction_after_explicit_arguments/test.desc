@@ -1,0 +1,31 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ a fixed parameter before the pack, mixed deduced types: SUCCESS$
+^\[main\.assertion\.2\] line \d+ explicit arguments only: SUCCESS$
+^\[main\.assertion\.3\] line \d+ pack extended by deduction: SUCCESS$
+^\[main\.assertion\.4\] line \d+ extended pack followed by a default: SUCCESS$
+^\[main\.assertion\.5\] line \d+ fully deduced: SUCCESS$
+^\[main\.assertion\.6\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [temp.arg.explicit]/9: "Template argument deduction can extend the
+sequence of template arguments corresponding to a template parameter
+pack, even when the sequence contains explicitly specified template
+arguments" -- the standard's own example is `f<int*, float*>(0, 0, 0)'
+with Types deduced as int*, float*, int.  The front end rejected
+`count<int>(1, 2, 3)' ("found no match for symbol 'count'"): a variadic
+template with explicit arguments was instantiated with exactly those, so
+the pack was not extended by the call arguments.  When the call has more
+arguments than the explicit ones account for, the explicit arguments are
+now kept as a prefix for deduction.  The same for a pack followed by a defaulted parameter
+(`template <class... Ts, int N = 7> int sum(Ts...)', [temp.param]/18;
+`sum<int>(1, 2)').  Fully deduced calls work.  Noted as out of scope in
+cpp14_function_template_pack_before_default_parameter (round 163b).
+Header-free.  Fails on the round-163 build bin52.

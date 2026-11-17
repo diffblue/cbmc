@@ -1,0 +1,18 @@
+CORE
+main.c
+--unwind 6 --unwinding-assertions
+^\[main\.assertion\.1\] line \d+ assertion k == 4: SUCCESS$
+^\[main\.assertion\.2\] line \d+ assertion r\.s\.is_long == 0: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^\[main\.unwind\.0\]
+--
+A bit field of one union member, read after byte updates of other bytes
+(memmove into the data array), was not simplified to the value written, so
+the loop bound n stayed symbolic: symbolic execution produced an unwinding
+assertion, and without --unwind did not terminate.  libc++'s alternate
+std::string layout (Apple arm64) keeps the short size there, and every
+string comparison became an unbounded memcmp on macOS 14.

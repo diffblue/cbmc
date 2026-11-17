@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ definition used: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+no body for callee
+--
+The definition spells a parameter `const Se last' where the declaration
+has `Se last'; the signatures were compared with the const, so the
+definition became a second template and the call used the bodyless
+declaration.

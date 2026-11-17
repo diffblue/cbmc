@@ -1,3 +1,4 @@
+#include <cassert>
 union {
   int a;
   char b;

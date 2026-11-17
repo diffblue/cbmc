@@ -1,0 +1,24 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ braced base element: SUCCESS$
+^\[main\.assertion\.2\] line \d+ empty list: SUCCESS$
+^\[main\.assertion\.3\] line \d+ copy-list: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [dcl.init.aggr]/4-5: in `E x{{1}, 2}' the base element A is
+aggregate-initialized from {1}: a from 1, c from its default member
+initializer 9.  The front end assigned only the listed values to the
+base's members, leaving c indeterminate, and initialized `E y{}' by E's
+implicit default constructor alone, leaving a and e indeterminate (bin53).
+A base element now initializes each of its members from the list, its
+default member initializer or zero; an empty list value-initializes
+([dcl.init.general]/9.1: zero first).  The test is C++17 (an aggregate
+with a base).  g++ 13 and clang++ 18 accept this program, and it fails
+only its WRONG assertion.

@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ dependent parameter type: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+is unknown
+--
+The type of a non-type template parameter of a friend function template
+defined in a class template named the enclosing template's parameter
+(`It'), which was unbound once the friend was converted at namespace
+scope.  The MSVC STL's reverse_iterator declares _Verify_range this way
+(cpp17_equal_reverse_iterator_crash on VS 2022).

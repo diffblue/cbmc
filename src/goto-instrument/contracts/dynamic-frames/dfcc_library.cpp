@@ -329,7 +329,10 @@ void dfcc_libraryt::load(std::set<irep_idt> &to_instrument)
 
   symbol_tablet tmp_symbol_table;
   cprover_c_library_factory_force_load(
-    to_load, tmp_symbol_table, message_handler);
+    to_load,
+    tmp_symbol_table,
+    message_handler,
+    has_cpp_code(goto_model.symbol_table));
 
   // compute missing library functions before modifying the symbol table
   std::set<irep_idt> missing = get_missing_funs();

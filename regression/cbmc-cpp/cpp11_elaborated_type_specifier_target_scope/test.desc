@@ -1,0 +1,18 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ alias in namespace: SUCCESS$
+^\[main\.assertion\.2\] line \d+ member declarator in namespace: SUCCESS$
+^\[main\.assertion\.3\] line \d+ parameter in namespace: SUCCESS$
+^\[main\.assertion\.4\] line \d+ block scope: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Classes declared by elaborated-type-specifiers used to go into the global
+scope (and, from an alias template, into none until its first use), so
+N::tag, N::inner_ref and N::param_t were not members of N.

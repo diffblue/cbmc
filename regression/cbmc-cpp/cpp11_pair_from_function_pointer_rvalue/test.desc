@@ -1,0 +1,17 @@
+CORE libstdcxx
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+^found no match
+dropped the body
+--
+user_defined_conversion_sequence (cpp_typecheck_conversions.cpp).  Exposed
+once std::__and_ evaluated correctly (cpp11_libstdcxx_and_conjunction).
+libstdcxx: with libc++ std::function<int()>'s members, defined outside the
+partial specialization, have no body
+(cpp11_partial_specialization_member_defined_outside_parameter_pack).

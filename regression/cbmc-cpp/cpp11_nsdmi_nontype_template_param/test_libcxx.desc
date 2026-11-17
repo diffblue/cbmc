@@ -1,0 +1,17 @@
+CORE libcxx
+main.cpp
+--cpp17 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ B=true -> 1: SUCCESS$
+^\[main\.assertion\.2\] line \d+ B=false -> 2: SUCCESS$
+^\[main\.assertion\.3\] line \d+ var-tmpl default false -> 9: SUCCESS$
+^\[main\.assertion\.4\] line \d+ var-tmpl default true -> 7: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG: must fail: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+Header-free counterpart of test.desc under libc++; NSDMI substitution of a
+non-type template parameter is a front-end property independent of the standard
+library.  See test.desc for the N5008 [class.mem]/[temp.inst] rationale.

@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] .* compound literal: SUCCESS$
+^\[main\.assertion\.2\] .* initialization: SUCCESS$
+^\[main\.assertion\.3\] .* return: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+invalid implicit conversion
+--
+A designated-initializer-list initializes the named elements
+([dcl.init.aggr]/3.1).  In a compound literal or a return statement of a
+non-POD aggregate, it was assigned to the members by position.

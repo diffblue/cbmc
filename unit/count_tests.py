@@ -35,7 +35,7 @@ class argument_separator_countert:
 def tests_in_file(file_path):
     file_test_count = 0
     template_counter = None
-    with open(file_path, "rt") as file:
+    with open(file_path, "rt", encoding="utf-8") as file:
         for line in file:
             if template_counter is None:
                 if line.startswith("TEST_CASE"):

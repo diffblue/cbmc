@@ -1,3 +1,4 @@
+#include <cassert>
 int f(const int &i)
 {
   assert(i == 1);

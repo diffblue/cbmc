@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ assignment from a lambda: SUCCESS$
+^\[main\.assertion\.2\] line \d+ implicit copy assignment: SUCCESS$
+^\[main\.assertion\.3\] line \d+ assignment operator template: SUCCESS$
+^\[main\.assertion\.4\] line \d+ implicit move assignment: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+An assignment to a POD class took the built-in path and ignored the
+class's assignment operator template (`g = [] {...}': "invalid implicit
+conversion").  Once a specialization of the template had been
+instantiated the class was no longer taken for POD, and as it has no
+synthesized copy or move assignment, `c = static_cast<pod &&>(b)' found
+no operator=.

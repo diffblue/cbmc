@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ converted through the deduced type: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+static assertion failed
+--
+Class template argument deduction required every template parameter to be
+deduced, so with an undeducible defaulted parameter it fell back to taking
+the argument type as C (view<const char *>).  GCC 11's
+std::filesystem::path(const Source &) lost its body this way
+(__effective_range returns `basic_string_view{&*__source}').

@@ -802,10 +802,13 @@ void goto_symext::loop_bound_exceeded(
 
   if(symex_config.unwinding_assertions)
   {
-    // Generate VCC for unwinding assertion.
+    // Generate VCC for unwinding assertion.  Name it after the goto
+    // function, like the loop's own identifier (`--show-loops',
+    // `--unwindset'): the source location's function is a display name
+    // that same-named functions share (C++ `a::fill' and `b::fill', or
+    // overloads), which gave their loops one property id.
     const std::string property_id =
-      id2string(state.source.pc->source_location().get_function()) +
-      ".unwind." + loop_number;
+      id2string(state.source.function_id) + ".unwind." + loop_number;
     vcc(
       negated_cond,
       property_id,

@@ -1,0 +1,18 @@
+CORE
+main.ii
+--winx64 --cpp11
+^\[main\.assertion\.1\] line \d+ default calling convention: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Two partial specializations that differ only in a calling convention,
+which cbmc ignores, have the same symbol.  The second replaced the first's
+declaration but kept the first's template scope, so its parameters R and A
+were unbound and the specialization never matched.  The MSVC STL's
+std::function is based on _Get_function_impl<_Ret __cdecl(_Types...)> and
+<_Ret __vectorcall(_Types...)>.

@@ -24,6 +24,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "destructor.h"
 
+#include <functional>
+
 goto_convertt::clean_expr_resultt goto_convertt::remove_assignment(
   side_effect_exprt &expr,
   bool result_is_used,
@@ -381,11 +383,13 @@ goto_convertt::clean_expr_resultt goto_convertt::remove_function_call(
   if(expr.function().id() == ID_symbol)
   {
     const irep_idt &identifier = to_symbol_expr(expr.function()).identifier();
-    const symbolt &symbol = ns.lookup(identifier);
-
-    new_base_name += '_';
-    new_base_name += id2string(symbol.base_name);
-    new_symbol_mode = symbol.mode;
+    const symbolt *symbol_ptr;
+    if(!ns.lookup(identifier, symbol_ptr))
+    {
+      new_base_name += '_';
+      new_base_name += id2string(symbol_ptr->base_name);
+      new_symbol_mode = symbol_ptr->mode;
+    }
   }
 
   const symbolt &new_symbol = get_fresh_aux_symbol(
@@ -401,11 +405,18 @@ goto_convertt::clean_expr_resultt goto_convertt::remove_function_call(
     goto_programt::make_decl(new_symbol.symbol_expr(), new_symbol.location));
 
   {
-    goto_programt tmp_program2;
     code_function_callt call(
       new_symbol.symbol_expr(), expr.function(), expr.arguments());
     call.add_source_location() = new_symbol.location;
+    // the operands' temporaries belong to the enclosing full-expression
+    // ([class.temporary]/4)
+    std::list<irep_idt> operand_temporaries;
+    std::list<irep_idt> *const saved = nested_call_temporaries;
+    nested_call_temporaries = &operand_temporaries;
     convert_function_call(call, side_effects.side_effects, mode);
+    nested_call_temporaries = saved;
+    side_effects.temporaries.splice(
+      side_effects.temporaries.begin(), operand_temporaries);
   }
 
   static_cast<exprt &>(expr) = new_symbol.symbol_expr();
@@ -465,6 +476,8 @@ goto_convertt::remove_cpp_delete(side_effect_exprt &expr)
   tmp.add_source_location() = expr.source_location();
   tmp.copy_to_operands(to_unary_expr(expr).op());
   tmp.set(ID_destructor, expr.find(ID_destructor));
+  if(expr.find("#deallocated_object").is_not_nil())
+    tmp.add("#deallocated_object") = expr.find("#deallocated_object");
 
   clean_expr_resultt side_effects;
   convert_cpp_delete(tmp, side_effects.side_effects);
@@ -528,12 +541,66 @@ goto_convertt::remove_temporary_object(side_effect_exprt &expr)
     expr.find_source_location(),
     mode);
 
-  if(expr.operands().size() == 1)
+  const bool aggregate_value = expr.operands().size() == 1 &&
+                               (to_unary_expr(expr).op().id() == ID_struct ||
+                                to_unary_expr(expr).op().id() == ID_array ||
+                                to_unary_expr(expr).op().id() == ID_union);
+  if(expr.operands().size() == 1 && !aggregate_value)
   {
     const code_assignt assignment(
       new_symbol.symbol_expr(), to_unary_expr(expr).op());
 
     convert(assignment, side_effects.side_effects, mode);
+  }
+  else if(aggregate_value)
+  {
+    // N5008 [class.temporary]/6 (Note 5, Example 4): a temporary whose
+    // reference member is initialized by another temporary extends that
+    // temporary's lifetime with its own -- `const S &s = S{1}' with
+    // `struct S { const int &m; }'.  The aggregate value of this temporary
+    // then holds the inner temporary's address as a member; such inner
+    // temporaries become this temporary's own (destroyed with it), the
+    // others end with the full-expression as usual ([class.temporary]/4).
+    exprt value = to_unary_expr(expr).op();
+    clean_expr_resultt value_effects = clean_expr(value, mode);
+    side_effects.side_effects.destructive_append(value_effects.side_effects);
+    std::set<irep_idt> addressed;
+    std::function<void(const exprt &)> collect_addressed = [&](const exprt &e)
+    {
+      if(e.id() == ID_struct || e.id() == ID_array || e.id() == ID_union)
+      {
+        for(const auto &op : e.operands())
+          collect_addressed(op);
+      }
+      else if(e.id() == ID_typecast)
+        collect_addressed(to_typecast_expr(e).op());
+      else if(e.id() == ID_address_of)
+      {
+        const exprt &object = to_address_of_expr(e).object();
+        if(object.id() == ID_symbol)
+          addressed.insert(to_symbol_expr(object).get_identifier());
+      }
+    };
+    collect_addressed(value);
+    std::list<irep_idt> others;
+    for(const auto &id : value_effects.temporaries)
+    {
+      if(addressed.count(id) != 0)
+      {
+        side_effects.add_temporary(id);
+        side_effects.dependents[new_symbol.name].push_back(id);
+      }
+      else
+        others.push_back(id);
+    }
+    for(auto &d : value_effects.dependents)
+    {
+      side_effects.dependents[d.first].splice(
+        side_effects.dependents[d.first].begin(), d.second);
+    }
+    const code_assignt assignment(new_symbol.symbol_expr(), value);
+    copy(assignment, ASSIGN, side_effects.side_effects);
+    destruct_locals(others, side_effects.side_effects, ns);
   }
 
   if(expr.find(ID_initializer).is_not_nil())
@@ -545,7 +612,16 @@ goto_convertt::remove_temporary_object(side_effect_exprt &expr)
     exprt initializer = static_cast<const exprt &>(expr.find(ID_initializer));
     replace_new_object(new_symbol.symbol_expr(), initializer);
 
+    // the temporaries of the initialization (a constructor call's
+    // operands) belong to the enclosing full-expression
+    // ([class.temporary]/4)
+    std::list<irep_idt> initializer_temporaries;
+    std::list<irep_idt> *const saved = nested_call_temporaries;
+    nested_call_temporaries = &initializer_temporaries;
     convert(to_code(initializer), side_effects.side_effects, mode);
+    nested_call_temporaries = saved;
+    side_effects.temporaries.splice(
+      side_effects.temporaries.begin(), initializer_temporaries);
   }
 
   static_cast<exprt &>(expr) = new_symbol.symbol_expr();
@@ -776,6 +852,10 @@ goto_convertt::clean_expr_resultt goto_convertt::remove_side_effect(
     codet code = code_expressiont(side_effect_expr_throwt(
       expr.find(ID_exception_list), expr.type(), expr.source_location()));
     code.op0().operands().swap(expr.operands());
+    // preserve the enclosing-handler tag on a rethrow (`throw;`) so that
+    // remove_cpp_exceptions can re-propagate that handler's exception
+    if(!expr.get("#rethrow_handler").empty())
+      code.op0().set("#rethrow_handler", expr.get("#rethrow_handler"));
     code.add_source_location() = expr.source_location();
     side_effects.side_effects.add(goto_programt::instructiont(
       std::move(code), expr.source_location(), THROW, nil_exprt(), {}));

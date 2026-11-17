@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp11
+^\[test\.assertion\.1\] line 36 one branch: SUCCESS$
+^\[test\.assertion\.2\] line 37 created only if evaluated: SUCCESS$
+^\[test\.assertion\.3\] line 41 both branches: SUCCESS$
+^\[test\.assertion\.4\] line 42 selected branch: SUCCESS$
+^\[test\.assertion\.5\] line 46 logical operators: SUCCESS$
+^\[test\.assertion\.6\] line 47 created only if evaluated, && and \|\|: SUCCESS$
+^\[main\.assertion\.1\] line 57 WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The destructors of the temporaries of a branch of ?: (and so of the right
+operand of && and ||) ran on every path, also where the branch was not taken.

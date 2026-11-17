@@ -1,0 +1,22 @@
+CORE libcxx
+main.cpp
+--cpp11 --stdlib libc++
+^\[handler\.assertion\.1\] line \d+ terminate: non-throwing: SUCCESS$
+^\[handler\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\[main\.assertion\.1\] line \d+ plain: non-throwing: SUCCESS$
+^\[main\.assertion\.2\] line \d+ member throws: SUCCESS$
+^\[main\.assertion\.3\] line \d+ base throws: SUCCESS$
+^\[main\.assertion\.4\] line \d+ template: non-throwing: SUCCESS$
+^\[main\.assertion\.5\] line \d+ noexcept\(false\): SUCCESS$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Destructors without a noexcept-specifier were taken as potentially
+throwing, the noexcept operator took every destructor call as
+non-throwing, and the noexcept of a destructor declared in its class was
+not recorded at all (rConstructorDecl).  The handler runs on paths 1 and
+4 (g++ and clang++ agree on each path).

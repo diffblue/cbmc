@@ -1,0 +1,17 @@
+CORE
+clang_cases.cpp
+--cpp17 --32
+^\[main\.assertion\.1\] line \d+ conversion function: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+static assertion failed
+is unknown$
+dropped the body
+--
+As test_clang_cases.desc, with a 32-bit long (as int): the binding of
+const int & to a long converts it although the representation is the same.

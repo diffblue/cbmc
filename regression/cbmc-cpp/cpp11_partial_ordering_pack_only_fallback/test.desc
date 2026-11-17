@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ the more specialized template: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Partial ordering compared parameter-type-lists of equal length only, so
+the call was ambiguous between invoke(Args&&...) and invoke(F&&, Args&&...)
+(also on develop).  libc++ 19's std::__invoke has this pair; every
+ranges algorithm with a projection reached it (__get_property and
+__estimated_width in <format>, std::apply: the macOS CI job).

@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ constructor template: SUCCESS$
+^\[main\.assertion\.2\] line \d+ variadic constructor template: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+dropped the body
+--
+A conversion by a constructor of the class itself is not followed by a copy.

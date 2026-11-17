@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ operator\[\] result: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+Invariant check failed
+--
+`sizeof(t[0])' parses as the type `t[0]' first; when `t' named an object
+the front end built an array index expression, whose constructor requires
+an array operand, and crashed for a class object.

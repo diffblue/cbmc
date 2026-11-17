@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=6$
+^SIGNAL=0$
+could not fully type-check 'main'
+^CONVERSION ERROR$
+--
+^warning: ignoring
+^VERIFICATION SUCCESSFUL$
+--
+An incompletely type-checked USER function is an error, not a warning with
+a SUCCESSFUL verdict (Issue 13).  Library bodies keep the tolerant path.

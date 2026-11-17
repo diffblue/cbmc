@@ -1,0 +1,16 @@
+KNOWNBUG
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+no body for callee
+--
+The CPROVER library has no model for any of the <wchar.h> wide-character
+array and string functions (wmemcpy, wmemmove, wmemset, wmemcmp, wmemchr,
+wcslen, ...): calls to them are "no body for callee" and return or write
+nondeterministic values.  libstdc++'s char_traits<wchar_t> uses them, so
+std::char_traits<wchar_t>::copy and std::wstring operations are
+nondeterministic.  gcc runs this program without assertion failure.

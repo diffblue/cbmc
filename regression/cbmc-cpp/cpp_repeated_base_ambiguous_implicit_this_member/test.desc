@@ -1,0 +1,15 @@
+CORE
+main.cpp
+
+member 'i' of the ambiguous base class 'A' of 'D'$
+^CONVERSION ERROR$
+^EXIT=6$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+N5008 [expr.prim.id.general]/2: `i' in a member function of D is
+`(*this).i', ill-formed by [expr.ref]/8 when A is an ambiguous base of D
+([class.mi]/4-5).  g++ 13 ("reference to 'i' is ambiguous") and clang++ 18
+("non-static member 'i' found in multiple base-class subobjects") reject
+this program.

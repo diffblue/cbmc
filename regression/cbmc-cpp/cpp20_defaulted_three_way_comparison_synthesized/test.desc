@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ strong_ordering: SUCCESS$
+^\[main\.assertion\.2\] line \d+ strong_ordering, equal: SUCCESS$
+^\[main\.assertion\.3\] line \d+ weak_ordering: SUCCESS$
+^\[main\.assertion\.4\] line \d+ partial_ordering: SUCCESS$
+^\[main\.assertion\.5\] line \d+ reference operands: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+`M <=> M' (no operator<=>) became the C int lowering, so the defaulted
+operator<=> returned an int.  Without that lowering the comparison is
+synthesized from == and <; an int& operand of <=> is dereferenced.

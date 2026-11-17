@@ -11,11 +11,12 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_type2name.h"
 
-#include <string>
-
 #include <util/cprover_prefix.h>
 #include <util/pointer_expr.h>
+#include <util/std_types.h>
 #include <util/type.h>
+
+#include <string>
 
 static std::string do_prefix(const std::string &s)
 {
@@ -72,7 +73,8 @@ static std::string irep2name(const irept &irep)
   {
     if(
       named_sub.first == ID_C_constant || named_sub.first == ID_C_volatile ||
-      named_sub.first == ID_C_restricted)
+      named_sub.first == ID_C_restricted ||
+      named_sub.first == ID_C_ref_qualifier || named_sub.first == "#C_noexcept")
     {
       if(first)
         first=false;
@@ -119,12 +121,42 @@ std::string cpp_type2name(const typet &type)
     result += CPROVER_PREFIX "bool";
   else if(type.id()==ID_pointer)
   {
-    if(is_reference(type))
-      result += "ref_" + cpp_type2name(to_reference_type(type).base_type());
-    else if(is_rvalue_reference(type))
+    if(is_rvalue_reference(type))
       result += "rref_" + cpp_type2name(to_pointer_type(type).base_type());
+    else if(is_reference(type))
+      result += "ref_" + cpp_type2name(to_reference_type(type).base_type());
+    else if(type.find(ID_to_member).is_not_nil())
+    {
+      // N5008 [dcl.mptr]: a pointer to member `T C::*` is a distinct type
+      // from `T*`; naming both `ptr_T` made `memfun<int S::*>` and
+      // `memfun<int*>` the SAME instance (the second use silently reused
+      // the first's members).
+      result +=
+        "memptr_" +
+        cpp_type2name(static_cast<const typet &>(type.find(ID_to_member))) +
+        "_" + cpp_type2name(to_pointer_type(type).base_type());
+    }
     else
       result += "ptr_" + cpp_type2name(to_pointer_type(type).base_type());
+  }
+  else if(type.id() == ID_frontend_pointer)
+  {
+    // A not-yet-lowered parse-time pointer/reference (e.g. a reference
+    // parameter inside std::function<void(int&)>'s template argument)
+    // must produce the SAME name as its lowered ID_pointer form:
+    // otherwise one instantiation of e.g. std::forward<int&> is
+    // created under two identities -- the definition attaches to one
+    // (`forward<ref_signed_int>`) while calls bind the other
+    // (`forward<reference(signedbv...)>`, via the raw-irep fallback),
+    // which stays BODYLESS and havocs (std::function invocation lost
+    // its closure's effects).
+    const typet &base = to_type_with_subtype(type).subtype();
+    if(type.get_bool(ID_C_rvalue_reference))
+      result += "rref_" + cpp_type2name(base);
+    else if(type.get_bool(ID_C_reference))
+      result += "ref_" + cpp_type2name(base);
+    else
+      result += "ptr_" + cpp_type2name(base);
   }
   else if(type.id()==ID_signedbv || type.id()==ID_unsignedbv)
   {
@@ -163,13 +195,29 @@ std::string cpp_type2name(const typet &type)
     {
       if(arg_it!=parameters.begin())
         result+=',';
-      result+=cpp_type2name(arg_it->type());
+      result += irep2name(*arg_it);
     }
 
     result+=')';
     result+="->(";
     result+=cpp_type2name(return_type);
     result+=')';
+
+    if(to_code_type(type).has_ellipsis())
+      result += "_ellipsis";
+
+    const irep_idt &ref_qualifier = type.get(ID_C_ref_qualifier);
+    if(ref_qualifier == "&")
+      result += "_lref";
+    else if(ref_qualifier == "&&")
+      result += "_rref";
+
+    if(type.get_bool(ID_noexcept) || type.get_bool("#C_noexcept"))
+      result += "_noexcept";
+  }
+  else if(type.id() == ID_complex)
+  {
+    result += "complex_" + cpp_type2name(to_complex_type(type).subtype());
   }
   else
   {

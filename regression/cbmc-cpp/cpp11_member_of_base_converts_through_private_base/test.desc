@@ -1,0 +1,11 @@
+CORE
+main.cpp
+
+^EXIT=6$
+^SIGNAL=0$
+^CONVERSION ERROR$
+--
+^warning: ignoring
+--
+A member of the base itself got access to the private base, wrongly taken
+for a member of a derived class.

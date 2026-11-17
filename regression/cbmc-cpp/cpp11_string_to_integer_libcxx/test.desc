@@ -1,0 +1,18 @@
+CORE libcxx
+main.cpp
+--cpp11 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ stoi: SUCCESS$
+^\[main\.assertion\.2\] line \d+ stoll with index: SUCCESS$
+^\[main\.assertion\.3\] line \d+ stoul base 16: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+libc++ declares std::stoi and its siblings in <string> and defines them in
+libc++.so, so the calls had no body and returned nondeterministic values
+(cpp17_stoll_char_literal_overload failed on macOS).

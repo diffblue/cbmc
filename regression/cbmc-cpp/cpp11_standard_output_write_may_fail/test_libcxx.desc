@@ -1,0 +1,16 @@
+CORE libcxx
+main.cpp
+--cpp11 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ a write to stdout always succeeds: FAILURE$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 2 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Fixed (soundness): the stream buffers of provide_standard_stream_objects
+accepted every character, so a write never failed and assertion 1 was
+reported to hold.  overflow may now return eof() and xsputn may write
+any initial part of the characters.

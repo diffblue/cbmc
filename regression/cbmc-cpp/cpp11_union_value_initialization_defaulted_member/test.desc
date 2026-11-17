@@ -1,0 +1,29 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ short size set: SUCCESS$
+^\[main\.assertion\.2\] line \d+ Rep\(\): the union is value-initialized: SUCCESS$
+^\[main\.assertion\.3\] line \d+ new Rep\(\): SUCCESS$
+^\[main\.assertion\.4\] line \d+ Rep braces\{\}: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+found no match
+dropped the body
+--
+N5008 [class.union.general]/1: a union is a class; [class.default.ctor]/1-3:
+its default constructor is implicitly declared when no constructor is
+user-declared, not deleted here (the variant member's defaulted default
+constructor is trivial) and not user-provided.  `Rep()' therefore
+value-initializes: zero-initialization, then the (trivial) default
+constructor ([dcl.init.general]/9.1).  The front end's overload resolution
+turned only STRUCT types into constructor candidates, so the functional
+cast of this non-POD union failed with "found no match for symbol 'Rep'"
+-- libc++ 23's `__rep_ = __rep()' in basic_string's __init_internal_buffer
+and destructor, both dropped, so every libc++-23 std::string was nondet
+(KNOWNBUG libcxx23_string_fill_ctor, the largest failure family of the
+libc++-23 sweep; cvise reduction /tmp/r163/red).  Fixed in round 163b.

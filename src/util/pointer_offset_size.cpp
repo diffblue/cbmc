@@ -22,6 +22,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ssa_expr.h"
 #include "std_expr.h"
 
+#include <unordered_set>
+
 std::optional<bytest> member_offset(
   const struct_typet &type,
   const irep_idt &member,
@@ -34,6 +36,15 @@ std::optional<bytest> member_offset(
   {
     if(comp.get_name() == member)
       return result;
+
+    // member typedefs, static members and methods of a C++ class occupy no
+    // storage (as in size_of_expr_rec)
+    if(
+      comp.get_bool(ID_is_type) || comp.get_bool(ID_is_static) ||
+      comp.type().id() == ID_code)
+    {
+      continue;
+    }
 
     if(comp.type().id() == ID_c_bit_field)
     {
@@ -52,8 +63,17 @@ std::optional<bytest> member_offset(
     }
     else
     {
-      DATA_INVARIANT(
-        bit_field_bits == 0, "padding ensures offset at byte boundaries");
+      if(bit_field_bits != 0)
+      {
+        // The struct is not in a well-formed layout: an accumulated
+        // bit-field run has not been padded to a byte boundary
+        // before this non-bit-field member.  This can happen when
+        // the front-end fails to elaborate struct padding (for
+        // example on ill-formed inputs or after an earlier
+        // type-check error).  Return "offset not known" rather
+        // than aborting via INVARIANT.
+        return {};
+      }
       const auto sub_size = pointer_offset_size(comp.type(), ns);
       if(!sub_size.has_value())
         return {};
@@ -78,6 +98,15 @@ std::optional<bitst> member_offset_bits(
     if(comp.get_name()==member)
       return offset;
 
+    // member typedefs, static members and methods of a C++ class occupy no
+    // storage (as in size_of_expr_rec)
+    if(
+      comp.get_bool(ID_is_type) || comp.get_bool(ID_is_static) ||
+      comp.type().id() == ID_code)
+    {
+      continue;
+    }
+
     auto member_bits = pointer_offset_bits(comp.type(), ns);
     if(!member_bits.has_value())
       return {};
@@ -100,12 +129,15 @@ pointer_offset_size(const typet &type, const namespacet &ns)
     return {};
 }
 
-std::optional<bitst>
-pointer_offset_bits(const typet &type, const namespacet &ns)
+static std::optional<bitst> pointer_offset_bits_rec(
+  const typet &type,
+  const namespacet &ns,
+  std::unordered_set<irep_idt> &visited_tags)
 {
   if(type.id()==ID_array)
   {
-    auto sub = pointer_offset_bits(to_array_type(type).element_type(), ns);
+    auto sub = pointer_offset_bits_rec(
+      to_array_type(type).element_type(), ns, visited_tags);
     if(!sub.has_value())
       return {};
 
@@ -118,7 +150,8 @@ pointer_offset_bits(const typet &type, const namespacet &ns)
   }
   else if(type.id()==ID_vector)
   {
-    auto sub = pointer_offset_bits(to_vector_type(type).element_type(), ns);
+    auto sub = pointer_offset_bits_rec(
+      to_vector_type(type).element_type(), ns, visited_tags);
     if(!sub.has_value())
       return {};
 
@@ -130,7 +163,8 @@ pointer_offset_bits(const typet &type, const namespacet &ns)
   }
   else if(type.id()==ID_complex)
   {
-    auto sub = pointer_offset_bits(to_complex_type(type).subtype(), ns);
+    auto sub = pointer_offset_bits_rec(
+      to_complex_type(type).subtype(), ns, visited_tags);
 
     if(sub.has_value())
       return (*sub) * 2;
@@ -144,8 +178,16 @@ pointer_offset_bits(const typet &type, const namespacet &ns)
 
     for(const auto &c : struct_type.components())
     {
+      // skip typedefs, static members, and methods
+      if(
+        c.get_bool(ID_is_type) || c.get_bool(ID_is_static) ||
+        c.type().id() == ID_code)
+      {
+        continue;
+      }
+
       const typet &subtype = c.type();
-      auto sub_size = pointer_offset_bits(subtype, ns);
+      auto sub_size = pointer_offset_bits_rec(subtype, ns, visited_tags);
 
       if(!sub_size.has_value())
         return {};
@@ -186,7 +228,8 @@ pointer_offset_bits(const typet &type, const namespacet &ns)
   }
   else if(type.id()==ID_c_enum_tag)
   {
-    return pointer_offset_bits(ns.follow_tag(to_c_enum_tag_type(type)), ns);
+    return pointer_offset_bits_rec(
+      ns.follow_tag(to_c_enum_tag_type(type)), ns, visited_tags);
   }
   else if(type.id()==ID_bool)
   {
@@ -202,11 +245,23 @@ pointer_offset_bits(const typet &type, const namespacet &ns)
   }
   else if(type.id() == ID_union_tag)
   {
-    return pointer_offset_bits(ns.follow_tag(to_union_tag_type(type)), ns);
+    const irep_idt &tag_name = to_union_tag_type(type).get_identifier();
+    if(!visited_tags.insert(tag_name).second)
+      return {};
+    auto result = pointer_offset_bits_rec(
+      ns.follow_tag(to_union_tag_type(type)), ns, visited_tags);
+    visited_tags.erase(tag_name);
+    return result;
   }
   else if(type.id() == ID_struct_tag)
   {
-    return pointer_offset_bits(ns.follow_tag(to_struct_tag_type(type)), ns);
+    const irep_idt &tag_name = to_struct_tag_type(type).get_identifier();
+    if(!visited_tags.insert(tag_name).second)
+      return {};
+    auto result = pointer_offset_bits_rec(
+      ns.follow_tag(to_struct_tag_type(type)), ns, visited_tags);
+    visited_tags.erase(tag_name);
+    return result;
   }
   else if(type.id()==ID_code)
   {
@@ -218,6 +273,13 @@ pointer_offset_bits(const typet &type, const namespacet &ns)
   }
   else
     return {};
+}
+
+std::optional<bitst>
+pointer_offset_bits(const typet &type, const namespacet &ns)
+{
+  std::unordered_set<irep_idt> visited_tags;
+  return pointer_offset_bits_rec(type, ns, visited_tags);
 }
 
 std::optional<exprt>
@@ -254,6 +316,15 @@ std::optional<exprt> member_offset_expr(
     if(c.get_name() == member)
       break;
 
+    // member typedefs, static members and methods of a C++ class occupy no
+    // storage (as in size_of_expr_rec)
+    if(
+      c.get_bool(ID_is_type) || c.get_bool(ID_is_static) ||
+      c.type().id() == ID_code)
+    {
+      continue;
+    }
+
     if(c.type().id() == ID_c_bit_field)
     {
       std::size_t w = to_c_bit_field_type(c.type()).get_width();
@@ -273,8 +344,20 @@ std::optional<exprt> member_offset_expr(
     }
     else
     {
-      DATA_INVARIANT(
-        bit_field_bits == 0, "padding ensures offset at byte boundaries");
+      if(bit_field_bits != 0)
+      {
+        // Mirror member_offset() above: the struct is not in a well-formed
+        // byte layout -- an accumulated bit-field / boolean run has not been
+        // padded to a byte boundary before this non-bit-field member.  This
+        // occurs for a class with virtual bases, whose synthetic 1-bit
+        // `@most_derived` flag ([class.mi], modelled as a boolean) is not
+        // padded: the C++ front-end deliberately does not run add_padding() on
+        // classes with base classes (base-subobject layout is not modelled by
+        // its flattened from_base components).  Return "offset not known"
+        // rather than aborting via INVARIANT, consistently with
+        // member_offset().
+        return {};
+      }
       const typet &subtype = c.type();
       auto sub_size = size_of_expr(subtype, ns);
       if(!sub_size.has_value())
@@ -286,13 +369,16 @@ std::optional<exprt> member_offset_expr(
   return simplify_expr(std::move(result), ns);
 }
 
-std::optional<exprt> size_of_expr(const typet &type, const namespacet &ns)
+static std::optional<exprt> size_of_expr_rec(
+  const typet &type,
+  const namespacet &ns,
+  std::unordered_set<irep_idt> &visited_tags)
 {
   if(type.id()==ID_array)
   {
     const auto &array_type = to_array_type(type);
 
-    auto sub = size_of_expr(array_type.element_type(), ns);
+    auto sub = size_of_expr_rec(array_type.element_type(), ns, visited_tags);
     if(!sub.has_value())
       return {};
 
@@ -322,7 +408,7 @@ std::optional<exprt> size_of_expr(const typet &type, const namespacet &ns)
       }
     }
 
-    auto sub = size_of_expr(vector_type.element_type(), ns);
+    auto sub = size_of_expr_rec(vector_type.element_type(), ns, visited_tags);
     if(!sub.has_value())
       return {};
 
@@ -338,7 +424,8 @@ std::optional<exprt> size_of_expr(const typet &type, const namespacet &ns)
   }
   else if(type.id()==ID_complex)
   {
-    auto sub = size_of_expr(to_complex_type(type).subtype(), ns);
+    auto sub =
+      size_of_expr_rec(to_complex_type(type).subtype(), ns, visited_tags);
     if(!sub.has_value())
       return {};
 
@@ -354,6 +441,14 @@ std::optional<exprt> size_of_expr(const typet &type, const namespacet &ns)
 
     for(const auto &c : struct_type.components())
     {
+      // skip typedefs, static members, and methods
+      if(
+        c.get_bool(ID_is_type) || c.get_bool(ID_is_static) ||
+        c.type().id() == ID_code)
+      {
+        continue;
+      }
+
       if(c.type().id() == ID_c_bit_field)
       {
         std::size_t w = to_c_bit_field_type(c.type()).get_width();
@@ -373,7 +468,7 @@ std::optional<exprt> size_of_expr(const typet &type, const namespacet &ns)
         DATA_INVARIANT(
           bit_field_bits == 0, "padding ensures offset at byte boundaries");
         const typet &subtype = c.type();
-        auto sub_size_opt = size_of_expr(subtype, ns);
+        auto sub_size_opt = size_of_expr_rec(subtype, ns, visited_tags);
         if(!sub_size_opt.has_value())
           return {};
 
@@ -394,6 +489,15 @@ std::optional<exprt> size_of_expr(const typet &type, const namespacet &ns)
 
     for(const auto &c : union_type.components())
     {
+      // member typedefs, static members and methods of a C++ union occupy
+      // no storage
+      if(
+        c.get_bool(ID_is_type) || c.get_bool(ID_is_static) ||
+        c.type().id() == ID_code)
+      {
+        continue;
+      }
+
       const typet &subtype = c.type();
       exprt sub_size;
 
@@ -403,7 +507,7 @@ std::optional<exprt> size_of_expr(const typet &type, const namespacet &ns)
       {
         max_bytes = bytest{-1};
 
-        auto sub_size_opt = size_of_expr(subtype, ns);
+        auto sub_size_opt = size_of_expr_rec(subtype, ns, visited_tags);
         if(!sub_size_opt.has_value())
           return {};
         sub_size = sub_size_opt.value();
@@ -452,11 +556,13 @@ std::optional<exprt> size_of_expr(const typet &type, const namespacet &ns)
   }
   else if(type.id()==ID_c_enum)
   {
-    return size_of_expr(to_c_enum_type(type).underlying_type(), ns);
+    return size_of_expr_rec(
+      to_c_enum_type(type).underlying_type(), ns, visited_tags);
   }
   else if(type.id()==ID_c_enum_tag)
   {
-    return size_of_expr(ns.follow_tag(to_c_enum_tag_type(type)), ns);
+    return size_of_expr_rec(
+      ns.follow_tag(to_c_enum_tag_type(type)), ns, visited_tags);
   }
   else if(type.id()==ID_bool)
   {
@@ -477,11 +583,23 @@ std::optional<exprt> size_of_expr(const typet &type, const namespacet &ns)
   }
   else if(type.id() == ID_union_tag)
   {
-    return size_of_expr(ns.follow_tag(to_union_tag_type(type)), ns);
+    const irep_idt &tag_name = to_union_tag_type(type).get_identifier();
+    if(!visited_tags.insert(tag_name).second)
+      return {};
+    auto result = size_of_expr_rec(
+      ns.follow_tag(to_union_tag_type(type)), ns, visited_tags);
+    visited_tags.erase(tag_name);
+    return result;
   }
   else if(type.id() == ID_struct_tag)
   {
-    return size_of_expr(ns.follow_tag(to_struct_tag_type(type)), ns);
+    const irep_idt &tag_name = to_struct_tag_type(type).get_identifier();
+    if(!visited_tags.insert(tag_name).second)
+      return {};
+    auto result = size_of_expr_rec(
+      ns.follow_tag(to_struct_tag_type(type)), ns, visited_tags);
+    visited_tags.erase(tag_name);
+    return result;
   }
   else if(type.id()==ID_code)
   {
@@ -498,6 +616,12 @@ std::optional<exprt> size_of_expr(const typet &type, const namespacet &ns)
   }
   else
     return {};
+}
+
+std::optional<exprt> size_of_expr(const typet &type, const namespacet &ns)
+{
+  std::unordered_set<irep_idt> visited_tags;
+  return size_of_expr_rec(type, ns, visited_tags);
 }
 
 bool is_zero_width(const typet &type, const namespacet &ns)

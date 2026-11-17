@@ -1,0 +1,17 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] .* friend of the base: SUCCESS$
+^\[main\.assertion\.2\] .* in a template: SUCCESS$
+^\[main\.assertion\.3\] .* in decltype: SUCCESS$
+^\[main\.assertion\.4\] .* private member of the base: SUCCESS$
+^\[main\.assertion\.5\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [class.access.base]/5.4: friends of a base class may name its members
+through an object of a derived class.

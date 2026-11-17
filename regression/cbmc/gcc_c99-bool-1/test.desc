@@ -1,4 +1,4 @@
-CORE
+CORE no-vacuity-check
 c99-bool-1.c
 
 ^EXIT=0$
@@ -6,3 +6,6 @@ c99-bool-1.c
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+--
+no-vacuity-check: main ends with exit(0) (the GCC test-suite convention),
+which does not return; the checks before the call are reached.

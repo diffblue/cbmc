@@ -1,0 +1,17 @@
+CORE gcc-only
+main.c
+--unwind 4
+^\[main\.assertion\.1\] line \d+ assertion sum\(3, 1, 2, 4\) == 7: SUCCESS$
+^\[main\.assertion\.2\] line \d+ assertion not_a_parameter\(1, 9\) == 9: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+does not handle constant
+--
+The second argument was taken as the parameter the variadic arguments
+follow: `0' aborted symbolic execution ("address_arithmetic does not handle
+constant"), and a local variable left the va_list empty.

@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ braced argument: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+An abbreviated function template was recognized only at namespace scope;
+a member with a placeholder parameter (subrange(auto __first, _Sent
+__last) in <ranges>) kept an `auto' parameter type and was no candidate.
+GCC 14's <format> _M_parse_fill_and_align (`_Utf32_view<subrange<iterator>>
+__uv({__first, __last})') lost its body once __literal_encoding_is_unicode
+was evaluated.

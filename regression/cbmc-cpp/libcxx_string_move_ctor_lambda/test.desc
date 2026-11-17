@@ -1,0 +1,40 @@
+CORE libcxx
+main.cpp
+--cpp11 --stdlib libc++ --unwind 6 --no-unwinding-assertions --object-bits 12
+^\[main\.assertion\.1\] line \d+ moved string keeps its contents: SUCCESS$
+^\[main\.assertion\.2\] line \d+ element: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+libc++ 18's basic_string(basic_string &&) initializes `__r_' through an
+immediately-invoked lambda `[](basic_string &__s) -> decltype(__s.__r_) &&
+{ ...; return std::move(__s.__r_); }(__str)' (<string> line 925).  The
+lambda's body was dropped ("invalid implicit conversion from 'struct
+__compressed_pair &' to 'struct __compressed_pair &&'"), so a moved-from
+std::string was nondet under libc++ -- the moved string's size and elements
+read as garbage.  Preceded by "symbol '__compressed_pair_elem' does not
+uniquely resolve" in __compressed_pair's implicit copy constructor (two
+private bases that are specializations of one template); the header-free
+shape of that ambiguity alone (compressed_pair_elem<T1,0> and <T2,1> bases,
+a lambda returning `decltype(s.r_) &&') converts correctly, so the full
+libc++ context is needed to reproduce.  Under libstdc++ the same program
+passes.  Audit residue item 1 (round 162), 11 libc++ tests.
+Round 163b (cvise reduction to 14 lines, /tmp/r163/red): three defects.
+(1) The lambda's body, type-checked in place, was not marked converted, so
+the end-of-unit sweep completing half-converted system-header bodies
+converted it a second time and the re-check failed
+(cpp11_lambda_body_in_system_header_converted_once).  (2) `std::string
+("abc")[1]' was nondet even without a move: libc++ sizes its
+`__constexpr_memmove' with `__libcpp_datasizeof<char>::value', which is
+clang's `__datasizeof(char)' -- unknown to the front end
+(cpp11_datasizeof_builtin) -- or, without the builtin, an offsetof over a
+member class template instantiated from the static member's initializer
+while the enclosing instance is still being converted, which produced an
+empty struct (cpp11_member_class_template_in_static_member_initializer).
+All three fixed; the test is CORE.

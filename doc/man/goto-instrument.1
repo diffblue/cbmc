@@ -713,6 +713,12 @@ enable debug assertions in the cprover contracts library
 use simplified invalid pointer model in the cprover contracts library
 (faster, unsound)
 .TP
+\fB\-\-c\-library\-models\fR dir
+use the C library models preprocessed into \fIdir\fR by
+\fBcbmc \-\-dump\-c\-library\-models\fR, on this or another host, for the
+same target and library options, instead of preprocessing the built-in
+models with this host's headers
+.TP
 \fB\-\-model\-argc\-argv\fR \fIn\fR
 Create up to \fIn\fR non-deterministic C strings as entries to \fIargv\fR and
 set \fIargc\fR accordingly. In absence of such modelling, \fIargv\fR is left

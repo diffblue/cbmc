@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ move assignment template: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+is not accessible
+--
+The preference for a non-template candidate was applied before the
+comparison of reference bindings, so the deleted copy assignment beat a
+move assignment operator template for an rvalue argument.  The MSVC STL's
+unique_ptr declares its move assignment as a template
+(cpp11_unique_ptr_move on VS 2022).

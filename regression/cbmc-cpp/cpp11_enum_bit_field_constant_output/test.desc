@@ -1,0 +1,12 @@
+CORE
+main.cpp
+--cpp11 --show-goto-functions
+^\s*ASSIGN main::1::s := \{ 0, 0(, 0)* \}$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+[0-9]{30}
+--
+N5008 [class.bit]/4: format_expr of a constant of a bit-field type whose
+underlying type is an enumeration tag dereferenced an empty optional.

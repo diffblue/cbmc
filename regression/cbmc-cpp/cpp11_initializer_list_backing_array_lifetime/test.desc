@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--unwind 5
+^\[main\.assertion\.1\] .* elements copied while alive: SUCCESS$
+^\[main\.assertion\.2\] .* list elements destroyed: SUCCESS$
+^\[main\.assertion\.3\] .* each object destroyed once: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The backing array of a std::initializer_list argument lives until the end
+of the full-expression ([class.temporary]/4, [dcl.init.list]/6).  Its
+elements were destroyed when the list object had been built, before the
+callee read them, and those of a list of three or more elements twice.

@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp11 --object-bits 12 --unwind 5 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ size: SUCCESS$
+^\[main\.assertion\.2\] line \d+ elements destroyed: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+std::_Destroy and _Destroy_aux<false>::__destroy had empty-body models
+("no-op for scalars"), so no element of a container was ever destroyed.

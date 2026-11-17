@@ -1,0 +1,12 @@
+CORE libcxx
+main.cpp
+--cpp11 --stdlib libc++
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^PARSING ERROR$
+--
+`std::cerr << std::endl' now selects the manipulator overload
+(cpp11_manipulator_overload_for_each_stream_specialization), so the program
+verifies without bounds; it was a bounded conversion check.

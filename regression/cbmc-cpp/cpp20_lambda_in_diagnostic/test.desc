@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp20
+^file main\.cpp line \d+: static assertion failed: primary template of kind$
+^CONVERSION ERROR$
+^EXIT=6$
+^SIGNAL=0$
+--
+^Invariant check failed
+^VERIFICATION SUCCESSFUL$
+--
+The static_assert fails while kind<int> is instantiated for the
+requires-clause; that is not in the immediate context of the constraint
+([temp.constr.atomic]/3, [temp.deduct.general]/8), so the program is
+ill-formed: g++ and clang++ reject it.  Printing the constraint, which
+holds the lambda-expression, in a diagnostic failed an invariant of expr2c.

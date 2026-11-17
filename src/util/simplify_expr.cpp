@@ -857,15 +857,22 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
   }
 
   // eliminate casts to proper bool
-  if(expr_type.id()==ID_bool)
+  if(expr_type.id() == ID_bool)
   {
     // rewrite (bool)x to x!=0
-    binary_relation_exprt inequality(
-      expr.op(),
-      op_type.id() == ID_floatbv ? ID_ieee_float_notequal : ID_notequal,
-      from_integer(0, op_type));
-    inequality.add_source_location()=expr.source_location();
-    return changed(simplify_node(inequality));
+    if(
+      op_type.id() == ID_signedbv || op_type.id() == ID_unsignedbv ||
+      op_type.id() == ID_c_bool || op_type.id() == ID_c_bit_field ||
+      op_type.id() == ID_c_enum_tag || op_type.id() == ID_floatbv ||
+      op_type.id() == ID_fixedbv || op_type.id() == ID_pointer)
+    {
+      binary_relation_exprt inequality(
+        expr.op(),
+        op_type.id() == ID_floatbv ? ID_ieee_float_notequal : ID_notequal,
+        from_integer(0, op_type));
+      inequality.add_source_location() = expr.source_location();
+      return changed(simplify_node(inequality));
+    }
   }
 
   // eliminate casts from proper bool
@@ -932,6 +939,22 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
     auto new_expr = expr;
     new_expr.op() = to_typecast_expr(expr.op()).op();
     return changed(simplify_typecast(new_expr)); // recursive call
+  }
+
+  // an integer cast to a pointer, read as a bit vector and converted back to
+  // the integer's type: (T)(bv)(void *)x -> x (Visual Studio's va_arg, see
+  // simplify_extractbits).  Only to x's own type: where a pointer is as wide
+  // as int, the pointer read back from memcpy's bytes is
+  // (int *)(unsigned)(bv)(int *)44, and (int *)44u is not then found equal
+  // to (int *)44.
+  if(
+    (expr_type.id() == ID_signedbv || expr_type.id() == ID_unsignedbv) &&
+    op_type.id() == ID_bv && expr.op().id() == ID_typecast &&
+    to_typecast_expr(expr.op()).op().id() == ID_typecast &&
+    to_typecast_expr(expr.op()).op().type().id() == ID_pointer &&
+    to_typecast_expr(to_typecast_expr(expr.op()).op()).op().type() == expr_type)
+  {
+    return to_typecast_expr(to_typecast_expr(expr.op()).op()).op();
   }
 
   // casts from integer to pointer and back:
@@ -1116,9 +1139,15 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
   {
     const irep_idt &value=to_constant_expr(operand).get_value();
 
-    // preserve the sizeof type annotation
-    typet c_sizeof_type=
-      static_cast<const typet &>(operand.find(ID_C_c_sizeof_type));
+    // preserve the sizeof type annotation, the cast's own first (simplify_mult
+    // moves that of a `sizeof(char)' factor of one onto `(size_t)n')
+    typet c_sizeof_type =
+      static_cast<const typet &>(expr.find(ID_C_c_sizeof_type));
+    if(c_sizeof_type.is_nil())
+    {
+      c_sizeof_type =
+        static_cast<const typet &>(operand.find(ID_C_c_sizeof_type));
+    }
 
     if(op_type_id==ID_integer ||
        op_type_id==ID_natural)
@@ -1203,7 +1232,25 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
       mp_integer int_value;
 
       if(to_integer(to_constant_expr(operand), int_value))
-        return unchanged(expr);
+      {
+        // a bit-field of enumeration type (C++ [class.bit]/4): to_integer
+        // cannot read it without the namespace; the signedness is that of
+        // the enumeration's underlying type
+        if(
+          op_type_id != ID_c_bit_field ||
+          to_c_bit_field_type(op_type).underlying_type().id() != ID_c_enum_tag)
+        {
+          return unchanged(expr);
+        }
+        const c_enum_typet &enum_type = ns.follow_tag(
+          to_c_enum_tag_type(to_c_bit_field_type(op_type).underlying_type()));
+        if(enum_type.is_incomplete())
+          return unchanged(expr);
+        int_value = bvrep2integer(
+          value,
+          to_c_bit_field_type(op_type).get_width(),
+          enum_type.underlying_type().id() == ID_signedbv);
+      }
 
       if(expr_type_id==ID_bool)
       {
@@ -1577,7 +1624,8 @@ simplify_exprt::resultt<> simplify_exprt::simplify_with(const with_exprt &expr)
       if(!old_type_followed.has_component(component_name))
         return unchanged(expr);
 
-      std::size_t number = old_type_followed.component_number(component_name);
+      std::size_t number =
+        old_type_followed.data_component_number(component_name);
 
       if(number >= expr.old().operands().size())
         return unchanged(expr);

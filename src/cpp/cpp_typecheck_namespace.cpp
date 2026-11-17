@@ -18,18 +18,24 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
 {
   // save the scope
   cpp_save_scopet saved_scope(cpp_scopes);
+  cpp_scopet &parent_scope = cpp_scopes.current_scope();
 
   const irep_idt &name=namespace_spec.get_namespace();
 
+  irep_idt final_name(name);
+
+  bool is_anonymous = false;
   if(name.empty())
   {
-    // "unique namespace"
-    error().source_location=namespace_spec.source_location();
-    error() << "unique namespace not supported yet" << eom;
-    throw 0;
+    // N5008 [namespace.unnamed]/1: an unnamed namespace behaves as
+    //   namespace UNIQUE { } using namespace UNIQUE; namespace UNIQUE { body }
+    // where all occurrences in the same scope of a translation unit share
+    // the SAME unique name.  Use a fixed per-scope name so repeated
+    // `namespace { ... }` blocks reuse one namespace, and fall through to
+    // the regular machinery below so the body is actually converted.
+    final_name = "#anon_ns";
+    is_anonymous = true;
   }
-
-  irep_idt final_name(name);
 
   std::string identifier=
     cpp_scopes.current_scope().prefix+id2string(final_name);
@@ -78,6 +84,11 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
     cpp_scopes.new_namespace(final_name);
   }
 
+  // [namespace.unnamed]/1: the implicit using-directive makes the unnamed
+  // namespace's members visible in the enclosing scope.
+  if(is_anonymous)
+    parent_scope.add_using_scope(cpp_scopes.current_scope());
+
   if(namespace_spec.alias().is_not_nil())
   {
     cpp_typecheck_resolvet resolver(*this);
@@ -89,5 +100,12 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
     // do the declarations
     for(auto &item : namespace_spec.items())
       convert(item);
+
+    // C++11: inline namespaces make their names visible in the parent
+    if(namespace_spec.get_is_inline())
+    {
+      cpp_scopes.current_scope().is_inline_namespace = true;
+      parent_scope.add_using_scope(cpp_scopes.current_scope());
+    }
   }
 }

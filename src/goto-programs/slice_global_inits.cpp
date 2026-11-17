@@ -23,6 +23,11 @@ Date:   December 2016
 #include "goto_functions.h"
 #include "goto_model.h"
 
+#include <algorithm>
+#include <map>
+#include <unordered_set>
+#include <vector>
+
 void slice_global_inits(
   goto_modelt &goto_model,
   message_handlert &message_handler)
@@ -122,6 +127,111 @@ void slice_global_inits(
       !it->second.is_macro && it->second.type.id() != ID_code &&
       !it->first.starts_with(CPROVER_PREFIX) &&
       symbols_to_keep.find(it->first) == symbols_to_keep.end())
+    {
+      symbolt &symbol = it.get_writeable_symbol();
+      symbol.is_extern = true;
+      symbol.value.make_nil();
+      symbol.value.set(ID_C_no_nondet_initialization, 1);
+      changed = true;
+    }
+  }
+
+  if(changed && goto_model.can_produce_function(INITIALIZE_FUNCTION))
+    recreate_initialize_function(goto_model, message_handler);
+}
+
+void slice_unused_virtual_tables(
+  goto_modelt &goto_model,
+  message_handlert &message_handler)
+{
+  goto_functionst &goto_functions = goto_model.goto_functions;
+  const auto initialize = goto_functions.function_map.find(INITIALIZE_FUNCTION);
+  if(
+    goto_functions.function_map.count(goto_functionst::entry_point()) == 0 ||
+    initialize == goto_functions.function_map.end())
+  {
+    return;
+  }
+
+  const auto is_virtual_table = [](const irep_idt &id)
+  { return id.starts_with("virtual_table::"); };
+  if(std::none_of(
+       goto_model.symbol_table.begin(),
+       goto_model.symbol_table.end(),
+       [&](const auto &entry) { return is_virtual_table(entry.first); }))
+  {
+    return;
+  }
+
+  // The initialization function's assignments are followed only for the
+  // globals that are kept; its other instructions (the calls of dynamic
+  // initialization functions) are followed as those of any function.
+  std::multimap<irep_idt, const exprt *> initializers;
+  std::vector<const exprt *> initialize_other;
+  for(const auto &instruction : initialize->second.body.instructions)
+  {
+    if(instruction.is_assign() && instruction.assign_lhs().id() == ID_symbol)
+    {
+      initializers.emplace(
+        to_symbol_expr(instruction.assign_lhs()).get_identifier(),
+        &instruction.assign_rhs());
+    }
+    else
+    {
+      // apply() does not visit the callee of a function call
+      if(instruction.is_function_call())
+        initialize_other.push_back(&instruction.call_function());
+      instruction.apply([&initialize_other](const exprt &expr)
+                        { initialize_other.push_back(&expr); });
+    }
+  }
+
+  std::unordered_set<irep_idt> kept;
+  std::vector<irep_idt> work;
+  const auto keep_symbols_of = [&](const exprt &expr)
+  {
+    find_symbols_sett found;
+    find_symbols(expr, found);
+    for(const irep_idt &id : found)
+      if(kept.insert(id).second)
+        work.push_back(id);
+  };
+
+  // Functions are reachable when named in reachable code: called directly,
+  // or with their address taken (possibly called through it later).
+  kept.insert(goto_functionst::entry_point());
+  work.push_back(goto_functionst::entry_point());
+  kept.insert(INITIALIZE_FUNCTION);
+  for(const exprt *expr : initialize_other)
+    keep_symbols_of(*expr);
+  while(!work.empty())
+  {
+    const irep_idt id = work.back();
+    work.pop_back();
+    const auto range = initializers.equal_range(id);
+    for(auto it = range.first; it != range.second; ++it)
+      keep_symbols_of(*it->second);
+    const auto function = goto_functions.function_map.find(id);
+    if(
+      function == goto_functions.function_map.end() ||
+      id == INITIALIZE_FUNCTION)
+      continue;
+    for(const auto &instruction : function->second.body.instructions)
+    {
+      if(instruction.is_function_call())
+        keep_symbols_of(instruction.call_function());
+      instruction.apply(keep_symbols_of);
+    }
+  }
+
+  bool changed = false;
+  for(auto it = goto_model.symbol_table.begin();
+      it != goto_model.symbol_table.end();
+      ++it)
+  {
+    if(
+      is_virtual_table(it->first) && it->second.is_static_lifetime &&
+      kept.count(it->first) == 0 && it->second.value.is_not_nil())
     {
       symbolt &symbol = it.get_writeable_symbol();
       symbol.is_extern = true;

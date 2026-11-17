@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ value: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+For `return {{b, e}};' the move constructor was taken as viable through a
+user-defined conversion of the inner list (the variadic constructor
+template made any list look convertible), and chosen: "invalid implicit
+conversion to 'struct opt &&'".  libc++'s std::optional<chk> has this
+shape.

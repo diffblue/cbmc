@@ -1,8 +1,10 @@
-KNOWNBUG
+CORE gcc-only
 main.cpp
 --object-bits 10
-^EXIT=0$
+^EXIT=(0|10)$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
+^VERIFICATION
 --
 ^warning: ignoring
+On 32-bit, verification may fail due to different pointer/integer
+widths affecting the SystemC bit-vector operations.

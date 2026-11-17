@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp11 --unwind 4
+^\[main\.assertion\.1\] .* private member in braced-init-list argument: SUCCESS$
+^\[main\.assertion\.2\] .* local in braced list: SUCCESS$
+^\[main\.assertion\.3\] .* initializer_list of a local: SUCCESS$
+^\[main\.assertion\.4\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+g++ 13 (-fsanitize=address,undefined) and clang++ 18 accept this program,
+and it fails only its WRONG assertion.

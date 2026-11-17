@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp17 --unwind 3
+^\[main\.assertion\.1\] line \d+ alive in the loop: SUCCESS$
+^\[main\.assertion\.2\] line \d+ destroyed once each: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [stmt.ranged]/1, [class.temporary]/6: the range-initializer
+initializes `auto &&__range', and a prvalue it binds to lives until the
+end of the loop.  The front end held the range in an auxiliary variable
+that was never destroyed (bin53).  It is now declared, initialized from
+the prvalue by the class's constructor (directly in C++17,
+[dcl.init.general]/16.6.1) and destroyed after the loop.  g++ 13 and
+clang++ 18 accept this program, and it fails only its WRONG assertion.

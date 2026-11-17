@@ -1,0 +1,19 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ through B: SUCCESS$
+^\[main\.assertion\.2\] line \d+ through C: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The virtual pointer of D's second A subobject (through C) held a table of
+type virtual_table::A, which the conversion from C to the virtual base V
+read as a virtual_table::C, out of bounds, so V::g's dispatch through C
+was wrong.  The table of a repeated subobject is now a copy of the direct
+base's whole table (C's), made also when the class has virtual bases and
+no overriders, and the pointer points into it along the same members.

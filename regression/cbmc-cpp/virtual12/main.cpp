@@ -1,3 +1,4 @@
+#include <cassert>
 struct A
 {
   virtual int func()

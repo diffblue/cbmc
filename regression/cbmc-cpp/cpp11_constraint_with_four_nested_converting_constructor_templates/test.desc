@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] .* constructor template viable: SUCCESS$
+^\[main\.assertion\.2\] .* converting constructor: SUCCESS$
+^\[main\.assertion\.3\] .* four nested levels: SUCCESS$
+^\[main\.assertion\.4\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+g++ 13 (-fsanitize=address,undefined) and clang++ 18 accept this program,
+and it fails only its WRONG assertion.

@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ const T & parameter: SUCCESS$
+^\[main\.assertion\.2\] line \d+ two template parameters: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The parser skipped a lambda's template-parameter-list, and the type checker
+treated a lambda as generic only when a parameter's type was `auto' or a
+bare name, so `const T &' left T unknown.  libc++'s __synth_three_way
+(std::tuple's operator<=>, views::take) has this shape.

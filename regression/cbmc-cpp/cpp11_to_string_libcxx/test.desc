@@ -1,0 +1,19 @@
+CORE libcxx
+main.cpp
+--cpp11 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ int: SUCCESS$
+^\[main\.assertion\.2\] line \d+ unsigned zero: SUCCESS$
+^\[main\.assertion\.3\] line \d+ long long minimum: SUCCESS$
+^\[main\.assertion\.4\] line \d+ unsigned long long maximum: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+libc++ declares std::to_string in <string> and defines it in libc++.so, so
+the call had no body and returned a nondeterministic string.  cbmc now
+provides the body for the integer overloads.

@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ range \| closure: SUCCESS$
+^\[main\.assertion\.2\] line \d+ other specialization: SUCCESS$
+^\[main\.assertion\.3\] line \d+ closure \| closure: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+function_template_identifier rendered the requires-clause without its
+`type' sub-nodes, where the substituted enclosing argument lives; tag types
+there are now rendered.  g++ 13 and clang++ 18 accept this program, and it
+fails only its WRONG assertion.

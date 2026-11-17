@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ converted: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+dropped the body
+--
+__invoke_impl<_Partial<_Transform, ...>> and __invoke kept their bodies
+only when the call of the _Partial closure object selected its
+two-parameter operator() template.  Inside __invoke, instantiated from
+_Binder::_S_call in _Partial::operator(), the pack expansion in
+`typename decltype(_S_test<_Callable, _Args...>(0))::type' kept one
+element: the single-element pack substitution of the body removed every
+ellipsis, including those of patterns naming only __invoke's own
+two-element pack.  N5008 [temp.variadic]/8-9.  The header-free reduction
+is cpp20_call_result_through_pack_in_static_member_template.

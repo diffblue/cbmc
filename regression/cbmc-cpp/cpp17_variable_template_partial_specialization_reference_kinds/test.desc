@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ lvalue vs rvalue reference: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+static assertion failed
+--
+A partial specialization of a variable template, same_v<T, T>, matched
+same_v<int &&, int &>: irept equality ignores the attributes that tell
+lvalue from rvalue references.  The MSVC STL's std::is_same is built on
+such a variable template (cpp11_is_same_reference_kinds on Windows).

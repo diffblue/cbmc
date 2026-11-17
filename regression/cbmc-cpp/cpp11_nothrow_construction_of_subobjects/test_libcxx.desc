@@ -1,0 +1,35 @@
+CORE libcxx
+main.cpp
+--cpp11 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ base default: SUCCESS$
+^\[main\.assertion\.2\] line \d+ base copy: SUCCESS$
+^\[main\.assertion\.3\] line \d+ defaulted default: SUCCESS$
+^\[main\.assertion\.4\] line \d+ defaulted copy: SUCCESS$
+^\[main\.assertion\.5\] line \d+ defaulted, non-throwing member: SUCCESS$
+^\[main\.assertion\.6\] line \d+ default member initializer: SUCCESS$
+^\[main\.assertion\.7\] line \d+ copy ignores the default member initializer: SUCCESS$
+^\[main\.assertion\.8\] line \d+ constant default member initializer: SUCCESS$
+^\[main\.assertion\.9\] line \d+ array member: SUCCESS$
+^\[main\.assertion\.10\] line \d+ virtual base: SUCCESS$
+^\[main\.assertion\.11\] line \d+ union copy: SUCCESS$
+^\[main\.assertion\.12\] line \d+ int from long: SUCCESS$
+^\[main\.assertion\.13\] line \d+ throwing conversion function: SUCCESS$
+^\[main\.assertion\.14\] line \d+ noexcept conversion function: SUCCESS$
+^\[main\.assertion\.15\] line \d+ not constructible: SUCCESS$
+^\[main\.assertion\.16\] line \d+ reference: SUCCESS$
+^\[main\.assertion\.17\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The exception specifications of implicit and defaulted constructors
+([except.spec]/6) are now computed from the initializations of the bases,
+virtual bases, members and array elements, and from default member
+initializers.  __is_nothrow_constructible(T, Args...) now selects the
+initialization of T from the arguments (a constructor or, for a scalar,
+a conversion function) and checks its exception specification; it was
+true for every T with arguments.  g++ 13 and clang++ 18 (also with
+libc++) agree on every assertion as a static_assert.

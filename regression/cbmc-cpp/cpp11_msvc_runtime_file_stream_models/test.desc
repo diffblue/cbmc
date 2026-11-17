@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--winx64 --cpp17 --no-body-assertions
+^\[main\.assertion\.1\] line \d+ empty stream buffer: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+_Fiopen, _get_stream_buffer_pointers and _Lockit are defined in the MSVC
+runtime library and had no body: the FILE pointer and the stream buffer
+pointers were nondet.

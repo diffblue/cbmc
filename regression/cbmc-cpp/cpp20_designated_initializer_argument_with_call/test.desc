@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.\d+\] line \d+ pushed: SUCCESS$
+^\[main\.assertion\.\d+\] line \d+ rvalue overload: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+does not uniquely resolve
+already declared
+invalid implicit conversion
+--
+The clause's initializer is type-checked once.

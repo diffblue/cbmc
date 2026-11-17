@@ -1,0 +1,20 @@
+CORE libcxx
+main.cpp
+--cpp11 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ copy calls the target: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+^\[std::__1::__function::__value_func<.*\] assertion: FAILURE$
+^\[~__value_func\..*: FAILURE$
+--
+The this-adjusting thunk of a virtual function whose parameter has no name
+forwarded a variable its parameter had been renamed away from: the thunk's
+parameters had identifiers but no base names, and converting the thunk
+renamed them to `#anon_arg'.  The clone of a copied std::function was
+placed at a nondeterministic address, and calling the copy failed with
+bad_function_call.

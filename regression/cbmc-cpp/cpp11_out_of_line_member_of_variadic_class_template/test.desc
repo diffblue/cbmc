@@ -1,0 +1,28 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ a second target: SUCCESS$
+^\[main\.assertion\.2\] line \d+ constructed from a function pointer: SUCCESS$
+^\[main\.assertion\.3\] line \d+ copied: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [temp.mem]/1, [temp.variadic]/1: an out-of-line member definition
+repeats the class template's template-head, so it defines an ordinary
+member when its template-parameter-list has exactly the class template's
+parameters; a parameter pack is ONE parameter, however many arguments the
+specialization has.  Class-template instantiation compared the
+definition's parameter count with the number of ARGUMENTS
+(function<int, int, int>: three, against the definition's two), took
+`template <class R, class... A> function<R, A...>::function(const
+function &)' for a member template and skipped it, so the copy
+constructor had no body and the copy read nondet.  The partial
+specialization shape (libc++'s `function<R(A...)>') still fails, for a
+different reason: cpp11_out_of_line_constructor_template_definition_matched_by_signature.
+Fails on the round-163 build bin52.

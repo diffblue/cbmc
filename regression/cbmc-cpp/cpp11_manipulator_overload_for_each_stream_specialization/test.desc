@@ -1,0 +1,18 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ manipulator for os<char>: SUCCESS$
+^\[main\.assertion\.2\] line \d+ manipulator for os<wchar_t>: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Fixed: the function template name was resolved without a target, from
+the first complete specialization of os in the symbol table, so one of
+the two insertions called operator<<(bool).  resolve_overload_set_operand
+now deduces it from the member operator<< functions taking a pointer to
+function ([temp.deduct.funcaddr]/1).

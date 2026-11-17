@@ -1,0 +1,20 @@
+CORE
+empty_braces.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ called with an empty braced list: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [dcl.init.list]/3.5, [over.ics.list]/7: `{}' for a parameter of class
+type std::duration<std::ratio<1>> value-initializes it.  The cvise
+reduction (/tmp/r163/red/kb_U5c) of test.desc: overload resolution
+declared `{}' not viable for classes named std::chrono::*, std::ratio<...>
+or std::__detail::*, a name-based guard, so the call found no match and
+the calling member was dropped.  Fails on bin53.  g++ 13 and clang++ 18
+accept the program.

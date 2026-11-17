@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ member: SUCCESS$
+^\[main\.assertion\.2\] line \d+ variable: SUCCESS$
+^\[main\.assertion\.3\] line \d+ functional cast and unscoped enumeration: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+List-initialization of an enumeration with a fixed underlying type from an
+integer was rejected ("invalid implicit conversion"); the MSVC STL's
+_Fs_file initializes its handle member as `_Raw{reinterpret_cast<intptr_t>(
+_Handle)}', which dropped std::filesystem's file operations on VS 2022.

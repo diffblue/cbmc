@@ -74,6 +74,9 @@ void goto_cc_modet::help()
     "symbols\n"
     " {y--print-rejected-preprocessed-source} {ufile} \t "
     "copy failing (preprocessed) source to file\n"
+    " {y--validate-goto-model} \t "
+    "enable additional well-formedness checks on the\n"
+    " \t goto program\n"
     "\n");
 }
 

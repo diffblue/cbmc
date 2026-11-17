@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.[0-9]*\] .* empty ls: SUCCESS$
+^\[main\.assertion\.[0-9]*\] .* one ls: SUCCESS$
+^\[main\.assertion\.[0-9]*\] .* nested expansion: SUCCESS$
+^\[main\.assertion\.[0-9]*\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The function parameter pack was sized like the FIRST template pack
+(Js); its own pack's name was looked up in the instantiated declaration,
+where a one-element pack is already replaced by its element.  g++ 13 and
+clang++ 18 accept this program, and it fails only its WRONG assertion.

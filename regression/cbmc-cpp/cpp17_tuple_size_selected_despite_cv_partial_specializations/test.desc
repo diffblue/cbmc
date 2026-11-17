@@ -1,0 +1,28 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ the base of the selected specialization: SUCCESS$
+^\[main\.assertion\.2\] line \d+ value: SUCCESS$
+^\[main\.assertion\.3\] line \d+ const tuple: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [tuple.helper], [temp.spec.partial.match]/1, [temp.deduct.general]/8:
+tuple_size<tuple<int, int>> selects the partial specialization for tuple<T...>
+and has integral_constant<size_t, 2> as its base; the cv-qualified partial
+specializations, guarded by `integral_constant<size_t, sizeof(tuple_size<T>)>'
+inside an alias template argument, do not match a non-cv tuple.  Regression
+test (round 163g): letting alias-template arguments skip the instantiation of
+class template specializations they name (an attempted fix for
+cpp11_alias_template_pointer_does_not_instantiate_pointee) completed
+tuple_size<tuple<int, int>> WITHOUT its base, so `value' read nondet and
+libc++'s std::apply returned void (cpp17_apply_basic/test_libcxx.desc).
+Reduced by cvise from libc++ 18's <tuple> (/tmp/r163/red/reg_ts).
+test_libcxx.desc checks the same with libc++.  g++ 13 and clang++ 18
+accept both programs.

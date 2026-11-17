@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ non-template member: SUCCESS$
+^\[main\.assertion\.2\] line \d+ member template: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The explicit instantiation declaration instantiates str<char> before its
+members' definitions.  The out-of-class definition of the member template
+find was then given to every same-named member of matching arity without
+a body, the non-template find(char, size_type) included.  libc++'s
+std::string::find(char) returned what the string_view overload's
+body computed.

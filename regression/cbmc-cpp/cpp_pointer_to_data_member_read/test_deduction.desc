@@ -1,0 +1,19 @@
+CORE
+deduction.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ deduced: SUCCESS$
+^\[main\.assertion\.2\] line \d+ auto, decltype, value-initialized: SUCCESS$
+^\[main\.assertion\.3\] line \d+ trait: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [temp.deduct.type]/8 (`T C::*'), [dcl.spec.auto], [dcl.type.decltype],
+[dcl.init.general]/9 (value-initialization gives the null member pointer
+value): pointers to data members through template argument deduction,
+auto, decltype and a partial specialization on `T C::*'.  g++ 13 and
+clang++ 18 accept the program.

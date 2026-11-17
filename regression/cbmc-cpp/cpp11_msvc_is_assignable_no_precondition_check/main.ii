@@ -1,0 +1,21 @@
+extern "C" void __CPROVER_assert(bool, const char *);
+struct L {
+  int v;
+};
+struct no_copy {
+  no_copy &operator=(const no_copy &) = delete;
+};
+// MSVC's __is_assignable_no_precondition_check(T, U) is is_assignable
+// ([meta.unary.prop]) without checking its completeness preconditions; the
+// MSVC STL's _Is_copy_assignable_no_precondition_check guards pair's
+// copy assignment
+int main() {
+  __CPROVER_assert(
+      __is_assignable_no_precondition_check(L &, const L &) &&
+          !__is_assignable_no_precondition_check(const L &, const L &) &&
+          !__is_assignable_no_precondition_check(no_copy &, const no_copy &),
+      "assignability");
+  __CPROVER_assert(!__is_assignable_no_precondition_check(L &, const L &),
+                   "WRONG (must FAIL)");
+  return 0;
+}

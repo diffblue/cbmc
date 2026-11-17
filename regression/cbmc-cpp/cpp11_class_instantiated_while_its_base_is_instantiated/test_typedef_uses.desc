@@ -1,0 +1,22 @@
+CORE
+typedef_uses.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ derived-to-base conversion: SUCCESS$
+^\[main\.assertion\.2\] line \d+ initializer_list element: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [temp.inst]/2 (Note 2): a conversion between pointers to class
+types depends on the inheritance relationship, and list-initialization
+of a class depends on its constructors, so both instantiate the class
+template specialization when only a member typedef has named it so far
+(the shapes of libstdc++'s _Rb_tree::_Link_type and map::value_type,
+cpp11_set_iterate and cpp11_initializer_list_of_class_elements_argument).
+standard_conversion_pointer and brace_init_is_viable now instantiate it.
+bin53 rejects the program.  g++ 13 and clang++ 18 accept this program,
+and it fails only its WRONG assertion.

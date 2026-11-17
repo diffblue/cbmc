@@ -24,11 +24,12 @@ class symbol_table_baset;
 
 #define OPT_CONFIG_C_CPP                                                       \
   "D:I:(include)(function)"                                                    \
-  "(c89)(c99)(c11)(c17)(c23)(cpp98)(cpp03)(cpp11)"                             \
+  "(c89)(c99)(c11)(c17)(c23)(cpp98)(cpp03)(cpp11)(cpp14)(cpp17)"               \
+  "(cpp20)(cpp23)(cpp26)"                                                      \
   "(unsigned-char)"                                                            \
   "(round-to-even)(round-to-nearest)"                                          \
   "(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)"                     \
-  "(no-library)"
+  "(no-library)(stdlib):"
 
 #define HELP_CONFIG_C_CPP                                                      \
   " {y-I} {upath} \t set include path (C/C++)\n"                               \
@@ -54,7 +55,9 @@ class symbol_table_baset;
         ? "c23"                                                                \
         : "") +                                                                \
     ")\n"                                                                      \
-    " {y--cpp98}, {y--cpp03}, {y--cpp11} \t "                                  \
+    " {y--cpp98}, {y--cpp03}, {y--cpp11},\n"                                   \
+    " {y--cpp14}, {y--cpp17}, {y--cpp20},\n"                                   \
+    " {y--cpp23}, {y--cpp26} \t "                                              \
     "set C++ language standard (default: " +                                   \
     std::string(                                                               \
       configt::cppt::default_cpp_standard() ==                                 \
@@ -66,6 +69,21 @@ class symbol_table_baset;
       : configt::cppt::default_cpp_standard() ==                               \
           configt::cppt::cpp_standardt::CPP11                                  \
         ? "cpp11"                                                              \
+      : configt::cppt::default_cpp_standard() ==                               \
+          configt::cppt::cpp_standardt::CPP14                                  \
+        ? "cpp14"                                                              \
+      : configt::cppt::default_cpp_standard() ==                               \
+          configt::cppt::cpp_standardt::CPP17                                  \
+        ? "cpp17"                                                              \
+      : configt::cppt::default_cpp_standard() ==                               \
+          configt::cppt::cpp_standardt::CPP20                                  \
+        ? "cpp20"                                                              \
+      : configt::cppt::default_cpp_standard() ==                               \
+          configt::cppt::cpp_standardt::CPP23                                  \
+        ? "cpp23"                                                              \
+      : configt::cppt::default_cpp_standard() ==                               \
+          configt::cppt::cpp_standardt::CPP26                                  \
+        ? "cpp26"                                                              \
         : "") +                                                                \
     ")\n"                                                                      \
     " {y--unsigned-char} \t make \"char\" unsigned by default\n"               \
@@ -74,14 +92,16 @@ class symbol_table_baset;
     " {y--round-to-plus-inf} \t rounding towards plus infinity\n"              \
     " {y--round-to-minus-inf} \t rounding towards minus infinity\n"            \
     " {y--round-to-zero} \t rounding towards zero\n"                           \
-    " {y--no-library} \t disable built-in abstract C library\n"
+    " {y--no-library} \t disable built-in abstract C library\n"                \
+    " {y--stdlib} {ulib} \t C++ standard library (e.g., libc++)\n"
 
 #define OPT_CONFIG_LIBRARY                                                     \
   "(malloc-fail-assert)(malloc-fail-null)(malloc-may-fail)"                    \
   "(no-malloc-may-fail)"                                                       \
   "(string-abstraction)"                                                       \
   "(dfcc-debug-lib)"                                                           \
-  "(dfcc-simple-invalid-pointer-model)"
+  "(dfcc-simple-invalid-pointer-model)"                                        \
+  "(c-library-models):"
 
 #define HELP_CONFIG_LIBRARY                                                    \
   " {y--malloc-may-fail} \t allow malloc calls to return a null pointer\n"     \
@@ -93,7 +113,9 @@ class symbol_table_baset;
   " {y--dfcc-debug-lib} \t enable debug assertions in the cprover contracts "  \
   "library\n"                                                                  \
   " {y--dfcc-simple-invalid-pointer-model} \t use simplified invalid pointer " \
-  "model in the cprover contracts library (faster, unsound)\n"
+  "model in the cprover contracts library (faster, unsound)\n"                 \
+  " {y--c-library-models} {udir} \t use the C library models preprocessed "    \
+  "into {udir} by cbmc {y--dump-c-library-models}\n"
 
 #define OPT_CONFIG_JAVA "(classpath)(cp)(main-class)"
 
@@ -332,6 +354,10 @@ public:
     libt lib;
 
     bool string_abstraction;
+    /// A directory of C library models preprocessed by
+    /// `cbmc --dump-c-library-models` (possibly on another platform), used
+    /// instead of preprocessing the built-in models on this host.
+    std::string c_library_models_dir;
     bool malloc_may_fail = true;
 
     /// enable debug code in cprover_contracts library
@@ -365,9 +391,18 @@ public:
       CPP03,
       CPP11,
       CPP14,
-      CPP17
+      CPP17,
+      CPP20,
+      CPP23,
+      CPP26
     } cpp_standard;
     static cpp_standardt default_cpp_standard();
+
+    /// True while `cpp_standard` is the built-in default rather than a
+    /// standard selected on the command line (or by a platform rule); the
+    /// C++ front-end then follows the host compiler's default dialect
+    /// (see apply_host_default_cxx_standard).
+    bool standard_is_default = true;
 
     void set_cpp98()
     {
@@ -388,6 +423,18 @@ public:
     void set_cpp17()
     {
       cpp_standard = cpp_standardt::CPP17;
+    }
+    void set_cpp20()
+    {
+      cpp_standard = cpp_standardt::CPP20;
+    }
+    void set_cpp23()
+    {
+      cpp_standard = cpp_standardt::CPP23;
+    }
+    void set_cpp26()
+    {
+      cpp_standard = cpp_standardt::CPP26;
     }
 
     static const std::size_t default_object_bits = 8;

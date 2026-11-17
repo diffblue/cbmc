@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ B's overrider: SUCCESS$
+^\[main\.assertion\.2\] line \d+ A's own in C's A: SUCCESS$
+^\[main\.assertion\.3\] line \d+ D's x in both X: SUCCESS$
+^\[main\.assertion\.4\] line \d+ copy keeps both A subobjects: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [class.mi]/4, [class.virtual]/2: the repeated base A is the second
+(non-primary, Itanium C++ ABI 2.4) dynamic base of B and of C, so each of
+D's A subobjects has a virtual pointer of its own; D::x overrides X::x in
+both X subobjects; the implicit copy constructor copies both A subobjects
+([class.copy.ctor]/14).  The front end rejected the class.  g++ 13 and
+clang++ 18 accept this program, and it fails only its WRONG assertion.

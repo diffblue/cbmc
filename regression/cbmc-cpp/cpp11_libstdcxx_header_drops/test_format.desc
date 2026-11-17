@@ -1,0 +1,35 @@
+CORE libstdcxx13 libstdcxx
+format.cpp
+--cpp20 --object-bits 12
+^\[main\.assertion\.1\] line \d+ format: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body of system-header function
+could not fully type-check
+--
+libstdc++ 13 <format>: std::format("{}", 42).  Fixed in earlier rounds: the
+floating-point formatter selected for int, the visitor's `this' capture, the
+primary formatter template, the per-specialization lambda closures,
+formatter<const char *, char>::format, and the output of enumeration
+bit-field constants (cpp11_enum_bit_field_constant_output).  Symbolic
+execution did not terminate because the _Arg_store temporary of
+make_format_args was destroyed before vformat read the argument through
+basic_format_args (cpp98_temporary_lives_until_end_of_full_expression), and
+comparisons of the _Spec bit-fields of enumeration type stayed symbolic
+(cpp11_enum_bit_field_constant_comparison_simplified).  It now verifies in
+about 70 s and 2.7 GB, which ran out of memory on CI's runners, hence
+THOROUGH; test_format_typecheck.desc keeps the conversion in CORE.  g++ 13
+accepts this program, and it fails only its WRONG
+assertion.
+It was KNOWNBUG (scaling limit) at 2.65 GB, above the 2.5 GB that CI's
+CBMC_TEST_MEMLIMIT allows; with the round-194 front-end fixes it takes
+29 s and 0.7 GB (binW172, x86_64 Linux, libstdc++ 13).
+With libstdc++ 16 (16-20260315) the test passes: the drops of
+<format>'s _Seq_sink::_M_reserve and _M_span were fixed with
+cpp20_hidden_friend_spaceship_template_alias_return_type (it was tagged
+broken-libstdcxx16).

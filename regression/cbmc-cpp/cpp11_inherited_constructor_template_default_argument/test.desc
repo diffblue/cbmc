@@ -1,0 +1,17 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ inherited: SUCCESS$
+^\[main\.assertion\.2\] line \d+ inherited through an alias: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+guess_function_template_args took the enclosing class from the call's
+ID_C_class (the derived class), so `B...' in the default template argument
+was unbound, substitution failed, and `derived<int, char> d(1, 2)' found
+no match.  g++ 13 and clang++ 18 accept this program, and it fails only its
+WRONG assertion.

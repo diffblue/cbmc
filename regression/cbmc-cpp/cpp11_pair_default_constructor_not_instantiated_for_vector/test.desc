@@ -1,0 +1,35 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ no default construction needed: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [temp.inst]/3: the implicit instantiation of a class template
+specialization instantiates the DECLARATIONS, not the definitions, of its
+member classes; [temp.inst]/4: a member function (template)
+specialization's definition is instantiated only when it is used, and
+[over.match.viable]/3 + [temp.deduct.general]/8: pair's constrained
+default constructor template is not viable for pair<symbolish> (no
+default constructor), so it is never used.  The front end, instantiating
+vector<pair<symbolish>>, also completes the nested member class `storage'
+whose data member has type pair<symbolish>, and in doing so instantiates
+pair's default constructor template's body, fails on `first()' ("found no
+match for symbol 'symbolish'") and reports it dropped.  Removing the
+nested class (or giving vector a plain member of the element type) made
+the drop disappear.  Cause: __is_constructible(T) (is_default_constructible)
+was always true for a class type, so the constrained constructor was not
+removed ([temp.deduct.general]/8) and its body was instantiated; fixed with
+cpp11_is_constructible_class_without_default_constructor.  libstdc++: vector::_Temporary_value::_Storage and
+pair's `template <class _U1 = _T1, ..., enable_if<__and_<
+__is_implicitly_default_constructible<_U1>, ...>>> pair()'
+(stl_pair.h:543, 8 cbmc-cpp descs in the round-163 audit);
+test_libstdcxx.desc is the libstdc++ program.  Header-free (from the cvise
+reduction in /tmp/r163/red/kb_D1).  Pre-existing (round-162 snapshot
+bin51).

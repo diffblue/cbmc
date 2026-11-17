@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp11 --object-bits 12 --unwind 5 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ argument array destroyed: SUCCESS$
+^\[main\.assertion\.2\] line \d+ array destroyed after initialization: SUCCESS$
+^\[main\.assertion\.3\] line \d+ vector elements destroyed: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Fixed: the backing array, held in a static-lifetime symbol
+(initializer_list_backing_array) whose elements are constructed in place,
+is now a temporary of its full-expression in goto conversion (clean_expr)
+and destroyed at its end, unless an initializer_list variable is
+initialized from it (cpp11_initializer_list_elements_destroyed_with_the_
+array).  Assertion 3 also needed std::_Destroy's header body
+(cpp11_vector_destroys_its_elements).

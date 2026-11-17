@@ -1,0 +1,21 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ qualified access: SUCCESS$
+^\[main\.assertion\.2\] line \d+ through the bases: SUCCESS$
+^\[main\.assertion\.3\] line \d+ distinct subobjects: SUCCESS$
+^\[main\.assertion\.4\] line \d+ writes stay apart: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [class.mi]/4-5: D : B, C with B and C both derived non-virtually from
+A has two A subobjects; `B::i' / `C::i' ([class.mi]/5) and the conversions
+to B& and C& ([conv.ptr]/3) each designate one of them.  The front end
+rejected the class ("non-virtual base class tag-A inherited multiple
+times").  g++ 13 and clang++ 18 accept this program, and it fails only its
+WRONG assertion.

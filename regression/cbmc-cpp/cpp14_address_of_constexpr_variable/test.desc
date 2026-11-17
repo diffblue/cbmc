@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp14
+^\[main\.assertion\.1\] line \d+ namespace scope: SUCCESS$
+^\[main\.assertion\.2\] line \d+ static data member: SUCCESS$
+^\[main\.assertion\.3\] line \d+ variable template \(C\+\+14\): SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The address of a constexpr variable was taken only when its substituted
+value was a literal ("address_of error: '(signed long int)sizeof(signed long
+int)' not an lvalue"), and the object then had no static storage duration,
+so it was never initialized.

@@ -1,0 +1,27 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ member function: SUCCESS$
+^\[main\.assertion\.2\] line \d+ data member: SUCCESS$
+^\[main\.assertion\.3\] line \d+ outside a member function: SUCCESS$
+^\[main\.assertion\.4\] line \d+ repeated base: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+--
+N5008 [basic.lookup.qual.general]/2-3: in x.eh::get() the member-qualified
+name eh is looked up in the type of x, where it is a member typedef naming
+the base H.  After converting x to its H subobject ([class.access.base]/6),
+the front end looked up `eh::get' again in H's scope, where eh is not
+visible, so f and g were left incomplete (a regression of the repeated
+non-virtual base subobjects change; it dropped libstdc++'s
+_Hash_code_base::_M_swap, `__x.__ebo_hash::_M_get()', in
+std::unordered_map::swap).  Before that change the first three assertions
+held and the repeated base A was rejected (bin53: CONVERSION ERROR).  g++ 13
+and clang++ 18 accept this program (-std=c++98), and it fails only its WRONG
+assertion.

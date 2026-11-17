@@ -1,0 +1,12 @@
+CORE
+main.cpp
+--cpp11
+^file main\.cpp line 12: static_assert condition is not a constant expression$
+^file main\.cpp line 15 function main: static_assert condition is not a constant expression$
+^CONVERSION ERROR$
+^EXIT=6$
+^SIGNAL=0$
+--
+^VERIFICATION SUCCESSFUL$
+--
+The program is ill-formed, so there is no WRONG assertion.

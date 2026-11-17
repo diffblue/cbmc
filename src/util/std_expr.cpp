@@ -297,7 +297,7 @@ auto component(T &struct_expr, const irep_idt &name, const namespacet &ns)
     struct_expr.type().id() == ID_struct_tag
       ? ns.follow_tag(to_struct_tag_type(struct_expr.type()))
       : to_struct_type(struct_expr.type());
-  const auto index = struct_type.component_number(name);
+  const auto index = struct_type.data_component_number(name);
   DATA_INVARIANT(
     index < struct_expr.operands().size(),
     "component matching index should exist");

@@ -1,4 +1,4 @@
-CORE
+CORE no-vacuity-check
 main.c
 --symex-coverage-report - --unwind 1 --no-standard-checks --no-unwinding-assertions
 <line branch="true" condition-coverage="50% \(1/2\)" hits="2" number="3">
@@ -8,3 +8,7 @@ main.c
 --
 ^warning: ignoring
 ^Invariant check failed
+--
+no-vacuity-check: --unwind 1 cuts the recursion of factorial on purpose;
+the expected coverage of line 3 (50%, 2 hits) exists only with that cut
+(#7473), so the end of main is not reached.

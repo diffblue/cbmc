@@ -1,0 +1,22 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ later data member, throwing: SUCCESS$
+^\[main\.assertion\.2\] line \d+ later data member, non-throwing: SUCCESS$
+^\[main\.assertion\.3\] line \d+ static member: SUCCESS$
+^\[main\.assertion\.4\] line \d+ const member: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+At the declaration, a noexcept operator whose operand names a later
+member could not be type-checked and was taken to be true, so the
+specifier was never re-evaluated: assertions 1, 3 and 4 failed.  Such a
+specifier is now kept and evaluated again with the complete class and,
+outside class templates, with `this' bound to the member function's
+object (cpp11_member_noexcept_specifier_in_class_template is the class
+template case).

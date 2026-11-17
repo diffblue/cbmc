@@ -1,0 +1,12 @@
+CORE
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The cap of #pragma pack(n) applies to an array member's exact
+(`packed, aligned(k)') alignment as it does to a scalar's; the cap is
+recorded on the array's element type.

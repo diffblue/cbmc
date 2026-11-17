@@ -60,6 +60,13 @@ public:
     return message_count[level];
   }
 
+  void set_message_count(unsigned level, std::size_t count)
+  {
+    if(level >= message_count.size())
+      message_count.resize(level + 1, 0);
+    message_count[level] = count;
+  }
+
   /// \brief Create an ECMA-48 SGR (Select Graphic Rendition) command.
   /// The default behavior is no action.
   virtual std::string command(unsigned) const

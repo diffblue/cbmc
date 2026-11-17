@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ cross-cast to the sibling subobject: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dereferenced function pointer must be.*: FAILURE$
+--
+N5008 [expr.dynamic.cast]/9.2: dynamic_cast<iface_b *>(p) with p pointing
+to the iface_a subobject of an impl object yields a pointer to its iface_b
+subobject, so q->b() returns 2.  The front end modelled the check as a
+nondeterministic choice between null and the unadjusted pointer (bin53;
+the call through it then failed the function-pointer check).  See
+cpp98_dynamic_cast_runtime_check.  g++ 13 and clang++ 18 accept this
+program, and it fails only its WRONG assertion.

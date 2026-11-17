@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp23
+^\[main\.assertion\.1\] line \d+ const and non-const object: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+A member function template with an explicit object parameter was rejected
+for a const object: the check that a const object needs a const member
+function (member_template_object_viable) applied, though such a member
+has no implicit object parameter.  GCC 16's ranges adaptor
+_Partial::operator()(this _Self&&, _Range&&) for a const adaptor.

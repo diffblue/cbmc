@@ -1,3 +1,4 @@
+#include <cassert>
 struct C
 {
   bool b;

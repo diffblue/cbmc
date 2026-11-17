@@ -1,0 +1,23 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ class hidden by parameter: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [basic.lookup.qual.general]/1: lookup of N in N::b considers only
+namespaces, types and templates whose specializations are types, so it
+finds struct N although the parameter N hides it.  The front end found the
+parameter, discarded it, and left f's body incomplete ("could not fully
+type-check", bin53); the search now continues past scopes that declare
+only variables or functions of that name.  A
+hidden namespace works.  test_enumeration.desc covers a scoped enumeration;
+libc++'s __format_spec::__validate_*(__flags __flags) use `__flags::__second'
+etc., so their bodies are dropped (__chrono/parser_std_format_spec.h:73-133
+for <chrono>).  Pre-existing (bin53).  g++ 13 and clang++ 18 accept this
+program (-std=c++98), and it fails only its WRONG assertion.

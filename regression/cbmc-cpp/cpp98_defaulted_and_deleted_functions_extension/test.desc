@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp98
+^\[main\.assertion\.1\] line \d+ defaulted copy constructor: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^PARSING ERROR$
+--
+`= default' and `= delete' were a parse error before C++11, so with libc++
+(`exception(const exception &) _NOEXCEPT = default;') every C++98 program
+including a standard header failed to parse.

@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp26
+^file main\.cpp line \d+: static assertion failed: f\(\) is 4$
+^CONVERSION ERROR$
+^EXIT=6$
+^SIGNAL=0$
+--
+static_assert condition is not a constant expression
+^VERIFICATION SUCCESSFUL$
+--
+The program is ill-formed: GCC 16 reports "static assertion failed: f() is
+4".  CBMC's constant evaluator did not evaluate throw and try
+(cpp26_constexpr_exception), and a static_assert whose condition it could
+not evaluate was skipped with a warning, so verification succeeded; it must
+not be reported as "not a constant expression" either.  The
+static_assert is the check that must fail, so there is no WRONG assertion.

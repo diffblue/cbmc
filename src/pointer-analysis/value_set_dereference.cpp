@@ -594,6 +594,37 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       // The simplest case: types match, and offset is zero!
       // This is great, we are almost done.
 
+      // When the types are compatible but NOT equal -- e.g. the
+      // dereference type is a struct PREFIX of the object type, the
+      // shape of a C++ derived-to-base access through a converted
+      // pointer ((__new_allocator<char> *)&string_object, libstdc++'s
+      // EBO allocator bases) -- a struct-to-struct value typecast is
+      // NOT bit-blastable: boolbvt::conversion_failed would silently
+      // havoc the value ("warning: ignoring typecast"), dropping the
+      // constraint.  Denote the base SUBOBJECT instead: build the
+      // member selection at offset 0 of the matching type.  Scalar
+      // compatibilities (same-width bitvectors, code pointers) keep
+      // the typecast, which converts fine.
+      if(
+        object_type != dereference_type &&
+        (object_type.id() == ID_struct_tag || object_type.id() == ID_struct))
+      {
+        auto subexpr = get_subexpression_at_offset(
+          object, from_integer(0, c_index_type()), dereference_type, ns);
+        if(subexpr.has_value())
+          simplify(subexpr.value(), ns);
+        if(
+          subexpr.has_value() &&
+          subexpr.value().id() != ID_byte_extract_little_endian &&
+          subexpr.value().id() != ID_byte_extract_big_endian)
+        {
+          result.value = subexpr.value();
+          result.pointer = typecast_exprt::conditional_cast(
+            address_of_exprt{skip_typecast(subexpr.value())}, pointer_type);
+          return result;
+        }
+      }
+
       result.value = typecast_exprt::conditional_cast(object, dereference_type);
       result.pointer =
         typecast_exprt::conditional_cast(object_pointer, pointer_type);

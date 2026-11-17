@@ -1,0 +1,18 @@
+CORE
+rebind_pointer.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ linked node: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [temp.alias]/2, [temp.inst]/2: libc++'s shape of test.desc, where
+the pointer alias `rebind<U> = U *' is reached through the alias
+`rebind_pointer_t<From, To> = typename ptr_traits<From>::template
+rebind<To>' (libc++'s __rebind_pointer_t).  Naming node<void *> in its
+argument list must not instantiate it.  Fails on bin53 (CONVERSION
+ERROR).  g++ 13 and clang++ 18 accept the program.

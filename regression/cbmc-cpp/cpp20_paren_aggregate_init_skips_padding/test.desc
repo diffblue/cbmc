@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] .* padding skipped: SUCCESS$
+^\[main\.assertion\.2\] .* no padding: SUCCESS$
+^\[main\.assertion\.3\] .* missing element value-initialized: SUCCESS$
+^\[main\.assertion\.4\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+g++ 13 (-fsanitize=address,undefined) and clang++ 18 accept this program,
+and it fails only its WRONG assertion.

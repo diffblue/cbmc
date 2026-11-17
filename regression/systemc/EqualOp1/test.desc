@@ -1,8 +1,13 @@
 CORE
 main.cpp
 
-^EXIT=0$
+^file main.cpp line 21 function main: no comparison operator for an operand of class type 'struct myclass'$
+^CONVERSION ERROR$
+^EXIT=6$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+--
+N5008 [expr.eq]/2: the operands of == shall have scalar type, and myclass
+declares no operator==, so `x == y' is ill-formed (g++ and clang++ reject
+it as well).

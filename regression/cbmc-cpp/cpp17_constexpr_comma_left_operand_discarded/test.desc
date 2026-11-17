@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line 35 array bound: SUCCESS$
+^\[main\.assertion\.2\] line 36 template argument: SUCCESS$
+^\[main\.assertion\.3\] line 37 WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The value of a constexpr variable initialized by a comma expression kept
+the comma, so its elements were not constants.

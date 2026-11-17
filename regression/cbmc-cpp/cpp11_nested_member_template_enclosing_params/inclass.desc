@@ -1,0 +1,14 @@
+CORE
+inclass.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+--
+In-class variant: nested plain struct, member function template, and
+member class template bodies all naming the enclosing template's
+parameters.

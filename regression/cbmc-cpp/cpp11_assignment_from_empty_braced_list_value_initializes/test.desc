@@ -1,0 +1,19 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] .* bit-fields: SUCCESS$
+^\[main\.assertion\.2\] .* members: SUCCESS$
+^\[main\.assertion\.3\] .* default member initializer: SUCCESS$
+^\[main\.assertion\.4\] .* user-provided constructor: SUCCESS$
+^\[main\.assertion\.5\] .* argument: SUCCESS$
+^\[main\.assertion\.6\] .* reference argument: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+An empty braced-init-list converted to a class type value-initializes the
+temporary ([dcl.init.list]/3.5): without a user-provided default constructor
+the object is zero-initialized first ([dcl.init.general]/9.1).  In `x = {}'
+and in arguments `f({})' the members were left indeterminate.

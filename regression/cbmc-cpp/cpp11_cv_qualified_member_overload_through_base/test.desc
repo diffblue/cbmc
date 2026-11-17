@@ -1,0 +1,28 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ the const overload, through a base class: SUCCESS$
+^\[main\.assertion\.2\] line \d+ the const overload, directly: SUCCESS$
+^\[main\.assertion\.3\] line \d+ the const volatile overload: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [over.match.funcs.general]/4-5, [over.ics.rank]/3.2.6: for `d.load(0)'
+on a non-const `derived', the implicit object parameters are `const base &'
+and `const volatile base &'; both bindings are reference bindings of the
+same derived-to-base kind, and the one to the less cv-qualified type is
+better, so the const overload is selected.  The front end reported
+"symbol 'load' does not uniquely resolve" when the call went through a
+BASE class: reference_compatible recorded only WHETHER the binding changes
+the cv-qualification, not by how much, so `const' and `const volatile'
+tied; it now counts the qualifiers the binding adds.  This is libstdc++'s
+std::atomic<unsigned> (__atomic_base::load() const and load() const
+volatile) used by __atomic_futex_unsigned::_M_load / _M_load_and_test
+(atomic_futex.h:84/155, <future>, cpp11_future_header in the round-163
+audit).  Header-free.  Fails on the round-163 build bin52.

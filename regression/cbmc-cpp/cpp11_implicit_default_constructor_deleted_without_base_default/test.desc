@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ values: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+static assertion failed
+--
+typecheck_compound_body now leaves the implicit default constructor
+undeclared when a base or a member without a default member initializer has
+no usable default constructor.  Fails on bin53 too; with a using-declaration
+inheriting B's constructors (cpp11_inheriting_constructors_keep_implicit_
+default_constructor's fix) it surfaced as a regression.  g++ 13 and clang++
+18 accept this program, and it fails only its WRONG assertion.

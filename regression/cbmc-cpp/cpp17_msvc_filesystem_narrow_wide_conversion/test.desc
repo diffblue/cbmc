@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--winx64 --cpp17
+^\[main\.assertion\.1\] line \d+ length: SUCCESS$
+^\[main\.assertion\.2\] line \d+ converted: SUCCESS$
+^\[main\.assertion\.3\] line \d+ back: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The conversions are defined in the MSVC runtime library; without a model
+their results were nondet, so a path from "a.txt" could be empty.

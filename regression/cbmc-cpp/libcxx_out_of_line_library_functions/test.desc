@@ -1,0 +1,19 @@
+CORE libcxx
+main.cpp
+--cpp20 --stdlib libc++ --object-bits 12 --unwind 12
+^\[main\.assertion\.1\] line \d+ lock while alive: SUCCESS$
+^\[main\.assertion\.2\] line \d+ lock after expiry: SUCCESS$
+^\[main\.assertion\.3\] line \d+ unordered_map: SUCCESS$
+^\[main\.assertion\.4\] line \d+ what: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+no body for callee
+dropped the body
+--
+The models follow libc++ 18's src/memory.cpp, src/hash.cpp, src/new.cpp and
+the exception fallback; what() strings are implementation-defined.

@@ -1,0 +1,33 @@
+CORE
+main.cpp
+--cpp98
+^\[main\.assertion\.1\] line \d+ cross-cast: SUCCESS$
+^\[main\.assertion\.2\] line \d+ cross-cast, deeper: SUCCESS$
+^\[main\.assertion\.3\] line \d+ downcast to an intermediate class: SUCCESS$
+^\[main\.assertion\.4\] line \d+ downcast failing: SUCCESS$
+^\[main\.assertion\.5\] line \d+ private base: SUCCESS$
+^\[main\.assertion\.6\] line \d+ no such base: SUCCESS$
+^\[main\.assertion\.7\] line \d+ null: SUCCESS$
+^\[main\.assertion\.8\] line \d+ from the second base: SUCCESS$
+^\[main\.assertion\.9\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [expr.dynamic.cast]/9-10: dynamic_cast<C *>(v) with C not a base
+of v's class yields a pointer to the C subobject of the most derived
+object, if unique and public (a down- or cross-cast), else null; a null v
+yields null (/4).  The front end returned the operand statically adjusted
+(downcasts) or a nondeterministic choice between the unadjusted pointer
+and null (cross-casts), so failing casts succeeded and cross-casts pointed
+to the wrong subobject (bin53).  The check is now resolved once every
+class of the translation unit is known: for each class D with a unique A
+subobject, the most derived object is a D iff the A subobject's vtable
+pointer holds the value D installs, and the result is then the C
+subobject or null.  A pointer matching no class of the translation unit
+(an object of a class defined elsewhere) and layouts with virtual bases or
+repeated subobjects keep the nondeterministic model.  g++ 13 and clang++
+18 accept this program, and it fails only its WRONG assertion.

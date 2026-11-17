@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ direct-list-initialization: SUCCESS$
+^\[main\.assertion\.2\] line \d+ from the prvalue: SUCCESS$
+^\[main\.assertion\.3\] line \d+ empty and non-empty bases: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Fixed: the braced explicit type conversion paired the elements with the
+class's own members after skipping only EMPTY bases, so the clause of a
+base with data members went to the first member (t.w = 6).  Such bases
+now take the constructor path, which initializes the base subobject.

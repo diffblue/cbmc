@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ names a later throwing member: SUCCESS$
+^\[main\.assertion\.2\] line \d+ names a later non-throwing member: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The noexcept expression of a member declaration that cannot be evaluated
+at the declaration (b is not yet declared) is kept for
+implicit_exception_specifications.  The inner noexcept operator took its
+failing operand to be true, so nothing was kept; and the retry had no
+`this', so `b()' did not call S::b.  Now a specifier whose noexcept
+operators had such an operand is kept, and the retry binds `this'
+([expr.prim.this]/4).

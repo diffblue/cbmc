@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ deduced as int: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+inconsistent deduction
+--
+A constexpr static data member (template) of class type was not const
+([dcl.constexpr]/6), so the member read in the if constexpr condition did
+not fold, both branches were kept and the discarded `return 1.0' took
+part in the deduction.  On MSVC this made ranges::iter_move return void
+for `int *&', so indirectly_readable<int *> and every iterator concept
+above it were false (std::span's iterator constructor).

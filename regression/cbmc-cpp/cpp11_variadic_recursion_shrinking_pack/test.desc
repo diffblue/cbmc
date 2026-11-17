@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+^could not fully type-check
+dropped the body
+--
+elaborate_class_template's same-template recursion limit (two nested
+instantiations of one template) now admits an instance with strictly fewer
+template arguments than every enclosing instance of the template
+(convergence on the pack length, N5008 [temp.variadic]), as it already did
+for a strictly decreasing non-type integer argument.

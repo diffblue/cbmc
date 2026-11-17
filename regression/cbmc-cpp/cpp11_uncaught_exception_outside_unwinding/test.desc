@@ -1,0 +1,17 @@
+CORE libstdcxx
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ none before the throw: SUCCESS$
+^\[main\.assertion\.2\] line \d+ none in the handler: SUCCESS$
+^\[main\.assertion\.3\] line \d+ count after: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+std::uncaught_exception and std::uncaught_exceptions had no body, so
+their results were nondeterministic.  They now read the in-flight
+exception of the exception lowering.

@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] .* constraint satisfied: SUCCESS$
+^\[main\.assertion\.2\] .* constraint false: SUCCESS$
+^\[main\.assertion\.3\] .* substitution failure: SUCCESS$
+^\[main\.assertion\.4\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+N5008 [temp.constr.atomic]/3: a requires-clause of a partial specialization
+whose substitution fails is not satisfied, and the specialization does not
+match.

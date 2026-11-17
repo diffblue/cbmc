@@ -1,4 +1,6 @@
-SRC = cpp_constructor.cpp \
+SRC = cpp_base_subobjects.cpp \
+      cpp_constexpr_eval.cpp \
+      cpp_constructor.cpp \
       cpp_convert_type.cpp \
       cpp_declaration.cpp \
       cpp_declarator.cpp \
@@ -17,6 +19,7 @@ SRC = cpp_constructor.cpp \
       cpp_parser.cpp \
       cpp_scope.cpp \
       cpp_scopes.cpp \
+      cpp_sfinae_context.cpp \
       cpp_storage_spec.cpp \
       cpp_token_buffer.cpp \
       cpp_type2name.cpp \
@@ -26,6 +29,7 @@ SRC = cpp_constructor.cpp \
       cpp_typecheck_compound_type.cpp \
       cpp_typecheck_constructor.cpp \
       cpp_typecheck_conversions.cpp \
+      cpp_typecheck_dynamic_cast.cpp \
       cpp_typecheck_declaration.cpp \
       cpp_typecheck_destructor.cpp \
       cpp_typecheck_enum_type.cpp \
@@ -38,6 +42,7 @@ SRC = cpp_constructor.cpp \
       cpp_typecheck_namespace.cpp \
       cpp_typecheck_resolve.cpp \
       cpp_typecheck_static_assert.cpp \
+      cpp_typecheck_stdlib.cpp \
       cpp_typecheck_template.cpp \
       cpp_typecheck_type.cpp \
       cpp_typecheck_using.cpp \
@@ -45,6 +50,7 @@ SRC = cpp_constructor.cpp \
       cpp_util.cpp \
       cprover_library.cpp \
       expr2cpp.cpp \
+      itanium_abi_cpp_zero_initializer.cpp \
       parse.cpp \
       template_map.cpp \
       # Empty last line

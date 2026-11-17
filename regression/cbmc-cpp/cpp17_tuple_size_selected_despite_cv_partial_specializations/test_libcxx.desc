@@ -1,0 +1,16 @@
+CORE libcxx
+libcxx.cpp
+--cpp17 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ the base of the selected specialization: SUCCESS$
+^\[main\.assertion\.2\] line \d+ std::apply: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^warning: ignoring
+--
+libc++'s std::tuple_size and std::apply (see test.desc): the conversion to
+the base class and the static_asserts need the tuple<T...> partial
+specialization with its base.  clang++ 18 with libc++ accepts the program.

@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] .* direct call: SUCCESS$
+^\[main\.assertion\.2\] .* virtual call: SUCCESS$
+^\[main\.assertion\.3\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^\[.*pointer_dereference.*: FAILURE$
+--
+g++ 13 (-fsanitize=address,undefined) and clang++ 18 accept this program,
+and it fails only its WRONG assertion.  Fixed: the thunk for B's vtable
+slot kept D::self's return type D *, which did not fit the slot, and D's
+virtual table object was not created at all (both assertions failed with
+dereference failures).

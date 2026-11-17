@@ -1,0 +1,19 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ through B: SUCCESS$
+^\[main\.assertion\.2\] line \d+ through C: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The program was rejected (E's implicit destructor, see
+cpp_implicit_destructor_of_class_derived_from_repeated_base); then the
+delete through C passed a pointer to the C subobject to the deallocation
+function.  Now the destructor through C is dispatched through C's copy of
+the table of D's second A subobject, and the deallocation gets the
+address of the most derived object.

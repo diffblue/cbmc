@@ -1,0 +1,13 @@
+CORE
+main.c
+
+^\[main\.assertion\.1\] .* reached: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+no body for callee
+--
+__CPROVER_cover and the must/may annotations have no body by design: they
+are interpreted by --cover and by the must/may analyses, and do nothing
+otherwise.  Each call was reported as a call to a function without a body.

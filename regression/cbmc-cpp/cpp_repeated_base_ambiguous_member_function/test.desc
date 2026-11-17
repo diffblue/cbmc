@@ -1,0 +1,15 @@
+CORE
+main.cpp
+
+member 'get' of the ambiguous base class 'A' of 'D'$
+^CONVERSION ERROR$
+^EXIT=6$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+N5008 [expr.ref]/8: `d.get()' names a non-static member of A, an ambiguous
+base of D, the naming class ([class.mi]/4; the implicit object parameter is
+of type A, [over.match.funcs.general]/4).  g++ 13
+("request for member 'get' is ambiguous") and clang++ 18 ("non-static member
+'get' found in multiple base-class subobjects") reject this program.

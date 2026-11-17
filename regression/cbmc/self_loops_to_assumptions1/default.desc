@@ -1,4 +1,4 @@
-CORE
+CORE no-vacuity-check
 main.c
 --unwind 1 --unwinding-assertions --verbosity 8
 ^replacing self-loop at file main.c line 3 function main by assume\(FALSE\)$
@@ -7,3 +7,6 @@ main.c
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
+--
+no-vacuity-check: main is the self-loop while(1){} whose replacement by
+assume(FALSE) this test checks; the end of main is unreachable by design.

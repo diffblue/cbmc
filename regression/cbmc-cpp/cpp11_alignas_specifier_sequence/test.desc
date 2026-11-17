@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line 27 the strictest member alignment: SUCCESS$
+^\[main\.assertion\.2\] line 28 padded to it: SUCCESS$
+^\[main\.assertion\.3\] line 29 block scope: SUCCESS$
+^\[main\.assertion\.4\] line 30 namespace scope: SUCCESS$
+^\[main\.assertion\.5\] line 31 WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+A second alignas was a parse error.
