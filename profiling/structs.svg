@@ -1,0 +1,3770 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" width="1200" height="790" onload="init(evt)" viewBox="0 0 1200 790" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<!-- Flame graph stack visualization. See https://github.com/brendangregg/FlameGraph for latest version, and http://www.brendangregg.com/flamegraphs.html for examples. -->
+<!-- NOTES:  -->
+<defs>
+	<linearGradient id="background" y1="0" y2="1" x1="0" x2="0" >
+		<stop stop-color="#eeeeee" offset="5%" />
+		<stop stop-color="#eeeeb0" offset="95%" />
+	</linearGradient>
+</defs>
+<style type="text/css">
+	text { font-family:Verdana; font-size:12px; fill:rgb(0,0,0); }
+	#search, #ignorecase { opacity:0.1; cursor:pointer; }
+	#search:hover, #search.show, #ignorecase:hover, #ignorecase.show { opacity:1; }
+	#subtitle { text-anchor:middle; font-color:rgb(160,160,160); }
+	#title { text-anchor:middle; font-size:17px}
+	#unzoom { cursor:pointer; }
+	#frames > *:hover { stroke:black; stroke-width:0.5; cursor:pointer; }
+	.hide { display:none; }
+	.parent { opacity:0.5; }
+</style>
+<script type="text/ecmascript">
+<![CDATA[
+	"use strict";
+	var details, searchbtn, unzoombtn, matchedtxt, svg, searching, currentSearchTerm, ignorecase, ignorecaseBtn;
+	function init(evt) {
+		details = document.getElementById("details").firstChild;
+		searchbtn = document.getElementById("search");
+		ignorecaseBtn = document.getElementById("ignorecase");
+		unzoombtn = document.getElementById("unzoom");
+		matchedtxt = document.getElementById("matched");
+		svg = document.getElementsByTagName("svg")[0];
+		searching = 0;
+		currentSearchTerm = null;
+
+		// use GET parameters to restore a flamegraphs state.
+		var params = get_params();
+		if (params.x && params.y)
+			zoom(find_group(document.querySelector('[x="' + params.x + '"][y="' + params.y + '"]')));
+                if (params.s) search(params.s);
+	}
+
+	// event listeners
+	window.addEventListener("click", function(e) {
+		var target = find_group(e.target);
+		if (target) {
+			if (target.nodeName == "a") {
+				if (e.ctrlKey === false) return;
+				e.preventDefault();
+			}
+			if (target.classList.contains("parent")) unzoom(true);
+			zoom(target);
+			if (!document.querySelector('.parent')) {
+				// we have basically done a clearzoom so clear the url
+				var params = get_params();
+				if (params.x) delete params.x;
+				if (params.y) delete params.y;
+				history.replaceState(null, null, parse_params(params));
+				unzoombtn.classList.add("hide");
+				return;
+			}
+
+			// set parameters for zoom state
+			var el = target.querySelector("rect");
+			if (el && el.attributes && el.attributes.y && el.attributes._orig_x) {
+				var params = get_params()
+				params.x = el.attributes._orig_x.value;
+				params.y = el.attributes.y.value;
+				history.replaceState(null, null, parse_params(params));
+			}
+		}
+		else if (e.target.id == "unzoom") clearzoom();
+		else if (e.target.id == "search") search_prompt();
+		else if (e.target.id == "ignorecase") toggle_ignorecase();
+	}, false)
+
+	// mouse-over for info
+	// show
+	window.addEventListener("mouseover", function(e) {
+		var target = find_group(e.target);
+		if (target) details.nodeValue = "Function: " + g_to_text(target);
+	}, false)
+
+	// clear
+	window.addEventListener("mouseout", function(e) {
+		var target = find_group(e.target);
+		if (target) details.nodeValue = ' ';
+	}, false)
+
+	// ctrl-F for search
+	// ctrl-I to toggle case-sensitive search
+	window.addEventListener("keydown",function (e) {
+		if (e.keyCode === 114 || (e.ctrlKey && e.keyCode === 70)) {
+			e.preventDefault();
+			search_prompt();
+		}
+		else if (e.ctrlKey && e.keyCode === 73) {
+			e.preventDefault();
+			toggle_ignorecase();
+		}
+	}, false)
+
+	// functions
+	function get_params() {
+		var params = {};
+		var paramsarr = window.location.search.substr(1).split('&');
+		for (var i = 0; i < paramsarr.length; ++i) {
+			var tmp = paramsarr[i].split("=");
+			if (!tmp[0] || !tmp[1]) continue;
+			params[tmp[0]]  = decodeURIComponent(tmp[1]);
+		}
+		return params;
+	}
+	function parse_params(params) {
+		var uri = "?";
+		for (var key in params) {
+			uri += key + '=' + encodeURIComponent(params[key]) + '&';
+		}
+		if (uri.slice(-1) == "&")
+			uri = uri.substring(0, uri.length - 1);
+		if (uri == '?')
+			uri = window.location.href.split('?')[0];
+		return uri;
+	}
+	function find_child(node, selector) {
+		var children = node.querySelectorAll(selector);
+		if (children.length) return children[0];
+	}
+	function find_group(node) {
+		var parent = node.parentElement;
+		if (!parent) return;
+		if (parent.id == "frames") return node;
+		return find_group(parent);
+	}
+	function orig_save(e, attr, val) {
+		if (e.attributes["_orig_" + attr] != undefined) return;
+		if (e.attributes[attr] == undefined) return;
+		if (val == undefined) val = e.attributes[attr].value;
+		e.setAttribute("_orig_" + attr, val);
+	}
+	function orig_load(e, attr) {
+		if (e.attributes["_orig_"+attr] == undefined) return;
+		e.attributes[attr].value = e.attributes["_orig_" + attr].value;
+		e.removeAttribute("_orig_"+attr);
+	}
+	function g_to_text(e) {
+		var text = find_child(e, "title").firstChild.nodeValue;
+		return (text)
+	}
+	function g_to_func(e) {
+		var func = g_to_text(e);
+		// if there's any manipulation we want to do to the function
+		// name before it's searched, do it here before returning.
+		return (func);
+	}
+	function update_text(e) {
+		var r = find_child(e, "rect");
+		var t = find_child(e, "text");
+		var w = parseFloat(r.attributes.width.value) -3;
+		var txt = find_child(e, "title").textContent.replace(/\([^(]*\)$/,"");
+		t.attributes.x.value = parseFloat(r.attributes.x.value) + 3;
+
+		// Smaller than this size won't fit anything
+		if (w < 2 * 12 * 0.59) {
+			t.textContent = "";
+			return;
+		}
+
+		t.textContent = txt;
+		var sl = t.getSubStringLength(0, txt.length);
+		// check if only whitespace or if we can fit the entire string into width w
+		if (/^ *$/.test(txt) || sl < w)
+			return;
+
+		// this isn't perfect, but gives a good starting point
+		// and avoids calling getSubStringLength too often
+		var start = Math.floor((w/sl) * txt.length);
+		for (var x = start; x > 0; x = x-2) {
+			if (t.getSubStringLength(0, x + 2) <= w) {
+				t.textContent = txt.substring(0, x) + "..";
+				return;
+			}
+		}
+		t.textContent = "";
+	}
+
+	// zoom
+	function zoom_reset(e) {
+		if (e.attributes != undefined) {
+			orig_load(e, "x");
+			orig_load(e, "width");
+		}
+		if (e.childNodes == undefined) return;
+		for (var i = 0, c = e.childNodes; i < c.length; i++) {
+			zoom_reset(c[i]);
+		}
+	}
+	function zoom_child(e, x, ratio) {
+		if (e.attributes != undefined) {
+			if (e.attributes.x != undefined) {
+				orig_save(e, "x");
+				e.attributes.x.value = (parseFloat(e.attributes.x.value) - x - 10) * ratio + 10;
+				if (e.tagName == "text")
+					e.attributes.x.value = find_child(e.parentNode, "rect[x]").attributes.x.value + 3;
+			}
+			if (e.attributes.width != undefined) {
+				orig_save(e, "width");
+				e.attributes.width.value = parseFloat(e.attributes.width.value) * ratio;
+			}
+		}
+
+		if (e.childNodes == undefined) return;
+		for (var i = 0, c = e.childNodes; i < c.length; i++) {
+			zoom_child(c[i], x - 10, ratio);
+		}
+	}
+	function zoom_parent(e) {
+		if (e.attributes) {
+			if (e.attributes.x != undefined) {
+				orig_save(e, "x");
+				e.attributes.x.value = 10;
+			}
+			if (e.attributes.width != undefined) {
+				orig_save(e, "width");
+				e.attributes.width.value = parseInt(svg.width.baseVal.value) - (10 * 2);
+			}
+		}
+		if (e.childNodes == undefined) return;
+		for (var i = 0, c = e.childNodes; i < c.length; i++) {
+			zoom_parent(c[i]);
+		}
+	}
+	function zoom(node) {
+		var attr = find_child(node, "rect").attributes;
+		var width = parseFloat(attr.width.value);
+		var xmin = parseFloat(attr.x.value);
+		var xmax = parseFloat(xmin + width);
+		var ymin = parseFloat(attr.y.value);
+		var ratio = (svg.width.baseVal.value - 2 * 10) / width;
+
+		// XXX: Workaround for JavaScript float issues (fix me)
+		var fudge = 0.0001;
+
+		unzoombtn.classList.remove("hide");
+
+		var el = document.getElementById("frames").children;
+		for (var i = 0; i < el.length; i++) {
+			var e = el[i];
+			var a = find_child(e, "rect").attributes;
+			var ex = parseFloat(a.x.value);
+			var ew = parseFloat(a.width.value);
+			var upstack;
+			// Is it an ancestor
+			if (0 == 0) {
+				upstack = parseFloat(a.y.value) > ymin;
+			} else {
+				upstack = parseFloat(a.y.value) < ymin;
+			}
+			if (upstack) {
+				// Direct ancestor
+				if (ex <= xmin && (ex+ew+fudge) >= xmax) {
+					e.classList.add("parent");
+					zoom_parent(e);
+					update_text(e);
+				}
+				// not in current path
+				else
+					e.classList.add("hide");
+			}
+			// Children maybe
+			else {
+				// no common path
+				if (ex < xmin || ex + fudge >= xmax) {
+					e.classList.add("hide");
+				}
+				else {
+					zoom_child(e, xmin, ratio);
+					update_text(e);
+				}
+			}
+		}
+		search();
+	}
+	function unzoom(dont_update_text) {
+		unzoombtn.classList.add("hide");
+		var el = document.getElementById("frames").children;
+		for(var i = 0; i < el.length; i++) {
+			el[i].classList.remove("parent");
+			el[i].classList.remove("hide");
+			zoom_reset(el[i]);
+			if(!dont_update_text) update_text(el[i]);
+		}
+		search();
+	}
+	function clearzoom() {
+		unzoom();
+
+		// remove zoom state
+		var params = get_params();
+		if (params.x) delete params.x;
+		if (params.y) delete params.y;
+		history.replaceState(null, null, parse_params(params));
+	}
+
+	// search
+	function toggle_ignorecase() {
+		ignorecase = !ignorecase;
+		if (ignorecase) {
+			ignorecaseBtn.classList.add("show");
+		} else {
+			ignorecaseBtn.classList.remove("show");
+		}
+		reset_search();
+		search();
+	}
+	function reset_search() {
+		var el = document.querySelectorAll("#frames rect");
+		for (var i = 0; i < el.length; i++) {
+			orig_load(el[i], "fill")
+		}
+		var params = get_params();
+		delete params.s;
+		history.replaceState(null, null, parse_params(params));
+	}
+	function search_prompt() {
+		if (!searching) {
+			var term = prompt("Enter a search term (regexp " +
+			    "allowed, eg: ^ext4_)"
+			    + (ignorecase ? ", ignoring case" : "")
+			    + "\nPress Ctrl-i to toggle case sensitivity", "");
+			if (term != null) search(term);
+		} else {
+			reset_search();
+			searching = 0;
+			currentSearchTerm = null;
+			searchbtn.classList.remove("show");
+			searchbtn.firstChild.nodeValue = "Search"
+			matchedtxt.classList.add("hide");
+			matchedtxt.firstChild.nodeValue = ""
+		}
+	}
+	function search(term) {
+		if (term) currentSearchTerm = term;
+		if (currentSearchTerm === null) return;
+
+		var re = new RegExp(currentSearchTerm, ignorecase ? 'i' : '');
+		var el = document.getElementById("frames").children;
+		var matches = new Object();
+		var maxwidth = 0;
+		for (var i = 0; i < el.length; i++) {
+			var e = el[i];
+			var func = g_to_func(e);
+			var rect = find_child(e, "rect");
+			if (func == null || rect == null)
+				continue;
+
+			// Save max width. Only works as we have a root frame
+			var w = parseFloat(rect.attributes.width.value);
+			if (w > maxwidth)
+				maxwidth = w;
+
+			if (func.match(re)) {
+				// highlight
+				var x = parseFloat(rect.attributes.x.value);
+				orig_save(rect, "fill");
+				rect.attributes.fill.value = "rgb(230,0,230)";
+
+				// remember matches
+				if (matches[x] == undefined) {
+					matches[x] = w;
+				} else {
+					if (w > matches[x]) {
+						// overwrite with parent
+						matches[x] = w;
+					}
+				}
+				searching = 1;
+			}
+		}
+		if (!searching)
+			return;
+		var params = get_params();
+		params.s = currentSearchTerm;
+		history.replaceState(null, null, parse_params(params));
+
+		searchbtn.classList.add("show");
+		searchbtn.firstChild.nodeValue = "Reset Search";
+
+		// calculate percent matched, excluding vertical overlap
+		var count = 0;
+		var lastx = -1;
+		var lastw = 0;
+		var keys = Array();
+		for (k in matches) {
+			if (matches.hasOwnProperty(k))
+				keys.push(k);
+		}
+		// sort the matched frames by their x location
+		// ascending, then width descending
+		keys.sort(function(a, b){
+			return a - b;
+		});
+		// Step through frames saving only the biggest bottom-up frames
+		// thanks to the sort order. This relies on the tree property
+		// where children are always smaller than their parents.
+		var fudge = 0.0001;	// JavaScript floating point
+		for (var k in keys) {
+			var x = parseFloat(keys[k]);
+			var w = matches[keys[k]];
+			if (x >= lastx + lastw - fudge) {
+				count += w;
+				lastx = x;
+				lastw = w;
+			}
+		}
+		// display matched percent
+		matchedtxt.classList.remove("hide");
+		var pct = 100 * count / maxwidth;
+		if (pct != 100) pct = pct.toFixed(1)
+		matchedtxt.firstChild.nodeValue = "Matched: " + pct + "%";
+	}
+]]>
+</script>
+<rect x="0.0" y="0" width="1200.0" height="790.0" fill="url(#background)"  />
+<text id="title" x="600.00" y="24" >CBMC Profile: structs</text>
+<text id="details" x="10.00" y="773" > </text>
+<text id="unzoom" x="10.00" y="24" class="hide">Reset Zoom</text>
+<text id="search" x="1090.00" y="24" >Search</text>
+<text id="ignorecase" x="1174.00" y="24" >ic</text>
+<text id="matched" x="1090.00" y="773" > </text>
+<g id="frames">
+<g >
+<title>c_typecheck_baset::typecheck_vector_type (3,767,832 samples, 1.58%)</title><rect x="221.9" y="421" width="18.6" height="15.0" fill="rgb(248,200,47)" rx="2" ry="2" />
+<text  x="224.85" y="431.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="885.0" y="549" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="888.00" y="559.5" ></text>
+</g>
+<g >
+<title>goto_check_ct::check_rec_member (3,749,825 samples, 1.57%)</title><rect x="298.4" y="421" width="18.5" height="15.0" fill="rgb(221,76,18)" rx="2" ry="2" />
+<text  x="301.41" y="431.5" ></text>
+</g>
+<g >
+<title>[unknown] (528,632 samples, 0.22%)</title><rect x="1159.7" y="597" width="2.7" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1162.75" y="607.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_type (3,673,601 samples, 1.54%)</title><rect x="167.5" y="469" width="18.2" height="15.0" fill="rgb(219,65,15)" rx="2" ry="2" />
+<text  x="170.51" y="479.5" ></text>
+</g>
+<g >
+<title>[ld-linux-x86-64.so.2] (2,356,002 samples, 0.99%)</title><rect x="22.1" y="693" width="11.7" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="25.13" y="703.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify_node (3,733,863 samples, 1.56%)</title><rect x="610.7" y="293" width="18.5" height="15.0" fill="rgb(243,175,42)" rx="2" ry="2" />
+<text  x="613.74" y="303.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify_node_preorder (11,192,698 samples, 4.69%)</title><rect x="592.3" y="405" width="55.3" height="15.0" fill="rgb(228,109,26)" rx="2" ry="2" />
+<text  x="595.32" y="415.5" >simpl..</text>
+</g>
+<g >
+<title>ansi_c_typecheck (3,767,832 samples, 1.58%)</title><rect x="221.9" y="501" width="18.6" height="15.0" fill="rgb(236,146,34)" rx="2" ry="2" />
+<text  x="224.85" y="511.5" ></text>
+</g>
+<g >
+<title>[libc.so.6] (3,718,962 samples, 1.56%)</title><rect x="114.1" y="469" width="18.4" height="15.0" fill="rgb(223,84,20)" rx="2" ry="2" />
+<text  x="117.10" y="479.5" ></text>
+</g>
+<g >
+<title>convert (3,774,526 samples, 1.58%)</title><rect x="203.2" y="357" width="18.7" height="15.0" fill="rgb(245,188,44)" rx="2" ry="2" />
+<text  x="206.21" y="367.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,947,140 samples, 0.82%)</title><rect x="522.5" y="533" width="9.6" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="525.48" y="543.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,003,008 samples, 0.42%)</title><rect x="33.8" y="661" width="4.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="36.76" y="671.5" ></text>
+</g>
+<g >
+<title>run (501,504 samples, 0.21%)</title><rect x="240.5" y="485" width="2.4" height="15.0" fill="rgb(210,26,6)" rx="2" ry="2" />
+<text  x="243.47" y="495.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,003,008 samples, 0.42%)</title><rect x="33.8" y="501" width="4.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="36.76" y="511.5" ></text>
+</g>
+<g >
+<title>[unknown] (521,327 samples, 0.22%)</title><rect x="28.7" y="517" width="2.6" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="31.71" y="527.5" ></text>
+</g>
+<g >
+<title>ansi_c_languaget::typecheck (10,766,850 samples, 4.51%)</title><rect x="132.5" y="597" width="53.2" height="15.0" fill="rgb(237,150,35)" rx="2" ry="2" />
+<text  x="135.47" y="607.5" >ansi_..</text>
+</g>
+<g >
+<title>simplify_exprt::simplify_typecast_preorder (3,729,166 samples, 1.56%)</title><rect x="629.2" y="357" width="18.4" height="15.0" fill="rgb(239,158,37)" rx="2" ry="2" />
+<text  x="632.19" y="367.5" ></text>
+</g>
+<g >
+<title>[ld-linux-x86-64.so.2] (501,504 samples, 0.21%)</title><rect x="885.0" y="581" width="2.5" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="888.00" y="591.5" ></text>
+</g>
+<g >
+<title>goto_check_c (7,505,554 samples, 3.14%)</title><rect x="298.4" y="565" width="37.1" height="15.0" fill="rgb(253,222,53)" rx="2" ry="2" />
+<text  x="301.41" y="575.5" >got..</text>
+</g>
+<g >
+<title>[cc1] (5,488,266 samples, 2.30%)</title><rect x="1072.5" y="565" width="27.1" height="15.0" fill="rgb(229,111,26)" rx="2" ry="2" />
+<text  x="1075.50" y="575.5" >[..</text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="354.1" y="357" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="357.09" y="367.5" ></text>
+</g>
+<g >
+<title>field_sensitivityt::get_fields (3,730,209 samples, 1.56%)</title><rect x="776.8" y="373" width="18.5" height="15.0" fill="rgb(234,135,32)" rx="2" ry="2" />
+<text  x="779.84" y="383.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_expr (3,802,483 samples, 1.59%)</title><rect x="279.6" y="389" width="18.8" height="15.0" fill="rgb(238,154,37)" rx="2" ry="2" />
+<text  x="282.63" y="399.5" ></text>
+</g>
+<g >
+<title>[ld-linux-x86-64.so.2] (501,504 samples, 0.21%)</title><rect x="885.0" y="565" width="2.5" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="888.00" y="575.5" ></text>
+</g>
+<g >
+<title>ansi_c_typecheck (3,830,921 samples, 1.60%)</title><rect x="38.7" y="373" width="18.9" height="15.0" fill="rgb(236,146,34)" rx="2" ry="2" />
+<text  x="41.72" y="383.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_declaration (10,766,850 samples, 4.51%)</title><rect x="132.5" y="517" width="53.2" height="15.0" fill="rgb(245,187,44)" rx="2" ry="2" />
+<text  x="135.47" y="527.5" >c_typ..</text>
+</g>
+<g >
+<title>c_preprocess_gcc_clang (501,504 samples, 0.21%)</title><rect x="354.1" y="549" width="2.5" height="15.0" fill="rgb(231,122,29)" rx="2" ry="2" />
+<text  x="357.09" y="559.5" ></text>
+</g>
+<g >
+<title>process_goto_program (11,271,229 samples, 4.72%)</title><rect x="298.4" y="581" width="55.7" height="15.0" fill="rgb(223,83,19)" rx="2" ry="2" />
+<text  x="301.41" y="591.5" >proce..</text>
+</g>
+<g >
+<title>[unknown] (1,389,938 samples, 0.58%)</title><rect x="850.7" y="549" width="6.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="853.70" y="559.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify_rec (3,733,863 samples, 1.56%)</title><rect x="610.7" y="309" width="18.5" height="15.0" fill="rgb(240,164,39)" rx="2" ry="2" />
+<text  x="613.74" y="319.5" ></text>
+</g>
+<g >
+<title>std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;::_M_append (3,740,506 samples, 1.57%)</title><rect x="813.7" y="485" width="18.5" height="15.0" fill="rgb(222,79,19)" rx="2" ry="2" />
+<text  x="816.68" y="495.5" ></text>
+</g>
+<g >
+<title>convert (3,780,541 samples, 1.58%)</title><rect x="57.6" y="389" width="18.7" height="15.0" fill="rgb(245,188,44)" rx="2" ry="2" />
+<text  x="60.64" y="399.5" ></text>
+</g>
+<g >
+<title>[unknown] (2,874,872 samples, 1.20%)</title><rect x="981.1" y="565" width="14.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="984.10" y="575.5" ></text>
+</g>
+<g >
+<title>[unknown] (2,874,872 samples, 1.20%)</title><rect x="981.1" y="469" width="14.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="984.10" y="479.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_symbol (3,767,832 samples, 1.58%)</title><rect x="221.9" y="645" width="18.6" height="15.0" fill="rgb(249,206,49)" rx="2" ry="2" />
+<text  x="224.85" y="655.5" ></text>
+</g>
+<g >
+<title>[libc.so.6] (3,729,166 samples, 1.56%)</title><rect x="629.2" y="37" width="18.4" height="15.0" fill="rgb(223,84,20)" rx="2" ry="2" />
+<text  x="632.19" y="47.5" ></text>
+</g>
+<g >
+<title>[unknown] (911,866 samples, 0.38%)</title><rect x="1185.5" y="581" width="4.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1188.50" y="591.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_function_body (7,093,249 samples, 2.97%)</title><rect x="132.5" y="485" width="35.0" height="15.0" fill="rgb(214,44,10)" rx="2" ry="2" />
+<text  x="135.47" y="495.5" >c_..</text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="1157.3" y="485" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1160.27" y="495.5" ></text>
+</g>
+<g >
+<title>field_sensitivityt::field_assignments (3,730,209 samples, 1.56%)</title><rect x="776.8" y="389" width="18.5" height="15.0" fill="rgb(218,62,14)" rx="2" ry="2" />
+<text  x="779.84" y="399.5" ></text>
+</g>
+<g >
+<title>[unknown] (3,239,095 samples, 1.36%)</title><rect x="995.3" y="629" width="16.0" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="998.30" y="639.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_redefinition_non_type (3,830,921 samples, 1.60%)</title><rect x="38.7" y="613" width="18.9" height="15.0" fill="rgb(235,138,33)" rx="2" ry="2" />
+<text  x="41.72" y="623.5" ></text>
+</g>
+<g >
+<title>sharing_treet&lt;irept, forward_list_as_mapt&lt;dstringt, irept&gt; &gt;::remove_ref (3,714,771 samples, 1.56%)</title><rect x="504.1" y="453" width="18.4" height="15.0" fill="rgb(246,191,45)" rx="2" ry="2" />
+<text  x="507.13" y="463.5" ></text>
+</g>
+<g >
+<title>[libc.so.6] (859,617 samples, 0.36%)</title><rect x="1164.8" y="661" width="4.3" height="15.0" fill="rgb(223,84,20)" rx="2" ry="2" />
+<text  x="1167.84" y="671.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,003,008 samples, 0.42%)</title><rect x="33.8" y="533" width="4.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="36.76" y="543.5" ></text>
+</g>
+<g >
+<title>std::ios_base::_M_init (3,750,323 samples, 1.57%)</title><rect x="739.8" y="245" width="18.5" height="15.0" fill="rgb(228,107,25)" rx="2" ry="2" />
+<text  x="742.78" y="255.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,947,140 samples, 0.82%)</title><rect x="522.5" y="501" width="9.6" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="525.48" y="511.5" ></text>
+</g>
+<g >
+<title>[unknown] (2,874,872 samples, 1.20%)</title><rect x="981.1" y="517" width="14.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="984.10" y="527.5" ></text>
+</g>
+<g >
+<title>[libc.so.6] (521,327 samples, 0.22%)</title><rect x="28.7" y="629" width="2.6" height="15.0" fill="rgb(223,84,20)" rx="2" ry="2" />
+<text  x="31.71" y="639.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_compound_body (3,554,718 samples, 1.49%)</title><rect x="185.7" y="373" width="17.5" height="15.0" fill="rgb(221,74,17)" rx="2" ry="2" />
+<text  x="188.65" y="383.5" ></text>
+</g>
+<g >
+<title>[unknown] (3,239,095 samples, 1.36%)</title><rect x="995.3" y="645" width="16.0" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="998.30" y="655.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="354.1" y="309" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="357.09" y="319.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="354.1" y="405" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="357.09" y="415.5" ></text>
+</g>
+<g >
+<title>field_sensitivityt::apply (7,470,388 samples, 3.13%)</title><rect x="721.4" y="421" width="36.9" height="15.0" fill="rgb(238,154,37)" rx="2" ry="2" />
+<text  x="724.41" y="431.5" >fie..</text>
+</g>
+<g >
+<title>[unknown] (521,327 samples, 0.22%)</title><rect x="28.7" y="565" width="2.6" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="31.71" y="575.5" ></text>
+</g>
+<g >
+<title>[unknown] (521,327 samples, 0.22%)</title><rect x="28.7" y="469" width="2.6" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="31.71" y="479.5" ></text>
+</g>
+<g >
+<title>_cpp_handle_directive (3,502,624 samples, 1.47%)</title><rect x="1011.3" y="565" width="17.3" height="15.0" fill="rgb(235,141,33)" rx="2" ry="2" />
+<text  x="1014.30" y="575.5" ></text>
+</g>
+<g >
+<title>[x86_64-linux-gnu-gcc-13] (3,733,388 samples, 1.56%)</title><rect x="1171.6" y="661" width="18.4" height="15.0" fill="rgb(238,152,36)" rx="2" ry="2" />
+<text  x="1174.56" y="671.5" ></text>
+</g>
+<g >
+<title>multi_path_symex_only_checkert::generate_equation (59,744,555 samples, 25.01%)</title><rect x="537.0" y="581" width="295.2" height="15.0" fill="rgb(227,103,24)" rx="2" ry="2" />
+<text  x="540.05" y="591.5" >multi_path_symex_only_checkert::generat..</text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="31.3" y="533" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="34.29" y="543.5" ></text>
+</g>
+<g >
+<title>BigInt::BigInt (3,830,921 samples, 1.60%)</title><rect x="38.7" y="229" width="18.9" height="15.0" fill="rgb(211,28,6)" rx="2" ry="2" />
+<text  x="41.72" y="239.5" ></text>
+</g>
+<g >
+<title>[unknown] (5,318,405 samples, 2.23%)</title><rect x="937.8" y="613" width="26.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="940.77" y="623.5" >[..</text>
+</g>
+<g >
+<title>symex_assignt::assign_rec (3,729,026 samples, 1.56%)</title><rect x="795.3" y="437" width="18.4" height="15.0" fill="rgb(219,66,15)" rx="2" ry="2" />
+<text  x="798.26" y="447.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify_typecast_preorder (3,733,863 samples, 1.56%)</title><rect x="610.7" y="325" width="18.5" height="15.0" fill="rgb(239,158,37)" rx="2" ry="2" />
+<text  x="613.74" y="335.5" ></text>
+</g>
+<g >
+<title>[ld-linux-x86-64.so.2] (2,356,002 samples, 0.99%)</title><rect x="22.1" y="709" width="11.7" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="25.13" y="719.5" ></text>
+</g>
+<g >
+<title>std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;::find (3,391,716 samples, 1.42%)</title><rect x="435.0" y="325" width="16.7" height="15.0" fill="rgb(236,142,34)" rx="2" ry="2" />
+<text  x="437.97" y="335.5" ></text>
+</g>
+<g >
+<title>renamedt&lt;exprt,  (7,498,409 samples, 3.14%)</title><rect x="666.0" y="341" width="37.0" height="15.0" fill="rgb(220,69,16)" rx="2" ry="2" />
+<text  x="669.00" y="351.5" >ren..</text>
+</g>
+<g >
+<title>ansi_c_languaget::typecheck (3,554,718 samples, 1.49%)</title><rect x="185.7" y="661" width="17.5" height="15.0" fill="rgb(237,150,35)" rx="2" ry="2" />
+<text  x="188.65" y="671.5" ></text>
+</g>
+<g >
+<title>size_of_expr (3,729,166 samples, 1.56%)</title><rect x="629.2" y="229" width="18.4" height="15.0" fill="rgb(210,27,6)" rx="2" ry="2" />
+<text  x="632.19" y="239.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,947,140 samples, 0.82%)</title><rect x="522.5" y="389" width="9.6" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="525.48" y="399.5" ></text>
+</g>
+<g >
+<title>ansi_c_languaget::parse (7,929,123 samples, 3.32%)</title><rect x="240.5" y="533" width="39.1" height="15.0" fill="rgb(207,10,2)" rx="2" ry="2" />
+<text  x="243.47" y="543.5" >ans..</text>
+</g>
+<g >
+<title>size_of_expr (3,729,166 samples, 1.56%)</title><rect x="629.2" y="277" width="18.4" height="15.0" fill="rgb(210,27,6)" rx="2" ry="2" />
+<text  x="632.19" y="287.5" ></text>
+</g>
+<g >
+<title>[ld-linux-x86-64.so.2] (2,301,657 samples, 0.96%)</title><rect x="876.1" y="661" width="11.4" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="879.11" y="671.5" ></text>
+</g>
+<g >
+<title>[x86_64-linux-gnu-gcc-13] (801,253 samples, 0.34%)</title><rect x="1181.5" y="549" width="4.0" height="15.0" fill="rgb(238,152,36)" rx="2" ry="2" />
+<text  x="1184.54" y="559.5" ></text>
+</g>
+<g >
+<title>[libc.so.6] (2,783,334 samples, 1.17%)</title><rect x="1124.5" y="645" width="13.8" height="15.0" fill="rgb(223,84,20)" rx="2" ry="2" />
+<text  x="1127.51" y="655.5" ></text>
+</g>
+<g >
+<title>ansi_c_parsert::add_declarator (2,281,935 samples, 0.96%)</title><rect x="368.1" y="533" width="11.2" height="15.0" fill="rgb(210,27,6)" rx="2" ry="2" />
+<text  x="371.06" y="543.5" ></text>
+</g>
+<g >
+<title>goto_symext::symex_with_state (59,744,555 samples, 25.01%)</title><rect x="537.0" y="549" width="295.2" height="15.0" fill="rgb(223,85,20)" rx="2" ry="2" />
+<text  x="540.05" y="559.5" >goto_symext::symex_with_state</text>
+</g>
+<g >
+<title>renamedt&lt;exprt,  (11,222,738 samples, 4.70%)</title><rect x="647.6" y="421" width="55.4" height="15.0" fill="rgb(220,69,16)" rx="2" ry="2" />
+<text  x="650.61" y="431.5" >renam..</text>
+</g>
+<g >
+<title>[unknown] (9,032,900 samples, 3.78%)</title><rect x="919.4" y="693" width="44.6" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="922.42" y="703.5" >[unk..</text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_symbol (3,830,921 samples, 1.60%)</title><rect x="38.7" y="629" width="18.9" height="15.0" fill="rgb(249,206,49)" rx="2" ry="2" />
+<text  x="41.72" y="639.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="31.3" y="501" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="34.29" y="511.5" ></text>
+</g>
+<g >
+<title>fopen (2,783,334 samples, 1.17%)</title><rect x="1124.5" y="613" width="13.8" height="15.0" fill="rgb(251,211,50)" rx="2" ry="2" />
+<text  x="1127.51" y="623.5" ></text>
+</g>
+<g >
+<title>typecheckt::typecheck_main (3,481,989 samples, 1.46%)</title><rect x="132.5" y="373" width="17.2" height="15.0" fill="rgb(228,108,25)" rx="2" ry="2" />
+<text  x="135.47" y="383.5" ></text>
+</g>
+<g >
+<title>[x86_64-linux-gnu-gcc-13] (4,234,892 samples, 1.77%)</title><rect x="1169.1" y="709" width="20.9" height="15.0" fill="rgb(238,152,36)" rx="2" ry="2" />
+<text  x="1172.08" y="719.5" ></text>
+</g>
+<g >
+<title>size_of_expr (3,733,863 samples, 1.56%)</title><rect x="610.7" y="261" width="18.5" height="15.0" fill="rgb(210,27,6)" rx="2" ry="2" />
+<text  x="613.74" y="271.5" ></text>
+</g>
+<g >
+<title>symex_assignt::assign_non_struct_symbol (3,750,461 samples, 1.57%)</title><rect x="758.3" y="437" width="18.5" height="15.0" fill="rgb(232,126,30)" rx="2" ry="2" />
+<text  x="761.31" y="447.5" ></text>
+</g>
+<g >
+<title>_dl_catch_exception (501,504 samples, 0.21%)</title><rect x="885.0" y="629" width="2.5" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="888.00" y="639.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_ifthenelse (3,780,541 samples, 1.58%)</title><rect x="57.6" y="453" width="18.7" height="15.0" fill="rgb(209,20,4)" rx="2" ry="2" />
+<text  x="60.64" y="463.5" ></text>
+</g>
+<g >
+<title>[unknown] (751,337 samples, 0.31%)</title><rect x="900.9" y="613" width="3.7" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="903.88" y="623.5" ></text>
+</g>
+<g >
+<title>[unknown] (2,874,872 samples, 1.20%)</title><rect x="981.1" y="613" width="14.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="984.10" y="623.5" ></text>
+</g>
+<g >
+<title>builtin_factory (3,830,921 samples, 1.60%)</title><rect x="38.7" y="405" width="18.9" height="15.0" fill="rgb(237,148,35)" rx="2" ry="2" />
+<text  x="41.72" y="415.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,003,008 samples, 0.42%)</title><rect x="532.1" y="485" width="4.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="535.09" y="495.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="36.2" y="389" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="39.24" y="399.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_side_effect_function_call (3,774,526 samples, 1.58%)</title><rect x="203.2" y="389" width="18.7" height="15.0" fill="rgb(222,80,19)" rx="2" ry="2" />
+<text  x="206.21" y="399.5" ></text>
+</g>
+<g >
+<title>field_sensitivityt::apply (7,476,311 samples, 3.13%)</title><rect x="537.0" y="357" width="37.0" height="15.0" fill="rgb(238,154,37)" rx="2" ry="2" />
+<text  x="540.05" y="367.5" >fie..</text>
+</g>
+<g >
+<title>_cpp_lex_token (10,005,653 samples, 4.19%)</title><rect x="1011.3" y="581" width="49.4" height="15.0" fill="rgb(239,160,38)" rx="2" ry="2" />
+<text  x="1014.30" y="591.5" >_cpp..</text>
+</g>
+<g >
+<title>gcc (7,629,157 samples, 3.19%)</title><rect x="1152.3" y="725" width="37.7" height="15.0" fill="rgb(219,64,15)" rx="2" ry="2" />
+<text  x="1155.32" y="735.5" >gcc</text>
+</g>
+<g >
+<title>simplify_exprt::simplify_rec (3,729,166 samples, 1.56%)</title><rect x="629.2" y="149" width="18.4" height="15.0" fill="rgb(240,164,39)" rx="2" ry="2" />
+<text  x="632.19" y="159.5" ></text>
+</g>
+<g >
+<title>language_filest::typecheck_module (3,554,718 samples, 1.49%)</title><rect x="185.7" y="693" width="17.5" height="15.0" fill="rgb(232,125,29)" rx="2" ry="2" />
+<text  x="188.65" y="703.5" ></text>
+</g>
+<g >
+<title>ansi_c_typecheckt::typecheck (3,554,718 samples, 1.49%)</title><rect x="185.7" y="613" width="17.5" height="15.0" fill="rgb(236,145,34)" rx="2" ry="2" />
+<text  x="188.65" y="623.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_declaration (3,767,832 samples, 1.58%)</title><rect x="221.9" y="661" width="18.6" height="15.0" fill="rgb(245,187,44)" rx="2" ry="2" />
+<text  x="224.85" y="671.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="904.6" y="661" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="907.59" y="671.5" ></text>
+</g>
+<g >
+<title>yyansi_cparse (15,873,422 samples, 6.64%)</title><rect x="356.6" y="549" width="78.4" height="15.0" fill="rgb(206,8,1)" rx="2" ry="2" />
+<text  x="359.57" y="559.5" >yyansi_cp..</text>
+</g>
+<g >
+<title>add_library (11,429,808 samples, 4.78%)</title><rect x="57.6" y="613" width="56.5" height="15.0" fill="rgb(241,166,39)" rx="2" ry="2" />
+<text  x="60.64" y="623.5" >add_l..</text>
+</g>
+<g >
+<title>typecheckt::typecheck_main (3,774,526 samples, 1.58%)</title><rect x="203.2" y="533" width="18.7" height="15.0" fill="rgb(228,108,25)" rx="2" ry="2" />
+<text  x="206.21" y="543.5" ></text>
+</g>
+<g >
+<title>link_to_library (15,148,770 samples, 6.34%)</title><rect x="57.6" y="645" width="74.9" height="15.0" fill="rgb(251,215,51)" rx="2" ry="2" />
+<text  x="60.64" y="655.5" >link_to_..</text>
+</g>
+<g >
+<title>typecheckt::typecheck_main (3,554,718 samples, 1.49%)</title><rect x="185.7" y="453" width="17.5" height="15.0" fill="rgb(228,108,25)" rx="2" ry="2" />
+<text  x="188.65" y="463.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_function_body (3,774,526 samples, 1.58%)</title><rect x="203.2" y="453" width="18.7" height="15.0" fill="rgb(214,44,10)" rx="2" ry="2" />
+<text  x="206.21" y="463.5" ></text>
+</g>
+<g >
+<title>get_cprover_library_text (3,718,962 samples, 1.56%)</title><rect x="114.1" y="597" width="18.4" height="15.0" fill="rgb(221,74,17)" rx="2" ry="2" />
+<text  x="117.10" y="607.5" ></text>
+</g>
+<g >
+<title>malloc (3,815,831 samples, 1.60%)</title><rect x="76.3" y="325" width="18.9" height="15.0" fill="rgb(230,119,28)" rx="2" ry="2" />
+<text  x="79.31" y="335.5" ></text>
+</g>
+<g >
+<title>get_cprover_library_text (3,718,962 samples, 1.56%)</title><rect x="114.1" y="613" width="18.4" height="15.0" fill="rgb(221,74,17)" rx="2" ry="2" />
+<text  x="117.10" y="623.5" ></text>
+</g>
+<g >
+<title>decl_attributes (3,430,624 samples, 1.44%)</title><rect x="1072.5" y="533" width="16.9" height="15.0" fill="rgb(240,163,39)" rx="2" ry="2" />
+<text  x="1075.50" y="543.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_function_body (3,767,832 samples, 1.58%)</title><rect x="221.9" y="613" width="18.6" height="15.0" fill="rgb(214,44,10)" rx="2" ry="2" />
+<text  x="224.85" y="623.5" ></text>
+</g>
+<g >
+<title>[libc.so.6] (2,783,334 samples, 1.17%)</title><rect x="1124.5" y="661" width="13.8" height="15.0" fill="rgb(223,84,20)" rx="2" ry="2" />
+<text  x="1127.51" y="671.5" ></text>
+</g>
+<g >
+<title>string_containert::get (2,783,334 samples, 1.17%)</title><rect x="379.3" y="517" width="13.8" height="15.0" fill="rgb(230,116,27)" rx="2" ry="2" />
+<text  x="382.33" y="527.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="1157.3" y="533" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1160.27" y="543.5" ></text>
+</g>
+<g >
+<title>_GLOBAL__sub_I__Z11is_ptr_diffRK5exprt (1,389,938 samples, 0.58%)</title><rect x="850.7" y="677" width="6.9" height="15.0" fill="rgb(223,83,19)" rx="2" ry="2" />
+<text  x="853.70" y="687.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,003,008 samples, 0.42%)</title><rect x="33.8" y="485" width="4.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="36.76" y="495.5" ></text>
+</g>
+<g >
+<title>execvpe (501,504 samples, 0.21%)</title><rect x="240.5" y="469" width="2.4" height="15.0" fill="rgb(205,3,0)" rx="2" ry="2" />
+<text  x="243.47" y="479.5" ></text>
+</g>
+<g >
+<title>open64 (1,947,140 samples, 0.82%)</title><rect x="522.5" y="565" width="9.6" height="15.0" fill="rgb(225,92,22)" rx="2" ry="2" />
+<text  x="525.48" y="575.5" ></text>
+</g>
+<g >
+<title>ansi_c_typecheckt::typecheck (3,554,718 samples, 1.49%)</title><rect x="185.7" y="437" width="17.5" height="15.0" fill="rgb(236,145,34)" rx="2" ry="2" />
+<text  x="188.65" y="447.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,389,938 samples, 0.58%)</title><rect x="850.7" y="629" width="6.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="853.70" y="639.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify_node_preorder (3,713,458 samples, 1.55%)</title><rect x="574.0" y="373" width="18.3" height="15.0" fill="rgb(228,109,26)" rx="2" ry="2" />
+<text  x="576.98" y="383.5" ></text>
+</g>
+<g >
+<title>field_sensitivityt::apply (7,476,311 samples, 3.13%)</title><rect x="537.0" y="373" width="37.0" height="15.0" fill="rgb(238,154,37)" rx="2" ry="2" />
+<text  x="540.05" y="383.5" >fie..</text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="534.6" y="389" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="537.57" y="399.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,389,938 samples, 0.58%)</title><rect x="850.7" y="645" width="6.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="853.70" y="655.5" ></text>
+</g>
+<g >
+<title>std::basic_ios&lt;char, std::char_traits&lt;char&gt; &gt;::_M_cache_locale (3,728,031 samples, 1.56%)</title><rect x="537.0" y="197" width="18.5" height="15.0" fill="rgb(223,86,20)" rx="2" ry="2" />
+<text  x="540.05" y="207.5" ></text>
+</g>
+<g >
+<title>std::__detail::_Map_base&lt;std::basic_string_view&lt;char, std::char_traits&lt;char&gt; &gt;, std::pair&lt;std::basic_string_view&lt;char, std::char_traits&lt;char&gt; &gt; const, unsigned int&gt;, std::allocator&lt;std::pair&lt;std::basic_string_view&lt;char, std::char_traits&lt;char&gt; &gt; const, unsigned int&gt; &gt;, std::__detail::_Select1st, std::equal_to&lt;std::basic_string_view&lt;char, std::char_traits&lt;char&gt; &gt; &gt;, string_view_hasht, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits&lt;true, false, true&gt;, true&gt;::operator[] (2,783,334 samples, 1.17%)</title><rect x="379.3" y="501" width="13.8" height="15.0" fill="rgb(240,162,38)" rx="2" ry="2" />
+<text  x="382.33" y="511.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="1157.3" y="501" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1160.27" y="511.5" ></text>
+</g>
+<g >
+<title>goto_symext::do_simplify (3,713,458 samples, 1.55%)</title><rect x="574.0" y="421" width="18.3" height="15.0" fill="rgb(254,225,53)" rx="2" ry="2" />
+<text  x="576.98" y="431.5" ></text>
+</g>
+<g >
+<title>gcc_init_libintl (2,783,334 samples, 1.17%)</title><rect x="1124.5" y="693" width="13.8" height="15.0" fill="rgb(230,116,27)" rx="2" ry="2" />
+<text  x="1127.51" y="703.5" ></text>
+</g>
+<g >
+<title>operator new (3,647,624 samples, 1.53%)</title><rect x="451.7" y="373" width="18.0" height="15.0" fill="rgb(216,51,12)" rx="2" ry="2" />
+<text  x="454.73" y="383.5" ></text>
+</g>
+<g >
+<title>malloc (3,647,624 samples, 1.53%)</title><rect x="451.7" y="357" width="18.0" height="15.0" fill="rgb(230,119,28)" rx="2" ry="2" />
+<text  x="454.73" y="367.5" ></text>
+</g>
+<g >
+<title>main (123,541,558 samples, 51.71%)</title><rect x="240.5" y="661" width="610.2" height="15.0" fill="rgb(243,179,42)" rx="2" ry="2" />
+<text  x="243.47" y="671.5" >main</text>
+</g>
+<g >
+<title>find_pattern (3,391,716 samples, 1.42%)</title><rect x="435.0" y="341" width="16.7" height="15.0" fill="rgb(207,12,3)" rx="2" ry="2" />
+<text  x="437.97" y="351.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="1162.4" y="549" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1165.36" y="559.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_block (3,767,832 samples, 1.58%)</title><rect x="221.9" y="597" width="18.6" height="15.0" fill="rgb(247,196,47)" rx="2" ry="2" />
+<text  x="224.85" y="607.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,947,140 samples, 0.82%)</title><rect x="522.5" y="485" width="9.6" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="525.48" y="495.5" ></text>
+</g>
+<g >
+<title>[unknown] (5,318,405 samples, 2.23%)</title><rect x="937.8" y="581" width="26.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="940.77" y="591.5" >[..</text>
+</g>
+<g >
+<title>simplify_exprt::simplify_node_preorder (3,748,280 samples, 1.57%)</title><rect x="555.5" y="149" width="18.5" height="15.0" fill="rgb(228,109,26)" rx="2" ry="2" />
+<text  x="558.46" y="159.5" ></text>
+</g>
+<g >
+<title>std::basic_ostream&lt;char, std::char_traits&lt;char&gt; &gt;&amp; std::__ostream_insert&lt;char, std::char_traits&lt;char&gt; &gt; (3,718,962 samples, 1.56%)</title><rect x="114.1" y="581" width="18.4" height="15.0" fill="rgb(220,73,17)" rx="2" ry="2" />
+<text  x="117.10" y="591.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_declaration (3,830,921 samples, 1.60%)</title><rect x="38.7" y="645" width="18.9" height="15.0" fill="rgb(245,187,44)" rx="2" ry="2" />
+<text  x="41.72" y="655.5" ></text>
+</g>
+<g >
+<title>goto_symext::symex_assert (37,323,965 samples, 15.62%)</title><rect x="537.0" y="469" width="184.4" height="15.0" fill="rgb(225,94,22)" rx="2" ry="2" />
+<text  x="540.05" y="479.5" >goto_symext::symex_assert</text>
+</g>
+<g >
+<title>ansi_c_languaget::typecheck (14,000,076 samples, 5.86%)</title><rect x="435.0" y="533" width="69.1" height="15.0" fill="rgb(237,150,35)" rx="2" ry="2" />
+<text  x="437.97" y="543.5" >ansi_c_..</text>
+</g>
+<g >
+<title>ansi_c_typecheckt::typecheck (3,481,989 samples, 1.46%)</title><rect x="132.5" y="357" width="17.2" height="15.0" fill="rgb(236,145,34)" rx="2" ry="2" />
+<text  x="135.47" y="367.5" ></text>
+</g>
+<g >
+<title>sharing_treet&lt;irept, forward_list_as_mapt&lt;dstringt, irept&gt; &gt;::detach (3,749,825 samples, 1.57%)</title><rect x="298.4" y="357" width="18.5" height="15.0" fill="rgb(247,193,46)" rx="2" ry="2" />
+<text  x="301.41" y="367.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="240.5" y="245" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="243.47" y="255.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify_object_size (3,729,166 samples, 1.56%)</title><rect x="629.2" y="309" width="18.4" height="15.0" fill="rgb(217,58,13)" rx="2" ry="2" />
+<text  x="632.19" y="319.5" ></text>
+</g>
+<g >
+<title>[unknown] (859,617 samples, 0.36%)</title><rect x="1164.8" y="581" width="4.3" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1167.84" y="591.5" ></text>
+</g>
+<g >
+<title>[x86_64-linux-gnu-gcc-13] (501,504 samples, 0.21%)</title><rect x="1169.1" y="693" width="2.5" height="15.0" fill="rgb(238,152,36)" rx="2" ry="2" />
+<text  x="1172.08" y="703.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_type (3,833,436 samples, 1.60%)</title><rect x="95.2" y="501" width="18.9" height="15.0" fill="rgb(219,65,15)" rx="2" ry="2" />
+<text  x="98.16" y="511.5" ></text>
+</g>
+<g >
+<title>cprover_c_library_factory (3,774,526 samples, 1.58%)</title><rect x="203.2" y="597" width="18.7" height="15.0" fill="rgb(215,48,11)" rx="2" ry="2" />
+<text  x="206.21" y="607.5" ></text>
+</g>
+<g >
+<title>sharing_treet&lt;irept, forward_list_as_mapt&lt;dstringt, irept&gt; &gt;::remove_ref (7,498,409 samples, 3.14%)</title><rect x="666.0" y="309" width="37.0" height="15.0" fill="rgb(246,191,45)" rx="2" ry="2" />
+<text  x="669.00" y="319.5" >sha..</text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_type (3,767,832 samples, 1.58%)</title><rect x="221.9" y="437" width="18.6" height="15.0" fill="rgb(219,65,15)" rx="2" ry="2" />
+<text  x="224.85" y="447.5" ></text>
+</g>
+<g >
+<title>field_sensitivityt::field_assignments_rec (3,729,026 samples, 1.56%)</title><rect x="795.3" y="389" width="18.4" height="15.0" fill="rgb(226,98,23)" rx="2" ry="2" />
+<text  x="798.26" y="399.5" ></text>
+</g>
+<g >
+<title>ansi_c_typecheckt::typecheck (11,429,808 samples, 4.78%)</title><rect x="57.6" y="549" width="56.5" height="15.0" fill="rgb(236,145,34)" rx="2" ry="2" />
+<text  x="60.64" y="559.5" >ansi_..</text>
+</g>
+<g >
+<title>ansi_c_languaget::typecheck (3,802,483 samples, 1.59%)</title><rect x="279.6" y="533" width="18.8" height="15.0" fill="rgb(237,150,35)" rx="2" ry="2" />
+<text  x="282.63" y="543.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify_node_preorder (3,748,280 samples, 1.57%)</title><rect x="555.5" y="245" width="18.5" height="15.0" fill="rgb(228,109,26)" rx="2" ry="2" />
+<text  x="558.46" y="255.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_side_effect_function_call (3,554,718 samples, 1.49%)</title><rect x="185.7" y="517" width="17.5" height="15.0" fill="rgb(222,80,19)" rx="2" ry="2" />
+<text  x="188.65" y="527.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify_rec (3,748,280 samples, 1.57%)</title><rect x="555.5" y="197" width="18.5" height="15.0" fill="rgb(240,164,39)" rx="2" ry="2" />
+<text  x="558.46" y="207.5" ></text>
+</g>
+<g >
+<title>std::basic_streambuf&lt;char, std::char_traits&lt;char&gt; &gt;::xsputn (3,718,962 samples, 1.56%)</title><rect x="114.1" y="565" width="18.4" height="15.0" fill="rgb(244,181,43)" rx="2" ry="2" />
+<text  x="117.10" y="575.5" ></text>
+</g>
+<g >
+<title>field_sensitivityt::apply (7,476,311 samples, 3.13%)</title><rect x="537.0" y="389" width="37.0" height="15.0" fill="rgb(238,154,37)" rx="2" ry="2" />
+<text  x="540.05" y="399.5" >fie..</text>
+</g>
+<g >
+<title>[unknown] (1,003,008 samples, 0.42%)</title><rect x="532.1" y="533" width="4.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="535.09" y="543.5" ></text>
+</g>
+<g >
+<title>[ld-linux-x86-64.so.2] (501,504 samples, 0.21%)</title><rect x="1157.3" y="597" width="2.4" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="1160.27" y="607.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="240.5" y="389" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="243.47" y="399.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify_rec (11,192,698 samples, 4.69%)</title><rect x="592.3" y="421" width="55.3" height="15.0" fill="rgb(240,164,39)" rx="2" ry="2" />
+<text  x="595.32" y="431.5" >simpl..</text>
+</g>
+<g >
+<title>[unknown] (3,239,095 samples, 1.36%)</title><rect x="995.3" y="565" width="16.0" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="998.30" y="575.5" ></text>
+</g>
+<g >
+<title>field_sensitivityt::apply (3,724,329 samples, 1.56%)</title><rect x="647.6" y="357" width="18.4" height="15.0" fill="rgb(238,154,37)" rx="2" ry="2" />
+<text  x="650.61" y="367.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify_node_preorder (3,729,166 samples, 1.56%)</title><rect x="629.2" y="165" width="18.4" height="15.0" fill="rgb(228,109,26)" rx="2" ry="2" />
+<text  x="632.19" y="175.5" ></text>
+</g>
+<g >
+<title>convert (7,093,249 samples, 2.97%)</title><rect x="132.5" y="405" width="35.0" height="15.0" fill="rgb(245,188,44)" rx="2" ry="2" />
+<text  x="135.47" y="415.5" >co..</text>
+</g>
+<g >
+<title>instrument_preconditions (3,765,675 samples, 1.58%)</title><rect x="335.5" y="565" width="18.6" height="15.0" fill="rgb(208,13,3)" rx="2" ry="2" />
+<text  x="338.49" y="575.5" ></text>
+</g>
+<g >
+<title>[cc1] (3,502,624 samples, 1.47%)</title><rect x="1011.3" y="517" width="17.3" height="15.0" fill="rgb(229,111,26)" rx="2" ry="2" />
+<text  x="1014.30" y="527.5" ></text>
+</g>
+<g >
+<title>builtin_factory (3,391,716 samples, 1.42%)</title><rect x="435.0" y="357" width="16.7" height="15.0" fill="rgb(237,148,35)" rx="2" ry="2" />
+<text  x="437.97" y="367.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="1157.3" y="389" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1160.27" y="399.5" ></text>
+</g>
+<g >
+<title>run (1,003,008 samples, 0.42%)</title><rect x="532.1" y="597" width="4.9" height="15.0" fill="rgb(210,26,6)" rx="2" ry="2" />
+<text  x="535.09" y="607.5" ></text>
+</g>
+<g >
+<title>stop_on_fail_verifiert&lt;multi_path_symex_checkert&gt;::operator (59,744,555 samples, 25.01%)</title><rect x="537.0" y="613" width="295.2" height="15.0" fill="rgb(212,35,8)" rx="2" ry="2" />
+<text  x="540.05" y="623.5" >stop_on_fail_verifiert&lt;multi_path_symex..</text>
+</g>
+<g >
+<title>renamedt&lt;exprt,  (11,222,738 samples, 4.70%)</title><rect x="647.6" y="389" width="55.4" height="15.0" fill="rgb(220,69,16)" rx="2" ry="2" />
+<text  x="650.61" y="399.5" >renam..</text>
+</g>
+<g >
+<title>[ld-linux-x86-64.so.2] (2,356,002 samples, 0.99%)</title><rect x="22.1" y="645" width="11.7" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="25.13" y="655.5" ></text>
+</g>
+<g >
+<title>goto_symext::clean_expr (7,470,388 samples, 3.13%)</title><rect x="721.4" y="453" width="36.9" height="15.0" fill="rgb(217,59,14)" rx="2" ry="2" />
+<text  x="724.41" y="463.5" >got..</text>
+</g>
+<g >
+<title>std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;::_M_create (3,740,506 samples, 1.57%)</title><rect x="813.7" y="453" width="18.5" height="15.0" fill="rgb(248,198,47)" rx="2" ry="2" />
+<text  x="816.68" y="463.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify (3,729,166 samples, 1.56%)</title><rect x="629.2" y="197" width="18.4" height="15.0" fill="rgb(232,128,30)" rx="2" ry="2" />
+<text  x="632.19" y="207.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="31.3" y="485" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="34.29" y="495.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_declaration (3,481,989 samples, 1.46%)</title><rect x="132.5" y="341" width="17.2" height="15.0" fill="rgb(245,187,44)" rx="2" ry="2" />
+<text  x="135.47" y="351.5" ></text>
+</g>
+<g >
+<title>std::ios_base::_M_init (3,833,436 samples, 1.60%)</title><rect x="95.2" y="453" width="18.9" height="15.0" fill="rgb(228,107,25)" rx="2" ry="2" />
+<text  x="98.16" y="463.5" ></text>
+</g>
+<g >
+<title>builtin_factory (3,554,718 samples, 1.49%)</title><rect x="185.7" y="501" width="17.5" height="15.0" fill="rgb(237,148,35)" rx="2" ry="2" />
+<text  x="188.65" y="511.5" ></text>
+</g>
+<g >
+<title>goto_check_ct::check_rec (7,505,554 samples, 3.14%)</title><rect x="298.4" y="517" width="37.1" height="15.0" fill="rgb(217,59,14)" rx="2" ry="2" />
+<text  x="301.41" y="527.5" >got..</text>
+</g>
+<g >
+<title>[unknown] (1,003,008 samples, 0.42%)</title><rect x="532.1" y="501" width="4.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="535.09" y="511.5" ></text>
+</g>
+<g >
+<title>[libc.so.6] (3,815,831 samples, 1.60%)</title><rect x="76.3" y="309" width="18.9" height="15.0" fill="rgb(223,84,20)" rx="2" ry="2" />
+<text  x="79.31" y="319.5" ></text>
+</g>
+<g >
+<title>ansi_c_typecheckt::typecheck (10,301,343 samples, 4.31%)</title><rect x="435.0" y="469" width="50.9" height="15.0" fill="rgb(236,145,34)" rx="2" ry="2" />
+<text  x="437.97" y="479.5" >ansi_..</text>
+</g>
+<g >
+<title>integer2bvrep (3,733,863 samples, 1.56%)</title><rect x="610.7" y="133" width="18.5" height="15.0" fill="rgb(237,151,36)" rx="2" ry="2" />
+<text  x="613.74" y="143.5" ></text>
+</g>
+<g >
+<title>irept::find (3,748,280 samples, 1.57%)</title><rect x="555.5" y="133" width="18.5" height="15.0" fill="rgb(230,116,27)" rx="2" ry="2" />
+<text  x="558.46" y="143.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_redefinition_non_type (3,774,526 samples, 1.58%)</title><rect x="203.2" y="469" width="18.7" height="15.0" fill="rgb(235,138,33)" rx="2" ry="2" />
+<text  x="206.21" y="479.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_type (3,673,601 samples, 1.54%)</title><rect x="167.5" y="501" width="18.2" height="15.0" fill="rgb(219,65,15)" rx="2" ry="2" />
+<text  x="170.51" y="511.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_expr (3,830,921 samples, 1.60%)</title><rect x="38.7" y="549" width="18.9" height="15.0" fill="rgb(238,154,37)" rx="2" ry="2" />
+<text  x="41.72" y="559.5" ></text>
+</g>
+<g >
+<title>[unknown] (528,632 samples, 0.22%)</title><rect x="1159.7" y="581" width="2.7" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1162.75" y="591.5" ></text>
+</g>
+<g >
+<title>[unknown] (3,239,095 samples, 1.36%)</title><rect x="995.3" y="517" width="16.0" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="998.30" y="527.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_block (7,093,249 samples, 2.97%)</title><rect x="132.5" y="469" width="35.0" height="15.0" fill="rgb(247,196,47)" rx="2" ry="2" />
+<text  x="135.47" y="479.5" >c_..</text>
+</g>
+<g >
+<title>[libc.so.6] (859,617 samples, 0.36%)</title><rect x="1164.8" y="645" width="4.3" height="15.0" fill="rgb(223,84,20)" rx="2" ry="2" />
+<text  x="1167.84" y="655.5" ></text>
+</g>
+<g >
+<title>goto_symex_statet::assignment (3,750,461 samples, 1.57%)</title><rect x="758.3" y="421" width="18.5" height="15.0" fill="rgb(228,108,25)" rx="2" ry="2" />
+<text  x="761.31" y="431.5" ></text>
+</g>
+<g >
+<title>goto_symext::execute_next_instruction (56,004,049 samples, 23.44%)</title><rect x="537.0" y="485" width="276.7" height="15.0" fill="rgb(235,141,33)" rx="2" ry="2" />
+<text  x="540.05" y="495.5" >goto_symext::execute_next_instruction</text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="354.1" y="293" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="357.09" y="303.5" ></text>
+</g>
+<g >
+<title>_IO_link_in (2,783,334 samples, 1.17%)</title><rect x="1124.5" y="597" width="13.8" height="15.0" fill="rgb(223,87,20)" rx="2" ry="2" />
+<text  x="1127.51" y="607.5" ></text>
+</g>
+<g >
+<title>[ld-linux-x86-64.so.2] (501,504 samples, 0.21%)</title><rect x="31.3" y="581" width="2.5" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="34.29" y="591.5" ></text>
+</g>
+<g >
+<title>[libc.so.6] (3,830,921 samples, 1.60%)</title><rect x="38.7" y="181" width="18.9" height="15.0" fill="rgb(223,84,20)" rx="2" ry="2" />
+<text  x="41.72" y="191.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="31.3" y="469" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="34.29" y="479.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="1157.3" y="453" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1160.27" y="463.5" ></text>
+</g>
+<g >
+<title>symex_assignt::assign_non_struct_symbol (3,730,209 samples, 1.56%)</title><rect x="776.8" y="405" width="18.5" height="15.0" fill="rgb(232,126,30)" rx="2" ry="2" />
+<text  x="779.84" y="415.5" ></text>
+</g>
+<g >
+<title>remove_internal_symbols (3,698,733 samples, 1.55%)</title><rect x="485.9" y="501" width="18.2" height="15.0" fill="rgb(230,115,27)" rx="2" ry="2" />
+<text  x="488.86" y="511.5" ></text>
+</g>
+<g >
+<title>cfree (3,802,483 samples, 1.59%)</title><rect x="279.6" y="293" width="18.8" height="15.0" fill="rgb(223,86,20)" rx="2" ry="2" />
+<text  x="282.63" y="303.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="1162.4" y="581" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1165.36" y="591.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_symbol (3,802,483 samples, 1.59%)</title><rect x="279.6" y="453" width="18.8" height="15.0" fill="rgb(249,206,49)" rx="2" ry="2" />
+<text  x="282.63" y="463.5" ></text>
+</g>
+<g >
+<title>_start (17,877,663 samples, 7.48%)</title><rect x="1011.3" y="709" width="88.3" height="15.0" fill="rgb(245,185,44)" rx="2" ry="2" />
+<text  x="1014.30" y="719.5" >_start</text>
+</g>
+<g >
+<title>malloc (3,718,962 samples, 1.56%)</title><rect x="114.1" y="501" width="18.4" height="15.0" fill="rgb(230,119,28)" rx="2" ry="2" />
+<text  x="117.10" y="511.5" ></text>
+</g>
+<g >
+<title>is_osx_fat_header (2,454,925 samples, 1.03%)</title><rect x="10.0" y="677" width="12.1" height="15.0" fill="rgb(245,186,44)" rx="2" ry="2" />
+<text  x="13.00" y="687.5" ></text>
+</g>
+<g >
+<title>ansi_c_typecheckt::typecheck (3,802,483 samples, 1.59%)</title><rect x="279.6" y="485" width="18.8" height="15.0" fill="rgb(236,145,34)" rx="2" ry="2" />
+<text  x="282.63" y="495.5" ></text>
+</g>
+<g >
+<title>[unknown] (2,806,233 samples, 1.17%)</title><rect x="950.2" y="549" width="13.8" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="953.17" y="559.5" ></text>
+</g>
+<g >
+<title>ix86_init_builtins (2,845,457 samples, 1.19%)</title><rect x="1138.3" y="565" width="14.0" height="15.0" fill="rgb(209,21,5)" rx="2" ry="2" />
+<text  x="1141.26" y="575.5" ></text>
+</g>
+<g >
+<title>initialize_goto_model (10,766,850 samples, 4.51%)</title><rect x="132.5" y="661" width="53.2" height="15.0" fill="rgb(232,124,29)" rx="2" ry="2" />
+<text  x="135.47" y="671.5" >initi..</text>
+</g>
+<g >
+<title>value_sett::assign (3,750,461 samples, 1.57%)</title><rect x="758.3" y="405" width="18.5" height="15.0" fill="rgb(245,184,44)" rx="2" ry="2" />
+<text  x="761.31" y="415.5" ></text>
+</g>
+<g >
+<title>typecheckt::typecheck_main (3,830,921 samples, 1.60%)</title><rect x="38.7" y="357" width="18.9" height="15.0" fill="rgb(228,108,25)" rx="2" ry="2" />
+<text  x="41.72" y="367.5" ></text>
+</g>
+<g >
+<title>language_filet::~language_filet (3,714,771 samples, 1.56%)</title><rect x="504.1" y="581" width="18.4" height="15.0" fill="rgb(248,200,47)" rx="2" ry="2" />
+<text  x="507.13" y="591.5" ></text>
+</g>
+<g >
+<title>goto_symext::symex_threaded_step (59,744,555 samples, 25.01%)</title><rect x="537.0" y="533" width="295.2" height="15.0" fill="rgb(213,37,8)" rx="2" ry="2" />
+<text  x="540.05" y="543.5" >goto_symext::symex_threaded_step</text>
+</g>
+<g >
+<title>[unknown] (859,617 samples, 0.36%)</title><rect x="1164.8" y="549" width="4.3" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1167.84" y="559.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify_rec (7,463,029 samples, 3.12%)</title><rect x="610.7" y="389" width="36.9" height="15.0" fill="rgb(240,164,39)" rx="2" ry="2" />
+<text  x="613.74" y="399.5" >sim..</text>
+</g>
+<g >
+<title>[ld-linux-x86-64.so.2] (501,504 samples, 0.21%)</title><rect x="31.3" y="565" width="2.5" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="34.29" y="575.5" ></text>
+</g>
+<g >
+<title>[unknown] (859,617 samples, 0.36%)</title><rect x="1164.8" y="709" width="4.3" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1167.84" y="719.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="885.0" y="405" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="888.00" y="415.5" ></text>
+</g>
+<g >
+<title>typecheckt::typecheck_main (3,802,483 samples, 1.59%)</title><rect x="279.6" y="501" width="18.8" height="15.0" fill="rgb(228,108,25)" rx="2" ry="2" />
+<text  x="282.63" y="511.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_type (3,262,003 samples, 1.37%)</title><rect x="469.7" y="437" width="16.2" height="15.0" fill="rgb(219,65,15)" rx="2" ry="2" />
+<text  x="472.74" y="447.5" ></text>
+</g>
+<g >
+<title>c_qualifierst::read (3,767,832 samples, 1.58%)</title><rect x="221.9" y="389" width="18.6" height="15.0" fill="rgb(242,174,41)" rx="2" ry="2" />
+<text  x="224.85" y="399.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_symbol (7,596,372 samples, 3.18%)</title><rect x="57.6" y="517" width="37.6" height="15.0" fill="rgb(249,206,49)" rx="2" ry="2" />
+<text  x="60.64" y="527.5" >c_t..</text>
+</g>
+<g >
+<title>simplify_exprt::simplify_rec (3,748,280 samples, 1.57%)</title><rect x="555.5" y="165" width="18.5" height="15.0" fill="rgb(240,164,39)" rx="2" ry="2" />
+<text  x="558.46" y="175.5" ></text>
+</g>
+<g >
+<title>goto_symext::symex_from_entry_point_of (59,744,555 samples, 25.01%)</title><rect x="537.0" y="565" width="295.2" height="15.0" fill="rgb(233,130,31)" rx="2" ry="2" />
+<text  x="540.05" y="575.5" >goto_symext::symex_from_entry_point_of</text>
+</g>
+<g >
+<title>cprover_c_library_factory (15,148,770 samples, 6.34%)</title><rect x="57.6" y="629" width="74.9" height="15.0" fill="rgb(215,48,11)" rx="2" ry="2" />
+<text  x="60.64" y="639.5" >cprover_..</text>
+</g>
+<g >
+<title>goto_check_ct::check_rec (3,749,825 samples, 1.57%)</title><rect x="298.4" y="437" width="18.5" height="15.0" fill="rgb(217,59,14)" rx="2" ry="2" />
+<text  x="301.41" y="447.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="1157.3" y="437" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1160.27" y="447.5" ></text>
+</g>
+<g >
+<title>type_with_subtypest::move_to_subtypes (3,815,831 samples, 1.60%)</title><rect x="76.3" y="373" width="18.9" height="15.0" fill="rgb(219,66,15)" rx="2" ry="2" />
+<text  x="79.31" y="383.5" ></text>
+</g>
+<g >
+<title>sort_and_join (3,713,458 samples, 1.55%)</title><rect x="574.0" y="325" width="18.3" height="15.0" fill="rgb(216,53,12)" rx="2" ry="2" />
+<text  x="576.98" y="335.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_expr (3,802,483 samples, 1.59%)</title><rect x="279.6" y="373" width="18.8" height="15.0" fill="rgb(238,154,37)" rx="2" ry="2" />
+<text  x="282.63" y="383.5" ></text>
+</g>
+<g >
+<title>ansi_c_convert_typet::~ansi_c_convert_typet (3,262,003 samples, 1.37%)</title><rect x="469.7" y="421" width="16.2" height="15.0" fill="rgb(224,89,21)" rx="2" ry="2" />
+<text  x="472.74" y="431.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify_node (3,729,166 samples, 1.56%)</title><rect x="629.2" y="325" width="18.4" height="15.0" fill="rgb(243,175,42)" rx="2" ry="2" />
+<text  x="632.19" y="335.5" ></text>
+</g>
+<g >
+<title>get_temporary_file (1,947,140 samples, 0.82%)</title><rect x="522.5" y="597" width="9.6" height="15.0" fill="rgb(254,225,54)" rx="2" ry="2" />
+<text  x="525.48" y="607.5" ></text>
+</g>
+<g >
+<title>[libc.so.6] (3,802,483 samples, 1.59%)</title><rect x="279.6" y="277" width="18.8" height="15.0" fill="rgb(223,84,20)" rx="2" ry="2" />
+<text  x="282.63" y="287.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_symbol (7,093,249 samples, 2.97%)</title><rect x="132.5" y="501" width="35.0" height="15.0" fill="rgb(249,206,49)" rx="2" ry="2" />
+<text  x="135.47" y="511.5" >c_..</text>
+</g>
+<g >
+<title>main (17,877,663 samples, 7.48%)</title><rect x="1011.3" y="661" width="88.3" height="15.0" fill="rgb(243,179,42)" rx="2" ry="2" />
+<text  x="1014.30" y="671.5" >main</text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_ifthenelse (3,774,526 samples, 1.58%)</title><rect x="203.2" y="421" width="18.7" height="15.0" fill="rgb(209,20,4)" rx="2" ry="2" />
+<text  x="206.21" y="431.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="240.5" y="437" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="243.47" y="447.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="534.6" y="421" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="537.57" y="431.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="31.3" y="517" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="34.29" y="527.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_side_effect_function_call (3,391,716 samples, 1.42%)</title><rect x="435.0" y="373" width="16.7" height="15.0" fill="rgb(222,80,19)" rx="2" ry="2" />
+<text  x="437.97" y="383.5" ></text>
+</g>
+<g >
+<title>build_function_type (2,057,642 samples, 0.86%)</title><rect x="1089.4" y="549" width="10.2" height="15.0" fill="rgb(248,199,47)" rx="2" ry="2" />
+<text  x="1092.44" y="559.5" ></text>
+</g>
+<g >
+<title>[x86_64-linux-gnu-gcc-13] (1,547,780 samples, 0.65%)</title><rect x="1177.9" y="613" width="7.6" height="15.0" fill="rgb(238,152,36)" rx="2" ry="2" />
+<text  x="1180.85" y="623.5" ></text>
+</g>
+<g >
+<title>symbol_tablet::move (3,647,624 samples, 1.53%)</title><rect x="451.7" y="421" width="18.0" height="15.0" fill="rgb(229,113,27)" rx="2" ry="2" />
+<text  x="454.73" y="431.5" ></text>
+</g>
+<g >
+<title>field_sensitivityt::apply (7,470,388 samples, 3.13%)</title><rect x="721.4" y="389" width="36.9" height="15.0" fill="rgb(238,154,37)" rx="2" ry="2" />
+<text  x="724.41" y="399.5" >fie..</text>
+</g>
+<g >
+<title>typecheckt::typecheck_main (3,830,921 samples, 1.60%)</title><rect x="38.7" y="677" width="18.9" height="15.0" fill="rgb(228,108,25)" rx="2" ry="2" />
+<text  x="41.72" y="687.5" ></text>
+</g>
+<g >
+<title>field_sensitivityt::get_fields (3,720,065 samples, 1.56%)</title><rect x="721.4" y="293" width="18.4" height="15.0" fill="rgb(234,135,32)" rx="2" ry="2" />
+<text  x="724.41" y="303.5" ></text>
+</g>
+<g >
+<title>[ld-linux-x86-64.so.2] (501,504 samples, 0.21%)</title><rect x="885.0" y="613" width="2.5" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="888.00" y="623.5" ></text>
+</g>
+<g >
+<title>c_common_nodes_and_builtins (2,845,457 samples, 1.19%)</title><rect x="1138.3" y="597" width="14.0" height="15.0" fill="rgb(228,109,26)" rx="2" ry="2" />
+<text  x="1141.26" y="607.5" ></text>
+</g>
+<g >
+<title>ansi_c_convert_typet::write (3,833,436 samples, 1.60%)</title><rect x="95.2" y="485" width="18.9" height="15.0" fill="rgb(216,50,12)" rx="2" ry="2" />
+<text  x="98.16" y="495.5" ></text>
+</g>
+<g >
+<title>builtin_factory (3,780,541 samples, 1.58%)</title><rect x="57.6" y="405" width="18.7" height="15.0" fill="rgb(237,148,35)" rx="2" ry="2" />
+<text  x="60.64" y="415.5" ></text>
+</g>
+<g >
+<title>link_to_library (3,774,526 samples, 1.58%)</title><rect x="203.2" y="613" width="18.7" height="15.0" fill="rgb(251,215,51)" rx="2" ry="2" />
+<text  x="206.21" y="623.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_return (3,391,716 samples, 1.42%)</title><rect x="435.0" y="389" width="16.7" height="15.0" fill="rgb(235,139,33)" rx="2" ry="2" />
+<text  x="437.97" y="399.5" ></text>
+</g>
+<g >
+<title>[unknown] (2,383,744 samples, 1.00%)</title><rect x="1060.7" y="549" width="11.8" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1063.72" y="559.5" ></text>
+</g>
+<g >
+<title>_dl_catch_exception (501,504 samples, 0.21%)</title><rect x="31.3" y="629" width="2.5" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="34.29" y="639.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,947,140 samples, 0.82%)</title><rect x="522.5" y="469" width="9.6" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="525.48" y="479.5" ></text>
+</g>
+<g >
+<title>[unknown] (3,729,026 samples, 1.56%)</title><rect x="795.3" y="277" width="18.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="798.26" y="287.5" ></text>
+</g>
+<g >
+<title>get_preconditions (3,765,675 samples, 1.58%)</title><rect x="335.5" y="533" width="18.6" height="15.0" fill="rgb(230,118,28)" rx="2" ry="2" />
+<text  x="338.49" y="543.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="534.6" y="453" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="537.57" y="463.5" ></text>
+</g>
+<g >
+<title>stop_on_fail_verifiert&lt;multi_path_symex_checkert&gt;::~stop_on_fail_verifiert (3,754,247 samples, 1.57%)</title><rect x="832.2" y="613" width="18.5" height="15.0" fill="rgb(239,160,38)" rx="2" ry="2" />
+<text  x="835.16" y="623.5" ></text>
+</g>
+<g >
+<title>symex_assignt::assign_byte_extract (3,730,209 samples, 1.56%)</title><rect x="776.8" y="437" width="18.5" height="15.0" fill="rgb(238,155,37)" rx="2" ry="2" />
+<text  x="779.84" y="447.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,389,938 samples, 0.58%)</title><rect x="850.7" y="613" width="6.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="853.70" y="623.5" ></text>
+</g>
+<g >
+<title>irept::get (3,765,675 samples, 1.58%)</title><rect x="335.5" y="517" width="18.6" height="15.0" fill="rgb(207,9,2)" rx="2" ry="2" />
+<text  x="338.49" y="527.5" ></text>
+</g>
+<g >
+<title>_cpp_init_hashtable (2,383,744 samples, 1.00%)</title><rect x="1060.7" y="597" width="11.8" height="15.0" fill="rgb(247,193,46)" rx="2" ry="2" />
+<text  x="1063.72" y="607.5" ></text>
+</g>
+<g >
+<title>[libc.so.6] (3,718,962 samples, 1.56%)</title><rect x="114.1" y="453" width="18.4" height="15.0" fill="rgb(223,84,20)" rx="2" ry="2" />
+<text  x="117.10" y="463.5" ></text>
+</g>
+<g >
+<title>ansi_c_declaratort::build (2,281,935 samples, 0.96%)</title><rect x="368.1" y="517" width="11.2" height="15.0" fill="rgb(250,210,50)" rx="2" ry="2" />
+<text  x="371.06" y="527.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify_rec (3,748,280 samples, 1.57%)</title><rect x="555.5" y="309" width="18.5" height="15.0" fill="rgb(240,164,39)" rx="2" ry="2" />
+<text  x="558.46" y="319.5" ></text>
+</g>
+<g >
+<title>ansi_c_typecheck (3,830,921 samples, 1.60%)</title><rect x="38.7" y="693" width="18.9" height="15.0" fill="rgb(236,146,34)" rx="2" ry="2" />
+<text  x="41.72" y="703.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_function_body (7,596,372 samples, 3.18%)</title><rect x="57.6" y="485" width="37.6" height="15.0" fill="rgb(214,44,10)" rx="2" ry="2" />
+<text  x="60.64" y="495.5" >c_t..</text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="882.5" y="629" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="885.52" y="639.5" ></text>
+</g>
+<g >
+<title>[unknown] (521,327 samples, 0.22%)</title><rect x="28.7" y="501" width="2.6" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="31.71" y="511.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,003,008 samples, 0.42%)</title><rect x="33.8" y="517" width="4.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="36.76" y="527.5" ></text>
+</g>
+<g >
+<title>[unknown] (528,632 samples, 0.22%)</title><rect x="1159.7" y="549" width="2.7" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1162.75" y="559.5" ></text>
+</g>
+<g >
+<title>[unknown] (2,874,872 samples, 1.20%)</title><rect x="981.1" y="533" width="14.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="984.10" y="543.5" ></text>
+</g>
+<g >
+<title>sharing_treet&lt;irept, forward_list_as_mapt&lt;dstringt, irept&gt; &gt;::remove_ref (3,698,733 samples, 1.55%)</title><rect x="485.9" y="469" width="18.2" height="15.0" fill="rgb(246,191,45)" rx="2" ry="2" />
+<text  x="488.86" y="479.5" ></text>
+</g>
+<g >
+<title>field_sensitivityt::apply (7,476,311 samples, 3.13%)</title><rect x="537.0" y="405" width="37.0" height="15.0" fill="rgb(238,154,37)" rx="2" ry="2" />
+<text  x="540.05" y="415.5" >fie..</text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="354.1" y="341" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="357.09" y="351.5" ></text>
+</g>
+<g >
+<title>size_of_expr (3,729,166 samples, 1.56%)</title><rect x="629.2" y="245" width="18.4" height="15.0" fill="rgb(210,27,6)" rx="2" ry="2" />
+<text  x="632.19" y="255.5" ></text>
+</g>
+<g >
+<title>setlocale (859,617 samples, 0.36%)</title><rect x="1164.8" y="677" width="4.3" height="15.0" fill="rgb(237,151,36)" rx="2" ry="2" />
+<text  x="1167.84" y="687.5" ></text>
+</g>
+<g >
+<title>[unknown] (521,327 samples, 0.22%)</title><rect x="28.7" y="597" width="2.6" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="31.71" y="607.5" ></text>
+</g>
+<g >
+<title>irept::add (3,749,825 samples, 1.57%)</title><rect x="298.4" y="373" width="18.5" height="15.0" fill="rgb(205,2,0)" rx="2" ry="2" />
+<text  x="301.41" y="383.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify_rec (3,748,280 samples, 1.57%)</title><rect x="555.5" y="229" width="18.5" height="15.0" fill="rgb(240,164,39)" rx="2" ry="2" />
+<text  x="558.46" y="239.5" ></text>
+</g>
+<g >
+<title>power (3,830,921 samples, 1.60%)</title><rect x="38.7" y="245" width="18.9" height="15.0" fill="rgb(215,47,11)" rx="2" ry="2" />
+<text  x="41.72" y="255.5" ></text>
+</g>
+<g >
+<title>field_sensitivityt::apply (7,470,388 samples, 3.13%)</title><rect x="721.4" y="357" width="36.9" height="15.0" fill="rgb(238,154,37)" rx="2" ry="2" />
+<text  x="724.41" y="367.5" >fie..</text>
+</g>
+<g >
+<title>[unknown] (5,318,405 samples, 2.23%)</title><rect x="937.8" y="677" width="26.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="940.77" y="687.5" >[..</text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="240.5" y="421" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="243.47" y="431.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="534.6" y="437" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="537.57" y="447.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="1162.4" y="597" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1165.36" y="607.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,003,008 samples, 0.42%)</title><rect x="33.8" y="469" width="4.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="36.76" y="479.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,003,008 samples, 0.42%)</title><rect x="33.8" y="565" width="4.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="36.76" y="575.5" ></text>
+</g>
+<g >
+<title>typecheckt::typecheck_main (3,767,832 samples, 1.58%)</title><rect x="221.9" y="485" width="18.6" height="15.0" fill="rgb(228,108,25)" rx="2" ry="2" />
+<text  x="224.85" y="495.5" ></text>
+</g>
+<g >
+<title>[unknown] (3,729,026 samples, 1.56%)</title><rect x="795.3" y="293" width="18.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="798.26" y="303.5" ></text>
+</g>
+<g >
+<title>field_sensitivityt::apply (7,470,388 samples, 3.13%)</title><rect x="721.4" y="405" width="36.9" height="15.0" fill="rgb(238,154,37)" rx="2" ry="2" />
+<text  x="724.41" y="415.5" >fie..</text>
+</g>
+<g >
+<title>renamedt&lt;exprt,  (7,498,409 samples, 3.14%)</title><rect x="666.0" y="357" width="37.0" height="15.0" fill="rgb(220,69,16)" rx="2" ry="2" />
+<text  x="669.00" y="367.5" >ren..</text>
+</g>
+<g >
+<title>goto_symext::dereference (7,470,388 samples, 3.13%)</title><rect x="721.4" y="437" width="36.9" height="15.0" fill="rgb(205,4,1)" rx="2" ry="2" />
+<text  x="724.41" y="447.5" >got..</text>
+</g>
+<g >
+<title>[ld-linux-x86-64.so.2] (501,504 samples, 0.21%)</title><rect x="1157.3" y="565" width="2.4" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="1160.27" y="575.5" ></text>
+</g>
+<g >
+<title>language_filest::typecheck (14,000,076 samples, 5.86%)</title><rect x="435.0" y="565" width="69.1" height="15.0" fill="rgb(219,64,15)" rx="2" ry="2" />
+<text  x="437.97" y="575.5" >languag..</text>
+</g>
+<g >
+<title>field_sensitivityt::get_fields (7,470,388 samples, 3.13%)</title><rect x="721.4" y="325" width="36.9" height="15.0" fill="rgb(234,135,32)" rx="2" ry="2" />
+<text  x="724.41" y="335.5" >fie..</text>
+</g>
+<g >
+<title>[libc.so.6] (3,647,624 samples, 1.53%)</title><rect x="451.7" y="341" width="18.0" height="15.0" fill="rgb(223,84,20)" rx="2" ry="2" />
+<text  x="454.73" y="351.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify_plus (3,733,863 samples, 1.56%)</title><rect x="610.7" y="165" width="18.5" height="15.0" fill="rgb(249,204,48)" rx="2" ry="2" />
+<text  x="613.74" y="175.5" ></text>
+</g>
+<g >
+<title>yyansi_cparse (3,611,260 samples, 1.51%)</title><rect x="149.7" y="389" width="17.8" height="15.0" fill="rgb(206,8,1)" rx="2" ry="2" />
+<text  x="152.67" y="399.5" ></text>
+</g>
+<g >
+<title>[unknown] (859,617 samples, 0.36%)</title><rect x="1164.8" y="597" width="4.3" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1167.84" y="607.5" ></text>
+</g>
+<g >
+<title>__sprintf_chk (3,454,733 samples, 1.45%)</title><rect x="964.0" y="677" width="17.1" height="15.0" fill="rgb(219,68,16)" rx="2" ry="2" />
+<text  x="967.04" y="687.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify_rec (3,713,458 samples, 1.55%)</title><rect x="574.0" y="357" width="18.3" height="15.0" fill="rgb(240,164,39)" rx="2" ry="2" />
+<text  x="576.98" y="367.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="1157.3" y="421" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1160.27" y="431.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="354.1" y="373" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="357.09" y="383.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,947,140 samples, 0.82%)</title><rect x="522.5" y="517" width="9.6" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="525.48" y="527.5" ></text>
+</g>
+<g >
+<title>irept::get (3,767,832 samples, 1.58%)</title><rect x="221.9" y="357" width="18.6" height="15.0" fill="rgb(207,9,2)" rx="2" ry="2" />
+<text  x="224.85" y="367.5" ></text>
+</g>
+<g >
+<title>[unknown] (2,874,872 samples, 1.20%)</title><rect x="981.1" y="501" width="14.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="984.10" y="511.5" ></text>
+</g>
+<g >
+<title>find_pattern (3,802,483 samples, 1.59%)</title><rect x="279.6" y="309" width="18.8" height="15.0" fill="rgb(207,12,3)" rx="2" ry="2" />
+<text  x="282.63" y="319.5" ></text>
+</g>
+<g >
+<title>[unknown] (521,327 samples, 0.22%)</title><rect x="28.7" y="533" width="2.6" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="31.71" y="543.5" ></text>
+</g>
+<g >
+<title>[libc.so.6] (5,042,027 samples, 2.11%)</title><rect x="1099.6" y="709" width="24.9" height="15.0" fill="rgb(223,84,20)" rx="2" ry="2" />
+<text  x="1102.61" y="719.5" >[..</text>
+</g>
+<g >
+<title>[unknown] (911,866 samples, 0.38%)</title><rect x="1185.5" y="549" width="4.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1188.50" y="559.5" ></text>
+</g>
+<g >
+<title>irept::add (3,611,260 samples, 1.51%)</title><rect x="149.7" y="341" width="17.8" height="15.0" fill="rgb(205,2,0)" rx="2" ry="2" />
+<text  x="152.67" y="351.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify_node (3,729,166 samples, 1.56%)</title><rect x="629.2" y="133" width="18.4" height="15.0" fill="rgb(243,175,42)" rx="2" ry="2" />
+<text  x="632.19" y="143.5" ></text>
+</g>
+<g >
+<title>execve (501,504 samples, 0.21%)</title><rect x="240.5" y="453" width="2.4" height="15.0" fill="rgb(229,111,26)" rx="2" ry="2" />
+<text  x="243.47" y="463.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,003,008 samples, 0.42%)</title><rect x="532.1" y="469" width="4.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="535.09" y="479.5" ></text>
+</g>
+<g >
+<title>[libc.so.6] (3,718,962 samples, 1.56%)</title><rect x="114.1" y="485" width="18.4" height="15.0" fill="rgb(223,84,20)" rx="2" ry="2" />
+<text  x="117.10" y="495.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,947,140 samples, 0.82%)</title><rect x="522.5" y="453" width="9.6" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="525.48" y="463.5" ></text>
+</g>
+<g >
+<title>BigInt::BigInt (3,729,166 samples, 1.56%)</title><rect x="629.2" y="85" width="18.4" height="15.0" fill="rgb(211,28,6)" rx="2" ry="2" />
+<text  x="632.19" y="95.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,003,008 samples, 0.42%)</title><rect x="33.8" y="437" width="4.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="36.76" y="447.5" ></text>
+</g>
+<g >
+<title>[unknown] (3,239,095 samples, 1.36%)</title><rect x="995.3" y="533" width="16.0" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="998.30" y="543.5" ></text>
+</g>
+<g >
+<title>[unknown] (5,318,405 samples, 2.23%)</title><rect x="937.8" y="645" width="26.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="940.77" y="655.5" >[..</text>
+</g>
+<g >
+<title>builtin_factory (3,774,526 samples, 1.58%)</title><rect x="203.2" y="373" width="18.7" height="15.0" fill="rgb(237,148,35)" rx="2" ry="2" />
+<text  x="206.21" y="383.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_expr_operands (3,830,921 samples, 1.60%)</title><rect x="38.7" y="469" width="18.9" height="15.0" fill="rgb(219,66,15)" rx="2" ry="2" />
+<text  x="41.72" y="479.5" ></text>
+</g>
+<g >
+<title>goto_check_ct::check_rec_member (3,755,729 samples, 1.57%)</title><rect x="316.9" y="453" width="18.6" height="15.0" fill="rgb(221,76,18)" rx="2" ry="2" />
+<text  x="319.94" y="463.5" ></text>
+</g>
+<g >
+<title>[libc.so.6] (2,874,872 samples, 1.20%)</title><rect x="981.1" y="661" width="14.2" height="15.0" fill="rgb(223,84,20)" rx="2" ry="2" />
+<text  x="984.10" y="671.5" ></text>
+</g>
+<g >
+<title>malloc (3,830,921 samples, 1.60%)</title><rect x="38.7" y="197" width="18.9" height="15.0" fill="rgb(230,119,28)" rx="2" ry="2" />
+<text  x="41.72" y="207.5" ></text>
+</g>
+<g >
+<title>cbmc_parse_optionst::get_goto_program (57,092,608 samples, 23.90%)</title><rect x="240.5" y="613" width="282.0" height="15.0" fill="rgb(247,196,47)" rx="2" ry="2" />
+<text  x="243.47" y="623.5" >cbmc_parse_optionst::get_goto_program</text>
+</g>
+<g >
+<title>[libz.so.1.3] (751,337 samples, 0.31%)</title><rect x="900.9" y="677" width="3.7" height="15.0" fill="rgb(230,116,27)" rx="2" ry="2" />
+<text  x="903.88" y="687.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_declaration (3,554,718 samples, 1.49%)</title><rect x="185.7" y="597" width="17.5" height="15.0" fill="rgb(245,187,44)" rx="2" ry="2" />
+<text  x="188.65" y="607.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="904.6" y="597" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="907.59" y="607.5" ></text>
+</g>
+<g >
+<title>all (238,890,027 samples, 100%)</title><rect x="10.0" y="741" width="1180.0" height="15.0" fill="rgb(213,39,9)" rx="2" ry="2" />
+<text  x="13.00" y="751.5" ></text>
+</g>
+<g >
+<title>parse_options_baset::main (123,541,558 samples, 51.71%)</title><rect x="240.5" y="645" width="610.2" height="15.0" fill="rgb(242,171,40)" rx="2" ry="2" />
+<text  x="243.47" y="655.5" >parse_options_baset::main</text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_side_effect_function_call (3,830,921 samples, 1.60%)</title><rect x="38.7" y="421" width="18.9" height="15.0" fill="rgb(222,80,19)" rx="2" ry="2" />
+<text  x="41.72" y="431.5" ></text>
+</g>
+<g >
+<title>[ld-linux-x86-64.so.2] (2,301,657 samples, 0.96%)</title><rect x="876.1" y="677" width="11.4" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="879.11" y="687.5" ></text>
+</g>
+<g >
+<title>[unknown] (5,318,405 samples, 2.23%)</title><rect x="937.8" y="629" width="26.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="940.77" y="639.5" >[..</text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_compound_type (3,554,718 samples, 1.49%)</title><rect x="185.7" y="389" width="17.5" height="15.0" fill="rgb(241,170,40)" rx="2" ry="2" />
+<text  x="188.65" y="399.5" ></text>
+</g>
+<g >
+<title>field_sensitivityt::apply (7,470,388 samples, 3.13%)</title><rect x="721.4" y="341" width="36.9" height="15.0" fill="rgb(238,154,37)" rx="2" ry="2" />
+<text  x="724.41" y="351.5" >fie..</text>
+</g>
+<g >
+<title>[unknown] (751,337 samples, 0.31%)</title><rect x="900.9" y="645" width="3.7" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="903.88" y="655.5" ></text>
+</g>
+<g >
+<title>[unknown] (2,874,872 samples, 1.20%)</title><rect x="981.1" y="645" width="14.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="984.10" y="655.5" ></text>
+</g>
+<g >
+<title>ansi_c_typecheck (3,554,718 samples, 1.49%)</title><rect x="185.7" y="645" width="17.5" height="15.0" fill="rgb(236,146,34)" rx="2" ry="2" />
+<text  x="188.65" y="655.5" ></text>
+</g>
+<g >
+<title>__libc_early_init (501,504 samples, 0.21%)</title><rect x="1162.4" y="645" width="2.4" height="15.0" fill="rgb(248,202,48)" rx="2" ry="2" />
+<text  x="1165.36" y="655.5" ></text>
+</g>
+<g >
+<title>sharing_treet&lt;irept, forward_list_as_mapt&lt;dstringt, irept&gt; &gt;::remove_ref (3,698,733 samples, 1.55%)</title><rect x="485.9" y="437" width="18.2" height="15.0" fill="rgb(246,191,45)" rx="2" ry="2" />
+<text  x="488.86" y="447.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_type (3,554,718 samples, 1.49%)</title><rect x="185.7" y="405" width="17.5" height="15.0" fill="rgb(219,65,15)" rx="2" ry="2" />
+<text  x="188.65" y="415.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify (11,192,698 samples, 4.69%)</title><rect x="592.3" y="437" width="55.3" height="15.0" fill="rgb(232,128,30)" rx="2" ry="2" />
+<text  x="595.32" y="447.5" >simpl..</text>
+</g>
+<g >
+<title>[unknown] (1,947,140 samples, 0.82%)</title><rect x="522.5" y="437" width="9.6" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="525.48" y="447.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,003,008 samples, 0.42%)</title><rect x="33.8" y="453" width="4.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="36.76" y="463.5" ></text>
+</g>
+<g >
+<title>[unknown] (3,239,095 samples, 1.36%)</title><rect x="995.3" y="501" width="16.0" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="998.30" y="511.5" ></text>
+</g>
+<g >
+<title>[unknown] (3,729,026 samples, 1.56%)</title><rect x="795.3" y="309" width="18.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="798.26" y="319.5" ></text>
+</g>
+<g >
+<title>ansi_c_typecheckt::typecheck (3,767,832 samples, 1.58%)</title><rect x="221.9" y="469" width="18.6" height="15.0" fill="rgb(236,145,34)" rx="2" ry="2" />
+<text  x="224.85" y="479.5" ></text>
+</g>
+<g >
+<title>std::basic_ios&lt;char, std::char_traits&lt;char&gt; &gt;::init (3,728,031 samples, 1.56%)</title><rect x="537.0" y="213" width="18.5" height="15.0" fill="rgb(206,7,1)" rx="2" ry="2" />
+<text  x="540.05" y="223.5" ></text>
+</g>
+<g >
+<title>[unknown] (2,874,872 samples, 1.20%)</title><rect x="981.1" y="629" width="14.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="984.10" y="639.5" ></text>
+</g>
+<g >
+<title>[unknown] (751,337 samples, 0.31%)</title><rect x="900.9" y="629" width="3.7" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="903.88" y="639.5" ></text>
+</g>
+<g >
+<title>_cpp_init_directives (2,383,744 samples, 1.00%)</title><rect x="1060.7" y="581" width="11.8" height="15.0" fill="rgb(231,121,29)" rx="2" ry="2" />
+<text  x="1063.72" y="591.5" ></text>
+</g>
+<g >
+<title>main (2,845,457 samples, 1.19%)</title><rect x="1138.3" y="661" width="14.0" height="15.0" fill="rgb(243,179,42)" rx="2" ry="2" />
+<text  x="1141.26" y="671.5" ></text>
+</g>
+<g >
+<title>execvpe (1,003,008 samples, 0.42%)</title><rect x="532.1" y="581" width="4.9" height="15.0" fill="rgb(205,3,0)" rx="2" ry="2" />
+<text  x="535.09" y="591.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,389,938 samples, 0.58%)</title><rect x="850.7" y="581" width="6.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="853.70" y="591.5" ></text>
+</g>
+<g >
+<title>sum_expr (3,729,166 samples, 1.56%)</title><rect x="629.2" y="101" width="18.4" height="15.0" fill="rgb(209,20,4)" rx="2" ry="2" />
+<text  x="632.19" y="111.5" ></text>
+</g>
+<g >
+<title>gcc_versiont::get (2,950,148 samples, 1.23%)</title><rect x="522.5" y="613" width="14.5" height="15.0" fill="rgb(239,159,38)" rx="2" ry="2" />
+<text  x="525.48" y="623.5" ></text>
+</g>
+<g >
+<title>sharing_treet&lt;irept, forward_list_as_mapt&lt;dstringt, irept&gt; &gt;::sharing_treet (3,718,760 samples, 1.56%)</title><rect x="703.0" y="453" width="18.4" height="15.0" fill="rgb(247,194,46)" rx="2" ry="2" />
+<text  x="706.04" y="463.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_expr (3,830,921 samples, 1.60%)</title><rect x="38.7" y="565" width="18.9" height="15.0" fill="rgb(238,154,37)" rx="2" ry="2" />
+<text  x="41.72" y="575.5" ></text>
+</g>
+<g >
+<title>[ld-linux-x86-64.so.2] (831,667 samples, 0.35%)</title><rect x="24.6" y="581" width="4.1" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="27.60" y="591.5" ></text>
+</g>
+<g >
+<title>field_sensitivityt::apply (7,476,311 samples, 3.13%)</title><rect x="537.0" y="421" width="37.0" height="15.0" fill="rgb(238,154,37)" rx="2" ry="2" />
+<text  x="540.05" y="431.5" >fie..</text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_expr (3,830,921 samples, 1.60%)</title><rect x="38.7" y="517" width="18.9" height="15.0" fill="rgb(238,154,37)" rx="2" ry="2" />
+<text  x="41.72" y="527.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="31.3" y="421" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="34.29" y="431.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,003,008 samples, 0.42%)</title><rect x="532.1" y="517" width="4.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="535.09" y="527.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify_rec (3,729,026 samples, 1.56%)</title><rect x="795.3" y="357" width="18.4" height="15.0" fill="rgb(240,164,39)" rx="2" ry="2" />
+<text  x="798.26" y="367.5" ></text>
+</g>
+<g >
+<title>goto_check_ct::check_rec (7,505,554 samples, 3.14%)</title><rect x="298.4" y="469" width="37.1" height="15.0" fill="rgb(217,59,14)" rx="2" ry="2" />
+<text  x="301.41" y="479.5" >got..</text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="904.6" y="581" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="907.59" y="591.5" ></text>
+</g>
+<g >
+<title>cfree (3,746,755 samples, 1.57%)</title><rect x="666.0" y="293" width="18.5" height="15.0" fill="rgb(223,86,20)" rx="2" ry="2" />
+<text  x="669.00" y="303.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="1157.3" y="469" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1160.27" y="479.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="31.3" y="453" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="34.29" y="463.5" ></text>
+</g>
+<g >
+<title>ansi_c_languaget::typecheck (11,429,808 samples, 4.78%)</title><rect x="57.6" y="597" width="56.5" height="15.0" fill="rgb(237,150,35)" rx="2" ry="2" />
+<text  x="60.64" y="607.5" >ansi_..</text>
+</g>
+<g >
+<title>from_integer (3,733,863 samples, 1.56%)</title><rect x="610.7" y="149" width="18.5" height="15.0" fill="rgb(238,153,36)" rx="2" ry="2" />
+<text  x="613.74" y="159.5" ></text>
+</g>
+<g >
+<title>field_sensitivityt::get_fields (7,470,388 samples, 3.13%)</title><rect x="721.4" y="309" width="36.9" height="15.0" fill="rgb(234,135,32)" rx="2" ry="2" />
+<text  x="724.41" y="319.5" >fie..</text>
+</g>
+<g >
+<title>std::__cxx11::basic_stringbuf&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;::overflow (3,718,962 samples, 1.56%)</title><rect x="114.1" y="549" width="18.4" height="15.0" fill="rgb(221,75,18)" rx="2" ry="2" />
+<text  x="117.10" y="559.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,003,008 samples, 0.42%)</title><rect x="33.8" y="421" width="4.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="36.76" y="431.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify (3,733,863 samples, 1.56%)</title><rect x="610.7" y="213" width="18.5" height="15.0" fill="rgb(232,128,30)" rx="2" ry="2" />
+<text  x="613.74" y="223.5" ></text>
+</g>
+<g >
+<title>ansi_c_languaget::typecheck (3,774,526 samples, 1.58%)</title><rect x="203.2" y="565" width="18.7" height="15.0" fill="rgb(237,150,35)" rx="2" ry="2" />
+<text  x="206.21" y="575.5" ></text>
+</g>
+<g >
+<title>_newstack (3,713,124 samples, 1.55%)</title><rect x="242.9" y="501" width="18.4" height="15.0" fill="rgb(218,62,14)" rx="2" ry="2" />
+<text  x="245.94" y="511.5" ></text>
+</g>
+<g >
+<title>[unknown] (521,327 samples, 0.22%)</title><rect x="28.7" y="485" width="2.6" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="31.71" y="495.5" ></text>
+</g>
+<g >
+<title>[unknown] (2,845,457 samples, 1.19%)</title><rect x="1138.3" y="549" width="14.0" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1141.26" y="559.5" ></text>
+</g>
+<g >
+<title>from_integer (3,830,921 samples, 1.60%)</title><rect x="38.7" y="277" width="18.9" height="15.0" fill="rgb(238,153,36)" rx="2" ry="2" />
+<text  x="41.72" y="287.5" ></text>
+</g>
+<g >
+<title>simplify_expr (3,733,863 samples, 1.56%)</title><rect x="610.7" y="229" width="18.5" height="15.0" fill="rgb(246,193,46)" rx="2" ry="2" />
+<text  x="613.74" y="239.5" ></text>
+</g>
+<g >
+<title>void std::vector&lt;typet, std::allocator&lt;typet&gt; &gt;::_M_realloc_insert&lt;typet const&amp;&gt; (3,815,831 samples, 1.60%)</title><rect x="76.3" y="357" width="18.9" height="15.0" fill="rgb(245,185,44)" rx="2" ry="2" />
+<text  x="79.31" y="367.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="354.1" y="325" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="357.09" y="335.5" ></text>
+</g>
+<g >
+<title>cbmc_parse_optionst::process_goto_program (3,774,526 samples, 1.58%)</title><rect x="203.2" y="629" width="18.7" height="15.0" fill="rgb(210,23,5)" rx="2" ry="2" />
+<text  x="206.21" y="639.5" ></text>
+</g>
+<g >
+<title>std::_Hashtable&lt;dstringt, std::pair&lt;dstringt const, symbolt&gt;, std::allocator&lt;std::pair&lt;dstringt const, symbolt&gt; &gt;, std::__detail::_Select1st, std::equal_to&lt;dstringt&gt;, std::hash&lt;dstringt&gt;, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits&lt;true, false, true&gt; &gt;::erase (3,698,733 samples, 1.55%)</title><rect x="485.9" y="485" width="18.2" height="15.0" fill="rgb(251,212,50)" rx="2" ry="2" />
+<text  x="488.86" y="495.5" ></text>
+</g>
+<g >
+<title>lrealpath (3,239,095 samples, 1.36%)</title><rect x="995.3" y="693" width="16.0" height="15.0" fill="rgb(231,121,29)" rx="2" ry="2" />
+<text  x="998.30" y="703.5" ></text>
+</g>
+<g >
+<title>field_sensitivityt::field_assignments (3,729,026 samples, 1.56%)</title><rect x="795.3" y="405" width="18.4" height="15.0" fill="rgb(218,62,14)" rx="2" ry="2" />
+<text  x="798.26" y="415.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="31.3" y="437" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="34.29" y="447.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,003,008 samples, 0.42%)</title><rect x="33.8" y="597" width="4.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="36.76" y="607.5" ></text>
+</g>
+<g >
+<title>[x86_64-linux-gnu-gcc-13] (2,459,646 samples, 1.03%)</title><rect x="1177.9" y="645" width="12.1" height="15.0" fill="rgb(238,152,36)" rx="2" ry="2" />
+<text  x="1180.85" y="655.5" ></text>
+</g>
+<g >
+<title>sharing_treet&lt;irept, forward_list_as_mapt&lt;dstringt, irept&gt; &gt;::remove_ref (3,714,771 samples, 1.56%)</title><rect x="504.1" y="469" width="18.4" height="15.0" fill="rgb(246,191,45)" rx="2" ry="2" />
+<text  x="507.13" y="479.5" ></text>
+</g>
+<g >
+<title>yyansi_cparse (3,780,541 samples, 1.58%)</title><rect x="57.6" y="373" width="18.7" height="15.0" fill="rgb(206,8,1)" rx="2" ry="2" />
+<text  x="60.64" y="383.5" ></text>
+</g>
+<g >
+<title>[libc.so.6] (11,533,542 samples, 4.83%)</title><rect x="907.1" y="709" width="56.9" height="15.0" fill="rgb(223,84,20)" rx="2" ry="2" />
+<text  x="910.07" y="719.5" >[libc...</text>
+</g>
+<g >
+<title>simplify_exprt::simplify_node_preorder (7,463,029 samples, 3.12%)</title><rect x="610.7" y="373" width="36.9" height="15.0" fill="rgb(228,109,26)" rx="2" ry="2" />
+<text  x="613.74" y="383.5" >sim..</text>
+</g>
+<g >
+<title>goto_symext::symex_other (7,459,235 samples, 3.12%)</title><rect x="776.8" y="469" width="36.9" height="15.0" fill="rgb(248,202,48)" rx="2" ry="2" />
+<text  x="779.84" y="479.5" >got..</text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_redefinition_non_type (3,802,483 samples, 1.59%)</title><rect x="279.6" y="437" width="18.8" height="15.0" fill="rgb(235,138,33)" rx="2" ry="2" />
+<text  x="282.63" y="447.5" ></text>
+</g>
+<g >
+<title>goto_symext::symex_assign (7,459,235 samples, 3.12%)</title><rect x="776.8" y="453" width="36.9" height="15.0" fill="rgb(209,20,4)" rx="2" ry="2" />
+<text  x="779.84" y="463.5" >got..</text>
+</g>
+<g >
+<title>ansi_c_parsert::~ansi_c_parsert (3,774,526 samples, 1.58%)</title><rect x="203.2" y="341" width="18.7" height="15.0" fill="rgb(214,43,10)" rx="2" ry="2" />
+<text  x="206.21" y="351.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify_plus (3,729,166 samples, 1.56%)</title><rect x="629.2" y="117" width="18.4" height="15.0" fill="rgb(249,204,48)" rx="2" ry="2" />
+<text  x="632.19" y="127.5" ></text>
+</g>
+<g >
+<title>[libc.so.6] (3,753,428 samples, 1.57%)</title><rect x="857.6" y="693" width="18.5" height="15.0" fill="rgb(223,84,20)" rx="2" ry="2" />
+<text  x="860.57" y="703.5" ></text>
+</g>
+<g >
+<title>__libc_start_main (17,877,663 samples, 7.48%)</title><rect x="1011.3" y="693" width="88.3" height="15.0" fill="rgb(236,142,34)" rx="2" ry="2" />
+<text  x="1014.30" y="703.5" >__libc_sta..</text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="1157.3" y="517" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1160.27" y="527.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,947,140 samples, 0.82%)</title><rect x="522.5" y="421" width="9.6" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="525.48" y="431.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_block (3,767,832 samples, 1.58%)</title><rect x="221.9" y="565" width="18.6" height="15.0" fill="rgb(247,196,47)" rx="2" ry="2" />
+<text  x="224.85" y="575.5" ></text>
+</g>
+<g >
+<title>[ld-linux-x86-64.so.2] (831,667 samples, 0.35%)</title><rect x="24.6" y="597" width="4.1" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="27.60" y="607.5" ></text>
+</g>
+<g >
+<title>renamedt&lt;exprt,  (11,222,738 samples, 4.70%)</title><rect x="647.6" y="453" width="55.4" height="15.0" fill="rgb(220,69,16)" rx="2" ry="2" />
+<text  x="650.61" y="463.5" >renam..</text>
+</g>
+<g >
+<title>merge (3,815,831 samples, 1.60%)</title><rect x="76.3" y="389" width="18.9" height="15.0" fill="rgb(252,219,52)" rx="2" ry="2" />
+<text  x="79.31" y="399.5" ></text>
+</g>
+<g >
+<title>[unknown] (3,239,095 samples, 1.36%)</title><rect x="995.3" y="613" width="16.0" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="998.30" y="623.5" ></text>
+</g>
+<g >
+<title>[unknown] (2,874,872 samples, 1.20%)</title><rect x="981.1" y="485" width="14.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="984.10" y="495.5" ></text>
+</g>
+<g >
+<title>ansi_c_typecheck (10,766,850 samples, 4.51%)</title><rect x="132.5" y="565" width="53.2" height="15.0" fill="rgb(236,146,34)" rx="2" ry="2" />
+<text  x="135.47" y="575.5" >ansi_..</text>
+</g>
+<g >
+<title>ansi_c_languaget::typecheck (10,766,850 samples, 4.51%)</title><rect x="132.5" y="581" width="53.2" height="15.0" fill="rgb(237,150,35)" rx="2" ry="2" />
+<text  x="135.47" y="591.5" >ansi_..</text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_expr_operands (3,830,921 samples, 1.60%)</title><rect x="38.7" y="501" width="18.9" height="15.0" fill="rgb(219,66,15)" rx="2" ry="2" />
+<text  x="41.72" y="511.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="36.2" y="405" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="39.24" y="415.5" ></text>
+</g>
+<g >
+<title>[unknown] (859,617 samples, 0.36%)</title><rect x="1164.8" y="501" width="4.3" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1167.84" y="511.5" ></text>
+</g>
+<g >
+<title>[unknown] (5,318,405 samples, 2.23%)</title><rect x="937.8" y="597" width="26.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="940.77" y="607.5" >[..</text>
+</g>
+<g >
+<title>[ld-linux-x86-64.so.2] (6,267,671 samples, 2.62%)</title><rect x="876.1" y="709" width="31.0" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="879.11" y="719.5" >[l..</text>
+</g>
+<g >
+<title>ht_lookup_with_hash (2,383,744 samples, 1.00%)</title><rect x="1060.7" y="565" width="11.8" height="15.0" fill="rgb(217,58,13)" rx="2" ry="2" />
+<text  x="1063.72" y="575.5" ></text>
+</g>
+<g >
+<title>[cc1] (3,128,460 samples, 1.31%)</title><rect x="1045.3" y="549" width="15.4" height="15.0" fill="rgb(229,111,26)" rx="2" ry="2" />
+<text  x="1048.27" y="559.5" ></text>
+</g>
+<g >
+<title>[libc.so.6] (3,774,526 samples, 1.58%)</title><rect x="203.2" y="261" width="18.7" height="15.0" fill="rgb(223,84,20)" rx="2" ry="2" />
+<text  x="206.21" y="271.5" ></text>
+</g>
+<g >
+<title>sharing_treet&lt;irept, forward_list_as_mapt&lt;dstringt, irept&gt; &gt;::detach (3,724,329 samples, 1.56%)</title><rect x="647.6" y="341" width="18.4" height="15.0" fill="rgb(247,193,46)" rx="2" ry="2" />
+<text  x="650.61" y="351.5" ></text>
+</g>
+<g >
+<title>ansi_c_languaget::typecheck (3,554,718 samples, 1.49%)</title><rect x="185.7" y="677" width="17.5" height="15.0" fill="rgb(237,150,35)" rx="2" ry="2" />
+<text  x="188.65" y="687.5" ></text>
+</g>
+<g >
+<title>typecheckt::typecheck_main (3,767,832 samples, 1.58%)</title><rect x="221.9" y="693" width="18.6" height="15.0" fill="rgb(228,108,25)" rx="2" ry="2" />
+<text  x="224.85" y="703.5" ></text>
+</g>
+<g >
+<title>[x86_64-linux-gnu-gcc-13] (801,253 samples, 0.34%)</title><rect x="1181.5" y="597" width="4.0" height="15.0" fill="rgb(238,152,36)" rx="2" ry="2" />
+<text  x="1184.54" y="607.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="904.6" y="629" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="907.59" y="639.5" ></text>
+</g>
+<g >
+<title>cbmc_parse_optionst::doit (123,541,558 samples, 51.71%)</title><rect x="240.5" y="629" width="610.2" height="15.0" fill="rgb(209,22,5)" rx="2" ry="2" />
+<text  x="243.47" y="639.5" >cbmc_parse_optionst::doit</text>
+</g>
+<g >
+<title>sharing_treet&lt;irept, forward_list_as_mapt&lt;dstringt, irept&gt; &gt;::remove_ref (3,714,771 samples, 1.56%)</title><rect x="504.1" y="501" width="18.4" height="15.0" fill="rgb(246,191,45)" rx="2" ry="2" />
+<text  x="507.13" y="511.5" ></text>
+</g>
+<g >
+<title>sharing_treet&lt;irept, forward_list_as_mapt&lt;dstringt, irept&gt; &gt;::remove_ref (3,714,771 samples, 1.56%)</title><rect x="504.1" y="485" width="18.4" height="15.0" fill="rgb(246,191,45)" rx="2" ry="2" />
+<text  x="507.13" y="495.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="904.6" y="565" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="907.59" y="575.5" ></text>
+</g>
+<g >
+<title>yyansi_clex (3,714,495 samples, 1.55%)</title><rect x="261.3" y="501" width="18.3" height="15.0" fill="rgb(213,38,9)" rx="2" ry="2" />
+<text  x="264.28" y="511.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,947,140 samples, 0.82%)</title><rect x="522.5" y="357" width="9.6" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="525.48" y="367.5" ></text>
+</g>
+<g >
+<title>[cc1] (5,488,266 samples, 2.30%)</title><rect x="1072.5" y="581" width="27.1" height="15.0" fill="rgb(229,111,26)" rx="2" ry="2" />
+<text  x="1075.50" y="591.5" >[..</text>
+</g>
+<g >
+<title>ansi_c_languaget::~ansi_c_languaget (3,714,771 samples, 1.56%)</title><rect x="504.1" y="565" width="18.4" height="15.0" fill="rgb(250,207,49)" rx="2" ry="2" />
+<text  x="507.13" y="575.5" ></text>
+</g>
+<g >
+<title>[unknown] (911,866 samples, 0.38%)</title><rect x="1185.5" y="485" width="4.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1188.50" y="495.5" ></text>
+</g>
+<g >
+<title>main (3,774,526 samples, 1.58%)</title><rect x="203.2" y="693" width="18.7" height="15.0" fill="rgb(243,179,42)" rx="2" ry="2" />
+<text  x="206.21" y="703.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="904.6" y="645" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="907.59" y="655.5" ></text>
+</g>
+<g >
+<title>link_to_library (11,731,606 samples, 4.91%)</title><rect x="240.5" y="581" width="57.9" height="15.0" fill="rgb(251,215,51)" rx="2" ry="2" />
+<text  x="243.47" y="591.5" >link_t..</text>
+</g>
+<g >
+<title>string_containert::get (3,714,495 samples, 1.55%)</title><rect x="261.3" y="453" width="18.3" height="15.0" fill="rgb(230,116,27)" rx="2" ry="2" />
+<text  x="264.28" y="463.5" ></text>
+</g>
+<g >
+<title>toplev::main (2,845,457 samples, 1.19%)</title><rect x="1138.3" y="645" width="14.0" height="15.0" fill="rgb(242,171,41)" rx="2" ry="2" />
+<text  x="1141.26" y="655.5" ></text>
+</g>
+<g >
+<title>_start (124,931,496 samples, 52.30%)</title><rect x="240.5" y="709" width="617.1" height="15.0" fill="rgb(245,185,44)" rx="2" ry="2" />
+<text  x="243.47" y="719.5" >_start</text>
+</g>
+<g >
+<title>[unknown] (1,947,140 samples, 0.82%)</title><rect x="522.5" y="405" width="9.6" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="525.48" y="415.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,947,140 samples, 0.82%)</title><rect x="522.5" y="309" width="9.6" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="525.48" y="319.5" ></text>
+</g>
+<g >
+<title>[unknown] (859,617 samples, 0.36%)</title><rect x="1164.8" y="533" width="4.3" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1167.84" y="543.5" ></text>
+</g>
+<g >
+<title>irept::get (3,481,989 samples, 1.46%)</title><rect x="132.5" y="293" width="17.2" height="15.0" fill="rgb(207,9,2)" rx="2" ry="2" />
+<text  x="135.47" y="303.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_declaration (3,554,718 samples, 1.49%)</title><rect x="185.7" y="421" width="17.5" height="15.0" fill="rgb(245,187,44)" rx="2" ry="2" />
+<text  x="188.65" y="431.5" ></text>
+</g>
+<g >
+<title>typecheckt::typecheck_main (11,429,808 samples, 4.78%)</title><rect x="57.6" y="565" width="56.5" height="15.0" fill="rgb(228,108,25)" rx="2" ry="2" />
+<text  x="60.64" y="575.5" >typec..</text>
+</g>
+<g >
+<title>[unknown] (2,874,872 samples, 1.20%)</title><rect x="981.1" y="597" width="14.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="984.10" y="607.5" ></text>
+</g>
+<g >
+<title>[unknown] (751,337 samples, 0.31%)</title><rect x="900.9" y="597" width="3.7" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="903.88" y="607.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_symbol (7,039,340 samples, 2.95%)</title><rect x="435.0" y="437" width="34.7" height="15.0" fill="rgb(249,206,49)" rx="2" ry="2" />
+<text  x="437.97" y="447.5" >c_..</text>
+</g>
+<g >
+<title>[ld-linux-x86-64.so.2] (501,504 samples, 0.21%)</title><rect x="31.3" y="613" width="2.5" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="34.29" y="623.5" ></text>
+</g>
+<g >
+<title>builtin_factory (3,767,832 samples, 1.58%)</title><rect x="221.9" y="533" width="18.6" height="15.0" fill="rgb(237,148,35)" rx="2" ry="2" />
+<text  x="224.85" y="543.5" ></text>
+</g>
+<g >
+<title>goto_check_ct::check_rec (3,749,825 samples, 1.57%)</title><rect x="298.4" y="453" width="18.5" height="15.0" fill="rgb(217,59,14)" rx="2" ry="2" />
+<text  x="301.41" y="463.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_code_type (3,673,601 samples, 1.54%)</title><rect x="167.5" y="485" width="18.2" height="15.0" fill="rgb(250,209,50)" rx="2" ry="2" />
+<text  x="170.51" y="495.5" ></text>
+</g>
+<g >
+<title>typecheckt::typecheck_main (10,301,343 samples, 4.31%)</title><rect x="435.0" y="485" width="50.9" height="15.0" fill="rgb(228,108,25)" rx="2" ry="2" />
+<text  x="437.97" y="495.5" >typec..</text>
+</g>
+<g >
+<title>[libc.so.6] (3,454,733 samples, 1.45%)</title><rect x="964.0" y="645" width="17.1" height="15.0" fill="rgb(223,84,20)" rx="2" ry="2" />
+<text  x="967.04" y="655.5" ></text>
+</g>
+<g >
+<title>cfree (3,774,526 samples, 1.58%)</title><rect x="203.2" y="277" width="18.7" height="15.0" fill="rgb(223,86,20)" rx="2" ry="2" />
+<text  x="206.21" y="287.5" ></text>
+</g>
+<g >
+<title>[[heap]] (2,454,925 samples, 1.03%)</title><rect x="10.0" y="709" width="12.1" height="15.0" fill="rgb(211,31,7)" rx="2" ry="2" />
+<text  x="13.00" y="719.5" ></text>
+</g>
+<g >
+<title>[libc.so.6] (2,713,173 samples, 1.14%)</title><rect x="887.5" y="677" width="13.4" height="15.0" fill="rgb(223,84,20)" rx="2" ry="2" />
+<text  x="890.48" y="687.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify_rec (3,713,458 samples, 1.55%)</title><rect x="574.0" y="389" width="18.3" height="15.0" fill="rgb(240,164,39)" rx="2" ry="2" />
+<text  x="576.98" y="399.5" ></text>
+</g>
+<g >
+<title>symbol_tablet::insert (3,647,624 samples, 1.53%)</title><rect x="451.7" y="405" width="18.0" height="15.0" fill="rgb(245,186,44)" rx="2" ry="2" />
+<text  x="454.73" y="415.5" ></text>
+</g>
+<g >
+<title>yyansi_cparse (7,427,619 samples, 3.11%)</title><rect x="242.9" y="517" width="36.7" height="15.0" fill="rgb(206,8,1)" rx="2" ry="2" />
+<text  x="245.94" y="527.5" >yya..</text>
+</g>
+<g >
+<title>ansi_c_typecheckt::typecheck (3,774,526 samples, 1.58%)</title><rect x="203.2" y="517" width="18.7" height="15.0" fill="rgb(236,145,34)" rx="2" ry="2" />
+<text  x="206.21" y="527.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="885.0" y="517" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="888.00" y="527.5" ></text>
+</g>
+<g >
+<title>[unknown] (528,632 samples, 0.22%)</title><rect x="1159.7" y="613" width="2.7" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1162.75" y="623.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify (3,713,458 samples, 1.55%)</title><rect x="574.0" y="405" width="18.3" height="15.0" fill="rgb(232,128,30)" rx="2" ry="2" />
+<text  x="576.98" y="415.5" ></text>
+</g>
+<g >
+<title>irept::get (3,730,209 samples, 1.56%)</title><rect x="776.8" y="357" width="18.5" height="15.0" fill="rgb(207,9,2)" rx="2" ry="2" />
+<text  x="779.84" y="367.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_type (3,767,832 samples, 1.58%)</title><rect x="221.9" y="405" width="18.6" height="15.0" fill="rgb(219,65,15)" rx="2" ry="2" />
+<text  x="224.85" y="415.5" ></text>
+</g>
+<g >
+<title>ansi_c_declarationt::full_type (3,481,989 samples, 1.46%)</title><rect x="132.5" y="309" width="17.2" height="15.0" fill="rgb(228,107,25)" rx="2" ry="2" />
+<text  x="135.47" y="319.5" ></text>
+</g>
+<g >
+<title>sharing_treet&lt;irept, forward_list_as_mapt&lt;dstringt, irept&gt; &gt;::remove_ref (3,714,771 samples, 1.56%)</title><rect x="504.1" y="549" width="18.4" height="15.0" fill="rgb(246,191,45)" rx="2" ry="2" />
+<text  x="507.13" y="559.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="354.1" y="389" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="357.09" y="399.5" ></text>
+</g>
+<g >
+<title>_newstack (2,809,451 samples, 1.18%)</title><rect x="406.0" y="517" width="13.8" height="15.0" fill="rgb(218,62,14)" rx="2" ry="2" />
+<text  x="408.97" y="527.5" ></text>
+</g>
+<g >
+<title>integer2bvrep (3,830,921 samples, 1.60%)</title><rect x="38.7" y="261" width="18.9" height="15.0" fill="rgb(237,151,36)" rx="2" ry="2" />
+<text  x="41.72" y="271.5" ></text>
+</g>
+<g >
+<title>[unknown] (528,632 samples, 0.22%)</title><rect x="1159.7" y="501" width="2.7" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1162.75" y="511.5" ></text>
+</g>
+<g >
+<title>[unknown] (521,327 samples, 0.22%)</title><rect x="28.7" y="549" width="2.6" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="31.71" y="559.5" ></text>
+</g>
+<g >
+<title>cbmc_parse_optionst::get_goto_program (25,915,620 samples, 10.85%)</title><rect x="57.6" y="677" width="128.1" height="15.0" fill="rgb(247,196,47)" rx="2" ry="2" />
+<text  x="60.64" y="687.5" >cbmc_parse_optio..</text>
+</g>
+<g >
+<title>cfree (3,755,729 samples, 1.57%)</title><rect x="316.9" y="421" width="18.6" height="15.0" fill="rgb(223,86,20)" rx="2" ry="2" />
+<text  x="319.94" y="431.5" ></text>
+</g>
+<g >
+<title>size_of_expr (3,729,166 samples, 1.56%)</title><rect x="629.2" y="261" width="18.4" height="15.0" fill="rgb(210,27,6)" rx="2" ry="2" />
+<text  x="632.19" y="271.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_block (3,780,541 samples, 1.58%)</title><rect x="57.6" y="437" width="18.7" height="15.0" fill="rgb(247,196,47)" rx="2" ry="2" />
+<text  x="60.64" y="447.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,389,938 samples, 0.58%)</title><rect x="850.7" y="517" width="6.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="853.70" y="527.5" ></text>
+</g>
+<g >
+<title>goto_symext::do_simplify (11,192,698 samples, 4.69%)</title><rect x="592.3" y="453" width="55.3" height="15.0" fill="rgb(254,225,53)" rx="2" ry="2" />
+<text  x="595.32" y="463.5" >goto_..</text>
+</g>
+<g >
+<title>[ld-linux-x86-64.so.2] (1,333,171 samples, 0.56%)</title><rect x="22.1" y="629" width="6.6" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="25.13" y="639.5" ></text>
+</g>
+<g >
+<title>[unknown] (3,239,095 samples, 1.36%)</title><rect x="995.3" y="661" width="16.0" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="998.30" y="671.5" ></text>
+</g>
+<g >
+<title>c_preprocess_gcc_clang (501,504 samples, 0.21%)</title><rect x="240.5" y="501" width="2.4" height="15.0" fill="rgb(231,122,29)" rx="2" ry="2" />
+<text  x="243.47" y="511.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_declaration (3,767,832 samples, 1.58%)</title><rect x="221.9" y="453" width="18.6" height="15.0" fill="rgb(245,187,44)" rx="2" ry="2" />
+<text  x="224.85" y="463.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="240.5" y="277" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="243.47" y="287.5" ></text>
+</g>
+<g >
+<title>renamedt&lt;exprt,  (11,222,738 samples, 4.70%)</title><rect x="647.6" y="405" width="55.4" height="15.0" fill="rgb(220,69,16)" rx="2" ry="2" />
+<text  x="650.61" y="415.5" >renam..</text>
+</g>
+<g >
+<title>__libc_start_main (3,733,388 samples, 1.56%)</title><rect x="1171.6" y="693" width="18.4" height="15.0" fill="rgb(236,142,34)" rx="2" ry="2" />
+<text  x="1174.56" y="703.5" ></text>
+</g>
+<g >
+<title>convert (3,830,921 samples, 1.60%)</title><rect x="38.7" y="389" width="18.9" height="15.0" fill="rgb(245,188,44)" rx="2" ry="2" />
+<text  x="41.72" y="399.5" ></text>
+</g>
+<g >
+<title>operator new (3,718,962 samples, 1.56%)</title><rect x="114.1" y="517" width="18.4" height="15.0" fill="rgb(216,51,12)" rx="2" ry="2" />
+<text  x="117.10" y="527.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,389,938 samples, 0.58%)</title><rect x="850.7" y="565" width="6.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="853.70" y="575.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_function_body (3,554,718 samples, 1.49%)</title><rect x="185.7" y="565" width="17.5" height="15.0" fill="rgb(214,44,10)" rx="2" ry="2" />
+<text  x="188.65" y="575.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_expr_operands (3,802,483 samples, 1.59%)</title><rect x="279.6" y="357" width="18.8" height="15.0" fill="rgb(219,66,15)" rx="2" ry="2" />
+<text  x="282.63" y="367.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,003,008 samples, 0.42%)</title><rect x="33.8" y="645" width="4.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="36.76" y="655.5" ></text>
+</g>
+<g >
+<title>instrument_preconditions (3,765,675 samples, 1.58%)</title><rect x="335.5" y="549" width="18.6" height="15.0" fill="rgb(208,13,3)" rx="2" ry="2" />
+<text  x="338.49" y="559.5" ></text>
+</g>
+<g >
+<title>[unknown] (528,632 samples, 0.22%)</title><rect x="1159.7" y="533" width="2.7" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1162.75" y="543.5" ></text>
+</g>
+<g >
+<title>yyansi_clex (8,481,023 samples, 3.55%)</title><rect x="393.1" y="533" width="41.9" height="15.0" fill="rgb(213,38,9)" rx="2" ry="2" />
+<text  x="396.08" y="543.5" >yya..</text>
+</g>
+<g >
+<title>[ld-linux-x86-64.so.2] (501,504 samples, 0.21%)</title><rect x="1154.8" y="629" width="2.5" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="1157.79" y="639.5" ></text>
+</g>
+<g >
+<title>[unknown] (2,874,872 samples, 1.20%)</title><rect x="981.1" y="549" width="14.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="984.10" y="559.5" ></text>
+</g>
+<g >
+<title>goto_symext::clean_expr (11,189,769 samples, 4.68%)</title><rect x="537.0" y="453" width="55.3" height="15.0" fill="rgb(217,59,14)" rx="2" ry="2" />
+<text  x="540.05" y="463.5" >goto_..</text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_type (3,830,921 samples, 1.60%)</title><rect x="38.7" y="309" width="18.9" height="15.0" fill="rgb(219,65,15)" rx="2" ry="2" />
+<text  x="41.72" y="319.5" ></text>
+</g>
+<g >
+<title>sharing_treet&lt;irept, forward_list_as_mapt&lt;dstringt, irept&gt; &gt;::remove_ref (2,809,451 samples, 1.18%)</title><rect x="406.0" y="501" width="13.8" height="15.0" fill="rgb(246,191,45)" rx="2" ry="2" />
+<text  x="408.97" y="511.5" ></text>
+</g>
+<g >
+<title>goto_symext::symex_step (56,004,049 samples, 23.44%)</title><rect x="537.0" y="501" width="276.7" height="15.0" fill="rgb(207,13,3)" rx="2" ry="2" />
+<text  x="540.05" y="511.5" >goto_symext::symex_step</text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="31.3" y="405" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="34.29" y="415.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="885.0" y="469" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="888.00" y="479.5" ></text>
+</g>
+<g >
+<title>yyansi_clex (3,611,260 samples, 1.51%)</title><rect x="149.7" y="373" width="17.8" height="15.0" fill="rgb(213,38,9)" rx="2" ry="2" />
+<text  x="152.67" y="383.5" ></text>
+</g>
+<g >
+<title>[cc1] (2,057,642 samples, 0.86%)</title><rect x="1089.4" y="517" width="10.2" height="15.0" fill="rgb(229,111,26)" rx="2" ry="2" />
+<text  x="1092.44" y="527.5" ></text>
+</g>
+<g >
+<title>ansi_c_typecheck (10,301,343 samples, 4.31%)</title><rect x="435.0" y="501" width="50.9" height="15.0" fill="rgb(236,146,34)" rx="2" ry="2" />
+<text  x="437.97" y="511.5" >ansi_..</text>
+</g>
+<g >
+<title>preprocessor_line (3,714,495 samples, 1.55%)</title><rect x="261.3" y="485" width="18.3" height="15.0" fill="rgb(240,162,38)" rx="2" ry="2" />
+<text  x="264.28" y="495.5" ></text>
+</g>
+<g >
+<title>[libc.so.6] (123,541,558 samples, 51.71%)</title><rect x="240.5" y="677" width="610.2" height="15.0" fill="rgb(223,84,20)" rx="2" ry="2" />
+<text  x="243.47" y="687.5" >[libc.so.6]</text>
+</g>
+<g >
+<title>cbmc_parse_optionst::doit (25,915,620 samples, 10.85%)</title><rect x="57.6" y="693" width="128.1" height="15.0" fill="rgb(209,22,5)" rx="2" ry="2" />
+<text  x="60.64" y="703.5" >cbmc_parse_optio..</text>
+</g>
+<g >
+<title>[unknown] (1,003,008 samples, 0.42%)</title><rect x="33.8" y="629" width="4.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="36.76" y="639.5" ></text>
+</g>
+<g >
+<title>update_identifier (3,750,323 samples, 1.57%)</title><rect x="739.8" y="293" width="18.5" height="15.0" fill="rgb(205,0,0)" rx="2" ry="2" />
+<text  x="742.78" y="303.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="240.5" y="293" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="243.47" y="303.5" ></text>
+</g>
+<g >
+<title>exprt* std::__do_uninit_copy&lt;__gnu_cxx::__normal_iterator&lt;exprt const*, std::vector&lt;exprt, std::allocator&lt;exprt&gt; &gt; &gt;, exprt*&gt; (3,729,669 samples, 1.56%)</title><rect x="592.3" y="389" width="18.4" height="15.0" fill="rgb(221,77,18)" rx="2" ry="2" />
+<text  x="595.32" y="399.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,003,008 samples, 0.42%)</title><rect x="33.8" y="677" width="4.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="36.76" y="687.5" ></text>
+</g>
+<g >
+<title>[unknown] (859,617 samples, 0.36%)</title><rect x="1164.8" y="485" width="4.3" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1167.84" y="495.5" ></text>
+</g>
+<g >
+<title>cbmc_parse_optionst::get_goto_program (3,774,526 samples, 1.58%)</title><rect x="203.2" y="645" width="18.7" height="15.0" fill="rgb(247,196,47)" rx="2" ry="2" />
+<text  x="206.21" y="655.5" ></text>
+</g>
+<g >
+<title>ansi_c_typecheckt::typecheck (3,830,921 samples, 1.60%)</title><rect x="38.7" y="341" width="18.9" height="15.0" fill="rgb(236,145,34)" rx="2" ry="2" />
+<text  x="41.72" y="351.5" ></text>
+</g>
+<g >
+<title>multi_path_symex_only_checkert::~multi_path_symex_only_checkert (3,754,247 samples, 1.57%)</title><rect x="832.2" y="597" width="18.5" height="15.0" fill="rgb(235,141,33)" rx="2" ry="2" />
+<text  x="835.16" y="607.5" ></text>
+</g>
+<g >
+<title>__libc_start_main (2,845,457 samples, 1.19%)</title><rect x="1138.3" y="693" width="14.0" height="15.0" fill="rgb(236,142,34)" rx="2" ry="2" />
+<text  x="1141.26" y="703.5" ></text>
+</g>
+<g >
+<title>[ld-linux-x86-64.so.2] (501,504 samples, 0.21%)</title><rect x="885.0" y="597" width="2.5" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="888.00" y="607.5" ></text>
+</g>
+<g >
+<title>initialize_from_source_files (10,766,850 samples, 4.51%)</title><rect x="132.5" y="645" width="53.2" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="135.47" y="655.5" >initi..</text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="240.5" y="357" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="243.47" y="367.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="885.0" y="437" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="888.00" y="447.5" ></text>
+</g>
+<g >
+<title>irept::get_bool (3,767,832 samples, 1.58%)</title><rect x="221.9" y="373" width="18.6" height="15.0" fill="rgb(228,108,25)" rx="2" ry="2" />
+<text  x="224.85" y="383.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify (3,729,026 samples, 1.56%)</title><rect x="795.3" y="373" width="18.4" height="15.0" fill="rgb(232,128,30)" rx="2" ry="2" />
+<text  x="798.26" y="383.5" ></text>
+</g>
+<g >
+<title>readlink (3,239,095 samples, 1.36%)</title><rect x="995.3" y="677" width="16.0" height="15.0" fill="rgb(224,88,21)" rx="2" ry="2" />
+<text  x="998.30" y="687.5" ></text>
+</g>
+<g >
+<title>symex_assignt::assign_rec (3,750,461 samples, 1.57%)</title><rect x="758.3" y="453" width="18.5" height="15.0" fill="rgb(219,66,15)" rx="2" ry="2" />
+<text  x="761.31" y="463.5" ></text>
+</g>
+<g >
+<title>__libc_start_main (124,931,496 samples, 52.30%)</title><rect x="240.5" y="693" width="617.1" height="15.0" fill="rgb(236,142,34)" rx="2" ry="2" />
+<text  x="243.47" y="703.5" >__libc_start_main</text>
+</g>
+<g >
+<title>[unknown] (911,866 samples, 0.38%)</title><rect x="1185.5" y="501" width="4.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1188.50" y="511.5" ></text>
+</g>
+<g >
+<title>ansi_c_typecheck (11,429,808 samples, 4.78%)</title><rect x="57.6" y="581" width="56.5" height="15.0" fill="rgb(236,146,34)" rx="2" ry="2" />
+<text  x="60.64" y="591.5" >ansi_..</text>
+</g>
+<g >
+<title>[libc.so.6] (1,947,140 samples, 0.82%)</title><rect x="522.5" y="581" width="9.6" height="15.0" fill="rgb(223,84,20)" rx="2" ry="2" />
+<text  x="525.48" y="591.5" ></text>
+</g>
+<g >
+<title>std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;::reserve (3,718,962 samples, 1.56%)</title><rect x="114.1" y="533" width="18.4" height="15.0" fill="rgb(244,181,43)" rx="2" ry="2" />
+<text  x="117.10" y="543.5" ></text>
+</g>
+<g >
+<title>add_library (3,774,526 samples, 1.58%)</title><rect x="203.2" y="581" width="18.7" height="15.0" fill="rgb(241,166,39)" rx="2" ry="2" />
+<text  x="206.21" y="591.5" ></text>
+</g>
+<g >
+<title>sharing_treet&lt;irept, forward_list_as_mapt&lt;dstringt, irept&gt; &gt;::remove_ref (3,774,526 samples, 1.58%)</title><rect x="203.2" y="293" width="18.7" height="15.0" fill="rgb(246,191,45)" rx="2" ry="2" />
+<text  x="206.21" y="303.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify_node (3,729,026 samples, 1.56%)</title><rect x="795.3" y="341" width="18.4" height="15.0" fill="rgb(243,175,42)" rx="2" ry="2" />
+<text  x="798.26" y="351.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_expr (3,830,921 samples, 1.60%)</title><rect x="38.7" y="453" width="18.9" height="15.0" fill="rgb(238,154,37)" rx="2" ry="2" />
+<text  x="41.72" y="463.5" ></text>
+</g>
+<g >
+<title>typecheckt::typecheck_main (10,766,850 samples, 4.51%)</title><rect x="132.5" y="549" width="53.2" height="15.0" fill="rgb(228,108,25)" rx="2" ry="2" />
+<text  x="135.47" y="559.5" >typec..</text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="1157.3" y="357" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1160.27" y="367.5" ></text>
+</g>
+<g >
+<title>[ld-linux-x86-64.so.2] (501,504 samples, 0.21%)</title><rect x="31.3" y="597" width="2.5" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="34.29" y="607.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_block (3,774,526 samples, 1.58%)</title><rect x="203.2" y="437" width="18.7" height="15.0" fill="rgb(247,196,47)" rx="2" ry="2" />
+<text  x="206.21" y="447.5" ></text>
+</g>
+<g >
+<title>[ld-linux-x86-64.so.2] (2,534,648 samples, 1.06%)</title><rect x="1152.3" y="709" width="12.5" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="1155.32" y="719.5" ></text>
+</g>
+<g >
+<title>run (501,504 samples, 0.21%)</title><rect x="354.1" y="533" width="2.5" height="15.0" fill="rgb(210,26,6)" rx="2" ry="2" />
+<text  x="357.09" y="543.5" ></text>
+</g>
+<g >
+<title>goto_check_ct::check_rec (7,505,554 samples, 3.14%)</title><rect x="298.4" y="485" width="37.1" height="15.0" fill="rgb(217,59,14)" rx="2" ry="2" />
+<text  x="301.41" y="495.5" >got..</text>
+</g>
+<g >
+<title>c_objc_common_init (5,488,266 samples, 2.30%)</title><rect x="1072.5" y="629" width="27.1" height="15.0" fill="rgb(249,205,49)" rx="2" ry="2" />
+<text  x="1075.50" y="639.5" >c..</text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="1157.3" y="405" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1160.27" y="415.5" ></text>
+</g>
+<g >
+<title>std::locale::operator= (3,833,436 samples, 1.60%)</title><rect x="95.2" y="437" width="18.9" height="15.0" fill="rgb(242,173,41)" rx="2" ry="2" />
+<text  x="98.16" y="447.5" ></text>
+</g>
+<g >
+<title>ansi_c_typecheck (3,554,718 samples, 1.49%)</title><rect x="185.7" y="469" width="17.5" height="15.0" fill="rgb(236,146,34)" rx="2" ry="2" />
+<text  x="188.65" y="479.5" ></text>
+</g>
+<g >
+<title>[unknown] (911,866 samples, 0.38%)</title><rect x="1185.5" y="533" width="4.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1188.50" y="543.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="354.1" y="485" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="357.09" y="495.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="885.0" y="453" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="888.00" y="463.5" ></text>
+</g>
+<g >
+<title>cbmc_parse_optionst::process_goto_program (15,148,770 samples, 6.34%)</title><rect x="57.6" y="661" width="74.9" height="15.0" fill="rgb(210,23,5)" rx="2" ry="2" />
+<text  x="60.64" y="671.5" >cbmc_par..</text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_vector_type (3,830,921 samples, 1.60%)</title><rect x="38.7" y="293" width="18.9" height="15.0" fill="rgb(248,200,47)" rx="2" ry="2" />
+<text  x="41.72" y="303.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="240.5" y="309" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="243.47" y="319.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="240.5" y="405" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="243.47" y="415.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify_node_preorder (3,748,280 samples, 1.57%)</title><rect x="555.5" y="213" width="18.5" height="15.0" fill="rgb(228,109,26)" rx="2" ry="2" />
+<text  x="558.46" y="223.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,003,008 samples, 0.42%)</title><rect x="33.8" y="581" width="4.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="36.76" y="591.5" ></text>
+</g>
+<g >
+<title>[unknown] (3,239,095 samples, 1.36%)</title><rect x="995.3" y="549" width="16.0" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="998.30" y="559.5" ></text>
+</g>
+<g >
+<title>c_init_decl_processing (5,488,266 samples, 2.30%)</title><rect x="1072.5" y="613" width="27.1" height="15.0" fill="rgb(221,77,18)" rx="2" ry="2" />
+<text  x="1075.50" y="623.5" >c..</text>
+</g>
+<g >
+<title>sharing_treet&lt;irept, forward_list_as_mapt&lt;dstringt, irept&gt; &gt;::remove_ref (3,751,654 samples, 1.57%)</title><rect x="684.5" y="293" width="18.5" height="15.0" fill="rgb(246,191,45)" rx="2" ry="2" />
+<text  x="687.51" y="303.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_block (3,391,716 samples, 1.42%)</title><rect x="435.0" y="405" width="16.7" height="15.0" fill="rgb(247,196,47)" rx="2" ry="2" />
+<text  x="437.97" y="415.5" ></text>
+</g>
+<g >
+<title>ansi_c_languaget::parse (16,374,926 samples, 6.85%)</title><rect x="354.1" y="565" width="80.9" height="15.0" fill="rgb(207,10,2)" rx="2" ry="2" />
+<text  x="357.09" y="575.5" >ansi_c_la..</text>
+</g>
+<g >
+<title>size_of_expr (3,729,166 samples, 1.56%)</title><rect x="629.2" y="293" width="18.4" height="15.0" fill="rgb(210,27,6)" rx="2" ry="2" />
+<text  x="632.19" y="303.5" ></text>
+</g>
+<g >
+<title>size_of_expr (3,733,863 samples, 1.56%)</title><rect x="610.7" y="245" width="18.5" height="15.0" fill="rgb(210,27,6)" rx="2" ry="2" />
+<text  x="613.74" y="255.5" ></text>
+</g>
+<g >
+<title>[unknown] (528,632 samples, 0.22%)</title><rect x="1159.7" y="485" width="2.7" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1162.75" y="495.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="885.0" y="421" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="888.00" y="431.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify_rec (3,729,166 samples, 1.56%)</title><rect x="629.2" y="341" width="18.4" height="15.0" fill="rgb(240,164,39)" rx="2" ry="2" />
+<text  x="632.19" y="351.5" ></text>
+</g>
+<g >
+<title>source_locationt::as_string[abi:cxx11] (3,740,506 samples, 1.57%)</title><rect x="813.7" y="501" width="18.5" height="15.0" fill="rgb(230,117,28)" rx="2" ry="2" />
+<text  x="816.68" y="511.5" ></text>
+</g>
+<g >
+<title>[ld-linux-x86-64.so.2] (1,504,512 samples, 0.63%)</title><rect x="1152.3" y="645" width="7.4" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="1155.32" y="655.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="534.6" y="357" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="537.57" y="367.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify (3,748,280 samples, 1.57%)</title><rect x="555.5" y="325" width="18.5" height="15.0" fill="rgb(232,128,30)" rx="2" ry="2" />
+<text  x="558.46" y="335.5" ></text>
+</g>
+<g >
+<title>simplify_expr (3,729,166 samples, 1.56%)</title><rect x="629.2" y="213" width="18.4" height="15.0" fill="rgb(246,193,46)" rx="2" ry="2" />
+<text  x="632.19" y="223.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify_object_size (3,733,863 samples, 1.56%)</title><rect x="610.7" y="277" width="18.5" height="15.0" fill="rgb(217,58,13)" rx="2" ry="2" />
+<text  x="613.74" y="287.5" ></text>
+</g>
+<g >
+<title>sharing_treet&lt;irept, forward_list_as_mapt&lt;dstringt, irept&gt; &gt;::remove_ref (3,774,526 samples, 1.58%)</title><rect x="203.2" y="309" width="18.7" height="15.0" fill="rgb(246,191,45)" rx="2" ry="2" />
+<text  x="206.21" y="319.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_block (3,774,526 samples, 1.58%)</title><rect x="203.2" y="405" width="18.7" height="15.0" fill="rgb(247,196,47)" rx="2" ry="2" />
+<text  x="206.21" y="415.5" ></text>
+</g>
+<g >
+<title>sharing_treet&lt;irept, forward_list_as_mapt&lt;dstringt, irept&gt; &gt;::remove_ref (3,714,771 samples, 1.56%)</title><rect x="504.1" y="517" width="18.4" height="15.0" fill="rgb(246,191,45)" rx="2" ry="2" />
+<text  x="507.13" y="527.5" ></text>
+</g>
+<g >
+<title>initialize_goto_model (34,089,773 samples, 14.27%)</title><rect x="354.1" y="597" width="168.4" height="15.0" fill="rgb(232,124,29)" rx="2" ry="2" />
+<text  x="357.09" y="607.5" >initialize_goto_model</text>
+</g>
+<g >
+<title>convert (3,554,718 samples, 1.49%)</title><rect x="185.7" y="485" width="17.5" height="15.0" fill="rgb(245,188,44)" rx="2" ry="2" />
+<text  x="188.65" y="495.5" ></text>
+</g>
+<g >
+<title>cpp_create_reader (2,383,744 samples, 1.00%)</title><rect x="1060.7" y="613" width="11.8" height="15.0" fill="rgb(242,172,41)" rx="2" ry="2" />
+<text  x="1063.72" y="623.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="1162.4" y="469" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1165.36" y="479.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="1162.4" y="565" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1165.36" y="575.5" ></text>
+</g>
+<g >
+<title>goto_symext::symex_assign (11,220,849 samples, 4.70%)</title><rect x="721.4" y="469" width="55.4" height="15.0" fill="rgb(209,20,4)" rx="2" ry="2" />
+<text  x="724.41" y="479.5" >goto_..</text>
+</g>
+<g >
+<title>cfree (3,698,733 samples, 1.55%)</title><rect x="485.9" y="421" width="18.2" height="15.0" fill="rgb(223,86,20)" rx="2" ry="2" />
+<text  x="488.86" y="431.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_block (3,802,483 samples, 1.59%)</title><rect x="279.6" y="405" width="18.8" height="15.0" fill="rgb(247,196,47)" rx="2" ry="2" />
+<text  x="282.63" y="415.5" ></text>
+</g>
+<g >
+<title>convert (3,767,832 samples, 1.58%)</title><rect x="221.9" y="517" width="18.6" height="15.0" fill="rgb(245,188,44)" rx="2" ry="2" />
+<text  x="224.85" y="527.5" ></text>
+</g>
+<g >
+<title>[ld-linux-x86-64.so.2] (2,356,002 samples, 0.99%)</title><rect x="22.1" y="677" width="11.7" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="25.13" y="687.5" ></text>
+</g>
+<g >
+<title>[ld-linux-x86-64.so.2] (2,534,648 samples, 1.06%)</title><rect x="1152.3" y="693" width="12.5" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="1155.32" y="703.5" ></text>
+</g>
+<g >
+<title>[x86_64-linux-gnu-gcc-13] (801,253 samples, 0.34%)</title><rect x="1181.5" y="565" width="4.0" height="15.0" fill="rgb(238,152,36)" rx="2" ry="2" />
+<text  x="1184.54" y="575.5" ></text>
+</g>
+<g >
+<title>parse_options_baset::main (3,774,526 samples, 1.58%)</title><rect x="203.2" y="677" width="18.7" height="15.0" fill="rgb(242,171,40)" rx="2" ry="2" />
+<text  x="206.21" y="687.5" ></text>
+</g>
+<g >
+<title>goto_symext::dereference (11,189,769 samples, 4.68%)</title><rect x="537.0" y="437" width="55.3" height="15.0" fill="rgb(205,4,1)" rx="2" ry="2" />
+<text  x="540.05" y="447.5" >goto_..</text>
+</g>
+<g >
+<title>symex_bmct::symex_step (59,744,555 samples, 25.01%)</title><rect x="537.0" y="517" width="295.2" height="15.0" fill="rgb(229,114,27)" rx="2" ry="2" />
+<text  x="540.05" y="527.5" >symex_bmct::symex_step</text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="534.6" y="405" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="537.57" y="415.5" ></text>
+</g>
+<g >
+<title>[ld-linux-x86-64.so.2] (2,534,648 samples, 1.06%)</title><rect x="1152.3" y="677" width="12.5" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="1155.32" y="687.5" ></text>
+</g>
+<g >
+<title>[libc.so.6] (3,454,733 samples, 1.45%)</title><rect x="964.0" y="661" width="17.1" height="15.0" fill="rgb(223,84,20)" rx="2" ry="2" />
+<text  x="967.04" y="671.5" ></text>
+</g>
+<g >
+<title>update_identifier (3,728,031 samples, 1.56%)</title><rect x="537.0" y="245" width="18.5" height="15.0" fill="rgb(205,0,0)" rx="2" ry="2" />
+<text  x="540.05" y="255.5" ></text>
+</g>
+<g >
+<title>language_filest::typecheck (10,766,850 samples, 4.51%)</title><rect x="132.5" y="629" width="53.2" height="15.0" fill="rgb(219,64,15)" rx="2" ry="2" />
+<text  x="135.47" y="639.5" >langu..</text>
+</g>
+<g >
+<title>simplify_exprt::simplify_node_preorder (3,733,863 samples, 1.56%)</title><rect x="610.7" y="341" width="18.5" height="15.0" fill="rgb(228,109,26)" rx="2" ry="2" />
+<text  x="613.74" y="351.5" ></text>
+</g>
+<g >
+<title>language_filest::typecheck_module (10,766,850 samples, 4.51%)</title><rect x="132.5" y="613" width="53.2" height="15.0" fill="rgb(232,125,29)" rx="2" ry="2" />
+<text  x="135.47" y="623.5" >langu..</text>
+</g>
+<g >
+<title>malloc (3,729,166 samples, 1.56%)</title><rect x="629.2" y="53" width="18.4" height="15.0" fill="rgb(230,119,28)" rx="2" ry="2" />
+<text  x="632.19" y="63.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_expr_operands (3,830,921 samples, 1.60%)</title><rect x="38.7" y="437" width="18.9" height="15.0" fill="rgb(219,66,15)" rx="2" ry="2" />
+<text  x="41.72" y="447.5" ></text>
+</g>
+<g >
+<title>[ld-linux-x86-64.so.2] (831,667 samples, 0.35%)</title><rect x="24.6" y="613" width="4.1" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="27.60" y="623.5" ></text>
+</g>
+<g >
+<title>access (911,866 samples, 0.38%)</title><rect x="1185.5" y="613" width="4.5" height="15.0" fill="rgb(219,67,16)" rx="2" ry="2" />
+<text  x="1188.50" y="623.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="1162.4" y="517" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1165.36" y="527.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="904.6" y="677" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="907.59" y="687.5" ></text>
+</g>
+<g >
+<title>irept::set_size_t (3,749,825 samples, 1.57%)</title><rect x="298.4" y="389" width="18.5" height="15.0" fill="rgb(241,165,39)" rx="2" ry="2" />
+<text  x="301.41" y="399.5" ></text>
+</g>
+<g >
+<title>ansi_c_typecheckt::typecheck (3,767,832 samples, 1.58%)</title><rect x="221.9" y="677" width="18.6" height="15.0" fill="rgb(236,145,34)" rx="2" ry="2" />
+<text  x="224.85" y="687.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="1162.4" y="629" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1165.36" y="639.5" ></text>
+</g>
+<g >
+<title>pointer_type (3,749,825 samples, 1.57%)</title><rect x="298.4" y="405" width="18.5" height="15.0" fill="rgb(225,93,22)" rx="2" ry="2" />
+<text  x="301.41" y="415.5" ></text>
+</g>
+<g >
+<title>execvpe (501,504 samples, 0.21%)</title><rect x="354.1" y="517" width="2.5" height="15.0" fill="rgb(205,3,0)" rx="2" ry="2" />
+<text  x="357.09" y="527.5" ></text>
+</g>
+<g >
+<title>std::_Hashtable&lt;std::basic_string_view&lt;char, std::char_traits&lt;char&gt; &gt;, std::pair&lt;std::basic_string_view&lt;char, std::char_traits&lt;char&gt; &gt; const, unsigned int&gt;, std::allocator&lt;std::pair&lt;std::basic_string_view&lt;char, std::char_traits&lt;char&gt; &gt; const, unsigned int&gt; &gt;, std::__detail::_Select1st, std::equal_to&lt;std::basic_string_view&lt;char, std::char_traits&lt;char&gt; &gt; &gt;, string_view_hasht, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits&lt;true, false, true&gt; &gt;::_M_rehash (2,783,334 samples, 1.17%)</title><rect x="379.3" y="485" width="13.8" height="15.0" fill="rgb(217,55,13)" rx="2" ry="2" />
+<text  x="382.33" y="495.5" ></text>
+</g>
+<g >
+<title>make_identifier (2,783,334 samples, 1.17%)</title><rect x="379.3" y="533" width="13.8" height="15.0" fill="rgb(234,135,32)" rx="2" ry="2" />
+<text  x="382.33" y="543.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_expr (3,830,921 samples, 1.60%)</title><rect x="38.7" y="485" width="18.9" height="15.0" fill="rgb(238,154,37)" rx="2" ry="2" />
+<text  x="41.72" y="495.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,389,938 samples, 0.58%)</title><rect x="850.7" y="661" width="6.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="853.70" y="671.5" ></text>
+</g>
+<g >
+<title>multi_path_symex_checkert::operator (59,744,555 samples, 25.01%)</title><rect x="537.0" y="597" width="295.2" height="15.0" fill="rgb(218,62,15)" rx="2" ry="2" />
+<text  x="540.05" y="607.5" >multi_path_symex_checkert::operator</text>
+</g>
+<g >
+<title>ansi_c_languaget::typecheck (14,000,076 samples, 5.86%)</title><rect x="435.0" y="517" width="69.1" height="15.0" fill="rgb(237,150,35)" rx="2" ry="2" />
+<text  x="437.97" y="527.5" >ansi_c_..</text>
+</g>
+<g >
+<title>[cc1] (3,430,624 samples, 1.44%)</title><rect x="1072.5" y="549" width="16.9" height="15.0" fill="rgb(229,111,26)" rx="2" ry="2" />
+<text  x="1075.50" y="559.5" ></text>
+</g>
+<g >
+<title>build_identifier (3,750,323 samples, 1.57%)</title><rect x="739.8" y="277" width="18.5" height="15.0" fill="rgb(248,197,47)" rx="2" ry="2" />
+<text  x="742.78" y="287.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,389,938 samples, 0.58%)</title><rect x="850.7" y="501" width="6.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="853.70" y="511.5" ></text>
+</g>
+<g >
+<title>[cc1] (3,128,460 samples, 1.31%)</title><rect x="1045.3" y="517" width="15.4" height="15.0" fill="rgb(229,111,26)" rx="2" ry="2" />
+<text  x="1048.27" y="527.5" ></text>
+</g>
+<g >
+<title>[cc1plus] (2,845,457 samples, 1.19%)</title><rect x="1138.3" y="581" width="14.0" height="15.0" fill="rgb(209,20,4)" rx="2" ry="2" />
+<text  x="1141.26" y="591.5" ></text>
+</g>
+<g >
+<title>operator new (3,815,831 samples, 1.60%)</title><rect x="76.3" y="341" width="18.9" height="15.0" fill="rgb(216,51,12)" rx="2" ry="2" />
+<text  x="79.31" y="351.5" ></text>
+</g>
+<g >
+<title>preprocess_file (10,005,653 samples, 4.19%)</title><rect x="1011.3" y="613" width="49.4" height="15.0" fill="rgb(245,185,44)" rx="2" ry="2" />
+<text  x="1014.30" y="623.5" >prep..</text>
+</g>
+<g >
+<title>_start (2,845,457 samples, 1.19%)</title><rect x="1138.3" y="709" width="14.0" height="15.0" fill="rgb(245,185,44)" rx="2" ry="2" />
+<text  x="1141.26" y="719.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_side_effect_function_call (3,815,831 samples, 1.60%)</title><rect x="76.3" y="453" width="18.9" height="15.0" fill="rgb(222,80,19)" rx="2" ry="2" />
+<text  x="79.31" y="463.5" ></text>
+</g>
+<g >
+<title>language_filest::typecheck_module (14,000,076 samples, 5.86%)</title><rect x="435.0" y="549" width="69.1" height="15.0" fill="rgb(232,125,29)" rx="2" ry="2" />
+<text  x="437.97" y="559.5" >languag..</text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_function_body (3,391,716 samples, 1.42%)</title><rect x="435.0" y="421" width="16.7" height="15.0" fill="rgb(214,44,10)" rx="2" ry="2" />
+<text  x="437.97" y="431.5" ></text>
+</g>
+<g >
+<title>initialize_from_source_files (30,375,002 samples, 12.72%)</title><rect x="354.1" y="581" width="150.0" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="357.09" y="591.5" >initialize_from_sou..</text>
+</g>
+<g >
+<title>convert (3,815,831 samples, 1.60%)</title><rect x="76.3" y="421" width="18.9" height="15.0" fill="rgb(245,188,44)" rx="2" ry="2" />
+<text  x="79.31" y="431.5" ></text>
+</g>
+<g >
+<title>goto_check_ct::pointer_validity_check (3,755,729 samples, 1.57%)</title><rect x="316.9" y="437" width="18.6" height="15.0" fill="rgb(244,183,43)" rx="2" ry="2" />
+<text  x="319.94" y="447.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_side_effect_function_call (3,767,832 samples, 1.58%)</title><rect x="221.9" y="549" width="18.6" height="15.0" fill="rgb(222,80,19)" rx="2" ry="2" />
+<text  x="224.85" y="559.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,389,938 samples, 0.58%)</title><rect x="850.7" y="597" width="6.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="853.70" y="607.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="885.0" y="501" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="888.00" y="511.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_function_body (3,830,921 samples, 1.60%)</title><rect x="38.7" y="597" width="18.9" height="15.0" fill="rgb(214,44,10)" rx="2" ry="2" />
+<text  x="41.72" y="607.5" ></text>
+</g>
+<g >
+<title>[libc.so.6] (2,845,457 samples, 1.19%)</title><rect x="1138.3" y="677" width="14.0" height="15.0" fill="rgb(223,84,20)" rx="2" ry="2" />
+<text  x="1141.26" y="687.5" ></text>
+</g>
+<g >
+<title>parsert::set_source_location (3,062,966 samples, 1.28%)</title><rect x="419.8" y="517" width="15.2" height="15.0" fill="rgb(244,180,43)" rx="2" ry="2" />
+<text  x="422.84" y="527.5" ></text>
+</g>
+<g >
+<title>operator new (3,830,921 samples, 1.60%)</title><rect x="38.7" y="213" width="18.9" height="15.0" fill="rgb(216,51,12)" rx="2" ry="2" />
+<text  x="41.72" y="223.5" ></text>
+</g>
+<g >
+<title>_cpp_lex_direct (6,503,029 samples, 2.72%)</title><rect x="1028.6" y="565" width="32.1" height="15.0" fill="rgb(208,16,3)" rx="2" ry="2" />
+<text  x="1031.60" y="575.5" >_c..</text>
+</g>
+<g >
+<title>[unknown] (1,003,008 samples, 0.42%)</title><rect x="33.8" y="549" width="4.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="36.76" y="559.5" ></text>
+</g>
+<g >
+<title>[unknown] (528,632 samples, 0.22%)</title><rect x="1159.7" y="517" width="2.7" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1162.75" y="527.5" ></text>
+</g>
+<g >
+<title>[unknown] (3,239,095 samples, 1.36%)</title><rect x="995.3" y="581" width="16.0" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="998.30" y="591.5" ></text>
+</g>
+<g >
+<title>toplev::main (17,877,663 samples, 7.48%)</title><rect x="1011.3" y="645" width="88.3" height="15.0" fill="rgb(242,171,41)" rx="2" ry="2" />
+<text  x="1014.30" y="655.5" >toplev::main</text>
+</g>
+<g >
+<title>std::basic_ios&lt;char, std::char_traits&lt;char&gt; &gt;::init (3,750,323 samples, 1.57%)</title><rect x="739.8" y="261" width="18.5" height="15.0" fill="rgb(206,7,1)" rx="2" ry="2" />
+<text  x="742.78" y="271.5" ></text>
+</g>
+<g >
+<title>symex_assignt::assign_rec (3,730,209 samples, 1.56%)</title><rect x="776.8" y="421" width="18.5" height="15.0" fill="rgb(219,66,15)" rx="2" ry="2" />
+<text  x="779.84" y="431.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_function_body (3,802,483 samples, 1.59%)</title><rect x="279.6" y="421" width="18.8" height="15.0" fill="rgb(214,44,10)" rx="2" ry="2" />
+<text  x="282.63" y="431.5" ></text>
+</g>
+<g >
+<title>[unknown] (521,327 samples, 0.22%)</title><rect x="28.7" y="613" width="2.6" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="31.71" y="623.5" ></text>
+</g>
+<g >
+<title>ansi_c_declarationt::to_symbol (3,481,989 samples, 1.46%)</title><rect x="132.5" y="325" width="17.2" height="15.0" fill="rgb(252,218,52)" rx="2" ry="2" />
+<text  x="135.47" y="335.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,389,938 samples, 0.58%)</title><rect x="850.7" y="533" width="6.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="853.70" y="543.5" ></text>
+</g>
+<g >
+<title>[unknown] (528,632 samples, 0.22%)</title><rect x="1159.7" y="565" width="2.7" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1162.75" y="575.5" ></text>
+</g>
+<g >
+<title>[ld-linux-x86-64.so.2] (5,766,167 samples, 2.41%)</title><rect x="876.1" y="693" width="28.5" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="879.11" y="703.5" >[l..</text>
+</g>
+<g >
+<title>symex_assignt::assign_non_struct_symbol (3,729,026 samples, 1.56%)</title><rect x="795.3" y="421" width="18.4" height="15.0" fill="rgb(232,126,30)" rx="2" ry="2" />
+<text  x="798.26" y="431.5" ></text>
+</g>
+<g >
+<title>goto_check_ct::check_rec (7,505,554 samples, 3.14%)</title><rect x="298.4" y="501" width="37.1" height="15.0" fill="rgb(217,59,14)" rx="2" ry="2" />
+<text  x="301.41" y="511.5" >got..</text>
+</g>
+<g >
+<title>[unknown] (911,866 samples, 0.38%)</title><rect x="1185.5" y="597" width="4.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1188.50" y="607.5" ></text>
+</g>
+<g >
+<title>builtin_factory (7,093,249 samples, 2.97%)</title><rect x="132.5" y="421" width="35.0" height="15.0" fill="rgb(237,148,35)" rx="2" ry="2" />
+<text  x="135.47" y="431.5" >bu..</text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="1162.4" y="613" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1165.36" y="623.5" ></text>
+</g>
+<g >
+<title>[unknown] (859,617 samples, 0.36%)</title><rect x="1164.8" y="613" width="4.3" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1167.84" y="623.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="885.0" y="533" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="888.00" y="543.5" ></text>
+</g>
+<g >
+<title>irept::set (3,611,260 samples, 1.51%)</title><rect x="149.7" y="357" width="17.8" height="15.0" fill="rgb(229,112,26)" rx="2" ry="2" />
+<text  x="152.67" y="367.5" ></text>
+</g>
+<g >
+<title>[unknown] (911,866 samples, 0.38%)</title><rect x="1185.5" y="453" width="4.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1188.50" y="463.5" ></text>
+</g>
+<g >
+<title>builtin_factory (3,815,831 samples, 1.60%)</title><rect x="76.3" y="437" width="18.9" height="15.0" fill="rgb(237,148,35)" rx="2" ry="2" />
+<text  x="79.31" y="447.5" ></text>
+</g>
+<g >
+<title>[ld-linux-x86-64.so.2] (2,356,002 samples, 0.99%)</title><rect x="22.1" y="661" width="11.7" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="25.13" y="671.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,947,140 samples, 0.82%)</title><rect x="522.5" y="549" width="9.6" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="525.48" y="559.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify_rec (3,733,863 samples, 1.56%)</title><rect x="610.7" y="197" width="18.5" height="15.0" fill="rgb(240,164,39)" rx="2" ry="2" />
+<text  x="613.74" y="207.5" ></text>
+</g>
+<g >
+<title>_cpp_lex_direct (3,502,624 samples, 1.47%)</title><rect x="1011.3" y="533" width="17.3" height="15.0" fill="rgb(208,16,3)" rx="2" ry="2" />
+<text  x="1014.30" y="543.5" ></text>
+</g>
+<g >
+<title>cxx_init_decl_processing (2,845,457 samples, 1.19%)</title><rect x="1138.3" y="613" width="14.0" height="15.0" fill="rgb(221,75,18)" rx="2" ry="2" />
+<text  x="1141.26" y="623.5" ></text>
+</g>
+<g >
+<title>std::_Hashtable&lt;dstringt, std::pair&lt;dstringt const, symbolt&gt;, std::allocator&lt;std::pair&lt;dstringt const, symbolt&gt; &gt;, std::__detail::_Select1st, std::equal_to&lt;dstringt&gt;, std::hash&lt;dstringt&gt;, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits&lt;true, false, true&gt; &gt;::_M_rehash (3,647,624 samples, 1.53%)</title><rect x="451.7" y="389" width="18.0" height="15.0" fill="rgb(235,138,33)" rx="2" ry="2" />
+<text  x="454.73" y="399.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="1162.4" y="485" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1165.36" y="495.5" ></text>
+</g>
+<g >
+<title>cbmc_parse_optionst::doit (3,774,526 samples, 1.58%)</title><rect x="203.2" y="661" width="18.7" height="15.0" fill="rgb(209,22,5)" rx="2" ry="2" />
+<text  x="206.21" y="671.5" ></text>
+</g>
+<g >
+<title>_dl_catch_exception (501,504 samples, 0.21%)</title><rect x="1157.3" y="629" width="2.4" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1160.27" y="639.5" ></text>
+</g>
+<g >
+<title>build_identifier (3,728,031 samples, 1.56%)</title><rect x="537.0" y="229" width="18.5" height="15.0" fill="rgb(248,197,47)" rx="2" ry="2" />
+<text  x="540.05" y="239.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,947,140 samples, 0.82%)</title><rect x="522.5" y="341" width="9.6" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="525.48" y="351.5" ></text>
+</g>
+<g >
+<title>[ld-linux-x86-64.so.2] (1,003,008 samples, 0.42%)</title><rect x="882.5" y="645" width="5.0" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="885.52" y="655.5" ></text>
+</g>
+<g >
+<title>[x86_64-linux-gnu-gcc-13] (801,253 samples, 0.34%)</title><rect x="1181.5" y="581" width="4.0" height="15.0" fill="rgb(238,152,36)" rx="2" ry="2" />
+<text  x="1184.54" y="591.5" ></text>
+</g>
+<g >
+<title>[x86_64-linux-gnu-gcc-13] (859,617 samples, 0.36%)</title><rect x="1164.8" y="693" width="4.3" height="15.0" fill="rgb(238,152,36)" rx="2" ry="2" />
+<text  x="1167.84" y="703.5" ></text>
+</g>
+<g >
+<title>std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;::_M_mutate (3,740,506 samples, 1.57%)</title><rect x="813.7" y="469" width="18.5" height="15.0" fill="rgb(217,56,13)" rx="2" ry="2" />
+<text  x="816.68" y="479.5" ></text>
+</g>
+<g >
+<title>[unknown] (859,617 samples, 0.36%)</title><rect x="1164.8" y="517" width="4.3" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1167.84" y="527.5" ></text>
+</g>
+<g >
+<title>ansi_c_typecheck (3,481,989 samples, 1.46%)</title><rect x="132.5" y="389" width="17.2" height="15.0" fill="rgb(236,146,34)" rx="2" ry="2" />
+<text  x="135.47" y="399.5" ></text>
+</g>
+<g >
+<title>c_common_init_options (2,383,744 samples, 1.00%)</title><rect x="1060.7" y="629" width="11.8" height="15.0" fill="rgb(235,139,33)" rx="2" ry="2" />
+<text  x="1063.72" y="639.5" ></text>
+</g>
+<g >
+<title>ansi_c_typecheckt::typecheck (3,830,921 samples, 1.60%)</title><rect x="38.7" y="661" width="18.9" height="15.0" fill="rgb(236,145,34)" rx="2" ry="2" />
+<text  x="41.72" y="671.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="354.1" y="469" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="357.09" y="479.5" ></text>
+</g>
+<g >
+<title>cprover_c_library_factory (11,731,606 samples, 4.91%)</title><rect x="240.5" y="565" width="57.9" height="15.0" fill="rgb(215,48,11)" rx="2" ry="2" />
+<text  x="243.47" y="575.5" >cprove..</text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_type (3,833,436 samples, 1.60%)</title><rect x="95.2" y="517" width="18.9" height="15.0" fill="rgb(219,65,15)" rx="2" ry="2" />
+<text  x="98.16" y="527.5" ></text>
+</g>
+<g >
+<title>cfree (3,753,428 samples, 1.57%)</title><rect x="857.6" y="709" width="18.5" height="15.0" fill="rgb(223,86,20)" rx="2" ry="2" />
+<text  x="860.57" y="719.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_declaration (11,429,808 samples, 4.78%)</title><rect x="57.6" y="533" width="56.5" height="15.0" fill="rgb(245,187,44)" rx="2" ry="2" />
+<text  x="60.64" y="543.5" >c_typ..</text>
+</g>
+<g >
+<title>[libc.so.6] (3,733,863 samples, 1.56%)</title><rect x="610.7" y="101" width="18.5" height="15.0" fill="rgb(223,84,20)" rx="2" ry="2" />
+<text  x="613.74" y="111.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="240.5" y="325" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="243.47" y="335.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_redefinition_non_type (7,596,372 samples, 3.18%)</title><rect x="57.6" y="501" width="37.6" height="15.0" fill="rgb(235,138,33)" rx="2" ry="2" />
+<text  x="60.64" y="511.5" >c_t..</text>
+</g>
+<g >
+<title>typecheckt::typecheck_main (3,554,718 samples, 1.49%)</title><rect x="185.7" y="629" width="17.5" height="15.0" fill="rgb(228,108,25)" rx="2" ry="2" />
+<text  x="188.65" y="639.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify_rec (3,733,863 samples, 1.56%)</title><rect x="610.7" y="357" width="18.5" height="15.0" fill="rgb(240,164,39)" rx="2" ry="2" />
+<text  x="613.74" y="367.5" ></text>
+</g>
+<g >
+<title>[unknown] (859,617 samples, 0.36%)</title><rect x="1164.8" y="469" width="4.3" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1167.84" y="479.5" ></text>
+</g>
+<g >
+<title>[unknown] (859,617 samples, 0.36%)</title><rect x="1164.8" y="565" width="4.3" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1167.84" y="575.5" ></text>
+</g>
+<g >
+<title>[unknown] (2,454,925 samples, 1.03%)</title><rect x="10.0" y="661" width="12.1" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="13.00" y="671.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,947,140 samples, 0.82%)</title><rect x="522.5" y="373" width="9.6" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="525.48" y="383.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_return (3,554,718 samples, 1.49%)</title><rect x="185.7" y="533" width="17.5" height="15.0" fill="rgb(235,139,33)" rx="2" ry="2" />
+<text  x="188.65" y="543.5" ></text>
+</g>
+<g >
+<title>[cc1] (3,454,733 samples, 1.45%)</title><rect x="964.0" y="693" width="17.1" height="15.0" fill="rgb(229,111,26)" rx="2" ry="2" />
+<text  x="967.04" y="703.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="240.5" y="261" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="243.47" y="271.5" ></text>
+</g>
+<g >
+<title>c_common_nodes_and_builtins (5,488,266 samples, 2.30%)</title><rect x="1072.5" y="597" width="27.1" height="15.0" fill="rgb(228,109,26)" rx="2" ry="2" />
+<text  x="1075.50" y="607.5" >c..</text>
+</g>
+<g >
+<title>field_sensitivityt::apply (7,476,311 samples, 3.13%)</title><rect x="537.0" y="341" width="37.0" height="15.0" fill="rgb(238,154,37)" rx="2" ry="2" />
+<text  x="540.05" y="351.5" >fie..</text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_side_effect_function_call (3,802,483 samples, 1.59%)</title><rect x="279.6" y="341" width="18.8" height="15.0" fill="rgb(222,80,19)" rx="2" ry="2" />
+<text  x="282.63" y="351.5" ></text>
+</g>
+<g >
+<title>cc1plus (10,670,818 samples, 4.47%)</title><rect x="1099.6" y="725" width="52.7" height="15.0" fill="rgb(248,198,47)" rx="2" ry="2" />
+<text  x="1102.61" y="735.5" >cc1plus</text>
+</g>
+<g >
+<title>simplify_exprt::simplify_node (3,733,863 samples, 1.56%)</title><rect x="610.7" y="181" width="18.5" height="15.0" fill="rgb(243,175,42)" rx="2" ry="2" />
+<text  x="613.74" y="191.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_side_effect_function_call (3,780,541 samples, 1.58%)</title><rect x="57.6" y="421" width="18.7" height="15.0" fill="rgb(222,80,19)" rx="2" ry="2" />
+<text  x="60.64" y="431.5" ></text>
+</g>
+<g >
+<title>_cpp_lex_token (3,502,624 samples, 1.47%)</title><rect x="1011.3" y="549" width="17.3" height="15.0" fill="rgb(239,160,38)" rx="2" ry="2" />
+<text  x="1014.30" y="559.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="31.3" y="549" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="34.29" y="559.5" ></text>
+</g>
+<g >
+<title>yyansi_cparse (3,815,831 samples, 1.60%)</title><rect x="76.3" y="405" width="18.9" height="15.0" fill="rgb(206,8,1)" rx="2" ry="2" />
+<text  x="79.31" y="415.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify_rec (3,748,280 samples, 1.57%)</title><rect x="555.5" y="261" width="18.5" height="15.0" fill="rgb(240,164,39)" rx="2" ry="2" />
+<text  x="558.46" y="271.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_block (3,554,718 samples, 1.49%)</title><rect x="185.7" y="549" width="17.5" height="15.0" fill="rgb(247,196,47)" rx="2" ry="2" />
+<text  x="188.65" y="559.5" ></text>
+</g>
+<g >
+<title>parsert::set_file (3,714,495 samples, 1.55%)</title><rect x="261.3" y="469" width="18.3" height="15.0" fill="rgb(250,210,50)" rx="2" ry="2" />
+<text  x="264.28" y="479.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_block (7,596,372 samples, 3.18%)</title><rect x="57.6" y="469" width="37.6" height="15.0" fill="rgb(247,196,47)" rx="2" ry="2" />
+<text  x="60.64" y="479.5" >c_t..</text>
+</g>
+<g >
+<title>std::__basic_file&lt;char&gt;::xsgetn (2,454,925 samples, 1.03%)</title><rect x="10.0" y="693" width="12.1" height="15.0" fill="rgb(219,66,15)" rx="2" ry="2" />
+<text  x="13.00" y="703.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_ifthenelse (3,767,832 samples, 1.58%)</title><rect x="221.9" y="581" width="18.6" height="15.0" fill="rgb(209,20,4)" rx="2" ry="2" />
+<text  x="224.85" y="591.5" ></text>
+</g>
+<g >
+<title>field_sensitivityt::apply (7,470,388 samples, 3.13%)</title><rect x="721.4" y="373" width="36.9" height="15.0" fill="rgb(238,154,37)" rx="2" ry="2" />
+<text  x="724.41" y="383.5" >fie..</text>
+</g>
+<g >
+<title>[unknown] (2,806,233 samples, 1.17%)</title><rect x="950.2" y="565" width="13.8" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="953.17" y="575.5" ></text>
+</g>
+<g >
+<title>value_sett::assign_rec (3,750,461 samples, 1.57%)</title><rect x="758.3" y="389" width="18.5" height="15.0" fill="rgb(252,220,52)" rx="2" ry="2" />
+<text  x="761.31" y="399.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,389,938 samples, 0.58%)</title><rect x="850.7" y="485" width="6.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="853.70" y="495.5" ></text>
+</g>
+<g >
+<title>[x86_64-linux-gnu-gcc-13] (2,459,646 samples, 1.03%)</title><rect x="1177.9" y="629" width="12.1" height="15.0" fill="rgb(238,152,36)" rx="2" ry="2" />
+<text  x="1180.85" y="639.5" ></text>
+</g>
+<g >
+<title>cbmc_parse_optionst::process_goto_program (23,002,835 samples, 9.63%)</title><rect x="240.5" y="597" width="113.6" height="15.0" fill="rgb(210,23,5)" rx="2" ry="2" />
+<text  x="243.47" y="607.5" >cbmc_parse_opt..</text>
+</g>
+<g >
+<title>value_sett::update_entry (3,750,461 samples, 1.57%)</title><rect x="758.3" y="373" width="18.5" height="15.0" fill="rgb(213,40,9)" rx="2" ry="2" />
+<text  x="761.31" y="383.5" ></text>
+</g>
+<g >
+<title>[unknown] (859,617 samples, 0.36%)</title><rect x="1164.8" y="437" width="4.3" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1167.84" y="447.5" ></text>
+</g>
+<g >
+<title>[libc.so.6] (17,877,663 samples, 7.48%)</title><rect x="1011.3" y="677" width="88.3" height="15.0" fill="rgb(223,84,20)" rx="2" ry="2" />
+<text  x="1014.30" y="687.5" >[libc.so.6]</text>
+</g>
+<g >
+<title>[unknown] (1,003,008 samples, 0.42%)</title><rect x="33.8" y="693" width="4.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="36.76" y="703.5" ></text>
+</g>
+<g >
+<title>builtin_factory (3,802,483 samples, 1.59%)</title><rect x="279.6" y="325" width="18.8" height="15.0" fill="rgb(237,148,35)" rx="2" ry="2" />
+<text  x="282.63" y="335.5" ></text>
+</g>
+<g >
+<title>renamedt&lt;exprt,  (7,498,409 samples, 3.14%)</title><rect x="666.0" y="325" width="37.0" height="15.0" fill="rgb(220,69,16)" rx="2" ry="2" />
+<text  x="669.00" y="335.5" >ren..</text>
+</g>
+<g >
+<title>simplify_exprt::simplify_node (3,713,458 samples, 1.55%)</title><rect x="574.0" y="341" width="18.3" height="15.0" fill="rgb(243,175,42)" rx="2" ry="2" />
+<text  x="576.98" y="351.5" ></text>
+</g>
+<g >
+<title>[unknown] (528,632 samples, 0.22%)</title><rect x="1159.7" y="645" width="2.7" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1162.75" y="655.5" ></text>
+</g>
+<g >
+<title>_cpp_get_buff (2,874,872 samples, 1.20%)</title><rect x="981.1" y="693" width="14.2" height="15.0" fill="rgb(212,32,7)" rx="2" ry="2" />
+<text  x="984.10" y="703.5" ></text>
+</g>
+<g >
+<title>_cpp_clean_line (3,128,460 samples, 1.31%)</title><rect x="1045.3" y="533" width="15.4" height="15.0" fill="rgb(220,69,16)" rx="2" ry="2" />
+<text  x="1048.27" y="543.5" ></text>
+</g>
+<g >
+<title>field_sensitivityt::apply (3,728,031 samples, 1.56%)</title><rect x="537.0" y="309" width="18.5" height="15.0" fill="rgb(238,154,37)" rx="2" ry="2" />
+<text  x="540.05" y="319.5" ></text>
+</g>
+<g >
+<title>goto_check_ct::goto_check (7,505,554 samples, 3.14%)</title><rect x="298.4" y="533" width="37.1" height="15.0" fill="rgb(247,195,46)" rx="2" ry="2" />
+<text  x="301.41" y="543.5" >got..</text>
+</g>
+<g >
+<title>simplify_exprt::simplify_node_preorder (3,748,280 samples, 1.57%)</title><rect x="555.5" y="181" width="18.5" height="15.0" fill="rgb(228,109,26)" rx="2" ry="2" />
+<text  x="558.46" y="191.5" ></text>
+</g>
+<g >
+<title>[ld-linux-x86-64.so.2] (2,534,648 samples, 1.06%)</title><rect x="1152.3" y="661" width="12.5" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="1155.32" y="671.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="354.1" y="453" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="357.09" y="463.5" ></text>
+</g>
+<g >
+<title>sharing_treet&lt;irept, forward_list_as_mapt&lt;dstringt, irept&gt; &gt;::remove_ref (3,774,526 samples, 1.58%)</title><rect x="203.2" y="325" width="18.7" height="15.0" fill="rgb(246,191,45)" rx="2" ry="2" />
+<text  x="206.21" y="335.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_declaration (10,301,343 samples, 4.31%)</title><rect x="435.0" y="453" width="50.9" height="15.0" fill="rgb(245,187,44)" rx="2" ry="2" />
+<text  x="437.97" y="463.5" >c_typ..</text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="885.0" y="485" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="888.00" y="495.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_side_effect_function_call (7,093,249 samples, 2.97%)</title><rect x="132.5" y="437" width="35.0" height="15.0" fill="rgb(222,80,19)" rx="2" ry="2" />
+<text  x="135.47" y="447.5" >c_..</text>
+</g>
+<g >
+<title>__mmap (859,617 samples, 0.36%)</title><rect x="1164.8" y="629" width="4.3" height="15.0" fill="rgb(227,104,25)" rx="2" ry="2" />
+<text  x="1167.84" y="639.5" ></text>
+</g>
+<g >
+<title>[unknown] (528,632 samples, 0.22%)</title><rect x="1159.7" y="629" width="2.7" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1162.75" y="639.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="1162.4" y="533" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1165.36" y="543.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_declaration (3,802,483 samples, 1.59%)</title><rect x="279.6" y="469" width="18.8" height="15.0" fill="rgb(245,187,44)" rx="2" ry="2" />
+<text  x="282.63" y="479.5" ></text>
+</g>
+<g >
+<title>[unknown] (2,581,891 samples, 1.08%)</title><rect x="1111.8" y="693" width="12.7" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1114.76" y="703.5" ></text>
+</g>
+<g >
+<title>renamedt&lt;exprt,  (11,222,738 samples, 4.70%)</title><rect x="647.6" y="373" width="55.4" height="15.0" fill="rgb(220,69,16)" rx="2" ry="2" />
+<text  x="650.61" y="383.5" >renam..</text>
+</g>
+<g >
+<title>add_library (11,731,606 samples, 4.91%)</title><rect x="240.5" y="549" width="57.9" height="15.0" fill="rgb(241,166,39)" rx="2" ry="2" />
+<text  x="243.47" y="559.5" >add_li..</text>
+</g>
+<g >
+<title>[unknown] (1,003,008 samples, 0.42%)</title><rect x="33.8" y="613" width="4.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="36.76" y="623.5" ></text>
+</g>
+<g >
+<title>sharing_mapt&lt;dstringt, value_sett::entryt, false, std::hash&lt;dstringt&gt;, std::equal_to&lt;dstringt&gt; &gt;::get_leaf_node (3,750,461 samples, 1.57%)</title><rect x="758.3" y="357" width="18.5" height="15.0" fill="rgb(248,198,47)" rx="2" ry="2" />
+<text  x="761.31" y="367.5" ></text>
+</g>
+<g >
+<title>operator delete (3,754,247 samples, 1.57%)</title><rect x="832.2" y="565" width="18.5" height="15.0" fill="rgb(247,196,46)" rx="2" ry="2" />
+<text  x="835.16" y="575.5" ></text>
+</g>
+<g >
+<title>[unknown] (859,617 samples, 0.36%)</title><rect x="1164.8" y="453" width="4.3" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1167.84" y="463.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify_rec (3,729,166 samples, 1.56%)</title><rect x="629.2" y="181" width="18.4" height="15.0" fill="rgb(240,164,39)" rx="2" ry="2" />
+<text  x="632.19" y="191.5" ></text>
+</g>
+<g >
+<title>cxx_init (2,845,457 samples, 1.19%)</title><rect x="1138.3" y="629" width="14.0" height="15.0" fill="rgb(243,176,42)" rx="2" ry="2" />
+<text  x="1141.26" y="639.5" ></text>
+</g>
+<g >
+<title>ansi_c_typecheck (3,802,483 samples, 1.59%)</title><rect x="279.6" y="517" width="18.8" height="15.0" fill="rgb(236,146,34)" rx="2" ry="2" />
+<text  x="282.63" y="527.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="534.6" y="373" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="537.57" y="383.5" ></text>
+</g>
+<g >
+<title>goto_check_c (7,505,554 samples, 3.14%)</title><rect x="298.4" y="549" width="37.1" height="15.0" fill="rgb(253,222,53)" rx="2" ry="2" />
+<text  x="301.41" y="559.5" >got..</text>
+</g>
+<g >
+<title>cfree (3,733,863 samples, 1.56%)</title><rect x="610.7" y="117" width="18.5" height="15.0" fill="rgb(223,86,20)" rx="2" ry="2" />
+<text  x="613.74" y="127.5" ></text>
+</g>
+<g >
+<title>[libc.so.6] (3,733,388 samples, 1.56%)</title><rect x="1171.6" y="677" width="18.4" height="15.0" fill="rgb(223,84,20)" rx="2" ry="2" />
+<text  x="1174.56" y="687.5" ></text>
+</g>
+<g >
+<title>[cc1] (10,005,653 samples, 4.19%)</title><rect x="1011.3" y="597" width="49.4" height="15.0" fill="rgb(229,111,26)" rx="2" ry="2" />
+<text  x="1014.30" y="607.5" >[cc1]</text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_expr_operands (3,830,921 samples, 1.60%)</title><rect x="38.7" y="533" width="18.9" height="15.0" fill="rgb(219,66,15)" rx="2" ry="2" />
+<text  x="41.72" y="543.5" ></text>
+</g>
+<g >
+<title>field_sensitivityt::get_fields (3,728,031 samples, 1.56%)</title><rect x="537.0" y="277" width="18.5" height="15.0" fill="rgb(234,135,32)" rx="2" ry="2" />
+<text  x="540.05" y="287.5" ></text>
+</g>
+<g >
+<title>operator new (3,554,718 samples, 1.49%)</title><rect x="185.7" y="357" width="17.5" height="15.0" fill="rgb(216,51,12)" rx="2" ry="2" />
+<text  x="188.65" y="367.5" ></text>
+</g>
+<g >
+<title>std::locale::~locale (3,750,323 samples, 1.57%)</title><rect x="739.8" y="229" width="18.5" height="15.0" fill="rgb(250,210,50)" rx="2" ry="2" />
+<text  x="742.78" y="239.5" ></text>
+</g>
+<g >
+<title>ansi_c_typecheckt::typecheck (10,766,850 samples, 4.51%)</title><rect x="132.5" y="533" width="53.2" height="15.0" fill="rgb(236,145,34)" rx="2" ry="2" />
+<text  x="135.47" y="543.5" >ansi_..</text>
+</g>
+<g >
+<title>type_hash_canon_hash (2,057,642 samples, 0.86%)</title><rect x="1089.4" y="533" width="10.2" height="15.0" fill="rgb(234,137,32)" rx="2" ry="2" />
+<text  x="1092.44" y="543.5" ></text>
+</g>
+<g >
+<title>field_sensitivityt::apply (3,728,031 samples, 1.56%)</title><rect x="537.0" y="325" width="18.5" height="15.0" fill="rgb(238,154,37)" rx="2" ry="2" />
+<text  x="540.05" y="335.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="354.1" y="437" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="357.09" y="447.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="1157.3" y="549" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1160.27" y="559.5" ></text>
+</g>
+<g >
+<title>malloc (2,874,872 samples, 1.20%)</title><rect x="981.1" y="677" width="14.2" height="15.0" fill="rgb(230,119,28)" rx="2" ry="2" />
+<text  x="984.10" y="687.5" ></text>
+</g>
+<g >
+<title>setlocale (2,783,334 samples, 1.17%)</title><rect x="1124.5" y="677" width="13.8" height="15.0" fill="rgb(237,151,36)" rx="2" ry="2" />
+<text  x="1127.51" y="687.5" ></text>
+</g>
+<g >
+<title>[unknown] (3,239,095 samples, 1.36%)</title><rect x="995.3" y="597" width="16.0" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="998.30" y="607.5" ></text>
+</g>
+<g >
+<title>ansi_c_convert_typet::read_rec (3,673,601 samples, 1.54%)</title><rect x="167.5" y="453" width="18.2" height="15.0" fill="rgb(247,196,46)" rx="2" ry="2" />
+<text  x="170.51" y="463.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="1162.4" y="501" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1165.36" y="511.5" ></text>
+</g>
+<g >
+<title>execve (1,003,008 samples, 0.42%)</title><rect x="532.1" y="565" width="4.9" height="15.0" fill="rgb(229,111,26)" rx="2" ry="2" />
+<text  x="535.09" y="575.5" ></text>
+</g>
+<g >
+<title>[libc.so.6] (3,698,733 samples, 1.55%)</title><rect x="485.9" y="405" width="18.2" height="15.0" fill="rgb(223,84,20)" rx="2" ry="2" />
+<text  x="488.86" y="415.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,947,140 samples, 0.82%)</title><rect x="522.5" y="325" width="9.6" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="525.48" y="335.5" ></text>
+</g>
+<g >
+<title>cc1 (45,247,576 samples, 18.94%)</title><rect x="876.1" y="725" width="223.5" height="15.0" fill="rgb(217,59,14)" rx="2" ry="2" />
+<text  x="879.11" y="735.5" >cc1</text>
+</g>
+<g >
+<title>[unknown] (751,337 samples, 0.31%)</title><rect x="900.9" y="661" width="3.7" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="903.88" y="671.5" ></text>
+</g>
+<g >
+<title>std::basic_ios&lt;char, std::char_traits&lt;char&gt; &gt;::init (3,833,436 samples, 1.60%)</title><rect x="95.2" y="469" width="18.9" height="15.0" fill="rgb(206,7,1)" rx="2" ry="2" />
+<text  x="98.16" y="479.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_block (3,830,921 samples, 1.60%)</title><rect x="38.7" y="581" width="18.9" height="15.0" fill="rgb(247,196,47)" rx="2" ry="2" />
+<text  x="41.72" y="591.5" ></text>
+</g>
+<g >
+<title>[unknown] (911,866 samples, 0.38%)</title><rect x="1185.5" y="517" width="4.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1188.50" y="527.5" ></text>
+</g>
+<g >
+<title>field_sensitivityt::get_fields (3,720,065 samples, 1.56%)</title><rect x="721.4" y="277" width="18.4" height="15.0" fill="rgb(234,135,32)" rx="2" ry="2" />
+<text  x="724.41" y="287.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify_node_preorder (3,748,280 samples, 1.57%)</title><rect x="555.5" y="293" width="18.5" height="15.0" fill="rgb(228,109,26)" rx="2" ry="2" />
+<text  x="558.46" y="303.5" ></text>
+</g>
+<g >
+<title>[unknown] (2,874,872 samples, 1.20%)</title><rect x="981.1" y="581" width="14.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="984.10" y="591.5" ></text>
+</g>
+<g >
+<title>operator new (3,729,166 samples, 1.56%)</title><rect x="629.2" y="69" width="18.4" height="15.0" fill="rgb(216,51,12)" rx="2" ry="2" />
+<text  x="632.19" y="79.5" ></text>
+</g>
+<g >
+<title>[unknown] (41,846,625 samples, 17.52%)</title><rect x="33.8" y="709" width="206.7" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="36.76" y="719.5" >[unknown]</text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_declaration (3,830,921 samples, 1.60%)</title><rect x="38.7" y="325" width="18.9" height="15.0" fill="rgb(245,187,44)" rx="2" ry="2" />
+<text  x="41.72" y="335.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="1157.3" y="341" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1160.27" y="351.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="904.6" y="613" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="907.59" y="623.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_symbol (3,774,526 samples, 1.58%)</title><rect x="203.2" y="485" width="18.7" height="15.0" fill="rgb(249,206,49)" rx="2" ry="2" />
+<text  x="206.21" y="495.5" ></text>
+</g>
+<g >
+<title>c_preprocess (501,504 samples, 0.21%)</title><rect x="240.5" y="517" width="2.4" height="15.0" fill="rgb(243,175,42)" rx="2" ry="2" />
+<text  x="243.47" y="527.5" ></text>
+</g>
+<g >
+<title>renamedt&lt;exprt,  (11,222,738 samples, 4.70%)</title><rect x="647.6" y="437" width="55.4" height="15.0" fill="rgb(220,69,16)" rx="2" ry="2" />
+<text  x="650.61" y="447.5" >renam..</text>
+</g>
+<g >
+<title>c_common_init (10,005,653 samples, 4.19%)</title><rect x="1011.3" y="629" width="49.4" height="15.0" fill="rgb(237,150,35)" rx="2" ry="2" />
+<text  x="1014.30" y="639.5" >c_co..</text>
+</g>
+<g >
+<title>[libc.so.6] (3,647,624 samples, 1.53%)</title><rect x="451.7" y="325" width="18.0" height="15.0" fill="rgb(223,84,20)" rx="2" ry="2" />
+<text  x="454.73" y="335.5" ></text>
+</g>
+<g >
+<title>[unknown] (9,568,700 samples, 4.01%)</title><rect x="964.0" y="709" width="47.3" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="967.04" y="719.5" >[unk..</text>
+</g>
+<g >
+<title>field_sensitivityt::get_fields (3,728,031 samples, 1.56%)</title><rect x="537.0" y="293" width="18.5" height="15.0" fill="rgb(234,135,32)" rx="2" ry="2" />
+<text  x="540.05" y="303.5" ></text>
+</g>
+<g >
+<title>[unknown] (859,617 samples, 0.36%)</title><rect x="1164.8" y="421" width="4.3" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1167.84" y="431.5" ></text>
+</g>
+<g >
+<title>[ld-linux-x86-64.so.2] (501,504 samples, 0.21%)</title><rect x="1157.3" y="613" width="2.4" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="1160.27" y="623.5" ></text>
+</g>
+<g >
+<title>cbmc (175,342,476 samples, 73.40%)</title><rect x="10.0" y="725" width="866.1" height="15.0" fill="rgb(247,194,46)" rx="2" ry="2" />
+<text  x="13.00" y="735.5" >cbmc</text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="240.5" y="341" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="243.47" y="351.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_redefinition_non_type (3,767,832 samples, 1.58%)</title><rect x="221.9" y="629" width="18.6" height="15.0" fill="rgb(235,138,33)" rx="2" ry="2" />
+<text  x="224.85" y="639.5" ></text>
+</g>
+<g >
+<title>sharing_treet&lt;irept, forward_list_as_mapt&lt;dstringt, irept&gt; &gt;::remove_ref (3,714,771 samples, 1.56%)</title><rect x="504.1" y="533" width="18.4" height="15.0" fill="rgb(246,191,45)" rx="2" ry="2" />
+<text  x="507.13" y="543.5" ></text>
+</g>
+<g >
+<title>[ld-linux-x86-64.so.2] (501,504 samples, 0.21%)</title><rect x="1157.3" y="581" width="2.4" height="15.0" fill="rgb(243,178,42)" rx="2" ry="2" />
+<text  x="1160.27" y="591.5" ></text>
+</g>
+<g >
+<title>std::_Hashtable&lt;std::basic_string_view&lt;char, std::char_traits&lt;char&gt; &gt;, std::pair&lt;std::basic_string_view&lt;char, std::char_traits&lt;char&gt; &gt; const, unsigned int&gt;, std::allocator&lt;std::pair&lt;std::basic_string_view&lt;char, std::char_traits&lt;char&gt; &gt; const, unsigned int&gt; &gt;, std::__detail::_Select1st, std::equal_to&lt;std::basic_string_view&lt;char, std::char_traits&lt;char&gt; &gt; &gt;, string_view_hasht, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits&lt;true, false, true&gt; &gt;::find (3,714,495 samples, 1.55%)</title><rect x="261.3" y="437" width="18.3" height="15.0" fill="rgb(250,207,49)" rx="2" ry="2" />
+<text  x="264.28" y="447.5" ></text>
+</g>
+<g >
+<title>execve (501,504 samples, 0.21%)</title><rect x="354.1" y="501" width="2.5" height="15.0" fill="rgb(229,111,26)" rx="2" ry="2" />
+<text  x="357.09" y="511.5" ></text>
+</g>
+<g >
+<title>ansi_c_typecheck (3,774,526 samples, 1.58%)</title><rect x="203.2" y="549" width="18.7" height="15.0" fill="rgb(236,146,34)" rx="2" ry="2" />
+<text  x="206.21" y="559.5" ></text>
+</g>
+<g >
+<title>[libc.so.6] (2,783,334 samples, 1.17%)</title><rect x="1124.5" y="629" width="13.8" height="15.0" fill="rgb(223,84,20)" rx="2" ry="2" />
+<text  x="1127.51" y="639.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_declaration (3,774,526 samples, 1.58%)</title><rect x="203.2" y="501" width="18.7" height="15.0" fill="rgb(245,187,44)" rx="2" ry="2" />
+<text  x="206.21" y="511.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_symbol (3,554,718 samples, 1.49%)</title><rect x="185.7" y="581" width="17.5" height="15.0" fill="rgb(249,206,49)" rx="2" ry="2" />
+<text  x="188.65" y="591.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="354.1" y="421" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="357.09" y="431.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="1157.3" y="373" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1160.27" y="383.5" ></text>
+</g>
+<g >
+<title>sharing_treet&lt;irept, forward_list_as_mapt&lt;dstringt, irept&gt; &gt;::remove_ref (3,698,733 samples, 1.55%)</title><rect x="485.9" y="453" width="18.2" height="15.0" fill="rgb(246,191,45)" rx="2" ry="2" />
+<text  x="488.86" y="463.5" ></text>
+</g>
+<g >
+<title>field_sensitivityt::get_fields (3,728,031 samples, 1.56%)</title><rect x="537.0" y="261" width="18.5" height="15.0" fill="rgb(234,135,32)" rx="2" ry="2" />
+<text  x="540.05" y="271.5" ></text>
+</g>
+<g >
+<title>[unknown] (521,327 samples, 0.22%)</title><rect x="28.7" y="581" width="2.6" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="31.71" y="591.5" ></text>
+</g>
+<g >
+<title>[unknown] (5,318,405 samples, 2.23%)</title><rect x="937.8" y="661" width="26.2" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="940.77" y="671.5" >[..</text>
+</g>
+<g >
+<title>[unknown] (911,866 samples, 0.38%)</title><rect x="1185.5" y="469" width="4.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1188.50" y="479.5" ></text>
+</g>
+<g >
+<title>[unknown] (911,866 samples, 0.38%)</title><rect x="1185.5" y="565" width="4.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1188.50" y="575.5" ></text>
+</g>
+<g >
+<title>std::_Hashtable&lt;irept, irept, std::allocator&lt;irept&gt;, std::__detail::_Identity, std::equal_to&lt;irept&gt;, irep_hash, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits&lt;true, true, true&gt; &gt;::clear (3,754,247 samples, 1.57%)</title><rect x="832.2" y="581" width="18.5" height="15.0" fill="rgb(246,192,46)" rx="2" ry="2" />
+<text  x="835.16" y="591.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify_index_preorder (3,748,280 samples, 1.57%)</title><rect x="555.5" y="277" width="18.5" height="15.0" fill="rgb(242,171,41)" rx="2" ry="2" />
+<text  x="558.46" y="287.5" ></text>
+</g>
+<g >
+<title>irept::find (3,720,065 samples, 1.56%)</title><rect x="721.4" y="261" width="18.4" height="15.0" fill="rgb(230,116,27)" rx="2" ry="2" />
+<text  x="724.41" y="271.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="904.6" y="693" width="2.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="907.59" y="703.5" ></text>
+</g>
+<g >
+<title>[unknown] (1,003,008 samples, 0.42%)</title><rect x="532.1" y="549" width="4.9" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="535.09" y="559.5" ></text>
+</g>
+<g >
+<title>[unknown] (501,504 samples, 0.21%)</title><rect x="240.5" y="373" width="2.4" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="243.47" y="383.5" ></text>
+</g>
+<g >
+<title>[unknown] (2,783,334 samples, 1.17%)</title><rect x="1124.5" y="709" width="13.8" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1127.51" y="719.5" ></text>
+</g>
+<g >
+<title>simplify_exprt::simplify_index (3,729,026 samples, 1.56%)</title><rect x="795.3" y="325" width="18.4" height="15.0" fill="rgb(206,8,1)" rx="2" ry="2" />
+<text  x="798.26" y="335.5" ></text>
+</g>
+<g >
+<title>c_typecheck_baset::typecheck_return (7,093,249 samples, 2.97%)</title><rect x="132.5" y="453" width="35.0" height="15.0" fill="rgb(235,139,33)" rx="2" ry="2" />
+<text  x="135.47" y="463.5" >c_..</text>
+</g>
+</g>
+</svg>
