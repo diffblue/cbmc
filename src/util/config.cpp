@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <climits>
 #include <cstdlib>
+#include <type_traits>
 
 configt config;
 
@@ -320,6 +321,10 @@ void configt::ansi_ct::set_arch_spec_arm(const irep_idt &subarch)
 
   endianness=endiannesst::IS_LITTLE_ENDIAN;
   char_is_unsigned=true;
+  // The procedure call standards for both 32-bit and 64-bit Arm (AAPCS and
+  // AAPCS64) make wchar_t an unsigned integer type. Apple, NetBSD, and OpenBSD
+  // deviate from this, see configt::set_os_arch_overrides.
+  wchar_t_is_unsigned = true;
   NULL_is_zero=true;
 
   switch(mode)
@@ -915,6 +920,64 @@ configt::bv_encodingt parse_object_bits_encoding(
   return bv_encoding;
 }
 
+void configt::set_os_arch_overrides()
+{
+  const irep_idt &os = ansi_c.os_name;
+  const irep_idt &arch = ansi_c.arch;
+  const bool is_arm =
+    arch == "arm64" || arch == "armhf" || arch == "armel" || arch == "arm";
+
+  if(os == "windows")
+  {
+    // note that sizeof(void *)==8, but sizeof(long)==4!
+    if(arch == "x86_64")
+      ansi_c.set_LLP64();
+
+    // On Windows, wchar_t is unsigned 16 bit, regardless
+    // of the compiler used.
+    ansi_c.wchar_t_width = 2 * 8;
+    ansi_c.wchar_t_is_unsigned = true;
+
+    // long double is the same as double in Visual Studio,
+    // but it's 16 bytes with GCC with the 64-bit target.
+    if(arch == "x86_64" && ansi_c.mode == ansi_ct::flavourt::GCC)
+      ansi_c.long_double_width = 16 * 8;
+    else
+      ansi_c.long_double_width = 8 * 8;
+  }
+  else if(os == "macos" && is_arm)
+  {
+    // Apple's Arm platforms deviate from AAPCS/AAPCS64, see
+    // https://developer.apple.com/documentation/xcode/
+    // writing_arm64_code_for_apple_platforms#//apple_ref/doc/uid/TP40013702-SW1
+    ansi_c.char_is_unsigned = false;
+    ansi_c.wchar_t_is_unsigned = false;
+    ansi_c.long_double_width = 8 * 8;
+  }
+  else if((os == "netbsd" || os == "openbsd") && is_arm)
+  {
+    // NetBSD and OpenBSD deviate from AAPCS/AAPCS64: wchar_t is int.
+    ansi_c.wchar_t_is_unsigned = false;
+  }
+  else if(
+    os == "freebsd" &&
+    (arch == "powerpc" || arch == "ppc64" || arch == "ppc64le"))
+  {
+    // FreeBSD/PowerPC does not use the 128-bit long double assumed by
+    // set_arch_spec_power(): it is 64-bit, except on powerpc64le since
+    // FreeBSD 16.0, where it is IEEE binary128.  The width is a property
+    // of the release, which the target triple does not carry, so follow
+    // the toolchain when verifying natively and assume FreeBSD >= 16.0
+    // when cross-verifying.
+    if(arch == this_architecture() && os == this_operating_system())
+      ansi_c.long_double_width = sizeof(long double) * CHAR_BIT;
+    else if(arch == "ppc64le")
+      ansi_c.long_double_width = 16 * 8;
+    else
+      ansi_c.long_double_width = 8 * 8;
+  }
+}
+
 bool configt::set(const cmdlinet &cmdline)
 {
   // defaults -- we match the architecture we have ourselves
@@ -1117,50 +1180,9 @@ bool configt::set(const cmdlinet &cmdline)
   if(ansi_c.preprocessor == ansi_ct::preprocessort::GCC)
     ansi_c.gcc__float128_type = true;
 
+  ansi_c.os_name = os;
   set_arch(arch);
-
-  if(os=="windows")
-  {
-    // note that sizeof(void *)==8, but sizeof(long)==4!
-    if(arch=="x86_64")
-      ansi_c.set_LLP64();
-
-    // On Windows, wchar_t is unsigned 16 bit, regardless
-    // of the compiler used.
-    ansi_c.wchar_t_width=2*8;
-    ansi_c.wchar_t_is_unsigned=true;
-
-    // long double is the same as double in Visual Studio,
-    // but it's 16 bytes with GCC with the 64-bit target.
-    if(arch == "x86_64" && cmdline.isset("gcc"))
-      ansi_c.long_double_width=16*8;
-    else
-      ansi_c.long_double_width=8*8;
-  }
-  else if(os == "macos" && arch == "arm64")
-  {
-    // https://developer.apple.com/documentation/xcode/
-    // writing_arm64_code_for_apple_platforms#//apple_ref/doc/uid/TP40013702-SW1
-    ansi_c.char_is_unsigned = false;
-    ansi_c.long_double_width = 8 * 8;
-  }
-  else if(
-    os == "freebsd" &&
-    (arch == "powerpc" || arch == "ppc64" || arch == "ppc64le"))
-  {
-    // FreeBSD/PowerPC does not use the 128-bit long double assumed by
-    // set_arch_spec_power(): it is 64-bit, except on powerpc64le since
-    // FreeBSD 16.0, where it is IEEE binary128.  The width is a property
-    // of the release, which the target triple does not carry, so follow
-    // the toolchain when verifying natively and assume FreeBSD >= 16.0
-    // when cross-verifying.
-    if(arch == this_arch && os == this_os)
-      ansi_c.long_double_width = sizeof(long double) * CHAR_BIT;
-    else if(arch == "ppc64le")
-      ansi_c.long_double_width = 16 * 8;
-    else
-      ansi_c.long_double_width = 8 * 8;
-  }
+  set_os_arch_overrides();
 
   // Let's check some of the type widths in case we run
   // the same architecture and OS that we are verifying for.
@@ -1197,6 +1219,12 @@ bool configt::set(const cmdlinet &cmdline)
       ansi_c.char_is_unsigned ==
         (static_cast<char>((1 << CHAR_BIT) - 1) == (1 << CHAR_BIT) - 1),
       "char_is_unsigned flag shall indicate system char unsignedness");
+    INVARIANT(
+      ansi_c.wchar_t_width == sizeof(wchar_t) * CHAR_BIT,
+      "wchar_t width shall be equal to the system wchar_t width");
+    INVARIANT(
+      ansi_c.wchar_t_is_unsigned == std::is_unsigned<wchar_t>::value,
+      "wchar_t_is_unsigned flag shall indicate system wchar_t unsignedness");
 
 #ifndef _WIN32
     // On Windows, long double width varies by compiler

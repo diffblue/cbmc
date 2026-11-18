@@ -1,0 +1,12 @@
+CORE
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+The type of wide character constants must match the width and signedness of
+the wchar_t typedef of the host's <stddef.h> when verifying for the host
+platform.

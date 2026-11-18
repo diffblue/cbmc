@@ -274,6 +274,10 @@ public:
 
     irep_idt arch;
 
+    /// The operating system as configured by configt::set (e.g., "netbsd"),
+    /// which is more specific than \ref os.
+    irep_idt os_name;
+
     // architecture-specific integer value of null pointer constant
     bool NULL_is_zero;
 
@@ -418,6 +422,13 @@ public:
   std::optional<std::string> main;
 
   void set_arch(const irep_idt &);
+
+  /// Apply the settings that depend on the combination of operating system
+  /// (ansi_c.os_name) and architecture (ansi_c.arch), and which override the
+  /// architecture's defaults. As \ref set_arch and the
+  /// ansi_ct::set_arch_spec_* methods restore those defaults, call this method
+  /// again after changing the architecture.
+  void set_os_arch_overrides();
 
   void set_from_symbol_table(const symbol_table_baset &);
 

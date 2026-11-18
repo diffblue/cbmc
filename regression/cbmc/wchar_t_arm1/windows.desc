@@ -1,0 +1,10 @@
+CORE
+main.i
+--arch arm64 --os windows
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+On Windows, wchar_t is an unsigned 16-bit integer type, also on Arm.

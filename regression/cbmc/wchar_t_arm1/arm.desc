@@ -1,0 +1,11 @@
+CORE
+main.i
+--arch armhf --os linux
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+The procedure call standard for 32-bit Arm (AAPCS) makes wchar_t an unsigned
+integer type.

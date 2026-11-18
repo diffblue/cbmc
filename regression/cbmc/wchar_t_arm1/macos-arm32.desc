@@ -1,0 +1,12 @@
+CORE
+main.i
+--arch armhf --os macos
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ wchar_t is unsigned: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Apple's 32-bit Arm platforms deviate from AAPCS as well: wchar_t is a signed
+integer type.
