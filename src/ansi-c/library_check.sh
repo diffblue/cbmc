@@ -100,7 +100,12 @@ perl -p -i -e 's/^_mm_setr_epi(16|32)\n//' __functions # cbmc/SIMD1
 perl -p -i -e 's/^_mm_setr_pi16\n//' __functions # cbmc/SIMD1
 perl -p -i -e 's/^_mm_subs_ep[iu]16\n//' __functions # cbmc/SIMD1
 
-ls -1 ../../regression/cbmc-library/ | egrep -v '(Makefile|CMakeLists.txt)' | LC_ALL=C sort -u > __tests
+# Each test is a directory; list only those so that files the test runner
+# leaves behind (tests.log, tests-<suffix>.log) are not taken to be tests.
+for d in ../../regression/cbmc-library/*/; do
+  d="${d%/}"
+  echo "${d##*/}"
+done | LC_ALL=C sort -u > __tests
 diff -u __tests __functions
 ec="${?}"
 rm __functions __tests
