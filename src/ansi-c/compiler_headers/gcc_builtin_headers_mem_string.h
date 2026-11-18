@@ -136,7 +136,6 @@ int __builtin_puts_unlocked(const char*);
 void* __builtin_realloc(void*, __CPROVER_size_t);
 void* __builtin_return_address(unsigned);
 char* __builtin_rindex(const char*, int);
-int __builtin_scanf(const char *str, const char *fmt, ...);
 int __builtin_scanf(const char*, ...);
 int __builtin_snprintf(char*, __CPROVER_size_t, const char*, ...);
 int __builtin_sprintf(char*, const char*, ...);
