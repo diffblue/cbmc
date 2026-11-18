@@ -36,7 +36,7 @@ public class Main {
     }
 
     public void tab() {
-        String str = " ".trim();
+        String str = "\t".trim();
         assert str.equals("");
     }
 

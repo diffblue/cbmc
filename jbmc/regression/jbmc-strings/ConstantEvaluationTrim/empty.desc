@@ -4,6 +4,7 @@ Main
 ^Generated [0-9]+ VCC\(s\), 0 remaining after simplification$
 ^EXIT=0$
 ^SIGNAL=0$
+^\[java::Main\.empty:\(\)V\.assertion\.1\] .*: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 --

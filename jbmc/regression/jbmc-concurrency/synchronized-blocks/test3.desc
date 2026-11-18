@@ -1,8 +1,9 @@
 CORE
 A
---function 'A.me0:()V' --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar` --java-threading
+--function 'A.me0:()V' --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar` --java-threading --no-lazy-methods
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
 --
+As test2.desc, but with all methods loaded eagerly rather than lazily.

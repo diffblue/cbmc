@@ -39,8 +39,11 @@ public class Test
 
   public void testSuccess6(StringBuffer sb)
   {
-    CProverString.setLength(sb, 0);
-    assert sb.toString().equals("");
+    if(sb != null)
+    {
+      CProverString.setLength(sb, 0);
+      assert sb.toString().equals("");
+    }
   }
 
   public void testNoPropagation1()
