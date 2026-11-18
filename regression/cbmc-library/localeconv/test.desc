@@ -1,8 +1,13 @@
-KNOWNBUG
+CORE
 main.c
---pointer-check --bounds-check
-^EXIT=0$
+--pointer-check --bounds-check --unwind 3 --unwinding-assertions
+^\[main\.assertion\.\d+\] line \d+ decimal point is ',': FAILURE$
+^\*\* 1 of \d+ failed
+^EXIT=10$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
+^VERIFICATION FAILED$
 --
 ^warning: ignoring
+--
+C11 7.11p2: the "C" locale's values, which are in effect at program startup.
+Before, every string member of the result was a null pointer.

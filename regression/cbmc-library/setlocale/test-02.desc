@@ -1,0 +1,10 @@
+CORE
+main2.c
+--pointer-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+A null pointer for the locale argument is not dereferenced.
