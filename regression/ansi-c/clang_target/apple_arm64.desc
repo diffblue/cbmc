@@ -1,0 +1,11 @@
+CORE clang-only
+apple_arm64.i
+--i386-macos -target arm64-apple-macos
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+-target changes the architecture after the operating system has been
+configured; the operating-system-specific settings for Arm must still apply.

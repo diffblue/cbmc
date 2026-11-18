@@ -452,6 +452,10 @@ int gcc_modet::doit()
   // get configuration
   config.set(cmdline);
 
+  // The options below may change the architecture, which requires
+  // re-applying the operating-system-specific settings.
+  bool arch_changed = false;
+
   // Intel-specific
   // in GCC, m16 is 32-bit (!), as documented here:
   // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59672
@@ -460,11 +464,13 @@ int gcc_modet::doit()
   {
     config.ansi_c.arch="i386";
     config.ansi_c.set_arch_spec_i386();
+    arch_changed = true;
   }
   else if(cmdline.isset("m64"))
   {
     config.ansi_c.arch="x86_64";
     config.ansi_c.set_arch_spec_x86_64();
+    arch_changed = true;
   }
 
   // ARM-specific
@@ -474,7 +480,10 @@ int gcc_modet::doit()
     config.ansi_c.endianness=configt::ansi_ct::endiannesst::IS_LITTLE_ENDIAN;
 
   if(cmdline.isset("mthumb") || cmdline.isset("mthumb-interwork"))
+  {
     config.ansi_c.set_arch_spec_arm("armhf");
+    arch_changed = true;
+  }
 
   // -mcpu sets both the arch and tune, but should only be used if
   // neither -march nor -mtune are passed on the command line.
@@ -490,6 +499,7 @@ int gcc_modet::doit()
       for(auto &processor : pair.second)
         if(processor==target_cpu)
         {
+          arch_changed = true;
           if(pair.first.find("mips")==std::string::npos)
             config.set_arch(pair.first);
           else
@@ -570,7 +580,11 @@ int gcc_modet::doit()
       config.set_arch("none");
     else
       config.set_arch(it->second);
+    arch_changed = true;
   }
+
+  if(arch_changed)
+    config.set_os_arch_overrides();
 
   // -fshort-wchar makes wchar_t "short unsigned int"
   if(cmdline.isset("fshort-wchar"))
