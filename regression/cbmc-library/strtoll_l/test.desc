@@ -1,0 +1,16 @@
+CORE unix
+main.c
+
+^\[main\.assertion\.6\] line \d+ assertion .*: FAILURE$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+implicit function declaration
+is not declared
+--
+strtoll_l converts as strtoll does; the locale argument is not read. strtoll_l and
+locale_t are POSIX; Windows has _strtoll_l with _locale_t instead, hence the
+unix tag.

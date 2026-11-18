@@ -1,0 +1,11 @@
+CORE unix
+main_c23.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+glibc 2.38 and later redirect strtoll_l to __isoc23_strtoll_l in C23 mode, with
+_GNU_SOURCE, and in C++. Unlike strtoll_l, it accepts the C23 "0b" prefix.

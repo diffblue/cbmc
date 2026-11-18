@@ -1,0 +1,15 @@
+CORE unix
+main.c
+-D_GNU_SOURCE
+^\[main\.assertion\.6\] line \d+ assertion .*: FAILURE$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+implicit function declaration
+is not declared
+--
+With _GNU_SOURCE also defined when preprocessing the library, the model must
+not call itself via glibc's redirect of strtoll_l.
