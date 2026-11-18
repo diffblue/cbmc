@@ -21,6 +21,8 @@ Date:   March 2017
 
 #include <goto-programs/goto_instruction_code.h>
 
+#include "java_types.h"
+
 /// converts based on a function on expressions
 /// \param expr_function: A reference to a function on expressions
 /// \param target: A position in a goto program
@@ -36,6 +38,21 @@ codet character_refine_preprocesst::convert_char_function(
   return code_assignt(result, expr_function(arg, type));
 }
 
+/// \p chr, converted to int unless its type can represent \p value. Code
+/// points can exceed the range of the (16-bit) char type, and comparing a char
+/// with such a value in the char type would compare with the value modulo
+/// 2^16.
+/// \param chr: An expression of type character or int
+/// \param value: The value \p chr is to be compared with
+/// \return \p chr, or \p chr converted to int
+static exprt widen_for(const exprt &chr, const mp_integer &value)
+{
+  const auto &type = to_integer_bitvector_type(chr.type());
+  if(value >= type.smallest() && value <= type.largest())
+    return chr;
+  return typecast_exprt{chr, java_int_type()};
+}
+
 /// The returned expression is true when the first argument is in the interval
 /// defined by the lower and upper bounds (included)
 /// \param chr: Expression we want to bound
@@ -47,9 +64,12 @@ exprt character_refine_preprocesst::in_interval_expr(
   const mp_integer &lower_bound,
   const mp_integer &upper_bound)
 {
+  const exprt widened = widen_for(chr, upper_bound);
   return and_exprt(
-    binary_relation_exprt(chr, ID_ge, from_integer(lower_bound, chr.type())),
-    binary_relation_exprt(chr, ID_le, from_integer(upper_bound, chr.type())));
+    binary_relation_exprt(
+      widened, ID_ge, from_integer(lower_bound, widened.type())),
+    binary_relation_exprt(
+      widened, ID_le, from_integer(upper_bound, widened.type())));
 }
 
 /// The returned expression is true when the given character is equal to one of
@@ -62,7 +82,10 @@ exprt character_refine_preprocesst::in_list_expr(
 {
   exprt::operandst ops;
   for(const auto &i : list)
-    ops.push_back(equal_exprt(chr, from_integer(i, chr.type())));
+  {
+    const exprt widened = widen_for(chr, i);
+    ops.push_back(equal_exprt(widened, from_integer(i, widened.type())));
+  }
   return disjunction(ops);
 }
 
@@ -447,8 +470,9 @@ exprt character_refine_preprocesst::expr_of_is_defined(
   intervals.push_back(in_interval_expr(chr, 0x10840, 0x1CFFF));
   intervals.push_back(in_interval_expr(chr, 0x1D200, 0x1D2FF));
   intervals.push_back(in_interval_expr(chr, 0x1D360, 0x1D3FF));
-  intervals.push_back(
-    binary_relation_exprt(chr, ID_ge, from_integer(0x1D800, chr.type())));
+  const exprt widened = widen_for(chr, 0x1D800);
+  intervals.push_back(binary_relation_exprt(
+    widened, ID_ge, from_integer(0x1D800, widened.type())));
 
   return not_exprt(disjunction(intervals));
 }
