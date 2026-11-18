@@ -264,7 +264,7 @@ codet character_refine_preprocesst::convert_for_digit(conversion_inputt &target)
   typecast_exprt casted_digit(digit, type);
 
   exprt d10=from_integer(10, type);
-  binary_relation_exprt small(casted_digit, ID_le, d10);
+  binary_relation_exprt small(casted_digit, ID_lt, d10);
   plus_exprt value1(casted_digit, from_integer('0', type));
   plus_exprt value2(minus_exprt(casted_digit, d10), from_integer('a', type));
   return code_assignt(result, if_exprt(small, value1, value2));
