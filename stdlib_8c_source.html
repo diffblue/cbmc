@@ -929,242 +929,542 @@ $(function(){initNavTree('stdlib_8c_source.html','',''); });
 <div class="line"><a id="l00795" name="l00795"></a><span class="lineno">  795</span>}</div>
 </div>
 <div class="line"><a id="l00796" name="l00796"></a><span class="lineno">  796</span> </div>
-<div class="line"><a id="l00797" name="l00797"></a><span class="lineno">  797</span><span class="comment">/* FUNCTION: atoi */</span></div>
+<div class="line"><a id="l00797" name="l00797"></a><span class="lineno">  797</span><span class="comment">/* FUNCTION: strtol_l */</span></div>
 <div class="line"><a id="l00798" name="l00798"></a><span class="lineno">  798</span> </div>
-<div class="line"><a id="l00799" name="l00799"></a><span class="lineno">  799</span><span class="preprocessor">#undef atoi</span></div>
-<div class="line"><a id="l00800" name="l00800"></a><span class="lineno">  800</span><span class="preprocessor">#undef strtol</span></div>
-<div class="line"><a id="l00801" name="l00801"></a><span class="lineno">  801</span> </div>
-<div class="line"><a id="l00802" name="l00802"></a><span class="lineno">  802</span><span class="keywordtype">long</span> <a class="code hl_function" href="stdlib_8c.html#a311071298c2fe3e5d7057f396a6acfdc">strtol</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *nptr, <span class="keywordtype">char</span> **endptr, <span class="keywordtype">int</span> base);</div>
+<div class="line"><a id="l00799" name="l00799"></a><span class="lineno">  799</span><span class="comment">// POSIX.1-2024: as strtol, with a locale argument. The conversion of integers</span></div>
+<div class="line"><a id="l00800" name="l00800"></a><span class="lineno">  800</span><span class="comment">// only depends on the locale via the white-space characters, which the model</span></div>
+<div class="line"><a id="l00801" name="l00801"></a><span class="lineno">  801</span><span class="comment">// takes from the &quot;C&quot; locale. libc++ converts integers read by num_get with</span></div>
+<div class="line"><a id="l00802" name="l00802"></a><span class="lineno">  802</span><span class="comment">// strtoll_l and strtoull_l.</span></div>
 <div class="line"><a id="l00803" name="l00803"></a><span class="lineno">  803</span> </div>
-<div class="foldopen" id="foldopen00804" data-start="{" data-end="}">
-<div class="line"><a id="l00804" name="l00804"></a><span class="lineno"><a class="line" href="stdlib_8c.html#ad228deceea1bac4d9f171f647c265059">  804</a></span><span class="keywordtype">int</span> <a class="code hl_function" href="stdlib_8c.html#ad228deceea1bac4d9f171f647c265059">atoi</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *nptr)</div>
-<div class="line"><a id="l00805" name="l00805"></a><span class="lineno">  805</span>{</div>
-<div class="line"><a id="l00806" name="l00806"></a><span class="lineno">  806</span>  __CPROVER_HIDE:;</div>
-<div class="line"><a id="l00807" name="l00807"></a><span class="lineno">  807</span>  <span class="keywordflow">return</span> (<span class="keywordtype">int</span>)<a class="code hl_function" href="stdlib_8c.html#a311071298c2fe3e5d7057f396a6acfdc">strtol</a>(nptr, (<span class="keywordtype">char</span> **)0, 10);</div>
-<div class="line"><a id="l00808" name="l00808"></a><span class="lineno">  808</span>}</div>
+<div class="line"><a id="l00804" name="l00804"></a><span class="lineno">  804</span><span class="preprocessor">#ifndef _WIN32</span></div>
+<div class="line"><a id="l00805" name="l00805"></a><span class="lineno">  805</span> </div>
+<div class="line"><a id="l00806" name="l00806"></a><span class="lineno">  806</span><span class="preprocessor">#  ifndef __CPROVER_LOCALE_H_INCLUDED</span></div>
+<div class="line"><a id="l00807" name="l00807"></a><span class="lineno">  807</span><span class="preprocessor">#    include &lt;locale.h&gt;</span></div>
+<div class="line"><a id="l00808" name="l00808"></a><span class="lineno"><a class="line" href="stdlib_8c.html#a451492de9c0572caa55ea24a56ff9162">  808</a></span><span class="preprocessor">#    define __CPROVER_LOCALE_H_INCLUDED</span></div>
+<div class="line"><a id="l00809" name="l00809"></a><span class="lineno">  809</span><span class="preprocessor">#  endif</span></div>
+<div class="line"><a id="l00810" name="l00810"></a><span class="lineno">  810</span> </div>
+<div class="line"><a id="l00811" name="l00811"></a><span class="lineno">  811</span><span class="preprocessor">#  ifdef __APPLE__</span></div>
+<div class="line"><a id="l00812" name="l00812"></a><span class="lineno">  812</span><span class="preprocessor">#    ifndef __CPROVER_XLOCALE_H_INCLUDED</span></div>
+<div class="line"><a id="l00813" name="l00813"></a><span class="lineno">  813</span><span class="preprocessor">#      include &lt;xlocale.h&gt;</span></div>
+<div class="line"><a id="l00814" name="l00814"></a><span class="lineno">  814</span><span class="preprocessor">#      define __CPROVER_XLOCALE_H_INCLUDED</span></div>
+<div class="line"><a id="l00815" name="l00815"></a><span class="lineno">  815</span><span class="preprocessor">#    endif</span></div>
+<div class="line"><a id="l00816" name="l00816"></a><span class="lineno">  816</span><span class="preprocessor">#  endif</span></div>
+<div class="line"><a id="l00817" name="l00817"></a><span class="lineno">  817</span> </div>
+<div class="line"><a id="l00818" name="l00818"></a><span class="lineno">  818</span><span class="keywordtype">long</span> <a class="code hl_function" href="stdlib_8c.html#a85c61391561ca28b10c032b83326faf6">__CPROVER_strtol_internal</a>(</div>
+<div class="line"><a id="l00819" name="l00819"></a><span class="lineno">  819</span>  <span class="keyword">const</span> <span class="keywordtype">char</span> *nptr,</div>
+<div class="line"><a id="l00820" name="l00820"></a><span class="lineno">  820</span>  <span class="keywordtype">char</span> **endptr,</div>
+<div class="line"><a id="l00821" name="l00821"></a><span class="lineno">  821</span>  <span class="keywordtype">int</span> base,</div>
+<div class="line"><a id="l00822" name="l00822"></a><span class="lineno">  822</span>  _Bool c23);</div>
+<div class="line"><a id="l00823" name="l00823"></a><span class="lineno">  823</span> </div>
+<div class="foldopen" id="foldopen00824" data-start="{" data-end="}">
+<div class="line"><a id="l00824" name="l00824"></a><span class="lineno"><a class="line" href="stdlib_8c.html#a94f8f87df6be969db953d19128381630">  824</a></span><span class="keywordtype">long</span> <a class="code hl_function" href="stdlib_8c.html#a94f8f87df6be969db953d19128381630">strtol_l</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *nptr, <span class="keywordtype">char</span> **endptr, <span class="keywordtype">int</span> base, locale_t loc)</div>
+<div class="line"><a id="l00825" name="l00825"></a><span class="lineno">  825</span>{</div>
+<div class="line"><a id="l00826" name="l00826"></a><span class="lineno">  826</span>__CPROVER_HIDE:;</div>
+<div class="line"><a id="l00827" name="l00827"></a><span class="lineno">  827</span>  (void)loc;</div>
+<div class="line"><a id="l00828" name="l00828"></a><span class="lineno">  828</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="stdlib_8c.html#a85c61391561ca28b10c032b83326faf6">__CPROVER_strtol_internal</a>(nptr, endptr, base, 0);</div>
+<div class="line"><a id="l00829" name="l00829"></a><span class="lineno">  829</span>}</div>
 </div>
-<div class="line"><a id="l00809" name="l00809"></a><span class="lineno">  809</span> </div>
-<div class="line"><a id="l00810" name="l00810"></a><span class="lineno">  810</span><span class="comment">/* FUNCTION: atol */</span></div>
-<div class="line"><a id="l00811" name="l00811"></a><span class="lineno">  811</span> </div>
-<div class="line"><a id="l00812" name="l00812"></a><span class="lineno">  812</span><span class="preprocessor">#undef atol</span></div>
-<div class="line"><a id="l00813" name="l00813"></a><span class="lineno">  813</span><span class="preprocessor">#undef strtol</span></div>
-<div class="line"><a id="l00814" name="l00814"></a><span class="lineno">  814</span> </div>
-<div class="line"><a id="l00815" name="l00815"></a><span class="lineno">  815</span><span class="keywordtype">long</span> <a class="code hl_function" href="stdlib_8c.html#a311071298c2fe3e5d7057f396a6acfdc">strtol</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *nptr, <span class="keywordtype">char</span> **endptr, <span class="keywordtype">int</span> base);</div>
-<div class="line"><a id="l00816" name="l00816"></a><span class="lineno">  816</span> </div>
-<div class="foldopen" id="foldopen00817" data-start="{" data-end="}">
-<div class="line"><a id="l00817" name="l00817"></a><span class="lineno"><a class="line" href="stdlib_8c.html#a185551efd32d058ef290ebe2d144219f">  817</a></span><span class="keywordtype">long</span> <a class="code hl_function" href="stdlib_8c.html#a185551efd32d058ef290ebe2d144219f">atol</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *nptr)</div>
-<div class="line"><a id="l00818" name="l00818"></a><span class="lineno">  818</span>{</div>
-<div class="line"><a id="l00819" name="l00819"></a><span class="lineno">  819</span>  __CPROVER_HIDE:;</div>
-<div class="line"><a id="l00820" name="l00820"></a><span class="lineno">  820</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="stdlib_8c.html#a311071298c2fe3e5d7057f396a6acfdc">strtol</a>(nptr, (<span class="keywordtype">char</span> **)0, 10);</div>
-<div class="line"><a id="l00821" name="l00821"></a><span class="lineno">  821</span>}</div>
-</div>
-<div class="line"><a id="l00822" name="l00822"></a><span class="lineno">  822</span> </div>
-<div class="line"><a id="l00823" name="l00823"></a><span class="lineno">  823</span><span class="comment">/* FUNCTION: getenv */</span></div>
-<div class="line"><a id="l00824" name="l00824"></a><span class="lineno">  824</span> </div>
-<div class="line"><a id="l00825" name="l00825"></a><span class="lineno">  825</span><span class="preprocessor">#undef getenv</span></div>
-<div class="line"><a id="l00826" name="l00826"></a><span class="lineno">  826</span> </div>
-<div class="line"><a id="l00827" name="l00827"></a><span class="lineno">  827</span><span class="preprocessor">#ifndef __CPROVER_STDDEF_H_INCLUDED</span></div>
-<div class="line"><a id="l00828" name="l00828"></a><span class="lineno">  828</span><span class="preprocessor">#  include &lt;stddef.h&gt;</span></div>
-<div class="line"><a id="l00829" name="l00829"></a><span class="lineno"><a class="line" href="stdlib_8c.html#a75f4ddb89445a1e78e51ef43d128ce5f">  829</a></span><span class="preprocessor">#  define __CPROVER_STDDEF_H_INCLUDED</span></div>
-<div class="line"><a id="l00830" name="l00830"></a><span class="lineno">  830</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l00831" name="l00831"></a><span class="lineno">  831</span> </div>
-<div class="line"><a id="l00832" name="l00832"></a><span class="lineno">  832</span>__CPROVER_bool <a class="code hl_function" href="stdlib_8c.html#a8cb534abb228896759dded0be6ac4351">__VERIFIER_nondet___CPROVER_bool</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a id="l00833" name="l00833"></a><span class="lineno"><a class="line" href="stdlib_8c.html#ac7eae8dd2e24285c5410fce64db23515">  833</a></span>ptrdiff_t <a class="code hl_function" href="stdlib_8c.html#ac7eae8dd2e24285c5410fce64db23515">__VERIFIER_nondet_ptrdiff_t</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a id="l00830" name="l00830"></a><span class="lineno">  830</span> </div>
+<div class="line"><a id="l00831" name="l00831"></a><span class="lineno">  831</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00832" name="l00832"></a><span class="lineno">  832</span> </div>
+<div class="line"><a id="l00833" name="l00833"></a><span class="lineno">  833</span><span class="comment">/* FUNCTION: __isoc23_strtol_l */</span></div>
 <div class="line"><a id="l00834" name="l00834"></a><span class="lineno">  834</span> </div>
-<div class="foldopen" id="foldopen00835" data-start="{" data-end="}">
-<div class="line"><a id="l00835" name="l00835"></a><span class="lineno"><a class="line" href="stdlib_8c.html#ab1ec8cf93b9478de49bb3e77465ab4af">  835</a></span><span class="keywordtype">char</span> *<a class="code hl_function" href="stdlib_8c.html#ab1ec8cf93b9478de49bb3e77465ab4af">getenv</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *name)</div>
-<div class="line"><a id="l00836" name="l00836"></a><span class="lineno">  836</span>{</div>
-<div class="line"><a id="l00837" name="l00837"></a><span class="lineno">  837</span>  __CPROVER_HIDE:;</div>
-<div class="line"><a id="l00838" name="l00838"></a><span class="lineno">  838</span> </div>
-<div class="line"><a id="l00839" name="l00839"></a><span class="lineno">  839</span>  (void)*name;</div>
-<div class="line"><a id="l00840" name="l00840"></a><span class="lineno">  840</span><span class="preprocessor">  #ifdef __CPROVER_STRING_ABSTRACTION</span></div>
-<div class="line"><a id="l00841" name="l00841"></a><span class="lineno">  841</span>  <a class="code hl_function" href="cprover__builtin__headers_8h.html#a9e05c8aeb35905c38bd7bcdb78145dae">__CPROVER_precondition</a>(<a class="code hl_function" href="cprover__builtin__headers_8h.html#ac580a358f798722e5dfa5ed3ede23b11">__CPROVER_is_zero_string</a>(name),</div>
-<div class="line"><a id="l00842" name="l00842"></a><span class="lineno">  842</span>    <span class="stringliteral">&quot;zero-termination of argument of getenv&quot;</span>);</div>
-<div class="line"><a id="l00843" name="l00843"></a><span class="lineno">  843</span><span class="preprocessor">  #endif</span></div>
+<div class="line"><a id="l00835" name="l00835"></a><span class="lineno">  835</span><span class="comment">// glibc 2.38 and later redirect strtol_l to this function in C23 mode, with</span></div>
+<div class="line"><a id="l00836" name="l00836"></a><span class="lineno">  836</span><span class="comment">// _GNU_SOURCE, and in C++. Unlike strtol_l, it accepts the C23 &quot;0b&quot; prefix.</span></div>
+<div class="line"><a id="l00837" name="l00837"></a><span class="lineno">  837</span> </div>
+<div class="line"><a id="l00838" name="l00838"></a><span class="lineno">  838</span><span class="preprocessor">#ifndef _WIN32</span></div>
+<div class="line"><a id="l00839" name="l00839"></a><span class="lineno">  839</span> </div>
+<div class="line"><a id="l00840" name="l00840"></a><span class="lineno">  840</span><span class="preprocessor">#  ifndef __CPROVER_LOCALE_H_INCLUDED</span></div>
+<div class="line"><a id="l00841" name="l00841"></a><span class="lineno">  841</span><span class="preprocessor">#    include &lt;locale.h&gt;</span></div>
+<div class="line"><a id="l00842" name="l00842"></a><span class="lineno">  842</span><span class="preprocessor">#    define __CPROVER_LOCALE_H_INCLUDED</span></div>
+<div class="line"><a id="l00843" name="l00843"></a><span class="lineno">  843</span><span class="preprocessor">#  endif</span></div>
 <div class="line"><a id="l00844" name="l00844"></a><span class="lineno">  844</span> </div>
-<div class="line"><a id="l00845" name="l00845"></a><span class="lineno">  845</span><span class="preprocessor">#ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS</span></div>
-<div class="line"><a id="l00846" name="l00846"></a><span class="lineno">  846</span>  __CPROVER_event(<span class="stringliteral">&quot;invalidate_pointer&quot;</span>, <span class="stringliteral">&quot;getenv_result&quot;</span>);</div>
-<div class="line"><a id="l00847" name="l00847"></a><span class="lineno">  847</span>  <span class="keywordtype">char</span> *getenv_result;</div>
-<div class="line"><a id="l00848" name="l00848"></a><span class="lineno">  848</span>  <a class="code hl_function" href="cprover__builtin__headers_8h.html#ad3a2aedad97977b64290f8141eed690c">__CPROVER_set_must</a>(getenv_result, <span class="stringliteral">&quot;getenv_result&quot;</span>);</div>
-<div class="line"><a id="l00849" name="l00849"></a><span class="lineno">  849</span>  <span class="keywordflow">return</span> getenv_result;</div>
-<div class="line"><a id="l00850" name="l00850"></a><span class="lineno">  850</span> </div>
-<div class="line"><a id="l00851" name="l00851"></a><span class="lineno">  851</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00852" name="l00852"></a><span class="lineno">  852</span> </div>
-<div class="line"><a id="l00853" name="l00853"></a><span class="lineno">  853</span>  __CPROVER_bool found=<a class="code hl_function" href="stdlib_8c.html#a8cb534abb228896759dded0be6ac4351">__VERIFIER_nondet___CPROVER_bool</a>();</div>
-<div class="line"><a id="l00854" name="l00854"></a><span class="lineno">  854</span>  <span class="keywordflow">if</span>(!found) <span class="keywordflow">return</span> 0;</div>
-<div class="line"><a id="l00855" name="l00855"></a><span class="lineno">  855</span> </div>
-<div class="line"><a id="l00856" name="l00856"></a><span class="lineno">  856</span>  ptrdiff_t buf_size = <a class="code hl_function" href="stdlib_8c.html#ac7eae8dd2e24285c5410fce64db23515">__VERIFIER_nondet_ptrdiff_t</a>();</div>
+<div class="line"><a id="l00845" name="l00845"></a><span class="lineno">  845</span><span class="preprocessor">#  ifdef __APPLE__</span></div>
+<div class="line"><a id="l00846" name="l00846"></a><span class="lineno">  846</span><span class="preprocessor">#    ifndef __CPROVER_XLOCALE_H_INCLUDED</span></div>
+<div class="line"><a id="l00847" name="l00847"></a><span class="lineno">  847</span><span class="preprocessor">#      include &lt;xlocale.h&gt;</span></div>
+<div class="line"><a id="l00848" name="l00848"></a><span class="lineno">  848</span><span class="preprocessor">#      define __CPROVER_XLOCALE_H_INCLUDED</span></div>
+<div class="line"><a id="l00849" name="l00849"></a><span class="lineno">  849</span><span class="preprocessor">#    endif</span></div>
+<div class="line"><a id="l00850" name="l00850"></a><span class="lineno">  850</span><span class="preprocessor">#  endif</span></div>
+<div class="line"><a id="l00851" name="l00851"></a><span class="lineno">  851</span> </div>
+<div class="line"><a id="l00852" name="l00852"></a><span class="lineno">  852</span><span class="keywordtype">long</span> <a class="code hl_function" href="stdlib_8c.html#a85c61391561ca28b10c032b83326faf6">__CPROVER_strtol_internal</a>(</div>
+<div class="line"><a id="l00853" name="l00853"></a><span class="lineno">  853</span>  <span class="keyword">const</span> <span class="keywordtype">char</span> *nptr,</div>
+<div class="line"><a id="l00854" name="l00854"></a><span class="lineno">  854</span>  <span class="keywordtype">char</span> **endptr,</div>
+<div class="line"><a id="l00855" name="l00855"></a><span class="lineno">  855</span>  <span class="keywordtype">int</span> base,</div>
+<div class="line"><a id="l00856" name="l00856"></a><span class="lineno">  856</span>  _Bool c23);</div>
 <div class="line"><a id="l00857" name="l00857"></a><span class="lineno">  857</span> </div>
-<div class="line"><a id="l00858" name="l00858"></a><span class="lineno">  858</span>  <span class="comment">// It&#39;s reasonable to assume this won&#39;t exceed the signed</span></div>
-<div class="line"><a id="l00859" name="l00859"></a><span class="lineno">  859</span>  <span class="comment">// range in practice, but in principle, this could exceed</span></div>
-<div class="line"><a id="l00860" name="l00860"></a><span class="lineno">  860</span>  <span class="comment">// the range.</span></div>
-<div class="line"><a id="l00861" name="l00861"></a><span class="lineno">  861</span> </div>
-<div class="line"><a id="l00862" name="l00862"></a><span class="lineno">  862</span>  <a class="code hl_function" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(buf_size &gt;= 1);</div>
-<div class="line"><a id="l00863" name="l00863"></a><span class="lineno">  863</span>  <span class="keywordtype">char</span> *buffer = (<span class="keywordtype">char</span> *)<a class="code hl_function" href="ansi-c_2library_2cprover_8h.html#a39d7421bc1364fd1101bef751362f9d6">__CPROVER_allocate</a>(buf_size * <span class="keyword">sizeof</span>(<span class="keywordtype">char</span>), 0);</div>
-<div class="line"><a id="l00864" name="l00864"></a><span class="lineno">  864</span>  buffer[buf_size-1]=0;</div>
-<div class="line"><a id="l00865" name="l00865"></a><span class="lineno">  865</span> </div>
-<div class="line"><a id="l00866" name="l00866"></a><span class="lineno">  866</span><span class="preprocessor">#  ifdef __CPROVER_STRING_ABSTRACTION</span></div>
-<div class="line"><a id="l00867" name="l00867"></a><span class="lineno">  867</span>  <a class="code hl_function" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(<a class="code hl_function" href="cprover__builtin__headers_8h.html#a00109de552d5ffc4e206a729dffb2b58">__CPROVER_buffer_size</a>(buffer) == buf_size);</div>
-<div class="line"><a id="l00868" name="l00868"></a><span class="lineno">  868</span>  <a class="code hl_function" href="cprover__builtin__headers_8h.html#ac580a358f798722e5dfa5ed3ede23b11">__CPROVER_is_zero_string</a>(buffer) = 1;</div>
-<div class="line"><a id="l00869" name="l00869"></a><span class="lineno">  869</span>  <a class="code hl_function" href="cprover__builtin__headers_8h.html#a85d3c5a542e78b671377625ec9e0e42a">__CPROVER_zero_string_length</a>(buffer) = buf_size - 1;</div>
-<div class="line"><a id="l00870" name="l00870"></a><span class="lineno">  870</span><span class="preprocessor">#  endif</span></div>
-<div class="line"><a id="l00871" name="l00871"></a><span class="lineno">  871</span> </div>
-<div class="line"><a id="l00872" name="l00872"></a><span class="lineno">  872</span>  <span class="keywordflow">return</span> buffer;</div>
-<div class="line"><a id="l00873" name="l00873"></a><span class="lineno">  873</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l00874" name="l00874"></a><span class="lineno">  874</span>}</div>
+<div class="foldopen" id="foldopen00858" data-start="{" data-end="}">
+<div class="line"><a id="l00858" name="l00858"></a><span class="lineno"><a class="line" href="stdlib_8c.html#ad02f083bf7d0c509aa6a2f7eb2e610b1">  858</a></span><span class="keywordtype">long</span> <a class="code hl_function" href="stdlib_8c.html#ad02f083bf7d0c509aa6a2f7eb2e610b1">__isoc23_strtol_l</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *nptr, <span class="keywordtype">char</span> **endptr, <span class="keywordtype">int</span> base, locale_t loc)</div>
+<div class="line"><a id="l00859" name="l00859"></a><span class="lineno">  859</span>{</div>
+<div class="line"><a id="l00860" name="l00860"></a><span class="lineno">  860</span>__CPROVER_HIDE:;</div>
+<div class="line"><a id="l00861" name="l00861"></a><span class="lineno">  861</span>  (void)loc;</div>
+<div class="line"><a id="l00862" name="l00862"></a><span class="lineno">  862</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="stdlib_8c.html#a85c61391561ca28b10c032b83326faf6">__CPROVER_strtol_internal</a>(nptr, endptr, base, 1);</div>
+<div class="line"><a id="l00863" name="l00863"></a><span class="lineno">  863</span>}</div>
 </div>
+<div class="line"><a id="l00864" name="l00864"></a><span class="lineno">  864</span> </div>
+<div class="line"><a id="l00865" name="l00865"></a><span class="lineno">  865</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00866" name="l00866"></a><span class="lineno">  866</span> </div>
+<div class="line"><a id="l00867" name="l00867"></a><span class="lineno">  867</span><span class="comment">/* FUNCTION: strtoul_l */</span></div>
+<div class="line"><a id="l00868" name="l00868"></a><span class="lineno">  868</span> </div>
+<div class="line"><a id="l00869" name="l00869"></a><span class="lineno">  869</span><span class="comment">// POSIX.1-2024: as strtoul, with a locale argument. The conversion of integers</span></div>
+<div class="line"><a id="l00870" name="l00870"></a><span class="lineno">  870</span><span class="comment">// only depends on the locale via the white-space characters, which the model</span></div>
+<div class="line"><a id="l00871" name="l00871"></a><span class="lineno">  871</span><span class="comment">// takes from the &quot;C&quot; locale. libc++ converts integers read by num_get with</span></div>
+<div class="line"><a id="l00872" name="l00872"></a><span class="lineno">  872</span><span class="comment">// strtoll_l and strtoull_l.</span></div>
+<div class="line"><a id="l00873" name="l00873"></a><span class="lineno">  873</span> </div>
+<div class="line"><a id="l00874" name="l00874"></a><span class="lineno">  874</span><span class="preprocessor">#ifndef _WIN32</span></div>
 <div class="line"><a id="l00875" name="l00875"></a><span class="lineno">  875</span> </div>
-<div class="line"><a id="l00876" name="l00876"></a><span class="lineno">  876</span><span class="comment">/* FUNCTION: realloc */</span></div>
-<div class="line"><a id="l00877" name="l00877"></a><span class="lineno">  877</span> </div>
-<div class="line"><a id="l00878" name="l00878"></a><span class="lineno">  878</span><span class="keywordtype">void</span> *<a class="code hl_function" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a>(__CPROVER_size_t malloc_size);</div>
-<div class="line"><a id="l00879" name="l00879"></a><span class="lineno">  879</span><span class="keywordtype">void</span> <a class="code hl_function" href="stdlib_8c.html#afbedc913aa4651b3c3b4b3aecd9b4711">free</a>(<span class="keywordtype">void</span> *ptr);</div>
+<div class="line"><a id="l00876" name="l00876"></a><span class="lineno">  876</span><span class="preprocessor">#  ifndef __CPROVER_LOCALE_H_INCLUDED</span></div>
+<div class="line"><a id="l00877" name="l00877"></a><span class="lineno">  877</span><span class="preprocessor">#    include &lt;locale.h&gt;</span></div>
+<div class="line"><a id="l00878" name="l00878"></a><span class="lineno">  878</span><span class="preprocessor">#    define __CPROVER_LOCALE_H_INCLUDED</span></div>
+<div class="line"><a id="l00879" name="l00879"></a><span class="lineno">  879</span><span class="preprocessor">#  endif</span></div>
 <div class="line"><a id="l00880" name="l00880"></a><span class="lineno">  880</span> </div>
-<div class="foldopen" id="foldopen00881" data-start="{" data-end="}">
-<div class="line"><a id="l00881" name="l00881"></a><span class="lineno"><a class="line" href="stdlib_8c.html#aed52b7297948c8be2727c9383e29077b">  881</a></span><span class="keywordtype">void</span> *<a class="code hl_function" href="stdlib_8c.html#aed52b7297948c8be2727c9383e29077b">realloc</a>(<span class="keywordtype">void</span> *ptr, __CPROVER_size_t malloc_size)</div>
-<div class="line"><a id="l00882" name="l00882"></a><span class="lineno">  882</span>{</div>
-<div class="line"><a id="l00883" name="l00883"></a><span class="lineno">  883</span>  __CPROVER_HIDE:;</div>
-<div class="line"><a id="l00884" name="l00884"></a><span class="lineno">  884</span> </div>
-<div class="line"><a id="l00885" name="l00885"></a><span class="lineno">  885</span>  <a class="code hl_function" href="cprover__builtin__headers_8h.html#a9e05c8aeb35905c38bd7bcdb78145dae">__CPROVER_precondition</a>(ptr==0 || <a class="code hl_function" href="cprover__builtin__headers_8h.html#ada85b7fd94e31925350fe3f725b7f7bc">__CPROVER_DYNAMIC_OBJECT</a>(ptr),</div>
-<div class="line"><a id="l00886" name="l00886"></a><span class="lineno">  886</span>                         <span class="stringliteral">&quot;realloc argument is dynamic object&quot;</span>);</div>
+<div class="line"><a id="l00881" name="l00881"></a><span class="lineno">  881</span><span class="preprocessor">#  ifdef __APPLE__</span></div>
+<div class="line"><a id="l00882" name="l00882"></a><span class="lineno">  882</span><span class="preprocessor">#    ifndef __CPROVER_XLOCALE_H_INCLUDED</span></div>
+<div class="line"><a id="l00883" name="l00883"></a><span class="lineno">  883</span><span class="preprocessor">#      include &lt;xlocale.h&gt;</span></div>
+<div class="line"><a id="l00884" name="l00884"></a><span class="lineno">  884</span><span class="preprocessor">#      define __CPROVER_XLOCALE_H_INCLUDED</span></div>
+<div class="line"><a id="l00885" name="l00885"></a><span class="lineno">  885</span><span class="preprocessor">#    endif</span></div>
+<div class="line"><a id="l00886" name="l00886"></a><span class="lineno">  886</span><span class="preprocessor">#  endif</span></div>
 <div class="line"><a id="l00887" name="l00887"></a><span class="lineno">  887</span> </div>
-<div class="line"><a id="l00888" name="l00888"></a><span class="lineno">  888</span>  <span class="comment">// if ptr is NULL, this behaves like malloc</span></div>
-<div class="line"><a id="l00889" name="l00889"></a><span class="lineno">  889</span>  <span class="keywordflow">if</span>(ptr==0)</div>
-<div class="line"><a id="l00890" name="l00890"></a><span class="lineno">  890</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a>(malloc_size);</div>
-<div class="line"><a id="l00891" name="l00891"></a><span class="lineno">  891</span> </div>
-<div class="line"><a id="l00892" name="l00892"></a><span class="lineno">  892</span>  <span class="comment">// if malloc-size is 0, allocate new minimum sized object</span></div>
-<div class="line"><a id="l00893" name="l00893"></a><span class="lineno">  893</span>  <span class="comment">// and free original</span></div>
-<div class="line"><a id="l00894" name="l00894"></a><span class="lineno">  894</span>  <span class="keywordflow">if</span>(malloc_size==0)</div>
-<div class="line"><a id="l00895" name="l00895"></a><span class="lineno">  895</span>  {</div>
-<div class="line"><a id="l00896" name="l00896"></a><span class="lineno">  896</span>    <a class="code hl_function" href="stdlib_8c.html#afbedc913aa4651b3c3b4b3aecd9b4711">free</a>(ptr);</div>
-<div class="line"><a id="l00897" name="l00897"></a><span class="lineno">  897</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a>(0);</div>
-<div class="line"><a id="l00898" name="l00898"></a><span class="lineno">  898</span>  }</div>
-<div class="line"><a id="l00899" name="l00899"></a><span class="lineno">  899</span> </div>
-<div class="line"><a id="l00900" name="l00900"></a><span class="lineno">  900</span>  <span class="comment">// this shouldn&#39;t move if the new size isn&#39;t bigger</span></div>
-<div class="line"><a id="l00901" name="l00901"></a><span class="lineno">  901</span>  <span class="keywordtype">void</span> *res;</div>
-<div class="line"><a id="l00902" name="l00902"></a><span class="lineno">  902</span>  res=<a class="code hl_function" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a>(malloc_size);</div>
-<div class="line"><a id="l00903" name="l00903"></a><span class="lineno">  903</span>  <span class="keywordflow">if</span>(res != (<span class="keywordtype">void</span> *)0)</div>
-<div class="line"><a id="l00904" name="l00904"></a><span class="lineno">  904</span>  {</div>
-<div class="line"><a id="l00905" name="l00905"></a><span class="lineno">  905</span>    <a class="code hl_function" href="cprover__builtin__headers_8h.html#aec7a559f3ba9abb05c2b79537811402f">__CPROVER_array_copy</a>(res, ptr);</div>
-<div class="line"><a id="l00906" name="l00906"></a><span class="lineno">  906</span>    <a class="code hl_function" href="stdlib_8c.html#afbedc913aa4651b3c3b4b3aecd9b4711">free</a>(ptr);</div>
-<div class="line"><a id="l00907" name="l00907"></a><span class="lineno">  907</span>  }</div>
-<div class="line"><a id="l00908" name="l00908"></a><span class="lineno">  908</span> </div>
-<div class="line"><a id="l00909" name="l00909"></a><span class="lineno">  909</span>  <span class="keywordflow">return</span> res;</div>
-<div class="line"><a id="l00910" name="l00910"></a><span class="lineno">  910</span>}</div>
+<div class="line"><a id="l00888" name="l00888"></a><span class="lineno">  888</span><span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <a class="code hl_function" href="stdlib_8c.html#a6754aab356fd18e145bf8af1526b24a3">__CPROVER_strtoul_internal</a>(</div>
+<div class="line"><a id="l00889" name="l00889"></a><span class="lineno">  889</span>  <span class="keyword">const</span> <span class="keywordtype">char</span> *nptr,</div>
+<div class="line"><a id="l00890" name="l00890"></a><span class="lineno">  890</span>  <span class="keywordtype">char</span> **endptr,</div>
+<div class="line"><a id="l00891" name="l00891"></a><span class="lineno">  891</span>  <span class="keywordtype">int</span> base,</div>
+<div class="line"><a id="l00892" name="l00892"></a><span class="lineno">  892</span>  _Bool c23);</div>
+<div class="line"><a id="l00893" name="l00893"></a><span class="lineno">  893</span> </div>
+<div class="foldopen" id="foldopen00894" data-start="{" data-end="}">
+<div class="line"><a id="l00894" name="l00894"></a><span class="lineno"><a class="line" href="stdlib_8c.html#ad9da9d487f9ef6ba14447c89f392885f">  894</a></span><span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <a class="code hl_function" href="stdlib_8c.html#ad9da9d487f9ef6ba14447c89f392885f">strtoul_l</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *nptr, <span class="keywordtype">char</span> **endptr, <span class="keywordtype">int</span> base, locale_t loc)</div>
+<div class="line"><a id="l00895" name="l00895"></a><span class="lineno">  895</span>{</div>
+<div class="line"><a id="l00896" name="l00896"></a><span class="lineno">  896</span>__CPROVER_HIDE:;</div>
+<div class="line"><a id="l00897" name="l00897"></a><span class="lineno">  897</span>  (void)loc;</div>
+<div class="line"><a id="l00898" name="l00898"></a><span class="lineno">  898</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="stdlib_8c.html#a6754aab356fd18e145bf8af1526b24a3">__CPROVER_strtoul_internal</a>(nptr, endptr, base, 0);</div>
+<div class="line"><a id="l00899" name="l00899"></a><span class="lineno">  899</span>}</div>
 </div>
-<div class="line"><a id="l00911" name="l00911"></a><span class="lineno">  911</span> </div>
-<div class="line"><a id="l00912" name="l00912"></a><span class="lineno">  912</span><span class="comment">/* FUNCTION: valloc */</span></div>
-<div class="line"><a id="l00913" name="l00913"></a><span class="lineno">  913</span> </div>
-<div class="line"><a id="l00914" name="l00914"></a><span class="lineno">  914</span><span class="keywordtype">void</span> *<a class="code hl_function" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a>(__CPROVER_size_t malloc_size);</div>
-<div class="line"><a id="l00915" name="l00915"></a><span class="lineno">  915</span> </div>
-<div class="foldopen" id="foldopen00916" data-start="{" data-end="}">
-<div class="line"><a id="l00916" name="l00916"></a><span class="lineno"><a class="line" href="stdlib_8c.html#a65c45dbbff309982f14adb06fda0edc5">  916</a></span><span class="keywordtype">void</span> *<a class="code hl_function" href="stdlib_8c.html#a65c45dbbff309982f14adb06fda0edc5">valloc</a>(__CPROVER_size_t malloc_size)</div>
-<div class="line"><a id="l00917" name="l00917"></a><span class="lineno">  917</span>{</div>
-<div class="line"><a id="l00918" name="l00918"></a><span class="lineno">  918</span>  <span class="comment">// The allocated memory is aligned on a page</span></div>
-<div class="line"><a id="l00919" name="l00919"></a><span class="lineno">  919</span>  <span class="comment">// boundary, which we don&#39;t model.</span></div>
-<div class="line"><a id="l00920" name="l00920"></a><span class="lineno">  920</span> </div>
-<div class="line"><a id="l00921" name="l00921"></a><span class="lineno">  921</span>  __CPROVER_HIDE:;</div>
-<div class="line"><a id="l00922" name="l00922"></a><span class="lineno">  922</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a>(malloc_size);</div>
-<div class="line"><a id="l00923" name="l00923"></a><span class="lineno">  923</span>}</div>
+<div class="line"><a id="l00900" name="l00900"></a><span class="lineno">  900</span> </div>
+<div class="line"><a id="l00901" name="l00901"></a><span class="lineno">  901</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00902" name="l00902"></a><span class="lineno">  902</span> </div>
+<div class="line"><a id="l00903" name="l00903"></a><span class="lineno">  903</span><span class="comment">/* FUNCTION: __isoc23_strtoul_l */</span></div>
+<div class="line"><a id="l00904" name="l00904"></a><span class="lineno">  904</span> </div>
+<div class="line"><a id="l00905" name="l00905"></a><span class="lineno">  905</span><span class="comment">// glibc 2.38 and later redirect strtoul_l to this function in C23 mode, with</span></div>
+<div class="line"><a id="l00906" name="l00906"></a><span class="lineno">  906</span><span class="comment">// _GNU_SOURCE, and in C++. Unlike strtoul_l, it accepts the C23 &quot;0b&quot; prefix.</span></div>
+<div class="line"><a id="l00907" name="l00907"></a><span class="lineno">  907</span> </div>
+<div class="line"><a id="l00908" name="l00908"></a><span class="lineno">  908</span><span class="preprocessor">#ifndef _WIN32</span></div>
+<div class="line"><a id="l00909" name="l00909"></a><span class="lineno">  909</span> </div>
+<div class="line"><a id="l00910" name="l00910"></a><span class="lineno">  910</span><span class="preprocessor">#  ifndef __CPROVER_LOCALE_H_INCLUDED</span></div>
+<div class="line"><a id="l00911" name="l00911"></a><span class="lineno">  911</span><span class="preprocessor">#    include &lt;locale.h&gt;</span></div>
+<div class="line"><a id="l00912" name="l00912"></a><span class="lineno">  912</span><span class="preprocessor">#    define __CPROVER_LOCALE_H_INCLUDED</span></div>
+<div class="line"><a id="l00913" name="l00913"></a><span class="lineno">  913</span><span class="preprocessor">#  endif</span></div>
+<div class="line"><a id="l00914" name="l00914"></a><span class="lineno">  914</span> </div>
+<div class="line"><a id="l00915" name="l00915"></a><span class="lineno">  915</span><span class="preprocessor">#  ifdef __APPLE__</span></div>
+<div class="line"><a id="l00916" name="l00916"></a><span class="lineno">  916</span><span class="preprocessor">#    ifndef __CPROVER_XLOCALE_H_INCLUDED</span></div>
+<div class="line"><a id="l00917" name="l00917"></a><span class="lineno">  917</span><span class="preprocessor">#      include &lt;xlocale.h&gt;</span></div>
+<div class="line"><a id="l00918" name="l00918"></a><span class="lineno">  918</span><span class="preprocessor">#      define __CPROVER_XLOCALE_H_INCLUDED</span></div>
+<div class="line"><a id="l00919" name="l00919"></a><span class="lineno">  919</span><span class="preprocessor">#    endif</span></div>
+<div class="line"><a id="l00920" name="l00920"></a><span class="lineno">  920</span><span class="preprocessor">#  endif</span></div>
+<div class="line"><a id="l00921" name="l00921"></a><span class="lineno">  921</span> </div>
+<div class="line"><a id="l00922" name="l00922"></a><span class="lineno">  922</span><span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <a class="code hl_function" href="stdlib_8c.html#a6754aab356fd18e145bf8af1526b24a3">__CPROVER_strtoul_internal</a>(</div>
+<div class="line"><a id="l00923" name="l00923"></a><span class="lineno">  923</span>  <span class="keyword">const</span> <span class="keywordtype">char</span> *nptr,</div>
+<div class="line"><a id="l00924" name="l00924"></a><span class="lineno">  924</span>  <span class="keywordtype">char</span> **endptr,</div>
+<div class="line"><a id="l00925" name="l00925"></a><span class="lineno">  925</span>  <span class="keywordtype">int</span> base,</div>
+<div class="line"><a id="l00926" name="l00926"></a><span class="lineno">  926</span>  _Bool c23);</div>
+<div class="line"><a id="l00927" name="l00927"></a><span class="lineno">  927</span> </div>
+<div class="line"><a id="l00928" name="l00928"></a><span class="lineno">  928</span><span class="keywordtype">unsigned</span> <span class="keywordtype">long</span></div>
+<div class="foldopen" id="foldopen00929" data-start="{" data-end="}">
+<div class="line"><a id="l00929" name="l00929"></a><span class="lineno"><a class="line" href="stdlib_8c.html#a72d5533459e5ff45950a302f18c98100">  929</a></span><a class="code hl_function" href="stdlib_8c.html#a72d5533459e5ff45950a302f18c98100">__isoc23_strtoul_l</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *nptr, <span class="keywordtype">char</span> **endptr, <span class="keywordtype">int</span> base, locale_t loc)</div>
+<div class="line"><a id="l00930" name="l00930"></a><span class="lineno">  930</span>{</div>
+<div class="line"><a id="l00931" name="l00931"></a><span class="lineno">  931</span>__CPROVER_HIDE:;</div>
+<div class="line"><a id="l00932" name="l00932"></a><span class="lineno">  932</span>  (void)loc;</div>
+<div class="line"><a id="l00933" name="l00933"></a><span class="lineno">  933</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="stdlib_8c.html#a6754aab356fd18e145bf8af1526b24a3">__CPROVER_strtoul_internal</a>(nptr, endptr, base, 1);</div>
+<div class="line"><a id="l00934" name="l00934"></a><span class="lineno">  934</span>}</div>
 </div>
-<div class="line"><a id="l00924" name="l00924"></a><span class="lineno">  924</span> </div>
-<div class="line"><a id="l00925" name="l00925"></a><span class="lineno">  925</span><span class="comment">/* FUNCTION: posix_memalign */</span></div>
-<div class="line"><a id="l00926" name="l00926"></a><span class="lineno">  926</span> </div>
-<div class="line"><a id="l00927" name="l00927"></a><span class="lineno">  927</span><span class="preprocessor">#ifndef __CPROVER_ERRNO_H_INCLUDED</span></div>
-<div class="line"><a id="l00928" name="l00928"></a><span class="lineno">  928</span><span class="preprocessor">#include &lt;errno.h&gt;</span></div>
-<div class="line"><a id="l00929" name="l00929"></a><span class="lineno">  929</span><span class="preprocessor">#define __CPROVER_ERRNO_H_INCLUDED</span></div>
-<div class="line"><a id="l00930" name="l00930"></a><span class="lineno">  930</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l00931" name="l00931"></a><span class="lineno">  931</span> </div>
-<div class="line"><a id="l00932" name="l00932"></a><span class="lineno">  932</span><span class="preprocessor">#undef posix_memalign</span></div>
-<div class="line"><a id="l00933" name="l00933"></a><span class="lineno">  933</span> </div>
-<div class="line"><a id="l00934" name="l00934"></a><span class="lineno">  934</span><span class="keywordtype">void</span> *<a class="code hl_function" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a>(__CPROVER_size_t malloc_size);</div>
-<div class="foldopen" id="foldopen00935" data-start="{" data-end="}">
-<div class="line"><a id="l00935" name="l00935"></a><span class="lineno"><a class="line" href="stdlib_8c.html#a25039dc7d1ee0131ad097abd4e9ce3d9">  935</a></span><span class="keywordtype">int</span> <a class="code hl_function" href="stdlib_8c.html#a25039dc7d1ee0131ad097abd4e9ce3d9">posix_memalign</a>(</div>
-<div class="line"><a id="l00936" name="l00936"></a><span class="lineno">  936</span>  <span class="keywordtype">void</span> **ptr,</div>
-<div class="line"><a id="l00937" name="l00937"></a><span class="lineno">  937</span>  __CPROVER_size_t <a class="code hl_function" href="padding_8cpp.html#ac8121cb248deefe3df1e974127851740">alignment</a>,</div>
-<div class="line"><a id="l00938" name="l00938"></a><span class="lineno">  938</span>  __CPROVER_size_t size)</div>
-<div class="line"><a id="l00939" name="l00939"></a><span class="lineno">  939</span>{</div>
-<div class="line"><a id="l00940" name="l00940"></a><span class="lineno">  940</span>__CPROVER_HIDE:;</div>
-<div class="line"><a id="l00941" name="l00941"></a><span class="lineno">  941</span> </div>
-<div class="line"><a id="l00942" name="l00942"></a><span class="lineno">  942</span>  __CPROVER_size_t multiplier = <a class="code hl_function" href="padding_8cpp.html#ac8121cb248deefe3df1e974127851740">alignment</a> / <span class="keyword">sizeof</span>(<span class="keywordtype">void</span> *);</div>
-<div class="line"><a id="l00943" name="l00943"></a><span class="lineno">  943</span>  <span class="comment">// Modeling the posix_memalign checks on alignment.</span></div>
-<div class="line"><a id="l00944" name="l00944"></a><span class="lineno">  944</span>  <span class="keywordflow">if</span>(</div>
-<div class="line"><a id="l00945" name="l00945"></a><span class="lineno">  945</span>    <a class="code hl_function" href="padding_8cpp.html#ac8121cb248deefe3df1e974127851740">alignment</a> % <span class="keyword">sizeof</span>(<span class="keywordtype">void</span> *) != 0 || ((multiplier) &amp; (multiplier - 1)) != 0 ||</div>
-<div class="line"><a id="l00946" name="l00946"></a><span class="lineno">  946</span>    <a class="code hl_function" href="padding_8cpp.html#ac8121cb248deefe3df1e974127851740">alignment</a> == 0)</div>
-<div class="line"><a id="l00947" name="l00947"></a><span class="lineno">  947</span>  {</div>
-<div class="line"><a id="l00948" name="l00948"></a><span class="lineno">  948</span>    <span class="keywordflow">return</span> EINVAL;</div>
-<div class="line"><a id="l00949" name="l00949"></a><span class="lineno">  949</span>  }</div>
-<div class="line"><a id="l00950" name="l00950"></a><span class="lineno">  950</span>  <span class="comment">// The address of the allocated memory is supposed to be aligned with</span></div>
-<div class="line"><a id="l00951" name="l00951"></a><span class="lineno">  951</span>  <span class="comment">// alignment. As cbmc doesn&#39;t model address alignment,</span></div>
-<div class="line"><a id="l00952" name="l00952"></a><span class="lineno">  952</span>  <span class="comment">// assuming MALLOC_ALIGNMENT = MAX_INT_VALUE seems fair.</span></div>
-<div class="line"><a id="l00953" name="l00953"></a><span class="lineno">  953</span>  <span class="comment">// As _mid_memalign simplifies for alignment &lt;= MALLOC_ALIGNMENT</span></div>
-<div class="line"><a id="l00954" name="l00954"></a><span class="lineno">  954</span>  <span class="comment">// to a malloc call, it should be sound, if we do it too.</span></div>
-<div class="line"><a id="l00955" name="l00955"></a><span class="lineno">  955</span> </div>
-<div class="line"><a id="l00956" name="l00956"></a><span class="lineno">  956</span>  <span class="keywordtype">void</span> *tmp = <a class="code hl_function" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a>(size);</div>
-<div class="line"><a id="l00957" name="l00957"></a><span class="lineno">  957</span>  <span class="keywordflow">if</span>(tmp != (<span class="keywordtype">void</span> *)0)</div>
-<div class="line"><a id="l00958" name="l00958"></a><span class="lineno">  958</span>  {</div>
-<div class="line"><a id="l00959" name="l00959"></a><span class="lineno">  959</span>    *ptr = tmp;</div>
-<div class="line"><a id="l00960" name="l00960"></a><span class="lineno">  960</span>    <span class="keywordflow">return</span> 0;</div>
-<div class="line"><a id="l00961" name="l00961"></a><span class="lineno">  961</span>  }</div>
-<div class="line"><a id="l00962" name="l00962"></a><span class="lineno">  962</span>  <span class="keywordflow">return</span> ENOMEM;</div>
-<div class="line"><a id="l00963" name="l00963"></a><span class="lineno">  963</span>}</div>
-</div>
+<div class="line"><a id="l00935" name="l00935"></a><span class="lineno">  935</span> </div>
+<div class="line"><a id="l00936" name="l00936"></a><span class="lineno">  936</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00937" name="l00937"></a><span class="lineno">  937</span> </div>
+<div class="line"><a id="l00938" name="l00938"></a><span class="lineno">  938</span><span class="comment">/* FUNCTION: strtoll_l */</span></div>
+<div class="line"><a id="l00939" name="l00939"></a><span class="lineno">  939</span> </div>
+<div class="line"><a id="l00940" name="l00940"></a><span class="lineno">  940</span><span class="comment">// POSIX.1-2024: as strtoll, with a locale argument. The conversion of integers</span></div>
+<div class="line"><a id="l00941" name="l00941"></a><span class="lineno">  941</span><span class="comment">// only depends on the locale via the white-space characters, which the model</span></div>
+<div class="line"><a id="l00942" name="l00942"></a><span class="lineno">  942</span><span class="comment">// takes from the &quot;C&quot; locale. libc++ converts integers read by num_get with</span></div>
+<div class="line"><a id="l00943" name="l00943"></a><span class="lineno">  943</span><span class="comment">// strtoll_l and strtoull_l.</span></div>
+<div class="line"><a id="l00944" name="l00944"></a><span class="lineno">  944</span> </div>
+<div class="line"><a id="l00945" name="l00945"></a><span class="lineno">  945</span><span class="preprocessor">#ifndef _WIN32</span></div>
+<div class="line"><a id="l00946" name="l00946"></a><span class="lineno">  946</span> </div>
+<div class="line"><a id="l00947" name="l00947"></a><span class="lineno">  947</span><span class="preprocessor">#  ifndef __CPROVER_LOCALE_H_INCLUDED</span></div>
+<div class="line"><a id="l00948" name="l00948"></a><span class="lineno">  948</span><span class="preprocessor">#    include &lt;locale.h&gt;</span></div>
+<div class="line"><a id="l00949" name="l00949"></a><span class="lineno">  949</span><span class="preprocessor">#    define __CPROVER_LOCALE_H_INCLUDED</span></div>
+<div class="line"><a id="l00950" name="l00950"></a><span class="lineno">  950</span><span class="preprocessor">#  endif</span></div>
+<div class="line"><a id="l00951" name="l00951"></a><span class="lineno">  951</span> </div>
+<div class="line"><a id="l00952" name="l00952"></a><span class="lineno">  952</span><span class="preprocessor">#  ifdef __APPLE__</span></div>
+<div class="line"><a id="l00953" name="l00953"></a><span class="lineno">  953</span><span class="preprocessor">#    ifndef __CPROVER_XLOCALE_H_INCLUDED</span></div>
+<div class="line"><a id="l00954" name="l00954"></a><span class="lineno">  954</span><span class="preprocessor">#      include &lt;xlocale.h&gt;</span></div>
+<div class="line"><a id="l00955" name="l00955"></a><span class="lineno">  955</span><span class="preprocessor">#      define __CPROVER_XLOCALE_H_INCLUDED</span></div>
+<div class="line"><a id="l00956" name="l00956"></a><span class="lineno">  956</span><span class="preprocessor">#    endif</span></div>
+<div class="line"><a id="l00957" name="l00957"></a><span class="lineno">  957</span><span class="preprocessor">#  endif</span></div>
+<div class="line"><a id="l00958" name="l00958"></a><span class="lineno">  958</span> </div>
+<div class="line"><a id="l00959" name="l00959"></a><span class="lineno">  959</span><span class="keywordtype">long</span> <span class="keywordtype">long</span> <a class="code hl_function" href="stdlib_8c.html#a367ed539bb4584e16d6cc73d58ea16ae">__CPROVER_strtoll_internal</a>(</div>
+<div class="line"><a id="l00960" name="l00960"></a><span class="lineno">  960</span>  <span class="keyword">const</span> <span class="keywordtype">char</span> *nptr,</div>
+<div class="line"><a id="l00961" name="l00961"></a><span class="lineno">  961</span>  <span class="keywordtype">char</span> **endptr,</div>
+<div class="line"><a id="l00962" name="l00962"></a><span class="lineno">  962</span>  <span class="keywordtype">int</span> base,</div>
+<div class="line"><a id="l00963" name="l00963"></a><span class="lineno">  963</span>  _Bool c23);</div>
 <div class="line"><a id="l00964" name="l00964"></a><span class="lineno">  964</span> </div>
-<div class="line"><a id="l00965" name="l00965"></a><span class="lineno">  965</span><span class="comment">/* FUNCTION: random */</span></div>
-<div class="line"><a id="l00966" name="l00966"></a><span class="lineno">  966</span> </div>
-<div class="line"><a id="l00967" name="l00967"></a><span class="lineno"><a class="line" href="stdlib_8c.html#afdcc836c0043b83bdf4f5fa3005fc649">  967</a></span><span class="keywordtype">long</span> <a class="code hl_function" href="stdlib_8c.html#afdcc836c0043b83bdf4f5fa3005fc649">__VERIFIER_nondet_long</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a id="l00968" name="l00968"></a><span class="lineno">  968</span> </div>
-<div class="foldopen" id="foldopen00969" data-start="{" data-end="}">
-<div class="line"><a id="l00969" name="l00969"></a><span class="lineno"><a class="line" href="stdlib_8c.html#a114aeb1751119382aaf3340355b22cfd">  969</a></span><span class="keywordtype">long</span> <a class="code hl_function" href="stdlib_8c.html#a114aeb1751119382aaf3340355b22cfd">random</a>(<span class="keywordtype">void</span>)</div>
-<div class="line"><a id="l00970" name="l00970"></a><span class="lineno">  970</span>{</div>
-<div class="line"><a id="l00971" name="l00971"></a><span class="lineno">  971</span>  <span class="comment">// We return a non-deterministic value instead of a random one.</span></div>
-<div class="line"><a id="l00972" name="l00972"></a><span class="lineno">  972</span>  __CPROVER_HIDE:;</div>
-<div class="line"><a id="l00973" name="l00973"></a><span class="lineno">  973</span>  <span class="keywordtype">long</span> result=<a class="code hl_function" href="stdlib_8c.html#afdcc836c0043b83bdf4f5fa3005fc649">__VERIFIER_nondet_long</a>();</div>
-<div class="line"><a id="l00974" name="l00974"></a><span class="lineno">  974</span>  <a class="code hl_function" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(result&gt;=0 &amp;&amp; result&lt;=2147483647);</div>
-<div class="line"><a id="l00975" name="l00975"></a><span class="lineno">  975</span>  <span class="keywordflow">return</span> result;</div>
-<div class="line"><a id="l00976" name="l00976"></a><span class="lineno">  976</span>}</div>
+<div class="foldopen" id="foldopen00965" data-start="{" data-end="}">
+<div class="line"><a id="l00965" name="l00965"></a><span class="lineno"><a class="line" href="stdlib_8c.html#a18055d24dfe48efdafb3fb2bd9b852c3">  965</a></span><span class="keywordtype">long</span> <span class="keywordtype">long</span> <a class="code hl_function" href="stdlib_8c.html#a18055d24dfe48efdafb3fb2bd9b852c3">strtoll_l</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *nptr, <span class="keywordtype">char</span> **endptr, <span class="keywordtype">int</span> base, locale_t loc)</div>
+<div class="line"><a id="l00966" name="l00966"></a><span class="lineno">  966</span>{</div>
+<div class="line"><a id="l00967" name="l00967"></a><span class="lineno">  967</span>__CPROVER_HIDE:;</div>
+<div class="line"><a id="l00968" name="l00968"></a><span class="lineno">  968</span>  (void)loc;</div>
+<div class="line"><a id="l00969" name="l00969"></a><span class="lineno">  969</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="stdlib_8c.html#a367ed539bb4584e16d6cc73d58ea16ae">__CPROVER_strtoll_internal</a>(nptr, endptr, base, 0);</div>
+<div class="line"><a id="l00970" name="l00970"></a><span class="lineno">  970</span>}</div>
 </div>
-<div class="line"><a id="l00977" name="l00977"></a><span class="lineno">  977</span> </div>
-<div class="line"><a id="l00978" name="l00978"></a><span class="lineno">  978</span><span class="comment">/* FUNCTION: rand */</span></div>
-<div class="line"><a id="l00979" name="l00979"></a><span class="lineno">  979</span> </div>
-<div class="line"><a id="l00980" name="l00980"></a><span class="lineno"><a class="line" href="stdlib_8c.html#a04daf060736c4b84b8132b745409c7cf">  980</a></span><span class="keywordtype">int</span> <a class="code hl_function" href="stdlib_8c.html#a04daf060736c4b84b8132b745409c7cf">__VERIFIER_nondet_int</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a id="l00981" name="l00981"></a><span class="lineno">  981</span> </div>
-<div class="foldopen" id="foldopen00982" data-start="{" data-end="}">
-<div class="line"><a id="l00982" name="l00982"></a><span class="lineno"><a class="line" href="stdlib_8c.html#ae23144bcbb8e3742b00eb687c36654d1">  982</a></span><span class="keywordtype">int</span> <a class="code hl_function" href="stdlib_8c.html#ae23144bcbb8e3742b00eb687c36654d1">rand</a>(<span class="keywordtype">void</span>)</div>
-<div class="line"><a id="l00983" name="l00983"></a><span class="lineno">  983</span>{</div>
-<div class="line"><a id="l00984" name="l00984"></a><span class="lineno">  984</span>__CPROVER_HIDE:;</div>
-<div class="line"><a id="l00985" name="l00985"></a><span class="lineno">  985</span>  <span class="comment">// We return a non-deterministic value instead of a random one.</span></div>
-<div class="line"><a id="l00986" name="l00986"></a><span class="lineno">  986</span>  <span class="keywordtype">int</span> result = <a class="code hl_function" href="stdlib_8c.html#a04daf060736c4b84b8132b745409c7cf">__VERIFIER_nondet_int</a>();</div>
-<div class="line"><a id="l00987" name="l00987"></a><span class="lineno">  987</span>  <a class="code hl_function" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(result &gt;= 0);</div>
-<div class="line"><a id="l00988" name="l00988"></a><span class="lineno">  988</span>  <span class="keywordflow">return</span> result;</div>
-<div class="line"><a id="l00989" name="l00989"></a><span class="lineno">  989</span>}</div>
-</div>
-<div class="line"><a id="l00990" name="l00990"></a><span class="lineno">  990</span> </div>
-<div class="line"><a id="l00991" name="l00991"></a><span class="lineno">  991</span><span class="comment">/* FUNCTION: rand_r */</span></div>
+<div class="line"><a id="l00971" name="l00971"></a><span class="lineno">  971</span> </div>
+<div class="line"><a id="l00972" name="l00972"></a><span class="lineno">  972</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00973" name="l00973"></a><span class="lineno">  973</span> </div>
+<div class="line"><a id="l00974" name="l00974"></a><span class="lineno">  974</span><span class="comment">/* FUNCTION: __isoc23_strtoll_l */</span></div>
+<div class="line"><a id="l00975" name="l00975"></a><span class="lineno">  975</span> </div>
+<div class="line"><a id="l00976" name="l00976"></a><span class="lineno">  976</span><span class="comment">// glibc 2.38 and later redirect strtoll_l to this function in C23 mode, with</span></div>
+<div class="line"><a id="l00977" name="l00977"></a><span class="lineno">  977</span><span class="comment">// _GNU_SOURCE, and in C++. Unlike strtoll_l, it accepts the C23 &quot;0b&quot; prefix.</span></div>
+<div class="line"><a id="l00978" name="l00978"></a><span class="lineno">  978</span> </div>
+<div class="line"><a id="l00979" name="l00979"></a><span class="lineno">  979</span><span class="preprocessor">#ifndef _WIN32</span></div>
+<div class="line"><a id="l00980" name="l00980"></a><span class="lineno">  980</span> </div>
+<div class="line"><a id="l00981" name="l00981"></a><span class="lineno">  981</span><span class="preprocessor">#  ifndef __CPROVER_LOCALE_H_INCLUDED</span></div>
+<div class="line"><a id="l00982" name="l00982"></a><span class="lineno">  982</span><span class="preprocessor">#    include &lt;locale.h&gt;</span></div>
+<div class="line"><a id="l00983" name="l00983"></a><span class="lineno">  983</span><span class="preprocessor">#    define __CPROVER_LOCALE_H_INCLUDED</span></div>
+<div class="line"><a id="l00984" name="l00984"></a><span class="lineno">  984</span><span class="preprocessor">#  endif</span></div>
+<div class="line"><a id="l00985" name="l00985"></a><span class="lineno">  985</span> </div>
+<div class="line"><a id="l00986" name="l00986"></a><span class="lineno">  986</span><span class="preprocessor">#  ifdef __APPLE__</span></div>
+<div class="line"><a id="l00987" name="l00987"></a><span class="lineno">  987</span><span class="preprocessor">#    ifndef __CPROVER_XLOCALE_H_INCLUDED</span></div>
+<div class="line"><a id="l00988" name="l00988"></a><span class="lineno">  988</span><span class="preprocessor">#      include &lt;xlocale.h&gt;</span></div>
+<div class="line"><a id="l00989" name="l00989"></a><span class="lineno">  989</span><span class="preprocessor">#      define __CPROVER_XLOCALE_H_INCLUDED</span></div>
+<div class="line"><a id="l00990" name="l00990"></a><span class="lineno">  990</span><span class="preprocessor">#    endif</span></div>
+<div class="line"><a id="l00991" name="l00991"></a><span class="lineno">  991</span><span class="preprocessor">#  endif</span></div>
 <div class="line"><a id="l00992" name="l00992"></a><span class="lineno">  992</span> </div>
-<div class="line"><a id="l00993" name="l00993"></a><span class="lineno">  993</span><span class="keywordtype">int</span> <a class="code hl_function" href="stdlib_8c.html#a04daf060736c4b84b8132b745409c7cf">__VERIFIER_nondet_int</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a id="l00994" name="l00994"></a><span class="lineno">  994</span> </div>
-<div class="foldopen" id="foldopen00995" data-start="{" data-end="}">
-<div class="line"><a id="l00995" name="l00995"></a><span class="lineno"><a class="line" href="stdlib_8c.html#a48ccb326f8a50d01bc6d60660623bf56">  995</a></span><span class="keywordtype">int</span> <a class="code hl_function" href="stdlib_8c.html#a48ccb326f8a50d01bc6d60660623bf56">rand_r</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> *seed)</div>
-<div class="line"><a id="l00996" name="l00996"></a><span class="lineno">  996</span>{</div>
-<div class="line"><a id="l00997" name="l00997"></a><span class="lineno">  997</span>__CPROVER_HIDE:;</div>
-<div class="line"><a id="l00998" name="l00998"></a><span class="lineno">  998</span>  <span class="comment">// We return a non-deterministic value instead of a random one.</span></div>
-<div class="line"><a id="l00999" name="l00999"></a><span class="lineno">  999</span>  (void)*seed;</div>
-<div class="line"><a id="l01000" name="l01000"></a><span class="lineno"> 1000</span>  <span class="keywordtype">int</span> result = <a class="code hl_function" href="stdlib_8c.html#a04daf060736c4b84b8132b745409c7cf">__VERIFIER_nondet_int</a>();</div>
-<div class="line"><a id="l01001" name="l01001"></a><span class="lineno"> 1001</span>  <a class="code hl_function" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(result &gt;= 0);</div>
-<div class="line"><a id="l01002" name="l01002"></a><span class="lineno"> 1002</span>  <span class="keywordflow">return</span> result;</div>
-<div class="line"><a id="l01003" name="l01003"></a><span class="lineno"> 1003</span>}</div>
+<div class="line"><a id="l00993" name="l00993"></a><span class="lineno">  993</span><span class="keywordtype">long</span> <span class="keywordtype">long</span> <a class="code hl_function" href="stdlib_8c.html#a367ed539bb4584e16d6cc73d58ea16ae">__CPROVER_strtoll_internal</a>(</div>
+<div class="line"><a id="l00994" name="l00994"></a><span class="lineno">  994</span>  <span class="keyword">const</span> <span class="keywordtype">char</span> *nptr,</div>
+<div class="line"><a id="l00995" name="l00995"></a><span class="lineno">  995</span>  <span class="keywordtype">char</span> **endptr,</div>
+<div class="line"><a id="l00996" name="l00996"></a><span class="lineno">  996</span>  <span class="keywordtype">int</span> base,</div>
+<div class="line"><a id="l00997" name="l00997"></a><span class="lineno">  997</span>  _Bool c23);</div>
+<div class="line"><a id="l00998" name="l00998"></a><span class="lineno">  998</span> </div>
+<div class="line"><a id="l00999" name="l00999"></a><span class="lineno">  999</span><span class="keywordtype">long</span> <span class="keywordtype">long</span></div>
+<div class="foldopen" id="foldopen01000" data-start="{" data-end="}">
+<div class="line"><a id="l01000" name="l01000"></a><span class="lineno"><a class="line" href="stdlib_8c.html#adafd13c16a09ce409d75345bd9ad3b31"> 1000</a></span><a class="code hl_function" href="stdlib_8c.html#adafd13c16a09ce409d75345bd9ad3b31">__isoc23_strtoll_l</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *nptr, <span class="keywordtype">char</span> **endptr, <span class="keywordtype">int</span> base, locale_t loc)</div>
+<div class="line"><a id="l01001" name="l01001"></a><span class="lineno"> 1001</span>{</div>
+<div class="line"><a id="l01002" name="l01002"></a><span class="lineno"> 1002</span>__CPROVER_HIDE:;</div>
+<div class="line"><a id="l01003" name="l01003"></a><span class="lineno"> 1003</span>  (void)loc;</div>
+<div class="line"><a id="l01004" name="l01004"></a><span class="lineno"> 1004</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="stdlib_8c.html#a367ed539bb4584e16d6cc73d58ea16ae">__CPROVER_strtoll_internal</a>(nptr, endptr, base, 1);</div>
+<div class="line"><a id="l01005" name="l01005"></a><span class="lineno"> 1005</span>}</div>
 </div>
-<div class="line"><a id="l01004" name="l01004"></a><span class="lineno"> 1004</span> </div>
-<div class="line"><a id="l01005" name="l01005"></a><span class="lineno"> 1005</span><span class="comment">/* FUNCTION: __CPROVER_deallocate */</span></div>
 <div class="line"><a id="l01006" name="l01006"></a><span class="lineno"> 1006</span> </div>
-<div class="line"><a id="l01007" name="l01007"></a><span class="lineno"> 1007</span>__CPROVER_bool <a class="code hl_function" href="stdlib_8c.html#a8cb534abb228896759dded0be6ac4351">__VERIFIER_nondet___CPROVER_bool</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a id="l01007" name="l01007"></a><span class="lineno"> 1007</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l01008" name="l01008"></a><span class="lineno"> 1008</span> </div>
-<div class="foldopen" id="foldopen01009" data-start="{" data-end="}">
-<div class="line"><a id="l01009" name="l01009"></a><span class="lineno"><a class="line" href="ansi-c_2library_2cprover_8h.html#a5ef264d7c09f165e1d72b108c150dd32"> 1009</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="stdlib_8c.html#a5ef264d7c09f165e1d72b108c150dd32">__CPROVER_deallocate</a>(<span class="keywordtype">void</span> *ptr)</div>
-<div class="line"><a id="l01010" name="l01010"></a><span class="lineno"> 1010</span>{</div>
-<div class="line"><a id="l01011" name="l01011"></a><span class="lineno"> 1011</span>  <span class="keywordflow">if</span>(<a class="code hl_function" href="stdlib_8c.html#a8cb534abb228896759dded0be6ac4351">__VERIFIER_nondet___CPROVER_bool</a>())</div>
-<div class="line"><a id="l01012" name="l01012"></a><span class="lineno"> 1012</span>    <a class="code hl_variable" href="ansi-c_2library_2cprover_8h.html#a62443eebddd4033552d58dcf25c77c8f">__CPROVER_deallocated</a> = ptr;</div>
-<div class="line"><a id="l01013" name="l01013"></a><span class="lineno"> 1013</span>}</div>
+<div class="line"><a id="l01009" name="l01009"></a><span class="lineno"> 1009</span><span class="comment">/* FUNCTION: strtoull_l */</span></div>
+<div class="line"><a id="l01010" name="l01010"></a><span class="lineno"> 1010</span> </div>
+<div class="line"><a id="l01011" name="l01011"></a><span class="lineno"> 1011</span><span class="comment">// POSIX.1-2024: as strtoull, with a locale argument. The conversion of integers</span></div>
+<div class="line"><a id="l01012" name="l01012"></a><span class="lineno"> 1012</span><span class="comment">// only depends on the locale via the white-space characters, which the model</span></div>
+<div class="line"><a id="l01013" name="l01013"></a><span class="lineno"> 1013</span><span class="comment">// takes from the &quot;C&quot; locale. libc++ converts integers read by num_get with</span></div>
+<div class="line"><a id="l01014" name="l01014"></a><span class="lineno"> 1014</span><span class="comment">// strtoll_l and strtoull_l.</span></div>
+<div class="line"><a id="l01015" name="l01015"></a><span class="lineno"> 1015</span> </div>
+<div class="line"><a id="l01016" name="l01016"></a><span class="lineno"> 1016</span><span class="preprocessor">#ifndef _WIN32</span></div>
+<div class="line"><a id="l01017" name="l01017"></a><span class="lineno"> 1017</span> </div>
+<div class="line"><a id="l01018" name="l01018"></a><span class="lineno"> 1018</span><span class="preprocessor">#  ifndef __CPROVER_LOCALE_H_INCLUDED</span></div>
+<div class="line"><a id="l01019" name="l01019"></a><span class="lineno"> 1019</span><span class="preprocessor">#    include &lt;locale.h&gt;</span></div>
+<div class="line"><a id="l01020" name="l01020"></a><span class="lineno"> 1020</span><span class="preprocessor">#    define __CPROVER_LOCALE_H_INCLUDED</span></div>
+<div class="line"><a id="l01021" name="l01021"></a><span class="lineno"> 1021</span><span class="preprocessor">#  endif</span></div>
+<div class="line"><a id="l01022" name="l01022"></a><span class="lineno"> 1022</span> </div>
+<div class="line"><a id="l01023" name="l01023"></a><span class="lineno"> 1023</span><span class="preprocessor">#  ifdef __APPLE__</span></div>
+<div class="line"><a id="l01024" name="l01024"></a><span class="lineno"> 1024</span><span class="preprocessor">#    ifndef __CPROVER_XLOCALE_H_INCLUDED</span></div>
+<div class="line"><a id="l01025" name="l01025"></a><span class="lineno"> 1025</span><span class="preprocessor">#      include &lt;xlocale.h&gt;</span></div>
+<div class="line"><a id="l01026" name="l01026"></a><span class="lineno"> 1026</span><span class="preprocessor">#      define __CPROVER_XLOCALE_H_INCLUDED</span></div>
+<div class="line"><a id="l01027" name="l01027"></a><span class="lineno"> 1027</span><span class="preprocessor">#    endif</span></div>
+<div class="line"><a id="l01028" name="l01028"></a><span class="lineno"> 1028</span><span class="preprocessor">#  endif</span></div>
+<div class="line"><a id="l01029" name="l01029"></a><span class="lineno"> 1029</span> </div>
+<div class="line"><a id="l01030" name="l01030"></a><span class="lineno"> 1030</span><span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <span class="keywordtype">long</span> <a class="code hl_function" href="stdlib_8c.html#a216bf2bb658472d340e5d9607777147b">__CPROVER_strtoull_internal</a>(</div>
+<div class="line"><a id="l01031" name="l01031"></a><span class="lineno"> 1031</span>  <span class="keyword">const</span> <span class="keywordtype">char</span> *nptr,</div>
+<div class="line"><a id="l01032" name="l01032"></a><span class="lineno"> 1032</span>  <span class="keywordtype">char</span> **endptr,</div>
+<div class="line"><a id="l01033" name="l01033"></a><span class="lineno"> 1033</span>  <span class="keywordtype">int</span> base,</div>
+<div class="line"><a id="l01034" name="l01034"></a><span class="lineno"> 1034</span>  _Bool c23);</div>
+<div class="line"><a id="l01035" name="l01035"></a><span class="lineno"> 1035</span> </div>
+<div class="line"><a id="l01036" name="l01036"></a><span class="lineno"> 1036</span><span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <span class="keywordtype">long</span></div>
+<div class="foldopen" id="foldopen01037" data-start="{" data-end="}">
+<div class="line"><a id="l01037" name="l01037"></a><span class="lineno"><a class="line" href="stdlib_8c.html#aba2a931ce321883383e58906f009b02e"> 1037</a></span><a class="code hl_function" href="stdlib_8c.html#aba2a931ce321883383e58906f009b02e">strtoull_l</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *nptr, <span class="keywordtype">char</span> **endptr, <span class="keywordtype">int</span> base, locale_t loc)</div>
+<div class="line"><a id="l01038" name="l01038"></a><span class="lineno"> 1038</span>{</div>
+<div class="line"><a id="l01039" name="l01039"></a><span class="lineno"> 1039</span>__CPROVER_HIDE:;</div>
+<div class="line"><a id="l01040" name="l01040"></a><span class="lineno"> 1040</span>  (void)loc;</div>
+<div class="line"><a id="l01041" name="l01041"></a><span class="lineno"> 1041</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="stdlib_8c.html#a216bf2bb658472d340e5d9607777147b">__CPROVER_strtoull_internal</a>(nptr, endptr, base, 0);</div>
+<div class="line"><a id="l01042" name="l01042"></a><span class="lineno"> 1042</span>}</div>
+</div>
+<div class="line"><a id="l01043" name="l01043"></a><span class="lineno"> 1043</span> </div>
+<div class="line"><a id="l01044" name="l01044"></a><span class="lineno"> 1044</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l01045" name="l01045"></a><span class="lineno"> 1045</span> </div>
+<div class="line"><a id="l01046" name="l01046"></a><span class="lineno"> 1046</span><span class="comment">/* FUNCTION: __isoc23_strtoull_l */</span></div>
+<div class="line"><a id="l01047" name="l01047"></a><span class="lineno"> 1047</span> </div>
+<div class="line"><a id="l01048" name="l01048"></a><span class="lineno"> 1048</span><span class="comment">// glibc 2.38 and later redirect strtoull_l to this function in C23 mode, with</span></div>
+<div class="line"><a id="l01049" name="l01049"></a><span class="lineno"> 1049</span><span class="comment">// _GNU_SOURCE, and in C++. Unlike strtoull_l, it accepts the C23 &quot;0b&quot; prefix.</span></div>
+<div class="line"><a id="l01050" name="l01050"></a><span class="lineno"> 1050</span> </div>
+<div class="line"><a id="l01051" name="l01051"></a><span class="lineno"> 1051</span><span class="preprocessor">#ifndef _WIN32</span></div>
+<div class="line"><a id="l01052" name="l01052"></a><span class="lineno"> 1052</span> </div>
+<div class="line"><a id="l01053" name="l01053"></a><span class="lineno"> 1053</span><span class="preprocessor">#  ifndef __CPROVER_LOCALE_H_INCLUDED</span></div>
+<div class="line"><a id="l01054" name="l01054"></a><span class="lineno"> 1054</span><span class="preprocessor">#    include &lt;locale.h&gt;</span></div>
+<div class="line"><a id="l01055" name="l01055"></a><span class="lineno"> 1055</span><span class="preprocessor">#    define __CPROVER_LOCALE_H_INCLUDED</span></div>
+<div class="line"><a id="l01056" name="l01056"></a><span class="lineno"> 1056</span><span class="preprocessor">#  endif</span></div>
+<div class="line"><a id="l01057" name="l01057"></a><span class="lineno"> 1057</span> </div>
+<div class="line"><a id="l01058" name="l01058"></a><span class="lineno"> 1058</span><span class="preprocessor">#  ifdef __APPLE__</span></div>
+<div class="line"><a id="l01059" name="l01059"></a><span class="lineno"> 1059</span><span class="preprocessor">#    ifndef __CPROVER_XLOCALE_H_INCLUDED</span></div>
+<div class="line"><a id="l01060" name="l01060"></a><span class="lineno"> 1060</span><span class="preprocessor">#      include &lt;xlocale.h&gt;</span></div>
+<div class="line"><a id="l01061" name="l01061"></a><span class="lineno"> 1061</span><span class="preprocessor">#      define __CPROVER_XLOCALE_H_INCLUDED</span></div>
+<div class="line"><a id="l01062" name="l01062"></a><span class="lineno"> 1062</span><span class="preprocessor">#    endif</span></div>
+<div class="line"><a id="l01063" name="l01063"></a><span class="lineno"> 1063</span><span class="preprocessor">#  endif</span></div>
+<div class="line"><a id="l01064" name="l01064"></a><span class="lineno"> 1064</span> </div>
+<div class="line"><a id="l01065" name="l01065"></a><span class="lineno"> 1065</span><span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <span class="keywordtype">long</span> <a class="code hl_function" href="stdlib_8c.html#a216bf2bb658472d340e5d9607777147b">__CPROVER_strtoull_internal</a>(</div>
+<div class="line"><a id="l01066" name="l01066"></a><span class="lineno"> 1066</span>  <span class="keyword">const</span> <span class="keywordtype">char</span> *nptr,</div>
+<div class="line"><a id="l01067" name="l01067"></a><span class="lineno"> 1067</span>  <span class="keywordtype">char</span> **endptr,</div>
+<div class="line"><a id="l01068" name="l01068"></a><span class="lineno"> 1068</span>  <span class="keywordtype">int</span> base,</div>
+<div class="line"><a id="l01069" name="l01069"></a><span class="lineno"> 1069</span>  _Bool c23);</div>
+<div class="line"><a id="l01070" name="l01070"></a><span class="lineno"> 1070</span> </div>
+<div class="line"><a id="l01071" name="l01071"></a><span class="lineno"> 1071</span><span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <span class="keywordtype">long</span></div>
+<div class="foldopen" id="foldopen01072" data-start="{" data-end="}">
+<div class="line"><a id="l01072" name="l01072"></a><span class="lineno"><a class="line" href="stdlib_8c.html#a9c797734c6bbd8e8686683cf74c88104"> 1072</a></span><a class="code hl_function" href="stdlib_8c.html#a9c797734c6bbd8e8686683cf74c88104">__isoc23_strtoull_l</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *nptr, <span class="keywordtype">char</span> **endptr, <span class="keywordtype">int</span> base, locale_t loc)</div>
+<div class="line"><a id="l01073" name="l01073"></a><span class="lineno"> 1073</span>{</div>
+<div class="line"><a id="l01074" name="l01074"></a><span class="lineno"> 1074</span>__CPROVER_HIDE:;</div>
+<div class="line"><a id="l01075" name="l01075"></a><span class="lineno"> 1075</span>  (void)loc;</div>
+<div class="line"><a id="l01076" name="l01076"></a><span class="lineno"> 1076</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="stdlib_8c.html#a216bf2bb658472d340e5d9607777147b">__CPROVER_strtoull_internal</a>(nptr, endptr, base, 1);</div>
+<div class="line"><a id="l01077" name="l01077"></a><span class="lineno"> 1077</span>}</div>
+</div>
+<div class="line"><a id="l01078" name="l01078"></a><span class="lineno"> 1078</span> </div>
+<div class="line"><a id="l01079" name="l01079"></a><span class="lineno"> 1079</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l01080" name="l01080"></a><span class="lineno"> 1080</span> </div>
+<div class="line"><a id="l01081" name="l01081"></a><span class="lineno"> 1081</span><span class="comment">/* FUNCTION: atoi */</span></div>
+<div class="line"><a id="l01082" name="l01082"></a><span class="lineno"> 1082</span> </div>
+<div class="line"><a id="l01083" name="l01083"></a><span class="lineno"> 1083</span><span class="preprocessor">#undef atoi</span></div>
+<div class="line"><a id="l01084" name="l01084"></a><span class="lineno"> 1084</span><span class="preprocessor">#undef strtol</span></div>
+<div class="line"><a id="l01085" name="l01085"></a><span class="lineno"> 1085</span> </div>
+<div class="line"><a id="l01086" name="l01086"></a><span class="lineno"> 1086</span><span class="keywordtype">long</span> <a class="code hl_function" href="stdlib_8c.html#a311071298c2fe3e5d7057f396a6acfdc">strtol</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *nptr, <span class="keywordtype">char</span> **endptr, <span class="keywordtype">int</span> base);</div>
+<div class="line"><a id="l01087" name="l01087"></a><span class="lineno"> 1087</span> </div>
+<div class="foldopen" id="foldopen01088" data-start="{" data-end="}">
+<div class="line"><a id="l01088" name="l01088"></a><span class="lineno"><a class="line" href="stdlib_8c.html#ad228deceea1bac4d9f171f647c265059"> 1088</a></span><span class="keywordtype">int</span> <a class="code hl_function" href="stdlib_8c.html#ad228deceea1bac4d9f171f647c265059">atoi</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *nptr)</div>
+<div class="line"><a id="l01089" name="l01089"></a><span class="lineno"> 1089</span>{</div>
+<div class="line"><a id="l01090" name="l01090"></a><span class="lineno"> 1090</span>  __CPROVER_HIDE:;</div>
+<div class="line"><a id="l01091" name="l01091"></a><span class="lineno"> 1091</span>  <span class="keywordflow">return</span> (<span class="keywordtype">int</span>)<a class="code hl_function" href="stdlib_8c.html#a311071298c2fe3e5d7057f396a6acfdc">strtol</a>(nptr, (<span class="keywordtype">char</span> **)0, 10);</div>
+<div class="line"><a id="l01092" name="l01092"></a><span class="lineno"> 1092</span>}</div>
+</div>
+<div class="line"><a id="l01093" name="l01093"></a><span class="lineno"> 1093</span> </div>
+<div class="line"><a id="l01094" name="l01094"></a><span class="lineno"> 1094</span><span class="comment">/* FUNCTION: atol */</span></div>
+<div class="line"><a id="l01095" name="l01095"></a><span class="lineno"> 1095</span> </div>
+<div class="line"><a id="l01096" name="l01096"></a><span class="lineno"> 1096</span><span class="preprocessor">#undef atol</span></div>
+<div class="line"><a id="l01097" name="l01097"></a><span class="lineno"> 1097</span><span class="preprocessor">#undef strtol</span></div>
+<div class="line"><a id="l01098" name="l01098"></a><span class="lineno"> 1098</span> </div>
+<div class="line"><a id="l01099" name="l01099"></a><span class="lineno"> 1099</span><span class="keywordtype">long</span> <a class="code hl_function" href="stdlib_8c.html#a311071298c2fe3e5d7057f396a6acfdc">strtol</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *nptr, <span class="keywordtype">char</span> **endptr, <span class="keywordtype">int</span> base);</div>
+<div class="line"><a id="l01100" name="l01100"></a><span class="lineno"> 1100</span> </div>
+<div class="foldopen" id="foldopen01101" data-start="{" data-end="}">
+<div class="line"><a id="l01101" name="l01101"></a><span class="lineno"><a class="line" href="stdlib_8c.html#a185551efd32d058ef290ebe2d144219f"> 1101</a></span><span class="keywordtype">long</span> <a class="code hl_function" href="stdlib_8c.html#a185551efd32d058ef290ebe2d144219f">atol</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *nptr)</div>
+<div class="line"><a id="l01102" name="l01102"></a><span class="lineno"> 1102</span>{</div>
+<div class="line"><a id="l01103" name="l01103"></a><span class="lineno"> 1103</span>  __CPROVER_HIDE:;</div>
+<div class="line"><a id="l01104" name="l01104"></a><span class="lineno"> 1104</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="stdlib_8c.html#a311071298c2fe3e5d7057f396a6acfdc">strtol</a>(nptr, (<span class="keywordtype">char</span> **)0, 10);</div>
+<div class="line"><a id="l01105" name="l01105"></a><span class="lineno"> 1105</span>}</div>
+</div>
+<div class="line"><a id="l01106" name="l01106"></a><span class="lineno"> 1106</span> </div>
+<div class="line"><a id="l01107" name="l01107"></a><span class="lineno"> 1107</span><span class="comment">/* FUNCTION: getenv */</span></div>
+<div class="line"><a id="l01108" name="l01108"></a><span class="lineno"> 1108</span> </div>
+<div class="line"><a id="l01109" name="l01109"></a><span class="lineno"> 1109</span><span class="preprocessor">#undef getenv</span></div>
+<div class="line"><a id="l01110" name="l01110"></a><span class="lineno"> 1110</span> </div>
+<div class="line"><a id="l01111" name="l01111"></a><span class="lineno"> 1111</span><span class="preprocessor">#ifndef __CPROVER_STDDEF_H_INCLUDED</span></div>
+<div class="line"><a id="l01112" name="l01112"></a><span class="lineno"> 1112</span><span class="preprocessor">#  include &lt;stddef.h&gt;</span></div>
+<div class="line"><a id="l01113" name="l01113"></a><span class="lineno"><a class="line" href="stdlib_8c.html#a75f4ddb89445a1e78e51ef43d128ce5f"> 1113</a></span><span class="preprocessor">#  define __CPROVER_STDDEF_H_INCLUDED</span></div>
+<div class="line"><a id="l01114" name="l01114"></a><span class="lineno"> 1114</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l01115" name="l01115"></a><span class="lineno"> 1115</span> </div>
+<div class="line"><a id="l01116" name="l01116"></a><span class="lineno"> 1116</span>__CPROVER_bool <a class="code hl_function" href="stdlib_8c.html#a8cb534abb228896759dded0be6ac4351">__VERIFIER_nondet___CPROVER_bool</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a id="l01117" name="l01117"></a><span class="lineno"><a class="line" href="stdlib_8c.html#ac7eae8dd2e24285c5410fce64db23515"> 1117</a></span>ptrdiff_t <a class="code hl_function" href="stdlib_8c.html#ac7eae8dd2e24285c5410fce64db23515">__VERIFIER_nondet_ptrdiff_t</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a id="l01118" name="l01118"></a><span class="lineno"> 1118</span> </div>
+<div class="foldopen" id="foldopen01119" data-start="{" data-end="}">
+<div class="line"><a id="l01119" name="l01119"></a><span class="lineno"><a class="line" href="stdlib_8c.html#ab1ec8cf93b9478de49bb3e77465ab4af"> 1119</a></span><span class="keywordtype">char</span> *<a class="code hl_function" href="stdlib_8c.html#ab1ec8cf93b9478de49bb3e77465ab4af">getenv</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *name)</div>
+<div class="line"><a id="l01120" name="l01120"></a><span class="lineno"> 1120</span>{</div>
+<div class="line"><a id="l01121" name="l01121"></a><span class="lineno"> 1121</span>  __CPROVER_HIDE:;</div>
+<div class="line"><a id="l01122" name="l01122"></a><span class="lineno"> 1122</span> </div>
+<div class="line"><a id="l01123" name="l01123"></a><span class="lineno"> 1123</span>  (void)*name;</div>
+<div class="line"><a id="l01124" name="l01124"></a><span class="lineno"> 1124</span><span class="preprocessor">  #ifdef __CPROVER_STRING_ABSTRACTION</span></div>
+<div class="line"><a id="l01125" name="l01125"></a><span class="lineno"> 1125</span>  <a class="code hl_function" href="cprover__builtin__headers_8h.html#a9e05c8aeb35905c38bd7bcdb78145dae">__CPROVER_precondition</a>(<a class="code hl_function" href="cprover__builtin__headers_8h.html#ac580a358f798722e5dfa5ed3ede23b11">__CPROVER_is_zero_string</a>(name),</div>
+<div class="line"><a id="l01126" name="l01126"></a><span class="lineno"> 1126</span>    <span class="stringliteral">&quot;zero-termination of argument of getenv&quot;</span>);</div>
+<div class="line"><a id="l01127" name="l01127"></a><span class="lineno"> 1127</span><span class="preprocessor">  #endif</span></div>
+<div class="line"><a id="l01128" name="l01128"></a><span class="lineno"> 1128</span> </div>
+<div class="line"><a id="l01129" name="l01129"></a><span class="lineno"> 1129</span><span class="preprocessor">#ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS</span></div>
+<div class="line"><a id="l01130" name="l01130"></a><span class="lineno"> 1130</span>  __CPROVER_event(<span class="stringliteral">&quot;invalidate_pointer&quot;</span>, <span class="stringliteral">&quot;getenv_result&quot;</span>);</div>
+<div class="line"><a id="l01131" name="l01131"></a><span class="lineno"> 1131</span>  <span class="keywordtype">char</span> *getenv_result;</div>
+<div class="line"><a id="l01132" name="l01132"></a><span class="lineno"> 1132</span>  <a class="code hl_function" href="cprover__builtin__headers_8h.html#ad3a2aedad97977b64290f8141eed690c">__CPROVER_set_must</a>(getenv_result, <span class="stringliteral">&quot;getenv_result&quot;</span>);</div>
+<div class="line"><a id="l01133" name="l01133"></a><span class="lineno"> 1133</span>  <span class="keywordflow">return</span> getenv_result;</div>
+<div class="line"><a id="l01134" name="l01134"></a><span class="lineno"> 1134</span> </div>
+<div class="line"><a id="l01135" name="l01135"></a><span class="lineno"> 1135</span><span class="preprocessor">#else</span></div>
+<div class="line"><a id="l01136" name="l01136"></a><span class="lineno"> 1136</span> </div>
+<div class="line"><a id="l01137" name="l01137"></a><span class="lineno"> 1137</span>  __CPROVER_bool found=<a class="code hl_function" href="stdlib_8c.html#a8cb534abb228896759dded0be6ac4351">__VERIFIER_nondet___CPROVER_bool</a>();</div>
+<div class="line"><a id="l01138" name="l01138"></a><span class="lineno"> 1138</span>  <span class="keywordflow">if</span>(!found) <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a id="l01139" name="l01139"></a><span class="lineno"> 1139</span> </div>
+<div class="line"><a id="l01140" name="l01140"></a><span class="lineno"> 1140</span>  ptrdiff_t buf_size = <a class="code hl_function" href="stdlib_8c.html#ac7eae8dd2e24285c5410fce64db23515">__VERIFIER_nondet_ptrdiff_t</a>();</div>
+<div class="line"><a id="l01141" name="l01141"></a><span class="lineno"> 1141</span> </div>
+<div class="line"><a id="l01142" name="l01142"></a><span class="lineno"> 1142</span>  <span class="comment">// It&#39;s reasonable to assume this won&#39;t exceed the signed</span></div>
+<div class="line"><a id="l01143" name="l01143"></a><span class="lineno"> 1143</span>  <span class="comment">// range in practice, but in principle, this could exceed</span></div>
+<div class="line"><a id="l01144" name="l01144"></a><span class="lineno"> 1144</span>  <span class="comment">// the range.</span></div>
+<div class="line"><a id="l01145" name="l01145"></a><span class="lineno"> 1145</span> </div>
+<div class="line"><a id="l01146" name="l01146"></a><span class="lineno"> 1146</span>  <a class="code hl_function" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(buf_size &gt;= 1);</div>
+<div class="line"><a id="l01147" name="l01147"></a><span class="lineno"> 1147</span>  <span class="keywordtype">char</span> *buffer = (<span class="keywordtype">char</span> *)<a class="code hl_function" href="ansi-c_2library_2cprover_8h.html#a39d7421bc1364fd1101bef751362f9d6">__CPROVER_allocate</a>(buf_size * <span class="keyword">sizeof</span>(<span class="keywordtype">char</span>), 0);</div>
+<div class="line"><a id="l01148" name="l01148"></a><span class="lineno"> 1148</span>  buffer[buf_size-1]=0;</div>
+<div class="line"><a id="l01149" name="l01149"></a><span class="lineno"> 1149</span> </div>
+<div class="line"><a id="l01150" name="l01150"></a><span class="lineno"> 1150</span><span class="preprocessor">#  ifdef __CPROVER_STRING_ABSTRACTION</span></div>
+<div class="line"><a id="l01151" name="l01151"></a><span class="lineno"> 1151</span>  <a class="code hl_function" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(<a class="code hl_function" href="cprover__builtin__headers_8h.html#a00109de552d5ffc4e206a729dffb2b58">__CPROVER_buffer_size</a>(buffer) == buf_size);</div>
+<div class="line"><a id="l01152" name="l01152"></a><span class="lineno"> 1152</span>  <a class="code hl_function" href="cprover__builtin__headers_8h.html#ac580a358f798722e5dfa5ed3ede23b11">__CPROVER_is_zero_string</a>(buffer) = 1;</div>
+<div class="line"><a id="l01153" name="l01153"></a><span class="lineno"> 1153</span>  <a class="code hl_function" href="cprover__builtin__headers_8h.html#a85d3c5a542e78b671377625ec9e0e42a">__CPROVER_zero_string_length</a>(buffer) = buf_size - 1;</div>
+<div class="line"><a id="l01154" name="l01154"></a><span class="lineno"> 1154</span><span class="preprocessor">#  endif</span></div>
+<div class="line"><a id="l01155" name="l01155"></a><span class="lineno"> 1155</span> </div>
+<div class="line"><a id="l01156" name="l01156"></a><span class="lineno"> 1156</span>  <span class="keywordflow">return</span> buffer;</div>
+<div class="line"><a id="l01157" name="l01157"></a><span class="lineno"> 1157</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l01158" name="l01158"></a><span class="lineno"> 1158</span>}</div>
+</div>
+<div class="line"><a id="l01159" name="l01159"></a><span class="lineno"> 1159</span> </div>
+<div class="line"><a id="l01160" name="l01160"></a><span class="lineno"> 1160</span><span class="comment">/* FUNCTION: realloc */</span></div>
+<div class="line"><a id="l01161" name="l01161"></a><span class="lineno"> 1161</span> </div>
+<div class="line"><a id="l01162" name="l01162"></a><span class="lineno"> 1162</span><span class="keywordtype">void</span> *<a class="code hl_function" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a>(__CPROVER_size_t malloc_size);</div>
+<div class="line"><a id="l01163" name="l01163"></a><span class="lineno"> 1163</span><span class="keywordtype">void</span> <a class="code hl_function" href="stdlib_8c.html#afbedc913aa4651b3c3b4b3aecd9b4711">free</a>(<span class="keywordtype">void</span> *ptr);</div>
+<div class="line"><a id="l01164" name="l01164"></a><span class="lineno"> 1164</span> </div>
+<div class="foldopen" id="foldopen01165" data-start="{" data-end="}">
+<div class="line"><a id="l01165" name="l01165"></a><span class="lineno"><a class="line" href="stdlib_8c.html#aed52b7297948c8be2727c9383e29077b"> 1165</a></span><span class="keywordtype">void</span> *<a class="code hl_function" href="stdlib_8c.html#aed52b7297948c8be2727c9383e29077b">realloc</a>(<span class="keywordtype">void</span> *ptr, __CPROVER_size_t malloc_size)</div>
+<div class="line"><a id="l01166" name="l01166"></a><span class="lineno"> 1166</span>{</div>
+<div class="line"><a id="l01167" name="l01167"></a><span class="lineno"> 1167</span>  __CPROVER_HIDE:;</div>
+<div class="line"><a id="l01168" name="l01168"></a><span class="lineno"> 1168</span> </div>
+<div class="line"><a id="l01169" name="l01169"></a><span class="lineno"> 1169</span>  <a class="code hl_function" href="cprover__builtin__headers_8h.html#a9e05c8aeb35905c38bd7bcdb78145dae">__CPROVER_precondition</a>(ptr==0 || <a class="code hl_function" href="cprover__builtin__headers_8h.html#ada85b7fd94e31925350fe3f725b7f7bc">__CPROVER_DYNAMIC_OBJECT</a>(ptr),</div>
+<div class="line"><a id="l01170" name="l01170"></a><span class="lineno"> 1170</span>                         <span class="stringliteral">&quot;realloc argument is dynamic object&quot;</span>);</div>
+<div class="line"><a id="l01171" name="l01171"></a><span class="lineno"> 1171</span> </div>
+<div class="line"><a id="l01172" name="l01172"></a><span class="lineno"> 1172</span>  <span class="comment">// if ptr is NULL, this behaves like malloc</span></div>
+<div class="line"><a id="l01173" name="l01173"></a><span class="lineno"> 1173</span>  <span class="keywordflow">if</span>(ptr==0)</div>
+<div class="line"><a id="l01174" name="l01174"></a><span class="lineno"> 1174</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a>(malloc_size);</div>
+<div class="line"><a id="l01175" name="l01175"></a><span class="lineno"> 1175</span> </div>
+<div class="line"><a id="l01176" name="l01176"></a><span class="lineno"> 1176</span>  <span class="comment">// if malloc-size is 0, allocate new minimum sized object</span></div>
+<div class="line"><a id="l01177" name="l01177"></a><span class="lineno"> 1177</span>  <span class="comment">// and free original</span></div>
+<div class="line"><a id="l01178" name="l01178"></a><span class="lineno"> 1178</span>  <span class="keywordflow">if</span>(malloc_size==0)</div>
+<div class="line"><a id="l01179" name="l01179"></a><span class="lineno"> 1179</span>  {</div>
+<div class="line"><a id="l01180" name="l01180"></a><span class="lineno"> 1180</span>    <a class="code hl_function" href="stdlib_8c.html#afbedc913aa4651b3c3b4b3aecd9b4711">free</a>(ptr);</div>
+<div class="line"><a id="l01181" name="l01181"></a><span class="lineno"> 1181</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a>(0);</div>
+<div class="line"><a id="l01182" name="l01182"></a><span class="lineno"> 1182</span>  }</div>
+<div class="line"><a id="l01183" name="l01183"></a><span class="lineno"> 1183</span> </div>
+<div class="line"><a id="l01184" name="l01184"></a><span class="lineno"> 1184</span>  <span class="comment">// this shouldn&#39;t move if the new size isn&#39;t bigger</span></div>
+<div class="line"><a id="l01185" name="l01185"></a><span class="lineno"> 1185</span>  <span class="keywordtype">void</span> *res;</div>
+<div class="line"><a id="l01186" name="l01186"></a><span class="lineno"> 1186</span>  res=<a class="code hl_function" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a>(malloc_size);</div>
+<div class="line"><a id="l01187" name="l01187"></a><span class="lineno"> 1187</span>  <span class="keywordflow">if</span>(res != (<span class="keywordtype">void</span> *)0)</div>
+<div class="line"><a id="l01188" name="l01188"></a><span class="lineno"> 1188</span>  {</div>
+<div class="line"><a id="l01189" name="l01189"></a><span class="lineno"> 1189</span>    <a class="code hl_function" href="cprover__builtin__headers_8h.html#aec7a559f3ba9abb05c2b79537811402f">__CPROVER_array_copy</a>(res, ptr);</div>
+<div class="line"><a id="l01190" name="l01190"></a><span class="lineno"> 1190</span>    <a class="code hl_function" href="stdlib_8c.html#afbedc913aa4651b3c3b4b3aecd9b4711">free</a>(ptr);</div>
+<div class="line"><a id="l01191" name="l01191"></a><span class="lineno"> 1191</span>  }</div>
+<div class="line"><a id="l01192" name="l01192"></a><span class="lineno"> 1192</span> </div>
+<div class="line"><a id="l01193" name="l01193"></a><span class="lineno"> 1193</span>  <span class="keywordflow">return</span> res;</div>
+<div class="line"><a id="l01194" name="l01194"></a><span class="lineno"> 1194</span>}</div>
+</div>
+<div class="line"><a id="l01195" name="l01195"></a><span class="lineno"> 1195</span> </div>
+<div class="line"><a id="l01196" name="l01196"></a><span class="lineno"> 1196</span><span class="comment">/* FUNCTION: valloc */</span></div>
+<div class="line"><a id="l01197" name="l01197"></a><span class="lineno"> 1197</span> </div>
+<div class="line"><a id="l01198" name="l01198"></a><span class="lineno"> 1198</span><span class="keywordtype">void</span> *<a class="code hl_function" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a>(__CPROVER_size_t malloc_size);</div>
+<div class="line"><a id="l01199" name="l01199"></a><span class="lineno"> 1199</span> </div>
+<div class="foldopen" id="foldopen01200" data-start="{" data-end="}">
+<div class="line"><a id="l01200" name="l01200"></a><span class="lineno"><a class="line" href="stdlib_8c.html#a65c45dbbff309982f14adb06fda0edc5"> 1200</a></span><span class="keywordtype">void</span> *<a class="code hl_function" href="stdlib_8c.html#a65c45dbbff309982f14adb06fda0edc5">valloc</a>(__CPROVER_size_t malloc_size)</div>
+<div class="line"><a id="l01201" name="l01201"></a><span class="lineno"> 1201</span>{</div>
+<div class="line"><a id="l01202" name="l01202"></a><span class="lineno"> 1202</span>  <span class="comment">// The allocated memory is aligned on a page</span></div>
+<div class="line"><a id="l01203" name="l01203"></a><span class="lineno"> 1203</span>  <span class="comment">// boundary, which we don&#39;t model.</span></div>
+<div class="line"><a id="l01204" name="l01204"></a><span class="lineno"> 1204</span> </div>
+<div class="line"><a id="l01205" name="l01205"></a><span class="lineno"> 1205</span>  __CPROVER_HIDE:;</div>
+<div class="line"><a id="l01206" name="l01206"></a><span class="lineno"> 1206</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a>(malloc_size);</div>
+<div class="line"><a id="l01207" name="l01207"></a><span class="lineno"> 1207</span>}</div>
+</div>
+<div class="line"><a id="l01208" name="l01208"></a><span class="lineno"> 1208</span> </div>
+<div class="line"><a id="l01209" name="l01209"></a><span class="lineno"> 1209</span><span class="comment">/* FUNCTION: posix_memalign */</span></div>
+<div class="line"><a id="l01210" name="l01210"></a><span class="lineno"> 1210</span> </div>
+<div class="line"><a id="l01211" name="l01211"></a><span class="lineno"> 1211</span><span class="preprocessor">#ifndef __CPROVER_ERRNO_H_INCLUDED</span></div>
+<div class="line"><a id="l01212" name="l01212"></a><span class="lineno"> 1212</span><span class="preprocessor">#include &lt;errno.h&gt;</span></div>
+<div class="line"><a id="l01213" name="l01213"></a><span class="lineno"> 1213</span><span class="preprocessor">#define __CPROVER_ERRNO_H_INCLUDED</span></div>
+<div class="line"><a id="l01214" name="l01214"></a><span class="lineno"> 1214</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l01215" name="l01215"></a><span class="lineno"> 1215</span> </div>
+<div class="line"><a id="l01216" name="l01216"></a><span class="lineno"> 1216</span><span class="preprocessor">#undef posix_memalign</span></div>
+<div class="line"><a id="l01217" name="l01217"></a><span class="lineno"> 1217</span> </div>
+<div class="line"><a id="l01218" name="l01218"></a><span class="lineno"> 1218</span><span class="keywordtype">void</span> *<a class="code hl_function" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a>(__CPROVER_size_t malloc_size);</div>
+<div class="foldopen" id="foldopen01219" data-start="{" data-end="}">
+<div class="line"><a id="l01219" name="l01219"></a><span class="lineno"><a class="line" href="stdlib_8c.html#a25039dc7d1ee0131ad097abd4e9ce3d9"> 1219</a></span><span class="keywordtype">int</span> <a class="code hl_function" href="stdlib_8c.html#a25039dc7d1ee0131ad097abd4e9ce3d9">posix_memalign</a>(</div>
+<div class="line"><a id="l01220" name="l01220"></a><span class="lineno"> 1220</span>  <span class="keywordtype">void</span> **ptr,</div>
+<div class="line"><a id="l01221" name="l01221"></a><span class="lineno"> 1221</span>  __CPROVER_size_t <a class="code hl_function" href="padding_8cpp.html#ac8121cb248deefe3df1e974127851740">alignment</a>,</div>
+<div class="line"><a id="l01222" name="l01222"></a><span class="lineno"> 1222</span>  __CPROVER_size_t size)</div>
+<div class="line"><a id="l01223" name="l01223"></a><span class="lineno"> 1223</span>{</div>
+<div class="line"><a id="l01224" name="l01224"></a><span class="lineno"> 1224</span>__CPROVER_HIDE:;</div>
+<div class="line"><a id="l01225" name="l01225"></a><span class="lineno"> 1225</span> </div>
+<div class="line"><a id="l01226" name="l01226"></a><span class="lineno"> 1226</span>  __CPROVER_size_t multiplier = <a class="code hl_function" href="padding_8cpp.html#ac8121cb248deefe3df1e974127851740">alignment</a> / <span class="keyword">sizeof</span>(<span class="keywordtype">void</span> *);</div>
+<div class="line"><a id="l01227" name="l01227"></a><span class="lineno"> 1227</span>  <span class="comment">// Modeling the posix_memalign checks on alignment.</span></div>
+<div class="line"><a id="l01228" name="l01228"></a><span class="lineno"> 1228</span>  <span class="keywordflow">if</span>(</div>
+<div class="line"><a id="l01229" name="l01229"></a><span class="lineno"> 1229</span>    <a class="code hl_function" href="padding_8cpp.html#ac8121cb248deefe3df1e974127851740">alignment</a> % <span class="keyword">sizeof</span>(<span class="keywordtype">void</span> *) != 0 || ((multiplier) &amp; (multiplier - 1)) != 0 ||</div>
+<div class="line"><a id="l01230" name="l01230"></a><span class="lineno"> 1230</span>    <a class="code hl_function" href="padding_8cpp.html#ac8121cb248deefe3df1e974127851740">alignment</a> == 0)</div>
+<div class="line"><a id="l01231" name="l01231"></a><span class="lineno"> 1231</span>  {</div>
+<div class="line"><a id="l01232" name="l01232"></a><span class="lineno"> 1232</span>    <span class="keywordflow">return</span> EINVAL;</div>
+<div class="line"><a id="l01233" name="l01233"></a><span class="lineno"> 1233</span>  }</div>
+<div class="line"><a id="l01234" name="l01234"></a><span class="lineno"> 1234</span>  <span class="comment">// The address of the allocated memory is supposed to be aligned with</span></div>
+<div class="line"><a id="l01235" name="l01235"></a><span class="lineno"> 1235</span>  <span class="comment">// alignment. As cbmc doesn&#39;t model address alignment,</span></div>
+<div class="line"><a id="l01236" name="l01236"></a><span class="lineno"> 1236</span>  <span class="comment">// assuming MALLOC_ALIGNMENT = MAX_INT_VALUE seems fair.</span></div>
+<div class="line"><a id="l01237" name="l01237"></a><span class="lineno"> 1237</span>  <span class="comment">// As _mid_memalign simplifies for alignment &lt;= MALLOC_ALIGNMENT</span></div>
+<div class="line"><a id="l01238" name="l01238"></a><span class="lineno"> 1238</span>  <span class="comment">// to a malloc call, it should be sound, if we do it too.</span></div>
+<div class="line"><a id="l01239" name="l01239"></a><span class="lineno"> 1239</span> </div>
+<div class="line"><a id="l01240" name="l01240"></a><span class="lineno"> 1240</span>  <span class="keywordtype">void</span> *tmp = <a class="code hl_function" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a>(size);</div>
+<div class="line"><a id="l01241" name="l01241"></a><span class="lineno"> 1241</span>  <span class="keywordflow">if</span>(tmp != (<span class="keywordtype">void</span> *)0)</div>
+<div class="line"><a id="l01242" name="l01242"></a><span class="lineno"> 1242</span>  {</div>
+<div class="line"><a id="l01243" name="l01243"></a><span class="lineno"> 1243</span>    *ptr = tmp;</div>
+<div class="line"><a id="l01244" name="l01244"></a><span class="lineno"> 1244</span>    <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a id="l01245" name="l01245"></a><span class="lineno"> 1245</span>  }</div>
+<div class="line"><a id="l01246" name="l01246"></a><span class="lineno"> 1246</span>  <span class="keywordflow">return</span> ENOMEM;</div>
+<div class="line"><a id="l01247" name="l01247"></a><span class="lineno"> 1247</span>}</div>
+</div>
+<div class="line"><a id="l01248" name="l01248"></a><span class="lineno"> 1248</span> </div>
+<div class="line"><a id="l01249" name="l01249"></a><span class="lineno"> 1249</span><span class="comment">/* FUNCTION: random */</span></div>
+<div class="line"><a id="l01250" name="l01250"></a><span class="lineno"> 1250</span> </div>
+<div class="line"><a id="l01251" name="l01251"></a><span class="lineno"><a class="line" href="stdlib_8c.html#afdcc836c0043b83bdf4f5fa3005fc649"> 1251</a></span><span class="keywordtype">long</span> <a class="code hl_function" href="stdlib_8c.html#afdcc836c0043b83bdf4f5fa3005fc649">__VERIFIER_nondet_long</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a id="l01252" name="l01252"></a><span class="lineno"> 1252</span> </div>
+<div class="foldopen" id="foldopen01253" data-start="{" data-end="}">
+<div class="line"><a id="l01253" name="l01253"></a><span class="lineno"><a class="line" href="stdlib_8c.html#a114aeb1751119382aaf3340355b22cfd"> 1253</a></span><span class="keywordtype">long</span> <a class="code hl_function" href="stdlib_8c.html#a114aeb1751119382aaf3340355b22cfd">random</a>(<span class="keywordtype">void</span>)</div>
+<div class="line"><a id="l01254" name="l01254"></a><span class="lineno"> 1254</span>{</div>
+<div class="line"><a id="l01255" name="l01255"></a><span class="lineno"> 1255</span>  <span class="comment">// We return a non-deterministic value instead of a random one.</span></div>
+<div class="line"><a id="l01256" name="l01256"></a><span class="lineno"> 1256</span>  __CPROVER_HIDE:;</div>
+<div class="line"><a id="l01257" name="l01257"></a><span class="lineno"> 1257</span>  <span class="keywordtype">long</span> result=<a class="code hl_function" href="stdlib_8c.html#afdcc836c0043b83bdf4f5fa3005fc649">__VERIFIER_nondet_long</a>();</div>
+<div class="line"><a id="l01258" name="l01258"></a><span class="lineno"> 1258</span>  <a class="code hl_function" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(result&gt;=0 &amp;&amp; result&lt;=2147483647);</div>
+<div class="line"><a id="l01259" name="l01259"></a><span class="lineno"> 1259</span>  <span class="keywordflow">return</span> result;</div>
+<div class="line"><a id="l01260" name="l01260"></a><span class="lineno"> 1260</span>}</div>
+</div>
+<div class="line"><a id="l01261" name="l01261"></a><span class="lineno"> 1261</span> </div>
+<div class="line"><a id="l01262" name="l01262"></a><span class="lineno"> 1262</span><span class="comment">/* FUNCTION: rand */</span></div>
+<div class="line"><a id="l01263" name="l01263"></a><span class="lineno"> 1263</span> </div>
+<div class="line"><a id="l01264" name="l01264"></a><span class="lineno"><a class="line" href="stdlib_8c.html#a04daf060736c4b84b8132b745409c7cf"> 1264</a></span><span class="keywordtype">int</span> <a class="code hl_function" href="stdlib_8c.html#a04daf060736c4b84b8132b745409c7cf">__VERIFIER_nondet_int</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a id="l01265" name="l01265"></a><span class="lineno"> 1265</span> </div>
+<div class="foldopen" id="foldopen01266" data-start="{" data-end="}">
+<div class="line"><a id="l01266" name="l01266"></a><span class="lineno"><a class="line" href="stdlib_8c.html#ae23144bcbb8e3742b00eb687c36654d1"> 1266</a></span><span class="keywordtype">int</span> <a class="code hl_function" href="stdlib_8c.html#ae23144bcbb8e3742b00eb687c36654d1">rand</a>(<span class="keywordtype">void</span>)</div>
+<div class="line"><a id="l01267" name="l01267"></a><span class="lineno"> 1267</span>{</div>
+<div class="line"><a id="l01268" name="l01268"></a><span class="lineno"> 1268</span>__CPROVER_HIDE:;</div>
+<div class="line"><a id="l01269" name="l01269"></a><span class="lineno"> 1269</span>  <span class="comment">// We return a non-deterministic value instead of a random one.</span></div>
+<div class="line"><a id="l01270" name="l01270"></a><span class="lineno"> 1270</span>  <span class="keywordtype">int</span> result = <a class="code hl_function" href="stdlib_8c.html#a04daf060736c4b84b8132b745409c7cf">__VERIFIER_nondet_int</a>();</div>
+<div class="line"><a id="l01271" name="l01271"></a><span class="lineno"> 1271</span>  <a class="code hl_function" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(result &gt;= 0);</div>
+<div class="line"><a id="l01272" name="l01272"></a><span class="lineno"> 1272</span>  <span class="keywordflow">return</span> result;</div>
+<div class="line"><a id="l01273" name="l01273"></a><span class="lineno"> 1273</span>}</div>
+</div>
+<div class="line"><a id="l01274" name="l01274"></a><span class="lineno"> 1274</span> </div>
+<div class="line"><a id="l01275" name="l01275"></a><span class="lineno"> 1275</span><span class="comment">/* FUNCTION: rand_r */</span></div>
+<div class="line"><a id="l01276" name="l01276"></a><span class="lineno"> 1276</span> </div>
+<div class="line"><a id="l01277" name="l01277"></a><span class="lineno"> 1277</span><span class="keywordtype">int</span> <a class="code hl_function" href="stdlib_8c.html#a04daf060736c4b84b8132b745409c7cf">__VERIFIER_nondet_int</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a id="l01278" name="l01278"></a><span class="lineno"> 1278</span> </div>
+<div class="foldopen" id="foldopen01279" data-start="{" data-end="}">
+<div class="line"><a id="l01279" name="l01279"></a><span class="lineno"><a class="line" href="stdlib_8c.html#a48ccb326f8a50d01bc6d60660623bf56"> 1279</a></span><span class="keywordtype">int</span> <a class="code hl_function" href="stdlib_8c.html#a48ccb326f8a50d01bc6d60660623bf56">rand_r</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> *seed)</div>
+<div class="line"><a id="l01280" name="l01280"></a><span class="lineno"> 1280</span>{</div>
+<div class="line"><a id="l01281" name="l01281"></a><span class="lineno"> 1281</span>__CPROVER_HIDE:;</div>
+<div class="line"><a id="l01282" name="l01282"></a><span class="lineno"> 1282</span>  <span class="comment">// We return a non-deterministic value instead of a random one.</span></div>
+<div class="line"><a id="l01283" name="l01283"></a><span class="lineno"> 1283</span>  (void)*seed;</div>
+<div class="line"><a id="l01284" name="l01284"></a><span class="lineno"> 1284</span>  <span class="keywordtype">int</span> result = <a class="code hl_function" href="stdlib_8c.html#a04daf060736c4b84b8132b745409c7cf">__VERIFIER_nondet_int</a>();</div>
+<div class="line"><a id="l01285" name="l01285"></a><span class="lineno"> 1285</span>  <a class="code hl_function" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(result &gt;= 0);</div>
+<div class="line"><a id="l01286" name="l01286"></a><span class="lineno"> 1286</span>  <span class="keywordflow">return</span> result;</div>
+<div class="line"><a id="l01287" name="l01287"></a><span class="lineno"> 1287</span>}</div>
+</div>
+<div class="line"><a id="l01288" name="l01288"></a><span class="lineno"> 1288</span> </div>
+<div class="line"><a id="l01289" name="l01289"></a><span class="lineno"> 1289</span><span class="comment">/* FUNCTION: __CPROVER_deallocate */</span></div>
+<div class="line"><a id="l01290" name="l01290"></a><span class="lineno"> 1290</span> </div>
+<div class="line"><a id="l01291" name="l01291"></a><span class="lineno"> 1291</span>__CPROVER_bool <a class="code hl_function" href="stdlib_8c.html#a8cb534abb228896759dded0be6ac4351">__VERIFIER_nondet___CPROVER_bool</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a id="l01292" name="l01292"></a><span class="lineno"> 1292</span> </div>
+<div class="foldopen" id="foldopen01293" data-start="{" data-end="}">
+<div class="line"><a id="l01293" name="l01293"></a><span class="lineno"><a class="line" href="ansi-c_2library_2cprover_8h.html#a5ef264d7c09f165e1d72b108c150dd32"> 1293</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="stdlib_8c.html#a5ef264d7c09f165e1d72b108c150dd32">__CPROVER_deallocate</a>(<span class="keywordtype">void</span> *ptr)</div>
+<div class="line"><a id="l01294" name="l01294"></a><span class="lineno"> 1294</span>{</div>
+<div class="line"><a id="l01295" name="l01295"></a><span class="lineno"> 1295</span>  <span class="keywordflow">if</span>(<a class="code hl_function" href="stdlib_8c.html#a8cb534abb228896759dded0be6ac4351">__VERIFIER_nondet___CPROVER_bool</a>())</div>
+<div class="line"><a id="l01296" name="l01296"></a><span class="lineno"> 1296</span>    <a class="code hl_variable" href="ansi-c_2library_2cprover_8h.html#a62443eebddd4033552d58dcf25c77c8f">__CPROVER_deallocated</a> = ptr;</div>
+<div class="line"><a id="l01297" name="l01297"></a><span class="lineno"> 1297</span>}</div>
 </div>
 <div class="ttc" id="aansi-c_2library_2cprover_8h_html_a25b90c5c09c162016f22649dad66811a"><div class="ttname"><a href="ansi-c_2library_2cprover_8h.html#a25b90c5c09c162016f22649dad66811a">__CPROVER_max_malloc_size</a></div><div class="ttdeci">__CPROVER_thread_local __CPROVER_size_t __CPROVER_max_malloc_size</div></div>
 <div class="ttc" id="aansi-c_2library_2cprover_8h_html_a277d56c6d8d48e44db87add1d5c526dc"><div class="ttname"><a href="ansi-c_2library_2cprover_8h.html#a277d56c6d8d48e44db87add1d5c526dc">__CPROVER_malloc_failure_mode</a></div><div class="ttdeci">int __CPROVER_malloc_failure_mode</div></div>
@@ -1194,48 +1494,56 @@ $(function(){initNavTree('stdlib_8c_source.html','',''); });
 <div class="ttc" id="agcc__builtin__headers__generic_8h_html_a28e8555fcc85ddb2e781f766f6115ccc"><div class="ttname"><a href="gcc__builtin__headers__generic_8h.html#a28e8555fcc85ddb2e781f766f6115ccc">__builtin_unreachable</a></div><div class="ttdeci">void __builtin_unreachable(void)</div></div>
 <div class="ttc" id="apadding_8cpp_html_ac8121cb248deefe3df1e974127851740"><div class="ttname"><a href="padding_8cpp.html#ac8121cb248deefe3df1e974127851740">alignment</a></div><div class="ttdeci">bytest alignment(const typet &amp;type, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition</b> <a href="padding_8cpp_source.html#l00023">padding.cpp:23</a></div></div>
 <div class="ttc" id="astdlib_8c_html_a04daf060736c4b84b8132b745409c7cf"><div class="ttname"><a href="stdlib_8c.html#a04daf060736c4b84b8132b745409c7cf">__VERIFIER_nondet_int</a></div><div class="ttdeci">int __VERIFIER_nondet_int(void)</div></div>
-<div class="ttc" id="astdlib_8c_html_a114aeb1751119382aaf3340355b22cfd"><div class="ttname"><a href="stdlib_8c.html#a114aeb1751119382aaf3340355b22cfd">random</a></div><div class="ttdeci">long random(void)</div><div class="ttdef"><b>Definition</b> <a href="#l00969">stdlib.c:969</a></div></div>
+<div class="ttc" id="astdlib_8c_html_a114aeb1751119382aaf3340355b22cfd"><div class="ttname"><a href="stdlib_8c.html#a114aeb1751119382aaf3340355b22cfd">random</a></div><div class="ttdeci">long random(void)</div><div class="ttdef"><b>Definition</b> <a href="#l01253">stdlib.c:1253</a></div></div>
 <div class="ttc" id="astdlib_8c_html_a15814086b55f0eadf1f7f51f59e443aa"><div class="ttname"><a href="stdlib_8c.html#a15814086b55f0eadf1f7f51f59e443aa">alloca</a></div><div class="ttdeci">void * alloca(__CPROVER_size_t alloca_size)</div><div class="ttdef"><b>Definition</b> <a href="#l00297">stdlib.c:297</a></div></div>
-<div class="ttc" id="astdlib_8c_html_a185551efd32d058ef290ebe2d144219f"><div class="ttname"><a href="stdlib_8c.html#a185551efd32d058ef290ebe2d144219f">atol</a></div><div class="ttdeci">long atol(const char *nptr)</div><div class="ttdef"><b>Definition</b> <a href="#l00817">stdlib.c:817</a></div></div>
+<div class="ttc" id="astdlib_8c_html_a18055d24dfe48efdafb3fb2bd9b852c3"><div class="ttname"><a href="stdlib_8c.html#a18055d24dfe48efdafb3fb2bd9b852c3">strtoll_l</a></div><div class="ttdeci">long long strtoll_l(const char *nptr, char **endptr, int base, locale_t loc)</div><div class="ttdef"><b>Definition</b> <a href="#l00965">stdlib.c:965</a></div></div>
+<div class="ttc" id="astdlib_8c_html_a185551efd32d058ef290ebe2d144219f"><div class="ttname"><a href="stdlib_8c.html#a185551efd32d058ef290ebe2d144219f">atol</a></div><div class="ttdeci">long atol(const char *nptr)</div><div class="ttdef"><b>Definition</b> <a href="#l01101">stdlib.c:1101</a></div></div>
 <div class="ttc" id="astdlib_8c_html_a1e27079aa7fd798053272e6a94f56fd4"><div class="ttname"><a href="stdlib_8c.html#a1e27079aa7fd798053272e6a94f56fd4">__builtin_mul_overflow</a></div><div class="ttdeci">_Bool __builtin_mul_overflow()</div></div>
 <div class="ttc" id="astdlib_8c_html_a216bf2bb658472d340e5d9607777147b"><div class="ttname"><a href="stdlib_8c.html#a216bf2bb658472d340e5d9607777147b">__CPROVER_strtoull_internal</a></div><div class="ttdeci">unsigned long long __CPROVER_strtoull_internal(const char *nptr, char **endptr, int base, _Bool c23)</div><div class="ttdoc">Convert as strtoull, accepting C23 prefixes if c23 is set.</div><div class="ttdef"><b>Definition</b> <a href="#l00744">stdlib.c:744</a></div></div>
 <div class="ttc" id="astdlib_8c_html_a22729006ddf62315c10407cc608d15aa"><div class="ttname"><a href="stdlib_8c.html#a22729006ddf62315c10407cc608d15aa">labs</a></div><div class="ttdeci">long int labs(long int i)</div><div class="ttdef"><b>Definition</b> <a href="#l00027">stdlib.c:27</a></div></div>
-<div class="ttc" id="astdlib_8c_html_a25039dc7d1ee0131ad097abd4e9ce3d9"><div class="ttname"><a href="stdlib_8c.html#a25039dc7d1ee0131ad097abd4e9ce3d9">posix_memalign</a></div><div class="ttdeci">int posix_memalign(void **ptr, __CPROVER_size_t alignment, __CPROVER_size_t size)</div><div class="ttdef"><b>Definition</b> <a href="#l00935">stdlib.c:935</a></div></div>
+<div class="ttc" id="astdlib_8c_html_a25039dc7d1ee0131ad097abd4e9ce3d9"><div class="ttname"><a href="stdlib_8c.html#a25039dc7d1ee0131ad097abd4e9ce3d9">posix_memalign</a></div><div class="ttdeci">int posix_memalign(void **ptr, __CPROVER_size_t alignment, __CPROVER_size_t size)</div><div class="ttdef"><b>Definition</b> <a href="#l01219">stdlib.c:1219</a></div></div>
 <div class="ttc" id="astdlib_8c_html_a311071298c2fe3e5d7057f396a6acfdc"><div class="ttname"><a href="stdlib_8c.html#a311071298c2fe3e5d7057f396a6acfdc">strtol</a></div><div class="ttdeci">long strtol(const char *nptr, char **endptr, int base)</div><div class="ttdef"><b>Definition</b> <a href="#l00548">stdlib.c:548</a></div></div>
 <div class="ttc" id="astdlib_8c_html_a367ed539bb4584e16d6cc73d58ea16ae"><div class="ttname"><a href="stdlib_8c.html#a367ed539bb4584e16d6cc73d58ea16ae">__CPROVER_strtoll_internal</a></div><div class="ttdeci">long long __CPROVER_strtoll_internal(const char *nptr, char **endptr, int base, _Bool c23)</div><div class="ttdoc">Convert as strtoll, accepting C23 prefixes if c23 is set.</div><div class="ttdef"><b>Definition</b> <a href="#l00592">stdlib.c:592</a></div></div>
-<div class="ttc" id="astdlib_8c_html_a48ccb326f8a50d01bc6d60660623bf56"><div class="ttname"><a href="stdlib_8c.html#a48ccb326f8a50d01bc6d60660623bf56">rand_r</a></div><div class="ttdeci">int rand_r(unsigned int *seed)</div><div class="ttdef"><b>Definition</b> <a href="#l00995">stdlib.c:995</a></div></div>
+<div class="ttc" id="astdlib_8c_html_a48ccb326f8a50d01bc6d60660623bf56"><div class="ttname"><a href="stdlib_8c.html#a48ccb326f8a50d01bc6d60660623bf56">rand_r</a></div><div class="ttdeci">int rand_r(unsigned int *seed)</div><div class="ttdef"><b>Definition</b> <a href="#l01279">stdlib.c:1279</a></div></div>
 <div class="ttc" id="astdlib_8c_html_a5210b545acc005a1e5ec8d51d0fd2a25"><div class="ttname"><a href="stdlib_8c.html#a5210b545acc005a1e5ec8d51d0fd2a25">__CPROVER_imaxabs</a></div><div class="ttdeci">intmax_t __CPROVER_imaxabs(intmax_t)</div></div>
 <div class="ttc" id="astdlib_8c_html_a53a0f3908528e9d382f76b87e2b8a76b"><div class="ttname"><a href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a></div><div class="ttdeci">void * malloc(__CPROVER_size_t malloc_size)</div><div class="ttdef"><b>Definition</b> <a href="#l00212">stdlib.c:212</a></div></div>
 <div class="ttc" id="astdlib_8c_html_a55e99c539cf7723ec15e856b7e0a8cee"><div class="ttname"><a href="stdlib_8c.html#a55e99c539cf7723ec15e856b7e0a8cee">exit</a></div><div class="ttdeci">void exit(int status)</div><div class="ttdef"><b>Definition</b> <a href="#l00102">stdlib.c:102</a></div></div>
 <div class="ttc" id="astdlib_8c_html_a58f7ad019ba2edb2be2921f86757e6f4"><div class="ttname"><a href="stdlib_8c.html#a58f7ad019ba2edb2be2921f86757e6f4">__builtin_labs</a></div><div class="ttdeci">long int __builtin_labs(long int i)</div><div class="ttdef"><b>Definition</b> <a href="#l00086">stdlib.c:86</a></div></div>
-<div class="ttc" id="astdlib_8c_html_a5ef264d7c09f165e1d72b108c150dd32"><div class="ttname"><a href="stdlib_8c.html#a5ef264d7c09f165e1d72b108c150dd32">__CPROVER_deallocate</a></div><div class="ttdeci">void __CPROVER_deallocate(void *)</div><div class="ttdef"><b>Definition</b> <a href="#l01009">stdlib.c:1009</a></div></div>
-<div class="ttc" id="astdlib_8c_html_a65c45dbbff309982f14adb06fda0edc5"><div class="ttname"><a href="stdlib_8c.html#a65c45dbbff309982f14adb06fda0edc5">valloc</a></div><div class="ttdeci">void * valloc(__CPROVER_size_t malloc_size)</div><div class="ttdef"><b>Definition</b> <a href="#l00916">stdlib.c:916</a></div></div>
+<div class="ttc" id="astdlib_8c_html_a5ef264d7c09f165e1d72b108c150dd32"><div class="ttname"><a href="stdlib_8c.html#a5ef264d7c09f165e1d72b108c150dd32">__CPROVER_deallocate</a></div><div class="ttdeci">void __CPROVER_deallocate(void *)</div><div class="ttdef"><b>Definition</b> <a href="#l01293">stdlib.c:1293</a></div></div>
+<div class="ttc" id="astdlib_8c_html_a65c45dbbff309982f14adb06fda0edc5"><div class="ttname"><a href="stdlib_8c.html#a65c45dbbff309982f14adb06fda0edc5">valloc</a></div><div class="ttdeci">void * valloc(__CPROVER_size_t malloc_size)</div><div class="ttdef"><b>Definition</b> <a href="#l01200">stdlib.c:1200</a></div></div>
 <div class="ttc" id="astdlib_8c_html_a6754aab356fd18e145bf8af1526b24a3"><div class="ttname"><a href="stdlib_8c.html#a6754aab356fd18e145bf8af1526b24a3">__CPROVER_strtoul_internal</a></div><div class="ttdeci">unsigned long __CPROVER_strtoul_internal(const char *nptr, char **endptr, int base, _Bool c23)</div><div class="ttdoc">Convert as strtoul, accepting C23 prefixes if c23 is set.</div><div class="ttdef"><b>Definition</b> <a href="#l00673">stdlib.c:673</a></div></div>
 <div class="ttc" id="astdlib_8c_html_a6c32fdc4219ca7dcdc44e3ef7ec18c97"><div class="ttname"><a href="stdlib_8c.html#a6c32fdc4219ca7dcdc44e3ef7ec18c97">__CPROVER_strto_scan</a></div><div class="ttdeci">unsigned long long __CPROVER_strto_scan(const char *nptr, char **endptr, int base, _Bool c23, _Bool *negative, _Bool *overflow)</div><div class="ttdoc">Scan an integer as specified for strtol, strtoll, strtoul, and strtoull in C23 7.24....</div><div class="ttdef"><b>Definition</b> <a href="#l00394">stdlib.c:394</a></div></div>
 <div class="ttc" id="astdlib_8c_html_a6d257fc3f00865d0556ed7327c312b55"><div class="ttname"><a href="stdlib_8c.html#a6d257fc3f00865d0556ed7327c312b55">strtoul</a></div><div class="ttdeci">unsigned long strtoul(const char *nptr, char **endptr, int base)</div><div class="ttdef"><b>Definition</b> <a href="#l00701">stdlib.c:701</a></div></div>
+<div class="ttc" id="astdlib_8c_html_a72d5533459e5ff45950a302f18c98100"><div class="ttname"><a href="stdlib_8c.html#a72d5533459e5ff45950a302f18c98100">__isoc23_strtoul_l</a></div><div class="ttdeci">unsigned long __isoc23_strtoul_l(const char *nptr, char **endptr, int base, locale_t loc)</div><div class="ttdef"><b>Definition</b> <a href="#l00929">stdlib.c:929</a></div></div>
 <div class="ttc" id="astdlib_8c_html_a7631d470a867ad04b3272667ea4b643e"><div class="ttname"><a href="stdlib_8c.html#a7631d470a867ad04b3272667ea4b643e">_Exit</a></div><div class="ttdeci">void _Exit(int status)</div><div class="ttdef"><b>Definition</b> <a href="#l00115">stdlib.c:115</a></div></div>
 <div class="ttc" id="astdlib_8c_html_a792acf158eb34b5fe0f4fa14d9a7db38"><div class="ttname"><a href="stdlib_8c.html#a792acf158eb34b5fe0f4fa14d9a7db38">calloc</a></div><div class="ttdeci">void * calloc(__CPROVER_size_t nmemb, __CPROVER_size_t size)</div><div class="ttdef"><b>Definition</b> <a href="#l00146">stdlib.c:146</a></div></div>
 <div class="ttc" id="astdlib_8c_html_a85c61391561ca28b10c032b83326faf6"><div class="ttname"><a href="stdlib_8c.html#a85c61391561ca28b10c032b83326faf6">__CPROVER_strtol_internal</a></div><div class="ttdeci">long __CPROVER_strtol_internal(const char *nptr, char **endptr, int base, _Bool c23)</div><div class="ttdoc">Convert as strtol, accepting C23 prefixes if c23 is set.</div><div class="ttdef"><b>Definition</b> <a href="#l00508">stdlib.c:508</a></div></div>
 <div class="ttc" id="astdlib_8c_html_a8cb534abb228896759dded0be6ac4351"><div class="ttname"><a href="stdlib_8c.html#a8cb534abb228896759dded0be6ac4351">__VERIFIER_nondet___CPROVER_bool</a></div><div class="ttdeci">__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void)</div></div>
 <div class="ttc" id="astdlib_8c_html_a8dec7c95227ff149687066cf04029191"><div class="ttname"><a href="stdlib_8c.html#a8dec7c95227ff149687066cf04029191">abort</a></div><div class="ttdeci">void abort(void)</div><div class="ttdef"><b>Definition</b> <a href="#l00128">stdlib.c:128</a></div></div>
+<div class="ttc" id="astdlib_8c_html_a94f8f87df6be969db953d19128381630"><div class="ttname"><a href="stdlib_8c.html#a94f8f87df6be969db953d19128381630">strtol_l</a></div><div class="ttdeci">long strtol_l(const char *nptr, char **endptr, int base, locale_t loc)</div><div class="ttdef"><b>Definition</b> <a href="#l00824">stdlib.c:824</a></div></div>
 <div class="ttc" id="astdlib_8c_html_a967acc61fefd64c56c1cdbdd27343cce"><div class="ttname"><a href="stdlib_8c.html#a967acc61fefd64c56c1cdbdd27343cce">__builtin_alloca</a></div><div class="ttdeci">void * __builtin_alloca(__CPROVER_size_t alloca_size)</div><div class="ttdef"><b>Definition</b> <a href="#l00270">stdlib.c:270</a></div></div>
 <div class="ttc" id="astdlib_8c_html_a9a93701d8b6535e6bb194c8681cef7d3"><div class="ttname"><a href="stdlib_8c.html#a9a93701d8b6535e6bb194c8681cef7d3">imaxabs</a></div><div class="ttdeci">intmax_t imaxabs(intmax_t i)</div><div class="ttdef"><b>Definition</b> <a href="#l00070">stdlib.c:70</a></div></div>
+<div class="ttc" id="astdlib_8c_html_a9c797734c6bbd8e8686683cf74c88104"><div class="ttname"><a href="stdlib_8c.html#a9c797734c6bbd8e8686683cf74c88104">__isoc23_strtoull_l</a></div><div class="ttdeci">unsigned long long __isoc23_strtoull_l(const char *nptr, char **endptr, int base, locale_t loc)</div><div class="ttdef"><b>Definition</b> <a href="#l01072">stdlib.c:1072</a></div></div>
 <div class="ttc" id="astdlib_8c_html_a9cb9f411b6828da86e587ec9203807bf"><div class="ttname"><a href="stdlib_8c.html#a9cb9f411b6828da86e587ec9203807bf">__isoc23_strtoul</a></div><div class="ttdeci">unsigned long __isoc23_strtoul(const char *nptr, char **endptr, int base)</div><div class="ttdef"><b>Definition</b> <a href="#l00717">stdlib.c:717</a></div></div>
 <div class="ttc" id="astdlib_8c_html_a9e4f3a211671d05c9df210bb611719bf"><div class="ttname"><a href="stdlib_8c.html#a9e4f3a211671d05c9df210bb611719bf">isspace</a></div><div class="ttdeci">int isspace(int)</div><div class="ttdef"><b>Definition</b> <a href="ctype_8c_source.html#l00080">ctype.c:80</a></div></div>
 <div class="ttc" id="astdlib_8c_html_a9ee5e0bece317e0e12bca8c1ef6f3e28"><div class="ttname"><a href="stdlib_8c.html#a9ee5e0bece317e0e12bca8c1ef6f3e28">__builtin_add_overflow</a></div><div class="ttdeci">_Bool __builtin_add_overflow()</div></div>
 <div class="ttc" id="astdlib_8c_html_a9fa75e735488f246dd6ed34d0b2d3067"><div class="ttname"><a href="stdlib_8c.html#a9fa75e735488f246dd6ed34d0b2d3067">llabs</a></div><div class="ttdeci">long long int llabs(long long int i)</div><div class="ttdef"><b>Definition</b> <a href="#l00045">stdlib.c:45</a></div></div>
 <div class="ttc" id="astdlib_8c_html_aa07074fcd98bf063592fd76ca0662d0e"><div class="ttname"><a href="stdlib_8c.html#aa07074fcd98bf063592fd76ca0662d0e">__builtin_abs</a></div><div class="ttdeci">int __builtin_abs(int i)</div><div class="ttdef"><b>Definition</b> <a href="#l00079">stdlib.c:79</a></div></div>
-<div class="ttc" id="astdlib_8c_html_ab1ec8cf93b9478de49bb3e77465ab4af"><div class="ttname"><a href="stdlib_8c.html#ab1ec8cf93b9478de49bb3e77465ab4af">getenv</a></div><div class="ttdeci">char * getenv(const char *name)</div><div class="ttdef"><b>Definition</b> <a href="#l00835">stdlib.c:835</a></div></div>
+<div class="ttc" id="astdlib_8c_html_ab1ec8cf93b9478de49bb3e77465ab4af"><div class="ttname"><a href="stdlib_8c.html#ab1ec8cf93b9478de49bb3e77465ab4af">getenv</a></div><div class="ttdeci">char * getenv(const char *name)</div><div class="ttdef"><b>Definition</b> <a href="#l01119">stdlib.c:1119</a></div></div>
 <div class="ttc" id="astdlib_8c_html_ab687850fb20d01a96f0000875cd00303"><div class="ttname"><a href="stdlib_8c.html#ab687850fb20d01a96f0000875cd00303">__builtin_llabs</a></div><div class="ttdeci">long long int __builtin_llabs(long long int i)</div><div class="ttdef"><b>Definition</b> <a href="#l00093">stdlib.c:93</a></div></div>
 <div class="ttc" id="astdlib_8c_html_ab791a2da0c2573abff7e8253f233c15a"><div class="ttname"><a href="stdlib_8c.html#ab791a2da0c2573abff7e8253f233c15a">__CPROVER_STRTO_DIGIT_VALUE</a></div><div class="ttdeci">#define __CPROVER_STRTO_DIGIT_VALUE(ch)</div><div class="ttdef"><b>Definition</b> <a href="#l00376">stdlib.c:376</a></div></div>
+<div class="ttc" id="astdlib_8c_html_aba2a931ce321883383e58906f009b02e"><div class="ttname"><a href="stdlib_8c.html#aba2a931ce321883383e58906f009b02e">strtoull_l</a></div><div class="ttdeci">unsigned long long strtoull_l(const char *nptr, char **endptr, int base, locale_t loc)</div><div class="ttdef"><b>Definition</b> <a href="#l01037">stdlib.c:1037</a></div></div>
 <div class="ttc" id="astdlib_8c_html_abea6f681a5ef446856f1fe549b48dfda"><div class="ttname"><a href="stdlib_8c.html#abea6f681a5ef446856f1fe549b48dfda">__isoc23_strtoull</a></div><div class="ttdeci">unsigned long long __isoc23_strtoull(const char *nptr, char **endptr, int base)</div><div class="ttdef"><b>Definition</b> <a href="#l00791">stdlib.c:791</a></div></div>
 <div class="ttc" id="astdlib_8c_html_ac160067ec58a2b028b26f4b37afb614c"><div class="ttname"><a href="stdlib_8c.html#ac160067ec58a2b028b26f4b37afb614c">__isoc23_strtol</a></div><div class="ttdeci">long __isoc23_strtol(const char *nptr, char **endptr, int base)</div><div class="ttdef"><b>Definition</b> <a href="#l00564">stdlib.c:564</a></div></div>
 <div class="ttc" id="astdlib_8c_html_ac7eae8dd2e24285c5410fce64db23515"><div class="ttname"><a href="stdlib_8c.html#ac7eae8dd2e24285c5410fce64db23515">__VERIFIER_nondet_ptrdiff_t</a></div><div class="ttdeci">ptrdiff_t __VERIFIER_nondet_ptrdiff_t(void)</div></div>
 <div class="ttc" id="astdlib_8c_html_ace326158a2d773506c0122f57861dcc5"><div class="ttname"><a href="stdlib_8c.html#ace326158a2d773506c0122f57861dcc5">__isoc23_strtoll</a></div><div class="ttdeci">long long __isoc23_strtoll(const char *nptr, char **endptr, int base)</div><div class="ttdef"><b>Definition</b> <a href="#l00645">stdlib.c:645</a></div></div>
-<div class="ttc" id="astdlib_8c_html_ad228deceea1bac4d9f171f647c265059"><div class="ttname"><a href="stdlib_8c.html#ad228deceea1bac4d9f171f647c265059">atoi</a></div><div class="ttdeci">int atoi(const char *nptr)</div><div class="ttdef"><b>Definition</b> <a href="#l00804">stdlib.c:804</a></div></div>
-<div class="ttc" id="astdlib_8c_html_ae23144bcbb8e3742b00eb687c36654d1"><div class="ttname"><a href="stdlib_8c.html#ae23144bcbb8e3742b00eb687c36654d1">rand</a></div><div class="ttdeci">int rand(void)</div><div class="ttdef"><b>Definition</b> <a href="#l00982">stdlib.c:982</a></div></div>
+<div class="ttc" id="astdlib_8c_html_ad02f083bf7d0c509aa6a2f7eb2e610b1"><div class="ttname"><a href="stdlib_8c.html#ad02f083bf7d0c509aa6a2f7eb2e610b1">__isoc23_strtol_l</a></div><div class="ttdeci">long __isoc23_strtol_l(const char *nptr, char **endptr, int base, locale_t loc)</div><div class="ttdef"><b>Definition</b> <a href="#l00858">stdlib.c:858</a></div></div>
+<div class="ttc" id="astdlib_8c_html_ad228deceea1bac4d9f171f647c265059"><div class="ttname"><a href="stdlib_8c.html#ad228deceea1bac4d9f171f647c265059">atoi</a></div><div class="ttdeci">int atoi(const char *nptr)</div><div class="ttdef"><b>Definition</b> <a href="#l01088">stdlib.c:1088</a></div></div>
+<div class="ttc" id="astdlib_8c_html_ad9da9d487f9ef6ba14447c89f392885f"><div class="ttname"><a href="stdlib_8c.html#ad9da9d487f9ef6ba14447c89f392885f">strtoul_l</a></div><div class="ttdeci">unsigned long strtoul_l(const char *nptr, char **endptr, int base, locale_t loc)</div><div class="ttdef"><b>Definition</b> <a href="#l00894">stdlib.c:894</a></div></div>
+<div class="ttc" id="astdlib_8c_html_adafd13c16a09ce409d75345bd9ad3b31"><div class="ttname"><a href="stdlib_8c.html#adafd13c16a09ce409d75345bd9ad3b31">__isoc23_strtoll_l</a></div><div class="ttdeci">long long __isoc23_strtoll_l(const char *nptr, char **endptr, int base, locale_t loc)</div><div class="ttdef"><b>Definition</b> <a href="#l01000">stdlib.c:1000</a></div></div>
+<div class="ttc" id="astdlib_8c_html_ae23144bcbb8e3742b00eb687c36654d1"><div class="ttname"><a href="stdlib_8c.html#ae23144bcbb8e3742b00eb687c36654d1">rand</a></div><div class="ttdeci">int rand(void)</div><div class="ttdef"><b>Definition</b> <a href="#l01266">stdlib.c:1266</a></div></div>
 <div class="ttc" id="astdlib_8c_html_ae5835422eb2dfc17ea8deb3b15bcc541"><div class="ttname"><a href="stdlib_8c.html#ae5835422eb2dfc17ea8deb3b15bcc541">strtoull</a></div><div class="ttdeci">unsigned long long strtoull(const char *nptr, char **endptr, int base)</div><div class="ttdef"><b>Definition</b> <a href="#l00775">stdlib.c:775</a></div></div>
-<div class="ttc" id="astdlib_8c_html_aed52b7297948c8be2727c9383e29077b"><div class="ttname"><a href="stdlib_8c.html#aed52b7297948c8be2727c9383e29077b">realloc</a></div><div class="ttdeci">void * realloc(void *ptr, __CPROVER_size_t malloc_size)</div><div class="ttdef"><b>Definition</b> <a href="#l00881">stdlib.c:881</a></div></div>
+<div class="ttc" id="astdlib_8c_html_aed52b7297948c8be2727c9383e29077b"><div class="ttname"><a href="stdlib_8c.html#aed52b7297948c8be2727c9383e29077b">realloc</a></div><div class="ttdeci">void * realloc(void *ptr, __CPROVER_size_t malloc_size)</div><div class="ttdef"><b>Definition</b> <a href="#l01165">stdlib.c:1165</a></div></div>
 <div class="ttc" id="astdlib_8c_html_af15d7205d8d10c4820f997ce5c526279"><div class="ttname"><a href="stdlib_8c.html#af15d7205d8d10c4820f997ce5c526279">abs</a></div><div class="ttdeci">int abs(int i)</div><div class="ttdef"><b>Definition</b> <a href="#l00010">stdlib.c:10</a></div></div>
 <div class="ttc" id="astdlib_8c_html_afb901aa665b7e2e3e27025ca77fecd1b"><div class="ttname"><a href="stdlib_8c.html#afb901aa665b7e2e3e27025ca77fecd1b">strtoll</a></div><div class="ttdeci">long long strtoll(const char *nptr, char **endptr, int base)</div><div class="ttdef"><b>Definition</b> <a href="#l00629">stdlib.c:629</a></div></div>
 <div class="ttc" id="astdlib_8c_html_afbedc913aa4651b3c3b4b3aecd9b4711"><div class="ttname"><a href="stdlib_8c.html#afbedc913aa4651b3c3b4b3aecd9b4711">free</a></div><div class="ttdeci">void free(void *ptr)</div><div class="ttdef"><b>Definition</b> <a href="#l00317">stdlib.c:317</a></div></div>
