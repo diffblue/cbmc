@@ -1,0 +1,12 @@
+CORE smt-backend broken-cprover-smt-backend no-new-smt
+nested-quantifier.c
+--cvc5
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^VERIFICATION ERROR$
+--
+--arrays-exp implies --fmf-bound in cvc5, which disables prenexing and leaves
+the outer quantifier without a trigger: cvc5 then reports unknown unless it is
+also given --no-fmf-bound.

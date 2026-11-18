@@ -95,6 +95,9 @@ decision_proceduret::resultt smt2_dect::dec_solve(const exprt &assumption)
     {
       // needed for (as const ...) arrays as of cvc5 1.3.4
       argv.push_back("--arrays-exp");
+      // --arrays-exp implies --fmf-bound, which disables prenexing of nested
+      // quantifiers, leaving them without triggers
+      argv.push_back("--no-fmf-bound");
       // needed for floating-point formats other than Float32 and Float64,
       // such as x86's 80-bit long double
       argv.push_back("--fp-exp");
