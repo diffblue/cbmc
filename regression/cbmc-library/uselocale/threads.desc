@@ -1,0 +1,13 @@
+CORE unix
+threads.c
+--no-standard-checks
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+The locale that uselocale sets is per thread: a new thread starts with
+LC_GLOBAL_LOCALE, and its changes do not affect the creating thread.
+--no-standard-checks avoids "pointer handling for concurrency is unsound",
+which is unrelated to uselocale.
