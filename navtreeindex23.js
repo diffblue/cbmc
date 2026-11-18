@@ -1,5 +1,6 @@
 var NAVTREEINDEX23 =
 {
+"classcpp__save__scopet.html#abc3f23b73ed6d1deec0334c44d2310ac":[5,0,331,1],
 "classcpp__save__scopet.html#ae841a6963c16a4c517b9ecfa0921561e":[5,0,331,2],
 "classcpp__save__scopet.html#aec3b2a3dd2ba34ad90367323c4061fce":[5,0,331,3],
 "classcpp__save__scopet.html#aefa28da307c0a44849e59fcafb11acbd":[5,0,331,0],
@@ -248,6 +249,5 @@ var NAVTREEINDEX23 =
 "classcpp__typecheckt.html#a72dbce84b89f9b44121099a6951aad9d":[5,0,345,4],
 "classcpp__typecheckt.html#a733024c966be67438cceb023e4a9caab":[5,0,345,156],
 "classcpp__typecheckt.html#a7394cbff76c4f1dfee331c430030ee75":[5,0,345,44],
-"classcpp__typecheckt.html#a74b2859e66dbe18f79ee81ef289131f3":[5,0,345,35],
-"classcpp__typecheckt.html#a76d3b15fdc81731530c3db518672555c":[5,0,345,17]
+"classcpp__typecheckt.html#a74b2859e66dbe18f79ee81ef289131f3":[5,0,345,35]
 };

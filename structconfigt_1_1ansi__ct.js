@@ -116,6 +116,7 @@ var structconfigt_1_1ansi__ct =
     [ "mode", "structconfigt_1_1ansi__ct.html#af249a411a92a3effeb3155adbe35ea5c", null ],
     [ "NULL_is_zero", "structconfigt_1_1ansi__ct.html#adc1cba4fe2b1f6716d17f49eda886ec7", null ],
     [ "os", "structconfigt_1_1ansi__ct.html#a3264df7228b249afdb195d42122a612d", null ],
+    [ "os_name", "structconfigt_1_1ansi__ct.html#a3c1e9b79e52aa5b205c7fd1fdae6d281", null ],
     [ "pointer_width", "structconfigt_1_1ansi__ct.html#a592aaee744f051f2e7e09c6901f98b9a", null ],
     [ "preprocessor", "structconfigt_1_1ansi__ct.html#aa82a8dfa7d3d62e82a976df2fa0c1102", null ],
     [ "preprocessor_options", "structconfigt_1_1ansi__ct.html#a854e0e426f201f365d3b46450c42b21f", null ],

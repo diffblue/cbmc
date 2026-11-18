@@ -13,6 +13,7 @@ var classconfigt =
     [ "set_classpath", "classconfigt.html#a8752312ff730905ac4da575e88c868a7", null ],
     [ "set_from_symbol_table", "classconfigt.html#ab32b9fa7fe3694ced87c37a7aea2cca7", null ],
     [ "set_object_bits_from_symbol_table", "classconfigt.html#a02edde10c26fc92da8d3641a94768323", null ],
+    [ "set_os_arch_overrides", "classconfigt.html#abb16f11187037c7610552f4f331a59f1", null ],
     [ "this_architecture", "classconfigt.html#abf0ff23ebf6e57c98ba4e09841ca33ea", null ],
     [ "this_operating_system", "classconfigt.html#af9a6fec588d1a19fe5e72a56fd2e77de", null ],
     [ "ansi_c", "classconfigt.html#afea36d271997788d5fae9e5baefd358b", null ],
