@@ -89,6 +89,12 @@ public:
   std::size_t get_number_of_solver_calls() const override;
 
   static std::string convert_identifier(const irep_idt &identifier);
+  static std::string datatype_selector_name(
+    const std::string &smt_typename,
+    const irep_idt &component_name);
+  static std::string datatype_update_name(
+    const std::string &smt_typename,
+    const irep_idt &component_name);
 
   void set_converter(irep_idt id, std::function<void(const exprt &)> converter)
   {
