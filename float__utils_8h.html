@@ -110,7 +110,7 @@ $(function(){initNavTree('float__utils_8h.html','',''); });
 <div id="dynsection-1-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-1-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" loading="lazy" frameborder="0" src="float__utils_8h__dep__incl.svg" width="2895" height="292"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" loading="lazy" frameborder="0" src="float__utils_8h__dep__incl.svg" width="3103" height="292"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 </div>
 <p><a href="float__utils_8h_source.html">Go to the source code of this file.</a></p>
@@ -122,7 +122,41 @@ Classes</h2></td></tr>
 <tr class="memitem:float_5Futilst_3A_3Aunpacked_5Ffloatt" id="r_float_5Futilst_3A_3Aunpacked_5Ffloatt"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfloat__utilst_1_1unpacked__floatt.html">float_utilst::unpacked_floatt</a></td></tr>
 <tr class="memitem:float_5Futilst_3A_3Abiased_5Ffloatt" id="r_float_5Futilst_3A_3Abiased_5Ffloatt"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfloat__utilst_1_1biased__floatt.html">float_utilst::biased_floatt</a></td></tr>
 <tr class="memitem:float_5Futilst_3A_3Aunbiased_5Ffloatt" id="r_float_5Futilst_3A_3Aunbiased_5Ffloatt"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfloat__utilst_1_1unbiased__floatt.html">float_utilst::unbiased_floatt</a></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a5993db3ebbe1aa7384c0573b3cd4cfbc" id="r_a5993db3ebbe1aa7384c0573b3cd4cfbc"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5993db3ebbe1aa7384c0573b3cd4cfbc">float_div_exponent_width</a> (const <a class="el" href="classieee__float__spect.html">ieee_float_spect</a> &amp;spec)</td></tr>
+<tr class="memdesc:a5993db3ebbe1aa7384c0573b3cd4cfbc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Width of the signed bit-vector in which floating-point division (<a class="el" href="classfloat__utilst.html#a9fc44dce2a3201570f923ab0539a48cc">float_utilst::div</a> and <a class="el" href="classfloat__bvt.html#a84bd174425b6d0e0a5cfa3e81794a2fa">float_bvt::div</a>) subtracts the exponents of its operands and then adds spec.f.  <br /></td></tr>
 </table>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+<a id="a5993db3ebbe1aa7384c0573b3cd4cfbc" name="a5993db3ebbe1aa7384c0573b3cd4cfbc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5993db3ebbe1aa7384c0573b3cd4cfbc">&#9670;&#160;</a></span>float_div_exponent_width()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::size_t float_div_exponent_width </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classieee__float__spect.html">ieee_float_spect</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>spec</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Width of the signed bit-vector in which floating-point division (<a class="el" href="classfloat__utilst.html#a9fc44dce2a3201570f923ab0539a48cc">float_utilst::div</a> and <a class="el" href="classfloat__bvt.html#a84bd174425b6d0e0a5cfa3e81794a2fa">float_bvt::div</a>) subtracts the exponents of its operands and then adds spec.f. </p>
+<p>The result lies in [1 - 2 * bias, 2 * bias - 1 + spec.f], i.e., its magnitude is less than 2^spec.e + spec.f, which max(spec.e, address_bits(spec.f)) + 2 bits cover. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">spec</td><td>the format of the operands </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The width of the exponent arithmetic </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="float__utils_8cpp_source.html#l00630">630</a> of file <a class="el" href="float__utils_8cpp_source.html">float_utils.cpp</a>.</p>
+
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <div id="page-nav" class="page-nav-panel">

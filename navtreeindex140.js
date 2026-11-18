@@ -1,5 +1,7 @@
 var NAVTREEINDEX140 =
 {
+"strings_8c.html#a3324a2054378b994b7467003966424d6":[6,0,2,1,2,30,0],
+"strings_8c_source.html":[6,0,2,1,2,30],
 "struct_____c_p_r_o_v_e_r__cegis__instructiont.html":[5,0,5],
 "struct_____c_p_r_o_v_e_r__cegis__instructiont.html#a26e9bbb4cc78bbb6763b4ce15d40f958":[5,0,5,2],
 "struct_____c_p_r_o_v_e_r__cegis__instructiont.html#a3d6f19fbcfbf0db065b5371458d043e3":[5,0,5,3],
@@ -247,7 +249,5 @@ var NAVTREEINDEX140 =
 "structbv__refinementt_1_1approximationt.html#ab7f74f8ba20c7636dab7913900aaede2":[5,0,146,2,1],
 "structbv__refinementt_1_1approximationt.html#ac15ee02667959f755bc10be3d2e528a8":[5,0,146,2,17],
 "structbv__refinementt_1_1approximationt.html#aca902cc90c30456c04eba07437bd8aa9":[5,0,146,2,9],
-"structbv__refinementt_1_1approximationt.html#ae75be3510735ce7ed83c2eb2bd2cb1e4":[5,0,146,2,14],
-"structbv__refinementt_1_1approximationt.html#aefc4529da28e9925114aadf51aace5cd":[5,0,146,2,8],
-"structbv__refinementt_1_1approximationt.html#af06567bf6c2cd3b2d342ff173ac3001d":[5,0,146,2,0]
+"structbv__refinementt_1_1approximationt.html#ae75be3510735ce7ed83c2eb2bd2cb1e4":[5,0,146,2,14]
 };
