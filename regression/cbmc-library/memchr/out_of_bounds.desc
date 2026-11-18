@@ -1,0 +1,11 @@
+CORE
+out_of_bounds.c
+
+^\[memchr\.precondition\.\d+\] line \d+ memchr region readable: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+A search beyond the object that does not find the character is reported.
