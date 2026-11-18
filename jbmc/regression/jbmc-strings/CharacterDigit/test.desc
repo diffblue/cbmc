@@ -1,0 +1,12 @@
+CORE
+Test
+--cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+JBMC replaces Character.digit by an expression (character_refine_preprocesst),
+which compared the char argument with the int radix, and which computed in the
+char type, so that -1 could not be represented.
