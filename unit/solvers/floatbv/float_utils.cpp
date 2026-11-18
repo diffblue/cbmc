@@ -92,7 +92,7 @@ static bvt compute(
   const bvt b1 = float_utils.build_constant(i1);
   const bvt b2 = float_utils.build_constant(i2);
 
-  const auto op = i % 3;
+  const auto op = i % 4;
 
   switch(op)
   {
@@ -126,7 +126,7 @@ static void print(
   const float &f2,
   const float &f3)
 {
-  const unsigned op = i % 3;
+  const unsigned op = i % 4;
   const char *opsym = binopsyms[op];
 
   std::cout << i1 << opsym << i2 << " != " << fres << '\n';
