@@ -1,0 +1,12 @@
+CORE
+main_02.c
+--c11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Edge cases of C23 7.24.1.7, each of which matches glibc's behaviour. Use C11
+to make sure that strtoll is not redirected to __isoc23_strtoll, which accepts
+the 0b prefix.

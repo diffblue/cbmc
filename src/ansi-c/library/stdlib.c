@@ -351,108 +351,447 @@ void free(void *ptr)
   }
 }
 
-/* FUNCTION: strtol */
+/* FUNCTION: __CPROVER_strto_scan */
 
 #ifndef __CPROVER_ERRNO_H_INCLUDED
-#include <errno.h>
-#define __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
 #endif
 
 #ifndef __CPROVER_LIMITS_H_INCLUDED
-#include <limits.h>
-#define __CPROVER_LIMITS_H_INCLUDED
+#  include <limits.h>
+#  define __CPROVER_LIMITS_H_INCLUDED
 #endif
 
-#undef strtol
-#undef isdigit
 #undef isspace
 
 int isspace(int);
-int isdigit(int);
 
 #ifndef __GNUC__
 _Bool __builtin_add_overflow();
 _Bool __builtin_mul_overflow();
 #endif
 
-long strtol(const char *nptr, char **endptr, int base)
-{
-  __CPROVER_HIDE:;
-  #ifdef __CPROVER_STRING_ABSTRACTION
-  __CPROVER_precondition(__CPROVER_is_zero_string(nptr),
-    "zero-termination of argument of strtol");
-  #endif
+// The value of the digit ch in bases up to 36, and 36 for any other character
+#define __CPROVER_STRTO_DIGIT_VALUE(ch)                                        \
+  ((ch) >= '0' && (ch) <= '9'   ? (ch) - '0'                                   \
+   : (ch) >= 'a' && (ch) <= 'z' ? (ch) - 'a' + 10                              \
+   : (ch) >= 'A' && (ch) <= 'Z' ? (ch) - 'A' + 10                              \
+                                : 36)
 
-  if(base==1 || base<0 || base>36)
+/// Scan an integer as specified for strtol, strtoll, strtoul, and strtoull
+/// in C23 7.24.1.7, and set \p *endptr (if \p endptr is not null).
+/// \param nptr: the string to convert
+/// \param endptr: where to store the end of the subject sequence
+/// \param base: the base, or 0 to determine the base from the prefix
+/// \param c23: whether to accept a "0b" or "0B" prefix for base 0 and 2, as
+///   C23 does
+/// \param [out] negative: whether the subject sequence starts with '-'
+/// \param [out] overflow: whether the magnitude exceeds ULLONG_MAX
+/// \return the magnitude of the converted value, or ULLONG_MAX if \p overflow
+///   is set; 0 (with \p negative and \p overflow false) if no conversion
+///   could be performed
+unsigned long long __CPROVER_strto_scan(
+  const char *nptr,
+  char **endptr,
+  int base,
+  _Bool c23,
+  _Bool *negative,
+  _Bool *overflow)
+{
+__CPROVER_HIDE:;
+#ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_precondition(
+    __CPROVER_is_zero_string(nptr), "zero-termination of argument of strto*");
+#endif
+
+  *negative = 0;
+  *overflow = 0;
+
+  if(base == 1 || base < 0 || base > 36)
   {
-    errno=EINVAL;
+    errno = EINVAL;
     return 0;
   }
 
-  long res=0;
-  _Bool in_number=0;
-  char sign=0;
+  __CPROVER_size_t i = 0;
+  while(isspace((unsigned char)nptr[i]))
+    ++i;
 
-  // 32 chars is an arbitrarily chosen limit
-  int i=0;
-  for( ; i<31; ++i)
+  _Bool is_negative = 0;
+  if(nptr[i] == '-')
   {
-    char ch=nptr[i];
-    char sub=0;
-    if(ch==0)
-      break;
-    else if((base==0 || base==16) && !in_number &&
-            ch=='0' && (nptr[i+1]=='x' || nptr[i+1]=='X'))
-    {
-      base=16;
-      in_number=1;
-      ++i;
-      continue;
-    }
-    else if(base==0 && !in_number && ch=='0')
-    {
-      base=8;
-      in_number=1;
-      continue;
-    }
-    else if(!in_number && !sign && isspace(ch))
-      continue;
-    else if(!in_number && !sign && (ch=='-' || ch=='+'))
-    {
-      sign=ch;
-      continue;
-    }
-    else if(base>10 && ch>='a' && ch-'a'<base-10)
-      sub='a'-10;
-    else if(base>10 && ch>='A' && ch-'A'<base-10)
-      sub='A'-10;
-    else if(isdigit(ch))
-    {
-      sub='0';
-      base=base==0 ? 10 : base;
-    }
-    else
-      break;
+    is_negative = 1;
+    ++i;
+  }
+  else if(nptr[i] == '+')
+    ++i;
 
-    in_number=1;
-    _Bool overflow = __builtin_mul_overflow(res, (long)base, &res);
-    if(overflow || __builtin_add_overflow(res, (long)(ch - sub), &res))
+  // A prefix is only part of the subject sequence if a digit follows it.
+  if(
+    (base == 0 || base == 16) && nptr[i] == '0' &&
+    (nptr[i + 1] == 'x' || nptr[i + 1] == 'X') &&
+    __CPROVER_STRTO_DIGIT_VALUE(nptr[i + 2]) < 16)
+  {
+    base = 16;
+    i += 2;
+  }
+  else if(
+    c23 && (base == 0 || base == 2) && nptr[i] == '0' &&
+    (nptr[i + 1] == 'b' || nptr[i + 1] == 'B') &&
+    __CPROVER_STRTO_DIGIT_VALUE(nptr[i + 2]) < 2)
+  {
+    base = 2;
+    i += 2;
+  }
+  else if(base == 0)
+    base = nptr[i] == '0' ? 8 : 10;
+
+  const __CPROVER_size_t first_digit = i;
+  unsigned long long result = 0;
+  _Bool has_overflow = 0;
+  for(;; ++i)
+  {
+    int digit = __CPROVER_STRTO_DIGIT_VALUE(nptr[i]);
+    if(digit >= base)
+      break;
+    // keep consuming digits after an overflow, as endptr must point past the
+    // subject sequence
+    if(
+      !has_overflow &&
+      (__builtin_mul_overflow(result, (unsigned long long)base, &result) ||
+       __builtin_add_overflow(result, (unsigned long long)digit, &result)))
     {
-      errno=ERANGE;
-      if(sign=='-')
-        return LONG_MIN;
-      else
-        return LONG_MAX;
+      has_overflow = 1;
     }
   }
 
-  if(endptr!=0)
-    *endptr=(char*)nptr+i;
+  if(i == first_digit)
+  {
+    // no conversion performed
+    if(endptr != 0)
+      *endptr = (char *)nptr;
+    return 0;
+  }
 
-  if(sign=='-')
-    res*=-1;
+  if(endptr != 0)
+    *endptr = (char *)nptr + i;
 
-  return res;
+  *negative = is_negative;
+  *overflow = has_overflow;
+  return has_overflow ? ULLONG_MAX : result;
+}
+
+#undef __CPROVER_STRTO_DIGIT_VALUE
+
+/* FUNCTION: __CPROVER_strtol_internal */
+
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_LIMITS_H_INCLUDED
+#  include <limits.h>
+#  define __CPROVER_LIMITS_H_INCLUDED
+#endif
+
+unsigned long long __CPROVER_strto_scan(
+  const char *nptr,
+  char **endptr,
+  int base,
+  _Bool c23,
+  _Bool *negative,
+  _Bool *overflow);
+
+/// Convert as strtol, accepting C23 prefixes if \p c23 is set.
+long __CPROVER_strtol_internal(
+  const char *nptr,
+  char **endptr,
+  int base,
+  _Bool c23)
+{
+__CPROVER_HIDE:;
+  _Bool negative, overflow;
+  unsigned long long magnitude =
+    __CPROVER_strto_scan(nptr, endptr, base, c23, &negative, &overflow);
+
+  if(negative)
+  {
+    if(overflow || magnitude > (unsigned long long)LONG_MAX + 1)
+    {
+      errno = ERANGE;
+      return LONG_MIN;
+    }
+    return magnitude == (unsigned long long)LONG_MAX + 1 ? LONG_MIN
+                                                         : -(long)magnitude;
+  }
+  else if(overflow || magnitude > LONG_MAX)
+  {
+    errno = ERANGE;
+    return LONG_MAX;
+  }
+  else
+    return (long)magnitude;
+}
+
+/* FUNCTION: strtol */
+
+#undef strtol
+
+long __CPROVER_strtol_internal(
+  const char *nptr,
+  char **endptr,
+  int base,
+  _Bool c23);
+
+long strtol(const char *nptr, char **endptr, int base)
+{
+__CPROVER_HIDE:;
+  return __CPROVER_strtol_internal(nptr, endptr, base, 0);
+}
+
+/* FUNCTION: __isoc23_strtol */
+
+long __CPROVER_strtol_internal(
+  const char *nptr,
+  char **endptr,
+  int base,
+  _Bool c23);
+
+// glibc 2.38 and later redirect strtol to this function in C23 mode, with
+// _GNU_SOURCE, and in C++. Unlike strtol, it accepts the C23 "0b" prefix.
+long __isoc23_strtol(const char *nptr, char **endptr, int base)
+{
+__CPROVER_HIDE:;
+  return __CPROVER_strtol_internal(nptr, endptr, base, 1);
+}
+
+/* FUNCTION: __CPROVER_strtoll_internal */
+
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_LIMITS_H_INCLUDED
+#  include <limits.h>
+#  define __CPROVER_LIMITS_H_INCLUDED
+#endif
+
+unsigned long long __CPROVER_strto_scan(
+  const char *nptr,
+  char **endptr,
+  int base,
+  _Bool c23,
+  _Bool *negative,
+  _Bool *overflow);
+
+/// Convert as strtoll, accepting C23 prefixes if \p c23 is set.
+long long
+__CPROVER_strtoll_internal(const char *nptr, char **endptr, int base, _Bool c23)
+{
+__CPROVER_HIDE:;
+  _Bool negative, overflow;
+  unsigned long long magnitude =
+    __CPROVER_strto_scan(nptr, endptr, base, c23, &negative, &overflow);
+
+  if(negative)
+  {
+    if(overflow || magnitude > (unsigned long long)LLONG_MAX + 1)
+    {
+      errno = ERANGE;
+      return LLONG_MIN;
+    }
+    return magnitude == (unsigned long long)LLONG_MAX + 1
+             ? LLONG_MIN
+             : -(long long)magnitude;
+  }
+  else if(overflow || magnitude > LLONG_MAX)
+  {
+    errno = ERANGE;
+    return LLONG_MAX;
+  }
+  else
+    return (long long)magnitude;
+}
+
+/* FUNCTION: strtoll */
+
+#undef strtoll
+
+long long __CPROVER_strtoll_internal(
+  const char *nptr,
+  char **endptr,
+  int base,
+  _Bool c23);
+
+long long strtoll(const char *nptr, char **endptr, int base)
+{
+__CPROVER_HIDE:;
+  return __CPROVER_strtoll_internal(nptr, endptr, base, 0);
+}
+
+/* FUNCTION: __isoc23_strtoll */
+
+long long __CPROVER_strtoll_internal(
+  const char *nptr,
+  char **endptr,
+  int base,
+  _Bool c23);
+
+// glibc 2.38 and later redirect strtoll to this function in C23 mode, with
+// _GNU_SOURCE, and in C++. Unlike strtoll, it accepts the C23 "0b" prefix.
+long long __isoc23_strtoll(const char *nptr, char **endptr, int base)
+{
+__CPROVER_HIDE:;
+  return __CPROVER_strtoll_internal(nptr, endptr, base, 1);
+}
+
+/* FUNCTION: __CPROVER_strtoul_internal */
+
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_LIMITS_H_INCLUDED
+#  include <limits.h>
+#  define __CPROVER_LIMITS_H_INCLUDED
+#endif
+
+unsigned long long __CPROVER_strto_scan(
+  const char *nptr,
+  char **endptr,
+  int base,
+  _Bool c23,
+  _Bool *negative,
+  _Bool *overflow);
+
+/// Convert as strtoul, accepting C23 prefixes if \p c23 is set.
+unsigned long
+__CPROVER_strtoul_internal(const char *nptr, char **endptr, int base, _Bool c23)
+{
+__CPROVER_HIDE:;
+  _Bool negative, overflow;
+  unsigned long long magnitude =
+    __CPROVER_strto_scan(nptr, endptr, base, c23, &negative, &overflow);
+
+  if(overflow || magnitude > ULONG_MAX)
+  {
+    errno = ERANGE;
+    return ULONG_MAX;
+  }
+
+  // C23 7.24.1.7p5: a leading '-' negates the converted value in the return
+  // type
+  return negative ? -(unsigned long)magnitude : (unsigned long)magnitude;
+}
+
+/* FUNCTION: strtoul */
+
+#undef strtoul
+
+unsigned long __CPROVER_strtoul_internal(
+  const char *nptr,
+  char **endptr,
+  int base,
+  _Bool c23);
+
+unsigned long strtoul(const char *nptr, char **endptr, int base)
+{
+__CPROVER_HIDE:;
+  return __CPROVER_strtoul_internal(nptr, endptr, base, 0);
+}
+
+/* FUNCTION: __isoc23_strtoul */
+
+unsigned long __CPROVER_strtoul_internal(
+  const char *nptr,
+  char **endptr,
+  int base,
+  _Bool c23);
+
+// glibc 2.38 and later redirect strtoul to this function in C23 mode, with
+// _GNU_SOURCE, and in C++. Unlike strtoul, it accepts the C23 "0b" prefix.
+unsigned long __isoc23_strtoul(const char *nptr, char **endptr, int base)
+{
+__CPROVER_HIDE:;
+  return __CPROVER_strtoul_internal(nptr, endptr, base, 1);
+}
+
+/* FUNCTION: __CPROVER_strtoull_internal */
+
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_LIMITS_H_INCLUDED
+#  include <limits.h>
+#  define __CPROVER_LIMITS_H_INCLUDED
+#endif
+
+unsigned long long __CPROVER_strto_scan(
+  const char *nptr,
+  char **endptr,
+  int base,
+  _Bool c23,
+  _Bool *negative,
+  _Bool *overflow);
+
+/// Convert as strtoull, accepting C23 prefixes if \p c23 is set.
+unsigned long long __CPROVER_strtoull_internal(
+  const char *nptr,
+  char **endptr,
+  int base,
+  _Bool c23)
+{
+__CPROVER_HIDE:;
+  _Bool negative, overflow;
+  unsigned long long magnitude =
+    __CPROVER_strto_scan(nptr, endptr, base, c23, &negative, &overflow);
+
+  if(overflow)
+  {
+    errno = ERANGE;
+    return ULLONG_MAX;
+  }
+
+  // C23 7.24.1.7p5: a leading '-' negates the converted value in the return
+  // type
+  return negative ? -magnitude : magnitude;
+}
+/* FUNCTION: strtoull */
+
+#undef strtoull
+
+unsigned long long __CPROVER_strtoull_internal(
+  const char *nptr,
+  char **endptr,
+  int base,
+  _Bool c23);
+
+unsigned long long strtoull(const char *nptr, char **endptr, int base)
+{
+__CPROVER_HIDE:;
+  return __CPROVER_strtoull_internal(nptr, endptr, base, 0);
+}
+
+/* FUNCTION: __isoc23_strtoull */
+
+unsigned long long __CPROVER_strtoull_internal(
+  const char *nptr,
+  char **endptr,
+  int base,
+  _Bool c23);
+
+// glibc 2.38 and later redirect strtoull to this function in C23 mode, with
+// _GNU_SOURCE, and in C++. Unlike strtoull, it accepts the C23 "0b" prefix.
+unsigned long long __isoc23_strtoull(const char *nptr, char **endptr, int base)
+{
+__CPROVER_HIDE:;
+  return __CPROVER_strtoull_internal(nptr, endptr, base, 1);
 }
 
 /* FUNCTION: atoi */

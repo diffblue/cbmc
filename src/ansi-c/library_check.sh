@@ -50,6 +50,7 @@ perl -p -i -e 's/^__inet_(addr|aton|ntoa|network)\n//' __functions # inet_*, Fre
 perl -p -i -e 's/^__isoc99_v?fscanf\n//' __functions # fscanf, Linux
 perl -p -i -e 's/^__isoc99_v?scanf\n//' __functions # scanf, Linux
 perl -p -i -e 's/^__isoc99_v?sscanf\n//' __functions # sscanf, Linux
+perl -p -i -e 's/^__isoc23_strto(l|ll|ul|ull)\n//' __functions # strto*, Linux
 perl -p -i -e 's/^__sigsetjmp\n//' __functions # sigsetjmp, Linux
 perl -p -i -e 's/^__stdio_common_vfscanf\n//' __functions # fscanf, Windows
 perl -p -i -e 's/^__stdio_common_vsprintf\n//' __functions # snprintf, Windows
@@ -66,6 +67,8 @@ perl -p -i -e 's/^(creat|fcntl|open|openat)64\n//' __functions # same as creat, 
 perl -p -i -e 's/^__CPROVER_deallocate\n//' __functions # free-01
 perl -p -i -e 's/^__builtin_alloca\n//' __functions # alloca-01
 perl -p -i -e 's/^fclose_cleanup\n//' __functions # fopen
+perl -p -i -e 's/^__CPROVER_strto_scan\n//' __functions # strtol
+perl -p -i -e 's/^__CPROVER_strto(l|ll|ul|ull)_internal\n//' __functions # strto*
 perl -p -i -e 's/^fopen64\n//' __functions # fopen
 perl -p -i -e 's/^freopen64\n//' __functions # freopen
 perl -p -i -e 's/^mmap64\n//' __functions # mmap

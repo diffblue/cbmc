@@ -1,0 +1,10 @@
+CORE
+main_02.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Edge cases of C23 7.24.1.7, each of which matches glibc's behaviour.
