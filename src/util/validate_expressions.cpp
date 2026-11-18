@@ -68,6 +68,70 @@ void call_on_expr(const exprt &expr, Args &&... args)
   {
     CALL_ON_EXPR(let_exprt);
   }
+  else if(expr.id() == ID_notequal)
+  {
+    CALL_ON_EXPR(notequal_exprt);
+  }
+  else if(expr.id() == ID_lt)
+  {
+    CALL_ON_EXPR(less_than_exprt);
+  }
+  else if(expr.id() == ID_le)
+  {
+    CALL_ON_EXPR(less_than_or_equal_exprt);
+  }
+  else if(expr.id() == ID_gt)
+  {
+    CALL_ON_EXPR(greater_than_exprt);
+  }
+  else if(expr.id() == ID_ge)
+  {
+    CALL_ON_EXPR(greater_than_or_equal_exprt);
+  }
+  else if(expr.id() == ID_minus)
+  {
+    CALL_ON_EXPR(minus_exprt);
+  }
+  else if(expr.id() == ID_div)
+  {
+    CALL_ON_EXPR(div_exprt);
+  }
+  else if(expr.id() == ID_mod)
+  {
+    CALL_ON_EXPR(mod_exprt);
+  }
+  else if(expr.id() == ID_shl)
+  {
+    CALL_ON_EXPR(shl_exprt);
+  }
+  else if(expr.id() == ID_ashr)
+  {
+    CALL_ON_EXPR(ashr_exprt);
+  }
+  else if(expr.id() == ID_lshr)
+  {
+    CALL_ON_EXPR(lshr_exprt);
+  }
+  else if(expr.id() == ID_index)
+  {
+    CALL_ON_EXPR(index_exprt);
+  }
+  else if(expr.id() == ID_typecast)
+  {
+    CALL_ON_EXPR(typecast_exprt);
+  }
+  else if(expr.id() == ID_address_of)
+  {
+    CALL_ON_EXPR(address_of_exprt);
+  }
+  else if(expr.id() == ID_not)
+  {
+    CALL_ON_EXPR(not_exprt);
+  }
+  else if(expr.id() == ID_unary_minus)
+  {
+    CALL_ON_EXPR(unary_minus_exprt);
+  }
   else
   {
 #ifdef REPORT_UNIMPLEMENTED_EXPRESSION_CHECKS

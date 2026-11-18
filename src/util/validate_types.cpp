@@ -14,6 +14,7 @@ Author: Daniel Poetzl
 
 #include "bitvector_types.h" // IWYU pragma: keep
 #include "c_types.h"         // IWYU pragma: keep
+#include "std_types.h"       // IWYU pragma: keep
 #include "validate_helpers.h"
 
 #define CALL_ON_TYPE(type_type)                                                \
@@ -56,6 +57,10 @@ void call_on_type(const typet &type, Args &&... args)
   else if(type.id() == ID_array)
   {
     CALL_ON_TYPE(array_typet);
+  }
+  else if(type.id() == ID_vector)
+  {
+    CALL_ON_TYPE(vector_typet);
   }
   else
   {

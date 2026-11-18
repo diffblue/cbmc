@@ -35,6 +35,16 @@ public:
     return static_cast<vector_typet &>(multi_ary_exprt::type());
   }
 
+  static void check(
+    const exprt &expr,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    DATA_CHECK(
+      vm,
+      expr.operands().size() == 3,
+      "shuffle_vector must have three operands");
+  }
+
   const exprt &vector1() const
   {
     return op0();
@@ -81,7 +91,7 @@ inline bool can_cast_expr<shuffle_vector_exprt>(const exprt &base)
 
 inline void validate_expr(const shuffle_vector_exprt &value)
 {
-  validate_operands(value, 3, "shuffle_vector must have three operands");
+  shuffle_vector_exprt::check(value);
 }
 
 /// \brief Cast an exprt to a \ref shuffle_vector_exprt
