@@ -1,0 +1,13 @@
+KNOWNBUG
+Test
+--function Test.check --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+The expression replacing Character.getNumericValue is that of Character.digit
+with radix 36, which only handles ASCII digits and letters as well as full-
+width letters.
+All cases are results confirmed with the JVM.
