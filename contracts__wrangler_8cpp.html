@@ -103,11 +103,15 @@ $(function(){initNavTree('contracts__wrangler_8cpp.html','',''); });
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="contracts__wrangler_8h_source.html">contracts_wrangler.h</a>&quot;</code><br />
 <code>#include &lt;<a class="el" href="c__types_8h_source.html">util/c_types.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="exception__utils_8h_source.html">util/exception_utils.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="expr__iterator_8h_source.html">util/expr_iterator.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="format__expr_8h_source.html">util/format_expr.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="pointer__expr_8h_source.html">util/pointer_expr.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="simplify__expr_8h_source.html">util/simplify_expr.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="std__expr_8h_source.html">util/std_expr.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="std__types_8h_source.html">util/std_types.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="string2int_8h_source.html">util/string2int.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="typecheck_8h_source.html">util/typecheck.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="remove__unused__functions_8h_source.html">goto-programs/remove_unused_functions.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="ansi__c__parser_8h_source.html">ansi-c/ansi_c_parser.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="ansi__c__typecheck_8h_source.html">ansi-c/ansi_c_typecheck.h</a>&gt;</code><br />
@@ -116,15 +120,55 @@ $(function(){initNavTree('contracts__wrangler_8cpp.html','',''); });
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" loading="lazy" frameborder="0" src="contracts__wrangler_8cpp__incl.svg" width="3010" height="822"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" loading="lazy" frameborder="0" src="contracts__wrangler_8cpp__incl.svg" width="3415" height="974"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 </div>
 <p><a href="contracts__wrangler_8cpp_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:afe4ea378f6ed001f6d92da8cdd672fd9" id="r_afe4ea378f6ed001f6d92da8cdd672fd9"><td class="memItemLeft" align="right" valign="top">static std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afe4ea378f6ed001f6d92da8cdd672fd9">describe_missing_loop</a> (<a class="el" href="classgoto__functiont.html">goto_functiont</a> &amp;function, const unsigned loop_number)</td></tr>
+<tr class="memdesc:afe4ea378f6ed001f6d92da8cdd672fd9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Explain why <code class="param">function</code> has no natural loop numbered <code class="param">loop_number</code> that loop contracts can be attached to.  <br /></td></tr>
+</table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Parse and annotate contracts. </p>
 
 <p class="definition">Definition in file <a class="el" href="contracts__wrangler_8cpp_source.html">contracts_wrangler.cpp</a>.</p>
-</div></div><!-- contents -->
+</div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+<a id="afe4ea378f6ed001f6d92da8cdd672fd9" name="afe4ea378f6ed001f6d92da8cdd672fd9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afe4ea378f6ed001f6d92da8cdd672fd9">&#9670;&#160;</a></span>describe_missing_loop()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string describe_missing_loop </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classgoto__functiont.html">goto_functiont</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>function</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const unsigned</td>          <td class="paramname"><span class="paramname"><em>loop_number</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Explain why <code class="param">function</code> has no natural loop numbered <code class="param">loop_number</code> that loop contracts can be attached to. </p>
+
+<p class="definition">Definition at line <a class="el" href="contracts__wrangler_8cpp_source.html#l00109">109</a> of file <a class="el" href="contracts__wrangler_8cpp_source.html">contracts_wrangler.cpp</a>.</p>
+
+</div>
+</div>
+</div><!-- contents -->
 </div><!-- doc-content -->
 <div id="page-nav" class="page-nav-panel">
 <div id="page-nav-resize-handle"></div>

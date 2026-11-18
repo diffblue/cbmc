@@ -139,7 +139,7 @@ var searchData=
   ['loop_5flimit_136',['loop_limit',['../classsolver__optionst.html#ad3dfe49ad660d486fd4acda65fc8a7fd',1,'solver_optionst']]],
   ['loop_5fmap_137',['loop_map',['../classloop__analysist.html#a6c7ec66e618c8af824b1fe2fd249d516',1,'loop_analysist::loop_map'],['../classgoto__program2codet.html#aa135a2cd0f1892c52e4230db6581eca0',1,'goto_program2codet::loop_map'],['../classunwindsett.html#a05c9336ffcfa98048cb54101e636a865',1,'unwindsett::loop_map']]],
   ['loop_5fnames_138',['loop_names',['../classcode__contractst.html#accfee04723c3fd9a7704246906873d75',1,'code_contractst']]],
-  ['loop_5fnumber_139',['loop_number',['../classgoto__programt_1_1instructiont.html#a69d6b6665d98805dfa3aece19d8b691f',1,'goto_programt::instructiont::loop_number'],['../structloop__idt.html#acd960c249df10e118b0139444528b13d',1,'loop_idt::loop_number']]],
+  ['loop_5fnumber_139',['loop_number',['../structloop__contracts__clauset.html#ab5650a780b54f2ed7fd8215432da8de6',1,'loop_contracts_clauset::loop_number'],['../classgoto__programt_1_1instructiont.html#a69d6b6665d98805dfa3aece19d8b691f',1,'goto_programt::instructiont::loop_number'],['../structloop__idt.html#acd960c249df10e118b0139444528b13d',1,'loop_idt::loop_number']]],
   ['loop_5ftype_140',['loop_type',['../structc__wranglert_1_1loop__contract__clauset.html#a97c5572e8c926dca44162151e1eee47f',1,'c_wranglert::loop_contract_clauset']]],
   ['loop_5funwind_5fhandlers_141',['loop_unwind_handlers',['../classsymex__bmct.html#a394cee46306c88e7b0a136f3e975245b',1,'symex_bmct']]],
   ['loops_142',['loops',['../classgoto__program2codet.html#aebe8a7d48833729ee2cffdfa60164c97',1,'goto_program2codet::loops'],['../classevent__grapht.html#a3b359757cb15283f9f83c0fc699cac25',1,'event_grapht::loops']]],

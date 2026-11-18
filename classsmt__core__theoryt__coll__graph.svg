@@ -275,8 +275,8 @@
 <g id="Node000007" class="node">
 <title>Node7</title>
 <g id="a_Node000007"><a xlink:href="structloop__contracts__clauset.html" target="_top" xlink:title=" ">
-<polygon fill="white" stroke="#666666" points="401,-291.75 273.25,-291.75 273.25,-271 401,-271 401,-291.75"/>
-<text xml:space="preserve" text-anchor="middle" x="337.12" y="-278.25" font-family="Helvetica,sans-Serif" font-size="10.00">loop_contracts_clauset</text>
+<polygon fill="white" stroke="#666666" points="401,-308.75 273.25,-308.75 273.25,-288 401,-288 401,-308.75"/>
+<text xml:space="preserve" text-anchor="middle" x="337.12" y="-295.25" font-family="Helvetica,sans-Serif" font-size="10.00">loop_contracts_clauset</text>
 </a>
 </g>
 </g>
@@ -284,11 +284,11 @@
 <g id="edge6_Node000006_Node000007" class="edge">
 <title>Node7&#45;&gt;Node6</title>
 <g id="a_edge6_Node000006_Node000007"><a xlink:title=" ">
-<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M388.25,-295.14C442.68,-310.08 529.73,-333.98 588.66,-350.16"/>
-<polygon fill="#9a32cd" stroke="#9a32cd" points="389.51,-291.85 378.94,-292.58 387.66,-298.6 389.51,-291.85"/>
+<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M401.64,-311.57C445.88,-320.86 506.22,-333.7 559.25,-345.62 565.66,-347.07 572.32,-348.59 578.99,-350.13"/>
+<polygon fill="#9a32cd" stroke="#9a32cd" points="402.45,-308.17 391.95,-309.54 401.02,-315.02 402.45,-308.17"/>
 </a>
 </g>
-<text xml:space="preserve" text-anchor="start" x="466.25" y="-348.21" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey">elements</text>
+<text xml:space="preserve" text-anchor="start" x="466.25" y="-351.88" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey">elements</text>
 </g>
 <!-- Node8 -->
 <g id="Node000008" class="node">
@@ -313,21 +313,20 @@
 <g id="edge7_Node000007_Node000008" class="edge">
 <title>Node8&#45;&gt;Node7</title>
 <g id="a_edge7_Node000007_Node000008"><a xlink:title=" ">
-<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M120.79,-409.61C133.02,-406.77 145.36,-401.6 154,-392.38 182.77,-361.64 141.04,-327.9 172,-299.38 198.67,-274.81 239.06,-270.12 273.09,-271.67"/>
-<polygon fill="#9a32cd" stroke="#9a32cd" points="120.41,-406.12 111.19,-411.34 121.65,-413.01 120.41,-406.12"/>
+<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M120.57,-409.39C132.79,-406.55 145.18,-401.43 154,-392.38 178.31,-367.44 145.9,-339.17 172,-316.12 199.07,-292.22 239.25,-287.55 273.08,-288.97"/>
+<polygon fill="#9a32cd" stroke="#9a32cd" points="120.2,-405.9 110.99,-411.15 121.46,-412.79 120.2,-405.9"/>
 </a>
 </g>
 <text xml:space="preserve" text-anchor="start" x="188.88" y="-355.88" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey">assigns</text>
 <text xml:space="preserve" text-anchor="start" x="188.88" y="-339.12" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey">decreases</text>
-<text xml:space="preserve" text-anchor="start" x="188.88" y="-322.38" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey">identifier</text>
-<text xml:space="preserve" text-anchor="start" x="188.88" y="-305.62" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey">invariants</text>
+<text xml:space="preserve" text-anchor="start" x="188.88" y="-322.38" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey">invariants</text>
 </g>
 <!-- Node10 -->
 <g id="Node000010" class="node">
 <title>Node10</title>
 <g id="a_Node000010"><a xlink:href="classunchecked__replace__symbolt.html" target="_top" xlink:title=" ">
-<polygon fill="#fff0f0" stroke="red" points="154,-249.75 0,-249.75 0,-229 154,-229 154,-249.75"/>
-<text xml:space="preserve" text-anchor="middle" x="77" y="-236.25" font-family="Helvetica,sans-Serif" font-size="10.00">unchecked_replace_symbolt</text>
+<polygon fill="#fff0f0" stroke="red" points="154,-266.75 0,-266.75 0,-246 154,-246 154,-266.75"/>
+<text xml:space="preserve" text-anchor="middle" x="77" y="-253.25" font-family="Helvetica,sans-Serif" font-size="10.00">unchecked_replace_symbolt</text>
 </a>
 </g>
 </g>
@@ -335,11 +334,11 @@
 <g id="edge8_Node000007_Node000010" class="edge">
 <title>Node10&#45;&gt;Node7</title>
 <g id="a_edge8_Node000007_Node000010"><a xlink:title=" ">
-<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M165.71,-232.1C194.57,-231.79 226.6,-233.71 255.25,-240.62 279.4,-246.45 304.54,-260.61 320.26,-270.59"/>
-<polygon fill="#9a32cd" stroke="#9a32cd" points="165.83,-228.6 155.91,-232.31 165.98,-235.6 165.83,-228.6"/>
+<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M165.71,-249.1C194.57,-248.79 226.6,-250.71 255.25,-257.62 279.4,-263.45 304.54,-277.61 320.26,-287.59"/>
+<polygon fill="#9a32cd" stroke="#9a32cd" points="165.83,-245.6 155.91,-249.31 165.98,-252.6 165.83,-245.6"/>
 </a>
 </g>
-<text xml:space="preserve" text-anchor="start" x="175" y="-246.88" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey">replace_symbol</text>
+<text xml:space="preserve" text-anchor="start" x="175" y="-263.88" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey">replace_symbol</text>
 </g>
 <!-- Node19 -->
 <g id="Node000019" class="node">

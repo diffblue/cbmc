@@ -102,12 +102,14 @@ $(function(){initNavTree('utils_8h.html','',''); });
 <code>#include &lt;<a class="el" href="loop__ids_8h_source.html">goto-programs/loop_ids.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="havoc__utils_8h_source.html">goto-instrument/havoc_utils.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="loop__utils_8h_source.html">goto-instrument/loop_utils.h</a>&gt;</code><br />
+<code>#include &lt;optional&gt;</code><br />
+<code>#include &lt;utility&gt;</code><br />
 <code>#include &lt;vector&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return dynsection.toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;"><span class="dynarrow"><span class="arrowhead closed"></span></span>Include dependency graph for utils.h:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" loading="lazy" frameborder="0" src="utils_8h__incl.svg" width="2916" height="1200"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" loading="lazy" frameborder="0" src="utils_8h__incl.svg" width="2826" height="1200"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return dynsection.toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;"><span class="dynarrow"><span class="arrowhead closed"></span></span>This graph shows which files directly or indirectly include this file:</div>
 <div id="dynsection-1-summary" class="dynsummary" style="display:block;">
@@ -178,6 +180,8 @@ Functions</h2></td></tr>
 <tr class="memitem:aaa236bc60b743c89f2c364d8fc61876c" id="r_aaa236bc60b743c89f2c364d8fc61876c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaa236bc60b743c89f2c364d8fc61876c">get_loop_end_from_loop_head_and_content_mutable</a> (const <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &amp;loop_head, const <a class="el" href="classloop__templatet.html">loop_templatet</a>&lt; <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a>, <a class="el" href="classgoto__programt.html#aae1f5166a7e251a800df037937325733">goto_programt::target_less_than</a> &gt; &amp;loop)</td></tr>
 <tr class="memdesc:aaa236bc60b743c89f2c364d8fc61876c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find the goto instruction of <span class="tt">loop</span> that jumps to <span class="tt">loop_head</span>.  <br /></td></tr>
 <tr class="memitem:a205c743a5e4280f055576f73a5068320" id="r_a205c743a5e4280f055576f73a5068320"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a205c743a5e4280f055576f73a5068320">get_loop_end_from_loop_head_and_content</a> (const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;loop_head, const <a class="el" href="classloop__templatet.html">loop_templatet</a>&lt; <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a>, <a class="el" href="classgoto__programt.html#aae1f5166a7e251a800df037937325733">goto_programt::target_less_than</a> &gt; &amp;loop)</td></tr>
+<tr class="memitem:aaca2c9712990c78a812ef2200b3f22f8" id="r_aaca2c9712990c78a812ef2200b3f22f8"><td class="memItemLeft" align="right" valign="top">std::optional&lt; std::pair&lt; <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a>, <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaca2c9712990c78a812ef2200b3f22f8">find_loop_head_and_end</a> (const unsigned int loop_number, <a class="el" href="classgoto__functiont.html">goto_functiont</a> &amp;function)</td></tr>
+<tr class="memdesc:aaca2c9712990c78a812ef2200b3f22f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find the natural loop numbered <code class="param">loop_number</code> in <code class="param">function</code>.  <br /></td></tr>
 <tr class="memitem:a92072c81085023f93375bc71c2b84a7f" id="r_a92072c81085023f93375bc71c2b84a7f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a92072c81085023f93375bc71c2b84a7f">get_loop_head_or_end</a> (const unsigned int loop_number, <a class="el" href="classgoto__functiont.html">goto_functiont</a> &amp;function, bool finding_head)</td></tr>
 <tr class="memdesc:a92072c81085023f93375bc71c2b84a7f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return loop head if <span class="tt">finding_head</span> is true, Otherwise return loop end.  <br /></td></tr>
 <tr class="memitem:ae0af75cc5b9107423465e2c30e582383" id="r_ae0af75cc5b9107423465e2c30e582383"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae0af75cc5b9107423465e2c30e582383">get_loop_end</a> (const unsigned int loop_number, <a class="el" href="classgoto__functiont.html">goto_functiont</a> &amp;function)</td></tr>
@@ -211,7 +215,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="utils_8h_source.html#l00024">24</a> of file <a class="el" href="utils_8h_source.html">utils.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8h_source.html#l00026">26</a> of file <a class="el" href="utils_8h_source.html">utils.h</a>.</p>
 
 </div>
 </div>
@@ -227,7 +231,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="utils_8h_source.html#l00023">23</a> of file <a class="el" href="utils_8h_source.html">utils.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8h_source.html#l00025">25</a> of file <a class="el" href="utils_8h_source.html">utils.h</a>.</p>
 
 </div>
 </div>
@@ -243,7 +247,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="utils_8h_source.html#l00025">25</a> of file <a class="el" href="utils_8h_source.html">utils.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8h_source.html#l00027">27</a> of file <a class="el" href="utils_8h_source.html">utils.h</a>.</p>
 
 </div>
 </div>
@@ -259,7 +263,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="utils_8h_source.html#l00026">26</a> of file <a class="el" href="utils_8h_source.html">utils.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8h_source.html#l00028">28</a> of file <a class="el" href="utils_8h_source.html">utils.h</a>.</p>
 
 </div>
 </div>
@@ -276,7 +280,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="utils_8h_source.html#l00030">30</a> of file <a class="el" href="utils_8h_source.html">utils.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8h_source.html#l00032">32</a> of file <a class="el" href="utils_8h_source.html">utils.h</a>.</p>
 
 </div>
 </div>
@@ -336,7 +340,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00747">747</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00766">766</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -362,7 +366,7 @@ Functions</h2></td></tr>
 <p>Annotate the assigns in <span class="tt">assigns_map</span> to their corresponding loops. </p>
 <p>Corresponding loops are specified by keys of <span class="tt">assigns_map</span> </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00725">725</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00744">744</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -388,7 +392,7 @@ Functions</h2></td></tr>
 <p>Annotate the decreases in <span class="tt">decreases_map</span> to their corresponding loops. </p>
 <p>Corresponding loops are specified by keys of <span class="tt">decreases_map</span> </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00766">766</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00785">785</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -414,7 +418,33 @@ Functions</h2></td></tr>
 <p>Annotate the invariants in <span class="tt">invariant_map</span> to their corresponding loops. </p>
 <p>Corresponding loops are specified by keys of <span class="tt">invariant_map</span> </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00705">705</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00724">724</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+
+</div>
+</div>
+<a id="aaca2c9712990c78a812ef2200b3f22f8" name="aaca2c9712990c78a812ef2200b3f22f8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaca2c9712990c78a812ef2200b3f22f8">&#9670;&#160;</a></span>find_loop_head_and_end()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::optional&lt; std::pair&lt; <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a>, <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &gt; &gt; find_loop_head_and_end </td>
+          <td>(</td>
+          <td class="paramtype">const unsigned int</td>          <td class="paramname"><span class="paramname"><em>loop_number</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classgoto__functiont.html">goto_functiont</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>function</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Find the natural loop numbered <code class="param">loop_number</code> in <code class="param">function</code>. </p>
+<p>A natural loop is numbered by its last back edge, i.e., the backward goto to the loop head with the greatest location number. </p><dl class="section return"><dt>Returns</dt><dd>the loop head and the last back edge of the loop, or an empty optional if <code class="param">function</code> has no such loop (loops that consist of a single instruction jumping to itself are not considered) </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00608">608</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -504,7 +534,7 @@ Functions</h2></td></tr>
 
 <p>Extract loop assigns from annotated loop end. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00683">683</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00702">702</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -530,7 +560,7 @@ Functions</h2></td></tr>
 <p>Extract loop decreases from annotated loop end. </p>
 <p>Will check if the loop decreases is side-effect free if <code class="param">check_side_effect</code> is set. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00688">688</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00707">707</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -556,7 +586,7 @@ Functions</h2></td></tr>
 <p>Find and return the last instruction of the natural loop with <span class="tt">loop_number</span> in <span class="tt">function</span>. </p>
 <p>loop_end -&gt; loop_head </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00634">634</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00653">653</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -630,7 +660,7 @@ Functions</h2></td></tr>
 <p>Find and return the first instruction of the natural loop with <span class="tt">loop_number</span> in <span class="tt">function</span>. </p>
 <p>loop_end -&gt; loop_head </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00640">640</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00659">659</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -660,7 +690,7 @@ Functions</h2></td></tr>
 
 <p>Return loop head if <span class="tt">finding_head</span> is true, Otherwise return loop end. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00607">607</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00638">638</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -686,7 +716,7 @@ Functions</h2></td></tr>
 <p>Extract loop invariants from annotated loop end. </p>
 <p>Will check if the loop invariant is side-effect free if <code class="param">check_side_effect</code> is set. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00666">666</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00685">685</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>

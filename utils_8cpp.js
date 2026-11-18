@@ -9,6 +9,7 @@ var utils_8cpp =
     [ "extract_loop_assigns", "utils_8cpp.html#a81de6ed0803cdac4eb940763eda2aa43", null ],
     [ "extract_loop_decreases", "utils_8cpp.html#ac33a49aa2c2260dba8ba9838e8f8913c", null ],
     [ "extract_loop_invariants", "utils_8cpp.html#afce3723e9e212529fdb79eaa938e2eb5", null ],
+    [ "find_loop_head_and_end", "utils_8cpp.html#aaca2c9712990c78a812ef2200b3f22f8", null ],
     [ "generate_history_variables_initialization", "utils_8cpp.html#a0e4c1d1b019f583c464308badc770bb2", null ],
     [ "generate_lexicographic_less_than_check", "utils_8cpp.html#af6a986e8441ef1b9d54624ed38b5d79c", null ],
     [ "get_loop_assigns", "utils_8cpp.html#a3a877a2a163b03545e093c694671a414", null ],

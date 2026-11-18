@@ -14,6 +14,7 @@ var utils_8h =
     [ "annotate_assigns", "utils_8h.html#a5eecfacf3d66c9c76a916c8600f8dc68", null ],
     [ "annotate_decreases", "utils_8h.html#a5d6d0a86e45d57067dd4fe993f9486a2", null ],
     [ "annotate_invariants", "utils_8h.html#aab60371e081d74195d69c087bb3b9543", null ],
+    [ "find_loop_head_and_end", "utils_8h.html#aaca2c9712990c78a812ef2200b3f22f8", null ],
     [ "generate_history_variables_initialization", "utils_8h.html#a0e4c1d1b019f583c464308badc770bb2", null ],
     [ "generate_lexicographic_less_than_check", "utils_8h.html#af6a986e8441ef1b9d54624ed38b5d79c", null ],
     [ "get_loop_assigns", "utils_8h.html#a3a877a2a163b03545e093c694671a414", null ],

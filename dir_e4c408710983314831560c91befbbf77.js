@@ -5,7 +5,7 @@ var dir_e4c408710983314831560c91befbbf77 =
     [ "cfg_info.h", "cfg__info_8h.html", "cfg__info_8h" ],
     [ "contracts.cpp", "contracts_8cpp.html", "contracts_8cpp" ],
     [ "contracts.h", "contracts_8h.html", "contracts_8h" ],
-    [ "contracts_wrangler.cpp", "contracts__wrangler_8cpp.html", null ],
+    [ "contracts_wrangler.cpp", "contracts__wrangler_8cpp.html", "contracts__wrangler_8cpp" ],
     [ "contracts_wrangler.h", "contracts__wrangler_8h.html", "contracts__wrangler_8h" ],
     [ "havoc_assigns_clause_targets.cpp", "havoc__assigns__clause__targets_8cpp.html", null ],
     [ "havoc_assigns_clause_targets.h", "havoc__assigns__clause__targets_8h.html", "havoc__assigns__clause__targets_8h" ],
