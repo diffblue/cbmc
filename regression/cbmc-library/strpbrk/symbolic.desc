@@ -1,0 +1,8 @@
+CORE
+symbolic.c
+--pointer-check --bounds-check --unwind 6 --unwinding-assertions
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
