@@ -1,0 +1,12 @@
+CORE
+self_loop.c
+--loop-contracts-file test_self_loop_other_loop.json --dfcc main --apply-loop-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+Invariant check failed
+--
+A loop consisting of a single instruction elsewhere in the function does not
+prevent attaching contracts to other loops.

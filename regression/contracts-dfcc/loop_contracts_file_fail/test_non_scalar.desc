@@ -1,0 +1,14 @@
+CORE
+main.c
+--loop-contracts-file test_non_scalar.json --dfcc main --apply-loop-contracts
+^file <predicate> line 1 function _fn: in expression '\*b':$
+^conversion from 'struct blob' to '__CPROVER_bool': implicit conversion not permitted$
+^failed to typecheck the loop contracts for loop 0 of function foo given in the loop contracts file$
+^EXIT=6$
+^SIGNAL=0$
+--
+^warning: ignoring
+Invariant check failed
+--
+A loop invariant that cannot be converted to Boolean is rejected, as it is
+when given in the source code. It used to fail an invariant in conjunction.

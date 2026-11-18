@@ -1,0 +1,11 @@
+CORE
+simple.c
+--loop-contracts-file test_loop_id_white_space.json --dfcc main --apply-loop-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+Invariant check failed
+--
+White space around the loop identifier is permitted.

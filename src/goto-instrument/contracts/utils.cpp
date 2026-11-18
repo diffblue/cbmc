@@ -604,30 +604,49 @@ goto_programt::targett get_loop_end_from_loop_head_and_content_mutable(
   return loop_end;
 }
 
+std::optional<std::pair<goto_programt::targett, goto_programt::targett>>
+find_loop_head_and_end(const unsigned int loop_number, goto_functiont &function)
+{
+  natural_loops_mutablet natural_loops(function.body);
+
+  // iterate over all natural loops to find the loop with `loop_number`
+  for(const auto &loop_p : natural_loops.loop_map)
+  {
+    const goto_programt::targett loop_head = loop_p.first;
+    // the loop end is the goto instruction of the loop that jumps backward to
+    // the loop head and has the greatest location number
+    goto_programt::targett loop_end = loop_head;
+    for(const auto &t : loop_p.second)
+    {
+      if(
+        t->is_goto() && t->get_target() == loop_head &&
+        t->location_number > loop_end->location_number)
+      {
+        loop_end = t;
+      }
+    }
+
+    // A loop consisting of a single instruction that jumps to itself has no
+    // separate loop end.
+    if(loop_end != loop_head && loop_end->loop_number == loop_number)
+      return {{loop_head, loop_end}};
+  }
+
+  return {};
+}
+
 goto_programt::targett get_loop_head_or_end(
   const unsigned int target_loop_number,
   goto_functiont &function,
   bool finding_head)
 {
-  natural_loops_mutablet natural_loops(function.body);
+  const auto loop = find_loop_head_and_end(target_loop_number, function);
+  INVARIANT(
+    loop.has_value(),
+    "function must have a natural loop numbered " +
+      std::to_string(target_loop_number));
 
-  // iterate over all natural loops to find the loop with `target_loop_number`
-  for(const auto &loop_p : natural_loops.loop_map)
-  {
-    const goto_programt::targett loop_head = loop_p.first;
-    goto_programt::targett loop_end =
-      get_loop_end_from_loop_head_and_content_mutable(loop_head, loop_p.second);
-    // check if the current loop is the target loop by comparing loop number
-    if(loop_end->loop_number == target_loop_number)
-    {
-      if(finding_head)
-        return loop_head;
-      else
-        return loop_end;
-    }
-  }
-
-  UNREACHABLE;
+  return finding_head ? loop->first : loop->second;
 }
 
 goto_programt::targett

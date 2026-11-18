@@ -18,6 +18,8 @@ Date: September 2021
 #include <goto-instrument/havoc_utils.h>
 #include <goto-instrument/loop_utils.h>
 
+#include <optional>
+#include <utility>
 #include <vector>
 
 #define IN_BASE_CASE "__in_base_case"
@@ -287,6 +289,17 @@ goto_programt::const_targett get_loop_end_from_loop_head_and_content(
   const loop_templatet<
     goto_programt::const_targett,
     goto_programt::target_less_than> &loop);
+
+/// Find the natural loop numbered \p loop_number in \p function. A natural
+/// loop is numbered by its last back edge, i.e., the backward goto to the
+/// loop head with the greatest location number.
+/// \return the loop head and the last back edge of the loop, or an empty
+///   optional if \p function has no such loop (loops that consist of a single
+///   instruction jumping to itself are not considered)
+std::optional<std::pair<goto_programt::targett, goto_programt::targett>>
+find_loop_head_and_end(
+  const unsigned int loop_number,
+  goto_functiont &function);
 
 /// Return loop head if `finding_head` is true,
 /// Otherwise return loop end.

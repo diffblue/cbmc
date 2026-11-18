@@ -1,0 +1,13 @@
+CORE
+simple.c
+--loop-contracts-file test_second_invariant.json --dfcc main --apply-loop-contracts
+^\[foo\.[^]]+\] line \d+ Check (loop )?invariant before entry.*: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+Invariant check failed
+--
+All invariants of the clause must hold: the second one, i >= 100, does not hold
+before the loop is entered. It used to be ignored.
