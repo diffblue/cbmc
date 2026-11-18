@@ -837,12 +837,27 @@ codet character_refine_preprocesst::convert_is_mirrored_int(
   return convert_is_mirrored_char(target);
 }
 
+/// Determines if the specified character is ISO-LATIN-1 white space according
+/// to the deprecated Character.isSpace, i.e., one of '\\t', '\\n', '\\f',
+/// '\\r' and ' '.
+/// \param chr: An expression of type character
+/// \param type: A type for the output
+/// \return A Boolean expression
+exprt character_refine_preprocesst::expr_of_is_space(
+  const exprt &chr,
+  const typet &type)
+{
+  (void)type; // unused parameter
+  return in_list_expr(chr, {'\t', '\n', '\f', '\r', ' '});
+}
+
 /// Converts function call to an assignment of an expression corresponding to
 /// the java method Character.isSpace:(C)Z
 /// \param target: a position in a goto program
 codet character_refine_preprocesst::convert_is_space(conversion_inputt &target)
 {
-  return convert_is_whitespace_char(target);
+  return convert_char_function(
+    &character_refine_preprocesst::expr_of_is_space, target);
 }
 
 /// Determines if the specified character is white space according to Unicode
