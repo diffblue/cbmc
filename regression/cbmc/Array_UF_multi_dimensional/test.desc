@@ -1,0 +1,14 @@
+KNOWNBUG
+main.c
+--arrays-uf-always
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+With --arrays-uf-always, a read from a two-dimensional array at indices that
+equal the indices of a preceding write, but are different terms, is not
+constrained to yield the written value: the propositional back-end reports a
+spurious counterexample. Without --arrays-uf-always, and with --z3, the
+assertion is proved.
