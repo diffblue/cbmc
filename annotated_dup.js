@@ -84,6 +84,7 @@ var annotated_dup =
     [ "and_exprt", "classand__exprt.html", "classand__exprt" ],
     [ "annotated_pointer_constant_exprt", "classannotated__pointer__constant__exprt.html", "classannotated__pointer__constant__exprt" ],
     [ "annotated_typet", "classannotated__typet.html", "classannotated__typet" ],
+    [ "anonymous_tag_namet", "structanonymous__tag__namet.html", "structanonymous__tag__namet" ],
     [ "ansi_c_convert_typet", "classansi__c__convert__typet.html", "classansi__c__convert__typet" ],
     [ "ansi_c_declarationt", "classansi__c__declarationt.html", "classansi__c__declarationt" ],
     [ "ansi_c_declaratort", "classansi__c__declaratort.html", "classansi__c__declaratort" ],

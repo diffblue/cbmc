@@ -165,6 +165,7 @@ var hierarchy =
     [ "smt_bit_vector_theoryt::andt", "structsmt__bit__vector__theoryt_1_1andt.html", null ],
     [ "smt_core_theoryt::andt", "structsmt__core__theoryt_1_1andt.html", null ],
     [ "java_bytecode_parse_treet::annotationt", "structjava__bytecode__parse__treet_1_1annotationt.html", null ],
+    [ "anonymous_tag_namet", "structanonymous__tag__namet.html", null ],
     [ "ansi_c_convert_typet", "classansi__c__convert__typet.html", [
       [ "cpp_convert_typet", "classcpp__convert__typet.html", null ]
     ] ],

@@ -8,6 +8,7 @@ var dir_f88182c44268ef6b082d02d66ccc5f99 =
     [ "allocate_objects.h", "allocate__objects_8h.html", "allocate__objects_8h" ],
     [ "anonymous_member.cpp", "anonymous__member_8cpp.html", "anonymous__member_8cpp" ],
     [ "anonymous_member.h", "anonymous__member_8h.html", "anonymous__member_8h" ],
+    [ "anonymous_tag.h", "anonymous__tag_8h.html", "anonymous__tag_8h" ],
     [ "ansi_c_convert_type.cpp", "ansi__c__convert__type_8cpp.html", null ],
     [ "ansi_c_convert_type.h", "ansi__c__convert__type_8h.html", "ansi__c__convert__type_8h" ],
     [ "ansi_c_declaration.cpp", "ansi__c__declaration_8cpp.html", null ],
