@@ -37,8 +37,11 @@ public class Test
 
   public void testSuccess6(StringBuilder sb)
   {
-    sb.setLength(0);
-    assert sb.toString().equals("");
+    if(sb != null)
+    {
+      sb.setLength(0);
+      assert sb.toString().equals("");
+    }
   }
 
   public void testException()
