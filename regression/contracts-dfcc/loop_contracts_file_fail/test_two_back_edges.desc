@@ -1,0 +1,12 @@
+CORE
+two_back_edges.c
+--loop-contracts-file test_two_back_edges.json --dfcc main --apply-loop-contracts
+^loop 0 of function foo, as given in the loop contracts file, is not the last back edge to its loop head; contracts for this loop must be given for loop 1$
+^EXIT=6$
+^SIGNAL=0$
+--
+^warning: ignoring
+Invariant check failed
+--
+A loop head with two back edges forms a single natural loop, which is numbered
+by its last back edge.

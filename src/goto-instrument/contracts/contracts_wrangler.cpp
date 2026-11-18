@@ -21,6 +21,7 @@ Date: June 2023
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
+#include <util/string2int.h>
 #include <util/typecheck.h>
 
 #include <goto-programs/remove_unused_functions.h>
@@ -102,11 +103,69 @@ contracts_wranglert::add_builtin_pointer_function_symbol(
   return fun_symbol.name;
 }
 
+/// Explain why \p function has no natural loop numbered \p loop_number that
+/// loop contracts can be attached to.
+static std::string
+describe_missing_loop(goto_functiont &function, const unsigned loop_number)
+{
+  for(auto it = function.body.instructions.begin();
+      it != function.body.instructions.end();
+      ++it)
+  {
+    if(!it->is_backwards_goto() || it->loop_number != loop_number)
+      continue;
+
+    if(it->get_target() == it)
+    {
+      return "consists of a single instruction that jumps to itself, which "
+             "loop contracts do not support";
+    }
+
+    // A loop head with several back edges forms a single natural loop, which
+    // is numbered by its last back edge.
+    for(auto other = std::next(it); other != function.body.instructions.end();
+        ++other)
+    {
+      if(other->is_backwards_goto() && other->get_target() == it->get_target())
+      {
+        const auto loop = find_loop_head_and_end(other->loop_number, function);
+        if(loop.has_value())
+        {
+          return "is not the last back edge to its loop head; contracts for "
+                 "this loop must be given for loop " +
+                 std::to_string(loop->second->loop_number);
+        }
+      }
+    }
+
+    return "is not a natural loop";
+  }
+
+  return "does not exist";
+}
+
 void contracts_wranglert::mangle(
   const loop_contracts_clauset &loop_contracts,
   const irep_idt &function_id)
 {
   messaget log(message_handler);
+
+  const std::string loop_description =
+    "loop " + std::to_string(loop_contracts.loop_number) + " of function " +
+    id2string(function_id);
+
+  auto function_it = goto_model.goto_functions.function_map.find(function_id);
+  PRECONDITION(function_it != goto_model.goto_functions.function_map.end());
+  const auto loop =
+    find_loop_head_and_end(loop_contracts.loop_number, function_it->second);
+  if(!loop.has_value())
+  {
+    throw invalid_input_exceptiont{
+      loop_description + ", as given in the loop contracts file, " +
+      describe_missing_loop(function_it->second, loop_contracts.loop_number)};
+  }
+  const goto_programt::targett loop_end = loop->second;
+
   // Loop contracts mangling consists of four steps.
   //
   // 1. Construct a fake function with a fake loop that contains the loop
@@ -164,29 +223,28 @@ void contracts_wranglert::mangle(
   if(ansi_c_parser.parse() || ansi_c_parser.parse_tree.items.empty())
   {
     throw invalid_input_exceptiont{
-      "failed to parse the loop contracts for loop " +
-      loop_contracts.identifier + " of function " + id2string(function_id) +
+      "failed to parse the loop contracts for " + loop_description +
       " given in the loop contracts file"};
   }
 
   // The loop of the fake function, which carries the clauses.
-  codet &loop = static_cast<codet &>(
+  codet &fake_loop = static_cast<codet &>(
     ansi_c_parser.parse_tree.items.front().declarator().value().operands()[0]);
   // As in the C front-end, decide from the parse tree which clauses are given.
   // Note that add() would create an empty (non-nil) clause.
-  const bool has_assigns = loop.find(ID_C_spec_assigns).is_not_nil();
-  const bool has_decreases = loop.find(ID_C_spec_decreases).is_not_nil();
+  const bool has_assigns = fake_loop.find(ID_C_spec_assigns).is_not_nil();
+  const bool has_decreases = fake_loop.find(ID_C_spec_decreases).is_not_nil();
 
   // Replace symbols in the clauses with the symbols in the symbol table.
   log.debug() << "Start to replace symbols" << log.eom;
   loop_contracts.replace_symbol(
-    static_cast<exprt &>(loop.add(ID_C_spec_loop_invariant)));
+    static_cast<exprt &>(fake_loop.add(ID_C_spec_loop_invariant)));
   if(has_assigns)
     loop_contracts.replace_symbol(
-      static_cast<exprt &>(loop.add(ID_C_spec_assigns)));
+      static_cast<exprt &>(fake_loop.add(ID_C_spec_assigns)));
   if(has_decreases)
     loop_contracts.replace_symbol(
-      static_cast<exprt &>(loop.add(ID_C_spec_decreases)));
+      static_cast<exprt &>(fake_loop.add(ID_C_spec_decreases)));
 
   // Add builtin functions that might be used in contracts to the symbol table,
   // and remove them again when leaving this function, also via an exception.
@@ -226,11 +284,10 @@ void contracts_wranglert::mangle(
     symbol_table.lookup_ref(function_id).module.c_str(),
     log.get_message_handler());
 
-  const auto typecheck_error = [&loop_contracts, &function_id]()
+  const auto typecheck_error = [&loop_description]()
   {
     return invalid_input_exceptiont{
-      "failed to typecheck the loop contracts for loop " +
-      loop_contracts.identifier + " of function " + id2string(function_id) +
+      "failed to typecheck the loop contracts for " + loop_description +
       " given in the loop contracts file"};
   };
 
@@ -238,15 +295,15 @@ void contracts_wranglert::mangle(
   try
   {
     log.debug() << "Start to typecheck the clauses." << log.eom;
-    ansi_c_typecheck.typecheck_spec_loop_invariant(loop);
+    ansi_c_typecheck.typecheck_spec_loop_invariant(fake_loop);
     if(has_assigns)
     {
       ansi_c_typecheck.typecheck_spec_assigns(
-        static_cast<unary_exprt &>(loop.add(ID_C_spec_assigns))
+        static_cast<unary_exprt &>(fake_loop.add(ID_C_spec_assigns))
           .op()
           .operands());
     }
-    ansi_c_typecheck.typecheck_spec_decreases(loop);
+    ansi_c_typecheck.typecheck_spec_decreases(fake_loop);
   }
   catch(int)
   {
@@ -278,35 +335,33 @@ void contracts_wranglert::mangle(
     throw typecheck_error();
   }
 
-  const loop_idt loop_id(function_id, std::stoi(loop_contracts.identifier));
-
   // Annotate the invariant. The clause may consist of several invariants, as
   // in "i <= 8) __CPROVER_loop_invariant(i >= 0", all of which must hold.
   const exprt::operandst &invariants =
-    static_cast<const exprt &>(loop.find(ID_C_spec_loop_invariant)).operands();
+    static_cast<const exprt &>(fake_loop.find(ID_C_spec_loop_invariant))
+      .operands();
   const exprt inv_expr = simplify_expr(conjunction(invariants), ns);
   log.debug() << "Extracted loop invariants: " << inv_expr.pretty() << "\n"
               << log.eom;
-  invariant_mapt inv_map;
-  inv_map[loop_id] = and_exprt(inv_expr, true_exprt());
-  annotate_invariants(inv_map, goto_model);
+  loop_end->condition_nonconst().add(ID_C_spec_loop_invariant) =
+    and_exprt{inv_expr, true_exprt{}};
 
   // Annotate the assigns clause.
   if(has_assigns)
   {
-    invariant_mapt assigns_map;
-    assigns_map[loop_id] =
-      static_cast<const exprt &>(loop.find(ID_C_spec_assigns)).operands()[0];
-    annotate_assigns(assigns_map, goto_model);
+    loop_end->condition_nonconst().add(ID_C_spec_assigns) =
+      static_cast<const exprt &>(fake_loop.find(ID_C_spec_assigns))
+        .operands()[0];
   }
 
   // Annotate the decreases clause.
   if(has_decreases)
   {
-    std::map<loop_idt, std::vector<exprt>> decreases_map;
-    decreases_map[loop_id] =
-      static_cast<const exprt &>(loop.find(ID_C_spec_decreases)).operands();
-    annotate_decreases(decreases_map, goto_model);
+    exprt decreases{ID_target_list};
+    decreases.operands() =
+      static_cast<const exprt &>(fake_loop.find(ID_C_spec_decreases))
+        .operands();
+    loop_end->condition_nonconst().add(ID_C_spec_decreases) = decreases;
   }
 
   log.debug() << "Mangling finished." << log.eom;
@@ -417,6 +472,20 @@ void contracts_wranglert::configure_functions(const jsont &config)
             "loop entry must have one identifier");
         }
 
+        // Surrounding white space is permitted, as in the symbol map.
+        const auto first = loop_id.find_first_not_of(" \t\n\r");
+        const auto last = loop_id.find_last_not_of(" \t\n\r");
+        const std::optional<unsigned> loop_number =
+          first == std::string::npos
+            ? std::optional<unsigned>{}
+            : string2optional_unsigned(loop_id.substr(first, last - first + 1));
+        if(!loop_number.has_value())
+        {
+          throw deserialization_exceptiont(
+            "loop identifier '" + loop_id + "' of function " + function_name +
+            " given in the loop contracts file is not a loop number");
+        }
+
         if(invariants_str.empty())
         {
           throw deserialization_exceptiont(
@@ -424,7 +493,11 @@ void contracts_wranglert::configure_functions(const jsont &config)
         }
 
         function_config.loop_contracts.emplace_back(
-          loop_id, invariants_str, assigns_str, decreases_str, replace_symbol);
+          *loop_number,
+          invariants_str,
+          assigns_str,
+          decreases_str,
+          replace_symbol);
       }
     }
   }

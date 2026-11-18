@@ -29,19 +29,19 @@ Date: June 2023
 
 struct loop_contracts_clauset
 {
-  std::string identifier;
+  unsigned loop_number;
   std::string invariants;
   std::string assigns;
   std::string decreases;
   unchecked_replace_symbolt replace_symbol;
 
   loop_contracts_clauset(
-    std::string _identifier,
+    unsigned _loop_number,
     std::string _invariants_str,
     std::string _assigns_str,
     std::string _decreases_str,
     unchecked_replace_symbolt _replace_symbol)
-    : identifier(std::move(_identifier)),
+    : loop_number(_loop_number),
       invariants(std::move(_invariants_str)),
       assigns(_assigns_str),
       decreases(_decreases_str),
