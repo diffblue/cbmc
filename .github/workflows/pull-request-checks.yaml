@@ -138,6 +138,10 @@ jobs:
           echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
       - name: Zero ccache stats and limit in size
         run: ccache -z --max-size=500M
+      - name: Perform C/C++ library syntax check
+        run: |
+          make -C src/ansi-c library_check
+          make -C src/cpp library_check
       - name: Build with make
         run: |
           make -C src       -j${{env.linux-vcpus}} MINISAT2=../../minisat-2.2.1 CADICAL=../../cadical
