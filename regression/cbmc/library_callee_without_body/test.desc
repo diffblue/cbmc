@@ -1,0 +1,16 @@
+CORE
+main.c
+-D_GNU_SOURCE
+^EXIT=(0|10)$
+^SIGNAL=0$
+^VERIFICATION (SUCCESSFUL|FAILED)$
+--
+^warning: ignoring
+map::at
+--
+A library model may call a function that is only declared in the library, for
+example because a system header renames it via an asm label, and that has no
+model either. Calling it must not abort symbolic execution, which used to fail
+with "map::at" as the function had no entry in the goto functions. Whether the
+callee has a model depends on the platform's C library, hence the result is not
+checked.
