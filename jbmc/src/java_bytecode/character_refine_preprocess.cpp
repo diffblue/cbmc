@@ -1242,7 +1242,8 @@ codet character_refine_preprocesst::convert_to_lower_case_int(
   return convert_to_lower_case_char(target);
 }
 
-/// Converts the character argument to titlecase.
+/// Converts the character argument to titlecase. Characters without a
+/// titlecase mapping of their own are converted to uppercase.
 /// \param chr: An expression of type character
 /// \param type: A type for the output
 /// \return An expression of the given type
@@ -1271,7 +1272,10 @@ exprt character_refine_preprocesst::expr_of_to_title_case(
       if_exprt(
         plus_8_set,
         plus_8,
-        if_exprt(in_list_expr(chr, plus_9_list), plus_9, chr))));
+        if_exprt(
+          in_list_expr(chr, plus_9_list),
+          plus_9,
+          expr_of_to_upper_case(chr, type)))));
 }
 
 /// Converts function call to an assignment of an expression corresponding to
