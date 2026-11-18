@@ -105,9 +105,9 @@ int main()
   float f25 = i25;
   __CPROVER_assert(f25 == -4294967296.0f, "33 bits, -4294967296");
   unsigned __CPROVER_bitvector[33] i26;
-  __CPROVER_assume(i26 == 16777216);
+  __CPROVER_assume(i26 == 1);
   float f26 = i26;
-  __CPROVER_assert(f26 == 16777216.0f, "33 bits, 16777216");
+  __CPROVER_assert(f26 == 1.0f, "33 bits, 1");
   unsigned __CPROVER_bitvector[33] i27;
   __CPROVER_assume(i27 == 16777216);
   float f27 = i27;

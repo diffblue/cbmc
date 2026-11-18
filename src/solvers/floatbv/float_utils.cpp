@@ -987,6 +987,8 @@ void float_utilst::normalization_shift(bvt &fraction, bvt &exponent)
   // The worst-case shift is the number of fraction
   // bits minus one, in case the fraction is one exactly.
   PRECONDITION(!fraction.empty());
+  // Shifting by up to fraction.size() - 1 needs address_bits(fraction.size())
+  // stages.
   std::size_t depth = address_bits(fraction.size());
 
   // sign-extend to ensure the arithmetic below cannot result in overflow/underflow
