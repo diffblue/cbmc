@@ -58,6 +58,8 @@ var classsmt2__convt =
     [ "convert_update_bit", "classsmt2__convt.html#a6db62fbf4aea81335e22f433acedc6db", null ],
     [ "convert_update_bits", "classsmt2__convt.html#ad38fd63c1704e1247c80a41c9bedea4d", null ],
     [ "convert_with", "classsmt2__convt.html#aaff22045e19cd027407a320a893c90b0", null ],
+    [ "datatype_selector_name", "classsmt2__convt.html#acc20ecd77e1a7584842fa1c9ac9f624a", null ],
+    [ "datatype_update_name", "classsmt2__convt.html#aa6dcecb323d5f5e83dece023a3a35ed6", null ],
     [ "dec_solve", "classsmt2__convt.html#a29223dc8875131d6b5cf1202a9ef7764", null ],
     [ "decision_procedure_text", "classsmt2__convt.html#a7d693c703cc7921c1a885e538f809ac3", null ],
     [ "define_object_size", "classsmt2__convt.html#a83458c9188b4d6e02d32dd33ad12cbb4", null ],
