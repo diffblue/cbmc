@@ -1,6 +1,9 @@
 CORE
 Test
---function Test.string1LengthConstPASS --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
-^EXIT=0$
+--function Test.string1LengthConstFAIL --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
+^EXIT=10$
 ^SIGNAL=0$
-line 25 assertion at file Test.java .*: SUCCESS
+line 30 assertion at file Test.java .*: FAILURE$
+^VERIFICATION FAILED$
+--
+--
