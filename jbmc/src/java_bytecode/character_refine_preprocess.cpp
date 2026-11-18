@@ -223,11 +223,16 @@ codet character_refine_preprocesst::convert_digit_char(
   // through z ('\uFF5A') and its code is less than radix + '\uFF41' - 10.
   // In this case, ch - '\uFF41' + 10 is returned.
   exprt uFF41=from_integer(0xFF41, arg.type());
+  exprt fullwidth_lower_case = in_interval_expr(arg, 0xFF41, 0xFF5A);
   plus_exprt value5(minus_exprt(arg, uFF41), i10);
   if_exprt case5(
     binary_relation_exprt(value5, ID_lt, radix), value5, invalid);
 
-  if_exprt fullwidth_cases(fullwidth_upper_case, case4, case5);
+  // Any other character is not a digit.
+  if_exprt fullwidth_cases(
+    fullwidth_upper_case,
+    case4,
+    if_exprt(fullwidth_lower_case, case5, invalid));
   if_exprt expr(
     latin_digit,
     case1,
