@@ -199,6 +199,12 @@ jobs:
           cpanm Thread::Pool::Simple
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
+      # Tests in regression/cbmc that pass --cvc5 run with cvc5 rather than Z3
+      # in the test-z3 step below, as --cvc5 takes precedence over --z3.
+      - name: Install cvc5
+        uses: ./.github/actions/install-cvc5
+        with:
+          version: ${{ env.cvc5-version }}
       - name: Restore ccache
         id: restore-ccache
         uses: actions/cache/restore@v6
