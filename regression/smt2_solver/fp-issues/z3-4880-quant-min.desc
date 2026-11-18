@@ -5,4 +5,4 @@ z3-4880-quant-min.smt2
 ^SIGNAL=0$
 ^unsat$
 --
-Z3#4880: quantified fp.min (fp.min + quantifiers unsupported)
+Z3#4880: quantified fp.min — should be unsat but quantifiers are ignored.
