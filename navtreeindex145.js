@@ -1,5 +1,7 @@
 var NAVTREEINDEX145 =
 {
+"structjava__bytecode__parse__treet_1_1membert.html#a6d27546b1a29225b11e4d20e8b20021f":[5,0,711,2,9],
+"structjava__bytecode__parse__treet_1_1membert.html#a86d6a1030c682101049b2a46e884519e":[5,0,711,2,7],
 "structjava__bytecode__parse__treet_1_1membert.html#a8f828450377286088f3b13b76fde10b0":[5,0,711,2,5],
 "structjava__bytecode__parse__treet_1_1membert.html#aacf3743cb044ace90e547764ddffb83e":[5,0,711,2,6],
 "structjava__bytecode__parse__treet_1_1methodt.html":[5,0,711,3],
@@ -247,7 +249,5 @@ var NAVTREEINDEX145 =
 "structmini__bdd__mgrt_1_1reverse__keyt.html#a62858efead7467206bb2b5e024cebe11":[5,0,837,1,3],
 "structmini__bdd__mgrt_1_1reverse__keyt.html#ab9fb18d7c9b3ebe22192ee4387ccadf5":[5,0,837,1,0],
 "structmini__bdd__mgrt_1_1reverse__keyt.html#abd368e952121901f4d28fd7884c7d49c":[5,0,837,1,1],
-"structmini__bdd__mgrt_1_1reverse__keyt.html#aecf3ac28785f08b384a94c3ef263cd85":[5,0,837,1,4],
-"structmini__bdd__mgrt_1_1var__table__entryt.html":[5,0,837,0],
-"structmini__bdd__mgrt_1_1var__table__entryt.html#a20fc678263de573827d297872cb6baf1":[5,0,837,0,1]
+"structmini__bdd__mgrt_1_1reverse__keyt.html#aecf3ac28785f08b384a94c3ef263cd85":[5,0,837,1,4]
 };

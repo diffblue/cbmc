@@ -131,11 +131,13 @@ Functions</h2></td></tr>
 <tr class="memitem:aa383452fe445bfae989358c9d7d96f4f" id="r_aa383452fe445bfae989358c9d7d96f4f"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa383452fe445bfae989358c9d7d96f4f">strlen</a> (const char *s)</td></tr>
 <tr class="memitem:ad593a8fc0baab9427df9636001dccddd" id="r_ad593a8fc0baab9427df9636001dccddd"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad593a8fc0baab9427df9636001dccddd">strdup</a> (const char *str)</td></tr>
 <tr class="memitem:ab15dd0a01835f878ce6d2420374f9914" id="r_ab15dd0a01835f878ce6d2420374f9914"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab15dd0a01835f878ce6d2420374f9914">memcpy</a> (void *dst, const void *src, size_t n)</td></tr>
+<tr class="memitem:adb1839a7f60866dd4e69892ecba145ac" id="r_adb1839a7f60866dd4e69892ecba145ac"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adb1839a7f60866dd4e69892ecba145ac">__builtin_memcpy</a> (void *dst, const void *src, __CPROVER_size_t n)</td></tr>
 <tr class="memitem:a31f55f452f1eb2dffe0751170717a180" id="r_a31f55f452f1eb2dffe0751170717a180"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a31f55f452f1eb2dffe0751170717a180">__builtin___memcpy_chk</a> (void *dst, const void *src, __CPROVER_size_t n, __CPROVER_size_t size)</td></tr>
 <tr class="memitem:a313175102214d45434bf045db18dddf0" id="r_a313175102214d45434bf045db18dddf0"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a313175102214d45434bf045db18dddf0">memset</a> (void *s, int c, size_t n)</td></tr>
 <tr class="memitem:a8f46f0b565b5d2c69bf06cab0e6f1078" id="r_a8f46f0b565b5d2c69bf06cab0e6f1078"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8f46f0b565b5d2c69bf06cab0e6f1078">__builtin_memset</a> (void *s, int c, __CPROVER_size_t n)</td></tr>
 <tr class="memitem:a42e0874f14a471a3b6aa43bbd14391f8" id="r_a42e0874f14a471a3b6aa43bbd14391f8"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a42e0874f14a471a3b6aa43bbd14391f8">__builtin___memset_chk</a> (void *s, int c, __CPROVER_size_t n, __CPROVER_size_t size)</td></tr>
 <tr class="memitem:a340d11725e5c81a874f508fbcdf1c5ef" id="r_a340d11725e5c81a874f508fbcdf1c5ef"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a340d11725e5c81a874f508fbcdf1c5ef">memmove</a> (void *dest, const void *src, size_t n)</td></tr>
+<tr class="memitem:a3a2b0da4f36111bcf154735fc6d935ae" id="r_a3a2b0da4f36111bcf154735fc6d935ae"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3a2b0da4f36111bcf154735fc6d935ae">__builtin_memmove</a> (void *dest, const void *src, __CPROVER_size_t n)</td></tr>
 <tr class="memitem:ab7c414834b62277e7c972652a9137080" id="r_ab7c414834b62277e7c972652a9137080"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab7c414834b62277e7c972652a9137080">__builtin___memmove_chk</a> (void *dest, const void *src, size_t n, __CPROVER_size_t size)</td></tr>
 <tr class="memitem:a9e6df54ee04e18a3772335580e2ed872" id="r_a9e6df54ee04e18a3772335580e2ed872"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9e6df54ee04e18a3772335580e2ed872">memcmp</a> (const void *<a class="el" href="bytecode__info_8h.html#a3b6653c9d2fc6aa11ec16b971883b82a">s1</a>, const void *<a class="el" href="bytecode__info_8h.html#a1ad7643875e80af295454566f9d548d8">s2</a>, size_t n)</td></tr>
 <tr class="memitem:a0a3e4af1b88f5d51a32fe7dcbf753b38" id="r_a0a3e4af1b88f5d51a32fe7dcbf753b38"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0a3e4af1b88f5d51a32fe7dcbf753b38">memchr</a> (const void *s, int c, size_t n)</td></tr>
@@ -209,7 +211,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l00660">660</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l00728">728</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
 
 </div>
 </div>
@@ -242,7 +244,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l00879">879</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l00992">992</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
 
 </div>
 </div>
@@ -275,7 +277,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l00791">791</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l00862">862</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
 
 </div>
 </div>
@@ -425,7 +427,63 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l00992">992</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l01110">1110</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
+
+</div>
+</div>
+<a id="adb1839a7f60866dd4e69892ecba145ac" name="adb1839a7f60866dd4e69892ecba145ac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adb1839a7f60866dd4e69892ecba145ac">&#9670;&#160;</a></span>__builtin_memcpy()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void * __builtin_memcpy </td>
+          <td>(</td>
+          <td class="paramtype">void *</td>          <td class="paramname"><span class="paramname"><em>dst</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const void *</td>          <td class="paramname"><span class="paramname"><em>src</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">__CPROVER_size_t</td>          <td class="paramname"><span class="paramname"><em>n</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l00681">681</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
+
+</div>
+</div>
+<a id="a3a2b0da4f36111bcf154735fc6d935ae" name="a3a2b0da4f36111bcf154735fc6d935ae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3a2b0da4f36111bcf154735fc6d935ae">&#9670;&#160;</a></span>__builtin_memmove()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void * __builtin_memmove </td>
+          <td>(</td>
+          <td class="paramtype">void *</td>          <td class="paramname"><span class="paramname"><em>dest</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const void *</td>          <td class="paramname"><span class="paramname"><em>src</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">__CPROVER_size_t</td>          <td class="paramname"><span class="paramname"><em>n</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l00951">951</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
 
 </div>
 </div>
@@ -453,7 +511,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l00752">752</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l00823">823</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
 
 </div>
 </div>
@@ -481,7 +539,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l00960">960</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l01078">1078</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
 
 </div>
 </div>
@@ -509,7 +567,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l00925">925</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l01043">1043</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
 
 </div>
 </div>
@@ -565,7 +623,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l00839">839</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l00910">910</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
 
 </div>
 </div>
@@ -593,7 +651,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l00715">715</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l00786">786</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
 
 </div>
 </div>
@@ -662,7 +720,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l01007">1007</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l01125">1125</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
 
 </div>
 </div>
@@ -746,7 +804,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l01134">1134</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l01252">1252</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
 
 </div>
 </div>
@@ -900,7 +958,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l01103">1103</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l01221">1221</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
 
 </div>
 </div>
@@ -923,7 +981,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l01036">1036</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l01154">1154</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
 
 </div>
 </div>
@@ -946,7 +1004,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l01065">1065</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l01183">1183</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
 
 </div>
 </div>

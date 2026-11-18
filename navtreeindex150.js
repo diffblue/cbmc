@@ -1,5 +1,7 @@
 var NAVTREEINDEX150 =
 {
+"symtab2gb__parse__options_8h.html#ab5f301549b42d5d1745d9aea4abf3cb5":[6,0,2,29,2,3],
+"symtab2gb__parse__options_8h.html#afa090be69779b07a36dcad0debd65ec3":[6,0,2,29,2,1],
 "symtab2gb__parse__options_8h_source.html":[6,0,2,29,2],
 "syntactic__diff_8cpp.html":[6,0,2,12,8],
 "syntactic__diff_8cpp_source.html":[6,0,2,12,8],
@@ -247,7 +249,5 @@ var NAVTREEINDEX150 =
 "unicode_8cpp.html#ad0736d1819ea827e52619ca7948764ee":[6,0,2,30,267,4],
 "unicode_8cpp.html#ad716b8e970180c886c32dea86b7229a1":[6,0,2,30,267,1],
 "unicode_8cpp.html#ae39f22a3570f43154a1c8e011e42b12b":[6,0,2,30,267,8],
-"unicode_8cpp.html#af60e2f885c0d0e44947e6be7f2de5cc7":[6,0,2,30,267,6],
-"unicode_8cpp.html#afacc648e3203e0d5c2b1c98ceaae2c44":[6,0,2,30,267,14],
-"unicode_8cpp.html#afdea7c24d4900e115885b954627fadd3":[6,0,2,30,267,13]
+"unicode_8cpp.html#af60e2f885c0d0e44947e6be7f2de5cc7":[6,0,2,30,267,6]
 };

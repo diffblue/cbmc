@@ -10,6 +10,8 @@ var string_8c =
     [ "__builtin___strncat_chk", "string_8c.html#a73f464dfdc458d7dd7917bb76e92c450", null ],
     [ "__builtin___strncpy_chk", "string_8c.html#a5b825d2243259b660b7063894c24c93c", null ],
     [ "__builtin_char_memchr", "string_8c.html#a63d1e17b46aca16f7993cbd8b22591b1", null ],
+    [ "__builtin_memcpy", "string_8c.html#adb1839a7f60866dd4e69892ecba145ac", null ],
+    [ "__builtin_memmove", "string_8c.html#a3a2b0da4f36111bcf154735fc6d935ae", null ],
     [ "__builtin_memset", "string_8c.html#a8f46f0b565b5d2c69bf06cab0e6f1078", null ],
     [ "memchr", "string_8c.html#a0a3e4af1b88f5d51a32fe7dcbf753b38", null ],
     [ "memcmp", "string_8c.html#a9e6df54ee04e18a3772335580e2ed872", null ],
