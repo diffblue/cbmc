@@ -1,0 +1,18 @@
+KNOWNBUG
+main.c
+--string-abstraction
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+With --string-abstraction, the buffer size of a char array initialised with a
+list ({'y', 'y', 'y', 'y'}, and also {'y', 'y', 'y', 0}) is unconstrained,
+whereas it is set for an array initialised with a string literal or not
+initialised at all. string_abstractiont::build_array only builds the abstract
+string for an array object with an element that is equal to 0, but the
+elements of the initialiser are typecasts of int constants (cast(0, char)),
+so that the comparison `*it == 0' never holds and the object is left without
+abstraction. Models that check the buffer size, such as memcpy
+(__CPROVER_buffer_size(dst) >= n), therefore fail.
