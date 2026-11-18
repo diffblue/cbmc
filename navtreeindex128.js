@@ -1,5 +1,6 @@
 var NAVTREEINDEX128 =
 {
+"partial__order__concurrency_8cpp.html":[6,0,2,17,27],
 "partial__order__concurrency_8cpp_source.html":[6,0,2,17,27],
 "partial__order__concurrency_8h.html":[6,0,2,17,28],
 "partial__order__concurrency_8h_source.html":[6,0,2,17,28],
@@ -248,6 +249,5 @@ var NAVTREEINDEX128 =
 "pragma__wpedantic_8def.html":[6,0,2,30,171],
 "pragma__wpedantic_8def_source.html":[6,0,2,30,171],
 "pragma__wsign__compare_8def.html":[6,0,2,30,172],
-"pragma__wsign__compare_8def_source.html":[6,0,2,30,172],
-"pragma__wtautological__compare_8def.html":[6,0,2,30,173]
+"pragma__wsign__compare_8def_source.html":[6,0,2,30,172]
 };

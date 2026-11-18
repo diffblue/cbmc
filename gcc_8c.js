@@ -13,6 +13,7 @@ var gcc_8c =
     [ "__atomic_signal_fence", "gcc_8c.html#af1a58328360b00c331efd2e5cc54fafd", null ],
     [ "__atomic_test_and_set", "gcc_8c.html#af9d5ac39e6c6ae816175106a01c080d6", null ],
     [ "__atomic_thread_fence", "gcc_8c.html#ad30afcb36419d1a5cb682797fbbdbb48", null ],
+    [ "__builtin_assume_aligned", "gcc_8c.html#a83da2d21df0b4a51e0d0bb55369fd5c4", null ],
     [ "__builtin_ia32_paddsw", "gcc_8c.html#afb8f0764a797cc3094a260d8cb3f5170", null ],
     [ "__builtin_ia32_psubsw", "gcc_8c.html#a52ce99c078533e8fe3ee270de79e0838", null ],
     [ "__builtin_ia32_psubsw128", "gcc_8c.html#ac109039aa6f1a79279c928470a88c2d8", null ],

@@ -466,7 +466,7 @@ var searchData=
   ['_5f_5fbuiltin_5fasinhl_463',['__builtin_asinhl',['../gcc__builtin__headers__math_8h.html#ad5bcd6f3ccdf469593de8cbf7269c6bc',1,'gcc_builtin_headers_math.h']]],
   ['_5f_5fbuiltin_5fasinl_464',['__builtin_asinl',['../gcc__builtin__headers__math_8h.html#a6b5ffda082cc87623a2324a21d7bb414',1,'gcc_builtin_headers_math.h']]],
   ['_5f_5fbuiltin_5fassume_465',['__builtin_assume',['../clang__builtin__headers_8h.html#a43b9db26f4908bc5485f51ae18d49143',1,'clang_builtin_headers.h']]],
-  ['_5f_5fbuiltin_5fassume_5faligned_466',['__builtin_assume_aligned',['../gcc__builtin__headers__mem__string_8h.html#a078c57dea3af63a6d756e34704dc4415',1,'gcc_builtin_headers_mem_string.h']]],
+  ['_5f_5fbuiltin_5fassume_5faligned_466',['__builtin_assume_aligned',['../gcc__builtin__headers__mem__string_8h.html#a078c57dea3af63a6d756e34704dc4415',1,'__builtin_assume_aligned(const void *, __CPROVER_size_t,...):&#160;gcc.c'],['../gcc_8c.html#a83da2d21df0b4a51e0d0bb55369fd5c4',1,'__builtin_assume_aligned(const void *exp, __CPROVER_size_t align,...):&#160;gcc.c']]],
   ['_5f_5fbuiltin_5fatan_467',['__builtin_atan',['../gcc__builtin__headers__math_8h.html#a4d98db15a341414141935af64039ab0d',1,'gcc_builtin_headers_math.h']]],
   ['_5f_5fbuiltin_5fatan2_468',['__builtin_atan2',['../gcc__builtin__headers__math_8h.html#ae860b00cba7a7ae4cc02c25fd4ed3003',1,'gcc_builtin_headers_math.h']]],
   ['_5f_5fbuiltin_5fatan2f_469',['__builtin_atan2f',['../gcc__builtin__headers__math_8h.html#a72872650c468e6f5d020c1297585ce3c',1,'gcc_builtin_headers_math.h']]],
