@@ -28,6 +28,11 @@
 # THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# This file is based on cpplint 1.6.0 as of
+# https://github.com/cpplint/cpplint/commit/2cba6ce8dfccfbe14dfe668c372149d9c39948a2
+# with CBMC-specific changes and additional checks, see the git history of
+# this file in the CBMC repository.
 
 """Does google-lint on c++ files.
 
