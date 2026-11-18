@@ -429,44 +429,48 @@ $(function(){initNavTree('time_8c_source.html','',''); });
 <div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span>  <span class="comment">// Check for null pointer - should set errno to EFAULT</span></div>
 <div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span>  <span class="comment">// Some systems have C headers where `tp` is annotated to be nonnull</span></div>
 <div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span><span class="preprocessor">#pragma GCC diagnostic push</span></div>
-<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span><span class="preprocessor">#pragma GCC diagnostic ignored &quot;-Wnonnull-compare&quot;</span></div>
-<div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span>  <span class="keywordflow">if</span>(!tp)</div>
-<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span>  {</div>
-<div class="line"><a id="l00317" name="l00317"></a><span class="lineno">  317</span>    errno = EFAULT;</div>
-<div class="line"><a id="l00318" name="l00318"></a><span class="lineno">  318</span>    <span class="keywordflow">return</span> -1;</div>
-<div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span>  }</div>
-<div class="line"><a id="l00320" name="l00320"></a><span class="lineno">  320</span><span class="preprocessor">#pragma GCC diagnostic pop</span></div>
-<div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span> </div>
-<div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span>  <span class="comment">// Non-deterministically choose success or failure</span></div>
-<div class="line"><a id="l00323" name="l00323"></a><span class="lineno">  323</span>  <span class="keywordtype">int</span> result = <a class="code hl_function" href="time_8c.html#a04daf060736c4b84b8132b745409c7cf">__VERIFIER_nondet_int</a>();</div>
-<div class="line"><a id="l00324" name="l00324"></a><span class="lineno">  324</span> </div>
-<div class="line"><a id="l00325" name="l00325"></a><span class="lineno">  325</span>  <span class="keywordflow">if</span>(result == 0)</div>
-<div class="line"><a id="l00326" name="l00326"></a><span class="lineno">  326</span>  {</div>
-<div class="line"><a id="l00327" name="l00327"></a><span class="lineno">  327</span>    <span class="comment">// Success case: fill in the timespec structure with non-deterministic but valid values</span></div>
-<div class="line"><a id="l00328" name="l00328"></a><span class="lineno">  328</span>    time_t sec = <a class="code hl_function" href="time_8c.html#a1de3ee87d6aca904fcc300736bc4814f">__VERIFIER_nondet_time_t</a>();</div>
-<div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span>    <span class="comment">// Assume reasonable time values (non-negative for typical use cases)</span></div>
-<div class="line"><a id="l00330" name="l00330"></a><span class="lineno">  330</span>    <a class="code hl_function" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(sec &gt;= 0);</div>
-<div class="line"><a id="l00331" name="l00331"></a><span class="lineno">  331</span>    tp-&gt;tv_sec = sec;</div>
-<div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span> </div>
-<div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span>    <span class="comment">// Nanoseconds should be between 0 and 999,999,999</span></div>
-<div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span>    <span class="keywordtype">long</span> nanosec = <a class="code hl_function" href="time_8c.html#afdcc836c0043b83bdf4f5fa3005fc649">__VERIFIER_nondet_long</a>();</div>
-<div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span>    <a class="code hl_function" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(nanosec &gt;= 0 &amp;&amp; nanosec &lt;= 999999999L);</div>
-<div class="line"><a id="l00336" name="l00336"></a><span class="lineno">  336</span>    tp-&gt;tv_nsec = nanosec;</div>
-<div class="line"><a id="l00337" name="l00337"></a><span class="lineno">  337</span> </div>
-<div class="line"><a id="l00338" name="l00338"></a><span class="lineno">  338</span>    <span class="keywordflow">return</span> 0;</div>
-<div class="line"><a id="l00339" name="l00339"></a><span class="lineno">  339</span>  }</div>
-<div class="line"><a id="l00340" name="l00340"></a><span class="lineno">  340</span>  <span class="keywordflow">else</span></div>
-<div class="line"><a id="l00341" name="l00341"></a><span class="lineno">  341</span>  {</div>
-<div class="line"><a id="l00342" name="l00342"></a><span class="lineno">  342</span>    <span class="comment">// Failure case: set errno and return -1</span></div>
-<div class="line"><a id="l00343" name="l00343"></a><span class="lineno">  343</span>    <span class="keywordtype">int</span> error_code = <a class="code hl_function" href="time_8c.html#a04daf060736c4b84b8132b745409c7cf">__VERIFIER_nondet_int</a>();</div>
-<div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span>    <span class="comment">// Most common error codes for clock_gettime</span></div>
-<div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span>    <a class="code hl_function" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(</div>
-<div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span>      error_code == EINVAL || error_code == EACCES || error_code == ENODEV ||</div>
-<div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span>      error_code == ENOTSUP || error_code == EOVERFLOW || error_code == EPERM);</div>
-<div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span>    errno = error_code;</div>
-<div class="line"><a id="l00349" name="l00349"></a><span class="lineno">  349</span>    <span class="keywordflow">return</span> -1;</div>
-<div class="line"><a id="l00350" name="l00350"></a><span class="lineno">  350</span>  }</div>
-<div class="line"><a id="l00351" name="l00351"></a><span class="lineno">  351</span>}</div>
+<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span><span class="preprocessor">#ifdef __clang__</span></div>
+<div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span><span class="preprocessor">#  pragma GCC diagnostic ignored &quot;-Wpointer-bool-conversion&quot;</span></div>
+<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span><span class="preprocessor">#else</span></div>
+<div class="line"><a id="l00317" name="l00317"></a><span class="lineno">  317</span><span class="preprocessor">#  pragma GCC diagnostic ignored &quot;-Wnonnull-compare&quot;</span></div>
+<div class="line"><a id="l00318" name="l00318"></a><span class="lineno">  318</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span>  <span class="keywordflow">if</span>(!tp)</div>
+<div class="line"><a id="l00320" name="l00320"></a><span class="lineno">  320</span>  {</div>
+<div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span>    errno = EFAULT;</div>
+<div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span>    <span class="keywordflow">return</span> -1;</div>
+<div class="line"><a id="l00323" name="l00323"></a><span class="lineno">  323</span>  }</div>
+<div class="line"><a id="l00324" name="l00324"></a><span class="lineno">  324</span><span class="preprocessor">#pragma GCC diagnostic pop</span></div>
+<div class="line"><a id="l00325" name="l00325"></a><span class="lineno">  325</span> </div>
+<div class="line"><a id="l00326" name="l00326"></a><span class="lineno">  326</span>  <span class="comment">// Non-deterministically choose success or failure</span></div>
+<div class="line"><a id="l00327" name="l00327"></a><span class="lineno">  327</span>  <span class="keywordtype">int</span> result = <a class="code hl_function" href="time_8c.html#a04daf060736c4b84b8132b745409c7cf">__VERIFIER_nondet_int</a>();</div>
+<div class="line"><a id="l00328" name="l00328"></a><span class="lineno">  328</span> </div>
+<div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span>  <span class="keywordflow">if</span>(result == 0)</div>
+<div class="line"><a id="l00330" name="l00330"></a><span class="lineno">  330</span>  {</div>
+<div class="line"><a id="l00331" name="l00331"></a><span class="lineno">  331</span>    <span class="comment">// Success case: fill in the timespec structure with non-deterministic but valid values</span></div>
+<div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span>    time_t sec = <a class="code hl_function" href="time_8c.html#a1de3ee87d6aca904fcc300736bc4814f">__VERIFIER_nondet_time_t</a>();</div>
+<div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span>    <span class="comment">// Assume reasonable time values (non-negative for typical use cases)</span></div>
+<div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span>    <a class="code hl_function" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(sec &gt;= 0);</div>
+<div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span>    tp-&gt;tv_sec = sec;</div>
+<div class="line"><a id="l00336" name="l00336"></a><span class="lineno">  336</span> </div>
+<div class="line"><a id="l00337" name="l00337"></a><span class="lineno">  337</span>    <span class="comment">// Nanoseconds should be between 0 and 999,999,999</span></div>
+<div class="line"><a id="l00338" name="l00338"></a><span class="lineno">  338</span>    <span class="keywordtype">long</span> nanosec = <a class="code hl_function" href="time_8c.html#afdcc836c0043b83bdf4f5fa3005fc649">__VERIFIER_nondet_long</a>();</div>
+<div class="line"><a id="l00339" name="l00339"></a><span class="lineno">  339</span>    <a class="code hl_function" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(nanosec &gt;= 0 &amp;&amp; nanosec &lt;= 999999999L);</div>
+<div class="line"><a id="l00340" name="l00340"></a><span class="lineno">  340</span>    tp-&gt;tv_nsec = nanosec;</div>
+<div class="line"><a id="l00341" name="l00341"></a><span class="lineno">  341</span> </div>
+<div class="line"><a id="l00342" name="l00342"></a><span class="lineno">  342</span>    <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a id="l00343" name="l00343"></a><span class="lineno">  343</span>  }</div>
+<div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span>  <span class="keywordflow">else</span></div>
+<div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span>  {</div>
+<div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span>    <span class="comment">// Failure case: set errno and return -1</span></div>
+<div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span>    <span class="keywordtype">int</span> error_code = <a class="code hl_function" href="time_8c.html#a04daf060736c4b84b8132b745409c7cf">__VERIFIER_nondet_int</a>();</div>
+<div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span>    <span class="comment">// Most common error codes for clock_gettime</span></div>
+<div class="line"><a id="l00349" name="l00349"></a><span class="lineno">  349</span>    <a class="code hl_function" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(</div>
+<div class="line"><a id="l00350" name="l00350"></a><span class="lineno">  350</span>      error_code == EINVAL || error_code == EACCES || error_code == ENODEV ||</div>
+<div class="line"><a id="l00351" name="l00351"></a><span class="lineno">  351</span>      error_code == ENOTSUP || error_code == EOVERFLOW || error_code == EPERM);</div>
+<div class="line"><a id="l00352" name="l00352"></a><span class="lineno">  352</span>    errno = error_code;</div>
+<div class="line"><a id="l00353" name="l00353"></a><span class="lineno">  353</span>    <span class="keywordflow">return</span> -1;</div>
+<div class="line"><a id="l00354" name="l00354"></a><span class="lineno">  354</span>  }</div>
+<div class="line"><a id="l00355" name="l00355"></a><span class="lineno">  355</span>}</div>
 </div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_a72964ce84fc78a75781c86abe871557d"><div class="ttname"><a href="cprover__builtin__headers_8h.html#a72964ce84fc78a75781c86abe871557d">__CPROVER_havoc_slice</a></div><div class="ttdeci">void __CPROVER_havoc_slice(void *, __CPROVER_size_t)</div></div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_ad3a2aedad97977b64290f8141eed690c"><div class="ttname"><a href="cprover__builtin__headers_8h.html#ad3a2aedad97977b64290f8141eed690c">__CPROVER_set_must</a></div><div class="ttdeci">void __CPROVER_set_must(const void *, const char *)</div></div>
