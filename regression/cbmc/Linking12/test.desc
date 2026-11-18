@@ -1,0 +1,16 @@
+CORE
+main.c
+module.c --validate-goto-model --validate-ssa-equation
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ member survived linking: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+parameter types differ
+conflicting
+unexpected difference between type symbols
+--
+An anonymous union that refers to a struct that is complete in one translation
+unit and incomplete in another has the same name in both, so the struct that
+contains it is the same type after linking.

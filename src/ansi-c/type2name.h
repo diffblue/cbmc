@@ -19,6 +19,13 @@ class typet;
 
 std::string type2name(const typet &type, const namespacet &ns);
 
+/// Like type2name, but describes named struct and union tags that \p type
+/// refers to by their name only, not by their body. This is used to name
+/// anonymous structs and unions: their names must not depend on whether a
+/// named tag that they refer to is complete, as the type is the same in
+/// translation units where it is complete and in those where it is not.
+std::string anonymous_tag_name(const typet &type, const namespacet &ns);
+
 /**
  * Constructs a string describing the given type, which can be used as part of
  * a `C` identifier. The resulting identifier is not guaranteed to uniquely

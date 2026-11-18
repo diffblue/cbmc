@@ -1,0 +1,13 @@
+CORE
+distinct_tags1.c
+distinct_tags2.c --validate-goto-model --validate-ssa-equation
+^EXIT=0$
+^SIGNAL=0$
+pointer parameter types differ between declaration and definition 'get'
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Anonymous unions that refer to differently named structs are different types,
+even if those structs have the same members, so the two struct S differ and
+linking warns about the parameter of get.
