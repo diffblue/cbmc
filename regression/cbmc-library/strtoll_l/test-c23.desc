@@ -1,0 +1,15 @@
+CORE unix
+main.c
+--c23
+^\[main\.assertion\.6\] line \d+ assertion .*: FAILURE$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+implicit function declaration
+is not declared
+--
+In C23 mode, glibc redirects strtoll_l to __isoc23_strtoll_l, which must have a
+model.
