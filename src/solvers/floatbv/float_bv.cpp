@@ -1142,10 +1142,14 @@ void float_bvt::normalization_shift(
   std::size_t exponent_bits=to_signedbv_type(exponent.type()).get_width();
   PRECONDITION(fraction_bits != 0);
 
+  // Shifting by up to fraction_bits - 1 needs address_bits(fraction_bits)
+  // stages.
   std::size_t depth = address_bits(fraction_bits);
 
-  exponent = typecast_exprt(
-    exponent, signedbv_typet(std::max(depth, exponent_bits + 1)));
+  // sign-extend to ensure the arithmetic below cannot result in
+  // overflow/underflow
+  const std::size_t extended_exponent_bits = std::max(depth, exponent_bits + 1);
+  exponent = typecast_exprt{exponent, signedbv_typet{extended_exponent_bits}};
 
   exprt exponent_delta=from_integer(0, exponent.type());
 
@@ -1170,7 +1174,7 @@ void float_bvt::normalization_shift(
 
     // add corresponding weight to exponent
     INVARIANT(
-      d < (signed int)exponent_bits,
+      d < (signed int)extended_exponent_bits,
       "depth must be smaller than exponent bits");
 
     exponent_delta=

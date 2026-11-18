@@ -1,0 +1,14 @@
+CORE smt-backend no-new-smt broken-cprover-smt-backend
+main.c
+--z3
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+Invariant check failed
+--
+With an SMT back end without floating-point theory, float_bvt checked the
+stage index of normalization_shift against the width of the exponent before
+it was extended, and thus failed an invariant ("depth must be smaller than
+exponent bits") for these formats.
