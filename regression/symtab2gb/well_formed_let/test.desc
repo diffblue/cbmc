@@ -1,0 +1,11 @@
+CORE
+let.json_symtab
+_ --show-symbol-table
+^EXIT=0$
+^SIGNAL=0$
+^Value\.*: LET qq=41 IN qq \+ 1$
+--
+malformed symbol table entry
+^Invariant check failed
+--
+A well-formed let expression passes validation.

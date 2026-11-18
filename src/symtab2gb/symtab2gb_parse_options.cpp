@@ -15,16 +15,12 @@ Author: Diffblue Ltd.
 #include <util/help_formatter.h>
 #include <util/json.h>
 #include <util/namespace.h>
-#include <util/prefix.h>
-#include <util/validate_expressions.h>
-#include <util/validate_types.h>
 #include <util/version.h>
 
 #include <goto-programs/goto_model.h>
 #include <goto-programs/write_goto_binary.h>
 
 #include <ansi-c/ansi_c_language.h>
-#include <ansi-c/c_expr.h>
 #include <ansi-c/goto-conversion/goto_convert_functions.h>
 #include <json-symtab-language/json_goto_functions.h>
 #include <json-symtab-language/json_symtab_language.h>
@@ -32,8 +28,9 @@ Author: Diffblue Ltd.
 #include <langapi/mode.h>
 #include <linking/linking.h>
 
+#include "validate_symtab.h"
+
 #include <fstream>
-#include <functional>
 #include <iostream>
 #include <string>
 
@@ -48,82 +45,6 @@ symtab2gb_parse_optionst::symtab2gb_parse_optionst(int argc, const char *argv[])
 static inline bool failed(bool error_indicator)
 {
   return error_indicator;
-}
-
-/// Apply \p f to every expression stored anywhere in \p irep, i.e., not only
-/// to operands, but also to expressions in named sub-trees of expressions,
-/// types and statements, such as array sizes or contract clauses. Any irep
-/// with a type is considered an expression.
-static void for_each_expression(
-  const irept &irep,
-  const std::function<void(const exprt &)> &f)
-{
-  for(const auto &sub : irep.get_sub())
-    for_each_expression(sub, f);
-  for(const auto &named_sub : irep.get_named_sub())
-  {
-    if(named_sub.first != ID_C_source_location)
-      for_each_expression(named_sub.second, f);
-  }
-
-  if(irep.find(ID_type).is_not_nil())
-    f(static_cast<const exprt &>(irep));
-}
-
-/// Validate the type and the value of \p symbol, including all expressions
-/// embedded in either of them, against \p ns. Throws
-/// invalid_input_exceptiont on the first malformed expression or type
-/// encountered, rather than letting downstream code read out of bounds.
-static void validate_symbol(const symbolt &symbol, const namespacet &ns)
-{
-  const validation_modet vm = validation_modet::EXCEPTION;
-  try
-  {
-    validate_full_type(symbol.type, ns, vm);
-    if(symbol.value.is_not_nil())
-      validate_full_expr(symbol.value, ns, vm);
-
-    // validate_full_type/validate_full_expr only follow subtypes and operands;
-    // also check expressions in other positions, and the expressions
-    // declared in ansi-c, which the dispatch table in
-    // util/validate_expressions.cpp cannot cover as util must not depend on
-    // ansi-c.
-    const auto check = [&](const exprt &expr)
-    {
-      validate_expr(expr, ns, vm);
-      if(can_cast_expr<conditional_target_group_exprt>(expr))
-        conditional_target_group_exprt::check(expr, vm);
-    };
-    for_each_expression(symbol.type, check);
-    for_each_expression(symbol.value, check);
-  }
-  catch(const incorrect_goto_program_exceptiont &e)
-  {
-    throw invalid_input_exceptiont{
-      "malformed symbol table entry `" + id2string(symbol.name) +
-      "': " + e.what()};
-  }
-}
-
-/// Validate the symbols of \p symbol_table that configt::set_from_symbol_table
-/// reads, which happens before the symbol tables of all input files have been
-/// linked.
-static void validate_configuration_symbols(const symbol_tablet &symbol_table)
-{
-  const namespacet ns{symbol_table};
-  for(const auto &symbol_pair : symbol_table.symbols)
-  {
-    if(has_prefix(id2string(symbol_pair.first), CPROVER_PREFIX "architecture_"))
-      validate_symbol(symbol_pair.second, ns);
-  }
-}
-
-/// Validate all symbols of the linked \p symbol_table.
-static void validate_symbol_table(const symbol_tablet &symbol_table)
-{
-  const namespacet ns{symbol_table};
-  for(const auto &symbol_pair : symbol_table.symbols)
-    validate_symbol(symbol_pair.second, ns);
 }
 
 static void run_symtab2gb(
@@ -192,7 +113,13 @@ static void run_symtab2gb(
       throw invalid_source_file_exceptiont{
         "failed to typecheck symbol table", source_location};
     }
-    validate_configuration_symbols(symtab);
+    // Linking and configt::set_from_symbol_table operate on the symbols of
+    // this file, so check their structure first. Checks that need to look
+    // up types (such as struct tags) can only be done once all input files
+    // have been linked, except for the configuration symbols, which
+    // configt::set_from_symbol_table simplifies.
+    check_symbol_table_structure(symtab);
+    validate_symbol_table(symtab, CPROVER_PREFIX "architecture_");
     config.set_from_symbol_table(symtab);
 
     if(failed(linking(linked_symbol_table, symtab, message_handler)))
@@ -202,8 +129,8 @@ static void run_symtab2gb(
     }
   }
 
-  // Validate only once all input files have been linked, as expressions may
-  // refer to types defined in other files.
+  // Validate (including look-ups) only once all input files have been
+  // linked, as expressions may refer to types defined in other files.
   validate_symbol_table(linked_symbol_table);
 
   goto_modelt linked_goto_model;
@@ -225,6 +152,9 @@ static void run_symtab2gb(
         "failed to parse JSON", source_location};
     }
     goto_functions_from_json(json, linked_goto_model.goto_functions);
+    validate_goto_functions(
+      linked_goto_model.goto_functions,
+      namespacet{linked_goto_model.symbol_table});
   }
 
   // Convert symbols to goto functions

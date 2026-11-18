@@ -1,0 +1,10 @@
+CORE
+bad.json_symtab
+good.json_symtab
+^EXIT=6$
+^SIGNAL=0$
+^malformed symbol table entry .p.: type must have one type parameter$
+--
+^Invariant check failed
+--
+As test.desc, with the input files in reverse order.

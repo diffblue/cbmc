@@ -1,0 +1,59 @@
+{
+ "symbolTable": {
+  "f": {
+   "type": {
+    "id": "code",
+    "sub": [],
+    "namedSub": {
+     "parameters": {
+      "id": "",
+      "sub": [],
+      "namedSub": {}
+     },
+     "return_type": {
+      "id": "pointer",
+      "sub": [],
+      "namedSub": {
+       "width": {
+        "id": "64",
+        "sub": [],
+        "namedSub": {}
+       }
+      }
+     }
+    }
+   },
+   "value": {
+    "id": "nil",
+    "sub": [],
+    "namedSub": {}
+   },
+   "location": {
+    "id": "nil",
+    "sub": [],
+    "namedSub": {}
+   },
+   "name": "f",
+   "module": "",
+   "baseName": "f",
+   "mode": "C",
+   "prettyName": "f",
+   "isType": false,
+   "isMacro": false,
+   "isExported": false,
+   "isInput": false,
+   "isOutput": false,
+   "isStateVar": false,
+   "isProperty": false,
+   "isStaticLifetime": true,
+   "isThreadLocal": false,
+   "isLvalue": true,
+   "isFileLocal": false,
+   "isExtern": false,
+   "isVolatile": false,
+   "isParameter": false,
+   "isAuxiliary": false,
+   "isWeak": false
+  }
+ }
+}

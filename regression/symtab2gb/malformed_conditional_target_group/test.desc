@@ -5,5 +5,7 @@ assert_ctg1.json_symtab
 ^SIGNAL=0$
 ^malformed symbol table entry .__CPROVER__start.: conditional target expression must have two operands$
 --
+^Invariant check failed
+--
 Rejects a symbol table with a malformed conditional_target_group expression that
 has only a single operand, which would cause a heap out-of-bounds read.

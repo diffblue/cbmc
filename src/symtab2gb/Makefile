@@ -1,6 +1,7 @@
 SRC = \
   symtab2gb_main.cpp \
   symtab2gb_parse_options.cpp \
+  validate_symtab.cpp \
   # Empty last line
 
 OBJ += \

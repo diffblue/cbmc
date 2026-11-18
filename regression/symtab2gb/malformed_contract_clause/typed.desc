@@ -1,0 +1,10 @@
+CORE
+typed.json_symtab
+
+^EXIT=6$
+^SIGNAL=0$
+^malformed symbol table entry .contract::f.: conditional target expression must have two operands$
+--
+^Invariant check failed
+--
+Rejects a malformed conditional_target_group in an assigns clause.

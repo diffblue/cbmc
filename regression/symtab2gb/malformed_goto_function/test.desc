@@ -1,0 +1,10 @@
+CORE
+f.json_symtab
+--goto-functions f.json_goto_functions
+^EXIT=6$
+^SIGNAL=0$
+^malformed goto function .f.: ternary expression must have three operands$
+--
+^Invariant check failed
+--
+Rejects a malformed expression in a goto function read with --goto-functions.

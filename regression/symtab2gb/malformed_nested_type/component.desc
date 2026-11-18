@@ -1,0 +1,11 @@
+CORE
+component.json_symtab
+
+^EXIT=6$
+^SIGNAL=0$
+^malformed symbol table entry .tag-S.: type must have one type parameter$
+--
+^Invariant check failed
+--
+Rejects a pointer or vector type without a subtype in a nested type position
+(the type of a struct component).

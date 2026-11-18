@@ -1,0 +1,10 @@
+CORE
+index.json_symtab
+
+^EXIT=6$
+^SIGNAL=0$
+^malformed symbol table entry .x.: binary expression must have two operands$
+--
+^Invariant check failed
+--
+Rejects an index expression with a single operand.

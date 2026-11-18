@@ -1,0 +1,10 @@
+CORE
+update.json_symtab
+
+^EXIT=6$
+^SIGNAL=0$
+^malformed symbol table entry .x.: ternary expression must have three operands$
+--
+^Invariant check failed
+--
+Rejects an update expression with a single operand.

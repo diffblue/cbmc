@@ -1,0 +1,11 @@
+CORE
+contract.json_symtab
+_ --show-symbol-table
+^EXIT=0$
+^SIGNAL=0$
+^Symbol\.*: contract::f$
+--
+malformed symbol table entry
+^Invariant check failed
+--
+A well-formed conditional_target_group in an assigns clause passes validation.

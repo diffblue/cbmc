@@ -1,0 +1,11 @@
+CORE
+f.json_symtab
+--goto-functions f.json_goto_functions _ --show-goto-functions
+^EXIT=0$
+^SIGNAL=0$
+^\s*ASSERT true$
+--
+malformed goto function
+^Invariant check failed
+--
+A well-formed goto function read with --goto-functions passes validation.
