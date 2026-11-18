@@ -1,3 +1,19 @@
+/* FUNCTION: __builtin_assume_aligned */
+
+void *__builtin_assume_aligned(const void *exp, __CPROVER_size_t align, ...)
+{
+__CPROVER_HIDE:;
+  // Per the GCC documentation, this returns `exp` and allows the
+  // compiler to assume the returned pointer is at least `align`-byte
+  // aligned (with an optional run-time misalignment offset in the
+  // variadic part).  The alignment claim is an optimisation hint; for
+  // verification we model the identity value flow only: the alignment
+  // claim is neither assumed (no behaviours are pruned) nor checked, so
+  // a false claim, which is undefined behaviour in GCC, goes undetected.
+  (void)align;
+  return (void *)exp;
+}
+
 /* FUNCTION: __builtin_ia32_sfence */
 
 #if defined(__i386__) || defined(__x86_64__)
