@@ -140,6 +140,8 @@ Functions</h2></td></tr>
 <tr class="memitem:a9e6df54ee04e18a3772335580e2ed872" id="r_a9e6df54ee04e18a3772335580e2ed872"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9e6df54ee04e18a3772335580e2ed872">memcmp</a> (const void *<a class="el" href="bytecode__info_8h.html#a3b6653c9d2fc6aa11ec16b971883b82a">s1</a>, const void *<a class="el" href="bytecode__info_8h.html#a1ad7643875e80af295454566f9d548d8">s2</a>, size_t n)</td></tr>
 <tr class="memitem:aa17096aac8b1ad0afb6be874d8c05d3c" id="r_aa17096aac8b1ad0afb6be874d8c05d3c"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa17096aac8b1ad0afb6be874d8c05d3c">strchr</a> (const char *src, int c)</td></tr>
 <tr class="memitem:a74bb83b922ff0d4f4267b8b47af45e2b" id="r_a74bb83b922ff0d4f4267b8b47af45e2b"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a74bb83b922ff0d4f4267b8b47af45e2b">strrchr</a> (const char *src, int c)</td></tr>
+<tr class="memitem:ab57319b670052e4c93c1f6822c28d5ce" id="r_ab57319b670052e4c93c1f6822c28d5ce"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab57319b670052e4c93c1f6822c28d5ce">strstr</a> (const char *haystack, const char *needle)</td></tr>
+<tr class="memitem:a58ec382a0a44be34a859ea51769c58ae" id="r_a58ec382a0a44be34a859ea51769c58ae"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a58ec382a0a44be34a859ea51769c58ae">strpbrk</a> (const char *<a class="el" href="bytecode__info_8h.html#a3b6653c9d2fc6aa11ec16b971883b82a">s1</a>, const char *<a class="el" href="bytecode__info_8h.html#a1ad7643875e80af295454566f9d548d8">s2</a>)</td></tr>
 <tr class="memitem:a4bc5f273980fb0e81e0fc7a4dd3de87e" id="r_a4bc5f273980fb0e81e0fc7a4dd3de87e"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4bc5f273980fb0e81e0fc7a4dd3de87e">strerror</a> (int errnum)</td></tr>
 </table>
 <a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
@@ -686,7 +688,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l01016">1016</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l01087">1087</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
 
 </div>
 </div>
@@ -821,6 +823,29 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a58ec382a0a44be34a859ea51769c58ae" name="a58ec382a0a44be34a859ea51769c58ae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a58ec382a0a44be34a859ea51769c58ae">&#9670;&#160;</a></span>strpbrk()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">char * strpbrk </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>s1</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>s2</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l01056">1056</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
+
+</div>
+</div>
 <a id="a74bb83b922ff0d4f4267b8b47af45e2b" name="a74bb83b922ff0d4f4267b8b47af45e2b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a74bb83b922ff0d4f4267b8b47af45e2b">&#9670;&#160;</a></span>strrchr()</h2>
 
@@ -841,6 +866,29 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="string_8c_source.html#l00989">989</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
+
+</div>
+</div>
+<a id="ab57319b670052e4c93c1f6822c28d5ce" name="ab57319b670052e4c93c1f6822c28d5ce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab57319b670052e4c93c1f6822c28d5ce">&#9670;&#160;</a></span>strstr()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">char * strstr </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>haystack</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>needle</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l01018">1018</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
 
 </div>
 </div>

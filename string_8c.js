@@ -26,5 +26,7 @@ var string_8c =
     [ "strncat", "string_8c.html#af81ab894ffe6a312661e5a18c9b74cdd", null ],
     [ "strncmp", "string_8c.html#a07f4a84c11c106e95c32b6ab509346ef", null ],
     [ "strncpy", "string_8c.html#a82f08f2390a9067f3c94b638e90e03bd", null ],
-    [ "strrchr", "string_8c.html#a74bb83b922ff0d4f4267b8b47af45e2b", null ]
+    [ "strpbrk", "string_8c.html#a58ec382a0a44be34a859ea51769c58ae", null ],
+    [ "strrchr", "string_8c.html#a74bb83b922ff0d4f4267b8b47af45e2b", null ],
+    [ "strstr", "string_8c.html#ab57319b670052e4c93c1f6822c28d5ce", null ]
 ];
