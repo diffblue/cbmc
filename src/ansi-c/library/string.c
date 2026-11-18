@@ -845,7 +845,7 @@ __CPROVER_HIDE:;
   // dst = src (with overlap allowed)
   if(__CPROVER_is_zero_string(src) && n > __CPROVER_zero_string_length(src))
   {
-    __CPROVER_is_zero_string(src) = 1;
+    __CPROVER_is_zero_string(dest) = 1;
     __CPROVER_zero_string_length(dest) = __CPROVER_zero_string_length(src);
   }
   else
@@ -891,7 +891,7 @@ __CPROVER_HIDE:;
   // dst = src (with overlap allowed)
   if(__CPROVER_is_zero_string(src) && n > __CPROVER_zero_string_length(src))
   {
-    __CPROVER_is_zero_string(src) = 1;
+    __CPROVER_is_zero_string(dest) = 1;
     __CPROVER_zero_string_length(dest) = __CPROVER_zero_string_length(src);
   }
   else
