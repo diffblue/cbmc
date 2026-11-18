@@ -627,16 +627,43 @@ bvt float_utilst::fma(
   return round_and_pack(result);
 }
 
+std::size_t float_div_exponent_width(const ieee_float_spect &spec)
+{
+  return std::max(spec.e, address_bits(spec.f)) + 2;
+}
+
 bvt float_utilst::div(const bvt &src1, const bvt &src2)
 {
   // unpack
   const unbiased_floatt unpacked1=unpack(src1);
   const unbiased_floatt unpacked2=unpack(src2);
 
-  std::size_t div_width=unpacked1.fraction.size()*2+1;
+  // The quotient needs spec.f + 2 significant bits (the significand plus a
+  // guard bit) above the remainder, which provides the sticky bit.  Padding
+  // the dividend with spec.f + 2 zeros achieves this for a normal dividend.
+  // A subnormal dividend, however, has up to spec.f leading zeros, each of
+  // which would cost one significant bit of the quotient. Rather than
+  // padding with spec.f more zeros, which makes every division more
+  // expensive, normalize the dividend: normalization_shift shifts out all
+  // leading zeros of the fraction, keeping its width, and decreases the
+  // exponent accordingly, which preserves the value. The divisor need not be
+  // normalized, as a subnormal divisor only makes the quotient larger.
+  // The exponent of a normalized subnormal can be as small as
+  // 1 - bias - spec.f, which needs to remain representable once we have
+  // subtracted the exponents and added spec.f below. Hence first extend the
+  // exponent to at least the width needed for that exponent arithmetic.
+  bvt dividend_fraction = unpacked1.fraction;
+  bvt dividend_exponent =
+    bv_utils.sign_extension(unpacked1.exponent, float_div_exponent_width(spec));
+  normalization_shift(dividend_fraction, dividend_exponent);
+  INVARIANT(
+    dividend_fraction.size() == unpacked1.fraction.size(),
+    "normalization_shift keeps the width of the fraction");
+
+  std::size_t div_width = dividend_fraction.size() * 2 + 1;
 
   // pad fraction1 with zeros
-  bvt fraction1=unpacked1.fraction;
+  bvt fraction1 = dividend_fraction;
   fraction1.reserve(div_width);
   while(fraction1.size()<div_width)
     fraction1.insert(fraction1.begin(), const_literal(false));
@@ -658,13 +685,13 @@ bvt float_utilst::div(const bvt &src1, const bvt &src2)
   result.fraction.insert(
     result.fraction.begin(), have_remainder);
 
-  // We will subtract the exponents;
-  // to account for overflow, we add a bit.
-  // we add a second bit for the adjust by extra fraction bits
-  const bvt exponent1=
-    bv_utils.sign_extension(unpacked1.exponent, unpacked1.exponent.size()+2);
-  const bvt exponent2=
-    bv_utils.sign_extension(unpacked2.exponent, unpacked2.exponent.size()+2);
+  // We will subtract the exponents and then add spec.f, see
+  // float_div_exponent_width; normalization_shift has extended the exponent
+  // of the dividend to at least that width.
+  const std::size_t exponent_width = dividend_exponent.size();
+  const bvt &exponent1 = dividend_exponent;
+  const bvt exponent2 =
+    bv_utils.sign_extension(unpacked2.exponent, exponent_width);
 
   // subtract exponents
   bvt added_exponent=bv_utils.sub(exponent1, exponent2);

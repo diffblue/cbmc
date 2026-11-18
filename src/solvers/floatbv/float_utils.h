@@ -14,6 +14,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/flattening/bv_utils.h>
 
+/// Width of the signed bit-vector in which floating-point division
+/// (float_utilst::div and float_bvt::div) subtracts the exponents of its
+/// operands and then adds spec.f. The result lies in
+/// [1 - 2 * bias, 2 * bias - 1 + spec.f], i.e., its magnitude is less than
+/// 2^spec.e + spec.f, which max(spec.e, address_bits(spec.f)) + 2 bits cover.
+/// \param spec: the format of the operands
+/// \return The width of the exponent arithmetic
+std::size_t float_div_exponent_width(const ieee_float_spect &spec);
+
 class float_utilst
 {
 public:
