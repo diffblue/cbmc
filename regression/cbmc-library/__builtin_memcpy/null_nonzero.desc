@@ -1,0 +1,18 @@
+CORE
+null_nonzero.c
+
+^\[main\.precondition_instance\.[0-9]+\] line 12 memcpy source region readable: FAILURE$
+^\[main\.precondition_instance\.[0-9]+\] line 12 memcpy destination region writeable: SUCCESS$
+^\[main\.precondition_instance\.[0-9]+\] line 13 memcpy source region readable: SUCCESS$
+^\[main\.precondition_instance\.[0-9]+\] line 13 memcpy destination region writeable: FAILURE$
+^\[main\.precondition_instance\.[0-9]+\] line 14 memmove source region readable: FAILURE$
+^\[main\.precondition_instance\.[0-9]+\] line 14 memmove destination region writeable: SUCCESS$
+^\[main\.precondition_instance\.[0-9]+\] line 15 memmove source region readable: SUCCESS$
+^\[main\.precondition_instance\.[0-9]+\] line 15 memmove destination region writeable: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+A null pointer is accepted only with a zero length.

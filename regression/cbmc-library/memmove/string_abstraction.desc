@@ -1,0 +1,10 @@
+CORE gcc-only
+string_abstraction.c
+--string-abstraction
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Copying a zero-terminated string makes the destination zero-terminated.

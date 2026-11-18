@@ -1,0 +1,15 @@
+CORE gcc-only
+main_msvc.c
+-D_MSC_VER=1950 --pointer-check
+^\[main\.precondition_instance\.[0-9]+\] line 18 memcpy source region readable: FAILURE$
+^\*\* 1 of [0-9]+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The library models of memcpy and memmove follow the Microsoft runtime when
+preprocessed by cl (_MSC_VER): a null pointer with a zero length is not an
+error. Only the copy with a non-zero length from a null pointer fails.
+gcc-only: cl defines _MSC_VER itself.

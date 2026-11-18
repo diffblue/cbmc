@@ -632,6 +632,26 @@ __CPROVER_HIDE:;
   }
 
 #else
+// The Microsoft runtime's memcpy accepts a null pointer with a zero length,
+// as C2y does (N3322), and the MSVC STL relies on it: copying an empty
+// vector calls memcpy(dest, nullptr, 0) (_Impl_copy_memmeow_tail). C17
+// 7.24.1/2 leaves the call undefined, which the other runtimes keep.
+// The preconditions are duplicated rather than written once as
+// `ZERO_LENGTH_OK || ...' with ZERO_LENGTH_OK being 0 for the other
+// runtimes: goto_check_c would check the argument expressions in the
+// right operand once more, under the guard `!(0 != 0)', and thus make each
+// of those checks twice (see #9478).
+#  ifdef _MSC_VER
+  __CPROVER_precondition(
+    n == 0 || __CPROVER_POINTER_OBJECT(dst) != __CPROVER_POINTER_OBJECT(src) ||
+      ((const unsigned char *)src >= (const unsigned char *)dst + n) ||
+      ((const unsigned char *)dst >= (const unsigned char *)src + n),
+    "memcpy src/dst overlap");
+  __CPROVER_precondition(
+    n == 0 || __CPROVER_r_ok(src, n), "memcpy source region readable");
+  __CPROVER_precondition(
+    n == 0 || __CPROVER_w_ok(dst, n), "memcpy destination region writeable");
+#  else
   __CPROVER_precondition(
     __CPROVER_POINTER_OBJECT(dst) != __CPROVER_POINTER_OBJECT(src) ||
       ((const unsigned char *)src >= (const unsigned char *)dst + n) ||
@@ -641,6 +661,7 @@ __CPROVER_HIDE:;
     __CPROVER_r_ok(src, n), "memcpy source region readable");
   __CPROVER_precondition(
     __CPROVER_w_ok(dst, n), "memcpy destination region writeable");
+#  endif
 
   if(n > 0)
   {
@@ -655,11 +676,61 @@ __CPROVER_HIDE:;
   return dst;
 }
 
+/* FUNCTION: __builtin_memcpy */
+
+void *__builtin_memcpy(void *dst, const void *src, __CPROVER_size_t n)
+{
+__CPROVER_HIDE:;
+// Unlike C17's memcpy (7.24.1/2), accept a null pointer with a zero length:
+// C2y (N3322) makes zero-length operations on null pointers well-defined,
+// and libc++'s vector relocation relies on it
+// (`__builtin_memcpy(new_begin, old_begin, 0)' with old_begin == nullptr
+// for an empty vector).
+#ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_precondition(
+    __CPROVER_buffer_size(src) >= n, "memcpy buffer overflow");
+  __CPROVER_precondition(
+    __CPROVER_buffer_size(dst) >= n, "memcpy buffer overflow");
+  if(__CPROVER_is_zero_string(src) && n > __CPROVER_zero_string_length(src))
+  {
+    __CPROVER_is_zero_string(dst) = 1;
+    __CPROVER_zero_string_length(dst) = __CPROVER_zero_string_length(src);
+  }
+  else if(!(__CPROVER_is_zero_string(dst) &&
+            n <= __CPROVER_zero_string_length(dst)))
+  {
+    __CPROVER_is_zero_string(dst) = 0;
+  }
+#else
+  __CPROVER_precondition(
+    n == 0 || __CPROVER_POINTER_OBJECT(dst) != __CPROVER_POINTER_OBJECT(src) ||
+      ((const unsigned char *)src >= (const unsigned char *)dst + n) ||
+      ((const unsigned char *)dst >= (const unsigned char *)src + n),
+    "memcpy src/dst overlap");
+  __CPROVER_precondition(
+    n == 0 || __CPROVER_r_ok(src, n), "memcpy source region readable");
+  __CPROVER_precondition(
+    n == 0 || __CPROVER_w_ok(dst, n), "memcpy destination region writeable");
+
+  if(n > 0)
+  {
+    unsigned char src_n[n];
+    __CPROVER_array_copy(src_n, (unsigned char *)src);
+    __CPROVER_array_replace((unsigned char *)dst, src_n);
+  }
+#endif
+
+  return dst;
+}
+
 /* FUNCTION: __builtin___memcpy_chk */
 
 void *__builtin___memcpy_chk(void *dst, const void *src, __CPROVER_size_t n, __CPROVER_size_t size)
 {
 __CPROVER_HIDE:
+  // Unlike __builtin_memcpy, this keeps C17's precondition for a null pointer
+  // with a zero length: with _FORTIFY_SOURCE and with the macOS SDK headers,
+  // calls of memcpy become calls of this builtin, with memcpy's contract.
 #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_precondition(
     __CPROVER_buffer_size(src) >= n, "memcpy buffer overflow");
@@ -838,24 +909,32 @@ __CPROVER_HIDE:;
 
 void *memmove(void *dest, const void *src, size_t n)
 {
-  __CPROVER_HIDE:;
-  #ifdef __CPROVER_STRING_ABSTRACTION
-  __CPROVER_precondition(__CPROVER_buffer_size(src)>=n,
-                         "memmove buffer overflow");
+__CPROVER_HIDE:;
+#ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_precondition(
+    __CPROVER_buffer_size(src) >= n, "memmove buffer overflow");
   // dst = src (with overlap allowed)
-  if(__CPROVER_is_zero_string(src) &&
-     n > __CPROVER_zero_string_length(src))
+  if(__CPROVER_is_zero_string(src) && n > __CPROVER_zero_string_length(src))
   {
-    __CPROVER_is_zero_string(src)=1;
-    __CPROVER_zero_string_length(dest)=__CPROVER_zero_string_length(src);
+    __CPROVER_is_zero_string(dest) = 1;
+    __CPROVER_zero_string_length(dest) = __CPROVER_zero_string_length(src);
   }
   else
-    __CPROVER_is_zero_string(dest)=0;
-  #else
-  __CPROVER_precondition(__CPROVER_r_ok(src, n),
-                         "memmove source region readable");
-  __CPROVER_precondition(__CPROVER_w_ok(dest, n),
-                         "memmove destination region writeable");
+    __CPROVER_is_zero_string(dest) = 0;
+#else
+// As for memcpy, the Microsoft runtime accepts a null pointer with a zero
+// length, and the preconditions are duplicated for that reason.
+#  ifdef _MSC_VER
+  __CPROVER_precondition(
+    n == 0 || __CPROVER_r_ok(src, n), "memmove source region readable");
+  __CPROVER_precondition(
+    n == 0 || __CPROVER_w_ok(dest, n), "memmove destination region writeable");
+#  else
+  __CPROVER_precondition(
+    __CPROVER_r_ok(src, n), "memmove source region readable");
+  __CPROVER_precondition(
+    __CPROVER_w_ok(dest, n), "memmove destination region writeable");
+#  endif
 
   if(n > 0)
   {
@@ -863,7 +942,41 @@ void *memmove(void *dest, const void *src, size_t n)
     __CPROVER_array_copy(src_n, (unsigned char *)src);
     __CPROVER_array_replace((unsigned char *)dest, src_n);
   }
-  #endif
+#endif
+  return dest;
+}
+
+/* FUNCTION: __builtin_memmove */
+
+void *__builtin_memmove(void *dest, const void *src, __CPROVER_size_t n)
+{
+__CPROVER_HIDE:;
+// As for __builtin_memcpy, a null pointer with a zero length is accepted.
+#ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_precondition(
+    __CPROVER_buffer_size(src) >= n, "memmove buffer overflow");
+  // dst = src (with overlap allowed)
+  if(__CPROVER_is_zero_string(src) && n > __CPROVER_zero_string_length(src))
+  {
+    __CPROVER_is_zero_string(dest) = 1;
+    __CPROVER_zero_string_length(dest) = __CPROVER_zero_string_length(src);
+  }
+  else
+    __CPROVER_is_zero_string(dest) = 0;
+#else
+  __CPROVER_precondition(
+    n == 0 || __CPROVER_r_ok(src, n), "memmove source region readable");
+  __CPROVER_precondition(
+    n == 0 || __CPROVER_w_ok(dest, n), "memmove destination region writeable");
+
+  if(n > 0)
+  {
+    unsigned char src_n[n];
+    __CPROVER_array_copy(src_n, (unsigned char *)src);
+    __CPROVER_array_replace((unsigned char *)dest, src_n);
+  }
+#endif
+
   return dest;
 }
 
@@ -876,31 +989,36 @@ void *memmove(void *dest, const void *src, size_t n)
 
 #undef memmove
 
-void *__builtin___memmove_chk(void *dest, const void *src, size_t n, __CPROVER_size_t size)
+void *__builtin___memmove_chk(
+  void *dest,
+  const void *src,
+  size_t n,
+  __CPROVER_size_t size)
 {
-  __CPROVER_HIDE:;
-  #ifdef __CPROVER_STRING_ABSTRACTION
-  __CPROVER_precondition(__CPROVER_buffer_size(src)>=n,
-                         "memmove buffer overflow");
+__CPROVER_HIDE:;
+// Unlike __builtin_memmove, this keeps C17's precondition for a null
+// pointer with a zero length, as for __builtin___memcpy_chk.
+#ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_precondition(
+    __CPROVER_buffer_size(src) >= n, "memmove buffer overflow");
   __CPROVER_precondition(
     size == ~(__CPROVER_size_t)0 || __CPROVER_buffer_size(dest) == size,
     "builtin object size");
   // dst = src (with overlap allowed)
-  if(__CPROVER_is_zero_string(src) &&
-     n > __CPROVER_zero_string_length(src))
+  if(__CPROVER_is_zero_string(src) && n > __CPROVER_zero_string_length(src))
   {
-    __CPROVER_is_zero_string(src)=1;
-    __CPROVER_zero_string_length(dest)=__CPROVER_zero_string_length(src);
+    __CPROVER_is_zero_string(dest) = 1;
+    __CPROVER_zero_string_length(dest) = __CPROVER_zero_string_length(src);
   }
   else
   {
-    __CPROVER_is_zero_string(dest)=0;
+    __CPROVER_is_zero_string(dest) = 0;
   }
-  #else
-  __CPROVER_precondition(__CPROVER_r_ok(src, n),
-                         "memmove source region readable");
-  __CPROVER_precondition(__CPROVER_w_ok(dest, n),
-                         "memmove destination region writeable");
+#else
+  __CPROVER_precondition(
+    __CPROVER_r_ok(src, n), "memmove source region readable");
+  __CPROVER_precondition(
+    __CPROVER_w_ok(dest, n), "memmove destination region writeable");
   (void)size;
 
   if(n > 0)
@@ -909,7 +1027,7 @@ void *__builtin___memmove_chk(void *dest, const void *src, size_t n, __CPROVER_s
     __CPROVER_array_copy(src_n, (unsigned char *)src);
     __CPROVER_array_replace((unsigned char *)dest, src_n);
   }
-  #endif
+#endif
   return dest;
 }
 
