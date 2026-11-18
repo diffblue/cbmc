@@ -99,11 +99,12 @@ $(function(){initNavTree('mman_8c.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &lt;sys/mman.h&gt;</code><br />
+<code>#include &lt;errno.h&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return dynsection.toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;"><span class="dynarrow"><span class="arrowhead closed"></span></span>Include dependency graph for mman.c:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" loading="lazy" frameborder="0" src="mman_8c__incl.svg" width="195" height="148"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" loading="lazy" frameborder="0" src="mman_8c__incl.svg" width="207" height="148"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 </div>
 <p><a href="mman_8c_source.html">Go to the source code of this file.</a></p>
@@ -114,6 +115,7 @@ Macros</h2></td></tr>
 <tr class="memitem:a387ec707b30c5e78cf20a14517a63b96" id="r_a387ec707b30c5e78cf20a14517a63b96"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a387ec707b30c5e78cf20a14517a63b96">MAP_FIXED</a>&#160;&#160;&#160;0</td></tr>
 <tr class="memitem:ae4f86bff73414c5fc08c058f957212f0" id="r_ae4f86bff73414c5fc08c058f957212f0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae4f86bff73414c5fc08c058f957212f0">MAP_ANONYMOUS</a>&#160;&#160;&#160;0</td></tr>
 <tr class="memitem:a14828817b96941a8a2ad71e2bb95143b" id="r_a14828817b96941a8a2ad71e2bb95143b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a14828817b96941a8a2ad71e2bb95143b">MAP_UNINITIALIZED</a>&#160;&#160;&#160;0</td></tr>
+<tr class="memitem:a40c164fa2b2bf09a2ec154c97be511cc" id="r_a40c164fa2b2bf09a2ec154c97be511cc"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a40c164fa2b2bf09a2ec154c97be511cc">__CPROVER_ERRNO_H_INCLUDED</a></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -125,6 +127,22 @@ Functions</h2></td></tr>
 <tr class="memitem:a449004606fcb9858f69b7dc9a930a395" id="r_a449004606fcb9858f69b7dc9a930a395"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a449004606fcb9858f69b7dc9a930a395">_munmap</a> (void *addr, __CPROVER_size_t length)</td></tr>
 </table>
 <a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
+<a id="a40c164fa2b2bf09a2ec154c97be511cc" name="a40c164fa2b2bf09a2ec154c97be511cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a40c164fa2b2bf09a2ec154c97be511cc">&#9670;&#160;</a></span>__CPROVER_ERRNO_H_INCLUDED</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define __CPROVER_ERRNO_H_INCLUDED</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="mman_8c_source.html#l00139">139</a> of file <a class="el" href="mman_8c_source.html">mman.c</a>.</p>
+
+</div>
+</div>
 <a id="a6491aa2bc6062c82c3026001f38bb424" name="a6491aa2bc6062c82c3026001f38bb424"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6491aa2bc6062c82c3026001f38bb424">&#9670;&#160;</a></span>__CPROVER_SYS_MMAN_H_INCLUDED</h2>
 
@@ -269,7 +287,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="mman_8c_source.html#l00158">158</a> of file <a class="el" href="mman_8c_source.html">mman.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mman_8c_source.html#l00166">166</a> of file <a class="el" href="mman_8c_source.html">mman.c</a>.</p>
 
 </div>
 </div>
@@ -378,7 +396,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="mman_8c_source.html#l00139">139</a> of file <a class="el" href="mman_8c_source.html">mman.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mman_8c_source.html#l00142">142</a> of file <a class="el" href="mman_8c_source.html">mman.c</a>.</p>
 
 </div>
 </div>
