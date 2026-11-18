@@ -1,0 +1,14 @@
+CORE
+main.c
+module.c --validate-goto-model
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^Invariant check failed
+--
+Linking renames struct A and struct S of one of the two files. The anonymous
+union nested in struct S depends on struct A and is thus renamed as well, which
+here yields the same name, which must keep the naming convention for anonymous
+tag types for the symbol table to be well formed. incomplete.desc makes the
+new name of the union differ from its old one.

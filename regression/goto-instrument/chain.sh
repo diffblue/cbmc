@@ -8,7 +8,16 @@ cbmc=$3
 is_windows=$4
 
 sources=${*:$#}
-args=${*:5:$#-5}
+args=""
+# C files among the options are compiled and linked with the main source file
+for arg in ${*:5:$#-5}; do
+  if [[ "$arg" == *.c ]]; then
+    sources="$arg $sources"
+  else
+    args="$args $arg"
+  fi
+done
+args=${args# }
 
 if [[ "$args" != *" _ "* ]]
 then

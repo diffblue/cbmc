@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/symbol_table_base.h>
 
+#include "anonymous_tag.h"
 #include "ansi_c_convert_type.h"
 #include "ansi_c_declaration.h"
 #include "c_qualifiers.h"
@@ -823,9 +824,10 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
 
     typecheck_compound_body(to_struct_union_type(compound_symbol.type));
 
-    std::string typestr = type2name(compound_symbol.type, *this);
-    compound_symbol.base_name = "#anon#" + typestr;
-    compound_symbol.name="tag-#anon#"+typestr;
+    const anonymous_tag_namet tag_name =
+      anonymous_tag_name(type2name(compound_symbol.type, *this));
+    compound_symbol.base_name = tag_name.base_name;
+    compound_symbol.name = tag_name.identifier;
     identifier=compound_symbol.name;
 
     // We might already have the same anonymous union/struct,

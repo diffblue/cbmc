@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol_table_base.h>
 
 #include "anonymous_member.h"
+#include "anonymous_tag.h"
 #include "c_typecheck_base.h"
 #include "type2name.h"
 
@@ -1053,10 +1054,11 @@ exprt c_typecheck_baset::do_initializer_list(
 
         // mimic bits of typecheck_compound_type to produce a new struct tag
         actual_struct_type.remove(ID_tag);
-        std::string typestr = type2name(actual_struct_type, *this);
-        irep_idt tag_identifier = "tag-#anon#" + typestr;
+        const anonymous_tag_namet tag_name =
+          anonymous_tag_name(type2name(actual_struct_type, *this));
+        const irep_idt &tag_identifier = tag_name.identifier;
         type_symbolt compound_symbol{tag_identifier, actual_struct_type, mode};
-        compound_symbol.base_name = "#anon#" + typestr;
+        compound_symbol.base_name = tag_name.base_name;
         compound_symbol.location = value.source_location();
 
         // We might already have the same anonymous struct, which is fine as it

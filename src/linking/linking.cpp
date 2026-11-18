@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/symbol_table_base.h>
 
+#include <ansi-c/anonymous_tag.h>
 #include <langapi/language_util.h>
 
 #include "linking_diagnostics.h"
@@ -965,7 +966,26 @@ std::unordered_map<irep_idt, irep_idt> linkingt::rename_symbols(
     irep_idt new_identifier;
 
     if(new_symbol.is_type)
-      new_identifier=type_to_name(src_ns, id, new_symbol.type);
+    {
+      // Anonymous tag types keep the naming convention of the C front-end
+      // (see anonymous_tag_name) so that they remain recognisable as
+      // anonymous. type_to_name includes the bodies of the tag types the type
+      // refers to, which is what may differ from the type in the main symbol
+      // table (unlike the front-end, which only names the body of the
+      // anonymous type itself). The new identifier may thus coincide with the
+      // old one, when the type was only renamed as it depends on a renamed
+      // type, but its name already reflects the bodies of those types. An
+      // existing symbol of the same name in the main symbol table then has
+      // the same body, and copy_symbols handles it as a duplicate type.
+      if(is_anonymous_tag(id))
+      {
+        new_identifier =
+          anonymous_tag_name(type_to_name(src_ns, id, new_symbol.type))
+            .identifier;
+      }
+      else
+        new_identifier = type_to_name(src_ns, id, new_symbol.type);
+    }
     else
       new_identifier = rename(src_symbol_table, id);
 
@@ -1000,7 +1020,12 @@ void linkingt::copy_symbols(
     rename_new_symbol(symbol.value);
     auto it = new_identifiers.find(named_symbol.first);
     if(it != new_identifiers.end())
+    {
       symbol.name = it->second;
+      // The base name of an anonymous tag type is derived from its name.
+      if(symbol.is_type && is_anonymous_tag(symbol.name))
+        symbol.base_name = anonymous_tag_base_name(symbol.name);
+    }
 
     src_symbols.emplace(named_symbol.first, std::move(symbol));
   }
