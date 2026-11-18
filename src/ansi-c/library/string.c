@@ -838,24 +838,23 @@ __CPROVER_HIDE:;
 
 void *memmove(void *dest, const void *src, size_t n)
 {
-  __CPROVER_HIDE:;
-  #ifdef __CPROVER_STRING_ABSTRACTION
-  __CPROVER_precondition(__CPROVER_buffer_size(src)>=n,
-                         "memmove buffer overflow");
+__CPROVER_HIDE:;
+#ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_precondition(
+    __CPROVER_buffer_size(src) >= n, "memmove buffer overflow");
   // dst = src (with overlap allowed)
-  if(__CPROVER_is_zero_string(src) &&
-     n > __CPROVER_zero_string_length(src))
+  if(__CPROVER_is_zero_string(src) && n > __CPROVER_zero_string_length(src))
   {
-    __CPROVER_is_zero_string(src)=1;
-    __CPROVER_zero_string_length(dest)=__CPROVER_zero_string_length(src);
+    __CPROVER_is_zero_string(src) = 1;
+    __CPROVER_zero_string_length(dest) = __CPROVER_zero_string_length(src);
   }
   else
-    __CPROVER_is_zero_string(dest)=0;
-  #else
-  __CPROVER_precondition(__CPROVER_r_ok(src, n),
-                         "memmove source region readable");
-  __CPROVER_precondition(__CPROVER_w_ok(dest, n),
-                         "memmove destination region writeable");
+    __CPROVER_is_zero_string(dest) = 0;
+#else
+  __CPROVER_precondition(
+    __CPROVER_r_ok(src, n), "memmove source region readable");
+  __CPROVER_precondition(
+    __CPROVER_w_ok(dest, n), "memmove destination region writeable");
 
   if(n > 0)
   {
@@ -863,7 +862,7 @@ void *memmove(void *dest, const void *src, size_t n)
     __CPROVER_array_copy(src_n, (unsigned char *)src);
     __CPROVER_array_replace((unsigned char *)dest, src_n);
   }
-  #endif
+#endif
   return dest;
 }
 
@@ -876,31 +875,34 @@ void *memmove(void *dest, const void *src, size_t n)
 
 #undef memmove
 
-void *__builtin___memmove_chk(void *dest, const void *src, size_t n, __CPROVER_size_t size)
+void *__builtin___memmove_chk(
+  void *dest,
+  const void *src,
+  size_t n,
+  __CPROVER_size_t size)
 {
-  __CPROVER_HIDE:;
-  #ifdef __CPROVER_STRING_ABSTRACTION
-  __CPROVER_precondition(__CPROVER_buffer_size(src)>=n,
-                         "memmove buffer overflow");
+__CPROVER_HIDE:;
+#ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_precondition(
+    __CPROVER_buffer_size(src) >= n, "memmove buffer overflow");
   __CPROVER_precondition(
     size == ~(__CPROVER_size_t)0 || __CPROVER_buffer_size(dest) == size,
     "builtin object size");
   // dst = src (with overlap allowed)
-  if(__CPROVER_is_zero_string(src) &&
-     n > __CPROVER_zero_string_length(src))
+  if(__CPROVER_is_zero_string(src) && n > __CPROVER_zero_string_length(src))
   {
-    __CPROVER_is_zero_string(src)=1;
-    __CPROVER_zero_string_length(dest)=__CPROVER_zero_string_length(src);
+    __CPROVER_is_zero_string(src) = 1;
+    __CPROVER_zero_string_length(dest) = __CPROVER_zero_string_length(src);
   }
   else
   {
-    __CPROVER_is_zero_string(dest)=0;
+    __CPROVER_is_zero_string(dest) = 0;
   }
-  #else
-  __CPROVER_precondition(__CPROVER_r_ok(src, n),
-                         "memmove source region readable");
-  __CPROVER_precondition(__CPROVER_w_ok(dest, n),
-                         "memmove destination region writeable");
+#else
+  __CPROVER_precondition(
+    __CPROVER_r_ok(src, n), "memmove source region readable");
+  __CPROVER_precondition(
+    __CPROVER_w_ok(dest, n), "memmove destination region writeable");
   (void)size;
 
   if(n > 0)
@@ -909,7 +911,7 @@ void *__builtin___memmove_chk(void *dest, const void *src, size_t n, __CPROVER_s
     __CPROVER_array_copy(src_n, (unsigned char *)src);
     __CPROVER_array_replace((unsigned char *)dest, src_n);
   }
-  #endif
+#endif
   return dest;
 }
 
