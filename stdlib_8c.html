@@ -116,6 +116,7 @@ Macros</h2></td></tr>
 <tr class="memitem:a508e18289cf35f19c7562637b9a63a8b" id="r_a508e18289cf35f19c7562637b9a63a8b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a508e18289cf35f19c7562637b9a63a8b">__CPROVER_LIMITS_H_INCLUDED</a></td></tr>
 <tr class="memitem:a7c479e0cc1989f8ce1b9371342f13f57" id="r_a7c479e0cc1989f8ce1b9371342f13f57"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7c479e0cc1989f8ce1b9371342f13f57">__CPROVER_INTTYPES_H_INCLUDED</a></td></tr>
 <tr class="memitem:a40c164fa2b2bf09a2ec154c97be511cc" id="r_a40c164fa2b2bf09a2ec154c97be511cc"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a40c164fa2b2bf09a2ec154c97be511cc">__CPROVER_ERRNO_H_INCLUDED</a></td></tr>
+<tr class="memitem:ab791a2da0c2573abff7e8253f233c15a" id="r_ab791a2da0c2573abff7e8253f233c15a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab791a2da0c2573abff7e8253f233c15a">__CPROVER_STRTO_DIGIT_VALUE</a>(ch)</td></tr>
 <tr class="memitem:a75f4ddb89445a1e78e51ef43d128ce5f" id="r_a75f4ddb89445a1e78e51ef43d128ce5f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a75f4ddb89445a1e78e51ef43d128ce5f">__CPROVER_STDDEF_H_INCLUDED</a></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
@@ -140,9 +141,25 @@ Functions</h2></td></tr>
 <tr class="memitem:a5ef264d7c09f165e1d72b108c150dd32" id="r_a5ef264d7c09f165e1d72b108c150dd32"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5ef264d7c09f165e1d72b108c150dd32">__CPROVER_deallocate</a> (void *)</td></tr>
 <tr class="memitem:afbedc913aa4651b3c3b4b3aecd9b4711" id="r_afbedc913aa4651b3c3b4b3aecd9b4711"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afbedc913aa4651b3c3b4b3aecd9b4711">free</a> (void *ptr)</td></tr>
 <tr class="memitem:a9e4f3a211671d05c9df210bb611719bf" id="r_a9e4f3a211671d05c9df210bb611719bf"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9e4f3a211671d05c9df210bb611719bf">isspace</a> (int)</td></tr>
-<tr class="memitem:a6fa1e2a306d0a84071e1537071172243" id="r_a6fa1e2a306d0a84071e1537071172243"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6fa1e2a306d0a84071e1537071172243">isdigit</a> (int)</td></tr>
 <tr class="memitem:a9ee5e0bece317e0e12bca8c1ef6f3e28" id="r_a9ee5e0bece317e0e12bca8c1ef6f3e28"><td class="memItemLeft" align="right" valign="top">_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9ee5e0bece317e0e12bca8c1ef6f3e28">__builtin_add_overflow</a> ()</td></tr>
+<tr class="memitem:a6c32fdc4219ca7dcdc44e3ef7ec18c97" id="r_a6c32fdc4219ca7dcdc44e3ef7ec18c97"><td class="memItemLeft" align="right" valign="top">unsigned long long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6c32fdc4219ca7dcdc44e3ef7ec18c97">__CPROVER_strto_scan</a> (const char *nptr, char **endptr, int base, _Bool c23, _Bool *negative, _Bool *overflow)</td></tr>
+<tr class="memdesc:a6c32fdc4219ca7dcdc44e3ef7ec18c97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Scan an integer as specified for strtol, strtoll, strtoul, and strtoull in C23 7.24.1.7, and set <code class="param">*endptr</code> (if <code class="param">endptr</code> is not null).  <br /></td></tr>
+<tr class="memitem:a85c61391561ca28b10c032b83326faf6" id="r_a85c61391561ca28b10c032b83326faf6"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a85c61391561ca28b10c032b83326faf6">__CPROVER_strtol_internal</a> (const char *nptr, char **endptr, int base, _Bool c23)</td></tr>
+<tr class="memdesc:a85c61391561ca28b10c032b83326faf6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert as strtol, accepting C23 prefixes if <code class="param">c23</code> is set.  <br /></td></tr>
 <tr class="memitem:a311071298c2fe3e5d7057f396a6acfdc" id="r_a311071298c2fe3e5d7057f396a6acfdc"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a311071298c2fe3e5d7057f396a6acfdc">strtol</a> (const char *nptr, char **endptr, int base)</td></tr>
+<tr class="memitem:ac160067ec58a2b028b26f4b37afb614c" id="r_ac160067ec58a2b028b26f4b37afb614c"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac160067ec58a2b028b26f4b37afb614c">__isoc23_strtol</a> (const char *nptr, char **endptr, int base)</td></tr>
+<tr class="memitem:a367ed539bb4584e16d6cc73d58ea16ae" id="r_a367ed539bb4584e16d6cc73d58ea16ae"><td class="memItemLeft" align="right" valign="top">long long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a367ed539bb4584e16d6cc73d58ea16ae">__CPROVER_strtoll_internal</a> (const char *nptr, char **endptr, int base, _Bool c23)</td></tr>
+<tr class="memdesc:a367ed539bb4584e16d6cc73d58ea16ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert as strtoll, accepting C23 prefixes if <code class="param">c23</code> is set.  <br /></td></tr>
+<tr class="memitem:afb901aa665b7e2e3e27025ca77fecd1b" id="r_afb901aa665b7e2e3e27025ca77fecd1b"><td class="memItemLeft" align="right" valign="top">long long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afb901aa665b7e2e3e27025ca77fecd1b">strtoll</a> (const char *nptr, char **endptr, int base)</td></tr>
+<tr class="memitem:ace326158a2d773506c0122f57861dcc5" id="r_ace326158a2d773506c0122f57861dcc5"><td class="memItemLeft" align="right" valign="top">long long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ace326158a2d773506c0122f57861dcc5">__isoc23_strtoll</a> (const char *nptr, char **endptr, int base)</td></tr>
+<tr class="memitem:a6754aab356fd18e145bf8af1526b24a3" id="r_a6754aab356fd18e145bf8af1526b24a3"><td class="memItemLeft" align="right" valign="top">unsigned long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6754aab356fd18e145bf8af1526b24a3">__CPROVER_strtoul_internal</a> (const char *nptr, char **endptr, int base, _Bool c23)</td></tr>
+<tr class="memdesc:a6754aab356fd18e145bf8af1526b24a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert as strtoul, accepting C23 prefixes if <code class="param">c23</code> is set.  <br /></td></tr>
+<tr class="memitem:a6d257fc3f00865d0556ed7327c312b55" id="r_a6d257fc3f00865d0556ed7327c312b55"><td class="memItemLeft" align="right" valign="top">unsigned long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6d257fc3f00865d0556ed7327c312b55">strtoul</a> (const char *nptr, char **endptr, int base)</td></tr>
+<tr class="memitem:a9cb9f411b6828da86e587ec9203807bf" id="r_a9cb9f411b6828da86e587ec9203807bf"><td class="memItemLeft" align="right" valign="top">unsigned long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9cb9f411b6828da86e587ec9203807bf">__isoc23_strtoul</a> (const char *nptr, char **endptr, int base)</td></tr>
+<tr class="memitem:a216bf2bb658472d340e5d9607777147b" id="r_a216bf2bb658472d340e5d9607777147b"><td class="memItemLeft" align="right" valign="top">unsigned long long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a216bf2bb658472d340e5d9607777147b">__CPROVER_strtoull_internal</a> (const char *nptr, char **endptr, int base, _Bool c23)</td></tr>
+<tr class="memdesc:a216bf2bb658472d340e5d9607777147b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert as strtoull, accepting C23 prefixes if <code class="param">c23</code> is set.  <br /></td></tr>
+<tr class="memitem:ae5835422eb2dfc17ea8deb3b15bcc541" id="r_ae5835422eb2dfc17ea8deb3b15bcc541"><td class="memItemLeft" align="right" valign="top">unsigned long long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae5835422eb2dfc17ea8deb3b15bcc541">strtoull</a> (const char *nptr, char **endptr, int base)</td></tr>
+<tr class="memitem:abea6f681a5ef446856f1fe549b48dfda" id="r_abea6f681a5ef446856f1fe549b48dfda"><td class="memItemLeft" align="right" valign="top">unsigned long long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abea6f681a5ef446856f1fe549b48dfda">__isoc23_strtoull</a> (const char *nptr, char **endptr, int base)</td></tr>
 <tr class="memitem:ad228deceea1bac4d9f171f647c265059" id="r_ad228deceea1bac4d9f171f647c265059"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad228deceea1bac4d9f171f647c265059">atoi</a> (const char *nptr)</td></tr>
 <tr class="memitem:a185551efd32d058ef290ebe2d144219f" id="r_a185551efd32d058ef290ebe2d144219f"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a185551efd32d058ef290ebe2d144219f">atol</a> (const char *nptr)</td></tr>
 <tr class="memitem:ac7eae8dd2e24285c5410fce64db23515" id="r_ac7eae8dd2e24285c5410fce64db23515"><td class="memItemLeft" align="right" valign="top">ptrdiff_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac7eae8dd2e24285c5410fce64db23515">__VERIFIER_nondet_ptrdiff_t</a> (void)</td></tr>
@@ -223,7 +240,30 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00490">490</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00829">829</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
+
+</div>
+</div>
+<a id="ab791a2da0c2573abff7e8253f233c15a" name="ab791a2da0c2573abff7e8253f233c15a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab791a2da0c2573abff7e8253f233c15a">&#9670;&#160;</a></span>__CPROVER_STRTO_DIGIT_VALUE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define __CPROVER_STRTO_DIGIT_VALUE</td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>ch</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">  ((ch) &gt;= <span class="charliteral">&#39;0&#39;</span> &amp;&amp; (ch) &lt;= <span class="charliteral">&#39;9&#39;</span>   ? (ch) - <span class="charliteral">&#39;0&#39;</span>                                   \</div>
+<div class="line">   : (ch) &gt;= <span class="charliteral">&#39;a&#39;</span> &amp;&amp; (ch) &lt;= <span class="charliteral">&#39;z&#39;</span> ? (ch) - <span class="charliteral">&#39;a&#39;</span> + 10                              \</div>
+<div class="line">   : (ch) &gt;= <span class="charliteral">&#39;A&#39;</span> &amp;&amp; (ch) &lt;= <span class="charliteral">&#39;Z&#39;</span> ? (ch) - <span class="charliteral">&#39;A&#39;</span> + 10                              \</div>
+<div class="line">                                : 36)</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00376">376</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
 
 </div>
 </div>
@@ -353,7 +393,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00670">670</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l01009">1009</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
 
 </div>
 </div>
@@ -371,6 +411,315 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6c32fdc4219ca7dcdc44e3ef7ec18c97" name="a6c32fdc4219ca7dcdc44e3ef7ec18c97"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6c32fdc4219ca7dcdc44e3ef7ec18c97">&#9670;&#160;</a></span>__CPROVER_strto_scan()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned long long __CPROVER_strto_scan </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>nptr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char **</td>          <td class="paramname"><span class="paramname"><em>endptr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>base</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">_Bool</td>          <td class="paramname"><span class="paramname"><em>c23</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">_Bool *</td>          <td class="paramname"><span class="paramname"><em>negative</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">_Bool *</td>          <td class="paramname"><span class="paramname"><em>overflow</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Scan an integer as specified for strtol, strtoll, strtoul, and strtoull in C23 7.24.1.7, and set <code class="param">*endptr</code> (if <code class="param">endptr</code> is not null). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir"></td><td class="paramname">nptr</td><td>the string to convert </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">endptr</td><td>where to store the end of the subject sequence </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">base</td><td>the base, or 0 to determine the base from the prefix </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">c23</td><td>whether to accept a "0b" or "0B" prefix for base 0 and 2, as C23 does </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">negative</td><td>whether the subject sequence starts with '-' </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">overflow</td><td>whether the magnitude exceeds ULLONG_MAX </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the magnitude of the converted value, or ULLONG_MAX if <code class="param">overflow</code> is set; 0 (with <code class="param">negative</code> and <code class="param">overflow</code> false) if no conversion could be performed </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00394">394</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
+
+</div>
+</div>
+<a id="a85c61391561ca28b10c032b83326faf6" name="a85c61391561ca28b10c032b83326faf6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a85c61391561ca28b10c032b83326faf6">&#9670;&#160;</a></span>__CPROVER_strtol_internal()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">long __CPROVER_strtol_internal </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>nptr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char **</td>          <td class="paramname"><span class="paramname"><em>endptr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>base</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">_Bool</td>          <td class="paramname"><span class="paramname"><em>c23</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Convert as strtol, accepting C23 prefixes if <code class="param">c23</code> is set. </p>
+
+<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00508">508</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
+
+</div>
+</div>
+<a id="a367ed539bb4584e16d6cc73d58ea16ae" name="a367ed539bb4584e16d6cc73d58ea16ae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a367ed539bb4584e16d6cc73d58ea16ae">&#9670;&#160;</a></span>__CPROVER_strtoll_internal()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">long long __CPROVER_strtoll_internal </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>nptr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char **</td>          <td class="paramname"><span class="paramname"><em>endptr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>base</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">_Bool</td>          <td class="paramname"><span class="paramname"><em>c23</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Convert as strtoll, accepting C23 prefixes if <code class="param">c23</code> is set. </p>
+
+<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00592">592</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
+
+</div>
+</div>
+<a id="a6754aab356fd18e145bf8af1526b24a3" name="a6754aab356fd18e145bf8af1526b24a3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6754aab356fd18e145bf8af1526b24a3">&#9670;&#160;</a></span>__CPROVER_strtoul_internal()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned long __CPROVER_strtoul_internal </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>nptr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char **</td>          <td class="paramname"><span class="paramname"><em>endptr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>base</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">_Bool</td>          <td class="paramname"><span class="paramname"><em>c23</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Convert as strtoul, accepting C23 prefixes if <code class="param">c23</code> is set. </p>
+
+<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00673">673</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
+
+</div>
+</div>
+<a id="a216bf2bb658472d340e5d9607777147b" name="a216bf2bb658472d340e5d9607777147b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a216bf2bb658472d340e5d9607777147b">&#9670;&#160;</a></span>__CPROVER_strtoull_internal()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned long long __CPROVER_strtoull_internal </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>nptr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char **</td>          <td class="paramname"><span class="paramname"><em>endptr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>base</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">_Bool</td>          <td class="paramname"><span class="paramname"><em>c23</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Convert as strtoull, accepting C23 prefixes if <code class="param">c23</code> is set. </p>
+
+<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00744">744</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
+
+</div>
+</div>
+<a id="ac160067ec58a2b028b26f4b37afb614c" name="ac160067ec58a2b028b26f4b37afb614c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac160067ec58a2b028b26f4b37afb614c">&#9670;&#160;</a></span>__isoc23_strtol()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">long __isoc23_strtol </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>nptr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char **</td>          <td class="paramname"><span class="paramname"><em>endptr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>base</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00564">564</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
+
+</div>
+</div>
+<a id="ace326158a2d773506c0122f57861dcc5" name="ace326158a2d773506c0122f57861dcc5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ace326158a2d773506c0122f57861dcc5">&#9670;&#160;</a></span>__isoc23_strtoll()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">long long __isoc23_strtoll </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>nptr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char **</td>          <td class="paramname"><span class="paramname"><em>endptr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>base</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00645">645</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
+
+</div>
+</div>
+<a id="a9cb9f411b6828da86e587ec9203807bf" name="a9cb9f411b6828da86e587ec9203807bf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9cb9f411b6828da86e587ec9203807bf">&#9670;&#160;</a></span>__isoc23_strtoul()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned long __isoc23_strtoul </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>nptr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char **</td>          <td class="paramname"><span class="paramname"><em>endptr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>base</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00717">717</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
+
+</div>
+</div>
+<a id="abea6f681a5ef446856f1fe549b48dfda" name="abea6f681a5ef446856f1fe549b48dfda"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abea6f681a5ef446856f1fe549b48dfda">&#9670;&#160;</a></span>__isoc23_strtoull()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned long long __isoc23_strtoull </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>nptr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char **</td>          <td class="paramname"><span class="paramname"><em>endptr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>base</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00791">791</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
 
 </div>
 </div>
@@ -533,7 +882,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00465">465</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00804">804</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
 
 </div>
 </div>
@@ -552,7 +901,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00478">478</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00817">817</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
 
 </div>
 </div>
@@ -632,7 +981,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00496">496</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00835">835</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
 
 </div>
 </div>
@@ -652,25 +1001,6 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00070">70</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
-
-</div>
-</div>
-<a id="a6fa1e2a306d0a84071e1537071172243" name="a6fa1e2a306d0a84071e1537071172243"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6fa1e2a306d0a84071e1537071172243">&#9670;&#160;</a></span>isdigit()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int isdigit </td>
-          <td>(</td>
-          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>c</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="ctype_8c_source.html#l00024">24</a> of file <a class="el" href="ctype_8c_source.html">ctype.c</a>.</p>
 
 </div>
 </div>
@@ -782,7 +1112,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00596">596</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00935">935</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
 
 </div>
 </div>
@@ -801,7 +1131,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00643">643</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00982">982</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
 
 </div>
 </div>
@@ -820,7 +1150,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00656">656</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00995">995</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
 
 </div>
 </div>
@@ -839,7 +1169,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00630">630</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00969">969</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
 
 </div>
 </div>
@@ -862,7 +1192,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00542">542</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00881">881</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
 
 </div>
 </div>
@@ -890,7 +1220,91 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00378">378</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00548">548</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
+
+</div>
+</div>
+<a id="afb901aa665b7e2e3e27025ca77fecd1b" name="afb901aa665b7e2e3e27025ca77fecd1b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afb901aa665b7e2e3e27025ca77fecd1b">&#9670;&#160;</a></span>strtoll()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">long long strtoll </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>nptr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char **</td>          <td class="paramname"><span class="paramname"><em>endptr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>base</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00629">629</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
+
+</div>
+</div>
+<a id="a6d257fc3f00865d0556ed7327c312b55" name="a6d257fc3f00865d0556ed7327c312b55"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6d257fc3f00865d0556ed7327c312b55">&#9670;&#160;</a></span>strtoul()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned long strtoul </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>nptr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char **</td>          <td class="paramname"><span class="paramname"><em>endptr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>base</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00701">701</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
+
+</div>
+</div>
+<a id="ae5835422eb2dfc17ea8deb3b15bcc541" name="ae5835422eb2dfc17ea8deb3b15bcc541"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae5835422eb2dfc17ea8deb3b15bcc541">&#9670;&#160;</a></span>strtoull()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned long long strtoull </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>nptr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char **</td>          <td class="paramname"><span class="paramname"><em>endptr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>base</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00775">775</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
 
 </div>
 </div>
@@ -909,7 +1323,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00577">577</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00916">916</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
 
 </div>
 </div>

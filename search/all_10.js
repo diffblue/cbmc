@@ -2134,7 +2134,7 @@ var searchData=
   ['isblank_2131',['isblank',['../ctype_8c.html#aea4929b1b41f1a6d723e0312b1f050ed',1,'ctype.c']]],
   ['iscntrl_2132',['iscntrl',['../ctype_8c.html#a0008a4e8e7889734dc1d83297de07158',1,'ctype.c']]],
   ['isconstructordecl_2133',['isConstructorDecl',['../class_parser.html#a3a1c93f5375d2452585e320c46168b47',1,'Parser']]],
-  ['isdigit_2134',['isdigit',['../ctype_8c.html#a3fa45b35c8abf67a950b6d3d4063dede',1,'isdigit(int c):&#160;ctype.c'],['../stdlib_8c.html#a6fa1e2a306d0a84071e1537071172243',1,'isdigit(int):&#160;ctype.c']]],
+  ['isdigit_2134',['isdigit',['../ctype_8c.html#a3fa45b35c8abf67a950b6d3d4063dede',1,'ctype.c']]],
   ['isfinite_2135',['isfinite',['../classfloat__bvt.html#a34a1bf0556b87ca43933795d1fce8916',1,'float_bvt::isfinite()'],['../math_8c.html#af4dbce976984f75dc170aef9b4e68001',1,'isfinite(double d):&#160;math.c']]],
   ['isfinite_5fexprt_2136',['isfinite_exprt',['../classisfinite__exprt.html',1,'isfinite_exprt'],['../classisfinite__exprt.html#ad26216ba13d9a0aa41b7358c430933c4',1,'isfinite_exprt::isfinite_exprt()']]],
   ['isgraph_2137',['isgraph',['../ctype_8c.html#a49f40fd869fd0c90e4497fda08c89561',1,'ctype.c']]],
