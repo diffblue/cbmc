@@ -5,6 +5,7 @@ var clang__builtin__headers_8h =
     [ "__builtin_bitreverse32", "clang__builtin__headers_8h.html#a62b81d061081eac9afc526cb62e93f83", null ],
     [ "__builtin_bitreverse64", "clang__builtin__headers_8h.html#a66a6f9c5144b35e3efe41a81076cb583", null ],
     [ "__builtin_bitreverse8", "clang__builtin__headers_8h.html#a222ac9c32f1fb75cce4aec1f7b37a8fc", null ],
+    [ "__builtin_char_memchr", "clang__builtin__headers_8h.html#a65f03e4b78a888e27999dc00b85cad09", null ],
     [ "__builtin_cpu_init", "clang__builtin__headers_8h.html#a874d1677b61664981fedbc925709b331", null ],
     [ "__builtin_cpu_is", "clang__builtin__headers_8h.html#aa6792610141173f450af915de817b049", null ],
     [ "__builtin_cpu_supports", "clang__builtin__headers_8h.html#ac52d33ec711784cbdec3471da74772ae", null ],

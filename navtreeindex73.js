@@ -1,5 +1,6 @@
 var NAVTREEINDEX73 =
 {
+"complexity__limiter_8cpp_source.html":[6,0,2,17,4],
 "complexity__limiter_8h.html":[6,0,2,17,5],
 "complexity__limiter_8h_source.html":[6,0,2,17,5],
 "complexity__violation_8h.html":[6,0,2,17,6],
@@ -248,6 +249,5 @@ var NAVTREEINDEX73 =
 "contracts__wrangler_8cpp_source.html":[6,0,2,15,1,5],
 "contracts__wrangler_8h.html":[6,0,2,15,1,6],
 "contracts__wrangler_8h.html#a7b9928d950b2f1da988b85e54a9e7bc5":[6,0,2,15,1,6,3],
-"contracts__wrangler_8h_source.html":[6,0,2,15,1,6],
-"contributing_documentation.html":[0,5]
+"contracts__wrangler_8h_source.html":[6,0,2,15,1,6]
 };

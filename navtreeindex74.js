@@ -1,5 +1,6 @@
 var NAVTREEINDEX74 =
 {
+"contributing_documentation.html":[0,5],
 "convert__bool__literal_8cpp.html":[6,0,2,28,0,0],
 "convert__bool__literal_8cpp.html#af0bf4aa9e05b554b5faefe6119d522fc":[6,0,2,28,0,0,0],
 "convert__bool__literal_8cpp_source.html":[6,0,2,28,0,0],
@@ -248,6 +249,5 @@ var NAVTREEINDEX74 =
 "counterexample__found_8h.html#aee37797323e4ec437d199048ab9e1366":[6,0,2,6,9,0],
 "counterexample__found_8h_source.html":[6,0,2,6,9],
 "cout__message_8cpp.html":[6,0,2,30,30],
-"cout__message_8cpp_source.html":[6,0,2,30,30],
-"cout__message_8h.html":[6,0,2,30,31]
+"cout__message_8cpp_source.html":[6,0,2,30,30]
 };

@@ -1085,165 +1085,216 @@ $(function(){initNavTree('string_8c_source.html','',''); });
 <div class="line"><a id="l00949" name="l00949"></a><span class="lineno">  949</span>}</div>
 </div>
 <div class="line"><a id="l00950" name="l00950"></a><span class="lineno">  950</span> </div>
-<div class="line"><a id="l00951" name="l00951"></a><span class="lineno">  951</span><span class="comment">/* FUNCTION: strchr */</span></div>
+<div class="line"><a id="l00951" name="l00951"></a><span class="lineno">  951</span><span class="comment">/* FUNCTION: memchr */</span></div>
 <div class="line"><a id="l00952" name="l00952"></a><span class="lineno">  952</span> </div>
 <div class="line"><a id="l00953" name="l00953"></a><span class="lineno">  953</span><span class="preprocessor">#ifndef __CPROVER_STRING_H_INCLUDED</span></div>
-<div class="line"><a id="l00954" name="l00954"></a><span class="lineno">  954</span><span class="preprocessor">#include &lt;string.h&gt;</span></div>
-<div class="line"><a id="l00955" name="l00955"></a><span class="lineno">  955</span><span class="preprocessor">#define __CPROVER_STRING_H_INCLUDED</span></div>
+<div class="line"><a id="l00954" name="l00954"></a><span class="lineno">  954</span><span class="preprocessor">#  include &lt;string.h&gt;</span></div>
+<div class="line"><a id="l00955" name="l00955"></a><span class="lineno">  955</span><span class="preprocessor">#  define __CPROVER_STRING_H_INCLUDED</span></div>
 <div class="line"><a id="l00956" name="l00956"></a><span class="lineno">  956</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00957" name="l00957"></a><span class="lineno">  957</span> </div>
-<div class="line"><a id="l00958" name="l00958"></a><span class="lineno">  958</span><span class="preprocessor">#undef strchr</span></div>
+<div class="line"><a id="l00958" name="l00958"></a><span class="lineno">  958</span><span class="preprocessor">#undef memchr</span></div>
 <div class="line"><a id="l00959" name="l00959"></a><span class="lineno">  959</span> </div>
 <div class="foldopen" id="foldopen00960" data-start="{" data-end="}">
-<div class="line"><a id="l00960" name="l00960"></a><span class="lineno"><a class="line" href="string_8c.html#aa17096aac8b1ad0afb6be874d8c05d3c">  960</a></span><span class="keywordtype">char</span> *<a class="code hl_function" href="string_8c.html#aa17096aac8b1ad0afb6be874d8c05d3c">strchr</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *src, <span class="keywordtype">int</span> c)</div>
+<div class="line"><a id="l00960" name="l00960"></a><span class="lineno"><a class="line" href="string_8c.html#a0a3e4af1b88f5d51a32fe7dcbf753b38">  960</a></span><span class="keywordtype">void</span> *<a class="code hl_function" href="string_8c.html#a0a3e4af1b88f5d51a32fe7dcbf753b38">memchr</a>(<span class="keyword">const</span> <span class="keywordtype">void</span> *s, <span class="keywordtype">int</span> c, <span class="keywordtype">size_t</span> n)</div>
 <div class="line"><a id="l00961" name="l00961"></a><span class="lineno">  961</span>{</div>
-<div class="line"><a id="l00962" name="l00962"></a><span class="lineno">  962</span>  __CPROVER_HIDE:;</div>
-<div class="line"><a id="l00963" name="l00963"></a><span class="lineno">  963</span><span class="preprocessor">  #ifdef __CPROVER_STRING_ABSTRACTION</span></div>
-<div class="line"><a id="l00964" name="l00964"></a><span class="lineno">  964</span>  <a class="code hl_function" href="cprover__builtin__headers_8h.html#a9e05c8aeb35905c38bd7bcdb78145dae">__CPROVER_precondition</a>(<a class="code hl_function" href="cprover__builtin__headers_8h.html#ac580a358f798722e5dfa5ed3ede23b11">__CPROVER_is_zero_string</a>(src),</div>
-<div class="line"><a id="l00965" name="l00965"></a><span class="lineno">  965</span>                         <span class="stringliteral">&quot;strchr zero-termination of string argument&quot;</span>);</div>
-<div class="line"><a id="l00966" name="l00966"></a><span class="lineno">  966</span>  __CPROVER_bool found;</div>
-<div class="line"><a id="l00967" name="l00967"></a><span class="lineno">  967</span>  __CPROVER_size_t i;</div>
-<div class="line"><a id="l00968" name="l00968"></a><span class="lineno">  968</span>  <span class="keywordflow">return</span> found?src+i:0;</div>
-<div class="line"><a id="l00969" name="l00969"></a><span class="lineno">  969</span><span class="preprocessor">  #else</span></div>
-<div class="line"><a id="l00970" name="l00970"></a><span class="lineno">  970</span>  <span class="keywordflow">for</span>(__CPROVER_size_t i=0; ; i++)</div>
-<div class="line"><a id="l00971" name="l00971"></a><span class="lineno">  971</span>  {</div>
-<div class="line"><a id="l00972" name="l00972"></a><span class="lineno">  972</span>    <span class="keywordflow">if</span>(src[i]==(<span class="keywordtype">char</span>)c)</div>
-<div class="line"><a id="l00973" name="l00973"></a><span class="lineno">  973</span>      <span class="keywordflow">return</span> ((<span class="keywordtype">char</span> *)src)+i; <span class="comment">// cast away const-ness</span></div>
-<div class="line"><a id="l00974" name="l00974"></a><span class="lineno">  974</span>    <span class="keywordflow">if</span>(src[i]==0) <span class="keywordflow">break</span>;</div>
-<div class="line"><a id="l00975" name="l00975"></a><span class="lineno">  975</span>  }</div>
-<div class="line"><a id="l00976" name="l00976"></a><span class="lineno">  976</span>  <span class="keywordflow">return</span> 0;</div>
-<div class="line"><a id="l00977" name="l00977"></a><span class="lineno">  977</span><span class="preprocessor">  #endif</span></div>
-<div class="line"><a id="l00978" name="l00978"></a><span class="lineno">  978</span>}</div>
+<div class="line"><a id="l00962" name="l00962"></a><span class="lineno">  962</span>__CPROVER_HIDE:;</div>
+<div class="line"><a id="l00963" name="l00963"></a><span class="lineno">  963</span>  <span class="comment">// C23 7.26.5.2: locate the first occurrence of (unsigned char)c in the</span></div>
+<div class="line"><a id="l00964" name="l00964"></a><span class="lineno">  964</span>  <span class="comment">// initial n characters (each interpreted as unsigned char) of the object</span></div>
+<div class="line"><a id="l00965" name="l00965"></a><span class="lineno">  965</span>  <span class="comment">// pointed to by s; return a pointer to it, or a null pointer if absent.</span></div>
+<div class="line"><a id="l00966" name="l00966"></a><span class="lineno">  966</span>  <span class="comment">// The search stops at the first match, so n is only an upper bound on the</span></div>
+<div class="line"><a id="l00967" name="l00967"></a><span class="lineno">  967</span>  <span class="comment">// bytes read: check each byte just before reading it. This also permits</span></div>
+<div class="line"><a id="l00968" name="l00968"></a><span class="lineno">  968</span>  <span class="comment">// s to be a null pointer when n is 0, as C2y (N3322) does.</span></div>
+<div class="line"><a id="l00969" name="l00969"></a><span class="lineno">  969</span>  <span class="comment">// The scan returns a pointer INTO s so pointer provenance is preserved</span></div>
+<div class="line"><a id="l00970" name="l00970"></a><span class="lineno">  970</span>  <span class="comment">// (callers subtract the base pointer, e.g. char_traits&lt;char&gt;::find).</span></div>
+<div class="line"><a id="l00971" name="l00971"></a><span class="lineno">  971</span>  <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> *sc = s;</div>
+<div class="line"><a id="l00972" name="l00972"></a><span class="lineno">  972</span>  <span class="keywordflow">for</span>(; n != 0; n--, sc++)</div>
+<div class="line"><a id="l00973" name="l00973"></a><span class="lineno">  973</span>  {</div>
+<div class="line"><a id="l00974" name="l00974"></a><span class="lineno">  974</span>    <a class="code hl_function" href="cprover__builtin__headers_8h.html#a9e05c8aeb35905c38bd7bcdb78145dae">__CPROVER_precondition</a>(<a class="code hl_function" href="ansi-c_2library_2cprover_8h.html#af18763f64d17687200a9717f7553a81c">__CPROVER_r_ok</a>(sc, 1), <span class="stringliteral">&quot;memchr region readable&quot;</span>);</div>
+<div class="line"><a id="l00975" name="l00975"></a><span class="lineno">  975</span>    <span class="keywordflow">if</span>(*sc == (<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>)c)</div>
+<div class="line"><a id="l00976" name="l00976"></a><span class="lineno">  976</span>      <span class="keywordflow">return</span> (<span class="keywordtype">void</span> *)sc;</div>
+<div class="line"><a id="l00977" name="l00977"></a><span class="lineno">  977</span>  }</div>
+<div class="line"><a id="l00978" name="l00978"></a><span class="lineno">  978</span>  <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a id="l00979" name="l00979"></a><span class="lineno">  979</span>}</div>
 </div>
-<div class="line"><a id="l00979" name="l00979"></a><span class="lineno">  979</span> </div>
-<div class="line"><a id="l00980" name="l00980"></a><span class="lineno">  980</span><span class="comment">/* FUNCTION: strrchr */</span></div>
-<div class="line"><a id="l00981" name="l00981"></a><span class="lineno">  981</span> </div>
-<div class="line"><a id="l00982" name="l00982"></a><span class="lineno">  982</span><span class="preprocessor">#ifndef __CPROVER_STRING_H_INCLUDED</span></div>
-<div class="line"><a id="l00983" name="l00983"></a><span class="lineno">  983</span><span class="preprocessor">#include &lt;string.h&gt;</span></div>
-<div class="line"><a id="l00984" name="l00984"></a><span class="lineno">  984</span><span class="preprocessor">#define __CPROVER_STRING_H_INCLUDED</span></div>
-<div class="line"><a id="l00985" name="l00985"></a><span class="lineno">  985</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l00986" name="l00986"></a><span class="lineno">  986</span> </div>
-<div class="line"><a id="l00987" name="l00987"></a><span class="lineno">  987</span><span class="preprocessor">#undef strchr</span></div>
-<div class="line"><a id="l00988" name="l00988"></a><span class="lineno">  988</span> </div>
-<div class="foldopen" id="foldopen00989" data-start="{" data-end="}">
-<div class="line"><a id="l00989" name="l00989"></a><span class="lineno"><a class="line" href="string_8c.html#a74bb83b922ff0d4f4267b8b47af45e2b">  989</a></span><span class="keywordtype">char</span> *<a class="code hl_function" href="string_8c.html#a74bb83b922ff0d4f4267b8b47af45e2b">strrchr</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *src, <span class="keywordtype">int</span> c)</div>
-<div class="line"><a id="l00990" name="l00990"></a><span class="lineno">  990</span>{</div>
-<div class="line"><a id="l00991" name="l00991"></a><span class="lineno">  991</span>  __CPROVER_HIDE:;</div>
-<div class="line"><a id="l00992" name="l00992"></a><span class="lineno">  992</span><span class="preprocessor">  #ifdef __CPROVER_STRING_ABSTRACTION</span></div>
-<div class="line"><a id="l00993" name="l00993"></a><span class="lineno">  993</span>  <a class="code hl_function" href="cprover__builtin__headers_8h.html#a9e05c8aeb35905c38bd7bcdb78145dae">__CPROVER_precondition</a>(<a class="code hl_function" href="cprover__builtin__headers_8h.html#ac580a358f798722e5dfa5ed3ede23b11">__CPROVER_is_zero_string</a>(src),</div>
-<div class="line"><a id="l00994" name="l00994"></a><span class="lineno">  994</span>                         <span class="stringliteral">&quot;strrchr zero-termination of string argument&quot;</span>);</div>
-<div class="line"><a id="l00995" name="l00995"></a><span class="lineno">  995</span>  __CPROVER_bool found;</div>
-<div class="line"><a id="l00996" name="l00996"></a><span class="lineno">  996</span>  __CPROVER_size_t i;</div>
-<div class="line"><a id="l00997" name="l00997"></a><span class="lineno">  997</span>  <span class="keywordflow">return</span> found?((<span class="keywordtype">char</span> *)src)+i:0;</div>
-<div class="line"><a id="l00998" name="l00998"></a><span class="lineno">  998</span><span class="preprocessor">  #else</span></div>
-<div class="line"><a id="l00999" name="l00999"></a><span class="lineno">  999</span>  <span class="keywordtype">char</span> *res=0;</div>
-<div class="line"><a id="l01000" name="l01000"></a><span class="lineno"> 1000</span>  <span class="keywordflow">for</span>(__CPROVER_size_t i=0; ; i++)</div>
-<div class="line"><a id="l01001" name="l01001"></a><span class="lineno"> 1001</span>  {</div>
-<div class="line"><a id="l01002" name="l01002"></a><span class="lineno"> 1002</span>    <span class="keywordflow">if</span>(src[i]==(<span class="keywordtype">char</span>)c) res=((<span class="keywordtype">char</span> *)src)+i;</div>
-<div class="line"><a id="l01003" name="l01003"></a><span class="lineno"> 1003</span>    <span class="keywordflow">if</span>(src[i]==0) <span class="keywordflow">break</span>;</div>
-<div class="line"><a id="l01004" name="l01004"></a><span class="lineno"> 1004</span>  }</div>
-<div class="line"><a id="l01005" name="l01005"></a><span class="lineno"> 1005</span>  <span class="keywordflow">return</span> res;</div>
-<div class="line"><a id="l01006" name="l01006"></a><span class="lineno"> 1006</span><span class="preprocessor">  #endif</span></div>
-<div class="line"><a id="l01007" name="l01007"></a><span class="lineno"> 1007</span>}</div>
+<div class="line"><a id="l00980" name="l00980"></a><span class="lineno">  980</span> </div>
+<div class="line"><a id="l00981" name="l00981"></a><span class="lineno">  981</span><span class="comment">/* FUNCTION: __builtin_char_memchr */</span></div>
+<div class="line"><a id="l00982" name="l00982"></a><span class="lineno">  982</span> </div>
+<div class="line"><a id="l00983" name="l00983"></a><span class="lineno">  983</span><span class="preprocessor">#ifndef __CPROVER_STRING_H_INCLUDED</span></div>
+<div class="line"><a id="l00984" name="l00984"></a><span class="lineno">  984</span><span class="preprocessor">#  include &lt;string.h&gt;</span></div>
+<div class="line"><a id="l00985" name="l00985"></a><span class="lineno">  985</span><span class="preprocessor">#  define __CPROVER_STRING_H_INCLUDED</span></div>
+<div class="line"><a id="l00986" name="l00986"></a><span class="lineno">  986</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00987" name="l00987"></a><span class="lineno">  987</span> </div>
+<div class="line"><a id="l00988" name="l00988"></a><span class="lineno">  988</span><span class="preprocessor">#undef memchr</span></div>
+<div class="line"><a id="l00989" name="l00989"></a><span class="lineno">  989</span> </div>
+<div class="line"><a id="l00990" name="l00990"></a><span class="lineno">  990</span><span class="comment">// Clang&#39;s __builtin_char_memchr is memchr for char objects, returning</span></div>
+<div class="line"><a id="l00991" name="l00991"></a><span class="lineno">  991</span><span class="comment">// `char *&#39; (libc++&#39;s __constexpr_memchr uses it).</span></div>
+<div class="foldopen" id="foldopen00992" data-start="{" data-end="}">
+<div class="line"><a id="l00992" name="l00992"></a><span class="lineno"><a class="line" href="clang__builtin__headers_8h.html#a65f03e4b78a888e27999dc00b85cad09">  992</a></span><span class="keywordtype">char</span> *<a class="code hl_function" href="string_8c.html#a63d1e17b46aca16f7993cbd8b22591b1">__builtin_char_memchr</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *s, <span class="keywordtype">int</span> c, __CPROVER_size_t n)</div>
+<div class="line"><a id="l00993" name="l00993"></a><span class="lineno">  993</span>{</div>
+<div class="line"><a id="l00994" name="l00994"></a><span class="lineno">  994</span>__CPROVER_HIDE:;</div>
+<div class="line"><a id="l00995" name="l00995"></a><span class="lineno">  995</span>  <span class="keywordflow">return</span> (<span class="keywordtype">char</span> *)<a class="code hl_function" href="string_8c.html#a0a3e4af1b88f5d51a32fe7dcbf753b38">memchr</a>(s, c, n);</div>
+<div class="line"><a id="l00996" name="l00996"></a><span class="lineno">  996</span>}</div>
 </div>
-<div class="line"><a id="l01008" name="l01008"></a><span class="lineno"> 1008</span> </div>
-<div class="line"><a id="l01009" name="l01009"></a><span class="lineno"> 1009</span><span class="comment">/* FUNCTION: strstr */</span></div>
-<div class="line"><a id="l01010" name="l01010"></a><span class="lineno"> 1010</span> </div>
-<div class="line"><a id="l01011" name="l01011"></a><span class="lineno"> 1011</span><span class="preprocessor">#ifndef __CPROVER_STRING_H_INCLUDED</span></div>
-<div class="line"><a id="l01012" name="l01012"></a><span class="lineno"> 1012</span><span class="preprocessor">#  include &lt;string.h&gt;</span></div>
-<div class="line"><a id="l01013" name="l01013"></a><span class="lineno"> 1013</span><span class="preprocessor">#  define __CPROVER_STRING_H_INCLUDED</span></div>
-<div class="line"><a id="l01014" name="l01014"></a><span class="lineno"> 1014</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l01015" name="l01015"></a><span class="lineno"> 1015</span> </div>
-<div class="line"><a id="l01016" name="l01016"></a><span class="lineno"> 1016</span><span class="preprocessor">#undef strstr</span></div>
-<div class="line"><a id="l01017" name="l01017"></a><span class="lineno"> 1017</span> </div>
-<div class="foldopen" id="foldopen01018" data-start="{" data-end="}">
-<div class="line"><a id="l01018" name="l01018"></a><span class="lineno"><a class="line" href="string_8c.html#ab57319b670052e4c93c1f6822c28d5ce"> 1018</a></span><span class="keywordtype">char</span> *<a class="code hl_function" href="string_8c.html#ab57319b670052e4c93c1f6822c28d5ce">strstr</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *haystack, <span class="keyword">const</span> <span class="keywordtype">char</span> *needle)</div>
-<div class="line"><a id="l01019" name="l01019"></a><span class="lineno"> 1019</span>{</div>
-<div class="line"><a id="l01020" name="l01020"></a><span class="lineno"> 1020</span>__CPROVER_HIDE:;</div>
-<div class="line"><a id="l01021" name="l01021"></a><span class="lineno"> 1021</span><span class="preprocessor">#ifdef __CPROVER_STRING_ABSTRACTION</span></div>
-<div class="line"><a id="l01022" name="l01022"></a><span class="lineno"> 1022</span>  <a class="code hl_function" href="cprover__builtin__headers_8h.html#a9e05c8aeb35905c38bd7bcdb78145dae">__CPROVER_precondition</a>(</div>
-<div class="line"><a id="l01023" name="l01023"></a><span class="lineno"> 1023</span>    <a class="code hl_function" href="cprover__builtin__headers_8h.html#ac580a358f798722e5dfa5ed3ede23b11">__CPROVER_is_zero_string</a>(haystack),</div>
-<div class="line"><a id="l01024" name="l01024"></a><span class="lineno"> 1024</span>    <span class="stringliteral">&quot;strstr zero-termination of first argument&quot;</span>);</div>
-<div class="line"><a id="l01025" name="l01025"></a><span class="lineno"> 1025</span>  <a class="code hl_function" href="cprover__builtin__headers_8h.html#a9e05c8aeb35905c38bd7bcdb78145dae">__CPROVER_precondition</a>(</div>
-<div class="line"><a id="l01026" name="l01026"></a><span class="lineno"> 1026</span>    <a class="code hl_function" href="cprover__builtin__headers_8h.html#ac580a358f798722e5dfa5ed3ede23b11">__CPROVER_is_zero_string</a>(needle),</div>
-<div class="line"><a id="l01027" name="l01027"></a><span class="lineno"> 1027</span>    <span class="stringliteral">&quot;strstr zero-termination of second argument&quot;</span>);</div>
-<div class="line"><a id="l01028" name="l01028"></a><span class="lineno"> 1028</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l01029" name="l01029"></a><span class="lineno"> 1029</span>  <span class="comment">// Unlike strchr, deliberately use the exact, concrete loop also under</span></div>
-<div class="line"><a id="l01030" name="l01030"></a><span class="lineno"> 1030</span>  <span class="comment">// string abstraction.</span></div>
-<div class="line"><a id="l01031" name="l01031"></a><span class="lineno"> 1031</span>  <span class="comment">// C23 7.26.5.8: the first occurrence of the sequence of characters of</span></div>
-<div class="line"><a id="l01032" name="l01032"></a><span class="lineno"> 1032</span>  <span class="comment">// needle (without its terminating null character) in haystack; haystack</span></div>
-<div class="line"><a id="l01033" name="l01033"></a><span class="lineno"> 1033</span>  <span class="comment">// itself if needle is empty</span></div>
-<div class="line"><a id="l01034" name="l01034"></a><span class="lineno"> 1034</span>  <span class="keywordflow">for</span>(__CPROVER_size_t i = 0;; i++)</div>
-<div class="line"><a id="l01035" name="l01035"></a><span class="lineno"> 1035</span>  {</div>
-<div class="line"><a id="l01036" name="l01036"></a><span class="lineno"> 1036</span>    __CPROVER_size_t j = 0;</div>
-<div class="line"><a id="l01037" name="l01037"></a><span class="lineno"> 1037</span>    <span class="keywordflow">while</span>(needle[j] != 0 &amp;&amp; haystack[i + j] == needle[j])</div>
-<div class="line"><a id="l01038" name="l01038"></a><span class="lineno"> 1038</span>      j++;</div>
-<div class="line"><a id="l01039" name="l01039"></a><span class="lineno"> 1039</span>    <span class="keywordflow">if</span>(needle[j] == 0)</div>
-<div class="line"><a id="l01040" name="l01040"></a><span class="lineno"> 1040</span>      <span class="keywordflow">return</span> ((<span class="keywordtype">char</span> *)haystack) + i; <span class="comment">// cast away const-ness</span></div>
-<div class="line"><a id="l01041" name="l01041"></a><span class="lineno"> 1041</span>    <span class="keywordflow">if</span>(haystack[i] == 0)</div>
-<div class="line"><a id="l01042" name="l01042"></a><span class="lineno"> 1042</span>      <span class="keywordflow">break</span>;</div>
-<div class="line"><a id="l01043" name="l01043"></a><span class="lineno"> 1043</span>  }</div>
-<div class="line"><a id="l01044" name="l01044"></a><span class="lineno"> 1044</span>  <span class="keywordflow">return</span> 0;</div>
-<div class="line"><a id="l01045" name="l01045"></a><span class="lineno"> 1045</span>}</div>
+<div class="line"><a id="l00997" name="l00997"></a><span class="lineno">  997</span> </div>
+<div class="line"><a id="l00998" name="l00998"></a><span class="lineno">  998</span><span class="comment">/* FUNCTION: strchr */</span></div>
+<div class="line"><a id="l00999" name="l00999"></a><span class="lineno">  999</span> </div>
+<div class="line"><a id="l01000" name="l01000"></a><span class="lineno"> 1000</span><span class="preprocessor">#ifndef __CPROVER_STRING_H_INCLUDED</span></div>
+<div class="line"><a id="l01001" name="l01001"></a><span class="lineno"> 1001</span><span class="preprocessor">#include &lt;string.h&gt;</span></div>
+<div class="line"><a id="l01002" name="l01002"></a><span class="lineno"> 1002</span><span class="preprocessor">#define __CPROVER_STRING_H_INCLUDED</span></div>
+<div class="line"><a id="l01003" name="l01003"></a><span class="lineno"> 1003</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l01004" name="l01004"></a><span class="lineno"> 1004</span> </div>
+<div class="line"><a id="l01005" name="l01005"></a><span class="lineno"> 1005</span><span class="preprocessor">#undef strchr</span></div>
+<div class="line"><a id="l01006" name="l01006"></a><span class="lineno"> 1006</span> </div>
+<div class="foldopen" id="foldopen01007" data-start="{" data-end="}">
+<div class="line"><a id="l01007" name="l01007"></a><span class="lineno"><a class="line" href="string_8c.html#aa17096aac8b1ad0afb6be874d8c05d3c"> 1007</a></span><span class="keywordtype">char</span> *<a class="code hl_function" href="string_8c.html#aa17096aac8b1ad0afb6be874d8c05d3c">strchr</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *src, <span class="keywordtype">int</span> c)</div>
+<div class="line"><a id="l01008" name="l01008"></a><span class="lineno"> 1008</span>{</div>
+<div class="line"><a id="l01009" name="l01009"></a><span class="lineno"> 1009</span>  __CPROVER_HIDE:;</div>
+<div class="line"><a id="l01010" name="l01010"></a><span class="lineno"> 1010</span><span class="preprocessor">  #ifdef __CPROVER_STRING_ABSTRACTION</span></div>
+<div class="line"><a id="l01011" name="l01011"></a><span class="lineno"> 1011</span>  <a class="code hl_function" href="cprover__builtin__headers_8h.html#a9e05c8aeb35905c38bd7bcdb78145dae">__CPROVER_precondition</a>(<a class="code hl_function" href="cprover__builtin__headers_8h.html#ac580a358f798722e5dfa5ed3ede23b11">__CPROVER_is_zero_string</a>(src),</div>
+<div class="line"><a id="l01012" name="l01012"></a><span class="lineno"> 1012</span>                         <span class="stringliteral">&quot;strchr zero-termination of string argument&quot;</span>);</div>
+<div class="line"><a id="l01013" name="l01013"></a><span class="lineno"> 1013</span>  __CPROVER_bool found;</div>
+<div class="line"><a id="l01014" name="l01014"></a><span class="lineno"> 1014</span>  __CPROVER_size_t i;</div>
+<div class="line"><a id="l01015" name="l01015"></a><span class="lineno"> 1015</span>  <span class="keywordflow">return</span> found?src+i:0;</div>
+<div class="line"><a id="l01016" name="l01016"></a><span class="lineno"> 1016</span><span class="preprocessor">  #else</span></div>
+<div class="line"><a id="l01017" name="l01017"></a><span class="lineno"> 1017</span>  <span class="keywordflow">for</span>(__CPROVER_size_t i=0; ; i++)</div>
+<div class="line"><a id="l01018" name="l01018"></a><span class="lineno"> 1018</span>  {</div>
+<div class="line"><a id="l01019" name="l01019"></a><span class="lineno"> 1019</span>    <span class="keywordflow">if</span>(src[i]==(<span class="keywordtype">char</span>)c)</div>
+<div class="line"><a id="l01020" name="l01020"></a><span class="lineno"> 1020</span>      <span class="keywordflow">return</span> ((<span class="keywordtype">char</span> *)src)+i; <span class="comment">// cast away const-ness</span></div>
+<div class="line"><a id="l01021" name="l01021"></a><span class="lineno"> 1021</span>    <span class="keywordflow">if</span>(src[i]==0) <span class="keywordflow">break</span>;</div>
+<div class="line"><a id="l01022" name="l01022"></a><span class="lineno"> 1022</span>  }</div>
+<div class="line"><a id="l01023" name="l01023"></a><span class="lineno"> 1023</span>  <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a id="l01024" name="l01024"></a><span class="lineno"> 1024</span><span class="preprocessor">  #endif</span></div>
+<div class="line"><a id="l01025" name="l01025"></a><span class="lineno"> 1025</span>}</div>
 </div>
-<div class="line"><a id="l01046" name="l01046"></a><span class="lineno"> 1046</span> </div>
-<div class="line"><a id="l01047" name="l01047"></a><span class="lineno"> 1047</span><span class="comment">/* FUNCTION: strpbrk */</span></div>
-<div class="line"><a id="l01048" name="l01048"></a><span class="lineno"> 1048</span> </div>
-<div class="line"><a id="l01049" name="l01049"></a><span class="lineno"> 1049</span><span class="preprocessor">#ifndef __CPROVER_STRING_H_INCLUDED</span></div>
-<div class="line"><a id="l01050" name="l01050"></a><span class="lineno"> 1050</span><span class="preprocessor">#  include &lt;string.h&gt;</span></div>
-<div class="line"><a id="l01051" name="l01051"></a><span class="lineno"> 1051</span><span class="preprocessor">#  define __CPROVER_STRING_H_INCLUDED</span></div>
-<div class="line"><a id="l01052" name="l01052"></a><span class="lineno"> 1052</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l01053" name="l01053"></a><span class="lineno"> 1053</span> </div>
-<div class="line"><a id="l01054" name="l01054"></a><span class="lineno"> 1054</span><span class="preprocessor">#undef strpbrk</span></div>
+<div class="line"><a id="l01026" name="l01026"></a><span class="lineno"> 1026</span> </div>
+<div class="line"><a id="l01027" name="l01027"></a><span class="lineno"> 1027</span><span class="comment">/* FUNCTION: strrchr */</span></div>
+<div class="line"><a id="l01028" name="l01028"></a><span class="lineno"> 1028</span> </div>
+<div class="line"><a id="l01029" name="l01029"></a><span class="lineno"> 1029</span><span class="preprocessor">#ifndef __CPROVER_STRING_H_INCLUDED</span></div>
+<div class="line"><a id="l01030" name="l01030"></a><span class="lineno"> 1030</span><span class="preprocessor">#include &lt;string.h&gt;</span></div>
+<div class="line"><a id="l01031" name="l01031"></a><span class="lineno"> 1031</span><span class="preprocessor">#define __CPROVER_STRING_H_INCLUDED</span></div>
+<div class="line"><a id="l01032" name="l01032"></a><span class="lineno"> 1032</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l01033" name="l01033"></a><span class="lineno"> 1033</span> </div>
+<div class="line"><a id="l01034" name="l01034"></a><span class="lineno"> 1034</span><span class="preprocessor">#undef strchr</span></div>
+<div class="line"><a id="l01035" name="l01035"></a><span class="lineno"> 1035</span> </div>
+<div class="foldopen" id="foldopen01036" data-start="{" data-end="}">
+<div class="line"><a id="l01036" name="l01036"></a><span class="lineno"><a class="line" href="string_8c.html#a74bb83b922ff0d4f4267b8b47af45e2b"> 1036</a></span><span class="keywordtype">char</span> *<a class="code hl_function" href="string_8c.html#a74bb83b922ff0d4f4267b8b47af45e2b">strrchr</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *src, <span class="keywordtype">int</span> c)</div>
+<div class="line"><a id="l01037" name="l01037"></a><span class="lineno"> 1037</span>{</div>
+<div class="line"><a id="l01038" name="l01038"></a><span class="lineno"> 1038</span>  __CPROVER_HIDE:;</div>
+<div class="line"><a id="l01039" name="l01039"></a><span class="lineno"> 1039</span><span class="preprocessor">  #ifdef __CPROVER_STRING_ABSTRACTION</span></div>
+<div class="line"><a id="l01040" name="l01040"></a><span class="lineno"> 1040</span>  <a class="code hl_function" href="cprover__builtin__headers_8h.html#a9e05c8aeb35905c38bd7bcdb78145dae">__CPROVER_precondition</a>(<a class="code hl_function" href="cprover__builtin__headers_8h.html#ac580a358f798722e5dfa5ed3ede23b11">__CPROVER_is_zero_string</a>(src),</div>
+<div class="line"><a id="l01041" name="l01041"></a><span class="lineno"> 1041</span>                         <span class="stringliteral">&quot;strrchr zero-termination of string argument&quot;</span>);</div>
+<div class="line"><a id="l01042" name="l01042"></a><span class="lineno"> 1042</span>  __CPROVER_bool found;</div>
+<div class="line"><a id="l01043" name="l01043"></a><span class="lineno"> 1043</span>  __CPROVER_size_t i;</div>
+<div class="line"><a id="l01044" name="l01044"></a><span class="lineno"> 1044</span>  <span class="keywordflow">return</span> found?((<span class="keywordtype">char</span> *)src)+i:0;</div>
+<div class="line"><a id="l01045" name="l01045"></a><span class="lineno"> 1045</span><span class="preprocessor">  #else</span></div>
+<div class="line"><a id="l01046" name="l01046"></a><span class="lineno"> 1046</span>  <span class="keywordtype">char</span> *res=0;</div>
+<div class="line"><a id="l01047" name="l01047"></a><span class="lineno"> 1047</span>  <span class="keywordflow">for</span>(__CPROVER_size_t i=0; ; i++)</div>
+<div class="line"><a id="l01048" name="l01048"></a><span class="lineno"> 1048</span>  {</div>
+<div class="line"><a id="l01049" name="l01049"></a><span class="lineno"> 1049</span>    <span class="keywordflow">if</span>(src[i]==(<span class="keywordtype">char</span>)c) res=((<span class="keywordtype">char</span> *)src)+i;</div>
+<div class="line"><a id="l01050" name="l01050"></a><span class="lineno"> 1050</span>    <span class="keywordflow">if</span>(src[i]==0) <span class="keywordflow">break</span>;</div>
+<div class="line"><a id="l01051" name="l01051"></a><span class="lineno"> 1051</span>  }</div>
+<div class="line"><a id="l01052" name="l01052"></a><span class="lineno"> 1052</span>  <span class="keywordflow">return</span> res;</div>
+<div class="line"><a id="l01053" name="l01053"></a><span class="lineno"> 1053</span><span class="preprocessor">  #endif</span></div>
+<div class="line"><a id="l01054" name="l01054"></a><span class="lineno"> 1054</span>}</div>
+</div>
 <div class="line"><a id="l01055" name="l01055"></a><span class="lineno"> 1055</span> </div>
-<div class="foldopen" id="foldopen01056" data-start="{" data-end="}">
-<div class="line"><a id="l01056" name="l01056"></a><span class="lineno"><a class="line" href="string_8c.html#a58ec382a0a44be34a859ea51769c58ae"> 1056</a></span><span class="keywordtype">char</span> *<a class="code hl_function" href="string_8c.html#a58ec382a0a44be34a859ea51769c58ae">strpbrk</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code hl_typedef" href="bytecode__info_8h.html#a3b6653c9d2fc6aa11ec16b971883b82a">s1</a>, <span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code hl_typedef" href="bytecode__info_8h.html#a1ad7643875e80af295454566f9d548d8">s2</a>)</div>
-<div class="line"><a id="l01057" name="l01057"></a><span class="lineno"> 1057</span>{</div>
-<div class="line"><a id="l01058" name="l01058"></a><span class="lineno"> 1058</span>__CPROVER_HIDE:;</div>
-<div class="line"><a id="l01059" name="l01059"></a><span class="lineno"> 1059</span><span class="preprocessor">#ifdef __CPROVER_STRING_ABSTRACTION</span></div>
-<div class="line"><a id="l01060" name="l01060"></a><span class="lineno"> 1060</span>  <a class="code hl_function" href="cprover__builtin__headers_8h.html#a9e05c8aeb35905c38bd7bcdb78145dae">__CPROVER_precondition</a>(</div>
-<div class="line"><a id="l01061" name="l01061"></a><span class="lineno"> 1061</span>    <a class="code hl_function" href="cprover__builtin__headers_8h.html#ac580a358f798722e5dfa5ed3ede23b11">__CPROVER_is_zero_string</a>(<a class="code hl_typedef" href="bytecode__info_8h.html#a3b6653c9d2fc6aa11ec16b971883b82a">s1</a>), <span class="stringliteral">&quot;strpbrk zero-termination of first argument&quot;</span>);</div>
-<div class="line"><a id="l01062" name="l01062"></a><span class="lineno"> 1062</span>  <a class="code hl_function" href="cprover__builtin__headers_8h.html#a9e05c8aeb35905c38bd7bcdb78145dae">__CPROVER_precondition</a>(</div>
-<div class="line"><a id="l01063" name="l01063"></a><span class="lineno"> 1063</span>    <a class="code hl_function" href="cprover__builtin__headers_8h.html#ac580a358f798722e5dfa5ed3ede23b11">__CPROVER_is_zero_string</a>(<a class="code hl_typedef" href="bytecode__info_8h.html#a1ad7643875e80af295454566f9d548d8">s2</a>),</div>
-<div class="line"><a id="l01064" name="l01064"></a><span class="lineno"> 1064</span>    <span class="stringliteral">&quot;strpbrk zero-termination of second argument&quot;</span>);</div>
-<div class="line"><a id="l01065" name="l01065"></a><span class="lineno"> 1065</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l01066" name="l01066"></a><span class="lineno"> 1066</span>  <span class="comment">// Unlike strchr, deliberately use the exact, concrete loop also under</span></div>
-<div class="line"><a id="l01067" name="l01067"></a><span class="lineno"> 1067</span>  <span class="comment">// string abstraction.</span></div>
-<div class="line"><a id="l01068" name="l01068"></a><span class="lineno"> 1068</span>  <span class="comment">// C23 7.26.5.5: the first character in s1 that is any character of s2</span></div>
-<div class="line"><a id="l01069" name="l01069"></a><span class="lineno"> 1069</span>  <span class="keywordflow">for</span>(__CPROVER_size_t i = 0; <a class="code hl_typedef" href="bytecode__info_8h.html#a3b6653c9d2fc6aa11ec16b971883b82a">s1</a>[i] != 0; i++)</div>
-<div class="line"><a id="l01070" name="l01070"></a><span class="lineno"> 1070</span>  {</div>
-<div class="line"><a id="l01071" name="l01071"></a><span class="lineno"> 1071</span>    <span class="keywordflow">for</span>(__CPROVER_size_t j = 0; <a class="code hl_typedef" href="bytecode__info_8h.html#a1ad7643875e80af295454566f9d548d8">s2</a>[j] != 0; j++)</div>
-<div class="line"><a id="l01072" name="l01072"></a><span class="lineno"> 1072</span>    {</div>
-<div class="line"><a id="l01073" name="l01073"></a><span class="lineno"> 1073</span>      <span class="keywordflow">if</span>(<a class="code hl_typedef" href="bytecode__info_8h.html#a3b6653c9d2fc6aa11ec16b971883b82a">s1</a>[i] == <a class="code hl_typedef" href="bytecode__info_8h.html#a1ad7643875e80af295454566f9d548d8">s2</a>[j])</div>
-<div class="line"><a id="l01074" name="l01074"></a><span class="lineno"> 1074</span>        <span class="keywordflow">return</span> ((<span class="keywordtype">char</span> *)<a class="code hl_typedef" href="bytecode__info_8h.html#a3b6653c9d2fc6aa11ec16b971883b82a">s1</a>) + i; <span class="comment">// cast away const-ness</span></div>
-<div class="line"><a id="l01075" name="l01075"></a><span class="lineno"> 1075</span>    }</div>
-<div class="line"><a id="l01076" name="l01076"></a><span class="lineno"> 1076</span>  }</div>
-<div class="line"><a id="l01077" name="l01077"></a><span class="lineno"> 1077</span>  <span class="keywordflow">return</span> 0;</div>
-<div class="line"><a id="l01078" name="l01078"></a><span class="lineno"> 1078</span>}</div>
+<div class="line"><a id="l01056" name="l01056"></a><span class="lineno"> 1056</span><span class="comment">/* FUNCTION: strstr */</span></div>
+<div class="line"><a id="l01057" name="l01057"></a><span class="lineno"> 1057</span> </div>
+<div class="line"><a id="l01058" name="l01058"></a><span class="lineno"> 1058</span><span class="preprocessor">#ifndef __CPROVER_STRING_H_INCLUDED</span></div>
+<div class="line"><a id="l01059" name="l01059"></a><span class="lineno"> 1059</span><span class="preprocessor">#  include &lt;string.h&gt;</span></div>
+<div class="line"><a id="l01060" name="l01060"></a><span class="lineno"> 1060</span><span class="preprocessor">#  define __CPROVER_STRING_H_INCLUDED</span></div>
+<div class="line"><a id="l01061" name="l01061"></a><span class="lineno"> 1061</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l01062" name="l01062"></a><span class="lineno"> 1062</span> </div>
+<div class="line"><a id="l01063" name="l01063"></a><span class="lineno"> 1063</span><span class="preprocessor">#undef strstr</span></div>
+<div class="line"><a id="l01064" name="l01064"></a><span class="lineno"> 1064</span> </div>
+<div class="foldopen" id="foldopen01065" data-start="{" data-end="}">
+<div class="line"><a id="l01065" name="l01065"></a><span class="lineno"><a class="line" href="string_8c.html#ab57319b670052e4c93c1f6822c28d5ce"> 1065</a></span><span class="keywordtype">char</span> *<a class="code hl_function" href="string_8c.html#ab57319b670052e4c93c1f6822c28d5ce">strstr</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *haystack, <span class="keyword">const</span> <span class="keywordtype">char</span> *needle)</div>
+<div class="line"><a id="l01066" name="l01066"></a><span class="lineno"> 1066</span>{</div>
+<div class="line"><a id="l01067" name="l01067"></a><span class="lineno"> 1067</span>__CPROVER_HIDE:;</div>
+<div class="line"><a id="l01068" name="l01068"></a><span class="lineno"> 1068</span><span class="preprocessor">#ifdef __CPROVER_STRING_ABSTRACTION</span></div>
+<div class="line"><a id="l01069" name="l01069"></a><span class="lineno"> 1069</span>  <a class="code hl_function" href="cprover__builtin__headers_8h.html#a9e05c8aeb35905c38bd7bcdb78145dae">__CPROVER_precondition</a>(</div>
+<div class="line"><a id="l01070" name="l01070"></a><span class="lineno"> 1070</span>    <a class="code hl_function" href="cprover__builtin__headers_8h.html#ac580a358f798722e5dfa5ed3ede23b11">__CPROVER_is_zero_string</a>(haystack),</div>
+<div class="line"><a id="l01071" name="l01071"></a><span class="lineno"> 1071</span>    <span class="stringliteral">&quot;strstr zero-termination of first argument&quot;</span>);</div>
+<div class="line"><a id="l01072" name="l01072"></a><span class="lineno"> 1072</span>  <a class="code hl_function" href="cprover__builtin__headers_8h.html#a9e05c8aeb35905c38bd7bcdb78145dae">__CPROVER_precondition</a>(</div>
+<div class="line"><a id="l01073" name="l01073"></a><span class="lineno"> 1073</span>    <a class="code hl_function" href="cprover__builtin__headers_8h.html#ac580a358f798722e5dfa5ed3ede23b11">__CPROVER_is_zero_string</a>(needle),</div>
+<div class="line"><a id="l01074" name="l01074"></a><span class="lineno"> 1074</span>    <span class="stringliteral">&quot;strstr zero-termination of second argument&quot;</span>);</div>
+<div class="line"><a id="l01075" name="l01075"></a><span class="lineno"> 1075</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l01076" name="l01076"></a><span class="lineno"> 1076</span>  <span class="comment">// Unlike strchr, deliberately use the exact, concrete loop also under</span></div>
+<div class="line"><a id="l01077" name="l01077"></a><span class="lineno"> 1077</span>  <span class="comment">// string abstraction.</span></div>
+<div class="line"><a id="l01078" name="l01078"></a><span class="lineno"> 1078</span>  <span class="comment">// C23 7.26.5.8: the first occurrence of the sequence of characters of</span></div>
+<div class="line"><a id="l01079" name="l01079"></a><span class="lineno"> 1079</span>  <span class="comment">// needle (without its terminating null character) in haystack; haystack</span></div>
+<div class="line"><a id="l01080" name="l01080"></a><span class="lineno"> 1080</span>  <span class="comment">// itself if needle is empty</span></div>
+<div class="line"><a id="l01081" name="l01081"></a><span class="lineno"> 1081</span>  <span class="keywordflow">for</span>(__CPROVER_size_t i = 0;; i++)</div>
+<div class="line"><a id="l01082" name="l01082"></a><span class="lineno"> 1082</span>  {</div>
+<div class="line"><a id="l01083" name="l01083"></a><span class="lineno"> 1083</span>    __CPROVER_size_t j = 0;</div>
+<div class="line"><a id="l01084" name="l01084"></a><span class="lineno"> 1084</span>    <span class="keywordflow">while</span>(needle[j] != 0 &amp;&amp; haystack[i + j] == needle[j])</div>
+<div class="line"><a id="l01085" name="l01085"></a><span class="lineno"> 1085</span>      j++;</div>
+<div class="line"><a id="l01086" name="l01086"></a><span class="lineno"> 1086</span>    <span class="keywordflow">if</span>(needle[j] == 0)</div>
+<div class="line"><a id="l01087" name="l01087"></a><span class="lineno"> 1087</span>      <span class="keywordflow">return</span> ((<span class="keywordtype">char</span> *)haystack) + i; <span class="comment">// cast away const-ness</span></div>
+<div class="line"><a id="l01088" name="l01088"></a><span class="lineno"> 1088</span>    <span class="keywordflow">if</span>(haystack[i] == 0)</div>
+<div class="line"><a id="l01089" name="l01089"></a><span class="lineno"> 1089</span>      <span class="keywordflow">break</span>;</div>
+<div class="line"><a id="l01090" name="l01090"></a><span class="lineno"> 1090</span>  }</div>
+<div class="line"><a id="l01091" name="l01091"></a><span class="lineno"> 1091</span>  <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a id="l01092" name="l01092"></a><span class="lineno"> 1092</span>}</div>
 </div>
-<div class="line"><a id="l01079" name="l01079"></a><span class="lineno"> 1079</span> </div>
-<div class="line"><a id="l01080" name="l01080"></a><span class="lineno"> 1080</span><span class="comment">/* FUNCTION: strerror */</span></div>
-<div class="line"><a id="l01081" name="l01081"></a><span class="lineno"> 1081</span> </div>
-<div class="line"><a id="l01082" name="l01082"></a><span class="lineno"> 1082</span><span class="preprocessor">#ifndef __CPROVER_STRING_H_INCLUDED</span></div>
-<div class="line"><a id="l01083" name="l01083"></a><span class="lineno"> 1083</span><span class="preprocessor">#include &lt;string.h&gt;</span></div>
-<div class="line"><a id="l01084" name="l01084"></a><span class="lineno"> 1084</span><span class="preprocessor">#define __CPROVER_STRING_H_INCLUDED</span></div>
-<div class="line"><a id="l01085" name="l01085"></a><span class="lineno"> 1085</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l01086" name="l01086"></a><span class="lineno"> 1086</span> </div>
-<div class="foldopen" id="foldopen01087" data-start="{" data-end="}">
-<div class="line"><a id="l01087" name="l01087"></a><span class="lineno"><a class="line" href="string_8c.html#a4bc5f273980fb0e81e0fc7a4dd3de87e"> 1087</a></span><span class="keywordtype">char</span> *<a class="code hl_function" href="string_8c.html#a4bc5f273980fb0e81e0fc7a4dd3de87e">strerror</a>(<span class="keywordtype">int</span> errnum)</div>
-<div class="line"><a id="l01088" name="l01088"></a><span class="lineno"> 1088</span>{</div>
-<div class="line"><a id="l01089" name="l01089"></a><span class="lineno"> 1089</span>  __CPROVER_HIDE:;</div>
-<div class="line"><a id="l01090" name="l01090"></a><span class="lineno"> 1090</span>  (void)errnum;</div>
-<div class="line"><a id="l01091" name="l01091"></a><span class="lineno"> 1091</span><span class="preprocessor">  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS</span></div>
-<div class="line"><a id="l01092" name="l01092"></a><span class="lineno"> 1092</span>  __CPROVER_event(<span class="stringliteral">&quot;invalidate_pointer&quot;</span>, <span class="stringliteral">&quot;strerror_result&quot;</span>);</div>
-<div class="line"><a id="l01093" name="l01093"></a><span class="lineno"> 1093</span>  <span class="keywordtype">char</span> *strerror_result;</div>
-<div class="line"><a id="l01094" name="l01094"></a><span class="lineno"> 1094</span>  <a class="code hl_function" href="cprover__builtin__headers_8h.html#ad3a2aedad97977b64290f8141eed690c">__CPROVER_set_must</a>(strerror_result, <span class="stringliteral">&quot;strerror_result&quot;</span>);</div>
-<div class="line"><a id="l01095" name="l01095"></a><span class="lineno"> 1095</span>  <span class="keywordflow">return</span> strerror_result;</div>
-<div class="line"><a id="l01096" name="l01096"></a><span class="lineno"> 1096</span><span class="preprocessor">  #else</span></div>
-<div class="line"><a id="l01097" name="l01097"></a><span class="lineno"> 1097</span>  <span class="keyword">static</span> <span class="keywordtype">char</span> strerror_result[1];</div>
-<div class="line"><a id="l01098" name="l01098"></a><span class="lineno"> 1098</span>  <span class="keywordflow">return</span> strerror_result;</div>
-<div class="line"><a id="l01099" name="l01099"></a><span class="lineno"> 1099</span><span class="preprocessor">  #endif</span></div>
-<div class="line"><a id="l01100" name="l01100"></a><span class="lineno"> 1100</span>}</div>
+<div class="line"><a id="l01093" name="l01093"></a><span class="lineno"> 1093</span> </div>
+<div class="line"><a id="l01094" name="l01094"></a><span class="lineno"> 1094</span><span class="comment">/* FUNCTION: strpbrk */</span></div>
+<div class="line"><a id="l01095" name="l01095"></a><span class="lineno"> 1095</span> </div>
+<div class="line"><a id="l01096" name="l01096"></a><span class="lineno"> 1096</span><span class="preprocessor">#ifndef __CPROVER_STRING_H_INCLUDED</span></div>
+<div class="line"><a id="l01097" name="l01097"></a><span class="lineno"> 1097</span><span class="preprocessor">#  include &lt;string.h&gt;</span></div>
+<div class="line"><a id="l01098" name="l01098"></a><span class="lineno"> 1098</span><span class="preprocessor">#  define __CPROVER_STRING_H_INCLUDED</span></div>
+<div class="line"><a id="l01099" name="l01099"></a><span class="lineno"> 1099</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l01100" name="l01100"></a><span class="lineno"> 1100</span> </div>
+<div class="line"><a id="l01101" name="l01101"></a><span class="lineno"> 1101</span><span class="preprocessor">#undef strpbrk</span></div>
+<div class="line"><a id="l01102" name="l01102"></a><span class="lineno"> 1102</span> </div>
+<div class="foldopen" id="foldopen01103" data-start="{" data-end="}">
+<div class="line"><a id="l01103" name="l01103"></a><span class="lineno"><a class="line" href="string_8c.html#a58ec382a0a44be34a859ea51769c58ae"> 1103</a></span><span class="keywordtype">char</span> *<a class="code hl_function" href="string_8c.html#a58ec382a0a44be34a859ea51769c58ae">strpbrk</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code hl_typedef" href="bytecode__info_8h.html#a3b6653c9d2fc6aa11ec16b971883b82a">s1</a>, <span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code hl_typedef" href="bytecode__info_8h.html#a1ad7643875e80af295454566f9d548d8">s2</a>)</div>
+<div class="line"><a id="l01104" name="l01104"></a><span class="lineno"> 1104</span>{</div>
+<div class="line"><a id="l01105" name="l01105"></a><span class="lineno"> 1105</span>__CPROVER_HIDE:;</div>
+<div class="line"><a id="l01106" name="l01106"></a><span class="lineno"> 1106</span><span class="preprocessor">#ifdef __CPROVER_STRING_ABSTRACTION</span></div>
+<div class="line"><a id="l01107" name="l01107"></a><span class="lineno"> 1107</span>  <a class="code hl_function" href="cprover__builtin__headers_8h.html#a9e05c8aeb35905c38bd7bcdb78145dae">__CPROVER_precondition</a>(</div>
+<div class="line"><a id="l01108" name="l01108"></a><span class="lineno"> 1108</span>    <a class="code hl_function" href="cprover__builtin__headers_8h.html#ac580a358f798722e5dfa5ed3ede23b11">__CPROVER_is_zero_string</a>(<a class="code hl_typedef" href="bytecode__info_8h.html#a3b6653c9d2fc6aa11ec16b971883b82a">s1</a>), <span class="stringliteral">&quot;strpbrk zero-termination of first argument&quot;</span>);</div>
+<div class="line"><a id="l01109" name="l01109"></a><span class="lineno"> 1109</span>  <a class="code hl_function" href="cprover__builtin__headers_8h.html#a9e05c8aeb35905c38bd7bcdb78145dae">__CPROVER_precondition</a>(</div>
+<div class="line"><a id="l01110" name="l01110"></a><span class="lineno"> 1110</span>    <a class="code hl_function" href="cprover__builtin__headers_8h.html#ac580a358f798722e5dfa5ed3ede23b11">__CPROVER_is_zero_string</a>(<a class="code hl_typedef" href="bytecode__info_8h.html#a1ad7643875e80af295454566f9d548d8">s2</a>),</div>
+<div class="line"><a id="l01111" name="l01111"></a><span class="lineno"> 1111</span>    <span class="stringliteral">&quot;strpbrk zero-termination of second argument&quot;</span>);</div>
+<div class="line"><a id="l01112" name="l01112"></a><span class="lineno"> 1112</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l01113" name="l01113"></a><span class="lineno"> 1113</span>  <span class="comment">// Unlike strchr, deliberately use the exact, concrete loop also under</span></div>
+<div class="line"><a id="l01114" name="l01114"></a><span class="lineno"> 1114</span>  <span class="comment">// string abstraction.</span></div>
+<div class="line"><a id="l01115" name="l01115"></a><span class="lineno"> 1115</span>  <span class="comment">// C23 7.26.5.5: the first character in s1 that is any character of s2</span></div>
+<div class="line"><a id="l01116" name="l01116"></a><span class="lineno"> 1116</span>  <span class="keywordflow">for</span>(__CPROVER_size_t i = 0; <a class="code hl_typedef" href="bytecode__info_8h.html#a3b6653c9d2fc6aa11ec16b971883b82a">s1</a>[i] != 0; i++)</div>
+<div class="line"><a id="l01117" name="l01117"></a><span class="lineno"> 1117</span>  {</div>
+<div class="line"><a id="l01118" name="l01118"></a><span class="lineno"> 1118</span>    <span class="keywordflow">for</span>(__CPROVER_size_t j = 0; <a class="code hl_typedef" href="bytecode__info_8h.html#a1ad7643875e80af295454566f9d548d8">s2</a>[j] != 0; j++)</div>
+<div class="line"><a id="l01119" name="l01119"></a><span class="lineno"> 1119</span>    {</div>
+<div class="line"><a id="l01120" name="l01120"></a><span class="lineno"> 1120</span>      <span class="keywordflow">if</span>(<a class="code hl_typedef" href="bytecode__info_8h.html#a3b6653c9d2fc6aa11ec16b971883b82a">s1</a>[i] == <a class="code hl_typedef" href="bytecode__info_8h.html#a1ad7643875e80af295454566f9d548d8">s2</a>[j])</div>
+<div class="line"><a id="l01121" name="l01121"></a><span class="lineno"> 1121</span>        <span class="keywordflow">return</span> ((<span class="keywordtype">char</span> *)<a class="code hl_typedef" href="bytecode__info_8h.html#a3b6653c9d2fc6aa11ec16b971883b82a">s1</a>) + i; <span class="comment">// cast away const-ness</span></div>
+<div class="line"><a id="l01122" name="l01122"></a><span class="lineno"> 1122</span>    }</div>
+<div class="line"><a id="l01123" name="l01123"></a><span class="lineno"> 1123</span>  }</div>
+<div class="line"><a id="l01124" name="l01124"></a><span class="lineno"> 1124</span>  <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a id="l01125" name="l01125"></a><span class="lineno"> 1125</span>}</div>
+</div>
+<div class="line"><a id="l01126" name="l01126"></a><span class="lineno"> 1126</span> </div>
+<div class="line"><a id="l01127" name="l01127"></a><span class="lineno"> 1127</span><span class="comment">/* FUNCTION: strerror */</span></div>
+<div class="line"><a id="l01128" name="l01128"></a><span class="lineno"> 1128</span> </div>
+<div class="line"><a id="l01129" name="l01129"></a><span class="lineno"> 1129</span><span class="preprocessor">#ifndef __CPROVER_STRING_H_INCLUDED</span></div>
+<div class="line"><a id="l01130" name="l01130"></a><span class="lineno"> 1130</span><span class="preprocessor">#include &lt;string.h&gt;</span></div>
+<div class="line"><a id="l01131" name="l01131"></a><span class="lineno"> 1131</span><span class="preprocessor">#define __CPROVER_STRING_H_INCLUDED</span></div>
+<div class="line"><a id="l01132" name="l01132"></a><span class="lineno"> 1132</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l01133" name="l01133"></a><span class="lineno"> 1133</span> </div>
+<div class="foldopen" id="foldopen01134" data-start="{" data-end="}">
+<div class="line"><a id="l01134" name="l01134"></a><span class="lineno"><a class="line" href="string_8c.html#a4bc5f273980fb0e81e0fc7a4dd3de87e"> 1134</a></span><span class="keywordtype">char</span> *<a class="code hl_function" href="string_8c.html#a4bc5f273980fb0e81e0fc7a4dd3de87e">strerror</a>(<span class="keywordtype">int</span> errnum)</div>
+<div class="line"><a id="l01135" name="l01135"></a><span class="lineno"> 1135</span>{</div>
+<div class="line"><a id="l01136" name="l01136"></a><span class="lineno"> 1136</span>  __CPROVER_HIDE:;</div>
+<div class="line"><a id="l01137" name="l01137"></a><span class="lineno"> 1137</span>  (void)errnum;</div>
+<div class="line"><a id="l01138" name="l01138"></a><span class="lineno"> 1138</span><span class="preprocessor">  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS</span></div>
+<div class="line"><a id="l01139" name="l01139"></a><span class="lineno"> 1139</span>  __CPROVER_event(<span class="stringliteral">&quot;invalidate_pointer&quot;</span>, <span class="stringliteral">&quot;strerror_result&quot;</span>);</div>
+<div class="line"><a id="l01140" name="l01140"></a><span class="lineno"> 1140</span>  <span class="keywordtype">char</span> *strerror_result;</div>
+<div class="line"><a id="l01141" name="l01141"></a><span class="lineno"> 1141</span>  <a class="code hl_function" href="cprover__builtin__headers_8h.html#ad3a2aedad97977b64290f8141eed690c">__CPROVER_set_must</a>(strerror_result, <span class="stringliteral">&quot;strerror_result&quot;</span>);</div>
+<div class="line"><a id="l01142" name="l01142"></a><span class="lineno"> 1142</span>  <span class="keywordflow">return</span> strerror_result;</div>
+<div class="line"><a id="l01143" name="l01143"></a><span class="lineno"> 1143</span><span class="preprocessor">  #else</span></div>
+<div class="line"><a id="l01144" name="l01144"></a><span class="lineno"> 1144</span>  <span class="keyword">static</span> <span class="keywordtype">char</span> strerror_result[1];</div>
+<div class="line"><a id="l01145" name="l01145"></a><span class="lineno"> 1145</span>  <span class="keywordflow">return</span> strerror_result;</div>
+<div class="line"><a id="l01146" name="l01146"></a><span class="lineno"> 1146</span><span class="preprocessor">  #endif</span></div>
+<div class="line"><a id="l01147" name="l01147"></a><span class="lineno"> 1147</span>}</div>
 </div>
 <div class="ttc" id="aansi-c_2library_2cprover_8h_html_a4f7c59e6fd6639afe168f4e28eef54f6"><div class="ttname"><a href="ansi-c_2library_2cprover_8h.html#a4f7c59e6fd6639afe168f4e28eef54f6">__CPROVER_w_ok</a></div><div class="ttdeci">__CPROVER_bool __CPROVER_w_ok(const void *,...)</div></div>
 <div class="ttc" id="aansi-c_2library_2cprover_8h_html_af18763f64d17687200a9717f7553a81c"><div class="ttname"><a href="ansi-c_2library_2cprover_8h.html#af18763f64d17687200a9717f7553a81c">__CPROVER_r_ok</a></div><div class="ttdeci">__CPROVER_bool __CPROVER_r_ok(const void *,...)</div></div>
@@ -1263,29 +1314,31 @@ $(function(){initNavTree('string_8c_source.html','',''); });
 <div class="ttc" id="apointer__predicates_8cpp_html_a4f4f8c2889a0c8ee9c61a7389bd29cbc"><div class="ttname"><a href="pointer__predicates_8cpp.html#a4f4f8c2889a0c8ee9c61a7389bd29cbc">object_size</a></div><div class="ttdeci">exprt object_size(const exprt &amp;pointer)</div><div class="ttdef"><b>Definition</b> <a href="pointer__predicates_8cpp_source.html#l00033">pointer_predicates.cpp:33</a></div></div>
 <div class="ttc" id="astdlib_8c_html_a792acf158eb34b5fe0f4fa14d9a7db38"><div class="ttname"><a href="stdlib_8c.html#a792acf158eb34b5fe0f4fa14d9a7db38">calloc</a></div><div class="ttdeci">void * calloc(__CPROVER_size_t nmemb, __CPROVER_size_t size)</div><div class="ttdef"><b>Definition</b> <a href="stdlib_8c_source.html#l00146">stdlib.c:146</a></div></div>
 <div class="ttc" id="astring_8c_html_a07f4a84c11c106e95c32b6ab509346ef"><div class="ttname"><a href="string_8c.html#a07f4a84c11c106e95c32b6ab509346ef">strncmp</a></div><div class="ttdeci">int strncmp(const char *s1, const char *s2, size_t n)</div><div class="ttdef"><b>Definition</b> <a href="#l00464">string.c:464</a></div></div>
+<div class="ttc" id="astring_8c_html_a0a3e4af1b88f5d51a32fe7dcbf753b38"><div class="ttname"><a href="string_8c.html#a0a3e4af1b88f5d51a32fe7dcbf753b38">memchr</a></div><div class="ttdeci">void * memchr(const void *s, int c, size_t n)</div><div class="ttdef"><b>Definition</b> <a href="#l00960">string.c:960</a></div></div>
 <div class="ttc" id="astring_8c_html_a0e27e25146a2ca46fca6344cf23a691b"><div class="ttname"><a href="string_8c.html#a0e27e25146a2ca46fca6344cf23a691b">__builtin___strcpy_chk</a></div><div class="ttdeci">char * __builtin___strcpy_chk(char *dst, const char *src, __CPROVER_size_t s)</div><div class="ttdef"><b>Definition</b> <a href="#l00003">string.c:3</a></div></div>
 <div class="ttc" id="astring_8c_html_a11bd144d7d44914099a3aeddf1c8567d"><div class="ttname"><a href="string_8c.html#a11bd144d7d44914099a3aeddf1c8567d">strcmp</a></div><div class="ttdeci">int strcmp(const char *s1, const char *s2)</div><div class="ttdef"><b>Definition</b> <a href="#l00363">string.c:363</a></div></div>
 <div class="ttc" id="astring_8c_html_a313175102214d45434bf045db18dddf0"><div class="ttname"><a href="string_8c.html#a313175102214d45434bf045db18dddf0">memset</a></div><div class="ttdeci">void * memset(void *s, int c, size_t n)</div><div class="ttdef"><b>Definition</b> <a href="#l00715">string.c:715</a></div></div>
 <div class="ttc" id="astring_8c_html_a31f55f452f1eb2dffe0751170717a180"><div class="ttname"><a href="string_8c.html#a31f55f452f1eb2dffe0751170717a180">__builtin___memcpy_chk</a></div><div class="ttdeci">void * __builtin___memcpy_chk(void *dst, const void *src, __CPROVER_size_t n, __CPROVER_size_t size)</div><div class="ttdef"><b>Definition</b> <a href="#l00660">string.c:660</a></div></div>
 <div class="ttc" id="astring_8c_html_a340d11725e5c81a874f508fbcdf1c5ef"><div class="ttname"><a href="string_8c.html#a340d11725e5c81a874f508fbcdf1c5ef">memmove</a></div><div class="ttdeci">void * memmove(void *dest, const void *src, size_t n)</div><div class="ttdef"><b>Definition</b> <a href="#l00839">string.c:839</a></div></div>
 <div class="ttc" id="astring_8c_html_a42e0874f14a471a3b6aa43bbd14391f8"><div class="ttname"><a href="string_8c.html#a42e0874f14a471a3b6aa43bbd14391f8">__builtin___memset_chk</a></div><div class="ttdeci">void * __builtin___memset_chk(void *s, int c, __CPROVER_size_t n, __CPROVER_size_t size)</div><div class="ttdef"><b>Definition</b> <a href="#l00791">string.c:791</a></div></div>
-<div class="ttc" id="astring_8c_html_a4bc5f273980fb0e81e0fc7a4dd3de87e"><div class="ttname"><a href="string_8c.html#a4bc5f273980fb0e81e0fc7a4dd3de87e">strerror</a></div><div class="ttdeci">char * strerror(int errnum)</div><div class="ttdef"><b>Definition</b> <a href="#l01087">string.c:1087</a></div></div>
+<div class="ttc" id="astring_8c_html_a4bc5f273980fb0e81e0fc7a4dd3de87e"><div class="ttname"><a href="string_8c.html#a4bc5f273980fb0e81e0fc7a4dd3de87e">strerror</a></div><div class="ttdeci">char * strerror(int errnum)</div><div class="ttdef"><b>Definition</b> <a href="#l01134">string.c:1134</a></div></div>
 <div class="ttc" id="astring_8c_html_a4f57a484405b019f42f47c5f249767c9"><div class="ttname"><a href="string_8c.html#a4f57a484405b019f42f47c5f249767c9">__builtin___strcat_chk</a></div><div class="ttdeci">__inline char * __builtin___strcat_chk(char *dst, const char *src, __CPROVER_size_t s)</div><div class="ttdef"><b>Definition</b> <a href="#l00037">string.c:37</a></div></div>
-<div class="ttc" id="astring_8c_html_a58ec382a0a44be34a859ea51769c58ae"><div class="ttname"><a href="string_8c.html#a58ec382a0a44be34a859ea51769c58ae">strpbrk</a></div><div class="ttdeci">char * strpbrk(const char *s1, const char *s2)</div><div class="ttdef"><b>Definition</b> <a href="#l01056">string.c:1056</a></div></div>
+<div class="ttc" id="astring_8c_html_a58ec382a0a44be34a859ea51769c58ae"><div class="ttname"><a href="string_8c.html#a58ec382a0a44be34a859ea51769c58ae">strpbrk</a></div><div class="ttdeci">char * strpbrk(const char *s1, const char *s2)</div><div class="ttdef"><b>Definition</b> <a href="#l01103">string.c:1103</a></div></div>
 <div class="ttc" id="astring_8c_html_a5b825d2243259b660b7063894c24c93c"><div class="ttname"><a href="string_8c.html#a5b825d2243259b660b7063894c24c93c">__builtin___strncpy_chk</a></div><div class="ttdeci">char * __builtin___strncpy_chk(char *dst, const char *src, size_t n, size_t object_size)</div><div class="ttdef"><b>Definition</b> <a href="#l00214">string.c:214</a></div></div>
+<div class="ttc" id="astring_8c_html_a63d1e17b46aca16f7993cbd8b22591b1"><div class="ttname"><a href="string_8c.html#a63d1e17b46aca16f7993cbd8b22591b1">__builtin_char_memchr</a></div><div class="ttdeci">char * __builtin_char_memchr(const char *s, int c, __CPROVER_size_t n)</div><div class="ttdef"><b>Definition</b> <a href="#l00992">string.c:992</a></div></div>
 <div class="ttc" id="astring_8c_html_a66e363031a1cbf510d5eafe40d49a790"><div class="ttname"><a href="string_8c.html#a66e363031a1cbf510d5eafe40d49a790">strcpy</a></div><div class="ttdeci">char * strcpy(char *dst, const char *src)</div><div class="ttdef"><b>Definition</b> <a href="#l00139">string.c:139</a></div></div>
 <div class="ttc" id="astring_8c_html_a674b7f779fec84cb1a3be8222b5c381a"><div class="ttname"><a href="string_8c.html#a674b7f779fec84cb1a3be8222b5c381a">strncasecmp</a></div><div class="ttdeci">int strncasecmp(const char *s1, const char *s2, size_t n)</div><div class="ttdef"><b>Definition</b> <a href="#l00511">string.c:511</a></div></div>
 <div class="ttc" id="astring_8c_html_a706b36f3a672f84685576723c3928baa"><div class="ttname"><a href="string_8c.html#a706b36f3a672f84685576723c3928baa">strcasecmp</a></div><div class="ttdeci">int strcasecmp(const char *s1, const char *s2)</div><div class="ttdef"><b>Definition</b> <a href="#l00412">string.c:412</a></div></div>
 <div class="ttc" id="astring_8c_html_a73f464dfdc458d7dd7917bb76e92c450"><div class="ttname"><a href="string_8c.html#a73f464dfdc458d7dd7917bb76e92c450">__builtin___strncat_chk</a></div><div class="ttdeci">__inline char * __builtin___strncat_chk(char *dst, const char *src, __CPROVER_size_t n, __CPROVER_size_t s)</div><div class="ttdef"><b>Definition</b> <a href="#l00081">string.c:81</a></div></div>
-<div class="ttc" id="astring_8c_html_a74bb83b922ff0d4f4267b8b47af45e2b"><div class="ttname"><a href="string_8c.html#a74bb83b922ff0d4f4267b8b47af45e2b">strrchr</a></div><div class="ttdeci">char * strrchr(const char *src, int c)</div><div class="ttdef"><b>Definition</b> <a href="#l00989">string.c:989</a></div></div>
+<div class="ttc" id="astring_8c_html_a74bb83b922ff0d4f4267b8b47af45e2b"><div class="ttname"><a href="string_8c.html#a74bb83b922ff0d4f4267b8b47af45e2b">strrchr</a></div><div class="ttdeci">char * strrchr(const char *src, int c)</div><div class="ttdef"><b>Definition</b> <a href="#l01036">string.c:1036</a></div></div>
 <div class="ttc" id="astring_8c_html_a82f08f2390a9067f3c94b638e90e03bd"><div class="ttname"><a href="string_8c.html#a82f08f2390a9067f3c94b638e90e03bd">strncpy</a></div><div class="ttdeci">char * strncpy(char *dst, const char *src, size_t n)</div><div class="ttdef"><b>Definition</b> <a href="#l00176">string.c:176</a></div></div>
 <div class="ttc" id="astring_8c_html_a8f46f0b565b5d2c69bf06cab0e6f1078"><div class="ttname"><a href="string_8c.html#a8f46f0b565b5d2c69bf06cab0e6f1078">__builtin_memset</a></div><div class="ttdeci">void * __builtin_memset(void *s, int c, __CPROVER_size_t n)</div><div class="ttdef"><b>Definition</b> <a href="#l00752">string.c:752</a></div></div>
 <div class="ttc" id="astring_8c_html_a9517a4a50477f651785c09b27826d8ce"><div class="ttname"><a href="string_8c.html#a9517a4a50477f651785c09b27826d8ce">strcat</a></div><div class="ttdeci">char * strcat(char *dst, const char *src)</div><div class="ttdef"><b>Definition</b> <a href="#l00262">string.c:262</a></div></div>
 <div class="ttc" id="astring_8c_html_a9e6df54ee04e18a3772335580e2ed872"><div class="ttname"><a href="string_8c.html#a9e6df54ee04e18a3772335580e2ed872">memcmp</a></div><div class="ttdeci">int memcmp(const void *s1, const void *s2, size_t n)</div><div class="ttdef"><b>Definition</b> <a href="#l00925">string.c:925</a></div></div>
-<div class="ttc" id="astring_8c_html_aa17096aac8b1ad0afb6be874d8c05d3c"><div class="ttname"><a href="string_8c.html#aa17096aac8b1ad0afb6be874d8c05d3c">strchr</a></div><div class="ttdeci">char * strchr(const char *src, int c)</div><div class="ttdef"><b>Definition</b> <a href="#l00960">string.c:960</a></div></div>
+<div class="ttc" id="astring_8c_html_aa17096aac8b1ad0afb6be874d8c05d3c"><div class="ttname"><a href="string_8c.html#aa17096aac8b1ad0afb6be874d8c05d3c">strchr</a></div><div class="ttdeci">char * strchr(const char *src, int c)</div><div class="ttdef"><b>Definition</b> <a href="#l01007">string.c:1007</a></div></div>
 <div class="ttc" id="astring_8c_html_aa383452fe445bfae989358c9d7d96f4f"><div class="ttname"><a href="string_8c.html#aa383452fe445bfae989358c9d7d96f4f">strlen</a></div><div class="ttdeci">size_t strlen(const char *s)</div><div class="ttdef"><b>Definition</b> <a href="#l00561">string.c:561</a></div></div>
 <div class="ttc" id="astring_8c_html_ab15dd0a01835f878ce6d2420374f9914"><div class="ttname"><a href="string_8c.html#ab15dd0a01835f878ce6d2420374f9914">memcpy</a></div><div class="ttdeci">void * memcpy(void *dst, const void *src, size_t n)</div><div class="ttdef"><b>Definition</b> <a href="#l00613">string.c:613</a></div></div>
-<div class="ttc" id="astring_8c_html_ab57319b670052e4c93c1f6822c28d5ce"><div class="ttname"><a href="string_8c.html#ab57319b670052e4c93c1f6822c28d5ce">strstr</a></div><div class="ttdeci">char * strstr(const char *haystack, const char *needle)</div><div class="ttdef"><b>Definition</b> <a href="#l01018">string.c:1018</a></div></div>
+<div class="ttc" id="astring_8c_html_ab57319b670052e4c93c1f6822c28d5ce"><div class="ttname"><a href="string_8c.html#ab57319b670052e4c93c1f6822c28d5ce">strstr</a></div><div class="ttdeci">char * strstr(const char *haystack, const char *needle)</div><div class="ttdef"><b>Definition</b> <a href="#l01065">string.c:1065</a></div></div>
 <div class="ttc" id="astring_8c_html_ab7c414834b62277e7c972652a9137080"><div class="ttname"><a href="string_8c.html#ab7c414834b62277e7c972652a9137080">__builtin___memmove_chk</a></div><div class="ttdeci">void * __builtin___memmove_chk(void *dest, const void *src, size_t n, __CPROVER_size_t size)</div><div class="ttdef"><b>Definition</b> <a href="#l00879">string.c:879</a></div></div>
 <div class="ttc" id="astring_8c_html_ad593a8fc0baab9427df9636001dccddd"><div class="ttname"><a href="string_8c.html#ad593a8fc0baab9427df9636001dccddd">strdup</a></div><div class="ttdeci">char * strdup(const char *str)</div><div class="ttdef"><b>Definition</b> <a href="#l00590">string.c:590</a></div></div>
 <div class="ttc" id="astring_8c_html_af81ab894ffe6a312661e5a18c9b74cdd"><div class="ttname"><a href="string_8c.html#af81ab894ffe6a312661e5a18c9b74cdd">strncat</a></div><div class="ttdeci">char * strncat(char *dst, const char *src, size_t n)</div><div class="ttdef"><b>Definition</b> <a href="#l00308">string.c:308</a></div></div>

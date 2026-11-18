@@ -1,5 +1,6 @@
 var NAVTREEINDEX75 =
 {
+"cout__message_8h.html":[6,0,2,30,31],
 "cout__message_8h_source.html":[6,0,2,30,31],
 "cover_8cpp.html":[6,0,2,15,15],
 "cover_8cpp.html#a0040a205c1606c1897d5cc60e8f9285f":[6,0,2,15,15,4],
@@ -248,6 +249,5 @@ var NAVTREEINDEX75 =
 "cpp__scope_8cpp_source.html":[6,0,2,5,34],
 "cpp__scope_8h.html":[6,0,2,5,35],
 "cpp__scope_8h.html#aaa17ffc258ff1bf0be4b65b3e1c51053":[6,0,2,5,35,2],
-"cpp__scope_8h_source.html":[6,0,2,5,35],
-"cpp__scopes_8cpp.html":[6,0,2,5,36]
+"cpp__scope_8h_source.html":[6,0,2,5,35]
 };

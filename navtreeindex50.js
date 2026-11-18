@@ -1,5 +1,6 @@
 var NAVTREEINDEX50 =
 {
+"classminisat__prooft.html#ad81649fa3c7aed1e16852661460e0f14":[5,0,841,5],
 "classminisat__prooft.html#aeda86976dc4c7a01220d212e2183b5ea":[5,0,841,0],
 "classminus__exprt.html":[5,0,842],
 "classminus__exprt.html#aefe80c48c652f93703a4068301e4a779":[5,0,842,0],
@@ -248,6 +249,5 @@ var NAVTREEINDEX50 =
 "classnew__scopet.html#a75084d1d9882036a70c9277c90fb62a6a95fbf728908187e4bb160a31525824d5":[5,0,876,1,5],
 "classnew__scopet.html#a75084d1d9882036a70c9277c90fb62a6aa290e084d82f3acaa70d52bd3fbb4b02":[5,0,876,1,8],
 "classnew__scopet.html#a75084d1d9882036a70c9277c90fb62a6ab50339a10e1de285ac99d4c3990b8693":[5,0,876,1,0],
-"classnew__scopet.html#a75084d1d9882036a70c9277c90fb62a6ae444f73956e5b2a401eb9471db89e7c9":[5,0,876,1,6],
-"classnew__scopet.html#a75084d1d9882036a70c9277c90fb62a6ae61ad9b2553a293b4a3f4d3b4fa5ab31":[5,0,876,1,4]
+"classnew__scopet.html#a75084d1d9882036a70c9277c90fb62a6ae444f73956e5b2a401eb9471db89e7c9":[5,0,876,1,6]
 };

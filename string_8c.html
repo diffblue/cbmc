@@ -138,6 +138,8 @@ Functions</h2></td></tr>
 <tr class="memitem:a340d11725e5c81a874f508fbcdf1c5ef" id="r_a340d11725e5c81a874f508fbcdf1c5ef"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a340d11725e5c81a874f508fbcdf1c5ef">memmove</a> (void *dest, const void *src, size_t n)</td></tr>
 <tr class="memitem:ab7c414834b62277e7c972652a9137080" id="r_ab7c414834b62277e7c972652a9137080"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab7c414834b62277e7c972652a9137080">__builtin___memmove_chk</a> (void *dest, const void *src, size_t n, __CPROVER_size_t size)</td></tr>
 <tr class="memitem:a9e6df54ee04e18a3772335580e2ed872" id="r_a9e6df54ee04e18a3772335580e2ed872"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9e6df54ee04e18a3772335580e2ed872">memcmp</a> (const void *<a class="el" href="bytecode__info_8h.html#a3b6653c9d2fc6aa11ec16b971883b82a">s1</a>, const void *<a class="el" href="bytecode__info_8h.html#a1ad7643875e80af295454566f9d548d8">s2</a>, size_t n)</td></tr>
+<tr class="memitem:a0a3e4af1b88f5d51a32fe7dcbf753b38" id="r_a0a3e4af1b88f5d51a32fe7dcbf753b38"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0a3e4af1b88f5d51a32fe7dcbf753b38">memchr</a> (const void *s, int c, size_t n)</td></tr>
+<tr class="memitem:a63d1e17b46aca16f7993cbd8b22591b1" id="r_a63d1e17b46aca16f7993cbd8b22591b1"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a63d1e17b46aca16f7993cbd8b22591b1">__builtin_char_memchr</a> (const char *s, int c, __CPROVER_size_t n)</td></tr>
 <tr class="memitem:aa17096aac8b1ad0afb6be874d8c05d3c" id="r_aa17096aac8b1ad0afb6be874d8c05d3c"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa17096aac8b1ad0afb6be874d8c05d3c">strchr</a> (const char *src, int c)</td></tr>
 <tr class="memitem:a74bb83b922ff0d4f4267b8b47af45e2b" id="r_a74bb83b922ff0d4f4267b8b47af45e2b"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a74bb83b922ff0d4f4267b8b47af45e2b">strrchr</a> (const char *src, int c)</td></tr>
 <tr class="memitem:ab57319b670052e4c93c1f6822c28d5ce" id="r_ab57319b670052e4c93c1f6822c28d5ce"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab57319b670052e4c93c1f6822c28d5ce">strstr</a> (const char *haystack, const char *needle)</td></tr>
@@ -399,6 +401,34 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a63d1e17b46aca16f7993cbd8b22591b1" name="a63d1e17b46aca16f7993cbd8b22591b1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a63d1e17b46aca16f7993cbd8b22591b1">&#9670;&#160;</a></span>__builtin_char_memchr()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">char * __builtin_char_memchr </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>s</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>c</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">__CPROVER_size_t</td>          <td class="paramname"><span class="paramname"><em>n</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l00992">992</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
+
+</div>
+</div>
 <a id="a8f46f0b565b5d2c69bf06cab0e6f1078" name="a8f46f0b565b5d2c69bf06cab0e6f1078"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8f46f0b565b5d2c69bf06cab0e6f1078">&#9670;&#160;</a></span>__builtin_memset()</h2>
 
@@ -424,6 +454,34 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="string_8c_source.html#l00752">752</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
+
+</div>
+</div>
+<a id="a0a3e4af1b88f5d51a32fe7dcbf753b38" name="a0a3e4af1b88f5d51a32fe7dcbf753b38"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0a3e4af1b88f5d51a32fe7dcbf753b38">&#9670;&#160;</a></span>memchr()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void * memchr </td>
+          <td>(</td>
+          <td class="paramtype">const void *</td>          <td class="paramname"><span class="paramname"><em>s</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>c</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>n</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l00960">960</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
 
 </div>
 </div>
@@ -604,7 +662,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l00960">960</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l01007">1007</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
 
 </div>
 </div>
@@ -688,7 +746,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l01087">1087</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l01134">1134</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
 
 </div>
 </div>
@@ -842,7 +900,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l01056">1056</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l01103">1103</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
 
 </div>
 </div>
@@ -865,7 +923,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l00989">989</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l01036">1036</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
 
 </div>
 </div>
@@ -888,7 +946,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l01018">1018</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l01065">1065</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
 
 </div>
 </div>
