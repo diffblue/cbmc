@@ -1,6 +1,11 @@
 #include <assert.h>
 #include <string.h>
 
+// cl does not declare the GCC builtins
+#ifndef __GNUC__
+void *__builtin_memcpy(void *, const void *, __CPROVER_size_t);
+#endif
+
 int main()
 {
   int src[] = {1, 2, 3};

@@ -1,6 +1,12 @@
 #include <assert.h>
 #include <stdlib.h>
 
+// cl does not declare the GCC builtins
+#ifndef __GNUC__
+void *__builtin_memcpy(void *, const void *, __CPROVER_size_t);
+void *__builtin_memmove(void *, const void *, __CPROVER_size_t);
+#endif
+
 // The compiler builtins accept a null pointer when the length is zero -- the
 // shape of libc++'s vector relocation on an empty vector
 // (`__builtin_memcpy(new_begin, old_begin /* nullptr */, 0)').  C2y (N3322)
