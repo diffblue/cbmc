@@ -1,0 +1,11 @@
+CORE
+constant.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Constant folding of round-to-integral, including formats in which 2^f is not a
+finite value, used to give wrong results.
