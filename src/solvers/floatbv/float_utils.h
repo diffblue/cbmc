@@ -173,6 +173,12 @@ protected:
   propt &prop;
   bv_utilst bv_utils;
 
+  /// Whether to round up the magnitude of a value with sign \p sign, given
+  /// the lowest bit \p lsb that is kept, the highest bit \p rbit that is
+  /// dropped, and whether any other dropped bit is set (\p sticky).
+  literalt
+  round_up(literalt sign, literalt lsb, literalt rbit, literalt sticky);
+
   // unpacked
   virtual void normalization_shift(bvt &fraction, bvt &exponent);
   void denormalization_shift(bvt &fraction, bvt &exponent);
