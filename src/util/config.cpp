@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <climits>
 #include <cstdlib>
+#include <type_traits>
 
 configt config;
 
@@ -320,6 +321,10 @@ void configt::ansi_ct::set_arch_spec_arm(const irep_idt &subarch)
 
   endianness=endiannesst::IS_LITTLE_ENDIAN;
   char_is_unsigned=true;
+  // The procedure call standards for both 32-bit and 64-bit Arm (AAPCS and
+  // AAPCS64) make wchar_t an unsigned integer type. Apple, NetBSD, and OpenBSD
+  // deviate from this, see configt::set_os_arch_overrides.
+  wchar_t_is_unsigned = true;
   NULL_is_zero=true;
 
   switch(mode)
@@ -919,6 +924,9 @@ void configt::set_os_arch_overrides()
 {
   const irep_idt &os = ansi_c.os_name;
   const irep_idt &arch = ansi_c.arch;
+  const bool is_arm =
+    arch == "arm64" || arch == "armhf" || arch == "armel" || arch == "arm";
+
   if(os == "windows")
   {
     // note that sizeof(void *)==8, but sizeof(long)==4!
@@ -937,12 +945,19 @@ void configt::set_os_arch_overrides()
     else
       ansi_c.long_double_width = 8 * 8;
   }
-  else if(os == "macos" && arch == "arm64")
+  else if(os == "macos" && is_arm)
   {
+    // Apple's Arm platforms deviate from AAPCS/AAPCS64, see
     // https://developer.apple.com/documentation/xcode/
     // writing_arm64_code_for_apple_platforms#//apple_ref/doc/uid/TP40013702-SW1
     ansi_c.char_is_unsigned = false;
+    ansi_c.wchar_t_is_unsigned = false;
     ansi_c.long_double_width = 8 * 8;
+  }
+  else if((os == "netbsd" || os == "openbsd") && is_arm)
+  {
+    // NetBSD and OpenBSD deviate from AAPCS/AAPCS64: wchar_t is int.
+    ansi_c.wchar_t_is_unsigned = false;
   }
   else if(
     os == "freebsd" &&
@@ -1204,6 +1219,12 @@ bool configt::set(const cmdlinet &cmdline)
       ansi_c.char_is_unsigned ==
         (static_cast<char>((1 << CHAR_BIT) - 1) == (1 << CHAR_BIT) - 1),
       "char_is_unsigned flag shall indicate system char unsignedness");
+    INVARIANT(
+      ansi_c.wchar_t_width == sizeof(wchar_t) * CHAR_BIT,
+      "wchar_t width shall be equal to the system wchar_t width");
+    INVARIANT(
+      ansi_c.wchar_t_is_unsigned == std::is_unsigned<wchar_t>::value,
+      "wchar_t_is_unsigned flag shall indicate system wchar_t unsignedness");
 
 #ifndef _WIN32
     // On Windows, long double width varies by compiler

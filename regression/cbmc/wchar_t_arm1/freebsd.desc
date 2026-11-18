@@ -1,0 +1,10 @@
+CORE
+main.i
+--arch arm64 --os freebsd
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+FreeBSD follows AAPCS64: wchar_t is an unsigned integer type.
