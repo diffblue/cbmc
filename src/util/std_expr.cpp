@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "rational.h"
 #include "rational_tools.h"
 #include "substitute_symbols.h"
+#include "symbol.h"
 
 #include <map>
 
@@ -334,18 +335,21 @@ void member_exprt::validate(
   const auto &member_expr = to_member_expr(expr);
 
   const typet &compound_type = member_expr.compound().type();
+  const struct_union_typet *struct_union_type = nullptr;
   if(compound_type.id() == ID_struct_tag || compound_type.id() == ID_union_tag)
   {
     const symbolt *symbol = nullptr;
     DATA_CHECK(
       vm,
-      !ns.lookup(to_tag_type(compound_type).get_identifier(), symbol),
+      !ns.lookup(to_tag_type(compound_type).get_identifier(), symbol) &&
+        symbol->is_type &&
+        (symbol->type.id() == ID_struct || symbol->type.id() == ID_union),
       "member must address a struct or union type that is defined");
+    struct_union_type = &to_struct_union_type(symbol->type);
   }
-  const auto *struct_union_type =
-    (compound_type.id() == ID_struct_tag || compound_type.id() == ID_union_tag)
-      ? &ns.follow_tag(to_struct_or_union_tag_type(compound_type))
-      : type_try_dynamic_cast<struct_union_typet>(compound_type);
+  else
+    struct_union_type =
+      type_try_dynamic_cast<struct_union_typet>(compound_type);
   DATA_CHECK(
     vm,
     struct_union_type != nullptr,
