@@ -1,0 +1,12 @@
+CORE
+zero_length_null.c
+--pointer-check --bounds-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+A zero-length __builtin_memcpy/__builtin_memmove with a null source and/or
+destination is accepted (C2y N3322). Before __builtin_memcpy and
+__builtin_memmove had models: "no body for callee __builtin_memcpy: FAILURE".

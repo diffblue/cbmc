@@ -1,0 +1,10 @@
+CORE
+string_abstraction.c
+--string-abstraction
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+The destination's string length is that of the copied string.
