@@ -430,6 +430,30 @@ static dfcc_loop_infot gen_dfcc_loop_info(
     dirty,
     loop_info_map);
 
+  // A tracked local is added to the loop's write set by its DECL. A loop local
+  // declared before the loop (see `gen_loop_locals_set`) has no DECL in the
+  // loop, so it is not tracked: assignments to it are not checked, but writes
+  // to it through pointers are checked against the write set (and fail), which
+  // is sound.
+  {
+    std::unordered_set<irep_idt> declared_in_loop;
+    const auto &loop_instructions = loop_nesting_graph[loop_id].instructions;
+    for(auto it = goto_function.body.instructions.begin();
+        it != goto_function.body.instructions.end();
+        ++it)
+    {
+      if(it->is_decl() && loop_instructions.contains(it))
+        declared_in_loop.insert(it->decl_symbol().get_identifier());
+    }
+    for(auto it = loop_tracked.begin(); it != loop_tracked.end();)
+    {
+      if(declared_in_loop.find(*it) == declared_in_loop.end())
+        it = loop_tracked.erase(it);
+      else
+        ++it;
+    }
+  }
+
   struct contract_clausest contract_clauses = default_loop_contract_clauses(
     loop_nesting_graph,
     loop_id,

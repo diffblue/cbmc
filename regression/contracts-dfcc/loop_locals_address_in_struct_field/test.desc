@@ -1,0 +1,13 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^\[check\.assertion\.\d+\] line \d+ assertion \*s->q == 0: FAILURE$
+--
+^VERIFICATION SUCCESSFUL$
+--
+Checks that an address stored in a field of a local struct is reachable
+through that struct: `check` reads the previous iteration's `t` through
+`s.q`, so `t` is not a loop local.

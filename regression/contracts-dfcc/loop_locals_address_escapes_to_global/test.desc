@@ -1,0 +1,12 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^\[check\.assertion\.\d+\] line \d+ assertion \*g == 0: FAILURE$
+--
+--
+Checks that once the address of a variable is passed to a function (which may
+store it in a global variable), any later function call may read the
+variable: `check` reads the previous iteration's `t` through `g`.

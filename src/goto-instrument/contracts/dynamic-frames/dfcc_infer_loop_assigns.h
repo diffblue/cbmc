@@ -18,8 +18,10 @@ class namespacet;
 class message_handlert;
 struct dfcc_loop_nesting_graph_nodet;
 
-/// Collect identifiers that are local to `loop`, i.e., those of variables
-/// declared inside `loop`.
+/// Collect identifiers that are local to `loop`: those of the variables
+/// declared inside `loop`, and those of the variables declared outside of it
+/// whose address is not taken, that only `loop` uses, that do not occur in
+/// loop contract clauses, and that are dead at its head.
 std::unordered_set<irep_idt> gen_loop_locals_set(
   goto_functiont &goto_function,
   const dfcc_loop_nesting_graph_nodet &loop);

@@ -1,0 +1,12 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^\[main\.loop_invariant_step\.\d+\] line \d+ Check invariant after step for loop main\.\d+: FAILURE$
+--
+--
+Checks that a variable that a loop invariant reads is not a loop local: the
+invariant is evaluated at the loop head, where the variable holds the value of
+the previous iteration.
