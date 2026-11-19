@@ -1240,3 +1240,121 @@ TEST_CASE(
 
   CHECK(test.sent_commands == expected_commands);
 }
+
+TEST_CASE(
+  "smt2_incremental_decision_proceduret defines the dependencies of each "
+  "expression it converts.",
+  "[core][smt2_incremental]")
+{
+  // Defining an array literal or array_of converts its elements, and defining
+  // the index of a with_exprt converts that index. Each such conversion first
+  // defines what the converted expression depends on, and each dependency is
+  // defined exactly once.
+  auto test = decision_procedure_test_environmentt::make();
+  const signedbv_typet index_type{32};
+  const signedbv_typet value_type{8};
+  const smt_bit_vector_sortt smt_index_sort{32};
+  const smt_bit_vector_sortt smt_value_sort{8};
+  const array_typet array_type{value_type, from_integer(2, index_type)};
+  const smt_array_sortt smt_array_sort{smt_index_sort, smt_value_sort};
+  const symbolt foo = make_test_symbol("foo", value_type);
+  const smt_identifier_termt foo_term{"foo", smt_value_sort};
+  const smt_identifier_termt array_term{"array_0", smt_array_sort};
+  const auto select = [&](const smt_termt &array, std::size_t i)
+  {
+    return smt_array_theoryt::select(
+      array, smt_bit_vector_constant_termt{i, 32});
+  };
+
+  SECTION("an array literal in the index of a with_exprt")
+  {
+    const array_typet inner_array_type{index_type, from_integer(2, index_type)};
+    const array_exprt inner_array{
+      {from_integer(5, index_type), from_integer(6, index_type)},
+      inner_array_type};
+    const index_exprt array_index{inner_array, from_integer(0, index_type)};
+    const symbolt the_array = make_test_symbol("the_array", array_type);
+    const with_exprt with_expr{
+      the_array.symbol_expr(), array_index, from_integer(7, value_type)};
+    test.sent_commands.clear();
+    test.procedure.handle(equal_exprt{with_expr, the_array.symbol_expr()});
+    const smt_identifier_termt inner_array_term{
+      "array_0", smt_array_sortt{smt_index_sort, smt_index_sort}};
+    const smt_identifier_termt the_array_term{"the_array", smt_array_sort};
+    const smt_identifier_termt index_term{"index_0", smt_index_sort};
+    const std::vector<smt_commandt> expected_commands{
+      smt_declare_function_commandt{inner_array_term, {}},
+      smt_assert_commandt{smt_core_theoryt::equal(
+        select(inner_array_term, 0), smt_bit_vector_constant_termt{5, 32})},
+      smt_assert_commandt{smt_core_theoryt::equal(
+        select(inner_array_term, 1), smt_bit_vector_constant_termt{6, 32})},
+      smt_declare_function_commandt{the_array_term, {}},
+      smt_define_function_commandt{"index_0", {}, select(inner_array_term, 0)},
+      smt_define_function_commandt{
+        "B0",
+        {},
+        smt_core_theoryt::equal(
+          smt_array_theoryt::store(
+            the_array_term, index_term, smt_bit_vector_constant_termt{7, 8}),
+          the_array_term)}};
+    REQUIRE(test.sent_commands == expected_commands);
+  }
+
+  const array_exprt array_literal{
+    {foo.symbol_expr(), from_integer(12, value_type)}, array_type};
+  const equal_exprt literal_equal{
+    index_exprt{array_literal, from_integer(0, index_type)}, foo.symbol_expr()};
+  // foo is declared while defining array_0, and before it is used there
+  const std::vector<smt_commandt> literal_definition{
+    smt_declare_function_commandt{array_term, {}},
+    smt_declare_function_commandt{foo_term, {}},
+    smt_assert_commandt{
+      smt_core_theoryt::equal(select(array_term, 0), foo_term)},
+    smt_assert_commandt{smt_core_theoryt::equal(
+      select(array_term, 1), smt_bit_vector_constant_termt{12, 8})}};
+
+  SECTION("an element of an array literal that the expression also uses")
+  {
+    test.sent_commands.clear();
+    test.procedure.set_to(literal_equal, true);
+    std::vector<smt_commandt> expected_commands = literal_definition;
+    expected_commands.push_back(smt_assert_commandt{
+      smt_core_theoryt::equal(select(array_term, 0), foo_term)});
+    REQUIRE(test.sent_commands == expected_commands);
+  }
+
+  SECTION("an element of an array literal that a handle also uses")
+  {
+    test.sent_commands.clear();
+    test.procedure.handle(literal_equal);
+    std::vector<smt_commandt> expected_commands = literal_definition;
+    expected_commands.push_back(smt_define_function_commandt{
+      "B0", {}, smt_core_theoryt::equal(select(array_term, 0), foo_term)});
+    REQUIRE(test.sent_commands == expected_commands);
+  }
+
+  SECTION("the element of an array_of that the expression also uses")
+  {
+    const symbolt index = make_test_symbol("index", index_type);
+    test.sent_commands.clear();
+    test.procedure.set_to(
+      equal_exprt{
+        index_exprt{
+          array_of_exprt{foo.symbol_expr(), array_type}, index.symbol_expr()},
+        foo.symbol_expr()},
+      true);
+    const smt_identifier_termt index_term{"index", smt_index_sort};
+    const smt_identifier_termt forall_term{"array_0_index", smt_index_sort};
+    const std::vector<smt_commandt> expected_commands{
+      smt_declare_function_commandt{array_term, {}},
+      smt_declare_function_commandt{foo_term, {}},
+      smt_assert_commandt{smt_forall_termt{
+        {forall_term},
+        smt_core_theoryt::equal(
+          smt_array_theoryt::select(array_term, forall_term), foo_term)}},
+      smt_declare_function_commandt{index_term, {}},
+      smt_assert_commandt{smt_core_theoryt::equal(
+        smt_array_theoryt::select(array_term, index_term), foo_term)}};
+    REQUIRE(test.sent_commands == expected_commands);
+  }
+}

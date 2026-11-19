@@ -183,6 +183,10 @@ void send_function_definition(
 
 /// \brief Defines any functions which \p expr depends on, which have not yet
 ///   been defined, along with their dependencies in turn.
+/// Defining a dependency may convert further expressions (the elements of an
+/// array literal, for example), and each conversion calls this function in
+/// turn. Such a nested call may define dependencies that are still queued
+/// here, which are then skipped.
 void smt2_incremental_decision_proceduret::define_dependent_functions(
   const exprt &expr)
 {
@@ -207,6 +211,12 @@ void smt2_incremental_decision_proceduret::define_dependent_functions(
   while(!to_be_defined.empty())
   {
     const exprt current = to_be_defined.top();
+    if(expression_identifiers.count(current) != 0)
+    {
+      // defined by a nested call
+      to_be_defined.pop();
+      continue;
+    }
     if(push_dependencies_needed(current))
       continue;
     if(const auto symbol_expr = expr_try_dynamic_cast<symbol_exprt>(current))
@@ -358,7 +368,6 @@ void smt2_incremental_decision_proceduret::ensure_handle_for_expr_defined(
 
   const exprt lowered_expr = lower(in_expr);
 
-  define_dependent_functions(lowered_expr);
   smt_define_function_commandt function{
     "B" + std::to_string(handle_sequence()),
     {},
@@ -414,6 +423,12 @@ exprt smt2_incremental_decision_proceduret::substitute_defined_padding(
 smt_termt
 smt2_incremental_decision_proceduret::convert_expr_to_smt(const exprt &expr)
 {
+  // Every conversion, including the nested ones from define_index_identifiers
+  // and initialize_array_elements, first defines the functions that expr
+  // depends on: the free ::convert_expr_to_smt overloads do not handle array
+  // literals, array_of and string constants, which must therefore be replaced
+  // by the identifiers defined for them.
+  define_dependent_functions(expr);
   define_index_identifiers(expr);
   const exprt substituted = substitute_defined_padding(
     substitute_identifiers(expr, expression_identifiers));
@@ -656,7 +671,6 @@ void smt2_incremental_decision_proceduret::set_to(
   const exprt lowered_expr = lower(in_expr);
   PRECONDITION(can_cast_type<bool_typet>(lowered_expr.type()));
 
-  define_dependent_functions(lowered_expr);
   auto converted_term = [&]() -> smt_termt {
     const auto expression_handle_identifier =
       expression_handle_identifiers.find(lowered_expr);
@@ -730,7 +744,6 @@ void smt2_incremental_decision_proceduret::define_object_properties()
       continue;
     else
       object_properties_defined[object->unique_id] = true;
-    define_dependent_functions(object->size);
     solver_process->send(object_size_function.make_definition(
       object->unique_id, convert_expr_to_smt(object->size)));
     solver_process->send(is_dynamic_object_function.make_definition(
