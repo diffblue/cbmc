@@ -2217,13 +2217,18 @@ __CPROVER_HIDE:;
       // not modelled exactly: the output from here on is unknown (its
       // arguments are not read, which only matters for a later %n).  If it
       // ends within the buffer, the result is its length; otherwise the buffer
-      // holds a prefix and the result is at least as long.
+      // holds a prefix and the result is at least as long.  Converting wide
+      // characters (%lc, %ls, and their synonyms %C, %S) may fail, which is
+      // an encoding error: the result is then negative.
+      const _Bool may_fail = ((conv == 'c' || conv == 's') && length == 3) ||
+                             conv == 'C' || conv == 'S';
+      int result = __VERIFIER_nondet_int();
       if(out + terminate >= size)
       {
         if(terminate && size > 0)
           str[size - 1] = '\0';
-        int result = __VERIFIER_nondet_int();
-        __CPROVER_assume(result >= 0 && (size_t)result >= out);
+        __CPROVER_assume(
+          (may_fail && result < 0) || (result >= 0 && (size_t)result >= out));
         return result;
       }
       size_t i = out;
@@ -2232,12 +2237,15 @@ __CPROVER_HIDE:;
         char c = __VERIFIER_nondet_char();
         str[i] = c;
         if(c == '\0')
-          return (int)i;
+        {
+          __CPROVER_assume((may_fail && result < 0) || result == (int)i);
+          return result;
+        }
       }
       if(terminate)
         str[i] = '\0';
-      int result = __VERIFIER_nondet_int();
-      __CPROVER_assume(result >= 0 && (size_t)result >= i);
+      __CPROVER_assume(
+        (may_fail && result < 0) || (result >= 0 && (size_t)result >= i));
       return result;
     }
     // a - flag: the padding follows
@@ -2550,8 +2558,9 @@ __CPROVER_HIDE:;
   (void)options;
   (void)locale;
   int result = __CPROVER_vsnprintf(str, size, fmt, args, 1);
+  // an encoding error is an error return, not a runtime-constraint violation
   __CPROVER_precondition(
-    result >= 0 && (size_t)result < size, "sprintf_s buffer too small");
+    result < 0 || (size_t)result < size, "sprintf_s buffer too small");
   return result;
 }
 

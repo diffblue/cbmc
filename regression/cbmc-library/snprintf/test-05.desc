@@ -1,0 +1,13 @@
+CORE
+main5.c
+--pointer-check --bounds-check --unwind 10 --unwinding-assertions
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^\[main\.assertion\.1\] line \d+ assertion r >= 0: FAILURE$
+^\[main\.assertion\.2\] line \d+ assertion r == 1: SUCCESS$
+--
+^warning: ignoring
+--
+Converting a wide character may fail, which is an encoding error: the result is
+then negative.  The integer conversions cannot fail.

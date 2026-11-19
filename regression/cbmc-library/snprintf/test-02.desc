@@ -1,0 +1,13 @@
+CORE
+main2.c
+--pointer-check --bounds-check --unwind 10 --unwinding-assertions
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^\[main\.assertion\.1\] line \d+ assertion r <= 4: FAILURE$
+^\[main\.assertion\.2\] line \d+ assertion r == 5: SUCCESS$
+--
+^warning: ignoring
+--
+The result is the length of the whole output, which may exceed the size of the
+buffer (issue #9307).
