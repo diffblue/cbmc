@@ -1,0 +1,18 @@
+CORE
+main.c
+--show-struct-alignment
+^EXIT=0$
+^SIGNAL=0$
+^WARNING: declaration of structure narrow at file main\.c line 1$
+^members a and b might interfere$
+^WARNING: declaration of structure pad at file main\.c line 11$
+^members c and s might interfere$
+--
+^warning: ignoring
+structure wide
+members x and y
+\$pad
+--
+Members that fit in a single memory operand (an int) may interfere, which a and
+b do, while x and y do not. The padding between c and s counts towards the
+size of the memory operand, but is not reported as a member.
