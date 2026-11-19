@@ -1,0 +1,10 @@
+CORE
+vector.json_symtab
+
+^EXIT=6$
+^SIGNAL=0$
+^malformed symbol table entry .v.: type must have one type parameter$
+--
+^Invariant check failed
+--
+Rejects a vector type without a subtype.

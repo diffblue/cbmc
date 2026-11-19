@@ -1,0 +1,76 @@
+{
+ "symbolTable": {
+  "tag-S": {
+   "type": {
+    "id": "struct",
+    "sub": [],
+    "namedSub": {
+     "components": {
+      "id": "",
+      "sub": [
+       {
+        "id": "",
+        "sub": [],
+        "namedSub": {
+         "name": {
+          "id": "p",
+          "sub": [],
+          "namedSub": {}
+         },
+         "type": {
+          "id": "pointer",
+          "sub": [],
+          "namedSub": {
+           "width": {
+            "id": "64",
+            "sub": [],
+            "namedSub": {}
+           }
+          }
+         }
+        }
+       }
+      ],
+      "namedSub": {}
+     },
+     "tag": {
+      "id": "S",
+      "sub": [],
+      "namedSub": {}
+     }
+    }
+   },
+   "value": {
+    "id": "nil",
+    "sub": [],
+    "namedSub": {}
+   },
+   "location": {
+    "id": "nil",
+    "sub": [],
+    "namedSub": {}
+   },
+   "name": "tag-S",
+   "module": "",
+   "baseName": "tag-S",
+   "mode": "C",
+   "prettyName": "tag-S",
+   "isType": true,
+   "isMacro": false,
+   "isExported": false,
+   "isInput": false,
+   "isOutput": false,
+   "isStateVar": false,
+   "isProperty": false,
+   "isStaticLifetime": false,
+   "isThreadLocal": false,
+   "isLvalue": false,
+   "isFileLocal": false,
+   "isExtern": false,
+   "isVolatile": false,
+   "isParameter": false,
+   "isAuxiliary": false,
+   "isWeak": false
+  }
+ }
+}

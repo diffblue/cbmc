@@ -1,0 +1,11 @@
+CORE
+member_use.json_symtab
+tag_def.json_symtab _ --show-symbol-table
+^EXIT=0$
+^SIGNAL=0$
+^Value\.*: s\.x$
+--
+malformed symbol table entry
+--
+A member expression may refer to a struct type defined in another input file,
+which validation must accept (it only validates once all files are linked).

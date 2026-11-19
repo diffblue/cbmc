@@ -9,10 +9,12 @@ Author: Diffblue Ltd.
 #include "symtab2gb_parse_options.h"
 
 #include <util/config.h>
+#include <util/cprover_prefix.h>
 #include <util/exception_utils.h>
 #include <util/exit_codes.h>
 #include <util/help_formatter.h>
 #include <util/json.h>
+#include <util/namespace.h>
 #include <util/version.h>
 
 #include <goto-programs/goto_model.h>
@@ -25,6 +27,8 @@ Author: Diffblue Ltd.
 #include <json/json_parser.h>
 #include <langapi/mode.h>
 #include <linking/linking.h>
+
+#include "validate_symtab.h"
 
 #include <fstream>
 #include <iostream>
@@ -109,6 +113,13 @@ static void run_symtab2gb(
       throw invalid_source_file_exceptiont{
         "failed to typecheck symbol table", source_location};
     }
+    // Linking and configt::set_from_symbol_table operate on the symbols of
+    // this file, so check their structure first. Checks that need to look
+    // up types (such as struct tags) can only be done once all input files
+    // have been linked, except for the configuration symbols, which
+    // configt::set_from_symbol_table simplifies.
+    check_symbol_table_structure(symtab);
+    validate_symbol_table(symtab, CPROVER_PREFIX "architecture_");
     config.set_from_symbol_table(symtab);
 
     if(failed(linking(linked_symbol_table, symtab, message_handler)))
@@ -117,6 +128,10 @@ static void run_symtab2gb(
         "failed to link `" + symtab_filename + "'"};
     }
   }
+
+  // Validate (including look-ups) only once all input files have been
+  // linked, as expressions may refer to types defined in other files.
+  validate_symbol_table(linked_symbol_table);
 
   goto_modelt linked_goto_model;
   linked_goto_model.symbol_table.swap(linked_symbol_table);
@@ -137,6 +152,9 @@ static void run_symtab2gb(
         "failed to parse JSON", source_location};
     }
     goto_functions_from_json(json, linked_goto_model.goto_functions);
+    validate_goto_functions(
+      linked_goto_model.goto_functions,
+      namespacet{linked_goto_model.symbol_table});
   }
 
   // Convert symbols to goto functions

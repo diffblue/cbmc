@@ -1,0 +1,10 @@
+CORE
+if.json_symtab
+
+^EXIT=6$
+^SIGNAL=0$
+^malformed symbol table entry .a.: ternary expression must have three operands$
+--
+^Invariant check failed
+--
+Rejects an array type whose size is a malformed if expression without a type.

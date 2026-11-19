@@ -141,12 +141,17 @@ codet character_refine_preprocesst::convert_digit_char(
   const code_function_callt &function_call=target;
   const std::size_t nb_args=function_call.arguments().size();
   PRECONDITION(nb_args==1 || nb_args==2);
-  const exprt &arg=function_call.arguments()[0];
+  const exprt &result = function_call.lhs();
+  const typet &type = result.type();
+  // Compute in the (int) type of the result, as Java promotes the char
+  // argument in this arithmetic, and as the result may be -1.
+  const exprt arg =
+    typecast_exprt::conditional_cast(function_call.arguments()[0], type);
   // If there is no radix argument we set it to 36 which is the maximum possible
-  const exprt &radix=
-    nb_args>1?function_call.arguments()[1]:from_integer(36, arg.type());
-  const exprt &result=function_call.lhs();
-  const typet &type=result.type();
+  const exprt radix =
+    nb_args > 1
+      ? typecast_exprt::conditional_cast(function_call.arguments()[1], type)
+      : from_integer(36, type);
 
   // TODO: If the radix is not in the range MIN_RADIX <= radix <= MAX_RADIX or
   // if the value of ch is not a valid digit in the specified radix,
@@ -204,9 +209,8 @@ codet character_refine_preprocesst::convert_digit_char(
     latin_digit,
     case1,
     if_exprt(upper_case, case2, if_exprt(lower_case, case3, fullwidth_cases)));
-  typecast_exprt tc_expr(expr, type);
 
-  return code_assignt(result, tc_expr);
+  return code_assignt(result, expr);
 }
 
 /// Converts function call to an assignment of an expression corresponding to

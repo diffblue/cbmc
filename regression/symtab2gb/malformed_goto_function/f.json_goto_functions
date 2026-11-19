@@ -1,0 +1,46 @@
+{
+ "functions": [
+  {
+   "name": "f",
+   "parameterIdentifiers": [],
+   "instructions": [
+    {
+     "instructionId": "ASSERT",
+     "locationNumber": 0,
+     "guard": {
+      "id": "if",
+      "sub": [
+       {
+        "id": "constant",
+        "sub": [],
+        "namedSub": {
+         "type": {
+          "id": "bool",
+          "sub": [],
+          "namedSub": {}
+         },
+         "value": {
+          "id": "1",
+          "sub": [],
+          "namedSub": {}
+         }
+        }
+       }
+      ],
+      "namedSub": {
+       "type": {
+        "id": "bool",
+        "sub": [],
+        "namedSub": {}
+       }
+      }
+     }
+    },
+    {
+     "instructionId": "END_FUNCTION",
+     "locationNumber": 1
+    }
+   ]
+  }
+ ]
+}

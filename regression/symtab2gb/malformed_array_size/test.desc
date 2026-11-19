@@ -1,0 +1,10 @@
+CORE
+array.json_symtab
+
+^EXIT=6$
+^SIGNAL=0$
+^malformed symbol table entry .a.: ternary expression must have three operands$
+--
+--
+Rejects an array type whose size expression is malformed, i.e., also checks
+expressions that are not operands.

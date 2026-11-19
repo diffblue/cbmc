@@ -1,0 +1,12 @@
+CORE
+ctg.json_symtab
+
+^EXIT=6$
+^SIGNAL=0$
+^malformed symbol table entry .a.: conditional target expression must have two operands$
+--
+^Invariant check failed
+--
+Rejects an array type whose size is a malformed conditional_target_group
+expression without a type: named sub-trees of types that hold expressions are
+checked whether or not these expressions have a type.

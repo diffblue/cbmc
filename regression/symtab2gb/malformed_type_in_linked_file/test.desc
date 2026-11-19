@@ -1,0 +1,12 @@
+CORE
+good.json_symtab
+bad.json_symtab
+^EXIT=6$
+^SIGNAL=0$
+^malformed symbol table entry .p.: type must have one type parameter$
+--
+^Invariant check failed
+--
+Rejects a malformed type in a file other than the first one, before linking
+compares it with the well-formed declaration of the same symbol in the first
+file.

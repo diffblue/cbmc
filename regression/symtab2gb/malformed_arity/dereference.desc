@@ -1,0 +1,10 @@
+CORE
+dereference.json_symtab
+
+^EXIT=6$
+^SIGNAL=0$
+^malformed symbol table entry .x.: dereference expression must have one operand$
+--
+^Invariant check failed
+--
+Rejects a dereference without an operand.

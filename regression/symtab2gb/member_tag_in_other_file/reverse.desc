@@ -1,0 +1,10 @@
+CORE
+tag_def.json_symtab
+member_use.json_symtab _ --show-symbol-table
+^EXIT=0$
+^SIGNAL=0$
+^Value\.*: s\.x$
+--
+malformed symbol table entry
+--
+As test.desc, with the input files in reverse order.

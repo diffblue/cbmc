@@ -1,0 +1,116 @@
+{
+ "symbolTable": {
+  "contract::f": {
+   "type": {
+    "id": "code",
+    "sub": [],
+    "namedSub": {
+     "parameters": {
+      "id": "",
+      "sub": [],
+      "namedSub": {}
+     },
+     "return_type": {
+      "id": "signedbv",
+      "sub": [],
+      "namedSub": {
+       "width": {
+        "id": "32",
+        "sub": [],
+        "namedSub": {}
+       }
+      }
+     },
+     "#spec_assigns": {
+      "id": "",
+      "sub": [
+       {
+        "id": "lambda",
+        "sub": [
+         {
+          "id": "tuple",
+          "sub": [],
+          "namedSub": {
+           "type": {
+            "id": "tuple",
+            "sub": [],
+            "namedSub": {}
+           }
+          }
+         },
+         {
+          "id": "conditional_target_group",
+          "sub": [
+           {
+            "id": "constant",
+            "sub": [],
+            "namedSub": {
+             "type": {
+              "id": "bool",
+              "sub": [],
+              "namedSub": {}
+             },
+             "value": {
+              "id": "1",
+              "sub": [],
+              "namedSub": {}
+             }
+            }
+           }
+          ],
+          "namedSub": {
+           "type": {
+            "id": "empty",
+            "sub": [],
+            "namedSub": {}
+           }
+          }
+         }
+        ],
+        "namedSub": {
+         "type": {
+          "id": "mathematical_function",
+          "sub": [],
+          "namedSub": {}
+         }
+        }
+       }
+      ],
+      "namedSub": {}
+     }
+    }
+   },
+   "value": {
+    "id": "nil",
+    "sub": [],
+    "namedSub": {}
+   },
+   "location": {
+    "id": "nil",
+    "sub": [],
+    "namedSub": {}
+   },
+   "name": "contract::f",
+   "module": "",
+   "baseName": "contract::f",
+   "mode": "C",
+   "prettyName": "contract::f",
+   "isType": false,
+   "isMacro": false,
+   "isExported": false,
+   "isInput": false,
+   "isOutput": false,
+   "isStateVar": false,
+   "isProperty": false,
+   "isStaticLifetime": false,
+   "isThreadLocal": false,
+   "isLvalue": true,
+   "isFileLocal": false,
+   "isExtern": false,
+   "isVolatile": false,
+   "isParameter": false,
+   "isAuxiliary": false,
+   "isWeak": false
+  }
+ }
+}
