@@ -1,0 +1,13 @@
+CORE
+main.c
+--show-local-bitvector-analysis
+^EXIT=0$
+^SIGNAL=0$
+^  main::1::local: \+dynamic_local$
+^  main::1::global: \+static_lifetime$
+^  main::1::null: \+null$
+--
+^warning: ignoring
+--
+Each pointer is classified by what it may point to: a local variable, an object
+with static lifetime, or nothing.
