@@ -36,6 +36,8 @@ ExcludedTests = list(map(lambda s: os.path.join(test_base_dir, s[0], s[1]), [
     ['reachability-slice-interproc2', 'test.desc'],
     ['real-assignments1', 'typecheck.desc'],
     ['saturating_arithmetric', 'output-goto.desc'],
+    # uses --show-loops instead of producing a trace
+    ['show-loops1', 'test.desc'],
     # this one wants show-properties instead producing a trace
     ['show_properties1', 'test.desc'],
     # program-only instead of trace
