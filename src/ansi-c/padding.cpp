@@ -27,15 +27,21 @@ static bytest member_layout_alignment(
   bool container_is_packed,
   const namespacet &ns);
 
+std::optional<bytest> layout_attribute(const irept &src, const irep_idt &id)
+{
+  // the cast is safe as exprt adds no data members to irept
+  const exprt &value = static_cast<const exprt &>(src.find(id));
+  if(value.is_nil() || value.id() == ID_default)
+    return {};
+  return numeric_cast<bytest>(value);
+}
+
 /// \return the maximum alignment set by a `#pragma pack(n)` in effect for
 ///   \p src (a component, or, with Visual Studio, an aggregate), or 0 when
 ///   there is none
 static bytest pragma_pack(const irept &src)
 {
-  const exprt &value = static_cast<const exprt &>(src.find(ID_C_pragma_pack));
-  if(value.is_nil())
-    return bytest{0};
-  return numeric_cast<bytest>(value).value_or(bytest{0});
+  return layout_attribute(src, ID_C_pragma_pack).value_or(bytest{0});
 }
 
 static bool is_visual_studio()
@@ -47,10 +53,7 @@ static bool is_visual_studio()
 ///   ID_C_declaration_alignment) of \p src, or 0 when there is none
 static bytest alignment_attribute(const irept &src, const irep_idt &id)
 {
-  const exprt &value = static_cast<const exprt &>(src.find(id));
-  if(value.is_nil() || value.id() == ID_default)
-    return bytest{0};
-  return numeric_cast<bytest>(value).value_or(bytest{0});
+  return layout_attribute(src, id).value_or(bytest{0});
 }
 
 /// The alignment of \p type, ignoring any alignment that an attribute of a
@@ -230,6 +233,22 @@ bit_field_start_alignment(const struct_union_typet::componentt &component)
   return max_alignment > bytest{0} ? std::min(a, max_alignment) : a;
 }
 
+/// The alignment used to lay out \p component within an aggregate. This
+/// implements the rules that depend on the context of the component:
+/// - bit-fields are densely packed in a packed aggregate, unless a
+///   `#pragma pack(n)` is in effect, which then caps their alignment at n;
+///   a zero-width bit-field only affects the alignment of the aggregate with
+///   the ARM ABIs (other than Apple's);
+/// - the alignment of any other component is the alignment of its type in
+///   the packing context of the aggregate (see
+///   member_layout_alignment_unconstrained), raised by any alignment that
+///   the declaration of the component requests;
+/// - `#pragma pack(n)` caps the result at n, except that Visual Studio does
+///   not let it reduce an alignment that `__declspec(align(m))` requires.
+/// \param component: the component of the aggregate
+/// \param container_is_packed: whether the aggregate is packed
+/// \param ns: namespace to resolve tag types
+/// \return the alignment of \p component in bytes
 static bytest member_layout_alignment(
   const struct_union_typet::componentt &component,
   bool container_is_packed,

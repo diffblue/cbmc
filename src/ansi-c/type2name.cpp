@@ -19,6 +19,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/std_expr.h>
 #include <util/symbol.h>
 
+#include "padding.h"
+
 #include <regex>
 
 typedef std::unordered_map<irep_idt, std::pair<size_t, bool>> symbol_numbert;
@@ -92,14 +94,13 @@ static std::string layout_attributes2name(const irept &src)
   for(const auto &id :
       {ID_C_alignment, ID_C_declaration_alignment, ID_C_pragma_pack})
   {
-    const exprt &value = static_cast<const exprt &>(src.find(id));
-    if(value.is_nil())
+    if(src.find(id).is_nil())
       continue;
     result += id == ID_C_alignment               ? 'a'
               : id == ID_C_declaration_alignment ? 'd'
                                                  : 'P';
-    const auto value_int = numeric_cast<mp_integer>(value);
-    result += value_int.has_value() ? integer2string(*value_int) : "?";
+    const auto value = layout_attribute(src, id);
+    result += value.has_value() ? integer2string(value->get()) : "?";
   }
 
   return result;
