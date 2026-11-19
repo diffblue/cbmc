@@ -1,0 +1,12 @@
+CORE
+main.c
+--list-undefined-functions _ --no-standard-checks
+^EXIT=0$
+^SIGNAL=0$
+^undefined$
+--
+^warning: ignoring
+^defined$
+^main$
+--
+Only functions without a body are listed.
