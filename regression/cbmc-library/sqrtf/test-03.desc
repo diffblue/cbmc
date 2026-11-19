@@ -1,0 +1,10 @@
+CORE
+main3.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Subnormal arguments must yield the correctly rounded square root.
