@@ -7,13 +7,8 @@ SRC = unit_tests.cpp \
 # Test source files
 SRC += analyses/ai/ai.cpp \
        analyses/ai/ai_simplify_lhs.cpp \
-       analyses/call_graph.cpp \
        analyses/constant_propagator.cpp \
        analyses/dependence_graph.cpp \
-       analyses/disconnect_unreachable_nodes_in_graph.cpp \
-       analyses/does_remove_const/does_expr_lose_const.cpp \
-       analyses/does_remove_const/does_type_preserve_const_correctness.cpp \
-       analyses/does_remove_const/is_type_at_least_as_const_as.cpp \
        analyses/variable-sensitivity/abstract_environment/to_predicate.cpp \
        analyses/variable-sensitivity/abstract_object/merge.cpp \
        analyses/variable-sensitivity/abstract_object/index_range.cpp \
@@ -63,6 +58,11 @@ SRC += analyses/ai/ai.cpp \
        goto-instrument/cover_instrument.cpp \
        goto-instrument/cover/cover_only.cpp \
        goto-synthesizer/expr_enumerator/expr_enumerator.cpp \
+       goto-programs/call_graph.cpp \
+       goto-programs/disconnect_unreachable_nodes_in_graph.cpp \
+       goto-programs/does_remove_const/does_expr_lose_const.cpp \
+       goto-programs/does_remove_const/does_type_preserve_const_correctness.cpp \
+       goto-programs/does_remove_const/is_type_at_least_as_const_as.cpp \
        goto-programs/goto_program_assume.cpp \
        goto-programs/goto_program_dead.cpp \
        goto-programs/goto_program_declaration.cpp \
