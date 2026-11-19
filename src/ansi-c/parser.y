@@ -1304,11 +1304,9 @@ basic_type_specifier:
 sue_declaration_specifier:
           declaration_qualifier_list elaborated_type_name
         {
-          // GCC and Clang ignore a packed attribute preceding the
-          // struct/union keyword, as it applies neither to the type nor to
-          // an object
-          strip_ignored_attributes(parser_stack($1), {ID_packed});
-          $$ = parser_stack($1).is_nil() ? $2 : merge($1, $2);
+          // attributes here apply to the declared entity, see
+          // mark_type_attributes
+          $$=merge($1, $2);
         }
         | sue_type_specifier storage_class gcc_type_attribute_opt
         {
@@ -1652,7 +1650,11 @@ aggregate_name:
           parser_stack($1).add(ID_components).get_sub().swap(
             (irept::subt &)parser_stack($6).operands());
 
-          // throw in the gcc attributes and Visual Studio declspecs
+          // throw in the gcc attributes and Visual Studio declspecs, which are
+          // attributes of the type in these positions
+          mark_type_attributes(parser_stack($2));
+          mark_type_attributes(parser_stack($3));
+          mark_type_attributes(parser_stack($8));
           $$=merge($1, merge($2, merge($3, $8)));
         }
         | aggregate_key
@@ -1675,7 +1677,11 @@ aggregate_name:
           parser_stack($1).add(ID_components).get_sub().swap(
             (irept::subt &)parser_stack($7).operands());
 
-          // throw in the gcc attributes and Visual Studio declspecs
+          // throw in the gcc attributes and Visual Studio declspecs, which are
+          // attributes of the type in these positions
+          mark_type_attributes(parser_stack($2));
+          mark_type_attributes(parser_stack($3));
+          mark_type_attributes(parser_stack($9));
           $$=merge($1, merge($2, merge($3, $9)));
         }
         | aggregate_key

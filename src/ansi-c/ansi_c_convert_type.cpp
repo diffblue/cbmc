@@ -14,10 +14,31 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/message.h>
+#include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/string_constant.h>
 
 #include "gcc_types.h"
+
+/// Combine the alignment \p new_alignment with \p alignment (which may be
+/// nil): the result is the larger of the two. An alignment attribute without
+/// argument (ID_default) is only used when there is no other one.
+static void add_alignment(exprt &alignment, const exprt &new_alignment)
+{
+  if(alignment.is_nil() || alignment.id() == ID_default)
+    alignment = new_alignment;
+  else if(new_alignment.id() != ID_default)
+  {
+    // neither has been type checked yet: the type checker evaluates this
+    const source_locationt location = new_alignment.source_location();
+    if_exprt larger{
+      binary_relation_exprt{new_alignment, ID_gt, alignment},
+      new_alignment,
+      alignment};
+    larger.add_source_location() = location;
+    alignment = std::move(larger);
+  }
+}
 
 void ansi_c_convert_typet::read_rec(const typet &type)
 {
@@ -177,17 +198,37 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     // ignore
   }
   else if(type.id()==ID_packed)
-    packed=true;
+  {
+    if(type.get_bool(ID_C_type_attribute))
+      type_packed = true;
+    else
+      packed = true;
+  }
   else if(type.id()==ID_aligned)
   {
-    aligned=true;
-    aligned_pointer_declarator = type.get_bool(ID_C_pointer_declarator);
-
     // may come with size or not
-    if(type.find(ID_size).is_nil())
-      alignment=exprt(ID_default);
+    const exprt new_alignment =
+      type.find(ID_size).is_nil()
+        ? exprt(ID_default)
+        : static_cast<const exprt &>(type.find(ID_size));
+
+    if(type.get_bool(ID_C_type_attribute))
+    {
+      // GCC uses the last of several alignment attributes of a type, Clang the
+      // largest one
+      type_aligned = true;
+      if(config.ansi_c.mode == configt::ansi_ct::flavourt::CLANG)
+        add_alignment(type_alignment, new_alignment);
+      else
+        type_alignment = new_alignment;
+    }
     else
-      alignment=static_cast<const exprt &>(type.find(ID_size));
+    {
+      // the largest of several alignments requested by a declaration applies
+      aligned = true;
+      aligned_pointer_declarator = type.get_bool(ID_C_pointer_declarator);
+      add_alignment(alignment, new_alignment);
+    }
   }
   else if(type.id()==ID_transparent_union)
   {
@@ -219,8 +260,16 @@ void ansi_c_convert_typet::read_rec(const typet &type)
         c_storage_spec.is_thread_local=true;
       else if(id=="align")
       {
-        aligned=true;
-        alignment = to_unary_expr(op).op();
+        if(type.get_bool(ID_C_type_attribute))
+        {
+          type_aligned = true;
+          add_alignment(type_alignment, to_unary_expr(op).op());
+        }
+        else
+        {
+          aligned = true;
+          add_alignment(alignment, to_unary_expr(op).op());
+        }
       }
     }
   }
@@ -685,8 +734,22 @@ void ansi_c_convert_typet::set_attributes(typet &type) const
 
   c_qualifiers.write(type);
 
+  // Packing of a declared struct/union is a property of the declared entity
+  // only: the type checker moves it from the struct/union definition to the
+  // tag type.
   if(packed)
+  {
+    if(type.id() == ID_struct || type.id() == ID_union)
+      type.set(ID_C_declaration_packed, true);
+    else
+      type.set(ID_C_packed, true);
+  }
+
+  if(type_packed)
     type.set(ID_C_packed, true);
+
+  if(type_aligned)
+    type.set(ID_C_alignment, type_alignment);
 
   if(aligned)
   {

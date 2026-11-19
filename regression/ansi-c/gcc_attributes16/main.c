@@ -36,6 +36,14 @@ __attribute__((packed)) struct S3
 };
 struct S3 s3;
 
+// both "packed" and "aligned"
+__attribute__((packed)) __attribute__((aligned(16))) struct S3a
+{
+  uint8_t c;
+  int32_t i;
+};
+struct S3a s3a;
+
 struct S4
 {
   uint8_t c;
@@ -138,6 +146,14 @@ struct __attribute__((aligned(16))) Fwd
 };
 struct Fwd fwd;
 
+// an attribute preceding the struct keyword applies to the declared object,
+// not to the struct type
+__attribute__((aligned(16))) static struct Q
+{
+  uint8_t c;
+  int32_t i;
+} q;
+
 // #8443 reduction: a packed-struct typedef stays packed wherever it is used
 // (its packing is part of its definition), while an `aligned` attribute on an
 // outer struct that uses it still takes effect and does not interfere with the
@@ -177,7 +193,7 @@ struct S
   uint8_t c2;
   struct S2a __attribute((aligned(8))) i3;
   uint8_t c3;
-  struct S3 __attribute((aligned(8))) i4;
+  struct S3a __attribute((aligned(8))) i4;
   uint8_t c4;
   T1a_t __attribute((aligned(8))) i5;
   T1_t __attribute((aligned(8))) i6;
@@ -197,6 +213,8 @@ int32_t main()
 
   _Static_assert(sizeof(struct S3) == 8, "");
   _Static_assert(sizeof(s3) == 8, "");
+  _Static_assert(sizeof(struct S3a) == 8, "");
+  _Static_assert(sizeof(s3a) == 8, "");
 
   _Static_assert(sizeof(struct S4) == 5, "");
   _Static_assert(sizeof(s4) == 5, "");
@@ -241,6 +259,10 @@ int32_t main()
   _Static_assert(_Alignof(union U1a) == 16, "");
 
   _Static_assert(_Alignof(struct Fwd) == 16, "");
+
+  _Static_assert(sizeof(struct Q) == 8, "");
+  _Static_assert(_Alignof(struct Q) == 4, "");
+  _Static_assert(__alignof__(q) == 16, "");
 
   _Static_assert(sizeof(Inner8443_t) == 5, "");
   _Static_assert(_Alignof(Inner8443_t) == 1, "");

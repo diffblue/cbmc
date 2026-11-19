@@ -972,14 +972,22 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
     original_qualifiers.is_transparent_union;
   remove_qualifiers.write(type);
 
-  bool is_packed = type.get_bool(ID_C_packed);
-  // Alignment attributes in a declaration with body are attributes of the
-  // struct/union type. Otherwise, they apply to the declared entity.
-  exprt alignment = alignment_of(type);
-  combine_alignments(alignment, declaration_alignment_of(type));
+  // Packing and alignment attributes between the keyword and the opening
+  // brace, or following the closing brace, of a definition are attributes of
+  // the struct/union type (see mark_type_attributes in parser_static.inc).
+  // Those in any other position of the declaration apply to the declared
+  // entity, and so do any of a declaration without body.
+  bool declaration_packed = type.get_bool(ID_C_declaration_packed);
+  exprt declaration_alignment = declaration_alignment_of(type);
+  type.remove(ID_C_declaration_packed);
   type.remove(ID_C_declaration_alignment);
-  if(have_body && alignment.is_not_nil())
-    type.set(ID_C_alignment, alignment);
+  if(!have_body)
+  {
+    declaration_packed = declaration_packed || type.get_bool(ID_C_packed);
+    combine_alignments(declaration_alignment, alignment_of(type));
+    type.remove(ID_C_packed);
+    type.remove(ID_C_alignment);
+  }
 
   if(type.find(ID_tag).is_nil())
   {
@@ -1088,16 +1096,11 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
 
   original_qualifiers.write(type);
 
-  // Packing and alignment attributes of a definition are recorded with the
-  // type symbol. Those of a declaration without body apply to the declared
-  // entity.
-  if(!have_body)
-  {
-    if(is_packed)
-      type.set(ID_C_packed, true);
-    if(alignment.is_not_nil())
-      type.set(ID_C_declaration_alignment, alignment);
-  }
+  // the attributes of the declared entity
+  if(declaration_packed)
+    type.set(ID_C_packed, true);
+  if(declaration_alignment.is_not_nil())
+    type.set(ID_C_declaration_alignment, declaration_alignment);
 }
 
 void c_typecheck_baset::typecheck_compound_body(
@@ -1876,12 +1879,12 @@ void c_typecheck_baset::typecheck_typedef_type(typet &type)
   type = symbol.type;
   c_qualifiers.write(type);
 
-  // For a typedef of a packed struct/union, the packing has already been baked
-  // into the component offsets when the definition was type-checked, so the
-  // residual ID_C_packed flag on the type is redundant. Retaining it here would
-  // wrongly affect alignment/padding when the typedef'd type is used (e.g. as a
-  // struct member), so it is stripped unless the use site itself requests
-  // packing. This matches GCC (see #8443 and the gcc_attributes16 test).
+  // Packing is a property of a struct/union definition (recorded with the type
+  // symbol, not with its tag type) or of a declared member. A packed attribute
+  // on a typedef of any other type, e.g., `typedef int TI
+  // __attribute__((packed));` or `typedef struct S __attribute__((packed))
+  // TS;`, is ignored by GCC and Clang (with a warning), so the type of the
+  // typedef does not retain it -- unless the use site itself requests packing.
   if(is_packed)
     type.set(ID_C_packed, true);
   else
