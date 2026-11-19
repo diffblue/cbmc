@@ -1,0 +1,14 @@
+CORE
+main.c
+--show-loops
+activate-multi-line-match
+^EXIT=0$
+^SIGNAL=0$
+Loop main\.0:\n  file main\.c line 9 function main
+Loop main\.1:\n  file main\.c line 8 function main
+Loop foo\.0:\n  file main\.c line 3 function foo
+--
+^warning: ignoring
+Loop main\.2:
+--
+Loops are numbered per function, inner loops first.
