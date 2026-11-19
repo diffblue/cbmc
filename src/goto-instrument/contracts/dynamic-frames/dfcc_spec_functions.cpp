@@ -217,6 +217,15 @@ void dfcc_spec_functionst::generate_havoc_instructions(
           havoc_program.add(goto_programt::make_incomplete_goto(
             dfcc_utilst::make_null_check_expr(target_expr), location));
 
+        // The havoc only gives the target an arbitrary value: writing to it is
+        // not an access of the program, so it is not pointer-checked (e.g. the
+        // target may be a variable whose lifetime ended in the previous
+        // iteration of the loop, see `gen_loop_locals_set`, which a
+        // pointer-check would report as a dereference of a dead object). The
+        // validity of assigns clause targets is checked separately.
+        source_locationt havoc_location(location);
+        havoc_location.add_pragma("disable:pointer-check");
+
         if(
           ptr_havoc_mode == dfcc_ptr_havoc_modet::INVALID &&
           target_type.id() == ID_pointer)
@@ -237,7 +246,7 @@ void dfcc_spec_functionst::generate_havoc_instructions(
             dereference_exprt{typecast_exprt::conditional_cast(
               target_expr, pointer_type(target_type))},
             invalid_ptr_expr,
-            location));
+            havoc_location));
           havoc_program.add(
             goto_programt::make_dead(invalid_ptr_expr, location));
         }
@@ -251,7 +260,7 @@ void dfcc_spec_functionst::generate_havoc_instructions(
             dereference_exprt{typecast_exprt::conditional_cast(
               target_expr, pointer_type(target_type))},
             nondet,
-            location));
+            havoc_location));
         }
         auto label =
           havoc_program.add(goto_programt::make_dead(target_expr, location));
