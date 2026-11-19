@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string_utils.h>
 
 #include <ansi-c/expr2c.h>
+#include <ansi-c/padding.h>
 #include <ansi-c/type2name.h>
 #include <cpp/cpp_type2name.h>
 #include <cpp/expr2cpp.h>
@@ -542,11 +543,7 @@ void dump_ct::convert_compound(
   // set member by member. Visual Studio additionally uses the value in effect
   // at the end of the definition, which we reproduce before the closing brace.
   const auto pragma_pack_of = [](const irept &src)
-  {
-    const exprt &value = static_cast<const exprt &>(src.find(ID_C_pragma_pack));
-    return value.is_nil() ? mp_integer{0}
-                          : numeric_cast<mp_integer>(value).value_or(0);
-  };
+  { return layout_attribute(src, ID_C_pragma_pack).value_or(bytest{0}).get(); };
   std::optional<mp_integer> pragma_pack;
   bool pragma_pack_varies = false;
   for(const auto &comp : type.components())
