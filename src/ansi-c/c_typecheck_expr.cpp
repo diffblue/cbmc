@@ -1131,22 +1131,63 @@ void c_typecheck_baset::typecheck_expr_alignof(exprt &expr)
 
   if(expr.operands().size() == 1)
   {
-    const exprt &op = to_unary_expr(expr).op();
+    exprt op = to_unary_expr(expr).op();
+
+    // GCC folds the dereference of the address of an object to that object,
+    // so that, e.g., __alignof__(*&x) is the alignment of x, whereas Clang
+    // only considers the operand as written.
+    const bool is_clang =
+      config.ansi_c.mode == configt::ansi_ct::flavourt::CLANG;
+    while(!is_clang && op.id() == ID_dereference)
+    {
+      const exprt pointer =
+        simplify_expr(to_dereference_expr(op).pointer(), *this);
+      if(pointer.id() != ID_address_of)
+        break;
+      op = to_address_of_expr(pointer).object();
+    }
 
     // The alignment of an object is the one requested by its declaration, if
     // any, which (unlike for members) may also be smaller than the alignment
     // of its type, as is the case with GCC and Clang.
-    const auto declaration_alignment = numeric_cast<mp_integer>(
-      static_cast<const exprt &>(op.type().find(ID_C_declaration_alignment)));
+    const auto declaration_alignment =
+      layout_attribute(op.type(), ID_C_declaration_alignment);
     if(op.id() == ID_symbol && declaration_alignment.has_value())
     {
-      exprt tmp = from_integer(*declaration_alignment, size_type());
+      exprt tmp = from_integer(declaration_alignment->get(), size_type());
       tmp.add_source_location() = expr.source_location();
       expr.swap(tmp);
       return;
     }
 
     argument_type = op.type();
+    // The alignment requested by the declaration of an object or member
+    // applies to that object or member only, not to expressions computed from
+    // it (such as x + 0).
+    if(op.id() != ID_symbol && op.id() != ID_member)
+      remove_declaration_alignment(argument_type);
+
+    // For a dereferenced pointer, GCC uses the largest alignment of the
+    // pointee types of the pointer and of any pointers it was converted from:
+    // with int x __attribute__((aligned(16))), __alignof__(*(char *)&x) is 4.
+    if(!is_clang && op.id() == ID_dereference)
+    {
+      bytest a = alignment(argument_type, *this);
+      for(const exprt *pointer = &to_dereference_expr(op).pointer();
+          pointer->id() == ID_typecast &&
+          to_typecast_expr(*pointer).op().type().id() == ID_pointer;)
+      {
+        pointer = &to_typecast_expr(*pointer).op();
+        typet base_type = to_pointer_type(pointer->type()).base_type();
+        remove_declaration_alignment(base_type);
+        a = std::max(a, alignment(base_type, *this));
+      }
+
+      exprt tmp = from_integer(a, size_type());
+      tmp.add_source_location() = expr.source_location();
+      expr.swap(tmp);
+      return;
+    }
   }
   else
   {
