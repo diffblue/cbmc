@@ -1,0 +1,15 @@
+CORE
+main.c
+--show-goto-functions --xml-ui
+^EXIT=0$
+^SIGNAL=0$
+^<functions>$
+^  <function is_body_available="true" is_internal="false" name="main">$
+<location file="main\.c" function="main" line="3"
+^      <instruction instruction_id="ASSERT">$
+ASSERT main::1::x = 1 // holds$
+^</functions>$
+--
+^warning: ignoring
+--
+The goto functions are output as XML.
