@@ -6,7 +6,6 @@
 #include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
-#include <util/range.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/string_constant.h>
@@ -190,18 +189,21 @@ void send_function_definition(
 void smt2_incremental_decision_proceduret::define_dependent_functions(
   const exprt &expr)
 {
-  std::unordered_set<exprt, irep_hash> seen_expressions =
-    make_range(expression_identifiers)
-      .map([](const std::pair<exprt, smt_identifier_termt> &expr_identifier) {
-        return expr_identifier.first;
-      });
+  // Dependencies that are neither defined (in expression_identifiers) nor
+  // queued by this call need defining. As this function runs for each
+  // conversion, copying expression_identifiers into a set of seen expressions
+  // would make defining an array literal of N elements take
+  // O(N * |expression_identifiers|) time.
+  std::unordered_set<exprt, irep_hash> queued;
   std::stack<exprt> to_be_defined;
   const auto push_dependencies_needed = [&](const exprt &expr) {
     bool result = false;
     for(const auto &dependency : gather_dependent_expressions(expr))
     {
-      if(!seen_expressions.insert(dependency).second)
-        continue;
+      if(expression_identifiers.count(dependency) != 0)
+        continue; // already defined
+      if(!queued.insert(dependency).second)
+        continue; // already queued by this traversal
       result = true;
       to_be_defined.push(dependency);
     }
