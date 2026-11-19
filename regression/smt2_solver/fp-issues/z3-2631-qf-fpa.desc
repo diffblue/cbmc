@@ -1,0 +1,10 @@
+CORE
+z3-2631-qf-fpa.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^unsat$
+--
+^\(error
+--
+Z3#2631: quantifier-free variant of z3-2631-quant-fpa.
