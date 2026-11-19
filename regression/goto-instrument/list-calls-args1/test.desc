@@ -1,0 +1,14 @@
+CORE
+main.c
+--list-calls-args _ --no-standard-checks
+^EXIT=0$
+^SIGNAL=0$
+^found call to undefined with arguments 1, v \+ 1$
+^found call to undefined with arguments 3, 4$
+^found call to defined with arguments v$
+^found call to main$
+--
+^warning: ignoring
+--
+Each call is listed with its arguments, including the call through the function
+pointer once function pointers have been removed.
