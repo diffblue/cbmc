@@ -1,0 +1,13 @@
+CORE
+read.c
+--isr isr
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line 11 the handler may run before a read: FAILURE$
+^\[main\.assertion\.2\] line 12 the handler need not run before a read: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+main only reads x, which the handler writes: the handler may run before that
+read. The assignment to other, which the handler does not access, gets no call.
