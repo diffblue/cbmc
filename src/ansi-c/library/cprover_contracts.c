@@ -268,13 +268,16 @@ __CPROVER_HIDE:;
   int object_bits = __builtin_clzl(__CPROVER_max_malloc_size);
   __CPROVER_size_t nof_objects = 1UL << object_bits;
 #endif
+  // a non-constant size keeps elems out of SAT flattening (see #2018)
+  __CPROVER_size_t n = __VERIFIER_nondet_size();
+  __CPROVER_assume(nof_objects <= n && n <= nof_objects + 1);
   *set = (__CPROVER_contracts_obj_set_t){
     .max_elems = nof_objects,
     .watermark = 0,
     .nof_elems = 0,
     .is_empty = 1,
     .indexed_by_object_id = 1,
-    .elems = __CPROVER_allocate(nof_objects * sizeof(*(set->elems)), 1)};
+    .elems = __CPROVER_allocate(n * sizeof(*(set->elems)), 1)};
 }
 
 /// \brief Initialises a \ref __CPROVER_contracts_obj_set_t object to use it
