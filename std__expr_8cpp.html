@@ -111,12 +111,13 @@ $(function(){initNavTree('std__expr_8cpp.html','',''); });
 <code>#include &quot;<a class="el" href="rational_8h_source.html">rational.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="rational__tools_8h_source.html">rational_tools.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="substitute__symbols_8h_source.html">substitute_symbols.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="symbol_8h_source.html">symbol.h</a>&quot;</code><br />
 <code>#include &lt;map&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return dynsection.toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;"><span class="dynarrow"><span class="arrowhead closed"></span></span>Include dependency graph for std_expr.cpp:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" loading="lazy" frameborder="0" src="std__expr_8cpp__incl.svg" width="2276" height="964"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" loading="lazy" frameborder="0" src="std__expr_8cpp__incl.svg" width="2070" height="964"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 </div>
 <p><a href="std__expr_8cpp_source.html">Go to the source code of this file.</a></p>
@@ -171,7 +172,7 @@ template&lt;typename T&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00291">291</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00292">292</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
 
 </div>
 </div>
@@ -192,7 +193,7 @@ template&lt;typename T&gt; </div>
 
 <p>1) generates a conjunction for two or more operands 2) for one operand, returns the operand 3) returns true otherwise </p>
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00275">275</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00276">276</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
 
 </div>
 </div>
@@ -218,7 +219,7 @@ template&lt;typename T&gt; </div>
 <p>Conjunction of two expressions. </p>
 <p>If the second is already an <span class="tt"><a class="el" href="classand__exprt.html" title="Boolean AND All operands must be boolean, and the result is always boolean.">and_exprt</a></span> add to its operands instead of creating a new expression. If one is <span class="tt">true</span>, return the other expression. If one is <span class="tt">false</span> returns <span class="tt">false</span>. </p>
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00252">252</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00253">253</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
 
 </div>
 </div>
@@ -239,7 +240,7 @@ template&lt;typename T&gt; </div>
 
 <p>1) generates a disjunction for two or more operands 2) for one operand, returns the operand 3) returns false otherwise </p>
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00240">240</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00241">241</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
 
 </div>
 </div>
@@ -264,7 +265,7 @@ template&lt;typename T&gt; </div>
 
 <p>Return whether the expression <code class="param">lhs</code> is not a constant of Boolean type or is not representing the Boolean value <code class="param">rhs</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00037">37</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00038">38</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
 
 </div>
 </div>
@@ -289,7 +290,7 @@ template&lt;typename T&gt; </div>
 
 <p>Returns the negation of <a class="el" href="#aad3c40d1c985310afff0bee9ee171415">operator==(const exprt &amp;, int)</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00060">60</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00061">61</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
 
 </div>
 </div>
@@ -314,7 +315,7 @@ template&lt;typename T&gt; </div>
 
 <p>Returns the negation of <a class="el" href="#a6c1d73123a7d5e28285795e85d8dd393">operator==(const exprt &amp;, std::nullptr_t)</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00192">192</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00193">193</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
 
 </div>
 </div>
@@ -339,7 +340,7 @@ template&lt;typename T&gt; </div>
 
 <p>Return whether the expression <code class="param">lhs</code> is a constant of Boolean type that is representing the Boolean value <code class="param">rhs</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00032">32</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00033">33</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
 
 </div>
 </div>
@@ -368,7 +369,7 @@ template&lt;typename T&gt; </div>
  For value 1 we consider the following types: ID_integer, ID_natural, ID_rational, ID_unsignedbv, ID_signedbv, ID_c_bool, ID_c_bit_field, ID_fixedbv, ID_floatbv.<br  />
  For all other types, return false. </p>
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00052">52</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00053">53</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
 
 </div>
 </div>
@@ -393,7 +394,7 @@ template&lt;typename T&gt; </div>
 
 <p>Return whether the expression <code class="param">lhs</code> is a constant representing the NULL pointer. </p>
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00186">186</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00187">187</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
 
 </div>
 </div>

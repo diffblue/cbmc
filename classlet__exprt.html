@@ -277,7 +277,8 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a73298003a7ee87ea8990590e8c9d171d" id="r_a73298003a7ee87ea8990590e8c9d171d"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a73298003a7ee87ea8990590e8c9d171d">validate</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;, <a class="el" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9">validation_modet</a>)</td></tr>
+<tr class="memitem:a4aca025a2ec0c687868903dbc4076d9c" id="r_a4aca025a2ec0c687868903dbc4076d9c"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4aca025a2ec0c687868903dbc4076d9c">check</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9">validation_modet</a> vm=<a class="el" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">validation_modet::INVARIANT</a>)</td></tr>
+<tr class="memitem:a905d86844a326c4bbee23d1aa483ad06" id="r_a905d86844a326c4bbee23d1aa483ad06"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a905d86844a326c4bbee23d1aa483ad06">validate</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;, const <a class="el" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9">validation_modet</a> vm=<a class="el" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">validation_modet::INVARIANT</a>)</td></tr>
 <tr class="inherit_header pub_static_methods_classbinary__exprt"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_static_methods_classbinary__exprt')"><span class="dynarrow"><span class="arrowhead closed"></span></span>Static Public Member Functions inherited from <a class="el" href="classbinary__exprt.html">binary_exprt</a></td></tr>
 <tr class="memitem:a6159cfbfe0029c4f6f74bf23d970165a inherit pub_static_methods_classbinary__exprt" id="r_a6159cfbfe0029c4f6f74bf23d970165a"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbinary__exprt.html#a6159cfbfe0029c4f6f74bf23d970165a">check</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9">validation_modet</a> vm=<a class="el" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">validation_modet::INVARIANT</a>)</td></tr>
 <tr class="memitem:a5196430cce68388fa9b24d2dacb7937e inherit pub_static_methods_classbinary__exprt" id="r_a5196430cce68388fa9b24d2dacb7937e"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbinary__exprt.html#a5196430cce68388fa9b24d2dacb7937e">validate</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;, const <a class="el" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9">validation_modet</a> vm=<a class="el" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">validation_modet::INVARIANT</a>)</td></tr>
@@ -472,6 +473,37 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
+<a id="a4aca025a2ec0c687868903dbc4076d9c" name="a4aca025a2ec0c687868903dbc4076d9c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4aca025a2ec0c687868903dbc4076d9c">&#9670;&#160;</a></span>check()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void let_exprt::check </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>expr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9">validation_modet</a></td>          <td class="paramname"><span class="paramname"><em>vm</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">validation_modet::INVARIANT</a></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03363">3363</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
+
+</div>
+</div>
 <a id="af8b3556905aa809689c5356d7b380697" name="af8b3556905aa809689c5356d7b380697"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af8b3556905aa809689c5356d7b380697">&#9670;&#160;</a></span>symbol() <span class="overload">[1/2]</span></h2>
 
@@ -530,8 +562,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a73298003a7ee87ea8990590e8c9d171d" name="a73298003a7ee87ea8990590e8c9d171d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a73298003a7ee87ea8990590e8c9d171d">&#9670;&#160;</a></span>validate()</h2>
+<a id="a905d86844a326c4bbee23d1aa483ad06" name="a905d86844a326c4bbee23d1aa483ad06"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a905d86844a326c4bbee23d1aa483ad06">&#9670;&#160;</a></span>validate()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -547,7 +579,12 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9">validation_modet</a></td>          <td class="paramname"><span class="paramname"><em>vm</em></span>&#160;)</td>
+          <td class="paramtype">const <a class="el" href="classnamespacet.html">namespacet</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9">validation_modet</a></td>          <td class="paramname"><span class="paramname"><em>vm</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">validation_modet::INVARIANT</a></span>&#160;)</td>
         </tr>
       </table>
   </td>
@@ -557,7 +594,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00362">362</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00374">374</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
 
 </div>
 </div>

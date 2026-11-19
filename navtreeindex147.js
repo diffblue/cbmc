@@ -1,5 +1,7 @@
 var NAVTREEINDEX147 =
 {
+"structscope__treet_1_1declaration__statet.html":[5,0,1070,0],
+"structscope__treet_1_1declaration__statet.html#a0381121f14c3be755dcd34e47c5ff4ba":[5,0,1070,0,0],
 "structscope__treet_1_1declaration__statet.html#a0aaa8ed89b5832a07ebd2827fe3d8b6b":[5,0,1070,0,1],
 "structscratch__program__symext.html":[5,0,1071],
 "structscratch__program__symext.html#adfa8cc065f752f3dcfc0dc4a8997bfec":[5,0,1071,1],
@@ -247,7 +249,5 @@ var NAVTREEINDEX147 =
 "structsmt__core__theoryt_1_1ort.html#a7ae854223e8e9c31dc73693252a2395b":[5,0,1142,3,0],
 "structsmt__core__theoryt_1_1ort.html#ac3a0c0ae377fe584c40c0df736724c91":[5,0,1142,3,1],
 "structsmt__core__theoryt_1_1xort.html":[5,0,1142,4],
-"structsmt__core__theoryt_1_1xort.html#a6cf999942c4a93ad4c670532e5cb6a78":[5,0,1142,4,0],
-"structsmt__core__theoryt_1_1xort.html#aad9e476bb35ad70ba6af90d6bcbf55a3":[5,0,1142,4,2],
-"structsmt__core__theoryt_1_1xort.html#ac27509a07a742a42b796aff0209c435b":[5,0,1142,4,1]
+"structsmt__core__theoryt_1_1xort.html#a6cf999942c4a93ad4c670532e5cb6a78":[5,0,1142,4,0]
 };

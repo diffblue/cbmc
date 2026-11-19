@@ -1,5 +1,7 @@
 var NAVTREEINDEX145 =
 {
+"structjava__bytecode__parse__treet_1_1instructiont.html#ab3d572f020762c216cfd0037f4902b09":[5,0,712,1,4],
+"structjava__bytecode__parse__treet_1_1instructiont.html#ad92705c3d4c3235a7fddd3b2f233d708":[5,0,712,1,3],
 "structjava__bytecode__parse__treet_1_1membert.html":[5,0,712,2],
 "structjava__bytecode__parse__treet_1_1membert.html#a0fc001baafd23ae22e1439052e43d733":[5,0,712,2,2],
 "structjava__bytecode__parse__treet_1_1membert.html#a2d37a74ff1ef72be10d3e62868f22568":[5,0,712,2,1],
@@ -247,7 +249,5 @@ var NAVTREEINDEX145 =
 "structmemory__snapshot__harness__generatort_1_1source__location__matcht.html#aea434a1134db28bfca0246be5ed18688":[5,0,824,3,4],
 "structmemory__snapshot__harness__generatort_1_1source__location__matcht.html#afbe25a583f2160ce507b495c7b6f37c9":[5,0,824,3,2],
 "structmerged__irep__hash.html":[5,0,828],
-"structmerged__irep__hash.html#a9c91b61362ee4bf83506bf404e39dffc":[5,0,828,0],
-"structmethod__bytecodet_1_1class__method__and__bytecodet.html":[5,0,834,0],
-"structmethod__bytecodet_1_1class__method__and__bytecodet.html#a633c99def2d5a0297b4c3a7b3d4d0d5f":[5,0,834,0,2]
+"structmerged__irep__hash.html#a9c91b61362ee4bf83506bf404e39dffc":[5,0,828,0]
 };

@@ -1,5 +1,7 @@
 var NAVTREEINDEX148 =
 {
+"structsmt__core__theoryt_1_1xort.html#aad9e476bb35ad70ba6af90d6bcbf55a3":[5,0,1142,4,2],
+"structsmt__core__theoryt_1_1xort.html#ac27509a07a742a42b796aff0209c435b":[5,0,1142,4,1],
 "structsmt__function__application__termt_1_1has__indicest.html":[5,0,1149,0],
 "structsmt__function__application__termt_1_1has__indicest_3_01functiont_00_01std_1_1void__t_3_01d3decc81de71c84a3e9ed33eb6a5b5091.html":[5,0,1149,1],
 "structsmt__is__dynamic__objectt.html":[5,0,1157],
@@ -247,7 +249,5 @@ var NAVTREEINDEX148 =
 "structtrace__optionst.html#a789f2d807df3cc04ff28c8abb5dce3fe":[5,0,1303,2],
 "structtrace__optionst.html#a996e9bc10e923d796b3cbf6e44a2fa69":[5,0,1303,7],
 "structtrace__optionst.html#ac83c0ab1c6ede34802a7e4ba90a0f11b":[5,0,1303,1],
-"structtrace__optionst.html#ad62883f8a357167a764549d6831e2242":[5,0,1303,3],
-"structtrace__optionst.html#ae6c3c9965f735618492236e14a94c23f":[5,0,1303,8],
-"structtrace__optionst.html#afa722051d21804cae6192a5124408700":[5,0,1303,9]
+"structtrace__optionst.html#ad62883f8a357167a764549d6831e2242":[5,0,1303,3]
 };

@@ -1,6 +1,7 @@
 var classshuffle__vector__exprt =
 [
     [ "shuffle_vector_exprt", "classshuffle__vector__exprt.html#a51ca0cec9aee3fa4dbeaa71ba877430c", null ],
+    [ "check", "classshuffle__vector__exprt.html#aa652a42f4645adfe64803baed7a16c5e", null ],
     [ "has_two_input_vectors", "classshuffle__vector__exprt.html#ae5423b1e8ba3a9dc86c4d4a9bc7b7532", null ],
     [ "indices", "classshuffle__vector__exprt.html#af642923c375d7a5ee62ef76475079a64", null ],
     [ "indices", "classshuffle__vector__exprt.html#a40d85e37b01fb4b42af945511ff4a02c", null ],
