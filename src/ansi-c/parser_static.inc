@@ -211,6 +211,39 @@ strip_ignored_attributes(irept &irep, std::initializer_list<irep_idt> ids)
 
 /*******************************************************************\
 
+Function: mark_type_attributes
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Mark the `packed` and `aligned` attributes and Visual Studio
+          declspecs in \p irep as attributes of the struct/union type
+          being defined. These are the ones between `struct`/`union` and
+          the opening brace and those directly following the closing
+          brace. Attributes in any other position of a declaration (e.g.,
+          `__attribute__((aligned(16))) struct S { char c; } s;`) apply to
+          the declared entity (here: `s`) instead.
+
+\*******************************************************************/
+
+static void mark_type_attributes(irept &irep)
+{
+  if(
+    irep.id() == ID_packed || irep.id() == ID_aligned ||
+    irep.id() == ID_msc_declspec)
+  {
+    irep.set(ID_C_type_attribute, true);
+  }
+  else if(irep.id() == ID_merged_type)
+  {
+    for(auto &s : irep.get_sub())
+      mark_type_attributes(s);
+  }
+}
+
+/*******************************************************************\
+
 Function: make_subtype
 
   Inputs:
