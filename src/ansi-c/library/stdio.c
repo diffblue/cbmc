@@ -192,6 +192,25 @@ __CPROVER_HIDE:;
   return freopen64(filename, mode, f);
 }
 
+/* FUNCTION: _freopen */
+
+// This is for Apple, whose header files rename freopen to _freopen.
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#  include <stdio.h>
+#  define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+FILE *freopen64(const char *filename, const char *mode, FILE *f);
+
+#ifdef __APPLE__
+FILE *_freopen(const char *filename, const char *mode, FILE *f)
+{
+__CPROVER_HIDE:;
+  return freopen64(filename, mode, f);
+}
+#endif
+
 /* FUNCTION: freopen64 */
 
 #ifndef __CPROVER_STDIO_H_INCLUDED
@@ -199,12 +218,20 @@ __CPROVER_HIDE:;
 #  define __CPROVER_STDIO_H_INCLUDED
 #endif
 
+#ifndef __CPROVER_STDLIB_H_INCLUDED
+#  include <stdlib.h>
+#  define __CPROVER_STDLIB_H_INCLUDED
+#endif
+
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
 
 FILE *freopen64(const char *filename, const char *mode, FILE *f)
 {
-  __CPROVER_HIDE:;
-  (void)*filename;
+__CPROVER_HIDE:;
+  // C11 7.21.5.4p3: if filename is a null pointer, the mode of the stream is
+  // changed
+  if(filename)
+    (void)*filename;
   (void)*mode;
 #if !defined(__linux__) || defined(__GLIBC__)
   (void)*f;
@@ -212,8 +239,21 @@ FILE *freopen64(const char *filename, const char *mode, FILE *f)
   (void)*(char*)f;
 #endif
 
+  // C11 7.21.5.4p5: the open operation may fail, in which case the result is
+  // a null pointer
   __CPROVER_bool error = __VERIFIER_nondet___CPROVER_bool();
-  return error ? (FILE *)0 : f;
+  if(!error)
+    return f;
+
+  // C11 7.21.5.4p4: freopen first closes any file associated with the stream
+  // (failure to close is ignored), hence the stream is closed when opening
+  // fails
+  free(f);
+#ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+  __CPROVER_clear_must(f, "open");
+  __CPROVER_set_must(f, "closed");
+#endif
+  return (FILE *)0;
 }
 
 /* FUNCTION: fclose */
