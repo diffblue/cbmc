@@ -452,21 +452,53 @@ static bool make_body(
   return true;
 }
 
+/// The functions with a body in \p goto_functions that \p program may call,
+/// directly or through the functions it calls, and that DFCC does not
+/// instrument.
+static std::vector<irep_idt> uninstrumented_callees(
+  const goto_functionst &goto_functions,
+  const goto_programt &program)
+{
+  std::vector<irep_idt> result;
+  std::set<irep_idt> seen;
+  std::vector<const goto_programt *> work{&program};
+  while(!work.empty())
+  {
+    const goto_programt &body = *work.back();
+    work.pop_back();
+    for(const auto &instruction : body.instructions)
+    {
+      if(
+        !instruction.is_function_call() ||
+        instruction.call_function().id() != ID_symbol)
+      {
+        continue;
+      }
+      const irep_idt &callee =
+        to_symbol_expr(instruction.call_function()).identifier();
+      const auto entry = goto_functions.function_map.find(callee);
+      if(
+        entry == goto_functions.function_map.end() ||
+        !entry->second.body_available() || !seen.insert(callee).second)
+      {
+        continue;
+      }
+      if(dfcc_is_cprover_function_symbol(callee))
+        result.push_back(callee);
+      work.push_back(&entry->second.body);
+    }
+  }
+  return result;
+}
+
 write_summary_bodiest::write_summary_bodiest(
   goto_functionst &goto_functions,
+  const goto_programt &program,
   const namespacet &ns)
   : goto_functions(goto_functions)
 {
-  std::vector<irep_idt> roots;
-  for(const auto &entry : goto_functions.function_map)
-  {
-    if(
-      dfcc_is_cprover_function_symbol(entry.first) &&
-      entry.second.body_available())
-    {
-      roots.push_back(entry.first);
-    }
-  }
+  const std::vector<irep_idt> roots =
+    uninstrumented_callees(goto_functions, program);
   write_summariest summaries(goto_functions, ns);
   summaries.compute(roots);
   for(const auto &id : roots)

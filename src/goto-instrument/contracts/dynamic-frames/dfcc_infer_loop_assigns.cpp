@@ -257,7 +257,8 @@ void dfcc_infer_loop_assigns_for_function(
 
   // Replace the bodies of the functions that DFCC does not instrument by
   // summaries of their writes, see `write_summary_bodiest`.
-  write_summary_bodiest summary_bodies(goto_functions, ns);
+  write_summary_bodiest summary_bodies(
+    goto_functions, goto_function_copy.body, ns);
 
   // Inline all function calls in goto_function_copy; this is best-effort
   // inlining, we can safely ignore warnings here.

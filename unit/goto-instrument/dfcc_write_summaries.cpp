@@ -208,8 +208,16 @@ TEST_CASE(
     "int g;\n"
     "void __VERIFIER_record(int *p) { int t = g; *p = t + 1; }\n"
     "void __VERIFIER_unknown(int **pp) { **pp = 1; }\n"
-    "void user(int *p) { *p = 1; }\n"
-    "void main() {}\n");
+    "void __VERIFIER_uncalled(void) { g = 1; }\n"
+    "void user(int *p) { *p = 1; __VERIFIER_record(p); }\n"
+    "void loop(void)\n"
+    "{\n"
+    "  int x;\n"
+    "  int *p = &x;\n"
+    "  user(&x);\n"
+    "  __VERIFIER_unknown(&p);\n"
+    "}\n"
+    "void main() { __VERIFIER_uncalled(); }\n");
   const namespacet ns{goto_model.symbol_table};
   auto &function_map = goto_model.goto_functions.function_map;
   const std::size_t record_size =
@@ -218,6 +226,8 @@ TEST_CASE(
     function_map.at("__VERIFIER_unknown").body.instructions.size();
   const std::size_t user_size =
     function_map.at("user").body.instructions.size();
+  const std::size_t uncalled_size =
+    function_map.at("__VERIFIER_uncalled").body.instructions.size();
 
   const std::function<bool(const exprt &)> is_parameter_dereference =
     [](const exprt &lhs)
@@ -229,7 +239,10 @@ TEST_CASE(
   };
 
   {
-    write_summary_bodiest summary_bodies{goto_model.goto_functions, ns};
+    // The functions that the body of `loop` may call, directly or through
+    // `user`, are summarized.
+    write_summary_bodiest summary_bodies{
+      goto_model.goto_functions, function_map.at("loop").body, ns};
     const goto_programt &summary = function_map.at("__VERIFIER_record").body;
     REQUIRE(summary.instructions.size() == 2);
     REQUIRE(assigns(summary, is_parameter_dereference));
@@ -240,6 +253,10 @@ TEST_CASE(
       function_map.at("__VERIFIER_unknown").body.instructions.size() ==
       unknown_size);
     REQUIRE(function_map.at("user").body.instructions.size() == user_size);
+    // A function that `loop` cannot call keeps its body.
+    REQUIRE(
+      function_map.at("__VERIFIER_uncalled").body.instructions.size() ==
+      uncalled_size);
   }
 
   REQUIRE(

@@ -137,7 +137,14 @@ private:
 class write_summary_bodiest
 {
 public:
-  write_summary_bodiest(goto_functionst &goto_functions, const namespacet &ns);
+  /// Replaces the bodies of the functions DFCC does not instrument that
+  /// \p program may call, directly or through the functions it calls.
+  /// Only those can be inlined into \p program, and summarizing every
+  /// function of a large program, for every function with loops, is costly.
+  write_summary_bodiest(
+    goto_functionst &goto_functions,
+    const goto_programt &program,
+    const namespacet &ns);
 
   ~write_summary_bodiest();
 
