@@ -1,0 +1,12 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^\[main\.assertion\.\d+\] line \d+ assertion \*p == 0: FAILURE$
+--
+--
+Checks that a read through a pointer counts as a read of the variables it may
+point to: `t` holds the value of the previous iteration when it is read
+through `p`, so it is not a loop local and is havoced.

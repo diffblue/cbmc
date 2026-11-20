@@ -1,0 +1,11 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^\[check\.assertion\.\d+\] line \d+ assertion \*q == 0: FAILURE$
+--
+--
+Checks that a variable whose address is passed to a function may be read by
+that function, so it is live at the loop head here and is havoced.

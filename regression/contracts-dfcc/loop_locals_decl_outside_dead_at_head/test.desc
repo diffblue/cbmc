@@ -1,0 +1,13 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^\[main\.assigns\.\d+\] .* Check that x is assignable: FAILURE$
+--
+Checks that a variable declared before a loop, only used in the loop, and
+overwritten before it is read in each iteration (i.e., dead at the loop head)
+is a loop local: it need not be in the loop assigns clause. Front-ends such
+as Kani declare all temporaries at the start of a function.
