@@ -1,0 +1,14 @@
+CORE
+main.c
+--instrument out.gb --instrument-targets function_start --verbosity 9 --vsd
+activate-multi-line-match
+^EXIT=0$
+^SIGNAL=0$
+^Instrumenting main\nInstruction \d+ because function_start... single history... condition is true_from_calling_context = 0 ∧ \(0 ≤ main::argc ∧ main::argc ≤ max_value\)... added as assumption$
+^Instrumenting example_function\nInstruction \d+ because function_start... single history... condition is example_function::argument = 1 ∧ true_from_calling_context = 1... added as assumption$
+--
+^warning: ignoring
+--
+Testing instrumenting at the function start
+
+

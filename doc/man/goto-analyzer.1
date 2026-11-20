@@ -109,6 +109,28 @@ may not be viable to fix.
 Do not remove instructions from which no
 property can be reached (use with \fB\-\-simplify\fR).
 .TP
+\fB\-\-instrument\fR \fIfile_name\fR
+Writes a new version of the input program to \fIfile_name\fR in which
+the abstract domains have been used to insert annotations, such as assertios
+or assumptions.  If everything is working correctly these should always
+be true because they are implied by the program and are an overapproximation.
+However they can be useful for a number of reasons.  Assertions can be
+used to test the results of goto-analyze against another tool.
+Assumptions can be useful as auxilliary constraints to help other
+tools or to provide better approximations of parts of the program.
+The exact instrumentation depends on the domain.
+.TP
+\fB\-\-instrument\-targets\fR
+A comma separated list of where in the program instrumentation should
+be added and what kind of instrumentation should be inserted.
+Available locations are function_start, function_end, function_call
+(before function calls), function_return (after function calls),
+any_goto_target, backwards_goto_target, after_goto_not_taken, requires
+and ensures.  If just the locations is used, assumptions will be
+inserted apart from requires and assumes which add the corresponding
+code contracts.  If the location is given followed by =assume, =assert or
+=nothing then assumptions, assertions or nothing is inserted.
+.TP
 \fB\-\-unreachable\-instructions\fR
 Lists which instructions have a domain which is bottom
 (i.e. unreachable).  If \fB\-\-function\fR has been used to set the program
