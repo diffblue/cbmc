@@ -9,15 +9,14 @@ Author: Diffblue Ltd.
 #ifndef CPROVER_SOLVERS_SOLVER_HARDNESS_H
 #define CPROVER_SOLVERS_SOLVER_HARDNESS_H
 
+#include <goto-programs/goto_program.h>
+
 #include <solvers/hardness_collector.h>
-#include <solvers/prop/prop_conv_solver.h>
 
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-
-#include <goto-programs/goto_program.h>
 
 /// A structure that facilitates collecting the complexity statistics from a
 /// decision procedure. The idea is to associate some solver complexity metric
@@ -157,27 +156,5 @@ struct hash<solver_hardnesst::hardness_ssa_keyt>
   }
 };
 } // namespace std
-
-static inline void with_solver_hardness(
-  decision_proceduret &maybe_hardness_collector,
-  std::function<void(solver_hardnesst &hardness)> handler)
-{
-  // FIXME I am wondering if there is a way to do this that is a bit less
-  // dynamically typed.
-  if(
-    auto prop_conv_solver =
-      dynamic_cast<prop_conv_solvert *>(&maybe_hardness_collector))
-  {
-    if(auto hardness_collector = prop_conv_solver->get_hardness_collector())
-    {
-      if(hardness_collector->solver_hardness)
-      {
-        auto &solver_hardness = static_cast<solver_hardnesst &>(
-          *(hardness_collector->solver_hardness));
-        handler(solver_hardness);
-      }
-    }
-  }
-}
 
 #endif // CPROVER_SOLVERS_SOLVER_HARDNESS_H
