@@ -976,7 +976,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
   // brace, or following the closing brace, of a definition are attributes of
   // the struct/union type (see mark_type_attributes in parser_static.inc).
   // Those in any other position of the declaration apply to the declared
-  // entity, and so do any of a declaration without body.
+  // entity.
   bool declaration_packed = type.get_bool(ID_C_declaration_packed);
   exprt declaration_alignment = declaration_alignment_of(type);
   type.remove(ID_C_declaration_packed);
@@ -995,13 +995,38 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
     type.set(ID_C_alignment, declaration_alignment);
   }
 
+  // Attributes between the keyword and the tag of a declaration without body
+  // are ignored by GCC. Clang, however, applies them to the type when it is
+  // not complete yet, i.e., they take effect when the type is defined later on
+  // (and Clang warns that they are ignored otherwise).
+  const bool is_clang = config.ansi_c.mode == configt::ansi_ct::flavourt::CLANG;
+  bool incomplete_type_packed = false;
+  exprt incomplete_type_alignment = nil_exprt{};
   if(!have_body)
   {
-    declaration_packed = declaration_packed || type.get_bool(ID_C_packed);
-    combine_alignments(declaration_alignment, alignment_of(type));
+    if(is_clang)
+    {
+      incomplete_type_packed = type.get_bool(ID_C_packed);
+      incomplete_type_alignment = alignment_of(type);
+    }
     type.remove(ID_C_packed);
     type.remove(ID_C_alignment);
   }
+
+  // Record the attributes that a declaration without body applies to the
+  // incomplete type \p symbol_type.
+  const auto apply_incomplete_type_attributes =
+    [&incomplete_type_packed, &incomplete_type_alignment](typet &symbol_type)
+  {
+    if(incomplete_type_packed)
+      symbol_type.set(ID_C_packed, true);
+    if(incomplete_type_alignment.is_not_nil())
+    {
+      exprt alignment = alignment_of(symbol_type);
+      combine_alignments(alignment, incomplete_type_alignment);
+      symbol_type.set(ID_C_alignment, alignment);
+    }
+  };
 
   if(type.find(ID_tag).is_nil())
   {
@@ -1053,6 +1078,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
 
       // mark as incomplete
       to_struct_union_type(compound_symbol.type).make_incomplete();
+      apply_incomplete_type_attributes(compound_symbol.type);
 
       symbolt *new_symbol;
       move_symbol(compound_symbol, new_symbol);
@@ -1078,8 +1104,23 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
           type.remove(ID_tag);
           type.set(ID_tag, base_name);
 
+          // attributes that earlier declarations without body applied to the
+          // type (see above)
+          const typet &incomplete_type = s_it->second.type;
+          if(incomplete_type.get_bool(ID_C_packed))
+            type.set(ID_C_packed, true);
+          exprt alignment = alignment_of(type);
+          combine_alignments(alignment, alignment_of(incomplete_type));
+          if(alignment.is_not_nil())
+            type.set(ID_C_alignment, alignment);
+
           typecheck_compound_body(type);
           symbol_table.get_writeable_ref(s_it->first).type.swap(type);
+        }
+        else
+        {
+          apply_incomplete_type_attributes(
+            symbol_table.get_writeable_ref(s_it->first).type);
         }
       }
       else if(s_it->second.type.id() != type.id())

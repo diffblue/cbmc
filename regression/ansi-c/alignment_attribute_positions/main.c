@@ -2,8 +2,9 @@
 // whether it applies to a struct/union type or to the declared entity:
 // between the struct/union keyword and the opening brace, and directly after
 // the closing brace, it applies to the type being defined; in any other
-// position, it applies to the declared object, member, or typedef. Between
-// the keyword and the tag of a declaration without body it is ignored.
+// position, it applies to the declared object, member, or typedef. See
+// attributes_declaration_without_body for those between the keyword and the
+// tag of a declaration without body.
 
 struct F
 {
