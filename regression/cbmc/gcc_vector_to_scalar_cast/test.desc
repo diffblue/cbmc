@@ -1,4 +1,4 @@
-CORE
+CORE no-new-smt
 main.c
 
 ^EXIT=0$
@@ -9,3 +9,5 @@ main.c
 --
 A cast from a vector to a scalar of the same size must be a bit-wise
 reinterpretation of the vector, without the back-end ignoring it.
+The incremental SMT back-end does not support floating-point or fixed-point
+values.
