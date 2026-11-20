@@ -1,0 +1,12 @@
+CORE gcc-only test-c++-front-end
+mode_names.c
+
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Mode names are honoured with and without a surrounding pair of double
+underscores, and an unrecognised mode on an enum must not make the enum its own
+underlying type (which crashed alignment() and pointer_offset_bits()).
