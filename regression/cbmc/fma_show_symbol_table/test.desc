@@ -1,0 +1,15 @@
+CORE
+main.c
+--show-symbol-table
+^  return fma\(x, x, 1\.0\);$
+^EXIT=0$
+^SIGNAL=0$
+--
+Invariant check failed
+^warning: ignoring
+--
+The C front end creates __CPROVER_fma's expression with three operands;
+adjust_float_expressions adds the rounding mode as the fourth only when the
+goto program is built.  Printing the symbol table's value of a function
+using it (--show-symbol-table) stopped with "Fused multiply-add must have
+four operands"; the expression is now printed with three or four.

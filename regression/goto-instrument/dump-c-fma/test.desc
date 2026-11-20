@@ -1,0 +1,17 @@
+CORE
+main.c
+--dump-c
+^#include <math.h>$
+^  return fma\(x, x, 1\.0\);$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+Invariant check failed
+^warning: ignoring
+--
+--dump-c of a goto binary built by goto-cc printed __CPROVER_fma's
+three-operand expression (the rounding mode is added later, by
+adjust_float_expressions) and stopped with "Fused multiply-add must have
+four operands".  The dump calls fma, whose declaration it now includes
+(<math.h>), so that the dumped program compiles and verifies.
