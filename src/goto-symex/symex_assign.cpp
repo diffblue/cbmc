@@ -97,9 +97,20 @@ void symex_assignt::assign_rec(
     }
     else if(type.id() == ID_union || type.id() == ID_union_tag)
     {
-      // should have been replaced by byte_extract
-      throw unsupported_operation_exceptiont(
-        "assign_rec: unexpected assignment to union member");
+      // Goto conversion turns assignments to union members into assignments
+      // to byte_extract expressions, but simplification may turn these back
+      // into union members, e.g., byte_extract(a[j].u, 0, short[2]) into
+      // a[j].u.h when h is a member of type short[2] of the union a[j].u.
+      // Field sensitivity does not turn this into a symbol when j is not a
+      // constant. Writing a union member updates the bytes at offset zero of
+      // the union.
+      const member_exprt &member = to_member_expr(lhs);
+      assign_byte_extract(
+        make_byte_extract(
+          member.struct_op(), from_integer(0, c_index_type()), member.type()),
+        full_lhs,
+        rhs,
+        guard);
     }
     else
       throw unsupported_operation_exceptiont(
