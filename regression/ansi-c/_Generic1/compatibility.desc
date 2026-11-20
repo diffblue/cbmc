@@ -1,0 +1,13 @@
+CORE gcc-only
+compatibility.c
+
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Generic selection uses type compatibility after lvalue conversion: _Atomic is
+removed, _Noreturn and parameter qualifiers do not affect function types,
+ellipsis does, VLAs are compatible with any array size, and wchar_t literals
+match the wchar_t typedef.
