@@ -1,6 +1,7 @@
 // Author: Diffblue Ltd.
 
 #include <util/arith_tools.h>
+#include <util/bitvector_types.h>
 #include <util/c_types.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
@@ -62,6 +63,21 @@ private:
           integer2bvrep(bit_vector_constant.value(), sort_width),
           *pointer_type};
       }
+      return;
+    }
+    // For floating-point and fixed-point types the value is the bit pattern,
+    // which from_integer would instead convert numerically.
+    if(
+      can_cast_type<floatbv_typet>(type_to_construct) ||
+      can_cast_type<fixedbv_typet>(type_to_construct))
+    {
+      INVARIANT(
+        to_bitvector_type(type_to_construct).get_width() == sort_width,
+        "Width of smt bit vector term must match the width of "
+        "floating-point or fixed-point type.");
+      result = constant_exprt{
+        integer2bvrep(bit_vector_constant.value(), sort_width),
+        type_to_construct};
       return;
     }
     if(
