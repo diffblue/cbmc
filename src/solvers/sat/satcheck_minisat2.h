@@ -70,6 +70,16 @@ public:
 protected:
   resultt do_prop_solve(const bvt &) override;
 
+  /// Whether to run the solver's simplifier on the next solve call.
+  /// Non-simplifying solvers always "simplify" (a no-op for them); the
+  /// simplifying subclass overrides this to honour
+  /// set_limit_incremental_simplification(). Has the side effect of recording
+  /// that a solve has happened.
+  virtual bool simplify_on_next_solve()
+  {
+    return true;
+  }
+
   std::unique_ptr<T> solver;
   uint32_t time_limit_seconds;
 
@@ -92,6 +102,30 @@ public:
   std::string solver_text() const override final;
   void set_frozen(literalt a) override final;
   bool is_eliminated(literalt a) const;
+
+  /// When set, the MiniSat simplifier only runs on the first solve call. This
+  /// prevents variable elimination between incremental calls from degrading
+  /// CDCL performance on certain array-heavy problems.
+  void set_limit_incremental_simplification() override final
+  {
+    limit_incremental_simplification = true;
+  }
+
+protected:
+  bool simplify_on_next_solve() override final
+  {
+    // Simplify (run variable elimination) only until the first solve has
+    // happened: once we are solving incrementally, re-running elimination
+    // before each solve is what degrades performance (see the class comment
+    // and set_limit_incremental_simplification()).
+    const bool do_simp =
+      !limit_incremental_simplification || !solver_was_called;
+    solver_was_called = true;
+    return do_simp;
+  }
+
+  bool solver_was_called = false;
+  bool limit_incremental_simplification = false;
 };
 
 #endif // CPROVER_SOLVERS_SAT_SATCHECK_MINISAT2_H

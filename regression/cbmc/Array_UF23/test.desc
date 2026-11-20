@@ -1,0 +1,27 @@
+CORE
+main.c
+--arrays-uf-always --unwind 1 --32
+^\[main\.array_bounds\.1\] line 15 array 'a' lower bound in a\[i0\]: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+This exercises the unbounded-array (U_ALL) Ackermann constraint refinement
+selected by --arrays-uf-always, which issues many incremental SAT calls,
+together with a simplifying SAT back-end and the default array-bounds checks on
+the variable-length array `a`. The verdict (array_bounds.1, lower bound of
+a[i0]) is produced regardless of how the simplifier is configured.
+
+The fix this accompanies addresses a solver hang rather than a wrong verdict:
+when MiniSat's simplifier re-runs variable elimination before every incremental
+solve, a later solve can blow up. That hang was observed in conjunction with
+the reduced Ackermann-constraint encoding for weak array equivalence and a
+32-bit verification target -- note it is the 32-bit *target* (--32) that
+matters, not a 32-bit build of cbmc: a 64-bit build with --32 reproduces it
+too. With the array encoding on its own this particular input still completes,
+so this test mainly pins the verdict and exercises the limited-simplification
+code path; the direct, self-contained guard for the fix is the unit test for
+set_limit_incremental_simplification(). test.pl applies no per-test timeout, so
+a reintroduced hang would surface as the (32-bit) CI job timing out rather than
+as a per-test failure.
