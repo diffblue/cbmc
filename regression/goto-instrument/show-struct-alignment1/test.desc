@@ -1,0 +1,14 @@
+CORE
+main.c
+--show-struct-alignment
+^EXIT=0$
+^SIGNAL=0$
+^WARNING: declaration of structure narrow at file main\.c line 1$
+^members a and b might interfere$
+--
+^warning: ignoring
+structure wide
+members x and y
+--
+Members that fit in a single memory operand (an int) may interfere, which a and
+b do, while x and y do not.
