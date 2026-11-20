@@ -1,0 +1,14 @@
+CORE
+write.c
+--isr isr
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line 10 the handler may run around the write: FAILURE$
+^\[main\.assertion\.2\] line 11 the handler need not run: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+--isr isr makes isr an interrupt handler, which may run before each access that
+conflicts with the handler's reads and writes, and after each such write. The
+calls are optional, hence both assertions fail.
