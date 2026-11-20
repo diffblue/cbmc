@@ -1,0 +1,10 @@
+CORE no-new-smt
+symbolic.c
+-DSMALL --floatbv
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+As symbolic.desc, for a format with a 3-bit exponent.

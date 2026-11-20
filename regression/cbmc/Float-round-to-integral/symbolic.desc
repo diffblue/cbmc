@@ -1,0 +1,13 @@
+CORE no-new-smt thorough-z3-smt-backend
+symbolic.c
+--floatbv
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Round-to-integral of an arbitrary float in an arbitrary rounding mode matches an
+exact reference.
+Excluded from the --z3 profile: symbolic-smt.desc covers this, as a
+THOROUGH test, and it takes over a minute with Z3.

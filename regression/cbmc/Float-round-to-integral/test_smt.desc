@@ -1,0 +1,13 @@
+CORE smt-backend no-new-smt
+main.c
+--smt2 --z3
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+As test.desc, but on the non-FPA SMT path, for which smt2_conv used to fail
+with UNEXPECTEDCASE("TODO floatbv_round_to_integral without FPA"). This also
+checks rounding-mode arguments of different integer types, which used to
+produce ill-typed SMT.

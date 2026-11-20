@@ -165,6 +165,12 @@ exprt float_bvt::convert(const exprt &expr) const
     const auto &op = to_unary_expr(expr).op();
     return isnormal(op, get_spec(op));
   }
+  else if(expr.id() == ID_floatbv_round_to_integral)
+  {
+    const auto &rti_expr = to_floatbv_round_to_integral_expr(expr);
+    return round_to_integral(
+      rti_expr.op(), rti_expr.rounding_mode(), get_spec(expr));
+  }
   else if(expr.id()==ID_lt)
   {
     const auto &rel_expr = to_binary_relation_expr(expr);
@@ -521,6 +527,133 @@ exprt float_bvt::conversion(
     unbiased_floatt result=unpack(src, src_spec);
     return rounder(result, rm, dest_spec);
   }
+}
+
+exprt float_bvt::round_up(
+  const rounding_mode_bitst &rounding_mode_bits,
+  const exprt &sign,
+  const exprt &lsb,
+  const exprt &rbit,
+  const exprt &sticky)
+{
+  return if_exprt{
+    rounding_mode_bits.round_to_even,
+    and_exprt{rbit, or_exprt{lsb, sticky}},
+    if_exprt{
+      rounding_mode_bits.round_to_away,
+      rbit,
+      if_exprt{
+        rounding_mode_bits.round_to_plus_inf,
+        and_exprt{not_exprt{sign}, or_exprt{rbit, sticky}},
+        if_exprt{
+          rounding_mode_bits.round_to_minus_inf,
+          and_exprt{sign, or_exprt{rbit, sticky}},
+          false_exprt{}}}}};
+}
+
+/// Round a floating-point value to integral.
+///
+/// The result is computed on the packed representation: clear the
+/// `drop` lowest bits, which hold the fractional part of the value, and
+/// conditionally add the unit of the integral part. For `|x| >= 1`, `drop`
+/// is `f - exp`, where `exp` is the unbiased exponent (`1 - bias` for
+/// subnormals), and the unit is `1 << drop`. The lowest remaining bit
+/// (`lsb`), the highest dropped bit (`rbit`) and the OR of the other dropped
+/// bits (`sticky`) determine whether to round up. When `drop == f`, `lsb` is
+/// the lowest bit of the biased exponent, which is `bias` and thus odd: the
+/// integral part is 1. For `|x| < 1`, all bits but the sign are dropped, the
+/// unit is the encoding of 1, `lsb` is false, `rbit` is `|x| >= 0.5` and
+/// `sticky` is `|x| != 0.5`. Comparing the magnitudes of non-NaN values as
+/// unsigned integers does not require 0.5 or 1 to be normal numbers, which
+/// they are not in formats with a 1- or 2-bit exponent. (If 0.5 is not
+/// representable, then 0 is the only value with `|x| < 1`.)
+///
+/// A carry out of the fraction bits increments the biased exponent, which
+/// yields the correctly rounded value. In the IEEE formats, where
+/// `spec.f < bias`, the result is finite. In formats with a narrow exponent
+/// (e.g., `__CPROVER_floatbv[28][23]`) rounding up the largest finite values
+/// can carry into an all-ones exponent, yielding infinity, as the integral
+/// result is not representable.
+///
+/// NaN, infinities, zeros, and values with `exp >= f` are returned as they
+/// are.
+///
+/// `float_utilst::round_to_integral` is the bvt-level mirror of this
+/// code; keep the two implementations in lockstep when changing the
+/// rounding logic.
+exprt float_bvt::round_to_integral(
+  const exprt &src,
+  const exprt &rm,
+  const ieee_float_spect &spec) const
+{
+  const std::size_t width = spec.width();
+  const unsignedbv_typet uint_type{width};
+  const exprt src_uint = extractbits_exprt{src, 0, uint_type};
+  const exprt zero_uint = from_integer(0, uint_type);
+  const exprt one_uint = from_integer(1, uint_type);
+  const exprt sign = sign_bit(src);
+
+  const exprt is_special =
+    or_exprt{isnan(src, spec), isinf(src, spec), is_zero(src)};
+
+  // The unbiased exponent is compared with, and subtracted from, spec.f,
+  // which need not be representable in spec.e bits (for example, for
+  // __CPROVER_floatbv[28][23]). Hence compute it with more bits.
+  const signedbv_typet exp_type{std::max(spec.e, address_bits(spec.f)) + 2};
+  const exprt biased_exp = get_exponent(src, spec);
+  const exprt exponent = minus_exprt{
+    if_exprt{
+      equal_exprt{biased_exp, from_integer(0, biased_exp.type())},
+      from_integer(1, exp_type),
+      typecast_exprt{biased_exp, exp_type}},
+    from_integer(spec.bias(), exp_type)};
+  const exprt exp_ge_f =
+    binary_relation_exprt{exponent, ID_ge, from_integer(spec.f, exp_type)};
+
+  // magnitudes of non-NaN values order like their unsigned encodings
+  const mp_integer magnitude_mask = power(2, width - 1) - 1;
+  const exprt magnitude =
+    bitand_exprt{src_uint, from_integer(magnitude_mask, uint_type)};
+  ieee_floatt one_float{spec, ieee_floatt::ROUND_TO_ZERO};
+  one_float.from_integer(1);
+  ieee_floatt half_float{spec, ieee_floatt::ROUND_TO_ZERO};
+  half_float.build(1, -1);
+  const exprt one_packed = from_integer(one_float.pack(), uint_type);
+  const exprt half_packed = from_integer(half_float.pack(), uint_type);
+  const exprt abs_lt_1 = binary_relation_exprt{magnitude, ID_lt, one_packed};
+
+  // |x| >= 1: the unit is 1 << drop, where drop = f - exponent is in [1, f]
+  // unless one of the other cases applies
+  const exprt drop = typecast_exprt{
+    minus_exprt{from_integer(spec.f, exp_type), exponent}, uint_type};
+  const exprt unit_ge1 = shl_exprt{one_uint, drop};
+  const exprt low_mask_ge1 = minus_exprt{unit_ge1, one_uint};
+  const exprt lsb_ge1 =
+    notequal_exprt{bitand_exprt{src_uint, unit_ge1}, zero_uint};
+  const exprt rbit_ge1 = notequal_exprt{
+    bitand_exprt{src_uint, lshr_exprt{unit_ge1, one_uint}}, zero_uint};
+  const exprt sticky_ge1 = notequal_exprt{
+    bitand_exprt{src_uint, lshr_exprt{low_mask_ge1, one_uint}}, zero_uint};
+
+  // |x| < 1: the unit is 1
+  const exprt rbit_lt1 = binary_relation_exprt{magnitude, ID_ge, half_packed};
+  const exprt sticky_lt1 = notequal_exprt{magnitude, half_packed};
+
+  const exprt low_mask =
+    if_exprt{abs_lt_1, from_integer(magnitude_mask, uint_type), low_mask_ge1};
+  const exprt unit = if_exprt{abs_lt_1, one_packed, unit_ge1};
+  const exprt inc = round_up(
+    rounding_mode_bitst{rm},
+    sign,
+    and_exprt{not_exprt{abs_lt_1}, lsb_ge1},
+    if_exprt{abs_lt_1, rbit_lt1, rbit_ge1},
+    if_exprt{abs_lt_1, sticky_lt1, sticky_ge1});
+
+  const exprt masked = bitand_exprt{src_uint, bitnot_exprt{low_mask}};
+  const exprt result_uint = if_exprt{inc, plus_exprt{masked, unit}, masked};
+
+  const exprt result = extractbits_exprt{result_uint, 0, spec.to_type()};
+  return if_exprt{or_exprt{is_special, exp_ge_f}, src, result};
 }
 
 exprt float_bvt::isnormal(

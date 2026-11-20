@@ -159,34 +159,108 @@ bvt float_utilst::build_constant(const ieee_float_valuet &src)
   return pack(bias(result));
 }
 
+literalt float_utilst::round_up(
+  literalt sign,
+  literalt lsb,
+  literalt rbit,
+  literalt sticky)
+{
+  // clang-format off
+  return prop.lselect(rounding_mode_bits.round_to_even,
+    prop.land(rbit, prop.lor(lsb, sticky)),
+  prop.lselect(rounding_mode_bits.round_to_away, rbit,
+  prop.lselect(rounding_mode_bits.round_to_plus_inf,
+    prop.land(!sign, prop.lor(rbit, sticky)),
+  prop.lselect(rounding_mode_bits.round_to_minus_inf,
+    prop.land(sign, prop.lor(rbit, sticky)),
+    const_literal(false)))));
+  // clang-format on
+}
+
+/// Round a floating-point value to integral, IEEE 754 semantics.
+///
+/// Bvt-level mirror of `float_bvt::round_to_integral` (see the Doxygen on
+/// that method for the algorithm). Both implement the same algorithm, using
+/// the `exprt` and the `literalt`/`bvt` API, respectively; keep them in
+/// lockstep when changing the rounding logic. Here, the bits that the
+/// algorithm needs are obtained from a single shift, `1 << drop`.
 bvt float_utilst::round_to_integral(const bvt &src)
 {
   PRECONDITION(src.size() == spec.width());
+  const std::size_t width = spec.width();
+  const literalt sign = sign_bit(src);
 
-  // Zero? NaN? Infinity?
-  auto unpacked = unpack(src);
-  auto is_special = prop.lor({unpacked.zero, unpacked.NaN, unpacked.infinity});
+  const literalt is_special =
+    prop.lor({is_zero(src), is_NaN(src), is_infinity(src)});
 
-  // add 2^f, where f is the number of fraction bits,
-  // by adding f to the exponent
-  auto magic_number = ieee_floatt{
-    spec, ieee_floatt::rounding_modet::ROUND_TO_ZERO, power(2, spec.f)};
+  // The unbiased exponent is compared with, and subtracted from, spec.f,
+  // which need not be representable in spec.e bits (for example, for
+  // __CPROVER_floatbv[28][23]). Hence compute it with more bits.
+  const std::size_t exp_width = std::max(spec.e, address_bits(spec.f)) + 2;
+  const bvt biased_exp = get_exponent(src);
+  const bvt exponent = bv_utils.sub(
+    bv_utils.select(
+      bv_utils.is_zero(biased_exp),
+      bv_utils.build_constant(1, exp_width),
+      bv_utils.zero_extension(biased_exp, exp_width)),
+    bv_utils.build_constant(spec.bias(), exp_width));
+  const literalt exp_ge_f = !bv_utils.signed_less_than(
+    exponent, bv_utils.build_constant(spec.f, exp_width));
 
-  auto magic_number_bv = build_constant(magic_number);
+  // magnitudes of non-NaN values order like their unsigned encodings
+  bvt magnitude = src;
+  magnitude.back() = const_literal(false);
+  ieee_floatt one_float{spec, ieee_floatt::ROUND_TO_ZERO};
+  one_float.from_integer(1);
+  ieee_floatt half_float{spec, ieee_floatt::ROUND_TO_ZERO};
+  half_float.build(1, -1);
+  const bvt one_packed = build_constant(one_float);
+  const bvt half_packed = build_constant(half_float);
+  const literalt abs_lt_1 = bv_utils.unsigned_less_than(magnitude, one_packed);
 
-  // abs(x) >= magic_number? If so, then there is no fractional part.
-  literalt ge_magic_number = relation(abs(src), relt::GE, magic_number_bv);
+  // |x| >= 1: the unit is 1 << drop, where drop = f - exponent is in [1, f]
+  // unless one of the other cases applies. Only the exp_width low bits of
+  // the distance are non-constant, which keeps the shifter small.
+  const bvt drop = bv_utils.zero_extension(
+    bv_utils.sub(bv_utils.build_constant(spec.f, exp_width), exponent), width);
+  const bvt unit_ge1 = bv_utils.shift(
+    bv_utils.build_constant(1, width), bv_utilst::shiftt::SHIFT_LEFT, drop);
+  // low_mask_ge1 = unit_ge1 - 1, i.e., the bits below the one set bit
+  bvt low_mask_ge1(width, const_literal(false));
+  for(std::size_t i = width - 1; i > 0; --i)
+    low_mask_ge1[i - 1] = prop.lor(unit_ge1[i], low_mask_ge1[i]);
+  bvt lsb_bits, rbit_bits, sticky_bits;
+  for(std::size_t i = 0; i < width; ++i)
+  {
+    lsb_bits.push_back(prop.land(src[i], unit_ge1[i]));
+    if(i + 1 < width)
+    {
+      rbit_bits.push_back(prop.land(src[i], unit_ge1[i + 1]));
+      sticky_bits.push_back(prop.land(src[i], low_mask_ge1[i + 1]));
+    }
+  }
 
-  magic_number_bv.back() = src.back(); // copy sign bit
+  // |x| < 1: the unit is 1
+  const literalt rbit_lt1 =
+    !bv_utils.unsigned_less_than(magnitude, half_packed);
+  const literalt sticky_lt1 = !bv_utils.equal(magnitude, half_packed);
 
-  auto tmp1 = add_sub(src, magic_number_bv, false);
+  bvt magnitude_mask(width, const_literal(true));
+  magnitude_mask.back() = const_literal(false);
+  const bvt low_mask = bv_utils.select(abs_lt_1, magnitude_mask, low_mask_ge1);
+  const bvt unit = bv_utils.select(abs_lt_1, one_packed, unit_ge1);
+  const literalt inc = round_up(
+    sign,
+    prop.land(!abs_lt_1, prop.lor(lsb_bits)),
+    prop.lselect(abs_lt_1, rbit_lt1, prop.lor(rbit_bits)),
+    prop.lselect(abs_lt_1, sticky_lt1, prop.lor(sticky_bits)));
 
-  auto tmp2 = add_sub(tmp1, magic_number_bv, true);
+  bvt masked(width);
+  for(std::size_t i = 0; i < width; ++i)
+    masked[i] = prop.land(src[i], !low_mask[i]);
+  const bvt result = bv_utils.select(inc, bv_utils.add(masked, unit), masked);
 
-  // restore the original sign bit
-  tmp2.back() = src.back();
-
-  return bv_utils.select(prop.lor(is_special, ge_magic_number), src, tmp2);
+  return bv_utils.select(prop.lor(is_special, exp_ge_f), src, result);
 }
 
 bvt float_utilst::conversion(

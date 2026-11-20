@@ -3324,6 +3324,11 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
+    // The rounding mode is an int, as declared in cprover_builtin_headers.h.
+    // The floating-point argument is not converted, as these built-ins are
+    // also used for formats other than float, double, and long double.
+    implicit_typecast(expr.arguments()[1], signed_int_type());
+
     auto round_to_integral_expr =
       floatbv_round_to_integral_exprt{expr.arguments()[0], expr.arguments()[1]};
     round_to_integral_expr.add_source_location() = source_location;
