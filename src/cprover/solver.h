@@ -12,6 +12,7 @@ Author: Daniel Kroening, dkr@amazon.com
 #ifndef CPROVER_CPROVER_SOLVER_H
 #define CPROVER_CPROVER_SOLVER_H
 
+#include <string>
 #include <vector>
 
 class exprt;
@@ -30,6 +31,7 @@ public:
   bool trace;
   bool verbose;
   std::size_t loop_limit;
+  std::string smt2_solver_binary; // empty = use built-in SAT solver
 };
 
 solver_resultt
