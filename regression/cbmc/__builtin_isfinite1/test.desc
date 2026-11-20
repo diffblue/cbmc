@@ -1,0 +1,10 @@
+CORE gcc-only
+main.c
+--validate-goto-model
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+no body for callee
+type mismatch

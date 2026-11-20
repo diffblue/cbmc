@@ -14,7 +14,7 @@ void __builtin_va_start(__builtin_va_list ap, ...);
 // stdlib
 void __builtin__Exit(int);
 void __builtin__exit(int);
-void __builtin_abort();
+void __builtin_abort(void);
 int __builtin_execl(const char*, const char*, ...);
 int __builtin_execle(const char*, const char*, ...);
 int __builtin_execlp(const char*, const char*, ...);

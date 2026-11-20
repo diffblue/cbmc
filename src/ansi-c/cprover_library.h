@@ -10,9 +10,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANSI_C_CPROVER_LIBRARY_H
 #define CPROVER_ANSI_C_CPROVER_LIBRARY_H
 
-#include <set>
-
 #include <util/irep.h>
+
+#include <set>
+#include <string>
 
 class message_handlert;
 class symbol_table_baset;
@@ -29,6 +30,17 @@ std::string get_cprover_library_text(
   const struct cprover_library_entryt[],
   const std::string &prologue,
   const bool force_load = false);
+
+/// \p model with every occurrence of the identifier \p from replaced by
+/// \p to. Only whole words are renamed, and neither in string or character
+/// literals (so that property descriptions such as "double free" stay as they
+/// are) nor in `#include` lines (as in `#include <time.h>`). Everything else
+/// is renamed, including comments, `#undef` directives, and any
+/// local variable, member or label named \p from.
+std::string rename_in_model(
+  const std::string &model,
+  const std::string &from,
+  const std::string &to);
 
 /// Parses and typechecks the given src and adds its contents to the
 /// symbol table. Symbols with names found in `keep` will survive
