@@ -1,0 +1,15 @@
+CORE gcc-only
+main.c
+-I include --validate-goto-model
+^\[main\.assertion\.1\] line \d+ assertion r == 1\.0 \|\| r == -1\.0: SUCCESS$
+^\[main\.assertion\.2\] line \d+ assertion r == -1\.0: FAILURE$
+^\[copysign\.no-body\.unmodelled_signbit\] line \d+ no body for callee unmodelled_signbit: FAILURE$
+^\*\* 2 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^Invariant check failed
+--
+unmodelled_signbit has no body: its call fails the no-body check, and the
+sign of the result is unknown, so assertion.2 fails.
