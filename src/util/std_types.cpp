@@ -112,35 +112,6 @@ struct_typet::get_base(const irep_idt &id) const
   return {};
 }
 
-/// Returns true if the struct is a prefix of \a other, i.e., if this struct
-/// has n components then the component types and names of this struct must
-/// match the first n components of \a other struct.
-/// \param other: Struct type to compare with.
-bool struct_typet::is_prefix_of(const struct_typet &other) const
-{
-  const componentst &ot_components=other.components();
-  const componentst &tt_components=components();
-
-  if(ot_components.size()<
-     tt_components.size())
-    return false;
-
-  componentst::const_iterator
-    ot_it=ot_components.begin();
-
-  for(const auto &tt_c : tt_components)
-  {
-    if(ot_it->type() != tt_c.type() || ot_it->get_name() != tt_c.get_name())
-    {
-      return false; // they just don't match
-    }
-
-    ot_it++;
-  }
-
-  return true; // ok, *this is a prefix of ot
-}
-
 /// Returns true if the type is a reference.
 bool is_reference(const typet &type)
 {
