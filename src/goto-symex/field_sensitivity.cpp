@@ -92,11 +92,14 @@ exprt field_sensitivityt::apply_byte_extract(
     // or the size of the array that is indexed into is larger than
     // max_field_sensitivity_array_size then only the expression up to (but
     // excluding) said index expression can be turned into an ssa_exprt.
+    // The access path may be wrapped in typecasts (e.g., when reading a
+    // pointer-typed member at the offset of a member of another pointer type),
+    // which must remain outside the SSA expression.
     exprt full_exprt = *recursive_member;
     exprt *for_ssa = &full_exprt;
+    while(for_ssa->id() == ID_typecast)
+      for_ssa = &to_typecast_expr(*for_ssa).op();
     exprt *parent = for_ssa;
-    while(parent->id() == ID_typecast)
-      parent = &to_typecast_expr(*parent).op();
     while(parent->id() == ID_member || parent->id() == ID_index)
     {
       if(parent->id() == ID_member)
@@ -132,17 +135,6 @@ exprt field_sensitivityt::apply_byte_extract(
       }
       else
         *for_ssa = apply(ns, state, std::move(tmp), write);
-
-      return full_exprt;
-    }
-    else if(for_ssa->id() == ID_typecast)
-    {
-      if(was_l2)
-      {
-        *for_ssa = apply(ns, state, state.rename(*for_ssa, ns).get(), write);
-      }
-      else
-        *for_ssa = apply(ns, state, std::move(*for_ssa), write);
 
       return full_exprt;
     }

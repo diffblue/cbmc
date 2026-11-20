@@ -1,0 +1,14 @@
+CORE
+union_pointer_member.c
+
+^\[main\.assertion\.1\] line \d+ read through the union: SUCCESS$
+^\[main\.assertion\.2\] line \d+ type-punned read: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Reading a pointer-typed union member through a pointer to the enclosing struct
+rewrites the access as a typecast of the union's first member. Field
+sensitivity must turn that member, not the typecast, into a field-sensitive
+symbol, or the dereferenced pointer has no points-to set.
