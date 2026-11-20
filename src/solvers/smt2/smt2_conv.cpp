@@ -187,6 +187,10 @@ void smt2_convt::write_header()
 
   out << "(set-option :produce-models true)" << "\n";
 
+  if(produce_unsat_cores)
+    out << "(set-option :produce-unsat-cores true)"
+        << "\n";
+
   // We use a broad mixture of logics, so on some solvers
   // its better not to declare here.
   // set-logic should come after setting options
@@ -210,6 +214,9 @@ void smt2_convt::write_footer()
     for(const auto &assumption : assumptions)
       convert_literal(assumption);
     out << "))\n";
+
+    if(produce_unsat_cores)
+      out << "(get-unsat-assumptions)\n";
   }
   else
   {
