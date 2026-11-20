@@ -43,6 +43,46 @@ void symex_slicet::slice(symex_target_equationt &equation)
     if(!it->ignore)
       slice(*it);
   }
+
+  ignore_gotos_over_sliced_assignments(equation);
+}
+
+/// Mark GOTO steps as ignored when their condition refers to the left-hand
+/// side of an assignment that has been sliced away.
+///
+/// The slicer does not follow GOTO steps, and the only use of their conditions
+/// is to record, when a trace is built, which way a branch went. The condition
+/// of a GOTO step may therefore refer to assignments that have just been
+/// sliced away. Converting such a condition would introduce the left-hand
+/// sides of those assignments as unconstrained variables, one per bit (a lot
+/// when the condition reads an array), and the value recorded for the branch
+/// would depend on them. Ignored steps are neither converted nor included in
+/// traces, as is already the case for the sliced assignments.
+/// \param [out] equation: symex trace that has been sliced
+void symex_slicet::ignore_gotos_over_sliced_assignments(
+  symex_target_equationt &equation)
+{
+  symbol_sett sliced;
+
+  for(auto &step : equation.SSA_steps)
+  {
+    if(step.is_assignment())
+    {
+      if(step.ignore)
+        sliced.insert(step.ssa_lhs.identifier());
+    }
+    else if(step.is_goto() && !step.ignore && !sliced.empty())
+    {
+      for(const auto &identifier : find_symbol_identifiers(step.cond_expr))
+      {
+        if(sliced.find(identifier) != sliced.end())
+        {
+          step.ignore = true;
+          break;
+        }
+      }
+    }
+  }
 }
 
 void symex_slicet::slice(SSA_stept &SSA_step)

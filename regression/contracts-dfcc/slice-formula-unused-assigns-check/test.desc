@@ -1,0 +1,17 @@
+CORE dfcc-only broken-z3-smt-backend broken-cprover-smt-backend no-new-smt
+main.c
+--dfcc main --enforce-contract set_a _ --slice-formula --object-bits 16 --verbosity 9
+^\d{1,6} variables, \d+ clauses$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^\d{7,} variables, \d+ clauses$
+--
+The check that `p->a` is assignable is discharged during symbolic execution, so
+with --slice-formula nothing depends on the branch in
+__CPROVER_contracts_write_set_check_assignment that looks `ptr` up in the set of
+locally allocated objects, and the assignments that define that set are sliced
+away. The condition of that branch must then not be converted: doing so creates
+unconstrained variables for the whole set, which holds 2^object-bits pointers.
+With 16 object bits the formula used to have more than 8 million variables.
