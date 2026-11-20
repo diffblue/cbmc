@@ -1,0 +1,13 @@
+CORE gcc-only
+conditional.c
+
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Null pointer constants in the conditional operator: an expression that
+simplifies to 0 is a null pointer constant only if it is an integer constant
+expression (C11 6.3.2.3p3, 6.6p6). GCC and Clang agree with every assertion.
+Linux's __is_constexpr and is_const rely on this (#7927).
