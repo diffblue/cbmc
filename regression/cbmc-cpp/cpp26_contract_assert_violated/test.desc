@@ -1,0 +1,15 @@
+KNOWNBUG
+main.cpp
+--cpp26
+^\[main\.assertion\.1\] line \d+ a call satisfying the assertion: SUCCESS$
+^\[half\.contract_assert\.1\] line \d+ contract assertion x % 2 == 0: FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+half(3) violates contract_assert(x % 2 == 0).  Checked with GCC 16
+-fcontracts (the call aborts).

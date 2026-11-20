@@ -1,0 +1,22 @@
+KNOWNBUG
+main.cpp
+--cpp26 --unwind 5
+^\[main\.assertion\.1\] line \d+ contracts hold: SUCCESS$
+^\[sign\.postcondition\.1\] line \d+ postcondition r == 1 \|\| r == -1: SUCCESS$
+^\[bump\.postcondition\.1\] line \d+ postcondition count >= by: SUCCESS$
+^\[.*add\.postcondition\.1\] line \d+ postcondition .*total >= v: SUCCESS$
+^\[sum\.contract_assert\.1\] line \d+ contract assertion .*: SUCCESS$
+^\[main\.precondition_instance\.\d+\] line \d+ precondition x != 0: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+CBMC uses the enforce evaluation semantic ([basic.contract.eval]/2 makes
+the choice implementation-defined) in C++26 mode: the contract assertions
+become properties, and a violation ends the path (the program is
+contract-terminated, /13).  Checked with GCC 16 -fcontracts.

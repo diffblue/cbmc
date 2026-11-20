@@ -1,0 +1,20 @@
+KNOWNBUG libstdcxx16
+main.cpp
+--cpp23 --object-bits 12
+^\[main\.assertion\.1\] line \d+ print returned: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+g++ and clang++ (GCC 16 for C++23 and C++26) accept this program, and it fails
+only its WRONG assertion.  With the libstdc++ 16 headers, CBMC did not finish
+within 300 s: vprint_nonunicode formats into the FILE's own buffer through
+glibc internals CBMC does not model.  It is now modelled as libstdc++'s
+buffered variant (format into a string, then fwrite, [print.fun]/16-17), with
+models of system_error's categories for the failing write
+(cpp11_system_error_generic_category).  About 60 s.

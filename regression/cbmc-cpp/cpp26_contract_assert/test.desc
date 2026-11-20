@@ -1,0 +1,17 @@
+KNOWNBUG
+main.cpp
+--cpp26
+^\[main\.assertion\.1\] line \d+ a call satisfying the contract: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+contract_assert(e) is an assertion statement ([stmt.contract.assert]).  CBMC
+reported "symbol 'contract_assert' is unknown" (CONVERSION ERROR); it now
+checks it, and pre() and post(), with the enforce semantic
+(cpp26_contract_assertions_enforced).  Checked with GCC 16 -fcontracts.
