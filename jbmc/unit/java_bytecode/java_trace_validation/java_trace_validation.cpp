@@ -183,6 +183,19 @@ TEST_CASE("java trace validation", "[core][java_trace_validation]")
       validation_modet::EXCEPTION));
   }
 
+  SECTION("check_trace_assumptions pass with a uniform array")
+  {
+    const array_of_exprt array_of{valid_constant, array_plain.type()};
+    REQUIRE(valid_rhs_expr_high_level(array_of));
+    const goto_tracet trace = make_test_trace(valid_symbol_expr, array_of);
+    REQUIRE_NOTHROW(check_trace_assumptions(
+      trace,
+      namespacet(symbol_tablet()),
+      messaget(null_message_handler),
+      true,
+      validation_modet::EXCEPTION));
+  }
+
   SECTION("check_trace_assumptions fail with an invalid steps - invalid lhs")
   {
     goto_tracet trace = make_test_trace(invalid_symbol_expr, valid_constant);
