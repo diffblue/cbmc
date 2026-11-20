@@ -1,0 +1,11 @@
+CORE dfcc-only
+main.c
+--dfcc main --enforce-contract foo
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Checks that a second, sequential top-level call to a function whose contract
+is being enforced is summarised by contract replacement instead of being
+rejected with a "single top-level call" assertion failure.
