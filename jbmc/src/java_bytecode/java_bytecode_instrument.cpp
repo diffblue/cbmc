@@ -435,6 +435,26 @@ void java_bytecode_instrumentt::instrument_code(codet &code)
         code_function_call.source_location()));
     }
 
+    // Check for a null monitor object of monitorenter/monitorexit. The JVM
+    // throws a NullPointerException when their argument is null; we instrument
+    // it here, like every other null check, so that it honours
+    // throw_runtime_exceptions (assertion by default, throw when set) rather
+    // than being a special case in the bytecode conversion.
+    if(code_function_call.function().id() == ID_symbol)
+    {
+      const irep_idt &callee =
+        to_symbol_expr(code_function_call.function()).get_identifier();
+      if(
+        callee == "java::java.lang.Object.monitorenter:(Ljava/lang/Object;)V" ||
+        callee == "java::java.lang.Object.monitorexit:(Ljava/lang/Object;)V")
+      {
+        PRECONDITION(code_function_call.arguments().size() == 1);
+        block.add(check_null_dereference(
+          code_function_call.arguments()[0],
+          code_function_call.source_location()));
+      }
+    }
+
     prepend_instrumentation(code, block);
   }
 
