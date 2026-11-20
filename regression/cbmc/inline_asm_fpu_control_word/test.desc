@@ -1,0 +1,11 @@
+CORE gcc-only
+main.c
+--arch riscv64
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+inline assembly statement at
+--
+The x87 control word instructions are modeled using the operand they refer to.

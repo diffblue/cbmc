@@ -1,0 +1,26 @@
+CORE gcc-only
+main.i
+--arch x86_64
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line 24 cmpxchg stored: SUCCESS$
+^\[main\.assertion\.2\] line 25 accumulator unchanged: SUCCESS$
+^\[main\.assertion\.3\] line 29 accumulator loaded: SUCCESS$
+^\[main\.assertion\.4\] line 30 destination unchanged: SUCCESS$
+^\[main\.assertion\.5\] line 37 bsf zero-extends: FAILURE$
+^\[main\.assertion\.6\] line 43 shlb by 20: SUCCESS$
+^\[main\.assertion\.7\] line 46 lea wraps: SUCCESS$
+^\[main\.assertion\.8\] line 51 array operand: SUCCESS$
+^\[main\.assertion\.9\] line 56 register variable: FAILURE$
+^\[main\.assertion\.10\] line 58 asm goto jumps: SUCCESS$
+^\[main\.assertion\.11\] line 59 asm goto falls through: SUCCESS$
+approximating inline assembly statement at .* line 55 function main: writes register rax, which is neither an operand nor clobbered
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+undefined-shift.*: FAILURE$
+overflow.*: FAILURE$
+approximating inline assembly statement at .* function branch
+--
+The properties marked "fails" in main.c are violated on hardware (or left
+undefined by the architecture); all others hold on hardware.

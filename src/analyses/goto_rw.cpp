@@ -19,12 +19,17 @@ Date: April 2010
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
+#include <util/symbol.h>
 
 #include <goto-programs/goto_functions.h>
 
 #include <langapi/language_util.h>
 #include <pointer-analysis/goto_program_dereference.h>
+#include <pointer-analysis/reachable_objects.h>
 
+#include "dirty.h"
+
+#include <algorithm>
 #include <memory>
 
 range_domain_baset::~range_domain_baset()
@@ -673,6 +678,78 @@ void rw_range_sett::get_array_objects(
     mode, ode.root_object(), range_spect::unknown(), range_spect::unknown());
 }
 
+void rw_range_sett::get_havoc_reachable_objects(
+  const irep_idt &function,
+  goto_programt::const_targett target,
+  const codet &code)
+{
+  for(const auto &op : code.operands())
+  {
+    get_objects_rec(function, target, get_modet::READ, op);
+    get_array_objects(function, target, get_modet::LHS_W, op);
+  }
+
+  if(code.get_bool(ID_arbitrary_memory))
+  {
+    for(const auto &object : static_lifetime_objects(ns.get_symbol_table(), ns))
+    {
+      get_objects_rec(function, target, get_modet::LHS_W, object);
+    }
+  }
+}
+
+void rw_range_set_value_sett::get_havoc_reachable_objects(
+  const irep_idt &_function,
+  goto_programt::const_targett _target,
+  const codet &code)
+{
+  function = _function;
+  target = _target;
+
+  std::vector<exprt> roots;
+  if(code.get_bool(ID_arbitrary_memory))
+  {
+    for(const auto &object : static_lifetime_objects(ns.get_symbol_table(), ns))
+    {
+      roots.push_back(object);
+    }
+    if(dirty != nullptr)
+    {
+      std::vector<irep_idt> locals;
+      for(const auto &identifier : dirty->get_dirty_ids())
+      {
+        const symbolt *symbol = nullptr;
+        if(!ns.lookup(identifier, symbol) && !symbol->is_static_lifetime)
+          locals.push_back(identifier);
+      }
+      std::sort(
+        locals.begin(),
+        locals.end(),
+        [](const irep_idt &a, const irep_idt &b)
+        { return id2string(a) < id2string(b); });
+      for(const auto &identifier : locals)
+        roots.push_back(ns.lookup(identifier).symbol_expr());
+    }
+  }
+
+  const reachable_objectst reachable = find_reachable_objects(
+    code.operands(),
+    roots,
+    [this](const exprt &pointer)
+    { return value_sets.get_values(function, target, pointer); },
+    ns);
+
+  for(const auto &op : code.operands())
+    get_objects_rec(get_modet::READ, op);
+  for(const auto &pointer : reachable.pointers)
+    get_objects_rec(get_modet::READ, pointer);
+  for(const auto &object : reachable.objects)
+  {
+    if(object.id() == ID_symbol)
+      get_objects_rec(get_modet::LHS_W, object);
+  }
+}
+
 void rw_range_set_value_sett::get_objects_dereference(
   get_modet mode,
   const dereference_exprt &deref,
@@ -839,6 +916,10 @@ static void goto_rw_other(
     // object being the pointer that code.op0() is
     rw_set.get_array_objects(
       function, target, rw_range_sett::get_modet::LHS_W, code.op0());
+  }
+  else if(statement == ID_havoc_reachable)
+  {
+    rw_set.get_havoc_reachable_objects(function, target, code);
   }
 }
 

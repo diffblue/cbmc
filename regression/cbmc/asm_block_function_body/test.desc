@@ -1,0 +1,12 @@
+CORE
+main.c
+--arch riscv64
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+Invariant check failed
+--
+An asm block that forms a function body (as with gcc -fasm-blocks) used to
+have no assembler flavor, which made remove_asm fail an invariant.
