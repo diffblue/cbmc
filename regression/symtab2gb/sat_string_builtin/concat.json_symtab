@@ -1,0 +1,481 @@
+{
+ "symbolTable": {
+  "main": {
+   "type": {
+    "id": "code",
+    "namedSub": {
+     "parameters": {
+      "id": ""
+     },
+     "return_type": {
+      "id": "empty"
+     }
+    }
+   },
+   "value": {
+    "id": "code",
+    "sub": [
+     {
+      "id": "code",
+      "sub": [
+       {
+        "id": "symbol",
+        "namedSub": {
+         "type": {
+          "id": "string"
+         },
+         "identifier": {
+          "id": "main::s"
+         }
+        }
+       }
+      ],
+      "namedSub": {
+       "type": {
+        "id": "empty"
+       },
+       "statement": {
+        "id": "decl"
+       }
+      }
+     },
+     {
+      "id": "code",
+      "sub": [
+       {
+        "id": "symbol",
+        "namedSub": {
+         "type": {
+          "id": "string"
+         },
+         "identifier": {
+          "id": "main::t"
+         }
+        }
+       }
+      ],
+      "namedSub": {
+       "type": {
+        "id": "empty"
+       },
+       "statement": {
+        "id": "decl"
+       }
+      }
+     },
+     {
+      "id": "code",
+      "sub": [
+       {
+        "id": "symbol",
+        "namedSub": {
+         "type": {
+          "id": "string"
+         },
+         "identifier": {
+          "id": "main::r"
+         }
+        }
+       }
+      ],
+      "namedSub": {
+       "type": {
+        "id": "empty"
+       },
+       "statement": {
+        "id": "decl"
+       }
+      }
+     },
+     {
+      "id": "code",
+      "sub": [
+       {
+        "id": "symbol",
+        "namedSub": {
+         "type": {
+          "id": "integer"
+         },
+         "identifier": {
+          "id": "main::n"
+         }
+        }
+       }
+      ],
+      "namedSub": {
+       "type": {
+        "id": "empty"
+       },
+       "statement": {
+        "id": "decl"
+       }
+      }
+     },
+     {
+      "id": "code",
+      "sub": [
+       {
+        "id": "symbol",
+        "namedSub": {
+         "type": {
+          "id": "bool"
+         },
+         "identifier": {
+          "id": "main::b"
+         }
+        }
+       }
+      ],
+      "namedSub": {
+       "type": {
+        "id": "empty"
+       },
+       "statement": {
+        "id": "decl"
+       }
+      }
+     },
+     {
+      "id": "code",
+      "sub": [
+       {
+        "id": "symbol",
+        "namedSub": {
+         "type": {
+          "id": "string"
+         },
+         "identifier": {
+          "id": "main::s"
+         }
+        }
+       },
+       {
+        "id": "constant",
+        "namedSub": {
+         "type": {
+          "id": "string"
+         },
+         "value": {
+          "id": "ab"
+         }
+        }
+       }
+      ],
+      "namedSub": {
+       "type": {
+        "id": "empty"
+       },
+       "statement": {
+        "id": "assign"
+       }
+      }
+     },
+     {
+      "id": "code",
+      "sub": [
+       {
+        "id": "symbol",
+        "namedSub": {
+         "type": {
+          "id": "string"
+         },
+         "identifier": {
+          "id": "main::t"
+         }
+        }
+       },
+       {
+        "id": "constant",
+        "namedSub": {
+         "type": {
+          "id": "string"
+         },
+         "value": {
+          "id": "cd"
+         }
+        }
+       }
+      ],
+      "namedSub": {
+       "type": {
+        "id": "empty"
+       },
+       "statement": {
+        "id": "assign"
+       }
+      }
+     },
+     {
+      "id": "code",
+      "sub": [
+       {
+        "id": "symbol",
+        "namedSub": {
+         "type": {
+          "id": "string"
+         },
+         "identifier": {
+          "id": "main::r"
+         }
+        }
+       },
+       {
+        "id": "function_application",
+        "sub": [
+         {
+          "id": "symbol",
+          "namedSub": {
+           "type": {
+            "id": "mathematical_function",
+            "sub": [
+             {
+              "id": "",
+              "sub": [
+               {
+                "id": "string"
+               },
+               {
+                "id": "string"
+               }
+              ]
+             },
+             {
+              "id": "string"
+             }
+            ]
+           },
+           "identifier": {
+            "id": "cprover_string_concat_func"
+           }
+          }
+         },
+         {
+          "id": "tuple",
+          "sub": [
+           {
+            "id": "symbol",
+            "namedSub": {
+             "type": {
+              "id": "string"
+             },
+             "identifier": {
+              "id": "main::s"
+             }
+            }
+           },
+           {
+            "id": "symbol",
+            "namedSub": {
+             "type": {
+              "id": "string"
+             },
+             "identifier": {
+              "id": "main::t"
+             }
+            }
+           }
+          ],
+          "namedSub": {
+           "type": {
+            "id": "nil"
+           }
+          }
+         }
+        ],
+        "namedSub": {
+         "type": {
+          "id": "string"
+         }
+        }
+       }
+      ],
+      "namedSub": {
+       "type": {
+        "id": "empty"
+       },
+       "statement": {
+        "id": "assign"
+       }
+      }
+     },
+     {
+      "id": "code",
+      "sub": [
+       {
+        "id": "=",
+        "sub": [
+         {
+          "id": "symbol",
+          "namedSub": {
+           "type": {
+            "id": "string"
+           },
+           "identifier": {
+            "id": "main::r"
+           }
+          }
+         },
+         {
+          "id": "constant",
+          "namedSub": {
+           "type": {
+            "id": "string"
+           },
+           "value": {
+            "id": "abcd"
+           }
+          }
+         }
+        ],
+        "namedSub": {
+         "type": {
+          "id": "bool"
+         }
+        }
+       }
+      ],
+      "namedSub": {
+       "type": {
+        "id": "empty"
+       },
+       "statement": {
+        "id": "assert"
+       }
+      }
+     }
+    ],
+    "namedSub": {
+     "type": {
+      "id": "empty"
+     },
+     "statement": {
+      "id": "block"
+     }
+    }
+   },
+   "location": {},
+   "name": "main",
+   "module": "m",
+   "baseName": "main",
+   "mode": "C",
+   "prettyName": "main",
+   "isLvalue": false
+  },
+  "__CPROVER_initialize": {
+   "type": {
+    "id": "code",
+    "namedSub": {
+     "parameters": {
+      "id": ""
+     },
+     "return_type": {
+      "id": "empty"
+     }
+    }
+   },
+   "value": {
+    "id": "code",
+    "namedSub": {
+     "type": {
+      "id": "empty"
+     },
+     "statement": {
+      "id": "block"
+     }
+    }
+   },
+   "location": {},
+   "name": "__CPROVER_initialize",
+   "module": "m",
+   "baseName": "__CPROVER_initialize",
+   "mode": "C",
+   "prettyName": "__CPROVER_initialize",
+   "isLvalue": false
+  },
+  "main::s": {
+   "type": {
+    "id": "string"
+   },
+   "value": {
+    "id": "nil"
+   },
+   "location": {},
+   "name": "main::s",
+   "module": "m",
+   "baseName": "s",
+   "mode": "C",
+   "prettyName": "main::s",
+   "isLvalue": true,
+   "isThreadLocal": true,
+   "isFileLocal": true
+  },
+  "main::t": {
+   "type": {
+    "id": "string"
+   },
+   "value": {
+    "id": "nil"
+   },
+   "location": {},
+   "name": "main::t",
+   "module": "m",
+   "baseName": "t",
+   "mode": "C",
+   "prettyName": "main::t",
+   "isLvalue": true,
+   "isThreadLocal": true,
+   "isFileLocal": true
+  },
+  "main::r": {
+   "type": {
+    "id": "string"
+   },
+   "value": {
+    "id": "nil"
+   },
+   "location": {},
+   "name": "main::r",
+   "module": "m",
+   "baseName": "r",
+   "mode": "C",
+   "prettyName": "main::r",
+   "isLvalue": true,
+   "isThreadLocal": true,
+   "isFileLocal": true
+  },
+  "main::n": {
+   "type": {
+    "id": "integer"
+   },
+   "value": {
+    "id": "nil"
+   },
+   "location": {},
+   "name": "main::n",
+   "module": "m",
+   "baseName": "n",
+   "mode": "C",
+   "prettyName": "main::n",
+   "isLvalue": true,
+   "isThreadLocal": true,
+   "isFileLocal": true
+  },
+  "main::b": {
+   "type": {
+    "id": "bool"
+   },
+   "value": {
+    "id": "nil"
+   },
+   "location": {},
+   "name": "main::b",
+   "module": "m",
+   "baseName": "b",
+   "mode": "C",
+   "prettyName": "main::b",
+   "isLvalue": true,
+   "isThreadLocal": true,
+   "isFileLocal": true
+  }
+ }
+}

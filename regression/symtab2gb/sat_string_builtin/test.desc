@@ -1,0 +1,13 @@
+CORE
+concat.json_symtab
+_ --function main --no-simplify --trace
+^string built-in 'cprover_string_concat_func' is not supported by the bit-vector back-end and is treated as an uninterpreted function, which may yield spurious counterexamples; use an SMT back-end \(e.g., --z3 or --cvc5\)$
+^EXIT=(0|10)$
+^SIGNAL=0$
+--
+^Invariant check failed
+--
+The bit-vector back-end does not interpret string built-ins over SMT-LIB
+strings, and must say so. The verdict and the trace values are those of an
+uninterpreted function, and therefore not checked. --no-simplify avoids
+symex constant propagation of the string operation.

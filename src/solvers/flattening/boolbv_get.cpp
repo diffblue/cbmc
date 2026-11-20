@@ -232,19 +232,17 @@ exprt boolbvt::bv_get_rec(const exprt &expr, const bvt &bv, std::size_t offset)
   switch(bvtype)
   {
   case bvtypet::IS_UNKNOWN:
-    PRECONDITION(
-      type.id() == ID_string || type.id() == ID_empty ||
-      type.id() == ID_enumeration);
     if(type.id()==ID_string)
     {
+      // Strings are numbered constants; any other value of the bits, as for
+      // the result of an uninterpreted string function, does not denote a
+      // string.
       mp_integer int_value=binary2integer(value, false);
-      irep_idt s;
-      if(int_value>=string_numbering.size())
-        s=irep_idt();
-      else
-        s = string_numbering[numeric_cast_v<std::size_t>(int_value)];
+      if(int_value >= string_numbering.size())
+        return nil_exprt{};
 
-      return constant_exprt(s, type);
+      return constant_exprt{
+        string_numbering[numeric_cast_v<std::size_t>(int_value)], type};
     }
     else if(type.id() == ID_empty)
     {
@@ -260,7 +258,13 @@ exprt boolbvt::bv_get_rec(const exprt &expr, const bvt &bv, std::size_t offset)
         return constant_exprt{
           elements[numeric_cast_v<std::size_t>(int_value)].id(), type};
     }
-    break;
+    else
+    {
+      // Types that the bit-vector encoding does not support, such as
+      // mathematical integers or reals: conversion_failed gave expressions
+      // of such types unconstrained bits, which do not denote any value.
+      return nil_exprt{};
+    }
 
   case bvtypet::IS_RANGE:
   {

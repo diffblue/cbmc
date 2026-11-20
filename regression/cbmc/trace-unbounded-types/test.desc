@@ -1,0 +1,12 @@
+CORE broken-cprover-smt-backend no-new-smt
+main.c
+--trace
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^  n=
+--
+^Invariant check failed
+--
+The bit-vector back-end does not encode mathematical integers, and must not fail
+when producing a trace that contains values of such types.
