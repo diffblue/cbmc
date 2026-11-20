@@ -1,0 +1,15 @@
+CORE
+main.c
+--generate-function-body '(?!__CPROVER).*' --generate-function-body-options assume-false
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+may interfere with analysis
+--
+This replaces the removed option --undefined-function-is-assume-false: each
+function without a body is given the body assume(false).  The removed option
+rewrote each call of such a function instead, and produced a goto binary that
+could not be read back when a call was the target of a jump, as are the calls
+in the branches of the if and the calls created for the function pointer.
