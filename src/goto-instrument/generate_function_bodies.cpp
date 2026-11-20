@@ -13,6 +13,7 @@ Author: Diffblue Ltd.
 #include <util/prefix.h>
 #include <util/string2int.h>
 #include <util/string_utils.h>
+#include <util/symbol_table_builder.h>
 
 #include <goto-programs/goto_model.h>
 #include <goto-programs/remove_skip.h>
@@ -165,7 +166,7 @@ private:
     const std::size_t initial_depth,
     const source_locationt &source_location,
     const irep_idt &function_id,
-    symbol_tablet &symbol_table,
+    symbol_table_baset &symbol_table,
     goto_programt &dest) const
   {
     symbol_factoryt symbol_factory(
@@ -220,6 +221,10 @@ protected:
     symbol_tablet &symbol_table,
     const irep_idt &function_name) const override
   {
+    // Remember the next free suffix per prefix: the object factory may
+    // allocate many objects under the same prefix.
+    symbol_table_buildert symbol_table_builder =
+      symbol_table_buildert::wrap(symbol_table);
     const namespacet ns(symbol_table);
     // some user input checking
     if(param_numbers_to_havoc.has_value() && !param_numbers_to_havoc->empty())
@@ -279,7 +284,7 @@ protected:
           1, // depth 1 since we pass the dereferenced pointer
           location,
           function_name,
-          symbol_table,
+          symbol_table_builder,
           dest);
 
         function.body.destructive_append(dest);
@@ -301,7 +306,7 @@ protected:
         0,
         location,
         irep_idt(),
-        symbol_table,
+        symbol_table_builder,
         dest);
 
       function.body.destructive_append(dest);
