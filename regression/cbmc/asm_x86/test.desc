@@ -1,0 +1,13 @@
+CORE gcc-only
+main.i
+--arch x86_64
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+approximating inline assembly
+--
+The x86 inline assembly in main.c is interpreted exactly: if CBMC approximated
+any statement (assigning nondeterministic values to its outputs), the
+assertions, which check values observed on x86-64 hardware, would fail.

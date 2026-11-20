@@ -1,0 +1,24 @@
+CORE gcc-only
+main.c
+--arch arm64 --unwind 3
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line 19 restartable loop: SUCCESS$
+^\[main\.unwind\.0\] line 23 unwinding assertion loop 0: FAILURE$
+^\[main\.assertion\.2\] line 32 counting loop: SUCCESS$
+^\[main\.assertion\.3\] line 33 one attempt: FAILURE$
+^\[main\.unwind\.1\] line 38 unwinding assertion loop 1: FAILURE$
+^\[main\.assertion\.4\] line 46 branch on success: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+approximating inline assembly
+line 11 unwinding assertion
+^\[main\.unwind\.2\]
+--
+The retry loop of a load-exclusive/store-exclusive sequence whose failed
+attempts have no effect is replaced by the attempt that succeeds, so that it
+needs no unwinding. Loops whose attempts are observable (here: counted), and
+branches that are not taken just when the store fails, remain loops. The
+assertions that fail may be violated on hardware, where a store-exclusive
+may fail spuriously.

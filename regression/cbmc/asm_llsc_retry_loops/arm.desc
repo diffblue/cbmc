@@ -1,0 +1,19 @@
+CORE gcc-only no-new-smt
+arm.c
+--arch arm --unwind 3
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line 19 teq/bne loop: SUCCESS$
+^\[main\.assertion\.2\] line 32 cmp/bne loop: SUCCESS$
+^\[main\.unwind\.0\] line 37 unwinding assertion loop 0: FAILURE$
+^\[main\.assertion\.3\] line 48 store in the loop: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+approximating inline assembly
+^\[main\.unwind\.1\]
+--
+The retry loops of load-exclusive/store-exclusive sequences that end with
+teq or cmp of the status and bne need no unwinding; a loop whose attempts
+store to memory remains a loop. The assertion that fails may be violated on
+hardware, where a store-exclusive may fail spuriously.

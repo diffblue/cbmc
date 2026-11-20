@@ -165,6 +165,7 @@ void dep_graph_domaint::data_dependencies(
   value_setst &value_sets=
     dep_graph.reaching_definitions().get_value_sets();
   rw_range_set_value_sett rw_set(ns, value_sets, message_handler);
+  rw_set.set_dirty(dep_graph.reaching_definitions().get_is_dirty());
   goto_rw(function_to, to, rw_set);
 
   for(const auto &read_object_entry : rw_set.get_r_set())

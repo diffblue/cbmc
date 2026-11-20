@@ -1,0 +1,15 @@
+CORE gcc-only no-new-smt
+main.c
+--arch arm
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+approximating inline assembly
+--
+The AArch32 inline assembly in main.c is interpreted exactly: if CBMC
+approximated any statement, the assertions, which check values observed with
+an emulator (Unicorn, and qemu-arm for A32 code compiled by GCC and Clang),
+would fail. The retry loops of load-exclusive/store-exclusive sequences need
+no unwinding: their failed attempts have no effect.

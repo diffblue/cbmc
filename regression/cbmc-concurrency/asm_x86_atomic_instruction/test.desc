@@ -1,0 +1,14 @@
+CORE gcc-only
+main.i
+--arch x86_64
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line 24 plain read-modify-write: FAILURE$
+^\[main\.assertion\.2\] line 25 locked increment: SUCCESS$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+approximating inline assembly
+--
+A lock-prefixed instruction is an atomic section on its own: making the whole
+statement atomic would hide the race on the plain read-modify-write of x.

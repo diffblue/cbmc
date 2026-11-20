@@ -747,6 +747,18 @@ protected:
   // havocs the given object
   void havoc_rec(statet &state, const guardt &guard, const exprt &dest);
 
+  /// Symbolically executes a `havoc_reachable` statement: assigns
+  /// nondeterministic values to the objects that the operands of \p code
+  /// point to (and, if \p code has the `arbitrary_memory` flag, to the
+  /// objects of static lifetime and the address-taken local variables of all
+  /// functions on the call stack), and to all objects reachable from these
+  /// according to the value set. Pointers stored in these objects are
+  /// restricted to pointers previously stored in them, the addresses of the
+  /// objects, or null.
+  /// \param state: Symbolic execution state
+  /// \param code: The `havoc_reachable` statement
+  void symex_havoc_reachable(statet &state, const codet &code);
+
   typedef symex_targett::assignment_typet assignment_typet;
 
   /// Execute any let expressions in \p expr using

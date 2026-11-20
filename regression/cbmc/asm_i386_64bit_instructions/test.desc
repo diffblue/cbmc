@@ -1,0 +1,16 @@
+CORE gcc-only
+main.i
+--arch i386
+^EXIT=0$
+^SIGNAL=0$
+approximating inline assembly statement at .* line 5 function main: 64-bit instruction in 32-bit mode
+approximating inline assembly statement at .* line 6 function main: 64-bit instruction in 32-bit mode
+approximating inline assembly statement at .* line 7 function main: 64-bit instruction in 32-bit mode
+^\[main\.assertion\.1\] line 10 32-bit instruction: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+approximating inline assembly statement at .* line 9
+--
+Instructions with 64-bit operands are not valid in 32-bit mode, and are not
+modeled; the 32-bit addl is.

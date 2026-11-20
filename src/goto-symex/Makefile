@@ -33,6 +33,7 @@ SRC = auto_objects.cpp \
       symex_dereference_state.cpp \
       symex_function_call.cpp \
       symex_goto.cpp \
+      symex_havoc_reachable.cpp \
       symex_main.cpp \
       symex_other.cpp \
       symex_set_return_value.cpp \

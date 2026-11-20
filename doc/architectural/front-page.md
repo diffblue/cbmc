@@ -67,6 +67,7 @@ you can access it <a href=
 "https://svn.cprover.org/wiki/doku.php?id=cprover_tutorial">here</a>.
 
 * \subpage memory-bounds-checking
+* \subpage inline-assembly
 * \subpage satabs
 
 ## For contributors:
