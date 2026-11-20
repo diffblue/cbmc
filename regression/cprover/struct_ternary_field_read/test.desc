@@ -1,0 +1,8 @@
+CORE
+main.c
+--text --solve --inline
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ field x after ternary: SUCCESS$
+^\[main\.assertion\.2\] line \d+ field y after ternary: SUCCESS$
+--
