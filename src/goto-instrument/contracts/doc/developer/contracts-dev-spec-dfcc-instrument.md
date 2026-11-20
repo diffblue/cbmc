@@ -30,6 +30,9 @@ declaration of the function; for a call with fewer arguments, as permitted for
 a function declared without a prototype; and for a call through a function
 pointer of any type.
 
+Variadic arguments are not passed on to a function whose contract is checked,
+see @ref contracts-dev-spec-dfcc-instrument-limitations.
+
 After this step the `write_set` parameter is in scope in the function and can
 be used to implement checks.
 
@@ -267,8 +270,16 @@ The  ranges of bytes `(void *lb, size_t size)` updated by the different operatio
     * `lb = (char *)ptr - pointer_offset(ptr);`
     * `size = object_size(ptr);`
 
+## Limitations {#contracts-dev-spec-dfcc-instrument-limitations}
+
+When checking the contract of a variadic function, the wrapper that checks the
+contract calls the function with its declared parameters only: a static call
+cannot pass on a variable number of variadic arguments. Reading a variadic
+argument with `va_arg` in the body of the function then fails a pointer
+check. DFCC warns about this when it checks the contract of a variadic
+function.
+
 ---
  Prev | Next
 :-----|:------
  @ref contracts-dev-spec-dfcc | @ref contracts-dev-spec-harness
-
