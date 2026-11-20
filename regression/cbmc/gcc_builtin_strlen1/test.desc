@@ -1,0 +1,15 @@
+CORE gcc-only
+main.c
+
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ assertion g == 42: SUCCESS$
+^\[main\.assertion\.2\] line \d+ assertion g == 7: SUCCESS$
+^\[main\.assertion\.3\] line \d+ assertion c == 2: SUCCESS$
+^\[main\.no-body\.__builtin_strlen\] line \d+ no body for callee __builtin_strlen: FAILURE$
+--
+^warning: ignoring
+--
+__builtin_strlen is only folded to a constant when its argument has no side
+effects. Calls that are not folded remain calls of __builtin_strlen, which has
+no body.
