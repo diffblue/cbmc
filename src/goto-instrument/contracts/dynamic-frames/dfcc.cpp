@@ -286,6 +286,11 @@ void dfcct::link_model_and_load_dfcc_library()
   // add C prover lib again to fetch any dependencies of the dfcc functions
   link_to_library(
     goto_model, log.get_message_handler(), cprover_c_library_factory);
+
+  // The library functions are numbered from 0 in each function. Number the
+  // whole program once; from here on, each body that DFCC creates or changes
+  // is renumbered when DFCC has finished changing it.
+  goto_model.goto_functions.update();
 }
 
 void dfcct::instrument_harness_function()

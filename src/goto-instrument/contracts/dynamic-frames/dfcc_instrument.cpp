@@ -293,7 +293,7 @@ void dfcc_instrumentt::instrument_harness_function(
     goto_programt::make_assignment(
       write_set, null_expr, first_instr->source_location()));
 
-  goto_model.goto_functions.update();
+  goto_model.goto_functions.update(body);
 }
 
 std::set<symbol_exprt>
@@ -423,7 +423,7 @@ void dfcc_instrumentt::instrument_goto_program(
   goto_program.clear();
   goto_program.copy_from(goto_function.body);
   remove_skip(goto_program);
-  goto_model.goto_functions.update();
+  goto_model.goto_functions.update(goto_program);
 }
 
 void dfcc_instrumentt::instrument_goto_function(
@@ -443,6 +443,7 @@ void dfcc_instrumentt::instrument_goto_function(
       options, object_factory_params, goto_model.symbol_table, message_handler);
     generate_function_bodies->generate_function_body(
       goto_function, goto_model.symbol_table, function_id);
+    goto_model.goto_functions.update(goto_function.body);
     return;
   }
 
@@ -468,8 +469,13 @@ void dfcc_instrumentt::instrument_goto_function(
     cfg_info,
     function_pointer_contracts);
 
-  // recalculate numbers, etc.
-  goto_model.goto_functions.update();
+  // Recalculate the numbers of this function only. Renumbering the whole
+  // program after each function costs time quadratic in the number of
+  // functions. Each body that DFCC creates or changes is renumbered when
+  // DFCC has finished changing it, so the other bodies keep valid numbers.
+  // dfcct::transform_goto_model renumbers the whole program after loading
+  // the DFCC library and at the end.
+  goto_model.goto_functions.update(body);
 
   if(loop_contract_config.apply_loop_contracts)
   {
@@ -514,8 +520,8 @@ void dfcc_instrumentt::instrument_goto_function(
 
   remove_skip(body);
 
-  // recalculate numbers, etc.
-  goto_model.goto_functions.update();
+  // recalculate numbers, etc. (this function only)
+  goto_model.goto_functions.update(body);
 }
 
 void dfcc_instrumentt::instrument_instructions(
