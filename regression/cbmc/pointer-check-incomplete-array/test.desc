@@ -1,0 +1,15 @@
+CORE no-new-smt
+main.c
+--pointer-overflow-check
+^\[b.pointer_dereference.1\] line 9 dereference failure: pointer NULL in \*a: FAILURE$
+^\[c.pointer_dereference.1\] line 15 dereference failure: pointer NULL in \*p: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+^Invariant check failed
+--
+Test that dereferencing pointers to incomplete array types does not cause
+invariant violations.
