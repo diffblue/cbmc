@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/bitvector_types.h>
 #include <util/c_types.h>
 #include <util/floatbv_expr.h>
+#include <util/namespace.h>
 
 #include <solvers/floatbv/float_utils.h>
 
@@ -35,6 +36,29 @@ bvt boolbvt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
       typecast_exprt(op0, to_c_bit_field_type(src_type).underlying_type()),
       op1,
       dest_type));
+  }
+
+  if(src_type.id() == ID_c_enum_tag || src_type.id() == ID_c_enum)
+  {
+    // convert via the underlying type
+    const typet &underlying_type =
+      src_type.id() == ID_c_enum_tag
+        ? ns.follow_tag(to_c_enum_tag_type(src_type)).underlying_type()
+        : to_c_enum_type(src_type).underlying_type();
+    return convert_floatbv_typecast(floatbv_typecast_exprt{
+      typecast_exprt{op0, underlying_type}, op1, dest_type});
+  }
+
+  if(dest_type.id() == ID_c_enum_tag || dest_type.id() == ID_c_enum)
+  {
+    // convert via the underlying type, which has the same bit-level
+    // representation as the enum type
+    const typet &underlying_type =
+      dest_type.id() == ID_c_enum_tag
+        ? ns.follow_tag(to_c_enum_tag_type(dest_type)).underlying_type()
+        : to_c_enum_type(dest_type).underlying_type();
+    return convert_floatbv_typecast(
+      floatbv_typecast_exprt{op0, op1, underlying_type});
   }
 
   float_utilst float_utils(prop);
