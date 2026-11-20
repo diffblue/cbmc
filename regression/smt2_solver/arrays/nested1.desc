@@ -1,0 +1,10 @@
+CORE
+nested1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^unsat$
+--
+--
+Collecting the indices of an array of arrays adds the inner arrays to the
+collection of arrays, which must not invalidate the array being processed.

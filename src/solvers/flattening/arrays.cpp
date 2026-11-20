@@ -97,7 +97,10 @@ void arrayst::collect_indices()
 {
   for(std::size_t i=0; i<arrays.size(); i++)
   {
-    collect_indices(arrays[i]);
+    // take a copy, as collect_indices may add (nested) arrays, which may
+    // invalidate references into arrays
+    const exprt a = arrays[i];
+    collect_indices(a);
   }
 }
 
