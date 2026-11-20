@@ -274,6 +274,20 @@ exprt mult_overflow_exprt::lower() const
     exact_result};
 }
 
+exprt div_overflow_exprt::lower() const
+{
+  // Overflow on signed division: INT_MIN / -1 is undefined.
+  // Unsigned division never overflows.
+  const auto &type = lhs().type();
+  if(type.id() == ID_signedbv)
+  {
+    return and_exprt{
+      equal_exprt{lhs(), to_signedbv_type(type).smallest_expr()},
+      equal_exprt{rhs(), from_integer(-1, type)}};
+  }
+  return false_exprt{};
+}
+
 exprt find_first_set_exprt::lower() const
 {
   exprt x = op();
