@@ -1,0 +1,13 @@
+CORE
+main.c
+
+^EXIT=10$
+^SIGNAL=0$
+^\[f\.division-by-zero\.1\] line 6 division by zero in 10 / divisor: FAILURE$
+^\[main\.assertion\.1\] line 13 after the return: UNKNOWN$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Code that runs after a return from the function holding a refuted fatal
+assertion is affected by it, too.
