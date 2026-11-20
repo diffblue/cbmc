@@ -1,0 +1,19 @@
+CORE
+unknown.c
+--stop-on-fail --sarif-result -
+activate-multi-line-match
+^EXIT=10$
+^SIGNAL=0$
+"kind": "open"
+"text": "undecided under stop-on-fail \(UNKNOWN\)"
+"propertyId": "main\.assertion\.1"
+"kind": "fail"
+"level": "error"
+"propertyId": "main\.assertion\.2"
+--
+"level": "(note|none|warning)"
+--
+Checks the UNKNOWN -> open SARIF mapping: under --stop-on-fail an undecided
+property is reported with kind "open" and no level (SARIF 2.1.0 3.27.10 only
+permits level "none" for kinds other than "fail"), while the failing property
+is reported with kind "fail" and level "error".
