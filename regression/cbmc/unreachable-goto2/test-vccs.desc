@@ -1,4 +1,4 @@
-CORE paths-lifo-expected-failure
+CORE
 test.c
 --show-vcc --verbosity 8
 ^Generated 1 VCC\(s\), 1 remaining after simplification$
