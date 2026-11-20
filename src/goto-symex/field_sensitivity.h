@@ -9,7 +9,11 @@ Author: Michael Tautschnig
 #ifndef CPROVER_GOTO_SYMEX_FIELD_SENSITIVITY_H
 #define CPROVER_GOTO_SYMEX_FIELD_SENSITIVITY_H
 
+#include <util/mp_arith.h>
 #include <util/ssa_expr.h>
+
+#include <map>
+#include <string>
 
 class byte_extract_exprt;
 class namespacet;
@@ -204,8 +208,34 @@ public:
   [[nodiscard]] bool
   is_divisible(const ssa_exprt &expr, bool disjoined_fields_only) const;
 
+  /// Arrays that were left without field sensitivity because their size
+  /// exceeds the limit given at construction, keyed by how they are printed,
+  /// with their number of elements.  Only arrays whose elements are structs,
+  /// unions or pointers are recorded: for those, the loss of field
+  /// sensitivity makes pointers read back from an element imprecise, which
+  /// surfaces far away as unexpected points-to targets.
+  const std::map<std::string, mp_integer> &arrays_over_limit() const
+  {
+    return arrays_over_limit_;
+  }
+
+  /// The limit given at construction.
+  std::size_t max_array_size() const
+  {
+    return max_field_sensitivity_array_size;
+  }
+
 private:
   const std::size_t max_field_sensitivity_array_size;
+
+  /// See \ref arrays_over_limit.  Mutable because it is updated by the const
+  /// \ref apply and \ref get_fields; it is diagnostic only and never affects
+  /// the result of either.
+  mutable std::map<std::string, mp_integer> arrays_over_limit_;
+
+  /// Record \p array in \ref arrays_over_limit_ if its elements are of a kind
+  /// for which field sensitivity matters.
+  void note_array_over_limit(const exprt &array, const mp_integer &size) const;
 
   const bool should_simplify;
   const irep_idt language_mode;

@@ -1,0 +1,10 @@
+CORE
+main.c
+--unwind 5 --max-field-sensitivity-array-size 65
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^field sensitivity was not applied
+--
+With the limit raised to cover the array, nothing is reported.
