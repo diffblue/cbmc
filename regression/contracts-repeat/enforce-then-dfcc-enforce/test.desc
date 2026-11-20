@@ -1,0 +1,14 @@
+CORE
+main.c
+--enforce-contract foo _ --dfcc main --enforce-contract foo
+^EXIT=6$
+^SIGNAL=0$
+^.*Contract enforcement has already been applied to function 'foo' by a non-DFCC goto-instrument pass.*$
+^.*Only one contract may be enforced at a time per function.*$
+--
+^.*VERIFICATION SUCCESSFUL.*$
+This test enforces a contract on foo with a plain (non-DFCC) pass, then
+enforces the same function under the DFCC pipeline on the resulting
+binary. The second invocation must fail: foo is already enforced and the
+DFCC pass would re-instrument it. Without the cross-mode guard this case
+was silently accepted.
