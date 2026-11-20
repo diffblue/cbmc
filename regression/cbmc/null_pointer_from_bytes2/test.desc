@@ -1,0 +1,18 @@
+CORE
+main.c
+--pointer-check
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line 18 p is target or NULL: SUCCESS$
+^\[main\.pointer_dereference\.\d+\] line 20 dereference failure: pointer NULL in \*p: SUCCESS$
+^\[main\.assertion\.2\] line 25 q is NULL: SUCCESS$
+^\[main\.pointer_dereference\.\d+\] line 31 dereference failure: pointer NULL in \*r: SUCCESS$
+^\[main\.pointer_dereference\.\d+\] line 34 dereference failure: pointer NULL in \*p: FAILURE$
+^VERIFICATION FAILED$
+--
+^\[.*\] line ([0-9]|[12][0-9]|3[0-3]) .*: FAILURE$
+^warning: ignoring
+--
+Pointers read back from the bytes of an untyped object: zero bytes must be
+treated as a null pointer, which pointer checks still flag when dereferenced,
+while bytes of a valid pointer must still yield that pointer.
