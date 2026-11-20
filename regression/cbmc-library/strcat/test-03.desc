@@ -1,0 +1,9 @@
+CORE
+main3.c
+--unwind 20
+^\[.*precondition.*\] line \d+ strcat src/dst overlap: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
