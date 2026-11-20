@@ -4,3 +4,7 @@ pid.c
 ^EXIT=0$
 ^SIGNAL=0$
 coverage results
+// Marked THOROUGH because CaDiCaL is slow on this test when combined with
+// the --cprover-smt2 backend: ~118s (cadical) vs 17-22s (minisat2). The
+// macOS CI uses CaDiCaL exclusively. No OS difference -- the slowness is
+// purely solver-dependent. See PR #8868 for the full investigation.
