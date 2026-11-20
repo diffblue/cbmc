@@ -1,0 +1,17 @@
+CORE
+main.c
+--show-local-bitvector-analysis
+activate-multi-line-match
+\*\*\*\* file main.c line 7 function foo\n(\n|.)*\s+foo::i: \+unknown\n(\n|.)*\n\s+// \d+ file main.c line 7 function foo\n\s+DEAD foo::1::1::i
+\*\*\*\* file main.c line 7 function foo\n(\n|.)*\s+foo::1::2::j: \+unknown\n(\n|.)*\n\s+// \d+ file main.c line 7 function foo\n\s+DEAD foo::1::1::i
+\*\*\*\* file main.c line 7 function foo\n(\n|.)*\s+foo::1::x: \+uninitialized\+maybe_alive\n(\n|.)*\n\s+// \d+ file main.c line 7 function foo\n\s+DEAD foo::1::1::i
+\*\*\*\* file main.c line 7 function foo\n(\n|.)*\s+foo::1::1::i: \+uninitialized\+maybe_alive\n(\n|.)*\n\s+// \d+ file main.c line 7 function foo\n\s+DEAD foo::1::1::i
+\*\*\*\* file main.c line 11 function foo\n(\n|.)*\s+foo::i: \+unknown\n(\n|.)*\n\s+// \d+ file main.c line 11 function foo\n\s+DEAD foo::1::2::j
+\*\*\*\* file main.c line 11 function foo\n(\n|.)*\s+foo::1::2::j: \+uninitialized\+maybe_alive\n(\n|.)*\n\s+// \d+ file main.c line 11 function foo\n\s+DEAD foo::1::2::j
+\*\*\*\* file main.c line 11 function foo\n(\n|.)*\s+foo::1::x: \+uninitialized\+maybe_alive\n(\n|.)*\n\s+// \d+ file main.c line 11 function foo\n\s+DEAD foo::1::2::j
+\*\*\*\* file main.c line 11 function foo\n(\n|.)*\s+foo::1::1::i: \+unknown\n(\n|.)*\n\s+// \d+ file main.c line 11 function foo\n\s+DEAD foo::1::2::j
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+\*\*\*\* file main.c line 13 function foo\n.*maybe_alive(\n|.)*END_FUNCTION
