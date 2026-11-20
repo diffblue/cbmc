@@ -233,6 +233,31 @@ void dfcct::check_transform_goto_model_preconditions()
   }
 }
 
+/// Adds to \p dest the functions (other than contracts) of \p symbol_table
+/// that \p irep refers to, e.g., the functions called in contract clauses.
+static void find_referenced_functions(
+  const irept &irep,
+  const symbol_table_baset &symbol_table,
+  std::set<irep_idt> &dest)
+{
+  if(irep.id() == ID_symbol)
+  {
+    const irep_idt &identifier = irep.get(ID_identifier);
+    const symbolt *symbol = symbol_table.lookup(identifier);
+    if(
+      symbol != nullptr && symbol->type.id() == ID_code && !symbol->is_macro &&
+      !has_prefix(id2string(identifier), "contract::"))
+    {
+      dest.insert(identifier);
+    }
+  }
+
+  for(const auto &sub : irep.get_sub())
+    find_referenced_functions(sub, symbol_table, dest);
+  for(const auto &named_sub : irep.get_named_sub())
+    find_referenced_functions(named_sub.second, symbol_table, dest);
+}
+
 void dfcct::partition_function_symbols(
   std::set<irep_idt> &contract_symbols,
   std::set<irep_idt> &other_symbols)
@@ -242,6 +267,47 @@ void dfcct::partition_function_symbols(
     goto_functionst::entry_point(),
     goto_model.goto_functions,
     called_functions);
+
+  // The functions that contract clauses (of functions and of loops) call,
+  // and the ones that they call in turn, are instrumented as well: this checks
+  // them for side effects, and calls to them receive a write set argument,
+  // which has to bind to the write set parameter that instrumentation adds.
+  std::set<irep_idt> clause_functions;
+  for(const auto &entry : goto_model.symbol_table)
+  {
+    const symbolt &symbol = entry.second;
+    if(
+      symbol.is_property && symbol.type.id() == ID_code &&
+      has_prefix(id2string(symbol.name), "contract::"))
+    {
+      find_referenced_functions(
+        symbol.type, goto_model.symbol_table, clause_functions);
+    }
+  }
+  std::size_t nof_called_functions;
+  do
+  {
+    nof_called_functions = called_functions.size();
+    for(const auto &function_id : called_functions)
+    {
+      auto found = goto_model.goto_functions.function_map.find(function_id);
+      if(found == goto_model.goto_functions.function_map.end())
+        continue;
+      for(const auto &instruction : found->second.body.instructions)
+      {
+        if(instruction.has_condition())
+        {
+          find_referenced_functions(
+            instruction.condition(), goto_model.symbol_table, clause_functions);
+        }
+      }
+    }
+    for(const auto &function_id : clause_functions)
+    {
+      find_used_functions(
+        function_id, goto_model.goto_functions, called_functions);
+    }
+  } while(called_functions.size() != nof_called_functions);
 
   // collect contract and other symbols
   for(auto &entry : goto_model.symbol_table)
