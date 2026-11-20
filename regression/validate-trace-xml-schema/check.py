@@ -25,17 +25,24 @@ ExcludedTests = list(map(lambda s: os.path.join(test_base_dir, s[0], s[1]), [
     ['xml-interface1', 'test.desc'],
     ['xml-interface1', 'test_wrong_flag.desc'],
     # these want --show-goto-functions instead of producing a trace
-    ['integer-assignments1', 'integer-typecheck.desc'],
     ['declaration-goto', 'no-duplicate-decl.desc'],
     ['destructors', 'compound_literal.desc'],
     ['destructors', 'enter_lexical_block.desc'],
     ['enum_is_in_range', 'enum_test3-simplified.desc'],
     ['enum_is_in_range', 'format.desc'],
+    ['integer-assignments1', 'integer-typecheck.desc'],
     ['r_w_ok9', 'simplify.desc'],
     ['rational1', 'typecheck.desc'],
+    ['reachability-slice', 'test.desc'],
+    ['reachability-slice', 'test2.desc'],
+    ['reachability-slice', 'test3.desc'],
+    ['reachability-slice-interproc', 'test.desc'],
     ['reachability-slice-interproc2', 'test.desc'],
+    ['reachability-slice-interproc3', 'test.desc'],
     ['real-assignments1', 'typecheck.desc'],
     ['saturating_arithmetric', 'output-goto.desc'],
+    ['sync_lock_release-1', 'symbol_per_type.desc'],
+    ['unsigned1', 'test.desc'],
     # uses --show-loops instead of producing a trace
     ['show-loops1', 'test.desc'],
     # this one wants show-properties instead producing a trace
@@ -51,6 +58,7 @@ ExcludedTests = list(map(lambda s: os.path.join(test_base_dir, s[0], s[1]), [
     ['havoc_slice', 'functional_slice_bytes.desc'],
     ['havoc_slice', 'functional_slice_typed.desc'],
     ['saturating_arithmetric', 'output-formula.desc'],
+    ['switch8', 'program-only.desc'],
     # these test for invalid command line handling
     ['bad_option', 'test_multiple.desc'],
     ['bad_option', 'test.desc'],
@@ -59,7 +67,8 @@ ExcludedTests = list(map(lambda s: os.path.join(test_base_dir, s[0], s[1]), [
     ['sat-solver-error', 'test.desc'],
     ['smt2-refine-strings-conflict', 'test.desc'],
     ['smt2-refine-strings-conflict', 'incremental.desc'],
-    # this one produces XML intermingled with main XML output when used with --xml-ui
+    # these produce XML intermingled with main XML output when used with --xml-ui
+    ['graphml_witness1', 'test.desc'],
     ['graphml_witness2', 'test.desc'],
     # these are producing coverage goals which aren't included in the schema
     ['cover-failed-assertions', 'test.desc'],
@@ -68,22 +77,12 @@ ExcludedTests = list(map(lambda s: os.path.join(test_base_dir, s[0], s[1]), [
     ['coverage_report1', 'test.desc'],
     ['coverage_report1', 'paths.desc'],
     ['coverage_report2', 'test.desc'],
-    ['graphml_witness1', 'test.desc'],
-    ['switch8', 'program-only.desc'],
     ['Failing_Assert1', 'dimacs.desc'],
     # this uses json-ui (fails for a different reason actually, but should also
     #   fail because of command line incompatibility)
     ['json1', 'test.desc'],
     ['Bool', 'bool3.desc'],
     ['Empty_struct3', 'test.desc'],
-    # uses show-goto-functions
-    ['reachability-slice', 'test.desc'],
-    ['reachability-slice', 'test2.desc'],
-    ['reachability-slice', 'test3.desc'],
-    ['reachability-slice-interproc', 'test.desc'],
-    ['unsigned1', 'test.desc'],
-    ['reachability-slice-interproc3', 'test.desc'],
-    ['sync_lock_release-1', 'symbol_per_type.desc'],
     # this test is marked smt-backend, and would thus fail as we run tests with
     # the SAT back-end only
     ['integer-assignments1', 'test.desc'],
