@@ -1,6 +1,7 @@
 // Author: Diffblue Ltd.
 
 #include <util/arith_tools.h>
+#include <util/bitvector_types.h>
 #include <util/c_types.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
@@ -72,7 +73,19 @@ private:
         bitvector_type->get_width() == sort_width,
         "Width of smt bit vector term must match the width of bit vector "
         "type.");
-      result = from_integer(bit_vector_constant.value(), type_to_construct);
+      // The SMT value is the bit pattern, which is not the numeric value for
+      // floating-point and fixed-point types (from_integer would convert the
+      // latter).
+      if(
+        can_cast_type<floatbv_typet>(type_to_construct) ||
+        can_cast_type<fixedbv_typet>(type_to_construct))
+      {
+        result = constant_exprt{
+          integer2bvrep(bit_vector_constant.value(), sort_width),
+          type_to_construct};
+      }
+      else
+        result = from_integer(bit_vector_constant.value(), type_to_construct);
       return;
     }
     if(
