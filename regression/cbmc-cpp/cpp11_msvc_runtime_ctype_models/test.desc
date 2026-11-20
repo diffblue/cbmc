@@ -1,0 +1,19 @@
+KNOWNBUG
+main.cpp
+--winx64 --cpp11
+^\[main\.assertion\.1\] line \d+ classification of the C locale: SUCCESS$
+^\[main\.assertion\.2\] line \d+ one byte, one character: SUCCESS$
+^\[main\.assertion\.3\] line \d+ the null character: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+no body for callee
+--
+_Getctype and _Mbrtowc had no model: the ctype facets of the MSVC STL
+read an unknown table, and the "no body" checks of the two functions
+failed in every test that constructs the standard streams (VS 2026 CI:
+cpp17_iostream_basic, cpp20_iostream_basic).

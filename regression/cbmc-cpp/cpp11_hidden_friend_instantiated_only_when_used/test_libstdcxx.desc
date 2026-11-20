@@ -1,0 +1,19 @@
+KNOWNBUG
+libstdcxx.cpp
+--cpp11 --object-bits 12 --unwind 3 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ map with a non-comparable mapped type: SUCCESS$
+^\[main\.assertion\.2\] line \d+ set of list iterators: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+The libstdc++ shape of main.cpp (see test.desc): std::map<std::string,
+value> and std::set<std::list<int>::iterator, cmp> instantiate _Rb_tree's
+hidden friend operator< although nothing compares two containers; the
+element comparisons it needs (stl_pair.h:835, predefined_ops.h:44) are
+dropped.  Pre-existing (round-162 snapshot bin51).

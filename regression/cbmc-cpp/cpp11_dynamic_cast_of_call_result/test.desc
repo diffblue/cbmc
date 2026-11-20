@@ -1,0 +1,22 @@
+KNOWNBUG
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ cross cast, one call: SUCCESS$
+^\[main\.assertion\.2\] line \d+ downcast, one call: SUCCESS$
+^\[main\.assertion\.3\] line \d+ to void \*, one call: SUCCESS$
+^\[main\.assertion\.4\] line \d+ reference cross cast, one call: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The run-time check of a dynamic_cast reads its operand more than once and
+was skipped for an operand with side effects: a cross cast then
+reinterpreted the pointer (offset 0 instead of the NE subobject's), and the
+reference form was rejected ("type mismatch on dynamic_cast").  Such an
+operand is now evaluated once into a local by a statement expression.
+Without a declaration of std::bad_cast the reference form is still
+rejected.

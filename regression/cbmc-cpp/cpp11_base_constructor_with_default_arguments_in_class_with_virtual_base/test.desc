@@ -1,0 +1,22 @@
+KNOWNBUG
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ virtual base constructed once: SUCCESS$
+^\[main\.assertion\.2\] line \d+ default argument passed: SUCCESS$
+^\[main\.assertion\.3\] line \d+ base body reaches the virtual base: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The hidden flag that selects base-object construction was appended right
+after the written arguments of a mem-initializer, so it bound to the base
+constructor's first defaulted parameter (`is_standard' became false only by
+luck), and the flag kept its default `true': B was constructed as a complete
+object and installed its own virtual pointer, through which its body found
+the virtual base at B's own offset, inside D's buffer.  The default
+arguments now come first.  Seen with the MSVC STL's istringstream
+(cpp20_istringstream_string_allocator_delegation_msvc).

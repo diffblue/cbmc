@@ -1,0 +1,22 @@
+KNOWNBUG libcxx
+main.cpp
+--cpp11 --object-bits 12 --stdlib libc++ --unwind 6 --unwinding-assertions
+^\[main\.assertion\.1\] line \d+ decimal: SUCCESS$
+^\[main\.assertion\.2\] line \d+ hex: SUCCESS$
+^\[main\.assertion\.3\] line \d+ showbase uppercase: SUCCESS$
+^\[main\.assertion\.4\] line \d+ internal padding: SUCCESS$
+^\[main\.assertion\.5\] line \d+ left padding: SUCCESS$
+^\[main\.assertion\.6\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+unwinding assertion loop \d+: FAILURE
+--
+libc++ formats an integer with snprintf, whose model wrote unknown
+characters, and with __num_put_base::__format_int and __identify_padding,
+which had no model.  With libstdc++ the checks passed already; one stream
+that is reset with str("") between the checks makes the libstdc++ run
+take more than 900 s, so each check has its own stream.

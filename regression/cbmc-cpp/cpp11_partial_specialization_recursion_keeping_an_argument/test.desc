@@ -1,0 +1,19 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ six at run time: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+could not be evaluated
+static assertion failed
+--
+The guard against runaway template recursion counted an enclosing instance
+of the same template whenever one argument contained the other's spelling,
+also when the argument was the same (Len above), and cut the recursion
+after three levels: F<L<...5 types...>, 0>::value was not known.  An
+unchanged argument is no longer evidence of growth.

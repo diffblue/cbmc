@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ zero-initialized: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The verification counterpart of test.desc; it passes on bin53 too (the
+bug affects only the output of constants).

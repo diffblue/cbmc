@@ -1,0 +1,25 @@
+extern "C" void __CPROVER_assert(bool, const char *);
+template <class>
+struct impl
+{
+  static constexpr int value = 0;
+};
+// the MSVC STL defines the same partial specialization per calling
+// convention (_Get_function_impl in <functional>); cbmc ignores calling
+// conventions, so the second is a redefinition of the first
+template <class R, class... A>
+struct impl<R __cdecl(A...)>
+{
+  static constexpr int value = 1;
+};
+template <class R, class... A>
+struct impl<R __vectorcall(A...)>
+{
+  static constexpr int value = 1;
+};
+int main()
+{
+  __CPROVER_assert(impl<int(int)>::value == 1, "default calling convention");
+  __CPROVER_assert(impl<int(int)>::value == 0, "WRONG (must FAIL)");
+  return 0;
+}

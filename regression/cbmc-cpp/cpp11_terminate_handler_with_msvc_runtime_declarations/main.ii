@@ -1,0 +1,61 @@
+// N5008 [except.terminate]/1.4, [set.terminate]: the MSVC runtime declares
+// terminate and set_terminate extern "C" at global scope
+// (<corecrt_terminate.h>), and the MSVC STL's <exception> brings them into
+// std by using-declarations.  The declarations below are those of the UCRT
+// (10.0.26100.0) and MSVC STL 14.51, as cl preprocesses them.
+#line 1 "C:\\Program Files (x86)\\Windows Kits\\10\\include\\10.0.26100.0\\ucrt\\corecrt_terminate.h"
+extern "C" {
+typedef void (__cdecl* terminate_handler )(void);
+__declspec(noreturn) void __cdecl terminate() throw();
+terminate_handler __cdecl set_terminate(terminate_handler _NewTerminateHandler) throw();
+terminate_handler __cdecl _get_terminate();
+}
+extern "C" __declspec(noreturn) void __cdecl abort();
+namespace std {
+using ::terminate;
+using ::set_terminate;
+using ::terminate_handler;
+using ::abort;
+inline terminate_handler __cdecl get_terminate() noexcept { return _get_terminate(); }
+}
+extern "C" __declspec(noreturn) void __cdecl abort();
+#line 1 "main.cpp"
+// N5008 [except.terminate]/1.4, /2: when the destruction of an object
+// during stack unwinding exits via an exception, std::terminate is called,
+// which calls the terminate handler ([terminate.handler]).  The handler
+// below asserts; a verifier that assumes the destructor does not throw
+// misses that failure.
+extern "C" void __CPROVER_assert(bool, const char *);
+
+bool unwinding = false;
+
+void handler()
+{
+  __CPROVER_assert(unwinding, "terminate called from the unwinding");
+  __CPROVER_assert(false, "WRONG (must FAIL)");
+  std::abort();
+}
+
+struct T
+{
+  ~T() noexcept(false)
+  {
+    if(unwinding)
+      throw 2;
+  }
+};
+
+int main()
+{
+  std::set_terminate(handler);
+  try
+  {
+    T t;
+    unwinding = true;
+    throw 1;
+  }
+  catch(...)
+  {
+  }
+  return 0;
+}

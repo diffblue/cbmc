@@ -1,0 +1,23 @@
+KNOWNBUG libcxx
+main.cpp
+--cpp11 --object-bits 12 --stdlib libc++ --unwind 12 --unwindset __builtin_memchr.0:27 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ no read error: SUCCESS$
+^\[main\.assertion\.2\] line \d+ failed: 0, a limit, or nothing extracted: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+libc++ reads the integer through num_get, whose facet, the "C" locale's
+numpunct and the conversion with strtoll_l are in libc++.so and the C
+library; they are modelled (use_facet, numpunct<char>, __get_base,
+__check_grouping, __cloc, __num_get_base::__src, strtoll_l).  Before,
+cin.fail() held on every path.  num_get looks every character up among 26
+atoms with std::find, which libc++ implements with memchr: its loop needs
+27 iterations.  num_get gathered the characters in a std::string, whose
+union representation, written at an index that differs between paths,
+made the formula grow quickly (more than 14 GB at --unwind 4); its model
+uses an array (at --unwind 12: 25 s, 0.7 GB).

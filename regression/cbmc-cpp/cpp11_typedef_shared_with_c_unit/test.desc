@@ -1,0 +1,22 @@
+KNOWNBUG
+main.cpp
+other.c --validate-goto-model
+^\[main\.assertion\.1\] line \d+ wrap: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+Invariant check failed
+--
+A C unit linked after a C++ unit declares a typedef of a struct the C++
+unit also declares; the two struct types differ (C++ qualifies member
+names), so the linker renames the C typedef.  It was renamed to a string
+built from its type, while the C types written with the typedef still
+named the old symbol: --validate-goto-model stopped with "locale_pointers
+not found".  Typedefs are now renamed with a $link suffix, as other
+symbols are, and so are the typedef names that types record.  The
+Universal CRT's _locale_t and stdio.h's inline functions hit this when
+the C library models are linked (VS 2026 CI).
