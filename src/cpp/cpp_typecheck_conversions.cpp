@@ -1322,7 +1322,7 @@ bool cpp_typecheckt::reference_binding(
         component_type.parameters().front().type();
       this_type.set(ID_C_reference, true);
 
-      exprt this_expr(expr);
+      const exprt &this_expr = expr;
 
       this_type.set(ID_C_this, true);
 
@@ -1348,7 +1348,7 @@ bool cpp_typecheckt::reference_binding(
         typecheck_side_effect_function_call(func_expr);
 
         // let's check if the returned value binds directly
-        exprt returned_value=func_expr;
+        exprt returned_value = std::move(func_expr);
         add_implicit_dereference(returned_value);
 
         if(

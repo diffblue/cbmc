@@ -458,7 +458,7 @@ void replace_function_calls_by_contracts(
             id2string(symbol.display_name()) + " precondition " +
             expr2text(instantiated_precondition, ns));
 
-          auto replaced_precondition = instantiated_precondition;
+          auto replaced_precondition = std::move(instantiated_precondition);
           replace_symbol(replaced_precondition);
 
           dest.add(
