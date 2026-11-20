@@ -79,15 +79,19 @@ bvt boolbvt::convert_byte_update(const byte_update_exprt &expr)
   }
 
   // byte_update with variable index
+  // The maps depend only on the types, not on the offset, and building one
+  // costs time linear in the width of the type.  Building them once rather
+  // than once per candidate offset turns this from quadratic into linear in
+  // the size of the updated object.
+  const endianness_mapt map_op = endianness_map(op.type(), little_endian);
+  const endianness_mapt map_value = endianness_map(value.type(), little_endian);
+
   for(std::size_t offset=0; offset<bv.size(); offset+=byte_width)
   {
     // index condition
     equal_exprt equality(
       offset_expr, from_integer(offset / byte_width, offset_expr.type()));
     literalt equal=convert(equality);
-
-    endianness_mapt map_op = endianness_map(op.type(), little_endian);
-    endianness_mapt map_value = endianness_map(value.type(), little_endian);
 
     for(std::size_t bit=0; bit<update_width; bit++)
       if(offset+bit<bv.size())
