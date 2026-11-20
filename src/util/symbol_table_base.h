@@ -53,10 +53,21 @@ public:
 
   virtual ~symbol_table_baset();
 
+protected:
+  /// Per-prefix "next search-start" hint consulted by
+  /// `next_unused_suffix(prefix)`.  Mutable so the hint can be updated
+  /// through the const read API.  See that function's docstring for
+  /// semantics.  Because this is mutated from a const method,
+  /// `symbol_table_baset` is not thread-safe: concurrent calls require
+  /// external synchronisation.
+  mutable std::unordered_map<std::string, std::size_t> suffix_hint_cache;
+
+public:
   /// Find smallest unused integer i so that prefix + std::to_string(i)
-  /// does not exist in the list \p symbols.
+  /// does not exist in the list \p symbols, starting the search at
+  /// \p start_number.
   /// \param prefix: A string denoting the prefix we want to find the
-  ///   smallest suffix of.
+  ///   smallest unused suffix of.
   /// \param start_number: The starting suffix number to search from.
   /// \return The small unused suffix size.
   std::size_t
@@ -69,9 +80,27 @@ public:
     return start_number;
   }
 
+  /// Find an unused integer i so that prefix + std::to_string(i) does
+  /// not exist in the list \p symbols.
+  ///
+  /// A per-prefix hint makes repeated allocation of names that share a
+  /// prefix amortised O(1) per call instead of a linear scan from 0, which
+  /// made allocating N such names O(N^2) (for example, in the object
+  /// factory or for symex failure values).
+  ///
+  /// The returned suffix is unused, but need not be the smallest unused one:
+  /// a gap left by erasing a symbol with a lower suffix after the hint has
+  /// moved past it is not reused. Callers only require uniqueness.
+  /// \param prefix: the prefix of the name
+  /// \return an unused suffix
   virtual std::size_t next_unused_suffix(const std::string &prefix) const
   {
-    return next_unused_suffix(prefix, 0);
+    // try_emplace only constructs the node (copying the key) when an insertion
+    // actually happens; on the common cache-hit path nothing is copied.
+    auto it = suffix_hint_cache.try_emplace(prefix, 0).first;
+    const std::size_t free_suffix = next_unused_suffix(prefix, it->second);
+    it->second = free_suffix + 1;
+    return free_suffix;
   }
 
   /// Permits implicit cast to const symbol_tablet &
