@@ -1,0 +1,14 @@
+KNOWNBUG
+main.c
+--arrays-uf-always --no-simplify
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^Invariant check failed
+--
+With --arrays-uf-always and --no-simplify, a write to an array member of a
+struct fails an invariant in arrayst::add_array_constraints ("unexpected array
+expression (add_array_constraints): 'member'"). Without --no-simplify, the
+assertion is proved.

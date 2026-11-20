@@ -1,0 +1,14 @@
+KNOWNBUG
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+When the inner dimension of a two-dimensional array is variable-length, the
+array is handled by the array theory, and a read at indices that equal the
+indices of a preceding write, but are different terms, is not constrained to
+yield the written value: the propositional back-end reports a spurious
+counterexample. With --z3, the assertion is proved.
