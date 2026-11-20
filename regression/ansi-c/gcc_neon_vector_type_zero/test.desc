@@ -1,0 +1,12 @@
+CORE gcc-only
+main.c
+
+^EXIT=1$
+^SIGNAL=0$
+error: vector size must be positive, but got 0$
+^CONVERSION ERROR$
+--
+^warning: ignoring
+^VERIFICATION
+--
+A neon_vector_type lane count of 0 must be rejected by the positivity check.
