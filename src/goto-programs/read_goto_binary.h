@@ -29,7 +29,7 @@ bool is_goto_binary(const std::string &filename, message_handlert &);
 /// \param [out] dest: GOTO model to update.
 /// \param message_handler: for diagnostics
 /// \return True on error, false otherwise
-bool read_objects_and_link(
+[[nodiscard]] bool read_objects_and_link(
   const std::list<std::string> &file_names,
   goto_modelt &dest,
   message_handlert &message_handler);
