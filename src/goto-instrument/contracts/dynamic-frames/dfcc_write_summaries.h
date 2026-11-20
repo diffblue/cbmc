@@ -13,6 +13,7 @@ Author: Felipe R. Monteiro, felisous@amazon.com
 #ifndef CPROVER_GOTO_INSTRUMENT_CONTRACTS_DYNAMIC_FRAMES_DFCC_WRITE_SUMMARIES_H
 #define CPROVER_GOTO_INSTRUMENT_CONTRACTS_DYNAMIC_FRAMES_DFCC_WRITE_SUMMARIES_H
 
+#include <util/expr.h>
 #include <util/irep.h>
 
 #include <goto-programs/goto_functions.h>
@@ -52,16 +53,24 @@ struct write_summaryt
 {
   /// Globals it may write, whole.
   std::set<irep_idt> globals;
+  /// Members of globals it may write, such as `g.a`.
+  std::set<exprt> global_parts;
   /// Parameters through which it may write, into the whole object they point
   /// to on entry.
   std::set<std::size_t> parameters;
+  /// For each pointer parameter that the function does not assign to and does
+  /// not take the address of, the members it may write of the object that
+  /// parameter points to on entry, such as `p->a` (`(*p).a`).
+  std::map<std::size_t, std::set<exprt>> parameter_parts;
   /// It may write through a pointer whose target the analysis cannot name.
   bool unknown = false;
   originst result;
 
   bool operator==(const write_summaryt &other) const
   {
-    return globals == other.globals && parameters == other.parameters &&
+    return globals == other.globals && global_parts == other.global_parts &&
+           parameters == other.parameters &&
+           parameter_parts == other.parameter_parts &&
            unknown == other.unknown && result == other.result;
   }
 };
@@ -97,6 +106,10 @@ private:
 
   // State of the function being analyzed.
   std::map<irep_idt, originst> variables;
+  /// The index of each pointer parameter that the function does not assign
+  /// to and does not take the address of: it points to the same object
+  /// throughout the function.
+  std::map<irep_idt, std::size_t> stable_parameters;
   write_summaryt current;
   bool variables_changed = false;
 
@@ -114,6 +127,12 @@ private:
   /// Records an assignment of \p content to \p lhs.
   void write(const exprt &lhs, const originst &content);
 
+  /// If \p lhs is a part of a global or of what a stable parameter points
+  /// to, records a write of the member of that object that \p lhs is part
+  /// of (or of the whole object, if \p lhs is not part of a member) and
+  /// returns true.
+  bool write_part(const exprt &lhs);
+
   /// The objects whose address is `&object`.
   originst object_origins(const exprt &object);
 
@@ -129,8 +148,10 @@ private:
 /// can then run out of memory. Their writes are not checked against a write
 /// set, but the objects they write must still be havocked, so the summary
 /// writes a nondeterministic value to:
-/// - each global the function or its callees may write, whole;
-/// - the whole object each pointer parameter it may write through points to;
+/// - each global the function or its callees may write, whole, or the
+///   members of it they write;
+/// - the whole object each pointer parameter it may write through points to,
+///   or the members of it they write;
 /// - its result, which may point to the objects its result may point to.
 /// A function that may write through a pointer the summary cannot name keeps
 /// its body. The bodies are restored on destruction.

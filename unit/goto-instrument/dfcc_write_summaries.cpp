@@ -136,6 +136,97 @@ static write_summaryt summary_with_other(
   return summaries["f"];
 }
 
+/// The component name of \p part, a member of a dereferenced parameter, or of
+/// a global, if \p dereference.
+static irep_idt member_of(const exprt &part, bool dereference)
+{
+  REQUIRE(part.id() == ID_member);
+  const exprt &compound = to_member_expr(part).compound();
+  REQUIRE(compound.id() == (dereference ? ID_dereference : ID_symbol));
+  return to_member_expr(part).get_component_name();
+}
+
+TEST_CASE(
+  "Write summaries record the members that are written",
+  "[core][goto-instrument][dfcc_write_summaries]")
+{
+  const std::string types =
+    "struct inner { int x; int y; };\n"
+    "struct S { int a; int b; struct inner in; int arr[2]; };\n"
+    "struct S g;\n";
+
+  SECTION("A member of a global")
+  {
+    const auto summary = summary_of(
+      types +
+        "void f(void) { g.a = 1; g.in.x = 2; }\n"
+        "void main() {}\n",
+      "f");
+    REQUIRE(summary.globals.empty());
+    REQUIRE(summary.global_parts.size() == 2);
+    std::set<irep_idt> members;
+    for(const auto &part : summary.global_parts)
+      members.insert(member_of(part, false));
+    // A part of a member counts as the whole member.
+    REQUIRE(members == std::set<irep_idt>{"a", "in"});
+  }
+
+  SECTION("A member of what a parameter points to")
+  {
+    const auto summary = summary_of(
+      types +
+        "void f(struct S *p, int i) { p->a = 1; p->arr[i] = 2; }\n"
+        "void main() {}\n",
+      "f");
+    REQUIRE(summary.parameters.empty());
+    REQUIRE(summary.parameter_parts.size() == 1);
+    std::set<irep_idt> members;
+    for(const auto &part : summary.parameter_parts.at(0))
+      members.insert(member_of(part, true));
+    REQUIRE(members == std::set<irep_idt>{"a", "arr"});
+    REQUIRE_FALSE(summary.unknown);
+  }
+
+  SECTION("A member written by a callee")
+  {
+    const auto summary = summary_of(
+      types +
+        "void h(struct inner *q) { q->x = 1; }\n"
+        "void f(struct S *p) { h(&p->in); h(&g.in); }\n"
+        "void main() {}\n",
+      "f");
+    REQUIRE(summary.parameters.empty());
+    REQUIRE(summary.parameter_parts.size() == 1);
+    REQUIRE(summary.parameter_parts.at(0).size() == 1);
+    REQUIRE(member_of(*summary.parameter_parts.at(0).begin(), true) == "in");
+    REQUIRE(summary.global_parts.size() == 1);
+    REQUIRE(member_of(*summary.global_parts.begin(), false) == "in");
+  }
+
+  SECTION("A parameter that the function changes")
+  {
+    const auto summary = summary_of(
+      types +
+        "void f(struct S *p) { p = p + 1; p->a = 1; }\n"
+        "void main() {}\n",
+      "f");
+    REQUIRE(summary.parameters == std::set<std::size_t>{0});
+    REQUIRE(summary.parameter_parts.empty());
+  }
+
+  SECTION("A parameter whose address is taken")
+  {
+    const auto summary = summary_of(
+      types +
+        "void h(struct S **pp) { *pp = &g; }\n"
+        "void f(struct S *p) { h(&p); p->a = 1; }\n"
+        "void main() {}\n",
+      "f");
+    REQUIRE(summary.parameter_parts.empty());
+    REQUIRE(summary.unknown);
+  }
+}
+
 TEST_CASE(
   "Write summaries of OTHER instructions",
   "[core][goto-instrument][dfcc_write_summaries]")
@@ -342,12 +433,16 @@ TEST_CASE(
     "void __VERIFIER_record(int *p) { int t = g; *p = t + 1; }\n"
     "void __VERIFIER_unknown(int **pp) { **pp = 1; }\n"
     "void __VERIFIER_uncalled(void) { g = 1; }\n"
+    "struct S { int a; int b; };\n"
+    "void __VERIFIER_member(struct S *s) { s->a = 1; }\n"
     "void user(int *p) { *p = 1; __VERIFIER_record(p); }\n"
     "void loop(void)\n"
     "{\n"
     "  int x;\n"
     "  int *p = &x;\n"
+    "  struct S s;\n"
     "  user(&x);\n"
+    "  __VERIFIER_member(&s);\n"
     "  __VERIFIER_unknown(&p);\n"
     "}\n"
     "void main() { __VERIFIER_uncalled(); }\n");
@@ -380,6 +475,18 @@ TEST_CASE(
     REQUIRE(summary.instructions.size() == 2);
     REQUIRE(assigns(summary, is_parameter_dereference));
     REQUIRE(summary.instructions.back().is_end_function());
+    // A function that writes a member of what its parameter points to
+    // writes only that member.
+    const goto_programt &member = function_map.at("__VERIFIER_member").body;
+    REQUIRE(member.instructions.size() == 2);
+    REQUIRE(assigns(
+      member,
+      [](const exprt &lhs)
+      {
+        return lhs.id() == ID_member &&
+               to_member_expr(lhs).get_component_name() == "a" &&
+               to_member_expr(lhs).compound().id() == ID_dereference;
+      }));
     // A function that may write through a pointer the summary cannot name,
     // and a function DFCC instruments, keep their bodies.
     REQUIRE(

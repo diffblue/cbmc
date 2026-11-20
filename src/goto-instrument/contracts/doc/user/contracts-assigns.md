@@ -545,6 +545,19 @@ The inference algorithm consist of three stages:
 We do the function inlining first so that we can infer those assigns targets
 hidden in the function call, for example, `j` is assigned to in `set_j`.
 
+Functions that DFCC does not instrument (the `__CPROVER_` functions of its
+library, and functions whose names start with `__VERIFIER` or `nondet`) are
+not inlined with their bodies: tools may call such functions in every
+instruction of a loop, and inlining them can then exhaust memory. The inference
+inlines a summary of their writes instead. The summary writes a
+nondeterministic value to each global that the function or its callees may
+write, and to each object that a pointer parameter points to and that they may
+write through it. Where they only write members of such a global or object
+(such as `s->a`), the summary writes only those members, and otherwise the
+whole global or object. A function that may write through a pointer that the
+summary cannot name, such as a pointer loaded from memory, is inlined with its
+body.
+
 Then we collect all targets of assignments in the loop after inlining. In the
 `test_loop_assigns_inference` example, there are five assignments in the loop.
 1. `n = &i`, with assign target `n`. `n` will not be included in the inferred
@@ -572,6 +585,8 @@ infer the assigns target `__CPROVER_object_whole(box.ptr)`.
 However, the failed inference does not result in unsoundness.
 That is, CBMC will report assignability-checks failure when the inferred
 assigns clauses are not accurate.
+This does not apply to writes in functions that DFCC does not instrument, as
+their writes are not checked.
 
 ## Additional Resources
 

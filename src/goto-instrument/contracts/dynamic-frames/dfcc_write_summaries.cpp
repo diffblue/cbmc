@@ -17,6 +17,9 @@ Author: Felipe R. Monteiro, felisous@amazon.com
 
 #include "dfcc_is_cprover_symbol.h"
 
+#include <functional>
+#include <optional>
+
 /// \p type, or the type its tag names.
 static const typet &follow_tags(const typet &type, const namespacet &ns)
 {
@@ -27,6 +30,46 @@ static const typet &follow_tags(const typet &type, const namespacet &ns)
   if(type.id() == ID_c_enum_tag)
     return ns.follow_tag(to_c_enum_tag_type(type));
   return type;
+}
+
+/// Calls \p f with the identifier of each variable that the lvalue \p lhs may
+/// denote part of.
+static void
+lvalue_roots(const exprt &lhs, const std::function<void(const irep_idt &)> &f)
+{
+  if(lhs.id() == ID_symbol)
+    f(to_symbol_expr(lhs).identifier());
+  else if(
+    lhs.id() == ID_member || lhs.id() == ID_index ||
+    lhs.id() == ID_byte_extract_little_endian ||
+    lhs.id() == ID_byte_extract_big_endian || lhs.id() == ID_typecast)
+  {
+    lvalue_roots(lhs.operands().front(), f);
+  }
+  else if(lhs.id() == ID_if)
+  {
+    lvalue_roots(to_if_expr(lhs).true_case(), f);
+    lvalue_roots(to_if_expr(lhs).false_case(), f);
+  }
+}
+
+/// \p part, a member of some object (or that object itself), with that
+/// object replaced by \p object.
+static exprt rebase(const exprt &part, const exprt &object)
+{
+  if(part.id() != ID_member)
+    return object;
+  return member_exprt{
+    object, to_member_expr(part).get_component_name(), part.type()};
+}
+
+/// The object that \p part, a member of some object (or that object itself),
+/// is part of.
+static const exprt &root_object(const exprt &part)
+{
+  if(part.id() != ID_member)
+    return part;
+  return to_member_expr(part).compound();
 }
 
 bool originst::merge(const originst &other)
@@ -130,10 +173,40 @@ write_summaryt write_summariest::analyze(const irep_idt &id)
   const goto_functiont &function = goto_functions.function_map.at(id);
   variables.clear();
   current = write_summaryt();
+  stable_parameters.clear();
   for(std::size_t i = 0; i < function.parameter_identifiers.size(); ++i)
   {
     const irep_idt &parameter = function.parameter_identifiers[i];
     variables[parameter].parameters.insert(i);
+    const symbolt *symbol;
+    if(!ns.lookup(parameter, symbol) && symbol->type.id() == ID_pointer)
+      stable_parameters.emplace(parameter, i);
+  }
+  const auto unstable = [this](const irep_idt &id)
+  { stable_parameters.erase(id); };
+  for(const auto &instruction : function.body.instructions)
+  {
+    if(instruction.is_assign())
+      lvalue_roots(instruction.assign_lhs(), unstable);
+    else if(instruction.is_function_call())
+      lvalue_roots(instruction.call_lhs(), unstable);
+    else if(
+      instruction.is_other() &&
+      instruction.get_other().get_statement() == ID_array_equal &&
+      instruction.get_other().operands().size() == 3)
+    {
+      // The other OTHER instructions only write through pointers, or make
+      // the summary unknown.
+      lvalue_roots(instruction.get_other().op2(), unstable);
+    }
+    const auto address_taken = [&unstable](const exprt &expr)
+    {
+      if(expr.id() == ID_address_of)
+        lvalue_roots(to_address_of_expr(expr).object(), unstable);
+    };
+    instruction.code().visit_pre(address_taken);
+    if(instruction.has_condition())
+      instruction.condition().visit_pre(address_taken);
   }
   do
   {
@@ -214,6 +287,8 @@ void write_summariest::call(const goto_programt::instructiont &instruction)
   const write_summaryt summary = summaries[callee];
   const auto &arguments = instruction.call_arguments();
   current.globals.insert(summary.globals.begin(), summary.globals.end());
+  current.global_parts.insert(
+    summary.global_parts.begin(), summary.global_parts.end());
   current.unknown |= summary.unknown;
   for(const auto i : summary.parameters)
   {
@@ -221,6 +296,42 @@ void write_summariest::call(const goto_programt::instructiont &instruction)
       write_through(origins(arguments[i]), unknown);
     else
       current.unknown = true;
+  }
+  const auto &callee_parameters =
+    goto_functions.function_map.at(callee).parameter_identifiers;
+  for(const auto &entry : summary.parameter_parts)
+  {
+    const std::size_t i = entry.first;
+    if(i >= arguments.size() || i >= callee_parameters.size())
+    {
+      current.unknown = true;
+      continue;
+    }
+    const exprt &argument = arguments[i];
+    const symbolt *parameter;
+    // The object the argument points to, if it is `&object` or a stable
+    // parameter, so that the parts the callee writes can be named here.
+    std::optional<exprt> object;
+    if(
+      !ns.lookup(callee_parameters[i], parameter) &&
+      argument.type() == parameter->type)
+    {
+      if(argument.id() == ID_address_of)
+        object = to_address_of_expr(argument).object();
+      else if(
+        argument.id() == ID_symbol &&
+        stable_parameters.count(to_symbol_expr(argument).identifier()))
+      {
+        object = dereference_exprt{argument};
+      }
+    }
+    if(!object.has_value())
+    {
+      write_through(origins(argument), unknown);
+      continue;
+    }
+    for(const auto &part : entry.second)
+      write(rebase(part, *object), unknown);
   }
   if(lhs.is_not_nil())
   {
@@ -249,8 +360,54 @@ void write_summariest::write_through(
     variables_changed |= variables[local].merge(content);
 }
 
+bool write_summariest::write_part(const exprt &lhs)
+{
+  // `root` is the innermost object of the members and indices of `lhs`, and
+  // `part` the member of `root` that `lhs` is part of, or `root` itself.
+  // Deeper parts are not kept: the loop assigns inference only takes members
+  // of variables and of dereferenced pointers as targets, see
+  // `get_assigns_lhs`, and leaves out a member of a member.
+  const exprt *root = &lhs;
+  const exprt *part = &lhs;
+  while(root->id() == ID_member || root->id() == ID_index)
+  {
+    part = root;
+    root = &root->operands().front();
+  }
+  if(part->id() != ID_member)
+    part = root;
+  if(root->id() == ID_symbol)
+  {
+    const irep_idt &id = to_symbol_expr(*root).identifier();
+    if(!is_global(id))
+      return false;
+    if(part == root)
+      current.globals.insert(id);
+    else
+      current.global_parts.insert(*part);
+    return true;
+  }
+  if(
+    root->id() == ID_dereference &&
+    to_dereference_expr(*root).pointer().id() == ID_symbol)
+  {
+    const auto entry = stable_parameters.find(
+      to_symbol_expr(to_dereference_expr(*root).pointer()).identifier());
+    if(entry == stable_parameters.end())
+      return false;
+    if(part == root)
+      current.parameters.insert(entry->second);
+    else
+      current.parameter_parts[entry->second].insert(*part);
+    return true;
+  }
+  return false;
+}
+
 void write_summariest::write(const exprt &lhs, const originst &content)
 {
+  if(write_part(lhs))
+    return;
   if(lhs.id() == ID_symbol)
   {
     const irep_idt &id = to_symbol_expr(lhs).identifier();
@@ -470,11 +627,18 @@ static bool make_body(
     return false;
   const symbolt &symbol = ns.lookup(id);
   const source_locationt &location = symbol.location;
-  for(const auto &global : summary.globals)
+  const auto havoc = [&body, &location](const exprt &target)
   {
-    const symbol_exprt target = ns.lookup(global).symbol_expr();
     body.add(goto_programt::make_assignment(
       target, side_effect_expr_nondett(target.type(), location), location));
+  };
+  for(const auto &global : summary.globals)
+    havoc(ns.lookup(global).symbol_expr());
+  for(const auto &part : summary.global_parts)
+  {
+    // Not needed if the global is written whole.
+    if(!summary.globals.count(to_symbol_expr(root_object(part)).identifier()))
+      havoc(part);
   }
   for(const auto i : summary.parameters)
   {
@@ -485,6 +649,20 @@ static bool make_body(
       ns.lookup(function.parameter_identifiers[i]).symbol_expr();
     if(!write_through(parameter, summaries, ns, location, body))
       return false;
+  }
+  for(const auto &entry : summary.parameter_parts)
+  {
+    const std::size_t i = entry.first;
+    INVARIANT(
+      i < function.parameter_identifiers.size(),
+      "summaries only name parameters of the function");
+    // Not needed if the whole object is written.
+    if(summary.parameters.count(i))
+      continue;
+    const dereference_exprt object{
+      ns.lookup(function.parameter_identifiers[i]).symbol_expr()};
+    for(const auto &part : entry.second)
+      havoc(rebase(part, object));
   }
   const typet &return_type = to_code_type(symbol.type).return_type();
   if(return_type.id() != ID_empty)
