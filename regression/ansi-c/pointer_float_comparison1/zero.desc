@@ -1,0 +1,11 @@
+CORE
+zero.c
+
+^.*error: operator 'notequal' not defined for types 'signed int \*' and 'double'$
+^CONVERSION ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--
+GCC and Clang reject comparing a pointer with 0.0, which is not a null pointer
+constant. CBMC used to treat it as a null pointer.

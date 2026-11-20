@@ -42,7 +42,7 @@ int main(void)
   double *local_double_ptr_show = local_double_ptr;
 
   assert(local_double_ptr == &d2);
-  assert(local_double_ptr == &d1 || local_double == &d2);
+  assert(local_double_ptr == &d1 || local_double_ptr == &d2);
   assert(*local_double_ptr > 0.0);
   assert(*local_double_ptr > 3.0);
 

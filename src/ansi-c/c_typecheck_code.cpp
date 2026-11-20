@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/cprover_prefix.h>
 #include <util/expr_util.h>
+#include <util/mathematical_types.h>
 #include <util/range.h>
 #include <util/string_constant.h>
 #include <util/symbol_table_base.h>
@@ -1117,6 +1118,18 @@ void c_typecheck_baset::typecheck_spec_decreases(codet &code)
     {
       typecheck_expr(decreases_clause_component);
       implicit_typecast_arithmetic(decreases_clause_component);
+
+      // A decreases clause is compared with the strict arithmetic (or, for
+      // several components, lexicographic) order, which requires real
+      // arithmetic types.
+      const typet &type = decreases_clause_component.type();
+      if(!is_number(type) || type.id() == ID_complex)
+      {
+        error().source_location = decreases_clause_component.source_location();
+        error() << "decreases clause component must have arithmetic type, "
+                << "but has type '" << to_string(type) << "'" << eom;
+        throw 0;
+      }
     }
   }
 }
