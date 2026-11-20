@@ -1,0 +1,12 @@
+CORE
+main.c
+--chain chain.sh
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Verify that --unwindset accepts hash-based loop identifiers.
+The hash is extracted dynamically via --show-loops to avoid
+platform-dependent hash values.

@@ -117,6 +117,8 @@ int goto_diff_parse_optionst::doit()
 
   if(cmdline.isset("show-loops"))
   {
+    goto_model1.goto_functions.compute_loop_hashes();
+    goto_model2.goto_functions.compute_loop_hashes();
     show_loop_ids(ui_message_handler.get_ui(), goto_model1);
     show_loop_ids(ui_message_handler.get_ui(), goto_model2);
     return CPROVER_EXIT_SUCCESS;

@@ -1,0 +1,11 @@
+CORE
+test.c
+--show-loops
+^EXIT=0$
+^SIGNAL=0$
+^Loop main\.[0-9]+: \(hash main\.hash_[0-9]+\)$
+^Loop main\.[0-9]+: \(hash main\.hash_[0-9]+\)$
+--
+^warning: ignoring
+--
+Nested loops should each have a unique hash identifier.
