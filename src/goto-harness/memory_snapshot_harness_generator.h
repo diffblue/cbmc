@@ -324,6 +324,9 @@ protected:
       auto push_to_output = [&output](const valuet &value) {
         output.push_back(value);
       };
+      // Clear the sets before starting the sort to ensure a fresh traversal
+      seen.clear();
+      inserted.clear();
       for(const auto &item : input)
       {
         dfs(item, associate_key_with_t, push_to_output);
@@ -339,10 +342,7 @@ protected:
     template <typename Value, typename Map, typename Handler>
     void dfs(Value &&node, Map &&key_to_t, Handler &&handle)
     {
-      PRECONDITION(seen.empty() && inserted.empty());
       dfs_inner(node, key_to_t, handle);
-      seen.clear();
-      inserted.clear();
     }
 
     template <typename Value, typename Map, typename Handler>

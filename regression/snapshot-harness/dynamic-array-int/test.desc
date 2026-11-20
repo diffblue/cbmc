@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.c
 array,iterator1,iterator2,iterator3 --harness-type initialize-with-memory-snapshot --initial-goto-location main:4
 ^EXIT=10$
@@ -9,11 +9,8 @@ array,iterator1,iterator2,iterator3 --harness-type initialize-with-memory-snapsh
 \[main.assertion.4\] line [0-9]+ assertion iterator2 == \&array\[1\]: SUCCESS
 \[main.assertion.5\] line [0-9]+ assertion \*iterator3 == array\[1\]: SUCCESS
 \[main.assertion.6\] line [0-9]+ assertion \*iterator3 == 2: SUCCESS
-\[main.pointer_dereference.27\] line [0-9]+ dereference failure: pointer outside object bounds in \*iterator3: FAILURE
+\[main.pointer_dereference.\d+\] line [0-9]+ dereference failure: pointer outside object bounds in \*iterator3: FAILURE
 \[main.assertion.7\] line [0-9]+ assertion \*iterator3 == 0: FAILURE
 VERIFICATION FAILED
 --
 unwinding assertion loop \d+: FAILURE
---
-Broken by https://github.com/diffblue/cbmc/issues/4978
-For more information take a look at github#5351
