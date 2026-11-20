@@ -59,6 +59,7 @@ import zipfile
 from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
+from statistics import median as _median
 
 
 # ── helpers ──────────────────────────────────────────────────────────────────
@@ -114,6 +115,22 @@ def fmt_duration(seconds: float) -> str:
     if m:
         return f"{m}m {s:02d}s"
     return f"{s}s"
+
+
+def median(values: list[float]) -> float:
+    """Return the median of *values* (0.0 for an empty list).
+
+    The median is preferred over the mean for the cross-run summaries: macOS
+    runners in particular vary by 30-40% run-to-run, and a single slow run
+    would skew a mean. The median is robust to such outliers, so a change in
+    the median across many runs is a much stronger signal of a real
+    regression than a change in a single run or in the mean.
+
+    This wraps ``statistics.median`` purely to add the 0.0-for-empty
+    behaviour, which several callers (e.g. ``_critical_paths``, ``_stats``)
+    rely on.
+    """
+    return _median(values) if values else 0.0
 
 
 # ── log timestamp extraction ────────────────────────────────────────────────
@@ -546,6 +563,61 @@ def analyse_run(run_id: int, log_dir: Path, top: int,
     return {"run_id": run_id, "jobs": jobs, "details": details}
 
 
+def _stats(durs: list[float]) -> str:
+    """``<median> (med) · <min>–<max> · n=<count>`` for a list of durations."""
+    if not durs:
+        return "n=0"
+    return (f"{fmt_duration(median(durs))} (med) · "
+            f"{fmt_duration(min(durs))}–{fmt_duration(max(durs))} · "
+            f"n={len(durs)}")
+
+
+def _slowest_job_per_run(result: dict) -> tuple[str, float]:
+    """Return (name, duration_s) of the slowest job in a single run."""
+    jobs = [j for j in result.get("jobs", []) if j.get("duration_s", 0) > 0]
+    if not jobs:
+        return ("(none)", 0.0)
+    j = max(jobs, key=lambda j: j["duration_s"])
+    return (j["name"], j["duration_s"])
+
+
+def _critical_paths(results: list[dict]) -> dict[str, dict]:
+    """Per job, summarise the serial critical path across runs.
+
+    For a job whose tests run as ctest suites under ``-jN``, the wall-clock is
+    bounded below by the *longest single suite* (which cannot be parallelised)
+    and by ``sum_of_suites / N``.  We therefore report, per job, the suite with
+    the greatest median duration across runs (with its name and that median),
+    and the median of the per-run suite totals.  Selecting the suite by its
+    median keeps the reported name and figure consistent even when the slowest
+    suite differs from run to run.  A job whose longest-suite median is a large
+    fraction of its total is a parallelism bottleneck that splitting the suite
+    would help.
+    """
+    # Per job: suite name -> that suite's durations across the analysed runs.
+    per_suite: dict[str, dict[str, list[float]]] = defaultdict(
+        lambda: defaultdict(list))
+    total: dict[str, list[float]] = defaultdict(list)
+    for r in results:
+        for job_name, detail in r.get("details", {}).items():
+            suites = detail.get("ctest_tests", [])
+            if not suites:
+                continue
+            for s in suites:
+                per_suite[job_name][s["name"]].append(s["duration_s"])
+            total[job_name].append(sum(s["duration_s"] for s in suites))
+    out: dict[str, dict] = {}
+    for job_name, suites in per_suite.items():
+        top_name = max(suites, key=lambda n: median(suites[n]))
+        out[job_name] = {
+            "longest_med": median(suites[top_name]),
+            "longest_suite": top_name,
+            "total_med": median(total[job_name]),
+            "n": len(total[job_name]),
+        }
+    return out
+
+
 def print_cross_run_summary(results: list[dict], top: int):
     """Print aggregated summary across all analysed runs."""
     info(f"\n{'#' * 72}")
@@ -558,16 +630,33 @@ def print_cross_run_summary(results: list[dict], top: int):
         for j in r["jobs"]:
             job_durations[j["name"]].append(j["duration_s"])
 
-    info(f"\n  Average job durations (sorted by mean):")
+    # Per-run trend (most recent first): slowest job per run over time.
+    if any("created" in r for r in results):
+        info(f"\n  Run trend (most recent first):")
+        for r in sorted(results, key=lambda r: r.get("created", ""),
+                        reverse=True):
+            name, dur = _slowest_job_per_run(r)
+            date = (r.get("created", "") or "")[:16].replace("T", " ")
+            info(f"    {date}  {r.get('sha',''):10s}  "
+                  f"[{r.get('conclusion','?'):>9s}]  "
+                  f"slowest: {fmt_duration(dur):>10s}  {name}")
+
+    info(f"\n  Job durations (sorted by median):")
     sorted_jobs = sorted(job_durations.items(),
-                         key=lambda kv: sum(kv[1]) / len(kv[1]),
-                         reverse=True)
+                         key=lambda kv: median(kv[1]), reverse=True)
     for name, durs in sorted_jobs:
-        mean = sum(durs) / len(durs)
-        mn, mx = min(durs), max(durs)
-        info(f"    {fmt_duration(mean):>10s} avg  "
-              f"({fmt_duration(mn)}-{fmt_duration(mx)})  "
-              f"n={len(durs)}  {name}")
+        info(f"    {_stats(durs)}  {name}")
+
+    # Per-job serial critical path (longest single suite bounds wall-clock).
+    crit = _critical_paths(results)
+    if crit:
+        info(f"\n  Per-job critical path (longest serial suite, median):")
+        for job_name, c in sorted(crit.items(),
+                                  key=lambda kv: kv[1]["longest_med"],
+                                  reverse=True):
+            info(f"    {fmt_duration(c['longest_med']):>10s}  "
+                  f"(of {fmt_duration(c['total_med'])} total)  "
+                  f"{job_name}: {c['longest_suite']}")
 
     # Aggregate ctest test durations
     test_durations: dict[str, list[float]] = defaultdict(list)
@@ -578,16 +667,12 @@ def print_cross_run_summary(results: list[dict], top: int):
                 test_durations[key].append(t["duration_s"])
 
     if test_durations:
-        info(f"\n  Slowest individual ctest tests (by mean, across runs):")
+        info(f"\n  Slowest individual ctest tests (by median, across runs):")
         sorted_tests = sorted(test_durations.items(),
-                              key=lambda kv: sum(kv[1]) / len(kv[1]),
+                              key=lambda kv: median(kv[1]),
                               reverse=True)
         for name, durs in sorted_tests[:top]:
-            mean = sum(durs) / len(durs)
-            mn, mx = min(durs), max(durs)
-            info(f"    {fmt_duration(mean):>10s} avg  "
-                  f"({fmt_duration(mn)}-{fmt_duration(mx)})  "
-                  f"n={len(durs)}  {name}")
+            info(f"    {_stats(durs)}  {name}")
 
     # Aggregate make suite durations
     suite_durations: dict[str, list[float]] = defaultdict(list)
@@ -598,16 +683,12 @@ def print_cross_run_summary(results: list[dict], top: int):
                 suite_durations[key].append(s["duration_s"])
 
     if suite_durations:
-        info(f"\n  Slowest make test suites (by mean, across runs):")
+        info(f"\n  Slowest make test suites (by median, across runs):")
         sorted_suites = sorted(suite_durations.items(),
-                               key=lambda kv: sum(kv[1]) / len(kv[1]),
+                               key=lambda kv: median(kv[1]),
                                reverse=True)
         for name, durs in sorted_suites[:top]:
-            mean = sum(durs) / len(durs)
-            mn, mx = min(durs), max(durs)
-            info(f"    {fmt_duration(mean):>10s} avg  "
-                  f"({fmt_duration(mn)}-{fmt_duration(mx)})  "
-                  f"n={len(durs)}  {name}")
+            info(f"    {_stats(durs)}  {name}")
 
     # Aggregate individual tests within ctest suites
     indiv_durations: dict[str, list[float]] = defaultdict(list)
@@ -620,16 +701,12 @@ def print_cross_run_summary(results: list[dict], top: int):
 
     if indiv_durations:
         info(f"\n  Slowest individual tests within ctest suites "
-              f"(by mean, across runs):")
+              f"(by median, across runs):")
         sorted_indiv = sorted(indiv_durations.items(),
-                              key=lambda kv: sum(kv[1]) / len(kv[1]),
+                              key=lambda kv: median(kv[1]),
                               reverse=True)
         for name, durs in sorted_indiv[:top]:
-            mean = sum(durs) / len(durs)
-            mn, mx = min(durs), max(durs)
-            info(f"    {fmt_duration(mean):>10s} avg  "
-                  f"({fmt_duration(mn)}-{fmt_duration(mx)})  "
-                  f"n={len(durs)}  {name}")
+            info(f"    {_stats(durs)}  {name}")
 
 
 def generate_markdown_summary(results: list[dict], top: int = 20) -> str:
@@ -638,25 +715,58 @@ def generate_markdown_summary(results: list[dict], top: int = 20) -> str:
     w = lines.append
 
     w(f"# CI Performance Analysis ({len(results)} runs)\n")
+    w("Figures are **medians across runs** (robust to the large run-to-run "
+      "variance of, in particular, the macOS runners). Only post-merge runs "
+      "on the target branch are analysed, including failed/timed-out ones.\n")
 
-    # Job durations table
+    # Per-run trend: shows the slowest job per run over time, so a genuine
+    # upward trend is distinguishable from one-off slow runs.
+    have_meta = any("created" in r for r in results)
+    if have_meta:
+        w("## Run trend (most recent first)\n")
+        w("| Date | Commit | Result | Slowest job | Duration |")
+        w("|------|--------|--------|-------------|----------|")
+        for r in sorted(results, key=lambda r: r.get("created", ""),
+                        reverse=True):
+            name, dur = _slowest_job_per_run(r)
+            date = (r.get("created", "") or "")[:16].replace("T", " ")
+            w(f"| {date} | {r.get('sha','')} | {r.get('conclusion','?')} "
+              f"| {name} | {fmt_duration(dur)} |")
+        w("")
+
+    # Job durations table (median-based).
     job_durations: dict[str, list[float]] = defaultdict(list)
     for r in results:
         for j in r["jobs"]:
             job_durations[j["name"]].append(j["duration_s"])
 
-    w("## Slowest Jobs\n")
-    w("| Job | Avg | Min | Max |")
-    w("|-----|-----|-----|-----|")
+    w("## Slowest jobs (median)\n")
+    w("| Job | Median | Min | Max | Runs |")
+    w("|-----|--------|-----|-----|------|")
     sorted_jobs = sorted(job_durations.items(),
-                         key=lambda kv: sum(kv[1]) / len(kv[1]),
-                         reverse=True)
+                         key=lambda kv: median(kv[1]), reverse=True)
     for name, durs in sorted_jobs[:top]:
-        mean = sum(durs) / len(durs)
-        w(f"| {name} | {fmt_duration(mean)} "
-          f"| {fmt_duration(min(durs))} | {fmt_duration(max(durs))} |")
+        w(f"| {name} | {fmt_duration(median(durs))} "
+          f"| {fmt_duration(min(durs))} | {fmt_duration(max(durs))} "
+          f"| {len(durs)} |")
 
-    # Slowest ctest suites
+    # Per-job serial critical path: the longest single suite bounds wall-clock
+    # under -jN, so this highlights where splitting a suite would help.
+    crit = _critical_paths(results)
+    if crit:
+        w("\n## Per-job critical path (longest serial suite)\n")
+        w("A job's wall-clock is bounded below by its longest single suite "
+          "(cannot be parallelised) and by Σsuites / parallelism. A longest "
+          "suite that is a large share of Σsuites is a split candidate.\n")
+        w("| Job | Longest suite (median) | Suite | Σ suites (median) |")
+        w("|-----|------------------------|-------|-------------------|")
+        for job_name, c in sorted(crit.items(),
+                                  key=lambda kv: kv[1]["longest_med"],
+                                  reverse=True)[:top]:
+            w(f"| {job_name} | {fmt_duration(c['longest_med'])} "
+              f"| {c['longest_suite']} | {fmt_duration(c['total_med'])} |")
+
+    # Slowest ctest suites (median).
     test_durations: dict[str, list[float]] = defaultdict(list)
     for r in results:
         for job_name, detail in r.get("details", {}).items():
@@ -665,18 +775,17 @@ def generate_markdown_summary(results: list[dict], top: int = 20) -> str:
                 test_durations[key].append(t["duration_s"])
 
     if test_durations:
-        w("\n## Slowest Test Suites (ctest)\n")
-        w("| Job / Suite | Avg | Min | Max |")
-        w("|-------------|-----|-----|-----|")
+        w("\n## Slowest test suites (ctest, median)\n")
+        w("| Job / Suite | Median | Min | Max | Runs |")
+        w("|-------------|--------|-----|-----|------|")
         sorted_tests = sorted(test_durations.items(),
-                              key=lambda kv: sum(kv[1]) / len(kv[1]),
-                              reverse=True)
+                              key=lambda kv: median(kv[1]), reverse=True)
         for name, durs in sorted_tests[:top]:
-            mean = sum(durs) / len(durs)
-            w(f"| {name} | {fmt_duration(mean)} "
-              f"| {fmt_duration(min(durs))} | {fmt_duration(max(durs))} |")
+            w(f"| {name} | {fmt_duration(median(durs))} "
+              f"| {fmt_duration(min(durs))} | {fmt_duration(max(durs))} "
+              f"| {len(durs)} |")
 
-    # Slowest individual tests
+    # Slowest individual tests (median).
     indiv_durations: dict[str, list[float]] = defaultdict(list)
     for r in results:
         for job_name, detail in r.get("details", {}).items():
@@ -686,16 +795,15 @@ def generate_markdown_summary(results: list[dict], top: int = 20) -> str:
                     indiv_durations[key].append(t["duration_s"])
 
     if indiv_durations:
-        w("\n## Slowest Individual Tests\n")
-        w("| Job / Suite / Test | Avg | Min | Max |")
-        w("|--------------------|-----|-----|-----|")
+        w("\n## Slowest individual tests (median)\n")
+        w("| Job / Suite / Test | Median | Min | Max | Runs |")
+        w("|--------------------|--------|-----|-----|------|")
         sorted_indiv = sorted(indiv_durations.items(),
-                              key=lambda kv: sum(kv[1]) / len(kv[1]),
-                              reverse=True)
+                              key=lambda kv: median(kv[1]), reverse=True)
         for name, durs in sorted_indiv[:top]:
-            mean = sum(durs) / len(durs)
-            w(f"| {name} | {fmt_duration(mean)} "
-              f"| {fmt_duration(min(durs))} | {fmt_duration(max(durs))} |")
+            w(f"| {name} | {fmt_duration(median(durs))} "
+              f"| {fmt_duration(min(durs))} | {fmt_duration(max(durs))} "
+              f"| {len(durs)} |")
 
     return "\n".join(lines)
 
@@ -710,6 +818,15 @@ def main():
         "--workflow", default="pull-request-checks.yaml",
         help="Workflow name or filename to analyse "
              "(default: 'pull-request-checks.yaml')")
+    parser.add_argument(
+        "--branch", default="develop",
+        help="Only analyse runs on this branch (default: 'develop'). "
+             "Pass an empty string to disable branch filtering.")
+    parser.add_argument(
+        "--event", default="push",
+        help="Only analyse runs triggered by this event (default: 'push', "
+             "i.e. post-merge runs on the target branch rather than noisier "
+             "pull_request runs). Pass an empty string to disable filtering.")
     parser.add_argument(
         "--all-workflows", action="store_true",
         help="Analyse all workflows, not just the specified one")
@@ -773,29 +890,50 @@ def _run_analysis(args: argparse.Namespace, repo: str, log_dir: Path):
         info(f"  Workflow: {wf}")
         info(f"{'*' * 72}")
 
-        # Get completed run IDs
-        raw = run_gh(
-            "run", "list",
-            "--limit", "50",
-            "--workflow", wf,
-            "--json", "databaseId,status,conclusion",
+        # Select the most recent *completed* runs. By default we restrict to
+        # post-merge runs on the target branch (push to develop): pull_request
+        # runs execute on a throw-away merge commit, run far more often, and
+        # are noisier, so mixing them in obscures the develop trend. We also
+        # deliberately include failed/timed-out runs (not just successes) --
+        # those are exactly the runs a performance investigation cares about.
+        list_args = ["run", "list", "--limit", "100", "--workflow", wf]
+        if args.branch:
+            list_args += ["--branch", args.branch]
+        if args.event:
+            list_args += ["--event", args.event]
+        list_args += [
+            "--json", "databaseId,status,conclusion,headSha,createdAt",
             "--jq",
-            '.[] | select(.status == "completed" and .conclusion == "success")'
-            ' | .databaseId',
-            repo=repo,
-        )
-        run_ids = [int(x) for x in raw.strip().splitlines()
-                   if x.strip()][:args.runs]
+            r'.[] | select(.status == "completed") '
+            r'| "\(.databaseId)\t\(.conclusion)\t\(.headSha[0:10])\t\(.createdAt)"',
+        ]
+        raw = run_gh(*list_args, repo=repo)
 
-        if not run_ids:
-            info("  No completed successful runs found.")
+        run_meta = []
+        for line in raw.strip().splitlines():
+            if not line.strip():
+                continue
+            parts = line.split("\t")
+            run_meta.append({
+                "id": int(parts[0]),
+                "conclusion": parts[1] if len(parts) > 1 else "?",
+                "sha": parts[2] if len(parts) > 2 else "",
+                "created": parts[3] if len(parts) > 3 else "",
+            })
+        run_meta = run_meta[:args.runs]
+
+        if not run_meta:
+            info("  No completed runs found "
+                 f"(branch={args.branch or 'any'}, event={args.event or 'any'}).")
             continue
 
-        info(f"  Analysing runs: {run_ids}")
+        info(f"  Analysing runs: {[m['id'] for m in run_meta]}")
 
-        for run_id in run_ids:
-            result = analyse_run(run_id, log_dir, top=args.top,
-                                repo=repo)
+        for meta in run_meta:
+            result = analyse_run(meta["id"], log_dir, top=args.top, repo=repo)
+            result["conclusion"] = meta["conclusion"]
+            result["sha"] = meta["sha"]
+            result["created"] = meta["created"]
             all_results.append(result)
 
     if all_results:
