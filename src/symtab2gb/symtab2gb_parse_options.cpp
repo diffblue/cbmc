@@ -112,12 +112,10 @@ static void run_symtab2gb(
       throw invalid_source_file_exceptiont{
         "failed to typecheck symbol table", source_location};
     }
-    // Linking and configt::set_from_symbol_table operate on the symbols of
-    // this file, so check their structure first. Checks that need to look
-    // up types (such as struct tags) can only be done once all input files
-    // have been linked, except for the configuration symbols, which
-    // configt::set_from_symbol_table simplifies.
-    check_symbol_table_structure(symtab);
+    // Typechecking has checked the structure of the symbols of this file.
+    // Checks that need to look up types (such as struct tags) can only be
+    // done once all input files have been linked, except for the
+    // configuration symbols, which configt::set_from_symbol_table simplifies.
     validate_symbol_table(symtab, CPROVER_PREFIX "architecture_");
     config.set_from_symbol_table(symtab);
 

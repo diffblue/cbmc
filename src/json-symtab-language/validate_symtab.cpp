@@ -222,7 +222,7 @@ static void validate_symbol(symtab_validatort &validator, const symbolt &symbol)
   }
 }
 
-void check_symbol_table_structure(const symbol_tablet &symbol_table)
+void check_symbol_table_structure(const symbol_table_baset &symbol_table)
 {
   symtab_validatort validator{nullptr};
   for(const auto &symbol_pair : symbol_table.symbols)
@@ -230,7 +230,7 @@ void check_symbol_table_structure(const symbol_tablet &symbol_table)
 }
 
 void validate_symbol_table(
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   const char *symbol_names_prefix)
 {
   const namespacet ns{symbol_table};
@@ -239,6 +239,19 @@ void validate_symbol_table(
   {
     if(has_prefix(id2string(symbol_pair.first), symbol_names_prefix))
       validate_symbol(validator, symbol_pair.second);
+  }
+}
+
+void validate_symbols(
+  const symbol_table_baset &symbol_table,
+  const std::unordered_set<irep_idt> &symbol_names,
+  const namespacet &ns)
+{
+  symtab_validatort validator{&ns};
+  for(const auto &name : symbol_names)
+  {
+    if(const symbolt *symbol = symbol_table.lookup(name))
+      validate_symbol(validator, *symbol);
   }
 }
 

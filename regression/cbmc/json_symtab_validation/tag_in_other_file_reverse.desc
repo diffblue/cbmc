@@ -1,0 +1,10 @@
+CORE
+member_use.json_symtab
+tag_def.json_symtab
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^malformed symbol table entry
+--
+As tag_in_other_file.desc, with the files in the other order.

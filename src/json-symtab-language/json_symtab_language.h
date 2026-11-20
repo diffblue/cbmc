@@ -20,6 +20,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 #include <set>
 #include <string>
+#include <unordered_set>
 
 class json_symtab_languaget : public languaget
 {
@@ -33,6 +34,10 @@ public:
     symbol_table_baset &symbol_table,
     const std::string &module,
     message_handlert &message_handler) override;
+
+  /// Validate the symbols read by \ref typecheck, now that the symbols of
+  /// all input files are available to look up types in.
+  bool final(symbol_table_baset &symbol_table) override;
 
   void show_parse(std::ostream &out, message_handlert &) override;
 
@@ -80,6 +85,8 @@ public:
 
 protected:
   jsont parsed_json_file;
+  /// The names of the symbols that \ref typecheck has read
+  std::unordered_set<irep_idt> symbol_names;
 };
 
 inline std::unique_ptr<languaget> new_json_symtab_language()

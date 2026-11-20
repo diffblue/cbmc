@@ -1,0 +1,10 @@
+CORE
+main.c
+harness.gb --harness-type initialize-with-memory-snapshot --memory-snapshot arity-snapshot.json --initial-goto-location main:13
+^EXIT=6$
+^SIGNAL=0$
+^malformed symbol table entry .x.: binary expression must have two operands$
+--
+^Invariant check failed
+--
+goto-harness checks the structure of the expressions in a memory snapshot.

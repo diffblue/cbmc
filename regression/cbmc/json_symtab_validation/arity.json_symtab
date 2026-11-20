@@ -1,0 +1,129 @@
+{
+ "symbolTable": {
+  "x": {
+   "type": {
+    "id": "bool",
+    "sub": [],
+    "namedSub": {}
+   },
+   "value": {
+    "id": "=",
+    "sub": [
+     {
+      "id": "constant",
+      "sub": [],
+      "namedSub": {
+       "type": {
+        "id": "signedbv",
+        "sub": [],
+        "namedSub": {
+         "width": {
+          "id": "32",
+          "sub": [],
+          "namedSub": {}
+         }
+        }
+       },
+       "value": {
+        "id": "1",
+        "sub": [],
+        "namedSub": {}
+       }
+      }
+     }
+    ],
+    "namedSub": {
+     "type": {
+      "id": "bool",
+      "sub": [],
+      "namedSub": {}
+     }
+    }
+   },
+   "location": {
+    "id": "nil",
+    "sub": [],
+    "namedSub": {}
+   },
+   "name": "x",
+   "module": "",
+   "baseName": "x",
+   "mode": "C",
+   "prettyName": "x",
+   "isType": false,
+   "isMacro": false,
+   "isExported": false,
+   "isInput": false,
+   "isOutput": false,
+   "isStateVar": false,
+   "isProperty": false,
+   "isStaticLifetime": true,
+   "isThreadLocal": false,
+   "isLvalue": true,
+   "isFileLocal": false,
+   "isExtern": false,
+   "isVolatile": false,
+   "isParameter": false,
+   "isAuxiliary": false,
+   "isWeak": false
+  },
+  "__CPROVER__start": {
+   "type": {
+    "id": "code",
+    "sub": [],
+    "namedSub": {
+     "parameters": {
+      "id": "parameters",
+      "sub": [],
+      "namedSub": {}
+     },
+     "return_type": {
+      "id": "empty",
+      "sub": [],
+      "namedSub": {}
+     }
+    }
+   },
+   "value": {
+    "id": "code",
+    "sub": [],
+    "namedSub": {
+     "statement": {
+      "id": "block"
+     },
+     "type": {
+      "id": "nil",
+      "sub": [],
+      "namedSub": {}
+     }
+    }
+   },
+   "location": {
+    "id": "nil",
+    "sub": [],
+    "namedSub": {}
+   },
+   "name": "__CPROVER__start",
+   "module": "",
+   "baseName": "__CPROVER__start",
+   "mode": "C",
+   "prettyName": "__CPROVER__start",
+   "isType": false,
+   "isMacro": false,
+   "isExported": false,
+   "isInput": false,
+   "isOutput": false,
+   "isStateVar": false,
+   "isProperty": false,
+   "isStaticLifetime": false,
+   "isThreadLocal": false,
+   "isLvalue": false,
+   "isFileLocal": false,
+   "isExtern": false,
+   "isVolatile": false,
+   "isParameter": false,
+   "isAuxiliary": false,
+   "isWeak": false
+  }
+ }
+}
