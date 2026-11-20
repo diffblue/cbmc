@@ -8,7 +8,8 @@ int main()
   int n = 5;
   int result = ackermann(m, n);
 
-  printf("Result of the Ackermann function: %d\n", result);
+  // we don't currently have contracts on what printf is assigning to
+  // printf("Result of the Ackermann function: %d\n", result);
   return 0;
 }
 

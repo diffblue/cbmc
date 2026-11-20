@@ -72,11 +72,18 @@ perl -p -i -e 's/^__CPROVER_strto_scan\n//' __functions # strtol
 perl -p -i -e 's/^__CPROVER_strto(l|ll|ul|ull)_internal\n//' __functions # strto*
 perl -p -i -e 's/^fopen64\n//' __functions # fopen
 perl -p -i -e 's/^freopen64\n//' __functions # freopen
+perl -p -i -e 's/^isinf[fl]\n//' __functions # isinf
+perl -p -i -e 's/^isnan[fl]\n//' __functions # isnan
 perl -p -i -e 's/^mmap64\n//' __functions # mmap
 perl -p -i -e 's/^__fgets_chk\n//' __functions # fgets/__fgets_chk.desc
 perl -p -i -e 's/^__fprintf_chk\n//' __functions # fprintf/__fprintf_chk.desc
 perl -p -i -e 's/^__fread_chk\n//' __functions # fread/__fread_chk.desc
+perl -p -i -e 's/^__isfinite[fl]?\n//' __functions # isfinite
+perl -p -i -e 's/^__isinf[fl]?\n//' __functions # isinf
+perl -p -i -e 's/^__isnan[dfl]?\n//' __functions # isnan
+perl -p -i -e 's/^__isnormal[fl]?\n//' __functions # isnormal
 perl -p -i -e 's/^__printf_chk\n//' __functions # printf/__printf_chk.desc
+perl -p -i -e 's/^__signbit[fl]?\n//' __functions # signbit, __signbitd
 perl -p -i -e 's/^__syslog_chk\n//' __functions # syslog/__syslog_chk.desc
 perl -p -i -e 's/^_syslog\$DARWIN_EXTSN\n//' __functions # syslog/test.desc
 perl -p -i -e 's/^__time64\n//' __functions # time
