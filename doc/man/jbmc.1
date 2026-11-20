@@ -339,6 +339,22 @@ stop incremental\-loop after nr unwindings
 do not check properties before unwind\-min
 when using incremental\-loop
 .TP
+\fB\-\-incremental\-check\-interval\fR N
+invoke the SAT solver every N symbolic execution steps to check
+assertions discovered so far, using incremental goal construction.
+Can find property violations before symbolic execution completes.
+.TP
+\fB\-\-concurrent\-incremental\fR
+run symbolic execution and SAT solving concurrently in separate
+threads. Symbolic execution pauses every N steps (set via
+\fB\-\-incremental\-check\-interval\fR) and hands off to the solver.
+Requires \fB\-\-incremental\-check\-interval\fR.
+.TP
+\fB\-\-speculative\-check\fR
+speculatively check assertions on partial equations using
+cone\-of\-influence slicing. Use with
+\fB\-\-incremental\-check\-interval\fR.
+.TP
 \fB\-\-show\-vcc\fR
 show the verification conditions
 .TP

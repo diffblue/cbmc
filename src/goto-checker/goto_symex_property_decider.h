@@ -17,6 +17,8 @@ Author: Daniel Kroening, Peter Schrammel
 #include "properties.h"
 #include "solver_factory.h"
 
+#include <optional>
+
 class ui_message_handlert;
 
 /// Provides management of goal variables that encode properties
@@ -53,6 +55,20 @@ public:
   /// Return the equation associated with this instance
   symex_target_equationt &get_equation() const;
 
+  /// Convert goals incrementally using the extensible goal
+  /// construction. Returns the goal extender handle to be assumed
+  /// false, or empty if there are no assertions to convert.
+  std::optional<exprt> convert_goals_incremental();
+
+  /// Add constraint from goals and push the goal extender assumption
+  /// onto the decision procedure stack via push(assumptions).
+  void add_incremental_constraint_from_goals(
+    std::function<bool(const irep_idt &property_id)> select_property);
+
+  /// Pop the incremental assumption that was pushed by
+  /// add_incremental_constraint_from_goals.
+  void pop_incremental_assumptions();
+
   /// Update the property status from the truth value of the goal variable
   /// \param [inout] properties: The status is updated in this data structure
   /// \param [inout] updated_properties: The set of property IDs of
@@ -87,6 +103,9 @@ protected:
   /// the property. Uses `std::string` to maintain consistent (lexicographic)
   /// ordering as we iterate over this map to produce constraints.
   std::map<std::string, goalt> goal_map;
+
+  std::optional<exprt> current_goal_extender_handle;
+  bool incremental_assumptions_active = false;
 };
 
 #endif // CPROVER_GOTO_CHECKER_GOTO_SYMEX_PROPERTY_DECIDER_H

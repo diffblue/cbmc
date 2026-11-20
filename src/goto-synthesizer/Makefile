@@ -38,7 +38,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
 
 INCLUDES= -I ..
 
-LIBS =
+LIBS = -lpthread
 
 CLEANFILES = goto-synthesizer$(EXEEXT) goto-synthesizer$(LIBEXT)
 

@@ -1,0 +1,10 @@
+CORE
+main.c
+--no-standard-checks --incremental-check-interval 100 --unwinding-assertions --unwind 55
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Test that incremental checking finds the failure before symex completes
