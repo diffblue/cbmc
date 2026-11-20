@@ -1,0 +1,14 @@
+CORE dfcc-only
+main.c
+--dfcc main --enforce-contract sum
+^\[count_pos\.assigns\.\d+\] line 5 Check that \*count is assignable: SUCCESS$
+^\[count_pos\.assigns\.\d+\] line 9 Check that \*count is assignable: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^\[.*\] .*: FAILURE$
+--
+Functions called in contract clauses are instrumented, and assignments to their
+own local variables, also via pointers in functions that they call, must not be
+reported as side effects of the requires clause.

@@ -1,0 +1,11 @@
+CORE dfcc-only
+main.c
+--dfcc main --enforce-contract foo
+^\[post_ok\.assigns\.\d+\] line 5 Check that g is assignable: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+Functions called in contract clauses are instrumented, so that side effects in
+them are detected: ensures clauses must not assign to g.

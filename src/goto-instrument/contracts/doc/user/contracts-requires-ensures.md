@@ -31,9 +31,11 @@ arguments of a function and/or global variables. The expression can include
 calls to CBMC built-in functions, to
 [Memory Predicates](@ref contracts-memory-predicates) or to
 [function pointer predicates](@ref contracts-function-pointer-predicates).
-User-defined functions can also be called inside _requires_ clauses as long as
-they are deterministic and do not have any side-effects
-(the absence of side effects is checked by the tool). In addition, _ensures_
+User-defined functions can also be called inside _requires_ and _ensures_
+clauses as long as they are deterministic and do not have any side-effects.
+The absence of side effects is checked by the tool, including in the functions
+that these functions call, and both when a contract is checked and when it
+replaces a function call. In addition, _ensures_
 clauses also accept [History Variables](@ref contracts-history-variables)
 and the special built-in symbol `__CPROVER_return_value` which represents the
 return value of the function.

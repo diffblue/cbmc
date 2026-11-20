@@ -233,6 +233,69 @@ void dfcct::check_transform_goto_model_preconditions()
   }
 }
 
+/// Adds to \p dest the functions (other than contracts) of \p symbol_table
+/// that \p irep refers to.
+static void find_referenced_functions(
+  const irept &irep,
+  const symbol_table_baset &symbol_table,
+  std::set<irep_idt> &dest)
+{
+  if(irep.id() == ID_symbol)
+  {
+    const irep_idt &identifier = irep.get(ID_identifier);
+    const symbolt *symbol = symbol_table.lookup(identifier);
+    if(
+      symbol != nullptr && symbol->type.id() == ID_code && !symbol->is_macro &&
+      !has_prefix(id2string(identifier), "contract::"))
+    {
+      dest.insert(identifier);
+    }
+  }
+
+  for(const auto &sub : irep.get_sub())
+    find_referenced_functions(sub, symbol_table, dest);
+  for(const auto &named_sub : irep.get_named_sub())
+    find_referenced_functions(named_sub.second, symbol_table, dest);
+}
+
+/// Adds to \p dest the functions that the clauses of function contracts
+/// (the `contract::` symbols of \p goto_model) refer to, for example a
+/// predicate `ptr_ok(x)` in a requires clause, and the functions that these
+/// call in turn.
+///
+/// DFCC evaluates requires and ensures clauses against a write set, and passes
+/// that write set to the functions that these clauses call. Instrumenting
+/// these functions makes them check their assignments against that write set,
+/// so that side effects are reported: requires and ensures clauses must not
+/// assign to a global variable, for example.
+///
+/// All contracts of the symbol table are scanned, also those that are neither
+/// checked nor replaced. The contracts that are used as function pointer
+/// contracts are only discovered during instrumentation, which is too late to
+/// add functions to the set of functions to instrument. Functions that only
+/// unused contracts refer to are thus instrumented needlessly, and
+/// `remove_unused_functions` removes them later.
+static void collect_contract_clause_functions(
+  goto_modelt &goto_model,
+  std::set<irep_idt> &dest)
+{
+  std::set<irep_idt> clause_functions;
+  for(const auto &entry : goto_model.symbol_table)
+  {
+    const symbolt &symbol = entry.second;
+    if(
+      symbol.is_property && symbol.type.id() == ID_code &&
+      has_prefix(id2string(symbol.name), "contract::"))
+    {
+      find_referenced_functions(
+        symbol.type, goto_model.symbol_table, clause_functions);
+    }
+  }
+
+  for(const auto &function_id : clause_functions)
+    find_used_functions(function_id, goto_model.goto_functions, dest);
+}
+
 void dfcct::partition_function_symbols(
   std::set<irep_idt> &contract_symbols,
   std::set<irep_idt> &other_symbols)
@@ -242,6 +305,7 @@ void dfcct::partition_function_symbols(
     goto_functionst::entry_point(),
     goto_model.goto_functions,
     called_functions);
+  collect_contract_clause_functions(goto_model, called_functions);
 
   // collect contract and other symbols
   for(auto &entry : goto_model.symbol_table)

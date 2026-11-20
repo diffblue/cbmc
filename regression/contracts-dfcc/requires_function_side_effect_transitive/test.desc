@@ -1,0 +1,12 @@
+CORE dfcc-only
+main.c
+--dfcc main --enforce-contract foo
+^\[set_g\.assigns\.\d+\] line 5 Check that g is assignable: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+The functions that functions called in contract clauses call are instrumented
+as well: requires clauses must not assign to g, not even via calls to helper
+functions.

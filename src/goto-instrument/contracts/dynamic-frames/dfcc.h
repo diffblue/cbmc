@@ -212,7 +212,8 @@ protected:
   void check_transform_goto_model_preconditions();
 
   /// Partitions the function symbols of the symbol table into pure contracts
-  /// and other function symbols symbols.
+  /// and other function symbols. The latter are the functions that are
+  /// reachable from the entry point or from the clauses of a contract.
   void partition_function_symbols(
     std::set<irep_idt> &pure_contract_symbols,
     std::set<irep_idt> &other_symbols);
