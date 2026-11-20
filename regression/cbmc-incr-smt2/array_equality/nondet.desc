@@ -1,0 +1,11 @@
+CORE
+nondet.c
+--no-bounds-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+SMT-LIB equality of arrays compares the entire index domain. Arrays with equal
+elements must be considered equal, irrespective of elements beyond their size.
