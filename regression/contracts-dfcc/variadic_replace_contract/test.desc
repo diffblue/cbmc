@@ -1,0 +1,12 @@
+CORE dfcc-only
+main.c
+--dfcc main --replace-call-with-contract my_log
+^\[my_log\.precondition\.1\] line 5 Check requires clause of contract contract::my_log for function my_log: SUCCESS$
+^\[main\.assertion\.1\] line 14 contract replaced: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+The harness has to pass the write set where the replacement wrapper of the
+variadic function my_log has its write set parameter.

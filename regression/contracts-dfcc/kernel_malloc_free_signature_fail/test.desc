@@ -1,0 +1,11 @@
+CORE dfcc-only
+main.c
+--dfcc main --enforce-contract release --enforce-contract acquire
+^\[free\.frees\.\d+\] line \d+ Check that ptr is freeable: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+With an empty frees clause, the call to free is still checked against the
+write set of release.

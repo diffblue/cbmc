@@ -463,15 +463,20 @@ void dfcc_wrapper_programt::encode_contract_write_set()
 
     auto &arguments = call.arguments();
 
-    // forward wrapper arguments
-    for(const auto &arg : wrapper_arguments)
-      arguments.push_back(arg);
+    // The write set parameters precede the parameters of the contract, in
+    // the reverse order of their addition (see dfcc_utilst::add_parameter):
+    // first the write set to check against, which instrumentation adds, then
+    // the write set to populate, which dfcc_spec_functionst adds.
+
+    // pass the empty write set to check side effects against
+    arguments.emplace_back(addr_of_requires_write_set);
 
     // pass write set to populate
     arguments.emplace_back(addr_of_contract_write_set);
 
-    // pass the empty write set to check side effects against
-    arguments.emplace_back(addr_of_requires_write_set);
+    // forward wrapper arguments
+    for(const auto &arg : wrapper_arguments)
+      arguments.push_back(arg);
 
     write_set_checks.add(goto_programt::make_function_call(call, wrapper_sl));
   }
@@ -482,15 +487,20 @@ void dfcc_wrapper_programt::encode_contract_write_set()
       contract_functions.get_spec_frees_function_symbol().symbol_expr());
     auto &arguments = call.arguments();
 
-    // forward wrapper arguments
-    for(const auto &arg : wrapper_arguments)
-      arguments.push_back(arg);
+    // The write set parameters precede the parameters of the contract, in
+    // the reverse order of their addition (see dfcc_utilst::add_parameter):
+    // first the write set to check against, which instrumentation adds, then
+    // the write set to populate, which dfcc_spec_functionst adds.
+
+    // pass the empty write set to check side effects against
+    arguments.emplace_back(addr_of_requires_write_set);
 
     // pass write set to populate
     arguments.emplace_back(addr_of_contract_write_set);
 
-    // pass the empty write set to check side effects against
-    arguments.emplace_back(addr_of_requires_write_set);
+    // forward wrapper arguments
+    for(const auto &arg : wrapper_arguments)
+      arguments.push_back(arg);
 
     write_set_checks.add(goto_programt::make_function_call(call, wrapper_sl));
   }
@@ -765,8 +775,10 @@ void dfcc_wrapper_programt::encode_function_call()
 
 void dfcc_wrapper_programt::encode_checked_function_call()
 {
-  // build call to the wrapped function
-  code_function_callt call(wrapped_symbol.symbol_expr());
+  // build call to the wrapped function, passing the write set to check
+  // against first, see dfcc_utilst::add_parameter
+  code_function_callt call(
+    wrapped_symbol.symbol_expr(), {addr_of_contract_write_set});
 
   if(return_value_opt)
   {
@@ -792,9 +804,6 @@ void dfcc_wrapper_programt::encode_checked_function_call()
     const symbolt &parameter_symbol = ns.lookup(parameter);
     call.arguments().push_back(parameter_symbol.symbol_expr());
   }
-
-  // pass write set to check against
-  call.arguments().push_back(addr_of_contract_write_set);
 
   function_call.add(goto_programt::make_function_call(call, wrapper_sl));
 }

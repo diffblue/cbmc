@@ -25,6 +25,10 @@ class symbolt;
 
 struct dfcc_utilst
 {
+  /// Base name of the write set parameter that instrumentation adds to each
+  /// instrumented function, see \ref add_parameter.
+  static const char *const write_set_to_check_base_name;
+
   /// Returns true iff the given symbol exists and satisfies requirements.
   static bool
   function_symbol_exists(const goto_modelt &, const irep_idt &function_id);
@@ -83,14 +87,21 @@ struct dfcc_utilst
 
   /// \brief Adds the given symbol as parameter to the function symbol's
   /// code_type. Also adds the corresponding parameter to its goto_function if
-  /// it exists in the function map of the goto model.
+  /// it exists in the function map of the goto model. The parameter is added
+  /// before the existing parameters. Calls hence pass the corresponding
+  /// argument first, which binds it to the parameter for any number of other
+  /// arguments: for a variadic function (va_start takes the arguments that
+  /// follow the last declared parameter), for calls with surplus or missing
+  /// arguments (e.g., calls written against a different declaration of the
+  /// function), and for calls through function pointers of any type.
   static void add_parameter(
     goto_modelt &,
     const symbolt &symbol,
     const irep_idt &function_id);
 
   /// \brief Adds a parameter with given `base_name` and `type` to the given
-  /// `function_id`. Both the symbol and the goto_function are updated.
+  /// `function_id`, before the existing parameters. Both the symbol and the
+  /// goto_function are updated.
   static const symbolt &add_parameter(
     goto_modelt &,
     const irep_idt &function_id,

@@ -18,8 +18,17 @@ ret_t foo(foo-parameters);
 is turned into the extended version:
 
 ```c
-ret_t  foo(foo-parameters,  __CPROVER_contracts_write_set_ptr_t write_set);
+ret_t  foo(__CPROVER_contracts_write_set_ptr_t write_set,  foo-parameters);
 ```
+
+Calls pass the write set as the first argument. This binds it to the
+`write_set` parameter whatever the number of other arguments: for a variadic
+function, where `va_start` reads the variadic arguments from the arguments
+that follow the last declared parameter; for a call with more arguments than
+the function has parameters, e.g., a call written against a different
+declaration of the function; for a call with fewer arguments, as permitted for
+a function declared without a prototype; and for a call through a function
+pointer of any type.
 
 After this step the `write_set` parameter is in scope in the function and can
 be used to implement checks.
@@ -262,3 +271,4 @@ The  ranges of bytes `(void *lb, size_t size)` updated by the different operatio
  Prev | Next
 :-----|:------
  @ref contracts-dev-spec-dfcc | @ref contracts-dev-spec-harness
+

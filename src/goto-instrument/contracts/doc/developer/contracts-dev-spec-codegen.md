@@ -48,21 +48,22 @@ calls.
 
 The rewriting pass @ref contracts-dev-spec-spec-rewriting-assigns is applied
 to transform the function into a function that accepts two
-write set parameters: The first one is the write set that gets populated with
-assignable locations specified by the function, the second is a write set that
-is used by the function to check its side effects.
+write set parameters, which precede the function parameters: The first one is
+a write set that is used by the function to check its side effects, the second
+is the write set that gets populated with assignable locations specified by the
+function.
 
 ```c
 void contract::foo::assigns(
 
-  // function parameters
-  foo-parameters,
+  // write set against which to check itself for unwanted side effects
+  __CPROVER_contracts_write_set_ptr_t __write_set_to_check,
 
   // write set to populate with new targets
   __CPROVER_contracts_write_set_ptr_t __write_set_to_fill,
 
-  // write set against which to check itself for unwanted side effects
-  __CPROVER_contracts_write_set_ptr_t __write_set_to_check);
+  // function parameters
+  foo-parameters);
 ```
 
 The rewriting step @ref contracts-dev-spec-spec-rewriting-havoc is also applied
@@ -120,21 +121,22 @@ contents of the frees clause but does not have any runtime effects.
 
 The rewriting pass @ref contracts-dev-spec-spec-rewriting-frees is applied
 to transform the function into a function that accepts two
-write set parameters: The first one is the write set that gets populated with
-freeable pointers specified by the function, the second is a write set that is
-used by the function to check its side effects.
+write set parameters, which precede the function parameters: The first one is
+a write set that is used by the function to check its side effects, the second
+is the write set that gets populated with freeable pointers specified by the
+function.
 
 ```c
 void contract::foo::frees(
 
-  // function parameters
-  foo-parameters,
+  // write set against which to check itself for unwanted side effects
+  __CPROVER_contracts_write_set_ptr_t __write_set_to_check,
 
   // write set to populate with new targets
   __CPROVER_contracts_write_set_ptr_t __write_set_to_fill,
 
-  // write set against which to check itself for unwanted side effects
-  __CPROVER_contracts_write_set_ptr_t __write_set_to_check);
+  // function parameters
+  foo-parameters);
 ```
 
 ---
