@@ -1,0 +1,14 @@
+CORE gcc-only
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+Invariant check failed
+--
+bits2expr used to fail an invariant for arrays whose element type has zero
+width, such as arrays of GNU C empty structs, although its struct branch
+accepts zero-width components. A typed read of constant bytes reaches it via
+byte_extract simplification.
