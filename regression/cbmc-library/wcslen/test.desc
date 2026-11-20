@@ -1,0 +1,12 @@
+CORE
+main.c
+--pointer-check --bounds-check
+^\[main\.assertion\.1\] line 7 assertion wcslen\(s\) == 3: SUCCESS$
+^\[main\.assertion\.2\] line 9 assertion wcslen\(s\) == 1: SUCCESS$
+^\[main\.assertion\.3\] line 10 assertion wcslen\(s\) == 3: FAILURE$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
