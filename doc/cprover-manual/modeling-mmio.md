@@ -28,17 +28,26 @@ as an out-of-bounds memory reference. This is an example of
 implementation-defined behavior that must be modeled to avoid reporting false
 positives.
 
-CBMC uses the built-in function `__CPROVER_allocated_memory(address, size)` to
-mark ranges of memory as valid. Accesses within this region are exempt from the
-out-of-bounds assertion checking that CBMC would normally do. The function
-declares the half-open interval [address, address + size) as valid memory that
-can be read and written.
+CBMC provides two mechanisms for declaring memory-mapped I/O regions:
 
-This function can be used anywhere in the source code, but is most commonly used
-in the verification harness. Note that there is no flow sensitivity or scope
-restriction: CBMC considers accesses to memory regions marked as above valid for
-read or write access even before the call to the built-in function is
-encountered.
+1. **`--mmio-region address:size` (recommended):** Declare regions on the
+   command line. Each region becomes a byte-array object in the symbol table.
+   Reads and writes to addresses within a declared region are redirected to the
+   corresponding array element. See the
+   [per-region object model](#per-region-object-model-recommended) section below.
+
+2. **`__CPROVER_allocated_memory(address, size)` (deprecated):** A built-in
+   function that marks the half-open interval [address, address + size) as valid
+   memory. Accesses within this region are exempt from out-of-bounds assertion
+   checking. This function can be used anywhere in the source code, but is most
+   commonly used in the verification harness. Note that there is no flow
+   sensitivity or scope restriction: CBMC considers accesses to memory regions
+   marked as above valid for read or write access even before the call to the
+   built-in function is encountered.
+
+> **Deprecation notice:** `__CPROVER_allocated_memory` is deprecated. Use
+> `--mmio-region` instead, which provides better scalability and does not
+> require source-code changes.
 
 ### Device behavior
 
@@ -71,7 +80,60 @@ the methods in the API.
 
 *If the device has no API,* meaning that the code refers directly to the address
 in the memory-mapped I/O region for the device without reference to accessor
-functions, use
+functions, there are two approaches available.
+
+#### Per-region object model (recommended)
+
+Use `--mmio-region <address>:<size>` to declare each
+contiguous MMIO region as an individual object. Each region becomes a byte array
+in the symbol table, named `__CPROVER_mmio_region_0x<address>`. Reads and writes
+to addresses within a declared region are redirected to the corresponding bytes
+of that array. An access wider than a single byte spans the appropriate number
+of consecutive bytes (`ceil(width / 8)`), honouring the endianness configured
+for the program, so multi-byte loads and stores are modelled faithfully (a
+32-bit store updates four bytes rather than truncating to one).
+
+This option is supported by both `cbmc` and `goto-instrument`.
+
+This approach avoids the scalability problems of the single-array callback model:
+each write only updates the targeted region object rather than the entire memory
+array.
+
+For example, given firmware that accesses a UART at `0x40000000` (256 bytes) and
+a GPIO controller at `0x40001000` (64 bytes):
+
+```sh
+# Directly with cbmc:
+cbmc --mmio-region 0x40000000:256 \
+  --mmio-region 0x40001000:64 \
+  --no-pointer-check --no-bounds-check firmware.c
+
+# Or via goto-instrument:
+goto-cc -o firmware.gb firmware.c
+goto-instrument --mmio-region 0x40000000:256 \
+  --mmio-region 0x40001000:64 \
+  firmware.gb firmware-mod.gb
+cbmc --no-pointer-check --no-bounds-check firmware-mod.gb
+```
+
+The `--no-pointer-check` and `--no-bounds-check` flags are needed because
+integer addresses used for MMIO are not valid pointers from CBMC's perspective.
+
+Constant addresses are resolved at instrumentation time to a byte offset within
+the region's array. Symbolic addresses (e.g., a pointer that could refer to
+either region) are handled via a conditional dispatch over all declared regions.
+
+Regions must not overlap; both `cbmc` and `goto-instrument` will report an
+error if overlapping regions are specified.
+
+Storing and loading C pointer values through an MMIO region is not fully
+supported: a pointer written to a region is serialised to its bytes, and
+reading it back does not reconstruct the original pointer's object identity.
+Such accesses may therefore be modelled imprecisely.
+
+#### Callback model
+
+Alternatively, use
 ```C
 __CPROVER_mm_io_r(address, size)
 __CPROVER_mm_io_w(address, size, value)
@@ -89,3 +151,13 @@ char __CPROVER_mm_io_r(void *a, unsigned s) {
 ```
 will return the value 2 upon any access at address 0x1000, and return a
 non-deterministic value in all other cases.
+
+The callback model can be combined with `--mmio-region`: per-region
+instrumentation runs first to give declared regions precise array-backed
+modeling, and the callbacks then handle any remaining dereferences. This is
+useful when some regions need custom read/write behaviour beyond simple
+nondeterministic access.
+
+Note that the callback model uses a single unbounded `__CPROVER_memory` array,
+which means every write implies an update of the entire array. For programs with
+many MMIO regions, the per-region object model described above is preferred.

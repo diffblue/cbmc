@@ -456,6 +456,11 @@ void goto_check_ct::collect_allocations(const goto_functionst &goto_functions)
         throw "expected two unsigned arguments to " CPROVER_PREFIX
               "allocated_memory";
 
+      log.warning() << instruction.source_location().as_string() << ": "
+                    << CPROVER_PREFIX "allocated_memory is deprecated, "
+                    << "use --mmio-region on the command line instead"
+                    << messaget::eom;
+
       DATA_INVARIANT(
         args[0].type() == args[1].type(),
         "arguments of allocated_memory must have same type");

@@ -1,0 +1,10 @@
+CORE broken-smt-backend paths-lifo-expected-failure
+main.c
+-DCMDLINE --mmio-region 0x10:4 --no-pointer-check --no-bounds-check
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] .* assertion \*p==42: SUCCESS$
+^\[main\.mmio-region\.2\] .* MMIO write address must be within a declared region: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring

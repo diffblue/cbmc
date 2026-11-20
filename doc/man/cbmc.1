@@ -322,6 +322,29 @@ print test suite for coverage criterion (requires \fB\-\-cover\fR)
 \fB\-\-mm\fR MM
 memory consistency model for concurrent programs (default: sc)
 .TP
+\fB\-\-mmio\-region\fR \fIaddress\fR:\fIsize\fR
+Define a contiguous memory\-mapped I/O region starting at \fIaddress\fR with the
+given \fIsize\fR in bytes. The \fIaddress\fR may use a \fB0x\fR prefix for
+hexadecimal notation. This option may be repeated to define multiple regions.
+Regions must not overlap.
+.IP
+Each region is modeled as an individual byte\-array object in the symbol table.
+Reads from and writes to constant addresses that fall within a declared region
+are mapped directly to the corresponding array element. Symbolic addresses are
+handled via a conditional dispatch over all declared regions.
+.IP
+Use \fB\-\-no\-pointer\-check\fR and \fB\-\-no\-bounds\-check\fR when verifying
+programs with MMIO regions, since integer addresses used for memory\-mapped I/O
+are not valid pointers from CBMC's perspective.
+.IP
+Example:
+.EX
+.in +4n
+cbmc \-\-mmio\-region 0x40000000:256 \-\-mmio\-region 0x40001000:64 \\
+  \-\-no\-pointer\-check \-\-no\-bounds\-check firmware.c
+.in
+.EE
+.TP
 \fB\-\-malloc\-may\-fail\fR
 allow malloc calls to return a null pointer
 .TP

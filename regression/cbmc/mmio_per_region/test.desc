@@ -1,0 +1,8 @@
+CORE
+main.c
+--mmio-region 0x1000:256 --no-pointer-check --no-bounds-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+Replaced MMIO operations
+--

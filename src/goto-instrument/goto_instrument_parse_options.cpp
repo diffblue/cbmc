@@ -1525,11 +1525,10 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
   // some analyses require function pointer removal and partial inlining
 
-  if(cmdline.isset("remove-pointers") ||
-     cmdline.isset("race-check") ||
-     cmdline.isset("mm") ||
-     cmdline.isset("isr") ||
-     cmdline.isset("concurrency"))
+  if(
+    cmdline.isset("remove-pointers") || cmdline.isset("race-check") ||
+    cmdline.isset("mm") || cmdline.isset("isr") || cmdline.isset("mmio") ||
+    cmdline.isset("mmio-region") || cmdline.isset("concurrency"))
   {
     do_indirect_call_and_rtti_removal();
 
@@ -1650,10 +1649,25 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     }
 
     // Memory-mapped I/O
-    if(cmdline.isset("mmio"))
+    if(cmdline.isset("mmio") || cmdline.isset("mmio-region"))
     {
       log.status() << "Instrumenting memory-mapped I/O" << messaget::eom;
-      mmio(value_set_analysis, goto_model, ui_message_handler);
+
+      // Per-region instrumentation runs first so that declared regions
+      // get precise array-backed modeling.
+      if(cmdline.isset("mmio-region"))
+      {
+        const std::vector<mmio_regiont> regions = parse_mmio_regions(
+          cmdline.get_values("mmio-region"), ui_message_handler);
+
+        mm_io(goto_model, regions, ui_message_handler);
+      }
+
+      // Concurrency shared-buffer instrumentation (--mmio).
+      // Runs after per-region so that callbacks can handle remaining
+      // dereferences not covered by declared regions.
+      if(cmdline.isset("mmio"))
+        mmio(value_set_analysis, goto_model, ui_message_handler);
     }
 
     if(cmdline.isset("concurrency"))
@@ -1946,6 +1960,8 @@ void goto_instrument_parse_optionst::help()
     HELP_NONDET_VOLATILE
     " {y--isr} {ufunction} \t instruments an interrupt service routine\n"
     " {y--mmio} \t instruments memory-mapped I/O\n"
+    " {y--mmio-region} {uaddr:size} \t define MMIO region as individual object"
+    " (can be combined with --mmio)\n"
     " {y--nondet-static} \t add nondeterministic initialization of variables"
     " with static lifetime\n"
     " {y--nondet-static-exclude} {ue} \t same as nondet-static except for the"

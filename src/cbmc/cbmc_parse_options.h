@@ -64,6 +64,7 @@ class optionst;
   OPT_COVER \
   "(symex-coverage-report):" \
   "(mm):" \
+  "(mmio-region):" \
   OPT_TIMESTAMP \
   "(arrays-uf-always)(arrays-uf-never)" \
   OPT_FLUSH \
