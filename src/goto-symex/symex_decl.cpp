@@ -36,6 +36,7 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
     },
     ns);
 
+  const ssa_exprt l1_ssa = ssa;
   ssa = state.declare(std::move(ssa), ns);
 
   // we hide the declaration of auxiliary variables
@@ -44,13 +45,22 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
                 state.call_stack().top().hidden_function ||
                 state.source.pc->source_location().get_hide();
 
+  // The declaration only introduces the symbols of the fields: represent a
+  // union by its own symbol, not by the value of its widest member.
   target.decl(
     state.guard.as_expr(),
     ssa,
-    state.field_sensitivity.apply(ns, state, ssa, false),
+    state.field_sensitivity.get_fields(ns, state, ssa, true, false),
     state.source,
     hidden ? symex_targett::assignment_typet::HIDDEN
            : symex_targett::assignment_typet::STATE);
+
+  state.field_sensitivity.initialize_union_members(
+    ns,
+    state,
+    state.field_sensitivity.get_fields(ns, state, l1_ssa, false),
+    target,
+    symex_config.allow_pointer_unsoundness);
 
   if(path_storage.dirty(ssa.get_object_name()) && state.atomic_section_id == 0)
     target.shared_write(

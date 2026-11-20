@@ -1,0 +1,26 @@
+CORE no-new-smt
+main.c
+
+^\[main.assertion.1\] .* first byte: SUCCESS$
+^\[main.assertion.2\] .* first byte of struct: SUCCESS$
+^\[main.assertion.3\] .* byte of array element: SUCCESS$
+^\[main.assertion.4\] .* overlapping members: SUCCESS$
+^\[main.assertion.5\] .* nested union, outer: SUCCESS$
+^\[main.assertion.6\] .* nested union: SUCCESS$
+^\[main.assertion.7\] .* id copied: SUCCESS$
+^\[main.assertion.8\] .* items copied: SUCCESS$
+^\[main.assertion.9\] .* code copied: SUCCESS$
+^\[main.assertion.10\] .* nondeterministic: FAILURE$
+^\*\* 1 of [0-9]+ failed
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Field sensitivity represents a union both by a symbol for the union as a whole
+and by symbols for (the fields of) each of its members. For a union that was
+declared, but not assigned, these previously had unrelated values, so that the
+bytes of the union (as read by memcpy) and its members could differ from each
+other.
+The incremental SMT back-end does not support arrays within unions.
