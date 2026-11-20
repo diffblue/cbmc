@@ -1,0 +1,13 @@
+CORE broken-cprover-smt-backend no-new-smt
+main.c
+--no-pointer-primitive-check --lift-nested-dereferences
+^\[main\.assertion\.1\] line \d+ path is reachable: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Pins the top-level-conjunct restriction: a negated rw_ok (!rw_ok(...)) does not
+create a backing object, so the path is not silently made infeasible.
+See GitHub issue diffblue/cbmc#7829.
