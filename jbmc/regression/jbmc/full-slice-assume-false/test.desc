@@ -1,0 +1,12 @@
+CORE symex-driven-lazy-loading-expected-failure
+Test
+-cp target/classes --function Test.check --full-slice
+^\[java::Test\.check:\(I\)V\.assertion\.1\] line 3 .*: FAILURE$
+^\[java::Test\.check:\(I\)V\.assertion\.2\] line 5 .*: SUCCESS$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+A failing Java assertion ends the path with ASSUME false. The full slicer must
+keep it, else the second assertion becomes reachable with x == 7.
