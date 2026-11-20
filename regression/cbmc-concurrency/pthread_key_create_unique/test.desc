@@ -1,0 +1,12 @@
+CORE pthread
+main.c
+--no-standard-checks
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Keys created by pthread_key_create must be unique across threads.
+Before the fix, __CPROVER_next_thread_key was thread-local, so both
+threads could receive the same key value.
