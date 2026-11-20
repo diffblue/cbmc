@@ -1,0 +1,11 @@
+CORE
+nondet.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+No loop of the model is bounded by the value that it converts, so a
+nondeterministic value does not require --unwind.

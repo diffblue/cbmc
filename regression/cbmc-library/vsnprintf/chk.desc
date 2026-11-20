@@ -1,0 +1,12 @@
+CORE gcc-only
+chk.c
+
+^\[__builtin___vsnprintf_chk\.precondition\.1\] line \d+ vsnprintf buffer overflow: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+The fortified vsnprintf requires that size does not exceed the object size,
+unless that is unknown ((size_t)-1). Only the second call violates this.

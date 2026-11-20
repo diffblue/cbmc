@@ -1,0 +1,11 @@
+CORE
+width.c
+--unwind 12 --unwinding-assertions
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Padding and leading zeros are bounded by the size of the buffer, too:
+characters that do not fit are only counted.

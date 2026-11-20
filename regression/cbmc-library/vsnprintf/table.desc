@@ -1,0 +1,14 @@
+CORE
+table.c
+--object-bits 12
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+The flags (- + space # 0), field width and precision (also given as *), the
+length modifiers hh, h, l, ll, j, z and t, integer minima and maxima, and %c,
+%s and %% give the output and the result of glibc, both for a buffer that
+holds the whole output and for one that truncates it. On Windows, the
+test needs more than the 256 objects of the default --object-bits.
