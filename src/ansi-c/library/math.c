@@ -1150,6 +1150,573 @@ float fminf(float f, float g) { return ((f <= g) || isnan(g)) ? f : g; }
 // TODO : Should call a __CPROVER_function so that it can be converted to SMT-LIB 
 long double fminl(long double f, long double g) { return ((f <= g) || isnan(g)) ? f : g; }
 
+/* ISO 9899:2024 (C23) 7.12.12.4 to 7.12.12.11 and F.10.9.4, F.10.9.5
+ * specify the fmaximum and fminimum families, which correspond to the
+ * IEEE 754-2019 operations maximum, minimum, maximumNumber,
+ * minimumNumber, maximumMagnitude, minimumMagnitude,
+ * maximumMagnitudeNumber and minimumMagnitudeNumber:
+ * - fmaximum/fminimum return the larger/smaller argument and a NaN if
+ *   either argument is a NaN.
+ * - The _num variants return the other argument if exactly one argument
+ *   is a NaN.
+ * - The _mag variants compare absolute values, and fall back to
+ *   fmaximum/fminimum (resp. their _num variant) if these are equal.
+ * - Unlike fmax and fmin, all of them treat -0 as less than +0.
+ * - The result is exact and independent of the rounding mode.
+ * Adding the arguments yields a quiet NaN if any of them is a NaN.
+ */
+
+/* FUNCTION: fmaximum */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+double fmaximum(double x, double y)
+{
+  if(isnan(x) || isnan(y))
+    return x + y;
+  if(x > y)
+    return x;
+  if(y > x)
+    return y;
+  // x and y are equal: either identical, or zeros of different sign
+  return signbit(x) ? y : x;
+}
+
+/* FUNCTION: fmaximumf */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+float fmaximumf(float x, float y)
+{
+  if(isnan(x) || isnan(y))
+    return x + y;
+  if(x > y)
+    return x;
+  if(y > x)
+    return y;
+  // x and y are equal: either identical, or zeros of different sign
+  return signbit(x) ? y : x;
+}
+
+/* FUNCTION: fmaximuml */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+long double fmaximuml(long double x, long double y)
+{
+  if(isnan(x) || isnan(y))
+    return x + y;
+  if(x > y)
+    return x;
+  if(y > x)
+    return y;
+  // x and y are equal: either identical, or zeros of different sign
+  return signbit(x) ? y : x;
+}
+
+/* FUNCTION: fmaximum_num */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+double fmaximum_num(double x, double y)
+{
+  if(isnan(x))
+    return isnan(y) ? x + y : y;
+  if(isnan(y))
+    return x;
+  if(x > y)
+    return x;
+  if(y > x)
+    return y;
+  // x and y are equal: either identical, or zeros of different sign
+  return signbit(x) ? y : x;
+}
+
+/* FUNCTION: fmaximum_numf */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+float fmaximum_numf(float x, float y)
+{
+  if(isnan(x))
+    return isnan(y) ? x + y : y;
+  if(isnan(y))
+    return x;
+  if(x > y)
+    return x;
+  if(y > x)
+    return y;
+  // x and y are equal: either identical, or zeros of different sign
+  return signbit(x) ? y : x;
+}
+
+/* FUNCTION: fmaximum_numl */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+long double fmaximum_numl(long double x, long double y)
+{
+  if(isnan(x))
+    return isnan(y) ? x + y : y;
+  if(isnan(y))
+    return x;
+  if(x > y)
+    return x;
+  if(y > x)
+    return y;
+  // x and y are equal: either identical, or zeros of different sign
+  return signbit(x) ? y : x;
+}
+
+/* FUNCTION: fmaximum_mag */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+double fmaximum_mag(double x, double y)
+{
+  if(isnan(x) || isnan(y))
+    return x + y;
+  double abs_x = __CPROVER_fabs(x);
+  double abs_y = __CPROVER_fabs(y);
+  if(abs_x > abs_y)
+    return x;
+  if(abs_y > abs_x)
+    return y;
+  if(x > y)
+    return x;
+  if(y > x)
+    return y;
+  // x and y are equal: either identical, or zeros of different sign
+  return signbit(x) ? y : x;
+}
+
+/* FUNCTION: fmaximum_magf */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+float fmaximum_magf(float x, float y)
+{
+  if(isnan(x) || isnan(y))
+    return x + y;
+  float abs_x = __CPROVER_fabsf(x);
+  float abs_y = __CPROVER_fabsf(y);
+  if(abs_x > abs_y)
+    return x;
+  if(abs_y > abs_x)
+    return y;
+  if(x > y)
+    return x;
+  if(y > x)
+    return y;
+  // x and y are equal: either identical, or zeros of different sign
+  return signbit(x) ? y : x;
+}
+
+/* FUNCTION: fmaximum_magl */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+long double fmaximum_magl(long double x, long double y)
+{
+  if(isnan(x) || isnan(y))
+    return x + y;
+  long double abs_x = __CPROVER_fabsl(x);
+  long double abs_y = __CPROVER_fabsl(y);
+  if(abs_x > abs_y)
+    return x;
+  if(abs_y > abs_x)
+    return y;
+  if(x > y)
+    return x;
+  if(y > x)
+    return y;
+  // x and y are equal: either identical, or zeros of different sign
+  return signbit(x) ? y : x;
+}
+
+/* FUNCTION: fmaximum_mag_num */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+double fmaximum_mag_num(double x, double y)
+{
+  if(isnan(x))
+    return isnan(y) ? x + y : y;
+  if(isnan(y))
+    return x;
+  double abs_x = __CPROVER_fabs(x);
+  double abs_y = __CPROVER_fabs(y);
+  if(abs_x > abs_y)
+    return x;
+  if(abs_y > abs_x)
+    return y;
+  if(x > y)
+    return x;
+  if(y > x)
+    return y;
+  // x and y are equal: either identical, or zeros of different sign
+  return signbit(x) ? y : x;
+}
+
+/* FUNCTION: fmaximum_mag_numf */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+float fmaximum_mag_numf(float x, float y)
+{
+  if(isnan(x))
+    return isnan(y) ? x + y : y;
+  if(isnan(y))
+    return x;
+  float abs_x = __CPROVER_fabsf(x);
+  float abs_y = __CPROVER_fabsf(y);
+  if(abs_x > abs_y)
+    return x;
+  if(abs_y > abs_x)
+    return y;
+  if(x > y)
+    return x;
+  if(y > x)
+    return y;
+  // x and y are equal: either identical, or zeros of different sign
+  return signbit(x) ? y : x;
+}
+
+/* FUNCTION: fmaximum_mag_numl */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+long double fmaximum_mag_numl(long double x, long double y)
+{
+  if(isnan(x))
+    return isnan(y) ? x + y : y;
+  if(isnan(y))
+    return x;
+  long double abs_x = __CPROVER_fabsl(x);
+  long double abs_y = __CPROVER_fabsl(y);
+  if(abs_x > abs_y)
+    return x;
+  if(abs_y > abs_x)
+    return y;
+  if(x > y)
+    return x;
+  if(y > x)
+    return y;
+  // x and y are equal: either identical, or zeros of different sign
+  return signbit(x) ? y : x;
+}
+
+/* FUNCTION: fminimum */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+double fminimum(double x, double y)
+{
+  if(isnan(x) || isnan(y))
+    return x + y;
+  if(x < y)
+    return x;
+  if(y < x)
+    return y;
+  // x and y are equal: either identical, or zeros of different sign
+  return signbit(x) ? x : y;
+}
+
+/* FUNCTION: fminimumf */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+float fminimumf(float x, float y)
+{
+  if(isnan(x) || isnan(y))
+    return x + y;
+  if(x < y)
+    return x;
+  if(y < x)
+    return y;
+  // x and y are equal: either identical, or zeros of different sign
+  return signbit(x) ? x : y;
+}
+
+/* FUNCTION: fminimuml */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+long double fminimuml(long double x, long double y)
+{
+  if(isnan(x) || isnan(y))
+    return x + y;
+  if(x < y)
+    return x;
+  if(y < x)
+    return y;
+  // x and y are equal: either identical, or zeros of different sign
+  return signbit(x) ? x : y;
+}
+
+/* FUNCTION: fminimum_num */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+double fminimum_num(double x, double y)
+{
+  if(isnan(x))
+    return isnan(y) ? x + y : y;
+  if(isnan(y))
+    return x;
+  if(x < y)
+    return x;
+  if(y < x)
+    return y;
+  // x and y are equal: either identical, or zeros of different sign
+  return signbit(x) ? x : y;
+}
+
+/* FUNCTION: fminimum_numf */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+float fminimum_numf(float x, float y)
+{
+  if(isnan(x))
+    return isnan(y) ? x + y : y;
+  if(isnan(y))
+    return x;
+  if(x < y)
+    return x;
+  if(y < x)
+    return y;
+  // x and y are equal: either identical, or zeros of different sign
+  return signbit(x) ? x : y;
+}
+
+/* FUNCTION: fminimum_numl */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+long double fminimum_numl(long double x, long double y)
+{
+  if(isnan(x))
+    return isnan(y) ? x + y : y;
+  if(isnan(y))
+    return x;
+  if(x < y)
+    return x;
+  if(y < x)
+    return y;
+  // x and y are equal: either identical, or zeros of different sign
+  return signbit(x) ? x : y;
+}
+
+/* FUNCTION: fminimum_mag */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+double fminimum_mag(double x, double y)
+{
+  if(isnan(x) || isnan(y))
+    return x + y;
+  double abs_x = __CPROVER_fabs(x);
+  double abs_y = __CPROVER_fabs(y);
+  if(abs_x < abs_y)
+    return x;
+  if(abs_y < abs_x)
+    return y;
+  if(x < y)
+    return x;
+  if(y < x)
+    return y;
+  // x and y are equal: either identical, or zeros of different sign
+  return signbit(x) ? x : y;
+}
+
+/* FUNCTION: fminimum_magf */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+float fminimum_magf(float x, float y)
+{
+  if(isnan(x) || isnan(y))
+    return x + y;
+  float abs_x = __CPROVER_fabsf(x);
+  float abs_y = __CPROVER_fabsf(y);
+  if(abs_x < abs_y)
+    return x;
+  if(abs_y < abs_x)
+    return y;
+  if(x < y)
+    return x;
+  if(y < x)
+    return y;
+  // x and y are equal: either identical, or zeros of different sign
+  return signbit(x) ? x : y;
+}
+
+/* FUNCTION: fminimum_magl */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+long double fminimum_magl(long double x, long double y)
+{
+  if(isnan(x) || isnan(y))
+    return x + y;
+  long double abs_x = __CPROVER_fabsl(x);
+  long double abs_y = __CPROVER_fabsl(y);
+  if(abs_x < abs_y)
+    return x;
+  if(abs_y < abs_x)
+    return y;
+  if(x < y)
+    return x;
+  if(y < x)
+    return y;
+  // x and y are equal: either identical, or zeros of different sign
+  return signbit(x) ? x : y;
+}
+
+/* FUNCTION: fminimum_mag_num */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+double fminimum_mag_num(double x, double y)
+{
+  if(isnan(x))
+    return isnan(y) ? x + y : y;
+  if(isnan(y))
+    return x;
+  double abs_x = __CPROVER_fabs(x);
+  double abs_y = __CPROVER_fabs(y);
+  if(abs_x < abs_y)
+    return x;
+  if(abs_y < abs_x)
+    return y;
+  if(x < y)
+    return x;
+  if(y < x)
+    return y;
+  // x and y are equal: either identical, or zeros of different sign
+  return signbit(x) ? x : y;
+}
+
+/* FUNCTION: fminimum_mag_numf */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+float fminimum_mag_numf(float x, float y)
+{
+  if(isnan(x))
+    return isnan(y) ? x + y : y;
+  if(isnan(y))
+    return x;
+  float abs_x = __CPROVER_fabsf(x);
+  float abs_y = __CPROVER_fabsf(y);
+  if(abs_x < abs_y)
+    return x;
+  if(abs_y < abs_x)
+    return y;
+  if(x < y)
+    return x;
+  if(y < x)
+    return y;
+  // x and y are equal: either identical, or zeros of different sign
+  return signbit(x) ? x : y;
+}
+
+/* FUNCTION: fminimum_mag_numl */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+long double fminimum_mag_numl(long double x, long double y)
+{
+  if(isnan(x))
+    return isnan(y) ? x + y : y;
+  if(isnan(y))
+    return x;
+  long double abs_x = __CPROVER_fabsl(x);
+  long double abs_y = __CPROVER_fabsl(y);
+  if(abs_x < abs_y)
+    return x;
+  if(abs_y < abs_x)
+    return y;
+  if(x < y)
+    return x;
+  if(y < x)
+    return y;
+  // x and y are equal: either identical, or zeros of different sign
+  return signbit(x) ? x : y;
+}
 
 /* ISO 9899:2011
  * The fdim functions determine the positive difference between their
