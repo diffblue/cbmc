@@ -121,9 +121,25 @@ SCENARIO("string refinement", "[core][solvers][strings][string_refinement]")
       }
     }
 
+    WHEN("a string is empty")
+    {
+      const exprt length = from_integer(0, int_type);
+      solver.set_to(equal_exprt{length1, length}, true);
+
+      REQUIRE(solver() == decision_proceduret::resultt::D_SATISFIABLE);
+
+      THEN("its model is an empty array")
+      {
+        const exprt array_model = solver.get(array1);
+        REQUIRE(can_cast_expr<array_exprt>(array_model));
+        REQUIRE(array_model.operands().empty());
+        REQUIRE(to_array_type(array_model.type()).size() == length);
+      }
+    }
+
     WHEN("a string has unconstrained contents")
     {
-      const auto size = GENERATE(0, 1, 4194304);
+      const auto size = GENERATE(1, 4194304);
       CAPTURE(size);
       const exprt length = from_integer(size, int_type);
       solver.set_to(equal_exprt{length1, length}, true);

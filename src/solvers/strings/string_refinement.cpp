@@ -1895,11 +1895,14 @@ exprt string_refinementt::get(const exprt &expr) const
     {
       const exprt length = super_get(length_from_pool.value());
 
-      if(numeric_cast<std::size_t>(length))
+      if(const auto n = numeric_cast<std::size_t>(length))
       {
+        const typet &char_type = to_array_type(arr.type()).element_type();
+        // An empty string has no characters, unknown or otherwise.
+        if(*n == 0)
+          return array_exprt{{}, array_typet{char_type, length}};
         // No character values are known. Keep the repeated placeholder compact
         // so building a trace does not allocate and print one per character.
-        const typet &char_type = to_array_type(arr.type()).element_type();
         return array_of_exprt(
           from_integer(CHARACTER_FOR_UNKNOWN, char_type),
           array_typet(char_type, length));
