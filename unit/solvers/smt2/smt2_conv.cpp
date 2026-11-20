@@ -20,6 +20,303 @@
 #include <solvers/smt2/smt2_dec.h>
 #include <testing-utils/use_catch.h>
 
+namespace
+{
+/// Expose the existing response reader to supply solver protocol fixtures.
+class smt2_result_testt : public smt2_dect
+{
+public:
+  using smt2_dect::read_result;
+  using smt2_dect::smt2_dect;
+};
+} // namespace
+
+TEST_CASE(
+  "SMT model queries preserve the identifier set",
+  "[core][solvers][smt2]")
+{
+  symbol_tablet symbol_table;
+  namespacet ns{symbol_table};
+  const auto solver = GENERATE(
+    smt2_convt::solvert::Z3,
+    smt2_convt::solvert::GENERIC,
+    smt2_convt::solvert::BITWUZLA,
+    smt2_convt::solvert::BOOLECTOR,
+    smt2_convt::solvert::CPROVER_SMT2,
+    smt2_convt::solvert::CVC5,
+    smt2_convt::solvert::MATHSAT,
+    smt2_convt::solvert::YICES);
+  std::ostringstream output;
+  smt2_convt converter{ns, "queries", "", "ALL", solver, output};
+  std::string expected;
+  SECTION("Empty")
+  {
+    // Q1: no identifiers means no model request, including no empty Z3 query.
+  }
+  SECTION("Singleton")
+  {
+    // Q2: one identifier keeps exactly the previous singleton request.
+    const symbol_exprt x{"x", unsignedbv_typet{8}};
+    converter.set_to(equal_exprt{x, from_integer(1, x.type())}, true);
+    expected = "(get-value (x))\n";
+  }
+  SECTION("Multiple, including escaped identifier")
+  {
+    // Q3: Z3 batches every identifier in the existing sorted set once;
+    // Q4: other solvers retain singleton commands, and Boolector retains none.
+    // Deliberately discover the symbols out of order and include an escaped id.
+    for(const auto &name : {"x|y", "z", "a"})
+    {
+      const symbol_exprt x{name, unsignedbv_typet{8}};
+      converter.set_to(equal_exprt{x, from_integer(1, x.type())}, true);
+    }
+    expected = solver == smt2_convt::solvert::Z3
+                 ? "(get-value (a z |x&124;y|))\n"
+                 : "(get-value (a))\n(get-value (z))\n"
+                   "(get-value (|x&124;y|))\n";
+  }
+  if(solver == smt2_convt::solvert::BOOLECTOR)
+    expected.clear();
+  CHECK(converter() == decision_proceduret::resultt::D_ERROR);
+  const auto text = output.str();
+  const auto check = text.find("(check-sat)\n");
+  REQUIRE(check != std::string::npos);
+  CHECK(
+    text.substr(check) ==
+    "(check-sat)\n\n" + expected + "\n(exit)\n; end of SMT2 file\n");
+}
+
+TEST_CASE(
+  "SMT model responses decode every typed value",
+  "[core][solvers][smt2]")
+{
+  symbol_tablet symbol_table;
+  namespacet ns{symbol_table};
+  null_message_handlert messages;
+  smt2_result_testt solver{
+    ns, "results", "", "ALL", smt2_convt::solvert::Z3, "", messages};
+  const unsignedbv_typet byte{8};
+  const symbol_exprt x{"x|y", byte};
+  const symbol_exprt empty_name{"", byte};
+  const symbol_exprt number{"number", integer_typet{}};
+  const struct_typet record_type{{{"field", byte}}};
+  const symbol_exprt record{"record", record_type};
+  const array_typet array_type{byte, from_integer(2, unsignedbv_typet{64})};
+  const symbol_exprt array{"array", array_type};
+  solver.set_to(equal_exprt{x, from_integer(42, byte)}, true);
+  solver.set_to(equal_exprt{empty_name, from_integer(9, byte)}, true);
+  solver.set_to(equal_exprt{number, from_integer(-10, number.type())}, true);
+  solver.set_to(
+    equal_exprt{record, struct_exprt{{from_integer(3, byte)}, record_type}},
+    true);
+  solver.set_to(
+    equal_exprt{array, array_of_exprt{from_integer(7, byte), array_type}},
+    true);
+  const auto yes = solver.handle(equal_exprt{x, from_integer(42, byte)});
+  const auto no =
+    solver.handle(equal_exprt{number, from_integer(0, number.type())});
+
+  // Q5/Q6: singleton and multiline batched responses must produce the same
+  // actual values. Reordered pairs, quoted/escaped ids, both Boolean values,
+  // the legal empty quoted identifier, indexed bitvectors, negative integers,
+  // arrays and structs all use the
+  // original parsed_values map and typed parse_rec implementation.
+  const std::vector<std::string> pairs{
+    "(B1 false)",
+    "(|| #x09)",
+    "(array ((as const (Array (_ BitVec 64) (_ BitVec 8))) #x07))",
+    "(|x&124;y| (_ bv42 8))",
+    "(record (mk-struct.0 #x03))",
+    "(B0 true)",
+    "(number (- 10))"};
+  std::string response = "sat\n";
+  SECTION("Singleton responses")
+  {
+    for(const auto &pair : pairs)
+      response += "(" + pair + ")\n";
+  }
+  SECTION("Batched response")
+  {
+    response += "(\n";
+    for(const auto &pair : pairs)
+      response += pair + "\n";
+    response += ")\n";
+  }
+  std::istringstream input{response};
+  REQUIRE(
+    solver.read_result(input) == decision_proceduret::resultt::D_SATISFIABLE);
+  CHECK(solver.get(x) == from_integer(42, byte));
+  CHECK(solver.get(empty_name) == from_integer(9, byte));
+  CHECK(solver.get(number) == from_integer(-10, number.type()));
+  CHECK(
+    solver.get(record) == struct_exprt{{from_integer(3, byte)}, record_type});
+  CHECK(
+    solver.get(array) ==
+    array_exprt{{from_integer(7, byte), from_integer(7, byte)}, array_type});
+  CHECK(solver.get(yes) == true_exprt{});
+  CHECK(solver.get(no) == false_exprt{});
+}
+
+TEST_CASE(
+  "SMT model response failures do not become SAT",
+  "[core][solvers][smt2]")
+{
+  symbol_tablet symbol_table;
+  namespacet ns{symbol_table};
+  null_message_handlert messages;
+  smt2_result_testt solver{
+    ns, "results", "", "ALL", smt2_convt::solvert::Z3, "", messages};
+  const auto response = GENERATE(
+    "sat\n(error \"model unavailable\")\n",
+    "unknown\n",
+    "sat\n()\n",
+    "sat\n((x #x01) (broken) (y #x02))\n",
+    "sat\n((x #x01) (y #x02 extra))\n",
+    "sat\n((x #x01) ((bad name) #x02))\n",
+    "sat\n((x #x01) (y #x02)\n",
+    "sat\n((x #x01))\n)\n");
+  // Q7: SAT errors and UNKNOWN are failures as before. Q8: malformed middle
+  // or last pairs, empty lists and syntax errors also fail, even after valid
+  // values or SAT were parsed. Never return a partially accepted model.
+  std::istringstream input{response};
+  CHECK(solver.read_result(input) == decision_proceduret::resultt::D_ERROR);
+}
+
+TEST_CASE(
+  "SMT model status and Boolean fallback remain compatible",
+  "[core][solvers][smt2]")
+{
+  symbol_tablet symbol_table;
+  namespacet ns{symbol_table};
+  null_message_handlert messages;
+  smt2_result_testt solver{
+    ns, "results", "", "ALL", smt2_convt::solvert::Z3, "", messages};
+  SECTION("UNSAT ignores later model errors")
+  {
+    // Q9: no model exists after UNSAT; retain the existing error exemption.
+    std::istringstream input{"unsat\n(error \"model unavailable\")\n"};
+    CHECK(
+      solver.read_result(input) ==
+      decision_proceduret::resultt::D_UNSATISFIABLE);
+  }
+  SECTION("Historical diagnostics do not invalidate a clean response")
+  {
+    // Q10: syntax-error detection compares the current parser call's error
+    // count, not unrelated diagnostics previously sent to the shared handler.
+    messaget log{messages};
+    log.error() << "earlier diagnostic" << messaget::eom;
+    std::istringstream input{"sat\n"};
+    CHECK(
+      solver.read_result(input) == decision_proceduret::resultt::D_SATISFIABLE);
+  }
+  SECTION("Missing typed value")
+  {
+    // Q11: a required typed identifier cannot silently parse an absent value.
+    const symbol_exprt x{"x", unsignedbv_typet{8}};
+    solver.set_to(equal_exprt{x, from_integer(1, x.type())}, true);
+    std::istringstream input{"sat\n"};
+    CHECK(solver.read_result(input) == decision_proceduret::resultt::D_ERROR);
+  }
+  SECTION("Missing Boolean without fallback")
+  {
+    // Q12: a missing solver Boolean must not default to false.
+    const symbol_exprt x{"x", unsignedbv_typet{8}};
+    solver.handle(equal_exprt{x, from_integer(1, x.type())});
+    std::istringstream input{"sat\n((x #x01))\n"};
+    CHECK(solver.read_result(input) == decision_proceduret::resultt::D_ERROR);
+  }
+  SECTION("Missing Boolean with set_to fallback")
+  {
+    // Q13: the established set_to fallback remains valid for a literal whose
+    // value is already fixed by an assertion; no model value is invented.
+    const symbol_exprt x{"x", unsignedbv_typet{8}};
+    const equal_exprt expression{x, from_integer(1, x.type())};
+    const auto literal = solver.handle(expression);
+    solver.set_to(expression, true);
+    std::istringstream input{"sat\n((x #x01))\n"};
+    REQUIRE(
+      solver.read_result(input) == decision_proceduret::resultt::D_SATISFIABLE);
+    CHECK(solver.get(literal) == true_exprt{});
+  }
+}
+
+TEST_CASE(
+  "SMT missing-value handling for other solvers is unchanged",
+  "[core][solvers][smt2]")
+{
+  symbol_tablet symbol_table;
+  namespacet ns{symbol_table};
+  null_message_handlert messages;
+  const auto backend =
+    GENERATE(smt2_convt::solvert::BOOLECTOR, smt2_convt::solvert::GENERIC);
+  smt2_result_testt solver{ns, "results", "", "ALL", backend, "", messages};
+  const symbol_exprt x{"x", unsignedbv_typet{8}};
+  solver.set_to(equal_exprt{x, from_integer(1, x.type())}, true);
+
+  // Q15: smt2_identifiers is not a request receipt for every backend:
+  // Boolector never emits get-value. The new missing-requested-value failure
+  // is limited to Z3; preserve other backends' existing result handling.
+  std::istringstream input{"sat\n"};
+  CHECK(
+    solver.read_result(input) == decision_proceduret::resultt::D_SATISFIABLE);
+}
+
+TEST_CASE(
+  "SMT other solver responses retain singleton and extra-model handling",
+  "[core][solvers][smt2]")
+{
+  symbol_tablet symbol_table;
+  namespacet ns{symbol_table};
+  null_message_handlert messages;
+  const auto backend =
+    GENERATE(smt2_convt::solvert::BOOLECTOR, smt2_convt::solvert::GENERIC);
+  smt2_result_testt solver{ns, "results", "", "ALL", backend, "", messages};
+  const symbol_exprt x{"x", unsignedbv_typet{8}};
+  solver.set_to(equal_exprt{x, from_integer(42, x.type())}, true);
+  std::string response = "sat\n((x #x2a))\n";
+  SECTION("Additional model list")
+  {
+    // Q16: a non-Z3 solver can emit an extra model list. Preserve the old
+    // unknown-list handling and the actual value read from its singleton.
+    response += "(model (define-fun x () (_ BitVec 8) #x2a))\n";
+  }
+  SECTION("Historical syntax-error behavior")
+  {
+    // Q17: this patch's new syntax-error rejection is scoped to Z3 batching;
+    // do not change other solvers' existing EOF/error interpretation here.
+    response += "(";
+  }
+  std::istringstream input{response};
+  REQUIRE(
+    solver.read_result(input) == decision_proceduret::resultt::D_SATISFIABLE);
+  CHECK(solver.get(x) == from_integer(42, x.type()));
+}
+
+TEST_CASE("Z3 batched model values retain their assignments", "[smt2][z3]")
+{
+  // Q18: multiple differently typed, constrained symbols trigger one model
+  // request. A real Z3 response must recover each value, including both
+  // Boolean outcomes. This exercises generation, transport and decoding.
+  symbol_tablet symbol_table;
+  namespacet ns{symbol_table};
+  null_message_handlert messages;
+  smt2_dect solver{
+    ns, "batch", "", "ALL", smt2_convt::solvert::Z3, "", messages};
+  const symbol_exprt x{"x|y", unsignedbv_typet{8}};
+  const symbol_exprt number{"number", integer_typet{}};
+  const equal_exprt condition{x, from_integer(42, x.type())};
+  const auto yes = solver.handle(condition);
+  const auto no =
+    solver.handle(equal_exprt{number, from_integer(0, number.type())});
+  solver.set_to(condition, true);
+  solver.set_to(equal_exprt{number, from_integer(-10, number.type())}, true);
+  REQUIRE(solver() == decision_proceduret::resultt::D_SATISFIABLE);
+  CHECK(solver.get(x) == from_integer(42, x.type()));
+  CHECK(solver.get(number) == from_integer(-10, number.type()));
+  CHECK(solver.get(yes) == true_exprt{});
+  CHECK(solver.get(no) == false_exprt{});
+}
+
 TEST_CASE(
   "smt2_convt::convert_identifier character escaping.",
   "[core][solvers][smt2]")
