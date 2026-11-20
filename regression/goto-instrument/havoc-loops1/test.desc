@@ -1,0 +1,14 @@
+CORE
+main.c
+--havoc-loops
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line 7 the loop runs three times: FAILURE$
+^\[main\.assertion\.2\] line 8 the loop does not change x: FAILURE$
+^\[main\.assertion\.3\] line 9 the loop does not change y: SUCCESS$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+--havoc-loops replaces the loop by a non-deterministic assignment to the
+variables that it modifies (x, but not y).
