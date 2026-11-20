@@ -1,6 +1,6 @@
-KNOWNBUG
-main.c
---pointer-check --bounds-check
+CORE
+tie_break.c
+
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
