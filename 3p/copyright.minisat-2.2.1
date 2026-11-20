@@ -1,0 +1,50 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: minisat2
+Upstream-Contact: Niklas Sorensson <niklasso@gmail.com>
+Source: http://minisat.se/
+Comment: MiniSat is a minimalistic, high-performance SAT solver. It is used
+ by src/solvers/sat/satcheck_minisat2.{cpp,h}, and is the default SAT back-end
+ of CBMC.
+ .
+ The directory minisat-2.2.1-original/ is byte-for-byte identical to the
+ contents of the Debian source tarball
+ http://ftp.debian.org/debian/pool/main/m/minisat2/minisat2_2.2.1.orig.tar.gz
+ (MD5 27faa19ee0508660bd6fb7f894646d42), which is version 2.2.1 of MiniSat
+ as released by Debian; upstream itself never tagged a 2.2.1 release.
+ .
+ The directory minisat-2.2.1-patched/ is the copy that is actually built. It
+ differs from minisat-2.2.1-original/ by the patch that was previously kept
+ in scripts/minisat-2.2.1-patch:
+  * fixes for compiler warnings and errors with newer C++ compilers and
+    with Visual Studio (parenthesization, template friend declarations,
+    dangling else, zero-length arrays, PRIi64 format macros);
+  * the zlib-based DIMACS parser in ParseUtils.h is disabled;
+  * fpu_control.h is only included with glibc;
+  * out-of-memory conditions are reported by exception rather than
+    depending on errno.
+ The patch can be re-created by diffing the two directories.
+
+Files: minisat-2.2.1-original/* minisat-2.2.1-patched/*
+Copyright: 2003-2006, Niklas Een, Niklas Sorensson
+           2007-2010, Niklas Sorensson
+License: Expat
+
+License: Expat
+ Permission is hereby granted, free of charge, to any person obtaining a
+ copy of this software and associated documentation files (the
+ "Software"), to deal in the Software without restriction, including
+ without limitation the rights to use, copy, modify, merge, publish,
+ distribute, sublicense, and/or sell copies of the Software, and to
+ permit persons to whom the Software is furnished to do so, subject to
+ the following conditions:
+ .
+ The above copyright notice and this permission notice shall be included
+ in all copies or substantial portions of the Software.
+ .
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+ OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

@@ -47,6 +47,7 @@ formal verification of C and C++ programs.
 
 ```
 cbmc/
+├── 3p/                     # Third-party libraries
 ├── src/                    # Main source code
 ├── jbmc/                   # Java Bounded Model Checker
 ├── regression/             # Regression test suites
@@ -170,7 +171,7 @@ Parallel structure to main CBMC for Java:
     - Abstract interpretation for Java
   - **`jdiff/`** - Diff tool for Java programs
     - Comparison of Java GOTO programs
-  - **`miniz/`** - ZIP compression library
+  - **`miniz/`** - ZIP compression library (sources in `3p/miniz-3.0.2/`)
     - Used for reading JAR files and compressed class files
 - **`jbmc/regression/`** - Java regression tests
 - **`jbmc/unit/`** - Java unit tests
@@ -443,7 +444,6 @@ Traditional makefiles are also available:
 
 ```bash
 cd src
-make minisat2-download
 make -j$(nproc)  # Parallel build
 ```
 
@@ -457,7 +457,8 @@ CBMC can use various SAT/SMT solvers:
 - **Z3**
 - And others
 
-CMake automatically downloads MiniSat during configuration.
+MiniSat is part of the source tree (in `3p/`); CMake automatically downloads
+the other solvers during configuration when they are selected.
 See `COMPILING.md` for detailed build instructions for all platforms.
 
 ---
