@@ -1345,6 +1345,70 @@ TEST_CASE(
   }
 }
 
+TEST_CASE(
+  "expr to smt conversion for extract bit, sign, abs, and constant shifts",
+  "[core][smt2_incremental]")
+{
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
+  const symbol_exprt foo{"foo", unsignedbv_typet{8}};
+  const smt_identifier_termt foo_term{"foo", smt_bit_vector_sortt{8}};
+
+  SECTION("extract bit with constant index")
+  {
+    CHECK(
+      test.convert(extractbit_exprt{foo, 3}) ==
+      smt_core_theoryt::equal(
+        smt_bit_vector_theoryt::extract(3, 3)(foo_term),
+        smt_bit_vector_constant_termt{1, 1}));
+  }
+
+  SECTION("sign of signed and unsigned bit vectors")
+  {
+    const symbol_exprt bar{"bar", signedbv_typet{8}};
+    CHECK(
+      test.convert(sign_exprt{bar}) ==
+      smt_bit_vector_theoryt::signed_less_than(
+        smt_identifier_termt{"bar", smt_bit_vector_sortt{8}},
+        smt_bit_vector_constant_termt{0, 8}));
+    CHECK(test.convert(sign_exprt{foo}) == smt_bool_literal_termt{false});
+  }
+
+  SECTION("absolute value of signed and unsigned bit vectors")
+  {
+    const symbol_exprt bar{"bar", signedbv_typet{8}};
+    const smt_identifier_termt bar_term{"bar", smt_bit_vector_sortt{8}};
+    CHECK(
+      test.convert(abs_exprt{bar}) ==
+      smt_core_theoryt::if_then_else(
+        smt_bit_vector_theoryt::signed_less_than(
+          bar_term, smt_bit_vector_constant_termt{0, 8}),
+        smt_bit_vector_theoryt::negate(bar_term),
+        bar_term));
+    CHECK(test.convert(abs_exprt{foo}) == foo_term);
+  }
+
+  SECTION("shift by a distance of integer type")
+  {
+    CHECK(
+      test.convert(shl_exprt{foo, 2}) ==
+      smt_bit_vector_theoryt::shift_left(
+        foo_term, smt_bit_vector_constant_termt{2, 8}));
+  }
+
+  SECTION("concatenation with Boolean operands")
+  {
+    const symbol_exprt b{"b", bool_typet{}};
+    CHECK(
+      test.convert(concatenation_exprt{{b, foo}, unsignedbv_typet{9}}) ==
+      smt_bit_vector_theoryt::concat(
+        smt_core_theoryt::if_then_else(
+          smt_identifier_termt{"b", smt_bool_sortt{}},
+          smt_bit_vector_constant_termt{1, 1},
+          smt_bit_vector_constant_termt{0, 1}),
+        foo_term));
+  }
+}
+
 TEST_CASE("expr to smt conversion for type casts", "[core][smt2_incremental]")
 {
   auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
