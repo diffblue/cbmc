@@ -1,0 +1,86 @@
+name: Propose a release on the 14th and 28th of each month
+
+on:
+  schedule:
+    - cron: "0 8 14,28 * *" # Run this on 14th and 28th of each month at 08:00
+  workflow_dispatch:        # Allow manual dispatching for a release at a custom point in time.
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  prepare-release:
+    # Do not propose releases from forks.
+    if: github.repository == 'diffblue/cbmc'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - name: Compare CBMC versions and determine next step
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          latest_tag=$(gh release view --json tagName --jq .tagName)
+          latest_release=${latest_tag#cbmc-}
+          # The peeled ("^{}") entry is the commit an annotated tag points to;
+          # lightweight tags only have the plain entry.
+          latest_release_sha=$(git ls-remote origin \
+            "refs/tags/$latest_tag" "refs/tags/$latest_tag^{}" | \
+            tail -n 1 | awk '{print $1}')
+          head_sha=$(git rev-parse HEAD)
+          echo "head_sha=$head_sha" >> $GITHUB_ENV
+          if [ "$latest_release_sha" = "$head_sha" ] ; then
+            # no changes since latest release
+            echo "next_step=none" >> $GITHUB_ENV
+          else
+            # Releases proposed by this workflow always increment the minor
+            # version.
+            latest_major=$(echo $latest_release | cut -f1 -d.)
+            latest_minor=$(echo $latest_release | cut -f2 -d.)
+            next_minor=$(($latest_minor + 1))
+            next_version="$latest_major.$next_minor.0"
+            echo "next_version=$next_version" >> $GITHUB_ENV
+            # produce an updated CHANGELOG using GitHub's release notes
+            gh api "repos/${{ github.repository }}/releases/generate-notes" \
+              -f tag_name="cbmc-$next_version" \
+              -f target_commitish="$head_sha" \
+              -f previous_tag_name="$latest_tag" \
+              --jq .body > CHANGELOG.new
+            echo "# CBMC $next_version" > CHANGELOG.tmp
+            echo >> CHANGELOG.tmp
+            cat -s CHANGELOG.new >> CHANGELOG.tmp
+            rm CHANGELOG.new
+            echo >> CHANGELOG.tmp
+            cat CHANGELOG >> CHANGELOG.tmp
+            mv CHANGELOG.tmp CHANGELOG
+            # update the version strings in the configuration files
+            perl -p -i -e \
+              "s/^CBMC_VERSION\s*=\s*\Q$latest_release\E/CBMC_VERSION = $next_version/" \
+               src/config.inc
+            perl -p -i -e \
+              "s/^version\s*=\s*\"\Q$latest_release\E\"/version = \"$next_version\"/" \
+               src/libcprover-rust/Cargo.toml
+            grep -q "^CBMC_VERSION = $next_version$" src/config.inc
+            grep -q "^version = \"$next_version\"$" src/libcprover-rust/Cargo.toml
+            # debug logging of changes
+            git diff
+            echo "next_step=create_pr" >> $GITHUB_ENV
+          fi
+      - name: Create Pull Request
+        if: ${{ env.next_step == 'create_pr' }}
+        uses: peter-evans/create-pull-request@v8
+        with:
+          # Pull requests created using the default GITHUB_TOKEN do not trigger
+          # any workflows, hence use the same token as regular-release.yaml.
+          token: ${{ secrets.DB_CI_CPROVER_ACCESS_TOKEN }}
+          commit-message: Release CBMC ${{ env.next_version }}
+          branch: cbmc-${{ env.next_version }}
+          delete-branch: true
+          title: 'Automatic release of CBMC ${{ env.next_version }}'
+          body: >
+            Release CBMC ${{ env.next_version }} (a new minor version) up to the
+            changes in ${{ env.head_sha }}. Before merging, consider adding a
+            summary of the release to the CHANGELOG. Once merged, tag the merge
+            commit as cbmc-${{ env.next_version }} to trigger the release
+            workflows.
