@@ -1,0 +1,8 @@
+CORE
+dummy.c
+goto-as --help
+^EXIT=0$
+^SIGNAL=0$
+goto-as understands the options of as
+--
+^warning: ignoring
