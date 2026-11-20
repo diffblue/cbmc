@@ -1,0 +1,11 @@
+CORE
+s6_triple_const_middle.c
+--generate-function-body havoc_triple_pointer_const_middle --generate-function-body-options havoc,params:.*
+^EXIT=0$
+^SIGNAL=0$
+^\[main.assertion.1\] .* assertion x == 42: SUCCESS$
+^\[main.assertion.2\] .* assertion y == 100: SUCCESS$
+^\[main.assertion.3\] .* assertion \*\*\*triple_ptr == 42: SUCCESS$
+^\[main.assertion.4\] .* assertion x == 42: SUCCESS$
+^\[main.assertion.5\] .* assertion y == 100: SUCCESS$
+--
