@@ -1695,10 +1695,11 @@ aggregate_name:
           gcc_type_attribute_opt
         {
           parser_stack($1).set(ID_components, ID_nil);
-          // GCC ignores packed and aligned attributes between the keyword and
-          // the tag of a declaration without body (and Clang warns about
-          // them), while those following the tag apply to the declared entity
-          strip_ignored_attributes(parser_stack($2), {ID_packed, ID_aligned});
+          // packed and aligned attributes between the keyword and the tag are
+          // attributes of the type (which only Clang applies, when the type
+          // is not complete yet), while those following the tag apply to the
+          // declared entity
+          mark_type_attributes(parser_stack($2));
           // Visual Studio declspecs
           $$=merge($1, merge($2, merge($3, $6)));
         }

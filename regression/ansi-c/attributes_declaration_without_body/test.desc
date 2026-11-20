@@ -1,0 +1,11 @@
+CORE gcc-only
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The values match GCC 15 and Clang 21. The test checks __clang__, as it runs in
+both GCC and Clang mode.
