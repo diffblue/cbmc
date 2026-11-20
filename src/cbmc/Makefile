@@ -14,6 +14,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../goto-checker/goto-checker$(LIBEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \
       ../goto-symex/goto-symex$(LIBEXT) \
+      ../pointer-analysis/reachable_objects$(OBJEXT) \
       ../pointer-analysis/value_set$(OBJEXT) \
       ../pointer-analysis/value_set_analysis_fi$(OBJEXT) \
       ../pointer-analysis/value_set_domain_fi$(OBJEXT) \

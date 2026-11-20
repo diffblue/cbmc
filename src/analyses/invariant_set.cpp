@@ -1081,6 +1081,11 @@ void invariant_sett::apply_code(const codet &code)
     // may be a disaster
     make_true();
   }
+  else if(statement == ID_havoc_reachable)
+  {
+    // the objects reachable from pointers may be any of the objects
+    make_true();
+  }
   else if(statement==ID_cpp_delete ||
           statement==ID_cpp_delete_array)
   {

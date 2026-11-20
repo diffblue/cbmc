@@ -257,6 +257,18 @@ public:
     get_modet,
     const exprt &);
 
+  /// Adds the objects that the `havoc_reachable` statement \p code reads and
+  /// writes. Without a pointer analysis, these are the operands (read), the
+  /// objects they point to (written), and, if \p code has the
+  /// `arbitrary_memory` flag, the objects of static lifetime (written).
+  /// \param function: Function containing \p target
+  /// \param target: The instruction \p code belongs to
+  /// \param code: The `havoc_reachable` statement
+  virtual void get_havoc_reachable_objects(
+    const irep_idt &function,
+    goto_programt::const_targett target,
+    const codet &code);
+
   void output(std::ostream &out) const;
 
 protected:
@@ -362,6 +374,7 @@ inline std::ostream &operator << (
   return out;
 }
 
+class dirtyt;
 class value_setst;
 
 class rw_range_set_value_sett:public rw_range_sett
@@ -410,8 +423,30 @@ public:
     rw_range_sett::get_array_objects(_function, _target, mode, pointer);
   }
 
+  /// Adds the objects that the `havoc_reachable` statement \p code reads and
+  /// writes, using the value sets: the operands and the pointers stored in
+  /// reachable objects are read, and all reachable objects that are symbols
+  /// are written. With the `arbitrary_memory` flag, the objects of static
+  /// lifetime and, if set via \ref set_dirty, the address-taken local
+  /// variables of all functions are additional roots.
+  /// \param function: Function containing \p target
+  /// \param target: The instruction \p code belongs to
+  /// \param code: The `havoc_reachable` statement
+  void get_havoc_reachable_objects(
+    const irep_idt &function,
+    goto_programt::const_targett target,
+    const codet &code) override;
+
+  /// Sets the address-taken local variables that `havoc_reachable` with the
+  /// `arbitrary_memory` flag may change.
+  void set_dirty(const dirtyt &_dirty)
+  {
+    dirty = &_dirty;
+  }
+
 protected:
   value_setst &value_sets;
+  const dirtyt *dirty = nullptr;
   irep_idt function;
   goto_programt::const_targett target;
 

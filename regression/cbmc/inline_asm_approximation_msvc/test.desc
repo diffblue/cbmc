@@ -1,0 +1,19 @@
+CORE
+main.i
+--winx64
+^EXIT=10$
+^SIGNAL=0$
+approximating inline assembly statement at .* line 15 function main: instruction 'mov' is not modeled, so the local variables it names, all objects of static lifetime
+^\[main\.assertion\.1\] line 10 nop is modeled: SUCCESS$
+^\[main\.assertion\.2\] line 16 inner x: FAILURE$
+^\[main\.assertion\.3\] line 18 outer x: FAILURE$
+^\[main\.assertion\.4\] line 19 y is not named: SUCCESS$
+^\[main\.assertion\.5\] line 20 static object: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+MSVC-style inline assembly that is not modeled is approximated conservatively.
+The input is preprocessed (main.i), and the test uses no instruction that is
+modeled by a library function (as fstcw is, see cbmc-library/__asm_fstcw), as
+preprocessing for --winx64 fails on a non-x86 host.
