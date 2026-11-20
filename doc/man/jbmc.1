@@ -458,6 +458,10 @@ output smt incremental formula to the given file
 \fB\-\-write\-solver\-stats\-to\fR \fIjson\-file\fR
 collect the solver query complexity
 .TP
+\fB\-\-solver\-time\-limit\fR N
+abort the SAT/SMT solver after N seconds (best-effort; not all
+back-ends honour this)
+.TP
 \fB\-\-no\-refine\-strings\fR
 turn off string refinement
 .TP

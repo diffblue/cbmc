@@ -174,6 +174,9 @@ public:
   // for incremental conversion
   bool converted = false;
 
+  /// Whether this step has been converted into the branch pruning solver.
+  bool converted_for_pruning = false;
+
   SSA_stept(
     const symex_targett::sourcet &_source,
     goto_trace_stept::typet _type)

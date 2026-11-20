@@ -1,0 +1,14 @@
+CORE
+guarded_assume.c
+--paths lifo
+^\[main\.assertion\.1\] .* x > 5 reachable: FAILURE$
+^\[main\.assertion\.2\] .* x >= 10 reachable: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Tests guarded assumes: the assume(x < 10) inside if(y > 0) has a
+non-trivial guard. On the y <= 0 path, x >= 10 is still feasible.
+Branch pruning must not over-prune using the guarded assume.

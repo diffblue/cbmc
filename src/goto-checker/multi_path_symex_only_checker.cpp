@@ -16,6 +16,12 @@ Author: Daniel Kroening, Peter Schrammel
 #include <goto-symex/shadow_memory.h>
 #include <goto-symex/show_program.h>
 #include <goto-symex/show_vcc.h>
+#include <solvers/flattening/bv_pointers.h>
+#include <solvers/prop/prop_conv_solver.h>
+#ifdef HAVE_MINISAT2
+#  include <solvers/sat/satcheck_minisat2.h>
+#endif
+#include <solvers/stack_decision_procedure.h>
 
 #include "bmc_util.h"
 
@@ -39,6 +45,39 @@ multi_path_symex_only_checkert::multi_path_symex_only_checkert(
   unwindset.parse_unwind(options.get_option("unwind"));
   unwindset.parse_unwindset(
     options.get_list_option("unwindset"), goto_model, ui_message_handler);
+
+  if(
+    !options.get_bool_option("no-branch-pruning") &&
+    !options.get_bool_option("refine") &&
+    !options.get_bool_option("refine-arrays") &&
+    !options.get_bool_option("refine-strings"))
+  {
+#ifdef HAVE_MINISAT2
+    auto sat =
+      std::make_unique<satcheck_minisat_no_simplifiert>(ui_message_handler);
+    auto bv = std::make_unique<bv_pointerst>(ns, *sat, ui_message_handler);
+    branch_pruning_solver = std::make_unique<solver_factoryt::solvert>(
+      std::unique_ptr<boolbvt>(std::move(bv)),
+      std::unique_ptr<propt>(std::move(sat)));
+#else
+    solver_factoryt solvers{
+      options,
+      ns,
+      ui_message_handler,
+      ui_message_handler.get_ui() == ui_message_handlert::uit::XML_UI};
+    branch_pruning_solver = solvers.get_solver();
+#endif
+
+    auto *prop_conv = dynamic_cast<prop_conv_solvert *>(
+      &branch_pruning_solver->decision_procedure());
+    if(prop_conv != nullptr)
+      prop_conv->set_all_frozen();
+
+    auto *stack_solver = dynamic_cast<stack_decision_proceduret *>(
+      &branch_pruning_solver->decision_procedure());
+    if(stack_solver != nullptr)
+      symex.set_branch_worklist_solver(*stack_solver);
+  }
 }
 
 incremental_goto_checkert::resultt multi_path_symex_only_checkert::
