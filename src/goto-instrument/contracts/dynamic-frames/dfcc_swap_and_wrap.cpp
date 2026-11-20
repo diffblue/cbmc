@@ -150,6 +150,16 @@ void dfcc_swap_and_wrapt::check_contract(
   const auto &wrapper_symbol =
     dfcc_utilst::get_function_symbol(goto_model.symbol_table, wrapper_id);
 
+  // The wrapper calls the wrapped function with the declared parameters only,
+  // as a static call cannot pass on a variable number of arguments.
+  if(to_code_type(wrapper_symbol.type).has_ellipsis())
+  {
+    log.warning().source_location = wrapper_symbol.location;
+    log.warning() << "variadic arguments are not passed to function '"
+                  << function_id << "' when checking its contract"
+                  << messaget::eom;
+  }
+
   auto check_started = dfcc_utilst::create_static_symbol(
                          goto_model.symbol_table,
                          bool_typet(),

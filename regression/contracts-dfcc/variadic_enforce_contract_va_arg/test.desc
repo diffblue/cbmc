@@ -1,0 +1,13 @@
+KNOWNBUG dfcc-only
+main.c
+--dfcc main --enforce-contract my_log
+^\[my_log\.assertion\.1\] line \d+ variadic argument forwarded: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+When checking the contract of a variadic function, the wrapper calls the
+function with its declared parameters only, as a static call cannot pass on a
+variable number of variadic arguments. Reading the variadic argument with
+va_arg hence fails.

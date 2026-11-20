@@ -6,9 +6,11 @@ main.c
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
+^file main.c line 3: variadic arguments are not passed to function 'my_log' when checking its contract$
 --
 --
 The harness and the wrapper of a variadic function under contract have to pass
 the write set where the wrapper and the wrapped function, respectively, have
 their write set parameter. Otherwise n binds to the write set, the requires
-clause cannot hold, and the body of my_log is unreachable.
+clause cannot hold, and the body of my_log is unreachable. As the variadic
+arguments are not passed on to the wrapped function, DFCC warns.
