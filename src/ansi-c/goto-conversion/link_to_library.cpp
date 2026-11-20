@@ -73,6 +73,23 @@ add_one_function(
     goto_model.symbol_table.get_writeable_ref(missing_function).set_compiled();
   }
 
+  // Functions that the library code only declares, such as a callee that a
+  // system header renames via an asm label, may be absent from goto_model.
+  // Add them without a body, as goto_convert does for declared functions, so
+  // that calls of them are calls of a function without a body.
+  for(const auto &entry : library_model.symbol_table)
+  {
+    const symbolt &symbol = entry.second;
+    if(
+      symbol.type.id() == ID_code && !symbol.is_type && !symbol.is_macro &&
+      library_model.goto_functions.function_map.find(entry.first) ==
+        library_model.goto_functions.function_map.end())
+    {
+      library_model.goto_functions.function_map[entry.first]
+        .set_parameter_identifiers(to_code_type(symbol.type));
+    }
+  }
+
   // check whether additional initialization may be required
   bool init_required = false;
   if(
