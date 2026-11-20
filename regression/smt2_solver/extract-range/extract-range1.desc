@@ -1,0 +1,8 @@
+CORE
+extract-range1.smt2
+
+^EXIT=20$
+^SIGNAL=0$
+extract upper index .* exceeds operand width
+--
+extract with out-of-range indices must be rejected.
