@@ -502,6 +502,8 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("show-intervals"))
     {
       do_indirect_call_and_rtti_removal();
+      do_remove_returns();
+      parameter_assignments(goto_model);
 
       // recalculate numbers, etc.
       goto_model.goto_functions.update();
