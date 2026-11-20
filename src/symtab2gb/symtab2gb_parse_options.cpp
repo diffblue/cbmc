@@ -24,11 +24,10 @@ Author: Diffblue Ltd.
 #include <ansi-c/goto-conversion/goto_convert_functions.h>
 #include <json-symtab-language/json_goto_functions.h>
 #include <json-symtab-language/json_symtab_language.h>
+#include <json-symtab-language/validate_symtab.h>
 #include <json/json_parser.h>
 #include <langapi/mode.h>
 #include <linking/linking.h>
-
-#include "validate_symtab.h"
 
 #include <fstream>
 #include <iostream>

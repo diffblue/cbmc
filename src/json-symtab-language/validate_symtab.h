@@ -9,8 +9,8 @@ Author: Michael Tautschnig
 /// \file
 /// Validation of symbol tables and goto functions read from JSON
 
-#ifndef CPROVER_SYMTAB2GB_VALIDATE_SYMTAB_H
-#define CPROVER_SYMTAB2GB_VALIDATE_SYMTAB_H
+#ifndef CPROVER_JSON_SYMTAB_LANGUAGE_VALIDATE_SYMTAB_H
+#define CPROVER_JSON_SYMTAB_LANGUAGE_VALIDATE_SYMTAB_H
 
 // The functions below visit every type and expression, knowing for each
 // position whether it holds a type or an expression. Each node is checked with
@@ -49,4 +49,4 @@ void validate_goto_functions(
   const goto_functionst &goto_functions,
   const namespacet &ns);
 
-#endif // CPROVER_SYMTAB2GB_VALIDATE_SYMTAB_H
+#endif // CPROVER_JSON_SYMTAB_LANGUAGE_VALIDATE_SYMTAB_H
