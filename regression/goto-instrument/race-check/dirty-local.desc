@@ -1,0 +1,9 @@
+CORE
+dirty-local.c
+--race-check
+ASSIGN main::1::local\$w_guard := true
+W/W data race on main::1::local
+^EXIT=6$
+^SIGNAL=0$
+--
+^warning: ignoring

@@ -1,0 +1,9 @@
+CORE
+assume-condition.c
+--race-check
+^EXIT=10$
+^SIGNAL=0$
+R/W data race on shared
+^VERIFICATION FAILED$
+--
+^warning: ignoring
