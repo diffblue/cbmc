@@ -1,0 +1,18 @@
+CORE
+main.c
+--trace
+^\[main\.assertion\.1\] line 9 member: SUCCESS$
+^\[main\.assertion\.2\] line 10 fails: FAILURE$
+^  s=\{ \.a=\{ -?\d+, -?\d+ \}, \.b=-?\d+ \}
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+^Invariant check failed
+--
+The declaration of a field-sensitive struct must only make the decision
+procedure aware of the individual fields, which are what all other steps use.
+Converting the struct as a whole made the incremental SMT back-end fail, as it
+does not support the concatenation that the struct equality was flattened to.
+The trace must still show the value of each field at the point of declaration.
