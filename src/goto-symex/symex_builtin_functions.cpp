@@ -24,6 +24,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "path_storage.h"
 #include "simplify_expr_with_value_set.h"
 
+#include <algorithm>
+
 inline static std::optional<typet> c_sizeof_type_rec(const exprt &expr)
 {
   const irept &sizeof_type=expr.find(ID_C_c_sizeof_type);
@@ -256,24 +258,32 @@ void goto_symext::symex_va_start(
     return; // ignore
 
   // create an array holding pointers to the parameters, starting after the
-  // parameter that the operand points to
+  // parameter that the operand points to -- or, if it points to no
+  // parameter (C23's va_start(ap), which GCC expands to
+  // __builtin_va_start(ap, 0)), after the last named parameter
   const exprt &op = skip_typecast(to_unary_expr(code).op());
-  // this must be the address of a symbol
-  const irep_idt start_parameter =
-    to_ssa_expr(to_address_of_expr(op).object()).get_object_name();
+  const auto &parameter_names = state.call_stack().top().parameter_names;
+  std::size_t first_variadic =
+    to_code_type(ns.lookup(state.source.function_id).type).parameters().size();
+  if(
+    op.id() == ID_address_of &&
+    to_address_of_expr(op).object().id() == ID_symbol &&
+    is_ssa_expr(to_address_of_expr(op).object()))
+  {
+    const irep_idt start_parameter =
+      to_ssa_expr(to_address_of_expr(op).object()).get_object_name();
+    const auto it = std::find(
+      parameter_names.begin(), parameter_names.end(), start_parameter);
+    if(it != parameter_names.end())
+      first_variadic =
+        static_cast<std::size_t>(it - parameter_names.begin()) + 1;
+  }
 
   exprt::operandst va_arg_operands;
-  bool parameter_id_found = false;
-  for(auto &parameter : state.call_stack().top().parameter_names)
+  for(std::size_t i = first_variadic; i < parameter_names.size(); ++i)
   {
-    if(!parameter_id_found)
-    {
-      parameter_id_found = parameter == start_parameter;
-      continue;
-    }
-
     va_arg_operands.push_back(
-      va_list_entry(parameter, to_pointer_type(lhs.type()), ns));
+      va_list_entry(parameter_names[i], to_pointer_type(lhs.type()), ns));
   }
   const std::size_t va_arg_size = va_arg_operands.size();
 
