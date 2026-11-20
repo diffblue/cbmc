@@ -1,0 +1,16 @@
+CORE
+main.c
+--refine-arrays --no-bounds-check
+^\[main\.assertion\.1\] line \d+ a\[1\] and b\[1\] may differ: FAILURE$
+^\[main\.assertion\.2\] line \d+ a and b may be equal: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+isEliminated
+--
+Checking all properties requires more than one solver call. Post-processing,
+which adds the array constraints, must only be done once: repeating it added
+constraints referring to variables that MiniSat's simplifier had eliminated
+after the first call, which failed an assertion in MiniSat.
