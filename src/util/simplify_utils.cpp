@@ -441,8 +441,25 @@ expr2bits(const exprt &expr, bool little_endian, const namespacet &ns)
     {
       if(config.ansi_c.NULL_is_zero && to_constant_expr(expr).is_null_pointer())
         return std::string(to_bitvector_type(type).get_width(), '0');
-      else
-        return {};
+      // An integer address, as bits2expr builds it from bits that are not all
+      // zero (`(char *)97' after a byte of a union over a pointer was
+      // written): the inverse conversion.  Without it every further byte
+      // update of such an object stayed symbolic -- libc++'s alternate
+      // string layout puts the short size in the bytes of the long
+      // representation's pointer.
+      const std::string &v = id2string(value);
+      if(
+        value != ID_NULL && !v.empty() &&
+        v.find_first_not_of("0123456789ABCDEF") == std::string::npos)
+      {
+        const auto width = to_bitvector_type(type).get_width();
+        endianness_mapt map(type, little_endian, ns);
+        std::string result(width, ' ');
+        for(std::string::size_type i = 0; i < width; ++i)
+          result[map.map_bit(i)] = get_bvrep_bit(value, width, i) ? '1' : '0';
+        return result;
+      }
+      return {};
     }
     else if(type.id() == ID_c_enum_tag)
     {
