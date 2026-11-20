@@ -1,0 +1,11 @@
+CORE
+Test
+--function Test.mustFail -cp `../../../../scripts/format_classpath.sh target/classes ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
+^EXIT=10$
+^SIGNAL=0$
+^\[java::Test\.mustFail:\(\)V\.assertion\.1\] line 54 .*: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+The Class objects of different classes must be distinct.
