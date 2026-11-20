@@ -1198,23 +1198,30 @@ TEST_CASE(
           symbol_exprt{"foo", make_type(32)},
           symbol_exprt{"bar", make_type(8)});
         INFO("Input expr: " + input.pretty(2, 0));
+        // Shift distances are always zero-extended, regardless of type.
         const smt_termt expected_result = make_shift_term(
           smt_identifier_termt{"foo", smt_bit_vector_sortt{32}},
-          make_extension(24)(
+          smt_bit_vector_theoryt::zero_extend(24)(
             smt_identifier_termt{"bar", smt_bit_vector_sortt{8}}));
         CHECK(test.convert(input) == expected_result);
       }
       SECTION("Wider right hand side")
       {
+        // The operand is extended by the shift kind: ashr sign-extends,
+        // lshr and shl zero-extend.
+        const smt_termt foo{
+          smt_identifier_termt{"foo", smt_bit_vector_sortt{8}}};
+        const smt_termt extended_foo =
+          shift_description == "Arithmetic right shift."
+            ? smt_termt{smt_bit_vector_theoryt::sign_extend(24)(foo)}
+            : smt_termt{smt_bit_vector_theoryt::zero_extend(24)(foo)};
         const exprt input = make_shift_expr(
           symbol_exprt{"foo", make_type(8)},
           symbol_exprt{"bar", make_type(32)});
         INFO("Input expr: " + input.pretty(2, 0));
-        const smt_termt expected_result =
-          smt_bit_vector_theoryt::extract(7, 0)(make_shift_term(
-            make_extension(24)(
-              smt_identifier_termt{"foo", smt_bit_vector_sortt{8}}),
-            smt_identifier_termt{"bar", smt_bit_vector_sortt{32}}));
+        const smt_termt expected_result = smt_bit_vector_theoryt::extract(
+          7, 0)(make_shift_term(
+          extended_foo, smt_identifier_termt{"bar", smt_bit_vector_sortt{32}}));
         CHECK(test.convert(input) == expected_result);
       }
     }
