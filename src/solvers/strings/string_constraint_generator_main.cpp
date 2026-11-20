@@ -17,18 +17,17 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 ///   Li and Indradeep Ghosh, which gives examples of constraints for several
 ///   functions.
 
-#include "string_constraint_generator.h"
-#include "string_refinement_invariant.h"
-
-#include <iterator>
-
 #include <util/arith_tools.h>
-#include <util/deprecate.h>
 #include <util/interval_constraint.h>
 #include <util/mathematical_expr.h>
 #include <util/simplify_expr.h>
 #include <util/ssa_expr.h>
 #include <util/string_constant.h>
+
+#include "string_constraint_generator.h"
+#include "string_refinement_invariant.h"
+
+#include <iterator>
 
 string_constraint_generatort::string_constraint_generatort(
   const namespacet &ns,
@@ -268,8 +267,6 @@ string_constraint_generatort::add_axioms_for_function_application(
     return add_axioms_for_trim(expr);
   else if(id == ID_cprover_string_empty_string_func)
     return add_axioms_for_empty_string(expr);
-  else if(id == ID_cprover_string_copy_func)
-    return add_axioms_for_copy(expr);
   else if(id == ID_cprover_string_of_int_hex_func)
     return add_axioms_from_int_hex(expr);
   else if(id == ID_cprover_string_of_float_func)
@@ -298,28 +295,6 @@ string_constraint_generatort::add_axioms_for_function_application(
     DATA_INVARIANT(false, string_refinement_invariantt(msg));
   }
   UNREACHABLE;
-}
-
-/// add axioms to say that the returned string expression is equal to the
-/// argument of the function application
-/// \deprecated should use substring instead
-/// \param f: function application with one argument, which is a string,
-///   or three arguments: string, integer offset and count
-/// \return a new string expression
-DEPRECATED(SINCE(2017, 10, 5, "should use substring instead"))
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_copy(
-  const function_application_exprt &f)
-{
-  const auto &args = f.arguments();
-  PRECONDITION(args.size() == 3 || args.size() == 5);
-  const array_string_exprt res = array_pool.find(args[1], args[0]);
-  const array_string_exprt str = get_string_expr(array_pool, args[2]);
-  const typet &index_type = str.length_type();
-  const exprt offset = args.size() == 3 ? from_integer(0, index_type) : args[3];
-  const exprt count =
-    args.size() == 3 ? array_pool.get_or_create_length(str) : args[4];
-  return add_axioms_for_substring(res, str, offset, plus_exprt(offset, count));
 }
 
 /// Length of a string
