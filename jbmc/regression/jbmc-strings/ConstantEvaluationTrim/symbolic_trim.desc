@@ -1,0 +1,11 @@
+CORE
+SymbolicTrim
+--function SymbolicTrim.check --unwind 6 --max-nondet-string-length 6 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Trim of a nondet string of length <= 4 is compared with a reference
+computed character by character, so the string solver's trim axioms are
+exercised (unlike the constant-folded tests in this directory).

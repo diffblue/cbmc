@@ -1288,6 +1288,47 @@ java_string_library_preprocesst::make_string_returning_function_from_call(
   return code;
 }
 
+/// Provide code for Java 11's String.strip, String.stripLeading and
+/// String.stripTrailing: these remove the characters accepted by
+/// Character.isWhitespace, unlike String.trim, which removes all characters
+/// up to U+0020.
+/// \param mode: the end(s) to strip, as expected by
+///   ID_cprover_string_strip_func: 0 for both (strip), 1 for the front
+///   (stripLeading), 2 for the back (stripTrailing)
+/// \param function_id: name of the Java method being replaced
+/// \param type: type of the function
+/// \param loc: location in the source
+/// \param symbol_table: symbol table
+/// \return Code corresponding to:
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// string_expr = cprover_string_strip(this, mode)
+/// string = new String
+/// string = string_expr_to_string(string)
+/// return string
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+code_blockt java_string_library_preprocesst::make_strip_function_from_call(
+  int mode,
+  const irep_idt &function_id,
+  const java_method_typet &type,
+  const source_locationt &loc,
+  symbol_table_baset &symbol_table)
+{
+  code_blockt code;
+  exprt::operandst arguments =
+    process_parameters(type.parameters(), loc, function_id, symbol_table, code);
+  arguments.push_back(from_integer(mode, java_int_type()));
+  const refined_string_exprt string_expr = string_expr_of_function(
+    ID_cprover_string_strip_func, arguments, loc, symbol_table, code);
+  const exprt str = allocate_fresh_string(
+    type.return_type(), loc, function_id, symbol_table, code);
+  code.add(
+    code_assign_string_expr_to_java_string(
+      str, string_expr, symbol_table, true),
+    loc);
+  code.add(code_returnt(str), loc);
+  return code;
+}
+
 /// Generates code for a function which copies a string object to a new string
 /// object.
 /// \param type: type of the function
@@ -1742,6 +1783,27 @@ void java_string_library_preprocesst::initialize_conversion_table()
   cprover_equivalent_to_java_string_returning_function
     ["java::java.lang.String.trim:()Ljava/lang/String;"]=
       ID_cprover_string_trim_func;
+  // Java 11's String.strip family: cprover_string_strip_func with a constant
+  // selecting the end(s) to strip (0 = both, 1 = front, 2 = back).
+  for(const auto &m :
+      {std::make_pair("strip", 0),
+       std::make_pair("stripLeading", 1),
+       std::make_pair("stripTrailing", 2)})
+  {
+    conversion_table
+      ["java::java.lang.String." + std::string{m.first} +
+       ":()Ljava/lang/String;"] =
+        [this, mode = m.second](
+          const java_method_typet &type,
+          const source_locationt &loc,
+          const irep_idt &function_id,
+          symbol_table_baset &symbol_table,
+          message_handlert &)
+    {
+      return make_strip_function_from_call(
+        mode, function_id, type, loc, symbol_table);
+    };
+  }
 
   // StringBuilder library
   conversion_table
