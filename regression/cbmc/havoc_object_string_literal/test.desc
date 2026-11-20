@@ -1,0 +1,15 @@
+CORE
+main.c
+
+^EXIT=10$
+^SIGNAL=0$
+^\[main.assertion.1\] line 10 string literal unchanged: SUCCESS$
+^\[main.assertion.2\] line 13 i may be havocked: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+Invariant check failed
+--
+__CPROVER_havoc_object applied to a pointer to a string literal used to fail
+an invariant in symbolic execution ("Attempted to symex havoc applied to
+unsupported expression").

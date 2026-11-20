@@ -491,6 +491,15 @@ protected:
     const codet &code,
     const namespacet &ns);
 
+  /// Applies the `havoc_reachable` statement \p code: the pointers stored in
+  /// the objects reachable from its operands (and, with the
+  /// `arbitrary_memory` flag, from the objects of static lifetime and the
+  /// objects whose address is stored anywhere) may in addition point to any
+  /// of the reachable objects of a compatible type, or be null.
+  /// \param code: The `havoc_reachable` statement
+  /// \param ns: Namespace
+  void havoc_reachable(const codet &code, const namespacet &ns);
+
 private:
   /// Subclass customisation point to filter or otherwise alter the value-set
   /// returned from get_value_set before it is passed into assign. For example,

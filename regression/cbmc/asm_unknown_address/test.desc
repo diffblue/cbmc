@@ -1,0 +1,25 @@
+CORE gcc-only
+main.i
+--arch x86_64 --unwind 4 --no-unwinding-assertions
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line 15 store via register variable: FAILURE$
+^\[main\.assertion\.2\] line 23 store via initialised register: SUCCESS$
+^\[main\.assertion\.3\] line 31 initialisation skipped by forward branch: FAILURE$
+^\[main\.assertion\.4\] line 41 register made unknown by backward branch: FAILURE$
+^\[main\.assertion\.5\] line 50 unknown address loaded from memory: FAILURE$
+^\[main\.assertion\.6\] line 60 loop with known addresses: SUCCESS$
+approximating inline assembly statement at .* line 13 function main: memory access at an address computed from a value that is not modeled
+approximating inline assembly statement at .* line 27 function main: memory access at an address computed from a value that is not modeled
+approximating inline assembly statement at .* line 35 function main: branch with values that are not modeled to code that relies on them
+approximating inline assembly statement at .* line 45 function main: memory access at an address computed from a value that is not modeled
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+approximating inline assembly statement at .* line (19|54) function main
+--
+A memory access at an address that may depend on a value CBMC does not model
+(here: registers the statement does not initialise, or the result of rdtsc)
+would change no object, as CBMC cannot relate such an address to an object.
+Such statements are approximated. The assertions that fail may be violated
+on hardware (x or y is then changed); the others hold on hardware.
