@@ -1,0 +1,13 @@
+CORE
+Test
+--function Test.test2 --slice-formula --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+--slice-formula must not remove the assignment whose right-hand side is a
+cprover_string_* function application: its constraints define the result
+string's length and characters, which are passed as arguments, while the
+assigned return code is never read. Before the fix, slicing dropped it and the
+assertion failed spuriously.
