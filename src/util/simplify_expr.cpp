@@ -3236,6 +3236,10 @@ simplify_exprt::resultt<> simplify_exprt::simplify_node(const exprt &node)
     r = simplify_floatbv_round_to_integral(
       to_floatbv_round_to_integral_expr(expr));
   }
+  else if(expr.id() == ID_floatbv_sqrt)
+  {
+    r = simplify_floatbv_sqrt(to_floatbv_sqrt_expr(expr));
+  }
   else if(expr.id()==ID_floatbv_typecast)
   {
     r = simplify_floatbv_typecast(to_floatbv_typecast_expr(expr));

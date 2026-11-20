@@ -1,0 +1,14 @@
+CORE
+arithmetic.c
+
+^\[main\.assertion\.1\] line \d+ multiplication: SUCCESS$
+^\[main\.assertion\.2\] line \d+ division: SUCCESS$
+^\[main\.assertion\.3\] line \d+ addition: SUCCESS$
+^\[main\.assertion\.4\] line \d+ subtraction: SUCCESS$
+^\[main\.assertion\.5\] line \d+ expected to fail: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Floating-point arithmetic is encoded as bit-vector operations with lots of
+shared sub-expressions, which are defined as separate SMT functions.

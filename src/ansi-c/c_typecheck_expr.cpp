@@ -3331,6 +3331,24 @@ exprt c_typecheck_baset::do_special_functions(
     return std::move(round_to_integral_expr);
   }
   else if(
+    identifier == CPROVER_PREFIX "sqrtf" ||
+    identifier == CPROVER_PREFIX "sqrtd" ||
+    identifier == CPROVER_PREFIX "sqrtld")
+  {
+    if(expr.arguments().size() != 2)
+    {
+      error().source_location = f_op.source_location();
+      error() << identifier << " expects two arguments" << eom;
+      throw 0;
+    }
+
+    auto sqrt_expr =
+      floatbv_sqrt_exprt{expr.arguments()[0], expr.arguments()[1]};
+    sqrt_expr.add_source_location() = source_location;
+
+    return std::move(sqrt_expr);
+  }
+  else if(
     identifier == CPROVER_PREFIX "abs" || identifier == CPROVER_PREFIX "labs" ||
     identifier == CPROVER_PREFIX "llabs" ||
     identifier == CPROVER_PREFIX "imaxabs" ||

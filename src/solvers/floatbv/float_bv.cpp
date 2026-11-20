@@ -134,6 +134,11 @@ exprt float_bvt::convert(const exprt &expr) const
       float_expr.rounding_mode(),
       get_spec(expr));
   }
+  else if(expr.id() == ID_floatbv_sqrt)
+  {
+    const auto &sqrt_expr = to_floatbv_sqrt_expr(expr);
+    return sqrt(sqrt_expr.op(), sqrt_expr.rounding_mode(), get_spec(expr));
+  }
   else if(expr.id() == ID_floatbv_fma)
   {
     const auto &fma_expr = to_floatbv_fma_expr(expr);
@@ -880,6 +885,79 @@ exprt float_bvt::div(
       force_zero,
       from_integer(0, result.fraction.type()),
       result.fraction);
+
+  return rounder(result, rm, spec);
+}
+
+exprt float_bvt::sqrt(
+  const exprt &src,
+  const exprt &rm,
+  const ieee_float_spect &spec) const
+{
+  // See float_utilst::sqrt for the details of this encoding.
+  const unbiased_floatt unpacked = unpack(src, spec);
+
+  const std::size_t fraction_width = spec.f + 1;
+  const std::size_t k = spec.f + 2;
+  std::size_t radicand_width = fraction_width + 2 * k + 1;
+  if(radicand_width % 2 != 0)
+    ++radicand_width;
+  const unsignedbv_typet radicand_type{radicand_width};
+
+  // is exponent - f odd?
+  const exprt exponent_lsb = extractbit_exprt{unpacked.exponent, 0};
+  const exprt odd = spec.f % 2 == 0 ? exponent_lsb : not_exprt{exponent_lsb};
+
+  const typecast_exprt fraction{unpacked.fraction, radicand_type};
+  const if_exprt radicand{
+    odd, shl_exprt{fraction, 2 * k + 1}, shl_exprt{fraction, 2 * k}};
+
+  // restoring (digit-by-digit) integer square root
+  const std::size_t root_width = radicand_width / 2;
+  const unsignedbv_typet work_type{root_width + 3};
+  exprt root = from_integer(0, work_type);
+  exprt remainder = from_integer(0, work_type);
+  for(std::size_t i = root_width; i > 0; --i)
+  {
+    const plus_exprt shifted_remainder{
+      shl_exprt{remainder, 2},
+      typecast_exprt{
+        extractbits_exprt{radicand, 2 * i - 2, unsignedbv_typet{2}},
+        work_type}};
+    const plus_exprt trial{shl_exprt{root, 2}, from_integer(1, work_type)};
+    const binary_relation_exprt fits{shifted_remainder, ID_ge, trial};
+    remainder =
+      if_exprt{fits, minus_exprt{shifted_remainder, trial}, shifted_remainder};
+    root = plus_exprt{shl_exprt{root, 1}, typecast_exprt{fits, work_type}};
+  }
+
+  unbiased_floatt result;
+
+  // the remainder becomes the sticky bit, as least-significant bit
+  result.fraction = concatenation_exprt{
+    typecast_exprt{root, unsignedbv_typet{root_width}},
+    notequal_exprt{remainder, from_integer(0, work_type)},
+    unsignedbv_typet{root_width + 1}};
+
+  const std::size_t exponent_width =
+    std::max(spec.e, address_bits(radicand_width + spec.f + 1)) + 2;
+  const signedbv_typet exponent_type{exponent_width};
+  const minus_exprt offset_exponent{
+    minus_exprt{
+      typecast_exprt{unpacked.exponent, exponent_type},
+      from_integer(spec.f + 2 * k, exponent_type)},
+    typecast_exprt{odd, exponent_type}};
+  // divide by two, which is exact
+  result.exponent = plus_exprt{
+    ashr_exprt{offset_exponent, 1},
+    from_integer(root_width - 1, exponent_type)};
+
+  // the square root of -0 is -0, and is positive otherwise
+  result.sign = and_exprt{unpacked.sign, unpacked.zero};
+  result.zero = unpacked.zero;
+  result.infinity = and_exprt{unpacked.infinity, not_exprt{unpacked.sign}};
+  result.NaN =
+    or_exprt{unpacked.NaN, and_exprt{unpacked.sign, not_exprt{unpacked.zero}}};
 
   return rounder(result, rm, spec);
 }

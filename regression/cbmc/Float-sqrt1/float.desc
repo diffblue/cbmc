@@ -1,0 +1,11 @@
+CORE
+float.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Single-precision square root of a symbolic argument, which all back-ends,
+including the incremental SMT2 back-end, solve within seconds.
