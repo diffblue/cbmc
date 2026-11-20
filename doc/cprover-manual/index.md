@@ -26,14 +26,19 @@
    * [Memory-mapped I/O](modeling/mmio/)
    * [Shadow Memory](modeling/shadow-memory/)
 
-8. Build Systems
+8. JBMC &ndash; Java Bounded Model Checking
+
+   * [JBMC User Manual](jbmc-user-manual/)
+   * [Java Modeling Constructs](java-modeling-constructs/)
+
+9. Build Systems
 
    * [Integration into Build Systems with goto-cc](goto-cc/)
    * [Integration with Visual Studio builds](visual-studio/)
 
-9. [The CPROVER API Reference](api/)
+10. [The CPROVER API Reference](api/)
 
-10. Background Information on selected Command-line Options
+11. Background Information on selected Command-line Options
 
    * [Incremental SMT solver](smt2-incr/)
    * [Unsound options](unsound_options/)
