@@ -1,0 +1,13 @@
+CORE dfcc-only
+main.c
+--dfcc main --enforce-contract callee
+^\[callee\.assertion\.1\] line 22 variadic argument received: SUCCESS$
+^\[my_log\.assigns\.\d+\] line 11 Check that g is assignable: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+The write set parameter of an instrumented variadic function precedes the
+declared parameters, so that va_start, which takes the arguments after the last
+declared parameter, still sees exactly the variadic arguments.

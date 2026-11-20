@@ -261,7 +261,7 @@ void dfcc_instrumentt::instrument_harness_function(
     goto_model.symbol_table,
     library.dfcc_type[dfcc_typet::WRITE_SET_PTR],
     function_id,
-    "__write_set_to_check",
+    dfcc_utilst::write_set_to_check_base_name,
     function_symbol.location);
 
   std::set<symbol_exprt> local_statics = get_local_statics(function_id);
@@ -333,7 +333,7 @@ void dfcc_instrumentt::instrument_function(
   const auto &write_set = dfcc_utilst::add_parameter(
                             goto_model,
                             function_id,
-                            "__write_set_to_check",
+                            dfcc_utilst::write_set_to_check_base_name,
                             library.dfcc_type[dfcc_typet::WRITE_SET_PTR])
                             .symbol_expr();
 
@@ -371,7 +371,7 @@ void dfcc_instrumentt::instrument_wrapped_function(
   const auto &write_set = dfcc_utilst::add_parameter(
                             goto_model,
                             wrapped_function_id,
-                            "__write_set_to_check",
+                            dfcc_utilst::write_set_to_check_base_name,
                             library.dfcc_type[dfcc_typet::WRITE_SET_PTR])
                             .symbol_expr();
 
@@ -789,6 +789,15 @@ void dfcc_instrumentt::instrument_assign(
   }
 }
 
+/// Adds \p write_set as the first argument of a call to an instrumented
+/// function, which binds it to the write set parameter, see
+/// \ref dfcc_utilst::add_parameter.
+static void
+add_write_set_argument(const exprt &write_set, exprt::operandst &arguments)
+{
+  arguments.insert(arguments.begin(), write_set);
+}
+
 void dfcc_instrumentt::instrument_fptr_call_instruction_dynamic_lookup(
   const exprt &write_set,
   goto_programt::targett &target,
@@ -823,7 +832,7 @@ void dfcc_instrumentt::instrument_fptr_call_instruction_dynamic_lookup(
     payload.add(goto_programt::make_incomplete_goto(cond, target_location));
   code_function_callt call_inst(
     target->call_lhs(), target->call_function(), target->call_arguments());
-  call_inst.arguments().push_back(write_set);
+  add_write_set_argument(write_set, call_inst.arguments());
   payload.add(goto_programt::make_function_call(call_inst, target_location));
   auto goto_end_inst = payload.add(
     goto_programt::make_incomplete_goto(true_exprt(), target_location));
@@ -853,7 +862,7 @@ void dfcc_instrumentt::instrument_call_instruction(
            to_symbol_expr(target->call_function()).identifier()))
       {
         // pass write set argument only if function is known to be instrumented
-        target->call_arguments().push_back(write_set);
+        add_write_set_argument(write_set, target->call_arguments());
       }
     }
     else

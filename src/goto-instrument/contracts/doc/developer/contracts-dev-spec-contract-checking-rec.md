@@ -16,7 +16,7 @@ triggers the contract replacement logic described in
 static bool foo_check_started = false;
 static bool foo_check_completed = false;
 
-ret_t foo(foo_params, write_set_t caller_write_set) {
+ret_t foo(write_set_t caller_write_set, foo_params) {
   assert(!foo_check_completed, "foo can only be called once from the harness");
 
    // first call, check the contract

@@ -1,0 +1,13 @@
+CORE dfcc-only
+main.c
+--dfcc main --enforce-contract callee
+^\[my_log\.assigns\.\d+\] line 6 Check that g is assignable: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+The write set has to bind to the write set parameter that instrumentation adds
+to my_log. When it was appended after the variadic argument, the variadic
+argument bound to the write set parameter instead, and the assignment to g
+was reported as not assignable although g is in the assigns clause.

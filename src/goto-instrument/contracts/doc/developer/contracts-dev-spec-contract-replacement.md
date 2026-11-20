@@ -28,7 +28,7 @@ We abstract `bar` by replacing its instructions with instructions modelling
 the non-deterministic behavior of the contract `d`, following this template:
 
 ```c
-ret_t foo(foo_params, write_set_t caller_write_set) {
+ret_t foo(write_set_t caller_write_set, foo_params) {
 
   // create empty write set to check side effects in requires clauses
   __CPROVER_contracts_write_set_t __requires_write_set;
@@ -48,8 +48,8 @@ ret_t foo(foo_params, write_set_t caller_write_set) {
   __CPROVER_contracts_write_set_create(contract_write_set, assigns_clause_size(contract), frees_clause_size(contract));
 
   // populate the write set
-  contract::assigns(contract_write_set, empty_write_set);
-  contract::frees(contract_write_set, empty_write_set);
+  contract::assigns(empty_write_set, contract_write_set);
+  contract::frees(empty_write_set, contract_write_set);
   assert(__CPROVER_contracts_write_set_check_allocated_deallocated_is_empty(requires_write_set));
 
   __CPROVER_contracts_write_set_release(requires_write_set);

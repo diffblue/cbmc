@@ -20,6 +20,7 @@ Author: Remi Delmas, delmasrd@amazon.com
 #include "dfcc_is_cprover_symbol.h"
 #include "dfcc_loop_nesting_graph.h"
 #include "dfcc_root_object.h"
+#include "dfcc_utils.h"
 
 /// Builds a call expression `object_whole(expr)`
 static exprt
@@ -783,6 +784,40 @@ static void remove_dead_object_assignment(goto_functiont &goto_function)
   }
 }
 
+/// The calls in \p program are not instrumented yet, and hence lack the write
+/// set argument. A callee that has been instrumented already, however, has the
+/// write set as its first parameter (see dfcc_utilst::add_parameter). Add a
+/// nil argument (meaning "do not assign" to the inliner) for that parameter,
+/// so that the other arguments bind to the parameters they belong to.
+static void add_write_set_argument_placeholders(
+  goto_programt &program,
+  const namespacet &ns)
+{
+  for(auto &instruction : program.instructions)
+  {
+    if(
+      !instruction.is_function_call() ||
+      instruction.call_function().id() != ID_symbol)
+    {
+      continue;
+    }
+
+    const symbolt *callee = nullptr;
+    if(ns.lookup(
+         to_symbol_expr(instruction.call_function()).identifier(), callee))
+      continue;
+
+    const auto &parameters = to_code_type(callee->type).parameters();
+    if(
+      !parameters.empty() && parameters.front().get_base_name() ==
+                               dfcc_utilst::write_set_to_check_base_name)
+    {
+      auto &arguments = instruction.call_arguments();
+      arguments.insert(arguments.begin(), nil_exprt{});
+    }
+  }
+}
+
 void dfcc_infer_loop_assigns_for_function(
   std::map<std::size_t, assignst> &inferred_loop_assigns_map,
   goto_functionst &goto_functions,
@@ -826,6 +861,8 @@ void dfcc_infer_loop_assigns_for_function(
   // Replace the bodies of the functions that DFCC does not instrument by
   // summaries of their writes, see `write_summary_bodiest`.
   write_summary_bodiest summary_bodies(goto_functions, ns);
+
+  add_write_set_argument_placeholders(goto_function_copy.body, ns);
 
   // Inline all function calls in goto_function_copy; this is best-effort
   // inlining, we can safely ignore warnings here.
