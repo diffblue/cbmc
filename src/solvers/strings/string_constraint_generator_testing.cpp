@@ -120,29 +120,22 @@ string_constraint_generatort::add_axioms_for_is_prefix(
   return {typecast_exprt(pair.first, f.type()), std::move(pair.second)};
 }
 
-/// Add axioms stating that the returned value is true exactly when the argument
-/// string is empty.
-/// \deprecated should use `string_length(s)==0` instead
-/// \param f: function application with a string argument
-/// \return a Boolean expression
-DEPRECATED(SINCE(2017, 10, 5, "should use `string_length s == 0` instead"))
+/// Add an axiom-free encoding of the `String.isEmpty` test: returns
+/// `length(s) == 0` directly. This realises the form recommended by the
+/// 2017 deprecation note that previously sat on this method.
+/// \param f: function application with a single string argument
+/// \return a Boolean expression, true iff `f.arguments()[0]` is empty
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_is_empty(
   const function_application_exprt &f)
 {
   PRECONDITION(f.type() == bool_typet() || f.type().id() == ID_c_bool);
   PRECONDITION(f.arguments().size() == 1);
-  // We add axioms:
-  // a1 : is_empty => |s0| = 0
-  // a2 : s0 => is_empty
-
-  symbol_exprt is_empty = fresh_symbol("is_empty");
-  array_string_exprt s0 = get_string_expr(array_pool, f.arguments()[0]);
-  string_constraintst constraints;
-  constraints.existential = {
-    implies_exprt(is_empty, equal_to(array_pool.get_or_create_length(s0), 0)),
-    implies_exprt(equal_to(array_pool.get_or_create_length(s0), 0), is_empty)};
-  return {typecast_exprt(is_empty, f.type()), std::move(constraints)};
+  const array_string_exprt s = get_string_expr(array_pool, f.arguments()[0]);
+  return {
+    typecast_exprt::conditional_cast(
+      equal_to(array_pool.get_or_create_length(s), 0), f.type()),
+    {}};
 }
 
 /// Test if the target is a suffix of the string
