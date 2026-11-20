@@ -2,7 +2,7 @@
 
 int main()
 {
-  unsigned x;
+  unsigned x = __VERIFIER_nondet_unsigned();
 
   if(x>=0 && x<=1000)
   {

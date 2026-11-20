@@ -1,6 +1,6 @@
 int main()
 {
-  unsigned len;
+  unsigned len = __VERIFIER_nondet_unsigned();
   unsigned A[len];
   if(len > 1 || len == 0 || sizeof(unsigned) != 4)
     return 0;

@@ -1,7 +1,7 @@
 int main()
 {
   {
-    unsigned i, j, k, l;
+    unsigned i, j, k = __VERIFIER_nondet_unsigned(), l;
 
     j=k;
     i=j/2;
@@ -15,7 +15,7 @@ int main()
   }
 
   {
-    signed int i, j, k, l;
+    signed int i, j, k = __VERIFIER_nondet_signed_int(), l;
 
     // shifting rounds into the wrong direction
     __CPROVER_assume(!(k&1));

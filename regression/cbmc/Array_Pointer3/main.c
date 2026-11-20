@@ -62,7 +62,7 @@ int f(int j, int k)
 
 int main()
 {
-  int x, y;
+  int x = __VERIFIER_nondet_int(), y = __VERIFIER_nondet_int();
   __CPROVER_assume(x > y);
   __CPROVER_assume(x >= 0);
   __CPROVER_assume((y > 15) && (y < 18));

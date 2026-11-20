@@ -14,7 +14,7 @@ void func(struct S *s)
 
 int main()
 {
-  __CPROVER_size_t buffer_size;
+  __CPROVER_size_t buffer_size = __VERIFIER_nondet___CPROVER_size_t();
   __CPROVER_assume(buffer_size >= 100);
   char buffer[buffer_size];
   struct S s;

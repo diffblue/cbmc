@@ -1,6 +1,6 @@
 int main()
 {
-  int i, j;
+  int i, j = __VERIFIER_nondet_int();
 
   i = 1;
 

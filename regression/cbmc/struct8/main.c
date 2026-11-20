@@ -5,7 +5,8 @@ struct X
 
 int main()
 {
-  int aa, bb, cc;
+  int aa = __VERIFIER_nondet_int(), bb = __VERIFIER_nondet_int(),
+      cc = __VERIFIER_nondet_int();
 
   struct X foo;
 

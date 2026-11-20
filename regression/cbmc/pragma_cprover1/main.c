@@ -1,6 +1,6 @@
 int main()
 {
-  int x;
+  int x = __VERIFIER_nondet_int();
   int y[1];
 
 #pragma CPROVER check push

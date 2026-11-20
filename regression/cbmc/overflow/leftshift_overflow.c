@@ -48,7 +48,7 @@ void leftshift_overflow7(unsigned char x)
 void leftshift_overflow8(unsigned char x)
 {
   // overflow in an expression where operand and distance types are different
-  uint32_t u32;
+  uint32_t u32 = __VERIFIER_nondet_uint32_t();
   int64_t i64 = ((int64_t)u32) << 32;
 }
 
