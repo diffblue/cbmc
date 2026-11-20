@@ -239,14 +239,16 @@ to_history_expr(const exprt &expr, const irep_idt &id)
 /// \brief A class for an expression that represents a conditional target or
 /// a list of targets sharing a common condition
 /// in an assigns clause.
-class conditional_target_group_exprt : public exprt
+class conditional_target_group_exprt : public binary_exprt
 {
 public:
   explicit conditional_target_group_exprt(exprt _condition, exprt _target_list)
-    : exprt(ID_conditional_target_group, empty_typet{})
+    : binary_exprt{
+        std::move(_condition),
+        ID_conditional_target_group,
+        std::move(_target_list),
+        empty_typet{}}
   {
-    add_to_operands(std::move(_condition));
-    add_to_operands(std::move(_target_list));
   }
 
   static void check(

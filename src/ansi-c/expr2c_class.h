@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class annotated_pointer_constant_exprt;
 class c_qualifierst;
+class conditional_target_group_exprt;
 class namespacet;
 class r_or_w_ok_exprt;
 class pointer_in_range_exprt;
@@ -283,7 +284,8 @@ protected:
     unsigned &precedence,
     bool include_padding_components);
 
-  std::string convert_conditional_target_group(const exprt &src);
+  std::string
+  convert_conditional_target_group(const conditional_target_group_exprt &src);
   std::string convert_bitreverse(const bitreverse_exprt &src);
 
   std::string convert_r_or_w_ok(const r_or_w_ok_exprt &src);
