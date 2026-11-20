@@ -234,8 +234,8 @@ improvements around contracts instrumentation (see #8697, #8694).
 
 # CBMC 6.7.1
 
-This release addresses bugs in our handling of array-update ("with")
-expressions (via #8674) and gaps in our C17/C23 support (via #8673).
+This release addresses bugs in our handling of array-update ("with") expressions
+(via #8674) and gaps in our C17/C23 support (via #8673).
 
 ## Bug Fixes
 * Remove deprecated make_with_expr by @tautschnig in https://github.com/diffblue/cbmc/pull/8666
@@ -310,11 +310,11 @@ that distribution has ended.
 
 # CBMC 6.5.0
 
-This release addresses both soundness (via #8562) and performance issues (via
-#8574, #8576) in our code contracts instrumentation, and includes a collection
-of bit-operator cleanup (such as #8524, #8531) and floating-point support
-improvements (TiesToAway rounding via #8515, native rounding to integer via
-#8538) that aid EBMC/HW-CBMC.
+This release addresses both soundness (via #8562) and performance issues
+(via #8574, #8576) in our code contracts instrumentation, and includes a
+collection of bit-operator cleanup (such as #8524, #8531) and floating-point
+support improvements (TiesToAway rounding via #8515, native rounding to integer
+via #8538) that aid EBMC/HW-CBMC.
 
 ## What's Changed
 * CONTRACTS: allow pointer predicates to fail in `assume` contexts by @remi-delmas-3000 in https://github.com/diffblue/cbmc/pull/8562
@@ -372,7 +372,8 @@ improvements (TiesToAway rounding via #8515, native rounding to integer via
 
 # CBMC 6.4.1
 
-This patch release addresses a hard-coding of C semantics in the back-end for pointer subtraction (via #8497).
+This patch release addresses a hard-coding of C semantics in the back-end for
+pointer subtraction (via #8497).
 
 ## Bug Fixes
 * fix `update_bit` lowering by @kroening in https://github.com/diffblue/cbmc/pull/8496
@@ -392,7 +393,9 @@ This patch release addresses a hard-coding of C semantics in the back-end for po
 
 # CBMC 6.4.0
 
-This release improves upon automated assigns-clause inference for loop invariants, which should make manually adding assigns clauses to loops less frequent.
+This release improves upon automated assigns-clause inference for loop
+invariants, which should make manually adding assigns clauses to loops less
+frequent.
 
 ## What's Changed
 * [CONTRACTS] Support alias of member pointers in loop assigns inference by @qinheping in https://github.com/diffblue/cbmc/pull/8486
@@ -425,9 +428,15 @@ This patch release addresses build failures on Apple Silicon (via PR #8461).
 
 # CBMC 6.3.0
 
-This release addresses build failures on aarch64 (64-bit ARM) platforms (via PR #8366) and for some CMake configurations (via PR #8435). Users of loop invariants with dynamic frames have two changes to their user experience:
-1) Users will no longer need to give unwinding specifications for `do { ... } while(0)` loops.
-2) Loop invariants that are conjunctions will be turned into more fine-grained properties to ease debugging of loop invariants when they aren't successfully proved.
+This release addresses build failures on aarch64 (64-bit ARM) platforms (via
+PR #8366) and for some CMake configurations (via PR #8435). Users of loop
+invariants with dynamic frames have two changes to their user experience:
+
+1. Users will no longer need to give unwinding specifications for `do { ... }
+   while(0)` loops.
+2. Loop invariants that are conjunctions will be turned into more fine-grained
+   properties to ease debugging of loop invariants when they aren't
+   successfully proved.
 
 ## What's Changed
 * Contracts: always remove spurious do {... } while(0) loops by @tautschnig in https://github.com/diffblue/cbmc/pull/8459
@@ -452,6 +461,12 @@ This release addresses build failures on aarch64 (64-bit ARM) platforms (via PR 
 **Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-6.2.0...cbmc-6.3.0
 
 # CBMC 6.2.0
+
+This release reduces noise from dynamic-frames contract checking by suppressing
+trivial properties (via #8413) and fixes several contract-related issues
+including do-while loop handling (via #8420) and skipped-loop write sets
+(via #8416). It also fixes inconsistent array flattening in the SMT2 back-end
+(via #8400).
 
 ## What's Changed
 * Dynamic frames: do not add trivial properties by @tautschnig in https://github.com/diffblue/cbmc/pull/8413
@@ -478,6 +493,10 @@ This release addresses build failures on aarch64 (64-bit ARM) platforms (via PR 
 
 # CBMC 6.1.1
 
+This patch release compiles CaDiCaL with -DNDEBUG for improved solver
+performance (via #8397) and adds flattening support for addition and subtraction
+on the range type (via #8396).
+
 ## What's Changed
 * Compile CaDiCaL with -DNDEBUG by @tautschnig in https://github.com/diffblue/cbmc/pull/8397
 
@@ -489,6 +508,12 @@ This release addresses build failures on aarch64 (64-bit ARM) platforms (via PR 
 **Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-6.1.0...cbmc-6.1.1
 
 # CBMC 6.1.0
+
+This release adds support for building with GCC 14 (via #8368), adds
+documentation for loop contracts and __CPROVER_loop_entry (via #8377), and
+improves loop contracts instrumentation including side-effect checking
+(via #8360). It also fixes complex-number multiplication and division
+(via #8376) and several SMT2 back-end issues (via #8379, #8387).
 
 ## What's Changed
 * Add support for building with GCC 14 by @tautschnig in https://github.com/diffblue/cbmc/pull/8368
@@ -517,6 +542,11 @@ This release addresses build failures on aarch64 (64-bit ARM) platforms (via PR 
 
 # CBMC 6.0.1
 
+This patch release fixes a GOTO conversion bug where declaration hops could
+invalidate incomplete gotos (via #8349) and a union member handling issue
+(via #8347). It also reduces default verbosity of the cprover binary and runtime
+messages (via #8352, #8354).
+
 ## Bug Fixes
 * Fix Python syntax error by @tautschnig in https://github.com/diffblue/cbmc/pull/8344
 * Use GNU parallel in Windows CI job by @tautschnig in https://github.com/diffblue/cbmc/pull/8345
@@ -532,6 +562,16 @@ This release addresses build failures on aarch64 (64-bit ARM) platforms (via PR 
 **Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-6.0.0...cbmc-6.0.1
 
 # CBMC 6.0.0
+
+This major release requires C++17 to build (via #7989) and changes several
+defaults: malloc may now fail by default (via #8101), unwinding assertions are
+enabled by default (via #8274, #8273), pointer dereference, array bounds, and
+modulo-by-zero checks are now fatal assertions (via #8316, #8314, #8315), and
+the default verbosity level has been lowered (via #8331). The release also adds
+support for the --no-unwinding-assertions flag (via #8109), permits re-setting
+--object-bits (via #7858), adds support for loongarch64 (via #8266), GNU Hurd
+(via #8211), and emscripten (via #8334), and includes many C library model
+additions (snprintf, dprintf, asprintf, and more).
 
 ## Major Changes
 * Change C++ version to C++17 by @esteffin in https://github.com/diffblue/cbmc/pull/7989
@@ -741,7 +781,7 @@ This release addresses build failures on aarch64 (64-bit ARM) platforms (via PR 
 * Undefined shifts are now fatal by @kroening in https://github.com/diffblue/cbmc/pull/8304
 * array-bounds checks are now fatal by @kroening in https://github.com/diffblue/cbmc/pull/8314
 * Simplifier: c_bool (and others) are also bitvector types by @tautschnig in https://github.com/diffblue/cbmc/pull/8247
-* Delete `string_constantt::get_value` and  `string_constantt::set_value` functions by @NlightNFotis in https://github.com/diffblue/cbmc/pull/8003
+* Delete `string_constantt::get_value` and `string_constantt::set_value` functions by @NlightNFotis in https://github.com/diffblue/cbmc/pull/8003
 * Remove deprecated messaget() constructor by @tautschnig in https://github.com/diffblue/cbmc/pull/8143
 * Move GCC-13 CI job to Ubuntu 24.04 by @tautschnig in https://github.com/diffblue/cbmc/pull/8320
 * Make DFCC is_dead_object_update less restrictive by @tautschnig in https://github.com/diffblue/cbmc/pull/8261
@@ -762,25 +802,28 @@ This release addresses build failures on aarch64 (64-bit ARM) platforms (via PR 
 
 # CBMC 5.95.1
 
-## What's Changed
+This patch release improves multiplication encoding using the Dadda tree
+algorithm (via #7984) and fixes extraneous parameters in C library exp/logl
+models (via #7985).
 
+## What's Changed
 * Multiplication encoding: cleanup, Dadda, data by @tautschnig in https://github.com/diffblue/cbmc/pull/7984
 
 ## Bug Fixes
-
 * Remove extraneous y parameter from calls to exp and logl by @NlightNFotis in https://github.com/diffblue/cbmc/pull/7985
 
 **Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-5.95.0...cbmc-5.95.1
 
-## CBMC 5.95.0
+# CBMC 5.95.0
 
-### What's Changed
+This release adds C front-end support for vector expressions as compile-time
+constants (via #7947) and C library models for exp, log, and pow (via #7906).
 
+## What's Changed
 * Add C front-end support for vector expressions as compile-time constants by @tautschnig in https://github.com/diffblue/cbmc/pull/7947
 * C library: add exp, log, pow models by @tautschnig in https://github.com/diffblue/cbmc/pull/7906
 
-### Bug Fixes
-
+## Bug Fixes
 * Fix bug with std::sort requires strict weak ordering by @tautschnig in https://github.com/diffblue/cbmc/pull/7956
 * SYNTHESIZER: Use only symbols from the original goto as terminals by @qinheping in https://github.com/diffblue/cbmc/pull/7970
 * Add missing lowering of symbol values in new SMT backend by @thomasspriggs in https://github.com/diffblue/cbmc/pull/7952
@@ -789,15 +832,20 @@ This release addresses build failures on aarch64 (64-bit ARM) platforms (via PR 
 
 **Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-5.94.0...cbmc-5.95.0
 
-## CBMC 5.94.0
+# CBMC 5.94.0
 
-### What's Changed
+This release adds documentation for CBMC Shadow Memory intrinsics (via #7913),
+models for C library functions getpwnam, getpwuid, and getopt
+(via #7919, #7916), and pointer-check support for shadow memory addresses
+(via #7936). The goto-synthesizer now accepts all CBMC options (via #7900).
+
+## What's Changed
 * Add models for C library: getpwnam, getpwuid, and getopt by @tautschnig in https://github.com/diffblue/cbmc/pull/7919 and https://github.com/diffblue/cbmc/pull/7916
 * Shadow memory addresses now also support --pointer-check argument by @esteffin in https://github.com/diffblue/cbmc/pull/7936
 * [DOCS] Add documentation on CBMC Shadow Memory intrinsics and shadow memory functions (via doxygen) by @NlightNFotis in https://github.com/diffblue/cbmc/pull/7913 and https://github.com/diffblue/cbmc/pull/7930
 * [SYNTHESIZER] goto-synthesizer now accepts all CBMC options by @qinheping in https://github.com/diffblue/cbmc/pull/7900
 
-### Bug Fixes
+## Bug Fixes
 * Fix problem on array size L2 renaming by @esteffin in https://github.com/diffblue/cbmc/pull/7877
 * Fix shadow memory missing aggregation on non-compound bitvector types by @esteffin in https://github.com/diffblue/cbmc/pull/7935
 * Fix SMT encoding of structs which contain a single struct field by @thomasspriggs in https://github.com/diffblue/cbmc/pull/7951
