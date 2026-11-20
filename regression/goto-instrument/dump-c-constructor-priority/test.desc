@@ -1,0 +1,12 @@
+CORE gcc-only
+main.c
+--dump-c
+__attribute__\(\(constructor\(101u?\)\)\)
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+--dump-c must keep the priority of constructors, otherwise the dumped program
+runs them in a different order.

@@ -615,7 +615,11 @@ std::string expr2ct::convert_rec(
   else if(src.id()==ID_constructor ||
           src.id()==ID_destructor)
   {
-    return q+"__attribute__(("+id2string(src.id())+")) void"+d;
+    std::string attribute = id2string(src.id());
+    const exprt &priority = static_cast<const exprt &>(src.find(ID_priority));
+    if(priority.is_not_nil())
+      attribute += "(" + convert(priority) + ")";
+    return q + "__attribute__((" + attribute + ")) void" + d;
   }
   else if(src.id() == ID_bv)
   {
