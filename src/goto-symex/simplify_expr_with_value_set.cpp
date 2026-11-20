@@ -8,8 +8,10 @@ Author: Michael Tautschnig
 
 #include "simplify_expr_with_value_set.h"
 
+#include <util/config.h>
 #include <util/expr_util.h>
 #include <util/pointer_expr.h>
+#include <util/pointer_predicates.h>
 #include <util/simplify_expr.h>
 #include <util/ssa_expr.h>
 
@@ -109,6 +111,35 @@ static std::optional<exprt> try_evaluate_pointer_comparison(
   {
     // The symbol cannot possibly have the value \p other_operand because it
     // isn't in the symbol's value-set
+    if(config.bv_encoding.malloc_may_alias)
+    {
+      // Dynamic objects may share addresses after free/realloc.
+      // Don't conclude inequality if both sides involve dynamic objects.
+      bool other_is_dynamic = false;
+      const exprt &other_root = skip_typecast(other_operand);
+      if(
+        other_root.id() == ID_address_of &&
+        to_address_of_expr(other_root).object().id() == ID_dynamic_object)
+        other_is_dynamic = true;
+      if(
+        constant_expr && !constant_expr->is_null_pointer() &&
+        other_operand.type().id() == ID_pointer)
+        other_is_dynamic = true; // constant pointer, likely from malloc
+
+      if(other_is_dynamic)
+      {
+        for(const auto &vs_elem : value_set_elements)
+        {
+          if(vs_elem.id() != ID_object_descriptor)
+            continue;
+          const exprt &root = to_object_descriptor_expr(vs_elem).root_object();
+          if(is_symex_dynamic_object(root))
+          {
+            return {};
+          }
+        }
+      }
+    }
     return operation == ID_equal ? static_cast<exprt>(false_exprt{})
                                  : static_cast<exprt>(true_exprt{});
   }

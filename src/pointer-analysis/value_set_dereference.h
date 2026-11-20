@@ -31,19 +31,23 @@ public:
   /// \param _exclude_null_derefs: Ignore value-set entries that indicate a
   //    given dereference may follow a null pointer
   /// \param _message_handler: Message handler for displaying points-to set
+  /// \param _wide_pointer_encoding: Use the wide (flat-address) pointer
+  ///   encoding, which affects how integer-to-pointer casts are dereferenced
   value_set_dereferencet(
     const namespacet &_ns,
     symbol_table_baset &_new_symbol_table,
     dereference_callbackt &_dereference_callback,
     const irep_idt _language_mode,
     bool _exclude_null_derefs,
-    message_handlert &_message_handler)
+    message_handlert &_message_handler,
+    bool _wide_pointer_encoding = false)
     : ns(_ns),
       new_symbol_table(_new_symbol_table),
       dereference_callback(_dereference_callback),
       language_mode(_language_mode),
       exclude_null_derefs(_exclude_null_derefs),
-      message_handler(_message_handler)
+      message_handler(_message_handler),
+      wide_pointer_encoding(_wide_pointer_encoding)
   { }
 
   virtual ~value_set_dereferencet() { }
@@ -106,6 +110,7 @@ private:
   /// disregard an apparent attempt to dereference NULL
   const bool exclude_null_derefs;
   message_handlert &message_handler;
+  bool wide_pointer_encoding;
   valuet get_failure_value(const exprt &pointer, const typet &type);
   exprt handle_dereference_base_case(
     const exprt &pointer,

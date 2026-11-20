@@ -1,0 +1,13 @@
+CORE wide-pointer-encoding broken-cprover-smt-backend no-new-smt
+test_struct_raw_bytes.c
+--wide-pointer-encoding
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^\*\* 11 of
+--
+^.*expecting SUCCESS: FAILURE$
+^.*dereference .*: FAILURE$
+--
+Wide pointer encoding: same results as standard encoding for
+struct byte operations.
