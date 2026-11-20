@@ -181,7 +181,7 @@ void symex_target_equationt::location(
 void symex_target_equationt::function_call(
   const exprt &guard,
   const irep_idt &function_id,
-  const std::vector<renamedt<exprt, L2>> &function_arguments,
+  const std::vector<exprt> &function_arguments,
   const sourcet &source,
   const bool hidden)
 {
@@ -190,8 +190,7 @@ void symex_target_equationt::function_call(
 
   SSA_step.guard = guard;
   SSA_step.called_function = function_id;
-  for(const auto &arg : function_arguments)
-    SSA_step.ssa_function_arguments.emplace_back(arg.get());
+  SSA_step.ssa_function_arguments = function_arguments;
   SSA_step.hidden = hidden;
 
   merge_ireps(SSA_step);
@@ -217,14 +216,13 @@ void symex_target_equationt::output(
   const exprt &guard,
   const sourcet &source,
   const irep_idt &output_id,
-  const std::list<renamedt<exprt, L2>> &args)
+  const std::list<exprt> &args)
 {
   SSA_steps.emplace_back(source, goto_trace_stept::typet::OUTPUT);
   SSA_stept &SSA_step=SSA_steps.back();
 
   SSA_step.guard=guard;
-  for(const auto &arg : args)
-    SSA_step.io_args.emplace_back(arg.get());
+  SSA_step.io_args = args;
   SSA_step.io_id=output_id;
 
   merge_ireps(SSA_step);
@@ -299,14 +297,14 @@ void symex_target_equationt::assertion(
 
 void symex_target_equationt::goto_instruction(
   const exprt &guard,
-  const renamedt<exprt, L2> &cond,
+  const exprt &cond,
   const sourcet &source)
 {
   SSA_steps.emplace_back(source, goto_trace_stept::typet::GOTO);
   SSA_stept &SSA_step=SSA_steps.back();
 
   SSA_step.guard=guard;
-  SSA_step.cond_expr = cond.get();
+  SSA_step.cond_expr = cond;
 
   merge_ireps(SSA_step);
 }

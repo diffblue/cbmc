@@ -82,7 +82,7 @@ public:
   virtual void function_call(
     const exprt &guard,
     const irep_idt &function_id,
-    const std::vector<renamedt<exprt, L2>> &ssa_function_arguments,
+    const std::vector<exprt> &ssa_function_arguments,
     const sourcet &source,
     bool hidden);
 
@@ -103,7 +103,7 @@ public:
     const exprt &guard,
     const sourcet &source,
     const irep_idt &output_id,
-    const std::list<renamedt<exprt, L2>> &args);
+    const std::list<exprt> &args);
 
   /// \copydoc symex_targett::output_fmt()
   virtual void output_fmt(
@@ -137,7 +137,7 @@ public:
   /// \copydoc symex_targett::goto_instruction()
   virtual void goto_instruction(
     const exprt &guard,
-    const renamedt<exprt, L2> &cond,
+    const exprt &cond,
     const sourcet &source);
 
   /// \copydoc symex_targett::constraint()
