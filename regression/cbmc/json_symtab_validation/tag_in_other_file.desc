@@ -1,0 +1,11 @@
+CORE
+tag_def.json_symtab
+member_use.json_symtab
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^malformed symbol table entry
+--
+A member expression may refer to a struct tag defined in another input file:
+validation with look-ups happens once all input files have been loaded.

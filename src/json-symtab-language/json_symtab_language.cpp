@@ -10,12 +10,14 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 #include "json_symtab_language.h"
 
+#include <util/namespace.h>
 #include <util/symbol_table.h>
 
 #include <json/json_parser.h>
 #include <linking/linking.h>
 
 #include "json_symbol_table.h"
+#include "validate_symtab.h"
 
 /// Parse a goto program in json form.
 /// \param instream: The input stream
@@ -47,6 +49,8 @@ bool json_symtab_languaget::typecheck(
   try
   {
     symbol_table_from_json(parsed_json_file, new_symbol_table);
+    for(const auto &symbol_pair : new_symbol_table.symbols)
+      symbol_names.insert(symbol_pair.first);
     return linking(symbol_table, new_symbol_table, message_handler);
   }
   catch(const std::string &str)
@@ -55,6 +59,14 @@ bool json_symtab_languaget::typecheck(
     log.error() << "typecheck: " << str << messaget::eom;
     return true;
   }
+}
+
+bool json_symtab_languaget::final(symbol_table_baset &symbol_table)
+{
+  // Linking may have renamed some of the symbols (e.g., file-local ones);
+  // these are not validated here.
+  validate_symbols(symbol_table, symbol_names, namespacet{symbol_table});
+  return false;
 }
 
 /// Output the result of the parsed json file to the output stream

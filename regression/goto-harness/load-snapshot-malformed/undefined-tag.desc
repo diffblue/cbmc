@@ -1,0 +1,11 @@
+CORE
+main.c
+harness.gb --harness-type initialize-with-memory-snapshot --memory-snapshot undefined-tag-snapshot.json --initial-goto-location main:13
+^EXIT=6$
+^SIGNAL=0$
+^malformed symbol table entry .x.: member must address a struct or union type that is defined$
+--
+^Invariant check failed
+--
+goto-harness validates a memory snapshot, looking up types in the snapshot and
+in the goto model.

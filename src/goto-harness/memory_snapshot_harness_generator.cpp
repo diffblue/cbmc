@@ -12,6 +12,7 @@ Author: Daniel Poetzl
 #include <util/c_types.h>
 #include <util/exception_utils.h>
 #include <util/fresh_symbol.h>
+#include <util/namespace.h>
 #include <util/string2int.h>
 #include <util/string_utils.h>
 #include <util/symbol_table.h>
@@ -20,6 +21,7 @@ Author: Daniel Poetzl
 
 #include <ansi-c/goto-conversion/goto_convert_functions.h>
 #include <json-symtab-language/json_symbol_table.h>
+#include <json-symtab-language/validate_symtab.h>
 #include <json/json_parser.h>
 
 #include "memory_snapshot_harness_generator_options.h"
@@ -372,6 +374,14 @@ void memory_snapshot_harness_generatort::generate(
 {
   symbol_tablet snapshot;
   get_memory_snapshot(memory_snapshot_file, snapshot);
+  // the snapshot may refer to types (such as struct tags) of the goto model
+  std::unordered_set<irep_idt> snapshot_symbol_names;
+  for(const auto &symbol_pair : snapshot.symbols)
+    snapshot_symbol_names.insert(symbol_pair.first);
+  validate_symbols(
+    snapshot,
+    snapshot_symbol_names,
+    namespacet{goto_model.symbol_table, snapshot});
 
   symbol_tablet &symbol_table = goto_model.symbol_table;
   goto_functionst &goto_functions = goto_model.goto_functions;
