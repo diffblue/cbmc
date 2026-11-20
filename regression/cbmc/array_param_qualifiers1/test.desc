@@ -1,0 +1,11 @@
+CORE
+main.c
+--bounds-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Tests that array parameter qualifier const from brackets
+is correctly handled during verification.
