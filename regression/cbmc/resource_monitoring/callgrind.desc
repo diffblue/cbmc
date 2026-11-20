@@ -1,0 +1,11 @@
+CORE
+main.c
+--unwind 7 --symex-callgrind ../callgrind_test.out
+^Symex callgrind data written to
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Tests that --symex-callgrind produces a callgrind-format output file
+that can be visualized with KCachegrind/QCachegrind.
