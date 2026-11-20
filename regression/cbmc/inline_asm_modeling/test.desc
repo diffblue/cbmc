@@ -1,0 +1,28 @@
+CORE gcc-only
+main.c
+--show-goto-functions
+^EXIT=0$
+^SIGNAL=0$
+^ *CALL __asm_mfence\(\)$
+^ *CALL __asm_lfence\(\)$
+^ *CALL __asm_sfence\(\)$
+^ *CALL __asm_fstcw\(cast\(address_of\(main::1::cw\), empty\*\)\)$
+^ *CALL __asm_fldcw\(cast\(address_of\(main::1::cw\), empty\*\)\)$
+^ *FENCE WW RR RW WR$
+^ *FENCE WW RR RW$
+^ *FENCE RR RW$
+^ *FENCE WW$
+^ *FENCE$
+--
+^warning: ignoring
+inline assembly statement at
+ATOMIC_BEGIN
+--
+Pins the documented translation of recognized inline-assembly instructions by
+the remove_asm pass (see doc/cprover-manual/modeling-inline-asm.md):
+x86 mfence/lfence/sfence -> __asm_* fence helper calls; ARM dmb/dsb and Power
+sync -> full fence (WW RR RW WR); ARM dmb/dsb with an ld option -> RR RW, with
+an st option -> WW; Power lwsync -> fence without WR; Power eieio -> WW; ARM
+isb / Power isync -> empty fence; nop/pause/yield -> nothing; fstcw/fldcw ->
+__CPROVER_rounding_mode helpers called with the address of the operand.
+See GitHub issue diffblue/cbmc#6374.

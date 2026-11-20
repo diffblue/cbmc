@@ -2590,7 +2590,7 @@ std::string expr2ct::convert_code_asm(
 
   if(src.get_flavor()==ID_gcc)
   {
-    if(src.operands().size()==5)
+    if(src.operands().size() == 5 || src.operands().size() == 6)
     {
       dest+="asm(";
       dest+=convert(src.op0());
