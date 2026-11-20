@@ -1,0 +1,13 @@
+CORE broken-smt-backend broken-cprover-smt-backend no-new-smt
+main.c
+--trace --beautify
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^  x=\d+ \([0 ]*1[0 ]*\)$
+^  y=\d+ \([0 ]*1[0 ]*\)$
+--
+^warning: ignoring
+--
+--beautify minimises the number of bits set in the values of the counterexample:
+a single bit suffices for each of x and y.
