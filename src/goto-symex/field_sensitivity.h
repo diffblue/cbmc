@@ -11,6 +11,8 @@ Author: Michael Tautschnig
 
 #include <util/ssa_expr.h>
 
+#include <optional>
+
 class byte_extract_exprt;
 class namespacet;
 class goto_symex_statet;
@@ -183,6 +185,9 @@ public:
   /// \param ssa_expr: the expression to evaluate
   /// \param disjoined_fields_only: whether to expand unions (`false`) or not
   ///   (`true`)
+  /// \param unions_through_widest_member: when \p disjoined_fields_only is
+  ///   true, whether to represent a union by the fields of its widest member,
+  ///   which is how a union is read, or by the symbol for the union as a whole
   /// \return Expanded expression; for example, for a \p ssa_expr of some struct
   ///   type, a `struct_exprt` with each component now being an SSA expression
   ///   is built.
@@ -190,7 +195,30 @@ public:
     const namespacet &ns,
     goto_symex_statet &state,
     const ssa_exprt &ssa_expr,
-    bool disjoined_fields_only) const;
+    bool disjoined_fields_only,
+    bool unions_through_widest_member = true) const;
+
+  /// Field sensitivity keeps symbols for the fields of each member of a union
+  /// (and for the union as a whole), which assignments to the union keep
+  /// consistent. A declaration, however, yields unconstrained values for all
+  /// of these, while reads of the union may use the fields of any member that
+  /// covers the bytes being read. For each union in \p fields, the fields of a
+  /// declared object, assign the fields of all members other than the widest
+  /// one the corresponding bytes of the widest member, whose fields also
+  /// represent the union when it is read as a whole (see get_fields).
+  /// \param ns: a namespace to resolve type symbols/tag types
+  /// \param [in,out] state: symbolic execution state
+  /// \param fields: the result of get_fields (with \p disjoined_fields_only
+  ///   set to false) for the L1 symbol of the declared object, or a part
+  ///   thereof
+  /// \param target: symbolic execution equation store
+  /// \param allow_pointer_unsoundness: allow pointer unsoundness
+  void initialize_union_members(
+    const namespacet &ns,
+    goto_symex_statet &state,
+    const exprt &fields,
+    symex_targett &target,
+    bool allow_pointer_unsoundness) const;
 
   /// Determine whether \p expr would translate to an atomic SSA expression
   /// (returns false) or a composite object made of several SSA expressions as
@@ -205,6 +233,37 @@ public:
   is_divisible(const ssa_exprt &expr, bool disjoined_fields_only) const;
 
 private:
+  /// Assign each of the fields in \p fields the part of \p value it
+  /// represents. Only the fields are assigned, not the symbols of structs,
+  /// unions, and arrays as a whole, which are not read.
+  /// \param ns: a namespace to resolve type symbols/tag types
+  /// \param [in,out] state: symbolic execution state
+  /// \param fields: the result of get_fields (with \p disjoined_fields_only
+  ///   set to false) for an L1 symbol, or a part thereof
+  /// \param value: the L2 value of the object that \p fields represents
+  /// \param target: symbolic execution equation store
+  /// \param allow_pointer_unsoundness: allow pointer unsoundness
+  void assign_fields(
+    const namespacet &ns,
+    goto_symex_statet &state,
+    const exprt &fields,
+    const exprt &value,
+    symex_targett &target,
+    bool allow_pointer_unsoundness) const;
+
+  /// Represent the value of a union \p ssa_expr, read as a whole, by the
+  /// fields of its widest member. These are consistent with the fields of the
+  /// other members (see initialize_union_members), whereas the symbol for the
+  /// union as a whole need not be, as a declaration leaves it unconstrained.
+  /// \return `union_exprt` of the widest member's fields, or, if the widest
+  ///   member is smaller than the union, a `byte_update_exprt` of the union
+  ///   with these fields; an empty optional if the union has no members or
+  ///   its size is not known
+  std::optional<exprt> union_value_from_widest_member(
+    const namespacet &ns,
+    goto_symex_statet &state,
+    const ssa_exprt &ssa_expr) const;
+
   const std::size_t max_field_sensitivity_array_size;
 
   const bool should_simplify;

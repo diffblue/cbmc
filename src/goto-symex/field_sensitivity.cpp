@@ -17,6 +17,8 @@ Author: Michael Tautschnig
 #include "simplify_expr_with_value_set.h"
 #include "symex_target.h"
 
+#include <optional>
+
 #define ENABLE_ARRAY_FIELD_SENSITIVITY
 
 exprt field_sensitivityt::apply(
@@ -40,12 +42,13 @@ exprt field_sensitivityt::apply_byte_extract(
   if(be.op().type().id() != ID_union && be.op().type().id() != ID_union_tag)
     return be;
 
-  // For non-constant offsets, decompose through the widest union member so
-  // that field sensitivity can process the resulting struct/array expression.
-  // This avoids materialising the full union as a flat bitvector in the SMT
-  // encoding. The operand need not be an SSA expression (e.g., it may be an
-  // index into an array of unions when array field sensitivity is disabled).
-  if(!be.offset().is_constant())
+  // Decompose through the widest union member so that field sensitivity can
+  // process the resulting struct/array expression.  This avoids
+  // materialising the full union as a flat bitvector in the SMT encoding,
+  // and lets constant propagation see the member's fields.  The operand need
+  // not be an SSA expression (e.g., it may be an index into an array of
+  // unions when array field sensitivity is disabled).
+  const auto through_widest_member = [&]() -> std::optional<exprt>
   {
     const union_typet &union_type =
       be.op().type().id() == ID_union_tag
@@ -55,18 +58,24 @@ exprt field_sensitivityt::apply_byte_extract(
     const auto union_size = pointer_offset_bits(union_type, ns);
     const auto widest = union_type.find_widest_union_component(ns);
     if(
-      widest.has_value() && union_size.has_value() &&
-      widest->second == *union_size)
+      !widest.has_value() || !union_size.has_value() ||
+      widest->second != *union_size)
     {
-      byte_extract_exprt new_be{
-        be.id(),
-        member_exprt{be.op(), widest->first.get_name(), widest->first.type()},
-        be.offset(),
-        be.get_bits_per_byte(),
-        be.type()};
-      return apply(ns, state, std::move(new_be), write);
+      return {};
     }
+    byte_extract_exprt new_be{
+      be.id(),
+      member_exprt{be.op(), widest->first.get_name(), widest->first.type()},
+      be.offset(),
+      be.get_bits_per_byte(),
+      be.type()};
+    return apply(ns, state, std::move(new_be), write);
+  };
 
+  if(!be.offset().is_constant())
+  {
+    if(auto decomposed = through_widest_member())
+      return *decomposed;
     return be;
   }
 
@@ -148,6 +157,15 @@ exprt field_sensitivityt::apply_byte_extract(
     }
   }
 
+  // No member has a subexpression of the extracted type at this offset:
+  // e.g. a pointer read from a union whose only member is a byte array
+  // (libc++'s aligned_storage<N>::type, `union type { unsigned char
+  // __data[N]; }', holding the object a std::function placed in it).
+  // Extract from the widest member instead, whose fields hold the bytes
+  // written.
+  if(auto decomposed = through_widest_member())
+    return *decomposed;
+
   return be;
 }
 
@@ -159,8 +177,22 @@ exprt field_sensitivityt::apply(
 {
   if(expr.id() != ID_address_of)
   {
-    Forall_operands(it, expr)
-      *it = apply(ns, state, std::move(*it), write);
+    // A union read as a whole is represented by the fields of its widest
+    // member (see get_fields), but a member of the union or a byte_extract
+    // from it may map to the fields of another member, which
+    // apply_byte_extract and the handling of member expressions below take
+    // care of.
+    const bool keep_union_operand =
+      (expr.id() == ID_member || expr.id() == ID_byte_extract_little_endian ||
+       expr.id() == ID_byte_extract_big_endian) &&
+      is_ssa_expr(expr.operands().front()) &&
+      (expr.operands().front().type().id() == ID_union ||
+       expr.operands().front().type().id() == ID_union_tag);
+    for(auto it = expr.operands().begin(); it != expr.operands().end(); ++it)
+    {
+      if(it != expr.operands().begin() || !keep_union_operand)
+        *it = apply(ns, state, std::move(*it), write);
+    }
   }
 
   if(!write && is_ssa_expr(expr))
@@ -290,12 +322,201 @@ exprt field_sensitivityt::apply(
   return expr;
 }
 
+void field_sensitivityt::assign_fields(
+  const namespacet &ns,
+  goto_symex_statet &state,
+  const exprt &fields,
+  const exprt &value,
+  symex_targett &target,
+  bool allow_pointer_unsoundness) const
+{
+  if(
+    const auto fs_ssa =
+      expr_try_dynamic_cast<field_sensitive_ssa_exprt>(fields))
+  {
+    // only assign the fields, as the symbols of structs, unions, and arrays as
+    // a whole are not read (see field_sensitivityt::get_fields)
+    const typet &type = fs_ssa->type();
+    if(type.id() == ID_array)
+    {
+      for(std::size_t i = 0; i < fs_ssa->operands().size(); ++i)
+      {
+        assign_fields(
+          ns,
+          state,
+          fs_ssa->operands()[i],
+          simplify_opt(
+            index_exprt{
+              value,
+              from_integer(i, to_array_type(type).index_type()),
+              to_array_type(type).element_type()},
+            state.value_set,
+            ns),
+          target,
+          allow_pointer_unsoundness);
+      }
+      return;
+    }
+
+    const auto &components =
+      (type.id() == ID_struct_tag || type.id() == ID_union_tag)
+        ? ns.follow_tag(to_struct_or_union_tag_type(type)).components()
+        : to_struct_union_type(type).components();
+    PRECONDITION(fs_ssa->operands().size() == components.size());
+    const bool is_union = type.id() == ID_union || type.id() == ID_union_tag;
+    for(std::size_t i = 0; i < components.size(); ++i)
+    {
+      const exprt component_value =
+        is_union
+          ? make_byte_extract(
+              value, from_integer(0, c_index_type()), components[i].type())
+          : exprt{member_exprt{value, components[i]}};
+      assign_fields(
+        ns,
+        state,
+        fs_ssa->operands()[i],
+        simplify_opt(component_value, state.value_set, ns),
+        target,
+        allow_pointer_unsoundness);
+    }
+  }
+  else if(is_ssa_expr(fields))
+  {
+    const ssa_exprt l2_field =
+      state
+        .assignment(
+          to_ssa_expr(fields), value, ns, true, true, allow_pointer_unsoundness)
+        .get();
+    target.assignment(
+      state.guard.as_expr(),
+      l2_field,
+      l2_field,
+      l2_field.get_original_expr(),
+      value,
+      state.source,
+      symex_targett::assignment_typet::HIDDEN);
+  }
+}
+
+void field_sensitivityt::initialize_union_members(
+  const namespacet &ns,
+  goto_symex_statet &state,
+  const exprt &fields,
+  symex_targett &target,
+  bool allow_pointer_unsoundness) const
+{
+  const auto fs_ssa = expr_try_dynamic_cast<field_sensitive_ssa_exprt>(fields);
+  if(!fs_ssa)
+    return;
+
+  const typet &type = fs_ssa->type();
+  if(type.id() != ID_union && type.id() != ID_union_tag)
+  {
+    for(const auto &op : fs_ssa->operands())
+      initialize_union_members(
+        ns, state, op, target, allow_pointer_unsoundness);
+    return;
+  }
+
+  const union_typet &union_type = type.id() == ID_union_tag
+                                    ? ns.follow_tag(to_union_tag_type(type))
+                                    : to_union_type(type);
+  const auto widest = union_type.find_widest_union_component(ns);
+  if(!widest.has_value())
+    return;
+
+  const auto &components = union_type.components();
+  PRECONDITION(fs_ssa->operands().size() == components.size());
+
+  // nested unions of the widest member need the same treatment first, as the
+  // value of the widest member is read from their fields
+  for(std::size_t i = 0; i < components.size(); ++i)
+  {
+    if(components[i].get_name() == widest->first.get_name())
+    {
+      initialize_union_members(
+        ns, state, fs_ssa->operands()[i], target, allow_pointer_unsoundness);
+    }
+  }
+
+  const exprt l2_union = state.rename(fs_ssa->get_object_ssa(), ns).get();
+  const exprt union_value =
+    is_ssa_expr(l2_union) ? get_fields(ns, state, to_ssa_expr(l2_union), true)
+                          : l2_union;
+
+  for(std::size_t i = 0; i < components.size(); ++i)
+  {
+    if(components[i].get_name() == widest->first.get_name())
+      continue;
+
+    assign_fields(
+      ns,
+      state,
+      fs_ssa->operands()[i],
+      simplify_opt(
+        make_byte_extract(
+          union_value, from_integer(0, c_index_type()), components[i].type()),
+        state.value_set,
+        ns),
+      target,
+      allow_pointer_unsoundness);
+  }
+}
+
+std::optional<exprt> field_sensitivityt::union_value_from_widest_member(
+  const namespacet &ns,
+  goto_symex_statet &state,
+  const ssa_exprt &ssa_expr) const
+{
+  const union_typet &union_type =
+    ssa_expr.type().id() == ID_union_tag
+      ? ns.follow_tag(to_union_tag_type(ssa_expr.type()))
+      : to_union_type(ssa_expr.type());
+
+  const auto union_size = pointer_offset_bits(union_type, ns);
+  const auto widest = union_type.find_widest_union_component(ns);
+  if(!widest.has_value() || !union_size.has_value())
+    return {};
+
+  ssa_exprt member_ssa = ssa_expr;
+  const bool was_l2 = !member_ssa.get_level_2().empty();
+  member_ssa.remove_level_2();
+  member_ssa.set_expression(member_exprt{
+    ssa_expr.get_original_expr(),
+    widest->first.get_name(),
+    widest->first.type()});
+  exprt member_value = get_fields(ns, state, member_ssa, true);
+  if(was_l2)
+    member_value = state.rename(std::move(member_value), ns).get();
+
+  if(widest->second == *union_size)
+  {
+    return union_exprt{
+      widest->first.get_name(), std::move(member_value), ssa_expr.type()};
+  }
+
+  // The bytes beyond the widest member are not part of any member: take them
+  // from the symbol of the union as a whole.
+  return make_byte_update(
+    ssa_expr, from_integer(0, c_index_type()), std::move(member_value));
+}
+
 exprt field_sensitivityt::get_fields(
   const namespacet &ns,
   goto_symex_statet &state,
   const ssa_exprt &ssa_expr,
-  bool disjoined_fields_only) const
+  bool disjoined_fields_only,
+  bool unions_through_widest_member) const
 {
+  if(
+    disjoined_fields_only && unions_through_widest_member &&
+    (ssa_expr.type().id() == ID_union || ssa_expr.type().id() == ID_union_tag))
+  {
+    if(auto value = union_value_from_widest_member(ns, state, ssa_expr))
+      return *std::move(value);
+    return ssa_expr;
+  }
+
   if(
     ssa_expr.type().id() == ID_struct ||
     ssa_expr.type().id() == ID_struct_tag ||
@@ -321,7 +542,8 @@ exprt field_sensitivityt::get_fields(
       tmp.remove_level_2();
       tmp.set_expression(
         member_exprt{compound_op, comp.get_name(), comp.type()});
-      exprt field = get_fields(ns, state, tmp, disjoined_fields_only);
+      exprt field = get_fields(
+        ns, state, tmp, disjoined_fields_only, unions_through_widest_member);
       if(was_l2)
       {
         fields.emplace_back(state.rename(std::move(field), ns).get());
@@ -364,7 +586,8 @@ exprt field_sensitivityt::get_fields(
       bool was_l2 = !tmp.get_level_2().empty();
       tmp.remove_level_2();
       tmp.set_expression(index);
-      exprt element = get_fields(ns, state, tmp, disjoined_fields_only);
+      exprt element = get_fields(
+        ns, state, tmp, disjoined_fields_only, unions_through_widest_member);
       if(was_l2)
       {
         elements.emplace_back(state.rename(std::move(element), ns).get());
