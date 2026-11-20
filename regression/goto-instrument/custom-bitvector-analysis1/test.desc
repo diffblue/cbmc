@@ -1,0 +1,17 @@
+CORE
+main.c
+--custom-bitvector-analysis
+^EXIT=10$
+^SIGNAL=0$
+^file main\.c line 6 function main, set: TRUE$
+^file main\.c line 7 function main, set, via p: TRUE$
+^file main\.c line 9 function main, cleared: FALSE$
+^file main\.c line 10 function main, never set: TRUE$
+^SUMMARY: 3 pass, 1 fail, 0 unknown$
+--
+--
+The pointer arguments of __CPROVER_get_must and __CPROVER_get_may are cast to
+void *, which the analysis used not to see through, so that every query on &x
+was false.  goto-instrument does not write a goto binary for this option, and
+chain.sh then runs cbmc on the original program: cbmc ignores the queries
+(with a warning), and the assertions using them fail.
