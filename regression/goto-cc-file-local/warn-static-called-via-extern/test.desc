@@ -1,0 +1,14 @@
+CORE
+main.c
+final-link
+^EXIT=0$
+^SIGNAL=0$
+^main\.c(:\d+:\d+:|\(\d+\):) warning: function '_recv' has no body, but a file-local function of that name exists as '__CPROVER_file_local_impl_c__recv'
+--
+^warning: ignoring
+--
+A `static` function (_recv) is defined in one translation unit but called via
+an unmangled `extern` declaration in another.  With --export-file-local-symbols
+its body lives under __CPROVER_file_local_impl_c__recv, so the unmangled call
+has no body.  goto-cc warns about this
+failure mode at executable link time.

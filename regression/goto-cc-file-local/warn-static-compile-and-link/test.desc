@@ -1,0 +1,13 @@
+CORE
+main.c
+compile-and-link
+^EXIT=0$
+^SIGNAL=0$
+warning: function '_recv' has no body, but a file-local function of that name exists as '__CPROVER_file_local_impl_c__recv
+--
+^warning: ignoring
+--
+As warn-static-called-via-extern, but compiling and linking both translation
+units in a single goto-cc invocation, where the linker renames the static
+function to _recv$link1 before mangling and the bodiless _recv is not in the
+function map.
