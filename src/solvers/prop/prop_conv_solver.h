@@ -50,7 +50,7 @@ public:
     return prop.l_get(a);
   }
 
-  exprt handle(const exprt &expr) override;
+  exprt do_handle(const exprt &expr) override;
 
   void set_frozen(literalt);
   void set_frozen(const bvt &);
@@ -62,7 +62,7 @@ public:
   /// For a Boolean expression \p expr, add the constraint
   /// 'current_context => expr' if \p value is `true`,
   /// otherwise add 'current_context => not expr'
-  void set_to(const exprt &expr, bool value) override;
+  void do_set_to(const exprt &expr, bool value) override;
 
   void push() override;
 

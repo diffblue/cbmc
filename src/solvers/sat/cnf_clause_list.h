@@ -29,7 +29,7 @@ public:
   }
   virtual ~cnf_clause_listt() { }
 
-  void lcnf(const bvt &bv) override;
+  void do_lcnf(const bvt &bv) override;
 
   std::string solver_text() const override
   { return "CNF clause list"; }
