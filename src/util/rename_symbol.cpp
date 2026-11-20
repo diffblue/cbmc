@@ -28,6 +28,13 @@ void rename_symbolt::insert(
 
 bool rename_symbolt::rename(exprt &dest) const
 {
+  // Nothing to rename: do not walk the tree.  Linking the C library into a
+  // goto model calls this on every function of the program once per library
+  // function added (link_goto_model), almost always with empty maps; the
+  // walk -- three named-sub lookups per node -- was half of a C++ run's time.
+  if(expr_map.empty() && type_map.empty())
+    return true;
+
   bool result=true;
 
   for(auto it = dest.depth_begin(), end = dest.depth_end(); it != end; ++it)
