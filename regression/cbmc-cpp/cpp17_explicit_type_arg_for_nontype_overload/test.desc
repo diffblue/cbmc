@@ -1,0 +1,17 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [temp.arg.general]/1 + [temp.deduct.general]/2: an explicit TYPE template
+argument supplied to an overload whose first template parameter is a NON-TYPE
+parameter (`get<double>(v)` against `get<size_t N>(V<Ts...>&)`) is a deduction
+failure that removes that candidate only; the by-type overload is selected.
+Before, it was the hard error "expected expression, but got type" (the mirror of
+the value-for-type case).

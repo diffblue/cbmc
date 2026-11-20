@@ -1,0 +1,11 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+^.*Invariant check failed.*$
+dropped the body
+--

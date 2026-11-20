@@ -1,0 +1,21 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ free functions: SUCCESS$
+^\[main\.assertion\.2\] line \d+ static member functions: SUCCESS$
+^\[main\.assertion\.3\] line \d+ pointers to member functions: SUCCESS$
+^\[main\.assertion\.4\] line \d+ noexcept to plain pointer: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The exception specification is a comment of the function type
+(#C_noexcept), which type equality ignores: a pointer to a throwing
+function converted to a pointer to noexcept function, and the two
+overloads of k were ambiguous.  standard_conversion_sequence now applies
+[conv.fctptr] and ranks the function pointer conversion below the
+identity.

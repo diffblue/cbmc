@@ -1,0 +1,26 @@
+KNOWNBUG libcxx
+main.cpp
+--cpp17 --unwind 3 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ default exception_ptr is null: SUCCESS$
+^\[main\.assertion\.2\] line \d+ kept alive by an exception_ptr: SUCCESS$
+^\[main\.assertion\.3\] line \d+ refers to the exception: SUCCESS$
+^\[main\.assertion\.4\] line \d+ copies are equal: SUCCESS$
+^\[main\.assertion\.5\] line \d+ kept alive by the copy: SUCCESS$
+^\[main\.assertion\.6\] line \d+ destroyed with the last exception_ptr: SUCCESS$
+^\[main\.assertion\.7\] line \d+ rethrown twice: SUCCESS$
+^\[main\.assertion\.8\] line \d+ still referred to: SUCCESS$
+^\[main\.assertion\.9\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+no body for callee
+--
+Models of libc++'s exception_ptr: remove_cpp_exceptions counts the
+exception_ptrs of each exception object; a handler's exit does not destroy
+an object that one refers to, and its last release does.  C++17: the
+prvalue `E(v)' initializes the exception object ([expr.throw]/2,
+[dcl.init.general]/16.6.1); before C++17 CBMC copies a temporary, whose
+destructor runs.

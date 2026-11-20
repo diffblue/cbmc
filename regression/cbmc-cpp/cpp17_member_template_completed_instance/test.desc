@@ -1,0 +1,20 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ members usable: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+template scope 'rebind' is ambiguous
+dropped the body
+--
+N5008 [temp.names]/3, [temp.inst]/11: `T::template rebind<int>' names a
+member class template of a completed class template instance (39 lines,
+header-free, reduced from cpp17_hash_node_vector_alloc; the alias chain
+mirrors libstdc++'s __uset_hashtable and the hash<vector> partial
+specialization, each needed for the instantiation order).  The lookup
+failed with "template scope 'rebind' is ambiguous": an error earlier in
+the instance's body dropped its later members, so rebind was never
+registered in the instance's scope and the fallback found every rebind of
+the program.  Members after a failing one are now still registered.

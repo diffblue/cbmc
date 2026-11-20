@@ -1,0 +1,19 @@
+KNOWNBUG libcxx
+main.cpp
+--cpp17 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ run time: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+could not be evaluated
+static assertion failed
+^warning: ignoring
+--
+With libc++ (18 and Xcode 26) the constant evaluator could not evaluate
+`std::string_view{"32"} == "32"': operator== passes the views by value,
+copying each with string_view's defaulted copy constructor, which had no
+definition yet (only odr-used ones are) and whose argument, the address
+of a constexpr object, was not taken as a constant.
