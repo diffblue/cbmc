@@ -55,6 +55,7 @@ __CPROVER_HIDE:;
 #endif
 
 int __VERIFIER_nondet_int(void);
+in_addr_t __VERIFIER_nondet_in_addr_t(void);
 
 int __inet_aton(const char *cp, struct in_addr *pin)
 {
@@ -64,9 +65,14 @@ int __inet_aton(const char *cp, struct in_addr *pin)
                          "inet_aton zero-termination of name argument");
   #endif
   (void)*cp;
-  (void)*pin;
 
-  int result=__VERIFIER_nondet_int();
+  // inet_aton(3): returns nonzero if the address is valid, zero if not.
+  // On success, the converted address is stored in *pin.
+  __CPROVER_bool result = __VERIFIER_nondet_int() != 0;
+
+  if(result)
+    pin->s_addr = __VERIFIER_nondet_in_addr_t();
+
   return result;
 }
 
