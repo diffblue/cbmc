@@ -24,6 +24,7 @@
    * [Floating Point](modeling/floating-point/)
    * [Generating Environments](goto-harness/)
    * [Memory-mapped I/O](modeling/mmio/)
+   * [Inline Assembly](modeling/inline-asm/)
    * [Shadow Memory](modeling/shadow-memory/)
 
 8. Build Systems
