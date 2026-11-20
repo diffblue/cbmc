@@ -1,0 +1,10 @@
+CORE no-new-smt
+nondet.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Arrays with nondeterministic, but equal, elements are equal.

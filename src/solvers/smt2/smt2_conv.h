@@ -33,6 +33,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class floatbv_fma_exprt;
 class floatbv_typecast_exprt;
 class ieee_float_op_exprt;
+class quantifier_exprt;
 class floatbv_round_to_integral_exprt;
 class union_typet;
 class update_bit_exprt;
@@ -69,6 +70,7 @@ public:
   bool use_check_sat_assuming = false;
   bool use_datatypes = false;
   bool use_lambda_for_array = false;
+  bool use_quantifiers = false;
   bool emit_set_logic = true;
 
   exprt handle(const exprt &expr) override;
@@ -133,6 +135,16 @@ protected:
   bool use_array_theory(const exprt &);
   void flatten_array(const exprt &);
 
+  /// Returns an expression that is equivalent to \p lhs = \p rhs in C, or
+  /// `lhs = rhs` if no lowering is required. SMT-LIB equality of arrays
+  /// compares the entire index domain, whereas C arrays only have elements
+  /// at indices below their size. Arrays using the array theory are thus
+  /// compared element by element, using a bounded quantifier where the solver
+  /// supports them. Structs encoded as datatypes are compared member by member
+  /// when they contain arrays.
+  exprt lower_equality(const exprt &lhs, const exprt &rhs);
+  std::size_t array_equality_index_counter = 0;
+
   // specific expressions go here
   void convert_typecast(const typecast_exprt &expr);
   void convert_floatbv_typecast(const floatbv_typecast_exprt &expr);
@@ -174,6 +186,7 @@ protected:
 
   // auxiliary methods
   exprt prepare_for_convert_expr(const exprt &expr);
+  literalt lift_quantifier(const quantifier_exprt &quantifier);
   exprt lower_byte_operators(const exprt &expr);
   void find_symbols(const exprt &expr);
   void find_symbols(const typet &type);
@@ -285,6 +298,10 @@ protected:
 
   typedef std::map<exprt, irep_idt> defined_expressionst;
   defined_expressionst defined_expressions;
+
+  /// With Z3, the Boolean variables that replace quantifiers, see
+  /// \ref lift_quantifier.
+  std::map<exprt, literalt> lifted_quantifiers;
   /// The values which boolean identifiers have been `smt2_convt::set_to` or
   /// in other words those which are asserted as true / false in the output
   /// smt2 formula.

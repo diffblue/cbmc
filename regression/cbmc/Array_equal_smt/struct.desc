@@ -1,0 +1,11 @@
+CORE no-new-smt
+struct.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Structs that are encoded as datatypes must be compared member by member when
+they contain arrays.
