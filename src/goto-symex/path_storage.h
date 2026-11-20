@@ -115,6 +115,11 @@ public:
   /// therefore may be referred to by a pointer.
   incremental_dirtyt dirty;
 
+  /// Number of temporaries introduced by goto_symext::symex_havoc_reachable,
+  /// to give them unique names (across all paths) without searching the
+  /// symbol table.
+  std::size_t havoc_reachable_temporaries = 0;
+
   /// Generates a loop analysis for the instructions in goto_programt and
   /// keys it against function ID.
   void add_function_loops(const irep_idt &identifier, const goto_programt &body)
