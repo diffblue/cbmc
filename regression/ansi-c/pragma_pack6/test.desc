@@ -1,0 +1,12 @@
+CORE gcc-only broken-test-c++-front-end
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Layout of aggregates under #pragma pack in combination with packed and aligned
+attributes, the semantics of #pragma pack(n) and #pragma pack(), and the
+compiler-specific choice of the #pragma pack value applying to a definition.

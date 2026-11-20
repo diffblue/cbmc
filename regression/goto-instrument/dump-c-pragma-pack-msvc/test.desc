@@ -1,0 +1,14 @@
+CORE
+main.c
+--winx64 --dump-c
+activate-multi-line-match
+#pragma pack\(push, 1\)\nstruct V\n\{\n  // c\n  char c;\n  // i\n  signed int i;\n#pragma pack\(4\)\n  // j\n  signed int j;\n  // e\n  char e;\n#pragma pack\(2\)\n\};\n#pragma pack\(pop\)
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+dump-c reproduces the #pragma pack of each member and the one in effect at the
+end of the definition, as needed for Visual Studio. The output is not compiled
+again, which would require Visual Studio's system headers.

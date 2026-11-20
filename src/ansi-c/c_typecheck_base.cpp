@@ -812,6 +812,7 @@ void c_typecheck_baset::typecheck_declaration(
 
       // now check other half of type
       typecheck_type(symbol.type);
+      apply_declaration_alignment(symbol.type, full_spec.is_typedef);
 
       if(!full_spec.alias.empty())
       {

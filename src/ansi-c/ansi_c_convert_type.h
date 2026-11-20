@@ -40,8 +40,14 @@ public:
 
   typet gcc_attribute_mode;
 
+  /// packing and alignment attributes of the declared entity
   bool packed, aligned;
-  exprt vector_size, alignment, bv_width, fraction_width;
+  /// the alignment attribute follows the '*' of a pointer declarator
+  bool aligned_pointer_declarator;
+  /// packing and alignment attributes of the struct/union type being defined
+  /// (see mark_type_attributes in parser_static.inc)
+  bool type_packed, type_aligned;
+  exprt vector_size, alignment, type_alignment, bv_width, fraction_width;
   exprt msc_based; // this is Visual Studio
   bool constructor, destructor;
 
@@ -106,8 +112,12 @@ protected:
       gcc_attribute_mode(static_cast<const typet &>(get_nil_irep())),
       packed(false),
       aligned(false),
+      aligned_pointer_declarator(false),
+      type_packed(false),
+      type_aligned(false),
       vector_size(nil_exprt{}),
       alignment(nil_exprt{}),
+      type_alignment(nil_exprt{}),
       bv_width(nil_exprt{}),
       fraction_width(nil_exprt{}),
       msc_based(nil_exprt{}),
