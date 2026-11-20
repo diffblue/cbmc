@@ -1,0 +1,11 @@
+CORE gcc-only broken-test-c++-front-end
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Member alignment under #pragma pack(n) is capped at min(n, natural), including
+for array members; regression for over-alignment inflating struct sizes.

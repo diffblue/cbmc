@@ -1,0 +1,14 @@
+CORE
+main.c
+--dump-c
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^  (struct|union) \{.*\$pad
+--
+This test should be run via chain.sh, which will try to recompile the dumped C
+code. dump-c prints the types of members of anonymous struct or union type as
+inline definitions, which must not include the padding components, as these
+are not part of the source program and the compiler adds the same padding.
