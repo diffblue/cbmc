@@ -1,4 +1,4 @@
-CORE no-new-smt broken-cprover-smt-backend
+CORE broken-cprover-smt-backend
 main.c
 --floatbv
 ^EXIT=0$

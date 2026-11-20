@@ -178,9 +178,17 @@ extension_for_type(const typet &type)
     return smt_bit_vector_theoryt::sign_extend;
   if(can_cast_type<unsignedbv_typet>(type))
     return smt_bit_vector_theoryt::zero_extend;
-  if(can_cast_type<bv_typet>(type))
+  if(can_cast_type<bv_typet>(type) || can_cast_type<c_bool_typet>(type))
     return smt_bit_vector_theoryt::zero_extend;
   if(can_cast_type<pointer_typet>(type))
+    return smt_bit_vector_theoryt::zero_extend;
+  if(const auto bit_field = type_try_dynamic_cast<c_bit_field_typet>(type))
+    return extension_for_type(bit_field->underlying_type());
+  // Integer constants are converted to unsigned bit vectors of the minimal
+  // width that holds their value, see the conversion of constants below. Such
+  // constants occur as shift distances in the bit-vector encoding of
+  // floating-point operations.
+  if(type.id() == ID_integer)
     return smt_bit_vector_theoryt::zero_extend;
   UNREACHABLE;
 }
@@ -369,10 +377,35 @@ static smt_termt convert_expr_to_smt(
   const concatenation_exprt &concatenation,
   const sub_expression_mapt &converted)
 {
-  if(operands_are_of_type<bitvector_typet>(concatenation))
+  const auto &operands = concatenation.operands();
+  if(
+    !operands.empty() &&
+    std::all_of(
+      operands.begin(),
+      operands.end(),
+      [](const exprt &operand)
+      {
+        return can_cast_type<bitvector_typet>(operand.type()) ||
+               operand.is_boolean();
+      }))
   {
-    return convert_multiary_operator_to_terms(
-      concatenation, converted, smt_bit_vector_theoryt::concat);
+    // Boolean operands, such as the sign bit that float_bvt::pack places in
+    // front of exponent and fraction, are single bits.
+    const auto operand_term = [&converted](const exprt &operand) -> smt_termt
+    {
+      const smt_termt &term = converted.at(operand);
+      if(!operand.is_boolean())
+        return term;
+      const smt_bit_vector_sortt bit{1};
+      return smt_core_theoryt::if_then_else(
+        term,
+        smt_bit_vector_constant_termt{1, bit},
+        smt_bit_vector_constant_termt{0, bit});
+    };
+    smt_termt result = operand_term(operands.front());
+    for(auto it = std::next(operands.begin()); it != operands.end(); ++it)
+      result = smt_bit_vector_theoryt::concat(result, operand_term(*it));
+    return result;
   }
   UNIMPLEMENTED_FEATURE(
     "Generation of SMT formula for concatenation expression: " +
@@ -474,6 +507,21 @@ static smt_termt convert_expr_to_smt(
   const sign_exprt &is_negative,
   const sub_expression_mapt &converted)
 {
+  const typet &op_type = is_negative.op().type();
+  if(can_cast_type<unsignedbv_typet>(op_type))
+    return smt_bool_literal_termt{false};
+  // Signed integers, and floating-point numbers, which are encoded as bit
+  // vectors, are negative when their most significant bit is set.
+  if(
+    can_cast_type<signedbv_typet>(op_type) ||
+    can_cast_type<floatbv_typet>(op_type))
+  {
+    const std::size_t width = to_bitvector_type(op_type).get_width();
+    return smt_core_theoryt::equal(
+      smt_bit_vector_theoryt::extract(width - 1, width - 1)(
+        converted.at(is_negative.op())),
+      smt_bit_vector_constant_termt{1, 1});
+  }
   UNIMPLEMENTED_FEATURE(
     "Generation of SMT formula for \"is negative\" expression: " +
     is_negative.pretty());
@@ -1111,6 +1159,14 @@ static smt_termt convert_expr_to_smt(
   const extractbit_exprt &extract_bit,
   const sub_expression_mapt &converted)
 {
+  const smt_termt &from = converted.at(extract_bit.src());
+  const auto index_value = numeric_cast<std::size_t>(extract_bit.index());
+  if(index_value)
+  {
+    return smt_core_theoryt::equal(
+      smt_bit_vector_theoryt::extract(*index_value, *index_value)(from),
+      smt_bit_vector_constant_termt{1, 1});
+  }
   UNIMPLEMENTED_FEATURE(
     "Generation of SMT formula for extract bit expression: " +
     extract_bit.pretty());
@@ -1165,6 +1221,21 @@ static smt_termt convert_expr_to_smt(
   const abs_exprt &absolute_value_of,
   const sub_expression_mapt &converted)
 {
+  const typet &op_type = absolute_value_of.op().type();
+  const smt_termt &operand = converted.at(absolute_value_of.op());
+  if(can_cast_type<unsignedbv_typet>(op_type))
+    return operand;
+  if(can_cast_type<signedbv_typet>(op_type))
+  {
+    // As in two's complement arithmetic, the absolute value of the minimum
+    // value is the minimum value itself.
+    const std::size_t width = to_signedbv_type(op_type).get_width();
+    return smt_core_theoryt::if_then_else(
+      smt_bit_vector_theoryt::signed_less_than(
+        operand, smt_bit_vector_constant_termt{0, width}),
+      smt_bit_vector_theoryt::negate(operand),
+      operand);
+  }
   UNIMPLEMENTED_FEATURE(
     "Generation of SMT formula for absolute value of expression: " +
     absolute_value_of.pretty());

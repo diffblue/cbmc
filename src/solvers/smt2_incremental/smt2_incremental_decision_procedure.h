@@ -117,6 +117,14 @@ protected:
   /// possible expression forms by expressing these in terms of the remaining
   /// language features.
   exprt lower(exprt expression) const;
+  /// The bit-vector encoding of floating-point operations (see
+  /// \ref float_bvt) shares sub-expressions extensively, making the encoding
+  /// exponentially larger when it is traversed as a tree, as the conversion
+  /// to SMT terms and the SMT output do. Define each sub-expression of the
+  /// lowered expression \p expr that is referenced more than once as a
+  /// separate SMT function, and replace its references by that function.
+  /// \return \p expr, with shared sub-expressions replaced.
+  exprt define_shared_subexpressions(const exprt &expr);
   std::optional<smt_termt> get_identifier(const exprt &expr) const;
 
   /// Namespace for looking up the expressions which symbol_exprts relate to.
@@ -144,7 +152,8 @@ protected:
       return next_id++;
     }
   };
-  sequencet handle_sequence, array_sequence, index_sequence, padding_sequence;
+  sequencet handle_sequence, array_sequence, index_sequence, padding_sequence,
+    shared_sequence;
   /// When the `handle(exprt)` member function is called, the decision procedure
   /// commands the SMT solver to define a new function corresponding to the
   /// given expression. The mapping of the expressions to the function

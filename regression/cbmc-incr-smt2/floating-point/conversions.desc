@@ -1,0 +1,22 @@
+CORE
+conversions.c
+
+^\[main\.assertion\.1\] line 5 int of positive: SUCCESS$
+^\[main\.assertion\.2\] line 6 unsigned of positive: SUCCESS$
+^\[main\.assertion\.3\] line 7 float to double: SUCCESS$
+^\[main\.assertion\.4\] line 8 char of positive: SUCCESS$
+^\[main\.assertion\.5\] line 9 bool of non-zero: SUCCESS$
+^\[main\.assertion\.6\] line 13 int of negative: SUCCESS$
+^\[main\.assertion\.7\] line 14 long long of negative: SUCCESS$
+^\[main\.assertion\.8\] line 15 negative float to double: SUCCESS$
+^\[main\.assertion\.9\] line 20 range: SUCCESS$
+^\[main\.assertion\.10\] line 21 can be 999: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Conversions from float to integer and double types. The bit-vector encoding of
+these conversions uses concatenations with Boolean operands, "is negative"
+expressions, and shifts by integer constants, which the incremental SMT2
+back-end did not support. The results match those of the SAT back-end.

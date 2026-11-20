@@ -5,6 +5,8 @@
 #include <util/bitvector_types.h>
 #include <util/config.h>
 #include <util/exception_utils.h>
+#include <util/floatbv_expr.h>
+#include <util/ieee_float.h>
 #include <util/namespace.h>
 #include <util/string_constant.h>
 #include <util/symbol_table.h>
@@ -1239,4 +1241,42 @@ TEST_CASE(
       smt_identifier_termt{symbol_with_value.name, smt_bit_vector_sortt{56}})}};
 
   CHECK(test.sent_commands == expected_commands);
+}
+
+TEST_CASE(
+  "smt2_incremental_decision_proceduret defines shared sub-expressions of "
+  "floating-point encodings",
+  "[core][smt2_incremental]")
+{
+  auto test = decision_procedure_test_environmentt::make();
+  const floatbv_typet float_type =
+    ieee_float_spect::single_precision().to_type();
+  const symbolt x = make_test_symbol("x", float_type);
+  const symbolt y = make_test_symbol("y", float_type);
+  const symbolt z = make_test_symbol("z", float_type);
+  const exprt rounding_mode = from_integer(0, unsignedbv_typet{32});
+  const ieee_float_equal_exprt sum_is_z{
+    ieee_float_op_exprt{
+      x.symbol_expr(), ID_floatbv_plus, y.symbol_expr(), rounding_mode},
+    z.symbol_expr()};
+
+  test.sent_commands.clear();
+  test.procedure.set_to(sum_is_z, true);
+
+  // The bit-vector encoding of the addition shares sub-expressions, which are
+  // defined as separate functions. Without these, the size of the commands
+  // would be exponential in the depth of the encoding.
+  std::size_t shared_definitions = 0;
+  std::size_t total_size = 0;
+  for(const auto &command : test.sent_commands)
+  {
+    const std::string text = smt_to_smt2_string(command);
+    total_size += text.size();
+    if(text.rfind("(define-fun shared_", 0) == 0)
+      ++shared_definitions;
+  }
+  REQUIRE(shared_definitions > 0);
+  CHECK(total_size < 100000);
+  CHECK(
+    smt_to_smt2_string(test.sent_commands.back()).rfind("(assert ", 0) == 0);
 }
