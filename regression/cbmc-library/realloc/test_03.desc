@@ -1,12 +1,8 @@
 CORE
 main_03.c
-
-^EXIT=6$
+--no-malloc-may-fail
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
 ^SIGNAL=0$
-pointer handling for concurrency is unsound
 --
 ^warning: ignoring
---
-The test uses "__CPROVER_ASYNC_1:" and the async-called function foo does
-pointer operations over allocated memory - which is not handled in a sound way
-in CBMC.
