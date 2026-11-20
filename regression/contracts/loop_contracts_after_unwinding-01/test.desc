@@ -1,0 +1,14 @@
+CORE
+main.c
+--unwindset z_f.0:1 -- --apply-loop-contracts _ --no-standard-checks
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+The do-while(0) loop of z_f is unwound once by a first goto-instrument run,
+then loop contracts are applied by a second one. The loop of a_acq has no
+assigns clause and calls m_spin, whose loop has a contract. Inferring the
+assigns clause of the outer loop must use a may-alias analysis that is
+recomputed after the inner loop was instrumented; with a stale analysis the
+instrumentation aborted with a CHECK_RETURN failure in local_may_aliast::get.
