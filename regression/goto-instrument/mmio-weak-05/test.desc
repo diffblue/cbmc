@@ -1,0 +1,14 @@
+CORE
+test.c
+--nondet-volatile-write-model data:observe_data --nondet-volatile-write-model cmd:observe_cmd --mmio-weak
+^EXIT=10$
+^SIGNAL=0$
+data committed before GO: FAILURE$
+^VERIFICATION FAILED$
+--
+--
+Cross-function deferral: the helper write_data posts the write to the data
+register and returns without a barrier. Because posted writes have static
+lifetime, the write can be delayed past the function return and observed after
+the command in main, so the ordering assertion fails. A model that flushed at
+the helper's return would miss this bug.

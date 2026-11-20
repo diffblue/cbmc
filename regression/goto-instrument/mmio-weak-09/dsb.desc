@@ -1,0 +1,12 @@
+CORE
+dsb.c
+--nondet-volatile-write-model reg:observe --mmio-weak --mmio-early-ack
+^EXIT=0$
+^SIGNAL=0$
+the write has completed after the barrier: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+An inline-assembly ARM DSB (data synchronization barrier) is lowered to a
+completion fence, so the write to reg has completed after it and the assertion
+holds. Compare test.desc, where a DMB does not complete the write.

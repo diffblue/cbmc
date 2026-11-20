@@ -1,0 +1,13 @@
+CORE
+test.c
+--nondet-volatile-write-model A:observe_A --nondet-volatile-write-model B:observe_B --mmio-weak --mmio-weak-depth 2
+^EXIT=10$
+^SIGNAL=0$
+a write to A observed before GO: FAILURE$
+^VERIFICATION FAILED$
+--
+--
+Deeper reordering: with a posted-write buffer of depth 2, both writes to A can
+be outstanding when B is written, so the command can be observed before either
+write to A. This reordering cannot be exhibited by a depth-1 buffer (see
+depth1.desc), where the second write to A forces the first to be observed.

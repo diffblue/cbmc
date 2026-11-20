@@ -376,6 +376,15 @@ void remove_asmt::process_instruction_gcc(
       code_fence.set(ID_RRcumul, true);
       code_fence.set(ID_WRcumul, true);
 
+      // A DMB (data memory barrier) orders memory accesses but does not
+      // guarantee their completion, whereas a DSB (data synchronization
+      // barrier) additionally waits for prior accesses to complete. They share
+      // the same ordering flags; the DMB is marked as ordering-only so that
+      // completion-sensitive analyses (e.g. the memory-mapped I/O model) can
+      // tell them apart.
+      if(command == "dmb")
+        code_fence.set(ID_ordering_fence, true);
+
       tmp_dest.add(
         goto_programt::make_other(code_fence, code.source_location()));
     }
