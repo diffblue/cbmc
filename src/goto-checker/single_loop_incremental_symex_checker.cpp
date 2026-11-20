@@ -77,6 +77,9 @@ operator()(propertiest &properties)
   // we haven't got an equation yet
   if(!initial_equation_generated)
   {
+    // Validate that the entry point exists before calling symex
+    goto_symext::validate_entry_point(goto_model);
+
     full_equation_generated = !symex.from_entry_point_of(
       goto_symext::get_goto_function(goto_model), symex_symbol_table);
 
