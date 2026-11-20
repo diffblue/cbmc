@@ -1,4 +1,4 @@
-.TH MEMORY-ANALYZER "1" "June 2022" "memory-analyzer-5.59.0" "User Commands"
+.TH MEMORY-ANALYZER "1" "March 1, 2026" "memory-analyzer-6.10.0" "User Commands"
 .SH NAME
 memory-analyzer \- Snapshot program state for symbolic analysis
 .SH SYNOPSIS
@@ -64,9 +64,10 @@ goto\-gcc \-g main.c \-o main_exe
 .EE
 .PP
 And then we call \fBmemory\-analyzer\fR with:
-.EE
+.EX
 .IP
 memory-analyzer --breakpoint checkpoint --symbols array main_exe
+.EE
 .PP
 to obtain as output the human readable list of values for each requested symbol:
 .EX
@@ -80,8 +81,10 @@ to obtain as output the human readable list of values for each requested symbol:
 The above result is useful for the user and their preliminary analysis but does
 not contain enough information for further automated analyses. To that end,
 memory analyzer has an option for the snapshot to be represented in the format
-of a symbol table (with \fB\-\-symtab\-snapshot\fR). Finally, to obtain an output in
-JSON format, e.g., for further analyses by \fBgoto\-harness\fR(1) the additional option
+of a symbol table (with \fB\-\-symtab\-snapshot\fR). Finally, to obtain an
+output in
+JSON format, e.g., for further analyses by \fBgoto\-harness\fR(1) the additional
+option
 \fB\-\-json\-ui\fR needs to be passed to \fBmemory\-analyzer\fR:
 .EX
 .IP
@@ -108,8 +111,10 @@ Write snapshot to \fIfile_name\fR.
 \fB\-\-json\-ui\fR
 Output snapshot in JSON format.
 .SH ENVIRONMENT
-All tools honor the TMPDIR environment variable when generating temporary
-files and directories.
+.TP
+.B TMPDIR
+All CProver tools honor this variable when creating temporary files and
+directories.
 .SH BUGS
 If you encounter a problem please create an issue at
 .B https://github.com/diffblue/cbmc/issues
@@ -117,8 +122,8 @@ If you encounter a problem please create an issue at
 .BR cbmc (1),
 .BR elf (5),
 .BR gdb (1),
-.BR goto-gcc (1),
-.BR goto-harness (1),
+.BR goto\-gcc (1),
+.BR goto\-harness (1),
 .BR symtab2gb (1)
 .SH COPYRIGHT
 2019, Malte Mues, Diffblue
