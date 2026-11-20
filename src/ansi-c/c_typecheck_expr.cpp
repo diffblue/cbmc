@@ -1471,14 +1471,19 @@ void c_typecheck_baset::typecheck_expr_rel(
   }
   else
   {
-    // pointer and zero
-    if(type0.id() == ID_pointer && simplify_expr(op1, *this) == 0)
+    // pointer and zero; replacing an operand with side effects by a null
+    // pointer would lose them, it is converted as any other integer below
+    if(
+      type0.id() == ID_pointer && !has_subexpr(op1, ID_side_effect) &&
+      simplify_expr(op1, *this) == 0)
     {
       op1 = null_pointer_exprt{to_pointer_type(type0)};
       return;
     }
 
-    if(type1.id() == ID_pointer && simplify_expr(op0, *this) == 0)
+    if(
+      type1.id() == ID_pointer && !has_subexpr(op0, ID_side_effect) &&
+      simplify_expr(op0, *this) == 0)
     {
       op0 = null_pointer_exprt{to_pointer_type(type1)};
       return;
