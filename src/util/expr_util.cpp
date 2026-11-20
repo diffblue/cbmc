@@ -317,3 +317,30 @@ exprt make_and(exprt a, exprt b)
 {
   return conjunction(a, b);
 }
+
+std::optional<exprt> make_array_equality(const exprt &lhs, const exprt &rhs)
+{
+  if(lhs.type() == rhs.type())
+    return equal_exprt{lhs, rhs};
+
+  if(lhs.type().id() != ID_array || rhs.type().id() != ID_array)
+    return {};
+
+  const array_typet &lhs_type = to_array_type(lhs.type());
+  const array_typet &rhs_type = to_array_type(rhs.type());
+  if(
+    lhs_type.element_type() != rhs_type.element_type() ||
+    lhs_type.size().is_nil() || rhs_type.size().is_nil())
+  {
+    return {};
+  }
+
+  // The sizes need to be equal, and if they are, re-interpreting rhs as an
+  // array of the type of lhs does not change the elements.
+  equal_exprt size_equal{
+    lhs_type.size(),
+    typecast_exprt::conditional_cast(rhs_type.size(), lhs_type.size().type())};
+  equal_exprt elements_equal{
+    lhs, make_byte_extract(rhs, from_integer(0, c_index_type()), lhs_type)};
+  return and_exprt{std::move(size_equal), std::move(elements_equal)};
+}

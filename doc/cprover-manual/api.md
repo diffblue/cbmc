@@ -119,8 +119,9 @@ void __CPROVER_array_copy(const void dest[], const void src[]);
 void __CPROVER_array_set(const void dest[], value);
 ```
 
-The function **\_\_CPROVER\_array\_equal** returns true if the values
-stored in the given arrays are equal. The function
+The function **\_\_CPROVER\_array\_equal** returns true if the given
+arrays have the same element type and size, and the values stored in them
+are equal. This includes variable-length arrays. The function
 **\_\_CPROVER\_array\_copy** copies the contents of the array **src** to
 the array **dest**. The function **\_\_CPROVER\_array\_set** initializes
 the array **dest** with the given value.

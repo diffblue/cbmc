@@ -1,0 +1,11 @@
+CORE
+main.c
+--program-only
+^\(\d+\) A#2\[\[0\]\] == 42$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The completed array type must be used in the goto program for field
+sensitivity to apply to the array.

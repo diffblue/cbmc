@@ -150,6 +150,9 @@ protected:
   virtual literalt convert_binary_overflow(const binary_overflow_exprt &expr);
   virtual literalt convert_unary_overflow(const unary_overflow_exprt &expr);
   virtual literalt convert_equality(const equal_exprt &expr);
+  /// Convert an equality of unbounded arrays, which, like equality in C,
+  /// only compares the elements at indices below the size of the arrays.
+  literalt convert_unbounded_array_equality(const equal_exprt &expr);
   virtual literalt convert_verilog_case_equality(
     const binary_relation_exprt &expr);
   virtual literalt convert_ieee_float_rel(const binary_relation_exprt &);
@@ -294,6 +297,9 @@ protected:
 
   // scopes
   std::size_t scope_counter = 0;
+
+  // to generate fresh symbols in convert_unbounded_array_equality
+  std::size_t array_equality_counter = 0;
 
   /// create new, unique variables for the given binding
   binding_exprt::variablest fresh_binding(const binding_exprt &);
