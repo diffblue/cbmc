@@ -194,7 +194,7 @@ void dfcc_swap_and_wrapt::check_contract(
   const auto write_set_symbol = dfcc_utilst::create_new_parameter_symbol(
     goto_model.symbol_table,
     function_id,
-    "__write_set_to_check",
+    dfcc_utilst::write_set_to_check_base_name,
     library.dfcc_type[dfcc_typet::CAR_SET_PTR]);
 
   contract_handler.add_contract_instructions(
@@ -276,7 +276,7 @@ void dfcc_swap_and_wrapt::replace_with_contract(
   const auto write_set_symbol = dfcc_utilst::create_new_parameter_symbol(
     goto_model.symbol_table,
     function_id,
-    "__write_set_to_check",
+    dfcc_utilst::write_set_to_check_base_name,
     library.dfcc_type[dfcc_typet::CAR_SET_PTR]);
 
   goto_programt body;

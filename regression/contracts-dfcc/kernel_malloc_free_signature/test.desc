@@ -1,0 +1,14 @@
+CORE dfcc-only
+main.c
+--dfcc main --enforce-contract release --enforce-contract acquire
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^\[.*\] .*: FAILURE$
+--
+The calls pass more arguments than the library's malloc and free take. The
+write set has to bind to the write set parameter, which follows the
+parameters of the definition, rather than be appended after the surplus
+arguments, where it bound to M_DEVBUF and made allocation and deallocation
+fail the write set checks.

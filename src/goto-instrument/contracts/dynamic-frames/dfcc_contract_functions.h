@@ -32,9 +32,9 @@ class goto_modelt;
 /// // Populates write_set_to_fill with targets of the assigns clause
 /// // checks its own body against write_set_to_check:
 /// void contract_id::c_assigns(
-///     function-params,
+///     write_set_to_check,
 ///     write_set_to_fill,
-///     write_set_to_check);
+///     function-params);
 /// ```
 ///
 /// ```c
@@ -47,9 +47,9 @@ class goto_modelt;
 /// // Populates write_set_to_fill with targets of the frees clause
 /// // checks its own body against write_set_to_check:
 /// void contract_id::frees(
-///     function-params,
+///     write_set_to_check,
 ///     write_set_to_fill,
-///     write_set_to_check);
+///     function-params);
 /// ```
 class dfcc_contract_functionst
 {
