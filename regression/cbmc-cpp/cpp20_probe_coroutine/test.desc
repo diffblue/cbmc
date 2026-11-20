@@ -1,0 +1,20 @@
+KNOWNBUG libstdcxx
+main.cpp
+--cpp20 --unwind 4
+^\[main\.assertion\.1\] line \d+ the yielded value: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+g++ and clang++ (GCC 16 for C++23 and C++26) accept this program, and it fails
+only its WRONG assertion.  Coroutines are parsed but not implemented; see
+cpp20_coroutine_generator_semantics for what CBMC does instead and what a fix
+needs.
+
+Since coroutines are reported as unsupported, the call of the coroutine
+also fails the property "coroutines are not supported" and ends the path.

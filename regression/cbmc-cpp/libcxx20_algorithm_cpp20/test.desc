@@ -1,0 +1,11 @@
+KNOWNBUG libcxx
+main.cpp
+
+^VERIFICATION
+^EXIT=(0|10)$
+^SIGNAL=0$
+--
+^PARSING ERROR$
+^CONVERSION ERROR$
+dropped the body
+--

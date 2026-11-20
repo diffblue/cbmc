@@ -1,0 +1,17 @@
+KNOWNBUG libstdcxx
+main.cpp
+--cpp20 --object-bits 12
+^\[main\.assertion\.1\] line \d+ defaulted three-way comparison: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+`a < b' is rewritten to (a <=> b) < 0; `a == b' uses the operator== that
+a defaulted operator<=> implicitly declares ([class.compare.default]/4),
+which CBMC did not declare: "no comparison operator for an operand of
+class type" (cpp20_defaulted_spaceship_declares_equality).
