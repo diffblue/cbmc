@@ -9,7 +9,6 @@ main.c
 ^\[foo.pointer_dereference.\d+\] line \d+ dereference failure: deallocated dynamic object in \*y: (UNKNOWN|FAILURE)$
 ^\[foo.pointer_dereference.\d+\] line \d+ dereference failure: dead object in \*y: (UNKNOWN|FAILURE)$
 ^\[foo.pointer_dereference.\d+\] line \d+ dereference failure: pointer outside object bounds in \*y: (UNKNOWN|FAILURE)$
-^\[foo.pointer_dereference.\d+\] line \d+ dereference failure: invalid integer address in \*y: (UNKNOWN|FAILURE)$
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

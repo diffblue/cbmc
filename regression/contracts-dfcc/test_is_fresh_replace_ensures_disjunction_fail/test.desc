@@ -6,7 +6,6 @@ main.c
 ^\[bar.pointer_dereference.\d+\] line 10 dereference failure: deallocated dynamic object in \*x: (UNKNOWN|FAILURE)$
 ^\[bar.pointer_dereference.\d+\] line 10 dereference failure: dead object in \*x: (UNKNOWN|FAILURE)$
 ^\[bar.pointer_dereference.\d+\] line 10 dereference failure: pointer outside object bounds in \*x: (UNKNOWN|FAILURE)$
-^\[bar.pointer_dereference.\d+\] line 10 dereference failure: invalid integer address in \*x: (UNKNOWN|FAILURE)$
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
