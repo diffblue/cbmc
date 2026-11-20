@@ -1,0 +1,10 @@
+CORE smt-backend no-new-smt
+main.c
+--z3 --fpa --trace
+^EXIT=10$
+^SIGNAL=0$
+^  x=-0\.0f
+^  y=-0\.0 
+^VERIFICATION FAILED$
+--
+^warning: ignoring
