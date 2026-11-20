@@ -34,6 +34,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_program2code.h"
 
+#include <algorithm>
+
 static std::string clean_identifier(const irep_idt &id)
 {
   std::string result;
@@ -620,6 +622,21 @@ void dump_ct::convert_compound(
           ? ns.follow_tag(to_struct_or_union_tag_type(comp.type()))
           : comp.type();
       comp_type_to_use.remove(ID_tag);
+      // The padding components are not part of the source program (and are
+      // of a type that a compiler does not accept): the compiler adds the same
+      // padding when it compiles the output.
+      if(
+        comp_type_to_use.id() == ID_struct || comp_type_to_use.id() == ID_union)
+      {
+        auto &components = to_struct_union_type(comp_type_to_use).components();
+        components.erase(
+          std::remove_if(
+            components.begin(),
+            components.end(),
+            [](const struct_union_typet::componentt &c)
+            { return c.get_is_padding(); }),
+          components.end());
+      }
       if(
         recursive && (comp_type_to_use.id() == ID_struct ||
                       comp_type_to_use.id() == ID_union))
