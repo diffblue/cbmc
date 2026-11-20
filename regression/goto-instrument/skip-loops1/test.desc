@@ -1,0 +1,13 @@
+CORE
+main.c
+--skip-loops main.0
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line 6 the loop runs three times: FAILURE$
+^\[main\.assertion\.2\] line 7 the loop is skipped: SUCCESS$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+--skip-loops main.0 adds a jump that skips the loop, which therefore does not
+change x.
