@@ -344,6 +344,61 @@ TEST_CASE("Simplify cast of a pointer constant to an integer", "[core][util]")
   }
 }
 
+TEST_CASE(
+  "Simplify equality of a pointer constant and an integer cast to a pointer",
+  "[core][util]")
+{
+  config.ansi_c.set_LP64();
+  const namespacet &ns = empty_namespace;
+  const pointer_typet pointer = pointer_type(signed_int_type());
+  const std::size_t width = pointer.get_width();
+  const unsignedbv_typet integer{width};
+  const constant_exprt constant{integer2bvrep(0x1234, width), pointer};
+
+  SECTION("A pointer converted to an integer and back")
+  {
+    // simplify_typecast folds (uintN)c to the integer constant 0x1234
+    const typecast_exprt round_trip{typecast_exprt{constant, integer}, pointer};
+    REQUIRE(simplify_expr(equal_exprt{round_trip, constant}, ns) == true);
+    REQUIRE(simplify_expr(notequal_exprt{round_trip, constant}, ns) == false);
+    REQUIRE(simplify_expr(equal_exprt{constant, round_trip}, ns) == true);
+  }
+
+  SECTION("Another integer address")
+  {
+    const typecast_exprt other{from_integer(0x1235, integer), pointer};
+    REQUIRE(simplify_expr(equal_exprt{other, constant}, ns) == false);
+  }
+
+  SECTION("A non-constant integer")
+  {
+    for(const typet &type :
+        {typet{integer}, typet{signedbv_typet{width}}, typet{bv_typet{width}}})
+    {
+      const symbol_exprt x{"x", type};
+      const exprt simp =
+        simplify_expr(equal_exprt{typecast_exprt{x, pointer}, constant}, ns);
+      REQUIRE(
+        simp == equal_exprt{x, constant_exprt{constant.get_value(), type}});
+    }
+  }
+
+  SECTION("An integer of a different width")
+  {
+    const symbol_exprt x{"x", unsignedbv_typet{width / 2}};
+    const equal_exprt equal{typecast_exprt{x, pointer}, constant};
+    REQUIRE(simplify_expr(equal, ns) == equal);
+  }
+
+  SECTION("A pointer constant that does not hold an integer address")
+  {
+    const symbol_exprt x{"x", integer};
+    const equal_exprt equal{
+      typecast_exprt{x, pointer}, constant_exprt{"INVALID", pointer}};
+    REQUIRE(simplify_expr(equal, ns) == equal);
+  }
+}
+
 TEST_CASE("simplify_expr boolean expressions", "[core][util]")
 {
   const namespacet &ns = empty_namespace;

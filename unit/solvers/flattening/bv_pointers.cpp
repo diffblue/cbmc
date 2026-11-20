@@ -58,6 +58,11 @@ TEST_CASE(
          typet{bv_typet{width}}})
     {
       require_simplification_agrees(typecast_exprt{constant, type});
+
+      // (T *)x == c with an integer x of the same width
+      const symbol_exprt x{"x", type};
+      require_simplification_agrees(
+        equal_exprt{typecast_exprt{x, pointer}, constant});
     }
   }
 }

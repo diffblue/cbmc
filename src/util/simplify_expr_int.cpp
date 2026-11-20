@@ -1870,6 +1870,28 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_rhs_is_constant(
         }
       }
     }
+    else if(
+      is_integer_address_constant(op1_constant) &&
+      expr.op0().id() == ID_typecast)
+    {
+      // (T *)x == c -> x == k, with c a pointer constant that holds an integer
+      // address, x an integer of the same width, and k the integer with c's
+      // bits: as for the casts in the other direction (see simplify_typecast),
+      // all back-ends encode c by its value bits and the cast as the identity.
+      // Without this, a pointer that is converted to an integer and back is no
+      // longer found equal to itself once simplify_typecast has folded the
+      // integer to a constant.
+      const exprt &op = to_typecast_expr(expr.op0()).op();
+      if(
+        (op.type().id() == ID_unsignedbv || op.type().id() == ID_signedbv ||
+         op.type().id() == ID_bv) &&
+        to_bitvector_type(op.type()).get_width() ==
+          to_pointer_type(expr.op1().type()).get_width())
+      {
+        return changed(simplify_inequality(equal_exprt{
+          op, constant_exprt{op1_constant.get_value(), op.type()}}));
+      }
+    }
 
     // all we are doing with pointers
     return unchanged(expr);
