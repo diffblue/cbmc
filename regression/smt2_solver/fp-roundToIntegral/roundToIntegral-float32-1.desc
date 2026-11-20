@@ -1,0 +1,8 @@
+CORE
+roundToIntegral-float32-1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^unsat$
+--
+roundToIntegral RTZ 3.5f == 3.0f on standard Float32.

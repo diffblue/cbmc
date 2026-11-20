@@ -1,0 +1,10 @@
+; Z3#5284: roundToIntegral on non-standard sort differs from input
+(set-logic QF_FP)
+(declare-fun X () (_ FloatingPoint 2 6))
+(declare-fun Y () (_ FloatingPoint 2 6))
+(assert (= X (fp.roundToIntegral RTZ Y)))
+(assert (not (fp.isNaN Y)))
+(assert (not (fp.isInfinite Y)))
+(assert (not (fp.isZero Y)))
+(assert (not (= X Y)))
+(check-sat)

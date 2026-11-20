@@ -1,0 +1,8 @@
+CORE
+nan-eq-uf1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^unsat$
+--
+Based on Z3#6728: NaN equality must be preserved through uninterpreted functions.

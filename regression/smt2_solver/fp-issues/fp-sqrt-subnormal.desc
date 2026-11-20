@@ -1,0 +1,10 @@
+CORE
+fp-sqrt-subnormal.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^unsat$
+--
+^\(error
+--
+fp.sqrt of the subnormal 4 * 2^-149 is the normal number 0x1AB504F3.

@@ -1,6 +1,6 @@
-KNOWNBUG
+CORE
 main.c
---pointer-check --bounds-check
+--float-overflow-check --nan-check
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

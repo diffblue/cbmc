@@ -1,0 +1,8 @@
+CORE
+cvc5-12371-to-fp-real-inf.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+--
+CVC5#12371: infinity literal predicates

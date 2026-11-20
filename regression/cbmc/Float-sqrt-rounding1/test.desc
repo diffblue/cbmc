@@ -1,0 +1,10 @@
+CORE
+main.c
+--floatbv --no-built-in-assertions
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+sqrtf(2.0f) under FE_TOWARDZERO, FE_TONEAREST and FE_UPWARD.

@@ -3324,11 +3324,34 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
+    // The rounding mode is an int, as declared in cprover_builtin_headers.h.
+    // The floating-point argument is not converted, as these built-ins are
+    // also used for formats other than float, double, and long double.
+    implicit_typecast(expr.arguments()[1], signed_int_type());
+
     auto round_to_integral_expr =
       floatbv_round_to_integral_exprt{expr.arguments()[0], expr.arguments()[1]};
     round_to_integral_expr.add_source_location() = source_location;
 
     return std::move(round_to_integral_expr);
+  }
+  else if(
+    identifier == CPROVER_PREFIX "sqrtf" ||
+    identifier == CPROVER_PREFIX "sqrtd" ||
+    identifier == CPROVER_PREFIX "sqrtld")
+  {
+    if(expr.arguments().size() != 2)
+    {
+      error().source_location = f_op.source_location();
+      error() << identifier << " expects two arguments" << eom;
+      throw 0;
+    }
+
+    auto sqrt_expr =
+      floatbv_sqrt_exprt{expr.arguments()[0], expr.arguments()[1]};
+    sqrt_expr.add_source_location() = source_location;
+
+    return std::move(sqrt_expr);
   }
   else if(
     identifier == CPROVER_PREFIX "abs" || identifier == CPROVER_PREFIX "labs" ||
@@ -3355,7 +3378,8 @@ exprt c_typecheck_baset::do_special_functions(
   else if(
     identifier == CPROVER_PREFIX "fmod" ||
     identifier == CPROVER_PREFIX "fmodf" ||
-    identifier == CPROVER_PREFIX "fmodl")
+    identifier == CPROVER_PREFIX "fmodl" ||
+    identifier == CPROVER_PREFIX "fmodf16")
   {
     if(expr.arguments().size() != 2)
     {
@@ -3379,7 +3403,8 @@ exprt c_typecheck_baset::do_special_functions(
   else if(
     identifier == CPROVER_PREFIX "remainder" ||
     identifier == CPROVER_PREFIX "remainderf" ||
-    identifier == CPROVER_PREFIX "remainderl")
+    identifier == CPROVER_PREFIX "remainderl" ||
+    identifier == CPROVER_PREFIX "remainderf16")
   {
     if(expr.arguments().size() != 2)
     {
@@ -3402,7 +3427,8 @@ exprt c_typecheck_baset::do_special_functions(
   }
   else if(
     identifier == CPROVER_PREFIX "fma" || identifier == CPROVER_PREFIX "fmaf" ||
-    identifier == CPROVER_PREFIX "fmal")
+    identifier == CPROVER_PREFIX "fmal" ||
+    identifier == CPROVER_PREFIX "fmaf16")
   {
     if(expr.arguments().size() != 3)
     {

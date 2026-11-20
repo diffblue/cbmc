@@ -434,6 +434,11 @@ public:
   // Rounds according to the configured rounding mode
   ieee_floatt round_to_integral() const;
 
+  /// IEEE 754 squareRoot: the square root, rounded according to the
+  /// configured rounding mode. The result is NaN for NaN and for negative
+  /// arguments other than -0, and the square root of -0 is -0.
+  ieee_floatt sqrt() const;
+
   // the usual operators
   ieee_floatt &operator/=(const ieee_floatt &other);
   ieee_floatt &operator*=(const ieee_floatt &other);

@@ -824,237 +824,36 @@ __CPROVER_hide:;
 
 /* IEEE 754 squareRoot, which is correctly rounded (C11 F.10.4.5). */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
-#ifndef __CPROVER_FENV_H_INCLUDED
-#include <fenv.h>
-#define __CPROVER_FENV_H_INCLUDED
-#endif
-
-float nextUpf(float f);
-
-float __VERIFIER_nondet_float(void);
-
 extern int __CPROVER_rounding_mode;
 
-float sqrtf(float f)
+float sqrtf(float x)
 {
 __CPROVER_hide:;
-
-  if(f < 0.0f)
-#pragma CPROVER check push
-#pragma CPROVER check disable "float-div-by-zero"
-    return 0.0f / 0.0f; // NaN
-#pragma CPROVER check pop
-  else if(
-    __CPROVER_isinff(f) || // +Inf only
-    f == 0.0f ||           // Includes -0
-    __CPROVER_isnanf(f))
-  {
-    return f;
-  }
-  else
-  {
-    // The square root of any positive (normal or subnormal) number is
-    // normal. Pick the normal number lower such that
-    // lower <= sqrt(f) < upper, where upper is the next number.
-    float lower = __VERIFIER_nondet_float();
-    __CPROVER_assume(lower > 0.0f);
-    __CPROVER_assume(__CPROVER_isnormalf(lower));
-    float upper = nextUpf(lower);
-
-    // Compare squares exactly: fma(a, b, -f) computes a * b - f with a single
-    // rounding, and rounding upward (downward) preserves whether the exact
-    // result is positive (non-negative). Note that upper may be +Inf.
-    const int rounding_mode = fegetround();
-    const int saved_rounding_mode = __CPROVER_rounding_mode;
-    __CPROVER_rounding_mode = 2; // upward
-    __CPROVER_assume(__CPROVER_fmaf(lower, lower, -f) <= 0.0f);
-    __CPROVER_assume(__CPROVER_fmaf(upper, upper, -f) > 0.0f);
-    __CPROVER_rounding_mode = 1; // downward
-    // Let lower = M * q and upper = (M + 1) * q, with q the distance between
-    // them. Then f is an integer multiple of q * q. When rounding to nearest,
-    // lower is the result iff f < (M + 1/2)^2 * q^2, i.e., iff
-    // f <= M * (M + 1) * q^2 = lower * upper. There are no ties.
-    const int lower_is_nearer = __CPROVER_fmaf(lower, upper, -f) >= 0.0f;
-    // lower * lower == f (as lower * lower <= f holds)
-    const int is_exact = __CPROVER_fmaf(lower, lower, -f) >= 0.0f;
-    __CPROVER_rounding_mode = saved_rounding_mode;
-
-    switch(rounding_mode)
-    {
-    case FE_TONEAREST:
-      return lower_is_nearer ? lower : upper;
-    case FE_UPWARD:
-      return is_exact ? lower : upper;
-    case FE_DOWNWARD: // Fall through
-    case FE_TOWARDZERO:
-      return lower;
-    default:;
-      return __VERIFIER_nondet_float();
-    }
-  }
+  return __CPROVER_sqrtf(x, __CPROVER_rounding_mode);
 }
 
 /* FUNCTION: sqrt */
 
 /* See sqrtf. */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
-#ifndef __CPROVER_FENV_H_INCLUDED
-#include <fenv.h>
-#define __CPROVER_FENV_H_INCLUDED
-#endif
-
-double nextUp(double f);
-
-double __VERIFIER_nondet_double(void);
-
 extern int __CPROVER_rounding_mode;
 
-double sqrt(double f)
+double sqrt(double x)
 {
 __CPROVER_hide:;
-
-  if(f < 0.0)
-#pragma CPROVER check push
-#pragma CPROVER check disable "float-div-by-zero"
-    return 0.0 / 0.0; // NaN
-#pragma CPROVER check pop
-  else if(
-    __CPROVER_isinfd(f) || // +Inf only
-    f == 0.0 ||            // Includes -0
-    __CPROVER_isnand(f))
-  {
-    return f;
-  }
-  else
-  {
-    // The square root of any positive (normal or subnormal) number is
-    // normal. Pick the normal number lower such that
-    // lower <= sqrt(f) < upper, where upper is the next number.
-    double lower = __VERIFIER_nondet_double();
-    __CPROVER_assume(lower > 0.0);
-    __CPROVER_assume(__CPROVER_isnormald(lower));
-    double upper = nextUp(lower);
-
-    // Compare squares exactly: fma(a, b, -f) computes a * b - f with a single
-    // rounding, and rounding upward (downward) preserves whether the exact
-    // result is positive (non-negative). Note that upper may be +Inf.
-    const int rounding_mode = fegetround();
-    const int saved_rounding_mode = __CPROVER_rounding_mode;
-    __CPROVER_rounding_mode = 2; // upward
-    __CPROVER_assume(__CPROVER_fma(lower, lower, -f) <= 0.0);
-    __CPROVER_assume(__CPROVER_fma(upper, upper, -f) > 0.0);
-    __CPROVER_rounding_mode = 1; // downward
-    // Let lower = M * q and upper = (M + 1) * q, with q the distance between
-    // them. Then f is an integer multiple of q * q. When rounding to nearest,
-    // lower is the result iff f < (M + 1/2)^2 * q^2, i.e., iff
-    // f <= M * (M + 1) * q^2 = lower * upper. There are no ties.
-    const int lower_is_nearer = __CPROVER_fma(lower, upper, -f) >= 0.0;
-    // lower * lower == f (as lower * lower <= f holds)
-    const int is_exact = __CPROVER_fma(lower, lower, -f) >= 0.0;
-    __CPROVER_rounding_mode = saved_rounding_mode;
-
-    switch(rounding_mode)
-    {
-    case FE_TONEAREST:
-      return lower_is_nearer ? lower : upper;
-    case FE_UPWARD:
-      return is_exact ? lower : upper;
-    case FE_DOWNWARD: // Fall through
-    case FE_TOWARDZERO:
-      return lower;
-    default:;
-      return __VERIFIER_nondet_double();
-    }
-  }
+  return __CPROVER_sqrtd(x, __CPROVER_rounding_mode);
 }
 
 /* FUNCTION: sqrtl */
 
 /* See sqrtf. */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
-#ifndef __CPROVER_FENV_H_INCLUDED
-#include <fenv.h>
-#define __CPROVER_FENV_H_INCLUDED
-#endif
-
-long double nextUpl(long double f);
-
-long double __VERIFIER_nondet_long_double(void);
-
 extern int __CPROVER_rounding_mode;
 
-long double sqrtl(long double f)
+long double sqrtl(long double x)
 {
 __CPROVER_hide:;
-
-  if(f < 0.0l)
-#pragma CPROVER check push
-#pragma CPROVER check disable "float-div-by-zero"
-    return 0.0l / 0.0l; // NaN
-#pragma CPROVER check pop
-  else if(
-    __CPROVER_isinfld(f) || // +Inf only
-    f == 0.0l ||            // Includes -0
-    __CPROVER_isnanld(f))
-  {
-    return f;
-  }
-  else
-  {
-    // The square root of any positive (normal or subnormal) number is
-    // normal. Pick the normal number lower such that
-    // lower <= sqrt(f) < upper, where upper is the next number.
-    long double lower = __VERIFIER_nondet_long_double();
-    __CPROVER_assume(lower > 0.0l);
-    __CPROVER_assume(__CPROVER_isnormalld(lower));
-    long double upper = nextUpl(lower);
-
-    // Compare squares exactly: fma(a, b, -f) computes a * b - f with a single
-    // rounding, and rounding upward (downward) preserves whether the exact
-    // result is positive (non-negative). Note that upper may be +Inf.
-    const int rounding_mode = fegetround();
-    const int saved_rounding_mode = __CPROVER_rounding_mode;
-    __CPROVER_rounding_mode = 2; // upward
-    __CPROVER_assume(__CPROVER_fmal(lower, lower, -f) <= 0.0l);
-    __CPROVER_assume(__CPROVER_fmal(upper, upper, -f) > 0.0l);
-    __CPROVER_rounding_mode = 1; // downward
-    // Let lower = M * q and upper = (M + 1) * q, with q the distance between
-    // them. Then f is an integer multiple of q * q. When rounding to nearest,
-    // lower is the result iff f < (M + 1/2)^2 * q^2, i.e., iff
-    // f <= M * (M + 1) * q^2 = lower * upper. There are no ties.
-    const int lower_is_nearer = __CPROVER_fmal(lower, upper, -f) >= 0.0l;
-    // lower * lower == f (as lower * lower <= f holds)
-    const int is_exact = __CPROVER_fmal(lower, lower, -f) >= 0.0l;
-    __CPROVER_rounding_mode = saved_rounding_mode;
-
-    switch(rounding_mode)
-    {
-    case FE_TONEAREST:
-      return lower_is_nearer ? lower : upper;
-    case FE_UPWARD:
-      return is_exact ? lower : upper;
-    case FE_DOWNWARD: // Fall through
-    case FE_TOWARDZERO:
-      return lower;
-    default:;
-      return __VERIFIER_nondet_long_double();
-    }
-  }
+  return __CPROVER_sqrtld(x, __CPROVER_rounding_mode);
 }
 
 /* ISO 9899:2011
@@ -1874,55 +1673,6 @@ long double modfl(long double x, long double *iptr)
   return (x - *iptr);
 }
 
-
-
-/* FUNCTION: __sort_of_CPROVER_remainder */
-// TODO : Should be a real __CPROVER function to convert to SMT-LIB
-
-double __sort_of_CPROVER_remainder (int rounding_mode, double x, double y)
-{
-  if (x == 0.0 || __CPROVER_isinfd(y))
-    return x;
-
-  // Extended precision helps... a bit...
-  long double div = x/y;
-  long double n = __CPROVER_round_to_integrald(rounding_mode, div);
-  long double res = (-y * n) + x;   // TODO : FMA would be an improvement
-  return res;
-}
-
-/* FUNCTION: __sort_of_CPROVER_remainderf */
-// TODO : Should be a real __CPROVER function to convert to SMT-LIB
-
-float __sort_of_CPROVER_remainderf (int rounding_mode, float x, float y)
-{
-  if (x == 0.0f || __CPROVER_isinff(y))
-    return x;
-
-  // Extended precision helps... a bit...
-  long double div = x/y;
-  long double n = __CPROVER_round_to_integralf(rounding_mode, div);
-  long double res = (-y * n) + x;   // TODO : FMA would be an improvement
-  return res;
-}
-
-/* FUNCTION: __sort_of_CPROVER_remainderl */
-// TODO : Should be a real __CPROVER function to convert to SMT-LIB
-
-long double __sort_of_CPROVER_remainderl (int rounding_mode, long double x, long double y)
-{
-  if (x == 0.0 || __CPROVER_isinfld(y))
-    return x;
-
-  // Extended precision helps... a bit...
-  long double div = x/y;
-  long double n = __CPROVER_round_to_integralld(rounding_mode, div);
-  long double res = (-y * n) + x;   // TODO : FMA would be an improvement
-  return res;
-}
-
-
-
 /* ISO 9899:2011
  *
  * The fmod functions return the value x - ny, for some
@@ -2003,15 +1753,10 @@ long double fmodl(long double x, long double y)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-#ifndef __CPROVER_FENV_H_INCLUDED
-#include <fenv.h>
-#define __CPROVER_FENV_H_INCLUDED
-#endif
-
-double __sort_of_CPROVER_remainder (int rounding_mode, double x, double y);
-
-double remainder(double x, double y) { return __sort_of_CPROVER_remainder(FE_TONEAREST, x, y); }
-
+double remainder(double x, double y)
+{
+  return __CPROVER_remainder(x, y);
+}
 
 /* FUNCTION: remainderf */
 
@@ -2020,15 +1765,10 @@ double remainder(double x, double y) { return __sort_of_CPROVER_remainder(FE_TON
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-#ifndef __CPROVER_FENV_H_INCLUDED
-#include <fenv.h>
-#define __CPROVER_FENV_H_INCLUDED
-#endif
-
-float __sort_of_CPROVER_remainderf (int rounding_mode, float x, float y);
-
-float remainderf(float x, float y) { return __sort_of_CPROVER_remainderf(FE_TONEAREST, x, y); }
-
+float remainderf(float x, float y)
+{
+  return __CPROVER_remainderf(x, y);
+}
 
 /* FUNCTION: remainderl */
 
@@ -2037,17 +1777,10 @@ float remainderf(float x, float y) { return __sort_of_CPROVER_remainderf(FE_TONE
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-#ifndef __CPROVER_FENV_H_INCLUDED
-#include <fenv.h>
-#define __CPROVER_FENV_H_INCLUDED
-#endif
-
-long double __sort_of_CPROVER_remainderl (int rounding_mode, long double x, long double y);
-
-long double remainderl(long double x, long double y) { return __sort_of_CPROVER_remainderl(FE_TONEAREST, x, y); }
-
-
-
+long double remainderl(long double x, long double y)
+{
+  return __CPROVER_remainderl(x, y);
+}
 
 /* ISO 9899:2011
  * The copysign functions produce a value with the magnitude of x and

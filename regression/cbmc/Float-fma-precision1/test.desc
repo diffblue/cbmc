@@ -1,4 +1,4 @@
-CORE no-new-smt
+CORE
 main.c
 --floatbv --no-built-in-assertions
 ^EXIT=0$

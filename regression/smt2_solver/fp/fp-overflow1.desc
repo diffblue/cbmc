@@ -1,0 +1,9 @@
+CORE
+fp-overflow1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+--
+Based on Z3#4673: Overflow should produce infinity, not saturate.
+x > 0 and (x * 2) * 0.5 > x is satisfiable (x = FLT_MAX).

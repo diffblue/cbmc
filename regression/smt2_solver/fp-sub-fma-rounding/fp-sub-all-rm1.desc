@@ -1,0 +1,9 @@
+CORE
+fp-sub-all-rm1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+--
+Based on Z3#7162: fp.sub with all rounding modes on Float64.
+IEEE 754: x - x == +0 for RNE/RNA/RTP/RTZ, -0 for RTN.
