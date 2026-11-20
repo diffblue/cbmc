@@ -61,7 +61,7 @@ std::wstring widen(const char *s)
 #endif
 }
 
-std::string narrow(const std::wstring &s)
+std::string narrow(std::wstring_view s)
 {
 #ifdef _WIN32
 
@@ -84,7 +84,7 @@ std::string narrow(const std::wstring &s)
 #endif
 }
 
-std::wstring widen(const std::string &s)
+std::wstring widen(std::string_view s)
 {
 #ifdef _WIN32
 
@@ -188,7 +188,7 @@ static void utf16_append_code(unsigned int code, std::wstring &result)
 /// \par parameters: String in UTF-8 format
 /// \return String in UTF-16 format. The encoding follows the endianness of the
 ///   architecture iff swap_bytes is true.
-std::wstring utf8_to_utf16_native_endian(const std::string &in)
+std::wstring utf8_to_utf16_native_endian(std::string_view in)
 {
   std::wstring result;
   result.reserve(in.size());
@@ -202,7 +202,7 @@ std::wstring utf8_to_utf16_native_endian(const std::string &in)
 /// Convert UTF8-encoded string to UTF-32 with architecture-native endianness.
 /// \par parameters: String in UTF-8 format
 /// \return String in UTF-32 format.
-std::u32string utf8_to_utf32(const std::string &utf8_str)
+std::u32string utf8_to_utf32(std::string_view utf8_str)
 {
   std::u32string result;
   result.reserve(utf8_str.size());
@@ -347,7 +347,7 @@ std::string utf16_native_endian_to_java(const char16_t ch)
 /// \param in: String in UTF-16 (native endianness) format
 /// \return Valid Java string literal in US-ASCII format, with \\uxxxx escapes
 /// for other characters
-std::string utf16_native_endian_to_java_string(const std::wstring &in)
+std::string utf16_native_endian_to_java_string(std::wstring_view in)
 {
   std::ostringstream result;
   const std::locale loc;
