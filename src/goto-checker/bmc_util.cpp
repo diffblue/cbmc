@@ -385,14 +385,22 @@ void run_property_decider(
     << property_decider.get_decision_procedure().decision_procedure_text()
     << messaget::eom;
 
-  property_decider.add_constraint_from_goals(
-    [&properties](const irep_idt &property_id) {
-      return is_property_to_check(properties.at(property_id).status);
-    });
+  const bool isolate_properties =
+    property_decider.get_options().get_bool_option("isolate-properties");
+
+  if(!isolate_properties)
+  {
+    property_decider.add_constraint_from_goals(
+      [&properties](const irep_idt &property_id)
+      { return is_property_to_check(properties.at(property_id).status); });
+  }
 
   auto const sat_solver_start = std::chrono::steady_clock::now();
 
-  decision_proceduret::resultt dec_result = property_decider.solve();
+  decision_proceduret::resultt dec_result =
+    isolate_properties ? property_decider.solve_goals_individually(
+                           properties, result.updated_properties, set_pass)
+                       : property_decider.solve();
 
   auto const sat_solver_stop = std::chrono::steady_clock::now();
   std::chrono::duration<double> sat_solver_runtime =
@@ -400,8 +408,11 @@ void run_property_decider(
   log.statistics() << "Runtime Solver: " << sat_solver_runtime.count() << "s"
                    << messaget::eom;
 
-  property_decider.update_properties_status_from_goals(
-    properties, result.updated_properties, dec_result, set_pass);
+  if(!isolate_properties)
+  {
+    property_decider.update_properties_status_from_goals(
+      properties, result.updated_properties, dec_result, set_pass);
+  }
 
   auto solver_stop = std::chrono::steady_clock::now();
   solver_runtime += std::chrono::duration<double>(solver_stop - solver_start);

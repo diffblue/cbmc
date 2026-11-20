@@ -44,6 +44,24 @@ public:
   /// Calls solve() on the solver instance
   decision_proceduret::resultt solve();
 
+  /// Decide the properties that remain to be checked one at a time, each in
+  /// a solver call of its own under the assumption that its goal holds,
+  /// instead of solving the disjunction of all goals. Stops at the first
+  /// property that fails, so that the current model is a counterexample for
+  /// it (and for any other property whose goal holds in that model), which
+  /// these properties are then marked as failing in.
+  /// \param [inout] properties: The status is updated in this data structure
+  /// \param [inout] updated_properties: The set of property IDs of
+  ///   updated properties
+  /// \param set_pass: If true then mark a property as passing if the solver
+  ///   returns UNSATISFIABLE for it
+  /// \return D_SATISFIABLE if a failing property was found, else
+  ///   D_UNSATISFIABLE
+  decision_proceduret::resultt solve_goals_individually(
+    propertiest &properties,
+    std::unordered_set<irep_idt> &updated_properties,
+    bool set_pass);
+
   /// Returns the solver instance
   stack_decision_proceduret &get_decision_procedure() const;
 
@@ -52,6 +70,12 @@ public:
 
   /// Return the equation associated with this instance
   symex_target_equationt &get_equation() const;
+
+  /// Return the options this instance was created with
+  const optionst &get_options() const
+  {
+    return options;
+  }
 
   /// Update the property status from the truth value of the goal variable
   /// \param [inout] properties: The status is updated in this data structure

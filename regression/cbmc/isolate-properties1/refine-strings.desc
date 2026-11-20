@@ -1,0 +1,8 @@
+CORE no-new-smt
+main.c
+--isolate-properties --refine-strings
+^EXIT=1$
+^SIGNAL=0$
+--isolate-properties is not supported with string refinement
+--
+^VERIFICATION

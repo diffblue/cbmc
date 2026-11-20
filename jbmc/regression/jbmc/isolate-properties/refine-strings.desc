@@ -1,0 +1,11 @@
+CORE
+Test
+-cp target/classes --function Test.check --isolate-properties
+^EXIT=1$
+^SIGNAL=0$
+--isolate-properties is not supported with string refinement
+--
+^VERIFICATION
+--
+The string refinement, which is the default, does not support solving under
+assumptions.

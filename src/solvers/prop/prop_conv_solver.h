@@ -107,6 +107,13 @@ public:
 protected:
   bool post_processing_done = false;
 
+  /// Run \ref finish_eager_conversion in the root context. The constraints
+  /// that it adds, such as the functional consistency of uninterpreted
+  /// functions or array axioms, hold irrespective of any context, and must
+  /// not be made conditional on the assumptions that happen to be pushed
+  /// when the decision procedure is first run.
+  void finish_eager_conversion_in_root_context();
+
   /// Get a _boolean_ value from the model if the formula is satisfiable.
   /// If the argument is not a boolean expression from the formula,
   /// {} is returned.

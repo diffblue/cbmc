@@ -1,0 +1,8 @@
+CORE
+main.c
+--isolate-properties --incremental-smt2-solver z3
+^EXIT=1$
+^SIGNAL=0$
+--isolate-properties is not supported with --incremental-smt2-solver
+--
+^VERIFICATION

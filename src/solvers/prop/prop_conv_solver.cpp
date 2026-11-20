@@ -451,7 +451,7 @@ prop_conv_solvert::dec_solve(const exprt &assumption)
       const auto post_process_start = std::chrono::steady_clock::now();
 
       log.progress() << "Post-processing" << messaget::eom;
-      finish_eager_conversion();
+      finish_eager_conversion_in_root_context();
       post_processing_done = true;
 
       const auto post_process_stop = std::chrono::steady_clock::now();
@@ -545,6 +545,19 @@ void prop_conv_solvert::set_to(const exprt &expr, bool value)
     add_constraints_to_prop(
       or_exprt(literal_exprt(!assumption_stack.back()), expr), value);
   }
+}
+
+void prop_conv_solvert::finish_eager_conversion_in_root_context()
+{
+  std::vector<literalt> saved_assumption_stack;
+  std::vector<size_t> saved_context_size_stack;
+  saved_assumption_stack.swap(assumption_stack);
+  saved_context_size_stack.swap(context_size_stack);
+
+  finish_eager_conversion();
+
+  assumption_stack.swap(saved_assumption_stack);
+  context_size_stack.swap(saved_context_size_stack);
 }
 
 void prop_conv_solvert::push(const std::vector<exprt> &assumptions)
