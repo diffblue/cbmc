@@ -1,4 +1,4 @@
-CORE broken-smt-backend no-new-smt
+CORE no-new-smt
 main.c
 --smt2 --fpa --outfile -
 ^EXIT=0$
@@ -12,6 +12,7 @@ when the program reinterprets the bits of a non-constant float through a
 union.  The fix emits the same bvfromfloat round-trip (declare a fresh BV,
 assert to_fp(bv) == float) that find_symbols uses for explicit typecasts.
 
-Tagged broken-smt-backend/no-new-smt because this test explicitly controls
-the output format (--smt2 --fpa --outfile -) and must not be re-run with a
-different solver backend.
+Tagged no-new-smt because this test explicitly controls the output format
+(--smt2 --fpa --outfile -). It is not tagged broken-smt-backend as it passes
+when re-run with any of the other SMT back-ends, whereas CI expects tests with
+that tag to fail with --cprover-smt2.
