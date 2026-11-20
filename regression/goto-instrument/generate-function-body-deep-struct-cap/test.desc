@@ -1,0 +1,19 @@
+CORE
+main.c
+--generate-function-body make_l1 --generate-function-body-options havoc --max-dynamic-object-instances 10
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+nondet initialisation reached the limit of 10 dynamic objects
+make_l1::malloc_site\$8
+--
+^warning: ignoring
+^\*\*\*\* WARNING: no body for function
+make_l1::malloc_site\$9
+--
+--max-dynamic-object-instances limits the number of objects allocated when
+generating a havocking body for a function returning a pointer into a deep
+struct hierarchy.  The hierarchy allocates 341 objects without a limit; with a
+limit of 10, only 10 allocation sites are emitted, so make_l1::malloc_site$8 is
+the last one present and make_l1::malloc_site$9 is absent.  The indices depend
+on the object factory's numbering of fresh symbols.

@@ -14,6 +14,7 @@ Author: Diffblue Ltd.
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/fresh_symbol.h>
+#include <util/message.h>
 #include <util/namespace.h>
 #include <util/nondet_bool.h>
 #include <util/pointer_expr.h>
@@ -79,6 +80,24 @@ void symbol_factoryt::gen_nondet_init(
         return;
       }
     }
+
+    // Limit the total number of dynamic objects for a single nondet-init
+    // root: the depth limit above only applies when the same struct tag
+    // recurs on the pointer chain, but an object tree that branches through
+    // many distinct struct types grows exponentially before that.  Once the
+    // limit is reached, initialise the pointer to NULL, even below
+    // min_null_tree_depth.  This under-approximation is reported by
+    // warn_if_limit_reached.
+    if(
+      dynamic_object_instance_count >=
+      object_factory_params.max_dynamic_object_instances)
+    {
+      dynamic_object_limit_reached = true;
+      assignments.add(
+        code_frontend_assignt{expr, null_pointer_exprt{pointer_type}, loc});
+      return;
+    }
+    ++dynamic_object_instance_count;
 
     code_blockt non_null_inst;
 
@@ -187,6 +206,21 @@ void symbol_factoryt::gen_nondet_array_init(
   }
 }
 
+void symbol_factoryt::warn_if_limit_reached(
+  message_handlert &message_handler) const
+{
+  if(!dynamic_object_limit_reached)
+    return;
+
+  messaget log{message_handler};
+  log.warning().source_location = loc;
+  log.warning() << "nondet initialisation reached the limit of "
+                << object_factory_params.max_dynamic_object_instances
+                << " dynamic objects (--max-dynamic-object-instances); further "
+                   "pointers are null"
+                << messaget::eom;
+}
+
 /// Creates a symbol and generates code so that it can vary over all possible
 /// values for its type. For pointers this involves allocating symbols which it
 /// can point to.
@@ -199,6 +233,8 @@ void symbol_factoryt::gen_nondet_array_init(
 ///   factory
 /// \param lifetime: Lifetime of the allocated object (AUTOMATIC_LOCAL,
 ///   STATIC_GLOBAL, or DYNAMIC)
+/// \param message_handler: Used to warn if the object tree had to be
+///   truncated
 /// \return Returns the symbol_exprt for the symbol created
 symbol_exprt c_nondet_symbol_factory(
   code_blockt &init_code,
@@ -207,7 +243,8 @@ symbol_exprt c_nondet_symbol_factory(
   const typet &type,
   const source_locationt &loc,
   const c_object_factory_parameterst &object_factory_parameters,
-  const lifetimet lifetime)
+  const lifetimet lifetime,
+  message_handlert &message_handler)
 {
   const symbolt &main_symbol = get_fresh_aux_symbol(
     type,
@@ -234,6 +271,8 @@ symbol_exprt c_nondet_symbol_factory(
   init_code.append(assignments);
 
   state.mark_created_symbols_as_input(init_code);
+
+  state.warn_if_limit_reached(message_handler);
 
   return main_symbol_expr;
 }
