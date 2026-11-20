@@ -69,6 +69,11 @@ exprt integer_address(const exprt &pointer)
                    notequal_exprt(null_pointer, pointer));
 }
 
+exprt is_integer_address(const exprt &pointer)
+{
+  return unary_predicate_exprt(ID_is_integer_address, pointer);
+}
+
 exprt object_upper_bound(
   const exprt &pointer,
   const exprt &access_size)
