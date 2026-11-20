@@ -1,0 +1,14 @@
+CORE no-new-smt broken-smt-backend wide-pointer-encoding
+main.c
+--wide-pointer-encoding
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] .* assertion \(unsigned int\)\(-1 \* \(long\)n\) < 6: FAILURE$
+^\[main\.assertion\.2\] .* assertion \(unsigned int\)\(-1 \* \(long\)a\) < 6: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Issue #8161: with wide pointer encoding, pointer-derived integers
+have meaningful flat addresses, making arithmetic on them consistent
+with plain integer arithmetic. Both assertions fail.

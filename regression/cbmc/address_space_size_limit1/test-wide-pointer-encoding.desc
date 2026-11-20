@@ -1,0 +1,15 @@
+CORE thorough-paths no-new-smt broken-smt-backend wide-pointer-encoding
+test.c
+--wide-pointer-encoding --no-simplify --unwind 301 --object-bits 8 --no-malloc-may-fail
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^too many addressed objects
+--
+Issue #881: with the wide pointer encoding a pointer carries a full flat
+address rather than a packed object identifier, so the --object-bits
+limit no longer bounds the number of addressable objects. This program
+allocates 300 distinct objects under --object-bits 8; the standard
+encoding rejects it with "too many addressed objects" (EXIT=6, see
+test.desc), whereas the wide encoding verifies it successfully.
