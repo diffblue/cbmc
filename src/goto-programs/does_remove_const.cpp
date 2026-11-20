@@ -1,32 +1,33 @@
 /*******************************************************************\
 
-Module: Analyses
+Module: Goto Programs
 
 Author: Diffblue Ltd.
 
 \*******************************************************************/
 
 /// \file
-/// Analyses
+/// Goto Programs
 
 #include "does_remove_const.h"
 
-#include <goto-programs/goto_program.h>
-
 #include <util/pointer_expr.h>
+
+#include "goto_program.h"
 
 /// A naive analysis to look for casts that remove const-ness from pointers.
 /// \param goto_program: the goto program to check
 does_remove_constt::does_remove_constt(const goto_programt &goto_program)
   : goto_program(goto_program)
-{}
+{
+}
 
 /// A naive analysis to look for casts that remove const-ness from pointers.
 /// \return Returns true if the program contains a const-removing cast
 std::pair<bool, source_locationt> does_remove_constt::operator()() const
 {
   for(const goto_programt::instructiont &instruction :
-    goto_program.instructions)
+      goto_program.instructions)
   {
     if(!instruction.is_assign())
     {
@@ -60,12 +61,12 @@ std::pair<bool, source_locationt> does_remove_constt::operator()() const
 ///   ness is lost.
 bool does_remove_constt::does_expr_lose_const(const exprt &expr) const
 {
-  const typet &root_type=expr.type();
+  const typet &root_type = expr.type();
 
   // Look in each child that has the same type as the root
   for(const exprt &op : expr.operands())
   {
-    const typet &op_type=op.type();
+    const typet &op_type = op.type();
     if(op_type == root_type)
     {
       // Is this child more const-qualified than the root
@@ -112,9 +113,10 @@ bool does_remove_constt::does_expr_lose_const(const exprt &expr) const
 /// \return Returns true if a value of type source_type could be assigned into a
 ///   a value of target_type without losing const-correctness
 bool does_remove_constt::does_type_preserve_const_correctness(
-  const typet *target_type, const typet *source_type) const
+  const typet *target_type,
+  const typet *source_type) const
 {
-  while(target_type->id()==ID_pointer)
+  while(target_type->id() == ID_pointer)
   {
     PRECONDITION(source_type->id() == ID_pointer);
 
@@ -156,7 +158,8 @@ bool does_remove_constt::does_type_preserve_const_correctness(
 ///   const qualified
 /// \return Returns true if type_more_const is at least as const as type_compare
 bool does_remove_constt::is_type_at_least_as_const_as(
-  const typet &type_more_const, const typet &type_compare) const
+  const typet &type_more_const,
+  const typet &type_compare) const
 {
   return !type_compare.get_bool(ID_C_constant) ||
          type_more_const.get_bool(ID_C_constant);

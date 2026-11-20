@@ -12,15 +12,18 @@ Author: Diffblue Ltd.
 #include <util/c_types.h>
 #include <util/mathematical_types.h>
 
+#include <goto-programs/does_remove_const.h>
 #include <goto-programs/goto_program.h>
 
-#include <analyses/does_remove_const.h>
-#include <analyses/does_remove_const/does_remove_const_util.h>
 #include <ansi-c/c_qualifiers.h>
 #include <testing-utils/use_catch.h>
 
-SCENARIO("does_type_preserve_const_correctness",
-  "[core][analyses][does_remove_const][does_type_preserve_const_correctness]")
+#include "does_remove_const_util.h"
+
+SCENARIO(
+  "does_type_preserve_const_correctness",
+  "[core][goto-programs][does_remove_const]"
+  "[does_type_preserve_const_correctness]")
 {
   goto_programt program;
   does_remove_constt does_remove_const(program);
@@ -29,42 +32,42 @@ SCENARIO("does_type_preserve_const_correctness",
   GIVEN("Const and non-const primitive and pointers to primitives")
   {
     c_qualifierst const_qualifier;
-    const_qualifier.is_constant=true;
+    const_qualifier.is_constant = true;
 
     // const int
-    typet const_primitive_type=integer_typet();
+    typet const_primitive_type = integer_typet();
     const_qualifier.write(const_primitive_type);
 
     // int
-    typet non_const_primitive_type=integer_typet();
+    typet non_const_primitive_type = integer_typet();
 
     // pointer (can be reassigned)
     //   to int (value can be changed)
     // int *
-    typet pointer_to_int_type=pointer_type(non_const_primitive_type);
+    typet pointer_to_int_type = pointer_type(non_const_primitive_type);
 
     // const pointer (can't be reassigned)
     //   to int (value can be changed)
     // int * const
-    typet const_pointer_to_int_type=pointer_type(non_const_primitive_type);
+    typet const_pointer_to_int_type = pointer_type(non_const_primitive_type);
     const_qualifier.write(const_pointer_to_int_type);
 
     // pointer (can be reassigned)
     //   to const int (value can't be changed)
     // const int *
-    typet pointer_to_const_int_type=pointer_type(const_primitive_type);
+    typet pointer_to_const_int_type = pointer_type(const_primitive_type);
 
     // constant pointer (can't be reassigned)
     //   to const int (value can't be changed)
     // const int * const
-    typet const_pointer_to_const_int_type=pointer_type(const_primitive_type);
+    typet const_pointer_to_const_int_type = pointer_type(const_primitive_type);
     const_qualifier.write(const_pointer_to_const_int_type);
 
     WHEN("Comparing int to int")
     {
       THEN("The target type preserves the const-correctness of the source type")
       {
-        bool result=
+        bool result =
           does_remove_const_test.does_type_preserve_const_correctness(
             &non_const_primitive_type, &non_const_primitive_type);
         REQUIRE(result);
@@ -74,7 +77,7 @@ SCENARIO("does_type_preserve_const_correctness",
     {
       THEN("The target type preserves the const-correctness of the source type")
       {
-        bool result=
+        bool result =
           does_remove_const_test.does_type_preserve_const_correctness(
             &const_primitive_type, &non_const_primitive_type);
         REQUIRE(result);
@@ -84,7 +87,7 @@ SCENARIO("does_type_preserve_const_correctness",
     {
       THEN("The target type preserves the const-correctness of the source type")
       {
-        bool result=
+        bool result =
           does_remove_const_test.does_type_preserve_const_correctness(
             &non_const_primitive_type, &const_primitive_type);
         REQUIRE(result);
@@ -94,7 +97,7 @@ SCENARIO("does_type_preserve_const_correctness",
     {
       THEN("The target type preserves the const-correctness of the source type")
       {
-        bool result=
+        bool result =
           does_remove_const_test.does_type_preserve_const_correctness(
             &const_primitive_type, &const_primitive_type);
         REQUIRE(result);
@@ -104,7 +107,7 @@ SCENARIO("does_type_preserve_const_correctness",
     {
       THEN("The target type preserves the const-correctness of the source type")
       {
-        bool result=
+        bool result =
           does_remove_const_test.does_type_preserve_const_correctness(
             &pointer_to_int_type, &pointer_to_int_type);
         REQUIRE(result);
@@ -114,7 +117,7 @@ SCENARIO("does_type_preserve_const_correctness",
     {
       THEN("The target type preserves the const-correctness of the source type")
       {
-        bool result=
+        bool result =
           does_remove_const_test.does_type_preserve_const_correctness(
             &pointer_to_const_int_type, &pointer_to_int_type);
         REQUIRE(result);
@@ -124,7 +127,7 @@ SCENARIO("does_type_preserve_const_correctness",
     {
       THEN("The target type preserves the const-correctness of the source type")
       {
-        bool result=
+        bool result =
           does_remove_const_test.does_type_preserve_const_correctness(
             &const_pointer_to_int_type, &pointer_to_int_type);
         REQUIRE(result);
@@ -134,7 +137,7 @@ SCENARIO("does_type_preserve_const_correctness",
     {
       THEN("The target type preserves the const-correctness of the source type")
       {
-        bool result=
+        bool result =
           does_remove_const_test.does_type_preserve_const_correctness(
             &const_pointer_to_const_int_type, &pointer_to_int_type);
         REQUIRE(result);
@@ -144,7 +147,7 @@ SCENARIO("does_type_preserve_const_correctness",
     {
       THEN("The target type loses const-correctness of the source type")
       {
-        bool result=
+        bool result =
           does_remove_const_test.does_type_preserve_const_correctness(
             &pointer_to_int_type, &pointer_to_const_int_type);
         REQUIRE_FALSE(result);
@@ -154,7 +157,7 @@ SCENARIO("does_type_preserve_const_correctness",
     {
       THEN("The target type preserves the const-correctness of the source type")
       {
-        bool result=
+        bool result =
           does_remove_const_test.does_type_preserve_const_correctness(
             &pointer_to_const_int_type, &pointer_to_const_int_type);
         REQUIRE(result);
@@ -164,7 +167,7 @@ SCENARIO("does_type_preserve_const_correctness",
     {
       THEN("The target type loses const-correctness of the source type")
       {
-        bool result=
+        bool result =
           does_remove_const_test.does_type_preserve_const_correctness(
             &const_pointer_to_int_type, &pointer_to_const_int_type);
         REQUIRE_FALSE(result);
@@ -174,7 +177,7 @@ SCENARIO("does_type_preserve_const_correctness",
     {
       THEN("The target type preserves the const-correctness of the source type")
       {
-        bool result=
+        bool result =
           does_remove_const_test.does_type_preserve_const_correctness(
             &const_pointer_to_const_int_type, &pointer_to_const_int_type);
         REQUIRE(result);
@@ -184,7 +187,7 @@ SCENARIO("does_type_preserve_const_correctness",
     {
       THEN("The target type preserves the const-correctness of the source type")
       {
-        bool result=
+        bool result =
           does_remove_const_test.does_type_preserve_const_correctness(
             &pointer_to_int_type, &const_pointer_to_int_type);
         REQUIRE(result);
@@ -194,9 +197,9 @@ SCENARIO("does_type_preserve_const_correctness",
     {
       THEN("The target type preserves the const-correctness of the source type")
       {
-        bool result=
+        bool result =
           does_remove_const_test.does_type_preserve_const_correctness(
-           &pointer_to_const_int_type, &const_pointer_to_int_type);
+            &pointer_to_const_int_type, &const_pointer_to_int_type);
         REQUIRE(result);
       }
     }
@@ -204,9 +207,9 @@ SCENARIO("does_type_preserve_const_correctness",
     {
       THEN("The target type preserves the const-correctness of the source type")
       {
-        bool result=
+        bool result =
           does_remove_const_test.does_type_preserve_const_correctness(
-           &const_pointer_to_int_type, &const_pointer_to_int_type);
+            &const_pointer_to_int_type, &const_pointer_to_int_type);
         REQUIRE(result);
       }
     }
@@ -214,9 +217,9 @@ SCENARIO("does_type_preserve_const_correctness",
     {
       THEN("The target type preserves the const-correctness of the source type")
       {
-        bool result=
+        bool result =
           does_remove_const_test.does_type_preserve_const_correctness(
-           &const_pointer_to_const_int_type, &const_pointer_to_int_type);
+            &const_pointer_to_const_int_type, &const_pointer_to_int_type);
         REQUIRE(result);
       }
     }
@@ -224,9 +227,9 @@ SCENARIO("does_type_preserve_const_correctness",
     {
       THEN("The target type loses const-correctness of the source type")
       {
-        bool result=
+        bool result =
           does_remove_const_test.does_type_preserve_const_correctness(
-           &pointer_to_int_type, &const_pointer_to_const_int_type);
+            &pointer_to_int_type, &const_pointer_to_const_int_type);
         REQUIRE_FALSE(result);
       }
     }
@@ -234,9 +237,9 @@ SCENARIO("does_type_preserve_const_correctness",
     {
       THEN("The target type preserves the const-correctness of the source type")
       {
-        bool result=
+        bool result =
           does_remove_const_test.does_type_preserve_const_correctness(
-           &pointer_to_const_int_type, &const_pointer_to_const_int_type);
+            &pointer_to_const_int_type, &const_pointer_to_const_int_type);
         REQUIRE(result);
       }
     }
@@ -244,9 +247,9 @@ SCENARIO("does_type_preserve_const_correctness",
     {
       THEN("The target type loses const-correctness of the source type")
       {
-        bool result=
+        bool result =
           does_remove_const_test.does_type_preserve_const_correctness(
-           &const_pointer_to_int_type, &const_pointer_to_const_int_type);
+            &const_pointer_to_int_type, &const_pointer_to_const_int_type);
         REQUIRE_FALSE(result);
       }
     }
@@ -254,9 +257,9 @@ SCENARIO("does_type_preserve_const_correctness",
     {
       THEN("The target type preserves the const-correctness of the source type")
       {
-        bool result=
+        bool result =
           does_remove_const_test.does_type_preserve_const_correctness(
-           &const_pointer_to_const_int_type, &const_pointer_to_const_int_type);
+            &const_pointer_to_const_int_type, &const_pointer_to_const_int_type);
         REQUIRE(result);
       }
     }

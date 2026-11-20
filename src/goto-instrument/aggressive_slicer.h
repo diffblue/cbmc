@@ -14,14 +14,13 @@ Author: Elizabeth Polgreen, polgreen@amazon.com
 #ifndef CPROVER_GOTO_INSTRUMENT_AGGRESSIVE_SLICER_H
 #define CPROVER_GOTO_INSTRUMENT_AGGRESSIVE_SLICER_H
 
-#include <list>
-#include <string>
-
 #include <util/irep.h>
 
-#include <analyses/call_graph.h>
-
+#include <goto-programs/call_graph.h>
 #include <goto-programs/goto_model.h>
+
+#include <list>
+#include <string>
 
 class message_handlert;
 

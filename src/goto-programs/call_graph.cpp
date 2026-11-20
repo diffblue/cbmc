@@ -13,13 +13,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/xml.h>
 
-#include <goto-programs/goto_model.h>
+#include "goto_model.h"
 
 /// Create empty call graph
 /// \param collect_callsites: if true, then each added graph edge will have
 ///   the calling instruction recorded in `callsites` map.
-call_grapht::call_grapht(bool collect_callsites):
-  collect_callsites(collect_callsites)
+call_grapht::call_grapht(bool collect_callsites)
+  : collect_callsites(collect_callsites)
 {
 }
 
@@ -27,8 +27,8 @@ call_grapht::call_grapht(bool collect_callsites):
 /// \param goto_model: model to search for callsites
 /// \param collect_callsites: if true, then each added graph edge will have
 ///   the calling instruction recorded in `callsites` map.
-call_grapht::call_grapht(const goto_modelt &goto_model, bool collect_callsites):
-  call_grapht(goto_model.goto_functions, collect_callsites)
+call_grapht::call_grapht(const goto_modelt &goto_model, bool collect_callsites)
+  : call_grapht(goto_model.goto_functions, collect_callsites)
 {
 }
 
@@ -37,8 +37,9 @@ call_grapht::call_grapht(const goto_modelt &goto_model, bool collect_callsites):
 /// \param collect_callsites: if true, then each added graph edge will have
 ///   the calling instruction recorded in `callsites` map.
 call_grapht::call_grapht(
-  const goto_functionst &goto_functions, bool collect_callsites):
-  collect_callsites(collect_callsites)
+  const goto_functionst &goto_functions,
+  bool collect_callsites)
+  : collect_callsites(collect_callsites)
 {
   for(const auto &gf_entry : goto_functions.function_map)
   {
@@ -75,15 +76,15 @@ static void forall_callsites(
 call_grapht::call_grapht(
   const goto_functionst &goto_functions,
   const irep_idt &root,
-  bool collect_callsites):
-  collect_callsites(collect_callsites)
+  bool collect_callsites)
+  : collect_callsites(collect_callsites)
 {
   std::stack<irep_idt, std::vector<irep_idt>> pending_stack;
   pending_stack.push(root);
 
   while(!pending_stack.empty())
   {
-    irep_idt function=pending_stack.top();
+    irep_idt function = pending_stack.top();
     pending_stack.pop();
 
     nodes.insert(function);
@@ -100,10 +101,9 @@ call_grapht::call_grapht(
       [&](goto_programt::const_targett i_it, const irep_idt &callee)
       {
         add(function, callee, i_it);
-        if(edges.find(callee)==edges.end())
+        if(edges.find(callee) == edges.end())
           pending_stack.push(callee);
-      }
-    ); // NOLINT
+      }); // NOLINT
   }
 }
 
@@ -115,30 +115,23 @@ call_grapht::call_grapht(
 call_grapht::call_grapht(
   const goto_modelt &goto_model,
   const irep_idt &root,
-  bool collect_callsites):
-  call_grapht(goto_model.goto_functions, root, collect_callsites)
+  bool collect_callsites)
+  : call_grapht(goto_model.goto_functions, root, collect_callsites)
 {
 }
 
-void call_grapht::add(
-  const irep_idt &function,
-  const goto_programt &body)
+void call_grapht::add(const irep_idt &function, const goto_programt &body)
 {
   forall_callsites(
     body,
     [&](goto_programt::const_targett i_it, const irep_idt &callee)
-    {
-      add(function, callee, i_it);
-    }
-  ); // NOLINT
+    { add(function, callee, i_it); }); // NOLINT
 }
 
 /// Add edge
 /// \param caller: caller function
 /// \param callee: callee function
-void call_grapht::add(
-  const irep_idt &caller,
-  const irep_idt &callee)
+void call_grapht::add(const irep_idt &caller, const irep_idt &callee)
 {
   edges.insert({caller, callee});
   nodes.insert(caller);
@@ -181,19 +174,18 @@ class function_indicest
 public:
   std::unordered_map<irep_idt, node_indext> function_indices;
 
-  explicit function_indicest(call_grapht::directed_grapht &graph):
-    graph(graph)
+  explicit function_indicest(call_grapht::directed_grapht &graph) : graph(graph)
   {
   }
 
   node_indext operator[](const irep_idt &function)
   {
-    auto findit=function_indices.insert({function, 0});
+    auto findit = function_indices.insert({function, 0});
     if(findit.second)
     {
-      node_indext new_index=graph.add_node();
-      findit.first->second=new_index;
-      graph[new_index].function=function;
+      node_indext new_index = graph.add_node();
+      findit.first->second = new_index;
+      graph[new_index].function = function;
     }
     return findit.first->second;
   }
@@ -218,19 +210,19 @@ call_grapht::directed_grapht call_grapht::get_directed_graph() const
 
   for(const auto &edge : edges)
   {
-    auto a_index=function_indices[edge.first];
-    auto b_index=function_indices[edge.second];
+    auto a_index = function_indices[edge.first];
+    auto b_index = function_indices[edge.second];
     // Check then create the edge like this to avoid copying the callsites
     // set once per parallel edge, which could be costly if there are many.
     if(!ret.has_edge(a_index, b_index))
     {
       ret.add_edge(a_index, b_index);
       if(collect_callsites)
-        ret[a_index].out[b_index].callsites=callsites.at(edge);
+        ret[a_index].out[b_index].callsites = callsites.at(edge);
     }
   }
 
-  ret.nodes_by_name=std::move(function_indices.function_indices);
+  ret.nodes_by_name = std::move(function_indices.function_indices);
   return ret;
 }
 
@@ -241,14 +233,14 @@ call_grapht::directed_grapht call_grapht::get_directed_graph() const
 std::string call_grapht::format_callsites(const edget &edge) const
 {
   PRECONDITION(collect_callsites);
-  std::string ret="{";
+  std::string ret = "{";
   for(const locationt &loc : callsites.at(edge))
   {
-    if(ret.size()>1)
-      ret+=", ";
-    ret+=std::to_string(loc->location_number);
+    if(ret.size() > 1)
+      ret += ", ";
+    ret += std::to_string(loc->location_number);
   }
-  ret+='}';
+  ret += '}';
   return ret;
 }
 
@@ -285,7 +277,7 @@ void call_grapht::output_xml(std::ostream &out) const
   // to the first interested XML user.
   if(collect_callsites)
     out << "<!-- XML call-graph representation does not document callsites yet."
-      " If you need this, edit call_grapht::output_xml -->\n";
+           " If you need this, edit call_grapht::output_xml -->\n";
   for(const auto &edge : edges)
   {
     out << "<call_graph_edge caller=\"";
@@ -299,8 +291,8 @@ void call_grapht::output_xml(std::ostream &out) const
 std::optional<std::size_t>
 call_grapht::directed_grapht::get_node_index(const irep_idt &function) const
 {
-  auto findit=nodes_by_name.find(function);
-  if(findit==nodes_by_name.end())
+  auto findit = nodes_by_name.find(function);
+  if(findit == nodes_by_name.end())
     return std::optional<node_indext>();
   else
     return findit->second;

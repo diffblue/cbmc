@@ -17,9 +17,9 @@ Date:   December 2016
 #include <util/find_symbols.h>
 #include <util/std_expr.h>
 
-#include <analyses/call_graph.h>
 #include <linking/static_lifetime_init.h>
 
+#include "call_graph.h"
 #include "goto_functions.h"
 #include "goto_model.h"
 

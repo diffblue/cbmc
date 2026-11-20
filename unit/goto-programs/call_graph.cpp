@@ -8,23 +8,20 @@ Author:
 
 #include <util/symbol_table.h>
 
+#include <goto-programs/call_graph.h>
+#include <goto-programs/call_graph_helpers.h>
 #include <goto-programs/goto_model.h>
 
-#include <analyses/call_graph.h>
-#include <analyses/call_graph_helpers.h>
 #include <ansi-c/goto-conversion/goto_convert_functions.h>
 #include <testing-utils/call_graph_test_utils.h>
 #include <testing-utils/use_catch.h>
 
 #include <iostream>
 
-SCENARIO("call_graph",
-  "[core][util][call_graph]")
+SCENARIO("call_graph", "[core][util][call_graph]")
 {
-
   GIVEN("Some cyclic function calls")
   {
-
     // Create code like:
     // void A()
     // {
@@ -50,8 +47,7 @@ SCENARIO("call_graph",
          code_function_callt(symbol_exprt("B", void_function_type)),
          code_function_callt(symbol_exprt("B", void_function_type))});
 
-      goto_model.symbol_table.add(
-        create_void_function_symbol("A", calls));
+      goto_model.symbol_table.add(create_void_function_symbol("A", calls));
     }
 
     {
@@ -59,16 +55,12 @@ SCENARIO("call_graph",
         {code_function_callt(symbol_exprt("C", void_function_type)),
          code_function_callt(symbol_exprt("D", void_function_type))});
 
-      goto_model.symbol_table.add(
-        create_void_function_symbol("B", calls));
+      goto_model.symbol_table.add(create_void_function_symbol("B", calls));
     }
 
-    goto_model.symbol_table.add(
-      create_void_function_symbol("C", code_skipt()));
-    goto_model.symbol_table.add(
-      create_void_function_symbol("D", code_skipt()));
-    goto_model.symbol_table.add(
-      create_void_function_symbol("E", code_skipt()));
+    goto_model.symbol_table.add(create_void_function_symbol("C", code_skipt()));
+    goto_model.symbol_table.add(create_void_function_symbol("D", code_skipt()));
+    goto_model.symbol_table.add(create_void_function_symbol("E", code_skipt()));
 
     stream_message_handlert msg(std::cout);
     goto_convert(goto_model, msg);
@@ -79,8 +71,8 @@ SCENARIO("call_graph",
     {
       THEN("We expect A -> { A, B, B }, B -> { C, D }")
       {
-        const auto &check_graph=call_graph_from_goto_functions.edges;
-        REQUIRE(check_graph.size()==5);
+        const auto &check_graph = call_graph_from_goto_functions.edges;
+        REQUIRE(check_graph.size() == 5);
         REQUIRE(multimap_key_matches(check_graph, "A", {"A", "B", "B"}));
         REQUIRE(multimap_key_matches(check_graph, "B", {"C", "D"}));
       }
@@ -92,12 +84,12 @@ SCENARIO("call_graph",
 
     WHEN("The call graph is inverted")
     {
-      call_grapht inverse_call_graph_from_goto_functions=
+      call_grapht inverse_call_graph_from_goto_functions =
         call_graph_from_goto_functions.get_inverted();
       THEN("We expect A -> { A }, B -> { A, A }, C -> { B }, D -> { B }")
       {
-        const auto &check_graph=inverse_call_graph_from_goto_functions.edges;
-        REQUIRE(check_graph.size()==5);
+        const auto &check_graph = inverse_call_graph_from_goto_functions.edges;
+        REQUIRE(check_graph.size() == 5);
         REQUIRE(multimap_key_matches(check_graph, "A", {"A"}));
         REQUIRE(multimap_key_matches(check_graph, "B", {"A", "A"}));
         REQUIRE(multimap_key_matches(check_graph, "C", {"B"}));
@@ -114,10 +106,10 @@ SCENARIO("call_graph",
           call_graph_from_goto_functions_tracking.callsites;
         for(const auto &edge : call_graph_from_goto_functions_tracking.edges)
         {
-          if(edge==call_grapht::edgest::value_type("A", "B"))
-            REQUIRE(check_callsites.at(edge).size()==2);
+          if(edge == call_grapht::edgest::value_type("A", "B"))
+            REQUIRE(check_callsites.at(edge).size() == 2);
           else
-            REQUIRE(check_callsites.at(edge).size()==1);
+            REQUIRE(check_callsites.at(edge).size() == 1);
         }
       }
       WHEN("Such a graph is inverted")
@@ -138,17 +130,17 @@ SCENARIO("call_graph",
 
       THEN("The graph should contain nodes for only B, C and D")
       {
-        call_grapht::nodest correct_value {"B", "C", "D"};
+        call_grapht::nodest correct_value{"B", "C", "D"};
         REQUIRE(call_graph_with_specific_root.nodes == correct_value);
       }
       THEN("Only B -> C and B -> D edges should exist, each with one callsite")
       {
-        const auto &check_callsites=call_graph_with_specific_root.callsites;
-        call_grapht::edgest correct_value { {"B", "C"}, {"B", "D"} };
+        const auto &check_callsites = call_graph_with_specific_root.callsites;
+        call_grapht::edgest correct_value{{"B", "C"}, {"B", "D"}};
         REQUIRE(call_graph_with_specific_root.edges == correct_value);
         for(const auto &edge : call_graph_with_specific_root.edges)
         {
-          REQUIRE(check_callsites.at(edge).size()==1);
+          REQUIRE(check_callsites.at(edge).size() == 1);
         }
       }
     }
@@ -159,21 +151,21 @@ SCENARIO("call_graph",
         call_grapht::create_from_root_function(goto_model, "B", false);
       THEN("We expect only B -> C and B -> D in the resulting graph")
       {
-        const auto &check_graph=call_graph_from_b.edges;
-        REQUIRE(check_graph.size()==2);
+        const auto &check_graph = call_graph_from_b.edges;
+        REQUIRE(check_graph.size() == 2);
         REQUIRE(multimap_key_matches(check_graph, "B", {"C", "D"}));
       }
     }
 
     WHEN("The call graph is exported as a grapht")
     {
-      call_grapht::directed_grapht exported=
+      call_grapht::directed_grapht exported =
         call_graph_from_goto_functions.get_directed_graph();
 
       typedef call_grapht::directed_grapht::node_indext node_indext;
       std::map<irep_idt, node_indext> nodes_by_name;
-      for(node_indext i=0; i<exported.size(); ++i)
-        nodes_by_name[exported[i].function]=i;
+      for(node_indext i = 0; i < exported.size(); ++i)
+        nodes_by_name[exported[i].function] = i;
 
       THEN("We expect 5 nodes")
       {
@@ -249,8 +241,7 @@ SCENARIO("call_graph",
 
       THEN("We expect all of {A, B, C, D} to be reachable from A")
       {
-        std::set<irep_idt> successors =
-          get_reachable_functions(exported, "A");
+        std::set<irep_idt> successors = get_reachable_functions(exported, "A");
         REQUIRE(successors.size() == 4);
         REQUIRE(successors.count("A"));
         REQUIRE(successors.count("B"));
@@ -260,8 +251,7 @@ SCENARIO("call_graph",
 
       THEN("We expect {D, B, A} to be able to reach D")
       {
-        std::set<irep_idt> predecessors =
-          get_reaching_functions(exported, "D");
+        std::set<irep_idt> predecessors = get_reaching_functions(exported, "D");
         REQUIRE(predecessors.size() == 3);
         REQUIRE(predecessors.count("A"));
         REQUIRE(predecessors.count("B"));
@@ -270,8 +260,7 @@ SCENARIO("call_graph",
 
       THEN("We expect {E} to be able to reach E")
       {
-        std::set<irep_idt> predecessors =
-          get_reaching_functions(exported, "E");
+        std::set<irep_idt> predecessors = get_reaching_functions(exported, "E");
         REQUIRE(predecessors.size() == 1);
         REQUIRE(predecessors.count("E"));
       }
@@ -285,8 +274,8 @@ SCENARIO("call_graph",
 
       typedef call_grapht::directed_grapht::node_indext node_indext;
       std::map<irep_idt, node_indext> nodes_by_name;
-      for(node_indext i=0; i<exported.size(); ++i)
-        nodes_by_name[exported[i].function]=i;
+      for(node_indext i = 0; i < exported.size(); ++i)
+        nodes_by_name[exported[i].function] = i;
 
       THEN("We expect 5 nodes")
       {
@@ -305,15 +294,15 @@ SCENARIO("call_graph",
 
       THEN("We expect all edges to have one callsite apart from A -> B with 2")
       {
-        for(node_indext i=0; i<exported.size(); ++i)
+        for(node_indext i = 0; i < exported.size(); ++i)
         {
-          const auto &node=exported[i];
+          const auto &node = exported[i];
           for(const auto &edge : node.out)
           {
-            if(i==nodes_by_name["A"] && edge.first==nodes_by_name["B"])
-              REQUIRE(edge.second.callsites.size()==2);
+            if(i == nodes_by_name["A"] && edge.first == nodes_by_name["B"])
+              REQUIRE(edge.second.callsites.size() == 2);
             else
-              REQUIRE(edge.second.callsites.size()==1);
+              REQUIRE(edge.second.callsites.size() == 1);
           }
         }
       }

@@ -43,7 +43,6 @@ OBJ += ../util/util$(LIBEXT) \
        ../langapi/langapi$(LIBEXT) \
        ../solvers/solvers$(LIBEXT) \
        ../analyses/dirty$(OBJEXT) \
-       ../analyses/does_remove_const$(OBJEXT) \
        ../analyses/locals$(OBJEXT) \
        ../analyses/local_bitvector_analysis$(OBJEXT) \
        ../analyses/local_cfg$(OBJEXT) \
