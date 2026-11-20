@@ -1,0 +1,15 @@
+CORE
+main.c
+--no-standard-checks
+^EXIT=10$
+^SIGNAL=0$
+^\[main.assertion.1\] .* set: SUCCESS$
+^\[main.assertion.2\] .* inner byte set: SUCCESS$
+^\[main.assertion.3\] .* unset: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+cannot set_field
+--
+The bytes of an object of pointer type are accessible as an array of
+characters, as through a character pointer.
