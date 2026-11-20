@@ -21,6 +21,19 @@ is turned into the extended version:
 ret_t  foo(foo-parameters,  __CPROVER_contracts_write_set_ptr_t write_set);
 ```
 
+For a variadic function, the `write_set` parameter is added before the other
+parameters instead, as `va_start` reads the variadic arguments from the
+parameters that follow the last declared one:
+
+```c
+ret_t  foo(__CPROVER_contracts_write_set_ptr_t write_set, foo-parameters, ...);
+```
+
+Calls pass the write set argument at the position of the `write_set`
+parameter. A call with more arguments than the function has parameters passes
+the surplus arguments after the write set, and a call with fewer arguments is
+padded with non-deterministic values up to the `write_set` parameter.
+
 After this step the `write_set` parameter is in scope in the function and can
 be used to implement checks.
 

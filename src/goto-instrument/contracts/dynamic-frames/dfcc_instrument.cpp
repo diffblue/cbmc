@@ -16,6 +16,7 @@ Author: Remi Delmas, delmarsd@amazon.com
 #include <util/pointer_expr.h>
 #include <util/pointer_predicates.h>
 #include <util/prefix.h>
+#include <util/std_code.h>
 #include <util/suffix.h>
 
 #include <goto-programs/goto_model.h>
@@ -42,6 +43,7 @@ Author: Remi Delmas, delmarsd@amazon.com
 #include "dfcc_spec_functions.h"
 #include "dfcc_utils.h"
 
+#include <iterator>
 #include <memory>
 
 std::set<irep_idt> dfcc_instrumentt::function_cache;
@@ -789,6 +791,47 @@ void dfcc_instrumentt::instrument_assign(
   }
 }
 
+/// Adds \p write_set to \p arguments, a call to a function of type
+/// \p code_type, so that it binds to the write set parameter. That parameter
+/// is added first for a variadic function and last otherwise, see
+/// \ref dfcc_utilst::add_parameter, and \p code_type may or may not have it
+/// yet, depending on whether the function has been instrumented already.
+///
+/// The call may have more arguments than \p code_type has parameters: those
+/// of a variadic function, but also those of a call written against a
+/// different declaration than the definition used, such as the FreeBSD
+/// kernel's `malloc(size, type, flags)` resolved to the CPROVER library's
+/// `malloc(size)`. Appending the write set would make it bind to one of the
+/// surplus arguments instead.
+static void add_write_set_argument(
+  const code_typet &code_type,
+  const exprt &write_set,
+  exprt::operandst &arguments)
+{
+  const auto &parameters = code_type.parameters();
+
+  std::size_t index = code_type.has_ellipsis() ? 0 : parameters.size();
+  for(std::size_t i = 0; i < parameters.size(); ++i)
+  {
+    if(parameters[i].get_base_name() == "__write_set_to_check")
+    {
+      index = i;
+      break;
+    }
+  }
+
+  // a call with fewer arguments than parameters: pad with non-deterministic
+  // values, as symex would, so that the write set still binds to its parameter
+  while(arguments.size() < index)
+  {
+    arguments.push_back(side_effect_expr_nondett{
+      parameters[arguments.size()].type(), write_set.source_location()});
+  }
+  arguments.insert(
+    std::next(arguments.begin(), static_cast<std::ptrdiff_t>(index)),
+    write_set);
+}
+
 void dfcc_instrumentt::instrument_fptr_call_instruction_dynamic_lookup(
   const exprt &write_set,
   goto_programt::targett &target,
@@ -823,7 +866,8 @@ void dfcc_instrumentt::instrument_fptr_call_instruction_dynamic_lookup(
     payload.add(goto_programt::make_incomplete_goto(cond, target_location));
   code_function_callt call_inst(
     target->call_lhs(), target->call_function(), target->call_arguments());
-  call_inst.arguments().push_back(write_set);
+  add_write_set_argument(
+    to_code_type(callf.type()), write_set, call_inst.arguments());
   payload.add(goto_programt::make_function_call(call_inst, target_location));
   auto goto_end_inst = payload.add(
     goto_programt::make_incomplete_goto(true_exprt(), target_location));
@@ -849,11 +893,15 @@ void dfcc_instrumentt::instrument_call_instruction(
     if(target->call_function().id() == ID_symbol)
     {
       // this is a function call
-      if(!do_not_instrument(
-           to_symbol_expr(target->call_function()).identifier()))
+      const irep_idt &callee_id =
+        to_symbol_expr(target->call_function()).identifier();
+      if(!do_not_instrument(callee_id))
       {
         // pass write set argument only if function is known to be instrumented
-        target->call_arguments().push_back(write_set);
+        add_write_set_argument(
+          to_code_type(goto_model.symbol_table.lookup_ref(callee_id).type),
+          write_set,
+          target->call_arguments());
       }
     }
     else

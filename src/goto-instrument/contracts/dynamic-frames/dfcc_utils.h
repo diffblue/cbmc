@@ -83,7 +83,9 @@ struct dfcc_utilst
 
   /// \brief Adds the given symbol as parameter to the function symbol's
   /// code_type. Also adds the corresponding parameter to its goto_function if
-  /// it exists in the function map of the goto model.
+  /// it exists in the function map of the goto model. The parameter is added
+  /// last, unless the function is variadic: then it is added first, so that
+  /// the arguments taken by va_start remain the variadic ones.
   static void add_parameter(
     goto_modelt &,
     const symbolt &symbol,

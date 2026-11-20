@@ -142,7 +142,9 @@ const symbolt &dfcc_utilst::create_new_parameter_symbol(
   return symbol;
 }
 
-/// \brief Adds the given symbol as parameter to the given code_typet.
+/// \brief Adds the given symbol as parameter to the given code_typet: as the
+/// last parameter, unless the function is variadic. Then it is the first, as
+/// va_start takes the arguments that follow the last declared parameter.
 static void add_parameter(const symbolt &symbol, code_typet &code_type)
 {
   PRECONDITION(symbol.is_parameter);
@@ -150,7 +152,9 @@ static void add_parameter(const symbolt &symbol, code_typet &code_type)
   parameter.set_base_name(symbol.base_name);
   parameter.set_identifier(symbol.name);
   auto &parameters = code_type.parameters();
-  parameters.insert(parameters.end(), parameter);
+  parameters.insert(
+    code_type.has_ellipsis() ? parameters.begin() : parameters.end(),
+    parameter);
 }
 
 void dfcc_utilst::add_parameter(
@@ -380,6 +384,10 @@ void dfcc_utilst::wrap_function(
     new_params);
 
   code_typet new_code_type(new_params, old_code_type.return_type());
+  // keep the wrapper variadic, so that the write set parameter is added at the
+  // same position as in the wrapped function, see add_parameter
+  if(old_code_type.has_ellipsis())
+    new_code_type.make_ellipsis();
 
   wrapper_sym.type = new_code_type;
 
