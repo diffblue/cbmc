@@ -88,8 +88,21 @@ decision_proceduret::resultt smt2_dect::dec_solve(const exprt &assumption)
     break;
 
   case solvert::CVC5:
-    argv = {
-      solver_binary_name("cvc5"), "--lang", "smtlib", temp_file_problem()};
+    argv = {solver_binary_name("cvc5"), "--lang", "smtlib"};
+    // A user-supplied binary or wrapper (--external-smt2-solver) chooses its
+    // own options.
+    if(solver_binary_or_empty.empty())
+    {
+      // needed for (as const ...) arrays as of cvc5 1.3.4
+      argv.push_back("--arrays-exp");
+      // --arrays-exp implies --fmf-bound, which disables prenexing of nested
+      // quantifiers, leaving them without triggers
+      argv.push_back("--no-fmf-bound");
+      // needed for floating-point formats other than Float32 and Float64,
+      // such as x86's 80-bit long double
+      argv.push_back("--fp-exp");
+    }
+    argv.push_back(temp_file_problem());
     break;
 
   case solvert::MATHSAT:

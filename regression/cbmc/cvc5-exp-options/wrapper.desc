@@ -1,0 +1,12 @@
+CORE smt-backend gcc-only no-new-smt
+memset.c
+--cvc5 --external-smt2-solver ./cvc5-wrapper.sh
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^VERIFICATION ERROR$
+--
+CBMC passes only --lang smtlib to a user-supplied cvc5 binary or wrapper, which
+chooses its own options. This test is marked "gcc-only" as resolving ./ won't
+work with Windows.
