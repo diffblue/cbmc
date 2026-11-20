@@ -516,7 +516,8 @@ int pthread_rwlock_trywrlock(pthread_rwlock_t *lock)
 int pthread_rwlock_unlock(pthread_rwlock_t *lock)
 {
   __CPROVER_HIDE:;
-  __CPROVER_assert(*((signed char *)lock)==1,
+  __CPROVER_assert(
+    *((signed char *)lock) == 1 || *((signed char *)lock) == 2,
     "must hold lock upon unlock");
   // TODO: unlocks all held locks at once
   *((signed char *)lock)=0;
