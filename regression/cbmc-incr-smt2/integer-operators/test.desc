@@ -1,0 +1,17 @@
+CORE
+integer-operators.c
+
+Passing problem to incremental SMT2 solving
+^\[main\.assertion\.1\] line 8 a - b > 0: SUCCESS$
+^\[main\.assertion\.2\] line 10 -a < 0: SUCCESS$
+^\[main\.assertion\.3\] line 12 b <= a: SUCCESS$
+^\[main\.assertion\.4\] line 13 a >= b: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Exercises mathematical-integer (__CPROVER_integer) subtraction, unary minus and
+the relational operators in the incremental SMT2 back-end (smt_integer_theoryt).
+Division and modulo are intentionally not yet supported (deferred; SMT-LIB Int
+div/mod are Euclidean whereas mod_exprt/div_exprt truncate toward zero).

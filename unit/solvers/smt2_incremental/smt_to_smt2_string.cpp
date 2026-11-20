@@ -20,6 +20,7 @@ TEST_CASE("Test smt_indext to string conversion", "[core][smt2_incremental]")
 TEST_CASE("Test smt_sortt to string conversion", "[core][smt2_incremental]")
 {
   CHECK(smt_to_smt2_string(smt_bool_sortt{}) == "Bool");
+  CHECK(smt_to_smt2_string(smt_int_sortt{}) == "Int");
   CHECK(smt_to_smt2_string(smt_bit_vector_sortt{16}) == "(_ BitVec 16)");
   CHECK(
     smt_to_smt2_string(smt_array_sortt{smt_bool_sortt{}, smt_bool_sortt{}}) ==
@@ -40,6 +41,16 @@ TEST_CASE(
   "[core][smt2_incremental]")
 {
   CHECK(smt_to_smt2_string(smt_bit_vector_constant_termt{0, 8}) == "(_ bv0 8)");
+}
+
+TEST_CASE(
+  "Test smt_int_constant_termt to string conversion",
+  "[core][smt2_incremental]")
+{
+  CHECK(smt_to_smt2_string(smt_int_constant_termt{42}) == "42");
+  CHECK(smt_to_smt2_string(smt_int_constant_termt{0}) == "0");
+  // Negative integers are emitted using SMT-LIB unary minus, not "-1".
+  CHECK(smt_to_smt2_string(smt_int_constant_termt{-1}) == "(- 1)");
 }
 
 TEST_CASE(
