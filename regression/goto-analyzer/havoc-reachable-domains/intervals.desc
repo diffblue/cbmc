@@ -1,0 +1,12 @@
+CORE
+main.c
+--verify --intervals
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line 14 global: UNKNOWN$
+^\[main\.assertion\.2\] line 15 address-taken local: UNKNOWN$
+--
+^warning: ignoring
+--
+Inline assembly with a "memory" clobber may change the objects of static
+lifetime and the address-taken local variables (the havoc_reachable statement).

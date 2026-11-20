@@ -265,6 +265,12 @@ public:
 
   void apply_code(const codet &code, const namespacet &ns);
 
+  /// Applies the `havoc_reachable` statement \p code, as
+  /// value_sett::havoc_reachable does.
+  /// \param code: The `havoc_reachable` statement
+  /// \param ns: Namespace
+  void havoc_reachable(const codet &code, const namespacet &ns);
+
   void assign(
     const exprt &lhs,
     const exprt &rhs,

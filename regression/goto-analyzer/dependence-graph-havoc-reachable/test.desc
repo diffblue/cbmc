@@ -1,0 +1,15 @@
+CORE
+main.c
+--dependence-graph --show
+activate-multi-line-match
+^EXIT=0$
+^SIGNAL=0$
+\/\/ ([0-9]+).*\n.*p := address_of\(x\)\n(.*\n)*Data dependencies: ([0-9]+,)*\1(,[0-9]+)*\n\n.*\n.*HAVOC_REACHABLE \(arbitrary memory\)
+\/\/ ([0-9]+).*\n.*HAVOC_REACHABLE \(arbitrary memory\)\n(.*\n)*Data dependencies: ([0-9]+,)*\1(,[0-9]+)*\n\n.*\n.*out := \*p
+--
+^warning: ignoring
+--
+The havoc_reachable statement emitted for the inline assembly reads the
+pointers stored in the objects reachable from the objects of static lifetime
+(here, p), and writes the objects it reaches (here, x, which out is then read
+from).

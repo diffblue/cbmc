@@ -1,0 +1,20 @@
+CORE gcc-only
+main.c
+--full-slice
+^EXIT=10$
+^SIGNAL=0$
+^not slicing, as the program contains inline assembly that may change any reachable object$
+^\[main\.assertion\.1\] line 37 heap object reachable from static: FAILURE$
+^\[main\.assertion\.2\] line 38 pointer in static: FAILURE$
+^\[main\.assertion\.3\] line 39 pointers are restricted to known values: SUCCESS$
+^\[main\.assertion\.4\] line 50 escaped local of caller: FAILURE$
+^\[main\.assertion\.5\] line 51 local without address: SUCCESS$
+^\[main\.assertion\.6\] line 59 heap object reachable from operand: FAILURE$
+^\[main\.assertion\.7\] line 60 unreachable heap object: SUCCESS$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+dereference failure.*: FAILURE$
+--
+The full slicer does not know which objects havoc_reachable changes and
+reads, and therefore does not slice such programs.
