@@ -1,0 +1,12 @@
+CORE
+model.c
+
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ holds: SUCCESS$
+^\[main\.assertion\.2\] line \d+ fails: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+A model must be obtained even when a property containing a quantifier holds.
