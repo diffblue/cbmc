@@ -1,0 +1,10 @@
+CORE gcc-only
+empty_struct_member.c
+
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Empty struct members (a GNU C extension) must not cause a mismatch between the
+encoded struct value width and the type width.
