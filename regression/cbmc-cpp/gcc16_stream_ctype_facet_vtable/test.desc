@@ -1,0 +1,24 @@
+KNOWNBUG gcc16 libstdcxx16
+main.cpp
+--cpp11 --object-bits 12
+^\[main\.assertion\.1\] line \d+ setw inserter converts: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+^\[(?!main\.assertion\.2\]).*: FAILURE$
+--
+Construction of a stream and its ctype facets with the headers of
+libstdc++ 16 (tagged libstdcxx16: runs only where the host gcc is 16 or
+later, regression/README.md); with gcc 16 the wchar_t facet is reached.
+It needed GCC's atomic builtins in C++ (__gnu_cxx::__atomic_add's
+__atomic_fetch_add: the CONVERSION ERROR), and the modelled "C" locale
+ctype<char> facet (cpp_typecheck_stdlib.cpp) filling the _M_widen and
+_M_narrow caches with the identity and setting _M_widen_ok and
+_M_narrow_ok ([facet.ctype.char.virtuals]/1, [locale.ctype.virtuals]/11,
+13), so ctype<char>::widen needs no virtual call on the modelled object.
+Any failed property other than the WRONG assertion is forbidden.  To
+check elsewhere, preprocess with g++-16 -E and run cbmc on the .ii file.

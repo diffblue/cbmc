@@ -1,0 +1,14 @@
+KNOWNBUG
+enumeration.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ enumeration hidden by parameter: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+See test.desc.  g++ 13 and clang++ 18 accept this program, and it fails only
+its WRONG assertion.

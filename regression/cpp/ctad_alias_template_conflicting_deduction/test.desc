@@ -1,0 +1,8 @@
+CORE
+main.cpp
+-std=c++20
+^EXIT=(1|6|64)$
+^SIGNAL=0$
+^CONVERSION ERROR$
+--
+^warning: ignoring

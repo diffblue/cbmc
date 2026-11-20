@@ -1,0 +1,18 @@
+KNOWNBUG
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ deleted through a call result: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+"delete argument must have offset zero" failed: the address of the most
+derived object was attached to a delete-expression only when its operand
+had no side effects, so `delete make()' passed the pointer to the Y
+subobject to __delete.  The check is now built over a placeholder for the
+operand, which goto conversion replaces by the operand's value after its
+side effects; `delete ps[i++]' evaluates the operand once.
