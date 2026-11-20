@@ -6398,8 +6398,7 @@ void smt2_convt::find_symbols(const exprt &expr)
   }
 }
 
-exprt smt2_convt::inline_flattened_array_let_bindings(
-  const let_exprt &let_expr)
+exprt smt2_convt::inline_flattened_array_let_bindings(const let_exprt &let_expr)
 {
   replace_symbolt substitutions;
 
