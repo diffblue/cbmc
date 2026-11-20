@@ -1,0 +1,12 @@
+CORE
+multibyte-symbolic.c
+--little-endian --no-simplify
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Same as multibyte.c (9-bit case) but with a symbolic (constrained-to-0)
+byte offset, exercising the variable-offset branch of convert_byte_update
+for a non-byte-aligned update wider than one byte.
