@@ -62,7 +62,6 @@ bool statement_list_languaget::parse(
 {
   statement_list_parsert statement_list_parser{message_handler};
   parse_path = path;
-  statement_list_parser.set_line_no(0);
   statement_list_parser.set_file(path);
   statement_list_parser.in = &instream;
   bool result = statement_list_parser.parse();
