@@ -1,0 +1,14 @@
+CORE
+main.c
+--show-value-sets
+activate-multi-line-match
+^EXIT=0$
+^SIGNAL=0$
+\nq = \{[^}]*<x, 0, signedbv\[32\]>
+\nq = \{[^}]*<y, 0, signedbv\[32\]>
+--
+^warning: ignoring
+--
+q is null until the inline assembly, which may store in q the address of any
+object reachable from the objects of static lifetime (x, through p) or whose
+address is stored in a variable (y, through local_p).

@@ -260,6 +260,16 @@ void constant_propagator_domaint::transform(
         values.set_to_top();
     }
   }
+  else if(
+    from->is_other() && from->get_other().get_statement() == ID_havoc_reachable)
+  {
+    // the objects reachable from pointers may be any of the objects of static
+    // lifetime and the address-taken variables
+    if(have_dirty)
+      values.set_dirty_to_top(cp->dirty, ns);
+    else
+      values.set_to_top();
+  }
   else if(from->is_end_function())
   {
     // erase parameters

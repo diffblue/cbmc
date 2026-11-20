@@ -42,7 +42,8 @@ void dirtyt::search_other(const goto_programt::instructiont &instruction)
       statement == ID_expression || statement == ID_array_set ||
       statement == ID_array_equal || statement == ID_array_copy ||
       statement == ID_array_replace || statement == ID_havoc_object ||
-      statement == ID_input || statement == ID_output)
+      statement == ID_havoc_reachable || statement == ID_input ||
+      statement == ID_output)
     {
       for(const auto &op : code.operands())
         find_dirty(op);
