@@ -270,17 +270,33 @@ TEST_CASE("interval::equality", "[core][analyses][interval]")
 
     SECTION("Same interval")
     {
-      // TODO: wrongly concludes that these are equal
-      // ADA-537
-      // REQUIRE(two_to_four.equal(two_to_four).is_unknown());
-      // REQUIRE(two_to_four.not_equal(two_to_four).is_unknown());
+      REQUIRE(two_to_four.equal(two_to_four).is_unknown());
+      REQUIRE(two_to_four.not_equal(two_to_four).is_unknown());
     }
     SECTION("Overlapping intervals")
     {
-      // TODO: wrongly concludes that these are not equal
-      // ADA-537
-      // REQUIRE_FALSE(six_to_eight.equal(five_to_ten).is_unknown());
-      // REQUIRE_FALSE(six_to_eight.not_equal(five_to_ten).is_unknown());
+      // The intervals overlap but neither contains the other, so value
+      // equality is genuinely unknown.  (A more precise, relational domain
+      // might do better, but the interval domain cannot.)
+      REQUIRE(six_to_eight.equal(five_to_ten).is_unknown());
+      REQUIRE(six_to_eight.not_equal(five_to_ten).is_unknown());
+    }
+    SECTION("operator== / operator!= on non-singleton intervals")
+    {
+      constant_interval_exprt also_two_to_four(CEV(2), CEV(4));
+      constant_interval_exprt two_to_five(CEV(2), CEV(5));
+
+      // Same bounds compare structurally equal even though value-equality
+      // (equal()) is unknown.
+      REQUIRE(two_to_four == also_two_to_four);
+      REQUIRE_FALSE(two_to_four != also_two_to_four);
+      REQUIRE(two_to_four.equal(also_two_to_four).is_unknown());
+
+      // Different bounds are not structurally equal (operator==) even when
+      // the intervals overlap.
+      REQUIRE_FALSE(two_to_four == two_to_five);
+      REQUIRE(two_to_four != two_to_five);
+      REQUIRE(two_to_four.equal(two_to_five).is_unknown());
     }
     SECTION("Disjoint intervals")
     {
