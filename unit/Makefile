@@ -191,6 +191,7 @@ SRC += analyses/ai/ai.cpp \
        util/max_malloc_size.cpp \
        util/mathematical_types.cpp \
        util/memory_info.cpp \
+       util/memory_units.cpp \
        util/message.cpp \
        util/ui_message.cpp \
        util/optional_utils.cpp \

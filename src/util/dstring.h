@@ -84,17 +84,12 @@ public:
   {
   }
 
+  // The defaulted copy and move operations are noexcept and trivial, which
+  // lets containers such as std::vector<irep_idt> relocate elements cheaply.
   dstringt(const dstringt &) = default;
-
-  /// Move constructor. There is no need and no point in actually destroying the
-  /// source object \p other, this is effectively just a copy constructor.
-#ifdef __GNUC__
-  constexpr
-#endif
-    dstringt(dstringt &&other) noexcept
-    : no(other.no)
-  {
-  }
+  dstringt(dstringt &&) = default;
+  dstringt &operator=(const dstringt &) = default;
+  dstringt &operator=(dstringt &&) = default;
 
   // access
 
@@ -173,17 +168,6 @@ public:
 
   void swap(dstringt &b)
   { unsigned t=no; no=b.no; b.no=t; }
-
-  dstringt &operator=(const dstringt &b)
-  { no=b.no; return *this; }
-
-  /// Move assignment. There is no need and no point in actually destroying the
-  /// source object \p other, this is effectively just an assignment.
-  dstringt &operator=(dstringt &&other) noexcept
-  {
-    no = other.no;
-    return *this;
-  }
 
   // output
 

@@ -182,7 +182,7 @@ public:
     }
   }
 
-  // Copy from rvalue reference.
+  // Move constructor.
   // Note that this does avoid a branch compared to the
   // standard copy constructor above.
   // Marked noexcept so that std::vector (and other containers) move

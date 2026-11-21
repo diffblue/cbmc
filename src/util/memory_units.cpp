@@ -16,24 +16,6 @@ memory_sizet::memory_sizet() : bytes(0)
 memory_sizet::memory_sizet(std::size_t bytes) : bytes(bytes)
 {
 }
-memory_sizet::memory_sizet(const memory_sizet &other) : bytes(other.bytes)
-{
-}
-memory_sizet::memory_sizet(memory_sizet &&other) noexcept : bytes(other.bytes)
-{
-}
-
-memory_sizet &memory_sizet::operator=(const memory_sizet &other)
-{
-  bytes = other.bytes;
-  return *this;
-}
-
-memory_sizet &memory_sizet::operator=(memory_sizet &&other) noexcept
-{
-  bytes = other.bytes;
-  return *this;
-}
 
 memory_sizet memory_sizet::from_bytes(std::size_t bytes)
 {
