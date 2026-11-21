@@ -124,7 +124,7 @@ static void set_internal_dynamic_object(
   if(expr.id()==ID_symbol)
   {
     const auto &type = expr.type();
-    if(type.id() != ID_code && type.id() != ID_mathematical_function)
+    if(type.id() != ID_code)
     {
       const irep_idt &id = to_ssa_expr(expr).get_original_name();
       const symbolt *symbol;
