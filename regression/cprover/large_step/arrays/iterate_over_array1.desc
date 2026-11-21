@@ -1,0 +1,7 @@
+CORE
+iterate_over_array1.c
+--safety
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.array_bounds\.1\] line \d+ array bounds in array\[.*i\]: SUCCESS$
+--

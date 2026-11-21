@@ -1,0 +1,7 @@
+CORE
+use_old1.c
+
+^EXIT=0$
+^SIGNAL=0$
+^\[my_function\.assertion\.1\] line \d+ property 1: SUCCESS$
+--

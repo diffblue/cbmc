@@ -1,0 +1,6 @@
+CORE
+memset_override_0_impl_contract.c
+--safety
+^EXIT=0$
+^SIGNAL=0$
+--

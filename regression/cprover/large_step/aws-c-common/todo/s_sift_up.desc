@@ -1,0 +1,6 @@
+CORE
+s_sift_up_contract.c
+--safety
+^EXIT=0$
+^SIGNAL=0$
+--
