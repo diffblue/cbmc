@@ -1020,10 +1020,53 @@ void goto_instrument_parse_optionst::get_goto_program()
   config.set_from_symbol_table(goto_model.symbol_table);
 }
 
+void goto_instrument_parse_optionst::parse_contract_replacement_options(
+  optionst &options) const
+{
+  const bool require_contracts =
+    cmdline.isset(FLAG_ALWAYS_REQUIRE_FUNCTION_CONTRACTS);
+  const bool always_use_contracts =
+    require_contracts || cmdline.isset(FLAG_ALWAYS_USE_FUNCTION_CONTRACTS);
+  if(cmdline.isset(FLAG_KEEP_FUNCTION_BODY) && !always_use_contracts)
+  {
+    throw invalid_command_line_argument_exceptiont(
+      "Requires --" FLAG_ALWAYS_USE_FUNCTION_CONTRACTS
+      " or --" FLAG_ALWAYS_REQUIRE_FUNCTION_CONTRACTS,
+      "--" FLAG_KEEP_FUNCTION_BODY);
+  }
+  if(!always_use_contracts)
+    return;
+
+  const std::string mode_option =
+    require_contracts ? "--" FLAG_ALWAYS_REQUIRE_FUNCTION_CONTRACTS
+                      : "--" FLAG_ALWAYS_USE_FUNCTION_CONTRACTS;
+  if(!cmdline.isset(FLAG_DFCC))
+  {
+    throw invalid_command_line_argument_exceptiont(
+      "Requires --" FLAG_DFCC, mode_option);
+  }
+  for(const auto &flag : {"inline", "escape-analysis"})
+  {
+    if(cmdline.isset(flag))
+    {
+      throw invalid_command_line_argument_exceptiont(
+        std::string("--") + flag +
+          " can inline function bodies before contract replacement",
+        mode_option);
+    }
+  }
+
+  options.set_option(FLAG_ALWAYS_USE_FUNCTION_CONTRACTS, true);
+  options.set_option(FLAG_ALWAYS_REQUIRE_FUNCTION_CONTRACTS, require_contracts);
+  options.set_option(
+    FLAG_KEEP_FUNCTION_BODY, cmdline.get_values(FLAG_KEEP_FUNCTION_BODY));
+}
+
 void goto_instrument_parse_optionst::instrument_goto_program()
 {
   optionst options;
 
+  parse_contract_replacement_options(options);
   parse_nondet_volatile_options(cmdline, options);
 
   // disable simplify when adding various checks?
@@ -2044,6 +2087,9 @@ void goto_instrument_parse_optionst::help()
     "\n"
     "Code contracts:\n"
     HELP_DFCC
+    HELP_ALWAYS_USE_FUNCTION_CONTRACTS
+    HELP_ALWAYS_REQUIRE_FUNCTION_CONTRACTS
+    HELP_KEEP_FUNCTION_BODY
     HELP_LOOP_CONTRACTS
     HELP_DISABLE_SIDE_EFFECT_CHECK
     HELP_LOOP_CONTRACTS_NO_UNWIND

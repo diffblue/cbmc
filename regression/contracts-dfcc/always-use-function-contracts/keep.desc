@@ -1,0 +1,9 @@
+CORE dfcc-only
+main.c
+--dfcc main --enforce-contract foo --always-use-function-contracts --keep-function-body callee
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+An explicit body exception restores the proof using the implementation.

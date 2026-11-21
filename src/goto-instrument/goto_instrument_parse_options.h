@@ -101,6 +101,9 @@ Author: Daniel Kroening, kroening@kroening.com
   "(z3)(add-library)(show-dependence-graph)" \
   "(horn)(skip-loops):(model-argc-argv):" \
   OPT_DFCC \
+  OPT_ALWAYS_USE_FUNCTION_CONTRACTS \
+  OPT_ALWAYS_REQUIRE_FUNCTION_CONTRACTS \
+  OPT_KEEP_FUNCTION_BODY \
   "(" FLAG_LOOP_CONTRACTS ")" \
   "(" FLAG_DISABLE_SIDE_EFFECT_CHECK ")" \
   "(" FLAG_LOOP_CONTRACTS_NO_UNWIND ")" \
@@ -155,6 +158,9 @@ protected:
 
   void get_goto_program();
   void instrument_goto_program();
+
+  /// Validate and pass the options for default function contract replacement.
+  void parse_contract_replacement_options(optionst &options) const;
 
   void do_indirect_call_and_rtti_removal(bool force=false);
   void do_remove_const_function_pointers_only();

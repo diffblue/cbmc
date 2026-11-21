@@ -1,0 +1,10 @@
+CORE dfcc-only
+missing.c
+--dfcc main --enforce-contract foo --always-use-function-contracts
+^Keeping body of 'callee', which has no contract$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+A callee without a contract keeps its body, and the fallback is reported.
