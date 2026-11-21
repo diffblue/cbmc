@@ -33,41 +33,44 @@ public:
   virtual std::string what() const;
   virtual ~cprover_exception_baset() = default;
 
-  cprover_exception_baset() = default;
-
   cprover_exception_baset(cprover_exception_baset &&) = default;
 
   // std::ostringstream does not have a copy constructor
   cprover_exception_baset(const cprover_exception_baset &src)
   {
-    _reason << src.reason();
+    reason_stream << src.reason();
   }
+
+  // std::ostringstream is not copy-assignable, and exceptions need not be
+  // assignable
+  cprover_exception_baset &operator=(const cprover_exception_baset &) = delete;
 
   std::string reason() const
   {
-    return _reason.str();
+    return reason_stream.str();
   }
 
 protected:
-  /// This constructor is marked protected to ensure this class isn't used
+  /// The constructors are marked protected to ensure this class isn't used
   /// directly. Deriving classes should be used to more precisely describe the
   /// problem that occurred.
+  cprover_exception_baset() = default;
+
   explicit cprover_exception_baset(std::string reason)
+    : reason_stream{std::move(reason), std::ios_base::out | std::ios_base::ate}
   {
-    // ostringstream does not have an appropriate constructor
-    _reason << reason;
   }
 
   /// The reason this exception was generated. This is the string returned by
   /// `what()` unless that method is overridden.  This is an ostringstream
   /// to enable efficient appending with <<.
-  std::ostringstream _reason;
+  std::ostringstream reason_stream;
 
-  // to provide access to the _reason field
+  // to provide access to the reason_stream field
   template <typename E, typename T>
   friend std::enable_if_t<
     std::is_base_of<cprover_exception_baset, std::decay_t<E>>::value,
-    E &&>
+    E>
   operator<<(E &&, const T &);
 };
 
@@ -75,13 +78,17 @@ protected:
 /// cprover_exception_baset exception; the type of the
 /// exception is preserved, enabling
 /// `throw some_exceptiont{...} << "text"`
+/// \return a reference to \p e if it is an lvalue, and otherwise the
+///   exception itself (moved from \p e), so that the result does not refer to
+///   a temporary that may no longer exist when the result is used
 template <typename E, typename T>
-std::enable_if_t<
-  std::is_base_of<cprover_exception_baset, std::decay_t<E>>::value,
-  E &&>
-operator<<(E &&e, const T &message)
+std::
+  enable_if_t<
+    std::is_base_of<cprover_exception_baset, std::decay_t<E>>::value,
+    E>
+  operator<<(E &&e, const T &message)
 {
-  e._reason << message;
+  e.reason_stream << message;
   return std::forward<E>(e);
 }
 
@@ -216,12 +223,6 @@ public:
     std::string reason,
     source_locationt source_location);
   std::string what() const override;
-
-  // This method will go away, in favor of cprover_exception_baset::reason
-  std::string get_reason() const
-  {
-    return reason();
-  }
 
   const source_locationt &get_source_location() const
   {

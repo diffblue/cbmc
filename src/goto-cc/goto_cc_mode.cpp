@@ -122,7 +122,7 @@ int goto_cc_modet::main(int argc, const char **argv)
   {
     messaget log{message_handler};
     log.error().source_location = e.get_source_location();
-    log.error() << e.get_reason() << messaget::eom;
+    log.error() << e.reason() << messaget::eom;
     return EX_SOFTWARE;
   }
 

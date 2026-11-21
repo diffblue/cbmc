@@ -331,7 +331,7 @@ void contracts_wranglert::mangle(
   catch(const invalid_source_file_exceptiont &e)
   {
     log.error().source_location = e.get_source_location();
-    log.error() << e.get_reason() << messaget::eom;
+    log.error() << e.reason() << messaget::eom;
     throw typecheck_error();
   }
 
