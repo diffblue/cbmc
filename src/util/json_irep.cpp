@@ -185,6 +185,11 @@ json_objectt json(const source_locationt &location)
   const auto &pragmas = location.get_pragmas();
   if(!pragmas.empty())
   {
+    // Not built with make_range(pragmas).map(...): pre-release snapshots of
+    // GCC 16 (16.0.1) report a false-positive -Warray-bounds for the
+    // json_stringt that such a mapping creates; GCC 16.2.0 does not. Whether
+    // the warning occurs depends on the surrounding code, not on the
+    // container: the nested mapping in optionst::to_json does not trigger it.
     json_arrayt json_pragmas;
     for(const auto &pragma : pragmas)
       json_pragmas.push_back(json_stringt{pragma.first});

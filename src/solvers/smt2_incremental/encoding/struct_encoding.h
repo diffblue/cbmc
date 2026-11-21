@@ -20,6 +20,8 @@ class struct_encodingt final
 public:
   explicit struct_encodingt(const namespacet &ns);
   struct_encodingt(const struct_encodingt &other);
+  /// Not assignable, as the namespace is held by reference.
+  struct_encodingt &operator=(const struct_encodingt &) = delete;
   ~struct_encodingt();
 
   typet encode(typet type) const;

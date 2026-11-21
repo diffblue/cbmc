@@ -161,6 +161,9 @@ exprt integer_expression(int i)
 
 exprt top_expression()
 {
+  // A local object rather than std::make_shared: with the latter, GCC 16
+  // reports a false-positive -Warray-bounds in the shared_ptr control block
+  // for the virtual call to to_constant.
   abstract_objectt top_value(integer_typet(), true, false);
-  return top_value.abstract_objectt::to_constant();
+  return top_value.to_constant();
 }
