@@ -167,12 +167,10 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    ```
    dnf install java-1.8.0-openjdk-devel maven jq
    ```
-   JBMC can be built with JDK versions 8 through 21. JDK 22 and newer fail to
-   compile the Java models library in `jbmc/lib/java-models-library`. The
-   supported JDK does not need to be the system-wide default. If the default
-   JDK is newer than 21, set `JAVA_HOME` to a supported JDK and prepend its
-   `bin` directory to `PATH` in the shell that runs the build. For example,
-   on Debian/Ubuntu on x86-64:
+   JBMC can be built with JDK 8 or newer (versions up to 25 are known to
+   work). The JDK does not need to be the system-wide default: to use another
+   one, set `JAVA_HOME` to it and prepend its `bin` directory to `PATH` in the
+   shell that runs the build. For example, on Debian/Ubuntu on x86-64:
    ```
    export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
    export PATH="$JAVA_HOME/bin:$PATH"
@@ -184,7 +182,7 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    java -version
    javac -version
    ```
-   Both commands should report a version between 1.8 (that is, 8) and 21.
+   Both commands should report a version of 1.8 (that is, 8) or newer.
 
 2. As a user, get the CBMC source via
    ```
@@ -227,11 +225,10 @@ Follow these instructions:
    make -C src
    ```
 4. To compile JBMC, you additionally need Maven 3, which has to be installed
-   manually, and a JDK with a version between 8 and 21. JDK 22 and newer fail
-   to compile the Java models library. Homebrew's `maven` package uses the
-   newest Homebrew OpenJDK unless `JAVA_HOME` is set, so set `JAVA_HOME` to a
-   supported JDK in the shell that runs the build. `/usr/libexec/java_home -V`
-   lists the JDKs that macOS knows about. Then do
+   manually, and JDK 8 or newer. Homebrew's `maven` package uses the newest
+   Homebrew OpenJDK unless `JAVA_HOME` is set; to use another JDK, set
+   `JAVA_HOME` to it in the shell that runs the build.
+   `/usr/libexec/java_home -V` lists the JDKs that macOS knows about. Then do
    ```
    make -C jbmc/src setup-submodules
    make -C jbmc/src
@@ -272,9 +269,8 @@ Maven 3 manually.
    ```
    pkg install openjdk8 wget maven
    ```
-   JBMC can be built with JDK versions 8 through 21, but not with JDK 22 or
-   newer. If the default JDK is newer than 21, select OpenJDK 8 in the shell
-   that runs the build:
+   JBMC can be built with JDK 8 or newer. To select OpenJDK 8 in the shell
+   that runs the build, if it is not the default:
    ```
    export JAVA_HOME=/usr/local/openjdk8
    export PATH="$JAVA_HOME/bin:$PATH"
