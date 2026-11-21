@@ -1,7 +1,7 @@
 int main() {
-  unsigned x;
-  int i;
-  int a[100];
+  unsigned x = __VERIFIER_nondet_unsigned();
+  int i = __VERIFIER_nondet_int();
+  int a[100] = {0};
 
   // this is guaranteed not to be a buffer overflow
   if(x<100 && a[x])

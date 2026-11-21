@@ -1,0 +1,11 @@
+CORE
+main.c
+--function test_initialized_before_use --uninitialized-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+\[test_initialized_before_use.uninitialized.*FAILURE
+--
+Basic: variable initialized before use should pass.

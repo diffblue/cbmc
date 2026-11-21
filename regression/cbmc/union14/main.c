@@ -18,7 +18,7 @@ union repr {
 struct slice cast(int *data, unsigned long int len)
 {
   struct fatptr x;
-  union repr z;
+  union repr z = {0};
   x.data = data;
   x.len = len;
   z.raw = x;
@@ -28,7 +28,7 @@ struct slice cast(int *data, unsigned long int len)
 struct fatptr cast2(int *data, unsigned long int len)
 {
   struct slice w;
-  union repr z;
+  union repr z = {0};
   w.data = data;
   w.len = len;
   z.rust = w;

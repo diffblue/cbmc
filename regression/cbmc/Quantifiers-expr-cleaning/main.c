@@ -8,7 +8,7 @@ int main()
 
   // make value sets produce a derefd_pointer object for ((const char*)p)[i]
   // below
-  _Bool nondet;
+  _Bool nondet = __VERIFIER_nondet__Bool();
   int *p = nondet ? &x : &y;
 
   // clang-format off

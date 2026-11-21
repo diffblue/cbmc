@@ -13,7 +13,7 @@ void g(int garg)
 int main()
 {
   void (*p)(int);
-  __CPROVER_bool c;
+  __CPROVER_bool c = __VERIFIER_nondet___CPROVER_bool();
 
   p=c?f:g;
 

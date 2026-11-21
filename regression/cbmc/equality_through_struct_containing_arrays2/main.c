@@ -33,7 +33,7 @@ void pass_through_struct_containing_arrays (int q, int j)
 
 int main (void)
 {
-  int q;
+  int q = __VERIFIER_nondet_int();
 
   s[1].z = 0;
 

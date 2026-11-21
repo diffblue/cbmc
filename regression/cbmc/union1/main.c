@@ -14,7 +14,7 @@ int main()
   // little and big endian case, assuming sizeof(int)==4
   assert(my_U.i==1 || my_U.i==0x01000000);
 
-  union u_type u;
+  union u_type u = {0};
 
   u.i=1;
   assert(u.i==1);
