@@ -138,8 +138,6 @@ void dfcc_spec_functionst::generate_havoc_function(
     "not enough arguments when inlining " + id2string(havoc_function_id));
 
   goto_model.goto_functions.function_map.at(havoc_function_id).make_hidden();
-
-  goto_model.goto_functions.update(havoc_program);
 }
 
 void dfcc_spec_functionst::generate_havoc_instructions(
