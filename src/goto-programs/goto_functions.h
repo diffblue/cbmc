@@ -131,6 +131,15 @@ public:
   /// The validation mode indicates whether well-formedness check failures are
   /// reported via DATA_INVARIANT violations or exceptions.
   void validate(const namespacet &, validation_modet) const;
+
+  /// Check that the numbers computed by \ref update() are valid in every
+  /// function body: each body by \ref goto_programt::validate_numbering, and
+  /// across the bodies, location numbers below the unused location number
+  /// that do not overlap between bodies.
+  ///
+  /// The validation mode indicates whether well-formedness check failures are
+  /// reported via DATA_INVARIANT violations or exceptions.
+  void validate_numbering(const validation_modet vm) const;
 };
 
 #endif // CPROVER_GOTO_PROGRAMS_GOTO_FUNCTIONS_H

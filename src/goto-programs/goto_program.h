@@ -870,6 +870,18 @@ public:
     }
   }
 
+  /// Check that the numbers computed by \ref update() are valid: location
+  /// numbers strictly increase along the instructions (gaps are allowed),
+  /// target numbers are 1, 2, 3, ... on the jump targets, loop numbers are
+  /// 0, 1, 2, ... on the backwards gotos, and the incoming edges are the
+  /// predecessors. This does not check that location numbers are unique
+  /// across the functions of a program, see
+  /// \ref goto_functionst::validate_numbering.
+  ///
+  /// The validation mode indicates whether well-formedness check failures are
+  /// reported via DATA_INVARIANT violations or exceptions.
+  void validate_numbering(const validation_modet vm) const;
+
   static instructiont make_set_return_value(
     exprt return_value,
     const source_locationt &l = source_locationt::nil())

@@ -27,8 +27,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "validate_code.h"
 
+#include <algorithm>
 #include <iomanip>
 #include <map>
+#include <unordered_map>
+#include <unordered_set>
 
 goto_programt::instructiont goto_programt::make_incomplete_goto(
   const code_gotot &_code,
@@ -766,6 +769,110 @@ void goto_programt::compute_incoming_edges()
       if(s!=instructions.end())
         s->incoming_edges.insert(it);
     }
+  }
+}
+
+void goto_programt::validate_numbering(const validation_modet vm) const
+{
+  using const_target_sett =
+    std::unordered_set<const_targett, const_target_hash>;
+
+  const auto describe = [](const instructiont &instruction)
+  { return "location number " + std::to_string(instruction.location_number); };
+
+  // Location numbers, see compute_location_numbers
+  for(auto it = instructions.begin(); it != instructions.end(); ++it)
+  {
+    const auto next = std::next(it);
+    DATA_CHECK_WITH_DIAGNOSTICS(
+      vm,
+      next == instructions.end() || it->location_number < next->location_number,
+      "location numbers must strictly increase along the instructions",
+      describe(*it) + " is followed by " + describe(*next));
+  }
+
+  // Target numbers, see compute_target_numbers
+  const_target_sett jump_targets;
+  for(const auto &instruction : instructions)
+  {
+    for(const auto &target : instruction.targets)
+    {
+      if(target != instructions.end())
+        jump_targets.insert(target);
+    }
+  }
+
+  unsigned expected_target_number = 1;
+  for(auto it = instructions.begin(); it != instructions.end(); ++it)
+  {
+    const bool is_jump_target = jump_targets.count(it) != 0;
+    DATA_CHECK_WITH_DIAGNOSTICS(
+      vm,
+      !is_jump_target || it->is_target(),
+      "an instruction that is a jump target must have a target number",
+      describe(*it));
+    DATA_CHECK_WITH_DIAGNOSTICS(
+      vm,
+      is_jump_target || !it->is_target(),
+      "an instruction that is not a jump target must not have a target number",
+      describe(*it));
+
+    if(is_jump_target)
+    {
+      DATA_CHECK_WITH_DIAGNOSTICS(
+        vm,
+        it->target_number == expected_target_number,
+        "target numbers must be 1, 2, 3, ... in the order of the instructions",
+        describe(*it) + " has target number " +
+          std::to_string(it->target_number) + ", expected " +
+          std::to_string(expected_target_number));
+      ++expected_target_number;
+    }
+  }
+
+  // Loop numbers, see compute_loop_numbers. This relies on the location
+  // numbers checked above, which is_backwards_goto compares.
+  unsigned expected_loop_number = 0;
+  for(auto it = instructions.begin(); it != instructions.end(); ++it)
+  {
+    if(it->is_backwards_goto())
+    {
+      DATA_CHECK_WITH_DIAGNOSTICS(
+        vm,
+        it->loop_number == expected_loop_number,
+        "loop numbers must be 0, 1, 2, ... in the order of the backwards gotos",
+        describe(*it) + " has loop number " + std::to_string(it->loop_number) +
+          ", expected " + std::to_string(expected_loop_number));
+      ++expected_loop_number;
+    }
+  }
+
+  // Incoming edges, see compute_incoming_edges
+  std::unordered_map<const_targett, const_target_sett, const_target_hash>
+    predecessors;
+  for(auto it = instructions.begin(); it != instructions.end(); ++it)
+  {
+    for(const auto &successor : get_successors(it))
+    {
+      if(successor != instructions.end())
+        predecessors[successor].insert(it);
+    }
+  }
+
+  for(auto it = instructions.begin(); it != instructions.end(); ++it)
+  {
+    const const_target_sett &expected = predecessors[it];
+    DATA_CHECK_WITH_DIAGNOSTICS(
+      vm,
+      it->incoming_edges.size() == expected.size() &&
+        std::all_of(
+          it->incoming_edges.begin(),
+          it->incoming_edges.end(),
+          [&expected](const targett &edge)
+          { return expected.count(edge) != 0; }),
+      "the incoming edges of an instruction must be the instructions that "
+      "have it as a successor",
+      describe(*it));
   }
 }
 
