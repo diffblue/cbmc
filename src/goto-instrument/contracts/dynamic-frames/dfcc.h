@@ -271,6 +271,17 @@ protected:
   /// are tagged with ID_C_no_nondet_initialization when created
   /// Update statics and static function maps
   void reinitialize_model();
+
+  /// Checks that every function body of the model has valid instruction
+  /// numbers, as computed by `goto_functionst::update`. DFCC keeps this
+  /// invariant between its stages, see
+  /// \ref dfcc_instrumentt::instrument_goto_function.
+  ///
+  /// A violation is a bug in the transformation, not in the user's program, so
+  /// it is reported as a failed invariant.
+  ///
+  /// \param stage name of the stage that has just finished, for the diagnostics
+  void check_numbering(const std::string &stage);
 };
 
 #endif

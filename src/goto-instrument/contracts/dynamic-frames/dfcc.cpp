@@ -9,6 +9,7 @@ Author: Remi Delmas, delmarsd@amazon.com
 #include "dfcc.h"
 
 #include <util/config.h>
+#include <util/invariant.h>
 #include <util/prefix.h>
 #include <util/string_utils.h>
 
@@ -434,6 +435,22 @@ void dfcct::wrap_discovered_function_pointer_contracts()
   }
 }
 
+void dfcct::check_numbering(const std::string &stage)
+{
+  try
+  {
+    goto_model.goto_functions.validate_numbering(validation_modet::EXCEPTION);
+  }
+  catch(const incorrect_goto_program_exceptiont &exception)
+  {
+    INVARIANT_WITH_DIAGNOSTICS(
+      false,
+      "DFCC keeps valid instruction numbers between its stages",
+      "after stage " + stage,
+      exception.what());
+  }
+}
+
 void dfcct::instrument_other_functions()
 {
   // instrument all other remaining functions
@@ -451,6 +468,9 @@ void dfcct::instrument_other_functions()
       function_id, loop_contract_config, function_pointer_contracts);
   }
 
+  // Before the update() below, which would hide a stale body
+  check_numbering("instrument_other_functions");
+
   goto_model.goto_functions.update();
 }
 
@@ -458,11 +478,19 @@ void dfcct::transform_goto_model()
 {
   check_transform_goto_model_preconditions();
   link_model_and_load_dfcc_library();
+
+  // From here on, check after each stage the numbering invariant
+  // documented in dfcc_instrumentt::instrument_goto_function.
   lift_memory_predicates();
+  check_numbering("lift_memory_predicates");
   instrument_harness_function();
+  check_numbering("instrument_harness_function");
   wrap_checked_function();
+  check_numbering("wrap_checked_function");
   wrap_replaced_functions();
+  check_numbering("wrap_replaced_functions");
   wrap_discovered_function_pointer_contracts();
+  check_numbering("wrap_discovered_function_pointer_contracts");
   instrument_other_functions();
 
   // take the max of function of loop contracts assigns clauses
