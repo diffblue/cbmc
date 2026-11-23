@@ -1,0 +1,13 @@
+CORE
+backward_goto_fallthrough.c
+--unwind 3 --unwinding-assertions --paths lifo
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+With --paths, resuming the saved jump-target path of the backward goto
+"goto back" continues at the instruction after that goto, which is the head of
+the inner loop. This transition is a forward one and must reset the inner
+loop's unwinding counter, as it does without --paths.
