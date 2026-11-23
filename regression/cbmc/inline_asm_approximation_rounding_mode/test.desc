@@ -1,0 +1,13 @@
+CORE gcc-only no-new-smt
+main.c
+
+^EXIT=10$
+^SIGNAL=0$
+approximating inline assembly statement at .* line 6 function main: instruction 'fxrstor' is not modeled, so the objects its operands point to
+^\[main\.assertion\.1\] line 8 rounding mode: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Inline assembly that is not modeled may change the floating-point rounding
+mode.

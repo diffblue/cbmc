@@ -1,0 +1,29 @@
+CORE gcc-only
+main.c
+--no-standard-checks
+^EXIT=10$
+^SIGNAL=0$
+approximating inline assembly statement at .* line 27 function main: instruction 'xchg' is not modeled, so its output operands and the rounding mode are assigned nondeterministic values
+approximating inline assembly statement at .* line 33 function main: instruction 'addl' is not modeled
+^\[main\.assertion\.1\] line 28 output operand: FAILURE$
+^\[main\.assertion\.2\] line 34 mixed statement: FAILURE$
+^\[main\.assertion\.3\] line 40 array operand: FAILURE$
+^\[main\.assertion\.4\] line 43 pointer cast to integer: FAILURE$
+^\[main\.assertion\.5\] line 47 pointer member: FAILURE$
+^\[main\.assertion\.6\] line 48 input operand: SUCCESS$
+^\[main\.assertion\.7\] line 55 static object: FAILURE$
+^\[main\.assertion\.8\] line 56 pointee of static pointer: FAILURE$
+^\[main\.assertion\.9\] line 62 address-taken local: FAILURE$
+^\[main\.assertion\.10\] line 63 local without address: SUCCESS$
+^\[main\.assertion\.11\] line 69 empty statement: SUCCESS$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+dropping inline assembly
+--
+Inline-assembly statements containing an unrecognized instruction are
+approximated conservatively by the remove_asm pass: output operands, the
+objects pointer operands point to, with a "memory" clobber the objects of
+static lifetime, what these point to, and address-taken local variables, and
+the rounding mode are assigned nondeterministic values.
+See GitHub issue diffblue/cbmc#6374.
