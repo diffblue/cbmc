@@ -1,0 +1,10 @@
+CORE
+count.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+%n (with the length modifiers) stores the number of characters output so far.

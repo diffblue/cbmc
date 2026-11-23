@@ -1,0 +1,11 @@
+CORE
+locale.c
+--unwind 10 --unwinding-assertions
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+On macOS and FreeBSD, snprintf_l and vsnprintf_l use the model of vsnprintf.
+Elsewhere this test is vacuous.

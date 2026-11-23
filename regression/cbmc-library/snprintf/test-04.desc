@@ -1,0 +1,10 @@
+CORE
+main4.c
+--pointer-check --bounds-check --unwind 10 --unwinding-assertions
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+snprintf(NULL, 0, ...) returns the length of the output (issue #9307).
