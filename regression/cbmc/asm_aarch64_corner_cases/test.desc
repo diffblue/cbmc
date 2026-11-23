@@ -1,0 +1,22 @@
+CORE gcc-only
+main.c
+--arch arm64
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line 27 msr nzcv clears Z: SUCCESS$
+^\[main\.assertion\.2\] line 30 mrs nzcv after equality: SUCCESS$
+^\[main\.assertion\.3\] line 34 ll/sc result: SUCCESS$
+^\[main\.assertion\.4\] line 35 ll/sc stored: SUCCESS$
+^\[main\.assertion\.5\] line 45 store-exclusive stores: FAILURE$
+^\[main\.assertion\.6\] line 46 store-exclusive fails: FAILURE$
+^\[main\.assertion\.7\] line 47 status matches the store: SUCCESS$
+^\[main\.assertion\.8\] line 55 store-exclusive after clrex: SUCCESS$
+^\[main\.assertion\.9\] line 60 register variable: FAILURE$
+approximating inline assembly statement at .* line 59 function main: writes register x0, which is neither an operand nor clobbered
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+approximating inline assembly statement at .* function add_ll_sc
+--
+The properties marked "fails" in main.c may be violated on hardware; all
+others hold on hardware.

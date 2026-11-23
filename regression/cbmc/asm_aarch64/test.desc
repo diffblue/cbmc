@@ -1,0 +1,14 @@
+CORE gcc-only
+main.c
+--arch arm64
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+approximating inline assembly
+--
+The AArch64 inline assembly in main.c is interpreted exactly: if CBMC
+approximated any statement, the assertions, which check values observed with
+an emulator, would fail. The retry loops of load-exclusive/store-exclusive
+sequences need no unwinding: their failed attempts have no effect.

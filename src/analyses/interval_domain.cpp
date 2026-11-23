@@ -127,6 +127,9 @@ void interval_domaint::transform(
   case SKIP:         // No action required
     break;
   case OTHER:
+    // the objects reachable from pointers may be any of the variables
+    if(instruction.get_other().get_statement() == ID_havoc_reachable)
+      make_top();
 #if 0
     DATA_INVARIANT(false, "Unclear what is a safe over-approximation of OTHER");
 #endif

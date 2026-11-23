@@ -694,7 +694,7 @@ void goto_convertt::convert(
   else if(statement == ID_CPROVER_try_finally)
     convert_CPROVER_try_finally(code, dest, mode);
   else if(statement == ID_asm)
-    convert_asm(to_code_asm(code), dest);
+    convert_asm(to_code_asm(code), dest, mode);
   else if(statement == ID_static_assert)
   {
     // C23 allows static_assert without message

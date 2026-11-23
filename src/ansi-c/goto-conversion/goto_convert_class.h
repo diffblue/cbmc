@@ -357,7 +357,8 @@ protected:
     const codet &code,
     goto_programt &dest,
     const irep_idt &mode);
-  void convert_asm(const code_asmt &code, goto_programt &dest);
+  void
+  convert_asm(const code_asmt &code, goto_programt &dest, const irep_idt &mode);
 
   void convert(const codet &code, goto_programt &dest, const irep_idt &mode);
 

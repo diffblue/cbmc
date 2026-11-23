@@ -1,0 +1,11 @@
+CORE
+main.c
+--arch riscv64
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Side effects in the operands of gcc-style inline assembly used to be lost, as
+the operands were only kept in the (later removed) assembly statement.
