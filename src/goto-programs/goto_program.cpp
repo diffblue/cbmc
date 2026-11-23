@@ -135,6 +135,20 @@ std::ostream &goto_programt::instructiont::output(std::ostream &out) const
         out << "HAVOC_OBJECT " << format(code.op0()) << '\n';
         break;
       }
+      else if(code.get_statement() == ID_havoc_reachable)
+      {
+        out << "HAVOC_REACHABLE";
+        if(code.get_bool(ID_arbitrary_memory))
+          out << " (arbitrary memory)";
+        bool first = true;
+        for(const auto &op : code.operands())
+        {
+          out << (first ? " " : ", ") << format(op);
+          first = false;
+        }
+        out << '\n';
+        break;
+      }
       else if(code.get_statement() == ID_fence)
       {
         out << "FENCE";

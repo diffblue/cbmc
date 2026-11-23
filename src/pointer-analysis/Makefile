@@ -1,5 +1,6 @@
 SRC = add_failed_symbols.cpp \
       goto_program_dereference.cpp \
+      reachable_objects.cpp \
       show_value_sets.cpp \
       value_set.cpp \
       value_set_analysis.cpp \
