@@ -310,6 +310,7 @@ void rd_range_domaint::transform_assign(
   reaching_definitions_analysist &rd)
 {
   rw_range_set_value_sett rw_set(ns, rd.get_value_sets(), message_handler);
+  rw_set.set_dirty(rd.get_is_dirty());
   goto_rw(function_to, to, rw_set);
   const bool is_must_alias=rw_set.get_w_set().size()==1;
 
