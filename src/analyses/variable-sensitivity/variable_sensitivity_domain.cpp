@@ -154,6 +154,9 @@ void variable_sensitivity_domaint::transform(
     throw "exceptions not handled";
 
   case OTHER:
+    // the objects reachable from pointers may be any of the variables
+    if(instruction.get_other().get_statement() == ID_havoc_reachable)
+      abstract_state.havoc("havoc_reachable");
     //    throw "other";
     break;
 
