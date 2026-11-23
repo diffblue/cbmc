@@ -47,7 +47,13 @@ protected:
     equalitiest equalities;
   };
 
-  typedef std::unordered_map<const typet, typestructt, irep_hash> typemapt;
+  /// Uses an ordered map as add_equality_constraints iterates over this map to
+  /// produce constraints: iterating over a hash map would make the order of
+  /// those constraints depend on hash values, which in turn depend on the
+  /// numbering of strings (see dstringt) and thus on unrelated inputs, such as
+  /// the set of C library functions or file names. The order of constraints
+  /// can significantly affect SAT-solver performance.
+  typedef std::map<typet, typestructt> typemapt;
 
   typemapt typemap;
 
