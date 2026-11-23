@@ -66,6 +66,10 @@ void goto_symext::havoc_rec(
   {
     havoc_rec(state, guard, to_member_expr(dest).struct_op());
   }
+  else if(dest.id() == ID_string_constant || dest.is_constant())
+  {
+    // string literals and other constants are not objects that can change
+  }
   else
   {
     INVARIANT_WITH_DIAGNOSTICS(
@@ -252,6 +256,10 @@ void goto_symext::symex_other(
   else if(statement==ID_fence)
   {
     target.memory_barrier(state.guard.as_expr(), state.source);
+  }
+  else if(statement == ID_havoc_reachable)
+  {
+    symex_havoc_reachable(state, code);
   }
   else if(statement==ID_havoc_object)
   {
