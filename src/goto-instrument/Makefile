@@ -25,6 +25,7 @@ SRC = accelerate/accelerate.cpp \
       contracts/dynamic-frames/dfcc_check_loop_normal_form.cpp \
       contracts/dynamic-frames/dfcc_root_object.cpp \
       contracts/dynamic-frames/dfcc_infer_loop_assigns.cpp \
+      contracts/dynamic-frames/dfcc_write_summaries.cpp \
       contracts/dynamic-frames/dfcc_cfg_info.cpp \
       contracts/dynamic-frames/dfcc_instrument_loop.cpp \
       contracts/dynamic-frames/dfcc_library.cpp \
