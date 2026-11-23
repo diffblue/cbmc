@@ -48,6 +48,19 @@ file(
 string(REGEX REPLACE "CBMC_VERSION = ([0-9.]+).*" "\\1" CBMC_VERSION ${CBMC_VERSION})
 message(STATUS "Building CBMC version ${CBMC_VERSION}")
 
+# Default to macOS 11.0, the oldest deployment target that libc++ 22 supports,
+# unless the user chose a target via -DCMAKE_OSX_DEPLOYMENT_TARGET=... or the
+# MACOSX_DEPLOYMENT_TARGET environment variable. This must be set before
+# project(), which uses it while detecting the toolchain. An empty cache entry,
+# as created by project() on macOS when neither is given, counts as unset.
+# src/common and .github/workflows/pull-request-check-rust-api.yaml hard-code
+# the same default.
+if("${CMAKE_OSX_DEPLOYMENT_TARGET}" STREQUAL "" AND
+   "$ENV{MACOSX_DEPLOYMENT_TARGET}" STREQUAL "")
+  set(CMAKE_OSX_DEPLOYMENT_TARGET 11.0 CACHE STRING
+    "Minimum macOS version to target for deployment" FORCE)
+endif()
+
 project(CBMC VERSION ${CBMC_VERSION})
 
 set(CBMC_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
@@ -62,8 +75,6 @@ if(CCACHE_PROGRAM)
  endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS true)
-
-set(CMAKE_OSX_DEPLOYMENT_TARGET 11.0)
 
 include(GNUInstallDirs)
 
