@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/format_expr.h>
 #include <util/format_type.h>
 #include <util/invariant.h>
+#include <util/irep_hash.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/std_code.h>
@@ -614,6 +615,162 @@ void goto_programt::compute_loop_numbers()
   for(auto &i : instructions)
     if(i.is_backwards_goto())
       i.loop_number=nr++;
+}
+
+/// Compute a structural hash of an expression that is stable across variable
+/// renaming. Symbols are replaced by a canonical index based on order of first
+/// appearance, so that two variables with different scopes but the same
+/// structural role hash identically.
+static std::size_t structural_expr_hash(
+  const exprt &expr,
+  std::map<irep_idt, std::size_t> &symbol_map)
+{
+  std::size_t result = hash_string(id2string(expr.id()));
+
+  if(expr.id() == ID_symbol)
+  {
+    // Replace the symbol name with a canonical index based on first appearance
+    const irep_idt &name = to_symbol_expr(expr).get_identifier();
+    auto [it, inserted] = symbol_map.emplace(name, symbol_map.size());
+    result = hash_combine(result, it->second);
+    result = hash_combine(result, expr.type().string_hash());
+  }
+  else
+  {
+    result = hash_combine(result, expr.type().string_hash());
+
+    for(const auto &op : expr.operands())
+      result = hash_combine(result, structural_expr_hash(op, symbol_map));
+
+    // Hash non-comment named subs (e.g., component_name for member access)
+    for(const auto &named_sub : expr.get_named_sub())
+    {
+      if(!irept::is_comment(named_sub.first) && named_sub.first != ID_type)
+      {
+        result = hash_combine(result, hash_string(id2string(named_sub.first)));
+        result = hash_combine(result, named_sub.second.string_hash());
+      }
+    }
+  }
+
+  return result;
+}
+
+/// Compute a hash for an instruction based on its structural properties.
+/// This hash excludes position-dependent information like location_number,
+/// target_number, source location, and variable names, focusing on the
+/// semantic structure.
+static std::size_t hash_instruction_structure(
+  const goto_programt::instructiont &instruction,
+  std::map<irep_idt, std::size_t> &symbol_map)
+{
+  std::size_t result = 0;
+
+  // Hash the instruction type
+  result = hash_combine(result, static_cast<std::size_t>(instruction.type()));
+
+  // Hash the guard/condition expression if present
+  if(instruction.has_condition())
+    result = hash_combine(
+      result, structural_expr_hash(instruction.condition(), symbol_map));
+
+  // Hash the code
+  result =
+    hash_combine(result, structural_expr_hash(instruction.code(), symbol_map));
+
+  // Hash the control-flow structure: for goto/branch instructions, fold in the
+  // relative offset of each target (target location number minus this
+  // instruction's location number). Using the relative offset keeps the hash
+  // position-independent -- shifting the whole loop leaves it unchanged --
+  // while still distinguishing loop bodies whose branch targets differ.
+  for(const auto &target : instruction.targets)
+    result = hash_combine(
+      result,
+      static_cast<std::size_t>(
+        target->location_number - instruction.location_number));
+
+  return result;
+}
+
+/// Compute hash-based loop identifiers that are stable across unrelated
+/// code changes. This implementation follows the AST fingerprinting approach,
+/// hashing the structural properties of the loop including:
+/// - The instruction types and semantic (expression) content in body order
+/// - The control flow structure of the loop body, via the relative offsets of
+///   branch targets (so the hash is position-independent but still sensitive
+///   to differing control flow)
+/// - The loop condition
+void goto_programt::compute_loop_hashes()
+{
+  for(auto it = instructions.begin(); it != instructions.end(); ++it)
+  {
+    if(!it->is_backwards_goto())
+      continue;
+
+    it->loop_hash = compute_loop_hash(it);
+  }
+}
+
+std::size_t
+goto_programt::compute_loop_hash(instructionst::const_iterator it) const
+{
+  PRECONDITION(it->is_backwards_goto());
+
+  std::size_t loop_hash = 0;
+
+  // Symbol map for canonical variable naming within this loop
+  std::map<irep_idt, std::size_t> symbol_map;
+
+  // Hash the condition of the backwards goto (loop exit condition)
+  if(it->has_condition())
+    loop_hash = hash_combine(
+      loop_hash, structural_expr_hash(it->condition(), symbol_map));
+
+  // Find the backwards target (loop header) — pick the target with the
+  // smallest location_number that is <= the goto's own location_number.
+  if(!it->targets.empty())
+  {
+    instructionst::const_iterator loop_head = instructions.end();
+    for(const auto &t : it->targets)
+    {
+      if(
+        t->location_number <= it->location_number &&
+        (loop_head == instructions.end() ||
+         t->location_number < loop_head->location_number))
+      {
+        loop_head = t;
+      }
+    }
+
+    if(loop_head != instructions.end())
+    {
+      // Hash the structure of instructions in the loop body
+      // We iterate from the loop header to the backwards goto.
+      // Note: for an irreducible region, or when the chosen backwards target
+      // sits earlier than the textual loop head, [loop_head, it) may sweep in
+      // instructions that don't belong to this loop. That only makes the hash
+      // coarser (more collisions), never unsafe: location_number is monotone,
+      // so the walk still terminates at `it`.
+      std::size_t body_hash = 0;
+      std::size_t instruction_count = 0;
+
+      for(auto body_it = loop_head; body_it != it; ++body_it)
+      {
+        body_hash = hash_combine(
+          body_hash, hash_instruction_structure(*body_it, symbol_map));
+        ++instruction_count;
+      }
+
+      // Incorporate the body hash and instruction count
+      loop_hash = hash_combine(loop_hash, body_hash);
+      loop_hash = hash_combine(loop_hash, instruction_count);
+    }
+  }
+
+  // Finalize the hash, ensuring it is never zero (zero is the sentinel for
+  // "not computed")
+  std::size_t result = hash_finalize(loop_hash, 0);
+  return result == 0 ? 1 : result;
 }
 
 void goto_programt::update()

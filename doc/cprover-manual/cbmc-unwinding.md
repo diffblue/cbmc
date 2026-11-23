@@ -104,6 +104,43 @@ As an example, consider a program with two loops in the function main:
 This sets a bound of 10 for the first loop, and a bound of 20 for the
 second loop.
 
+### Hash-based Loop Identifiers
+
+The ordinal loop IDs (such as `main.0`, `main.1`) depend on the
+position of the loop within the function. Adding or removing code before
+a loop — even unrelated code such as a `do { ... } while(0)` from a C
+macro — can shift the ordinal numbers and break `--unwindset` settings.
+
+To address this, `--show-loops` also displays a hash-based identifier
+for each loop:
+
+    Loop main.0: (hash main.hash_706061793765627172)
+      file example.c line 10 function main
+
+The hash is computed from the structural content of the loop body
+(instruction types, expression shapes and types, and the loop's
+control-flow structure via relative branch targets) while ignoring
+variable names. This makes it stable across unrelated code changes.
+
+Note that the hash is a machine-word-sized value: `hash_combine` and
+`hash_finalize` are parameterised on `sizeof(std::size_t) * CHAR_BIT`, so
+a given loop's hash differs between 32-bit and 64-bit builds. The
+stability guarantee therefore holds across unrelated code changes for a
+fixed toolchain and word size, not across platforms; a hash pinned in a
+CI script is tied to the build that produced it.
+
+Hash-based identifiers can be used in `--unwindset` in place of ordinal
+IDs:
+
+    --unwindset main.hash_706061793765627172:10
+
+This is particularly useful in CI scripts where the verification
+harness must survive code modifications in other parts of the file.
+
+Note that two loops with identical structure will have the same hash.
+In that case, the hash-based identifier refers to the first matching
+loop in the function.
+
 What if the number of unwindings specified is too small? In this case,
 bugs that require paths that are deeper may be missed. In order to
 address this problem, CBMC can optionally insert checks that the given
