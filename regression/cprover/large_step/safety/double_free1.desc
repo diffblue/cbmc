@@ -1,0 +1,8 @@
+CORE
+double_free1.c
+--safety
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.free\.1\] line \d+ free argument must be valid dynamic object: SUCCESS$
+^\[main\.free\.2\] line \d+ free argument must be valid dynamic object: REFUTED$
+--

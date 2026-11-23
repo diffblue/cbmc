@@ -29,6 +29,7 @@ class solver_optionst
 public:
   bool trace;
   bool verbose;
+  bool large_step;
   std::size_t loop_limit;
 };
 

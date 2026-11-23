@@ -1,0 +1,6 @@
+CORE
+aws_byte_buf_append_with_lookup_contract.c
+--safety
+^EXIT=0$
+^SIGNAL=0$
+--
