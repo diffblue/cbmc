@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/config.h>
 #include <util/find_symbols.h>
+#include <util/message.h>
 
 #include <goto-programs/remove_skip.h>
 
@@ -257,6 +258,27 @@ void full_slicert::operator()(
   const slicing_criteriont &criterion,
   message_handlert &message_handler)
 {
+  // The objects that havoc_reachable (from the approximation of inline
+  // assembly) changes are reachable through heap objects, which the
+  // dependence graph does not track: the instructions that link heap objects
+  // would be sliced away, making these objects unreachable.
+  for(const auto &gf_entry : goto_functions.function_map)
+  {
+    for(const auto &instruction : gf_entry.second.body.instructions)
+    {
+      if(
+        instruction.is_other() &&
+        instruction.get_other().get_statement() == ID_havoc_reachable)
+      {
+        messaget log{message_handler};
+        log.warning() << "not slicing, as the program contains inline "
+                         "assembly that may change any reachable object"
+                      << messaget::eom;
+        return;
+      }
+    }
+  }
+
   // build the CFG data structure
   cfg(goto_functions);
   for(const auto &gf_entry : goto_functions.function_map)
