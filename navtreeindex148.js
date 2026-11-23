@@ -1,5 +1,15 @@
 var NAVTREEINDEX148 =
 {
+"structsmt__core__theoryt_1_1nott.html":[5,0,1142,0],
+"structsmt__core__theoryt_1_1nott.html#a3c017380187f49f1445a1de6df79260c":[5,0,1142,0,1],
+"structsmt__core__theoryt_1_1nott.html#ab07e061d2ed29653b23448e22a17b283":[5,0,1142,0,2],
+"structsmt__core__theoryt_1_1nott.html#aceb602364586bf2439119def6cfd1971":[5,0,1142,0,0],
+"structsmt__core__theoryt_1_1ort.html":[5,0,1142,3],
+"structsmt__core__theoryt_1_1ort.html#a75498c02f910112b3a65af063347a875":[5,0,1142,3,2],
+"structsmt__core__theoryt_1_1ort.html#a7ae854223e8e9c31dc73693252a2395b":[5,0,1142,3,0],
+"structsmt__core__theoryt_1_1ort.html#ac3a0c0ae377fe584c40c0df736724c91":[5,0,1142,3,1],
+"structsmt__core__theoryt_1_1xort.html":[5,0,1142,4],
+"structsmt__core__theoryt_1_1xort.html#a6cf999942c4a93ad4c670532e5cb6a78":[5,0,1142,4,0],
 "structsmt__core__theoryt_1_1xort.html#aad9e476bb35ad70ba6af90d6bcbf55a3":[5,0,1142,4,2],
 "structsmt__core__theoryt_1_1xort.html#ac27509a07a742a42b796aff0209c435b":[5,0,1142,4,1],
 "structsmt__function__application__termt_1_1has__indicest.html":[5,0,1149,0],
@@ -239,15 +249,5 @@ var NAVTREEINDEX148 =
 "structtemplate__parametert.html#a4d52b8f54f9008e38e57627a30879db5":[5,0,1293,2],
 "structtemplate__parametert.html#aa16983bc267e38e4ff4686e0c1788b50":[5,0,1293,0],
 "structtemplate__parametert.html#aec90078a01d135d76e54f1cf1cf627d8":[5,0,1293,3],
-"structto__be__merged__irep__hash.html":[5,0,1299],
-"structto__be__merged__irep__hash.html#a1bf41d3c6ceb55ca581675ff2234faf0":[5,0,1299,0],
-"structtrace__optionst.html":[5,0,1303],
-"structtrace__optionst.html#a1cd395b2c6b6913cee49747796a272e6":[5,0,1303,4],
-"structtrace__optionst.html#a2f24c247d5fa9b58259a3f9a7eab9cf2":[5,0,1303,6],
-"structtrace__optionst.html#a55cd374bf8f4bb8b618bd1fe32ae3826":[5,0,1303,0],
-"structtrace__optionst.html#a76a5f0f669c04090fe75a4212d1dc215":[5,0,1303,5],
-"structtrace__optionst.html#a789f2d807df3cc04ff28c8abb5dce3fe":[5,0,1303,2],
-"structtrace__optionst.html#a996e9bc10e923d796b3cbf6e44a2fa69":[5,0,1303,7],
-"structtrace__optionst.html#ac83c0ab1c6ede34802a7e4ba90a0f11b":[5,0,1303,1],
-"structtrace__optionst.html#ad62883f8a357167a764549d6831e2242":[5,0,1303,3]
+"structto__be__merged__irep__hash.html":[5,0,1299]
 };

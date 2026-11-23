@@ -101,11 +101,14 @@ $(function(){initNavTree('stdio_8c.html','',''); });
 <div class="textblock"><code>#include &lt;stdio.h&gt;</code><br />
 <code>#include &lt;stdlib.h&gt;</code><br />
 <code>#include &lt;stdarg.h&gt;</code><br />
+<code>#include &lt;stddef.h&gt;</code><br />
+<code>#include &lt;stdint.h&gt;</code><br />
+<code>#include &lt;limits.h&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return dynsection.toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;"><span class="dynarrow"><span class="arrowhead closed"></span></span>Include dependency graph for stdio.c:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" loading="lazy" frameborder="0" src="stdio_8c__incl.svg" width="268" height="148"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" loading="lazy" frameborder="0" src="stdio_8c__incl.svg" width="555" height="148"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 </div>
 <p><a href="stdio_8c_source.html">Go to the source code of this file.</a></p>
@@ -115,6 +118,15 @@ Macros</h2></td></tr>
 <tr class="memitem:af17b9da009da2ac77559d406cc9b2662" id="r_af17b9da009da2ac77559d406cc9b2662"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af17b9da009da2ac77559d406cc9b2662">__CPROVER_STDIO_H_INCLUDED</a></td></tr>
 <tr class="memitem:a174ac0f9c9df3af3e5480cbc69b53da8" id="r_a174ac0f9c9df3af3e5480cbc69b53da8"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a174ac0f9c9df3af3e5480cbc69b53da8">__CPROVER_STDLIB_H_INCLUDED</a></td></tr>
 <tr class="memitem:a02659164b04453533e9b855e2d2783f0" id="r_a02659164b04453533e9b855e2d2783f0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a02659164b04453533e9b855e2d2783f0">__CPROVER_STDARG_H_INCLUDED</a></td></tr>
+<tr class="memitem:a75f4ddb89445a1e78e51ef43d128ce5f" id="r_a75f4ddb89445a1e78e51ef43d128ce5f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a75f4ddb89445a1e78e51ef43d128ce5f">__CPROVER_STDDEF_H_INCLUDED</a></td></tr>
+<tr class="memitem:a1e5f7b41a88e217972a585bf869395d4" id="r_a1e5f7b41a88e217972a585bf869395d4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1e5f7b41a88e217972a585bf869395d4">__CPROVER_STDINT_H_INCLUDED</a></td></tr>
+<tr class="memitem:a508e18289cf35f19c7562637b9a63a8b" id="r_a508e18289cf35f19c7562637b9a63a8b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a508e18289cf35f19c7562637b9a63a8b">__CPROVER_LIMITS_H_INCLUDED</a></td></tr>
+<tr class="memitem:a59b90a60784fc7b60a5201fdfbafa627" id="r_a59b90a60784fc7b60a5201fdfbafa627"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a59b90a60784fc7b60a5201fdfbafa627">__CPROVER_VSNPRINTF_EMIT</a>(c)</td></tr>
+<tr class="memitem:a11f6c1ba3a541b37a173e21bf0dce3df" id="r_a11f6c1ba3a541b37a173e21bf0dce3df"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a11f6c1ba3a541b37a173e21bf0dce3df">__CPROVER_VSNPRINTF_PAD</a>(c,  count,  bound)</td></tr>
+<tr class="memitem:a2d37a680548d34a14e88d9b2ec3076ce" id="r_a2d37a680548d34a14e88d9b2ec3076ce"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2d37a680548d34a14e88d9b2ec3076ce">__CPROVER_VSNPRINTF_DIGIT</a></td></tr>
+<tr class="memitem:a0f6103859671f9822345453ea04c553d" id="r_a0f6103859671f9822345453ea04c553d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0f6103859671f9822345453ea04c553d">__CPROVER_VSNPRINTF_DIGIT4</a></td></tr>
+<tr class="memitem:ad7a832b72ec0000b57e504b116baa7db" id="r_ad7a832b72ec0000b57e504b116baa7db"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad7a832b72ec0000b57e504b116baa7db">__CPROVER_VSNPRINTF_DIGIT_OUT</a>(k)</td></tr>
+<tr class="memitem:ad1119144b6f8ba67e9541f968054366c" id="r_ad1119144b6f8ba67e9541f968054366c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad1119144b6f8ba67e9541f968054366c">__CPROVER_VSNPRINTF_DIGIT_OUT4</a>(k)</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -176,9 +188,26 @@ Functions</h2></td></tr>
 <tr class="memitem:a37c1e8ce8a2b411fa666dc33972a2cec" id="r_a37c1e8ce8a2b411fa666dc33972a2cec"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a37c1e8ce8a2b411fa666dc33972a2cec">snprintf</a> (char *str, size_t size, const char *fmt,...)</td></tr>
 <tr class="memitem:a5d7b4614fd21a3faeeb556598b000aa2" id="r_a5d7b4614fd21a3faeeb556598b000aa2"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5d7b4614fd21a3faeeb556598b000aa2">__builtin___vsnprintf_chk</a> (char *str, size_t size, int flag, size_t bufsize, const char *fmt, va_list ap)</td></tr>
 <tr class="memitem:a61f1e8102ded95d7e691484db1320c66" id="r_a61f1e8102ded95d7e691484db1320c66"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a61f1e8102ded95d7e691484db1320c66">__builtin___snprintf_chk</a> (char *str, size_t size, int flag, size_t bufsize, const char *fmt,...)</td></tr>
+<tr class="memitem:a1b2ce319c3f183e85a5df523775d4a3b" id="r_a1b2ce319c3f183e85a5df523775d4a3b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1b2ce319c3f183e85a5df523775d4a3b">__CPROVER_vsnprintf</a> (char *str, size_t size, const char *fmt, va_list ap, _Bool terminate)</td></tr>
 <tr class="memitem:a154043ea6d83b8616f3148fbf4f24244" id="r_a154043ea6d83b8616f3148fbf4f24244"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a154043ea6d83b8616f3148fbf4f24244">vsnprintf</a> (char *str, size_t size, const char *fmt, va_list ap)</td></tr>
 </table>
 <a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
+<a id="a508e18289cf35f19c7562637b9a63a8b" name="a508e18289cf35f19c7562637b9a63a8b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a508e18289cf35f19c7562637b9a63a8b">&#9670;&#160;</a></span>__CPROVER_LIMITS_H_INCLUDED</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define __CPROVER_LIMITS_H_INCLUDED</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01877">1877</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+
+</div>
+</div>
 <a id="a02659164b04453533e9b855e2d2783f0" name="a02659164b04453533e9b855e2d2783f0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a02659164b04453533e9b855e2d2783f0">&#9670;&#160;</a></span>__CPROVER_STDARG_H_INCLUDED</h2>
 
@@ -192,6 +221,38 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01016">1016</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+
+</div>
+</div>
+<a id="a75f4ddb89445a1e78e51ef43d128ce5f" name="a75f4ddb89445a1e78e51ef43d128ce5f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a75f4ddb89445a1e78e51ef43d128ce5f">&#9670;&#160;</a></span>__CPROVER_STDDEF_H_INCLUDED</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define __CPROVER_STDDEF_H_INCLUDED</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01867">1867</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+
+</div>
+</div>
+<a id="a1e5f7b41a88e217972a585bf869395d4" name="a1e5f7b41a88e217972a585bf869395d4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1e5f7b41a88e217972a585bf869395d4">&#9670;&#160;</a></span>__CPROVER_STDINT_H_INCLUDED</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define __CPROVER_STDINT_H_INCLUDED</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01872">1872</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -224,6 +285,167 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00070">70</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+
+</div>
+</div>
+<a id="a2d37a680548d34a14e88d9b2ec3076ce" name="a2d37a680548d34a14e88d9b2ec3076ce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d37a680548d34a14e88d9b2ec3076ce">&#9670;&#160;</a></span>__CPROVER_VSNPRINTF_DIGIT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define __CPROVER_VSNPRINTF_DIGIT</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">  <span class="keywordflow">do</span>                                                                           \</div>
+<div class="line">  {                                                                            \</div>
+<div class="line">    if(m != 0)                                                                 \</div>
+<div class="line">    {                                                                          \</div>
+<div class="line">      buf[n] = digits[m % base];                                               \</div>
+<div class="line">      ++n;                                                                     \</div>
+<div class="line">      m /= base;                                                               \</div>
+<div class="line">    }                                                                          \</div>
+<div class="line">  } <span class="keywordflow">while</span>(0)</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01916">1916</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+
+</div>
+</div>
+<a id="a0f6103859671f9822345453ea04c553d" name="a0f6103859671f9822345453ea04c553d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0f6103859671f9822345453ea04c553d">&#9670;&#160;</a></span>__CPROVER_VSNPRINTF_DIGIT4</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define __CPROVER_VSNPRINTF_DIGIT4</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">  <span class="keywordflow">do</span>                                                                           \</div>
+<div class="line">  {                                                                            \</div>
+<div class="line">    <a class="code hl_define" href="#a2d37a680548d34a14e88d9b2ec3076ce">__CPROVER_VSNPRINTF_DIGIT</a>;                                                 \</div>
+<div class="line">    <a class="code hl_define" href="#a2d37a680548d34a14e88d9b2ec3076ce">__CPROVER_VSNPRINTF_DIGIT</a>;                                                 \</div>
+<div class="line">    <a class="code hl_define" href="#a2d37a680548d34a14e88d9b2ec3076ce">__CPROVER_VSNPRINTF_DIGIT</a>;                                                 \</div>
+<div class="line">    <a class="code hl_define" href="#a2d37a680548d34a14e88d9b2ec3076ce">__CPROVER_VSNPRINTF_DIGIT</a>;                                                 \</div>
+<div class="line">  } <span class="keywordflow">while</span>(0)</div>
+<div class="ttc" id="astdio_8c_html_a2d37a680548d34a14e88d9b2ec3076ce"><div class="ttname"><a href="#a2d37a680548d34a14e88d9b2ec3076ce">__CPROVER_VSNPRINTF_DIGIT</a></div><div class="ttdeci">#define __CPROVER_VSNPRINTF_DIGIT</div><div class="ttdef"><b>Definition</b> <a href="stdio_8c_source.html#l01916">stdio.c:1916</a></div></div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01926">1926</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+
+</div>
+</div>
+<a id="ad7a832b72ec0000b57e504b116baa7db" name="ad7a832b72ec0000b57e504b116baa7db"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad7a832b72ec0000b57e504b116baa7db">&#9670;&#160;</a></span>__CPROVER_VSNPRINTF_DIGIT_OUT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define __CPROVER_VSNPRINTF_DIGIT_OUT</td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>k</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">  <span class="keywordflow">do</span>                                                                           \</div>
+<div class="line">  {                                                                            \</div>
+<div class="line">    if(n &gt; (k))                                                                \</div>
+<div class="line">      __CPROVER_VSNPRINTF_EMIT(buf[k]);                                        \</div>
+<div class="line">  } <span class="keywordflow">while</span>(0)</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01934">1934</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+
+</div>
+</div>
+<a id="ad1119144b6f8ba67e9541f968054366c" name="ad1119144b6f8ba67e9541f968054366c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad1119144b6f8ba67e9541f968054366c">&#9670;&#160;</a></span>__CPROVER_VSNPRINTF_DIGIT_OUT4</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define __CPROVER_VSNPRINTF_DIGIT_OUT4</td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>k</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">  <span class="keywordflow">do</span>                                                                           \</div>
+<div class="line">  {                                                                            \</div>
+<div class="line">    __CPROVER_VSNPRINTF_DIGIT_OUT((k) + 3);                                    \</div>
+<div class="line">    __CPROVER_VSNPRINTF_DIGIT_OUT((k) + 2);                                    \</div>
+<div class="line">    __CPROVER_VSNPRINTF_DIGIT_OUT((k) + 1);                                    \</div>
+<div class="line">    __CPROVER_VSNPRINTF_DIGIT_OUT(k);                                          \</div>
+<div class="line">  } <span class="keywordflow">while</span>(0)</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01941">1941</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+
+</div>
+</div>
+<a id="a59b90a60784fc7b60a5201fdfbafa627" name="a59b90a60784fc7b60a5201fdfbafa627"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59b90a60784fc7b60a5201fdfbafa627">&#9670;&#160;</a></span>__CPROVER_VSNPRINTF_EMIT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define __CPROVER_VSNPRINTF_EMIT</td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>c</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">  <span class="keywordflow">do</span>                                                                           \</div>
+<div class="line">  {                                                                            \</div>
+<div class="line">    if(out + terminate &lt; size)                                                 \</div>
+<div class="line">      str[out] = (c);                                                          \</div>
+<div class="line">    ++out;                                                                     \</div>
+<div class="line">  } <span class="keywordflow">while</span>(0)</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01898">1898</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+
+</div>
+</div>
+<a id="a11f6c1ba3a541b37a173e21bf0dce3df" name="a11f6c1ba3a541b37a173e21bf0dce3df"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a11f6c1ba3a541b37a173e21bf0dce3df">&#9670;&#160;</a></span>__CPROVER_VSNPRINTF_PAD</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define __CPROVER_VSNPRINTF_PAD</td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>c</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>count</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>bound</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">  <span class="keywordflow">do</span>                                                                           \</div>
+<div class="line">  {                                                                            \</div>
+<div class="line">    for(<span class="keywordtype">long</span> <span class="keywordtype">long</span> k = 0; k &lt; (bound) &amp;&amp; (size_t)k &lt; size; ++k)                 \</div>
+<div class="line">      <span class="keywordflow">if</span>(k &lt; (count))                                                          \</div>
+<div class="line">        __CPROVER_VSNPRINTF_EMIT(c);                                           \</div>
+<div class="line">    if((count) &gt; 0 &amp;&amp; (<span class="keywordtype">size_t</span>)(count) &gt; size)                                  \</div>
+<div class="line">      out += (size_t)((count) - (<span class="keywordtype">long</span> <span class="keywordtype">long</span>)size);                              \</div>
+<div class="line">    (count) = 0;                                                               \</div>
+<div class="line">  } <span class="keywordflow">while</span>(0)</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01906">1906</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -310,7 +532,45 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01921">1921</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l02319">2319</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+
+</div>
+</div>
+<a id="a1b2ce319c3f183e85a5df523775d4a3b" name="a1b2ce319c3f183e85a5df523775d4a3b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1b2ce319c3f183e85a5df523775d4a3b">&#9670;&#160;</a></span>__CPROVER_vsnprintf()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int __CPROVER_vsnprintf </td>
+          <td>(</td>
+          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>str</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>size</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>fmt</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">va_list</td>          <td class="paramname"><span class="paramname"><em>ap</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">_Bool</td>          <td class="paramname"><span class="paramname"><em>terminate</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01950">1950</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -1677,7 +1937,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01869">1869</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l02292">2292</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
