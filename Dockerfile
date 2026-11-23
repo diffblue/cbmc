@@ -57,6 +57,13 @@ RUN --mount=type=cache,target=/ccache \
     ccache -s
 
 FROM ubuntu:24.04 AS runner
+# Link the image to this repository when it is pushed to the GitHub Container
+# Registry (see the push-docker-image-ghcr job in
+# .github/workflows/release-packages.yaml). Without this label GHCR does not
+# associate a newly created package with the repository, and the workflow's
+# GITHUB_TOKEN is then denied write access to it.
+LABEL org.opencontainers.image.source=https://github.com/diffblue/cbmc
+LABEL org.opencontainers.image.description="CBMC, JBMC, and the other CProver tools"
 COPY --from=builder /tmp/cbmc/build/bin/* /usr/local/bin/
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
