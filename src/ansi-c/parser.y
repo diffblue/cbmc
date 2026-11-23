@@ -2495,10 +2495,14 @@ compound_statement:
         }
         | compound_scope '{' TOK_ASM_STRING '}'
         {
+          // a block of assembly following the asm keyword, as in
+          // asm int f() { ... }: gcc-style basic assembly
           $$=$2;
           statement($$, ID_asm);
+          parser_stack($$).set(ID_flavor, ID_gcc);
           parser_stack($$).set(ID_C_end_location, parser_stack($4).source_location());
-          mto($$, $3);
+          parser_stack($$).operands().resize(5);
+          to_multi_ary_expr(parser_stack($$)).op0()=parser_stack($3);
           PARSER.pop_scope();
         }
         ;
@@ -2884,6 +2888,9 @@ gcc_asm_output:
         {
           $$=$5;
           parser_stack($$).id(ID_gcc_asm_output);
+          // the symbolic name, for %[name] references
+          parser_stack($$).set(
+            ID_identifier, parser_stack($2).get(ID_C_base_name));
           parser_stack($$).add_to_operands(std::move(parser_stack($4)), std::move(parser_stack($6)));
         }
         ;
@@ -2921,6 +2928,9 @@ gcc_asm_input:
         {
           $$=$5;
           parser_stack($$).id(ID_gcc_asm_input);
+          // the symbolic name, for %[name] references
+          parser_stack($$).set(
+            ID_identifier, parser_stack($2).get(ID_C_base_name));
           parser_stack($$).add_to_operands(std::move(parser_stack($4)), std::move(parser_stack($6)));
         }
         ;
