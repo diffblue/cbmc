@@ -78,6 +78,16 @@ TEST_CASE(
     REQUIRE_FALSE(summary.unknown);
   }
 
+  SECTION("Write through a cast parameter")
+  {
+    const auto summary = summary_of(
+      "void f(void *v) { *(int *)v = 1; }\n"
+      "void main() {}\n",
+      "f");
+    REQUIRE(summary.parameters == std::set<std::size_t>{0});
+    REQUIRE_FALSE(summary.unknown);
+  }
+
   SECTION("Recursion iterates to a fixpoint")
   {
     const auto summary = summary_of(
@@ -104,6 +114,74 @@ TEST_CASE(
       "f");
     REQUIRE(summary.parameters == std::set<std::size_t>{0, 1});
     REQUIRE_FALSE(summary.unknown);
+  }
+}
+
+/// The summary of `f` in \p code after adding an OTHER instruction with
+/// \p statement and \p operands to the end of its body.
+static write_summaryt summary_with_other(
+  const std::string &code,
+  const irep_idt &statement,
+  const std::function<exprt::operandst(const namespacet &)> &operands)
+{
+  goto_modelt goto_model = get_goto_model_from_c(code);
+  const namespacet ns{goto_model.symbol_table};
+  goto_programt &body = goto_model.goto_functions.function_map.at("f").body;
+  codet other{statement};
+  other.operands() = operands(ns);
+  body.insert_before(
+    std::prev(body.instructions.end()), goto_programt::make_other(other));
+  write_summariest summaries{goto_model.goto_functions, ns};
+  summaries.compute({"f"});
+  return summaries["f"];
+}
+
+TEST_CASE(
+  "Write summaries of OTHER instructions",
+  "[core][goto-instrument][dfcc_write_summaries]")
+{
+  const std::string code =
+    "_Bool g;\n"
+    "void f(int *a, int *b) {}\n"
+    "void main() {}\n";
+
+  SECTION("array_equal writes its third operand")
+  {
+    const auto summary = summary_with_other(
+      code,
+      ID_array_equal,
+      [](const namespacet &ns)
+      {
+        return exprt::operandst{
+          ns.lookup("f::a").symbol_expr(),
+          ns.lookup("f::b").symbol_expr(),
+          ns.lookup("g").symbol_expr()};
+      });
+    REQUIRE(summary.globals == std::set<irep_idt>{"g"});
+    REQUIRE(summary.parameters.empty());
+    REQUIRE_FALSE(summary.unknown);
+  }
+
+  SECTION("A statement that writes nothing")
+  {
+    const auto summary = summary_with_other(
+      code,
+      ID_printf,
+      [](const namespacet &ns)
+      { return exprt::operandst{ns.lookup("f::a").symbol_expr()}; });
+    REQUIRE(summary.globals.empty());
+    REQUIRE(summary.parameters.empty());
+    REQUIRE_FALSE(summary.unknown);
+  }
+
+  SECTION("A statement the analysis does not know")
+  {
+    const auto summary = summary_with_other(
+      code,
+      ID_cpp_delete,
+      [](const namespacet &ns)
+      { return exprt::operandst{ns.lookup("f::a").symbol_expr()}; });
+    REQUIRE(summary.unknown);
   }
 }
 
@@ -151,6 +229,61 @@ TEST_CASE(
   {
     const auto summary = summary_of(
       "void f(unsigned long a) { *(int *)a = 1; }\n"
+      "void main() {}\n",
+      "f");
+    REQUIRE(summary.unknown);
+  }
+
+  SECTION("Pointer stored through a member of a union")
+  {
+    const auto summary = summary_of(
+      "void f(int *q)\n"
+      "{\n"
+      "  union { int *p; unsigned long l; } u;\n"
+      "  u.l = (unsigned long)q;\n"
+      "  *u.p = 2;\n"
+      "}\n"
+      "void main() {}\n",
+      "f");
+    REQUIRE(summary.unknown);
+  }
+
+  SECTION("Pointer in a union literal")
+  {
+    const auto summary = summary_of(
+      "union U { int *p; unsigned long l; };\n"
+      "void f(int *q)\n"
+      "{\n"
+      "  union U u = {.l = (unsigned long)q};\n"
+      "  *u.p = 2;\n"
+      "}\n"
+      "void main() {}\n",
+      "f");
+    REQUIRE(summary.unknown);
+  }
+
+  SECTION("Pointer stored as an integer through a cast pointer")
+  {
+    const auto summary = summary_of(
+      "void f(int *q)\n"
+      "{\n"
+      "  int *p;\n"
+      "  *(unsigned long *)&p = (unsigned long)q;\n"
+      "  *p = 2;\n"
+      "}\n"
+      "void main() {}\n",
+      "f");
+    REQUIRE(summary.unknown);
+  }
+
+  SECTION("Pointer loaded from an integer through a cast pointer")
+  {
+    const auto summary = summary_of(
+      "void f(int *q)\n"
+      "{\n"
+      "  unsigned long l = (unsigned long)q;\n"
+      "  **(int **)&l = 2;\n"
+      "}\n"
       "void main() {}\n",
       "f");
     REQUIRE(summary.unknown);

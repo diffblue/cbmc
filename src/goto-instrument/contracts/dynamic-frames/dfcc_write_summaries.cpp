@@ -8,6 +8,7 @@ Author: Felipe R. Monteiro, felisous@amazon.com
 
 #include "dfcc_write_summaries.h"
 
+#include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
@@ -163,6 +164,26 @@ void write_summariest::analyze(const goto_programt::instructiont &instruction)
       content.unknown = true;
       write_through(origins(code.op0()), content);
     }
+    else if(statement == ID_array_equal && code.operands().size() == 3)
+    {
+      // Assigns whether the arrays are equal to the third operand.
+      write(code.op2(), originst{});
+    }
+    else if(
+      statement == ID_expression || statement == ID_printf ||
+      statement == ID_input || statement == ID_output ||
+      statement == ID_nondet || statement == ID_asm || statement == ID_fence ||
+      statement == ID_user_specified_predicate ||
+      statement == ID_user_specified_parameter_predicates ||
+      statement == ID_user_specified_return_predicates)
+    {
+      // These write nothing (symex ignores `asm`).
+    }
+    else
+    {
+      // Writes the analysis does not know about, for example `cpp_delete`.
+      current.unknown = true;
+    }
   }
 }
 
@@ -243,7 +264,22 @@ void write_summariest::write(const exprt &lhs, const originst &content)
     lhs.id() == ID_byte_extract_little_endian ||
     lhs.id() == ID_byte_extract_big_endian || lhs.id() == ID_typecast)
   {
-    write(lhs.operands().front(), content);
+    const exprt &object = lhs.operands().front();
+    // Writing a part of an object as another type, as through a member of a
+    // union, may turn the bytes of a value without pointers, whose origins
+    // the analysis does not track, into a pointer.
+    const bool reinterprets =
+      lhs.id() != ID_index &&
+      (lhs.id() != ID_member || object.type().id() == ID_union ||
+       object.type().id() == ID_union_tag);
+    if(reinterprets && has_pointers(object.type()))
+    {
+      originst unknown;
+      unknown.unknown = true;
+      write(object, unknown);
+    }
+    else
+      write(object, content);
   }
   else if(lhs.id() == ID_dereference)
     write_through(origins(to_dereference_expr(lhs).pointer()), content);
@@ -317,7 +353,47 @@ originst write_summariest::origins(const exprt &expr)
     if(!has_pointers(op.type()))
       result.unknown = true;
     else
+    {
       result = origins(op);
+      if(expr.type().id() == ID_pointer && op.type().id() == ID_pointer)
+      {
+        // Accessing the locals that the pointer points to as another type
+        // may read or write the bytes of a value without pointers, whose
+        // origins the analysis does not track, as a pointer.
+        const typet &base_type = to_pointer_type(expr.type()).base_type();
+        if(
+          base_type.id() != ID_empty &&
+          base_type != to_pointer_type(op.type()).base_type())
+        {
+          originst unknown;
+          unknown.unknown = true;
+          for(const auto &local : result.locals)
+            variables_changed |= variables[local].merge(unknown);
+        }
+      }
+    }
+  }
+  else if(
+    expr.id() == ID_byte_extract_little_endian ||
+    expr.id() == ID_byte_extract_big_endian)
+  {
+    // As above, reading an object as another type may make a pointer of
+    // the bytes of a value without pointers.
+    const exprt &op = to_byte_extract_expr(expr).op();
+    if(op.type() == expr.type())
+      result = origins(op);
+    else
+      result.unknown = true;
+  }
+  else if(
+    expr.id() == ID_union || expr.id() == ID_byte_update_little_endian ||
+    expr.id() == ID_byte_update_big_endian ||
+    (expr.id() == ID_with &&
+     (expr.type().id() == ID_union || expr.type().id() == ID_union_tag)))
+  {
+    // A member of a union, or an update of the bytes of an object, may hold
+    // a value without pointers that is read as a pointer.
+    result.unknown = true;
   }
   else if(expr.id() == ID_constant || expr.id() == ID_nil)
   {
