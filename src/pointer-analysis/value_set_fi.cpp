@@ -24,7 +24,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/language_util.h>
 
+#include "reachable_objects.h"
+
 #include <ostream>
+#include <set>
 
 const value_set_fit::object_map_dt value_set_fit::object_map_dt::blank{};
 
@@ -1380,6 +1383,41 @@ void value_set_fit::do_end_function(
   assign(lhs, rhs, ns);
 }
 
+void value_set_fit::havoc_reachable(const codet &code, const namespacet &ns)
+{
+  std::vector<exprt> roots;
+  if(code.get_bool(ID_arbitrary_memory))
+  {
+    for(const auto &object : static_lifetime_objects(ns.get_symbol_table(), ns))
+      roots.push_back(object);
+
+    // all variables whose address is stored anywhere
+    std::set<exprt> stored;
+    for(const auto &entry : values)
+    {
+      for(const auto &target : entry.second.object_map.read())
+      {
+        const exprt object = to_expr(target);
+        if(object.id() != ID_object_descriptor)
+          continue;
+        const exprt &root = to_object_descriptor_expr(object).root_object();
+        if(root.id() == ID_symbol && root.type().id() != ID_code)
+          stored.insert(root);
+      }
+    }
+    roots.insert(roots.end(), stored.begin(), stored.end());
+  }
+
+  const reachable_objectst reachable = find_reachable_objects(
+    code.operands(),
+    roots,
+    [this, &ns](const exprt &pointer) { return get_value_set(pointer, ns); },
+    ns);
+
+  for(const auto &pointer : reachable.pointers)
+    assign(pointer, reachable_pointer_value(pointer, reachable), ns);
+}
+
 void value_set_fit::apply_code(const codet &code, const namespacet &ns)
 {
   const irep_idt &statement=code.get(ID_statement);
@@ -1460,6 +1498,10 @@ void value_set_fit::apply_code(const codet &code, const namespacet &ns)
   }
   else if(statement == ID_havoc_object)
   {
+  }
+  else if(statement == ID_havoc_reachable)
+  {
+    havoc_reachable(code, ns);
   }
   else
     throw

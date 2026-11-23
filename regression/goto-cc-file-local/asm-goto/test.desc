@@ -1,0 +1,13 @@
+CORE
+main.c
+compile-and-link assertion-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^\*\*\*\* WARNING: no body for function
+--
+goto-cc --export-file-local-symbols renames the symbols of file-local
+functions. The variable that selects the label an asm goto jumps to must be
+renamed with them, else symbolic execution fails to find it.

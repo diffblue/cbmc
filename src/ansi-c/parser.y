@@ -2495,10 +2495,14 @@ compound_statement:
         }
         | compound_scope '{' TOK_ASM_STRING '}'
         {
+          // a block of assembly following the asm keyword, as in
+          // asm int f() { ... }: gcc-style basic assembly
           $$=$2;
           statement($$, ID_asm);
+          parser_stack($$).set(ID_flavor, ID_gcc);
           parser_stack($$).set(ID_C_end_location, parser_stack($4).source_location());
-          mto($$, $3);
+          parser_stack($$).operands().resize(5);
+          to_multi_ary_expr(parser_stack($$)).op0()=parser_stack($3);
           PARSER.pop_scope();
         }
         ;

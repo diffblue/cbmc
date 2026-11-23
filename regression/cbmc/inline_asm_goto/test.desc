@@ -1,0 +1,18 @@
+CORE gcc-only
+main.c
+--validate-goto-model --validate-ssa-equation
+^EXIT=10$
+^SIGNAL=0$
+approximating inline assembly statement at .* function branch: instruction 'testl' is not modeled, so the choice of the label it jumps to \(if any\)
+^\[main\.assertion\.1\] line 32 falls through: FAILURE$
+^\[main\.assertion\.2\] line 33 jumps to zero: FAILURE$
+^\[main\.assertion\.3\] line 34 jumps to nonzero: FAILURE$
+^\[main\.assertion\.4\] line 35 one of the labels: SUCCESS$
+^\[main\.assertion\.5\] line 36 modeled statement does not jump: SUCCESS$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+goto conversion dispatches on a variable that the translation of the asm goto
+statement sets to the label it jumps to: nondeterministically for a statement
+that is approximated, and to "no jump" for a modeled one.

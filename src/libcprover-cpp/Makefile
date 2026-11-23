@@ -33,6 +33,7 @@ OBJ += \
   ../linking/linking$(LIBEXT) \
   ../pointer-analysis/add_failed_symbols$(OBJEXT) \
   ../pointer-analysis/goto_program_dereference$(OBJEXT) \
+  ../pointer-analysis/reachable_objects$(OBJEXT) \
   ../pointer-analysis/value_set$(OBJEXT) \
   ../pointer-analysis/value_set_analysis_fi$(OBJEXT) \
   ../pointer-analysis/value_set_dereference$(OBJEXT) \
