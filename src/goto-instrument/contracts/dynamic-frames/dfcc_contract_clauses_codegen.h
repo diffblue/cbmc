@@ -18,6 +18,8 @@ Date: February 2023
 #include <util/message.h>
 #include <util/namespace.h>
 
+#include <goto-programs/goto_functions.h>
+
 class conditional_target_group_exprt;
 class dfcc_libraryt;
 class goto_modelt;
@@ -66,12 +68,28 @@ public:
     const exprt::operandst &frees_clause,
     goto_programt &dest);
 
+  /// \brief Records the bodies of the functions of the GOTO model as they are
+  /// now, before any of them gets instrumented.
+  ///
+  /// \details The calls in the instructions generated from then on, e.g., to a
+  /// function in the condition of a conditional target, are inlined using the
+  /// recorded bodies. An instrumented function takes a write set as additional
+  /// parameter, which the generated calls do not pass, and contains calls to
+  /// write set checks, which must not be part of the generated instructions.
+  /// Loop contracts are encoded while functions are being instrumented, so
+  /// that the functions called in their clauses may already be instrumented.
+  void record_function_bodies();
+
 protected:
   goto_modelt &goto_model;
   message_handlert &message_handler;
   messaget log;
   dfcc_libraryt &library;
   namespacet ns;
+
+  /// The function bodies recorded by record_function_bodies
+  goto_functionst function_bodies;
+  bool function_bodies_recorded = false;
 
   /// Generates GOTO instructions to build the representation of the given
   /// conditional target group.

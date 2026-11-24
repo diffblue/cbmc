@@ -17,9 +17,11 @@ Date: August 2022
 
 #include <set>
 
+class goto_functionst;
 class goto_modelt;
 class goto_programt;
 class message_handlert;
+class namespacet;
 class symbol_table_baset;
 class symbolt;
 
@@ -174,6 +176,18 @@ struct dfcc_utilst
   /// caused warnings.
   static void inline_program(
     goto_modelt &goto_model,
+    goto_programt &goto_program,
+    std::set<irep_idt> &no_body,
+    std::set<irep_idt> &recursive_call,
+    std::set<irep_idt> &missing_function,
+    std::set<irep_idt> &not_enough_arguments,
+    message_handlert &message_handler);
+
+  /// \brief Inlines the given program using the function bodies of
+  /// \p goto_functions, and returns function symbols that caused warnings.
+  static void inline_program(
+    goto_functionst &goto_functions,
+    const namespacet &ns,
     goto_programt &goto_program,
     std::set<irep_idt> &no_body,
     std::set<irep_idt> &recursive_call,

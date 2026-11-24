@@ -1,0 +1,17 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^\[foo\.loop_assigns\.\d+\] line 12 Check assigns clause inclusion for loop .*: SUCCESS$
+^\[main\.assertion\.\d+\] line 27 cond: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+The condition of a conditional target in a loop assigns clause calls cond, which
+is also reachable from main and hence instrumented. The code that DFCC generates
+for the loop assigns clause inlines the original body of cond. It used to inline
+the instrumented body, which takes a write set as additional parameter, and
+failed with "not enough arguments when inlining goto program". Passing a write
+set would not suffice: the instrumented body tracks the local r, and the code
+for the loop assigns clause must not contain such instrumentation.

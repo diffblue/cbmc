@@ -494,8 +494,30 @@ void dfcc_utilst::inline_program(
   message_handlert &message_handler)
 {
   const namespacet ns{goto_model.symbol_table};
+  inline_program(
+    goto_model.goto_functions,
+    ns,
+    goto_program,
+    no_body,
+    recursive_call,
+    missing_function,
+    not_enough_arguments,
+    message_handler);
+  goto_model.goto_functions.update();
+}
+
+void dfcc_utilst::inline_program(
+  goto_functionst &goto_functions,
+  const namespacet &ns,
+  goto_programt &goto_program,
+  std::set<irep_idt> &no_body,
+  std::set<irep_idt> &recursive_call,
+  std::set<irep_idt> &missing_function,
+  std::set<irep_idt> &not_enough_arguments,
+  message_handlert &message_handler)
+{
   inlining_decoratort decorated(message_handler);
-  goto_program_inline(goto_model.goto_functions, goto_program, ns, decorated);
+  goto_program_inline(goto_functions, goto_program, ns, decorated);
   no_body.insert(
     decorated.get_no_body_set().begin(), decorated.get_no_body_set().end());
   recursive_call.insert(
@@ -507,5 +529,4 @@ void dfcc_utilst::inline_program(
   not_enough_arguments.insert(
     decorated.get_not_enough_arguments_set().begin(),
     decorated.get_not_enough_arguments_set().end());
-  goto_model.goto_functions.update();
 }

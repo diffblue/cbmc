@@ -257,6 +257,52 @@ void dfcc_contract_clauses_codegent::encode_freeable_target(
   }
 }
 
+void dfcc_contract_clauses_codegent::record_function_bodies()
+{
+  for(const auto &entry : goto_model.goto_functions.function_map)
+    function_bodies.function_map[entry.first].copy_from(entry.second);
+  function_bodies_recorded = true;
+}
+
+/// Adds to \p function_bodies the functions with body that \p goto_program
+/// calls, directly or indirectly, and that are missing from
+/// \p function_bodies, taking them from \p goto_functions.
+static void add_missing_callees(
+  const goto_programt &goto_program,
+  const goto_functionst &goto_functions,
+  goto_functionst &function_bodies,
+  std::set<irep_idt> &visited)
+{
+  for(const auto &instruction : goto_program.instructions)
+  {
+    if(
+      !instruction.is_function_call() ||
+      instruction.call_function().id() != ID_symbol)
+    {
+      continue;
+    }
+
+    const irep_idt &callee =
+      to_symbol_expr(instruction.call_function()).identifier();
+    if(!visited.insert(callee).second)
+      continue;
+
+    auto recorded = function_bodies.function_map.find(callee);
+    if(recorded == function_bodies.function_map.end())
+    {
+      auto current = goto_functions.function_map.find(callee);
+      if(current == goto_functions.function_map.end())
+        continue;
+      recorded =
+        function_bodies.function_map.emplace(callee, goto_functiont{}).first;
+      recorded->second.copy_from(current->second);
+    }
+
+    add_missing_callees(
+      recorded->second.body, goto_functions, function_bodies, visited);
+  }
+}
+
 void dfcc_contract_clauses_codegent::inline_and_check_warnings(
   goto_programt &goto_program)
 {
@@ -267,14 +313,34 @@ void dfcc_contract_clauses_codegent::inline_and_check_warnings(
 
   // we inspect all warnings ourselves, no need to surface them
   null_message_handlert null_message_handler;
-  dfcc_utilst::inline_program(
-    goto_model,
-    goto_program,
-    no_body,
-    recursive_call,
-    missing_function,
-    not_enough_arguments,
-    null_message_handler);
+  if(function_bodies_recorded)
+  {
+    // functions created after the bodies were recorded are used as they are
+    std::set<irep_idt> visited;
+    add_missing_callees(
+      goto_program, goto_model.goto_functions, function_bodies, visited);
+    dfcc_utilst::inline_program(
+      function_bodies,
+      ns,
+      goto_program,
+      no_body,
+      recursive_call,
+      missing_function,
+      not_enough_arguments,
+      null_message_handler);
+    goto_model.goto_functions.update();
+  }
+  else
+  {
+    dfcc_utilst::inline_program(
+      goto_model,
+      goto_program,
+      no_body,
+      recursive_call,
+      missing_function,
+      not_enough_arguments,
+      null_message_handler);
+  }
 
   // check that the only no body / missing functions are the cprover builtins
   for(const auto &id : no_body)
