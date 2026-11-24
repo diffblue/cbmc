@@ -1699,6 +1699,9 @@ static exprt lower_byte_update_array_vector_unbounded(
   PRECONDITION(array_comprehension_index.type() == src.offset().type());
   PRECONDITION(subtype_size.type() == src.offset().type());
   PRECONDITION(first_index.type() == src.offset().type());
+  // remaining_bytes (below) must not wrap around for elements past the end of
+  // the update
+  PRECONDITION(can_cast_type<signedbv_typet>(src.offset().type()));
 
   // the bound from where updates start
   binary_predicate_exprt lower_bound{
@@ -1713,8 +1716,8 @@ static exprt lower_byte_update_array_vector_unbounded(
   const minus_exprt value_offset{
     mult_exprt{subtype_size, array_comprehension_index}, src.offset()};
   // The number of update bytes left from that position on. This is zero or
-  // negative (signed offset type) for elements past the end of the update,
-  // which then remain unchanged.
+  // negative (as the offset type is signed) for elements past the end of the
+  // update, which then remain unchanged.
   const minus_exprt remaining_bytes{
     typecast_exprt::conditional_cast(
       non_const_update_bound, value_offset.type()),
