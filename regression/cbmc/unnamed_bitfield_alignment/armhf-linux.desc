@@ -1,0 +1,11 @@
+CORE
+aapcs.i
+--arch armhf --os linux
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Variant of arm64-linux.desc for 32-bit Arm (AAPCS).

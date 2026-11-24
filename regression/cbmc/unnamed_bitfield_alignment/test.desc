@@ -1,10 +1,12 @@
-CORE gcc-only
-main.c
---c17
-^VERIFICATION SUCCESSFUL$
+CORE
+sysv.i
+--arch x86_64 --os linux
 ^EXIT=0$
 ^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
-FAILURE
 ^CONVERSION ERROR$
+--
+Unnamed bit-fields do not affect the alignment of a structure or union on
+x86-64 Linux. The layouts are those of GCC and Clang.

@@ -1,0 +1,12 @@
+CORE
+sysv.i
+--arch arm64 --os macos
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Variant of test.desc for Arm macOS, which does not follow AAPCS64 in this
+respect.
