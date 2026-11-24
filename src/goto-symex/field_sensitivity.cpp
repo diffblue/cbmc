@@ -177,22 +177,8 @@ exprt field_sensitivityt::apply(
 {
   if(expr.id() != ID_address_of)
   {
-    // A union read as a whole is represented by the fields of its widest
-    // member (see get_fields), but a member of the union or a byte_extract
-    // from it may map to the fields of another member, which
-    // apply_byte_extract and the handling of member expressions below take
-    // care of.
-    const bool keep_union_operand =
-      (expr.id() == ID_member || expr.id() == ID_byte_extract_little_endian ||
-       expr.id() == ID_byte_extract_big_endian) &&
-      is_ssa_expr(expr.operands().front()) &&
-      (expr.operands().front().type().id() == ID_union ||
-       expr.operands().front().type().id() == ID_union_tag);
-    for(auto it = expr.operands().begin(); it != expr.operands().end(); ++it)
-    {
-      if(it != expr.operands().begin() || !keep_union_operand)
-        *it = apply(ns, state, std::move(*it), write);
-    }
+    Forall_operands(it, expr)
+      *it = apply(ns, state, std::move(*it), write);
   }
 
   if(!write && is_ssa_expr(expr))
@@ -441,8 +427,9 @@ void field_sensitivityt::initialize_union_members(
 
   const exprt l2_union = state.rename(fs_ssa->get_object_ssa(), ns).get();
   const exprt union_value =
-    is_ssa_expr(l2_union) ? get_fields(ns, state, to_ssa_expr(l2_union), true)
-                          : l2_union;
+    is_ssa_expr(l2_union)
+      ? get_fields(ns, state, to_ssa_expr(l2_union), true, true)
+      : l2_union;
 
   for(std::size_t i = 0; i < components.size(); ++i)
   {
@@ -485,7 +472,7 @@ std::optional<exprt> field_sensitivityt::union_value_from_widest_member(
     ssa_expr.get_original_expr(),
     widest->first.get_name(),
     widest->first.type()});
-  exprt member_value = get_fields(ns, state, member_ssa, true);
+  exprt member_value = get_fields(ns, state, member_ssa, true, true);
   if(was_l2)
     member_value = state.rename(std::move(member_value), ns).get();
 

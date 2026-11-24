@@ -45,12 +45,10 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
                 state.call_stack().top().hidden_function ||
                 state.source.pc->source_location().get_hide();
 
-  // The declaration only introduces the symbols of the fields: represent a
-  // union by its own symbol, not by the value of its widest member.
   target.decl(
     state.guard.as_expr(),
     ssa,
-    state.field_sensitivity.get_fields(ns, state, ssa, true, false),
+    state.field_sensitivity.apply(ns, state, ssa, false),
     state.source,
     hidden ? symex_targett::assignment_typet::HIDDEN
            : symex_targett::assignment_typet::STATE);

@@ -186,8 +186,9 @@ public:
   /// \param disjoined_fields_only: whether to expand unions (`false`) or not
   ///   (`true`)
   /// \param unions_through_widest_member: when \p disjoined_fields_only is
-  ///   true, whether to represent a union by the fields of its widest member,
-  ///   which is how a union is read, or by the symbol for the union as a whole
+  ///   true, whether to represent a union by the fields of its widest member
+  ///   (as initialize_union_members does), or by the symbol for the union as a
+  ///   whole, which is how a union is read
   /// \return Expanded expression; for example, for a \p ssa_expr of some struct
   ///   type, a `struct_exprt` with each component now being an SSA expression
   ///   is built.
@@ -196,7 +197,7 @@ public:
     goto_symex_statet &state,
     const ssa_exprt &ssa_expr,
     bool disjoined_fields_only,
-    bool unions_through_widest_member = true) const;
+    bool unions_through_widest_member = false) const;
 
   /// Field sensitivity keeps symbols for the fields of each member of a union
   /// (and for the union as a whole), which assignments to the union keep
@@ -204,8 +205,7 @@ public:
   /// of these, while reads of the union may use the fields of any member that
   /// covers the bytes being read. For each union in \p fields, the fields of a
   /// declared object, assign the fields of all members other than the widest
-  /// one the corresponding bytes of the widest member, whose fields also
-  /// represent the union when it is read as a whole (see get_fields).
+  /// one the corresponding bytes of the widest member.
   /// \param ns: a namespace to resolve type symbols/tag types
   /// \param [in,out] state: symbolic execution state
   /// \param fields: the result of get_fields (with \p disjoined_fields_only
@@ -251,10 +251,9 @@ private:
     symex_targett &target,
     bool allow_pointer_unsoundness) const;
 
-  /// Represent the value of a union \p ssa_expr, read as a whole, by the
-  /// fields of its widest member. These are consistent with the fields of the
-  /// other members (see initialize_union_members), whereas the symbol for the
-  /// union as a whole need not be, as a declaration leaves it unconstrained.
+  /// The value of a union \p ssa_expr as given by the fields of its widest
+  /// member (and of the widest members of unions nested in it), from which
+  /// initialize_union_members takes the values of the other members.
   /// \return `union_exprt` of the widest member's fields, or, if the widest
   ///   member is smaller than the union, a `byte_update_exprt` of the union
   ///   with these fields; an empty optional if the union has no members or

@@ -1,0 +1,23 @@
+CORE broken-cprover-smt-backend
+main.c
+--unwind 43 --unwinding-assertions
+^\[main\.assertion\.1\] line \d+ read through a pointer: SUCCESS$
+^\[main\.assertion\.2\] line \d+ read as a member: SUCCESS$
+^\[main\.assertion\.3\] line \d+ pointer member: SUCCESS$
+^\[main\.assertion\.4\] line \d+ loop: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^\[main\.unwind\.\d+\]
+--
+A union read as a whole was represented by the fields of its widest member.
+Copies of the union, and reads of a member of a union that is a member of a
+struct, or through a pointer to the member's type, then took the other
+members' values from those fields: a reinterpretation of a floating-point
+number, which lost the constant stored as an int (so the loop bound became
+symbolic) and the target of the pointer (a spurious failure of "pointer
+member").

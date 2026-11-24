@@ -1,0 +1,24 @@
+CORE no-new-smt
+main.c
+--little-endian --unwind 6 --unwinding-assertions
+^\[main\.assertion\.1\] line \d+ assertion k == 4: SUCCESS$
+^\[main\.assertion\.2\] line \d+ assertion r\.s\.data\[1\] == 'b': SUCCESS$
+^\[main\.assertion\.3\] line \d+ assertion k == 7: SUCCESS$
+^\[main\.assertion\.4\] line \d+ assertion w\.s\.data\[1\] == 'y': SUCCESS$
+^\[main\.assertion\.5\] line \d+ assertion u\.h == 0x0702: SUCCESS$
+^\[main\.assertion\.6\] line \d+ assertion u\.b\[2\] == 9: SUCCESS$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^\[main\.unwind\.\d+\]
+--
+Writing some bytes of a union (memmove into one member's array) must keep
+the values that the other bytes have in each member: field sensitivity
+computed every member's new value from the fields of the widest member, so
+the constant size stored in the short member was lost and the loop bound
+became symbolic (an unwinding assertion).  The short member is as wide as the
+union in r and narrower than the union in w.  The last part writes bytes of a
+union with a value that reads other bytes of the same union.
