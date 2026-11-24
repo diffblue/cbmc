@@ -1,0 +1,13 @@
+CORE dfcc-only
+main.c
+--dfcc main --enforce-contract foo --replace-call-with-contract h _ --unwind 2 --unwinding-assertions
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^\[.*unwind.*\] .*: FAILURE$
+--
+The check that the assigns clause of h's contract, which replaces the call,
+is included in foo's loops over h's 6 targets: DFCC unwinds it as far as the
+largest assigns clause, which counts the replacing contracts' too (foo's has
+1 target), rather than as --unwind says.

@@ -420,6 +420,13 @@ void dfcct::wrap_replaced_functions()
 
     if(other_symbols.find(wrapper_id) != other_symbols.end())
       other_symbols.erase(wrapper_id);
+
+    // (the check that its assigns clause is included in the caller's runs
+    // over its targets)
+    const std::size_t assigns_clause_size =
+      contract_handler.get_assigns_clause_size(contract_id);
+    if(assigns_clause_size > max_assigns_clause_size)
+      max_assigns_clause_size = assigns_clause_size;
   }
 }
 
@@ -482,6 +489,11 @@ void dfcct::wrap_discovered_function_pointer_contracts()
         swap_and_wrap.swap_and_wrap_replace(
           fp_contract, fp_contract, new_contracts);
         swapped.insert(fp_contract);
+        // (see wrap_replaced_functions)
+        const std::size_t assigns_clause_size =
+          contract_handler.get_assigns_clause_size(fp_contract);
+        if(assigns_clause_size > max_assigns_clause_size)
+          max_assigns_clause_size = assigns_clause_size;
 
         // remove it from the set of symbols to process
         if(other_symbols.find(fp_contract) != other_symbols.end())

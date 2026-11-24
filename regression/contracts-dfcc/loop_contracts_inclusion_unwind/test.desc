@@ -1,0 +1,14 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts _ --unwind 2 --unwinding-assertions
+^EXIT=0$
+^SIGNAL=0$
+^\[g\.loop_assigns\.\d+\] line \d+ Check assigns clause inclusion for loop g\.0: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+^\[.*unwind.*\] .*: FAILURE$
+--
+The check that the assigns clause of g's loop is included in that of the
+loop that calls g loops over the clause's targets: DFCC unwinds it as
+far as the largest assigns clause, as its other loops over write sets,
+rather than as --unwind says (2 here, for 7 targets).
