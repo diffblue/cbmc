@@ -1859,6 +1859,22 @@ member_declaring_list:
           record_pragma_pack(parser_stack($$));
           PARSER.add_declarator(parser_stack($$), parser_stack($3));
         }
+        | msc_declspec
+          msc_declspec_opt
+          type_specifier
+          member_declarator
+        {
+          // Visual Studio declspecs preceding the type of a member
+          $3=merge($3, merge($1, $2));
+
+          init($$, ID_declaration);
+          to_ansi_c_declaration(parser_stack($$)).set_is_member(true);
+          parser_stack($$).add_source_location()=parser_stack($3).source_location();
+          parser_stack($$).type().swap(parser_stack($3));
+          // the #pragma pack in effect at this member
+          record_pragma_pack(parser_stack($$));
+          PARSER.add_declarator(parser_stack($$), parser_stack($4));
+        }
         | member_declaring_list ',' member_declarator
         {
           $$=$1;
