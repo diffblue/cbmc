@@ -1,0 +1,14 @@
+CORE
+main.c
+--program-only
+^\(\d+\) counter#\d+ == 2$
+^EXIT=0$
+^SIGNAL=0$
+--
+SHARED_WRITE
+SHARED_READ
+--
+Writes to global and to address-taken local objects were recorded as shared
+write events, for the memory model of a program with several threads.  No
+thread can be started here, so there are none: the equation is shorter and
+constant propagation is not affected.

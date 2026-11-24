@@ -60,12 +60,14 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
     target,
     symex_config.allow_pointer_unsoundness);
 
-  if(path_storage.dirty(ssa.get_object_name()) && state.atomic_section_id == 0)
+  // no events if no thread can be started (see set_program_may_start_threads)
+  if(
+    state.record_events.top() && path_storage.dirty(ssa.get_object_name()) &&
+    state.atomic_section_id == 0)
+  {
     target.shared_write(
-      state.guard.as_expr(),
-      ssa,
-      state.atomic_section_id,
-      state.source);
+      state.guard.as_expr(), ssa, state.atomic_section_id, state.source);
+  }
 
   shadow_memory.symex_field_local_init(state, ssa);
 }

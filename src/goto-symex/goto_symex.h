@@ -102,6 +102,19 @@ public:
   ///   goto_functionst
   static get_goto_functiont get_goto_function(abstract_goto_modelt &goto_model);
 
+  /// \return whether a function of \p goto_functions may start a thread: has
+  ///   a START_THREAD instruction
+  static bool may_start_threads(const goto_functionst &goto_functions);
+
+  /// Declare whether the program to be executed may start a thread.  If it
+  /// cannot, accesses to shared objects are not recorded as events: they
+  /// only serve the memory model of an equation with several threads.  The
+  /// default is that it may.
+  void set_program_may_start_threads(bool may_start_threads)
+  {
+    program_may_start_threads = may_start_threads;
+  }
+
   /// \brief Symbolically execute the entire program starting from entry point
   /// \remarks
   /// The state that goto_symext maintains uses a lot of memory.
@@ -182,6 +195,9 @@ public:
   virtual bool check_break(const irep_idt &loop_id, unsigned unwind);
 
 protected:
+  /// See set_program_may_start_threads.
+  bool program_may_start_threads = true;
+
   /// The configuration to use for this symbolic execution
   const symex_configt symex_config;
 

@@ -75,6 +75,12 @@ void single_path_symex_only_checkert::initialize_worklist()
     guard_manager,
     unwindset);
   setup_symex(symex);
+  // with symex-driven lazy loading, the functions are not known yet
+  if(!options.get_bool_option("symex-driven-lazy-loading"))
+  {
+    symex.set_program_may_start_threads(
+      goto_symext::may_start_threads(goto_model.get_goto_functions()));
+  }
 
   // Gather fields for shadow memory instrumentation
   const auto fields =
@@ -105,6 +111,12 @@ bool single_path_symex_only_checkert::resume_path(path_storaget::patht &path)
     guard_manager,
     unwindset);
   setup_symex(symex);
+  // with symex-driven lazy loading, the functions are not known yet
+  if(!options.get_bool_option("symex-driven-lazy-loading"))
+  {
+    symex.set_program_may_start_threads(
+      goto_symext::may_start_threads(goto_model.get_goto_functions()));
+  }
 
   symex_symbol_table = symex.resume_symex_from_saved_state(
     goto_symext::get_goto_function(goto_model), path.state, &path.equation);

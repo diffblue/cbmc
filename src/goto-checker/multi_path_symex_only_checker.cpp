@@ -78,6 +78,13 @@ void multi_path_symex_only_checkert::generate_equation()
   const auto fields =
     shadow_memoryt::gather_field_declarations(goto_model, ui_message_handler);
 
+  // with symex-driven lazy loading, the functions are not known yet
+  if(!options.get_bool_option("symex-driven-lazy-loading"))
+  {
+    symex.set_program_may_start_threads(
+      goto_symext::may_start_threads(goto_model.get_goto_functions()));
+  }
+
   const auto symex_start = std::chrono::steady_clock::now();
 
   symex_symbol_table = symex.symex_from_entry_point_of(

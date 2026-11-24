@@ -393,6 +393,19 @@ symbol_tablet goto_symext::resume_symex_from_saved_state(
   return symex_with_state(state, get_goto_function);
 }
 
+bool goto_symext::may_start_threads(const goto_functionst &goto_functions)
+{
+  for(const auto &function : goto_functions.function_map)
+  {
+    for(const auto &instruction : function.second.body.instructions)
+    {
+      if(instruction.is_start_thread())
+        return true;
+    }
+  }
+  return false;
+}
+
 std::unique_ptr<goto_symext::statet> goto_symext::initialize_entry_point_state(
   const get_goto_functiont &get_goto_function)
 {
@@ -432,6 +445,11 @@ std::unique_ptr<goto_symext::statet> goto_symext::initialize_entry_point_state(
   state->call_stack().top().hidden_function = start_function->is_hidden();
 
   state->symex_target = &target;
+
+  // no events for shared accesses if no thread can be started (see
+  // set_program_may_start_threads)
+  if(!program_may_start_threads)
+    state->record_events.top() = false;
 
   state->run_validation_checks = symex_config.run_validation_checks;
 

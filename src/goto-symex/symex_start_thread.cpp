@@ -23,6 +23,11 @@ void goto_symext::symex_start_thread(statet &state)
   if(!state.reachable)
     return;
 
+  // the shared accesses before this point were not recorded
+  INVARIANT(
+    program_may_start_threads,
+    "a thread is started in a program declared not to start threads");
+
   if(state.atomic_section_id != 0)
     throw incorrect_goto_program_exceptiont(
       "spawning threads out of atomic sections is not allowed; "

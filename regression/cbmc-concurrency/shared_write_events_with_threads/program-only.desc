@@ -1,0 +1,12 @@
+CORE
+main.c
+--program-only
+^\(\d+\) SHARED_WRITE\(counter#\d+\)$
+^\(\d+\) SHARED_READ\(counter#\d+\)$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+A program that may start a thread records shared accesses as events, as
+regression/cbmc/no_shared_write_events_without_threads does not.
