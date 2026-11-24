@@ -90,6 +90,38 @@ static bytest alignment_attribute(const irept &src, const irep_idt &id)
   return layout_attribute(src, id).value_or(bytest{0});
 }
 
+/// \return the natural alignment of \p type, which must not be a struct,
+///   union, or tag type, ignoring any explicit alignment or packing of
+///   \p type itself
+static bytest natural_alignment(const typet &type, const namespacet &ns)
+{
+  if(type.id() == ID_array)
+    return alignment(to_array_type(type).element_type(), ns);
+  else if(
+    type.id() == ID_unsignedbv || type.id() == ID_signedbv ||
+    type.id() == ID_fixedbv || type.id() == ID_floatbv ||
+    type.id() == ID_c_bool || type.id() == ID_pointer)
+  {
+    // Scalars are aligned to their size, or, if that is not a power of two,
+    // to the largest power of two that divides the size: the 12-byte long
+    // double of i386 has an alignment of 4.
+    const bytest size = *pointer_offset_size(type, ns);
+    bytest result{1};
+    while(size > bytest{0} && size % (result * 2) == bytest{0})
+      result = result * 2;
+    return result;
+  }
+  else if(type.id() == ID_c_enum)
+    return alignment(to_c_enum_type(type).underlying_type(), ns);
+  else if(type.id() == ID_c_bit_field)
+  {
+    // we align these according to the 'underlying type'
+    return alignment(to_c_bit_field_type(type).underlying_type(), ns);
+  }
+  else
+    return bytest{1};
+}
+
 /// The alignment of \p type, ignoring any alignment that an attribute of a
 /// declaration requests for the declared entity (ID_C_declaration_alignment).
 static bytest type_alignment(const typet &type, const namespacet &ns)
@@ -147,39 +179,22 @@ static bytest type_alignment(const typet &type, const namespacet &ns)
     return std::max(result, a_int);
   }
 
+  // An explicit alignment of any other type is taken verbatim, matching
+  // GCC/Clang where a typedef may request an alignment smaller than the
+  // natural one. Visual Studio, however, does not let __declspec(align(n))
+  // reduce the alignment (and warns).
   if(a_int > bytest{0})
+  {
+    if(is_visual_studio())
+      return std::max(a_int, natural_alignment(type, ns));
     return a_int;
+  }
 
   // no explicit alignment, but packing: dense packing, i.e. alignment 1
   if(packed)
     return bytest{1};
 
-  // the natural alignment
-  if(type.id() == ID_array)
-    return alignment(to_array_type(type).element_type(), ns);
-  else if(
-    type.id() == ID_unsignedbv || type.id() == ID_signedbv ||
-    type.id() == ID_fixedbv || type.id() == ID_floatbv ||
-    type.id() == ID_c_bool || type.id() == ID_pointer)
-  {
-    // Scalars are aligned to their size, or, if that is not a power of two,
-    // to the largest power of two that divides the size: the 12-byte long
-    // double of i386 has an alignment of 4.
-    const bytest size = *pointer_offset_size(type, ns);
-    bytest result{1};
-    while(size > bytest{0} && size % (result * 2) == bytest{0})
-      result = result * 2;
-    return result;
-  }
-  else if(type.id() == ID_c_enum)
-    return alignment(to_c_enum_type(type).underlying_type(), ns);
-  else if(type.id() == ID_c_bit_field)
-  {
-    // we align these according to the 'underlying type'
-    return alignment(to_c_bit_field_type(type).underlying_type(), ns);
-  }
-  else
-    return bytest{1};
+  return natural_alignment(type, ns);
 }
 
 /// Visual Studio does not let `#pragma pack(n)` reduce an alignment that

@@ -260,15 +260,25 @@ void ansi_c_convert_typet::read_rec(const typet &type)
         c_storage_spec.is_thread_local=true;
       else if(id=="align")
       {
+        // Visual Studio uses the last of several align declspecs (and warns)
+        const bool use_last =
+          config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO;
+        const exprt &new_alignment = to_unary_expr(op).op();
         if(type.get_bool(ID_C_type_attribute))
         {
           type_aligned = true;
-          add_alignment(type_alignment, to_unary_expr(op).op());
+          if(use_last)
+            type_alignment = new_alignment;
+          else
+            add_alignment(type_alignment, new_alignment);
         }
         else
         {
           aligned = true;
-          add_alignment(alignment, to_unary_expr(op).op());
+          if(use_last)
+            alignment = new_alignment;
+          else
+            add_alignment(alignment, new_alignment);
         }
       }
     }

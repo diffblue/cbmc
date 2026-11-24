@@ -1149,12 +1149,20 @@ void c_typecheck_baset::typecheck_expr_alignof(exprt &expr)
 
     // The alignment of an object is the one requested by its declaration, if
     // any, which (unlike for members) may also be smaller than the alignment
-    // of its type, as is the case with GCC and Clang.
+    // of its type, as is the case with GCC and Clang. Visual Studio does not
+    // let __declspec(align(n)) reduce the alignment (and warns).
     const auto declaration_alignment =
       layout_attribute(op.type(), ID_C_declaration_alignment);
     if(op.id() == ID_symbol && declaration_alignment.has_value())
     {
-      exprt tmp = from_integer(declaration_alignment->get(), size_type());
+      bytest a = *declaration_alignment;
+      if(config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
+      {
+        typet type = op.type();
+        remove_declaration_alignment(type);
+        a = std::max(a, alignment(type, *this));
+      }
+      exprt tmp = from_integer(a.get(), size_type());
       tmp.add_source_location() = expr.source_location();
       expr.swap(tmp);
       return;
