@@ -1,0 +1,15 @@
+CORE broken-cprover-smt-backend no-new-smt
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+memcpy with a symbolic size into a struct and into a union, starting partway
+into a member. Byte-operator lowering used to keep the wrong original bytes
+of the target past the end of the update.
+With or without the fix, CPROVER SMT2 reports VERIFICATION ERROR and the
+new SMT back-end fails an invariant (unimplemented conversion of a tuple
+expression), hence broken-cprover-smt-backend and no-new-smt.

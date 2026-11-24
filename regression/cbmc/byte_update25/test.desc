@@ -1,0 +1,15 @@
+CORE no-new-smt
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+memset with a symbolic size to a symbolic offset into an array of uint64_t,
+and memset with a size of type uint8_t that is assumed to be 16, as
+reported on #9187. Byte-operator lowering used to leave elements
+unchanged.
+With or without the fix, the new SMT back-end fails an invariant, hence
+no-new-smt.
