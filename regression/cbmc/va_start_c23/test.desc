@@ -1,0 +1,18 @@
+CORE gcc-only
+main.c
+
+^\[main\.assertion\.1\] line 46 c23_one: SUCCESS$
+^\[main\.assertion\.2\] line 47 c23_two: SUCCESS$
+^\[main\.assertion\.3\] line 48 c23_zero: SUCCESS$
+^\[main\.assertion\.4\] line 49 not_last: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+The variadic arguments start after the last named parameter of the function,
+whatever the second argument of va_start is. C23 made that argument optional:
+the stdarg.h of GCC 15 and Clang 21 then uses __builtin_c23_va_start, which
+CBMC did not know, and those of GCC 13 and 14 and Clang 16 to 20 pass 0, for
+which symex failed with "address_arithmetic does not handle constant".

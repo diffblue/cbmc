@@ -143,8 +143,10 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
 
   // save current return type
   typet old_return_type=return_type;
+  typet old_function_type = current_function_type;
 
   return_type=function_type.return_type();
+  current_function_type = function_type;
 
   // constructor, destructor?
   if(return_type.id() == ID_constructor || return_type.id() == ID_destructor)
@@ -155,6 +157,7 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   symbol.value.type()=symbol.type;
 
   return_type = old_return_type;
+  current_function_type = old_function_type;
 
   deferred_typechecking.erase(symbol.name);
 }

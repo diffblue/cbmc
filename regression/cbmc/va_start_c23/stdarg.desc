@@ -1,0 +1,12 @@
+CORE gcc-only
+stdarg.c
+--c23
+^\[main\.assertion\.1\] line 14 first: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+In C23 mode, the stdarg.h of recent versions of GCC and Clang expands va_start
+to __builtin_c23_va_start(ap, c) or __builtin_va_start(ap, 0).

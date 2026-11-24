@@ -184,6 +184,9 @@ protected:
   bool case_is_allowed;
   typet switch_op_type;
   typet return_type;
+  /// The type of the function whose body is being type checked, nil outside
+  /// of function bodies
+  typet current_function_type;
 
   // to check that all labels used are also defined
   std::map<irep_idt, source_locationt> labels_defined, labels_used;
@@ -229,6 +232,11 @@ protected:
   virtual void typecheck_function_call_arguments(
     side_effect_expr_function_callt &expr);
   virtual exprt do_special_functions(side_effect_expr_function_callt &expr);
+  /// Replaces the second argument of a call to `__builtin_va_start`, or the
+  /// optional one of a call to `__builtin_c23_va_start`, by the last named
+  /// parameter of the function that is being type checked.
+  /// \return the resulting call to `__builtin_va_start`
+  exprt typecheck_builtin_va_start(const side_effect_expr_function_callt &expr);
   exprt typecheck_builtin_overflow(
     side_effect_expr_function_callt &expr,
     const irep_idt &arith_op);
