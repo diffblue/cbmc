@@ -1,0 +1,12 @@
+CORE dfcc-only
+main.c
+--dfcc main --enforce-contract bar --replace-call-with-contract foo
+^\[post_ok\.assigns\.\d+\] line 5 Check that g is assignable: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+Functions called in contract clauses are instrumented, so that side effects in
+them are detected also when the contract replaces a call: the ensures clause of
+foo, which is assumed after the call in bar, must not assign to g.

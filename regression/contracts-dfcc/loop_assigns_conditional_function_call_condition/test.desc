@@ -1,0 +1,15 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^\[foo\.loop_assigns\.\d+\] line 8 Check assigns clause inclusion for loop .*: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+The condition of a conditional target in a loop assigns clause may call a
+side-effect-free function. DFCC inlines that call, without a write set
+argument, when it generates the loop write set. Instrumenting cond, which is
+neither reachable from the entry point nor called from a function contract,
+made goto-instrument fail with "not enough arguments when inlining goto
+program".
