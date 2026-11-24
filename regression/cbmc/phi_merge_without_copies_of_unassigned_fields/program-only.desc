@@ -1,0 +1,15 @@
+CORE
+main.c
+--program-only
+^\(\d+\) dynamic_object#\d+\.\.key == 1$
+^EXIT=0$
+^SIGNAL=0$
+--
+^\(\d+\) dynamic_object#\d+\.\.values\[\[\d\]\] == dynamic_object#\d+\.\.values
+^\(\d+\) dynamic_object#\d+\.\.key == dynamic_object#\d+\.\.key$
+--
+At the join after the allocation, which fails on the other branch, the
+object's fields were not assigned on that branch (generation zero): the merged
+value of each field is its value on the allocating branch, which symbolic
+execution used to copy into a new generation, one assignment per field of the
+object.  Symbolic execution now continues with the allocating branch's name.

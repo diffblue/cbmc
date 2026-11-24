@@ -631,6 +631,25 @@ static void merge_names(
     return;
   }
 
+  // Where one of the states cannot be followed, or did not assign the object
+  // (generation zero: it is uninitialized there, an invalid target), the
+  // merged value is the other state's value: a copy of it would add one
+  // assignment per such object -- per field of a field-sensitive object, as
+  // at the join after an allocation that may fail.  Use the other state's
+  // name (and constant) instead.
+  if(!goto_state.reachable || (goto_count == 0 && dest_state.reachable))
+    return; // dest_state keeps its name
+  if(!dest_state.reachable || dest_count == 0)
+  {
+    dest_state.set_l2_generation(ssa, goto_count);
+    const auto p_it = goto_state.propagation.find(l1_identifier);
+    if(p_it.has_value())
+      dest_state.propagation.insert_or_replace(l1_identifier, *p_it);
+    else
+      dest_state.propagation.erase_if_exists(l1_identifier);
+    return;
+  }
+
   exprt goto_state_rhs = ssa, dest_state_rhs = ssa;
 
   {
@@ -658,24 +677,14 @@ static void merge_names(
   //  2. Either identifier is of generation zero, and so hasn't been
   //     initialized and therefore an invalid target.
 
-  // These rules only apply to dynamic objects and locals.
-  if(!dest_state.reachable)
-    rhs = goto_state_rhs;
-  else if(!goto_state.reachable)
-    rhs = dest_state_rhs;
-  else if(goto_count == 0)
-    rhs = dest_state_rhs;
-  else if(dest_count == 0)
-    rhs = goto_state_rhs;
-  else
+  // (These cases, which only apply to dynamic objects and locals, are
+  // handled above.)
+  rhs = if_exprt(diff_guard.as_expr(), goto_state_rhs, dest_state_rhs);
+  if(do_simplify)
   {
-    rhs = if_exprt(diff_guard.as_expr(), goto_state_rhs, dest_state_rhs);
-    if(do_simplify)
-    {
-      // Do not value-set supported filtering here as neither dest_state nor
-      // goto_state necessarily have a comprehensive value set.
-      simplify(rhs, ns);
-    }
+    // Do not value-set supported filtering here as neither dest_state nor
+    // goto_state necessarily have a comprehensive value set.
+    simplify(rhs, ns);
   }
 
   dest_state.record_events.push(false);

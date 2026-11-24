@@ -45,6 +45,7 @@ ExcludedTests = list(map(lambda s: os.path.join(test_base_dir, s[0], s[1]), [
     # program-only instead of trace
     ['vla1', 'program-only.desc'],
     ['Array_operations4', 'program-only.desc'],
+    ['phi_merge_without_copies_of_unassigned_fields', 'program-only.desc'],
     ['Pointer_Arithmetic19', 'test.desc'],
     ['Quantifiers-simplify', 'simplify_not_forall.desc'],
     ['array-cell-sensitivity15', 'test.desc'],

@@ -242,6 +242,15 @@ public:
     level2.current_names.erase_if_exists(l1_identifier);
   }
 
+  /// Makes \p generation the current L2 generation of the L1 name \p ssa,
+  /// without recording an assignment: \p generation must already denote
+  /// the value of \p ssa in this state (see merge_names in symex_goto.cpp).
+  void set_l2_generation(const ssa_exprt &ssa, std::size_t generation)
+  {
+    level2.current_names.insert_or_replace(
+      ssa.get_identifier(), std::make_pair(ssa, generation));
+  }
+
   std::function<std::size_t(const irep_idt &)> get_l2_name_provider() const
   {
     return fresh_l2_name_provider;
