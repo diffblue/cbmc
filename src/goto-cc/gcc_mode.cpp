@@ -322,8 +322,19 @@ int gcc_modet::doit()
     base_name=="bcc" ||
     base_name.find("goto-bcc")!=std::string::npos;
 
-  // if we are gcc or bcc, then get the version number
-  gcc_version.get(native_tool_name);
+  // if we are gcc or bcc, then get the version number, and the C and C++
+  // standards that the preprocessor uses with the options given
+  std::vector<std::string> standard_options;
+  for(const auto &argument : cmdline.parsed_argv)
+  {
+    if(
+      !argument.is_infile_name &&
+      (has_prefix(argument.arg, "-std=") || argument.arg == "-ansi"))
+    {
+      standard_options.push_back(argument.arg);
+    }
+  }
+  gcc_version.get(native_tool_name, standard_options);
 
   if((cmdline.isset('v') && cmdline.have_infile_arg()) ||
      (cmdline.isset("version") && !produce_hybrid_binary))
@@ -660,7 +671,17 @@ int gcc_modet::doit()
   else
     compiler.object_file_extension="o";
 
-  if(cmdline.isset("std"))
+  if(
+    gcc_version.flavor == gcc_versiont::flavort::GCC ||
+    gcc_version.flavor == gcc_versiont::flavort::CLANG)
+  {
+    // Use the standards that the native preprocessor uses with any -std or
+    // -ansi option given, as it determines, e.g., which declarations system
+    // headers provide, and which macros they use.
+    config.ansi_c.c_standard = gcc_version.default_c_standard;
+    config.cpp.cpp_standard = gcc_version.default_cxx_standard;
+  }
+  else if(cmdline.isset("std"))
   {
     std::string std_string=cmdline.get_value("std");
 

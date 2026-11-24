@@ -1,0 +1,12 @@
+CORE gcc-only
+main.c
+-ansi
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^PARSING ERROR$
+--
+With -ansi, the native preprocessor and the C front-end must both use C90, where
+bool and true are identifiers, also when the native compiler defaults to C23 (as
+GCC 15 does).
