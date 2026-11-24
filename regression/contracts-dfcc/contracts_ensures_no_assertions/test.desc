@@ -1,0 +1,11 @@
+CORE
+main.c
+--dfcc main --enforce-contract f _ --no-assertions
+^EXIT=10$
+^SIGNAL=0$
+^\[f\.postcondition\.\d+\] line 2 Check ensures clause.*: FAILURE$
+^VERIFICATION FAILED$
+--
+--
+The check of a contract's ensures clause (here f returns x + 1, not x + 2)
+is not one of the user's assertions: --no-assertions keeps it.

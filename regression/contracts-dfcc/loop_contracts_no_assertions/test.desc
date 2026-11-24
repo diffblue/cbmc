@@ -1,0 +1,13 @@
+CORE
+main.c
+--dfcc main --apply-loop-contracts _ --signed-overflow-check --no-assertions
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.(loop_invariant_step\.)?\d+\] line 4 Check (invariant after step for loop main\.0|that loop invariant is preserved): FAILURE$
+^VERIFICATION FAILED$
+--
+--
+The check that the loop invariant is inductive (here it is not) is a check
+of the loop's contract, not one of the user's assertions: --no-assertions
+keeps it. (goto_convert marked it user-provided, and the invariant, which
+the loop then assumed, made the overflow after the loop unreachable.)

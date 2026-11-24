@@ -268,6 +268,15 @@ void simplify_gotos(goto_programt &goto_program, const namespacet &ns)
   }
 }
 
+void mark_contract_checks(goto_programt &program)
+{
+  for(auto &instruction : program.instructions)
+  {
+    if(instruction.is_assert())
+      instruction.source_location_nonconst().set("user-provided", false);
+  }
+}
+
 bool is_loop_free(
   const goto_programt &goto_program,
   const namespacet &ns,

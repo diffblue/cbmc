@@ -548,6 +548,7 @@ void dfcc_instrument_loopt::add_body_instructions(
       assertion.add_source_location() = check_location;
       converter.goto_convert(assertion, pre_loop_latch_instrs, language_mode);
     }
+    mark_contract_checks(pre_loop_latch_instrs);
   }
 
   {
