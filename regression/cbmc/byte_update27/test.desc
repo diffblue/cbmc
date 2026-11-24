@@ -1,0 +1,17 @@
+CORE broken-smt-backend no-new-smt
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+memcpy with a symbolic size into an array of arrays. Byte-operator lowering
+turns this into an array comprehension whose body is an array.
+The SMT2 back-end converts the array literal in that body into a separate array
+that is constrained outside the lambda, with a free variable in place of the
+index of the comprehension. Z3 therefore reports VERIFICATION FAILED, hence
+broken-smt-backend. The new SMT back-end fails an invariant (unimplemented
+conversion of a tuple expression), hence no-new-smt. --arrays-uf-always also
+reports VERIFICATION FAILED, see arrays-uf-always.desc.
