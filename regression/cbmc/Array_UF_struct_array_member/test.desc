@@ -1,0 +1,19 @@
+CORE broken-cprover-smt-backend no-new-smt
+main.c
+--arrays-uf-always
+^\[main\.assertion\.9\] line \d+ assertion h->slots.*: SUCCESS$
+^\[main\.assertion\.10\] line \d+ assertion 0: FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^Invariant check failed
+--
+With --arrays-uf-always every array, also an array member of a struct that is
+flattened (an element of an array of structs, a struct literal), is handled by
+the array decision procedure where it is an operand of an equality.  Updates of
+such members failed an invariant in convert_with_array, reads and equalities
+failed invariants in arrayst, and the bits of an array symbol in a flattened
+struct were not constrained to equal the array's elements.

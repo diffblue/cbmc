@@ -1,0 +1,15 @@
+CORE broken-cprover-smt-backend no-new-smt
+main.c
+--arrays-uf-always --no-simplify
+^\[main\.assertion\.9\] line \d+ assertion h->slots.*: SUCCESS$
+^\[main\.assertion\.10\] line \d+ assertion 0: FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^Invariant check failed
+--
+See test.desc; without simplification the members of symbols are not
+replaced by their values.

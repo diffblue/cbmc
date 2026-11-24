@@ -32,9 +32,26 @@ bvt boolbvt::convert_index(const index_exprt &expr)
     const array_typet &array_type=
       to_array_type(array_op_type);
 
+    // An array that is a member of a struct-typed expression other than a
+    // symbol (an element of an array of structs, a conditional, a struct
+    // literal, an update) is part of the bit vector of that expression, also
+    // where the array decision procedure handles arrays of its type (with
+    // --arrays-uf-always, all of them): read its elements from that bit
+    // vector, so that they agree with the value of the struct.  Recording
+    // the index makes the constraints of the array decision procedure (for
+    // an equality or an update involving the member) cover the element.
+    const bool member_of_flattened_struct =
+      array.id() == ID_member &&
+      to_member_expr(array).struct_op().id() != ID_symbol &&
+      to_member_expr(array).struct_op().id() != ID_nondet_symbol &&
+      array_type.size().is_constant() &&
+      bv_width.get_width_opt(array_type).has_value();
+
     // see if the array size is constant
 
-    if(is_unbounded_array(array_type))
+    if(is_unbounded_array(array_type) && member_of_flattened_struct)
+      record_array_index(expr);
+    else if(is_unbounded_array(array_type))
     {
       // use array decision procedure
 

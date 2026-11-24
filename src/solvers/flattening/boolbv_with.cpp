@@ -113,12 +113,14 @@ void boolbvt::convert_with_array(
   const bvt &prev_bv,
   bvt &next_bv)
 {
-  // can't do this
-  DATA_INVARIANT_WITH_DIAGNOSTICS(
-    !is_unbounded_array(type),
-    "convert_with_array called for unbounded array",
-    irep_pretty_diagnosticst{type});
-
+  // An array that the array decision procedure handles where it is an
+  // operand of an equality (an "unbounded" array, which with
+  // --arrays-uf-always is every array) can still be part of an expression
+  // that is flattened, such as the new value of an array member of a struct
+  // (`a[i].data[0] = v` is an update of a struct with an updated member
+  // data).  There it is a bit vector, as are array literals (convert_array)
+  // and the old value prev_bv: flatten the update element-wise.  The width
+  // of the array is known, as prev_bv has it, so the size is a constant.
   const exprt &array_size=type.size();
 
   const auto size = numeric_cast<mp_integer>(array_size);

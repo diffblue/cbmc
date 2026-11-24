@@ -310,6 +310,35 @@ bvt boolbvt::convert_symbol(const exprt &expr)
   const irep_idt &identifier = expr.get(ID_identifier);
   CHECK_RETURN(!identifier.empty());
 
+  // The bits of an array that the array decision procedure handles (an
+  // "unbounded" array, which with --arrays-uf-always is any array) are needed
+  // where the array is part of an expression that is flattened, such as a
+  // struct with an array member.  Its elements are those of the array
+  // decision procedure, which the equalities defining the array constrain:
+  // use them as its bits (literals of its own would be unconstrained).
+  if(type.id() == ID_array && width > 0 && is_unbounded_array(type))
+  {
+    const array_typet &array_type = to_array_type(type);
+    const auto size = numeric_cast<mp_integer>(array_type.size());
+    if(
+      size.has_value() && *size > 0 && *size <= MAX_FLATTENED_ARRAY_SIZE &&
+      width % numeric_cast_v<std::size_t>(*size) == 0)
+    {
+      const std::size_t element_width =
+        width / numeric_cast_v<std::size_t>(*size);
+      bvt bv;
+      bv.reserve(width);
+      for(mp_integer i = 0; i < *size; ++i)
+      {
+        const bvt &element = convert_bv(
+          index_exprt{expr, from_integer(i, array_type.index_type())},
+          element_width);
+        bv.insert(bv.end(), element.begin(), element.end());
+      }
+      return bv;
+    }
+  }
+
   bvt bv = map.get_literals(identifier, type, width);
 
   INVARIANT_WITH_DIAGNOSTICS(
