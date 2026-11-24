@@ -111,6 +111,22 @@ static bytest natural_alignment(const typet &type, const namespacet &ns)
       result = result * 2;
     return result;
   }
+  else if(type.id() == ID_complex)
+  {
+    // complex numbers are aligned like their real and imaginary parts
+    return alignment(to_complex_type(type).subtype(), ns);
+  }
+  else if(type.id() == ID_vector)
+  {
+    // Vectors are aligned to their size (which GCC requires to be a power of
+    // two), rounded up to a power of two for vectors of three elements, as
+    // Clang does.
+    const auto size = pointer_offset_size(type, ns);
+    bytest result{1};
+    while(size.has_value() && result < *size)
+      result = result * 2;
+    return result;
+  }
   else if(type.id() == ID_c_enum)
     return alignment(to_c_enum_type(type).underlying_type(), ns);
   else if(type.id() == ID_c_bit_field)
