@@ -1,0 +1,10 @@
+CORE
+main.i
+--i386-linux
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Variant of test.desc with --i386-linux.

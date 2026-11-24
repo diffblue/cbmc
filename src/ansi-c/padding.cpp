@@ -73,20 +73,14 @@ bytest alignment(const typet &type, const namespacet &ns)
   {
     // get the max
     // (should really be the smallest common denominator)
-    const auto &components = to_struct_union_type(type).components();
-
-    // Neither unnamed bit-fields nor the padding they introduce count here.
-    const bool has_sysv_unnamed_bit_field = std::any_of(
-      components.begin(), components.end(), is_sysv_unnamed_bit_field);
-
-    for(const auto &c : components)
+    for(const auto &c : to_struct_union_type(type).components())
     {
-      if(
-        is_sysv_unnamed_bit_field(c) ||
-        (has_sysv_unnamed_bit_field && c.get_is_padding()))
-      {
+      // Padding members are derived from the other members, and must not
+      // contribute: the padding member of a union spans the entire union,
+      // and the padding following an unnamed bit-field may be wider than the
+      // alignment of any member that contributes.
+      if(c.get_is_padding() || is_sysv_unnamed_bit_field(c))
         continue;
-      }
 
       result = std::max(result, alignment(c.type(), ns));
     }
