@@ -190,3 +190,49 @@ SCENARIO(
     }
   }
 }
+
+SCENARIO(
+  "multipliers compute the product modulo 2^width",
+  "[core][solvers][flattening][bv_utils]")
+{
+  const std::size_t width = 4;
+  const mp_integer modulus = power(2, width);
+
+  for(const auto rep :
+      {bv_utilst::representationt::SIGNED,
+       bv_utilst::representationt::UNSIGNED})
+  {
+    for(mp_integer a = 0; a < modulus; ++a)
+    {
+      for(mp_integer b = 0; b < modulus; ++b)
+      {
+        satcheckt satcheck(null_message_handler);
+        bv_utilst bv_utils(satcheck);
+        const bvt a_constant = bv_utilst::build_constant(a, width);
+        const bvt b_constant = bv_utilst::build_constant(b, width);
+        const bvt x = satcheck.new_variables(width);
+        const bvt y = satcheck.new_variables(width);
+        satcheck.l_set_to_true(bv_utils.equal(x, a_constant));
+        satcheck.l_set_to_true(bv_utils.equal(y, b_constant));
+
+        // non-constant operands, and a constant one in either position, which
+        // the multiplier may negate
+        const std::vector<bvt> products{
+          bv_utils.multiplier(x, y, rep),
+          bv_utils.multiplier(x, b_constant, rep),
+          bv_utils.multiplier(a_constant, y, rep)};
+
+        REQUIRE(satcheck.prop_solve() == propt::resultt::P_SATISFIABLE);
+
+        const bvt expected =
+          bv_utilst::build_constant((a * b) % modulus, width);
+        for(const auto &product : products)
+        {
+          REQUIRE(product.size() == width);
+          for(std::size_t i = 0; i < width; ++i)
+            REQUIRE(satcheck.l_get(product[i]) == satcheck.l_get(expected[i]));
+        }
+      }
+    }
+  }
+}

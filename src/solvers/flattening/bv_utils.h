@@ -83,6 +83,8 @@ public:
   static bvt shift(const bvt &op, const shiftt shift, std::size_t distance);
   bvt shift(const bvt &op, const shiftt shift, const bvt &distance);
 
+  /// \return the product of \p op0 and \p op1 modulo 2^width, where width
+  ///   is the width of the operands
   bvt unsigned_multiplier(const bvt &op0, const bvt &op1);
   bvt signed_multiplier(const bvt &op0, const bvt &op1);
   bvt multiplier(const bvt &op0, const bvt &op1, representationt rep);
