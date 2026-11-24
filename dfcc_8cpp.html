@@ -127,8 +127,85 @@ Functions</h2></td></tr>
 <tr class="memitem:ab050391cc4dadf6cddf0323812c749d9" id="r_ab050391cc4dadf6cddf0323812c749d9"><td class="memItemLeft" align="right" valign="top">static std::pair&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab050391cc4dadf6cddf0323812c749d9">parse_function_contract_pair</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;cli_flag)</td></tr>
 <tr class="memitem:ga6919243ec4c04ea33fa91a043a06e9b3" id="r_ga6919243ec4c04ea33fa91a043a06e9b3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dfcc-module.html#ga6919243ec4c04ea33fa91a043a06e9b3">dfcc</a> (const <a class="el" href="classoptionst.html">optionst</a> &amp;options, <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;harness_id, const std::optional&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;to_check, const bool allow_recursive_calls, const std::set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;to_replace, const <a class="el" href="structloop__contract__configt.html">loop_contract_configt</a> loop_contract_config, const std::set&lt; std::string &gt; &amp;to_exclude_from_nondet_static, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
 <tr class="memdesc:ga6919243ec4c04ea33fa91a043a06e9b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies function contracts transformation to GOTO model, using the dynamic frame condition checking approach.  <br /></td></tr>
+<tr class="memitem:a68838f580d6bff09fef8023ef4928881" id="r_a68838f580d6bff09fef8023ef4928881"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a68838f580d6bff09fef8023ef4928881">find_referenced_functions</a> (const <a class="el" href="classirept.html">irept</a> &amp;irep, const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, std::set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;dest)</td></tr>
+<tr class="memdesc:a68838f580d6bff09fef8023ef4928881"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds to <code class="param">dest</code> the functions (other than contracts) of <code class="param">symbol_table</code> that <code class="param">irep</code> refers to.  <br /></td></tr>
+<tr class="memitem:abb561299c4cc7bceb1cd85af84187a6b" id="r_abb561299c4cc7bceb1cd85af84187a6b"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abb561299c4cc7bceb1cd85af84187a6b">collect_contract_clause_functions</a> (<a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model, std::set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;dest)</td></tr>
+<tr class="memdesc:abb561299c4cc7bceb1cd85af84187a6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds to <code class="param">dest</code> the functions that the clauses of function contracts (the <span class="tt">contract::</span> symbols of <code class="param">goto_model</code>) refer to, for example a predicate <span class="tt">ptr_ok(x)</span> in a requires clause, and the functions that these call in turn.  <br /></td></tr>
 </table>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+<a id="abb561299c4cc7bceb1cd85af84187a6b" name="abb561299c4cc7bceb1cd85af84187a6b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abb561299c4cc7bceb1cd85af84187a6b">&#9670;&#160;</a></span>collect_contract_clause_functions()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void collect_contract_clause_functions </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>goto_model</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>dest</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Adds to <code class="param">dest</code> the functions that the clauses of function contracts (the <span class="tt">contract::</span> symbols of <code class="param">goto_model</code>) refer to, for example a predicate <span class="tt">ptr_ok(x)</span> in a requires clause, and the functions that these call in turn. </p>
+<p>DFCC evaluates requires and ensures clauses against a write set, and passes that write set to the functions that these clauses call. Instrumenting these functions makes them check their assignments against that write set, so that side effects are reported: requires and ensures clauses must not assign to a global variable, for example.</p>
+<p>All contracts of the symbol table are scanned, also those that are neither checked nor replaced. The contracts that are used as function pointer contracts are only discovered during instrumentation, which is too late to add functions to the set of functions to instrument. Functions that only unused contracts refer to are thus instrumented needlessly, and <span class="tt"><a class="el" href="remove__unused__functions_8cpp.html#a7c6887237c7a8c11e740af84c9c2a527">remove_unused_functions</a></span> removes them later. </p>
+
+<p class="definition">Definition at line <a class="el" href="dfcc_8cpp_source.html#l00278">278</a> of file <a class="el" href="dfcc_8cpp_source.html">dfcc.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a68838f580d6bff09fef8023ef4928881" name="a68838f580d6bff09fef8023ef4928881"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a68838f580d6bff09fef8023ef4928881">&#9670;&#160;</a></span>find_referenced_functions()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void find_referenced_functions </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classirept.html">irept</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>irep</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>symbol_table</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>dest</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Adds to <code class="param">dest</code> the functions (other than contracts) of <code class="param">symbol_table</code> that <code class="param">irep</code> refers to. </p>
+
+<p class="definition">Definition at line <a class="el" href="dfcc_8cpp_source.html#l00238">238</a> of file <a class="el" href="dfcc_8cpp_source.html">dfcc.cpp</a>.</p>
+
+</div>
+</div>
 <a id="ab050391cc4dadf6cddf0323812c749d9" name="ab050391cc4dadf6cddf0323812c749d9"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab050391cc4dadf6cddf0323812c749d9">&#9670;&#160;</a></span>parse_function_contract_pair()</h2>
 

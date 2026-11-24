@@ -122,7 +122,7 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:a866e917d642e523a0efa4019dde9d61e" id="r_a866e917d642e523a0efa4019dde9d61e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a866e917d642e523a0efa4019dde9d61e">check_transform_goto_model_preconditions</a> ()</td></tr>
 <tr class="memdesc:a866e917d642e523a0efa4019dde9d61e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks preconditions on arguments of <a class="el" href="#a9172448269d6c4b47d1ffbcc5cf176f2">transform_goto_model</a>.  <br /></td></tr>
 <tr class="memitem:af0c627f2fe139353d0f46ed32c981d0c" id="r_af0c627f2fe139353d0f46ed32c981d0c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af0c627f2fe139353d0f46ed32c981d0c">partition_function_symbols</a> (std::set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;<a class="el" href="#a165f24947156fe2dfd8e61de9dfdb220">pure_contract_symbols</a>, std::set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;<a class="el" href="#adaeb0cb47474c3edc6a062ab11510414">other_symbols</a>)</td></tr>
-<tr class="memdesc:af0c627f2fe139353d0f46ed32c981d0c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Partitions the function symbols of the symbol table into pure contracts and other function symbols symbols.  <br /></td></tr>
+<tr class="memdesc:af0c627f2fe139353d0f46ed32c981d0c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Partitions the function symbols of the symbol table into pure contracts and other function symbols.  <br /></td></tr>
 <tr class="memitem:a4d0fe54b155de5cf38f4bb68f2fa7519" id="r_a4d0fe54b155de5cf38f4bb68f2fa7519"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4d0fe54b155de5cf38f4bb68f2fa7519">link_model_and_load_dfcc_library</a> ()</td></tr>
 <tr class="memitem:a1e6ce41e4f34d847b5dddfc8f4bc000a" id="r_a1e6ce41e4f34d847b5dddfc8f4bc000a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1e6ce41e4f34d847b5dddfc8f4bc000a">instrument_harness_function</a> ()</td></tr>
 <tr class="memitem:a691433169b44356d2b9cfa0f29851ec2" id="r_a691433169b44356d2b9cfa0f29851ec2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a691433169b44356d2b9cfa0f29851ec2">lift_memory_predicates</a> ()</td></tr>
@@ -303,7 +303,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc_8cpp_source.html#l00291">291</a> of file <a class="el" href="dfcc_8cpp_source.html">dfcc.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc_8cpp_source.html#l00355">355</a> of file <a class="el" href="dfcc_8cpp_source.html">dfcc.cpp</a>.</p>
 
 </div>
 </div>
@@ -330,7 +330,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc_8cpp_source.html#l00432">432</a> of file <a class="el" href="dfcc_8cpp_source.html">dfcc.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc_8cpp_source.html#l00496">496</a> of file <a class="el" href="dfcc_8cpp_source.html">dfcc.cpp</a>.</p>
 
 </div>
 </div>
@@ -357,7 +357,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc_8cpp_source.html#l00304">304</a> of file <a class="el" href="dfcc_8cpp_source.html">dfcc.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc_8cpp_source.html#l00368">368</a> of file <a class="el" href="dfcc_8cpp_source.html">dfcc.cpp</a>.</p>
 
 </div>
 </div>
@@ -384,7 +384,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc_8cpp_source.html#l00269">269</a> of file <a class="el" href="dfcc_8cpp_source.html">dfcc.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc_8cpp_source.html#l00333">333</a> of file <a class="el" href="dfcc_8cpp_source.html">dfcc.cpp</a>.</p>
 
 </div>
 </div>
@@ -415,9 +415,10 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Partitions the function symbols of the symbol table into pure contracts and other function symbols symbols. </p>
+<p>Partitions the function symbols of the symbol table into pure contracts and other function symbols. </p>
+<p>The latter are the functions that are reachable from the entry point or from the clauses of a contract. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc_8cpp_source.html#l00236">236</a> of file <a class="el" href="dfcc_8cpp_source.html">dfcc.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc_8cpp_source.html#l00299">299</a> of file <a class="el" href="dfcc_8cpp_source.html">dfcc.cpp</a>.</p>
 
 </div>
 </div>
@@ -468,7 +469,7 @@ Protected Attributes</h2></td></tr>
 <li>call generate_ansi_c_start_function Make all user-defined statics nondet. Other statics added by the instrumentation will be unaffected because they are tagged with ID_C_no_nondet_initialization when created Update statics and static function maps </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="dfcc_8cpp_source.html#l00507">507</a> of file <a class="el" href="dfcc_8cpp_source.html">dfcc.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc_8cpp_source.html#l00571">571</a> of file <a class="el" href="dfcc_8cpp_source.html">dfcc.cpp</a>.</p>
 
 </div>
 </div>
@@ -507,7 +508,7 @@ Protected Attributes</h2></td></tr>
 <li>specialise the instrumentation functions by unwinding loops they contain to the maximum size of any assigns clause involved in the model. </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="dfcc_8cpp_source.html#l00452">452</a> of file <a class="el" href="dfcc_8cpp_source.html">dfcc.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc_8cpp_source.html#l00516">516</a> of file <a class="el" href="dfcc_8cpp_source.html">dfcc.cpp</a>.</p>
 
 </div>
 </div>
@@ -534,7 +535,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc_8cpp_source.html#l00316">316</a> of file <a class="el" href="dfcc_8cpp_source.html">dfcc.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc_8cpp_source.html#l00380">380</a> of file <a class="el" href="dfcc_8cpp_source.html">dfcc.cpp</a>.</p>
 
 </div>
 </div>
@@ -561,7 +562,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc_8cpp_source.html#l00362">362</a> of file <a class="el" href="dfcc_8cpp_source.html">dfcc.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc_8cpp_source.html#l00426">426</a> of file <a class="el" href="dfcc_8cpp_source.html">dfcc.cpp</a>.</p>
 
 </div>
 </div>
@@ -588,7 +589,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc_8cpp_source.html#l00345">345</a> of file <a class="el" href="dfcc_8cpp_source.html">dfcc.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc_8cpp_source.html#l00409">409</a> of file <a class="el" href="dfcc_8cpp_source.html">dfcc.cpp</a>.</p>
 
 </div>
 </div>

@@ -1,5 +1,7 @@
 var NAVTREEINDEX140 =
 {
+"string__refinement__util_8h_source.html":[6,0,2,27,10,34],
+"string__utils_8cpp.html":[6,0,2,30,239],
 "string__utils_8cpp.html#a0933e0e476f946f9e6e0046165923ab5":[6,0,2,30,239,5],
 "string__utils_8cpp.html#a13e19544a196a64b8c94f6ffa6e24574":[6,0,2,30,239,0],
 "string__utils_8cpp.html#a20711e94194755f88c235f3c80a6cc35":[6,0,2,30,239,2],
@@ -247,7 +249,5 @@ var NAVTREEINDEX140 =
 "structboundst.html#af7eba54b35c5e119cfeb8525f06b0260":[5,0,137,1],
 "structbuild__declaration__hops__inputst.html":[5,0,139],
 "structbuild__declaration__hops__inputst.html#a238084d7d984af9d21b72845af26b14c":[5,0,139,4],
-"structbuild__declaration__hops__inputst.html#a550903c209c072360021b5c92c63b27f":[5,0,139,0],
-"structbuild__declaration__hops__inputst.html#a70d6df918b82b7438fd6688b3b97eacb":[5,0,139,5],
-"structbuild__declaration__hops__inputst.html#a906fa1a080d2c0a8ab0ea1572108deca":[5,0,139,1]
+"structbuild__declaration__hops__inputst.html#a550903c209c072360021b5c92c63b27f":[5,0,139,0]
 };
