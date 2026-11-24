@@ -162,6 +162,16 @@ int conditional_keyword(bool condition, int token)
     return make_identifier();    
 }
 
+/// Marks the operator returned as \p token as one that reports the preferred
+/// alignment (as GCC's and Clang's `__alignof__` does) rather than the
+/// alignment requirement (as `_Alignof` does).
+int preferred_alignof(int token)
+{
+  if(token == TOK_ALIGNOF)
+    parser_stack(yyansi_clval).set(ID_C_preferred_alignment, true);
+  return token;
+}
+
 int MSC_cpp_keyword(int token)
 {
   if(PARSER.cpp98 && PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)
@@ -685,26 +695,26 @@ enable_or_disable ("enable"|"disable")
                     TOK_CLANG_BUILTIN_CONVERTVECTOR);
                 }
 
-"__alignof__"   { return conditional_keyword(
+"__alignof__"   { return preferred_alignof(conditional_keyword(
                     PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                     PARSER.mode==configt::ansi_ct::flavourt::CLANG ||
                     PARSER.mode==configt::ansi_ct::flavourt::ARM,
-                    TOK_ALIGNOF);
+                    TOK_ALIGNOF));
                 }
 
 "__alignof"     { // MS supports __alignof:
                   // http://msdn.microsoft.com/en-us/library/45t0s5f4%28v=vs.71%29.aspx
-                  return conditional_keyword(
+                  return preferred_alignof(conditional_keyword(
                     PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO ||
                     PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                     PARSER.mode==configt::ansi_ct::flavourt::CLANG ||
                     PARSER.mode==configt::ansi_ct::flavourt::ARM,
-                    TOK_ALIGNOF);
+                    TOK_ALIGNOF));
                 }
 
-"__ALIGNOF__"   { return conditional_keyword(
+"__ALIGNOF__"   { return preferred_alignof(conditional_keyword(
                     PARSER.mode==configt::ansi_ct::flavourt::ARM,
-                    TOK_ALIGNOF);
+                    TOK_ALIGNOF));
                 }
 
 "__builtin_alignof" {

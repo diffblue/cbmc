@@ -1,0 +1,12 @@
+CORE clang-only
+main.c
+-target i386-unknown-linux-gnu
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+goto-cc aligned long long and double to 8 bytes, also as members, and did not
+distinguish __alignof__ from _Alignof. The expectations are those of GCC 11 and
+Clang 14 for i386.

@@ -29,6 +29,11 @@ class union_typet;
 std::optional<bytest> layout_attribute(const irept &src, const irep_idt &id);
 
 bytest alignment(const typet &type, const namespacet &);
+
+/// \return the alignment that GCC's and Clang's `__alignof__` reports for
+///   \p type, which, with the System V ABI for i386, is 8 rather than 4 for
+///   8-byte scalars and arrays of such
+bytest preferred_alignment(const typet &type, const namespacet &);
 void add_padding(struct_typet &type, const namespacet &);
 void add_padding(union_typet &type, const namespacet &);
 

@@ -83,6 +83,16 @@ static bool is_visual_studio()
   return config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO;
 }
 
+/// \return true iff the target uses the System V ABI for i386, which, unlike
+///   the Windows ABI for i386, aligns 8-byte scalars to 4 bytes (options
+///   such as --64 change the widths, but not the architecture)
+static bool is_i386_system_v()
+{
+  return config.ansi_c.arch == "i386" && config.ansi_c.pointer_width == 32 &&
+         config.ansi_c.os != configt::ansi_ct::ost::OS_WIN &&
+         !is_visual_studio();
+}
+
 /// \return the value of the alignment attribute \p id (ID_C_alignment or
 ///   ID_C_declaration_alignment) of \p src, or 0 when there is none
 static bytest alignment_attribute(const irept &src, const irep_idt &id)
@@ -109,6 +119,10 @@ static bytest natural_alignment(const typet &type, const namespacet &ns)
     bytest result{1};
     while(size > bytest{0} && size % (result * 2) == bytest{0})
       result = result * 2;
+    // The System V ABI for i386 aligns 8-byte scalars (long long, double) to
+    // 4 bytes, see preferred_alignment for __alignof__.
+    if(result == bytest{8} && is_i386_system_v())
+      result = bytest{4};
     return result;
   }
   else if(type.id() == ID_complex)
@@ -211,6 +225,48 @@ static bytest type_alignment(const typet &type, const namespacet &ns)
     return bytest{1};
 
   return natural_alignment(type, ns);
+}
+
+bytest preferred_alignment(const typet &type, const namespacet &ns)
+{
+  const bytest a = alignment(type, ns);
+  if(!is_i386_system_v())
+    return a;
+
+  // GCC and Clang prefer to align 8-byte scalars, also as elements of arrays
+  // and as parts of complex numbers, to 8 bytes, unless an explicit alignment
+  // or packing applies.
+  const typet *t = &type;
+  while(true)
+  {
+    if(
+      t->find(ID_C_alignment).is_not_nil() ||
+      t->find(ID_C_declaration_alignment).is_not_nil() ||
+      t->get_bool(ID_C_packed))
+    {
+      return a;
+    }
+    else if(t->id() == ID_array)
+      t = &to_array_type(*t).element_type();
+    else if(t->id() == ID_complex)
+      t = &to_complex_type(*t).subtype();
+    else if(t->id() == ID_c_enum_tag)
+      t = &ns.follow_tag(to_c_enum_tag_type(*t)).underlying_type();
+    else if(t->id() == ID_c_enum)
+      t = &to_c_enum_type(*t).underlying_type();
+    else
+      break;
+  }
+
+  if(
+    (t->id() == ID_signedbv || t->id() == ID_unsignedbv ||
+     t->id() == ID_floatbv || t->id() == ID_fixedbv) &&
+    to_bitvector_type(*t).get_width() == 64)
+  {
+    return std::max(a, bytest{8});
+  }
+
+  return a;
 }
 
 /// Visual Studio does not let `#pragma pack(n)` reduce an alignment that
