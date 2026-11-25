@@ -27,11 +27,13 @@ std::unordered_set<irep_idt> gen_loop_locals_set(
 /// \brief Infer assigns clause targets for loops in `goto_function` from their
 /// instructions and an alias analysis at the function level (with inlining),
 /// and store the result in `inferred_loop_assigns_map`, a map from loop
-/// numbers to the set of inferred assigns targets.
+/// numbers to the set of inferred assigns targets. \p write_set_type is the
+/// type of the write set that DFCC passes to the functions it instruments.
 void dfcc_infer_loop_assigns_for_function(
   std::map<std::size_t, assignst> &inferred_loop_assigns_map,
   goto_functionst &goto_functions,
   const goto_functiont &goto_function,
+  const typet &write_set_type,
   message_handlert &message_handler,
   const namespacet &ns);
 

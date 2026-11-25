@@ -784,44 +784,143 @@ static void remove_dead_object_assignment(goto_functiont &goto_function)
   }
 }
 
-/// The calls in \p program are not instrumented yet, and hence lack the write
-/// set argument. A callee that has been instrumented already, however, has the
-/// write set as its first parameter (see dfcc_utilst::add_parameter). Add a
-/// nil argument (meaning "do not assign" to the inliner) for that parameter,
-/// so that the other arguments bind to the parameters they belong to.
-static void add_write_set_argument_placeholders(
-  goto_programt &program,
-  const namespacet &ns)
+/// Whether the first parameter of \p code_type is the write set that DFCC adds
+/// to the functions it instruments, see dfcc_utilst::add_parameter.
+static bool has_write_set_parameter(const code_typet &code_type)
 {
-  for(auto &instruction : program.instructions)
+  const auto &parameters = code_type.parameters();
+  return !parameters.empty() && parameters.front().get_base_name() ==
+                                  dfcc_utilst::write_set_to_check_base_name;
+}
+
+/// DFCC instruments one function at a time: it adds the write set as the
+/// first parameter of the function (see dfcc_utilst::add_parameter), and as
+/// the first argument of the calls in its body of the functions it
+/// instruments. Inlining, which binds the arguments of a call to the
+/// parameters of the callee in order, then meets calls whose arguments do not
+/// match those parameters: in a body that is not instrumented yet (such as the
+/// copy of the function whose loops are inferred), a call of a function that
+/// is instrumented already lacks the write set argument, and in a body that is
+/// instrumented, a call of a function that is not instrumented yet has it.
+/// This class makes them match, in a program and in the bodies of the
+/// functions that inlining reaches from it: it adds a nil argument (meaning
+/// "do not assign" to the inliner) for a write set parameter without an
+/// argument, and removes a write set argument without a parameter. The bodies
+/// of the functions are restored on destruction.
+class write_set_argumentst
+{
+public:
+  /// \param goto_functions: the functions that inlining \p program reaches
+  /// \param [in,out] program: the program to inline, which keeps its changes
+  /// \param write_set_type: the type of the write set arguments
+  /// \param ns: the namespace
+  write_set_argumentst(
+    goto_functionst &goto_functions,
+    goto_programt &program,
+    const typet &write_set_type,
+    const namespacet &ns)
+    : goto_functions(goto_functions)
   {
-    if(
-      !instruction.is_function_call() ||
-      instruction.call_function().id() != ID_symbol)
+    std::vector<irep_idt> work;
+    std::unordered_set<irep_idt> seen;
+    match(program, true, write_set_type, ns, seen, work);
+    while(!work.empty())
     {
-      continue;
-    }
-
-    const symbolt *callee = nullptr;
-    if(ns.lookup(
-         to_symbol_expr(instruction.call_function()).identifier(), callee))
-      continue;
-
-    const auto &parameters = to_code_type(callee->type).parameters();
-    if(
-      !parameters.empty() && parameters.front().get_base_name() ==
-                               dfcc_utilst::write_set_to_check_base_name)
-    {
-      auto &arguments = instruction.call_arguments();
-      arguments.insert(arguments.begin(), nil_exprt{});
+      const irep_idt id = work.back();
+      work.pop_back();
+      auto found = goto_functions.function_map.find(id);
+      if(
+        found == goto_functions.function_map.end() ||
+        !found->second.body_available())
+      {
+        continue;
+      }
+      goto_programt &body = found->second.body;
+      if(!match(body, false, write_set_type, ns, seen, work))
+        continue;
+      goto_programt matched;
+      matched.copy_from(body);
+      match(matched, true, write_set_type, ns, seen, work);
+      saved.emplace_back(id, std::move(body));
+      body = std::move(matched);
     }
   }
-}
+
+  ~write_set_argumentst()
+  {
+    for(auto &entry : saved)
+      goto_functions.function_map.at(entry.first).body =
+        std::move(entry.second);
+  }
+
+private:
+  goto_functionst &goto_functions;
+  std::vector<std::pair<irep_idt, goto_programt>> saved;
+
+  /// Adds the callees in \p program that are not in \p seen to \p seen and
+  /// \p work, and returns whether the arguments of a call in \p program do
+  /// not match the parameters of its callee; makes them match if \p apply.
+  static bool match(
+    goto_programt &program,
+    bool apply,
+    const typet &write_set_type,
+    const namespacet &ns,
+    std::unordered_set<irep_idt> &seen,
+    std::vector<irep_idt> &work)
+  {
+    bool mismatch = false;
+    for(auto &instruction : program.instructions)
+    {
+      if(
+        !instruction.is_function_call() ||
+        instruction.call_function().id() != ID_symbol)
+      {
+        continue;
+      }
+
+      const irep_idt &callee_id =
+        to_symbol_expr(instruction.call_function()).identifier();
+      if(seen.insert(callee_id).second)
+        work.push_back(callee_id);
+
+      const symbolt *callee = nullptr;
+      if(ns.lookup(callee_id, callee) || callee->type.id() != ID_code)
+        continue;
+
+      const code_typet &callee_type = to_code_type(callee->type);
+      auto &arguments = instruction.call_arguments();
+      const bool has_argument =
+        !arguments.empty() && (arguments.front().is_nil() ||
+                               arguments.front().type() == write_set_type);
+      if(has_write_set_parameter(callee_type))
+      {
+        if(has_argument)
+          continue;
+        mismatch = true;
+        if(apply)
+          arguments.insert(arguments.begin(), nil_exprt{});
+      }
+      else if(
+        has_argument && !arguments.front().is_nil() &&
+        (callee_type.parameters().empty() ||
+         callee_type.parameters().front().type() != write_set_type))
+      {
+        // (the functions of the cprover_contracts library take a write set
+        // as their first parameter of their own)
+        mismatch = true;
+        if(apply)
+          arguments.erase(arguments.begin());
+      }
+    }
+    return mismatch;
+  }
+};
 
 void dfcc_infer_loop_assigns_for_function(
   std::map<std::size_t, assignst> &inferred_loop_assigns_map,
   goto_functionst &goto_functions,
   const goto_functiont &goto_function,
+  const typet &write_set_type,
   message_handlert &message_handler,
   const namespacet &ns)
 {
@@ -862,7 +961,10 @@ void dfcc_infer_loop_assigns_for_function(
   // summaries of their writes, see `write_summary_bodiest`.
   write_summary_bodiest summary_bodies(goto_functions, ns);
 
-  add_write_set_argument_placeholders(goto_function_copy.body, ns);
+  // Make the write set arguments of the calls match the parameters of their
+  // callees, see `write_set_argumentst`.
+  write_set_argumentst write_set_arguments(
+    goto_functions, goto_function_copy.body, write_set_type, ns);
 
   // Inline all function calls in goto_function_copy; this is best-effort
   // inlining, we can safely ignore warnings here.

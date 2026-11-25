@@ -1,0 +1,18 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts _ --no-standard-checks
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] .* x is 0 or 1: FAILURE$
+^VERIFICATION FAILED$
+--
+^\[.*\.assigns\.\d+\] .*: FAILURE$
+^\[.*\.loop_assigns\.\d+\] .*: FAILURE$
+^Invariant check failed$
+--
+DFCC instruments first (declared implicitly, after second) before second.
+To infer the assigns clause of the loop of second, inlining reaches the body
+of first, which is instrumented and so passes the write set as the first
+argument to set_x, which is not instrumented yet. That argument has no
+parameter, and set_x's parameter v got &x, which stopped the inliner. The
+loops havoc x, so the assertion after them fails.
