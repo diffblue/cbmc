@@ -16715,3 +16715,55 @@ Verified: binW229 (13 suites, profiles (z3 complex2 flaky), vacuity
 1063/3, MSVC, macOS 142/142; GCC 16 image: 6 std::format/chrono failures
 -> scoped-enum bit-field switch fix), binW230 (cbmc-cpp, libc++, KNOWNBUG,
 GCC 16 image, macOS 142/142); unit, lint, format, doxygen, iwyu.
+
+## Round 240 (2026-11-24): user reports on symex and the array theory
+
+Reports triaged (generic reproducers only; the originals are not in the
+tree):
+- four earlier items were already fixed on the branch;
+- a crash assigning to a union member: fixed by #9544, now on the branch
+  (8f80b7ce37); bytes of an uninitialised union read by memcpy: fixed by
+  #9477's second commit, on the branch (f1784b3f12);
+- a lost write in a loop over a union and a DFCC assigns clause with
+  __CPROVER_object_whole: 11 and 4 variants, none reproduced.
+#9477 reads a union as a whole as its widest member's fields; other
+members derived from that lose constants and pointer offsets/targets:
+union_bit_field_after_other_byte_updates failed, std::format("{}", 42)
+did not terminate (libstdc++: widest member long double), libc++
+cpp11_std_bind_to_std_function ran out of memory on macOS (vtable
+pointers in std::function's byte storage union with unknown offsets), and
+develop+#9477 gives a spurious failure
+(regression/cbmc/union_member_values_through_copies).
+146a8a8738: read a union as a whole through its own symbol again; the
+widest member's fields are used only at declarations
+(initialize_union_members, nested unions expanded).  A 400-line attempt
+that rebased members on their own fields fixed std::format but not the
+libc++ case; assigning the union symbol at declarations breaks the
+incremental SMT2 back-end for unions with an array member.
+std::format probe: symex 0.4 s; libc++ std::bind: 8 s again.
+Set-up cost of large field-sensitive heap objects (32 x 8 x 16 structs of
+11 fields, 4 writes): 145,704 -> 54,491 steps, 6.3 -> 4.9 s, 625 -> 492 MB
+(CH=64: 13.2 -> 10.1 s, 1.24 GB -> 972 MB):
+- a0abec230e merge_names: no phi copy when one side has generation 0;
+  take the other side's L2 generation and propagation entry;
+- 4b7b85bad4 no SHARED_WRITE/DECL events when the program has no
+  START_THREAD (checkers call goto_symext::may_start_threads; not with
+  --symex-driven-lazy-loading; invariant in symex_start_thread).
+6551b4cf10 --arrays-uf-always with array members of flattened structs:
+convert_with_array invariant (s[i].data[j] = v), collect_arrays/
+add_array_constraints member invariants (also #9515's KNOWNBUG
+Array_UF_member_no_simplify), and unconstrained bits of array symbols in
+flattened structs (spurious failure).  #8468/#8905 only relax the
+collect_arrays invariant; #8468 gives a spurious failure, #8905 one with
+--no-array-field-sensitivity.  regression/cbmc under --arrays-uf-always:
+13 -> 4 failures, none new (Array_operations2 "byte_update should be
+removed before arrayst", SIMD1, trace-values, union_large_array
+pre-existing).
+Pitfalls: --cprover-smt2 runs need smt2_solver on PATH; the anonymity scan
+uses the default (myers) diff, where moved code can bring pre-existing
+identifiers into the patch.
+Verified: binW234 (13 suites, profiles (z3 complex2 flaky), vacuity
+1063/3, MSVC, macOS 142/142; GCC 16 image; the other ctest CORE suites incl.
+validate-trace-xml-schema; JBMC jbmc + jbmc-concurrency (sdll
+jbmc-concurrency failures pre-existing)); unit, lint, format, doxygen,
+iwyu.
