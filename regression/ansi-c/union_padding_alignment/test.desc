@@ -1,0 +1,11 @@
+CORE
+main.i
+
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The padding member that pads a union to a multiple of its alignment spans the
+entire union, and used to determine the alignment of the union.

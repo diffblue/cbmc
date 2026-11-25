@@ -1,0 +1,12 @@
+CORE
+oob.i
+--arch x86_64 --os linux --pointer-check
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.pointer_dereference\.1\] line 14 dereference failure: pointer outside object bounds in b\[\(signed long int\)7\]: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+From #9304: the unnamed bit-field used to raise the alignment, and thereby the
+size, of struct A to 4, so that the out-of-bounds write went unnoticed.

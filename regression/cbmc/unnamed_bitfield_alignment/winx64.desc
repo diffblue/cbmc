@@ -1,0 +1,13 @@
+CORE
+msvc.i
+--winx64
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+With the Microsoft ABI, unnamed bit-fields do affect the alignment of a
+structure or union. The layouts are those of Visual Studio (as implemented by
+Clang).

@@ -20,6 +20,40 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 
+/// Whether the unnamed bit-fields of a struct or union contribute to its
+/// alignment. The System V psABIs for AMD64 and i386 state in section 3.1.2,
+/// Bit-Fields, that "Unnamed bit-fields' types do not affect the alignment of a
+/// structure or union." GCC and Clang follow this rule on all targets except
+/// those using the Microsoft ABI or AAPCS/AAPCS64 (Arm, other than on Apple
+/// platforms).
+static bool unnamed_bit_fields_affect_alignment()
+{
+  const irep_idt &arch = config.ansi_c.arch;
+  const bool is_arm =
+    arch == "arm64" || arch == "armel" || arch == "armhf" || arch == "arm";
+
+  return config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO ||
+         config.ansi_c.os == configt::ansi_ct::ost::OS_WIN ||
+         (is_arm && config.ansi_c.os != configt::ansi_ct::ost::OS_MACOS);
+}
+
+/// Whether \p component contributes to the alignment of the struct or union
+/// that it is a member of.
+static bool contributes_to_aggregate_alignment(
+  const struct_union_typet::componentt &component)
+{
+  // Padding members are derived from the other members, and must not
+  // contribute: the padding member of a union spans the entire union, and the
+  // padding following an unnamed bit-field may be wider than the alignment of
+  // any member that contributes.
+  if(component.get_is_padding())
+    return false;
+
+  return !component.get_anonymous() ||
+         component.type().id() != ID_c_bit_field ||
+         unnamed_bit_fields_affect_alignment();
+}
+
 bytest alignment(const typet &type, const namespacet &ns)
 {
   // we need to consider a number of different cases:
@@ -64,7 +98,12 @@ bytest alignment(const typet &type, const namespacet &ns)
     // get the max
     // (should really be the smallest common denominator)
     for(const auto &c : to_struct_union_type(type).components())
+    {
+      if(!contributes_to_aggregate_alignment(c))
+        continue;
+
       result = std::max(result, alignment(c.type(), ns));
+    }
   }
   else if(type.id()==ID_unsignedbv ||
           type.id()==ID_signedbv ||
@@ -356,8 +395,8 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
       else
       {
         // Otherwise, ANSI-C says that bit-fields do not get padded!
-        // We consider the type for max_alignment, however.
-        if(max_alignment<a)
+        // We still consider the type for aggregate alignment when required.
+        if(contributes_to_aggregate_alignment(*it) && max_alignment < a)
           max_alignment=a;
 
         std::size_t w=to_c_bit_field_type(it_type).get_width();
@@ -397,7 +436,7 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
       a=config.ansi_c.alignment;
     }
 
-    if(max_alignment<a)
+    if(contributes_to_aggregate_alignment(*it) && max_alignment < a)
       max_alignment=a;
 
     if(
