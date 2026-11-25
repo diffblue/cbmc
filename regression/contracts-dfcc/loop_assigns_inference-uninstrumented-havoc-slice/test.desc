@@ -1,0 +1,16 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts _ --no-standard-checks
+^EXIT=10$
+^SIGNAL=0$
+^\[main.assertion.1\] .* y havocked through a parameter: FAILURE$
+^VERIFICATION FAILED$
+--
+^\[main\.assigns\.\d+\] .*: FAILURE$
+^\[main\.loop_assigns\.\d+\] .*: FAILURE$
+--
+`__CPROVER_havoc_slice` is implemented with `__CPROVER_array_replace`, which
+the loop assigns inference does not see after inlining the function's body.
+The summary that replaces the body of `__VERIFIER_havoc` for the inference
+writes the whole object its parameter points to, so the loop havocs y and the
+assertion fails. This test fails if the inference inlines the body instead.
