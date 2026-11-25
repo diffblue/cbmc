@@ -214,6 +214,36 @@ static bytest member_layout_alignment(
   bool container_is_packed,
   const namespacet &ns)
 {
+  if(
+    component.type().id() == ID_c_bit_field &&
+    config.ansi_c.mode != configt::ansi_ct::flavourt::VISUAL_STUDIO)
+  {
+    const c_bit_field_typet &bit_field_type =
+      to_c_bit_field_type(component.type());
+
+    // A zero-width bit-field aligns the next member. As it is an unnamed
+    // bit-field, it also affects the alignment of the aggregate only where
+    // unnamed bit-fields do (see unnamed_bit_fields_affect_alignment),
+    // irrespective of packing.
+    if(bit_field_type.get_width() == 0)
+    {
+      if(unnamed_bit_fields_affect_alignment())
+        return alignment(bit_field_type.underlying_type(), ns);
+      return bytest{1};
+    }
+
+    // Bit-fields are densely packed in a packed aggregate -- unless
+    // #pragma pack(n) is in effect, which then caps their alignment at n
+    // instead, as GCC and Clang do.
+    const bytest natural = alignment(bit_field_type.underlying_type(), ns);
+    const bytest max_alignment = pragma_pack(component);
+    if(max_alignment > bytest{0})
+      return std::min(max_alignment, natural);
+    if(container_is_packed || bit_field_type.get_bool(ID_C_packed))
+      return bytest{1};
+    return natural;
+  }
+
   const bytest a = member_layout_alignment_unconstrained(
     component.type(), container_is_packed, ns);
 
@@ -480,24 +510,38 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
     bytest a{1};
     const bytest max_alignment_pragma = pragma_pack(*it);
 
-    if(it_type.id()==ID_c_bit_field)
+    if(it_type.id() == ID_c_bit_field)
     {
-      a = alignment(to_c_bit_field_type(it_type).underlying_type(), ns);
-      if(max_alignment_pragma > bytest{0})
-        a = std::min(a, max_alignment_pragma);
-
-      // A zero-width bit-field causes alignment to the base-type.
-      if(to_c_bit_field_type(it_type).get_width()==0)
+      if(to_c_bit_field_type(it_type).get_width() == 0)
       {
+        // A zero-width bit-field causes alignment of the next member to the
+        // underlying type, irrespective of packing.
+        a = alignment(to_c_bit_field_type(it_type).underlying_type(), ns);
+        max_alignment = std::max(
+          max_alignment, member_layout_alignment(*it, struct_is_packed, ns));
+        DATA_INVARIANT(
+          bit_field_bits == 0, "padding ensures offset at byte boundaries");
+        const bytest displacement = offset % a;
+        if(displacement != bytest{0})
+        {
+          const bytest pad_bytes = a - displacement;
+          const std::size_t pad_bits =
+            numeric_cast_v<std::size_t>(pad_bytes * config.ansi_c.char_width);
+          it = pad(components, it, pad_bits);
+          offset += pad_bytes;
+        }
+        continue;
       }
       else
       {
         // Otherwise, ANSI-C says that bit-fields do not get padded!
-        // We still consider the type for aggregate alignment when required.
+        // We consider the type for max_alignment, however, unless this is an
+        // unnamed bit-field that does not contribute.
+        a = member_layout_alignment(*it, struct_is_packed, ns);
         if(contributes_to_aggregate_alignment(*it) && max_alignment < a)
-          max_alignment=a;
+          max_alignment = a;
 
-        std::size_t w=to_c_bit_field_type(it_type).get_width();
+        std::size_t w = to_c_bit_field_type(it_type).get_width();
         bit_field_bits += w;
         const std::size_t bytes = bit_field_bits / config.ansi_c.char_width;
         bit_field_bits %= config.ansi_c.char_width;

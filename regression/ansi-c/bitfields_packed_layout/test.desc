@@ -1,0 +1,11 @@
+CORE gcc-only broken-test-c++-front-end
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Layout of bit-fields in packed aggregates and under #pragma pack, and of
+zero-width bit-fields, as done by GCC and Clang.
