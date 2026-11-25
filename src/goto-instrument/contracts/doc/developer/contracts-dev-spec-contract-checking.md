@@ -84,7 +84,7 @@ conditions of the contract.
 static bool foo_check_started = false;
 static bool foo_check_completed = false;
 
-ret_t foo(foo-parameters, write_set_t caller_write_set) {
+ret_t foo(write_set_t caller_write_set, foo-parameters) {
 
   assert(!foo_check_started, "recursive calls to foo not allowed");
   assert(!foo_check_completed, "foo can only be called once from the harness");
@@ -112,12 +112,12 @@ ret_t foo(foo-parameters, write_set_t caller_write_set) {
 
   // allocate and populate the contract write set
   __CPROVER_contracts_write_set_create(contract_write_set, assigns_clause_size(c), frees_clause_size(c));
-  contract::assigns(contract_write_set, empty_write_set);
-  contract::frees(contract_write_set, empty_write_set);
+  contract::assigns(empty_write_set, contract_write_set);
+  contract::frees(empty_write_set, contract_write_set);
 
   // call the function
   ret_t retval;
-  retval = foo_swapped(foo_params, contact_write_set);
+  retval = foo_swapped(contract_write_set, foo_params);
   __CPROVER_contracts_write_set_release(contract_write_set);
 
   // create an empty write set to check for side effects in requires clauses
@@ -150,7 +150,7 @@ subsequent call triggers the contract replacement logic as described in
 static bool foo_check_started = false;
 static bool foo_check_completed = false;
 
-ret_t foo(foo_params, write_set_t caller_write_set) {
+ret_t foo(write_set_t caller_write_set, foo_params) {
   assert(!foo_check_completed, "foo can only be called once from the harness");
 
    // first call, check the contract

@@ -121,6 +121,9 @@ const symbolt &dfcc_utilst::create_static_symbol(
   return symbol;
 }
 
+const char *const dfcc_utilst::write_set_to_check_base_name =
+  "__write_set_to_check";
+
 const symbolt &dfcc_utilst::create_new_parameter_symbol(
   symbol_table_baset &symbol_table,
   const irep_idt &function_id,
@@ -142,7 +145,8 @@ const symbolt &dfcc_utilst::create_new_parameter_symbol(
   return symbol;
 }
 
-/// \brief Adds the given symbol as parameter to the given code_typet.
+/// \brief Adds the given symbol as the first parameter of the given code_typet,
+/// see \ref dfcc_utilst::add_parameter.
 static void add_parameter(const symbolt &symbol, code_typet &code_type)
 {
   PRECONDITION(symbol.is_parameter);
@@ -150,7 +154,7 @@ static void add_parameter(const symbolt &symbol, code_typet &code_type)
   parameter.set_base_name(symbol.base_name);
   parameter.set_identifier(symbol.name);
   auto &parameters = code_type.parameters();
-  parameters.insert(parameters.end(), parameter);
+  parameters.insert(parameters.begin(), parameter);
 }
 
 void dfcc_utilst::add_parameter(
@@ -380,6 +384,10 @@ void dfcc_utilst::wrap_function(
     new_params);
 
   code_typet new_code_type(new_params, old_code_type.return_type());
+  // keep the wrapper variadic like the wrapped function, so that it accepts
+  // the same calls
+  if(old_code_type.has_ellipsis())
+    new_code_type.make_ellipsis();
 
   wrapper_sym.type = new_code_type;
 
