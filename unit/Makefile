@@ -62,6 +62,7 @@ SRC += analyses/ai/ai.cpp \
        goto-checker/report_util/is_property_less_than.cpp \
        goto-instrument/cover_instrument.cpp \
        goto-instrument/cover/cover_only.cpp \
+       goto-instrument/dfcc_write_summaries.cpp \
        goto-synthesizer/expr_enumerator/expr_enumerator.cpp \
        goto-programs/goto_program_assume.cpp \
        goto-programs/goto_program_dead.cpp \
@@ -277,6 +278,8 @@ BMC_DEPS =../src/cbmc/c_test_input_generator$(OBJEXT) \
           ../src/goto-instrument/cover_instrument_mcdc$(OBJEXT) \
           ../src/goto-instrument/cover_instrument_other$(OBJEXT) \
           ../src/goto-instrument/cover_util$(OBJEXT) \
+          ../src/goto-instrument/contracts/dynamic-frames/dfcc_is_cprover_symbol$(OBJEXT) \
+          ../src/goto-instrument/contracts/dynamic-frames/dfcc_write_summaries$(OBJEXT) \
           ../src/goto-instrument/goto_program2code$(OBJEXT) \
           ../src/goto-instrument/reachability_slicer$(OBJEXT) \
           ../src/goto-instrument/nondet_static$(OBJEXT) \

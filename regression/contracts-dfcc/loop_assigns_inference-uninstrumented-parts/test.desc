@@ -1,0 +1,26 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts _ --no-standard-checks
+^EXIT=10$
+^SIGNAL=0$
+^\[main.assertion.1\] .* s.a written: FAILURE$
+^\[main.assertion.2\] .* s.b not written: SUCCESS$
+^\[main.assertion.3\] .* g.a written: FAILURE$
+^\[main.assertion.4\] .* g.b not written: SUCCESS$
+^\[main.assertion.5\] .* t.in.x written: FAILURE$
+^\[main.assertion.6\] .* t.a not written: SUCCESS$
+^\[main.assertion.7\] .* u.arr\[0\] written: FAILURE$
+^\[main.assertion.8\] .* u.b not written: SUCCESS$
+^\[main.assertion.9\] .* v\[1\].a written: FAILURE$
+^VERIFICATION FAILED$
+--
+^\[main\.assigns\.\d+\] .*: FAILURE$
+^\[main\.loop_assigns\.\d+\] .*: FAILURE$
+--
+The loop assigns inference replaces the bodies of the functions that DFCC does
+not instrument by summaries of their writes. A summary writes the members that
+the function writes, of globals and of the objects its parameters point to,
+rather than those whole objects, so that the loop does not havoc the members
+the function does not write. A write to a part of a member writes the whole
+member (here, `t.in` and `u.arr`), and a write through a parameter that the
+function changes writes the whole object it may point to.
