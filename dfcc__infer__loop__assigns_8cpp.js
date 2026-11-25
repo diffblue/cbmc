@@ -1,5 +1,6 @@
 var dfcc__infer__loop__assigns_8cpp =
 [
+    [ "add_write_set_argument_placeholders", "dfcc__infer__loop__assigns_8cpp.html#a1e23739420961cdd49825d97d9da7d38", null ],
     [ "depends_on", "dfcc__infer__loop__assigns_8cpp.html#adf8a94a7b4960b7c35b3783b48c3d16d", null ],
     [ "dfcc_infer_loop_assigns_for_function", "dfcc__infer__loop__assigns_8cpp.html#ac5875df4b0b91a9b6642ad68e5df8e11", null ],
     [ "dfcc_infer_loop_assigns_for_loop", "dfcc__infer__loop__assigns_8cpp.html#a3e4e7e52a3c8aaf1d94e0334e736a26e", null ],

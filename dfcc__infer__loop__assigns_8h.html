@@ -165,7 +165,7 @@ Functions</h2></td></tr>
 
 <p>Infer assigns clause targets for loops in <span class="tt">goto_function</span> from their instructions and an alias analysis at the function level (with inlining), and store the result in <span class="tt">inferred_loop_assigns_map</span>, a map from loop numbers to the set of inferred assigns targets. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html#l00786">786</a> of file <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html">dfcc_infer_loop_assigns.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html#l00821">821</a> of file <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html">dfcc_infer_loop_assigns.cpp</a>.</p>
 
 </div>
 </div>
@@ -192,7 +192,7 @@ Functions</h2></td></tr>
 <p>Collect identifiers that are local to <span class="tt">loop</span>, i.e., those of variables declared inside <span class="tt">loop</span>.</p>
 <p>A variable is a loop local if and only if it is declared inside the loop (i.e., there is a DECL instruction for it in the loop body). Variables declared outside the loop are never considered loop locals, even when they are only read or written inside the loop, because their storage persists across iterations and they must be havoced to ensure soundness. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html#l00058">58</a> of file <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html">dfcc_infer_loop_assigns.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html#l00059">59</a> of file <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html">dfcc_infer_loop_assigns.cpp</a>.</p>
 
 </div>
 </div>

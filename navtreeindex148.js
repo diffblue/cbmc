@@ -1,5 +1,9 @@
 var NAVTREEINDEX148 =
 {
+"structsmt__core__theoryt_1_1if__then__elset.html#a8fed6208ba2c2fd1fff3b0f77d325fda":[5,0,1142,7,0],
+"structsmt__core__theoryt_1_1if__then__elset.html#accfd4a5623c4dff2f02db891c1cdfe57":[5,0,1142,7,1],
+"structsmt__core__theoryt_1_1impliest.html":[5,0,1142,1],
+"structsmt__core__theoryt_1_1impliest.html#a4b7a46746815ffdc0824790dc0d0380e":[5,0,1142,1,1],
 "structsmt__core__theoryt_1_1impliest.html#a8a5c952ce6c85bb7ea1e1787172bbc5a":[5,0,1142,1,0],
 "structsmt__core__theoryt_1_1impliest.html#a9e7c43d48d040b087d9e72f4989a59eb":[5,0,1142,1,2],
 "structsmt__core__theoryt_1_1nott.html":[5,0,1142,0],
@@ -245,9 +249,5 @@ var NAVTREEINDEX148 =
 "structtemplate__parameter__symbol__typet.html":[5,0,1292],
 "structtemplate__parameter__symbol__typet.html#a1c8faef0cf9bb8a040a3f2b716c7d4e5":[5,0,1292,0],
 "structtemplate__parameter__symbol__typet.html#aabdb83b11abe4c5f7d31b01f8c82bb02":[5,0,1292,1],
-"structtemplate__parameter__symbol__typet.html#ad9c880bd351ec7d97cfa40a6c8058d68":[5,0,1292,2],
-"structtemplate__parametert.html":[5,0,1293],
-"structtemplate__parametert.html#a4966ec562707cc22a7b5e50f782812b6":[5,0,1293,1],
-"structtemplate__parametert.html#a4d52b8f54f9008e38e57627a30879db5":[5,0,1293,2],
-"structtemplate__parametert.html#aa16983bc267e38e4ff4686e0c1788b50":[5,0,1293,0]
+"structtemplate__parameter__symbol__typet.html#ad9c880bd351ec7d97cfa40a6c8058d68":[5,0,1292,2]
 };

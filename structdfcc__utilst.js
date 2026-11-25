@@ -14,5 +14,6 @@ var structdfcc__utilst =
     [ "inline_program", "structdfcc__utilst.html#abaec73cc73e5b341bccb3c9a609da2c7", null ],
     [ "make_null_check_expr", "structdfcc__utilst.html#a395032e90f53e46e039cd45eb82e6731", null ],
     [ "make_sizeof_expr", "structdfcc__utilst.html#a66bf928a90753a89cc06c4a9e7120183", null ],
-    [ "wrap_function", "structdfcc__utilst.html#a8f12edbd87d6552ab9a08fbb3399f76f", null ]
+    [ "wrap_function", "structdfcc__utilst.html#a8f12edbd87d6552ab9a08fbb3399f76f", null ],
+    [ "write_set_to_check_base_name", "structdfcc__utilst.html#a3bb43760deb9462bed70f26331c921b4", null ]
 ];

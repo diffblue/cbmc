@@ -117,7 +117,7 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:ab991d0556f4491f44d7f31245e4464f0" id="r_ab991d0556f4491f44d7f31245e4464f0"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab991d0556f4491f44d7f31245e4464f0">add_parameter</a> (<a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;, const <a class="el" href="classsymbolt.html">symbolt</a> &amp;symbol, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id)</td></tr>
 <tr class="memdesc:ab991d0556f4491f44d7f31245e4464f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds the given symbol as parameter to the function symbol's code_type.  <br /></td></tr>
 <tr class="memitem:a2353b6c808af2af345009cbe366067df" id="r_a2353b6c808af2af345009cbe366067df"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="classsymbolt.html">symbolt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2353b6c808af2af345009cbe366067df">add_parameter</a> (<a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, const std::string &amp;base_name, const <a class="el" href="classtypet.html">typet</a> &amp;type)</td></tr>
-<tr class="memdesc:a2353b6c808af2af345009cbe366067df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a parameter with given <span class="tt">base_name</span> and <span class="tt">type</span> to the given <span class="tt">function_id</span>.  <br /></td></tr>
+<tr class="memdesc:a2353b6c808af2af345009cbe366067df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a parameter with given <span class="tt">base_name</span> and <span class="tt">type</span> to the given <span class="tt">function_id</span>, before the existing parameters.  <br /></td></tr>
 <tr class="memitem:a9af0f91b12952afdb327f017bc7f977c" id="r_a9af0f91b12952afdb327f017bc7f977c"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="classsymbolt.html">symbolt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9af0f91b12952afdb327f017bc7f977c">clone_and_rename_function</a> (<a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;new_function_id, std::optional&lt; <a class="el" href="classtypet.html">typet</a> &gt; new_return_type)</td></tr>
 <tr class="memdesc:a9af0f91b12952afdb327f017bc7f977c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new function symbol and goto_function entry in the <span class="tt">goto_functions_map</span> by cloning the given <span class="tt">function_id</span>.  <br /></td></tr>
 <tr class="memitem:a8f12edbd87d6552ab9a08fbb3399f76f" id="r_a8f12edbd87d6552ab9a08fbb3399f76f"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8f12edbd87d6552ab9a08fbb3399f76f">wrap_function</a> (<a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;wrapped_function_id)</td></tr>
@@ -132,6 +132,11 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memdesc:a6d15bb3e350b338816f8aafdbdf8645f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inlines the given function, and returns function symbols that caused warnings.  <br /></td></tr>
 <tr class="memitem:abaec73cc73e5b341bccb3c9a609da2c7" id="r_abaec73cc73e5b341bccb3c9a609da2c7"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abaec73cc73e5b341bccb3c9a609da2c7">inline_program</a> (<a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program, std::set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;no_body, std::set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;recursive_call, std::set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;missing_function, std::set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;not_enough_arguments, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
 <tr class="memdesc:abaec73cc73e5b341bccb3c9a609da2c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inlines the given program, and returns function symbols that caused warnings.  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-static-attribs" class="groupheader"><a id="pub-static-attribs" name="pub-static-attribs"></a>
+Static Public Attributes</h2></td></tr>
+<tr class="memitem:a3bb43760deb9462bed70f26331c921b4" id="r_a3bb43760deb9462bed70f26331c921b4"><td class="memItemLeft" align="right" valign="top">static const char *const&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3bb43760deb9462bed70f26331c921b4">write_set_to_check_base_name</a></td></tr>
+<tr class="memdesc:a3bb43760deb9462bed70f26331c921b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base name of the write set parameter that instrumentation adds to each instrumented function, see <a class="el" href="#ab991d0556f4491f44d7f31245e4464f0">add_parameter</a>.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock">
@@ -174,10 +179,10 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Adds a parameter with given <span class="tt">base_name</span> and <span class="tt">type</span> to the given <span class="tt">function_id</span>. </p>
+<p>Adds a parameter with given <span class="tt">base_name</span> and <span class="tt">type</span> to the given <span class="tt">function_id</span>, before the existing parameters. </p>
 <p>Both the symbol and the goto_function are updated. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00170">170</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00174">174</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -214,9 +219,9 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Adds the given symbol as parameter to the function symbol's code_type. </p>
-<p>Also adds the corresponding parameter to its goto_function if it exists in the function map of the goto model. </p>
+<p>Also adds the corresponding parameter to its goto_function if it exists in the function map of the goto model. The parameter is added before the existing parameters. Calls hence pass the corresponding argument first, which binds it to the parameter for any number of other arguments: for a variadic function (va_start takes the arguments that follow the last declared parameter), for calls with surplus or missing arguments (e.g., calls written against a different declaration of the function), and for calls through function pointers of any type. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00156">156</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00160">160</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -260,7 +265,7 @@ Static Public Member Functions</h2></td></tr>
 <p>Creates a new function symbol and goto_function entry in the <span class="tt">goto_functions_map</span> by cloning the given <span class="tt">function_id</span>. </p>
 <p>The cloned function symbol has <span class="tt">new_function_id</span> as name The cloned parameters symbols have <span class="tt">new_function_id::name</span> as name Returns the new function symbol </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00300">300</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00304">304</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -303,7 +308,7 @@ Static Public Member Functions</h2></td></tr>
 
 <p>Creates a new parameter symbol for the given function_id. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00124">124</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00127">127</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -556,7 +561,7 @@ Static Public Member Functions</h2></td></tr>
 
 <p>Inlines the given function, aborts on recursive calls during inlining. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00443">443</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00451">451</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -614,7 +619,7 @@ Static Public Member Functions</h2></td></tr>
 
 <p>Inlines the given function, and returns function symbols that caused warnings. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00460">460</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00468">468</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -672,7 +677,7 @@ Static Public Member Functions</h2></td></tr>
 
 <p>Inlines the given program, and returns function symbols that caused warnings. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00487">487</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00495">495</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -701,7 +706,7 @@ Static Public Member Functions</h2></td></tr>
 
 <p>Returns the expression <span class="tt">expr == NULL</span>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00406">406</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00414">414</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -734,7 +739,7 @@ Static Public Member Functions</h2></td></tr>
 
 <p>Returns the expression <span class="tt">sizeof(expr)</span>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00411">411</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00419">419</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -779,7 +784,36 @@ Static Public Member Functions</h2></td></tr>
 </div><!-- fragment --><p>Any other goto_function calling <span class="tt">foo</span> still calls <span class="tt">foo</span> which has become a wrapper for <span class="tt">wrapped_foo</span>.</p>
 <p>By generating a new body for <span class="tt">foo</span>, one can implement contract checking logic, contract replacement logic, etc. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00324">324</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00328">328</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+
+</div>
+</div>
+<a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
+<a id="a3bb43760deb9462bed70f26331c921b4" name="a3bb43760deb9462bed70f26331c921b4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3bb43760deb9462bed70f26331c921b4">&#9670;&#160;</a></span>write_set_to_check_base_name</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char *const dfcc_utilst::write_set_to_check_base_name</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">=</div>
+<div class="line">  <span class="stringliteral">&quot;__write_set_to_check&quot;</span></div>
+</div><!-- fragment -->
+<p>Base name of the write set parameter that instrumentation adds to each instrumented function, see <a class="el" href="#ab991d0556f4491f44d7f31245e4464f0">add_parameter</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8h_source.html#l00030">30</a> of file <a class="el" href="dfcc__utils_8h_source.html">dfcc_utils.h</a>.</p>
 
 </div>
 </div>

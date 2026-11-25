@@ -167,18 +167,18 @@ Protected Attributes</h2></td></tr>
 <div class="fragment"><div class="line"><span class="comment">// Populates write_set_to_fill with targets of the assigns clause</span></div>
 <div class="line"><span class="comment">// checks its own body against write_set_to_check:</span></div>
 <div class="line"><span class="keywordtype">void</span> contract_id::c_assigns(</div>
-<div class="line">    function-params,</div>
+<div class="line">    write_set_to_check,</div>
 <div class="line">    write_set_to_fill,</div>
-<div class="line">    write_set_to_check);</div>
+<div class="line">    function-params);</div>
 </div><!-- fragment --><div class="fragment"><div class="line"><span class="comment">// Havocs the targets specified in the assigns clause, assuming</span></div>
 <div class="line"><span class="comment">// write_set_to_havoc is a snapshot created using contract_id::c_assigns</span></div>
 <div class="line"><span class="keywordtype">void</span> contract_id::c_assigns::havoc(write_set_to_havoc);</div>
 </div><!-- fragment --><div class="fragment"><div class="line"><span class="comment">// Populates write_set_to_fill with targets of the frees clause</span></div>
 <div class="line"><span class="comment">// checks its own body against write_set_to_check:</span></div>
 <div class="line"><span class="keywordtype">void</span> contract_id::frees(</div>
-<div class="line">    function-params,</div>
+<div class="line">    write_set_to_check,</div>
 <div class="line">    write_set_to_fill,</div>
-<div class="line">    write_set_to_check);</div>
+<div class="line">    function-params);</div>
 </div><!-- fragment --> 
 <p class="definition">Definition at line <a class="el" href="dfcc__contract__functions_8h_source.html#l00054">54</a> of file <a class="el" href="dfcc__contract__functions_8h_source.html">dfcc_contract_functions.h</a>.</p>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>

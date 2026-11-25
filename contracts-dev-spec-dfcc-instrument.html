@@ -106,9 +106,11 @@ Signature Extension</h1>
 <p>The signature of a function:</p>
 <div class="fragment"><div class="line">ret_t foo(foo-parameters);</div>
 </div><!-- fragment --><p>is turned into the extended version:</p>
-<div class="fragment"><div class="line">ret_t  foo(foo-parameters,  <a class="code hl_typedef" href="cprover__contracts_8c.html#a8f7470f5b28d687194dd6480b4fcf0c6">__CPROVER_contracts_write_set_ptr_t</a> write_set);</div>
+<div class="fragment"><div class="line">ret_t  foo(<a class="code hl_typedef" href="cprover__contracts_8c.html#a8f7470f5b28d687194dd6480b4fcf0c6">__CPROVER_contracts_write_set_ptr_t</a> write_set,  foo-parameters);</div>
 <div class="ttc" id="acprover__contracts_8c_html_a8f7470f5b28d687194dd6480b4fcf0c6"><div class="ttname"><a href="cprover__contracts_8c.html#a8f7470f5b28d687194dd6480b4fcf0c6">__CPROVER_contracts_write_set_ptr_t</a></div><div class="ttdeci">__CPROVER_contracts_write_set_t * __CPROVER_contracts_write_set_ptr_t</div><div class="ttdoc">Type of pointers to __CPROVER_contracts_write_set_t.</div><div class="ttdef"><b>Definition</b> <a href="cprover__contracts_8c_source.html#l00120">cprover_contracts.c:120</a></div></div>
-</div><!-- fragment --><p>After this step the <span class="tt">write_set</span> parameter is in scope in the function and can be used to implement checks.</p>
+</div><!-- fragment --><p>Calls pass the write set as the first argument. This binds it to the <span class="tt">write_set</span> parameter whatever the number of other arguments: for a variadic function, where <span class="tt">va_start</span> reads the variadic arguments from the arguments that follow the last declared parameter; for a call with more arguments than the function has parameters, e.g., a call written against a different declaration of the function; for a call with fewer arguments, as permitted for a function declared without a prototype; and for a call through a function pointer of any type.</p>
+<p>Variadic arguments are not passed on to a function whose contract is checked, see <a class="el" href="#contracts-dev-spec-dfcc-instrument-limitations">Limitations</a>.</p>
+<p>After this step the <span class="tt">write_set</span> parameter is in scope in the function and can be used to implement checks.</p>
 <p>It is valid to pass a <span class="tt">NULL</span> pointer for the <span class="tt">write_set</span> parameter. When the <span class="tt">write_set</span> parameter is NULL, no checks are performed in the function.</p>
 <h1 class="doxsection"><a class="anchor" id="contracts-dev-spec-dfcc-instrument-body"></a>
 Body Instrumentation</h1>
@@ -282,6 +284,9 @@ Instrumenting OTHER Instructions</h2>
 </ul>
 </li>
 </ul>
+<h1 class="doxsection"><a class="anchor" id="contracts-dev-spec-dfcc-instrument-limitations"></a>
+Limitations</h1>
+<p>When checking the contract of a variadic function, the wrapper that checks the contract calls the function with its declared parameters only: a static call cannot pass on a variable number of variadic arguments. Reading a variadic argument with <span class="tt">va_arg</span> in the body of the function then fails a pointer check. DFCC warns about this when it checks the contract of a variadic function.</p>
 <hr  />
  <table class="markdownTable">
 <tr class="markdownTableHead">

@@ -109,11 +109,12 @@ $(function(){initNavTree('dfcc__infer__loop__assigns_8cpp.html','',''); });
 <code>#include &quot;<a class="el" href="dfcc__is__cprover__symbol_8h_source.html">dfcc_is_cprover_symbol.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="dfcc__loop__nesting__graph_8h_source.html">dfcc_loop_nesting_graph.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="dfcc__root__object_8h_source.html">dfcc_root_object.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="dfcc__utils_8h_source.html">dfcc_utils.h</a>&quot;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return dynsection.toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;"><span class="dynarrow"><span class="arrowhead closed"></span></span>Include dependency graph for dfcc_infer_loop_assigns.cpp:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" loading="lazy" frameborder="0" src="dfcc__infer__loop__assigns_8cpp__incl.svg" width="3003" height="856"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" loading="lazy" frameborder="0" src="dfcc__infer__loop__assigns_8cpp__incl.svg" width="2867" height="856"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 </div>
 <p><a href="dfcc__infer__loop__assigns_8cpp_source.html">Go to the source code of this file.</a></p>
@@ -132,10 +133,46 @@ Functions</h2></td></tr>
 <tr class="memdesc:a3e4e7e52a3c8aaf1d94e0334e736a26e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Infer loop assigns in the given <span class="tt">loop</span>.  <br /></td></tr>
 <tr class="memitem:aa77cf6a75b5965cb4e7d73946e0610c6" id="r_aa77cf6a75b5965cb4e7d73946e0610c6"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa77cf6a75b5965cb4e7d73946e0610c6">remove_dead_object_assignment</a> (<a class="el" href="classgoto__functiont.html">goto_functiont</a> &amp;goto_function)</td></tr>
 <tr class="memdesc:aa77cf6a75b5965cb4e7d73946e0610c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove assignments to <span class="tt">__CPROVER_dead_object</span> to avoid aliasing all targets that are assigned to <span class="tt">__CPROVER_dead_object</span>.  <br /></td></tr>
+<tr class="memitem:a1e23739420961cdd49825d97d9da7d38" id="r_a1e23739420961cdd49825d97d9da7d38"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1e23739420961cdd49825d97d9da7d38">add_write_set_argument_placeholders</a> (<a class="el" href="classgoto__programt.html">goto_programt</a> &amp;program, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
+<tr class="memdesc:a1e23739420961cdd49825d97d9da7d38"><td class="mdescLeft">&#160;</td><td class="mdescRight">The calls in <code class="param">program</code> are not instrumented yet, and hence lack the write set argument.  <br /></td></tr>
 <tr class="memitem:ac5875df4b0b91a9b6642ad68e5df8e11" id="r_ac5875df4b0b91a9b6642ad68e5df8e11"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac5875df4b0b91a9b6642ad68e5df8e11">dfcc_infer_loop_assigns_for_function</a> (std::map&lt; std::size_t, <a class="el" href="havoc__utils_8h.html#a3cb48127eadbd7ae4878b91c91439bee">assignst</a> &gt; &amp;inferred_loop_assigns_map, <a class="el" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions, const <a class="el" href="classgoto__functiont.html">goto_functiont</a> &amp;goto_function, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
 <tr class="memdesc:ac5875df4b0b91a9b6642ad68e5df8e11"><td class="mdescLeft">&#160;</td><td class="mdescRight">Infer assigns clause targets for loops in <span class="tt">goto_function</span> from their instructions and an alias analysis at the function level (with inlining), and store the result in <span class="tt">inferred_loop_assigns_map</span>, a map from loop numbers to the set of inferred assigns targets.  <br /></td></tr>
 </table>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+<a id="a1e23739420961cdd49825d97d9da7d38" name="a1e23739420961cdd49825d97d9da7d38"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1e23739420961cdd49825d97d9da7d38">&#9670;&#160;</a></span>add_write_set_argument_placeholders()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void add_write_set_argument_placeholders </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classgoto__programt.html">goto_programt</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>program</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classnamespacet.html">namespacet</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>ns</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The calls in <code class="param">program</code> are not instrumented yet, and hence lack the write set argument. </p>
+<p>A callee that has been instrumented already, however, has the write set as its first parameter (see <a class="el" href="structdfcc__utilst.html#ab991d0556f4491f44d7f31245e4464f0" title="Adds the given symbol as parameter to the function symbol&#39;s code_type.">dfcc_utilst::add_parameter</a>). Add a nil argument (meaning "do not assign" to the inliner) for that parameter, so that the other arguments bind to the parameters they belong to. </p>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html#l00792">792</a> of file <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html">dfcc_infer_loop_assigns.cpp</a>.</p>
+
+</div>
+</div>
 <a id="adf8a94a7b4960b7c35b3783b48c3d16d" name="adf8a94a7b4960b7c35b3783b48c3d16d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#adf8a94a7b4960b7c35b3783b48c3d16d">&#9670;&#160;</a></span>depends_on()</h2>
 
@@ -165,7 +202,7 @@ Functions</h2></td></tr>
 
 <p>Returns true iff <code class="param">expr</code> contains at least one identifier found in <code class="param">identifiers</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html#l00041">41</a> of file <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html">dfcc_infer_loop_assigns.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html#l00042">42</a> of file <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html">dfcc_infer_loop_assigns.cpp</a>.</p>
 
 </div>
 </div>
@@ -205,7 +242,7 @@ Functions</h2></td></tr>
 
 <p>Infer assigns clause targets for loops in <span class="tt">goto_function</span> from their instructions and an alias analysis at the function level (with inlining), and store the result in <span class="tt">inferred_loop_assigns_map</span>, a map from loop numbers to the set of inferred assigns targets. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html#l00786">786</a> of file <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html">dfcc_infer_loop_assigns.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html#l00821">821</a> of file <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html">dfcc_infer_loop_assigns.cpp</a>.</p>
 
 </div>
 </div>
@@ -259,7 +296,7 @@ Functions</h2></td></tr>
 <p>Infer loop assigns in the given <span class="tt">loop</span>. </p>
 <p>Loop assigns should depend on some identifiers in <span class="tt">candidate_targets</span>. <span class="tt">function_assigns_map</span> contains the function contracts used to infer loop assigns of function_call instructions. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html#l00134">134</a> of file <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html">dfcc_infer_loop_assigns.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html#l00135">135</a> of file <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html">dfcc_infer_loop_assigns.cpp</a>.</p>
 
 </div>
 </div>
@@ -288,7 +325,7 @@ Functions</h2></td></tr>
 
 <p>Find all identifiers in <span class="tt">src</span>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html#l00080">80</a> of file <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html">dfcc_infer_loop_assigns.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html#l00081">81</a> of file <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html">dfcc_infer_loop_assigns.cpp</a>.</p>
 
 </div>
 </div>
@@ -315,7 +352,7 @@ Functions</h2></td></tr>
 <p>Collect identifiers that are local to <span class="tt">loop</span>, i.e., those of variables declared inside <span class="tt">loop</span>.</p>
 <p>A variable is a loop local if and only if it is declared inside the loop (i.e., there is a DECL instruction for it in the loop body). Variables declared outside the loop are never considered loop locals, even when they are only read or written inside the loop, because their storage persists across iterations and they must be havoced to ensure soundness. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html#l00058">58</a> of file <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html">dfcc_infer_loop_assigns.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html#l00059">59</a> of file <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html">dfcc_infer_loop_assigns.cpp</a>.</p>
 
 </div>
 </div>
@@ -348,7 +385,7 @@ Functions</h2></td></tr>
 
 <p>Builds a call expression <span class="tt">object_whole(expr)</span>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html#l00026">26</a> of file <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html">dfcc_infer_loop_assigns.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html#l00027">27</a> of file <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html">dfcc_infer_loop_assigns.cpp</a>.</p>
 
 </div>
 </div>
@@ -377,7 +414,7 @@ Functions</h2></td></tr>
 
 <p>Remove assignments to <span class="tt">__CPROVER_dead_object</span> to avoid aliasing all targets that are assigned to <span class="tt">__CPROVER_dead_object</span>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html#l00768">768</a> of file <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html">dfcc_infer_loop_assigns.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html#l00769">769</a> of file <a class="el" href="dfcc__infer__loop__assigns_8cpp_source.html">dfcc_infer_loop_assigns.cpp</a>.</p>
 
 </div>
 </div>

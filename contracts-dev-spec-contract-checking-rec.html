@@ -104,7 +104,7 @@ $(function(){initNavTree('contracts-dev-spec-contract-checking-rec.html','','');
 <div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keywordtype">bool</span> foo_check_started = <span class="keyword">false</span>;</div>
 <div class="line"><span class="keyword">static</span> <span class="keywordtype">bool</span> foo_check_completed = <span class="keyword">false</span>;</div>
 <div class="line"> </div>
-<div class="line">ret_t foo(foo_params, write_set_t caller_write_set) {</div>
+<div class="line">ret_t foo(write_set_t caller_write_set, foo_params) {</div>
 <div class="line">  assert(!foo_check_completed, <span class="stringliteral">&quot;foo can only be called once from the harness&quot;</span>);</div>
 <div class="line"> </div>
 <div class="line">   <span class="comment">// first call, check the contract</span></div>

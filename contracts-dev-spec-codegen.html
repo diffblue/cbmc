@@ -131,17 +131,17 @@ Translating Assigns Clauses to GOTO Functions</h1>
 </div><!-- fragment --></li>
 </ul>
 <p>Remark: The condition expressions needs to be goto_converted during translation since they come directly from the front-end and are allowed to contain function calls.</p>
-<p>The rewriting pass <a class="el" href="contracts-dev-spec-spec-rewriting.html#contracts-dev-spec-spec-rewriting-assigns">Rewriting Assigns Clause Functions</a> is applied to transform the function into a function that accepts two write set parameters: The first one is the write set that gets populated with assignable locations specified by the function, the second is a write set that is used by the function to check its side effects.</p>
+<p>The rewriting pass <a class="el" href="contracts-dev-spec-spec-rewriting.html#contracts-dev-spec-spec-rewriting-assigns">Rewriting Assigns Clause Functions</a> is applied to transform the function into a function that accepts two write set parameters, which precede the function parameters: The first one is a write set that is used by the function to check its side effects, the second is the write set that gets populated with assignable locations specified by the function.</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> contract::foo::assigns(</div>
 <div class="line"> </div>
-<div class="line">  <span class="comment">// function parameters</span></div>
-<div class="line">  foo-parameters,</div>
+<div class="line">  <span class="comment">// write set against which to check itself for unwanted side effects</span></div>
+<div class="line">  <a class="code hl_typedef" href="cprover__contracts_8c.html#a8f7470f5b28d687194dd6480b4fcf0c6">__CPROVER_contracts_write_set_ptr_t</a> __write_set_to_check,</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// write set to populate with new targets</span></div>
 <div class="line">  <a class="code hl_typedef" href="cprover__contracts_8c.html#a8f7470f5b28d687194dd6480b4fcf0c6">__CPROVER_contracts_write_set_ptr_t</a> __write_set_to_fill,</div>
 <div class="line"> </div>
-<div class="line">  <span class="comment">// write set against which to check itself for unwanted side effects</span></div>
-<div class="line">  <a class="code hl_typedef" href="cprover__contracts_8c.html#a8f7470f5b28d687194dd6480b4fcf0c6">__CPROVER_contracts_write_set_ptr_t</a> __write_set_to_check);</div>
+<div class="line">  <span class="comment">// function parameters</span></div>
+<div class="line">  foo-parameters);</div>
 <div class="ttc" id="acprover__contracts_8c_html_a8f7470f5b28d687194dd6480b4fcf0c6"><div class="ttname"><a href="cprover__contracts_8c.html#a8f7470f5b28d687194dd6480b4fcf0c6">__CPROVER_contracts_write_set_ptr_t</a></div><div class="ttdeci">__CPROVER_contracts_write_set_t * __CPROVER_contracts_write_set_ptr_t</div><div class="ttdoc">Type of pointers to __CPROVER_contracts_write_set_t.</div><div class="ttdef"><b>Definition</b> <a href="cprover__contracts_8c_source.html#l00120">cprover_contracts.c:120</a></div></div>
 </div><!-- fragment --><p>The rewriting step <a class="el" href="contracts-dev-spec-spec-rewriting.html#contracts-dev-spec-spec-rewriting-havoc">Generating Havoc Functions from Assigns Clause Functions</a> is also applied to the function in order to generate a havoc function that can be used to model contract replacement:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> contract::foo::havoc(<a class="code hl_typedef" href="cprover__contracts_8c.html#a8f7470f5b28d687194dd6480b4fcf0c6">__CPROVER_contracts_write_set_ptr_t</a> __write_set_to_havoc);</div>
@@ -171,17 +171,17 @@ Translating Frees Clauses to GOTO Functions</h1>
 </ul>
 <p>Remark: The condition expressions needs to be goto_converted during translation since they come directly from the front-end and are allowed to contain function calls.</p>
 <p>The resulting function is declarative, in the sense that it describes the contents of the frees clause but does not have any runtime effects.</p>
-<p>The rewriting pass <a class="el" href="contracts-dev-spec-spec-rewriting.html#contracts-dev-spec-spec-rewriting-frees">Rewriting Frees Clause Functions</a> is applied to transform the function into a function that accepts two write set parameters: The first one is the write set that gets populated with freeable pointers specified by the function, the second is a write set that is used by the function to check its side effects.</p>
+<p>The rewriting pass <a class="el" href="contracts-dev-spec-spec-rewriting.html#contracts-dev-spec-spec-rewriting-frees">Rewriting Frees Clause Functions</a> is applied to transform the function into a function that accepts two write set parameters, which precede the function parameters: The first one is a write set that is used by the function to check its side effects, the second is the write set that gets populated with freeable pointers specified by the function.</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> contract::foo::frees(</div>
 <div class="line"> </div>
-<div class="line">  <span class="comment">// function parameters</span></div>
-<div class="line">  foo-parameters,</div>
+<div class="line">  <span class="comment">// write set against which to check itself for unwanted side effects</span></div>
+<div class="line">  <a class="code hl_typedef" href="cprover__contracts_8c.html#a8f7470f5b28d687194dd6480b4fcf0c6">__CPROVER_contracts_write_set_ptr_t</a> __write_set_to_check,</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// write set to populate with new targets</span></div>
 <div class="line">  <a class="code hl_typedef" href="cprover__contracts_8c.html#a8f7470f5b28d687194dd6480b4fcf0c6">__CPROVER_contracts_write_set_ptr_t</a> __write_set_to_fill,</div>
 <div class="line"> </div>
-<div class="line">  <span class="comment">// write set against which to check itself for unwanted side effects</span></div>
-<div class="line">  <a class="code hl_typedef" href="cprover__contracts_8c.html#a8f7470f5b28d687194dd6480b4fcf0c6">__CPROVER_contracts_write_set_ptr_t</a> __write_set_to_check);</div>
+<div class="line">  <span class="comment">// function parameters</span></div>
+<div class="line">  foo-parameters);</div>
 </div><!-- fragment --><hr  />
  <table class="markdownTable">
 <tr class="markdownTableHead">

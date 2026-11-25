@@ -277,7 +277,7 @@ Static Protected Attributes</h2></td></tr>
 <p>Applies loop contracts transformations to the given GOTO function, using the given cfg_info instance to drive the transformation. </p>
 <dl class="section pre"><dt>Precondition</dt><dd>Instructions of the function must already have been instrumented for DFCC using the same cfg_info. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l01171">1171</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l01180">1180</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -584,7 +584,7 @@ Static Protected Attributes</h2></td></tr>
 <p>Adds the <code class="param">write_set</code> as extra argument to a function of function pointer call instruction. </p>
 <dl class="section pre"><dt>Precondition</dt><dd><code class="param">target</code> points to a <span class="tt">CALL</span> instruction. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00842">842</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00851">851</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -677,7 +677,7 @@ Static Protected Attributes</h2></td></tr>
 <p>Inserts deallocation checks and a write set update before a call to the __CPROVER_deallocate function. </p>
 <dl class="section pre"><dt>Precondition</dt><dd><code class="param">target</code> points to a <span class="tt">CALL <a class="el" href="ansi-c_2library_2cprover_8h.html#a5ef264d7c09f165e1d72b108c150dd32">__CPROVER_deallocate</a></span> instruction. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00870">870</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00879">879</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -765,7 +765,7 @@ Static Protected Attributes</h2></td></tr>
 <p>Before calling a function pointer, performs a dynamic lookup into the map of instrumented function provided by <a class="el" href="classdfcc__libraryt.html#a81eff42e4e9c47cc28a08217c62e467b">dfcc_libraryt::get_instrumented_functions_map_symbol</a>, and passes the write_set parameter to the function pointer only if it points to a function known to be instrumented and hence able to accept this parameter. </p>
 <dl class="section pre"><dt>Precondition</dt><dd><code class="param">target</code> points to a <span class="tt">CALL</span> instruction where the function expression is not a <a class="el" href="classsymbol__exprt.html">symbol_exprt</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00792">792</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00801">801</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -849,7 +849,7 @@ Static Protected Attributes</h2></td></tr>
 <p>Instruments a <span class="tt">CALL lhs := function(params)</span> instruction by adding an inclusion check of <span class="tt">lhs</span> in <span class="tt">write_set</span>, and passing <span class="tt">write_set</span> as an extra argument to the function call. </p>
 <dl class="section pre"><dt>Precondition</dt><dd><code class="param">target</code> points to a <span class="tt">CALL</span> instruction. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00939">939</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00948">948</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -1153,7 +1153,7 @@ Local statics are <em>not</em> collected and added to the write set.</dd></dl>
 <p>Instruments a <span class="tt"><a class="el" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296bebadbf1dee1b8cd7ea3c82661943c7b74f4">OTHER</a> statement;</span> instruction. </p>
 <p>OTHER instructions can be an array_set, array_copy, array_replace or a havoc_object instruction. </p><dl class="section pre"><dt>Precondition</dt><dd><code class="param">target</code> points to an <span class="tt"><a class="el" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296bebadbf1dee1b8cd7ea3c82661943c7b74f4">OTHER</a></span> instruction. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00973">973</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00982">982</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>

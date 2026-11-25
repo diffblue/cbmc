@@ -155,7 +155,7 @@ Swapping-and-Wrapping Functions</h1>
 <div class="line"><span class="keyword">static</span> <span class="keywordtype">bool</span> foo_check_started = <span class="keyword">false</span>;</div>
 <div class="line"><span class="keyword">static</span> <span class="keywordtype">bool</span> foo_check_completed = <span class="keyword">false</span>;</div>
 <div class="line"> </div>
-<div class="line">ret_t foo(foo-parameters, write_set_t caller_write_set) {</div>
+<div class="line">ret_t foo(write_set_t caller_write_set, foo-parameters) {</div>
 <div class="line"> </div>
 <div class="line">  assert(!foo_check_started, <span class="stringliteral">&quot;recursive calls to foo not allowed&quot;</span>);</div>
 <div class="line">  assert(!foo_check_completed, <span class="stringliteral">&quot;foo can only be called once from the harness&quot;</span>);</div>
@@ -183,12 +183,12 @@ Swapping-and-Wrapping Functions</h1>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// allocate and populate the contract write set</span></div>
 <div class="line">  <a class="code hl_function" href="cprover__contracts_8c.html#ab79449fced8abf348ef2c38bc7cce15a">__CPROVER_contracts_write_set_create</a>(contract_write_set, assigns_clause_size(c), frees_clause_size(c));</div>
-<div class="line">  contract::assigns(contract_write_set, empty_write_set);</div>
-<div class="line">  contract::frees(contract_write_set, empty_write_set);</div>
+<div class="line">  contract::assigns(empty_write_set, contract_write_set);</div>
+<div class="line">  contract::frees(empty_write_set, contract_write_set);</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// call the function</span></div>
 <div class="line">  ret_t retval;</div>
-<div class="line">  retval = foo_swapped(foo_params, contact_write_set);</div>
+<div class="line">  retval = foo_swapped(contract_write_set, foo_params);</div>
 <div class="line">  <a class="code hl_function" href="cprover__contracts_8c.html#a6b104b988f01f52cacd9dec8b2621c79">__CPROVER_contracts_write_set_release</a>(contract_write_set);</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// create an empty write set to check for side effects in requires clauses</span></div>
@@ -217,7 +217,7 @@ Wrapping Recursive Functions</h1>
 <div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keywordtype">bool</span> foo_check_started = <span class="keyword">false</span>;</div>
 <div class="line"><span class="keyword">static</span> <span class="keywordtype">bool</span> foo_check_completed = <span class="keyword">false</span>;</div>
 <div class="line"> </div>
-<div class="line">ret_t foo(foo_params, write_set_t caller_write_set) {</div>
+<div class="line">ret_t foo(write_set_t caller_write_set, foo_params) {</div>
 <div class="line">  assert(!foo_check_completed, <span class="stringliteral">&quot;foo can only be called once from the harness&quot;</span>);</div>
 <div class="line"> </div>
 <div class="line">   <span class="comment">// first call, check the contract</span></div>
