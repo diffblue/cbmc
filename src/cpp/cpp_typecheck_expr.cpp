@@ -12621,9 +12621,12 @@ void cpp_typecheckt::typecheck_expr(exprt &expr)
   // N5008 [over.over]/1.6: the target of an explicit type conversion selects
   // the function of an overload set -- `static_cast<const symbol_exprt
   // &(*)(const exprt &)>(to_symbol_expr)' (CBMC's own
-  // statement_list_parser.cpp, dog-fooding)
+  // statement_list_parser.cpp, dog-fooding), also of a C-style cast
+  // ([expr.cast]): gnulib's `(void const *(*)(void const *, int,
+  // size_t))(::memchr)' selects one of the C++ library's memchr overloads
   if(
-    (expr.id() == ID_static_cast || expr.id() == ID_reinterpret_cast) &&
+    (expr.id() == ID_static_cast || expr.id() == ID_reinterpret_cast ||
+     expr.id() == "explicit-typecast") &&
     expr.operands().size() == 1 &&
     (to_unary_expr(expr).op().id() == ID_cpp_name ||
      (to_unary_expr(expr).op().id() == ID_address_of &&
