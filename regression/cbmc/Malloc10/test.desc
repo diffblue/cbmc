@@ -1,4 +1,4 @@
-CORE no-new-smt
+CORE no-new-smt no-wide-pointer-encoding
 main.c
 
 ^EXIT=0$
