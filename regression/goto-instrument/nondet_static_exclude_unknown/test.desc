@@ -1,0 +1,14 @@
+CORE
+main.c
+--nondet-static --nondet-static-exclude does_not_exist
+^Invalid User Input$
+^Option: --nondet-static-exclude$
+^Reason: 'does_not_exist' did not match any symbol$
+^EXIT=1$
+^SIGNAL=0$
+--
+^VERIFICATION
+//
+// Regression test for #8225: an unknown --nondet-static-exclude argument must
+// be reported as an error rather than silently ignored. chain.sh runs
+// goto-instrument under "set -e", so its non-zero exit propagates here.
