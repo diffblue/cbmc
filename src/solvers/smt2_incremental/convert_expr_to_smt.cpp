@@ -1401,20 +1401,41 @@ static smt_termt convert_expr_to_smt(
     "Generation of SMT formula for literal expression: " + literal.pretty());
 }
 
+/// Shared conversion for quantifier expressions; the conversion is identical
+/// for `forall` and `exists` apart from the resulting term type.
+/// \tparam smt_quantifier_termt: SMT term to produce (\ref smt_forall_termt or
+///   \ref smt_exists_termt)
+template <typename smt_quantifier_termt>
+static smt_termt convert_quantifier_to_smt(
+  const quantifier_exprt &quantifier,
+  const sub_expression_mapt &converted)
+{
+  // Extract the bound variables from the quantifier expression
+  std::vector<smt_identifier_termt> bound_variables;
+  bound_variables.reserve(quantifier.variables().size());
+  for(const auto &variable : quantifier.variables())
+  {
+    bound_variables.push_back(smt_identifier_termt{
+      variable.identifier(), convert_type_to_smt_sort(variable.type())});
+  }
+
+  // Get the converted predicate (body) of the quantifier
+  return smt_quantifier_termt{
+    std::move(bound_variables), converted.at(quantifier.where())};
+}
+
 static smt_termt convert_expr_to_smt(
   const forall_exprt &for_all,
   const sub_expression_mapt &converted)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for for all expression: " + for_all.pretty());
+  return convert_quantifier_to_smt<smt_forall_termt>(for_all, converted);
 }
 
 static smt_termt convert_expr_to_smt(
   const exists_exprt &exists,
   const sub_expression_mapt &converted)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for exists expression: " + exists.pretty());
+  return convert_quantifier_to_smt<smt_exists_termt>(exists, converted);
 }
 
 static smt_termt convert_expr_to_smt(
@@ -1906,6 +1927,10 @@ exprt lower_address_of_array_index(exprt expr)
 /// Post order traversal where the children of a node are only visited if
 /// applying the \p filter function to that node returns true. Note that this
 /// function is based on the `visit_post_template` function.
+/// Binding expressions are treated specially: for quantifiers, only the body is
+/// visited, not the tuple of bound variables, which the conversion of the
+/// quantifier handles itself. `gather_dependent_expressions` makes the same
+/// choice. For `let` expressions, the values and the body are visited.
 void filtered_visit_post(
   const exprt &_expr,
   std::function<bool(const exprt &)> filter,
@@ -1937,8 +1962,25 @@ void filtered_visit_post(
       // do modification of 'top' before pushing in case 'top' isn't stable
       top.operands_pushed = true;
       if(filter(*top.e))
-        for(auto &op : top.e->operands())
-          stack.emplace(&op);
+      {
+        // Special handling for binding expressions: do not push the tuple of
+        // bound variables
+        if(can_cast_expr<quantifier_exprt>(*top.e))
+        {
+          stack.emplace(&to_quantifier_expr(*top.e).where());
+        }
+        else if(const auto let = expr_try_dynamic_cast<let_exprt>(*top.e))
+        {
+          for(const auto &value : let->values())
+            stack.emplace(&value);
+          stack.emplace(&let->where());
+        }
+        else
+        {
+          for(auto &op : top.e->operands())
+            stack.emplace(&op);
+        }
+      }
     }
   }
 }

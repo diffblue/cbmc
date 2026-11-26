@@ -1,0 +1,13 @@
+CORE
+symbolic_unequal.c
+--no-bounds-check
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ a\[1\] and b\[1\] may differ: FAILURE$
+^\[main\.assertion\.2\] line \d+ a and b may be equal: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+The solver must be able to produce models when arrays of non-constant size are
+compared using a bounded quantifier.

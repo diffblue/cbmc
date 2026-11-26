@@ -6,6 +6,9 @@
 #include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
+#include <util/expr_util.h>
+#include <util/magic.h>
+#include <util/mathematical_expr.h>
 #include <util/range.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
@@ -24,6 +27,7 @@
 #include <solvers/smt2_incremental/theories/smt_core_theory.h>
 #include <solvers/smt2_incremental/type_size_mapping.h>
 
+#include <forward_list>
 #include <stack>
 #include <unordered_set>
 #include <vector>
@@ -60,6 +64,68 @@ get_problem_messages(const smt_responset &response)
   return {};
 }
 
+/// Identifiers of variables bound by quantifiers.
+using bound_identifierst = std::unordered_set<irep_idt>;
+
+/// \return True iff \p expr contains a symbol whose identifier is in \p bound.
+static bool has_bound_symbol(const exprt &expr, const bound_identifierst &bound)
+{
+  if(bound.empty())
+    return false;
+  return has_subexpr(
+    expr,
+    [&bound](const exprt &e)
+    {
+      const auto symbol = expr_try_dynamic_cast<symbol_exprt>(e);
+      return symbol && bound.count(symbol->identifier()) != 0;
+    });
+}
+
+/// Pre-order traversal of \p root that tracks the identifiers bound by the
+/// quantifiers enclosing each node. A quantifier binds its variables within its
+/// body; the tuple of bound variables itself is not visited. \p visitor is
+/// called with each node and the identifiers bound at that node, and returns
+/// whether the operands of the (possibly modified) node are to be visited.
+/// All passes that need to know which symbols are bound use this traversal, so
+/// that they agree with `convert_expr_to_smt` (see `filtered_visit_post`).
+template <typename exprT, typename visitorT>
+static void visit_pre_with_bound_identifiers(exprT &root, visitorT visitor)
+{
+  const bound_identifierst nothing_bound;
+  // owns the bound sets referred to by stack entries
+  std::forward_list<bound_identifierst> bound_sets;
+  struct framet
+  {
+    exprT *node;
+    const bound_identifierst *bound;
+  };
+  std::stack<framet> stack;
+  stack.push({&root, &nothing_bound});
+
+  while(!stack.empty())
+  {
+    framet frame = std::move(stack.top());
+    stack.pop();
+    exprT &node = *frame.node;
+
+    if(!visitor(node, *frame.bound))
+      continue;
+
+    if(can_cast_expr<quantifier_exprt>(node))
+    {
+      bound_sets.push_front(*frame.bound);
+      for(const auto &variable : to_quantifier_expr(node).variables())
+        bound_sets.front().insert(variable.identifier());
+      // operand 0 is the tuple of bound variables, operand 1 is the body
+      stack.push({&node.operands()[1], &bound_sets.front()});
+      continue;
+    }
+
+    for(auto &operand : node.operands())
+      stack.push({&operand, frame.bound});
+  }
+}
+
 /// \brief Find all sub expressions of the given \p expr which need to be
 ///   expressed as separate smt commands.
 /// \return A collection of sub expressions, which need to be expressed as
@@ -71,38 +137,50 @@ get_problem_messages(const smt_responset &response)
 ///   `convert_expr_to_smt` translates into function applications, must also be
 ///   returned by this`gather_dependent_expressions` function.
 /// \details `symbol_exprt`, `array_exprt` and `nondet_symbol_exprt` add
-///   dependant expressions.
+///   dependant expressions. Symbols bound by an enclosing quantifier are not
+///   dependencies, as they are declared by the quantifier; this matches
+///   `convert_expr_to_smt`, which does not convert the tuple of bound
+///   variables.
 static std::vector<exprt> gather_dependent_expressions(const exprt &root_expr)
 {
   std::vector<exprt> dependent_expressions;
 
-  std::stack<const exprt *> stack;
-  stack.push(&root_expr);
-
-  while(!stack.empty())
-  {
-    const exprt &expr_node = *stack.top();
-    stack.pop();
-    if(
-      can_cast_expr<symbol_exprt>(expr_node) ||
-      can_cast_expr<array_exprt>(expr_node) ||
-      can_cast_expr<array_of_exprt>(expr_node) ||
-      can_cast_expr<nondet_symbol_exprt>(expr_node) ||
-      can_cast_expr<string_constantt>(expr_node))
+  visit_pre_with_bound_identifiers(
+    root_expr,
+    [&dependent_expressions](const exprt &node, const bound_identifierst &bound)
     {
-      dependent_expressions.push_back(expr_node);
-    }
-    // The decision procedure does not depend on the values inside address of
-    // code typed expressions. We can build the address without knowing the
-    // value at that memory location. In this case the hypothetical compiled
-    // machine instructions at the address are not relevant to solving, only
-    // representing *which* function a pointer points to is needed.
-    const auto address_of = expr_try_dynamic_cast<address_of_exprt>(expr_node);
-    if(address_of && can_cast_type<code_typet>(address_of->object().type()))
-      continue;
-    for(auto &operand : expr_node.operands())
-      stack.push(&operand);
-  }
+      if(const auto symbol = expr_try_dynamic_cast<symbol_exprt>(node))
+      {
+        if(bound.count(symbol->identifier()) == 0)
+          dependent_expressions.push_back(node);
+      }
+      else if(
+        can_cast_expr<array_exprt>(node) ||
+        can_cast_expr<array_of_exprt>(node) ||
+        can_cast_expr<nondet_symbol_exprt>(node) ||
+        can_cast_expr<string_constantt>(node))
+      {
+        // These are defined as separate functions, which must not refer to
+        // variables bound by an enclosing quantifier.
+        if(has_bound_symbol(node, bound))
+        {
+          UNIMPLEMENTED_FEATURE(
+            "Generation of SMT formula for array expression depending on a "
+            "quantified variable: " +
+            node.pretty());
+        }
+        dependent_expressions.push_back(node);
+      }
+      // The decision procedure does not depend on the values inside address of
+      // code typed expressions. We can build the address without knowing the
+      // value at that memory location. In this case the hypothetical compiled
+      // machine instructions at the address are not relevant to solving, only
+      // representing *which* function a pointer points to is needed.
+      const auto address_of = expr_try_dynamic_cast<address_of_exprt>(node);
+      return !(
+        address_of && can_cast_type<code_typet>(address_of->object().type()));
+    });
+
   return dependent_expressions;
 }
 
@@ -247,18 +325,28 @@ void smt2_incremental_decision_proceduret::define_dependent_functions(
 
 /// Replaces the sub expressions of \p expr which have been defined as separate
 /// functions in the smt solver, using the \p expression_identifiers map.
+/// Sub expressions referring to variables bound by an enclosing quantifier are
+/// not replaced, as the definitions are outside the scope of the quantifier.
 static exprt substitute_identifiers(
   exprt expr,
   const std::unordered_map<exprt, smt_identifier_termt, irep_hash>
     &expression_identifiers)
 {
-  expr.visit_pre([&](exprt &node) -> void {
-    auto find_result = expression_identifiers.find(node);
-    if(find_result == expression_identifiers.cend())
-      return;
-    const auto type = find_result->first.type();
-    node = symbol_exprt{find_result->second.identifier(), type};
-  });
+  visit_pre_with_bound_identifiers(
+    expr,
+    [&](exprt &node, const bound_identifierst &bound)
+    {
+      auto find_result = expression_identifiers.find(node);
+      if(
+        find_result == expression_identifiers.cend() ||
+        has_bound_symbol(node, bound))
+      {
+        return true;
+      }
+      const auto type = find_result->first.type();
+      node = symbol_exprt{find_result->second.identifier(), type};
+      return false;
+    });
   return expr;
 }
 
@@ -297,6 +385,98 @@ static exprt lower_rw_ok_pointer_in_range(exprt expr, const namespacet &ns)
     }
   });
   return expr;
+}
+
+/// Returns an expression that is equivalent to \p lhs = \p rhs in C. SMT-LIB
+/// equality of arrays compares the entire index domain, whereas C arrays only
+/// have elements at indices below their size. Arrays are thus compared element
+/// by element: for (not too many) elements of constant number, this keeps the
+/// formula quantifier free; otherwise, a bounded quantifier is used.
+/// \param depth: nesting depth of quantifiers introduced by this function,
+///   used to name their bound variables
+static exprt
+lower_array_equality(const exprt &lhs, const exprt &rhs, std::size_t depth)
+{
+  // Syntactically equal operands need no lowering. Equalities of this kind are
+  // also used to make sure symbols are declared.
+  if(lhs == rhs)
+    return equal_exprt{lhs, rhs};
+
+  if(lhs.type().id() != ID_array)
+    return equal_exprt{lhs, rhs};
+
+  const array_typet &array_type = to_array_type(lhs.type());
+  if(array_type.size().is_nil())
+    return equal_exprt{lhs, rhs};
+
+  const typet &index_type = array_type.index_type();
+  const exprt size =
+    typecast_exprt::conditional_cast(array_type.size(), index_type);
+
+  auto element_equality = [&lhs, &rhs, depth](const exprt &index)
+  {
+    return lower_array_equality(
+      index_exprt{lhs, index}, index_exprt{rhs, index}, depth + 1);
+  };
+
+  // For nested arrays, the limit applies to the total number of elements.
+  std::optional<mp_integer> total_elements = numeric_cast<mp_integer>(size);
+  for(const typet *t = &array_type.element_type();
+      total_elements.has_value() && t->id() == ID_array;
+      t = &to_array_type(*t).element_type())
+  {
+    const auto inner = numeric_cast<mp_integer>(to_array_type(*t).size());
+    if(inner.has_value())
+      *total_elements *= *inner;
+    else
+      total_elements.reset();
+  }
+  if(total_elements.has_value() && *total_elements <= MAX_FLATTENED_ARRAY_SIZE)
+  {
+    const mp_integer size_int = *numeric_cast<mp_integer>(size);
+    exprt::operandst conjuncts;
+    for(mp_integer i = 0; i < size_int; ++i)
+      conjuncts.push_back(element_equality(from_integer(i, index_type)));
+    return conjunction(conjuncts);
+  }
+
+  const symbol_exprt index{
+    "smt2_incremental::array_equality_index$" + std::to_string(depth),
+    index_type};
+  exprt in_bounds = binary_relation_exprt{index, ID_lt, size};
+  if(index_type.id() == ID_signedbv)
+  {
+    in_bounds = and_exprt{
+      binary_relation_exprt{index, ID_ge, from_integer(0, index_type)},
+      std::move(in_bounds)};
+  }
+  return forall_exprt{
+    index, implies_exprt{std::move(in_bounds), element_equality(index)}};
+}
+
+/// Lowers all equalities of arrays in \p expr using `lower_array_equality`,
+/// except for an equality at the root of \p expr if \p keep_root_equality is
+/// set, which is the case for equalities that define one array in terms of
+/// another one.
+static exprt lower_array_equalities(exprt expr, bool keep_root_equality)
+{
+  for(auto &operand : expr.operands())
+    operand = lower_array_equalities(std::move(operand), false);
+
+  if(keep_root_equality || (expr.id() != ID_equal && expr.id() != ID_notequal))
+    return expr;
+
+  const auto &relation = to_binary_relation_expr(expr);
+  const typet &type = relation.lhs().type();
+  // Equalities of structs containing arrays still compare the entire index
+  // domain of those arrays.
+  if(type.id() != ID_array)
+    return expr;
+
+  exprt lowered = lower_array_equality(relation.lhs(), relation.rhs(), 0);
+  if(relation.id() == ID_notequal)
+    return not_exprt{std::move(lowered)};
+  return lowered;
 }
 
 static exprt lower_zero_extend(exprt expr, const namespacet &ns)
@@ -359,6 +539,7 @@ void smt2_incremental_decision_proceduret::ensure_handle_for_expr_defined(
   const exprt lowered_expr = lower(in_expr);
 
   define_dependent_functions(lowered_expr);
+  define_quantifier_identifiers(lowered_expr);
   smt_define_function_commandt function{
     "B" + std::to_string(handle_sequence()),
     {},
@@ -369,30 +550,75 @@ void smt2_incremental_decision_proceduret::ensure_handle_for_expr_defined(
   solver_process->send(function);
 }
 
+void smt2_incremental_decision_proceduret::define_quantifier_identifiers(
+  const exprt &expr)
+{
+  std::vector<exprt> quantifiers;
+  visit_pre_with_bound_identifiers(
+    expr,
+    [&quantifiers](const exprt &node, const bound_identifierst &)
+    {
+      if(!can_cast_expr<quantifier_exprt>(node))
+        return true;
+      // nested quantifiers may refer to variables bound by this one
+      quantifiers.push_back(node);
+      return false;
+    });
+
+  for(const exprt &quantifier : quantifiers)
+  {
+    if(expression_identifiers.find(quantifier) != expression_identifiers.end())
+      continue;
+
+    const smt_termt definition = convert_expr_to_smt(quantifier);
+    const smt_identifier_termt identifier{
+      "B" + std::to_string(handle_sequence()), smt_bool_sortt{}};
+    solver_process->send(smt_declare_function_commandt{identifier, {}});
+    // Z3 eliminates a Boolean constant B defined via (= B quantifier), and
+    // then returns the quantified formula rather than a value for B (see
+    // Z3Prover/z3#7743). Two implications avoid this.
+    solver_process->send(
+      smt_assert_commandt{smt_core_theoryt::implies(identifier, definition)});
+    solver_process->send(
+      smt_assert_commandt{smt_core_theoryt::implies(definition, identifier)});
+    expression_identifiers.emplace(quantifier, identifier);
+    identifier_table.emplace(identifier.identifier(), identifier);
+  }
+}
+
 void smt2_incremental_decision_proceduret::define_index_identifiers(
   const exprt &expr)
 {
-  expr.visit_post(
-    [&](const exprt &expr_node)
+  std::vector<exprt> indices;
+  visit_pre_with_bound_identifiers(
+    expr,
+    [&indices](const exprt &expr_node, const bound_identifierst &bound)
     {
-      if(!can_cast_type<array_typet>(expr_node.type()))
-        return;
-      if(const auto with_expr = expr_try_dynamic_cast<with_exprt>(expr_node))
+      // Indices referring to variables bound by an enclosing quantifier
+      // cannot be defined outside the quantifier.
+      const auto with_expr = expr_try_dynamic_cast<with_exprt>(expr_node);
+      if(
+        with_expr && can_cast_type<array_typet>(expr_node.type()) &&
+        !has_bound_symbol(with_expr->where(), bound))
       {
-        const auto index_expr = with_expr->where();
-        const auto index_term = convert_expr_to_smt(index_expr);
-        const auto index_identifier =
-          "index_" + std::to_string(index_sequence());
-        const auto index_definition =
-          smt_define_function_commandt{index_identifier, {}, index_term};
-        expression_identifiers.emplace(
-          index_expr, index_definition.identifier());
-        identifier_table.emplace(
-          index_identifier, index_definition.identifier());
-        solver_process->send(
-          smt_define_function_commandt{index_identifier, {}, index_term});
+        indices.push_back(with_expr->where());
       }
+      return true;
     });
+
+  // define in post order, as did the previous implementation using visit_post
+  for(auto it = indices.rbegin(); it != indices.rend(); ++it)
+  {
+    const exprt &index_expr = *it;
+    const auto index_term = convert_expr_to_smt(index_expr);
+    const auto index_identifier = "index_" + std::to_string(index_sequence());
+    const auto index_definition =
+      smt_define_function_commandt{index_identifier, {}, index_term};
+    expression_identifiers.emplace(index_expr, index_definition.identifier());
+    identifier_table.emplace(index_identifier, index_definition.identifier());
+    solver_process->send(
+      smt_define_function_commandt{index_identifier, {}, index_term});
+  }
 }
 
 exprt smt2_incremental_decision_proceduret::substitute_defined_padding(
@@ -653,10 +879,13 @@ void smt2_incremental_decision_proceduret::set_to(
     debug << "`set_to` (" << std::string{value ? "true" : "false"} << ") -\n  "
           << in_expr.pretty(2, 0) << messaget::eom;
   });
-  const exprt lowered_expr = lower(in_expr);
+  // An equality that is set to true defines the left-hand side, which must
+  // be equal to the right-hand side on all indices in case of arrays.
+  const exprt lowered_expr = lower(in_expr, value);
   PRECONDITION(can_cast_type<bool_typet>(lowered_expr.type()));
 
   define_dependent_functions(lowered_expr);
+  define_quantifier_identifiers(lowered_expr);
   auto converted_term = [&]() -> smt_termt {
     const auto expression_handle_identifier =
       expression_handle_identifiers.find(lowered_expr);
@@ -738,12 +967,16 @@ void smt2_incremental_decision_proceduret::define_object_properties()
   }
 }
 
-exprt smt2_incremental_decision_proceduret::lower(exprt expression) const
+exprt smt2_incremental_decision_proceduret::lower(
+  exprt expression,
+  bool keep_root_equality) const
 {
   const exprt lowered = struct_encoding.encode(lower_zero_extend(
     lower_enum(
-      lower_byte_operators(
-        lower_floatbv(lower_rw_ok_pointer_in_range(expression, ns)), ns),
+      lower_array_equalities(
+        lower_byte_operators(
+          lower_floatbv(lower_rw_ok_pointer_in_range(expression, ns)), ns),
+        keep_root_equality),
       ns),
     ns));
   log.conditional_output(log.debug(), [&](messaget::mstreamt &debug) {
