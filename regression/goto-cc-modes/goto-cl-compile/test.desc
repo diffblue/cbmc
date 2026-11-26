@@ -1,0 +1,8 @@
+CORE
+main.c
+goto-cl /c
+^EXIT=0$
+^SIGNAL=0$
+main\.c
+--
+^warning: ignoring
