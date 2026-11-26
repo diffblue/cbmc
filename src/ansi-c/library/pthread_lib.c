@@ -466,8 +466,10 @@ int pthread_rwlock_rdlock(pthread_rwlock_t *lock)
   __CPROVER_atomic_begin();
   __CPROVER_assert(*((signed char *)lock)!=-1,
     "lock not initialised or destroyed");
-  __CPROVER_assume(!*((signed char *)lock));
-  *((signed char *)lock)=1;
+  // POSIX.1-2017: a thread may hold multiple concurrent read locks;
+  // only a writer (bit 1) blocks a reader.
+  __CPROVER_assume(!(*((signed char *)lock) & 2));
+  (*(signed char *)lock) |= 1;
   __CPROVER_atomic_end();
   return 0; // we never fail
 }
