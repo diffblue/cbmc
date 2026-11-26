@@ -49,6 +49,11 @@ public:
   void Restore(post pos);
   void Replace(const cpp_tokent &token);
   void Insert(const cpp_tokent &token);
+  const cpp_tokent &peek()
+  {
+    PRECONDITION(current_pos <= token_vector.size());
+    return *token_vector[current_pos];
+  }
 
   void clear()
   {

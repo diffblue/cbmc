@@ -987,23 +987,6 @@ void cpp_typecheckt::convert_template_declaration(
 
   if(declaration.is_class_template())
   {
-    // there should not be declarators
-    if(!declaration.declarators().empty())
-    {
-      error().source_location=declaration.source_location();
-      error() << "class template not expected to have declarators"
-              << eom;
-      throw 0;
-    }
-
-    // it needs to be a class template
-    if(type.id()!=ID_struct)
-    {
-      error().source_location=declaration.source_location();
-      error() << "expected class template" << eom;
-      throw 0;
-    }
-
     // Is it class template specialization?
     // We can tell if there are template arguments in the class name,
     // like template<...> class tag<stuff> ...
