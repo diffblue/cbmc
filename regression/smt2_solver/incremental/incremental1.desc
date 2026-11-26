@@ -1,0 +1,9 @@
+CORE
+incremental1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+^unsat$
+--
+assert after check-sat must work (not abort).
