@@ -1,0 +1,12 @@
+CORE
+StringStrip
+--function StringStrip.reachEmpty --max-nondet-string-length 5 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
+^EXIT=10$
+^SIGNAL=0$
+^\[java::StringStrip.reachEmpty:\(Ljava/lang/String;I\)V.assertion.1\] line \d+ assertion at file StringStrip.java line \d+ function java::StringStrip.reachEmpty:\(Ljava/lang/String;I\)V bytecode-index \d+: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+An empty result of stripping a non-empty string must be reachable for each of
+strip, stripLeading and stripTrailing (the axioms must not be unsatisfiable).

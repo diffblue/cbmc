@@ -1,0 +1,11 @@
+CORE
+StringStrip
+--function StringStrip.unicode --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+strip removes the white space outside the ASCII range that
+Character.isWhitespace accepts, but not the no-break spaces.
