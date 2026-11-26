@@ -33,9 +33,13 @@ Author: Peter Schrammel
 #include <goto-diff/change_impact.h>
 #include <goto-diff/unified_diff.h>
 #include <goto-instrument/cover.h>
+#include <java_bytecode/convert_java_nondet.h>
 #include <java_bytecode/java_bytecode_language.h>
+#include <java_bytecode/java_object_factory_parameters.h>
 #include <java_bytecode/remove_exceptions.h>
 #include <java_bytecode/remove_instanceof.h>
+#include <java_bytecode/remove_java_new.h>
+#include <java_bytecode/replace_java_nondet.h>
 
 #include "java_syntactic_diff.h"
 
@@ -60,6 +64,7 @@ void jdiff_parse_optionst::get_command_line_options(optionst &options)
   }
 
   parse_java_language_options(cmdline, options);
+  parse_java_object_factory_options(cmdline, options);
 
   // check assertions
   if(cmdline.isset("no-assertions"))
@@ -198,7 +203,20 @@ bool jdiff_parse_optionst::process_goto_program(
   // remove returns
   remove_returns(goto_model);
 
+  // Java synthetic nondet calls (org.cprover.CProver.nondet*()) -> nondet
+  // side effects (may, in turn, introduce `new` statements below).
+  replace_java_nondet(goto_model);
+
+  // convert Java nondet expressions
+  java_object_factory_parameterst object_factory_parameters;
+  object_factory_parameters.set(options);
+  convert_nondet(goto_model, ui_message_handler, object_factory_parameters);
+
   transform_assertions_assumptions(options, goto_model);
+
+  // remove Java new expressions (must be after convert_nondet, which may
+  // introduce them)
+  remove_java_new(goto_model, ui_message_handler);
 
   // checks don't know about adjusted float expressions
   adjust_float_expressions(goto_model);
