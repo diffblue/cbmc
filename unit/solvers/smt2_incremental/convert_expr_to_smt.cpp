@@ -1345,6 +1345,28 @@ TEST_CASE(
   }
 }
 
+TEST_CASE(
+  "expr to smt conversion for extract bit expressions",
+  "[core][smt2_incremental]")
+{
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
+  const typet operand_type = unsignedbv_typet{8};
+  const smt_termt expected_result = smt_core_theoryt::equal(
+    smt_bit_vector_theoryt::extract(5, 5)(
+      smt_identifier_termt{"foo", smt_bit_vector_sortt{8}}),
+    smt_bit_vector_constant_termt{1, 1});
+  CHECK(
+    test.convert(extractbit_exprt{
+      symbol_exprt{"foo", operand_type}, from_integer(5, operand_type)}) ==
+    expected_result);
+  CHECK(
+    test.convert(extractbit_exprt{symbol_exprt{"foo", operand_type}, 5}) ==
+    expected_result);
+  const cbmc_invariants_should_throwt invariants_throw;
+  CHECK_THROWS(test.convert(extractbit_exprt{
+    symbol_exprt{"foo", operand_type}, symbol_exprt{"bar", operand_type}}));
+}
+
 TEST_CASE("expr to smt conversion for type casts", "[core][smt2_incremental]")
 {
   auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
