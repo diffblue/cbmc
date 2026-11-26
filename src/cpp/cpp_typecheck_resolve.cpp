@@ -2429,6 +2429,10 @@ exprt cpp_typecheck_resolvet::convert_identifier(
 
   e.add_source_location() = source_location;
 
+  // see disambiguate_functions
+  if(!identifier.using_declaration_class.empty() && e.type().id() == ID_code)
+    e.set("#using_declaration_class", identifier.using_declaration_class);
+
   return e;
 }
 
@@ -2712,6 +2716,90 @@ void cpp_typecheck_resolvet::exact_match_functions(
         identifiers.push_back(old_id);
     }
   }
+}
+
+/// The class of the implicit object parameter of \p type, or nullptr
+static const typet *implicit_object_class(const code_typet &type)
+{
+  if(
+    type.parameters().empty() || !type.parameters().front().get_this() ||
+    type.parameters().front().type().id() != ID_pointer)
+  {
+    return nullptr;
+  }
+  return &to_pointer_type(type.parameters().front().type()).base_type();
+}
+
+/// N5008 [namespace.udecl]/14: a member function of a class hides or
+/// overrides a member function that a using-declaration of the class brings
+/// in from a base and that has the same name, parameter-type-list,
+/// cv-qualification and ref-qualifier: of libstdc++'s `using
+/// _List_node_base::_M_base; _List_node_base *_M_base();`, the base's
+/// non-const _M_base is not a candidate.  Remove such candidates from
+/// \p identifiers.
+static void remove_hidden_using_declarations(std::vector<exprt> &identifiers)
+{
+  std::vector<bool> hidden(identifiers.size(), false);
+  for(std::size_t i = 0; i < identifiers.size(); ++i)
+  {
+    const exprt &e = identifiers[i];
+    const irep_idt &using_class = e.get("#using_declaration_class");
+    if(using_class.empty() || e.type().id() != ID_code)
+      continue;
+    const code_typet &e_type = to_code_type(e.type());
+    const typet *e_object = implicit_object_class(e_type);
+    if(e_object == nullptr)
+      continue;
+    for(const exprt &other : identifiers)
+    {
+      if(
+        other.type().id() != ID_code ||
+        !other.get("#using_declaration_class").empty())
+      {
+        continue;
+      }
+      const code_typet &o_type = to_code_type(other.type());
+      const typet *o_object = implicit_object_class(o_type);
+      if(
+        o_object == nullptr || o_object->id() != ID_struct_tag ||
+        to_struct_tag_type(*o_object).get_identifier() != using_class ||
+        o_object->get_bool(ID_C_constant) !=
+          e_object->get_bool(ID_C_constant) ||
+        o_object->get_bool(ID_C_volatile) !=
+          e_object->get_bool(ID_C_volatile) ||
+        o_type.get(ID_C_ref_qualifier) != e_type.get(ID_C_ref_qualifier) ||
+        o_type.parameters().size() != e_type.parameters().size() ||
+        o_type.has_ellipsis() != e_type.has_ellipsis())
+      {
+        continue;
+      }
+      bool same_parameters = true;
+      for(std::size_t p = 1; p < o_type.parameters().size(); ++p)
+      {
+        if(o_type.parameters()[p].type() != e_type.parameters()[p].type())
+        {
+          same_parameters = false;
+          break;
+        }
+      }
+      if(same_parameters)
+      {
+        hidden[i] = true;
+        break;
+      }
+    }
+  }
+  std::size_t kept = 0;
+  for(std::size_t i = 0; i < identifiers.size(); ++i)
+  {
+    if(!hidden[i])
+    {
+      if(kept != i)
+        identifiers[kept] = std::move(identifiers[i]);
+      ++kept;
+    }
+  }
+  identifiers.resize(kept);
 }
 
 void cpp_typecheck_resolvet::disambiguate_functions(
@@ -8396,6 +8484,8 @@ resolved_after_strip:
         }),
       candidates.end());
   };
+
+  remove_hidden_using_declarations(identifiers);
 
   // We disambiguate functions
   resolve_identifierst new_identifiers = identifiers;
@@ -14272,7 +14362,35 @@ bool cpp_typecheck_resolvet::disambiguate_functions(
   if(!cpp_typecheck.member_constraints_satisfied(expr))
     return false;
 
-  const code_typet &type = to_code_type(expr.type());
+  // N5008 [over.match.funcs.general]/4: a member function nominated by a
+  // using-declaration in a derived class is a member of that class for the
+  // type of its implicit object parameter: for `struct D : B { using B::f;
+  // int f(double); }', d.f(1) calls B::f(int) by an identity conversion of
+  // d rather than a derived-to-base conversion, which made the call
+  // ambiguous
+  const code_typet *candidate_type = &to_code_type(expr.type());
+  code_typet adjusted_type{{}, empty_typet{}};
+  const irep_idt &using_class = expr.get("#using_declaration_class");
+  if(
+    !using_class.empty() && !candidate_type->parameters().empty() &&
+    candidate_type->parameters().front().get_this() &&
+    candidate_type->parameters().front().type().id() == ID_pointer &&
+    to_pointer_type(candidate_type->parameters().front().type())
+        .base_type()
+        .id() == ID_struct_tag)
+  {
+    adjusted_type = *candidate_type;
+    typet &object =
+      to_pointer_type(adjusted_type.parameters().front().type()).base_type();
+    struct_tag_typet derived{using_class};
+    if(object.get_bool(ID_C_constant))
+      derived.set(ID_C_constant, true);
+    if(object.get_bool(ID_C_volatile))
+      derived.set(ID_C_volatile, true);
+    object = std::move(derived);
+    candidate_type = &adjusted_type;
+  }
+  const code_typet &type = *candidate_type;
 
   // N5008 [over.match.funcs.general]/8: the candidate set is built from
   // DECLARATIONS.  A symbol whose signature still contains a nil type

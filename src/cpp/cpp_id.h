@@ -89,6 +89,12 @@ public:
 
   // if it is a member or method, what class is it in?
   irep_idt class_identifier;
+
+  /// N5008 [over.match.funcs.general]/4: for a member function that a
+  /// using-declaration in a derived class copied into the scope of that
+  /// class, the derived class, whose type the implicit object parameter has
+  /// during overload resolution
+  irep_idt using_declaration_class;
   exprt this_expr;
 
   // scope data

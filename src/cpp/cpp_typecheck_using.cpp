@@ -161,7 +161,15 @@ void cpp_typecheckt::convert(cpp_usingt &cpp_using)
       if((*it)->id_class!=cpp_idt::id_classt::TEMPLATE_PARAMETER &&
          (*it)->id_class!=cpp_idt::id_classt::NAMESPACE)
       {
-        cpp_scopes.current_scope().insert(**it);
+        cpp_idt &copy = cpp_scopes.current_scope().insert(**it);
+        if(
+          cpp_scopes.current_scope().id_class == cpp_idt::id_classt::CLASS &&
+          copy.is_method &&
+          copy.class_identifier != cpp_scopes.current_scope().class_identifier)
+        {
+          copy.using_declaration_class =
+            cpp_scopes.current_scope().class_identifier;
+        }
 
         // C++20 using enum: import enumerators into scope
         const irep_idt &sym_id = (*it)->identifier;
