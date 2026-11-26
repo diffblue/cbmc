@@ -1,0 +1,13 @@
+CORE
+main.c
+--trace --xml-ui
+^EXIT=10$
+^SIGNAL=0$
+VERIFICATION FAILED
+--
+XML does not support escaping non-printable character
+--
+Test that cbmc with --trace --xml-ui handles non-printable characters
+gracefully without crashing when they appear in counterexample traces.
+This test verifies that the fix for character 0x01 allows XML generation
+to complete successfully by escaping them using C-style sequences (e.g. \0, \x01).
