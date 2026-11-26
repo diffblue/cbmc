@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] .* auto deduces std::initializer_list: SUCCESS$
+^\[main\.assertion\.2\] .* elements decay: SUCCESS$
+^\[main\.assertion\.3\] .* namespace scope: SUCCESS$
+^\[main\.assertion\.4\] .* in a template: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+N5008 [dcl.type.auto.deduct]/4: `auto il = {1, 2, 3};' deduces
+std::initializer_list<int>.  The list was deduced as an array `int[3]', so
+il.size() was rejected and sizeof(il) was 12.

@@ -400,6 +400,119 @@ bool cpp_typecheckt::has_user_declared_constructor(const struct_typet &type)
          type.get_bool("has_inherited_constructor");
 }
 
+/// \return whether \p type is the placeholder `auto`, possibly with
+///   cv-qualifiers (`const auto`, `auto volatile`)
+static bool is_cv_placeholder(const typet &type)
+{
+  if(type.id() == ID_auto)
+    return true;
+  if(type.id() != ID_merged_type)
+    return false;
+  bool placeholder = false;
+  for(const typet &subtype : to_type_with_subtypes(type).subtypes())
+  {
+    if(subtype.id() == ID_auto)
+      placeholder = true;
+    else if(subtype.id() != ID_const && subtype.id() != ID_volatile)
+      return false;
+  }
+  return placeholder;
+}
+
+/// N5008 [dcl.type.auto.deduct]/4: in the copy-list-initialization `auto x =
+/// {e1, ..., en}` (also with `const` or `volatile`) P is
+/// `std::initializer_list<U>`, and U is deduced from each element as for a
+/// function call ([temp.deduct.call]/1-2: arrays and functions decay,
+/// top-level cv-qualifiers are dropped).  Each element must deduce the same
+/// U.  The variable \p symbol_id is then initialized as a
+/// `std::initializer_list<U>` ([dcl.init.list]/5).
+/// \return false, and changes nothing, when the declared type is not the
+///   placeholder alone or no `std::initializer_list` is declared
+bool cpp_typecheckt::deduce_initializer_list_placeholder(
+  const irep_idt &symbol_id)
+{
+  const symbolt &symbol = symbol_table.lookup_ref(symbol_id);
+  if(!is_cv_placeholder(symbol.type))
+    return false;
+
+  // [dcl.type.auto.deduct]/4: a declaration of std::initializer_list shall
+  // precede the placeholder
+  bool declared = false;
+  for(cpp_idt *ns : cpp_scopes.get_global_scope().lookup(
+        "std", cpp_scopet::SCOPE_ONLY, cpp_idt::id_classt::NAMESPACE))
+  {
+    if(!static_cast<cpp_scopet *>(ns)
+          ->lookup(
+            "initializer_list",
+            cpp_scopet::QUALIFIED,
+            cpp_idt::id_classt::TEMPLATE)
+          .empty())
+    {
+      declared = true;
+    }
+  }
+  if(!declared)
+    return false;
+
+  exprt list = symbol.value;
+  const source_locationt source_location = symbol.location;
+  std::optional<typet> element_type;
+  for(auto &element : list.operands())
+  {
+    typecheck_expr(element);
+    if(element.type().id() == ID_initializer_list)
+    {
+      // [temp.deduct.call]/1: a nested braced-init-list deduces nothing
+      error().source_location = element.source_location();
+      error() << "unable to deduce 'std::initializer_list<auto>' from a "
+                 "nested braced-init-list"
+              << eom;
+      throw 0;
+    }
+    typet deduced = deduce_placeholder_type(typet{ID_auto}, element, false);
+    if(!element_type.has_value())
+      element_type = deduced;
+    else if(deduced != *element_type)
+    {
+      error().source_location = element.source_location();
+      error() << "unable to deduce 'std::initializer_list<auto>': '"
+              << to_string(*element_type) << "' and '" << to_string(deduced)
+              << "' are deduced for its elements" << eom;
+      throw 0;
+    }
+    already_typechecked_exprt::make_already_typechecked(element);
+  }
+  CHECK_RETURN(element_type.has_value());
+
+  typet il_type{ID_cpp_name};
+  auto &sub = il_type.get_sub();
+  sub.push_back(irept{ID_scope_resolution});
+  sub.push_back(cpp_namet::namet{"std", source_location});
+  sub.push_back(irept{ID_scope_resolution});
+  sub.push_back(cpp_namet::namet{"initializer_list", source_location});
+  irept template_args{ID_template_args};
+  template_args.add(ID_arguments)
+    .get_sub()
+    .push_back(static_cast<const irept &>(type_exprt{*element_type}));
+  sub.push_back(std::move(template_args));
+  il_type.add_source_location() = source_location;
+  typecheck_type(il_type);
+  if(il_type.id() != ID_struct_tag)
+    return false;
+  elaborate_class_template(il_type);
+
+  auto value = build_initializer_list_value(to_struct_tag_type(il_type), list);
+  if(!value.has_value())
+    return false;
+
+  symbolt &writable = symbol_table.get_writeable_ref(symbol_id);
+  // the cv-qualifiers of `const auto' qualify the deduced type
+  cpp_convert_auto(writable.type, il_type, get_message_handler());
+  typecheck_type(writable.type);
+  writable.value = std::move(*value);
+  return true;
+}
+
 void cpp_typecheckt::convert_initializer(symbolt &symbol)
 {
   const irep_idt sym_id = symbol.name;
@@ -548,6 +661,11 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
       symbol.value.id() == ID_initializer_list &&
       !symbol.value.operands().empty())
     {
+      if(deduce_initializer_list_placeholder(sym_id))
+        return;
+
+      // No std::initializer_list is declared (the program is ill-formed,
+      // [dcl.type.auto.deduct]/4); model the list as an array.
       // Type-check the first element to determine T
       exprt first = symbol.value.operands()[0];
       typecheck_expr(first);
