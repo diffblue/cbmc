@@ -1,0 +1,11 @@
+CORE
+symbolic.c
+--little-endian --no-simplify
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Same as test.desc but with a symbolic (constrained-to-0) byte offset,
+exercising the variable-offset branch of convert_byte_update.
