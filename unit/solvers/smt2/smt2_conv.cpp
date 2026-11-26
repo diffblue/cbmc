@@ -535,6 +535,56 @@ TEST_CASE(
     REQUIRE(get_assert(eq) == "(assert (= s1 s2))");
   }
 
+  SECTION("string operators replace_all/from_code/to_code/from_int")
+  {
+    const typet int_type{ID_integer};
+
+    // replace_all replaces every occurrence (str.replace_all), unlike
+    // replace (str.replace, first occurrence only).
+    const auto repl_all = string_builtin_app(
+      ID_cprover_string_replace_all_func, {s1, s2, s1}, string_type);
+    const auto c_repl_all = string_builtin_app(
+      ID_cprover_string_contains_func, {repl_all, s2}, bool_typet{});
+    REQUIRE(
+      get_assert(c_repl_all) ==
+      "(assert (str.contains (str.replace_all s1 s2 s1) s2))");
+
+    // from_code: the single-char string for a code point (str.from_code).
+    const auto fc = string_builtin_app(
+      ID_cprover_string_from_code_func,
+      {from_integer(102, int_type)},
+      string_type);
+    const auto c_fc = string_builtin_app(
+      ID_cprover_string_contains_func, {fc, s1}, bool_typet{});
+    REQUIRE(
+      get_assert(c_fc) == "(assert (str.contains (str.from_code 102) s1))");
+
+    // to_code: the code point of a single-char string, an Int result
+    // (str.to_code; -1 unless the string has length 1). Composed under an
+    // Int operand here to exercise nesting.
+    const auto tc =
+      string_builtin_app(ID_cprover_string_to_code_func, {s2}, int_type);
+    const auto at_tc =
+      string_builtin_app(ID_cprover_string_char_at_func, {s1, tc}, string_type);
+    const auto c_tc = string_builtin_app(
+      ID_cprover_string_contains_func, {at_tc, s1}, bool_typet{});
+    REQUIRE(
+      get_assert(c_tc) ==
+      "(assert (str.contains (str.at s1 (str.to_code s2)) s1))");
+
+    // from_int: the decimal string of a non-negative integer (str.from_int;
+    // SMT-LIB defines it for naturals only -- negative values yield "" and a
+    // front-end needing sign support composes it, e.g.
+    // ite(n < 0, "-" ++ from_int(-n), from_int(n))).
+    const auto fi =
+      string_builtin_app(ID_cprover_string_from_int_func, {tc}, string_type);
+    const auto c_fi = string_builtin_app(
+      ID_cprover_string_contains_func, {fi, s1}, bool_typet{});
+    REQUIRE(
+      get_assert(c_fi) ==
+      "(assert (str.contains (str.from_int (str.to_code s2)) s1))");
+  }
+
   SECTION("regex range/concat/plus/union/inter/comp operators")
   {
     const auto re1 =
@@ -619,6 +669,108 @@ TEST_CASE(
       ID_cprover_string_contains_func, {arr, s2}, bool_typet{});
     REQUIRE_THROWS(get_assert(contains));
   }
+
+  SECTION("Int-sorted string conversions reject other sorts and arities")
+  {
+    const signedbv_typet s32{32};
+    const auto fc_bv = string_builtin_app(
+      ID_cprover_string_from_code_func, {from_integer(102, s32)}, string_type);
+    REQUIRE_THROWS(get_assert(equal_exprt{fc_bv, s1}));
+
+    const auto fc_two = string_builtin_app(
+      ID_cprover_string_from_code_func,
+      {from_integer(102, integer_typet{}), from_integer(102, integer_typet{})},
+      string_type);
+    REQUIRE_THROWS(get_assert(equal_exprt{fc_two, s1}));
+
+    const auto tc_bv =
+      string_builtin_app(ID_cprover_string_to_code_func, {s2}, s32);
+    REQUIRE_THROWS(get_assert(equal_exprt{tc_bv, from_integer(102, s32)}));
+  }
+}
+
+/// Decide `lhs != expected` with Z3; UNSAT shows that the lowering of `lhs`
+/// evaluates to `expected`.
+static decision_proceduret::resultt
+z3_disproves(const exprt &lhs, const exprt &expected)
+{
+  symbol_tablet symbol_table;
+  namespacet ns{symbol_table};
+  null_message_handlert message_handler;
+  smt2_dect smt2_dec{
+    ns, "unit test", "", "ALL", smt2_dect::solvert::Z3, "", message_handler};
+  smt2_dec << notequal_exprt{lhs, expected};
+  return smt2_dec();
+}
+
+TEST_CASE(
+  "smt2_convt string conversions evaluated by Z3",
+  "[core][solvers][smt2]")
+{
+  const typet string_type{ID_string};
+  const integer_typet int_type;
+  const auto str = [&](const char *v)
+  { return constant_exprt{v, string_type}; };
+  const auto num = [&](long v) { return from_integer(v, int_type); };
+  const auto unsat = decision_proceduret::resultt::D_UNSATISFIABLE;
+
+  // replace_all replaces every match; replace only the first one.
+  REQUIRE(
+    z3_disproves(
+      string_builtin_app(
+        ID_cprover_string_replace_all_func,
+        {str("aXaXa"), str("X"), str("Y")},
+        string_type),
+      str("aYaYa")) == unsat);
+  REQUIRE(
+    z3_disproves(
+      string_builtin_app(
+        ID_cprover_string_replace_func,
+        {str("aXaXa"), str("X"), str("Y")},
+        string_type),
+      str("aYaXa")) == unsat);
+  // An empty pattern leaves the string unchanged (unlike Java and Python).
+  REQUIRE(
+    z3_disproves(
+      string_builtin_app(
+        ID_cprover_string_replace_all_func,
+        {str("abc"), str(""), str("x")},
+        string_type),
+      str("abc")) == unsat);
+
+  // from_code: "" outside [0, 196607].
+  REQUIRE(
+    z3_disproves(
+      string_builtin_app(
+        ID_cprover_string_from_code_func, {num(102)}, string_type),
+      str("f")) == unsat);
+  REQUIRE(
+    z3_disproves(
+      string_builtin_app(
+        ID_cprover_string_from_code_func, {num(196608)}, string_type),
+      str("")) == unsat);
+
+  // to_code: -1 unless the string has length 1.
+  REQUIRE(
+    z3_disproves(
+      string_builtin_app(ID_cprover_string_to_code_func, {str("f")}, int_type),
+      num(102)) == unsat);
+  REQUIRE(
+    z3_disproves(
+      string_builtin_app(ID_cprover_string_to_code_func, {str("ab")}, int_type),
+      num(-1)) == unsat);
+
+  // from_int: decimal digits, "" for negative values.
+  REQUIRE(
+    z3_disproves(
+      string_builtin_app(
+        ID_cprover_string_from_int_func, {num(42)}, string_type),
+      str("42")) == unsat);
+  REQUIRE(
+    z3_disproves(
+      string_builtin_app(
+        ID_cprover_string_from_int_func, {num(-5)}, string_type),
+      str("")) == unsat);
 }
 
 TEST_CASE(
