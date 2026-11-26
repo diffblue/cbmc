@@ -319,6 +319,29 @@ TEST_CASE("Simplify cast of a pointer constant to an integer", "[core][util]")
     const typecast_exprt cast{address_of_exprt{x}, unsignedbv_typet{width}};
     REQUIRE(simplify_expr(cast, ns) == cast);
   }
+
+  SECTION("To a wider integer")
+  {
+    // The back-ends disagree on the upper bits of a pointer with the sign bit
+    // set: bv_pointerst zero-extends, whereas smt2_convt sign-extends.
+    const constant_exprt negative{
+      integer2bvrep(string2integer("8303030303030303", 16), width), pointer};
+    const typecast_exprt cast{negative, unsignedbv_typet{2 * width}};
+    REQUIRE_FALSE(simplify_expr(cast, ns).is_constant());
+  }
+
+  SECTION("Pointer constants that do not hold an integer address")
+  {
+    // The back-ends build pointer constants with symbolic values, which are
+    // not bit-vector representations and must not become integer constants.
+    for(const irep_idt &symbolic_value :
+        {ID_invalid, irep_idt{"INVALID"}, irep_idt{"INVALID-2"}})
+    {
+      const constant_exprt symbolic{symbolic_value, pointer};
+      const typecast_exprt cast{symbolic, unsignedbv_typet{width}};
+      REQUIRE(simplify_expr(cast, ns) == cast);
+    }
+  }
 }
 
 TEST_CASE("simplify_expr boolean expressions", "[core][util]")

@@ -1,0 +1,14 @@
+CORE
+main.c
+--verbosity 9
+^Generated \d+ VCC\(s\), 0 remaining after simplification$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Shadow memory of pointers that are struct members, union members or array
+elements holds pointer constants. Reading it back must simplify to constants
+during symbolic execution, so that every assertion is decided without the
+solver. The tag 0x81 has the sign bit of its byte set.
