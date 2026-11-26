@@ -84,17 +84,15 @@ static bool find_symbols(
   }
 
   // Go over all named subs with id in subs_to_find
-  // and find symbols recursively.
+  // and find symbols recursively (also when the sub is a symbol itself).
   for(const auto &sub_to_find : subs_to_find)
   {
     auto sub_expr = static_cast<const exprt &>(src.find(sub_to_find));
-    if(sub_expr.is_not_nil())
+    if(
+      sub_expr.is_not_nil() &&
+      !find_symbols(kind, sub_expr, op, bindings, subs_to_find))
     {
-      for(const auto &sub_op : sub_expr.operands())
-      {
-        if(!find_symbols(kind, sub_op, op, bindings, subs_to_find))
-          return false;
-      }
+      return false;
     }
   }
 
