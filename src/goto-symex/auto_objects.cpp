@@ -85,10 +85,15 @@ void goto_symext::trigger_auto_object(const exprt &expr, statet &state)
       {
         const symbolt &symbol = ns.lookup(obj_identifier);
 
-        if(symbol.base_name.starts_with("symex::auto_object"))
+        if(
+          symbol.base_name.starts_with("auto_object") ||
+          (symbol.type.get_bool(ID_C_is_failed_symbol) &&
+           state.rw_ok_failed_symbols.count(obj_identifier)))
         {
           // done already?
-          if(!state.get_level2().current_names.has_key(ssa_expr.identifier()))
+          auto l2_index =
+            state.get_level2().current_names.find(ssa_expr.identifier());
+          if(!l2_index.has_value() || l2_index->get().second == 1)
           {
             initialize_auto_object(e, state);
           }

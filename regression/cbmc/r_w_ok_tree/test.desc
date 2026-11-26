@@ -1,0 +1,12 @@
+CORE broken-cprover-smt-backend no-new-smt
+main.c
+--pointer-check --no-pointer-primitive-check --unwind 3 --no-unwinding-assertions --lift-nested-dereferences
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Tests that rw_ok on a tree-shaped recursive struct supports traversal of both
+child pointers, bounded by --unwind (the tree case documented in
+memory-primitives.md). See GitHub issue diffblue/cbmc#7829.
