@@ -4,7 +4,7 @@ CPROVER now needs a C++17 compliant compiler and is known to work in the
 following environments:
 
 - Linux
-- MacOS X
+- MacOS X (the built binaries require macOS 11.0 or later)
 - Windows
 
 The above environments are currently tested as part of our continuous
@@ -89,7 +89,7 @@ files.
      -O build/minisat2-download/minisat2-download-prefix/src/minisat2_2.2.1.orig.tar.gz
    ```
 
-   On macOS >10.14, the build will fail unless you explicitly specify
+   On macOS, the build will fail unless you explicitly specify
    both the C and C++ compilers to avoid C++ standard library not found
    errors. This issue is being tracked
    [here](https://github.com/diffblue/cbmc/issues/8683). The invocation thus
@@ -113,9 +113,11 @@ files.
    dependencies by not building JBMC. Just pass `-DWITH_JBMC=OFF` to `cmake`.
 
    Finally, to enable building universal binaries on macOS, you can pass the
-   flag `-DCMAKE_OSX_ARCHITECTURES=i386;x86_64`. If you don't supply this flag,
-   the built binaries will only work on the architecture of the machine being
-   used to do the build.
+   flag `-DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"`. If you don't supply this
+   flag, the built binaries will only work on the architecture of the machine
+   being used to do the build. The binaries require macOS 11.0 or later; to
+   require a newer version, pass `-DCMAKE_OSX_DEPLOYMENT_TARGET=<version>` or
+   set the `MACOSX_DEPLOYMENT_TARGET` environment variable.
 
 5. Run the build:
    ```
