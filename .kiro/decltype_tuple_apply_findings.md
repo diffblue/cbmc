@@ -16767,3 +16767,76 @@ Verified: binW234 (13 suites, profiles (z3 complex2 flaky), vacuity
 validate-trace-xml-schema; JBMC jbmc + jbmc-concurrency (sdll
 jbmc-concurrency failures pre-existing)); unit, lint, format, doxygen,
 iwyu.
+
+## Round 241 (2026-11-26): C++ gaps report on Debian packages
+
+Report: ~/cpp-rework-gaps/ (classes 01-20 and S1-S9, reproducers in
+data/repro/, soundness programs in data/sound/).  31 commits, each with a
+regression test that passes natively (g++-13, clang++-18) and fails on
+binW234:
+- 32d27dc712 02 `typename` as the key of a template template parameter;
+  67359d2f38 18 returning a union by value; d24c6ed658 17 `->` on an array;
+  216ee49ce8 09 bool/float to enum; 50963c93bc float to bool (IEEE `!= 0`,
+  so -0.0 is false); 6df4e96637 S8 defaulted union copy/move;
+  780c0ca4c6 03 ADL through compound types and incomplete classes;
+  38a5bb8ae0 06 friend declaration source order; 4d066de07d 04 static
+  member functions as values; 7df74e62cd 08 const integral array bounds;
+  23d5170d1a 13 GNU `a ?: b`; 22f4049e14 14 `&&label`, `goto *e`;
+  a3008487bc 07 binary comma folds; 1a4e0d7311 11 symbols used only in a
+  `new[]` bound; 8fee48f247 19 C-style cast selects an overload;
+  7995921e5c 20 braced initialiser in a condition; 8090763146 S5 wchar_t
+  unsigned on Arm (bebf507186's semantics only: the cherry-pick needs
+  develop's set_os_arch_overrides); 04b1ff2817 S2 sizeof of a comparison;
+  cee2392333 S3 overloaded comma; a34a1ec4de S7/15 `T x(f());`.
+- bc3b24ab24 S6 `auto x = {...}` deduces std::initializer_list<U> via
+  build_initializer_list_value (array model kept when the template is not
+  declared; mismatched element types rejected).
+- 13ae6e4edf 01/S1 `(x) - y`: the parser marks a `(name)` followed by
+  `+ - * & (` as an ambiguous cast and the operator nodes above it (up to
+  parentheses) as a region (src/cpp/cpp_cast_ambiguity.h);
+  cpp_typecheckt::resolve_cast_ambiguity, at the very start of
+  typecheck_expr, looks each name up (VAR first: a function hides a class
+  of the same name) and re-parses the region by operator precedence; a
+  parenthesised operand becomes a call, also `(f)(a)[1]`, `(f)(a)(b) - 1`.
+  Pitfalls: the [over.over] cast pre-pass of typecheck_expr typechecked the
+  cast type before the hook ("found no match"); template instantiation
+  substitutes the cpp_name of a cast by its type.  Also `(N)` (non-type
+  template parameter), `(p[1])` and `(x) &&` (22f4049e14 had made the
+  latter a cast of `&&x`; broken between the two commits).
+- c7da3c0fcf 05 `a < b || a > (5)`: for an unqualified name unknown to the
+  parser, `<` is a comparison when `||`/`&&` occur before the closing `>`
+  at bracket and angle depth 0 (an `&&` before `,` `>` `...` is an rvalue
+  reference: a first version broke libstdc++'s not_fn and many libc++
+  tests); the relational-level retry no longer accepts follow tokens it
+  cannot consume.  The cvise form `len<insert_offset>(0);` stays a
+  template-id.
+- 651812831e 16 [temp.local]/1 injected-class-name of a base template with
+  arguments (instance type's ID_identifier names the template).
+- 40d46b7b3a 12 namespace alias in a member function: new_namespace
+  cleared class_identifier (new_scope copies it) and the alias target is
+  resolved in the enclosing scope.  The reduced reproducer still reports
+  `__variant::__emplace<_Np>;` (a statement in a discarded if constexpr);
+  std::variant::emplace with libstdc++ 13 verifies.
+- 89ffabb672 10b [over.match.funcs.general]/5: no user-defined conversion
+  for the implicit object parameter (endless reference_binding recursion).
+- 2b6a85ff2d S9b flexible array members are zero-length (glibc
+  __cmsg_nxthdr, needs -O for __USE_EXTERN_INLINES); 202fc4fc64 S9 real to
+  complex standard conversion (std::complex<double>::operator=(double)).
+- c2388be68d s18 [over.match.funcs.general]/4 (cpp_idt
+  using_declaration_class, candidate `#using_declaration_class`) plus
+  [namespace.udecl]/14 hiding, applied before exact_match_functions: the
+  first version made GCC 16's list (`using _List_node_base::_M_base;` and
+  its own _M_base) ambiguous, 11 failures in the GCC 16 image.
+- 86fb491787 issue 72 goto-cl /std:c++17/20/latest and C standards (test in
+  regression/goto-cl, Windows only; run locally through a goto-cl symlink).
+- d261c3398f stale "instantiating ..." prefixes: resolve wrote the
+  instantiation stack before a silent `throw 0`; sfinae_contextt also
+  restores the pending message text.
+Not done: 10a/10c (aarch64 GCC 16 built-in types; the C part, issue 05, is
+not on this branch either); S4 (pointer to member function is 8 bytes, the
+Itanium ABI says 16: needs a two-word representation); making dropped
+library bodies visible by default (a policy decision); the std::pair and
+_Scanner body drops ("not determined" in the report).
+Verified: binW235 (13 suites, profiles (z3 complex2 flaky), vacuity
+1063/3, MSVC, macOS 142/142; GCC 16 image; the other ctest CORE suites;
+JBMC jbmc + jbmc-concurrency); unit, lint, format, doxygen, iwyu.
