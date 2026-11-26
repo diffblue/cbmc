@@ -1,0 +1,22 @@
+KNOWNBUG libstdcxx
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ template arguments: SUCCESS$
+^\[main\.assertion\.2\] line \d+ run time: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not be evaluated
+expected constant expression
+--
+The constant evaluator gave up on a call of a constructor or member
+function on a local object (`S s("abcd"); s.cut_twice();'): such calls
+are now evaluated with `this' bound to the local's tracked value, which
+the call updates.  Compound assignments and increments of a member
+(`n -= k', `++n') are applied too.  This made libstdc++ 16.2.0's
+<format> lose __do_vformat_to<_Sink_iter<wchar_t>, ...>.
