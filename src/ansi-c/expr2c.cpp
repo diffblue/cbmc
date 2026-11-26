@@ -3734,14 +3734,15 @@ std::string expr2ct::convert_with_precedence(
       return convert_function(src, "SIGN");
   }
 
-  else if(src.id() == ID_floatbv_fma)
+  else if(src.id() == ID_floatbv_fma && src.operands().size() >= 3)
   {
     // Print only the 3 mathematical operands, omitting the rounding mode
-    // (4th operand) to produce valid C syntax: fma(a, b, c)
-    const auto &fma_expr = to_floatbv_fma_expr(src);
-    return "fma(" + convert(fma_expr.op_multiply_lhs()) + ", " +
-           convert(fma_expr.op_multiply_rhs()) + ", " +
-           convert(fma_expr.op_add()) + ")";
+    // (4th operand) to produce valid C syntax: fma(a, b, c).  The C front
+    // end creates the expression with 3 operands and adjust_float_expressions
+    // adds the rounding mode, so both forms are printed (--show-symbol-table
+    // and goto-instrument --dump-c show the unadjusted one).
+    return "fma(" + convert(src.operands()[0]) + ", " +
+           convert(src.operands()[1]) + ", " + convert(src.operands()[2]) + ")";
   }
 
   else if(src.id()==ID_popcount)
