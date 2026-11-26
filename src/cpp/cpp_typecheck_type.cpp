@@ -628,6 +628,19 @@ void cpp_typecheckt::typecheck_type(typet &type)
       typecheck_expr(size_expr);
       simplify(size_expr, *this);
 
+      // N5008 [expr.const]/8, 9: a non-volatile const object of integral or
+      // enumeration type with a constant initializer is usable in constant
+      // expressions, so `const int n = 3; int a[n];' is no variable-length
+      // array (the C front-end's typecheck_array_type would make it one)
+      if(!size_expr.is_constant())
+      {
+        exprt folded = size_expr;
+        propagate_constants(folded, symbol_table);
+        simplify(folded, *this);
+        if(folded.is_constant())
+          size_expr.swap(folded);
+      }
+
       // Give a constant bound the index type, as the C front-end
       // (typecheck_array_type) and string literals (string_constantt) do.
       // Array types are compared structurally, so `const char[4]' spelled

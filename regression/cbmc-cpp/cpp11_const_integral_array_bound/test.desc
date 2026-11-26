@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp11
+^\[f\.assertion\.1\] .* local: SUCCESS$
+^\[f\.assertion\.2\] .* enumeration and global: SUCCESS$
+^\[f\.assertion\.3\] .* initialized from another: SUCCESS$
+^\[main\.assertion\.1\] .* value: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+N5008 [expr.const]/8, 9: a non-volatile const object of integral or
+enumeration type with a constant initializer is usable in constant
+expressions; an array bound naming one was a variable-length array, which
+rejected the array's initializer ("array has non-constant size").
