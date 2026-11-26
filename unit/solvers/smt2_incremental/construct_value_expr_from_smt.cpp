@@ -3,6 +3,7 @@
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 #include <util/c_types.h>
+#include <util/ieee_float.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
@@ -114,6 +115,16 @@ TEST_CASE("Value expr construction from smt.", "[core][smt2_incremental]")
     rowt{
       smt_bit_vector_constant_termt{2, 42},
       constant_exprt{"2", c_enum_tag_typet{enum_type_symbol.name}}},
+    // The value of a floating-point bit vector is its bit pattern: 0x40000000
+    // is 2.0f, not the float nearest to 1073741824.
+    rowt{
+      smt_bit_vector_constant_termt{0x40000000, 32},
+      []
+      {
+        ieee_float_valuet two{ieee_float_spect::single_precision()};
+        two.from_float(2.0f);
+        return two.to_expr();
+      }()},
     UNSIGNED_BIT_VECTOR_TESTS(8),
     SIGNED_BIT_VECTOR_TESTS(8),
     UNSIGNED_BIT_VECTOR_TESTS(16),

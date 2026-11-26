@@ -1,0 +1,14 @@
+CORE
+trace_values.c
+--trace
+^  x=2\.0f \(01000000 00000000 00000000 00000000\)$
+^  d=-0\.5 \(10111111 11100000 00000000 00000000 00000000 00000000 00000000 00000000\)$
+^\[main\.assertion\.1\] line 7 values: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+The solver returns the values of floating-point variables as bit patterns,
+which must not be converted as if they were integers: x was shown as
+1.073742e+9f, the float nearest to 0x40000000.
