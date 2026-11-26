@@ -1,0 +1,21 @@
+CORE
+b.c
+a.c --unified
+^EXIT=0$
+^SIGNAL=0$
+\*\* main \*\*
+^\+.*function main
+ASSIGN main::1::x := 42
+\*\* foo \*\*
+^-.*function foo
+\*\* bar \*\*
+^\+.*function bar
+--
+^warning: ignoring
+//
+// goto-diff a.c (old) --unified b.c (new) -- old=a.c keeps the same old/new
+// convention as the sibling syntactic-diff1 test. Beyond the function headers
+// and the changed assignment, assert the unified-diff markers that
+// output_diff() emits on the leading "// <loc>" line of each instruction, so
+// the test pins all three classifications: main modified (+), foo deleted (-),
+// bar added (+).
