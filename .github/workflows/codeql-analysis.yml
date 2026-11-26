@@ -37,6 +37,15 @@ jobs:
         # Prefix the list here with "+" to use these queries and those in the config file.
         # queries: ./path/to/local/query, your-org/your-repo/queries@main
 
+    # java-models-library is built with `-source 8', which the JDK 25 of
+    # ubuntu-latest (Ubuntu 26.04) rejects for the models of java.lang.Object
+    # and java.lang.Class; JDK 21 accepts them
+    - name: Set up JDK 21
+      uses: actions/setup-java@v5
+      with:
+        distribution: temurin
+        java-version: '21'
+
     - name: Install dependencies
       run: |
         sudo apt-get update
