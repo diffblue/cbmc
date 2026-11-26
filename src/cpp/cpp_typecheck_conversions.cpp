@@ -13,6 +13,7 @@ Author:
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/expr_util.h>
+#include <util/floatbv_expr.h>
 #include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
@@ -877,10 +878,13 @@ bool cpp_typecheckt::standard_conversion_boolean(
   if(expr.get_bool(ID_C_lvalue))
     return false;
 
+  // N5008 [conv.bool]/1: a prvalue of arithmetic (including floating-point),
+  // unscoped enumeration, pointer or pointer-to-member type
   if(
     expr.type().id() != ID_signedbv && expr.type().id() != ID_unsignedbv &&
     expr.type().id() != ID_pointer && !expr.is_boolean() &&
-    expr.type().id() != ID_c_enum_tag)
+    expr.type().id() != ID_c_enum_tag && expr.type().id() != ID_floatbv &&
+    expr.type().id() != ID_fixedbv)
   {
     return false;
   }
@@ -893,6 +897,21 @@ bool cpp_typecheckt::standard_conversion_boolean(
 
   typet Bool = c_bool_type();
   qual_from.write(Bool);
+
+  // a zero value (also -0.0) converts to false, any other value (also a
+  // NaN) to true
+  if(expr.type().id() == ID_floatbv)
+  {
+    new_expr = typecast_exprt{
+      ieee_float_notequal_exprt{expr, from_integer(0, expr.type())}, Bool};
+    return true;
+  }
+  else if(expr.type().id() == ID_fixedbv)
+  {
+    new_expr =
+      typecast_exprt{notequal_exprt{expr, from_integer(0, expr.type())}, Bool};
+    return true;
+  }
 
   // N5008 [conv.bool]/1: the null member pointer value converts to false;
   // for a pointer to data member that is null_pointer_to_data_member, -1

@@ -1,0 +1,15 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] .* explicit and implicit: SUCCESS$
+^\[main\.assertion\.2\] .* contextual: SUCCESS$
+^\[main\.assertion\.3\] .* NaN is not zero: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+N5008 [conv.bool]/1: a floating-point value converts to bool, implicitly and
+explicitly; a zero value (also -0.0) yields false, any other value (also a
+NaN) true.
