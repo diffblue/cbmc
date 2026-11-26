@@ -349,6 +349,7 @@ _ERROR_CATEGORIES = [
     'runtime/printf_format',
     'runtime/references',
     'runtime/string',
+    'runtime/termination',
     'runtime/threadsafe_fn',
     'runtime/vlog',
     'runtime/catch_test_tags',
@@ -2819,6 +2820,45 @@ def CheckPosixThreading(filename, clean_lines, linenum, error):
             'Consider using ' + multithread_safe_func +
             '...) instead of ' + single_thread_func +
             '...) for improved thread safety.')
+
+
+# Functions that must not be used to terminate the program; see
+# https://github.com/diffblue/cbmc/issues/1902. Add e.g. '_Exit', 'quick_exit'
+# or 'std::terminate' here should they need to be covered too.
+_TERMINATION_LIST = ('exit', 'abort')
+
+
+def CheckTerminationFunctions(filename, clean_lines, linenum, error):
+  """Checks for use of exit() or abort() functions.
+
+  According to the coding policy (https://github.com/diffblue/cbmc/issues/1902),
+  normal termination should be via return from main, and abnormal termination
+  should use macros from invariant.h. Any other use of exit() or abort()
+  requires explanation and should be explicitly marked as NOLINT.
+
+  Args:
+    filename: The name of the current file.
+    clean_lines: A CleansedLines instance containing the file.
+    linenum: The number of the line to check.
+    error: The function to call with any errors found.
+  """
+  line = clean_lines.elided[linenum]
+
+  # Detect std::<fn>, ::<fn>, or a plain <fn> followed by '('.
+  # Pattern explanation:
+  #   - (?:^|[^\w:.>]) - start of line, or a character that is not a word
+  #     character, ':', '.' or '>'.  Excluding '.' and '>' avoids flagging
+  #     member calls such as obj.exit() and ptr->exit().
+  #   - (?:std::|::)?  - optional std:: or :: prefix
+  #   - <fn>           - the function name
+  #   - \s*\(          - optional whitespace followed by an opening paren
+  for function in _TERMINATION_LIST:
+    if Search(r'(?:^|[^\w:.>])\s*(?:std::|::)?' + function + r'\s*\(', line):
+      error(filename, linenum, 'runtime/termination', 4,
+            function + '() should not be used. Normal termination should be '
+            'via return from main. Abnormal termination should use '
+            'invariant.h macros. If this use is justified, mark with NOLINT. '
+            'See https://github.com/diffblue/cbmc/issues/1902')
 
 
 def CheckVlogArguments(filename, clean_lines, linenum, error):
@@ -6956,6 +6996,7 @@ def ProcessLine(filename, file_extension, clean_lines, line,
                                 nesting_state, error)
   CheckVlogArguments(filename, clean_lines, line, error)
   CheckPosixThreading(filename, clean_lines, line, error)
+  CheckTerminationFunctions(filename, clean_lines, line, error)
   CheckInvalidIncrement(filename, clean_lines, line, error)
   CheckMakePairUsesDeduction(filename, clean_lines, line, error)
   CheckRedundantVirtual(filename, clean_lines, line, error)
