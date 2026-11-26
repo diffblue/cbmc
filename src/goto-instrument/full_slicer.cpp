@@ -239,6 +239,14 @@ static bool implicit(goto_programt::const_targett target)
   if(statement==ID_array_copy)
     return true;
 
+  // An ASSUME false ends all paths through it. As it has no successors in
+  // the CFG, no instruction is control dependent on it, and neither are the
+  // instructions following a call of a function that does not return because
+  // of it. Removing it would, however, make those instructions reachable on
+  // the paths that it blocks.
+  if(target->is_assume() && target->condition() == false)
+    return true;
+
   if(!target->is_assign())
     return false;
 
