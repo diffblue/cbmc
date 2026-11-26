@@ -14,6 +14,8 @@
 #include "symex_target_equation.h"
 
 #include <memory>
+#include <set>
+#include <string>
 
 class cmdlinet;
 class optionst;
@@ -114,6 +116,11 @@ public:
   /// Local variables are considered 'dirty' if they've had an address taken and
   /// therefore may be referred to by a pointer.
   incremental_dirtyt dirty;
+
+  /// Arrays already reported by
+  /// \ref goto_symext::report_arrays_over_field_sensitivity_limit, so that
+  /// each is reported only once when symex is run once per path.
+  std::set<std::string> arrays_over_field_sensitivity_limit_reported;
 
   /// Generates a loop analysis for the instructions in goto_programt and
   /// keys it against function ID.

@@ -1,0 +1,17 @@
+CORE
+nested.c
+
+^EXIT=0$
+^SIGNAL=0$
+^field sensitivity was not applied to 4 arrays of structs, unions or pointers with more than 64 elements:$
+^  outer_over \(100 elements\)$
+^  pointers_over \(100 elements\)$
+^  inner_over\[1\] \(100 elements\)$
+^  in_struct\[2\]\.in \(70 elements\)$
+^VERIFICATION SUCCESSFUL$
+--
+^  inner_over\[0\]
+--
+Arrays whose elements are arrays of structs or pointers are reported, as are
+over-limit arrays nested in structs. Only the arrays that are indexed are
+listed (inner_over[1], but not inner_over[0]).

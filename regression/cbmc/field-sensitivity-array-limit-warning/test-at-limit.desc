@@ -1,0 +1,11 @@
+CORE
+main.c
+-DN_RINGS=64 --unwind 5
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^field sensitivity was not applied
+--
+At exactly the default limit of 64 elements field sensitivity applies, so
+nothing is reported.
