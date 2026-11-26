@@ -1,0 +1,12 @@
+CORE
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Constant folding must keep the sign and payload of a NaN where IEEE 754 only
+changes the sign bit (fabs, negation, copysign), and a NaN produced by
+arithmetic must be a quiet NaN, both in the simplifier and in the solver.

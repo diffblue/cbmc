@@ -1,0 +1,12 @@
+CORE broken-cprover-smt-backend no-new-smt
+main.c
+--no-simplify
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+As test.desc, but without constant folding, so that the solver encoding has to
+produce quiet NaNs. The SMT back-ends (--cprover-smt2, the incremental one)
+cannot yet read the bits of a non-constant float without simplification.
