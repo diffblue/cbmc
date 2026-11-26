@@ -1,0 +1,8 @@
+CORE
+bvxnor-nary1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+--
+n-ary bvxnor must fold left-associatively.
