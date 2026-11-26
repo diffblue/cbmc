@@ -37,6 +37,15 @@ std::optional<std::vector<mp_integer>> eval_string(
   }
 
   const exprt content = get_value(a.content());
+  if(const auto array_of = expr_try_dynamic_cast<array_of_exprt>(content))
+  {
+    const auto size = numeric_cast<std::size_t>(array_of->type().size());
+    if(!size)
+      return {};
+    const auto value = numeric_cast<mp_integer>(array_of->what());
+    return std::vector<mp_integer>(*size, value.value_or(mp_integer('?')));
+  }
+
   const auto &array = expr_try_dynamic_cast<array_exprt>(content);
   if(!array)
     return {};
