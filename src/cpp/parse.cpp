@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <ansi-c/literals/convert_integer_literal.h>
 #include <ansi-c/merged_type.h>
 
+#include "cpp_cast_ambiguity.h"
 #include "cpp_enum_type.h"
 #include "cpp_member_spec.h"
 #include "cpp_parser.h"
@@ -395,6 +396,20 @@ protected:
 
   bool MaybeTypeNameOrClassTemplate(cpp_tokent &);
   bool nested_declarator_names_a_type(const irept &name);
+  /// see cpp_cast_ambiguity.h: whether the type-id of `( type-id )` in
+  /// rCastExpr is a name that may not be a type
+  enum class cast_type_idt
+  {
+    TYPE,
+    KNOWN_TYPE_NAME,
+    NAME,
+    NOT_A_TYPE
+  };
+  cast_type_idt classify_cast_type_id(const typet &);
+  /// set by rCastExpr while it parses the operand of an ambiguous cast that
+  /// starts with `(`: the parenthesized expression (or cast) parsed next is
+  /// the argument list of the call the cast may be
+  bool cast_group_pending = false;
   /// set by rOtherDeclStatement for the declarators that follow: the
   /// decl-specifier is a name the parser knows as a type
   bool decl_specifier_is_known_type = false;
@@ -469,6 +484,20 @@ protected:
   // make the parameter look like a non-type parameter.
   std::set<irep_idt> concept_names;
 };
+
+/// Marks \p exp as part of the region of an ambiguous cast (see
+/// cpp_cast_ambiguity.h) if one of its operands is.
+static void mark_cast_ambiguity_region(exprt &exp)
+{
+  for(const auto &op : exp.operands())
+  {
+    if(op.get_bool(ID_C_cast_ambiguity()))
+    {
+      exp.set(ID_C_cast_ambiguity(), true);
+      return;
+    }
+  }
+}
 
 static bool is_identifier(int token)
 {
@@ -8699,6 +8728,7 @@ bool Parser::rLogicalOrExpr(exprt &exp, bool template_args)
 
     exp=exprt(ID_or);
     exp.add_to_operands(std::move(left), std::move(right));
+    mark_cast_ambiguity_region(exp);
     set_location(exp, tk);
   }
 
@@ -8762,6 +8792,7 @@ bool Parser::rLogicalAndExpr(exprt &exp, bool template_args)
 
     exp=exprt(ID_and);
     exp.add_to_operands(std::move(left), std::move(right));
+    mark_cast_ambiguity_region(exp);
     set_location(exp, tk);
   }
 
@@ -8825,6 +8856,7 @@ bool Parser::rInclusiveOrExpr(exprt &exp, bool template_args)
 
     exp=exprt(ID_bitor);
     exp.add_to_operands(std::move(left), std::move(right));
+    mark_cast_ambiguity_region(exp);
     set_location(exp, tk);
   }
 
@@ -8887,6 +8919,7 @@ bool Parser::rExclusiveOrExpr(exprt &exp, bool template_args)
 
     exp=exprt(ID_bitxor);
     exp.add_to_operands(std::move(left), std::move(right));
+    mark_cast_ambiguity_region(exp);
     set_location(exp, tk);
   }
 
@@ -8949,6 +8982,7 @@ bool Parser::rAndExpr(exprt &exp, bool template_args)
 
     exp=exprt(ID_bitand);
     exp.add_to_operands(std::move(left), std::move(right));
+    mark_cast_ambiguity_region(exp);
     set_location(exp, tk);
   }
 
@@ -8992,6 +9026,7 @@ bool Parser::rEqualityExpr(exprt &exp, bool template_args)
 
     exp=exprt(tk.kind==TOK_EQ?ID_equal:ID_notequal);
     exp.add_to_operands(std::move(left), std::move(right));
+    mark_cast_ambiguity_region(exp);
     set_location(exp, tk);
   }
 
@@ -9100,6 +9135,7 @@ bool Parser::rRelationalExpr(exprt &exp, bool template_args)
 
     exp=exprt(id);
     exp.add_to_operands(std::move(left), std::move(right));
+    mark_cast_ambiguity_region(exp);
     set_location(exp, tk);
   }
 
@@ -9143,6 +9179,7 @@ bool Parser::rShiftExpr(exprt &exp, bool template_args)
 
     exp=exprt((tk.kind==TOK_SHIFTRIGHT)?ID_shr:ID_shl);
     exp.add_to_operands(std::move(left), std::move(right));
+    mark_cast_ambiguity_region(exp);
     set_location(exp, tk);
   }
 
@@ -9216,6 +9253,7 @@ bool Parser::rAdditiveExpr(exprt &exp)
 
     exp=exprt(id);
     exp.add_to_operands(std::move(left), std::move(right));
+    mark_cast_ambiguity_region(exp);
     set_location(exp, tk);
   }
 
@@ -9290,6 +9328,7 @@ bool Parser::rMultiplyExpr(exprt &exp)
 
     exp=exprt(id);
     exp.add_to_operands(std::move(left), std::move(right));
+    mark_cast_ambiguity_region(exp);
     set_location(exp, tk);
   }
 
@@ -9337,6 +9376,7 @@ bool Parser::rPmExpr(exprt &exp)
 
     exp = exprt(ID_pointer_to_member);
     exp.add_to_operands(std::move(left), std::move(right));
+    mark_cast_ambiguity_region(exp);
     set_location(exp, tk);
   }
 
@@ -9382,17 +9422,31 @@ bool Parser::rCastExpr(exprt &exp)
     cpp_token_buffert::post pos=lex.Save();
     lex.get_token(tk1);
 
+    // this cast-expression is the start of the operand of an enclosing
+    // ambiguous cast (see cpp_cast_ambiguity.h)
+    const bool group = cast_group_pending;
+    cast_group_pending = false;
+
     if(rTypeName(tname))
     {
       if(lex.get_token(tk2)==')')
       {
-        if(lex.LookAhead(0)=='&' &&
-           lex.LookAhead(1)==TOK_INTEGER)
+        const cast_type_idt kind = classify_cast_type_id(tname);
+        const int next = lex.LookAhead(0);
+
+        if(next == '&' && lex.LookAhead(1) == TOK_INTEGER)
         {
           // we have (x) & 123
           // This is likely a binary bit-wise 'and'
         }
-        else if(lex.LookAhead(0) == '{')
+        else if(
+          kind == cast_type_idt::NOT_A_TYPE ||
+          (kind == cast_type_idt::NAME && next == TOK_ANDAND))
+        {
+          // an expression: `(N) - 1' with a non-type template parameter N,
+          // `(p[1]) - 2', `(x) && y'
+        }
+        else if(next == '{')
         {
           // GCC/Clang extension: (type) { ... }
           exprt exp2;
@@ -9403,27 +9457,105 @@ bool Parser::rCastExpr(exprt &exp)
           exp.type().swap(tname);
           exp.add_to_operands(std::move(exp2));
           set_location(exp, tk1);
+          if(group)
+            exp.set(ID_C_cast_ambiguity_group(), "cast");
 
           return true;
         }
-        else if(rCastExpr(exp))
+        else
         {
+          // N5008 [expr.cast]/1, [dcl.ambig.res]: `(x) - y' and `(x)(y)'
+          // are casts only if x names a type
+          const bool ambiguous = (kind == cast_type_idt::NAME ||
+                                  kind == cast_type_idt::KNOWN_TYPE_NAME) &&
+                                 (next == '+' || next == '-' || next == '*' ||
+                                  next == '&' || next == '(');
+          cast_group_pending = ambiguous && next == '(';
           exprt op;
-          op.swap(exp);
+          const bool parsed = rCastExpr(op);
+          cast_group_pending = false;
+          if(parsed)
+          {
+            exp = exprt("explicit-typecast");
+            exp.type().swap(tname);
+            exp.add_to_operands(std::move(op));
+            set_location(exp, tk1);
+            if(ambiguous)
+            {
+              exp.set(ID_C_ambiguous_cast(), next == '(' ? "call" : "unary");
+              exp.set(ID_C_cast_ambiguity(), true);
+            }
+            else
+              mark_cast_ambiguity_region(exp);
+            if(group)
+              exp.set(ID_C_cast_ambiguity_group(), "cast");
 
-          exp = exprt("explicit-typecast");
-          exp.type().swap(tname);
-          exp.add_to_operands(std::move(op));
-          set_location(exp, tk1);
-
-          return true;
+            return true;
+          }
         }
       }
     }
 
     lex.Restore(pos);
-    return rUnaryExpr(exp);
+    cast_group_pending = group;
+    const bool parsed = rUnaryExpr(exp);
+    cast_group_pending = false;
+    return parsed;
   }
+}
+
+/// \return how rCastExpr treats the type-id \p tname of `( type-id )`:
+///   NOT_A_TYPE for a name the parser knows not to name a type (a non-type
+///   template parameter, a function or variable template) and for an array
+///   or function declarator applied to a name not known to be a type
+///   (`(p[1]) - 2` is a subscript, not a cast to an array type);
+///   KNOWN_TYPE_NAME or NAME for any other name that may be an expression;
+///   TYPE otherwise
+Parser::cast_type_idt Parser::classify_cast_type_id(const typet &tname)
+{
+  const typet *t = &tname;
+  bool declarator = false;
+  while((t->id() == ID_array || t->id() == ID_function_type) &&
+        t->get_sub().size() == 1)
+  {
+    declarator = true;
+    t = &to_type_with_subtype(*t).subtype();
+  }
+
+  if(t->id() != ID_cpp_name || t->get_bool(ID_typename))
+    return cast_type_idt::TYPE;
+
+  cast_type_idt kind = cast_type_idt::NAME;
+  const auto &sub = t->get_sub();
+  if(
+    !sub.empty() && sub.front().id() == ID_name &&
+    (sub.size() == 1 ||
+     (sub.size() == 2 && sub.back().id() == ID_template_args)))
+  {
+    if(const new_scopet *found = lookup_id(sub.front().get(ID_identifier)))
+    {
+      if(
+        found->kind == new_scopet::kindt::NON_TYPE_TEMPLATE_PARAMETER ||
+        found->kind == new_scopet::kindt::FUNCTION_TEMPLATE ||
+        found->kind == new_scopet::kindt::VARIABLE_TEMPLATE)
+      {
+        kind = cast_type_idt::NOT_A_TYPE;
+      }
+      else if(
+        found->is_type() ||
+        found->kind == new_scopet::kindt::TEMPLATE_TEMPLATE_PARAMETER)
+      {
+        kind = cast_type_idt::KNOWN_TYPE_NAME;
+      }
+    }
+  }
+
+  if(declarator)
+  {
+    return kind == cast_type_idt::KNOWN_TYPE_NAME ? cast_type_idt::TYPE
+                                                  : cast_type_idt::NOT_A_TYPE;
+  }
+  return kind;
 }
 
 /*
@@ -9833,6 +9965,7 @@ bool Parser::rUnaryExpr(exprt &exp)
 
     exp.add_to_operands(std::move(right));
     set_location(exp, tk);
+    mark_cast_ambiguity_region(exp);
 
     return true;
   }
@@ -11931,10 +12064,16 @@ bool Parser::rPrimaryExpr(exprt &exp)
     return true;
 
   case '(':
+  {
 #ifdef DEBUG
     std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 7\n";
 #endif
     lex.get_token(tk);
+
+    // the argument list of the call an enclosing ambiguous cast may be (see
+    // cpp_cast_ambiguity.h)
+    const bool group = cast_group_pending;
+    cast_group_pending = false;
 
     // C++17 left fold expression: (... op expr)
     if(lex.LookAhead(0) == TOK_ELLIPSIS)
@@ -11988,6 +12127,8 @@ bool Parser::rPrimaryExpr(exprt &exp)
       fold.add_to_operands(std::move(right));
       set_location(fold, op_tk);
       exp.swap(fold);
+      if(group)
+        exp.set(ID_C_cast_ambiguity_group(), "single");
       return true;
     }
 
@@ -12026,13 +12167,36 @@ bool Parser::rPrimaryExpr(exprt &exp)
       if(exp2.id() == ID_cpp_name || exp2.id() == ID_member)
         exp2.set(ID_C_parenthesized, true);
 
+      // see cpp_cast_ambiguity.h: the operators in parentheses form a region
+      // of their own, and a comma expression in two pairs of parentheses is
+      // a single argument
+      const bool comma_in_parentheses =
+        exp2.id() == ID_comma && exp2.get_bool(ID_C_parenthesized_comma());
+      if(exp2.id() == ID_comma)
+        exp2.set(ID_C_parenthesized_comma(), true);
+      if(exp2.get_bool(ID_C_cast_ambiguity()))
+      {
+        exp2.remove(ID_C_cast_ambiguity());
+        exp2.set(ID_C_cast_ambiguity_root(), true);
+      }
+      if(group)
+      {
+        exp2.set(
+          ID_C_cast_ambiguity_group(),
+          exp2.id() == ID_comma && !comma_in_parentheses ? "split" : "single");
+      }
+
       exp.swap(exp2);
     }
+
+    if(group && exp.id() == ID_side_effect)
+      exp.set(ID_C_cast_ambiguity_group(), "single");
 
 #ifdef DEBUG
     std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 9\n";
 #endif
     return true;
+  }
 
   case TOK_UNARY_TYPE_PREDICATE:
   case TOK_BINARY_TYPE_PREDICATE:

@@ -1,0 +1,21 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] .* cast before a binary operator: SUCCESS$
+^\[main\.assertion\.2\] .* cast of a unary expression: SUCCESS$
+^\[main\.assertion\.3\] .* parenthesized operand: SUCCESS$
+^\[main\.assertion\.4\] .* call: SUCCESS$
+^\[main\.assertion\.5\] .* function hides class: SUCCESS$
+^\[main\.assertion\.6\] .* in templates: SUCCESS$
+^\[main\.assertion\.7\] .* variable hides typedef: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+N5008 [expr.cast]/1, [dcl.ambig.res]: `(T)(x) - y' was verified as
+`(T)(x - y)', `(f)(*p)' was rejected as `f * p', and `(p[1]) - 2' as a cast
+to an array type.  The parser cannot tell whether a parenthesized name is a
+type; the type checker now regroups the operators once it has looked the
+name up.

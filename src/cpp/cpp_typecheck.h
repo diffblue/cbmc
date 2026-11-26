@@ -1389,8 +1389,9 @@ protected:
   /// constraint-expression ([temp.constr.atomic]/3, [temp.constr.op]).
   void convert_concept_initializer(symbolt &symbol);
   std::optional<bool> evaluate_constraint(const exprt &constraint);
-  void explicit_typecast_ambiguity(exprt &);
-  void unary_operand_typecast_ambiguity(exprt &);
+  /// see cpp_cast_ambiguity.h
+  void resolve_cast_ambiguity(exprt &);
+  bool ambiguous_cast_names_type(const exprt &cast);
   void typecheck_expr_main(exprt &) override;
   /// Phase 1B target-typet overload of \ref typecheck_expr_main; the
   /// target is currently discarded.  See

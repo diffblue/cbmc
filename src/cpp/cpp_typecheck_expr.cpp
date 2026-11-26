@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <ansi-c/c_qualifiers.h>
 
+#include "cpp_cast_ambiguity.h"
 #include "cpp_constexpr_eval.h"
 #include "cpp_exception_id.h"
 #include "cpp_sfinae_context.h"
@@ -12627,6 +12628,16 @@ void cpp_typecheckt::resolve_overload_set_operand(exprt &expr)
 
 void cpp_typecheckt::typecheck_expr(exprt &expr)
 {
+  // We take care of an ambiguity in the C++ grammar: whether `(x) - y' is a
+  // cast.  Needs to be done before the operands, and before anything below
+  // takes an ambiguous cast as one.
+  if(
+    expr.get_bool(ID_C_cast_ambiguity()) ||
+    expr.get_bool(ID_C_cast_ambiguity_root()))
+  {
+    resolve_cast_ambiguity(expr);
+  }
+
   resolve_overload_set_operand(expr);
 
   // N5008 [over.over]/1.6: the target of an explicit type conversion selects
@@ -12741,11 +12752,6 @@ void cpp_typecheckt::typecheck_expr(exprt &expr)
     return;
   }
 
-  // We take care of an ambiguity in the C++ grammar.
-  // Needs to be done before the operands!
-  unary_operand_typecast_ambiguity(expr);
-  explicit_typecast_ambiguity(expr);
-
   // cpp_name uses get_sub, which can get confused with expressions.
   if(expr.id() == ID_cpp_name)
     typecheck_expr_cpp_name(expr, cpp_typecheck_fargst());
@@ -12858,94 +12864,363 @@ bool cpp_typecheckt::is_qualified_member_address(const exprt &expr)
   return cpp_scopes.current_scope().this_expr.is_not_nil();
 }
 
-void cpp_typecheckt::explicit_typecast_ambiguity(exprt &expr)
+namespace
 {
-  // There is an ambiguity in the C++ grammar as follows:
-  // (TYPENAME) + expr   (typecast of unary plus)  vs.
-  // (expr) + expr       (sum of two expressions)
-  // Same issue with the operators & and - and *
-
-  // We figure this out by resolving the type argument
-  // and re-writing if needed
-
-  if(expr.id() != "explicit-typecast")
-    return;
-
-  PRECONDITION(expr.operands().size() == 1);
-
-  irep_idt op0_id = to_unary_expr(expr).op().id();
-
-  if(
-    expr.type().id() == ID_cpp_name &&
-    to_unary_expr(expr).op().operands().size() == 1 &&
-    (op0_id == ID_unary_plus || op0_id == ID_unary_minus ||
-     op0_id == ID_address_of || op0_id == ID_dereference))
+/// Regroups the operators of a region of ambiguous casts (see
+/// cpp_cast_ambiguity.h): the region is flattened into the sequence of its
+/// operands and operators, each ambiguous cast becoming either a cast (a
+/// prefix operator) or, if its name is not a type, an operand followed by a
+/// binary operator or a call, and the sequence is parsed again with the
+/// precedence of the operators ([expr.compound]).
+class cast_ambiguity_regiont
+{
+public:
+  explicit cast_ambiguity_regiont(
+    std::function<bool(const exprt &)> _names_type)
+    : names_type(std::move(_names_type))
   {
-    exprt resolve_result = resolve(
-      to_cpp_name(expr.type()),
-      cpp_typecheck_resolvet::wantt::BOTH,
-      cpp_typecheck_fargst());
+  }
 
-    if(resolve_result.id() != ID_type)
+  exprt regroup(const exprt &root)
+  {
+    flatten(root, true);
+    exprt result = parse_binary(1);
+    INVARIANT(
+      next == items.size(), "the regrouped region uses all of its operands");
+    return result;
+  }
+
+private:
+  /// whether the name of an ambiguous cast names a type
+  std::function<bool(const exprt &)> names_type;
+
+  struct itemt
+  {
+    enum class kindt
     {
-      // need to re-write the expression
-      // e.g., (ID) +expr  ->  ID+expr
-      exprt new_binary_expr;
+      OPERAND,
+      PREFIX,
+      BINARY
+    };
+    kindt kind;
+    /// the operand, or the operator without its operands
+    exprt expr;
+  };
+  std::vector<itemt> items;
+  std::size_t next = 0;
 
-      new_binary_expr.operands().resize(2);
-      to_binary_expr(new_binary_expr).op0().swap(expr.type());
-      to_binary_expr(new_binary_expr)
-        .op1()
-        .swap(to_unary_expr(to_unary_expr(expr).op()).op());
+  /// N5008 [expr.mptr.oper] to [expr.log.or]: the binary operators in the
+  /// order of their precedence; 0 for any other expression
+  static int precedence(const irep_idt &id)
+  {
+    if(id == ID_pointer_to_member)
+      return 12;
+    if(id == ID_mult || id == ID_div || id == ID_mod)
+      return 11;
+    if(id == ID_plus || id == ID_minus)
+      return 10;
+    if(id == ID_shl || id == ID_shr)
+      return 9;
+    if(id == ID_spaceship)
+      return 8;
+    if(id == ID_lt || id == ID_gt || id == ID_le || id == ID_ge)
+      return 7;
+    if(id == ID_equal || id == ID_notequal)
+      return 6;
+    if(id == ID_bitand)
+      return 5;
+    if(id == ID_bitxor)
+      return 4;
+    if(id == ID_bitor)
+      return 3;
+    if(id == ID_and)
+      return 2;
+    if(id == ID_or)
+      return 1;
+    return 0;
+  }
 
-      if(op0_id == ID_unary_plus)
-        new_binary_expr.id(ID_plus);
-      else if(op0_id == ID_unary_minus)
-        new_binary_expr.id(ID_minus);
-      else if(op0_id == ID_address_of)
-        new_binary_expr.id(ID_bitand);
-      else if(op0_id == ID_dereference)
-        new_binary_expr.id(ID_mult);
+  static bool is_prefix_operator(const exprt &expr)
+  {
+    if(expr.operands().size() != 1)
+      return false;
+    const irep_idt &id = expr.id();
+    if(id == ID_side_effect)
+    {
+      const irep_idt &statement = expr.get(ID_statement);
+      return statement == ID_preincrement || statement == ID_predecrement;
+    }
+    return id == ID_unary_minus || id == ID_unary_plus || id == ID_not ||
+           id == ID_bitnot || id == ID_dereference || id == ID_address_of ||
+           id == "explicit-typecast";
+  }
 
-      new_binary_expr.add_source_location() =
-        to_unary_expr(expr).op().source_location();
-      new_binary_expr.set(ID_C_explicit_typecast_rewrite, true);
-      expr.swap(new_binary_expr);
+  static exprt without_operands(const exprt &expr)
+  {
+    exprt result = expr;
+    result.operands().clear();
+    result.remove(ID_C_cast_ambiguity());
+    result.remove(ID_C_cast_ambiguity_root());
+    result.remove(ID_C_ambiguous_cast());
+    return result;
+  }
+
+  void add(itemt::kindt kind, exprt expr)
+  {
+    items.push_back(itemt{kind, std::move(expr)});
+  }
+
+  void flatten(const exprt &expr, bool root)
+  {
+    if(!root && !expr.get_bool(ID_C_cast_ambiguity()))
+    {
+      add(itemt::kindt::OPERAND, expr);
+      return;
+    }
+
+    if(
+      expr.id() == "explicit-typecast" &&
+      !expr.get(ID_C_ambiguous_cast()).empty() && expr.operands().size() == 1)
+    {
+      if(names_type(expr))
+      {
+        add(itemt::kindt::PREFIX, without_operands(expr));
+        flatten(to_unary_expr(expr).op(), false);
+      }
+      else
+        flatten_expression(expr, name_expression(expr));
+      return;
+    }
+
+    if(precedence(expr.id()) > 0 && expr.operands().size() == 2)
+    {
+      flatten(to_binary_expr(expr).op0(), false);
+      add(itemt::kindt::BINARY, without_operands(expr));
+      flatten(to_binary_expr(expr).op1(), false);
+      return;
+    }
+
+    if(is_prefix_operator(expr))
+    {
+      add(itemt::kindt::PREFIX, without_operands(expr));
+      flatten(to_unary_expr(expr).op(), false);
+      return;
+    }
+
+    exprt operand = expr;
+    operand.remove(ID_C_cast_ambiguity());
+    operand.remove(ID_C_cast_ambiguity_root());
+    add(itemt::kindt::OPERAND, std::move(operand));
+  }
+
+  /// the name in the parentheses of the ambiguous cast \p cast, as an
+  /// expression
+  static exprt name_expression(const exprt &cast)
+  {
+    exprt name = static_cast<const exprt &>(
+      static_cast<const irept &>(static_cast<const typet &>(cast.type())));
+    name.set(ID_C_parenthesized, true);
+    if(name.source_location().is_nil())
+      name.add_source_location() = cast.source_location();
+    return name;
+  }
+
+  static side_effect_expr_function_callt make_call(
+    exprt function,
+    exprt::operandst arguments,
+    const source_locationt &source_location)
+  {
+    return side_effect_expr_function_callt{
+      std::move(function), std::move(arguments), typet{}, source_location};
+  }
+
+  /// The arguments in the comma expression \p expr, which is in the
+  /// parentheses of an argument list
+  static void
+  collect_arguments(const exprt &expr, bool top, exprt::operandst &arguments)
+  {
+    if(
+      expr.id() == ID_comma && expr.operands().size() == 2 &&
+      (top || !expr.get_bool(ID_C_parenthesized_comma())))
+    {
+      collect_arguments(to_binary_expr(expr).op0(), false, arguments);
+      arguments.push_back(to_binary_expr(expr).op1());
+    }
+    else
+      arguments.push_back(expr);
+  }
+
+  /// Replace the parenthesized expression at the start of the postfix
+  /// expression \p expr by the call of \p function with the arguments in
+  /// it: `(f)(a)[1]` is `f(a)[1]`.
+  /// \return false if \p expr does not start with such an expression
+  static bool replace_argument_list(exprt &expr, const exprt &function)
+  {
+    exprt *node = &expr;
+    for(;;)
+    {
+      const irep_idt &group = node->get(ID_C_cast_ambiguity_group());
+      if(group == "split" || group == "single")
+      {
+        exprt::operandst arguments;
+        if(group == "split")
+          collect_arguments(*node, true, arguments);
+        else
+          arguments.push_back(*node);
+        for(auto &argument : arguments)
+          argument.remove(ID_C_cast_ambiguity_group());
+        const source_locationt source_location = node->source_location();
+        *node = make_call(function, std::move(arguments), source_location);
+        return true;
+      }
+      const irep_idt &id = node->id();
+      if(
+        node->operands().empty() ||
+        (id != ID_index && id != ID_member && id != ID_ptrmember &&
+         id != ID_side_effect))
+      {
+        return false;
+      }
+      if(id == ID_side_effect)
+      {
+        const irep_idt &statement = node->get(ID_statement);
+        if(
+          statement != ID_function_call && statement != ID_postincrement &&
+          statement != ID_postdecrement)
+        {
+          return false;
+        }
+      }
+      node = &node->operands().front();
     }
   }
+
+  /// The ambiguous cast \p cast, whose `( name )` is the expression
+  /// \p expression rather than a type: `(x) - y` is the binary `x - y`, and
+  /// `(f)(y)` the call `f(y)`.
+  void flatten_expression(const exprt &cast, const exprt &expression)
+  {
+    const exprt &operand = to_unary_expr(cast).op();
+    if(cast.get(ID_C_ambiguous_cast()) == "unary")
+    {
+      // the operand is the unary + - * & of the token after the `)'
+      const irep_idt &id = operand.id();
+      const irep_idt binary_id = id == ID_unary_minus   ? ID_minus
+                                 : id == ID_unary_plus  ? ID_plus
+                                 : id == ID_dereference ? ID_mult
+                                 : id == ID_address_of  ? ID_bitand
+                                                        : irep_idt{};
+      if(!binary_id.empty() && operand.operands().size() == 1)
+      {
+        add(itemt::kindt::OPERAND, expression);
+        exprt binary{binary_id};
+        binary.add_source_location() = operand.source_location();
+        add(itemt::kindt::BINARY, std::move(binary));
+        flatten(to_unary_expr(operand).op(), false);
+        return;
+      }
+    }
+    else if(
+      operand.get(ID_C_cast_ambiguity_group()) == "cast" &&
+      operand.id() == "explicit-typecast" &&
+      !operand.get(ID_C_ambiguous_cast()).empty() &&
+      operand.operands().size() == 1)
+    {
+      // `(f)(a) - 1' and `(f)(a)(b)': the parentheses around the name of
+      // the inner ambiguous cast are the argument list
+      flatten_expression(
+        operand,
+        make_call(
+          expression, {name_expression(operand)}, operand.source_location()));
+      return;
+    }
+    else
+    {
+      exprt call = operand;
+      if(replace_argument_list(call, expression))
+      {
+        call.remove(ID_C_cast_ambiguity());
+        add(itemt::kindt::OPERAND, std::move(call));
+        return;
+      }
+    }
+
+    // a cast to a name that is not a type, which the type checker reports
+    add(itemt::kindt::PREFIX, without_operands(cast));
+    flatten(operand, false);
+  }
+
+  exprt parse_unary()
+  {
+    INVARIANT(next < items.size(), "a region ends in an operand");
+    itemt &item = items[next++];
+    if(item.kind == itemt::kindt::PREFIX)
+    {
+      exprt result = std::move(item.expr);
+      result.add_to_operands(parse_unary());
+      return result;
+    }
+    INVARIANT(
+      item.kind == itemt::kindt::OPERAND, "an operator follows an operand");
+    return std::move(item.expr);
+  }
+
+  /// precedence climbing; all binary operators are left-associative
+  exprt parse_binary(int min_precedence)
+  {
+    exprt left = parse_unary();
+    while(next < items.size() && items[next].kind == itemt::kindt::BINARY)
+    {
+      const int p = precedence(items[next].expr.id());
+      if(p < min_precedence)
+        break;
+      exprt result = std::move(items[next++].expr);
+      exprt right = parse_binary(p + 1);
+      result.add_to_operands(std::move(left), std::move(right));
+      left = std::move(result);
+    }
+    return left;
+  }
+};
+} // namespace
+
+/// \return whether the name of the ambiguous cast \p cast names a type.  A
+///   lookup for a value comes first: a class name is hidden by a function or
+///   variable of the same name in the same scope ([basic.lookup.general]/4),
+///   so `(stat)(path, &buf)` calls the function stat.
+bool cpp_typecheckt::ambiguous_cast_names_type(const exprt &cast)
+{
+  // the name may already have been replaced by the type it denotes (a
+  // template parameter substituted by template instantiation)
+  if(cast.type().id() != ID_cpp_name)
+    return true;
+  const cpp_namet &name = to_cpp_name(cast.type());
+  {
+    cpp_typecheck_resolvet resolver(*this);
+    const exprt value = resolver.resolve(
+      name, cpp_typecheck_resolvet::wantt::VAR, cpp_typecheck_fargst(), false);
+    if(value.is_not_nil() && value.id() != ID_type)
+      return false;
+  }
+  cpp_typecheck_resolvet resolver(*this);
+  return resolver
+           .resolve(
+             name,
+             cpp_typecheck_resolvet::wantt::TYPE,
+             cpp_typecheck_fargst(),
+             false)
+           .id() == ID_type;
 }
 
-/// N5008 [expr.cast]/2, [dcl.ambig.res]: `(x) & m` is a cast only if x
-/// names a type.  The parser took `*(wp) & m` as `*` applied to the cast
-/// `(wp) &m`; when explicit_typecast_ambiguity turns that operand into the
-/// binary `wp & m`, the prefix operator -- which binds tighter than any of
-/// the binary operators involved ([expr.unary.general]) -- applies to `(wp)`
-/// only: `(*wp) & m`.  Rotate it into the left operand.  libstdc++'s
-/// bitset::reference `(*(_M_wp) & _Base::_S_maskbit(_M_bpos))`.
-void cpp_typecheckt::unary_operand_typecast_ambiguity(exprt &expr)
+/// N5008 [expr.cast]/1 with [dcl.ambig.res]: `( name )` followed by `+`,
+/// `-`, `*`, `&` or `(` is a cast only if the name names a type; see
+/// cpp_cast_ambiguity.h.  Regroup the region rooted at \p expr accordingly.
+void cpp_typecheckt::resolve_cast_ambiguity(exprt &expr)
 {
-  static const std::set<irep_idt> prefix_operators{
-    ID_dereference,
-    ID_unary_minus,
-    ID_unary_plus,
-    ID_not,
-    ID_bitnot,
-    ID_address_of};
-  if(expr.operands().size() != 1 || prefix_operators.count(expr.id()) == 0)
-    return;
-  exprt &op = to_unary_expr(expr).op();
-  unary_operand_typecast_ambiguity(op);
-  explicit_typecast_ambiguity(op);
-  if(!op.get_bool(ID_C_explicit_typecast_rewrite) || op.operands().size() != 2)
-  {
-    return;
-  }
-  // unary(lhs OP rhs) -> unary(lhs) OP rhs
-  exprt binary = op;
-  exprt unary = expr;
-  to_unary_expr(unary).op() = to_binary_expr(binary).op0();
-  to_binary_expr(binary).op0() = std::move(unary);
-  expr.swap(binary);
+  cast_ambiguity_regiont region{[this](const exprt &cast)
+                                { return ambiguous_cast_names_type(cast); }};
+  exprt regrouped = region.regroup(expr);
+  expr.swap(regrouped);
 }
 
 void cpp_typecheckt::typecheck_expr_binary_arithmetic(exprt &expr)
