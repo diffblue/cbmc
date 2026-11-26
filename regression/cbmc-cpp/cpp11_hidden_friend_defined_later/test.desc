@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] .* set by the friend: SUCCESS$
+^\[main\.assertion\.2\] .* reset: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+N5008 [basic.lookup.argdep]/4.2: argument-dependent lookup finds a friend
+function from the point of its declaration in the class.  A call in a member
+function body, which is looked up after the class, failed when the function
+was declared again at namespace scope after the call.

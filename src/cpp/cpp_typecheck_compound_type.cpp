@@ -3420,6 +3420,11 @@ void cpp_typecheckt::typecheck_friend_declaration(
       declaration.storage_spec(),
       declaration.member_spec(),
       sub_it);
+    // N5008 [basic.lookup.argdep]/4.2: argument-dependent lookup finds the
+    // friend from the point of its declaration in the class, also when the
+    // function is redeclared at namespace scope later
+    note_source_order(
+      conv_symb.name, declaration, sub_it.value().id() == ID_code);
     // [dcl.fct.def.default]/5: explicitly defaulted on its first declaration,
     // recorded as for members (#explicitly_defaulted)
     if(defaulted_friend)
