@@ -1,0 +1,12 @@
+CORE
+main.c
+--show-locations
+^EXIT=0$
+^SIGNAL=0$
+^main \d+ file main\.c line 8 function main$
+^main \d+ file main\.c line 9 function main$
+^foo \d+ file main\.c line 4 function foo$
+--
+^warning: ignoring
+--
+Each instruction is listed with its function and source location.
