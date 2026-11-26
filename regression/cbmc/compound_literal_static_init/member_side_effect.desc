@@ -1,0 +1,11 @@
+CORE
+member_side_effect.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Simplifying a member of a compound literal to the selected initializer must
+not discard the side effects of the other initializers.
