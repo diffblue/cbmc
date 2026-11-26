@@ -7123,13 +7123,16 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
     }
 
     // Reject casts of non-static member functions — they require an
-    // object and cannot be used as values.
+    // object and cannot be used as values.  A static member function is an
+    // lvalue of function type ([expr.prim.id.unqual]/4, [expr.ref]/6.3.1),
+    // which converts to a pointer ([conv.func]).
     if(
       op.id() == ID_address_of && op.get_bool(ID_C_implicit) &&
       to_address_of_expr(op).object().type().id() == ID_code &&
       !to_code_type(to_address_of_expr(op).object().type())
          .get(ID_C_member_name)
-         .empty())
+         .empty() &&
+      to_code_type(to_address_of_expr(op).object().type()).has_this())
     {
       error().source_location = expr.find_source_location();
       error() << "invalid use of non-static member function" << eom;
@@ -8543,6 +8546,12 @@ void cpp_typecheckt::typecheck_expr_member(
       }
 
       expr = symbol_expr;
+      // N5008 [expr.ref]/6.1, 6.3.1: a static data member or a static member
+      // function named by a class member access is an lvalue (and a function
+      // converts to a pointer, [conv.func]: db5.3's `db->close =
+      // this->alt_close')
+      if(expr.id() == ID_symbol)
+        expr.set(ID_C_lvalue, true);
       return;
     }
     else if(symbol_expr.is_constant())
