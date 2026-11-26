@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] .* bool from a call: SUCCESS$
+^\[main\.assertion\.2\] .* class from a call: SUCCESS$
+^\[main\.assertion\.3\] .* function declaration: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+N5008 [dcl.ambig.res]/1: `bool b(rd());' declares a function only if rd names
+a type.  For a function rd, the declaration was turned into a variable whose
+initializer was the function itself, so `b' was `(bool)&rd' and rd was never
+called; a class type rejected the initializer.

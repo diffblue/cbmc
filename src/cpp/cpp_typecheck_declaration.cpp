@@ -1594,13 +1594,24 @@ void cpp_typecheckt::convert_non_template_declaration(
         const cpp_declarationt &pdecl =
           static_cast<const cpp_declarationt &>(param);
         // the ambiguous shape: a bare unqualified name with an empty
-        // declarator
+        // declarator, or with the abstract declarator `()' of a function
+        // without parameters, which as an expression is a call (`bool
+        // b(rd());' with rd a function)
+        const typet &declarator_type =
+          pdecl.declarators().size() == 1
+            ? pdecl.declarators().front().type()
+            : static_cast<const typet &>(get_nil_irep());
+        const bool is_call =
+          declarator_type.id() == ID_function_type &&
+          declarator_type.find(ID_parameters).get_sub().empty() &&
+          to_type_with_subtype(declarator_type).subtype().is_nil();
         if(
           pdecl.type().id() != ID_cpp_name ||
           to_cpp_name(pdecl.type()).is_qualified() ||
           to_cpp_name(pdecl.type()).has_template_args() ||
           pdecl.declarators().size() != 1 ||
-          pdecl.declarators().front().name().is_not_nil())
+          pdecl.declarators().front().name().is_not_nil() ||
+          (declarator_type.is_not_nil() && !is_call))
         {
           all_bare_nontype_names = false;
           break;
@@ -1628,8 +1639,15 @@ void cpp_typecheckt::convert_non_template_declaration(
         {
           const cpp_declarationt &pdecl =
             static_cast<const cpp_declarationt &>(param);
-          init_args.add_to_operands(static_cast<const exprt &>(
-            static_cast<const irept &>(to_cpp_name(pdecl.type()))));
+          const exprt &name = static_cast<const exprt &>(
+            static_cast<const irept &>(to_cpp_name(pdecl.type())));
+          if(pdecl.declarators().front().type().is_nil())
+            init_args.add_to_operands(name);
+          else
+          {
+            init_args.add_to_operands(side_effect_expr_function_callt{
+              name, {}, uninitialized_typet{}, name.source_location()});
+          }
         }
         typet var_type = to_type_with_subtype(d.type()).subtype();
         d.type() = var_type;
