@@ -8618,6 +8618,17 @@ void cpp_typecheckt::typecheck_expr_ptrmember(
 
   add_implicit_dereference(op);
 
+  // N5008 [expr.ref]/2: the first operand is a prvalue of pointer type,
+  // after the array-to-pointer conversion ([conv.array]) of an array (as
+  // gmp's `mpz_t x; x->_mp_d'); only an operand of class type uses an
+  // overloaded operator-> ([over.ref]).
+  if(op.type().id() == ID_array)
+  {
+    exprt converted;
+    standard_conversion_array_to_pointer(op, converted);
+    op.swap(converted);
+  }
+
   // is operator-> overloaded?
   if(op.type().id() != ID_pointer)
   {

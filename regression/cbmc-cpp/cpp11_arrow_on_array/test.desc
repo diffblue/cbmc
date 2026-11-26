@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] .* array of one: SUCCESS$
+^\[main\.assertion\.2\] .* member: SUCCESS$
+^\[main\.assertion\.3\] .* const array: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+N5008 [expr.ref]/2: the first operand of `->' is converted to a pointer; an
+array undergoes the array-to-pointer conversion ([conv.array]), as with
+gmp's `mpz_t x; x->_mp_d'.  Only class operands use an overloaded operator->.
