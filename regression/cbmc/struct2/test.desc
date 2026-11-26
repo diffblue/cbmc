@@ -1,0 +1,11 @@
+CORE gcc-only no-new-smt
+main.c
+
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+This test must not generate a warning about typecasts (between different struct
+types) being ignored.
