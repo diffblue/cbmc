@@ -1,0 +1,7 @@
+CORE
+main.c
+--mmio --mmio-region 0x1000:256 --mmio-region 0x2000:256 _ --no-pointer-check --no-bounds-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--

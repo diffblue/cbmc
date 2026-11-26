@@ -1,0 +1,12 @@
+CORE
+test.c
+--nondet-volatile-write-model data:observe_data --nondet-volatile-write-model cmd:observe_cmd
+^EXIT=0$
+^SIGNAL=0$
+data committed before GO: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Without --mmio the write models are called in program order (strongly ordered),
+so the ordering assertion holds. --mmio (see test.desc) applies the weakest
+sound model and exposes the missing-barrier bug with no extra flags.

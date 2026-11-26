@@ -1,0 +1,13 @@
+CORE
+test.c
+--nondet-volatile-write-model data:observe_data --nondet-volatile-write-model cmd:observe_cmd --mmio-weak
+^EXIT=10$
+^SIGNAL=0$
+data committed before GO: FAILURE$
+^VERIFICATION FAILED$
+--
+--
+Weak device memory (--mmio-weak): without a barrier between the two register
+writes, the device may observe the command before the write to the data
+register is committed (posted-write reordering), so the ordering assertion in
+the write model fails.
