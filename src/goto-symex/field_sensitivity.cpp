@@ -171,7 +171,17 @@ exprt field_sensitivityt::apply(
     !write && expr.id() == ID_member &&
     to_member_expr(expr).struct_op().id() == ID_struct)
   {
-    return simplify_opt(std::move(expr), state.value_set, ns);
+    // Reading a field-sensitive struct yields a struct expression of its
+    // fields (see get_fields): project the member right away. This must not
+    // depend on whether simplification is enabled, as back-ends may be unable
+    // to represent the struct expression as a whole (e.g., when one of the
+    // fields is an array of non-constant size).
+    const member_exprt &member = to_member_expr(expr);
+    exprt component = to_struct_expr(member.struct_op())
+                        .component(member.get_component_name(), ns);
+    if(component.type() != expr.type())
+      return simplify_opt(std::move(expr), state.value_set, ns);
+    return simplify_opt(std::move(component), state.value_set, ns);
   }
 #ifdef ENABLE_ARRAY_FIELD_SENSITIVITY
   else if(

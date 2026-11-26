@@ -1,0 +1,18 @@
+CORE
+main.c
+--no-simplify
+^\[main\.assertion\.1\] line 11 member: SUCCESS$
+^\[main\.assertion\.2\] line 12 array member: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^Invariant check failed
+--
+Reading a member of a field-sensitive struct must yield the field itself even
+when simplification is disabled. Else the back-end has to convert the struct
+expression of all fields, which the incremental SMT back-end does not support
+(it lacks conversion of the concatenation the struct is flattened to). A global
+struct is used to avoid a declaration, which would otherwise also convert the
+struct.
