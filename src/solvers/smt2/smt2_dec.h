@@ -33,7 +33,14 @@ public:
     solvert _solver,
     const std::string &_solver_binary_or_empty,
     message_handlert &_message_handler)
-    : smt2_convt(_ns, _benchmark, _notes, _logic, _solver, stringstream),
+    : smt2_convt(
+        _ns,
+        _benchmark,
+        _notes,
+        _logic,
+        _solver,
+        stringstream,
+        /*complete_problem=*/true),
       solver_binary_or_empty(_solver_binary_or_empty),
       message_handler(_message_handler)
   {
