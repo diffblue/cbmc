@@ -136,13 +136,13 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a7ac96af2839baaeeefe1b046638d6e7d" id="r_a7ac96af2839baaeeefe1b046638d6e7d"><td class="memTemplParams" colspan="2">template&lt;typename E, typename T&gt; </td></tr>
-<tr class="memitem:a7ac96af2839baaeeefe1b046638d6e7d template"><td class="memItemLeft" align="right" valign="top">std::enable_if_t&lt; std::is_base_of&lt; <a class="el" href="classcprover__exception__baset.html">cprover_exception_baset</a>, std::decay_t&lt; E &gt; &gt;::value, E &amp;&amp; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7ac96af2839baaeeefe1b046638d6e7d">operator&lt;&lt;</a> (E &amp;&amp;e, const T &amp;message)</td></tr>
-<tr class="memdesc:a7ac96af2839baaeeefe1b046638d6e7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">add to the diagnostic information in the given <a class="el" href="classcprover__exception__baset.html" title="Base class for exceptions thrown in the cprover project.">cprover_exception_baset</a> exception; the type of the exception is preserved, enabling <span class="tt">throw some_exceptiont{...} &lt;&lt; "text"</span>  <br /></td></tr>
+<tr class="memitem:ad3bcc53fbef4f54719084033db7e95ff" id="r_ad3bcc53fbef4f54719084033db7e95ff"><td class="memTemplParams" colspan="2">template&lt;typename E, typename T&gt; </td></tr>
+<tr class="memitem:ad3bcc53fbef4f54719084033db7e95ff template"><td class="memItemLeft" align="right" valign="top">std::enable_if_t&lt; std::is_base_of&lt; <a class="el" href="classcprover__exception__baset.html">cprover_exception_baset</a>, std::decay_t&lt; E &gt; &gt;::value, E &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad3bcc53fbef4f54719084033db7e95ff">operator&lt;&lt;</a> (E &amp;&amp;e, const T &amp;message)</td></tr>
+<tr class="memdesc:ad3bcc53fbef4f54719084033db7e95ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">add to the diagnostic information in the given <a class="el" href="classcprover__exception__baset.html" title="Base class for exceptions thrown in the cprover project.">cprover_exception_baset</a> exception; the type of the exception is preserved, enabling <span class="tt">throw some_exceptiont{...} &lt;&lt; "text"</span>  <br /></td></tr>
 </table>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
-<a id="a7ac96af2839baaeeefe1b046638d6e7d" name="a7ac96af2839baaeeefe1b046638d6e7d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7ac96af2839baaeeefe1b046638d6e7d">&#9670;&#160;</a></span>operator&lt;&lt;()</h2>
+<a id="ad3bcc53fbef4f54719084033db7e95ff" name="ad3bcc53fbef4f54719084033db7e95ff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad3bcc53fbef4f54719084033db7e95ff">&#9670;&#160;</a></span>operator&lt;&lt;()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -150,7 +150,7 @@ Functions</h2></td></tr>
 template&lt;typename E, typename T&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">std::enable_if_t&lt; std::is_base_of&lt; <a class="el" href="classcprover__exception__baset.html">cprover_exception_baset</a>, std::decay_t&lt; E &gt; &gt;::value, E &amp;&amp; &gt; operator&lt;&lt; </td>
+          <td class="memname">std::enable_if_t&lt; std::is_base_of&lt; <a class="el" href="classcprover__exception__baset.html">cprover_exception_baset</a>, std::decay_t&lt; E &gt; &gt;::value, E &gt; operator&lt;&lt; </td>
           <td>(</td>
           <td class="paramtype">E &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>e</em></span>, </td>
         </tr>
@@ -163,6 +163,7 @@ template&lt;typename E, typename T&gt; </div>
 </div><div class="memdoc">
 
 <p>add to the diagnostic information in the given <a class="el" href="classcprover__exception__baset.html" title="Base class for exceptions thrown in the cprover project.">cprover_exception_baset</a> exception; the type of the exception is preserved, enabling <span class="tt">throw some_exceptiont{...} &lt;&lt; "text"</span> </p>
+<dl class="section return"><dt>Returns</dt><dd>a reference to <code class="param">e</code> if it is an lvalue, and otherwise the exception itself (moved from <code class="param">e</code>), so that the result does not refer to a temporary that may no longer exist when the result is used </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="exception__utils_8h_source.html#l00001">1</a> of file <a class="el" href="exception__utils_8h_source.html">exception_utils.h</a>.</p>
 
