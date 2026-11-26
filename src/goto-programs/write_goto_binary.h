@@ -22,18 +22,20 @@ class goto_modelt;
 class message_handlert;
 class symbol_table_baset;
 
-bool write_goto_binary(
+[[nodiscard]] bool write_goto_binary(
   std::ostream &out,
   const goto_modelt &,
-  int version=GOTO_BINARY_VERSION);
+  message_handlert &,
+  int version = GOTO_BINARY_VERSION);
 
-bool write_goto_binary(
+[[nodiscard]] bool write_goto_binary(
   std::ostream &out,
   const symbol_table_baset &,
   const goto_functionst &,
+  message_handlert &,
   int version = GOTO_BINARY_VERSION);
 
-bool write_goto_binary(
+[[nodiscard]] bool write_goto_binary(
   const std::string &filename,
   const goto_modelt &,
   message_handlert &);
