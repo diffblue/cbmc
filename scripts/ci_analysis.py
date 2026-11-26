@@ -454,7 +454,7 @@ def analyse_run(run_id: int, log_dir: Path, top: int,
 
     details = {}
     log_files = sorted(run_dir.glob("*.txt"))
-    # Map log files to job names (files are like "4_check-macos-14-cmake-clang.txt")
+    # Map log files to job names (files are like "4_check-macos-26-cmake-clang.txt")
     log_map: dict[str, Path] = {}
     for lf in log_files:
         # Strip leading number and underscore
