@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp11 --unwind 6
+^\[main\.assertion\.1\] .* dispatch: SUCCESS$
+^\[main\.assertion\.2\] .* stop: SUCCESS$
+^\[main\.assertion\.3\] .* skipped: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+GNU labels as values (`&&label') and the computed goto (`goto *e;'), as in
+lua 5.4's jump table.  The C++ parser accepted neither.

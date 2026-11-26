@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/cprover_prefix.h>
+#include <util/pointer_expr.h>
 #include <util/std_code.h>
 
 #include <ansi-c/ansi_c_y.tab.h>
@@ -9729,6 +9730,21 @@ bool Parser::rUnaryExpr(exprt &exp)
     return true;
   }
 
+  // GNU extension: `&&label', the address of a label (labels as values),
+  // represented as by the C front-end
+  if(t == TOK_ANDAND && is_identifier(lex.LookAhead(1)))
+  {
+    cpp_tokent tk, label;
+    lex.get_token(tk);
+    lex.get_token(label);
+    exprt label_expr{ID_label};
+    label_expr.set(ID_identifier, label.data.get(ID_C_base_name));
+    set_location(label_expr, label);
+    exp = address_of_exprt{label_expr, pointer_type(void_type())};
+    set_location(exp, tk);
+    return true;
+  }
+
   if(
     t == '*' || t == '&' || t == '+' || t == '-' || t == '!' || t == '~' ||
     t == TOK_INCR || t == TOK_DECR)
@@ -12969,6 +12985,20 @@ std::optional<codet> Parser::rStatement()
   case TOK_GOTO:
   {
     lex.get_token(tk1);
+
+    // GNU extension: the computed goto `goto *expression;', whose operand
+    // is (as for the C front-end) the dereference
+    if(lex.LookAhead(0) == '*')
+    {
+      exprt destination;
+      if(!rCommaExpression(destination))
+        return {};
+      if(lex.get_token(tk3) != ';')
+        return {};
+      codet statement{ID_gcc_computed_goto, {std::move(destination)}};
+      set_location(statement, tk1);
+      return std::move(statement);
+    }
 
     if(!is_identifier(lex.get_token(tk2)))
       return {};
