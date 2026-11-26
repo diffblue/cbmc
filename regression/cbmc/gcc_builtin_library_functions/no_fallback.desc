@@ -1,0 +1,22 @@
+CORE gcc-only paths-lifo-expected-failure
+no_fallback.c
+--validate-goto-model
+^\[main\.no-body\.__builtin_fputs\] .* no body for callee __builtin_fputs: FAILURE$
+^\[main\.no-body\.__builtin_fwrite\] .* no body for callee __builtin_fwrite: FAILURE$
+^\[main\.no-body\.__builtin_setjmp\] .* no body for callee __builtin_setjmp: FAILURE$
+^\[vsn\.no-body\.__builtin_vsnprintf\] .* no body for callee __builtin_vsnprintf: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+pointer parameter types differ
+type mismatch
+not found
+--
+These builtins are not given the model of the C library function of the same
+name without the __builtin_ prefix: __builtin_vsnprintf takes a va_list (a
+struct on aarch64), __builtin_fputs and __builtin_fwrite take void * rather
+than FILE * streams, and GCC's __builtin_setjmp differs from setjmp.
+With --paths lifo, CBMC does not report missing function bodies, hence
+paths-lifo-expected-failure.

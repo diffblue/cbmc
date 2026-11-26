@@ -143,7 +143,7 @@ long double __builtin_fdiml(long double, long double);
 int __builtin_feclearexcept(int);
 int __builtin_fegetenv(fenv_t*);
 int __builtin_fegetexceptflag(fexcept_t*, int);
-int __builtin_fegetround();
+int __builtin_fegetround(void);
 int __builtin_feholdexcept(fenv_t*);
 int __builtin_feraiseexcept(int);
 int __builtin_fesetenv(const fenv_t*);
