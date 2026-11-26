@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] .* global: SUCCESS$
+^\[main\.assertion\.2\] .* local: SUCCESS$
+^\[main\.assertion\.3\] .* parameter: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Returning a named object of union type with a user-provided constructor
+failed an invariant: the check for its destructor assumed a struct type.

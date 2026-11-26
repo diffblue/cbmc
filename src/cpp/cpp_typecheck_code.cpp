@@ -401,9 +401,10 @@ void cpp_typecheckt::typecheck_return(code_frontend_returnt &code)
       code.return_value().id() != ID_temporary_object &&
       code.return_value().id() != ID_side_effect)
     {
-      // Check that the destructor symbol exists for the return type.
-      const struct_typet &struct_type =
-        follow_tag(to_struct_tag_type(return_type));
+      // Check that the destructor symbol exists for the return type (a class,
+      // which may be a union).
+      const struct_union_typet &struct_type =
+        follow_tag(to_struct_or_union_tag_type(return_type));
       bool has_dtor = false;
       for(const auto &c : struct_type.components())
       {
