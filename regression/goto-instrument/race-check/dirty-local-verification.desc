@@ -1,0 +1,14 @@
+// This test verifies that --race-check detects a W/W data race on a
+// dirty local variable (a local whose address is passed to another thread).
+// It is marked KNOWNBUG because CBMC's symex aborts with "pointer handling
+// for concurrency is unsound" when a pointer to a local variable is shared
+// between threads, preventing verification from completing.
+KNOWNBUG
+dirty-local.c
+--race-check
+^EXIT=10$
+^SIGNAL=0$
+W/W data race on main::1::local
+^VERIFICATION FAILED$
+--
+^warning: ignoring
