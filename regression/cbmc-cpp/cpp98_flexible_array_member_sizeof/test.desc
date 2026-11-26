@@ -1,0 +1,15 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] .* sizeof: SUCCESS$
+^\[main\.assertion\.2\] .* element: SUCCESS$
+^\[main\.assertion\.3\] .* next header: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+A flexible array member contributes no size, as in the C front end:
+`sizeof(header)' was rejected ("type has no size"), which in a system header
+dropped the body of glibc's __cmsg_nxthdr.

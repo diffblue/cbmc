@@ -5800,6 +5800,33 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
   // members all have a known size (a dependent template member has none --
   // and each instantiation re-typechecks the body from the parse tree, so
   // the concrete instance is padded in its own right).
+  //
+  // A flexible array member (C11 6.7.2.1/18, a GNU extension in C++; glibc's
+  // struct cmsghdr) contributes no size, as in the C front end: the last
+  // data member of incomplete array type becomes a zero-length array, so
+  // that `sizeof(struct cmsghdr)' has a value.
+  if(symbol.type.id() == ID_struct || symbol.type.id() == ID_union)
+  {
+    auto &components = to_struct_union_type(symbol.type).components();
+    for(auto it = components.rbegin(); it != components.rend(); ++it)
+    {
+      if(
+        it->type().id() == ID_code || it->get_bool(ID_is_static) ||
+        it->get_bool(ID_is_type) || it->get_is_padding())
+      {
+        continue;
+      }
+      if(
+        it->type().id() == ID_array &&
+        to_array_type(it->type()).is_incomplete() &&
+        !it->get_bool(ID_from_base))
+      {
+        to_array_type(it->type()).size() = from_integer(0, c_index_type());
+        it->type().set(ID_C_flexible_array_member, true);
+      }
+      break;
+    }
+  }
   if(symbol.type.id() == ID_union)
   {
     union_typet &union_type = to_union_type(symbol.type);
