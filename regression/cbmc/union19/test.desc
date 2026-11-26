@@ -1,0 +1,15 @@
+CORE no-new-smt
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+unexpected assignment to union member
+--
+Simplification turns the byte_extract expressions that represent the members of
+a union into member expressions when the union is part of an element of an array
+indexed by a non-constant index. Symbolic execution previously rejected such
+assignments with "assign_rec: unexpected assignment to union member".
+The incremental SMT back-end does not support arrays within unions.
