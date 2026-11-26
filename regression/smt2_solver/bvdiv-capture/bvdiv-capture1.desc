@@ -1,0 +1,9 @@
+CORE
+bvdiv-capture1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+^\(\(r \(_ bv3 8\)\)\)$
+--
+bvudiv must not capture a user symbol named "divisor".
