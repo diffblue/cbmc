@@ -110,7 +110,7 @@ void dfcc_spec_functionst::generate_havoc_function(
 
   havoc_program.add(goto_programt::make_end_function());
 
-  goto_model.goto_functions.update();
+  goto_model.goto_functions.update(havoc_program);
 
   std::set<irep_idt> no_body;
   std::set<irep_idt> missing_function;
@@ -138,8 +138,6 @@ void dfcc_spec_functionst::generate_havoc_function(
     "not enough arguments when inlining " + id2string(havoc_function_id));
 
   goto_model.goto_functions.function_map.at(havoc_function_id).make_hidden();
-
-  goto_model.goto_functions.update();
 }
 
 void dfcc_spec_functionst::generate_havoc_instructions(
@@ -297,7 +295,7 @@ void dfcc_spec_functionst::to_spec_assigns_function(
     goto_function.body,
     nof_targets);
 
-  goto_model.goto_functions.update();
+  goto_model.goto_functions.update(goto_function.body);
 
   goto_model.goto_functions.function_map.at(function_id).make_hidden();
 }
@@ -380,7 +378,7 @@ void dfcc_spec_functionst::to_spec_frees_function(
     goto_function.body,
     nof_targets);
 
-  goto_model.goto_functions.update();
+  goto_model.goto_functions.update(goto_function.body);
 
   goto_model.goto_functions.function_map.at(function_id).make_hidden();
 }

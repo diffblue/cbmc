@@ -13,6 +13,7 @@ Date: June 2003
 
 #include "goto_functions.h"
 
+#include <util/exception_utils.h>
 #include <util/namespace.h>
 #include <util/symbol.h>
 
@@ -146,5 +147,79 @@ void goto_functionst::validate(const namespacet &ns, const validation_modet vm)
           "void function should not return a value");
       }
     }
+  }
+}
+
+void goto_functionst::validate_numbering(const validation_modet vm) const
+{
+  struct location_number_ranget
+  {
+    unsigned first;
+    unsigned last;
+    irep_idt function_id;
+  };
+
+  std::vector<location_number_ranget> ranges;
+
+  for(const auto &entry : function_map)
+  {
+    const auto &function_id = entry.first;
+    const goto_functiont &goto_function = entry.second;
+    if(!goto_function.body_available())
+      continue;
+
+    const goto_programt &body = goto_function.body;
+    try
+    {
+      body.validate_numbering(validation_modet::EXCEPTION);
+    }
+    catch(const incorrect_goto_program_exceptiont &exception)
+    {
+      // Report in the requested mode, with the name of the function
+      DATA_CHECK_WITH_DIAGNOSTICS(
+        vm,
+        false,
+        "the instruction numbers of a function body are not valid",
+        "function " + id2string(function_id),
+        exception.what());
+    }
+
+    // The location numbers of a body increase, so the last one is the largest
+    const unsigned last = body.instructions.back().location_number;
+    DATA_CHECK_WITH_DIAGNOSTICS(
+      vm,
+      last < unused_location_number,
+      "location numbers must be below the unused location number",
+      "function " + id2string(function_id) + " has location number " +
+        std::to_string(last) + ", the unused location number is " +
+        std::to_string(unused_location_number));
+
+    ranges.push_back(
+      {body.instructions.front().location_number, last, function_id});
+  }
+
+  std::sort(
+    ranges.begin(),
+    ranges.end(),
+    [](const location_number_ranget &a, const location_number_ranget &b)
+    {
+      return a.first != b.first
+               ? a.first < b.first
+               : id2string(a.function_id) < id2string(b.function_id);
+    });
+
+  for(std::size_t i = 1; i < ranges.size(); ++i)
+  {
+    const location_number_ranget &previous = ranges[i - 1];
+    const location_number_ranget &next = ranges[i];
+    DATA_CHECK_WITH_DIAGNOSTICS(
+      vm,
+      previous.last < next.first,
+      "the location numbers of functions " + id2string(previous.function_id) +
+        " and " + id2string(next.function_id) + " overlap",
+      "function " + id2string(previous.function_id) + " has location numbers " +
+        std::to_string(previous.first) + " to " + std::to_string(previous.last),
+      "function " + id2string(next.function_id) + " has location numbers " +
+        std::to_string(next.first) + " to " + std::to_string(next.last));
   }
 }
