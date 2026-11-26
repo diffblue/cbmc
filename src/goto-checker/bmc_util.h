@@ -178,6 +178,8 @@ void run_property_decider(
   "(paths):"                                                                   \
   "(show-symex-strategies)"                                                    \
   "(depth):"                                                                   \
+  "(depth-assertions)"                                                         \
+  "(no-depth-assertions)"                                                      \
   "(max-field-sensitivity-array-size):"                                        \
   "(no-array-field-sensitivity)"                                               \
   "(graphml-witness):"                                                         \
@@ -199,6 +201,9 @@ void run_property_decider(
   " {y--program-only} \t only show program expression\n"                       \
   " {y--show-byte-ops} \t show all byte extracts and updates\n"                \
   " {y--depth} {unr} \t limit search depth\n"                                  \
+  " {y--depth-assertions} \t generate depth bounding assertions (enabled "     \
+  "by default when using {y--depth})\n"                                        \
+  " {y--no-depth-assertions} \t disable depth bounding assertions\n"           \
   " {y--max-field-sensitivity-array-size} {uM} \t "                            \
   "maximum size {uM} of arrays for which field sensitivity will be "           \
   "applied to array, the default is 64\n"                                      \
