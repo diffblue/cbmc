@@ -1,0 +1,10 @@
+CORE
+main.i
+--winx64
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Visual Studio layout of zero-width bit-fields.

@@ -122,6 +122,37 @@ static bytest natural_alignment(const typet &type, const namespacet &ns)
     return bytest{1};
 }
 
+/// Visual Studio ignores a zero-width bit-field unless it follows a bit-field
+/// of non-zero width: it then neither aligns the next member nor affects the
+/// alignment or size of the enclosing struct or union.
+/// \param components: the components of a struct or union
+/// \param it: a component in \p components
+/// \return true iff the layout uses the rules of Visual Studio, and \p it is
+///   a zero-width bit-field that does not follow a bit-field of non-zero width
+///   (ignoring padding)
+static bool is_ignored_msvc_zero_width_bit_field(
+  const struct_union_typet::componentst &components,
+  struct_union_typet::componentst::const_iterator it)
+{
+  if(
+    !is_visual_studio() || it->type().id() != ID_c_bit_field ||
+    to_c_bit_field_type(it->type()).get_width() != 0)
+  {
+    return false;
+  }
+
+  while(it != components.begin())
+  {
+    --it;
+    if(it->get_is_padding())
+      continue;
+    return it->type().id() != ID_c_bit_field ||
+           to_c_bit_field_type(it->type()).get_width() == 0;
+  }
+
+  return true;
+}
+
 /// The alignment of \p type, ignoring any alignment that an attribute of a
 /// declaration requests for the declared entity (ID_C_declaration_alignment).
 static bytest type_alignment(const typet &type, const namespacet &ns)
@@ -162,8 +193,10 @@ static bytest type_alignment(const typet &type, const namespacet &ns)
   if(type.id() == ID_struct || type.id() == ID_union)
   {
     bytest result{1};
-    for(const auto &c : to_struct_union_type(type).components())
+    const auto &components = to_struct_union_type(type).components();
+    for(auto it = components.begin(); it != components.end(); ++it)
     {
+      const auto &c = *it;
       if(!contributes_to_aggregate_alignment(c))
         continue;
       // With Visual Studio, bit-fields do not affect the alignment of a union
@@ -174,6 +207,8 @@ static bytest type_alignment(const typet &type, const namespacet &ns)
       {
         continue;
       }
+      if(is_ignored_msvc_zero_width_bit_field(components, it))
+        continue;
       result = std::max(result, member_layout_alignment(c, packed, ns));
     }
     return std::max(result, a_int);
@@ -437,6 +472,9 @@ static void add_padding_msvc(struct_typet &type, const namespacet &ns)
   {
     // there is exactly one case in which padding is not added:
     // if we continue a bit-field with size>0 and the same underlying width
+
+    if(is_ignored_msvc_zero_width_bit_field(components, it))
+      continue;
 
     if(
       it->type().id() == ID_c_bit_field &&
@@ -809,11 +847,15 @@ void add_padding(union_typet &type, const namespacet &ns)
   if(config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
   {
     // With Visual Studio, the size of a union is at least the size of the
-    // underlying type of any bit-field.
-    for(const auto &c : type.components())
-      if(c.type().id() == ID_c_bit_field)
+    // underlying type of any bit-field (other than any zero-width bit-field
+    // that it ignores).
+    const auto &components = type.components();
+    for(auto it = components.begin(); it != components.end(); ++it)
+      if(
+        it->type().id() == ID_c_bit_field &&
+        !is_ignored_msvc_zero_width_bit_field(components, it))
       {
-        auto w = underlying_width(to_c_bit_field_type(c.type()), ns);
+        auto w = underlying_width(to_c_bit_field_type(it->type()), ns);
         if(w.has_value())
           size_bits = std::max(size_bits, bitst{w.value()});
       }
