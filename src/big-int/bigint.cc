@@ -1053,9 +1053,18 @@ BigInt::operator*= (BigInt const &y)
 
 // Division method returning both quotient and remainder.
 
-void
-BigInt::div (BigInt const &x, BigInt const &y, BigInt &q, BigInt &r)
+BigInt::divisiont BigInt::div(BigInt const &x, BigInt const &y)
 {
+  divisiont result;
+  BigInt &q = result.quotient;
+  BigInt &r = result.remainder;
+
+  if(y.length == 0)
+  {
+    error("Division by zero.");
+    return result;
+  }
+
   // Eliminate some trivial cases.
   int cmp = x.ucompare (y);
   if (cmp < 0)
@@ -1064,39 +1073,31 @@ BigInt::div (BigInt const &x, BigInt const &y, BigInt &q, BigInt &r)
       r = x;
       q.length = 0;
       q.positive = true;
-      return;
+      return result;
     }
   if (cmp == 0)
     {
-      // Both operands are equal: Quotient = 1, remainder = 0.
+      // Both operands have the same magnitude: Quotient = +/-1,
+      // remainder = 0.
       r.length = 0;
       r.positive = true;
       q.length = 1;
       q.digit[0] = 1;
-      if (!y.positive)
-	q.negate();
-      return;
-    }
-  if (y.length == 0)
-    {
-    zero:
-      error ("Division by zero.");
-      return;
+      q.positive = x.positive == y.positive;
+      return result;
     }
   if (x.is_ulong())
     {
       // Can do it directly.
       ullong_t n = x.to_ulong();
       ullong_t m = y.to_ulong();
-      if (m == 0)
-	goto zero;
       q.assign (n / m);
       r.assign (n % m);
     }
   else if (y.length == 1)
     {
       // This digit_div() transforms the dividend into the quotient.
-      q = y;
+      q = x;
       r.digit[0] = digit_div (q.digit, q.length, y.digit[0]);
       r.length = r.digit[0] ? 1 : 0;
     }
@@ -1125,9 +1126,10 @@ BigInt::div (BigInt const &x, BigInt const &y, BigInt &q, BigInt &r)
       if (a[al-1] >= b[bl-1])
 	a[al++] = 0;
 
-      // Prepare q for receiving the quotient.
+      // Prepare q for receiving the quotient. Its digits are overwritten
+      // below, so there is no need to keep its contents.
+      q.reallocate(al - bl);
       q.length = al - bl;
-      q.resize (q.length);
 
       // Divide.
       digit_div (a, b, bl, q.digit, q.length);
@@ -1137,13 +1139,14 @@ BigInt::div (BigInt const &x, BigInt const &y, BigInt &q, BigInt &r)
       if (scale != 1)
 	digit_div (a, al, scale);
       if (al && a[al - 1] == 0) --al;
+      r.reallocate(al);
       r.length = al;
-      r.resize (r.length);
       memcpy (r.digit, a, al * sizeof (onedig_t));
     }
   q.adjust();
   q.positive = q.length == 0 || x.positive == y.positive;
   r.positive = r.length == 0 || x.positive;
+  return result;
 }
 
 BigInt &
@@ -1154,6 +1157,12 @@ BigInt::operator/= (BigInt const &y)
   {
       error("BigInt::operator/=: operand must not alias *this.");
       abort();
+  }
+
+  if(y.length == 0)
+  {
+      error("Division by zero.");
+      return *this;
   }
 
   // Eliminate some trivial cases.
@@ -1172,19 +1181,11 @@ BigInt::operator/= (BigInt const &y)
       digit[0] = 1;
       goto set_sign;
     }
-  if (y.length == 0)
-    {
-    zero:
-      error ("Division by zero.");
-      return *this;
-    }
   if (is_ulong())
     {
       // Can do it directly.
       ullong_t n = to_ulong();
       ullong_t m = y.to_ulong();
-      if (m == 0)
-	goto zero;
       digit_set (n / m, digit, length);
     }
   else if (y.length == 1)
@@ -1231,6 +1232,12 @@ BigInt::operator%= (BigInt const &y)
     abort();
   }
 
+  if(y.length == 0)
+  {
+    error("Division by zero.");
+    return *this;
+  }
+
   // Eliminate some trivial cases.
   int cmp = ucompare (y);
   if (cmp < 0)
@@ -1245,19 +1252,11 @@ BigInt::operator%= (BigInt const &y)
       positive = true;
       return *this;
     }
-  if (y.length == 0)
-    {
-    zero:
-      error ("Division by zero.");
-      return *this;
-    }
   if (is_ulong())
     {
       // Can do it directly.
       ullong_t n = to_ulong();
       ullong_t m = y.to_ulong();
-      if (m == 0)
-	goto zero;
       digit_set (n % m, digit, length);
     }
   else if (y.length == 1)
