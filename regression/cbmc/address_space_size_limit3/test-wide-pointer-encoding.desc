@@ -1,0 +1,13 @@
+CORE thorough-smt-backend no-new-smt wide-pointer-encoding
+main.i
+--32 --little-endian --object-bits 26
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^.* dereference failure: pointer outside object bounds in .*: FAILURE$
+--
+^warning: ignoring
+--
+Wide pointer encoding: the object-bits limitation is removed but
+the bounds violation is still detected. Slower than standard
+encoding due to 3x pointer width (requires thorough tag).

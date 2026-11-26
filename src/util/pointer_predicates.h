@@ -16,6 +16,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #define SYMEX_DYNAMIC_PREFIX "symex_dynamic"
 
+/// \return true iff \p obj denotes a symex dynamic (heap-allocated) object:
+/// either an `ID_dynamic_object` expression, or a symbol (possibly the array
+/// of an index expression) whose identifier contains SYMEX_DYNAMIC_PREFIX.
+bool is_symex_dynamic_object(const exprt &obj);
+
 exprt same_object(const exprt &p1, const exprt &p2);
 exprt deallocated(const exprt &pointer, const namespacet &);
 exprt dead_object(const exprt &pointer, const namespacet &);
