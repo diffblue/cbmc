@@ -544,13 +544,18 @@ static void add_padding_msvc(struct_typet &type, const namespacet &ns)
   }
 }
 
-/// Insert padding before the bit-field \p it so that it starts where GCC and
-/// Clang place it: unless packed, or `#pragma pack` is in effect, a bit-field
-/// must not span more units of the alignment of its declared type than the
-/// type itself does, i.e., a bit-field of type `int` (of size and alignment 4)
-/// must not straddle a 4-byte boundary, and is moved to the next one
-/// otherwise. This check takes place after aligning the start of the
-/// bit-field as an alignment attribute of its declaration may request.
+/// Insert padding before the bit-field \p it so that it starts where GCC or
+/// Clang place it:
+/// - an alignment attribute of the bit-field's declaration (even aligned(1))
+///   aligns its start, but `#pragma pack(n)` caps this alignment at n with GCC,
+///   whereas Clang then ignores alignment attributes greater than n;
+/// - unless packed, or `#pragma pack` is in effect, a bit-field must not span
+///   more units of the alignment of its declared type than the type itself
+///   does, i.e., a bit-field of type `int` (of size and alignment 4) must not
+///   straddle a 4-byte boundary, and is moved to the next one otherwise. GCC
+///   performs this check after aligning the start as requested by an
+///   attribute, whereas Clang performs it first, using the larger of both
+///   alignments (and only then honours the attribute).
 /// \param components: the components of the struct
 /// \param it: the bit-field to place
 /// \param struct_is_packed: whether the struct is packed
@@ -580,6 +585,9 @@ static struct_typet::componentst::iterator place_bit_field(
                          bit_field_type.get_bool(ID_C_packed) ||
                          underlying_type.get_bool(ID_C_packed);
   const mp_integer pragma_pack_bits = pragma_pack(*it).get() * char_width;
+  const mp_integer explicit_bits =
+    alignment_attribute(it->type(), ID_C_declaration_alignment).get() *
+    char_width;
 
   // the natural alignment and the size of the declared type, in bits
   typet unpacked_type = underlying_type;
@@ -593,22 +601,44 @@ static struct_typet::componentst::iterator place_bit_field(
   { return a <= 1 ? value : (value + a - 1) / a * a; };
   mp_integer target = start;
 
-  // an alignment attribute of the bit-field's declaration
-  const mp_integer start_alignment_bits =
-    bit_field_start_alignment(*it).get() * char_width;
-  if(start_alignment_bits > char_width)
-    target = align_to(start, start_alignment_bits);
-
-  // GCC's excess_unit_span (Clang's check is equivalent in the absence of
-  // alignment attributes)
-  if(
-    !is_packed && pragma_pack_bits == 0 && type_bits.has_value() &&
-    type_alignment_bits > 0 && type_bits->get() >= type_alignment_bits &&
-    (target % type_alignment_bits + width + type_alignment_bits - 1) /
-        type_alignment_bits >
-      type_bits->get() / type_alignment_bits)
+  if(config.ansi_c.mode == configt::ansi_ct::flavourt::CLANG)
   {
-    target = align_to(target, type_alignment_bits);
+    mp_integer field_alignment =
+      is_packed ? mp_integer{1} : type_alignment_bits;
+    field_alignment = std::max(field_alignment, explicit_bits);
+    if(
+      pragma_pack_bits == 0 && type_bits.has_value() &&
+      start % field_alignment + width > type_bits->get())
+    {
+      target = align_to(start, field_alignment);
+    }
+    else if(
+      explicit_bits > 0 &&
+      (pragma_pack_bits == 0 || explicit_bits <= pragma_pack_bits))
+    {
+      target = align_to(start, explicit_bits);
+    }
+  }
+  else
+  {
+    if(explicit_bits > 0)
+    {
+      target = align_to(
+        start,
+        pragma_pack_bits > 0 ? std::min(explicit_bits, pragma_pack_bits)
+                             : explicit_bits);
+    }
+
+    // GCC's excess_unit_span
+    if(
+      !is_packed && pragma_pack_bits == 0 && type_bits.has_value() &&
+      type_alignment_bits > 0 && type_bits->get() >= type_alignment_bits &&
+      (target % type_alignment_bits + width + type_alignment_bits - 1) /
+          type_alignment_bits >
+        type_bits->get() / type_alignment_bits)
+    {
+      target = align_to(target, type_alignment_bits);
+    }
   }
 
   if(target == start)
