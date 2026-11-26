@@ -1,0 +1,15 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] .* alias in a member function template: SUCCESS$
+^\[main\.assertion\.2\] .* alias of the same name: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+N5008 [namespace.alias]/2: a namespace alias in a member function of a
+class template made the type checker treat the alias's scope as a class
+(an invariant failure, "... was not found"), and `namespace impl = impl;'
+denoted the alias itself.

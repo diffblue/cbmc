@@ -20,6 +20,18 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
   cpp_save_scopet saved_scope(cpp_scopes);
   cpp_scopet &parent_scope = cpp_scopes.current_scope();
 
+  // N5008 [namespace.alias]/2: the alias denotes the namespace denoted by
+  // the qualified-namespace-specifier, which is looked up where the alias
+  // is declared -- not in the scope of the alias, where `namespace
+  // __variant = __variant;' found the alias itself
+  cpp_scopet *alias_target = nullptr;
+  if(namespace_spec.alias().is_not_nil())
+  {
+    cpp_typecheck_resolvet resolver(*this);
+    alias_target = &resolver.resolve_namespace(namespace_spec.alias());
+    cpp_scopes.go_to(parent_scope);
+  }
+
   const irep_idt &name=namespace_spec.get_namespace();
 
   irep_idt final_name(name);
@@ -89,12 +101,8 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
   if(is_anonymous)
     parent_scope.add_using_scope(cpp_scopes.current_scope());
 
-  if(namespace_spec.alias().is_not_nil())
-  {
-    cpp_typecheck_resolvet resolver(*this);
-    cpp_scopet &s=resolver.resolve_namespace(namespace_spec.alias());
-    cpp_scopes.current_scope().add_using_scope(s);
-  }
+  if(alias_target != nullptr)
+    cpp_scopes.current_scope().add_using_scope(*alias_target);
   else
   {
     // do the declarations

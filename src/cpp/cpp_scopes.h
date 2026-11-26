@@ -50,6 +50,10 @@ public:
   cpp_scopet &new_namespace(const irep_idt &new_scope_name)
   {
     cpp_scopet &n = new_scope(new_scope_name, cpp_idt::id_classt::NAMESPACE);
+    // a namespace is not a class, also when declared (as a namespace alias)
+    // in a block scope of a member function, whose class new_scope copies
+    n.class_identifier.clear();
+    n.this_expr.make_nil();
     namespaces_by_base_name.emplace(n.base_name, &n);
     return n;
   }
