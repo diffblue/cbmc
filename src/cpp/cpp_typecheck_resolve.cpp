@@ -7292,6 +7292,45 @@ exprt cpp_typecheck_resolvet::resolve(
     }
   }
 
+  // N5008 [temp.local]/1: the injected-class-name of a class template
+  // specialization followed by `<' names the class template.  Ordinary
+  // lookup finds it in the class and in a derived class ([class.member.lookup])
+  // also where the template itself is not visible: `class E : public
+  // d::Q<E, unsigned> { int f(const Q<E, unsigned> &); }' (LLVM's
+  // ElementCount, derived from details::FixedOrScalableQuantity).
+  if(id_set.empty() && template_args.is_not_nil())
+  {
+    for(const cpp_idt *found : cpp_typecheck.cpp_scopes.current_scope().lookup(
+          base_name, lookup_kind, cpp_idt::id_classt::CLASS))
+    {
+      const symbolt *instance =
+        cpp_typecheck.symbol_table.lookup(found->identifier);
+      if(
+        instance == nullptr ||
+        !instance->type.get_bool(ID_template_class_instance))
+      {
+        continue;
+      }
+      const auto it =
+        cpp_typecheck.cpp_scopes.id_map.find(instance->type.get(ID_identifier));
+      if(it == cpp_typecheck.cpp_scopes.id_map.end())
+        continue;
+      if(it->second->id_class == cpp_idt::id_classt::TEMPLATE)
+        id_set.insert(it->second);
+      else if(it->second->id_class == cpp_idt::id_classt::TEMPLATE_SCOPE)
+      {
+        for(cpp_idt *t : static_cast<cpp_scopet &>(it->second->get_parent())
+                           .lookup(
+                             base_name,
+                             cpp_scopet::SCOPE_ONLY,
+                             cpp_idt::id_classt::TEMPLATE))
+        {
+          id_set.insert(t);
+        }
+      }
+    }
+  }
+
   // Argument-dependent name lookup (ADL / Koenig lookup):
   // For unqualified calls, also search in the namespaces of the
   // argument types. This is required for e.g. operator+(string, string)
