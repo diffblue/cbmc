@@ -1,0 +1,14 @@
+CORE
+main.c
+--add-library --dump-c _ --no-standard-checks
+^EXIT=0$
+^SIGNAL=0$
+^  return __CPROVER_sqrtf\(x, __CPROVER_rounding_mode\);$
+^  return __CPROVER_sqrtld\(x, __CPROVER_rounding_mode\);$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+return sqrtf?l?\(
+--
+The library models of sqrtf and sqrtl must be dumped using the CPROVER built-in
+rather than a call to the function itself, which would make them recursive.

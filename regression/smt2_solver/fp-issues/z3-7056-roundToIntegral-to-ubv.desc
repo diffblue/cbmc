@@ -1,0 +1,8 @@
+CORE
+z3-7056-roundToIntegral-to-ubv.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^unsat$
+--
+Z3#7056: roundToIntegral RTZ + to_ubv + to_fp_unsigned roundtrip

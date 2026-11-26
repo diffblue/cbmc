@@ -1,0 +1,11 @@
+CORE smt-backend no-new-smt
+main.c
+--z3 --fpa
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+SMT-LIB fp.sqrt is used with the floating-point theory. --z3 cannot be combined
+with the incremental SMT2 back-end.

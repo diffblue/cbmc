@@ -1,0 +1,8 @@
+CORE
+z3-7135-bvfp-to-fp.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+--
+Z3#7135: to_fp from BV with fp.gt on Float64

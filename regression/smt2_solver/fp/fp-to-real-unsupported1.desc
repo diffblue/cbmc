@@ -1,0 +1,8 @@
+CORE
+fp-to-real-unsupported1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+--
+fp.to_real: find FP value matching real constant 1.0.

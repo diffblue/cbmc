@@ -145,6 +145,11 @@ public:
   /// \param addend: value added to the product
   bvt fma(const bvt &multiply_lhs, const bvt &multiply_rhs, const bvt &addend);
 
+  /// IEEE 754 squareRoot: the square root of \p src, correctly rounded.
+  /// The result is NaN for NaN and for negative arguments other than -0, and
+  /// the square root of -0 is -0.
+  bvt sqrt(const bvt &src);
+
   bvt abs(const bvt &);
   bvt negate(const bvt &);
 
@@ -177,9 +182,21 @@ protected:
   propt &prop;
   bv_utilst bv_utils;
 
+  /// Whether to round up the magnitude of a value with sign \p sign, given
+  /// the lowest bit \p lsb that is kept, the highest bit \p rbit that is
+  /// dropped, and whether any other dropped bit is set (\p sticky).
+  literalt
+  round_up(literalt sign, literalt lsb, literalt rbit, literalt sticky);
+
   // unpacked
   virtual void normalization_shift(bvt &fraction, bvt &exponent);
   void denormalization_shift(bvt &fraction, bvt &exponent);
+
+  /// Integer square root of \p radicand, which must have an even width.
+  /// \param radicand: the unsigned integer to compute the square root of
+  /// \param [out] remainder: radicand - root * root
+  /// \return floor(sqrt(radicand)), of half the width of \p radicand
+  bvt integer_sqrt(const bvt &radicand, bvt &remainder);
 
   bvt add_bias(const bvt &exponent);
   bvt sub_bias(const bvt &exponent);

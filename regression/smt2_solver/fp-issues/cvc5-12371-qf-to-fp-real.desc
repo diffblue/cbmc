@@ -1,0 +1,12 @@
+KNOWNBUG
+cvc5-12371-qf-to-fp-real.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^unsat$
+--
+^\(error
+--
+CVC5#12371: quantifier-free variant of cvc5-12371-quant-to-fp-real. This fails
+for reasons unrelated to quantifiers: the decimal literal is typed as Int rather
+than Real, and to_fp from a non-constant Real is not implemented.

@@ -1,4 +1,4 @@
-CORE no-new-smt
+CORE
 main.c
 --nan-check
 \[main.NaN.1\] line \d+ NaN on \+ in byte_extract_(big|little)_endian\(c, (0|0l|0ll), float\) \+ myzero: SUCCESS

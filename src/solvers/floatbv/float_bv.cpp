@@ -134,6 +134,11 @@ exprt float_bvt::convert(const exprt &expr) const
       float_expr.rounding_mode(),
       get_spec(expr));
   }
+  else if(expr.id() == ID_floatbv_sqrt)
+  {
+    const auto &sqrt_expr = to_floatbv_sqrt_expr(expr);
+    return sqrt(sqrt_expr.op(), sqrt_expr.rounding_mode(), get_spec(expr));
+  }
   else if(expr.id() == ID_floatbv_fma)
   {
     const auto &fma_expr = to_floatbv_fma_expr(expr);
@@ -144,6 +149,16 @@ exprt float_bvt::convert(const exprt &expr) const
       fma_expr.op_add(),
       fma_expr.rounding_mode(),
       spec);
+  }
+  else if(expr.id() == ID_floatbv_mod)
+  {
+    const auto &float_expr = to_binary_expr(expr);
+    return mod(float_expr.lhs(), float_expr.rhs());
+  }
+  else if(expr.id() == ID_floatbv_rem)
+  {
+    const auto &float_expr = to_binary_expr(expr);
+    return rem(float_expr.lhs(), float_expr.rhs());
   }
   else if(expr.id()==ID_isnan)
   {
@@ -164,6 +179,12 @@ exprt float_bvt::convert(const exprt &expr) const
   {
     const auto &op = to_unary_expr(expr).op();
     return isnormal(op, get_spec(op));
+  }
+  else if(expr.id() == ID_floatbv_round_to_integral)
+  {
+    const auto &rti_expr = to_floatbv_round_to_integral_expr(expr);
+    return round_to_integral(
+      rti_expr.op(), rti_expr.rounding_mode(), get_spec(expr));
   }
   else if(expr.id()==ID_lt)
   {
@@ -521,6 +542,130 @@ exprt float_bvt::conversion(
     unbiased_floatt result=unpack(src, src_spec);
     return rounder(result, rm, dest_spec);
   }
+}
+
+exprt float_bvt::round_up(
+  const rounding_mode_bitst &rounding_mode_bits,
+  const exprt &sign,
+  const exprt &lsb,
+  const exprt &rbit,
+  const exprt &sticky)
+{
+  // clang-format off
+  return if_exprt(rounding_mode_bits.round_to_even,
+    and_exprt(rbit, or_exprt(lsb, sticky)),
+  if_exprt(rounding_mode_bits.round_to_away, rbit,
+  if_exprt(rounding_mode_bits.round_to_plus_inf,
+    and_exprt(not_exprt(sign), or_exprt(rbit, sticky)),
+  if_exprt(rounding_mode_bits.round_to_minus_inf,
+    and_exprt(sign, or_exprt(rbit, sticky)),
+    false_exprt()))));
+  // clang-format on
+}
+
+/// Round a floating-point value to integral.
+///
+/// The result is computed on the packed representation: clear the
+/// `drop` lowest bits, which hold the fractional part of the value, and
+/// conditionally add the unit of the integral part. For `|x| >= 1`, `drop`
+/// is `f - exp`, where `exp` is the unbiased exponent (`1 - bias` for
+/// subnormals), and the unit is `1 << drop`. The lowest remaining bit
+/// (`lsb`), the highest dropped bit (`rbit`) and the OR of the other dropped
+/// bits (`sticky`) determine whether to round up. When `drop == f`, `lsb` is
+/// the lowest bit of the biased exponent, which is `bias` and thus odd: the
+/// integral part is 1. For `|x| < 1`, all bits but the sign are dropped, the
+/// unit is the encoding of 1, `lsb` is false, `rbit` is `|x| >= 0.5` and
+/// `sticky` is `|x| != 0.5`. Comparing the magnitudes of non-NaN values as
+/// unsigned integers does not require 0.5 or 1 to be normal numbers, which
+/// they are not in formats with a 1- or 2-bit exponent. (If 0.5 is not
+/// representable, then 0 is the only value with `|x| < 1`.)
+///
+/// A carry out of the fraction bits increments the biased exponent, which
+/// yields the correctly rounded value. In the IEEE formats, where
+/// `spec.f < bias`, the result is finite. In formats with a narrow exponent
+/// (e.g., `__CPROVER_floatbv[28][23]`) rounding up the largest finite values
+/// can carry into an all-ones exponent, yielding infinity, as the integral
+/// result is not representable.
+///
+/// NaN, infinities, zeros, and values with `exp >= f` are returned as they
+/// are.
+///
+/// `float_utilst::round_to_integral` is the bvt-level mirror of this
+/// code; keep the two implementations in lockstep when changing the
+/// rounding logic.
+exprt float_bvt::round_to_integral(
+  const exprt &src,
+  const exprt &rm,
+  const ieee_float_spect &spec) const
+{
+  const std::size_t width = spec.width();
+  const unsignedbv_typet uint_type{width};
+  const exprt src_uint = extractbits_exprt{src, 0, uint_type};
+  const exprt zero_uint = from_integer(0, uint_type);
+  const exprt one_uint = from_integer(1, uint_type);
+  const exprt sign = sign_bit(src);
+
+  const exprt is_special =
+    or_exprt{isnan(src, spec), isinf(src, spec), is_zero(src)};
+
+  // The unbiased exponent is compared with, and subtracted from, spec.f,
+  // which need not be representable in spec.e bits (for example, for
+  // __CPROVER_floatbv[28][23]). Hence compute it with more bits.
+  const signedbv_typet exp_type{std::max(spec.e, address_bits(spec.f)) + 2};
+  const exprt biased_exp = get_exponent(src, spec);
+  const exprt exponent = minus_exprt{
+    if_exprt{
+      equal_exprt{biased_exp, from_integer(0, biased_exp.type())},
+      from_integer(1, exp_type),
+      typecast_exprt{biased_exp, exp_type}},
+    from_integer(spec.bias(), exp_type)};
+  const exprt exp_ge_f =
+    binary_relation_exprt{exponent, ID_ge, from_integer(spec.f, exp_type)};
+
+  // magnitudes of non-NaN values order like their unsigned encodings
+  const mp_integer magnitude_mask = power(2, width - 1) - 1;
+  const exprt magnitude =
+    bitand_exprt{src_uint, from_integer(magnitude_mask, uint_type)};
+  ieee_floatt one_float{spec, ieee_floatt::ROUND_TO_ZERO};
+  one_float.from_integer(1);
+  ieee_floatt half_float{spec, ieee_floatt::ROUND_TO_ZERO};
+  half_float.build(1, -1);
+  const exprt one_packed = from_integer(one_float.pack(), uint_type);
+  const exprt half_packed = from_integer(half_float.pack(), uint_type);
+  const exprt abs_lt_1 = binary_relation_exprt{magnitude, ID_lt, one_packed};
+
+  // |x| >= 1: the unit is 1 << drop, where drop = f - exponent is in [1, f]
+  // unless one of the other cases applies
+  const exprt drop = typecast_exprt{
+    minus_exprt{from_integer(spec.f, exp_type), exponent}, uint_type};
+  const exprt unit_ge1 = shl_exprt{one_uint, drop};
+  const exprt low_mask_ge1 = minus_exprt{unit_ge1, one_uint};
+  const exprt lsb_ge1 =
+    notequal_exprt{bitand_exprt{src_uint, unit_ge1}, zero_uint};
+  const exprt rbit_ge1 = notequal_exprt{
+    bitand_exprt{src_uint, lshr_exprt{unit_ge1, one_uint}}, zero_uint};
+  const exprt sticky_ge1 = notequal_exprt{
+    bitand_exprt{src_uint, lshr_exprt{low_mask_ge1, one_uint}}, zero_uint};
+
+  // |x| < 1: the unit is 1
+  const exprt rbit_lt1 = binary_relation_exprt{magnitude, ID_ge, half_packed};
+  const exprt sticky_lt1 = notequal_exprt{magnitude, half_packed};
+
+  const exprt low_mask =
+    if_exprt{abs_lt_1, from_integer(magnitude_mask, uint_type), low_mask_ge1};
+  const exprt unit = if_exprt{abs_lt_1, one_packed, unit_ge1};
+  const exprt inc = round_up(
+    rounding_mode_bitst{rm},
+    sign,
+    and_exprt{not_exprt{abs_lt_1}, lsb_ge1},
+    if_exprt{abs_lt_1, rbit_lt1, rbit_ge1},
+    if_exprt{abs_lt_1, sticky_lt1, sticky_ge1});
+
+  const exprt masked = bitand_exprt{src_uint, bitnot_exprt{low_mask}};
+  const exprt result_uint = if_exprt{inc, plus_exprt{masked, unit}, masked};
+
+  const exprt result = extractbits_exprt{result_uint, 0, spec.to_type()};
+  return if_exprt{or_exprt{is_special, exp_ge_f}, src, result};
 }
 
 exprt float_bvt::isnormal(
@@ -884,6 +1029,79 @@ exprt float_bvt::div(
   return rounder(result, rm, spec);
 }
 
+exprt float_bvt::sqrt(
+  const exprt &src,
+  const exprt &rm,
+  const ieee_float_spect &spec) const
+{
+  // See float_utilst::sqrt for the details of this encoding.
+  const unbiased_floatt unpacked = unpack(src, spec);
+
+  const std::size_t fraction_width = spec.f + 1;
+  const std::size_t k = spec.f + 2;
+  std::size_t radicand_width = fraction_width + 2 * k + 1;
+  if(radicand_width % 2 != 0)
+    ++radicand_width;
+  const unsignedbv_typet radicand_type{radicand_width};
+
+  // is exponent - f odd?
+  const exprt exponent_lsb = extractbit_exprt{unpacked.exponent, 0};
+  const exprt odd = spec.f % 2 == 0 ? exponent_lsb : not_exprt{exponent_lsb};
+
+  const typecast_exprt fraction{unpacked.fraction, radicand_type};
+  const if_exprt radicand{
+    odd, shl_exprt{fraction, 2 * k + 1}, shl_exprt{fraction, 2 * k}};
+
+  // restoring (digit-by-digit) integer square root
+  const std::size_t root_width = radicand_width / 2;
+  const unsignedbv_typet work_type{root_width + 3};
+  exprt root = from_integer(0, work_type);
+  exprt remainder = from_integer(0, work_type);
+  for(std::size_t i = root_width; i > 0; --i)
+  {
+    const plus_exprt shifted_remainder{
+      shl_exprt{remainder, 2},
+      typecast_exprt{
+        extractbits_exprt{radicand, 2 * i - 2, unsignedbv_typet{2}},
+        work_type}};
+    const plus_exprt trial{shl_exprt{root, 2}, from_integer(1, work_type)};
+    const binary_relation_exprt fits{shifted_remainder, ID_ge, trial};
+    remainder =
+      if_exprt{fits, minus_exprt{shifted_remainder, trial}, shifted_remainder};
+    root = plus_exprt{shl_exprt{root, 1}, typecast_exprt{fits, work_type}};
+  }
+
+  unbiased_floatt result;
+
+  // the remainder becomes the sticky bit, as least-significant bit
+  result.fraction = concatenation_exprt{
+    typecast_exprt{root, unsignedbv_typet{root_width}},
+    notequal_exprt{remainder, from_integer(0, work_type)},
+    unsignedbv_typet{root_width + 1}};
+
+  const std::size_t exponent_width =
+    std::max(spec.e, address_bits(radicand_width + spec.f + 1)) + 2;
+  const signedbv_typet exponent_type{exponent_width};
+  const minus_exprt offset_exponent{
+    minus_exprt{
+      typecast_exprt{unpacked.exponent, exponent_type},
+      from_integer(spec.f + 2 * k, exponent_type)},
+    typecast_exprt{odd, exponent_type}};
+  // divide by two, which is exact
+  result.exponent = plus_exprt{
+    ashr_exprt{offset_exponent, 1},
+    from_integer(root_width - 1, exponent_type)};
+
+  // the square root of -0 is -0, and is positive otherwise
+  result.sign = and_exprt{unpacked.sign, unpacked.zero};
+  result.zero = unpacked.zero;
+  result.infinity = and_exprt{unpacked.infinity, not_exprt{unpacked.sign}};
+  result.NaN =
+    or_exprt{unpacked.NaN, and_exprt{unpacked.sign, not_exprt{unpacked.zero}}};
+
+  return rounder(result, rm, spec);
+}
+
 exprt float_bvt::fma(
   const exprt &multiply_lhs,
   const exprt &multiply_rhs,
@@ -1030,6 +1248,136 @@ exprt float_bvt::fma(
     if_exprt{result.zero, zero_sign, add_sub_sign}};
 
   return rounder(result, rm, spec);
+}
+
+exprt float_bvt::fmod_via_significand(
+  const exprt &x,
+  const exprt &y,
+  exprt &trunc_q_odd) const
+{
+  // fmod via integer significand arithmetic.  With |x| = t * 2^ex and
+  // |y| = u * 2^ey (t, u the unpacked significands), the fmod significand
+  // is r = (t * 2^(ex-ey)) mod u for ex >= ey, and fmod = r * 2^ey.  We
+  // align the significands and take a single integer remainder, which is
+  // correct for arbitrarily large exponent differences -- unlike
+  // truncating the floating-point quotient x/y to a fixed width, which
+  // overflows when floor(x/y) exceeds that width.  Mirrors the naive
+  // float_utilst::rem.
+  const ieee_float_spect spec = get_spec(x);
+  const unbiased_floatt unpacked1 = unpack(x, spec);
+  const unbiased_floatt unpacked2 = unpack(y, spec);
+
+  const std::size_t frac = spec.f + 1; // significand width (incl. hidden bit)
+  // Max exponent difference is emax - emin_subnormal = 2^e + p - 4; plus p
+  // significand bits and 2 guard bits gives 2^e + 2p - 2.
+  const std::size_t int_width = (std::size_t(1) << spec.e) + 2 * frac - 2;
+  const unsignedbv_typet iwt(int_width);
+
+  const exprt d_signed = subtract_exponents(unpacked1, unpacked2);
+  const std::size_t dw = to_signedbv_type(d_signed.type()).get_width();
+  const exprt ex_ge_ey =
+    binary_relation_exprt(d_signed, ID_ge, from_integer(0, d_signed.type()));
+  const exprt dist = limit_distance(
+    typecast_exprt(abs_exprt(d_signed), unsignedbv_typet(dw)),
+    mp_integer(int_width));
+
+  // Align: shift the operand with the larger exponent left.
+  const exprt mx = typecast_exprt(unpacked1.fraction, iwt);
+  const exprt my = typecast_exprt(unpacked2.fraction, iwt);
+  const exprt mx_aligned = if_exprt(ex_ge_ey, shl_exprt(mx, dist), mx);
+  const exprt my_aligned = if_exprt(ex_ge_ey, my, shl_exprt(my, dist));
+
+  // Integer remainder = fmod significand; quotient LSB = tie-break parity.
+  const exprt r_int = mod_exprt(mx_aligned, my_aligned);
+  trunc_q_odd = extractbit_exprt(div_exprt(mx_aligned, my_aligned), 0);
+
+  const exprt min_exp =
+    if_exprt(ex_ge_ey, unpacked2.exponent, unpacked1.exponent);
+
+  // value = r_int * 2^(min_exp - (frac-1)); with fraction width int_width,
+  // the exponent is min_exp + int_width - frac.
+  unbiased_floatt result;
+  result.fraction = r_int;
+  result.exponent = plus_exprt(
+    typecast_exprt(min_exp, signedbv_typet(spec.e + 2)),
+    from_integer(int_width - frac, signedbv_typet(spec.e + 2)));
+  result.sign = unpacked1.sign;
+  result.zero = equal_exprt(r_int, from_integer(0, iwt));
+
+  const constant_exprt round_to_zero =
+    from_integer(ieee_floatt::ROUND_TO_ZERO, unsignedbv_typet{2});
+  exprt fmod_result = rounder(result, round_to_zero, spec);
+
+  // IEEE 754 fmod special cases (cf. float_utilst::rem):
+  //   fmod(x, +-0) = NaN, fmod(+-inf, y) = NaN, fmod(NaN, .) = NaN,
+  //   fmod(., NaN) = NaN, fmod(+-0, y) = x, fmod(x, +-inf) = x.
+  const exprt nan_result = disjunction(
+    {unpacked1.infinity, unpacked1.NaN, unpacked2.NaN, unpacked2.zero});
+  const exprt nan_bv = ieee_float_valuet::NaN(spec).to_expr();
+  fmod_result = if_exprt(nan_result, nan_bv, fmod_result);
+  fmod_result =
+    if_exprt(and_exprt(unpacked1.zero, not_exprt(nan_result)), x, fmod_result);
+  fmod_result = if_exprt(
+    and_exprt(unpacked2.infinity, not_exprt(nan_result)), x, fmod_result);
+
+  return fmod_result;
+}
+
+exprt float_bvt::mod(const exprt &x, const exprt &y) const
+{
+  PRECONDITION(x.type() == y.type());
+
+  // fmod: x - trunc(x / y) * y, the remainder with quotient truncated
+  // toward zero (C99 7.12.10.1).  Computed exactly via integer significand
+  // arithmetic (correct for arbitrarily large exponent differences).
+  exprt trunc_q_odd;
+  return fmod_via_significand(x, y, trunc_q_odd);
+}
+
+exprt float_bvt::rem(const exprt &x, const exprt &y) const
+{
+  PRECONDITION(x.type() == y.type());
+  const floatbv_typet &type = to_floatbv_type(x.type());
+  const ieee_float_spect spec{type};
+
+  const constant_exprt round_to_zero =
+    from_integer(ieee_floatt::ROUND_TO_ZERO, unsignedbv_typet{2});
+
+  // Step 1: fmod(x, y) via integer significand arithmetic, and the parity
+  // of the truncated quotient floor(x/y) (for tie-breaking).
+  exprt trunc_q_odd;
+  exprt fmod_result = fmod_via_significand(x, y, trunc_q_odd);
+
+  // Step 2: conditional subtract for IEEE remainder.  Since |fmod| < |y|,
+  // the nearest-integer quotient is in {-1, 0, 1}:
+  //   2*|fmod| < |y|  -> remainder = fmod
+  //   2*|fmod| > |y|  -> remainder = fmod -+ y (preserving sign)
+  //   2*|fmod| = |y|  -> tie: correct iff floor(x/y) is odd
+  exprt abs_fmod = abs(fmod_result, spec);
+  exprt abs_y = abs(y, spec);
+  exprt two = from_integer(2, type);
+  // Use round-to-nearest here: when 2*|fmod| overflows the format it must
+  // become +inf (so the > |y| comparison holds), not saturate to fltmax as
+  // round-to-zero would, which would misclassify the case as a tie.
+  const constant_exprt round_to_even =
+    from_integer(ieee_floatt::ROUND_TO_EVEN, unsignedbv_typet{2});
+  exprt two_abs_fmod =
+    convert(ieee_float_op_exprt{abs_fmod, ID_floatbv_mult, two, round_to_even});
+
+  exprt sign_fmod = extractbit_exprt{fmod_result, type.get_width() - 1};
+  exprt sign_y = extractbit_exprt{y, type.get_width() - 1};
+  exprt signs_equal = equal_exprt{sign_fmod, sign_y};
+  exprt fmod_minus_y = convert(
+    ieee_float_op_exprt{fmod_result, ID_floatbv_minus, y, round_to_zero});
+  exprt fmod_plus_y = convert(
+    ieee_float_op_exprt{fmod_result, ID_floatbv_plus, y, round_to_zero});
+  exprt corrected = if_exprt{signs_equal, fmod_minus_y, fmod_plus_y};
+
+  exprt gt_half = relation(two_abs_fmod, relt::GT, abs_y, spec);
+  exprt eq_half = relation(two_abs_fmod, relt::EQ, abs_y, spec);
+  exprt use_corrected = or_exprt{gt_half, and_exprt{eq_half, trunc_q_odd}};
+
+  return if_exprt{use_corrected, corrected, fmod_result};
 }
 
 exprt float_bvt::relation(

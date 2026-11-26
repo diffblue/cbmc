@@ -1,0 +1,14 @@
+CORE
+main.c
+--add-library --dump-c _ --no-standard-checks
+^EXIT=0$
+^SIGNAL=0$
+^  return __CPROVER_fmaf\(x, y, z\);$
+^  return __CPROVER_fmal\(x, y, z\);$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+return fma\(
+--
+The library models of fmaf and fmal must be dumped using the precision-specific
+built-in rather than a call to fma, which would compute in double precision.

@@ -56,6 +56,7 @@ protected:
   bvt convert_div(const div_exprt &expr) override;
   bvt convert_mod(const mod_exprt &expr) override;
   bvt convert_floatbv_op(const ieee_float_op_exprt &) override;
+  bvt convert_floatbv_mod_rem(const binary_exprt &) override;
 
 private:
   // the list of operator approximations

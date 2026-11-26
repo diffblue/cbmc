@@ -1,0 +1,8 @@
+CORE
+fp-div-nonstandard1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+--
+Based on Bitwuzla#130: fp.div on non-standard FP sort (_ FloatingPoint 4 12).

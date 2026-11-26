@@ -1,0 +1,16 @@
+<<<<<<< HEAD
+KNOWNBUG
+=======
+CORE
+>>>>>>> 0cd1170412 (Add __CPROVER_fma built-in and floatbv_fma_exprt expression)
+cvc5-11139-fma.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+--
+<<<<<<< HEAD
+CVC5#11139: fp.fma unsupported
+=======
+fp.fma now supported.
+>>>>>>> 0cd1170412 (Add __CPROVER_fma built-in and floatbv_fma_exprt expression)

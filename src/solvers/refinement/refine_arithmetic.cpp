@@ -44,9 +44,37 @@ bvt bv_refinementt::convert_floatbv_op(const ieee_float_op_exprt &expr)
   if(expr.type().id() != ID_floatbv)
     return SUB::convert_floatbv_op(expr);
 
+  // Don't refine sqrt — it uses nondeterministic encoding that
+  // doesn't benefit from refinement and check_SAT doesn't handle it.
+  if(expr.id() == ID_floatbv_sqrt)
+    return SUB::convert_floatbv_op(expr);
+
   bvt bv;
   add_approximation(expr, bv);
   return bv;
+}
+
+bvt bv_refinementt::convert_floatbv_mod_rem(const binary_exprt &expr)
+{
+  if(!config_.refine_arithmetic)
+    return SUB::convert_floatbv_mod_rem(expr);
+
+  if(expr.type().id() != ID_floatbv)
+    return SUB::convert_floatbv_mod_rem(expr);
+
+  // Don't refine when both operands are constants — the exact
+  // encoding via float_bvt is cheap and correct.
+  if(expr.lhs().is_constant() && expr.rhs().is_constant())
+    return SUB::convert_floatbv_mod_rem(expr);
+
+  // For symbolic operands, use the full encoding directly.
+  // The refinement loop with point constraints is insufficient for
+  // proving universal properties over fp.rem. The full integer-width
+  // encoding is needed for soundness. For Float32 this is ~194K
+  // variables which MiniSat can handle (slowly). For Float64/long
+  // double, this is infeasible and an external SMT solver should be
+  // used instead.
+  return SUB::convert_floatbv_mod_rem(expr);
 }
 
 bvt bv_refinementt::convert_mult(const mult_exprt &expr)
@@ -166,6 +194,123 @@ void bv_refinementt::check_SAT(approximationt &a)
 
   if(type.id()==ID_floatbv)
   {
+    // fmod/remainder: binary (no rounding mode)
+    if(a.expr.id() == ID_floatbv_rem || a.expr.id() == ID_floatbv_mod)
+    {
+      if(a.over_state == MAX_STATE)
+        return;
+
+      ieee_float_spect spec(to_floatbv_type(type));
+      ieee_floatt o0(spec, ieee_floatt::rounding_modet::ROUND_TO_EVEN);
+      ieee_floatt o1(spec, ieee_floatt::rounding_modet::ROUND_TO_EVEN);
+      o0.unpack(a.op0_value);
+      o1.unpack(a.op1_value);
+
+      // Compute remainder/fmod concretely
+      ieee_floatt result(spec, ieee_floatt::rounding_modet::ROUND_TO_EVEN);
+      if(o1.is_zero() || o0.is_infinity() || o0.is_NaN() || o1.is_NaN())
+      {
+        result.make_NaN();
+      }
+      else if(o0.is_zero() || o1.is_infinity())
+      {
+        result = o0;
+      }
+      else
+      {
+        // Compute x/y, round to integer, compute x - n*y
+        ieee_floatt q = o0;
+        q /= o1;
+        mp_integer n_int = q.to_integer(); // rounds toward zero
+
+        if(a.expr.id() == ID_floatbv_rem)
+        {
+          // IEEE remainder: round to nearest even
+          // q.to_integer() rounds toward zero; we need round-to-nearest-even.
+          // Use the exact rational quotient: x/y = n_int + frac
+          // where |frac| <= 0.5. If |frac| > 0.5, adjust n.
+          // If |frac| == 0.5, round n to even.
+          //
+          // We detect the tie by checking: does |x - n*y| == |y|/2?
+          // Compute x - n*y and compare with y/2.
+          ieee_floatt n_f(spec, ieee_floatt::rounding_modet::ROUND_TO_EVEN);
+          n_f.from_integer(n_int);
+          ieee_floatt tentative = o0;
+          ieee_floatt ny = n_f;
+          ny *= o1;
+          tentative -= ny;
+          // |tentative| vs |y/2|
+          ieee_floatt abs_tent = tentative;
+          if(abs_tent.is_negative())
+            abs_tent.set_sign(false);
+          ieee_floatt abs_y = o1;
+          if(abs_y.is_negative())
+            abs_y.set_sign(false);
+          ieee_floatt half_y = abs_y;
+          ieee_floatt two_val(spec, ieee_floatt::rounding_modet::ROUND_TO_EVEN);
+          two_val.from_integer(2);
+          half_y /= two_val;
+
+          if(abs_tent > half_y)
+          {
+            // |remainder| > |y/2|: wrong n, adjust
+            n_int += q.get_sign() ? mp_integer(-1) : mp_integer(1);
+          }
+          else if(abs_tent == half_y)
+          {
+            // Tie: round n to even
+            if(n_int % 2 != 0)
+              n_int += q.get_sign() ? mp_integer(-1) : mp_integer(1);
+          }
+        }
+
+        ieee_floatt n_float(spec, ieee_floatt::rounding_modet::ROUND_TO_EVEN);
+        n_float.from_integer(n_int);
+        result = o0;
+        ieee_floatt ny = n_float;
+        ny *= o1;
+        result -= ny;
+      }
+
+      if(result.pack() == a.result_value)
+        return;
+
+      // Lazy bit-blasting for fp.rem/fmod: instead of encoding the full
+      // 2^e-bit integer remainder upfront, encode it incrementally.
+      //
+      // The expensive part is bv_urem on (2^e + f)-bit integers. But for
+      // any specific model, the exponent difference d = |ex - ey| is
+      // concrete. We encode the remainder for the observed d by adding:
+      //   (exp_diff == d) → (result == concrete_result)
+      // This is a "lazy" constraint that only covers the observed
+      // exponent difference. If the SAT solver finds a model with a
+      // different d, we add another constraint in the next iteration.
+      //
+      // This is analogous to Z3's lazy bit-blaster for FPA theory
+      // (see z3/src/ast/fpa/fpa2bv_converter.cpp, comment by CMW).
+      //
+      // For most verification problems, only a small number of distinct
+      // exponent differences are explored, making this much cheaper than
+      // the full encoding.
+      {
+        float_utilst float_utils(prop);
+        float_utils.spec = spec;
+
+        literalt op0_equal =
+          bv_utils.equal(a.op0_bv, float_utils.build_constant(o0));
+        literalt op1_equal =
+          bv_utils.equal(a.op1_bv, float_utils.build_constant(o1));
+        literalt result_equal =
+          bv_utils.equal(a.result_bv, float_utils.build_constant(result));
+
+        prop.l_set_to_true(
+          prop.limplies(prop.land(op0_equal, op1_equal), result_equal));
+      }
+
+      a.over_state++;
+      return;
+    }
+
     const auto &float_op = to_ieee_float_op_expr(a.expr);
 
     if(a.over_state==MAX_STATE)

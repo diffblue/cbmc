@@ -1,0 +1,8 @@
+CORE
+bf16-mul-bounds1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^unsat$
+--
+Based on CVC5#12306: BF16 multiplication with symmetric bound checks.

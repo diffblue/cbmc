@@ -1314,6 +1314,10 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     convert_floatbv_round_to_integral(to_floatbv_round_to_integral_expr(expr));
   }
+  else if(expr.id() == ID_floatbv_sqrt)
+  {
+    convert_floatbv_sqrt(to_floatbv_sqrt_expr(expr));
+  }
   else if(expr.id()==ID_struct)
   {
     convert_struct(to_struct_expr(expr));
@@ -1761,9 +1765,13 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     convert_floatbv_mult(to_ieee_float_op_expr(expr));
   }
+  else if(expr.id() == ID_floatbv_mod)
+  {
+    convert_floatbv_mod(to_floatbv_mod_expr(expr));
+  }
   else if(expr.id() == ID_floatbv_rem)
   {
-    convert_floatbv_rem(to_binary_expr(expr));
+    convert_floatbv_rem(to_floatbv_rem_expr(expr));
   }
   else if(expr.id() == ID_floatbv_fma)
   {
@@ -3790,7 +3798,29 @@ void smt2_convt::convert_floatbv_round_to_integral(
     out << ")";
   }
   else
-    UNEXPECTEDCASE("TODO floatbv_round_to_integral without FPA");
+  {
+    // Routed via the bvfp_set / define-fun cache (see the
+    // ID_floatbv_round_to_integral entry in find_symbols) so that multiple
+    // call sites share a single SMT model definition rather than duplicating
+    // the float_bvt rewrite.
+    convert_floatbv(expr);
+  }
+}
+
+void smt2_convt::convert_floatbv_sqrt(const floatbv_sqrt_exprt &expr)
+{
+  PRECONDITION(expr.type().id() == ID_floatbv);
+
+  if(use_FPA_theory)
+  {
+    out << "(fp.sqrt ";
+    convert_rounding_mode_FPA(expr.rounding_mode());
+    out << ' ';
+    convert_expr(expr.op());
+    out << ")";
+  }
+  else
+    convert_floatbv(expr);
 }
 
 void smt2_convt::convert_struct(const struct_exprt &expr)
@@ -4863,7 +4893,45 @@ void smt2_convt::convert_floatbv_mult(const ieee_float_op_exprt &expr)
     convert_floatbv(expr);
 }
 
-void smt2_convt::convert_floatbv_rem(const binary_exprt &expr)
+void smt2_convt::convert_floatbv_mod(const floatbv_mod_exprt &expr)
+{
+  DATA_INVARIANT(
+    expr.type().id() == ID_floatbv,
+    "type of ieee floating point expression shall be floatbv");
+
+  if(use_FPA_theory)
+  {
+    // fmod special cases: return x when y is infinite and x is finite
+    // The general formula x - trunc(x/y)*y fails when y=inf because
+    // trunc(x/inf)=0 and 0*inf=NaN.
+    out << "(ite (and (not (fp.isInfinite ";
+    convert_expr(expr.lhs());
+    out << ")) (fp.isInfinite ";
+    convert_expr(expr.rhs());
+    out << ")) ";
+    convert_expr(expr.lhs());
+    out << " ";
+    // General case: x - roundToIntegral(roundTowardZero, x/y) * y
+    out << "(fp.sub roundTowardZero ";
+    convert_expr(expr.lhs());
+    out << " ";
+    out << "(fp.mul roundTowardZero ";
+    out << "(fp.roundToIntegral roundTowardZero ";
+    out << "(fp.div roundTowardZero ";
+    convert_expr(expr.lhs());
+    out << " ";
+    convert_expr(expr.rhs());
+    out << "))"; // div, roundToIntegral
+    out << " ";
+    convert_expr(expr.rhs());
+    out << "))"; // mul, sub
+    out << ")";  // ite
+  }
+  else
+    convert_floatbv(expr);
+}
+
+void smt2_convt::convert_floatbv_rem(const floatbv_rem_exprt &expr)
 {
   DATA_INVARIANT(
     expr.type().id() == ID_floatbv,
@@ -4879,11 +4947,7 @@ void smt2_convt::convert_floatbv_rem(const binary_exprt &expr)
     out << ")";
   }
   else
-  {
-    SMT2_TODO(
-      "smt2_convt::convert_floatbv_rem to be implemented when not using "
-      "FPA_theory");
-  }
+    convert_floatbv(expr);
 }
 
 void smt2_convt::convert_floatbv_fma(const floatbv_fma_exprt &expr)
@@ -6067,7 +6131,11 @@ void smt2_convt::find_symbols(const exprt &expr)
            expr.id() == ID_floatbv_mult ||
            expr.id() == ID_floatbv_div ||
            expr.id() == ID_floatbv_fma ||
+           expr.id() == ID_floatbv_sqrt ||
+           expr.id() == ID_floatbv_mod ||
+           expr.id() == ID_floatbv_rem ||
            expr.id() == ID_floatbv_typecast ||
+           expr.id() == ID_floatbv_round_to_integral ||
            expr.id() == ID_ieee_float_equal ||
            expr.id() == ID_ieee_float_notequal ||
            ((expr.id() == ID_lt ||

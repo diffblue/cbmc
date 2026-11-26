@@ -1368,38 +1368,114 @@ bool ieee_float_valuet::is_float() const
   return spec.f==23 && spec.e==8;
 }
 
+/// \return floor(sqrt(n)) for \p n >= 0
+static mp_integer integer_sqrt(const mp_integer &n)
+{
+  PRECONDITION(n >= 0);
+  if(n < 2)
+    return n;
+
+  // Newton's method, starting from a value that is at least the root
+  mp_integer x = power(2, n.floorPow2() / 2 + 1);
+  while(true)
+  {
+    const mp_integer y = (x + n / x) / 2;
+    if(y >= x)
+      return x;
+    x = y;
+  }
+}
+
+ieee_floatt ieee_floatt::sqrt() const
+{
+  if(NaN_flag || is_zero())
+    return *this;
+
+  ieee_floatt result = *this;
+
+  if(sign_flag)
+  {
+    result.make_NaN();
+    return result;
+  }
+
+  if(infinity_flag)
+    return result;
+
+  // The value is fraction * 2^(exponent - f). Scale the fraction such that
+  // its integer square root has at least f + 3 bits (also for subnormal
+  // numbers), and such that the remaining power of two is even.
+  mp_integer scale = 2 * (spec.f + 2);
+  mp_integer scaled_exponent = exponent - spec.f - scale;
+  if(scaled_exponent % 2 != 0)
+  {
+    ++scale;
+    --scaled_exponent;
+  }
+  const mp_integer radicand =
+    fraction * power(2, numeric_cast_v<std::size_t>(scale));
+  const mp_integer root = integer_sqrt(radicand);
+
+  // Add a sticky bit, which is set iff the root is not exact.
+  result.fraction = 2 * root + (root * root == radicand ? 0 : 1);
+  // value = result.fraction * 2^(scaled_exponent / 2 - 1)
+  result.exponent = scaled_exponent / 2 - 1 + spec.f;
+  result.align();
+
+  return result;
+}
+
 ieee_floatt ieee_floatt::round_to_integral() const
 {
   if(NaN_flag || infinity_flag || is_zero())
     return *this;
 
-  ieee_floatt magic_number{spec, _rounding_mode};
-  magic_number.from_integer(power(2, spec.f));
-
-  if(this->abs() >= magic_number)
+  // |*this| = fraction * 2^exponent, with an odd fraction
+  mp_integer fraction, exponent;
+  extract_base2(fraction, exponent);
+  if(exponent >= 0)
     return *this;
-  else
+
+  // Compute the result exactly: adding and subtracting 2^f is not exact
+  // when 2^f is not a finite value of the format, as in formats with a
+  // narrow exponent.
+  const mp_integer divisor = power(2, -exponent);
+  mp_integer integer = fraction / divisor;
+  const mp_integer remainder = fraction % divisor;
+  const mp_integer half = divisor / 2;
+
+  bool round_up = false;
+  switch(_rounding_mode)
   {
-    ieee_floatt result = *this;
-
-    // add and subtract 2^f
-    // Preserve the original sign bit
-    bool original_sign = result.get_sign();
-
-    if(result.is_negative())
-    {
-      result -= magic_number;
-      result += magic_number;
-    }
-    else
-    {
-      result += magic_number;
-      result -= magic_number;
-    }
-
-    // Restore the original sign bit
-    result.sign_flag = original_sign;
-
-    return result;
+  case ROUND_TO_EVEN:
+    round_up = remainder > half || (remainder == half && integer % 2 == 1);
+    break;
+  case ROUND_TO_AWAY:
+    round_up = remainder >= half;
+    break;
+  case ROUND_TO_PLUS_INF:
+    round_up = !sign_flag;
+    break;
+  case ROUND_TO_MINUS_INF:
+    round_up = sign_flag;
+    break;
+  case ROUND_TO_ZERO:
+    break;
+  case NONDETERMINISTIC:
+  case UNKNOWN:
+    UNREACHABLE;
   }
+
+  if(round_up)
+    ++integer;
+
+  // The integer is exactly representable, unless rounding up exceeds the
+  // largest finite value, which may happen in formats with a narrow
+  // exponent; the result then is infinity.
+  ieee_floatt result{spec, _rounding_mode};
+  result.from_integer(sign_flag ? -integer : integer);
+  if(result.is_zero())
+    result.sign_flag = sign_flag;
+
+  return result;
 }

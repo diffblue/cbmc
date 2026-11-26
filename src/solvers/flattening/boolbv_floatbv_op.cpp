@@ -216,3 +216,18 @@ bvt boolbvt::convert_floatbv_op(const ieee_float_op_exprt &expr)
   else
     return conversion_failed(expr);
 }
+
+bvt boolbvt::convert_floatbv_sqrt(const floatbv_sqrt_exprt &expr)
+{
+  if(expr.op().type().id() == ID_floatbv)
+  {
+    float_utilst float_utils(prop);
+
+    float_utils.set_rounding_mode(convert_bv(expr.rounding_mode()));
+    float_utils.spec = ieee_float_spect{to_floatbv_type(expr.op().type())};
+
+    return float_utils.sqrt(convert_bv(expr.op()));
+  }
+  else
+    return conversion_failed(expr);
+}

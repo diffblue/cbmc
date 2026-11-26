@@ -3734,14 +3734,40 @@ std::string expr2ct::convert_with_precedence(
       return convert_function(src, "SIGN");
   }
 
-  else if(src.id() == ID_floatbv_fma)
+  else if(src.id() == ID_floatbv_sqrt)
   {
-    // Print only the 3 mathematical operands, omitting the rounding mode
-    // (4th operand) to produce valid C syntax: fma(a, b, c)
-    const auto &fma_expr = to_floatbv_fma_expr(src);
-    return "fma(" + convert(fma_expr.op_multiply_lhs()) + ", " +
-           convert(fma_expr.op_multiply_rhs()) + ", " +
-           convert(fma_expr.op_add()) + ")";
+    // Print the built-in that the C front-end turns into this expression.
+    // Printing "sqrt" would instead turn the library model of sqrt into a
+    // self-recursive function.
+    const auto &sqrt_expr = to_floatbv_sqrt_expr(src);
+    std::string name = CPROVER_PREFIX "sqrt";
+    if(sqrt_expr.type() == float_type())
+      name += 'f';
+    else if(
+      sqrt_expr.type() != double_type() &&
+      sqrt_expr.type() == long_double_type())
+    {
+      name += "ld";
+    }
+    else
+      name += 'd';
+    return name + "(" + convert(sqrt_expr.op()) + ", " +
+           convert(sqrt_expr.rounding_mode()) + ")";
+  }
+
+  else if(src.id() == ID_floatbv_fma && src.operands().size() >= 3)
+  {
+    // Print the built-in that the C front-end turns into this expression,
+    // omitting the rounding mode (4th operand, if adjust_float_expressions
+    // has been run), which the front-end re-introduces. Printing "fma" would
+    // instead turn the library model of fma into a self-recursive function.
+    std::string name = CPROVER_PREFIX "fma";
+    if(src.type() == float_type())
+      name += 'f';
+    else if(src.type() != double_type() && src.type() == long_double_type())
+      name += 'l';
+    return name + "(" + convert(src.operands()[0]) + ", " +
+           convert(src.operands()[1]) + ", " + convert(src.operands()[2]) + ")";
   }
 
   else if(src.id()==ID_popcount)
@@ -4146,6 +4172,7 @@ std::optional<std::string> expr2ct::convert_function(const exprt &src)
     {ID_separate, "SEPARATE"},
     {ID_floatbv_div, "FLOAT/"},
     {ID_floatbv_minus, "FLOAT-"},
+    {ID_floatbv_mod, "fmod"},
     {ID_floatbv_mult, "FLOAT*"},
     {ID_floatbv_plus, "FLOAT+"},
     {ID_floatbv_rem, "FLOAT%"},

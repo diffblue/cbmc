@@ -55,12 +55,21 @@ public:
   /// \param addend: value added to the product
   /// \param rm: IEEE 754 rounding mode
   /// \param spec: floating-point format specification
+  /// IEEE 754 squareRoot: the square root of \p src, correctly rounded
+  /// according to \p rm.
+  exprt
+  sqrt(const exprt &src, const exprt &rm, const ieee_float_spect &spec) const;
+
   exprt fma(
     const exprt &multiply_lhs,
     const exprt &multiply_rhs,
     const exprt &addend,
     const exprt &rm,
     const ieee_float_spect &) const;
+
+  // fmod and remainder
+  exprt mod(const exprt &, const exprt &) const;
+  exprt rem(const exprt &, const exprt &) const;
 
   // conversion
   exprt from_unsigned_integer(
@@ -93,6 +102,22 @@ public:
     const ieee_float_spect &src_spec,
     const ieee_float_spect &dest_spec) const;
 
+  /// Round a floating-point value to integral, IEEE 754 semantics.
+  /// \param src: packed bit-vector encoding of an IEEE float of the given
+  ///   `spec`.
+  /// \param rm: rounding mode encoded as `ieee_floatt::rounding_modet`.
+  /// \param spec: target IEEE format.
+  /// \return Packed bit-vector encoding of `roundToIntegral(rm, src)`.
+  ///   Special values (NaN, ±Inf, ±0) and values whose unbiased exponent
+  ///   already meets or exceeds the fraction width short-circuit to `src`.
+  /// \note `float_utilst::round_to_integral` is the bvt-level mirror; keep
+  ///   the two implementations in lockstep when changing the rounding
+  ///   logic.
+  exprt round_to_integral(
+    const exprt &src,
+    const exprt &rm,
+    const ieee_float_spect &spec) const;
+
   // relations
   enum class relt { LT, LE, EQ, GT, GE };
   static exprt
@@ -101,6 +126,13 @@ public:
 private:
   // helpers
   static ieee_float_spect get_spec(const exprt &);
+
+  // Integer-significand fmod, correct for arbitrarily large exponent
+  // differences.  Sets trunc_q_odd to the parity of the truncated
+  // quotient floor(x/y), used for IEEE remainder tie-breaking.
+  exprt fmod_via_significand(const exprt &x, const exprt &y, exprt &trunc_q_odd)
+    const;
+
   // still biased
   static exprt get_exponent(const exprt &, const ieee_float_spect &);
   // without hidden bit
@@ -123,6 +155,16 @@ private:
     void get(const exprt &rm);
     explicit rounding_mode_bitst(const exprt &rm) { get(rm); }
   };
+
+  /// Whether to round up the magnitude of a value with sign \p sign, given
+  /// the lowest bit \p lsb that is kept, the highest bit \p rbit that is
+  /// dropped, and whether any other dropped bit is set (\p sticky).
+  static exprt round_up(
+    const rounding_mode_bitst &,
+    const exprt &sign,
+    const exprt &lsb,
+    const exprt &rbit,
+    const exprt &sticky);
 
   // unpacked
   static void normalization_shift(exprt &fraction, exprt &exponent);
