@@ -1,0 +1,11 @@
+CORE
+main.i
+--arch armhf --os openbsd
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ wchar_t is unsigned: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+OpenBSD deviates from AAPCS: wchar_t is int.

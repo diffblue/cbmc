@@ -1,0 +1,11 @@
+CORE
+main.i
+--arch arm64 --os linux
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+The procedure call standard for 64-bit Arm (AAPCS64) makes wchar_t an unsigned
+integer type.

@@ -1,0 +1,11 @@
+extern "C" void __CPROVER_assert(bool, const char *);
+int main()
+{
+  // AAPCS64: wchar_t is an unsigned 32-bit type on aarch64 Linux
+  wchar_t w = (wchar_t)-1;
+  __CPROVER_assert(w > 0, "unsigned");
+  __CPROVER_assert((long)w == 4294967295L, "value");
+  __CPROVER_assert((__typeof__(L'a'))-1 > 0, "literal");
+  __CPROVER_assert(false, "WRONG (must FAIL)");
+  return 0;
+}

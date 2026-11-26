@@ -1,0 +1,14 @@
+CORE
+main.ii
+--arch arm64 --os linux
+^\[main\.assertion\.1\] .* unsigned: SUCCESS$
+^\[main\.assertion\.2\] .* value: SUCCESS$
+^\[main\.assertion\.3\] .* literal: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The procedure call standard for 64-bit Arm (AAPCS64) makes wchar_t, a keyword
+of C++, an unsigned 32-bit type.
