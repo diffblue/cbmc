@@ -1,0 +1,12 @@
+CORE
+main.c
+--show-local-safe-pointers _ --no-standard-checks
+activate-multi-line-match
+^EXIT=0$
+^SIGNAL=0$
+Non-null expressions: \{main::1::p\}\n\s+// \d+ file main\.c line 6 function main\n\s+ASSIGN main::1::x := \*main::1::p
+Non-null expressions: \{\}\n\s+// \d+ file main\.c line 7 function main\n\s+ASSIGN main::1::x := main::1::x \+ 1
+--
+^warning: ignoring
+--
+p is known to be non-null only where the condition p != 0 holds.
