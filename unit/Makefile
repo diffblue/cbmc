@@ -280,6 +280,7 @@ BMC_DEPS =../src/cbmc/c_test_input_generator$(OBJEXT) \
           ../src/goto-instrument/goto_program2code$(OBJEXT) \
           ../src/goto-instrument/reachability_slicer$(OBJEXT) \
           ../src/goto-instrument/nondet_static$(OBJEXT) \
+          ../src/goto-instrument/evaluation_order_reduction$(OBJEXT) \
           ../src/goto-instrument/full_slicer$(OBJEXT) \
           ../src/goto-synthesizer/expr_enumerator$(OBJEXT) \
           ../src/xmllang/xmllang$(LIBEXT) \

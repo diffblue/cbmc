@@ -64,6 +64,7 @@ SRC = accelerate/accelerate.cpp \
       document_properties.cpp \
       dot.cpp \
       dump_c.cpp \
+      evaluation_order_reduction.cpp \
       full_slicer.cpp \
       function.cpp \
       function_assigns.cpp \

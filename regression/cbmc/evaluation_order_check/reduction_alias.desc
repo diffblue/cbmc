@@ -1,0 +1,13 @@
+CORE
+reduction_alias.c
+--evaluation-order-check
+^Evaluation-order reduction: 0 of 2 side effects commute with all side effects they are unordered with$
+^\[main\.assertion\.1\] line 17 g executes before f: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+f writes x through a pointer, which g reads: the value sets of the pointer
+show that the calls do not commute, so both orders are explored.

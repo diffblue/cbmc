@@ -1,0 +1,12 @@
+CORE
+four_independent_writes.c
+--evaluation-order-check
+^Evaluation-order reduction: 4 of 4 side effects commute with all side effects they are unordered with$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+The four calls write distinct globals, so each commutes with all others and is
+executed once, in the fixed order, rather than in each of the four rounds.

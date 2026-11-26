@@ -32,6 +32,13 @@ Author: Michael Tautschnig
 ///   standard yields a different value. As the read is evaluated at all these
 ///   points, the enabled undefined-behaviour checks (division by zero,
 ///   pointer checks etc.) apply at all of them.
+/// - Each event that is unordered with some other event additionally gets a
+///   *pinned* copy, which executes before all other events, and a flag that
+///   selects between the pinned copy and the copies in the rounds. The flag
+///   is initially false; reduce_evaluation_order (see
+///   evaluation_order_reduction.h), which cbmc runs once the program is
+///   complete, sets it when the event commutes with all events it is
+///   unordered with and cannot change the reads in its window.
 ///
 /// Sub-expressions whose evaluation the standard sequences (&&, ||, ?:, the
 /// comma operator) are executed as one event, within which the usual
@@ -96,7 +103,11 @@ Author: Michael Tautschnig
 ///   read and write, including its callees) does not conflict with any
 ///   unordered event or checked read commutes with all of them and need not
 ///   be reordered. Footprints require the whole program, which is only
-///   available after linking.
+///   available after linking. This is implemented by the pinned copies and
+///   evaluation_order_reduction.h; with it, the calls that return a
+///   constant or run a 50-iteration loop in the table above take 0.02 s and
+///   0.07 s at n = 12, the same as the fixed order, and the calls that
+///   update one global are unaffected (none of them commutes).
 /// - Checking non-interference instead of exploring orders, as Frama-C
 ///   does: assert that the footprints of unordered events are disjoint and
 ///   keep the fixed order. This costs linear code but reports conflicts
@@ -913,6 +924,85 @@ goto_convertt::clean_expr_resultt goto_convertt::emit_evaluation_order_region(
     }
   }
 
+  // Each event that is unordered with some other event can be pinned: when
+  // reduce_evaluation_order (run once the whole program is available) finds
+  // that its footprint conflicts with neither an unordered event nor a read
+  // that it may execute in the window of, it sets the event's flag, which
+  // executes the event before all others rather than in its round. The
+  // annotations of the flag's initialisation tell reduce_evaluation_order
+  // which events and reads to check against.
+  std::vector<std::optional<symbol_exprt>> pinned(n);
+  for(std::size_t e = 0; e < n; ++e)
+  {
+    for(std::size_t other = 0; other < n; ++other)
+    {
+      if(
+        other != e && events[e].predecessors.count(other) == 0 &&
+        events[other].predecessors.count(e) == 0)
+      {
+        pinned[e] = new_temporary(bool_typet{}, "pinned");
+        break;
+      }
+    }
+  }
+  for(std::size_t e = 0; e < n; ++e)
+  {
+    if(!pinned[e].has_value())
+      continue;
+
+    exprt initial_value = false_exprt{};
+    irept &unordered = initial_value.add(ID_C_evaluation_order_unordered);
+    irept &predecessors = initial_value.add(ID_C_evaluation_order_predecessors);
+    irept &reads = initial_value.add(ID_C_evaluation_order_reads);
+    for(std::size_t other = 0; other < n; ++other)
+    {
+      if(
+        other != e && events[e].predecessors.count(other) == 0 &&
+        events[other].predecessors.count(e) == 0)
+      {
+        unordered.get_sub().push_back(*pinned[other]);
+      }
+    }
+    for(const std::size_t predecessor : events[e].predecessors)
+    {
+      // an event can only be pinned when its predecessors are
+      predecessors.get_sub().push_back(
+        pinned[predecessor].has_value()
+          ? static_cast<const exprt &>(*pinned[predecessor])
+          : static_cast<const exprt &>(false_exprt{}));
+    }
+    for(const auto &[r, value] : snapshots)
+    {
+      // As a pinned event executes before all others, it must not change
+      // any read that is checked before the event's round, which includes
+      // reads that the event or its predecessors consume. Only reads that
+      // depend on the event (or a successor of it) are checked after it.
+      bool after_e = false;
+      for(const std::size_t dependency : region.reads[r].dependencies)
+      {
+        after_e = after_e || dependency == e ||
+                  events[dependency].predecessors.count(e) != 0;
+      }
+      if(!after_e)
+        reads.get_sub().push_back(value);
+    }
+    dest.add(goto_programt::make_assignment(
+      *pinned[e], std::move(initial_value), source_location));
+  }
+
+  // Pinned events execute in their fixed order, after the values of the
+  // reads without dependencies have been recorded. As the predecessors of a
+  // pinned event are pinned as well, this respects all dependencies.
+  for(std::size_t e = 0; e < n; ++e)
+  {
+    if(pinned[e].has_value())
+    {
+      goto_programt copy;
+      copy.copy_from(events[e].code);
+      emit_guarded(*pinned[e], std::move(copy));
+    }
+  }
+
   for(std::size_t round = 0; round < n; ++round)
   {
     for(std::size_t e = 0; e < n; ++e)
@@ -921,10 +1011,10 @@ goto_convertt::clean_expr_resultt goto_convertt::emit_evaluation_order_region(
       {
         goto_programt copy;
         copy.copy_from(events[e].code);
-        emit_guarded(
-          simplify_expr(
-            equal_exprt{rounds[e], from_integer(round, round_type)}, ns),
-          std::move(copy));
+        exprt guard = equal_exprt{rounds[e], from_integer(round, round_type)};
+        if(pinned[e].has_value())
+          guard = and_exprt{guard, not_exprt{*pinned[e]}};
+        emit_guarded(simplify_expr(guard, ns), std::move(copy));
       }
     }
 

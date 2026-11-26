@@ -945,6 +945,9 @@ IREP_ID_ONE(prophecy_r_ok)
 IREP_ID_ONE(prophecy_w_ok)
 IREP_ID_ONE(prophecy_pointer_in_range)
 IREP_ID_ONE(bit_cast)
+IREP_ID_TWO(C_evaluation_order_unordered, #evaluation_order_unordered)
+IREP_ID_TWO(C_evaluation_order_predecessors, #evaluation_order_predecessors)
+IREP_ID_TWO(C_evaluation_order_reads, #evaluation_order_reads)
 
 // Projects depending on this code base that wish to extend the list of
 // available ids should provide a file local_irep_ids.def in their source tree

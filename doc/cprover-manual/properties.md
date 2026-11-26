@@ -270,7 +270,12 @@ expression: n side effects whose order is not fixed are each executed in up
 to n positions, i.e., the expression is analysed with up to n^2 copies of the
 side effects, and a property that depends on the order needs to be refuted for
 all n! orders. Expressions with one side effect only add the assertions
-about reads.
+about reads. CBMC reduces this cost by executing each side effect that
+commutes with all other side effects of the expression once, in the fixed
+order: a side effect commutes with another one if neither writes memory that
+the other one reads or writes, taking the functions they call into account.
+The message `Evaluation-order reduction: k of n side effects commute ...`
+reports how many side effects this applies to.
 
 ### Generating function bodies
 

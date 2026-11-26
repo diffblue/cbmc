@@ -1,0 +1,15 @@
+CORE
+reduction_partial.c
+--evaluation-order-check
+^Evaluation-order reduction: 1 of 2 side effects commute with all side effects they are unordered with$
+^\[main\.evaluation-order\.\d+\] line 17 value of x is independent of evaluation order: FAILURE$
+^\[main\.assertion\.1\] line 18 g executes once: SUCCESS$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+g neither accesses x nor what f accesses, so it is executed once. f writes x,
+which is read as the first operand, so f is still executed in each of its
+rounds, and the read of x is reported to depend on the evaluation order.
