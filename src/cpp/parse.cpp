@@ -406,6 +406,8 @@ protected:
     NOT_A_TYPE
   };
   cast_type_idt classify_cast_type_id(const typet &);
+  bool may_start_template_argument_list(const irept &name);
+  bool logical_operator_before_closing_angle();
   /// set by rCastExpr while it parses the operand of an ambiguous cast that
   /// starts with `(`: the parenthesized expression (or cast) parsed next is
   /// the argument list of the call the cast may be
@@ -9078,7 +9080,9 @@ bool Parser::rRelationalExpr(exprt &exp, bool template_args)
         name_expr = &to_unary_expr(*name_expr).op();
       }
 
-      if(name_expr->id() == ID_cpp_name)
+      if(
+        name_expr->id() == ID_cpp_name &&
+        may_start_template_argument_list(*name_expr))
       {
         auto saved = lex.Save();
         irept args;
@@ -9090,13 +9094,14 @@ bool Parser::rRelationalExpr(exprt &exp, bool template_args)
           // comparison, so multi-arg template-ids are safe.
           bool unambiguous_follow =
             next == ')' || next == '}' || next == ';' || next == TOK_ELLIPSIS;
+          // Only tokens that a level above the relational expressions
+          // consumes: after `a<b>' an arithmetic operator, `(' or `[' could
+          // not be parsed (`a < b && c > -1' failed to parse)
           if(
             (single_arg || unambiguous_follow) &&
             (next == '|' || next == '&' || next == '^' || next == ')' ||
              next == ',' || next == ';' || next == TOK_ELLIPSIS ||
-             next == '+' || next == '-' || next == '*' || next == '/' ||
-             next == TOK_OROR || next == TOK_ANDAND || next == '}' ||
-             next == '(' || next == '['))
+             next == TOK_OROR || next == TOK_ANDAND || next == '}'))
           {
             // the same shape as rName/rVarNameCore build: a template_args
             // component holding the arguments
@@ -9511,6 +9516,82 @@ bool Parser::rCastExpr(exprt &exp)
 ///   (`(p[1]) - 2` is a subscript, not a cast to an array type);
 ///   KNOWN_TYPE_NAME or NAME for any other name that may be an expression;
 ///   TYPE otherwise
+/// N5008 [temp.names]/3: after a name, `<` starts a template-argument-list
+/// only if the name is a template-name, which the parser cannot look up.
+/// \return false for a name the parser knows not to be a template (a
+///   non-type template parameter), and for an unqualified name it has not
+///   seen declared when the tokens after the `<` contain `||` or `&&`
+///   outside of parentheses before the first `>`: `a < b || a > (c)` with
+///   variables a and b are two comparisons, not the template-id `a<b || a>`
+///   applied to (c)
+bool Parser::may_start_template_argument_list(const irept &name)
+{
+  const auto &sub = name.get_sub();
+  if(sub.size() != 1 || sub[0].id() != ID_name)
+    return true;
+  const new_scopet *found = lookup_id(sub[0].get(ID_identifier));
+  if(found != nullptr)
+  {
+    return found->is_type() || found->is_template() ||
+           found->kind == new_scopet::kindt::TEMPLATE_TEMPLATE_PARAMETER;
+  }
+  return !logical_operator_before_closing_angle();
+}
+
+/// \return whether the tokens after the `<` at the current position contain
+///   `||` or `&&` outside of parentheses, brackets, braces and nested
+///   template-argument lists before a `>`; an `&&` followed by `,`, `>` or
+///   `...` is the declarator of an rvalue reference (`f<T &&>`), not an
+///   operator
+bool Parser::logical_operator_before_closing_angle()
+{
+  PRECONDITION(lex.LookAhead(0) == '<');
+  std::size_t depth = 0;
+  std::size_t angles = 0;
+  for(unsigned i = 1;; ++i)
+  {
+    const int t = lex.LookAhead(i);
+    if(t == '(' || t == '[' || t == '{')
+      ++depth;
+    else if(t == ')' || t == ']' || t == '}')
+    {
+      if(depth == 0)
+        return false;
+      --depth;
+    }
+    else if(t == 0 || t == ';')
+      return false;
+    else if(depth != 0)
+      continue;
+    else if(t == '<')
+      ++angles;
+    else if(t == '>')
+    {
+      if(angles == 0)
+        return false;
+      --angles;
+    }
+    else if(t == TOK_SHIFTRIGHT)
+    {
+      if(angles <= 1)
+        return false;
+      angles -= 2;
+    }
+    else if(angles == 0 && t == TOK_OROR)
+      return true;
+    else if(angles == 0 && t == TOK_ANDAND)
+    {
+      const int next = lex.LookAhead(i + 1);
+      if(
+        next != ',' && next != '>' && next != TOK_SHIFTRIGHT &&
+        next != TOK_ELLIPSIS && next != ')')
+      {
+        return true;
+      }
+    }
+  }
+}
+
 Parser::cast_type_idt Parser::classify_cast_type_id(const typet &tname)
 {
   const typet *t = &tname;
@@ -10794,14 +10875,8 @@ bool Parser::rPostfixExpr(exprt &exp)
         // Check if the name is a template. Non-type names (variables,
         // non-type template parameters) followed by '<' should be
         // treated as less-than, not template arguments.
-        bool is_template_name = true;
-        const auto &sub = name_expr->get_sub();
-        if(sub.size() == 1 && sub[0].id() == ID_name)
-        {
-          new_scopet *found = lookup_id(sub[0].get(ID_identifier));
-          if(found != nullptr && !found->is_type() && !found->is_template())
-            is_template_name = false;
-        }
+        const bool is_template_name =
+          may_start_template_argument_list(*name_expr);
 
         if(is_template_name)
         {
@@ -12444,9 +12519,16 @@ bool Parser::rVarNameCore(exprt &name)
         // unique_lock<T> var), not a template-id expression, so we
         // reject that case to avoid stealing tokens from the
         // declaration parser.
+        // N5008 [temp.names]/3: `a < b || a > (c)' with a variable a
+        const bool comparisons =
+          components.size() == 1 && !template_keyword_seen &&
+          lex.LookAhead(0) == '<' &&
+          lookup_id(tk.data.get(ID_C_base_name)) == nullptr &&
+          logical_operator_before_closing_angle();
         bool try_template_args =
+          !comparisons &&
           (maybeTemplateArgs() && MaybeTypeNameOrClassTemplate(tk));
-        if(!try_template_args && lex.LookAhead(0) == '<')
+        if(!try_template_args && !comparisons && lex.LookAhead(0) == '<')
         {
           irep_idt id = tk.data.get(ID_C_base_name);
           if(!id.empty())

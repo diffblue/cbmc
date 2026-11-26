@@ -1,0 +1,17 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] .* or: SUCCESS$
+^\[main\.assertion\.2\] .* or with a cast: SUCCESS$
+^\[main\.assertion\.3\] .* and: SUCCESS$
+^\[main\.assertion\.4\] .* template parameter: SUCCESS$
+^\[main\.assertion\.5\] .* template-id: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+N5008 [temp.names]/3: `a < b || a > (5)' with variables a and b was read
+as the template-id `a<b || a>' applied to (5) ("symbol 'a' is unknown"),
+and `a < b && c > -1' did not parse.
