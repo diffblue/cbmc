@@ -1,0 +1,12 @@
+CORE
+main.c
+--branch marker _ --pointer-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+--branch marker calls marker("taken") or marker("not-taken") on each outcome of
+a conditional jump.  The if statement is a jump to the else branch, which is
+taken when x <= 0.  Without the instrumentation, last is a null pointer.
