@@ -1,0 +1,8 @@
+KNOWNBUG
+main.cpp
+
+^EXIT=(1|6|64)$
+^SIGNAL=0$
+^CONVERSION ERROR$
+--
+^warning: ignoring

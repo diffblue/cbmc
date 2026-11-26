@@ -1,0 +1,18 @@
+KNOWNBUG gcc-only gcc16 libstdcxx16
+main.cpp
+--cpp20
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+std::common_reference_with of a type with itself, with the headers of
+libstdc++ 16 (tagged libstdcxx16: runs only where the host gcc is 16 or
+later, regression/README.md).  With those headers "static assertion
+failed: same reference type" dropped main until is_same on reference
+kinds and compound requirements were fixed.  The cv-differing case,
+common_reference_with<W &, const W &>, is
+cpp20_common_reference_with_cv_differing_references.  To check elsewhere,
+preprocess with g++-16 -E and run cbmc on the .ii file.

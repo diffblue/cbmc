@@ -1,0 +1,11 @@
+KNOWNBUG
+hidden_only_match.cpp
+--cpp11
+^EXIT=6$
+^SIGNAL=0$
+^CONVERSION ERROR$
+--
+^warning: ignoring
+^VERIFICATION
+--
+See test.desc.  g++ 13 and clang++ 18 reject this program.

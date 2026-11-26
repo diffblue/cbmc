@@ -1,0 +1,18 @@
+KNOWNBUG gcc-only gcc16 libstdcxx16
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+std::bind with a call through a deducing-this member, with the headers of
+libstdc++ 16, whose code paths differ from gcc 11-15 (tagged libstdcxx16:
+runs only where the host gcc is 16 or later, regression/README.md).  With
+those headers main was dropped (CONVERSION ERROR at <functional> line 654,
+the __enable_if_t default argument evaluated false) until a templated
+explicit object parameter was deduced from the object expression
+(cpp23_deducing_this_template_object_parameter, header-free).  To check
+elsewhere, preprocess with g++-16 -E and run cbmc on the .ii file.
