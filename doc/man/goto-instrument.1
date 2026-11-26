@@ -758,6 +758,11 @@ replace calls to \fIf\fR with calls to \fIg\fR
 limit size of nondet (e.g. input) object tree;
 at level N pointers are set to null
 .TP
+\fB\-\-max\-dynamic\-object\-instances\fR \fIN\fR
+limit the number of objects allocated for each
+nondet (e.g. input) object tree; beyond N,
+pointers are set to null (default: no limit)
+.TP
 \fB\-\-min\-null\-tree\-depth\fR \fIN\fR
 minimum level at which a pointer can first be
 NULL in a recursively nondet initialized struct

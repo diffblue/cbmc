@@ -9,10 +9,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_OBJECT_FACTORY_PARAMETERS_H
 #define CPROVER_UTIL_OBJECT_FACTORY_PARAMETERS_H
 
-#include <list>
-
 #include <util/irep.h>
 #include <util/magic.h>
+
+#include <limits>
+#include <list>
 
 class cmdlinet;
 class optionst;
@@ -56,6 +57,22 @@ struct object_factory_parameterst
   /// does not affect non-recursive data structures, which are always
   /// initialized to their full depth.
   size_t max_nondet_tree_depth = 5;
+
+  /// Maximum total number of dynamic objects the object factory will
+  /// allocate on behalf of a single nondet-initialisation root (by default,
+  /// there is no limit).
+  ///
+  /// `max_nondet_tree_depth` only limits the depth of recursion through the
+  /// same struct tag.  An object tree whose pointers branch through many
+  /// distinct struct types (for example, a cycle of 20 struct types each with
+  /// two pointers to the next) grows exponentially before any tag repeats,
+  /// and can be too large to generate at all.  Once this many objects have
+  /// been allocated, further pointers are initialised to NULL rather than to
+  /// fresh objects.  This is an under-approximation: paths through such
+  /// pointers are no longer explored, even below `min_null_tree_depth`.  The
+  /// C object factory warns when it applies this limit; JBMC's Java object
+  /// factory and goto-harness ignore it.
+  size_t max_dynamic_object_instances = std::numeric_limits<size_t>::max();
 
   /// To force a certain depth of non-null objects.
   /// The default is that objects are 'maybe null' up to the nondet tree depth.

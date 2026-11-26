@@ -189,6 +189,8 @@ private:
     symbol_factory.declare_created_symbols(init_code);
     init_code.append(assignments);
 
+    symbol_factory.warn_if_limit_reached(message.get_message_handler());
+
     goto_programt tmp_dest;
     goto_convert(
       init_code, symbol_table, tmp_dest, message.get_message_handler(), ID_C);
