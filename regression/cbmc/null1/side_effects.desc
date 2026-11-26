@@ -1,0 +1,11 @@
+CORE
+side_effects.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Comparing a pointer with, or converting to a pointer, an integer expression
+with value 0 must not discard its side effects.
