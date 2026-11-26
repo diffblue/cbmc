@@ -17,6 +17,7 @@ Author: Kiro
 #include <util/message.h>
 
 #include <cstddef>
+#include <string>
 
 class cpp_typecheckt;
 
@@ -112,6 +113,13 @@ private:
   std::size_t saved_error_count;
   unsigned saved_constant_expression_context;
   unsigned saved_copy_init_ctor_exploration;
+  /// A message being written when the guard is entered: what the guarded
+  /// region writes to the message stream without ending the message (an
+  /// instantiation context followed by a silent `throw`) is discarded with
+  /// the region, rather than prefixing the next, unrelated, message
+  std::string saved_pending_message;
+  unsigned saved_message_level;
+  source_locationt saved_message_location;
   null_message_handlert null_handler;
 };
 

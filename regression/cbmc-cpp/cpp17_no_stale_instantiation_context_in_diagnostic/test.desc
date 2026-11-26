@@ -1,0 +1,12 @@
+CORE
+main.cpp
+--cpp17
+^file .*main\.cpp line 13 function main: symbol 'undeclared_function' is unknown$
+^EXIT=(1|6)$
+^SIGNAL=0$
+--
+instantiating
+--
+A substitution failure in std::string's constructors constrained by _If_sv
+(a lookup of a qualified name that fails silently) left the instantiation
+context in the message stream; it prefixed the next, unrelated, error.

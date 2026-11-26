@@ -34,7 +34,10 @@ sfinae_contextt::sfinae_contextt(cpp_typecheckt &_typecheck)
     saved_error_count(
       _typecheck.get_message_handler().get_message_count(messaget::M_ERROR)),
     saved_constant_expression_context(_typecheck.constant_expression_context),
-    saved_copy_init_ctor_exploration(_typecheck.copy_init_ctor_exploration)
+    saved_copy_init_ctor_exploration(_typecheck.copy_init_ctor_exploration),
+    saved_pending_message(_typecheck.mstream.str()),
+    saved_message_level(_typecheck.mstream.message_level),
+    saved_message_location(_typecheck.mstream.source_location)
 {
   // [temp.deduct.general]/8: a substitution failure inside the immediate
   // context must not produce a user-visible diagnostic; redirect to
@@ -76,6 +79,10 @@ sfinae_contextt::~sfinae_contextt()
   // Restore handler first, so that setting the message count goes
   // to the real handler rather than the null one.
   typecheck.set_message_handler(*saved_handler);
+  typecheck.mstream.str(saved_pending_message);
+  typecheck.mstream.seekp(0, std::ios_base::end);
+  typecheck.mstream.message_level = saved_message_level;
+  typecheck.mstream.source_location = saved_message_location;
   typecheck.constant_expression_context = saved_constant_expression_context;
   typecheck.copy_init_ctor_exploration = saved_copy_init_ctor_exploration;
   if(typecheck.sfinae_context_depth > 0)

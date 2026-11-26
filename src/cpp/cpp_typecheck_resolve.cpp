@@ -7881,9 +7881,6 @@ exprt cpp_typecheck_resolvet::resolve(
     if(!fail_with_exception)
       return nil_exprt();
 
-    cpp_typecheck.show_instantiation_stack(cpp_typecheck.error());
-    cpp_typecheck.error().source_location = source_location;
-
     if(qualified)
     {
       // Per [temp.deduct.general]/8: qualified lookup failure during
@@ -7969,6 +7966,11 @@ exprt cpp_typecheck_resolvet::resolve(
           }
         }
       }
+      // the instantiation context goes with the message: written earlier,
+      // it stayed in the message stream when a path above threw without a
+      // message or recovered, and prefixed the next, unrelated, error
+      cpp_typecheck.show_instantiation_stack(cpp_typecheck.error());
+      cpp_typecheck.error().source_location = source_location;
       cpp_typecheck.error() << "symbol '" << base_name << "' is unknown";
     }
 
