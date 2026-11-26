@@ -127,6 +127,16 @@ protected:
   template <levelt>
   void rename_address(exprt &expr, const namespacet &ns);
 
+  /// Propagate the (renamed) type of \p ssa to its original expression. For
+  /// fields of field-sensitive objects, where the original expression is a
+  /// member or index expression, also rename the types of the enclosing
+  /// objects to \c level when the type of \p ssa contains symbols, as is the
+  /// case for arrays of non-constant size. Else the original expression would
+  /// combine a renamed field type with an enclosing object of a type that has
+  /// not been renamed in the same way.
+  template <levelt level>
+  void update_type(ssa_exprt &ssa, const namespacet &ns);
+
   /// Update values up to \c level.
   template <levelt level>
   [[nodiscard]] renamedt<ssa_exprt, level>
