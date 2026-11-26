@@ -51,7 +51,7 @@ public:
     rename_symbolt rename;
     std::map<irep_idt, irep_idt> renamed_funs;
     std::vector<symbolt> new_syms;
-    std::vector<symbol_tablet::symbolst::const_iterator> old_syms;
+    std::vector<irep_idt> old_syms;
 
     for(auto sym_it = model.symbol_table.symbols.begin();
         sym_it != model.symbol_table.symbols.end();
@@ -75,7 +75,7 @@ public:
       new_sym.is_file_local = false;
 
       new_syms.push_back(new_sym);
-      old_syms.push_back(sym_it);
+      old_syms.push_back(sym.name);
 
       rename.insert(sym.symbol_expr(), new_sym.symbol_expr());
       renamed_funs.insert(std::make_pair(sym.name, mangled));
@@ -85,8 +85,10 @@ public:
 
     for(const auto &sym : new_syms)
       model.symbol_table.insert(sym);
-    for(const auto &sym : old_syms)
-      model.symbol_table.erase(sym);
+    // Erase the originals by name: the inserts above may rehash the symbol
+    // table's map, which invalidates all iterators into it.
+    for(const auto &name : old_syms)
+      model.symbol_table.remove(name);
 
     for(auto it = model.symbol_table.begin(); it != model.symbol_table.end();
         ++it)
