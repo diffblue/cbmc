@@ -1,0 +1,11 @@
+CORE
+main.c
+2
+^EXIT=0$
+^SIGNAL=0$
+^Instrumenting k-induction for k=2, base case$
+^Instrumenting k-induction for k=2, step case$
+^## Base case passes$
+^## Step case passes$
+--
+^warning: ignoring
