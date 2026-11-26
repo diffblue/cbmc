@@ -5244,7 +5244,7 @@ struct operator_entryt
   {ID_gt, ">"},          {ID_ge, ">="},         {ID_spaceship, "<=>"},
   {ID_shl, "<<"},        {ID_shr, ">>"},        {ID_notequal, "!="},
   {ID_dereference, "*"}, {ID_ptrmember, "->"},  {ID_pointer_to_member, "->*"},
-  {irep_idt(), nullptr}};
+  {ID_comma, ","},       {irep_idt(), nullptr}};
 
 /// N5008 [over.match.oper]/3.4 (C++20): the rewritten and reversed
 /// candidates of a comparison `x @ y` -- `(x <=> y) @ 0`, `0 @ (y <=> x)`,
@@ -13032,12 +13032,10 @@ void cpp_typecheckt::typecheck_expr_comma(exprt &expr)
     throw 0;
   }
 
-  const auto &op0_type = to_binary_expr(expr).op0().type();
-
-  if(op0_type.id() == ID_struct || op0_type.id() == ID_struct_tag)
-  {
-    // TODO: check if the comma operator has been overloaded!
-  }
+  // N5008 [over.match.oper]/1, [expr.comma]/1: with an operand of class or
+  // enumeration type, a user-declared operator, may be selected
+  if(operator_is_overloaded(expr))
+    return;
 
   c_typecheck_baset::typecheck_expr_comma(expr);
 }
