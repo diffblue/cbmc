@@ -1,0 +1,14 @@
+CORE broken-z3-smt-backend broken-cprover-smt-backend no-new-smt
+no-array.c
+--cvc5
+^\[main\.assertion\.1\] line \d+ bits of 1\.0f: SUCCESS$
+^\[main\.assertion\.2\] line \d+ bits of a NaN: SUCCESS$
+^\[main\.assertion\.3\] line \d+ fails for -0\.0f: FAILURE$
+^\[main\.assertion\.4\] line \d+ bits of a struct: SUCCESS$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+As test.desc, with CVC5, which uses the FPA theory by default.
