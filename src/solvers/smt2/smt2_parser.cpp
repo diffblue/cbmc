@@ -1030,7 +1030,10 @@ exprt smt2_parsert::bv_division(
     if_exprt(divisor_is_zero, all_ones, division_result));
 }
 
-exprt smt2_parsert::bv_mod(const exprt::operandst &operands, bool is_signed)
+exprt smt2_parsert::bv_mod(
+  const exprt::operandst &operands,
+  bool is_signed,
+  bool sign_follows_divisor)
 {
   if(operands.size() != 2)
     throw error() << "bitvector modulo expects two operands";
@@ -1042,13 +1045,33 @@ exprt smt2_parsert::bv_mod(const exprt::operandst &operands, bool is_signed)
 
   exprt mod_result;
 
-  // bvurem and bvsrem match our mod_exprt.
-  // bvsmod doesn't.
+  // bvurem and bvsrem match our mod_exprt (truncated division, the
+  // remainder's sign follows the dividend). bvsmod does not: SMT-LIB
+  // defines its result's sign to follow the DIVISOR. We compute it
+  // from the truncated remainder r as
+  //   bvsmod(s, t) = (r != 0 && sign(r) != sign(t)) ? r + t : r,
+  // which matches the SMT-LIB definitional expansion case by case:
+  // r = 0 or matching signs give r; a negative dividend with
+  // non-negative divisor gives -u + t = r + t; a non-negative
+  // dividend with negative divisor gives u + t = r + t.
   if(is_signed)
   {
     auto signed_operands = cast_bv_to_signed({dividend, divisor});
-    mod_result =
-      cast_bv_to_unsigned(mod_exprt(signed_operands[0], signed_operands[1]));
+    auto r = mod_exprt(signed_operands[0], signed_operands[1]);
+    if(sign_follows_divisor)
+    {
+      auto zero = from_integer(0, r.type());
+      auto r_nonzero = notequal_exprt(r, zero);
+      auto r_neg = binary_relation_exprt(r, ID_lt, zero);
+      auto t_neg = binary_relation_exprt(signed_operands[1], ID_lt, zero);
+      auto signs_differ = notequal_exprt(r_neg, t_neg);
+      mod_result = cast_bv_to_unsigned(if_exprt(
+        and_exprt(r_nonzero, signs_differ),
+        plus_exprt(r, signed_operands[1]),
+        r));
+    }
+    else
+      mod_result = cast_bv_to_unsigned(r);
   }
   else
     mod_result = mod_exprt(dividend, divisor);
@@ -1271,7 +1294,7 @@ void smt2_parsert::setup_expressions()
 
   // 2's complement signed remainder (sign follows divisor)
   // We don't have that.
-  expressions["bvsmod"] = [this] { return bv_mod(operands(), true); };
+  expressions["bvsmod"] = [this] { return bv_mod(operands(), true, true); };
 
   expressions["mod"] = [this] {
     // SMT-LIB2 uses Boute's Euclidean definition for mod,
