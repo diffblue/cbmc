@@ -4999,6 +4999,17 @@ void cpp_typecheckt::typecheck_expr_sizeof(exprt &expr)
 
   complete_type_operand(expr);
   throw_if_incomplete_dependency(expr);
+
+  // N5008 [expr.rel]/1, [expr.eq]/1, [expr.log.and]/1, [expr.log.or]/1,
+  // [expr.unary.op]/9: comparisons and the logical operators have type bool
+  // (one byte), which CBMC represents by the Boolean type and the C
+  // front-end's sizeof takes to be int, the type these have in C
+  if(expr.operands().size() == 1 && to_unary_expr(expr).op().is_boolean())
+  {
+    exprt &op = to_unary_expr(expr).op();
+    op = typecast_exprt{op, c_bool_type()};
+  }
+
   c_typecheck_baset::typecheck_expr_sizeof(expr);
 }
 
