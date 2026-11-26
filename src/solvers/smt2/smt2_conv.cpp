@@ -3837,7 +3837,9 @@ void smt2_convt::convert_struct(const struct_exprt &expr)
       // may need to flatten array-theory arrays in there
       if(op.type().id() == ID_array && use_array_theory(op))
         flatten_array(op);
-      else if(op.type().id() == ID_bool)
+      else if(
+        op.type().id() == ID_bool ||
+        (op.type().id() == ID_floatbv && use_FPA_theory))
         flatten2bv(op);
       else
         convert_expr(op);
@@ -5007,7 +5009,9 @@ void smt2_convt::convert_with(const with_exprt &expr)
         // may need to flatten array-theory arrays in there
         if(op.type().id() == ID_array && use_array_theory(op))
           flatten_array(op);
-        else if(op.type().id() == ID_bool)
+        else if(
+          op.type().id() == ID_bool ||
+          (op.type().id() == ID_floatbv && use_FPA_theory))
           flatten2bv(op);
         else
           convert_expr(op);
@@ -5353,14 +5357,10 @@ void smt2_convt::flatten2bv(const exprt &expr)
   {
     if(use_FPA_theory)
     {
-      // A floatbv constant's IEEE-754 interchange bit pattern is exactly its
-      // bit-vector representation, so it is emitted as a literal bit-vector.
-      // This is the only shape that reaches flatten2bv under FPA: a
-      // non-constant float whose bits are read is lowered by
-      // lower_byte_operators into a float typecast, which is handled by the
-      // bvfromfloat round-trip in find_symbols and never reaches here.
       if(expr.is_constant())
       {
+        // A floatbv constant's IEEE-754 interchange bit pattern is exactly
+        // its bit-vector representation, so emit it as a literal BV.
         const ieee_float_spect spec(to_floatbv_type(type));
         const mp_integer value = bvrep2integer(
           to_constant_expr(expr).get_value(), spec.width(), false);
@@ -5368,8 +5368,17 @@ void smt2_convt::flatten2bv(const exprt &expr)
       }
       else
       {
-        UNEXPECTEDCASE(
-          "flatten2bv of a non-constant FPA-encoded float is unsupported");
+        // Non-constant float under FPA theory: look up the bvfromfloat
+        // auxiliary that find_symbols_flatten2bv pre-created for this
+        // expression.
+        const auto &floatbv_type = to_floatbv_type(type);
+        const typecast_exprt tc{expr, bv_typet{floatbv_type.width()}};
+
+        auto it = defined_expressions.find(tc);
+        CHECK_RETURN_WITH_DIAGNOSTICS(
+          it != defined_expressions.end(),
+          "flatten2bv: bvfromfloat entry missing for non-constant float");
+        out << it->second;
       }
     }
     else
@@ -5507,6 +5516,18 @@ void smt2_convt::unflatten(
     {
       // nop, already a bv
     }
+  }
+  else if(type.id() == ID_floatbv && use_FPA_theory)
+  {
+    // reinterpret the bits as a floating-point number
+    if(where == wheret::BEGIN)
+    {
+      const floatbv_typet &floatbv_type = to_floatbv_type(type);
+      out << "((_ to_fp " << floatbv_type.get_e() << " "
+          << floatbv_type.get_f() + 1 << ") ";
+    }
+    else
+      out << ')';
   }
   else
   {
@@ -5774,6 +5795,55 @@ exprt smt2_convt::prepare_for_convert_expr(const exprt &expr)
   return lowered_expr;
 }
 
+/// With the FPA theory, flattening a non-constant float to a bit-vector
+/// requires a bit-vector variable that is declared, and constrained to encode
+/// the float, before the expression is converted. Declare these for all the
+/// floats that \ref flatten2bv reaches when flattening \p expr.
+/// \param expr: expression that is going to be flattened
+void smt2_convt::find_symbols_flatten2bv(const exprt &expr)
+{
+  if(!use_FPA_theory)
+    return;
+
+  const typet &type = expr.type();
+
+  if(type.id() == ID_floatbv)
+  {
+    // the typecast to a bit-vector is converted using a bvfromfloat
+    // auxiliary, which flatten2bv then refers to
+    if(!expr.is_constant())
+      find_symbols(typecast_exprt{expr, bv_typet{boolbv_width(type)}});
+  }
+  else if(type.id() == ID_array)
+  {
+    // mirrors flatten2bv
+    const array_typet &array_type = to_array_type(type);
+    if(use_array_theory(expr) && array_type.size().is_constant())
+    {
+      const mp_integer size =
+        numeric_cast_v<mp_integer>(to_constant_expr(array_type.size()));
+      for(mp_integer i = 0; i < size; ++i)
+      {
+        find_symbols_flatten2bv(
+          index_exprt{expr, from_integer(i, array_type.index_type())});
+      }
+    }
+  }
+  else if(
+    (type.id() == ID_struct || type.id() == ID_struct_tag) && use_datatypes)
+  {
+    // mirrors flatten2bv
+    const struct_typet &struct_type =
+      type.id() == ID_struct_tag ? ns.follow_tag(to_struct_tag_type(type))
+                                 : to_struct_type(type);
+    for(const auto &component : struct_type.components())
+    {
+      if(!is_zero_width(component.type(), ns))
+        find_symbols_flatten2bv(member_exprt{expr, component});
+    }
+  }
+}
+
 /// Find and declare symbols used in an expression
 /// This function traverses the expression tree and creates SMT2 declarations
 /// for all symbols (variables) found. Symbols are added to identifier_map to
@@ -5823,6 +5893,29 @@ void smt2_convt::find_symbols(const exprt &expr)
   // recursive call on operands
   for(const auto &op : expr.operands())
     find_symbols(op);
+
+  // the conversion of these expressions uses flatten2bv on their operands
+  if(use_FPA_theory)
+  {
+    const irep_idt &id = expr.id();
+    const auto is_aggregate = [](const typet &type)
+    {
+      return type.id() == ID_struct || type.id() == ID_struct_tag ||
+             type.id() == ID_union || type.id() == ID_union_tag;
+    };
+    if(
+      id == ID_union || id == ID_concatenation || id == ID_replication ||
+      id == ID_extractbit || id == ID_extractbits || id == ID_bitand ||
+      id == ID_bitor || id == ID_bitxor || id == ID_bitxnor ||
+      id == ID_bitnand || id == ID_bitnor || id == ID_reduction_xor ||
+      (id == ID_struct && !use_datatypes) ||
+      (id == ID_with && is_aggregate(expr.type())) ||
+      (id == ID_typecast && is_aggregate(to_typecast_expr(expr).op().type())))
+    {
+      for(const auto &op : expr.operands())
+        find_symbols_flatten2bv(op);
+    }
+  }
 
   if(expr.id()==ID_symbol ||
      expr.id()==ID_nondet_symbol)
