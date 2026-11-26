@@ -113,7 +113,7 @@ _InterlockedCompareExchange64(long long volatile *p, long long v1, long long v2)
   return old;
 }
 
-/* FUNCTION: __InterlockedIncrement */
+/* FUNCTION: _InterlockedIncrement */
 
 long _InterlockedIncrement(long volatile *p)
 {
