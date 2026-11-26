@@ -7,8 +7,36 @@
 #define __CPROVER_THREADS_H_INCLUDED
 #endif
 
+__CPROVER_bool __CPROVER_threads_exited[__CPROVER_constant_infinity_uint];
+unsigned long __CPROVER_next_thread_id;
+
+// C17 7.26.5.1: thrd_create creates a new thread executing func(arg).
 int thrd_create(thrd_t *thr, thrd_start_t func, void *arg)
 {
+__CPROVER_HIDE:;
+  unsigned long this_thread_id;
+  __CPROVER_atomic_begin();
+  this_thread_id = ++__CPROVER_next_thread_id;
+  __CPROVER_atomic_end();
+
+  *thr = (thrd_t)this_thread_id;
+
+__CPROVER_ASYNC_1:
+{
+  func(arg);
+  __CPROVER_fence(
+    "WWfence",
+    "RRfence",
+    "RWfence",
+    "WRfence",
+    "WWcumul",
+    "RRcumul",
+    "RWcumul",
+    "WRcumul");
+  __CPROVER_threads_exited[this_thread_id] = 1;
+}
+
+  return thrd_success;
 }
 
 /* FUNCTION: thrd_equal */
@@ -134,8 +162,20 @@ void mtx_destroy(mtx_t *mutex)
 #define __CPROVER_THREADS_H_INCLUDED
 #endif
 
-void call_once(once_flag* flag, void (*func)(void))
+// C17 7.26.2.1: call_once calls func exactly once across all calls
+// with the same flag.  We model the first-call guarantee with an
+// atomic check of the first byte (ONCE_FLAG_INIT is all-zeros).
+void call_once(once_flag *flag, void (*func)(void))
 {
+__CPROVER_HIDE:;
+  signed char *p = (signed char *)flag;
+  _Bool already;
+  __CPROVER_atomic_begin();
+  already = *p;
+  *p = 1;
+  __CPROVER_atomic_end();
+  if(!already)
+    func();
 }
 
 /* FUNCTION: cnd_init */
