@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] .* bool: SUCCESS$
+^\[main\.assertion\.2\] .* static_cast bool: SUCCESS$
+^\[main\.assertion\.3\] .* double: SUCCESS$
+^\[main\.assertion\.4\] .* float: SUCCESS$
+^\[main\.assertion\.5\] .* functional cast: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+N5008 [expr.static.cast]/9: a value of integral type, which includes bool, or
+of floating-point type explicitly converts to an enumeration type (a
+floating-point value via the enumeration's underlying type).

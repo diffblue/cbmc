@@ -7051,13 +7051,26 @@ bool cpp_typecheckt::static_typecast(
     return true;
   }
 
-  // int/enum to enum
+  // N5008 [expr.static.cast]/9: a value of integral type (which includes
+  // bool, [basic.fundamental]/11) or enumeration type explicitly converts to
+  // an enumeration type, and so does a floating-point value, via the
+  // enumeration's underlying type ([conv.fpint])
   if(
     type.id() == ID_c_enum_tag &&
     (e.type().id() == ID_signedbv || e.type().id() == ID_unsignedbv ||
-     e.type().id() == ID_c_enum_tag))
+     e.type().id() == ID_c_enum_tag || e.type().id() == ID_c_bool ||
+     e.type().id() == ID_bool || e.type().id() == ID_floatbv ||
+     e.type().id() == ID_fixedbv))
   {
-    new_expr = typecast_exprt::conditional_cast(e, type);
+    if(e.type().id() == ID_c_enum_tag)
+      new_expr = typecast_exprt::conditional_cast(e, type);
+    else
+    {
+      const typet &underlying =
+        follow_tag(to_c_enum_tag_type(type)).underlying_type();
+      new_expr =
+        typecast_exprt{typecast_exprt::conditional_cast(e, underlying), type};
+    }
     new_expr.remove(ID_C_lvalue);
     return true;
   }
