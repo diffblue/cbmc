@@ -32,6 +32,12 @@ exprt object_upper_bound(
   const exprt &pointer,
   const exprt &access_size);
 
+/// Returns an expression that is true when the pointer's offset is
+/// non-negative AND the pointer's offset plus \p access_size does not exceed
+/// the object size. This is the positive form of the bounds check — callers
+/// no longer need to negate.
+exprt object_in_bounds(const exprt &pointer, const exprt &access_size);
+
 class is_invalid_pointer_exprt : public unary_predicate_exprt
 {
 public:

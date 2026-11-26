@@ -1,0 +1,15 @@
+CORE
+main.c
+--pointer-check
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.pointer_dereference\.\d+\] line 19 .*pointer NULL in \*p: FAILURE$
+^VERIFICATION FAILED$
+--
+^\[main\.pointer_dereference\.\d+\] line 19 .*pointer NULL in \*p: SUCCESS$
+--
+A function call that takes the address of a local pointer (clobber(&p)) can
+change that pointer's value, so cached pointer-validity assertions about the
+local must be cleared at the call. Without that, the NULL dereference at line
+19 is deduplicated against the cached check from line 14 and silently dropped,
+and verification wrongly succeeds.
