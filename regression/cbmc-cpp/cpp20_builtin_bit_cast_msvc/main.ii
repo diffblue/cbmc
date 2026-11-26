@@ -1,0 +1,23 @@
+extern "C" void __CPROVER_assert(bool, const char *);
+// MSVC (since VS 2019 16.8), like g++ and clang++, provides
+// __builtin_bit_cast(To, from), on which the MSVC STL's _Bit_cast and
+// std::bit_cast (N5008 [bit.cast]) are built
+template <class To, class From>
+constexpr To bit_cast_(const From &from) noexcept
+{
+  return __builtin_bit_cast(To, from);
+}
+struct pair16
+{
+  unsigned short lo;
+  unsigned short hi;
+};
+int main()
+{
+  unsigned int u = 0x00020001u;
+  pair16 p = bit_cast_<pair16>(u);
+  __CPROVER_assert(p.lo == 1 && p.hi == 2, "bit cast");
+  __CPROVER_assert(bit_cast_<unsigned int>(p) == u, "round trip");
+  __CPROVER_assert(p.lo == 2, "WRONG (must FAIL)");
+  return 0;
+}

@@ -1,0 +1,19 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ reused instances: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+static_assert condition could not be evaluated
+--
+CBMC re-instantiated an alias, concept or variable template specialization
+at each use; it now reuses the instance (25% less type-checking time for
+std::print).  A guard: the reused instances give the same results, also
+after substitution failures and from another scope.  (f(1.0) is checked at
+run time only: CBMC does not evaluate it in a constant expression.)

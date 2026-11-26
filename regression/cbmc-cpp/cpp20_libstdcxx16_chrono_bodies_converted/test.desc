@@ -1,0 +1,19 @@
+KNOWNBUG libstdcxx16 libstdcxx
+main.cpp
+--cpp20 --object-bits 12
+^\[main\.assertion\.1\] line \d+ duration: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+With the libstdc++ 16.2.0 headers (g++ 16.2.0), <chrono> lost the body of
+`__get_leap_second_info': its local `constexpr leap_second_info
+__after_last{.is_leap_second = false, .elapsed = seconds(...)}' passed
+the designated-initializer node to seconds' constructor.  Fixed with
+cpp20_designated_initializer_of_class_type_member.  Runs only with GCC 16
+headers (libstdcxx16).

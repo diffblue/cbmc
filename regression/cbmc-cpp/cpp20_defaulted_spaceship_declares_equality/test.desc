@@ -1,0 +1,17 @@
+KNOWNBUG libstdcxx
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ == and != from the defaulted <=>: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+CBMC did not declare the implicit operator== of a class with a defaulted
+operator<=> ([class.compare.default]/4): `a == b' was rejected with "no
+comparison operator for an operand of class type", as `a != c' (which
+[over.match.oper]/3.4 rewrites to !(a == c)).

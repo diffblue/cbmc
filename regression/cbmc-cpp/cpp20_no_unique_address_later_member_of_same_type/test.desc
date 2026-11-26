@@ -1,0 +1,33 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ distinct addresses: SUCCESS$
+^\[main\.assertion\.2\] line \d+ e at offset 0: SUCCESS$
+^\[main\.assertion\.3\] line \d+ x at offset 1: SUCCESS$
+^\[main\.assertion\.4\] line \d+ size: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The expected output is that of g++ 13 and clang++ 18.  CBMC places the
+ordinary members first, at their sequential offsets, and the empty
+[[no_unique_address]] members afterwards where no subobject of the same
+type lies (place_empty_potentially_overlapping_members): x is at offset 0
+and e at offset 1.  The program fails the second and third assertions.
+
+Why FUTURE and not KNOWNBUG: the addresses are distinct, as
+[intro.object]/10 requires, and the size is the same; which of the two
+objects gets which offset is implementation-defined.  Only the Itanium
+C++ ABI's choice is not matched.
+
+What it would take: allocate in declaration order, moving an ordinary
+member (and the members after it) when it conflicts with an empty
+member allocated before it.  The ordinary members' offsets come from
+add_padding, which knows nothing of the empty members, so this needs the
+conflict-driven placement of ordinary members as well (Itanium 2.4 II.2:
+"Place D at this offset unless doing so would result in two components
+of the same type having the same offset").

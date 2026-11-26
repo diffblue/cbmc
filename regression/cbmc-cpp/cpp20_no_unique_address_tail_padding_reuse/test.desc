@@ -1,0 +1,43 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ tail reused: SUCCESS$
+^\[main\.assertion\.2\] line \d+ distinct bytes: SUCCESS$
+^\[main\.assertion\.3\] line \d+ dsize\(O\): SUCCESS$
+^\[main\.assertion\.4\] line \d+ POD member: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The expected output is that of g++ 13 and clang++ 18.  CBMC lays out a
+non-empty [[no_unique_address]] member as any other member: sizeof(P) is
+12 and P::c is at offset 8, and offsetof(first_padding_byte<O>, ...) is 8,
+so the program fails the first and third assertions.
+
+Why FUTURE and not KNOWNBUG: CBMC's layout conforms to N5008.  Whether a
+potentially-overlapping subobject overlaps anything is
+implementation-defined ([intro.object]/8; [dcl.attr.nouniqueaddr]/2 is a
+note saying the padding "can" be reused), and every object here keeps
+storage disjoint from every other ([intro.object]/10).  What CBMC does not
+match is the Itanium C++ ABI that GCC and Clang implement.
+
+What it would take: CBMC's struct type has no notion of two components
+sharing bytes, so reusing the tail padding needs P::c to sit inside
+the bytes of P::o.  The empty-member support (cpp_typecheck_compound_type,
+make_empty_potentially_overlapping_members_zero_sized) avoids that by
+giving the member no bytes and reaching it through `*(T *)((char *)&x +
+offset)'; a non-empty member has bytes, so either the member would be
+cut to its dsize (an array of dsize bytes, reached the same way, with its
+tail padding left to the following members) or the following members
+would be reached at their ABI offsets.  dsize itself would have to be
+computed per class (the size without tail padding, Itanium 2.4 II).
+Also needed for base classes: CBMC already gives D : B (B non-POD with
+tail padding) the ABI size, by flattening.
+
+Consequences of the gap: sizeof and offsetof of such classes differ from
+GCC and Clang, and libc++'s __compressed_pair (Xcode 26) pads a stateful
+element of such a type differently; that changes layouts, not results.
