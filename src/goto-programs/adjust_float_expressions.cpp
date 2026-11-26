@@ -65,7 +65,8 @@ static bool have_to_adjust_float_expressions(const exprt &expr)
     else if(
       dest_type.id() == ID_floatbv &&
       (src_type.id() == ID_c_bit_field || src_type.id() == ID_signedbv ||
-       src_type.id() == ID_unsignedbv || src_type.id() == ID_c_enum_tag))
+       src_type.id() == ID_unsignedbv || src_type.id() == ID_c_enum_tag ||
+       src_type.id() == ID_integer || src_type.id() == ID_natural))
       return true;
     else if(
       (dest_type.id() == ID_signedbv || dest_type.id() == ID_unsignedbv ||
@@ -158,7 +159,8 @@ void adjust_float_expressions(exprt &expr, const exprt &rounding_mode)
     else if(
       dest_type.id() == ID_floatbv &&
       (src_type.id() == ID_signedbv || src_type.id() == ID_unsignedbv ||
-       src_type.id() == ID_c_enum_tag || src_type.id() == ID_c_bit_field))
+       src_type.id() == ID_c_enum_tag || src_type.id() == ID_c_bit_field ||
+       src_type.id() == ID_integer || src_type.id() == ID_natural))
     {
       // casts from integer to float-type might round
       expr.id(ID_floatbv_typecast);
