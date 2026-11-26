@@ -35,7 +35,7 @@ void prop_conv_solvert::set_all_frozen()
   freeze_all = true;
 }
 
-exprt prop_conv_solvert::handle(const exprt &expr)
+exprt prop_conv_solvert::do_handle(const exprt &expr)
 {
   // We can only improve Booleans.
   if(!expr.is_boolean())
@@ -532,7 +532,7 @@ std::size_t prop_conv_solvert::get_number_of_solver_calls() const
 
 const char *prop_conv_solvert::context_prefix = "prop_conv::context$";
 
-void prop_conv_solvert::set_to(const exprt &expr, bool value)
+void prop_conv_solvert::do_set_to(const exprt &expr, bool value)
 {
   if(assumption_stack.empty())
   {

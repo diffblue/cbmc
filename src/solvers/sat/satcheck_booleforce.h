@@ -23,7 +23,7 @@ public:
   std::string solver_text() const override;
   tvt l_get(literalt a) const override;
 
-  void lcnf(const bvt &bv) override;
+  void do_lcnf(const bvt &bv) override;
 
 protected:
   resultt do_prop_solve(const bvt &assumptions) override;

@@ -71,9 +71,9 @@ public:
 
   // overloading
   exprt get(const exprt &expr) const override;
-  void set_to(const exprt &expr, bool value) override;
+  void do_set_to(const exprt &expr, bool value) override;
   void print_assignment(std::ostream &out) const override;
-  exprt handle(const exprt &) override;
+  exprt do_handle(const exprt &) override;
 
   void clear_cache() override
   {

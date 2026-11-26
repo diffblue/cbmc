@@ -40,7 +40,7 @@ public:
 
   tvt l_get(literalt a) const override final;
 
-  void lcnf(const bvt &bv) override final;
+  void do_lcnf(const bvt &bv) override final;
   void set_assignment(literalt a, bool value) override;
 
   // extra MiniSat feature: default branching decision
