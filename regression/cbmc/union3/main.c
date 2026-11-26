@@ -13,7 +13,7 @@ int my_func(int stat_loc)
 int main(void)
 {
   #ifdef __GNUC__
-  int x;
+  int x = __VERIFIER_nondet_int();
   assert(my_func(x)==x);
 
   union my_U

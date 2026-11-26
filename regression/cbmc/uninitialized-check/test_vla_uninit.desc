@@ -1,0 +1,11 @@
+CORE
+main.c
+--function test_vla_uninit_size --uninitialized-check
+^EXIT=10$
+^SIGNAL=0$
+reading uninitialized local
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+VLA with uninitialized size.

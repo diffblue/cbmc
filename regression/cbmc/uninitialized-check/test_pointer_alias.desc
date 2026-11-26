@@ -1,0 +1,11 @@
+CORE
+main.c
+--function test_pointer_alias_init --uninitialized-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+\[test_pointer_alias_init.uninitialized.*FAILURE
+--
+Address-taken variable: conservatively skip (initialized via pointer).

@@ -16,6 +16,6 @@ int main()
   arrvec A;
   arrvec *x = &A;
   __CPROVER_assume(x->vec[1].data[0] < 42);
-  unsigned k;
+  unsigned k = __VERIFIER_nondet_unsigned();
   __CPROVER_assert(k != 2 || ((int *)x)[k] < 42, "");
 }

@@ -1,0 +1,11 @@
+CORE
+main.c
+--function test_struct_partial_init --uninitialized-check
+^EXIT=10$
+^SIGNAL=0$
+reading uninitialized local
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Phase 3: reading uninitialized member of partially initialized struct.

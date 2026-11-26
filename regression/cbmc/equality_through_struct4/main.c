@@ -18,7 +18,7 @@ void pass_through_struct (struct str *s, int q)
 
 int main (void)
 {
-  int q;
+  int q = __VERIFIER_nondet_int();
 
   struct str s;
 

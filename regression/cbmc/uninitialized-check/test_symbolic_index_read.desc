@@ -1,0 +1,11 @@
+CORE
+main.c
+--function test_symbolic_index_read --uninitialized-check
+^EXIT=10$
+^SIGNAL=0$
+reading uninitialized local
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Symbolic array index: not all elements initialized.

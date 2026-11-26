@@ -10,6 +10,6 @@ struct s
 
 int main()
 {
-  struct s X;
+  struct s X = {0};
   __CPROVER_assert(X.b[1] == 2, "should fail");
 }

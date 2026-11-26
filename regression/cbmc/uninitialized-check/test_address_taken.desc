@@ -1,0 +1,11 @@
+CORE
+main.c
+--function test_address_taken --uninitialized-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+\[test_address_taken.uninitialized.*FAILURE
+--
+Address-taken variables: conservatively skip (indeterminate, not UB).

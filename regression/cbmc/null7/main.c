@@ -16,7 +16,7 @@ int main()
 
   if(s_is_set)
   {
-    unsigned len;
+    unsigned len = __VERIFIER_nondet_unsigned();
     __CPROVER_assume(len < 3);
     s += len;
   }

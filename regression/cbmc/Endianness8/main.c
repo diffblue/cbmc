@@ -13,7 +13,7 @@ int main()
      sizeof(int)!=4)
     return 0;
 
-  union U u;
+  union U u = {0};
   u.b=0x04030201;
 
   assert(u.a==0x0403);

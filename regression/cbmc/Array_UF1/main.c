@@ -1,7 +1,8 @@
 int main()
 {
   int a[10], b[10];
-  int x, y, z;
+  int x = __VERIFIER_nondet_int(), y = __VERIFIER_nondet_int(),
+      z = __VERIFIER_nondet_int();
   __CPROVER_assume(2 <= y && y <= 4);
   __CPROVER_assume(6 <= z && z <= 8);
   b[y] = x;

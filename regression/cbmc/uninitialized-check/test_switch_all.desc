@@ -1,0 +1,11 @@
+CORE
+main.c
+--function test_switch_init --uninitialized-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+\[test_switch_init.uninitialized.*FAILURE
+--
+All switch cases initialize x.

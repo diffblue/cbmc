@@ -16,7 +16,7 @@ int main()
   assert(sizeof(int)==4);
   assert(sizeof(v4si)==16);
 
-  vector_u x, y, z;
+  vector_u x = {0}, y = {0}, z = {0};
 
   // vector operator vector
   z.v=x.v+y.v;

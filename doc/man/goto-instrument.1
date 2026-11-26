@@ -243,7 +243,8 @@ ignore user assumptions
 convert user assertions to assumptions
 .TP
 \fB\-\-uninitialized\-check\fR
-add checks for uninitialized locals (experimental)
+add checks for reads of uninitialized local variables whose address has
+never been taken (undefined behavior per C11 \[sc]6.3.2.1p2)
 .TP
 \fB\-\-stack\-depth\fR n
 add check that call stack size of non\-inlined functions never exceeds n
