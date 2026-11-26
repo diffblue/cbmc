@@ -1,0 +1,47 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: miniz
+Upstream-Contact: Rich Geldreich <richgel99@gmail.com>
+Source: https://github.com/richgel999/miniz
+Comment: miniz is a lossless, high performance data compression library that
+ implements the zlib (RFC 1950) and Deflate (RFC 1951) compressed data format
+ specification standards, with ZIP archive reading support. The vendored copy
+ consists of the amalgamated files miniz.h and miniz.cpp (upstream: miniz.c),
+ and is used by jbmc/src/java_bytecode/ to read .jar files.
+ .
+ The in-tree files are based on upstream commit
+ 0c30a001bc3c70770a8742ff00899e662f040c75 (release 3.0.2 plus all upstream
+ changes up to and including the fix for CVE-2018-12913), with the
+ following local modifications:
+  * miniz.c has been renamed to miniz.cpp and is compiled as C++;
+  * the configuration macros MINIZ_NO_TIME, MINIZ_NO_DEFLATE_APIS,
+    MINIZ_NO_ARCHIVE_WRITING_APIS, MINIZ_NO_ZLIB_APIS and
+    MINIZ_NO_ZLIB_COMPATIBLE_NAMES are enabled in miniz.h;
+  * compiler warnings (conversion and unhandled-enum warnings, in
+    particular with Visual Studio) have been silenced;
+  * functions that are only used when archive writing is enabled have
+    been removed.
+
+Files: miniz-3.0.2/*
+Copyright: 2013-2014, RAD Game Tools and Valve Software
+           2010-2014, Rich Geldreich and Tenacious Software LLC
+           2016, Martin Raiber
+License: Expat
+
+License: Expat
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to
+ deal in the Software without restriction, including without limitation the
+ rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ sell copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+ .
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+ .
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ IN THE SOFTWARE.
