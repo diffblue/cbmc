@@ -8380,6 +8380,17 @@ bool Parser::rCommaExpression(exprt &exp)
       fold.set("fold_op", ID_comma);
       fold.add_to_operands(std::move(exp));
       set_location(fold, tk);
+      // N5008 [expr.prim.fold]/1: binary fold `(init , ... , pack)'
+      // (libstdc++'s <bits/funcwrap.h>: `(nullptr, ..., __args)')
+      if(lex.LookAhead(0) == ',')
+      {
+        lex.get_token(tk);
+        exprt pack;
+        if(!rExpression(pack, false))
+          return false;
+        fold.id("cpp_binary_fold");
+        fold.add_to_operands(std::move(pack));
+      }
       exp.swap(fold);
       return true;
     }
