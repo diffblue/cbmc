@@ -359,8 +359,16 @@ exprt cpp_typecheck_resolvet::convert_identifier(
     }
     else if(symbol.is_macro)
     {
-      e=symbol.value;
-      PRECONDITION(e.is_not_nil());
+      if(symbol.type.id() == ID_code)
+      {
+        // constexpr function
+        e = cpp_symbol_expr(symbol);
+      }
+      else
+      {
+        e = symbol.value;
+        PRECONDITION(e.is_not_nil());
+      }
     }
     else
     {
