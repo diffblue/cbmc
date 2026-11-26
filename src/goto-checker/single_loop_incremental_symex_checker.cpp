@@ -96,37 +96,21 @@ operator()(propertiest &properties)
       // We have UNKNOWN properties, i.e. properties that we can check
       // on the current equation.
 
-      log.status()
-        << "Passing problem to "
-        << property_decider.get_decision_procedure().decision_procedure_text()
-        << messaget::eom;
-
       const auto solver_start = std::chrono::steady_clock::now();
 
       if(!current_equation_converted)
       {
         postprocess_equation(symex, equation, options, ns, ui_message_handler);
 
-        log.status() << "converting SSA" << messaget::eom;
-        equation.convert_without_assertions(
-          property_decider.get_decision_procedure());
-
-        property_decider.update_properties_goals_from_symex_target_equation(
-          properties);
-
-        // We convert the assertions in a new context.
-        property_decider.get_decision_procedure().push();
-        equation.convert_assertions(
-          property_decider.get_decision_procedure(), false);
-        property_decider.convert_goals();
+        solver_runtime += prepare_property_decider_incremental(
+          properties, equation, property_decider, ui_message_handler);
 
         current_equation_converted = true;
       }
 
-      property_decider.add_constraint_from_goals(
-        [&properties](const irep_idt &property_id) {
-          return is_property_to_check(properties.at(property_id).status);
-        });
+      property_decider.add_incremental_constraint_from_goals(
+        [&properties](const irep_idt &property_id)
+        { return is_property_to_check(properties.at(property_id).status); });
 
       log.status()
         << "Running "
@@ -153,9 +137,8 @@ operator()(propertiest &properties)
       if(result.progress == resultt::progresst::FOUND_FAIL)
         break;
 
-      // Nothing else to do with the current set of assertions.
-      // Let's pop them.
-      property_decider.get_decision_procedure().pop();
+      // Pop incremental assumptions for the next iteration.
+      property_decider.pop_incremental_assumptions();
     }
 
     // Now we are finally done.

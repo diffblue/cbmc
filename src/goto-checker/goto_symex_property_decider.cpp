@@ -128,6 +128,56 @@ symex_target_equationt &goto_symex_property_decidert::get_equation() const
   return equation;
 }
 
+std::optional<exprt> goto_symex_property_decidert::convert_goals_incremental()
+{
+  decision_proceduret &decision_procedure = solver->decision_procedure();
+  equation.convert_assertions_incremental(decision_procedure);
+  current_goal_extender_handle = std::nullopt;
+  return current_goal_extender_handle;
+}
+
+void goto_symex_property_decidert::add_incremental_constraint_from_goals(
+  std::function<bool(const irep_idt &)> select_property)
+{
+  // Pop any previously active assumptions first
+  pop_incremental_assumptions();
+
+  std::vector<exprt> assumptions;
+
+  // Build a goal selection assumption: at least one selected
+  // property must have a failing assertion instance.
+  exprt::operandst disjuncts;
+  for(const auto &goal_pair : goal_map)
+  {
+    if(select_property(goal_pair.first) && goal_pair.second.condition != false)
+    {
+      disjuncts.push_back(goal_pair.second.condition);
+    }
+  }
+
+  exprt goal_disjunction = disjunction(disjuncts);
+  assumptions.push_back(solver->decision_procedure().handle(goal_disjunction));
+
+  // The goal extender must be false to close the extensible
+  // assertion disjunction.
+  if(current_goal_extender_handle.has_value())
+  {
+    assumptions.push_back(not_exprt(current_goal_extender_handle.value()));
+  }
+
+  solver->decision_procedure().push(assumptions);
+  incremental_assumptions_active = true;
+}
+
+void goto_symex_property_decidert::pop_incremental_assumptions()
+{
+  if(incremental_assumptions_active)
+  {
+    solver->decision_procedure().pop();
+    incremental_assumptions_active = false;
+  }
+}
+
 void goto_symex_property_decidert::update_properties_status_from_goals(
   propertiest &properties,
   std::unordered_set<irep_idt> &updated_properties,
