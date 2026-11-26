@@ -11,3 +11,4 @@ test.c
 ^warning: ignoring
 --
 This is checking that the if statement body can actually be covered with the new flag
+--paths mode explores one path at a time, so individual paths may not cover all blocks.

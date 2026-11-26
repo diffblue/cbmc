@@ -7,3 +7,6 @@ main.c
 line . function main$
 ^VERIFICATION FAILED$
 --
+--
+--paths mode explores paths in a different order, finding a different failing
+assertion first, which changes the fault localization output.
