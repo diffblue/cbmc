@@ -25,6 +25,15 @@ exprt object_size(const exprt &pointer);
 exprt null_object(const exprt &pointer);
 
 exprt integer_address(const exprt &pointer);
+
+/// A predicate that holds for pointers that denote an integer (e.g.
+/// memory-mapped or device) address rather than a real allocated object.
+/// Under the standard encoding this is equivalent to
+/// `integer_address(pointer)`; the wide pointer encoding gives such pointers
+/// dedicated objects and recognises them directly, which `integer_address`
+/// (built on `same_object` with NULL) cannot. Used by the memory-mapped I/O
+/// instrumentation.
+exprt is_integer_address(const exprt &pointer);
 exprt object_lower_bound(
   const exprt &pointer,
   const exprt &offset);
