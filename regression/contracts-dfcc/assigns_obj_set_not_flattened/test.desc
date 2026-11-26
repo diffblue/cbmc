@@ -1,0 +1,14 @@
+CORE dfcc-only
+main.c
+--dfcc main --enforce-contract swap _ --object-bits 16 --verbosity 9
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^[0-9]{6,} variables, [0-9]+ clauses$
+--
+The write set's object set indexed by object id has 2^object_bits elements.
+With a constant size, the SAT back end flattened it, so the formula had more
+than 600,000 variables at 16 object bits (and more than 12 million for the
+same pattern in larger programs). Allocating it with a non-constant size keeps
+it in the array theory: this test needs about 45,000 variables.
