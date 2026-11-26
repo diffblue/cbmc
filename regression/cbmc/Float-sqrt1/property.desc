@@ -1,0 +1,12 @@
+CORE no-new-smt
+property.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+The square root of any number of at least 1 does not exceed the number.
+The incremental SMT2 back-end does not complete this double-precision
+property within 15 minutes.

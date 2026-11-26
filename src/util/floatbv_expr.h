@@ -147,6 +147,64 @@ to_floatbv_round_to_integral_expr(exprt &expr)
   return static_cast<floatbv_round_to_integral_exprt &>(expr);
 }
 
+/// \brief IEEE 754 squareRoot: the square root of the operand, correctly
+/// rounded according to the given rounding mode
+class floatbv_sqrt_exprt : public binary_exprt
+{
+public:
+  floatbv_sqrt_exprt(exprt op, exprt rounding)
+    : binary_exprt(op, ID_floatbv_sqrt, std::move(rounding), op.type())
+  {
+  }
+
+  exprt &op()
+  {
+    return op0();
+  }
+
+  const exprt &op() const
+  {
+    return op0();
+  }
+
+  exprt &rounding_mode()
+  {
+    return op1();
+  }
+
+  const exprt &rounding_mode() const
+  {
+    return op1();
+  }
+};
+
+template <>
+inline bool can_cast_expr<floatbv_sqrt_exprt>(const exprt &base)
+{
+  return base.id() == ID_floatbv_sqrt;
+}
+
+/// \brief Cast an exprt to a \ref floatbv_sqrt_exprt
+///
+/// \a expr must be known to be \ref floatbv_sqrt_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref floatbv_sqrt_exprt
+inline const floatbv_sqrt_exprt &to_floatbv_sqrt_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_floatbv_sqrt);
+  floatbv_sqrt_exprt::check(expr);
+  return static_cast<const floatbv_sqrt_exprt &>(expr);
+}
+
+/// \copydoc to_floatbv_sqrt_expr(const exprt &)
+inline floatbv_sqrt_exprt &to_floatbv_sqrt_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_floatbv_sqrt);
+  floatbv_sqrt_exprt::check(expr);
+  return static_cast<floatbv_sqrt_exprt &>(expr);
+}
+
 /// \brief Evaluates to true if the operand is NaN
 class isnan_exprt : public unary_predicate_exprt
 {

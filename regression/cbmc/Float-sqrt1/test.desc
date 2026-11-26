@@ -1,0 +1,13 @@
+CORE thorough-z3-smt-backend no-new-smt
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Square root is a built-in floating-point operation that the solver computes
+with correct rounding in all rounding modes.
+The incremental SMT2 back-end does not complete the double- and
+long-double-precision cases within 15 minutes.

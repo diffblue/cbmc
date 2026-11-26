@@ -733,6 +733,106 @@ bvt float_utilst::div(const bvt &src1, const bvt &src2)
   return round_and_pack(result);
 }
 
+bvt float_utilst::integer_sqrt(const bvt &radicand, bvt &remainder)
+{
+  PRECONDITION(radicand.size() % 2 == 0);
+  const std::size_t root_width = radicand.size() / 2;
+
+  // Restoring (digit-by-digit) square root: in each step, bring down the next
+  // two bits of the radicand, and try to subtract 4 * root + 1, which
+  // determines the next bit of the root. Invariant: remainder <= 2 * root,
+  // hence root_width + 2 bits suffice for the remainder.
+  bvt root = bv_utils.zeros(root_width);
+  remainder = bv_utils.zeros(root_width + 2);
+
+  for(std::size_t i = root_width; i > 0; --i)
+  {
+    // remainder = 4 * remainder + next two bits of the radicand
+    bvt shifted_remainder{radicand[2 * i - 2], radicand[2 * i - 1]};
+    shifted_remainder.insert(
+      shifted_remainder.end(), remainder.begin(), remainder.end() - 2);
+
+    // trial = 4 * root + 1
+    bvt trial{const_literal(true), const_literal(false)};
+    trial.insert(trial.end(), root.begin(), root.end());
+
+    // one extra bit to obtain the borrow
+    const bvt difference = bv_utils.sub(
+      bv_utils.zero_extension(shifted_remainder, root_width + 3),
+      bv_utils.zero_extension(trial, root_width + 3));
+    const literalt fits = !difference.back();
+
+    remainder = bv_utils.select(
+      fits, bvt{difference.begin(), difference.end() - 1}, shifted_remainder);
+
+    // root = 2 * root + fits
+    root.pop_back();
+    root.insert(root.begin(), fits);
+  }
+
+  return root;
+}
+
+bvt float_utilst::sqrt(const bvt &src)
+{
+  const unbiased_floatt unpacked = unpack(src);
+
+  // The value is fraction * 2^(exponent - f). Scale the fraction by an even
+  // power of two (or an odd one, making exponent - f - scale even), such that
+  // the integer square root has at least f + 3 bits even for subnormal
+  // arguments, i.e., enough bits for rounding, and a sticky bit.
+  const std::size_t k = spec.f + 2;
+  std::size_t radicand_width = unpacked.fraction.size() + 2 * k + 1;
+  if(radicand_width % 2 != 0)
+    ++radicand_width;
+
+  // is exponent - f odd?
+  const literalt odd =
+    spec.f % 2 == 0 ? unpacked.exponent[0] : !unpacked.exponent[0];
+
+  const bvt fraction =
+    bv_utils.zero_extension(unpacked.fraction, radicand_width);
+  const bvt radicand = bv_utils.select(
+    odd,
+    bv_utils.shift(fraction, bv_utilst::shiftt::SHIFT_LEFT, 2 * k + 1),
+    bv_utils.shift(fraction, bv_utilst::shiftt::SHIFT_LEFT, 2 * k));
+
+  bvt remainder;
+  const bvt root = integer_sqrt(radicand, remainder);
+
+  unbiased_floatt result;
+
+  // the remainder becomes the sticky bit, as least-significant bit
+  result.fraction = root;
+  result.fraction.insert(
+    result.fraction.begin(), bv_utils.is_not_zero(remainder));
+
+  // The square root is root * 2^((exponent - f - scale) / 2), where scale is
+  // 2 * k + odd; with the sticky bit added, the exponent is
+  // (exponent - f - scale) / 2 - 1 + root.size().
+  const std::size_t exponent_width =
+    std::max(spec.e, address_bits(radicand_width + spec.f + 1)) + 2;
+  const bvt exponent =
+    bv_utils.sign_extension(unpacked.exponent, exponent_width);
+  bvt offset_exponent = bv_utils.sub(
+    exponent, bv_utils.build_constant(spec.f + 2 * k, exponent_width));
+  offset_exponent = bv_utils.sub(
+    offset_exponent, bv_utils.zero_extension(bvt{odd}, exponent_width));
+  // divide by two, which is exact
+  bvt half_exponent{offset_exponent.begin() + 1, offset_exponent.end()};
+  half_exponent.push_back(half_exponent.back());
+  result.exponent = bv_utils.add(
+    half_exponent, bv_utils.build_constant(root.size() - 1, exponent_width));
+
+  // the square root of -0 is -0, and is positive otherwise
+  result.sign = prop.land(unpacked.sign, unpacked.zero);
+  result.zero = unpacked.zero;
+  result.infinity = prop.land(unpacked.infinity, !unpacked.sign);
+  result.NaN = prop.lor(unpacked.NaN, prop.land(unpacked.sign, !unpacked.zero));
+
+  return round_and_pack(result);
+}
+
 bvt float_utilst::rem(const bvt &src1, const bvt &src2)
 {
   /* The semantics of floating-point remainder implemented as below

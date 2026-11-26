@@ -1,4 +1,4 @@
-CORE no-new-smt
+CORE
 main.c
 --object-bits 8 --enum-range-check --div-by-zero-check --unsigned-overflow-check --pointer-overflow-check --float-overflow-check --float-div-by-zero-check --conversion-check --nan-check
 ^\[main\.pointer_primitives\.\d+\] line 80 pointer invalid in R_OK\(q, \(unsigned (long (long )?)?int\)1\): FAILURE$

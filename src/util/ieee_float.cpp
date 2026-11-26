@@ -1368,6 +1368,63 @@ bool ieee_float_valuet::is_float() const
   return spec.f==23 && spec.e==8;
 }
 
+/// \return floor(sqrt(n)) for \p n >= 0
+static mp_integer integer_sqrt(const mp_integer &n)
+{
+  PRECONDITION(n >= 0);
+  if(n < 2)
+    return n;
+
+  // Newton's method, starting from a value that is at least the root
+  mp_integer x = power(2, n.floorPow2() / 2 + 1);
+  while(true)
+  {
+    const mp_integer y = (x + n / x) / 2;
+    if(y >= x)
+      return x;
+    x = y;
+  }
+}
+
+ieee_floatt ieee_floatt::sqrt() const
+{
+  if(NaN_flag || is_zero())
+    return *this;
+
+  ieee_floatt result = *this;
+
+  if(sign_flag)
+  {
+    result.make_NaN();
+    return result;
+  }
+
+  if(infinity_flag)
+    return result;
+
+  // The value is fraction * 2^(exponent - f). Scale the fraction such that
+  // its integer square root has at least f + 3 bits (also for subnormal
+  // numbers), and such that the remaining power of two is even.
+  mp_integer scale = 2 * (spec.f + 2);
+  mp_integer scaled_exponent = exponent - spec.f - scale;
+  if(scaled_exponent % 2 != 0)
+  {
+    ++scale;
+    --scaled_exponent;
+  }
+  const mp_integer radicand =
+    fraction * power(2, numeric_cast_v<std::size_t>(scale));
+  const mp_integer root = integer_sqrt(radicand);
+
+  // Add a sticky bit, which is set iff the root is not exact.
+  result.fraction = 2 * root + (root * root == radicand ? 0 : 1);
+  // value = result.fraction * 2^(scaled_exponent / 2 - 1)
+  result.exponent = scaled_exponent / 2 - 1 + spec.f;
+  result.align();
+
+  return result;
+}
+
 ieee_floatt ieee_floatt::round_to_integral() const
 {
   if(NaN_flag || infinity_flag || is_zero())

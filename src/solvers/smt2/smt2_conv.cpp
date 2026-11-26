@@ -1314,6 +1314,10 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     convert_floatbv_round_to_integral(to_floatbv_round_to_integral_expr(expr));
   }
+  else if(expr.id() == ID_floatbv_sqrt)
+  {
+    convert_floatbv_sqrt(to_floatbv_sqrt_expr(expr));
+  }
   else if(expr.id()==ID_struct)
   {
     convert_struct(to_struct_expr(expr));
@@ -3793,6 +3797,22 @@ void smt2_convt::convert_floatbv_round_to_integral(
     UNEXPECTEDCASE("TODO floatbv_round_to_integral without FPA");
 }
 
+void smt2_convt::convert_floatbv_sqrt(const floatbv_sqrt_exprt &expr)
+{
+  PRECONDITION(expr.type().id() == ID_floatbv);
+
+  if(use_FPA_theory)
+  {
+    out << "(fp.sqrt ";
+    convert_rounding_mode_FPA(expr.rounding_mode());
+    out << ' ';
+    convert_expr(expr.op());
+    out << ")";
+  }
+  else
+    convert_floatbv(expr);
+}
+
 void smt2_convt::convert_struct(const struct_exprt &expr)
 {
   const struct_typet &struct_type =
@@ -6067,6 +6087,7 @@ void smt2_convt::find_symbols(const exprt &expr)
            expr.id() == ID_floatbv_mult ||
            expr.id() == ID_floatbv_div ||
            expr.id() == ID_floatbv_fma ||
+           expr.id() == ID_floatbv_sqrt ||
            expr.id() == ID_floatbv_typecast ||
            expr.id() == ID_ieee_float_equal ||
            expr.id() == ID_ieee_float_notequal ||
