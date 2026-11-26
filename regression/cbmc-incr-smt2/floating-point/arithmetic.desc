@@ -1,0 +1,15 @@
+CORE
+arithmetic.c
+
+^\[main\.assertion\.1\] line 5 plus: SUCCESS$
+^\[main\.assertion\.2\] line 9 from negative int: SUCCESS$
+^\[main\.assertion\.3\] line 14 sum can be 3: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Floating-point arithmetic on single-precision floats. The bit-vector encoding
+of these operations shares sub-expressions extensively; it ran out of memory
+(more than 8 GB) when traversed as a tree. The results match those of the SAT
+back-end.
