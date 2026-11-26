@@ -295,6 +295,50 @@ SCENARIO("irept_memory", "[core][utils][irept]")
       REQUIRE(irep1 == irep2);
       REQUIRE(!irep1.full_eq(irep2));
     }
+
+    THEN("compare agrees for shared and unshared equal ireps")
+    {
+      const irept original{
+        "id1",
+        irept::named_subt{{"op", irept{"sub"}}, {"#comment", irept{"c"}}},
+        {irept{"op0"}}};
+
+      // A copy shares the same node.
+      irept copy = original;
+      REQUIRE(original.compare(copy) == 0);
+      REQUIRE(!(original < copy));
+      REQUIRE(!(copy < original));
+
+      // Structurally equal but separately built, and without the comment:
+      // must still compare equal via the full walk.
+      const irept rebuilt{
+        "id1", irept::named_subt{{"op", irept{"sub"}}}, {irept{"op0"}}};
+      REQUIRE(original.compare(rebuilt) == 0);
+      REQUIRE(rebuilt.compare(original) == 0);
+
+      // Modifying the copy un-shares it; the ordering must reflect that.
+      copy.get_sub().front().id("op1");
+      REQUIRE(original.compare(copy) != 0);
+      REQUIRE((original.compare(copy) < 0) == (copy.compare(original) > 0));
+    }
+
+    THEN("compare does not walk shared sub-trees")
+    {
+      // node has 2^depth leaves but only depth + 1 distinct nodes. Without
+      // the sharing check in compare, the two look-ups below visit every
+      // leaf and do not finish in any reasonable time.
+      const std::size_t depth = 64;
+      irept node{"leaf"};
+      for(std::size_t k = 0; k < depth; ++k)
+        node = irept{"n", {}, {node, node}};
+
+      // Distinct top-level nodes that share their operand.
+      const irept a{"top", {}, {node}};
+      const irept b{"top", {}, {node}};
+      REQUIRE(a.compare(b) == 0);
+      REQUIRE(!(a < b));
+      REQUIRE(!(b < a));
+    }
   }
 }
 
