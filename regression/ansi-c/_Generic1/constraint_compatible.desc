@@ -1,0 +1,10 @@
+CORE gcc-only
+constraint_compatible.c
+
+^.*error: generic association type 'signed int \(\*\)\[5l?\]' is compatible with previous association type 'signed int \(\*\)\[\]'$
+^CONVERSION ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--
+C11 6.5.1.1p2 constrains the association list itself.

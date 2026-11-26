@@ -1,0 +1,10 @@
+CORE gcc-only
+constraint_default.c
+
+^.*error: generic selection has more than one default association$
+^CONVERSION ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--
+C11 6.5.1.1p2: at most one default association.
