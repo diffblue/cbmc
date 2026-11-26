@@ -1,0 +1,17 @@
+KNOWNBUG
+main.cpp
+--cpp26
+^\[main\.assertion\.1\] line \d+ structured binding declaration as a condition: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+[stmt.pre]/4: a condition may be a structured binding declaration, whose
+decision variable is the object it binds (contextually converted to bool,
+[stmt.pre]/5).  CBMC reported a parse error before `[ x , y'
+(cpp26_structured_binding_condition_forms).  Checked with GCC 16.

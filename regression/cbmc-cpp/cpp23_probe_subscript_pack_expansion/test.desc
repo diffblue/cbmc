@@ -1,0 +1,17 @@
+KNOWNBUG
+main.cpp
+--cpp23
+^\[main\.assertion\.1\] line \d+ pack expansion in a subscript: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The expression-list of a subscript may contain a pack expansion
+([expr.sub]/1, [temp.variadic]/5): `m[a...]' was a parse error
+(cpp23_subscript_pack_expansion_forms).  libstdc++ 16's <utility>
+(std::constant_wrapper::operator[]) uses this in C++26 mode.

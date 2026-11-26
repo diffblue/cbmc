@@ -1,0 +1,18 @@
+KNOWNBUG
+main.cpp
+--cpp26
+^\[main\.assertion\.1\] line \d+ an exception thrown and caught in a constant expression: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+C++26 permits an exception object in a constant expression when it is
+destroyed within the evaluation ([expr.const]/10.22).  CBMC's constant
+evaluator did not evaluate throw and try: W<f()> failed to type-check
+(CONVERSION ERROR) (cpp26_constexpr_exceptions_forms).  Checked with
+GCC 16.

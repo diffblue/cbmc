@@ -1,0 +1,20 @@
+KNOWNBUG
+main.cpp
+--cpp26
+^\[main\.assertion\.1\] line \d+ saturated: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Saturation arithmetic ([numeric.sat]) with N5008's names add_sat and
+saturate_cast.  libstdc++ 16 implements it as saturating_add and
+saturating_cast, names from a revision after N5008.  No standard library
+implements it yet (libstdc++ 16, libc++ 18), so the test is written to N5008
+and not checked with a compiler; it is FUTURE until a library provides the
+header.  Then it is a KNOWNBUG or CORE test of CBMC's support of that library
+code.
