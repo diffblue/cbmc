@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp11 --unwind 5
+^\[main\.assertion\.1\] .* copy-list-initialization: SUCCESS$
+^\[main\.assertion\.2\] .* direct-list-initialization: SUCCESS$
+^\[main\.assertion\.3\] .* while: SUCCESS$
+^\[main\.assertion\.4\] .* switch: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+N5008 [stmt.pre]/1: the initializer of a condition declaration is a
+brace-or-equal-initializer, `= {...}' (Google Test's EXPECT_TRUE) or `{...}';
+the parser required `= expression'.

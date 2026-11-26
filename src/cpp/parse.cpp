@@ -2795,16 +2795,32 @@ bool Parser::rSimpleDeclaration(cpp_declarationt &declaration)
   if(!rDeclarator(declarator, kDeclarator, true, true))
     return false;
 
-  // there really _has_ to be an initializer!
+  // there really _has_ to be an initializer: a brace-or-equal-initializer
+  // (N5008 [stmt.pre]/1), `= expression', `= {...}' or `{...}' (Google Test's
+  // `if (const AssertionResultExpectation gtest_are_ = {...})')
 
-  if(lex.LookAhead(0)!='=')
-    return false;
+  if(lex.LookAhead(0) == '{')
+  {
+    if(!rInitializeExpr(declarator.value()))
+      return false;
+    mark_direct_list_init(declarator.value());
+  }
+  else
+  {
+    if(lex.LookAhead(0) != '=')
+      return false;
 
-  cpp_tokent eqs;
-  lex.get_token(eqs);
+    cpp_tokent eqs;
+    lex.get_token(eqs);
 
-  if(!rExpression(declarator.value(), false))
-    return false;
+    if(lex.LookAhead(0) == '{')
+    {
+      if(!rInitializeExpr(declarator.value()))
+        return false;
+    }
+    else if(!rExpression(declarator.value(), false))
+      return false;
+  }
 
   declaration.declarators().push_back(declarator);
 
