@@ -1,0 +1,14 @@
+CORE gcc-only
+scopes.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+redeclaration of
+--
+The initializer of __auto_type is type checked once, so declarations, tags,
+enumeration constants and labels in a statement expression in it are not
+redeclared.

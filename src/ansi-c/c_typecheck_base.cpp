@@ -772,6 +772,26 @@ void c_typecheck_baset::check_was_freed(
   }
 }
 
+/// Find the `typeof` type that the parser created for a GCC `__auto_type`
+/// declaration, possibly merged with type qualifiers.
+/// \return pointer to the `typeof` type, or nullptr if there is none
+static typet *find_auto_typeof(typet &type)
+{
+  if(type.id() == ID_typeof && type.get_bool(ID_C_auto_type))
+    return &type;
+
+  if(type.id() == ID_merged_type)
+  {
+    for(auto &subtype : to_type_with_subtypes(type).subtypes())
+    {
+      if(typet *result = find_auto_typeof(subtype))
+        return result;
+    }
+  }
+
+  return nullptr;
+}
+
 void c_typecheck_baset::typecheck_declaration(
   ansi_c_declarationt &declaration)
 {
@@ -786,6 +806,24 @@ void c_typecheck_baset::typecheck_declaration(
   {
     // get storage spec
     c_storage_spect c_storage_spec(declaration.type());
+
+    // GCC's __auto_type: the parser produces `typeof(init) v = init;` with two
+    // copies of the initializer. Typecheck the initializer once and use the
+    // result for both copies: typechecking it twice would re-create any
+    // declarations, tags, enumerators or labels in a statement expression.
+    if(typet *auto_type = find_auto_typeof(declaration.type()))
+    {
+      if(
+        declaration.declarators().size() == 1 &&
+        declaration.declarator().value().is_not_nil())
+      {
+        exprt &init = declaration.declarator().value();
+        typecheck_expr(init);
+        to_unary_expr((exprt &)*auto_type).op() =
+          already_typechecked_exprt{init};
+        already_typechecked_exprt::make_already_typechecked(init);
+      }
+    }
 
     // first typecheck the type of the declaration
     typecheck_type(declaration.type());

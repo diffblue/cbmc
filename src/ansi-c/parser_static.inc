@@ -468,6 +468,8 @@ static void new_auto_type_declaration(
   // turn the __auto_type node into typeof(initializer)
   parser_stack(auto_type_node).id(ID_typeof);
   parser_stack(auto_type_node).copy_to_operands(parser_stack(initializer));
+  // lets the type checker typecheck the initializer only once
+  parser_stack(auto_type_node).set(ID_C_auto_type, true);
 
   // merge any qualifier list (const/volatile/...) into the typeof type
   const YYSTYPE type_node = qualifier_list != nullptr
