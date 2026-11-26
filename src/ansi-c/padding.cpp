@@ -804,29 +804,29 @@ void add_padding(union_typet &type, const namespacet &ns)
     if(s.has_value())
       size_bits = std::max(size_bits, *s);
   }
+  const bitst member_bits = size_bits;
 
   if(config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
   {
-    // Visual Studio pads up to the underlying width of
-    // any bit field.
+    // With Visual Studio, the size of a union is at least the size of the
+    // underlying type of any bit-field.
     for(const auto &c : type.components())
       if(c.type().id() == ID_c_bit_field)
       {
         auto w = underlying_width(to_c_bit_field_type(c.type()), ns);
-        if(w.has_value() && bitst{w.value()} > max_alignment_bits)
-          max_alignment_bits = bitst{w.value()};
+        if(w.has_value())
+          size_bits = std::max(size_bits, bitst{w.value()});
       }
   }
 
   // The size must be a multiple of the alignment, or
   // we add a padding member to the union.
-
   if(size_bits % max_alignment_bits != bitst{0})
-  {
-    bitst padding_bits = max_alignment_bits - (size_bits % max_alignment_bits);
+    size_bits += max_alignment_bits - (size_bits % max_alignment_bits);
 
-    unsignedbv_typet padding_type(
-      numeric_cast_v<std::size_t>(size_bits + padding_bits));
+  if(size_bits > member_bits)
+  {
+    unsignedbv_typet padding_type(numeric_cast_v<std::size_t>(size_bits));
 
     struct_typet::componentt component;
     component.type()=padding_type;

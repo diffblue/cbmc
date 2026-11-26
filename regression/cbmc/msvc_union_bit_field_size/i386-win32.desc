@@ -1,0 +1,10 @@
+CORE
+main.i
+--i386-win32
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Variant of test.desc for 32-bit Windows.

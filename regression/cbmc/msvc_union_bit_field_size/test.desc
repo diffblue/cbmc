@@ -1,0 +1,10 @@
+CORE
+main.i
+--winx64
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Visual Studio size of unions with bit-fields.
