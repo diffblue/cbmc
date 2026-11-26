@@ -1,1 +1,30 @@
-goto-cc.1
+.TH GOTO-GCC "1" "March 1, 2026" "goto-gcc-6.10.0" "User Commands"
+.SH NAME
+goto\-gcc \- C/C++ to goto compiler (GCC mode)
+.SH SYNOPSIS
+.B goto\-gcc
+.RI [ options ]
+.IR file ...
+.SH DESCRIPTION
+\fBgoto\-gcc\fR is an alias for \fBgoto\-cc\fR(1) that invokes \fBgcc\fR(1) as
+the preprocessor and produces an \fBelf\fR(5) object file with an additional
+\fIgoto\-cc\fR section containing the GOTO binary.  This allows the same
+file to be used both as a native executable and as input to \fBcbmc\fR(1).
+.PP
+\fBgoto\-gcc\fR accepts all options that \fBgoto\-cc\fR(1) and \fBgcc\fR(1)
+accept.  See \fBgoto\-cc\fR(1) for full documentation.
+.SH ENVIRONMENT
+.TP
+.B TMPDIR
+All CProver tools honor this variable when creating temporary files and
+directories.
+.SH BUGS
+If you encounter a problem please create an issue at
+.B https://github.com/diffblue/cbmc/issues
+.SH SEE ALSO
+.BR cbmc (1),
+.BR gcc (1),
+.BR goto\-cc (1),
+.BR goto\-ld (1)
+.SH COPYRIGHT
+2006\-2026, Daniel Kroening, Michael Tautschnig, Christoph Wintersteiger

@@ -1,39 +1,43 @@
-.TH JANALYZER "1" "June 2022" "janalyzer-5.59.0" "User Commands"
+.TH JANALYZER "1" "March 1, 2026" "janalyzer-6.10.0" "User Commands"
 .SH NAME
 janalyzer \- Data-flow analysis for Java bytecode
 .SH SYNOPSIS
-.TP
-.B janalyzer [\-?] [\-h] [\-\-help]
-show help
-.TP
-.B janalyzer \fImethod\-name\fR
-Use the fully qualified name of a method as entry point, e.g.,
-\fI'mypackage.Myclass.foo:(I)Z'\fR
-.TP
-.B janalyzer \fIclass\-name\fR
-The entry point is the method specified by
-\fB\-\-function\fR, or otherwise, the
-.B public static void main(String[])
-method of the given class \fIclass\-name\fR.
-.TP
-.B janalyzer \-jar \fIjarfile\fR
-JAR file to be checked.
-The entry point is the method specified by
-\fB\-\-function\fR or otherwise, the
-.B public static void main(String[])
-method
-of the class specified by \fB\-\-main\-class\fR or the main
-class specified in the JAR manifest
-(checked in this order).
-.TP
-.B janalyzer \-\-gb \fIgoto\-binary\fR
-GOTO binary file to be checked.
-The entry point is the method specified by
-\fB\-\-function\fR, or otherwise, the
-.B public static void main(String[])
-of the class specified by \fB\-\-main\-class\fR
-(checked in this order).
+.B janalyzer
+.RI [ options ]
+.I method-name
+.br
+.B janalyzer
+.RI [ options ]
+.I class-name
+.br
+.B janalyzer
+.RI [ options ]
+.BI \-jar " jarfile"
+.br
+.B janalyzer
+.RI [ options ]
+.BI \-\-gb " goto-binary"
 .SH DESCRIPTION
+\fBjanalyzer\fR is an abstract interpreter for Java bytecode.  It uses the
+same front-end as \fBjbmc\fR(1) but performs over-approximate analysis
+rather than bounded model checking.  Where \fBjbmc\fR can find concrete
+counterexamples, \fBjanalyzer\fR can prove properties for all possible
+executions (at the cost of potential false alarms).
+.PP
+See \fBgoto\-analyzer\fR(1) for the C/C++ equivalent and a more detailed
+description of the abstract interpretation framework.
+.SH EXAMPLES
+Verify all properties using abstract interpretation:
+.IP
+.B janalyzer \-\-verify MyClass
+.PP
+Show the abstract state at every program point:
+.IP
+.B janalyzer \-\-show MyClass
+.PP
+List unreachable methods:
+.IP
+.B janalyzer \-\-unreachable\-functions \-jar app.jar
 .SH OPTIONS
 .TP
 \fB\-classpath\fR dirs/jars, \fB\-cp\fR dirs/jars, \fB\-\-classpath\fR dirs/jars
@@ -62,7 +66,8 @@ reach the same location, each will be checked and the answers
 combined, with unknown taking precedence.
 .TP
 \fB\-\-simplify\fR \fIfile_name\fR
-Writes a new version of the input program to \fIfile_name\fR in which the program has
+Writes a new version of the input program to \fIfile_name\fR in which the
+program has
 been simplified using information from the abstract interpreter.  The
 exact simplification will depend on the domain that is used but
 typically this might be replacing any expression that has a constant
@@ -186,7 +191,8 @@ at level \fIN\fR references are set to \fBnull\fR.
 Never initialize reference-typed parameter to the
 entry point with \fBnull\fR.
 .TP
-\fB\-\-java\-assume\-inputs\-interval\fR [\fIL\fR:\fIU\fR] or [\fIL\fR:] or [:\fIU\fR]
+\fB\-\-java\-assume\-inputs\-interval\fR [\fIL\fR:\fIU\fR] or [\fIL\fR:] or
+[:\fIU\fR]
 Force numerical primitive-typed inputs (\fBbyte\fR, \fBshort\fR, \fBint\fR,
 \fBlong\fR, \fBfloat\fR, \fBdouble\fR) to be initialized within the given range;
 lower bound \fIL\fR and upper bound \fIU\fR must be integers; does not work for
@@ -270,10 +276,13 @@ updating another class' static field.
 .TP
 \fB\-\-arch\fR \fIarch\fR
 Set analysis architecture, which defaults to the host architecture. Use one of:
-\fBalpha\fR, \fBarm\fR, \fBarm64\fR, \fBarmel\fR, \fBarmhf\fR, \fBhppa\fR, \fBi386\fR, \fBia64\fR,
+\fBalpha\fR, \fBarm\fR, \fBarm64\fR, \fBarmel\fR, \fBarmhf\fR, \fBhppa\fR,
+\fBi386\fR, \fBia64\fR,
 \fBmips\fR, \fBmips64\fR, \fBmips64el\fR, \fBmipsel\fR, \fBmipsn32\fR,
-\fBmipsn32el\fR, \fBpowerpc\fR, \fBppc64\fR, \fBppc64le\fR, \fBriscv64\fR, \fBs390\fR,
-\fBs390x\fR, \fBsh4\fR, \fBsparc\fR, \fBsparc64\fR, \fBv850\fR, \fBx32\fR, \fBx86_64\fR, or
+\fBmipsn32el\fR, \fBpowerpc\fR, \fBppc64\fR, \fBppc64le\fR, \fBriscv64\fR,
+\fBs390\fR,
+\fBs390x\fR, \fBsh4\fR, \fBsparc\fR, \fBsparc64\fR, \fBv850\fR, \fBx32\fR,
+\fBx86_64\fR, or
 \fBnone\fR.
 .TP
 \fB\-\-os\fR \fIos\fR
@@ -281,10 +290,12 @@ Set analysis operating system, which defaults to the host operating system. Use
 one of: \fBfreebsd\fR, \fBlinux\fR, \fBmacos\fR, \fBnetbsd\fR, \fBopenbsd\fR,
 \fBsolaris\fR, \fBhurd\fR, or \fBwindows\fR.
 .TP
-\fB\-\-i386\-linux\fR, \fB\-\-i386\-win32\fR, \fB\-\-i386\-macos\fR, \fB\-\-ppc\-macos\fR, \fB\-\-win32\fR, \fB\-\-winx64\fR
+\fB\-\-i386\-linux\fR, \fB\-\-i386\-win32\fR, \fB\-\-i386\-macos\fR,
+\fB\-\-ppc\-macos\fR, \fB\-\-win32\fR, \fB\-\-winx64\fR
 Set analysis architecture and operating system.
 .TP
-\fB\-\-LP64\fR, \fB\-\-ILP64\fR, \fB\-\-LLP64\fR, \fB\-\-ILP32\fR, \fB\-\-LP32\fR
+\fB\-\-LP64\fR, \fB\-\-ILP64\fR, \fB\-\-LLP64\fR, \fB\-\-ILP32\fR,
+\fB\-\-LP32\fR
 Set width of int, long and pointers, but don't override default architecture and
 operating system.
 .TP
@@ -293,58 +304,61 @@ Equivalent to \fB\-\-LP32\fR, \fB\-\-ILP32\fR, \fB\-\-LP64\fR (on Windows:
 \fB\-\-LLP64\fR).
 .TP
 \fB\-\-little\-endian\fR
-allow little\-endian word\-byte conversions
+Assume little-endian byte order for word-byte conversions.
 .TP
 \fB\-\-big\-endian\fR
-allow big\-endian word\-byte conversions
+Assume big-endian byte order for word-byte conversions.
 .TP
 \fB\-\-gcc\fR
-use GCC as preprocessor
+Use GCC as the C preprocessor.
 .SS "Program representations:"
 .TP
 \fB\-\-show\-parse\-tree\fR
-show parse tree
+Display the parse tree of the loaded bytecode.
 .TP
 \fB\-\-show\-symbol\-table\fR
-show loaded symbol table
+Display the symbol table, listing all variables, methods, and types.
 .TP
 \fB\-\-show\-goto\-functions\fR
-show loaded goto program
+Display the GOTO program instructions for all loaded methods.
 .TP
 \fB\-\-list\-goto\-functions\fR
-list loaded goto functions
+List the names of all loaded methods without showing their bodies.
 .TP
 \fB\-\-show\-properties\fR
-show the properties, but don't run analysis
+List all properties without running analysis.
 .SS "Program instrumentation options:"
 .TP
 \fB\-\-no\-assertions\fR
-ignore user assertions
+Ignore all user-written assertions.
 .TP
 \fB\-\-no\-assumptions\fR
-ignore user assumptions
+Ignore all assumptions.
 .TP
 \fB\-\-property\fR \fIid\fR
-enable selected properties only
+Only check the property with the given \fIid\fR.
 .SS "Other options:"
 .TP
 \fB\-\-version\fR
-show version and exit
+Print version information and exit.
 .TP
 \fB\-\-verbosity\fR \fIn\fR
-verbosity level
+Set the verbosity level to \fIn\fR (default: 6).
 .TP
 \fB\-\-timestamp\fR [\fBmonotonic\fR|\fBwall\fR]
 Print microsecond\-precision timestamps.  \fBmonotonic\fR: stamps increase
 monotonically.  \fBwall\fR: ISO\-8601 wall clock timestamps.
 .SH ENVIRONMENT
-All tools honor the TMPDIR environment variable when generating temporary
-files and directories.
+.TP
+.B TMPDIR
+All CProver tools honor this variable when creating temporary files and
+directories.
 .SH BUGS
 If you encounter a problem please create an issue at
 .B https://github.com/diffblue/cbmc/issues
 .SH SEE ALSO
+.BR goto\-analyzer (1),
 .BR jbmc (1),
-.BR goto-analyzer (1)
+.BR jdiff (1)
 .SH COPYRIGHT
-2016\-2018, Daniel Kroening, Diffblue
+2016\-2026, Daniel Kroening, Diffblue
