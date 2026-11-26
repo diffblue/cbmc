@@ -820,13 +820,20 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
   }
 
   // casts from a constant pointer that holds an integer address to an integer
-  // of the same width: the integer with the same bits, which is how the
-  // back-ends encode both (bv_pointerst::convert_pointer_type and
-  // smt2_convt::convert_constant); shadow memory of pointer-typed objects
-  // yields such casts
+  // of the same width: the integer with the same bits; shadow memory of
+  // pointer-typed objects yields such casts.
+  // C leaves this conversion implementation-defined (C11 6.3.2.3p6), so the
+  // result is CBMC's own choice and has to agree with the back-ends. All of
+  // them encode such a constant by its value bits and the cast as the
+  // identity (bv_pointerst::convert_pointer_type and convert_bitvector,
+  // smt2_convt::convert_constant and convert_typecast, and the incremental
+  // SMT back-end's convert_expr_to_smt). Do not extend this to casts that
+  // change the width: there bv_pointerst zero-extends, but smt2_convt
+  // sign-extends. If the pointer encoding changes, this rule must change
+  // with it; unit/solvers/flattening/bv_pointers.cpp checks the agreement.
   if(
     op_type.id() == ID_pointer && expr.op().is_constant() &&
-    !to_constant_expr(expr.op()).is_null_pointer() &&
+    is_integer_address_constant(to_constant_expr(expr.op())) &&
     (expr_type.id() == ID_unsignedbv || expr_type.id() == ID_signedbv ||
      expr_type.id() == ID_bv) &&
     to_bitvector_type(expr_type).get_width() ==

@@ -485,6 +485,18 @@ expr2bits(const exprt &expr, bool little_endian, const namespacet &ns)
   return {};
 }
 
+bool is_integer_address_constant(const constant_exprt &constant)
+{
+  if(constant.type().id() != ID_pointer)
+    return false;
+
+  const irep_idt &value = constant.get_value();
+  const std::string &value_string = id2string(value);
+  return value != ID_NULL && !value_string.empty() &&
+         value_string.find_first_not_of("0123456789ABCDEF") ==
+           std::string::npos;
+}
+
 std::optional<std::reference_wrapper<const array_exprt>>
 try_get_string_data_array(const exprt &content, const namespacet &ns)
 {

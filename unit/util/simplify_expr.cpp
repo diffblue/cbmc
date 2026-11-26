@@ -319,6 +319,84 @@ TEST_CASE("Simplify cast of a pointer constant to an integer", "[core][util]")
     const typecast_exprt cast{address_of_exprt{x}, unsignedbv_typet{width}};
     REQUIRE(simplify_expr(cast, ns) == cast);
   }
+
+  SECTION("To a wider integer")
+  {
+    // The back-ends disagree on the upper bits of a pointer with the sign bit
+    // set: bv_pointerst zero-extends, whereas smt2_convt sign-extends.
+    const constant_exprt negative{
+      integer2bvrep(string2integer("8303030303030303", 16), width), pointer};
+    const typecast_exprt cast{negative, unsignedbv_typet{2 * width}};
+    REQUIRE_FALSE(simplify_expr(cast, ns).is_constant());
+  }
+
+  SECTION("Pointer constants that do not hold an integer address")
+  {
+    // The back-ends build pointer constants with symbolic values, which are
+    // not bit-vector representations and must not become integer constants.
+    for(const irep_idt &symbolic_value :
+        {ID_invalid, irep_idt{"INVALID"}, irep_idt{"INVALID-2"}})
+    {
+      const constant_exprt symbolic{symbolic_value, pointer};
+      const typecast_exprt cast{symbolic, unsignedbv_typet{width}};
+      REQUIRE(simplify_expr(cast, ns) == cast);
+    }
+  }
+}
+
+TEST_CASE(
+  "Simplify equality of a pointer constant and an integer cast to a pointer",
+  "[core][util]")
+{
+  config.ansi_c.set_LP64();
+  const namespacet &ns = empty_namespace;
+  const pointer_typet pointer = pointer_type(signed_int_type());
+  const std::size_t width = pointer.get_width();
+  const unsignedbv_typet integer{width};
+  const constant_exprt constant{integer2bvrep(0x1234, width), pointer};
+
+  SECTION("A pointer converted to an integer and back")
+  {
+    // simplify_typecast folds (uintN)c to the integer constant 0x1234
+    const typecast_exprt round_trip{typecast_exprt{constant, integer}, pointer};
+    REQUIRE(simplify_expr(equal_exprt{round_trip, constant}, ns) == true);
+    REQUIRE(simplify_expr(notequal_exprt{round_trip, constant}, ns) == false);
+    REQUIRE(simplify_expr(equal_exprt{constant, round_trip}, ns) == true);
+  }
+
+  SECTION("Another integer address")
+  {
+    const typecast_exprt other{from_integer(0x1235, integer), pointer};
+    REQUIRE(simplify_expr(equal_exprt{other, constant}, ns) == false);
+  }
+
+  SECTION("A non-constant integer")
+  {
+    for(const typet &type :
+        {typet{integer}, typet{signedbv_typet{width}}, typet{bv_typet{width}}})
+    {
+      const symbol_exprt x{"x", type};
+      const exprt simp =
+        simplify_expr(equal_exprt{typecast_exprt{x, pointer}, constant}, ns);
+      REQUIRE(
+        simp == equal_exprt{x, constant_exprt{constant.get_value(), type}});
+    }
+  }
+
+  SECTION("An integer of a different width")
+  {
+    const symbol_exprt x{"x", unsignedbv_typet{width / 2}};
+    const equal_exprt equal{typecast_exprt{x, pointer}, constant};
+    REQUIRE(simplify_expr(equal, ns) == equal);
+  }
+
+  SECTION("A pointer constant that does not hold an integer address")
+  {
+    const symbol_exprt x{"x", integer};
+    const equal_exprt equal{
+      typecast_exprt{x, pointer}, constant_exprt{"INVALID", pointer}};
+    REQUIRE(simplify_expr(equal, ns) == equal);
+  }
 }
 
 TEST_CASE("simplify_expr boolean expressions", "[core][util]")

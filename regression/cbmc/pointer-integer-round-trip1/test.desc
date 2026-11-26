@@ -1,0 +1,13 @@
+CORE
+main.c
+--verbosity 9
+^Generated \d+ VCC\(s\), 0 remaining after simplification$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+The integer address that the union read yields is a pointer constant.
+Converting it to an integer and back must yield a pointer that symbolic
+execution finds equal to the original, so that the assertion is decided
+without the solver.
