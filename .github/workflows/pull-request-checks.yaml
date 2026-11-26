@@ -1185,6 +1185,13 @@ jobs:
           skip-extraction: ${{ steps.docker-cache-mount.outputs.cache-hit }}
       - name: Build docker image
         run: docker buildx build --load -t cbmc .
+      - name: Check the image is linked to this repository
+        # GHCR uses this label to connect the release image to the repository,
+        # which the release workflow's GITHUB_TOKEN needs in order to push it.
+        run: |
+          SOURCE=$(docker inspect --format '{{ index .Config.Labels "org.opencontainers.image.source" }}' cbmc)
+          echo "org.opencontainers.image.source=$SOURCE"
+          test "$SOURCE" = "https://github.com/diffblue/cbmc"
       - name: Smoke test goto-cc
         run: docker run -v ${PWD}/.github/workflows/smoke_test_assets:/mnt/smoke -t cbmc goto-cc -o /mnt/smoke/test.goto /mnt/smoke/test.c
       - name: Smoke test cbmc

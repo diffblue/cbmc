@@ -18,6 +18,18 @@ This document outlines the current release process in a summary form.
      which creates a new release with some template text filled in.
    * After the release has been created, another github action starts building the
      binaries, driven by the `.github/workflows/release-packages.yaml`.
+   * The same workflow pushes the Docker image to `ghcr.io/diffblue/cbmc:<version>`
+     using the workflow's `GITHUB_TOKEN`. This requires the following one-time
+     set-up by an administrator of the package, in its settings on GitHub:
+     * The package must be connected to the `diffblue/cbmc` repository, and the
+       repository must have the "Write" role under "Manage Actions access".
+       Otherwise the push fails with `denied: permission_denied: write_package`.
+       The `org.opencontainers.image.source` label in the `Dockerfile` connects
+       new packages automatically, but a package that already exists without a
+       connection must be connected by hand.
+     * The package visibility must be set to "Public". GHCR creates packages as
+       private and does not inherit the visibility of the repository, so until
+       then users cannot pull the image without authenticating.
 
 ## Part II
 
