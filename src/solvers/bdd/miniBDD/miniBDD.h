@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <map>
 #include <stack>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 class mini_bddt
@@ -127,10 +128,18 @@ protected:
     unsigned var, low, high;
     reverse_keyt(unsigned _var, const mini_bddt &_low, const mini_bddt &_high);
 
-    bool operator<(const reverse_keyt &) const;
+    // Once we move to C++20 this can become `= default`.
+    bool operator==(const reverse_keyt &) const;
   };
 
-  typedef std::map<reverse_keyt, mini_bdd_nodet *> reverse_mapt;
+  // Hash for reverse_keyt so the unique table can be a hash table.
+  struct reverse_key_hasht
+  {
+    std::size_t operator()(const reverse_keyt &) const;
+  };
+
+  typedef std::unordered_map<reverse_keyt, mini_bdd_nodet *, reverse_key_hasht>
+    reverse_mapt;
   reverse_mapt reverse_map;
 
   typedef std::stack<mini_bdd_nodet *> freet;
