@@ -1,8 +1,9 @@
-KNOWNBUG
+CORE unix
 main.c
---pointer-check --bounds-check
-^EXIT=0$
+--pointer-check
+^EXIT=10$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
+^VERIFICATION FAILED$
+\[main\.assertion\.1\] line \d+ assertion a\.s_addr == 0: FAILURE
 --
 ^warning: ignoring
