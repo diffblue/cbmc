@@ -1,0 +1,13 @@
+CORE
+B
+--function B.test -cp `../../../../scripts/format_classpath.sh target/classes ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+super.getClass() must return the Class object of the runtime type of the
+receiver, as Object.getClass is final. javac emits invokespecial
+java/lang/Object/getClass for super.getClass(), but other compilers may name
+the superclass (here: A) instead, which must not bind to A's getClass override.

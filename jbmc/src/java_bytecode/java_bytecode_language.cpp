@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/cmdline.h>
 #include <util/config.h>
+#include <util/expr_initializer.h>
 #include <util/expr_iterator.h>
 #include <util/invariant.h>
 #include <util/journalling_symbol_table.h>
@@ -18,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol_table_builder.h>
 
 #include <goto-programs/class_hierarchy.h>
+#include <goto-programs/class_identifier.h>
 
 #include <json/json_parser.h>
 #include <linking/static_lifetime_init.h>
@@ -791,6 +793,395 @@ static void create_stub_global_symbols(
   }
 }
 
+/// Name of the global that \ref get_class_method_body uses to store the
+/// java.lang.Class object of \p class_id if the program does not refer to
+/// its class literal. It is null until getClass is first called on an object
+/// of that class.
+static irep_idt lazy_class_object_name(const irep_idt &class_id)
+{
+  return id2string(class_id) + "@class_object";
+}
+
+/// Name of the global that, with --java-threading, records whether a thread
+/// has started (1) or completed (2) obtaining the Class object stored in
+/// \ref lazy_class_object_name.
+static irep_idt lazy_class_object_state_name(const irep_idt &class_id)
+{
+  return id2string(class_id) + "@class_object_state";
+}
+
+/// Signature of the method of the model of java.lang.Class that returns the
+/// Class object of a class whose class literal the program does not refer
+/// to. It takes the same arguments as cproverInitializeClassLiteral, and
+/// returns the Class object that Class.forName created for this class, if
+/// any, and a new one otherwise.
+static const irep_idt &class_object_factory_signature()
+{
+  static const irep_idt signature =
+    "java::java.lang.Class.cproverGetClassObject:"
+    "(Ljava/lang/String;ZZZZZZZ)Ljava/lang/Class;";
+  return signature;
+}
+
+static const irep_idt &object_get_class_name()
+{
+  static const irep_idt name =
+    "java::java.lang.Object.getClass:()Ljava/lang/Class;";
+  return name;
+}
+
+/// For each class that can have instances, add a method `getClass` that
+/// overrides java.lang.Object.getClass and returns the class's Class object
+/// (see \ref get_class_method_body). Only the symbols are created here, the
+/// bodies are generated when the methods are converted, so that this is
+/// compatible with lazy loading: context-insensitive lazy loading only converts
+/// the overrides of classes that are instantiated, and symex-driven lazy
+/// loading converts those of the runtime types that symbolic execution
+/// encounters. Any symbols that the bodies use are created up front, as all
+/// globals must exist before __CPROVER_initialize is generated.
+/// \param symbol_table: global symbol table
+/// \param synthetic_methods: synthetic method map, to which the methods are
+///   added
+/// \param threading_support: true if --java-threading was given
+static void create_get_class_methods(
+  symbol_table_baset &symbol_table,
+  synthetic_methods_mapt &synthetic_methods,
+  bool threading_support)
+{
+  const symbolt *object_get_class =
+    symbol_table.lookup(object_get_class_name());
+  if(object_get_class == nullptr || object_get_class->value.is_not_nil())
+    return;
+
+  const bool have_class_object_factory =
+    symbol_table.has_symbol(class_object_factory_signature());
+  const bool have_class_literal_initializer =
+    symbol_table.has_symbol(get_java_class_literal_initializer_signature());
+
+  // Careful not to add to the symbol table while iterating over it
+  std::vector<irep_idt> class_ids;
+  for(const auto &entry : symbol_table)
+  {
+    const symbolt &symbol = entry.second;
+    if(
+      !symbol.is_type || symbol.mode != ID_java ||
+      !can_cast_type<java_class_typet>(symbol.type) ||
+      symbol.name == "java::java.lang.Object" || is_java_array_tag(symbol.name))
+    {
+      continue;
+    }
+    const java_class_typet &class_type = to_java_class_type(symbol.type);
+    if(class_type.get_interface() || class_type.get_abstract())
+      continue;
+    class_ids.push_back(symbol.name);
+  }
+
+  const java_method_typet &object_get_class_type =
+    to_java_method_type(object_get_class->type);
+  for(const irep_idt &class_id : class_ids)
+  {
+    const irep_idt method_id =
+      id2string(class_id) + ".getClass:()Ljava/lang/Class;";
+    if(symbol_table.has_symbol(method_id))
+      continue;
+
+    // If the program does not refer to the class literal, the Class object
+    // is only created or initialised once getClass is first called for this
+    // class (see get_class_method_body): initialising the class literals of
+    // all classes in __CPROVER_initialize would be expensive with
+    // symex-driven lazy loading, which does not remove unused globals.
+    const irep_idt literal_id = id2string(class_id) + JAVA_CLASS_MODEL_SUFFIX;
+    if(
+      !symbol_table.has_symbol(literal_id) &&
+      (have_class_object_factory || have_class_literal_initializer))
+    {
+      if(!have_class_object_factory)
+      {
+        get_or_create_class_literal_symbol(class_id, symbol_table);
+        symbol_table.get_writeable_ref(literal_id)
+          .type.set(ID_C_no_initialization_required, true);
+      }
+
+      const typet &class_reference_type = object_get_class_type.return_type();
+      symbolt class_object_symbol{
+        lazy_class_object_name(class_id), class_reference_type, ID_java};
+      class_object_symbol.base_name =
+        id2string(class_object_symbol.name).substr(6);
+      class_object_symbol.is_lvalue = true;
+      class_object_symbol.is_state_var = true;
+      class_object_symbol.is_static_lifetime = true;
+      class_object_symbol.value =
+        null_pointer_exprt{to_pointer_type(class_reference_type)};
+      symbol_table.add(class_object_symbol);
+
+      if(threading_support)
+      {
+        symbolt state_symbol{
+          lazy_class_object_state_name(class_id), java_int_type(), ID_java};
+        state_symbol.base_name = id2string(state_symbol.name).substr(6);
+        state_symbol.is_lvalue = true;
+        state_symbol.is_state_var = true;
+        state_symbol.is_static_lifetime = true;
+        state_symbol.value = from_integer(0, java_int_type());
+        symbol_table.add(state_symbol);
+      }
+    }
+    else
+      get_or_create_class_literal_symbol(class_id, symbol_table);
+
+    java_method_typet method_type = object_get_class_type;
+    method_type.set_is_final(true);
+    auto &this_param = method_type.parameters().front();
+    this_param.type() = java_reference_type(struct_tag_typet{class_id});
+    this_param.set_base_name("this");
+    this_param.set_identifier(id2string(method_id) + "::this");
+
+    symbolt method_symbol{method_id, method_type, ID_java};
+    method_symbol.base_name = "getClass";
+    method_symbol.pretty_name = id2string(class_id).substr(6) + ".getClass()";
+    set_declaring_class(method_symbol, class_id);
+    symbol_table.add(method_symbol);
+    synthetic_methods[method_id] = synthetic_method_typet::GET_CLASS;
+  }
+}
+
+/// Body of an override of java.lang.Object.getClass created by
+/// \ref create_get_class_methods for class C. If the program refers to the
+/// class literal of C, which __CPROVER_initialize then initialises, or the
+/// model of java.lang.Class has neither cproverGetClassObject nor
+/// cproverInitializeClassLiteral:
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// return &C@class_model;
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// Otherwise, the Class object is obtained on the first call from the model
+/// of java.lang.Class, which returns the object that Class.forName created
+/// for C, if any. The name is obtained via CProver.classIdentifier, as no new
+/// String literals can be created at this point:
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// if(C@class_object == null)
+///   C@class_object = Class.cproverGetClassObject(
+///     CProver.classIdentifier(this), ...);
+/// return C@class_object;
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// With --java-threading, only one thread obtains the Class object, and other
+/// threads wait for it to complete, as in the thread-safe static initializer
+/// wrappers (see get_thread_safe_clinit_wrapper_body):
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// ATOMIC_BEGIN
+/// assume(C@class_object_state != 1);
+/// must_init = C@class_object_state == 0;
+/// if(must_init)
+///   C@class_object_state = 1;
+/// ATOMIC_END
+/// if(must_init)
+/// {
+///   C@class_object = Class.cproverGetClassObject(...);
+///   ATOMIC_BEGIN
+///   C@class_object_state = 2;
+///   ATOMIC_END
+/// }
+/// return C@class_object;
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// Obtaining the Class object does not call getClass for C, so that this does
+/// not need to handle recursive initialisation as the static initializer
+/// wrappers do.
+/// With a model of java.lang.Class that does not have cproverGetClassObject,
+/// the class literal is initialised instead, in the same way as
+/// java_static_lifetime_init does:
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// if(C@class_object == null)
+/// {
+///   C@class_model = { zero-initialised object of type java.lang.Class };
+///   C@class_model.cproverInitializeClassLiteral(
+///     CProver.classIdentifier(this), ...);
+///   C@class_object = &C@class_model;
+/// }
+/// return C@class_object;
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// \param function_id: name of the method
+/// \param symbol_table: global symbol table
+/// \param threading_support: true if --java-threading was given
+/// \param message_handler: message handler
+/// \return code of the method
+static codet get_class_method_body(
+  const irep_idt &function_id,
+  symbol_table_baset &symbol_table,
+  bool threading_support,
+  message_handlert &message_handler)
+{
+  const symbolt &symbol = symbol_table.lookup_ref(function_id);
+  const java_method_typet &method_type = to_java_method_type(symbol.type);
+  for(const auto &parameter : method_type.parameters())
+  {
+    parameter_symbolt parameter_symbol;
+    parameter_symbol.name = parameter.get_identifier();
+    parameter_symbol.base_name = parameter.get_base_name();
+    parameter_symbol.mode = ID_java;
+    parameter_symbol.type = parameter.type();
+    symbol_table.add(parameter_symbol);
+  }
+
+  const auto class_id = declaring_class(symbol);
+  INVARIANT(class_id.has_value(), "getClass override must have a class");
+  const source_locationt &loc = symbol.location;
+  const irep_idt literal_id = id2string(*class_id) + JAVA_CLASS_MODEL_SUFFIX;
+
+  code_blockt code;
+
+  const symbolt *class_object =
+    symbol_table.lookup(lazy_class_object_name(*class_id));
+  if(class_object == nullptr)
+  {
+    code.add(code_frontend_returnt{typecast_exprt::conditional_cast(
+      address_of_exprt{symbol_table.lookup_ref(literal_id).symbol_expr()},
+      method_type.return_type())});
+    return std::move(code);
+  }
+
+  const symbolt *factory =
+    symbol_table.lookup(class_object_factory_signature());
+  const symbolt *initializer =
+    symbol_table.lookup(get_java_class_literal_initializer_signature());
+  INVARIANT(
+    factory != nullptr || initializer != nullptr,
+    "create_get_class_methods only creates " + id2string(class_object->name) +
+      " if the model of java.lang.Class can initialise it");
+  const java_method_typet &callee_type =
+    to_java_method_type((factory != nullptr ? factory : initializer)->type);
+  // cproverGetClassObject is static, cproverInitializeClassLiteral takes the
+  // class literal as its first argument
+  const typet &string_type =
+    callee_type.parameters()[factory != nullptr ? 0 : 1].type();
+
+  code_blockt init;
+
+  exprt name = null_pointer_exprt{to_pointer_type(string_type)};
+  const symbolt *class_identifier = symbol_table.lookup(
+    "java::org.cprover.CProver.classIdentifier:"
+    "(Ljava/lang/Object;)Ljava/lang/String;");
+  if(class_identifier != nullptr)
+  {
+    const symbolt &name_symbol = fresh_java_symbol(
+      string_type, "class_name", loc, function_id, symbol_table);
+    init.add(code_frontend_declt{name_symbol.symbol_expr()});
+    const java_method_typet &class_identifier_type =
+      to_java_method_type(class_identifier->type);
+    init.add(code_function_callt{
+      name_symbol.symbol_expr(),
+      class_identifier->symbol_expr(),
+      {typecast_exprt::conditional_cast(
+        symbol_exprt{
+          method_type.parameters()[0].get_identifier(),
+          method_type.parameters()[0].type()},
+        class_identifier_type.parameters()[0].type())}});
+    name = name_symbol.symbol_expr();
+  }
+
+  const java_class_typet &class_type =
+    to_java_class_type(symbol_table.lookup_ref(*class_id).type);
+  auto constant_bool = [](bool b)
+  { return from_integer(b ? 1 : 0, java_boolean_type()); };
+  const side_effect_expr_nondett nondet_bool{java_boolean_type(), loc};
+  // Argument order is: name, isAnnotation, isArray, isInterface,
+  // isSynthetic, isLocalClass, isMemberClass, isEnum
+  exprt::operandst arguments{
+    name,
+    constant_bool(class_type.get_is_annotation()),
+    constant_bool(false),
+    constant_bool(class_type.get_interface()),
+    constant_bool(class_type.get_synthetic()),
+    nondet_bool,
+    nondet_bool,
+    constant_bool(class_type.get_is_enumeration())};
+
+  const symbol_exprt class_object_expr = class_object->symbol_expr();
+  if(factory != nullptr)
+  {
+    const symbolt &result_symbol = fresh_java_symbol(
+      callee_type.return_type(),
+      "class_object",
+      loc,
+      function_id,
+      symbol_table);
+    init.add(code_frontend_declt{result_symbol.symbol_expr()});
+    init.add(code_function_callt{
+      result_symbol.symbol_expr(),
+      factory->symbol_expr(),
+      std::move(arguments)});
+    init.add(code_frontend_assignt{
+      class_object_expr,
+      typecast_exprt::conditional_cast(
+        result_symbol.symbol_expr(), class_object_expr.type())});
+  }
+  else
+  {
+    const symbol_exprt class_literal =
+      symbol_table.lookup_ref(literal_id).symbol_expr();
+    const namespacet ns{symbol_table};
+    auto zero_object = zero_initializer(class_literal.type(), loc, ns);
+    if(!zero_object.has_value())
+    {
+      messaget log{message_handler};
+      log.error() << "failed to zero-initialize " << class_literal.identifier()
+                  << messaget::eom;
+      throw 0;
+    }
+    set_class_identifier(
+      to_struct_expr(*zero_object),
+      ns,
+      to_struct_tag_type(class_literal.type()));
+    init.add(code_frontend_assignt{class_literal, *zero_object});
+
+    arguments.insert(arguments.begin(), address_of_exprt{class_literal});
+    init.add(
+      code_function_callt{initializer->symbol_expr(), std::move(arguments)});
+    init.add(code_frontend_assignt{
+      class_object_expr,
+      typecast_exprt::conditional_cast(
+        address_of_exprt{class_literal}, class_object_expr.type())});
+  }
+
+  const symbolt *state =
+    symbol_table.lookup(lazy_class_object_state_name(*class_id));
+  if(threading_support && state != nullptr)
+  {
+    const symbol_exprt state_expr = state->symbol_expr();
+    auto state_value = [](int value)
+    { return from_integer(value, java_int_type()); };
+    const symbolt &must_init = fresh_java_symbol(
+      java_boolean_type(), "must_init", loc, function_id, symbol_table);
+    const symbol_exprt must_init_expr = must_init.symbol_expr();
+    code.add(code_frontend_declt{must_init_expr});
+    code.add(codet{ID_atomic_begin});
+    code.add(code_assumet{notequal_exprt{state_expr, state_value(1)}});
+    code.add(code_frontend_assignt{
+      must_init_expr,
+      typecast_exprt{
+        equal_exprt{state_expr, state_value(0)}, java_boolean_type()}});
+    code.add(code_ifthenelset{
+      equal_exprt{state_expr, state_value(0)},
+      code_frontend_assignt{state_expr, state_value(1)}});
+    code.add(codet{ID_atomic_end});
+    init.add(codet{ID_atomic_begin});
+    init.add(code_frontend_assignt{state_expr, state_value(2)});
+    init.add(codet{ID_atomic_end});
+    code.add(code_ifthenelset{
+      notequal_exprt{must_init_expr, from_integer(0, java_boolean_type())},
+      std::move(init)});
+  }
+  else
+  {
+    code.add(code_ifthenelset{
+      equal_exprt{
+        class_object_expr,
+        null_pointer_exprt{to_pointer_type(class_object_expr.type())}},
+      std::move(init)});
+  }
+  code.add(code_frontend_returnt{typecast_exprt::conditional_cast(
+    class_object_expr, method_type.return_type())});
+  return std::move(code);
+}
+
 bool java_bytecode_languaget::typecheck(
   symbol_table_baset &symbol_table,
   const std::string &,
@@ -935,6 +1326,9 @@ bool java_bytecode_languaget::typecheck(
         parse_tree, symbol_table, language_options->string_refinement_enabled);
     }
   }
+
+  create_get_class_methods(
+    symbol_table, synthetic_methods, language_options->threading_support);
 
   messaget log(message_handler);
   log.status() << "Java: added "
@@ -1436,6 +1830,13 @@ bool java_bytecode_languaget::convert_single_method_code(
     case synthetic_method_typet::INVOKEDYNAMIC_METHOD:
       writable_symbol.value = invokedynamic_synthetic_method(
         function_id, symbol_table, message_handler);
+      break;
+    case synthetic_method_typet::GET_CLASS:
+      writable_symbol.value = get_class_method_body(
+        function_id,
+        symbol_table,
+        language_options->threading_support,
+        message_handler);
       break;
     case synthetic_method_typet::CREATE_ARRAY_WITH_TYPE:
     {

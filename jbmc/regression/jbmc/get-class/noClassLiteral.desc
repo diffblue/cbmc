@@ -1,0 +1,11 @@
+CORE
+Test
+--function Test.noClassLiteral -cp `../../../../scripts/format_classpath.sh target/classes ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Object.getClass must return the unique java.lang.Class object of the runtime
+type of the receiver, which is also the class literal of that type.
