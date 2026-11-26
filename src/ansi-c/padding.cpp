@@ -312,12 +312,19 @@ static bytest member_layout_alignment(
     // #pragma pack(n) is in effect, which then caps their alignment at n
     // instead, as GCC and Clang do. An alignment attribute of the bit-field's
     // declaration can only raise the alignment (subject to #pragma pack).
-    const bytest natural = alignment(bit_field_type.underlying_type(), ns);
+    // A packed attribute of the bit-field's declaration is recorded with its
+    // underlying type, but #pragma pack(n) takes precedence over it.
+    typet unpacked_type = bit_field_type.underlying_type();
+    const bool is_packed = container_is_packed ||
+                           bit_field_type.get_bool(ID_C_packed) ||
+                           unpacked_type.get_bool(ID_C_packed);
+    unpacked_type.remove(ID_C_packed);
+    const bytest natural = alignment(unpacked_type, ns);
     const bytest max_alignment = pragma_pack(component);
-    const bytest base =
-      max_alignment > bytest{0} ? std::min(max_alignment, natural)
-      : container_is_packed || bit_field_type.get_bool(ID_C_packed) ? bytest{1}
-                                                                    : natural;
+    const bytest base = max_alignment > bytest{0}
+                          ? std::min(max_alignment, natural)
+                        : is_packed ? bytest{1}
+                                    : natural;
     return std::max(base, bit_field_start_alignment(component));
   }
 
