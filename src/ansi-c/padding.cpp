@@ -444,8 +444,17 @@ static void add_padding_msvc(struct_typet &type, const namespacet &ns)
       underlying_width(to_c_bit_field_type(it->type()), ns).value_or(0) ==
         underlying_bits)
     {
-      // do not add padding, but count the bits
+      // do not add padding, but count the bits -- unless the bit-field does
+      // not fit into the remaining bits of the current unit, in which case
+      // it starts a new unit
       const auto width = to_c_bit_field_type(it->type()).get_width();
+      const std::size_t used_bits = bit_field_bits % underlying_bits;
+      if(used_bits != 0 && used_bits + width > underlying_bits)
+      {
+        const std::size_t pad_bits = underlying_bits - used_bits;
+        it = pad_bit_field(components, it, pad_bits);
+        bit_field_bits += pad_bits;
+      }
       bit_field_bits += width;
     }
     else if(it->is_boolean() && underlying_bits == config.ansi_c.char_width)
