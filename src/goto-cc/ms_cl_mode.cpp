@@ -101,12 +101,27 @@ int ms_cl_modet::doit()
   {
     const std::string std_string = cmdline.get_value("std");
 
-    if(
-      std_string == ":c++14" || std_string == "=c++14" ||
-      std_string == ":c++17" || std_string == "=c++17" ||
-      std_string == ":c++latest" || std_string == "=c++latest")
+    // Visual Studio's /std:c++14 (the default), /std:c++17, /std:c++20,
+    // /std:c++latest (the newest standard, with features of the next one),
+    // /std:c11, /std:c17 and /std:clatest
+    if(std_string == ":c++14" || std_string == "=c++14")
+      config.cpp.set_cpp14();
+    else if(std_string == ":c++17" || std_string == "=c++17")
+      config.cpp.set_cpp17();
+    else if(std_string == ":c++20" || std_string == "=c++20")
+      config.cpp.set_cpp20();
+    else if(std_string == ":c++latest" || std_string == "=c++latest")
+      config.cpp.set_cpp23();
+    else if(std_string == ":c11" || std_string == "=c11")
     {
-      // we don't have any newer version at the moment
+      config.ansi_c.set_c11();
+      config.cpp.set_cpp14();
+    }
+    else if(
+      std_string == ":c17" || std_string == "=c17" ||
+      std_string == ":clatest" || std_string == "=clatest")
+    {
+      config.ansi_c.set_c17();
       config.cpp.set_cpp14();
     }
     else if(std_string == ":c++11" || std_string == "=c++11")

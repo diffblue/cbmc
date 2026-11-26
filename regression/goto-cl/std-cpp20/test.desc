@@ -1,0 +1,12 @@
+CORE
+
+/std:c++20 /c main.cpp
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: unknown language standard
+^PARSING ERROR$
+^CONVERSION ERROR$
+--
+Visual Studio's /std:c++20 was not recognised, and the file was parsed as
+C++14.
