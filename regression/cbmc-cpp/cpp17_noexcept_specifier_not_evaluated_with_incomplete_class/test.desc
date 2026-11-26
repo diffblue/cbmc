@@ -1,0 +1,19 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ addresses: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+static assertion failed
+could not be evaluated
+--
+A member's noexcept-specifier was evaluated when the member's declarator
+was type-checked, during the instantiation of its class template
+specialization; evaluated later only when needed ([except.spec]/12.1, the
+function selected in an expression) since the deferral of round 209, it
+is no longer evaluated with an incomplete class.

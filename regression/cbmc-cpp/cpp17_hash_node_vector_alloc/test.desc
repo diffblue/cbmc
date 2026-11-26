@@ -1,0 +1,20 @@
+KNOWNBUG
+main.cpp
+--cpp17 --object-bits 12
+^\[main\.assertion\.1\] line \d+ vector element after hash-node rebind: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+dropped the body
+--
+unordered_set<K>::insert followed by vector<K> (dog-fooding
+src/util/find_symbols.cpp, which uses unordered_set<irep_idt> and
+std::vector<irep_idt>): instantiating the unordered_set first used to
+leave vector<K> incomplete ("symbol '_Tp_alloc_type' is unknown"), so
+v[0] read an arbitrary value.  The fixes: a member class template of a
+class template instance is registered in the instance's scope even when
+an earlier member fails ([temp.inst]/11, `__alloc_traits<..>::template
+rebind<T>', cpp17_member_template_completed_instance), and substitution
+starts afresh for each candidate ([temp.deduct.general]/1,
+cpp17_push_back_after_unordered_set_decl).

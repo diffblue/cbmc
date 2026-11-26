@@ -1,0 +1,18 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ promoted result: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+static assertion failed
+--
+A fold over an alias template's pack was left unexpanded in the alias's
+specialization, and the C type checker's fallback for a residual fold made
+it `true': decltype of the fold was bool.  With Xcode 26's libc++,
+std::__math::copysign<double, double> returned bool and lost its body
+(125 tests failed on the macOS 26 CI job).
