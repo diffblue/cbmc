@@ -1072,6 +1072,7 @@ static void instantiate_atomic_exchange(
   const code_typet &code_type,
   const source_locationt &source_location,
   const std::vector<symbol_exprt> &parameter_exprs,
+  symbol_table_baset &symbol_table,
   code_blockt &block)
 {
   // void __atomic_exchange (type *ptr, type *val, type *ret, int memorder)
@@ -1084,10 +1085,29 @@ static void instantiate_atomic_exchange(
     code_typet{{}, void_type()},
     source_location}});
 
+  // Read *val into a temporary first: val and ret may alias the same
+  // object (in-place swap), and we must not clobber *val by writing
+  // *ret first.
+  const auto &object_type =
+    to_pointer_type(parameter_exprs[0].type()).base_type();
+  symbolt tmp_symbol{
+    id2string(identifier_with_type) + "::atomic_exchange_tmp",
+    object_type,
+    ID_C};
+  tmp_symbol.base_name = "atomic_exchange_tmp";
+  tmp_symbol.location = source_location;
+  tmp_symbol.is_file_local = true;
+  tmp_symbol.is_lvalue = true;
+  tmp_symbol.is_thread_local = true;
+  symbol_table.add(tmp_symbol);
+  const symbol_exprt tmp_expr = tmp_symbol.symbol_expr();
+  block.add(codet{ID_decl_block, {code_frontend_declt{tmp_expr}}});
+  block.add(
+    code_frontend_assignt{tmp_expr, dereference_exprt{parameter_exprs[1]}});
   block.add(code_frontend_assignt{dereference_exprt{parameter_exprs[2]},
                                   dereference_exprt{parameter_exprs[0]}});
-  block.add(code_frontend_assignt{dereference_exprt{parameter_exprs[0]},
-                                  dereference_exprt{parameter_exprs[1]}});
+  block.add(
+    code_frontend_assignt{dereference_exprt{parameter_exprs[0]}, tmp_expr});
 
   block.add(code_expressiont{side_effect_expr_function_callt{
     symbol_exprt::typeless("__atomic_thread_fence")
@@ -1362,7 +1382,12 @@ code_blockt c_typecheck_baset::instantiate_gcc_polymorphic_builtin(
   else if(identifier == ID___atomic_exchange)
   {
     instantiate_atomic_exchange(
-      identifier_with_type, code_type, source_location, parameter_exprs, block);
+      identifier_with_type,
+      code_type,
+      source_location,
+      parameter_exprs,
+      symbol_table,
+      block);
   }
   else if(identifier == ID___atomic_exchange_n)
   {
