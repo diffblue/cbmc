@@ -218,6 +218,7 @@ SRC = $(BOOLEFORCE_SRC) \
       smt2_incremental/theories/smt_array_theory.cpp \
       smt2_incremental/theories/smt_bit_vector_theory.cpp \
       smt2_incremental/theories/smt_core_theory.cpp \
+      smt2_incremental/theories/smt_integer_theory.cpp \
       # Empty last line
 
 include ../common

@@ -32,6 +32,15 @@ public:
   constant_exprt one_expr() const;
 };
 
+/// Check whether a reference to a typet is a \ref integer_typet.
+/// \param type: Source type.
+/// \return True if \p type is a \ref integer_typet.
+template <>
+inline bool can_cast_type<integer_typet>(const typet &type)
+{
+  return type.id() == ID_integer;
+}
+
 /// Natural numbers including zero (mathematical integers, not bitvectors)
 class natural_typet : public typet
 {

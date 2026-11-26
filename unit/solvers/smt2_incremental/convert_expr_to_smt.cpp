@@ -6,6 +6,7 @@
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/constructor_of.h>
+#include <util/mathematical_types.h>
 #include <util/namespace.h>
 #include <util/pointer_predicates.h>
 #include <util/std_expr.h>
@@ -17,6 +18,7 @@
 #include <solvers/smt2_incremental/theories/smt_array_theory.h>
 #include <solvers/smt2_incremental/theories/smt_bit_vector_theory.h>
 #include <solvers/smt2_incremental/theories/smt_core_theory.h>
+#include <solvers/smt2_incremental/theories/smt_integer_theory.h>
 #include <solvers/smt2_incremental/type_size_mapping.h>
 #include <testing-utils/empty_namespace.h>
 #include <testing-utils/invariant.h>
@@ -730,6 +732,60 @@ TEST_CASE(
   {
     const cbmc_invariants_should_throwt invariants_throw;
     REQUIRE_THROWS(test.convert(unary_minus_exprt{true_exprt{}}));
+  }
+}
+
+TEST_CASE(
+  "expr to smt conversion for mathematical-integer division and modulo",
+  "[core][smt2_incremental]")
+{
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
+
+  const symbol_exprt a{"a", integer_typet{}};
+  const symbol_exprt b{"b", integer_typet{}};
+  const smt_termt sa = smt_identifier_termt{"a", smt_int_sortt{}};
+  const smt_termt sb = smt_identifier_termt{"b", smt_int_sortt{}};
+
+  // Absolute value, encoded as the converter does it.
+  const auto abs = [](const smt_termt &x)
+  {
+    return smt_core_theoryt::if_then_else(
+      smt_integer_theoryt::less_than(x, smt_int_constant_termt{0}),
+      smt_integer_theoryt::negate(x),
+      x);
+  };
+
+  SECTION("Euclidean modulo maps directly to SMT-LIB Int mod")
+  {
+    CHECK(
+      test.convert(euclidean_mod_exprt{a, b}) ==
+      smt_integer_theoryt::mod(sa, sb));
+  }
+
+  SECTION("Truncated division applies a sign correction")
+  {
+    const smt_termt magnitude_quotient =
+      smt_integer_theoryt::divide(abs(sa), abs(sb));
+    CHECK(
+      test.convert(div_exprt{a, b}) ==
+      smt_core_theoryt::if_then_else(
+        smt_core_theoryt::equal(
+          smt_integer_theoryt::less_than(sa, smt_int_constant_termt{0}),
+          smt_integer_theoryt::less_than(sb, smt_int_constant_termt{0})),
+        magnitude_quotient,
+        smt_integer_theoryt::negate(magnitude_quotient)));
+  }
+
+  SECTION("Truncated modulo applies the dividend's sign")
+  {
+    const smt_termt magnitude_remainder =
+      smt_integer_theoryt::mod(abs(sa), abs(sb));
+    CHECK(
+      test.convert(mod_exprt{a, b}) ==
+      smt_core_theoryt::if_then_else(
+        smt_integer_theoryt::less_than(sa, smt_int_constant_termt{0}),
+        smt_integer_theoryt::negate(magnitude_remainder),
+        magnitude_remainder));
   }
 }
 
