@@ -1188,6 +1188,21 @@ bool cpp_typecheckt::standard_conversion_sequence(
       if(curr_expr.type().id() != ID_c_bool)
         rank += 3;
     }
+    else if(
+      type.id() == ID_complex && (curr_expr.type().id() == ID_signedbv ||
+                                  curr_expr.type().id() == ID_unsignedbv ||
+                                  curr_expr.type().id() == ID_floatbv ||
+                                  curr_expr.type().id() == ID_fixedbv ||
+                                  curr_expr.type().id() == ID_c_bool ||
+                                  curr_expr.type().id() == ID_complex))
+    {
+      // GNU extension (as C11 6.3.1.7 for C): a real value converts to a
+      // complex type with an imaginary part of zero, and a complex value to
+      // another complex type part by part (`std::complex<double>' assigns
+      // its `_Complex double' member from a double)
+      new_expr = typecast_exprt{curr_expr, type};
+      rank += 3;
+    }
     else
       return false;
   }

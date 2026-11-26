@@ -1,0 +1,15 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] .* real to complex: SUCCESS$
+^\[main\.assertion\.2\] .* std::complex: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+dropped the body
+--
+GNU extension: a real value converts to a complex type.  `z = 4.0' was
+rejected, which in a system header dropped the body of
+std::complex<double>::operator=(double), so the assignment did nothing.
