@@ -57,6 +57,7 @@ Author: Daniel Kroening, kroening@kroening.com
   OPT_UNINITIALIZED_CHECK \
   OPT_WMM \
   "(race-check)" \
+  "(mmio)(mmio-region):" \
   OPT_UNWINDSET \
   "(unwindset-file):" \
   "(unwinding-assertions)(partial-loops)(continue-as-loops)" \
