@@ -13,7 +13,47 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "symex_slice_class.h"
 
 #include <util/find_symbols.h>
+#include <util/mathematical_expr.h>
 #include <util/std_expr.h>
+
+#include <algorithm>
+
+/// Return true if \p rhs is an application of a string-solver primitive in
+/// the refined-string form produced by JBMC's string preprocessing, e.g.
+/// `return_code = cprover_string_concat_func(res_length, res_content, s1, s2)`
+/// or `return_code = cprover_associate_array_to_pointer_func(array, pointer)`.
+/// The string solver (string_refinementt) treats such an application as a
+/// relation over its arguments: it constrains output arguments such as the
+/// result length and content, and registers pointer/array/length associations.
+/// The assigned return code, however, is usually never read, so the
+/// application must be kept even when its left-hand side is unused.
+/// Applications of the same identifiers in the SMT-LIB form (string, regex and
+/// scalar operands only, lowered in smt2_convt) are side-effect free and
+/// are not matched.
+static bool is_refined_string_primitive(const exprt &rhs)
+{
+  const auto app = expr_try_dynamic_cast<function_application_exprt>(rhs);
+  if(!app || app->function().id() != ID_symbol)
+    return false;
+
+  const irep_idt &id = to_symbol_expr(app->function()).identifier();
+  if(
+    !id.starts_with("cprover_string_") && !id.starts_with("cprover_char_") &&
+    !id.starts_with("cprover_associate_"))
+  {
+    return false;
+  }
+
+  return std::any_of(
+    app->arguments().begin(),
+    app->arguments().end(),
+    [](const exprt &arg)
+    {
+      const irep_idt &type_id = arg.type().id();
+      return type_id == ID_pointer || type_id == ID_array ||
+             type_id == ID_struct || type_id == ID_struct_tag;
+    });
+}
 
 void symex_slicet::get_symbols(const exprt &expr)
 {
@@ -109,6 +149,15 @@ void symex_slicet::slice_assignment(SSA_stept &SSA_step)
   auto entry = depends.find(id);
   if(entry == depends.end())
   {
+    if(is_refined_string_primitive(SSA_step.ssa_rhs))
+    {
+      // The return code is unused, but the application constrains its
+      // arguments (see is_refined_string_primitive): keep it and everything
+      // its arguments depend on.
+      get_symbols(SSA_step.ssa_rhs);
+      return;
+    }
+
     // we don't really need it
     SSA_step.ignore=true;
   }
