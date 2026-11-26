@@ -8573,6 +8573,23 @@ bool Parser::rConditionalExpr(exprt &exp, bool template_args)
     exprt then, otherwise;
 
     lex.get_token(tk1);
+
+    // GNU extension `a ?: b': the value of a if it is nonzero (a is evaluated
+    // once), else that of b; represented as by the C front-end
+    if(lex.LookAhead(0) == ':')
+    {
+      lex.get_token(tk2);
+      if(!rExpression(otherwise, template_args))
+        return false;
+
+      side_effect_exprt gcc_conditional{
+        ID_gcc_conditional_expression, typet{}, source_locationt{}};
+      gcc_conditional.add_to_operands(std::move(exp), std::move(otherwise));
+      exp.swap(gcc_conditional);
+      set_location(exp, tk1);
+      return true;
+    }
+
     if(!rCommaExpression(then))
       return false;
 
