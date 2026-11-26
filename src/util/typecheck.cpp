@@ -41,7 +41,7 @@ bool typecheckt::typecheck_main()
   catch(const invalid_source_file_exceptiont &e)
   {
     error().source_location = e.get_source_location();
-    error() << e.get_reason() << messaget::eom;
+    error() << e.reason() << messaget::eom;
   }
 
   catch(const errort &e)

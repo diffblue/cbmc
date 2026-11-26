@@ -34,9 +34,8 @@ public:
   {
   public:
     smt2_errort(const std::string &_message, unsigned _line_no)
-      : line_no(_line_no)
+      : cprover_exception_baset{_message}, line_no(_line_no)
     {
-      _reason << _message;
     }
 
     explicit smt2_errort(unsigned _line_no) : line_no(_line_no)
