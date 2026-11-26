@@ -1722,8 +1722,20 @@ gcc_type_attribute:
         { $$=$1; set($$, ID_noreturn); }
         | TOK_GCC_ATTRIBUTE_CONSTRUCTOR
         { $$=$1; set($$, ID_constructor); }
+        | TOK_GCC_ATTRIBUTE_CONSTRUCTOR '(' comma_expression ')'
+        {
+          $$=$1;
+          set($$, ID_constructor);
+          parser_stack($$).set(ID_priority, parser_stack($3));
+        }
         | TOK_GCC_ATTRIBUTE_DESTRUCTOR
         { $$=$1; set($$, ID_destructor); }
+        | TOK_GCC_ATTRIBUTE_DESTRUCTOR '(' comma_expression ')'
+        {
+          $$=$1;
+          set($$, ID_destructor);
+          parser_stack($$).set(ID_priority, parser_stack($3));
+        }
         | TOK_GCC_ATTRIBUTE_USED
         { $$=$1; set($$, ID_used); }
         ;

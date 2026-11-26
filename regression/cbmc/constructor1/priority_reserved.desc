@@ -1,0 +1,12 @@
+CORE gcc-only
+priority_reserved.c
+
+^EXIT=0$
+^SIGNAL=0$
+: constructor priorities from 0 to 100 are reserved for the implementation$
+: destructor priorities from 0 to 100 are reserved for the implementation$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+As GCC, warn about priorities from 0 to 100, but accept them.
