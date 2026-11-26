@@ -366,18 +366,20 @@ piped_processt::send(const std::string &message)
 #ifdef _WIN32
   const auto message_size = narrow<DWORD>(message.size());
   PRECONDITION(message_size > 0);
-  DWORD bytes_written = 0;
+  // The pipe is non-blocking (PIPE_NOWAIT), so `WriteFile` writes at most as
+  // many bytes as fit into the pipe's buffer, and possibly none at all if we
+  // write messages faster than the sub process reads them. Keep writing the
+  // remainder of the message, giving the sub process a chance to read the
+  // waiting data whenever no progress was made.
+  const char *remaining_data = message.c_str();
+  DWORD remaining_size = message_size;
   const int retry_limit = 10;
-  for(int send_attempts = 0; send_attempts < retry_limit; ++send_attempts)
+  int send_attempts = 0;
+  while(remaining_size > 0)
   {
-    // `WriteFile` can return a success status but write 0 bytes if we write
-    // messages quickly enough. This problem has been observed when using a
-    // release build, but resolved when using a debug build or `--verbosity 10`.
-    // Presumably this happens if cbmc gets too far ahead of the sub process.
-    // Flushing the buffer and retrying should then succeed to write the message
-    // in this case.
+    DWORD bytes_written = 0;
     if(!WriteFile(
-         child_std_IN_Wr, message.c_str(), message_size, &bytes_written, NULL))
+         child_std_IN_Wr, remaining_data, remaining_size, &bytes_written, NULL))
     {
       const DWORD error_code = GetLastError();
       log.debug() << "Last error code is " + std::to_string(error_code)
@@ -385,6 +387,13 @@ piped_processt::send(const std::string &message)
       return send_responset::FAILED;
     }
     if(bytes_written != 0)
+    {
+      remaining_data += bytes_written;
+      remaining_size -= bytes_written;
+      send_attempts = 0;
+      continue;
+    }
+    if(send_attempts == retry_limit)
       break;
     // Give the sub-process chance to read the waiting message(s).
     const auto wait_milliseconds = narrow<DWORD>(1 << send_attempts);
@@ -392,13 +401,14 @@ piped_processt::send(const std::string &message)
                 << wait_milliseconds << " milliseconds." << messaget::eom;
     FlushFileBuffers(child_std_IN_Wr);
     Sleep(wait_milliseconds);
+    ++send_attempts;
   }
   INVARIANT(
-    message_size == bytes_written,
+    remaining_size == 0,
     "Number of bytes written to sub process must match message size."
     "Message size is " +
-      std::to_string(message_size) + " but " + std::to_string(bytes_written) +
-      " bytes were written.");
+      std::to_string(message_size) + " but " +
+      std::to_string(message_size - remaining_size) + " bytes were written.");
 #else
   // send message to solver process
   int send_status = fputs(message.c_str(), command_stream);
