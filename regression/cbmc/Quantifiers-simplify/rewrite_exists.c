@@ -2,7 +2,7 @@
 
 int main()
 {
-  int k;
+  int k = __VERIFIER_nondet_int();
 
   __CPROVER_assume(__CPROVER_exists {
     int i;

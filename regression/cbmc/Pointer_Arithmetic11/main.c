@@ -1,6 +1,6 @@
 int main()
 {
-  int i, ii;
+  int i, ii = __VERIFIER_nondet_int();
   int data=0;
   char *p=(char *)&data;
   i=ii;
