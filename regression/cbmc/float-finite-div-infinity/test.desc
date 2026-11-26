@@ -1,0 +1,12 @@
+CORE no-new-smt broken-cprover-smt-backend
+main.c
+--nan-check
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test verifies that dividing a finite float by +INFINITY does NOT
+incorrectly trigger a NaN check failure (bug fix). According to IEEE 754-2019
+Section 6.1, division(x, ∞) for finite x = 0.0. Only inf/inf should produce NaN
+(which is covered in test float-inf-div-inf)

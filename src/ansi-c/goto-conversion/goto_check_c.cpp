@@ -1253,18 +1253,20 @@ void goto_check_ct::nan_check(const exprt &expr, const guardt &guard)
   {
     const auto &div_expr = to_div_expr(expr);
 
-    // there a two ways to get a new NaN on division:
-    // 0/0 = NaN and x/inf = NaN
+    // there are two ways to get a new NaN on division:
+    // 0/0 = NaN and inf/inf = NaN
     // (note that x/0 = +-inf for x!=0 and x!=inf)
-    const and_exprt zero_div_zero(
-      ieee_float_equal_exprt(
-        div_expr.op0(), from_integer(0, div_expr.dividend().type())),
-      ieee_float_equal_exprt(
-        div_expr.op1(), from_integer(0, div_expr.divisor().type())));
+    // (note that finite/inf = +-0.0, NOT NaN per IEEE 754-2019 Section 6.1)
+    and_exprt zero_div_zero{
+      ieee_float_equal_exprt{
+        div_expr.op0(), from_integer(0, div_expr.dividend().type())},
+      ieee_float_equal_exprt{
+        div_expr.op1(), from_integer(0, div_expr.divisor().type())}};
 
-    const isinf_exprt div_inf(div_expr.op1());
+    and_exprt inf_div_inf{
+      isinf_exprt{div_expr.op0()}, isinf_exprt{div_expr.op1()}};
 
-    isnan = or_exprt(zero_div_zero, div_inf);
+    isnan = or_exprt{std::move(zero_div_zero), std::move(inf_div_inf)};
   }
   else if(expr.id() == ID_mult)
   {
@@ -1273,18 +1275,18 @@ void goto_check_ct::nan_check(const exprt &expr, const guardt &guard)
 
     const auto &mult_expr = to_mult_expr(expr);
 
-    // Inf * 0 is NaN
-    const and_exprt inf_times_zero(
-      isinf_exprt(mult_expr.op0()),
-      ieee_float_equal_exprt(
-        mult_expr.op1(), from_integer(0, mult_expr.op1().type())));
+    // Inf * 0 is NaN, in either operand order.
+    and_exprt inf_times_zero{
+      isinf_exprt{mult_expr.op0()},
+      ieee_float_equal_exprt{
+        mult_expr.op1(), from_integer(0, mult_expr.op1().type())}};
 
-    const and_exprt zero_times_inf(
-      ieee_float_equal_exprt(
-        mult_expr.op1(), from_integer(0, mult_expr.op1().type())),
-      isinf_exprt(mult_expr.op0()));
+    and_exprt zero_times_inf{
+      ieee_float_equal_exprt{
+        mult_expr.op0(), from_integer(0, mult_expr.op0().type())},
+      isinf_exprt{mult_expr.op1()}};
 
-    isnan = or_exprt(inf_times_zero, zero_times_inf);
+    isnan = or_exprt{std::move(inf_times_zero), std::move(zero_times_inf)};
   }
   else if(expr.id() == ID_plus)
   {
