@@ -1,0 +1,11 @@
+CORE
+main.c
+--function-enter marker _ --pointer-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+--function-enter marker calls marker with the name of the function at the
+entry of each function other than marker itself.
