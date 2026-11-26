@@ -75,6 +75,16 @@ public:
   /// Popping from the empty stack results in an invariant violation.
   virtual void pop() = 0;
 
+  /// Freeze all solver variables that the decision procedure introduces, so
+  /// that an incremental SAT backend's simplifier does not eliminate them
+  /// between successive `operator()` calls. This is needed by SAT-based
+  /// flattening backends (see `prop_conv_solvert::set_all_frozen`); SMT-based
+  /// stack decision procedures rely on push/pop for incrementality and so do
+  /// not need freezing, which is why the default implementation is a no-op.
+  virtual void set_all_frozen()
+  {
+  }
+
   virtual ~stack_decision_proceduret() = default;
 };
 
