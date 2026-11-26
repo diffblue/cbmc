@@ -15,6 +15,7 @@ Date: June 2006
 
 #include <util/cmdline.h>
 #include <util/config.h>
+#include <util/expr_util.h>
 #include <util/get_base_name.h>
 #include <util/run.h>
 #include <util/symbol_table_builder.h>
@@ -23,6 +24,7 @@ Date: June 2006
 #include <util/unicode.h>
 #include <util/version.h>
 
+#include <goto-programs/compute_called_functions.h>
 #include <goto-programs/name_mangler.h>
 #include <goto-programs/read_goto_binary.h>
 #include <goto-programs/write_goto_binary.h>
@@ -36,10 +38,14 @@ Date: June 2006
 #include <linking/linking.h>
 #include <linking/static_lifetime_init.h>
 
+#include <algorithm>
 #include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
 
 #define DOTGRAPHSETTINGS  "color=black;" \
                           "orientation=portrait;" \
@@ -312,6 +318,83 @@ bool compilet::find_library(const std::string &name)
   return false;
 }
 
+/// Warn about a file-local (`static`) function that has a body under its
+/// mangled name `__CPROVER_file_local_<file>_<sym>` (as produced by
+/// `--export-file-local-symbols`), while the program also calls or takes the
+/// address of the *unmangled* name `<sym>`, typically through an `extern`
+/// declaration in another translation unit. The unmangled reference does not
+/// bind to the mangled body, so `<sym>` has no body after linking.
+///
+/// The original name of a mangled function is recorded in its `pretty_name`
+/// (see function_name_manglert), which is matched exactly against the
+/// bodiless callee. A callee that is not in the function map at all (as is
+/// the case for declarations when sources are compiled and linked in a single
+/// invocation) is treated as bodiless.
+static void
+warn_file_local_stub_calls(const goto_modelt &goto_model, messaget &log)
+{
+  const auto &function_map = goto_model.goto_functions.function_map;
+
+  // original name -> mangled name, for file-local functions with a body
+  std::unordered_map<irep_idt, irep_idt> file_local_by_name;
+  for(const auto &f : function_map)
+  {
+    if(!f.second.body_available() || !f.first.starts_with(FILE_LOCAL_PREFIX))
+      continue;
+    const symbolt *symbol = goto_model.symbol_table.lookup(f.first);
+    if(symbol != nullptr && !symbol->pretty_name.empty())
+      file_local_by_name.emplace(symbol->pretty_name, f.first);
+  }
+
+  if(file_local_by_name.empty())
+    return;
+
+  // direct call targets, with the location of the first call
+  std::unordered_map<irep_idt, source_locationt> referenced;
+  for(const auto &f : function_map)
+  {
+    for(const auto &instruction : f.second.body.instructions)
+    {
+      if(!instruction.is_function_call())
+        continue;
+      const exprt &callee = skip_typecast(instruction.call_function());
+      if(callee.id() == ID_symbol)
+      {
+        referenced.emplace(
+          to_symbol_expr(callee).get_identifier(),
+          instruction.source_location());
+      }
+    }
+  }
+
+  // functions whose address is taken, e.g., to call them via a pointer
+  std::unordered_set<irep_idt> address_taken;
+  compute_address_taken_functions(goto_model.goto_functions, address_taken);
+  for(const auto &name : address_taken)
+    referenced.emplace(name, source_locationt::nil());
+
+  std::vector<std::pair<std::string, irep_idt>> findings;
+  for(const auto &entry : referenced)
+  {
+    const auto f_it = function_map.find(entry.first);
+    if(f_it != function_map.end() && f_it->second.body_available())
+      continue;
+    if(file_local_by_name.find(entry.first) != file_local_by_name.end())
+      findings.emplace_back(id2string(entry.first), entry.first);
+  }
+  std::sort(findings.begin(), findings.end());
+
+  for(const auto &finding : findings)
+  {
+    const irep_idt &name = finding.second;
+    log.warning().source_location = referenced.at(name);
+    log.warning() << "function '" << finding.first
+                  << "' has no body, but a file-local function of that name "
+                  << "exists as '" << file_local_by_name.at(name)
+                  << "', which this reference does not reach" << messaget::eom;
+  }
+}
+
 /// parses object files and links them
 /// \return true on error, false otherwise
 bool compilet::link(std::optional<symbol_tablet> &&symbol_table)
@@ -358,6 +441,12 @@ bool compilet::link(std::optional<symbol_tablet> &&symbol_table)
       log.get_message_handler(), goto_model, file_local_mangle_suffix);
     mangler.mangle();
   }
+
+  // Warn about a file-local body that is shadowed by a bodiless unmangled
+  // call; see warn_file_local_stub_calls.  Restricted to executable links (a
+  // `gcc -shared` link legitimately leaves symbols unresolved).
+  if(mode == COMPILE_LINK_EXECUTABLE)
+    warn_file_local_stub_calls(goto_model, log);
 
   if(write_bin_object_file(output_file_executable, goto_model))
     return true;

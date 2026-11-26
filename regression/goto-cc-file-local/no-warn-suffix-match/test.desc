@@ -1,0 +1,10 @@
+CORE
+main.c
+final-link
+^EXIT=0$
+^SIGNAL=0$
+--
+has no body, but a file-local function
+--
+A file-local function whose name merely ends in the name of a bodiless
+external function (do_recv vs recv) must not be reported.
