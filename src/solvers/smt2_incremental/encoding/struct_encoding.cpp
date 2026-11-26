@@ -31,17 +31,61 @@ struct_encodingt::struct_encodingt(const struct_encodingt &other)
 
 struct_encodingt::~struct_encodingt() = default;
 
+/// Compute the encoded bit width of a type. For struct and union tag types,
+/// the width accounts for empty struct/union members being encoded as 8-bit
+/// zero values (see \c empty_encoding()).
+static std::size_t encoded_bit_width(
+  const typet &type,
+  const boolbv_widtht &boolbv_width,
+  const namespacet &ns);
+
 /// If the given \p type needs re-encoding as a bit-vector then this function
-/// \returns the width of the new bitvector type. The width calculation is
-/// delegated to \p boolbv_width.
-static std::optional<std::size_t>
-needs_width(const typet &type, const boolbv_widtht &boolbv_width)
+/// \returns the width of the new bitvector type. The width calculation
+/// accounts for empty struct/union members being encoded as 8-bit zero
+/// values.
+static std::optional<std::size_t> needs_width(
+  const typet &type,
+  const boolbv_widtht &boolbv_width,
+  const namespacet &ns)
+{
+  if(
+    can_cast_type<struct_tag_typet>(type) ||
+    can_cast_type<union_tag_typet>(type))
+  {
+    return encoded_bit_width(type, boolbv_width, ns);
+  }
+  return {};
+}
+
+static std::size_t encoded_bit_width(
+  const typet &type,
+  const boolbv_widtht &boolbv_width,
+  const namespacet &ns)
 {
   if(const auto struct_tag = type_try_dynamic_cast<struct_tag_typet>(type))
-    return boolbv_width(*struct_tag);
+  {
+    std::size_t total = 0;
+    for(const auto &comp : ns.follow_tag(*struct_tag).components())
+    {
+      if(
+        can_cast_type<struct_tag_typet>(comp.type()) ||
+        can_cast_type<union_tag_typet>(comp.type()))
+      {
+        total += encoded_bit_width(comp.type(), boolbv_width, ns);
+      }
+      else
+      {
+        total += boolbv_width(comp.type());
+      }
+    }
+    return total == 0 ? 8 : total;
+  }
   if(const auto union_tag = type_try_dynamic_cast<union_tag_typet>(type))
-    return boolbv_width(*union_tag);
-  return {};
+  {
+    const std::size_t w = boolbv_width(*union_tag);
+    return w == 0 ? 8 : w;
+  }
+  return boolbv_width(type);
 }
 
 typet struct_encodingt::encode(typet type) const
@@ -52,7 +96,7 @@ typet struct_encodingt::encode(typet type) const
   {
     typet &current = *work_queue.front();
     work_queue.pop();
-    if(auto assigned_bit_width = needs_width(current, *boolbv_width))
+    if(auto assigned_bit_width = needs_width(current, *boolbv_width, ns))
     {
       // The bit vector theory of SMT disallows zero bit length length bit
       // vectors. C++ gives a minimum size for a struct (even an empty struct)
@@ -135,7 +179,8 @@ encode(const union_exprt &union_expr, const boolbv_widtht &bit_width)
 static std::size_t count_trailing_bit_width(
   const struct_typet &type,
   const irep_idt name,
-  const boolbv_widtht &boolbv_width)
+  const boolbv_widtht &boolbv_width,
+  const namespacet &ns)
 {
   auto member_component_rit = std::find_if(
     type.components().rbegin(),
@@ -148,9 +193,9 @@ static std::size_t count_trailing_bit_width(
     "Definition of struct type should include named component.");
   const auto trailing_widths =
     make_range(type.components().rbegin(), member_component_rit)
-      .map([&](const struct_union_typet::componentt &component) -> std::size_t {
-        return boolbv_width(component.type());
-      });
+      .map(
+        [&](const struct_union_typet::componentt &component) -> std::size_t
+        { return encoded_bit_width(component.type(), boolbv_width, ns); });
   return std::accumulate(
     trailing_widths.begin(), trailing_widths.end(), std::size_t{0});
 }
@@ -179,7 +224,7 @@ exprt struct_encodingt::encode_member(const member_exprt &member_expr) const
         ? ns.follow_tag(type_checked_cast<struct_tag_typet>(compound_type))
         : type_checked_cast<struct_typet>(compound_type);
     return count_trailing_bit_width(
-      struct_type, member_expr.get_component_name(), *boolbv_width);
+      struct_type, member_expr.get_component_name(), *boolbv_width, ns);
   }();
   return extractbits_exprt{
     member_expr.compound(), offset_bits, member_expr.type()};
