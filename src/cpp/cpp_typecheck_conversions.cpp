@@ -4483,6 +4483,14 @@ bool cpp_typecheckt::reference_binding(
     rank = backup_rank;
   }
 
+  // N5008 [over.match.funcs.general]/5: no user-defined conversion (and, see
+  // below, no temporary) binds the implicit object parameter.  Binding the
+  // implicit object parameter of `operator double &()' to a const object
+  // through that conversion function recursed without end (snappy's use of
+  // Google Benchmark's Counter, `long(counters.at())').
+  if(reference_type.get_bool(ID_C_this))
+    return false;
+
   // conversion operators
   if(expr.type().id() == ID_struct_tag)
   {
@@ -4597,10 +4605,6 @@ bool cpp_typecheckt::reference_binding(
       }
     }
   }
-
-  // No temporary allowed for `this'
-  if(reference_type.get_bool(ID_C_this))
-    return false;
 
   // N5008 [dcl.init.ref]/5.2: a temporary is created and bound only when
   // the reference is an lvalue reference to a non-volatile const type OR an

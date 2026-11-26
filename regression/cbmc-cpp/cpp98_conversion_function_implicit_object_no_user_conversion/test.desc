@@ -1,0 +1,15 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] .* const rvalue: SUCCESS$
+^\[main\.assertion\.2\] .* const lvalue: SUCCESS$
+^\[main\.assertion\.3\] .* non-const lvalue: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+N5008 [over.match.funcs.general]/5: binding the implicit object parameter
+of `operator double &()' to a const object tried that conversion function
+again, without end (a segmentation fault).
