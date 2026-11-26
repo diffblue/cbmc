@@ -25,6 +25,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "boolbv_width.h"
 #include "bv_utils.h" // IWYU pragma: keep
 
+#include <unordered_set>
+
 class binary_overflow_exprt;
 class bitreverse_exprt;
 class bswap_exprt;
@@ -122,6 +124,14 @@ protected:
 
   // uninterpreted functions
   functionst functions;
+
+  /// Record an application of an uninterpreted function, warning (once per
+  /// function) about string built-ins that are only interpreted by the SMT
+  /// back-ends.
+  void record_function_application(const function_application_exprt &expr);
+
+  /// The string built-ins that a warning has been issued for.
+  std::unordered_set<irep_idt> warned_string_builtins;
 
   // the mapping from identifiers to literals
   boolbv_mapt map;

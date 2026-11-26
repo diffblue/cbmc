@@ -325,12 +325,54 @@ bvt boolbvt::convert_symbol(const exprt &expr)
   return bv;
 }
 
+/// Return true if \p expr is an application of a CPROVER string or regex
+/// built-in over SMT-LIB strings or regular expressions (see
+/// smt2_convt::convert_expr), which the bit-vector encoding does not
+/// interpret.
+static bool is_smt_lib_string_builtin(const function_application_exprt &expr)
+{
+  if(expr.function().id() != ID_symbol)
+    return false;
+
+  const irep_idt &id = to_symbol_expr(expr.function()).identifier();
+  if(!id.starts_with("cprover_string_") && !id.starts_with("cprover_regex_"))
+    return false;
+
+  const auto is_string_or_regex = [](const typet &type)
+  { return type.id() == ID_string || type.id() == ID_regex; };
+
+  return is_string_or_regex(expr.type()) ||
+         std::any_of(
+           expr.arguments().begin(),
+           expr.arguments().end(),
+           [&is_string_or_regex](const exprt &arg)
+           { return is_string_or_regex(arg.type()); });
+}
+
+void boolbvt::record_function_application(
+  const function_application_exprt &expr)
+{
+  if(
+    is_smt_lib_string_builtin(expr) &&
+    warned_string_builtins.insert(to_symbol_expr(expr.function()).identifier())
+      .second)
+  {
+    log.warning() << "string built-in '"
+                  << to_symbol_expr(expr.function()).identifier()
+                  << "' is not supported by the bit-vector back-end and is "
+                  << "treated as an uninterpreted function, which may "
+                  << "yield spurious counterexamples; use an SMT back-end "
+                  << "(e.g., --z3 or --cvc5)" << messaget::eom;
+  }
+
+  functions.record(expr);
+}
 
 bvt boolbvt::convert_function_application(
   const function_application_exprt &expr)
 {
   // record
-  functions.record(expr);
+  record_function_application(expr);
 
   // make it free bits
   return prop.new_variables(boolbv_width(expr.type()));
@@ -484,7 +526,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
   }
   else if(expr.id() == ID_function_application)
   {
-    functions.record(to_function_application_expr(expr));
+    record_function_application(to_function_application_expr(expr));
     return prop.new_variable();
   }
 
