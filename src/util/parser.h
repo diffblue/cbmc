@@ -33,9 +33,10 @@ public:
   explicit parsert(message_handlert &message_handler)
     : in(nullptr),
       log(message_handler),
-      line_no(0),
+      line_no(1),
       previous_line_no(std::numeric_limits<unsigned int>::max()),
-      column(1)
+      column(1),
+      last_input_ended_with_newline(false)
   {
   }
 
@@ -114,12 +115,7 @@ public:
     if(previous_line_no!=line_no)
     {
       previous_line_no=line_no;
-
-      // for the case of a file with no newlines
-      if(line_no == 0)
-        _source_location.set_line(1);
-      else
-        _source_location.set_line(line_no);
+      _source_location.set_line(line_no);
     }
 
     return _source_location;
@@ -150,6 +146,12 @@ protected:
   source_locationt _source_location;
   unsigned line_no, previous_line_no;
   unsigned column;
+
+public:
+  // Accessed by YY_INPUT macro; tracks whether the last YY_INPUT call
+  // ended with a newline so that the line-number increment can be
+  // deferred to the start of the next call.
+  bool last_input_ended_with_newline;
 };
 
 exprt &_newstack(parsert &parser, unsigned &x);
@@ -161,29 +163,35 @@ exprt &_newstack(parsert &parser, unsigned &x);
 #define stack_type(x) \
   (static_cast<typet &>(static_cast<irept &>(PARSER.stack[x])))
 
-#define YY_INPUT(buf, result, max_size) \
-    do { \
-        for(result=0; result<max_size;) \
-        { \
-          char ch; \
-          if(!PARSER.read(ch)) /* NOLINT(readability/braces) */ \
-          { \
-            if(result==0) \
-              result=YY_NULL; \
-            break; \
-          } \
-          \
-          if(ch!='\r') /* NOLINT(readability/braces) */ \
-          { \
-            buf[result++]=ch; \
-            if(ch=='\n') /* NOLINT(readability/braces) */ \
-            { \
-              PARSER.inc_line_no(); \
-              break; \
-            } \
-          } \
-        } \
-    } while(0)
+#define YY_INPUT(buf, result, max_size)                                        \
+  do                                                                           \
+  {                                                                            \
+    if(PARSER.last_input_ended_with_newline) /* NOLINT(readability/braces) */  \
+    {                                                                          \
+      PARSER.inc_line_no();                                                    \
+      PARSER.last_input_ended_with_newline = false;                            \
+    }                                                                          \
+    for(result = 0; result < max_size;)                                        \
+    {                                                                          \
+      char ch;                                                                 \
+      if(!PARSER.read(ch)) /* NOLINT(readability/braces) */                    \
+      {                                                                        \
+        if(result == 0)                                                        \
+          result = YY_NULL;                                                    \
+        break;                                                                 \
+      }                                                                        \
+                                                                               \
+      if(ch != '\r') /* NOLINT(readability/braces) */                          \
+      {                                                                        \
+        buf[result++] = ch;                                                    \
+        if(ch == '\n') /* NOLINT(readability/braces) */                        \
+        {                                                                      \
+          PARSER.last_input_ended_with_newline = true;                         \
+          break;                                                               \
+        }                                                                      \
+      }                                                                        \
+    }                                                                          \
+  } while(0)
 
 // The following tracks the column of the token, and is nicely explained here:
 // http://oreilly.com/linux/excerpts/9780596155971/error-reporting-recovery.html

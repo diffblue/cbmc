@@ -96,7 +96,7 @@ bool ansi_c_languaget::parse(
 
   if(!result)
   {
-    ansi_c_parser.set_line_no(0);
+    ansi_c_parser.set_line_no(1);
     ansi_c_parser.set_file(path);
     ansi_c_parser.in=&i_preprocessed;
     ansi_c_scanner_init(ansi_c_parser);
