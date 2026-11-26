@@ -1,0 +1,14 @@
+CORE
+main.c
+--instrument out.gb --instrument-targets function_call=assert,function_start=assume,function_end=assert,function_return=assume --verbosity 9 --vsd
+activate-multi-line-match
+^EXIT=0$
+^SIGNAL=0$
+^Instrumenting main\nInstruction \d+ because function_return... single history... condition is main::1::argument_input = 1 ∧ true_from_calling_context = 1 ∧ \(0 ≤ main::argc ∧ main::argc ≤ max_value\)... added as assumption\nInstruction \d+ because function_end... single history... condition is main#return_value = 0 ∧ true_from_calling_context = 1 ∧ \(0 ≤ main::argc ∧ main::argc ≤ max_value\)... added as assertion\nInstruction \d+ because function_start... single history... condition is true_from_calling_context = 0 ∧ \(0 ≤ main::argc ∧ main::argc ≤ max_value\)... added as assumption\nInstruction \d+ because function_call... single history... condition is main::1::argument_input = 1 ∧ true_from_calling_context = 1 ∧ \(0 ≤ main::argc ∧ main::argc ≤ max_value\)... added as assertion$
+^Instrumenting example_function\nInstruction \d+ because function_end... single history... condition is example_function::argument = 1 ∧ true_from_calling_context = 1... added as assertion\nInstruction \d+ because function_start... single history... condition is example_function::argument = 1 ∧ true_from_calling_context = 1... added as assumption$
+--
+^warning: ignoring
+--
+Testing the addition of assertions in a way that mimics the use of contracts
+
+
