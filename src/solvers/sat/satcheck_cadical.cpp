@@ -10,12 +10,27 @@ Author: Michael Tautschnig
 
 #  include "satcheck_cadical.h"
 
-#  include <util/exception_utils.h>
 #  include <util/invariant.h>
 #  include <util/narrow.h>
 #  include <util/threeval.h>
 
 #  include <cadical.hpp>
+#  include <chrono>
+
+/// Concrete `CaDiCaL::Terminator` for the per-solve time limit.
+/// Stores a deadline as a `steady_clock::time_point` and returns
+/// true once the deadline has passed. CaDiCaL polls the terminator
+/// during solving and aborts cleanly on a true return.
+class satcheck_cadical_baset::terminatort : public CaDiCaL::Terminator
+{
+public:
+  std::chrono::steady_clock::time_point deadline;
+
+  bool terminate() override
+  {
+    return std::chrono::steady_clock::now() >= deadline;
+  }
+};
 
 tvt satcheck_cadical_baset::l_get(literalt a) const
 {
@@ -114,7 +129,21 @@ propt::resultt satcheck_cadical_baset::do_prop_solve(const bvt &assumptions)
   auto limit2_ret = solver->limit("localsearch", localsearch_limit);
   CHECK_RETURN(limit2_ret);
 
-  switch(solver->solve())
+  if(time_limit_milliseconds != 0)
+  {
+    if(!terminator)
+      terminator = std::make_unique<terminatort>();
+    terminator->deadline = std::chrono::steady_clock::now() +
+                           std::chrono::milliseconds(time_limit_milliseconds);
+    solver->connect_terminator(terminator.get());
+  }
+
+  const int solver_state = solver->solve();
+
+  if(time_limit_milliseconds != 0)
+    solver->disconnect_terminator();
+
+  switch(solver_state)
   {
   case 10:
     log.status() << "SAT checker: instance is SATISFIABLE" << messaget::eom;
@@ -124,10 +153,14 @@ propt::resultt satcheck_cadical_baset::do_prop_solve(const bvt &assumptions)
     log.status() << "SAT checker: instance is UNSATISFIABLE" << messaget::eom;
     break;
   default:
-    log.status() << "SAT checker: solving returned without solution"
+    // Solving was interrupted; this is the path taken when our
+    // terminator signals that the configured time limit has passed.
+    // We return P_ERROR (matching the MiniSat 2 and IPASIR back-ends)
+    // so that callers can recognise a timeout, instead of throwing.
+    log.status() << "SAT checker: solving was interrupted (e.g. timeout)"
                  << messaget::eom;
-    throw analysis_exceptiont(
-      "solving inside CaDiCaL SAT solver has been interrupted");
+    status = statust::ERROR;
+    return resultt::P_ERROR;
   }
 
   status = statust::UNSAT;

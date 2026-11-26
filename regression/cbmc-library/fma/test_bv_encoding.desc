@@ -1,6 +1,6 @@
 CORE smt-backend
 precision.c
---smt2 --outfile -
+--smt2 --outfile - --no-branch-pruning
 float_bv\.floatbv_fma
 ^EXIT=0$
 ^SIGNAL=0$

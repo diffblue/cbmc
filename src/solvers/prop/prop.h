@@ -117,9 +117,20 @@ public:
   virtual void set_frozen(literalt) { }
 
   // Resource limits:
-  virtual void set_time_limit_seconds(uint32_t)
+
+  /// Set a wall-clock time limit for each solver call, in
+  /// milliseconds. A value of 0 disables the time limit. Default
+  /// implementation logs a warning and ignores the limit.
+  virtual void set_time_limit_milliseconds(uint32_t)
   {
     log.warning() << "CPU limit ignored (not implemented)" << messaget::eom;
+  }
+
+  /// Helper accepting a time limit in whole seconds; forwards to
+  /// `set_time_limit_milliseconds` after multiplying by 1000.
+  void set_time_limit_seconds(uint32_t lim)
+  {
+    set_time_limit_milliseconds(lim * 1000);
   }
 
   std::size_t get_number_of_solver_calls() const;

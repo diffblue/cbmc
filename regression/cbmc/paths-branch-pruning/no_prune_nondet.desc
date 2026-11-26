@@ -1,0 +1,13 @@
+CORE
+no_prune_nondet.c
+--paths lifo
+^\[main\.assertion\.1\] .* positive branch reachable: FAILURE$
+^\[main\.assertion\.2\] .* non-positive branch reachable: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Both branches are feasible (x is unconstrained nondet). Branch pruning
+must not prune either side. Both assertions must be reported as FAILURE.
