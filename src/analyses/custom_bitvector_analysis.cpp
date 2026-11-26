@@ -64,20 +64,12 @@ irep_idt custom_bitvector_domaint::object2id(const exprt &src)
   }
   else if(src.id()==ID_dereference)
   {
-    const exprt &op=to_dereference_expr(src).pointer();
+    // the pointer may be cast, as in get_must((void *)&x, "bit")
+    const exprt &op = skip_typecast(to_dereference_expr(src).pointer());
 
     if(op.id()==ID_address_of)
     {
       return object2id(to_address_of_expr(op).object());
-    }
-    else if(op.id()==ID_typecast)
-    {
-      irep_idt op_id=object2id(to_typecast_expr(op).op());
-
-      if(op_id.empty())
-        return irep_idt();
-      else
-        return '*'+id2string(op_id);
     }
     else
     {
