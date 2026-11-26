@@ -1,0 +1,10 @@
+CORE
+ЮЛ.class
+
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^CONVERSION ERROR
+--
+Test that .class suffix is properly stripped for Unicode class names
