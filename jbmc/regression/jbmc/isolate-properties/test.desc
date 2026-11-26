@@ -1,0 +1,11 @@
+CORE
+Test
+-cp target/classes --function Test.check --isolate-properties --no-refine-strings
+^\[java::Test\.check:\(I\)V\.assertion\.1\] line 3 .*: FAILURE$
+^\[java::Test\.check:\(I\)V\.assertion\.2\] line 5 .*: SUCCESS$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+Each property is decided in a solver call of its own.

@@ -112,6 +112,58 @@ decision_proceduret::resultt goto_symex_property_decidert::solve()
   return solver->decision_procedure()();
 }
 
+decision_proceduret::resultt
+goto_symex_property_decidert::solve_goals_individually(
+  propertiest &properties,
+  std::unordered_set<irep_idt> &updated_properties,
+  bool set_pass)
+{
+  stack_decision_proceduret &decision_procedure = solver->decision_procedure();
+
+  for(const auto &goal_pair : goal_map)
+  {
+    auto &status = properties.at(goal_pair.first).status;
+    if(!is_property_to_check(status))
+      continue;
+
+    decision_procedure.push({goal_pair.second.condition});
+    const decision_proceduret::resultt dec_result = decision_procedure();
+    decision_procedure.pop();
+
+    switch(dec_result)
+    {
+    case decision_proceduret::resultt::D_SATISFIABLE:
+      // The model remains available after the pop: mark all properties
+      // that the model is a counterexample for.
+      for(const auto &other_goal_pair : goal_map)
+      {
+        auto &other_status = properties.at(other_goal_pair.first).status;
+        if(
+          is_property_to_check(other_status) &&
+          decision_procedure.get(other_goal_pair.second.condition) == true)
+        {
+          other_status |= property_statust::FAIL;
+          updated_properties.insert(other_goal_pair.first);
+        }
+      }
+      return dec_result;
+    case decision_proceduret::resultt::D_UNSATISFIABLE:
+      if(set_pass)
+      {
+        status |= property_statust::PASS;
+        updated_properties.insert(goal_pair.first);
+      }
+      break;
+    case decision_proceduret::resultt::D_ERROR:
+      status |= property_statust::ERROR;
+      updated_properties.insert(goal_pair.first);
+      break;
+    }
+  }
+
+  return decision_proceduret::resultt::D_UNSATISFIABLE;
+}
+
 stack_decision_proceduret &
 goto_symex_property_decidert::get_decision_procedure() const
 {
