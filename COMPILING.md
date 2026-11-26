@@ -67,6 +67,22 @@ files.
    ```
    git submodule update --init
    ```
+   **Note for .tar.gz source releases**: If you downloaded CBMC as a `.tar.gz`
+   archive from GitHub releases (rather than cloning the git repository), the
+   git submodules will not be included. This primarily affects JBMC compilation,
+   which requires the `java-models-library` submodule. You have two options:
+
+   - **Option 1: Download java-models-library** (required for JBMC):
+     ```
+     curl -L https://github.com/diffblue/java-models-library/archive/refs/heads/master.tar.gz | tar xz
+     mkdir -p jbmc/lib
+     mv java-models-library-master jbmc/lib/java-models-library
+     ```
+
+   - **Option 2: Disable JBMC compilation** (see step 4 below):
+     If you don't need JBMC, you can skip the submodule setup and disable JBMC
+     by passing `-DWITH_JBMC=OFF` to CMake in step 4.
+
 4. Generate build files with CMake:
    ```
    cmake -S . -Bbuild
@@ -191,6 +207,9 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    git clone https://github.com/diffblue/cbmc cbmc-git
    cd cbmc-git
    ```
+   **Note for .tar.gz source releases**: If you downloaded CBMC as a `.tar.gz`
+   archive from GitHub releases, extract it and `cd` into the extracted
+   directory instead of using the `git clone` command above.
 
 3. To compile, do
    ```
@@ -203,6 +222,16 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
 4. To compile JBMC, do
    ```
    make -C jbmc/src setup-submodules
+   make -C jbmc/src
+   ```
+   **Note for .tar.gz source releases**: The `setup-submodules` target uses
+   `git submodule update --init`, which only works when building from a git
+   repository clone. If you downloaded a `.tar.gz` release, you must
+   download the java-models-library before compiling JBMC:
+   ```
+   curl -L https://github.com/diffblue/java-models-library/archive/refs/heads/master.tar.gz | tar xz
+   mkdir -p jbmc/lib
+   mv java-models-library-master jbmc/lib/java-models-library
    make -C jbmc/src
    ```
 
@@ -221,6 +250,10 @@ Follow these instructions:
    git clone https://github.com/diffblue/cbmc cbmc-git
    cd cbmc-git
    ```
+   **Note for .tar.gz source releases**: If you downloaded CBMC as a `.tar.gz`
+   archive from GitHub releases, extract it and `cd` into the extracted
+   directory instead of using the `git clone` command above.
+
 3. To compile CBMC, do
    ```
    make -C src minisat2-download
@@ -234,6 +267,16 @@ Follow these instructions:
    lists the JDKs that macOS knows about. Then do
    ```
    make -C jbmc/src setup-submodules
+   make -C jbmc/src
+   ```
+   **Note for .tar.gz source releases**: The `setup-submodules` target uses
+   `git submodule update --init`, which only works when building from a git
+   repository clone. If you downloaded a `.tar.gz` release, you must
+   download the java-models-library before compiling JBMC:
+   ```
+   curl -L https://github.com/diffblue/java-models-library/archive/refs/heads/master.tar.gz | tar xz
+   mkdir -p jbmc/lib
+   mv java-models-library-master jbmc/lib/java-models-library
    make -C jbmc/src
    ```
 
@@ -251,6 +294,10 @@ Maven 3 manually.
    git clone https://github.com/diffblue/cbmc cbmc-git
    cd cbmc-git
    ```
+   **Note for .tar.gz source releases**: If you downloaded CBMC as a `.tar.gz`
+   archive from GitHub releases, extract it and `cd` into the extracted
+   directory instead of using the `git clone` command above.
+
 3. To compile CBMC, type
    ```
    gmake -C src minisat2-download DOWNLOADER=wget TAR=gtar
@@ -259,6 +306,16 @@ Maven 3 manually.
 4. To compile JBMC, type
    ```
    gmake -C jbmc/src setup-submodules
+   gmake -C jbmc/src
+   ```
+   **Note for .tar.gz source releases**: The `setup-submodules` target uses
+   `git submodule update --init`, which only works when building from a git
+   repository clone. If you downloaded a `.tar.gz` release, you must
+   download the java-models-library before compiling JBMC:
+   ```
+   wget -O - https://github.com/diffblue/java-models-library/archive/refs/heads/master.tar.gz | gtar xz
+   mkdir -p jbmc/lib
+   mv java-models-library-master jbmc/lib/java-models-library
    gmake -C jbmc/src
    ```
 
@@ -285,6 +342,10 @@ Maven 3 manually.
    git clone https://github.com/diffblue/cbmc cbmc-git
    cd cbmc-git
    ```
+   **Note for .tar.gz source releases**: If you downloaded CBMC as a `.tar.gz`
+   archive from GitHub releases, extract it and `cd` into the extracted
+   directory instead of using the `git clone` command above.
+
 3. To compile CBMC, do
    ```
    gmake -C src minisat2-download
@@ -293,6 +354,16 @@ Maven 3 manually.
 4. To compile JBMC, do
    ```
    gmake -C jbmc/src setup-submodules
+   gmake -C jbmc/src
+   ```
+   **Note for .tar.gz source releases**: The `setup-submodules` target uses
+   `git submodule update --init`, which only works when building from a git
+   repository clone. If you downloaded a `.tar.gz` release, you must
+   download the java-models-library before compiling JBMC:
+   ```
+   wget -O - https://github.com/diffblue/java-models-library/archive/refs/heads/master.tar.gz | tar xz
+   mkdir -p jbmc/lib
+   mv java-models-library-master jbmc/lib/java-models-library
    gmake -C jbmc/src
    ```
 
