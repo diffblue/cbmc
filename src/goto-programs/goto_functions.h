@@ -93,6 +93,18 @@ public:
     compute_loop_numbers();
   }
 
+  /// Recompute the numbers of \p body only, in the same order as update().
+  /// Unlike goto_programt::update(), location numbers come from the counter
+  /// shared by all functions, so they stay unique in the program. The other
+  /// functions keep their numbers.
+  void update(goto_programt &body)
+  {
+    body.compute_incoming_edges();
+    body.compute_target_numbers();
+    compute_location_numbers(body);
+    body.compute_loop_numbers();
+  }
+
   /// Get the identifier of the entry point to a goto model
   static inline irep_idt entry_point()
   {
