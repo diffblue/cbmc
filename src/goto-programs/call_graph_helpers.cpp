@@ -28,14 +28,14 @@ static std::set<irep_idt> get_neighbours(
   return result;
 }
 
-std::set<irep_idt> get_callees(
-  const call_grapht::directed_grapht &graph, const irep_idt &function)
+std::set<irep_idt>
+get_callees(const call_grapht::directed_grapht &graph, const irep_idt &function)
 {
   return get_neighbours(graph, function, true);
 }
 
-std::set<irep_idt> get_callers(
-  const call_grapht::directed_grapht &graph, const irep_idt &function)
+std::set<irep_idt>
+get_callers(const call_grapht::directed_grapht &graph, const irep_idt &function)
 {
   return get_neighbours(graph, function, false);
 }
@@ -60,13 +60,15 @@ static std::set<irep_idt> get_connected_functions(
 }
 
 std::set<irep_idt> get_reachable_functions(
-  const call_grapht::directed_grapht &graph, const irep_idt &function)
+  const call_grapht::directed_grapht &graph,
+  const irep_idt &function)
 {
   return get_connected_functions(graph, function, true);
 }
 
 std::set<irep_idt> get_reaching_functions(
-  const call_grapht::directed_grapht &graph, const irep_idt &function)
+  const call_grapht::directed_grapht &graph,
+  const irep_idt &function)
 {
   return get_connected_functions(graph, function, false);
 }

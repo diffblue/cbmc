@@ -9,16 +9,16 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Function Call Graphs
 
-#ifndef CPROVER_ANALYSES_CALL_GRAPH_H
-#define CPROVER_ANALYSES_CALL_GRAPH_H
+#ifndef CPROVER_GOTO_PROGRAMS_CALL_GRAPH_H
+#define CPROVER_GOTO_PROGRAMS_CALL_GRAPH_H
+
+#include <util/graph.h>
+
+#include "goto_program.h"
 
 #include <iosfwd>
 #include <map>
 #include <unordered_set>
-
-#include <util/graph.h>
-
-#include <goto-programs/goto_program.h>
 
 class goto_functionst;
 class goto_modelt;
@@ -43,9 +43,9 @@ class goto_modelt;
 class call_grapht
 {
 public:
-  explicit call_grapht(bool collect_callsites=false);
-  explicit call_grapht(const goto_modelt &, bool collect_callsites=false);
-  explicit call_grapht(const goto_functionst &, bool collect_callsites=false);
+  explicit call_grapht(bool collect_callsites = false);
+  explicit call_grapht(const goto_modelt &, bool collect_callsites = false);
+  explicit call_grapht(const goto_functionst &, bool collect_callsites = false);
 
   // These two functions build a call graph restricted to functions
   // reachable from the given root.
@@ -79,7 +79,6 @@ private:
     bool collect_callsites);
 
 public:
-
   void output_dot(std::ostream &out) const;
   void output(std::ostream &out) const;
   void output_xml(std::ostream &out) const;
@@ -163,11 +162,11 @@ public:
   directed_grapht get_directed_graph() const;
 
 protected:
-  void add(const irep_idt &function,
-           const goto_programt &body);
+  void add(const irep_idt &function, const goto_programt &body);
+
 private:
   bool collect_callsites;
   std::string format_callsites(const edget &edge) const;
 };
 
-#endif // CPROVER_ANALYSES_CALL_GRAPH_H
+#endif // CPROVER_GOTO_PROGRAMS_CALL_GRAPH_H

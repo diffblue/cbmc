@@ -1,14 +1,11 @@
 SRC = ai.cpp \
       ai_domain.cpp \
       ai_history.cpp \
-      call_graph.cpp \
-      call_graph_helpers.cpp \
       call_stack_history.cpp \
       constant_propagator.cpp \
       custom_bitvector_analysis.cpp \
       dependence_graph.cpp \
       dirty.cpp \
-      does_remove_const.cpp \
       escape_analysis.cpp \
       flow_insensitive_analysis.cpp \
       global_may_alias.cpp \
