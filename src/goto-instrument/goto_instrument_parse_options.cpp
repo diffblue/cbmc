@@ -911,12 +911,6 @@ int goto_instrument_parse_optionst::doit()
       remove_unused_functions(goto_model.goto_functions, ui_message_handler);
     }
 
-    if(cmdline.isset("undefined-function-is-assume-false"))
-    {
-      do_indirect_call_and_rtti_removal();
-      undefined_function_abort_path(goto_model);
-    }
-
     // write new binary?
     if(cmdline.args.size()==2)
     {
@@ -1959,8 +1953,6 @@ void goto_instrument_parse_optionst::help()
     " the body of {ucaller}\n"
     " {y--check-call-sequence} {useq} \t instruments checks to assert that all"
     " call sequences match {useq}\n"
-    " {y--undefined-function-is-assume-false} \t convert each call to an"
-    " undefined function to assume(false)\n"
     HELP_INSERT_FINAL_ASSERT_FALSE
     HELP_REPLACE_FUNCTION_BODY
     HELP_RESTRICT_FUNCTION_POINTER
