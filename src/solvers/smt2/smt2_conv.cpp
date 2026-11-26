@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/format_expr.h>
 #include <util/ieee_float.h>
 #include <util/invariant.h>
+#include <util/magic.h>
 #include <util/mathematical_expr.h>
 #include <util/namespace.h>
 #include <util/pointer_offset_size.h>
@@ -49,6 +50,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cstdint>
 #include <map>
+#include <unordered_set>
 
 // Mark different kinds of error conditions
 
@@ -105,6 +107,7 @@ smt2_convt::smt2_convt(
     break;
 
   case solvert::CVC5:
+    use_quantifiers = true;
     logic = "ALL";
     use_FPA_theory = true;
     use_array_of_bool = true;
@@ -120,6 +123,7 @@ smt2_convt::smt2_convt(
     break;
 
   case solvert::Z3:
+    use_quantifiers = true;
     use_array_of_bool = true;
     // `as const` is disabled because of a soundness issue in Z3,
     // see https://github.com/Z3Prover/z3/issues/9550. Revisit once
@@ -986,17 +990,35 @@ literalt smt2_convt::convert(const exprt &expr)
   // Note that here we are always converting, so we do not need to consider
   // other literal kinds, only "|B###|"
 
-  // Z3 refuses get-value when a defined symbol contains a quantifier.
+  // Z3 refuses get-value when a defined symbol contains a quantifier, so we
+  // declare the symbol and constrain it separately rather than using
+  // define-fun.
   if(has_quantifier(prepared_expr))
   {
     out << "(declare-fun ";
     convert_literal(l);
     out << " () Bool)\n";
-    out << "(assert (= ";
-    convert_literal(l);
-    out << ' ';
-    convert_expr(prepared_expr);
-    out << "))\n";
+    if(solver == solvert::Z3)
+    {
+      // Z3's solve_eqs would eliminate B from (assert (= B <expr>)) and then
+      // return the quantified <expr> from get-value (Z3Prover/z3#7743), which
+      // two implications avoid. The let-binding emits <expr> only once.
+      out << "(assert (let ((?def ";
+      convert_expr(prepared_expr);
+      out << ")) (and (=> ";
+      convert_literal(l);
+      out << " ?def) (=> ?def ";
+      convert_literal(l);
+      out << "))))\n";
+    }
+    else
+    {
+      out << "(assert (= ";
+      convert_literal(l);
+      out << ' ';
+      convert_expr(prepared_expr);
+      out << "))\n";
+    }
   }
   else
   {
@@ -5571,7 +5593,17 @@ void smt2_convt::set_to(const exprt &expr, bool value)
         CHECK_RETURN(id_entry.second);
 
         find_symbols(id_entry.first->second.type);
-        exprt prepared_rhs = prepare_for_convert_expr(equal_expr.rhs());
+        // With Z3, prepare_for_convert_expr replaces each quantifier by a
+        // Boolean variable, except for a quantifier at the top level (see
+        // there). Z3's solve_eqs would eliminate a symbol defined by such a
+        // quantifier just like any other (see convert(const exprt &)), so
+        // define the symbol via a Boolean variable for the quantifier.
+        exprt prepared_rhs =
+          solver == solvert::Z3 &&
+              can_cast_expr<quantifier_exprt>(equal_expr.rhs())
+            ? literal_exprt{lift_quantifier(
+                to_quantifier_expr(equal_expr.rhs()))}
+            : prepare_for_convert_expr(equal_expr.rhs());
 
         std::string smt2_identifier=convert_identifier(identifier);
         smt2_identifiers.insert(smt2_identifier);
@@ -5728,6 +5760,55 @@ exprt smt2_convt::lower_byte_operators(const exprt &expr)
   return lowered_expr;
 }
 
+/// The identifiers of the variables bound by binders other than quantifiers
+/// (let, lambda, array comprehension) in \p expr.
+static std::unordered_set<irep_idt>
+non_quantifier_bound_variables(const exprt &expr)
+{
+  std::unordered_set<irep_idt> result;
+  expr.visit_pre(
+    [&result](const exprt &node)
+    {
+      if(can_cast_expr<let_exprt>(node))
+      {
+        for(const auto &variable : to_let_expr(node).variables())
+          result.insert(variable.get_identifier());
+      }
+      else if(
+        can_cast_expr<binding_exprt>(node) &&
+        !can_cast_expr<quantifier_exprt>(node))
+      {
+        for(const auto &variable : to_binding_expr(node).variables())
+          result.insert(variable.get_identifier());
+      }
+    });
+  return result;
+}
+
+/// True if \p expr has a free occurrence of one of \p identifiers.
+static bool has_free_variable_in(
+  const exprt &expr,
+  const std::unordered_set<irep_idt> &identifiers)
+{
+  for(const auto &identifier : identifiers)
+  {
+    if(has_symbol_expr(expr, identifier, false))
+      return true;
+  }
+  return false;
+}
+
+/// A Boolean variable that is equivalent to \p quantifier, defined using the
+/// encoding of \ref convert(const exprt &). The same variable is used for all
+/// occurrences of \p quantifier.
+literalt smt2_convt::lift_quantifier(const quantifier_exprt &quantifier)
+{
+  auto entry = lifted_quantifiers.find(quantifier);
+  if(entry == lifted_quantifiers.end())
+    entry = lifted_quantifiers.emplace(quantifier, convert(quantifier)).first;
+  return entry->second;
+}
+
 /// Perform steps necessary before an expression is passed to \ref convert_expr
 /// 1. Replace byte operators (byte_extract, _update) with equivalent
 ///    expressions
@@ -5744,10 +5825,38 @@ exprt smt2_convt::prepare_for_convert_expr(const exprt &expr)
     !has_byte_operator(lowered_expr),
     "lower_byte_operators should remove all byte operators");
 
+  // With Z3, quantifiers that are not nested within another quantifier are
+  // replaced by a Boolean variable (see below), unless the expression itself
+  // is a quantifier, which is the case when we are asked to define such a
+  // variable (set_to separately handles a symbol defined by a quantifier).
+  const bool lift_quantifiers =
+    solver == solvert::Z3 && !can_cast_expr<quantifier_exprt>(lowered_expr);
+  // A quantifier that refers to a variable bound by an enclosing binder other
+  // than a quantifier (let, lambda, array comprehension) cannot be replaced
+  // by a variable of its own, as that would unbind the variable.
+  const std::unordered_set<irep_idt> binder_variables =
+    lift_quantifiers ? non_quantifier_bound_variables(lowered_expr)
+                     : std::unordered_set<irep_idt>{};
+
   // Perform rewrites that may introduce new symbols
   for(auto it = lowered_expr.depth_begin(), itend = lowered_expr.depth_end();
       it != itend;) // no ++it
   {
+    if(lift_quantifiers && can_cast_expr<quantifier_exprt>(*it))
+    {
+      // Z3 may report a quantified formula rather than a value for symbols
+      // whose definition contains a quantifier, see convert(const exprt &).
+      // Defining a Boolean variable per quantifier, using the encoding that
+      // works around this, keeps all other definitions quantifier-free.
+      // Quantifiers nested in this one are not lifted, as they may refer to
+      // its bound variables.
+      if(!has_free_variable_in(*it, binder_variables))
+      {
+        it.mutate() = literal_exprt{lift_quantifier(to_quantifier_expr(*it))};
+      }
+      it.next_sibling_or_parent();
+      continue;
+    }
     if(
       auto prophecy_r_or_w_ok =
         expr_try_dynamic_cast<prophecy_r_or_w_ok_exprt>(*it))
@@ -5763,6 +5872,26 @@ exprt smt2_convt::prepare_for_convert_expr(const exprt &expr)
       exprt lowered = simplify_expr(prophecy_pointer_in_range->lower(ns), ns);
       it.mutate() = lowered;
       it.next_sibling_or_parent();
+    }
+    else if(
+      (it->id() == ID_equal || it->id() == ID_notequal) &&
+      (it->operands()[0].type().id() == ID_array ||
+       (use_datatypes && (it->operands()[0].type().id() == ID_struct_tag ||
+                          it->operands()[0].type().id() == ID_struct))))
+    {
+      // SMT-LIB equality of arrays compares the entire index domain, see
+      // lower_equality
+      const auto &relation = to_binary_relation_expr(*it);
+      exprt lowered = lower_equality(relation.lhs(), relation.rhs());
+      if(lowered.id() != ID_equal)
+      {
+        if(relation.id() == ID_notequal)
+          lowered = not_exprt{std::move(lowered)};
+        // process the resulting expression itself in the next iteration
+        it.mutate() = std::move(lowered);
+      }
+      else
+        ++it;
     }
     else
       ++it;
@@ -6364,6 +6493,97 @@ void smt2_convt::find_symbols(const exprt &expr)
       out << ")\n";              // declare-fun
     }
   }
+}
+
+exprt smt2_convt::lower_equality(const exprt &lhs, const exprt &rhs)
+{
+  // Syntactically equal operands need no lowering. Equalities of this kind are
+  // also used to make sure symbols are declared, see
+  // symex_target_equationt::convert_decls.
+  if(lhs == rhs)
+    return equal_exprt{lhs, rhs};
+
+  const typet &type = lhs.type();
+
+  if(type.id() == ID_array && (use_array_theory(lhs) || use_array_theory(rhs)))
+  {
+    const array_typet &array_type = to_array_type(type);
+    const typet &index_type = array_type.index_type();
+    const exprt size =
+      typecast_exprt::conditional_cast(array_type.size(), index_type);
+
+    auto element_equality = [this, &lhs, &rhs](const exprt &index)
+    {
+      return lower_equality(
+        index_exprt{lhs, index, to_array_type(lhs.type()).element_type()},
+        index_exprt{rhs, index, to_array_type(rhs.type()).element_type()});
+    };
+
+    // Compare element by element where the size is a (not too large)
+    // constant: this keeps the formula quantifier free, which solvers handle
+    // best, in particular when producing models. For nested arrays, the limit
+    // applies to the total number of elements.
+    const auto size_int = numeric_cast<mp_integer>(size);
+    std::optional<mp_integer> total_elements = size_int;
+    for(const typet *t = &array_type.element_type();
+        total_elements.has_value() && t->id() == ID_array;
+        t = &to_array_type(*t).element_type())
+    {
+      const auto inner = numeric_cast<mp_integer>(to_array_type(*t).size());
+      if(inner.has_value())
+        *total_elements *= *inner;
+      else
+        total_elements.reset();
+    }
+    if(
+      total_elements.has_value() && *total_elements <= MAX_FLATTENED_ARRAY_SIZE)
+    {
+      exprt::operandst conjuncts;
+      for(mp_integer i = 0; i < *size_int; ++i)
+        conjuncts.push_back(element_equality(from_integer(i, index_type)));
+      return conjunction(conjuncts);
+    }
+
+    // Otherwise, use a bounded quantifier, if supported. Without quantifiers,
+    // fall back to comparing the entire index domain, which may yield spurious
+    // inequalities.
+    if(!use_quantifiers)
+      return equal_exprt{lhs, rhs};
+
+    const symbol_exprt index{
+      "smt2_convt::array_equality_index$" +
+        std::to_string(array_equality_index_counter++),
+      index_type};
+    exprt in_bounds = binary_relation_exprt{index, ID_lt, size};
+    if(index_type.id() == ID_signedbv)
+    {
+      in_bounds = and_exprt{
+        binary_relation_exprt{index, ID_ge, from_integer(0, index_type)},
+        std::move(in_bounds)};
+    }
+    return forall_exprt{
+      index, implies_exprt{std::move(in_bounds), element_equality(index)}};
+  }
+  else if(
+    use_datatypes && (type.id() == ID_struct_tag || type.id() == ID_struct) &&
+    has_subtype(type, ID_array, ns))
+  {
+    // Structs encoded as datatypes are compared as a whole, which would
+    // compare the entire index domain of any array members. Compare member by
+    // member instead.
+    const struct_typet &struct_type =
+      type.id() == ID_struct_tag ? ns.follow_tag(to_struct_tag_type(type))
+                                 : to_struct_type(type);
+    exprt::operandst conjuncts;
+    for(const auto &component : struct_type.components())
+    {
+      conjuncts.push_back(lower_equality(
+        member_exprt{lhs, component}, member_exprt{rhs, component}));
+    }
+    return conjunction(conjuncts);
+  }
+
+  return equal_exprt{lhs, rhs};
 }
 
 bool smt2_convt::use_array_theory(const exprt &expr)

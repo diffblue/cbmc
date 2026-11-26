@@ -1,0 +1,18 @@
+CORE smt-backend gcc-only no-new-smt broken-cprover-smt-backend
+symbolic-unequal.c
+--cvc5 --external-smt2-solver ./cvc5-mbqi.sh
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ a\[1\] and b\[1\] may differ: FAILURE$
+^\[main\.assertion\.2\] line \d+ a and b may be equal: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+The solver must be able to produce models when arrays of non-constant size are
+compared using a bounded quantifier. For the second assertion, the model must
+satisfy the quantified formula, which cvc5 only reports as "sat" when using
+model-based quantifier instantiation (--mbqi): without it, cvc5 returns
+"unknown". CBMC does not pass --mbqi to cvc5 by default as it changes cvc5's
+performance considerably, hence the wrapper script. This test is marked
+"gcc-only" as resolving ./ won't work with Windows.
