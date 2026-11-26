@@ -1,0 +1,11 @@
+CORE
+main.c
+--pointer-check --bounds-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+The program is correct; treating the zero bytes as a null pointer must not
+change the verification result.

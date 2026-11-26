@@ -1,0 +1,12 @@
+CORE
+main.c
+--program-only
+^EXIT=0$
+^SIGNAL=0$
+--
+__CPROVER_memory#
+^warning: ignoring
+--
+The zero bytes of a stored null pointer must not make the pointer read back
+from them point to an integer address, which would add a __CPROVER_memory
+access to every dereference of that pointer.
