@@ -1,0 +1,12 @@
+CORE
+nondet_outer.c
+--unwind 3 --unwinding-assertions --paths lifo
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+On the second outer iteration the guard at "goto inner" is not true, so the
+unconditional-goto fast path is taken only because of path exploration. The
+inner loop's unwinding counter must still be reset on entry.
