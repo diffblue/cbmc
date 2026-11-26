@@ -1,0 +1,8 @@
+CORE
+Test.class
+
+^EXIT=(0|10)$
+^SIGNAL=0$
+--
+^CONVERSION ERROR
+^warning: ignoring
