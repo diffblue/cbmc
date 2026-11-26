@@ -544,68 +544,118 @@ static void add_padding_msvc(struct_typet &type, const namespacet &ns)
   }
 }
 
+/// Insert padding before the bit-field \p it so that it starts where GCC and
+/// Clang place it: unless packed, or `#pragma pack` is in effect, a bit-field
+/// must not span more units of the alignment of its declared type than the
+/// type itself does, i.e., a bit-field of type `int` (of size and alignment 4)
+/// must not straddle a 4-byte boundary, and is moved to the next one
+/// otherwise. This check takes place after aligning the start of the
+/// bit-field as an alignment attribute of its declaration may request.
+/// \param components: the components of the struct
+/// \param it: the bit-field to place
+/// \param struct_is_packed: whether the struct is packed
+/// \param [in,out] offset: the byte offset at which the bit-field starts,
+///   not including \p bit_field_bits
+/// \param [in,out] bit_field_bits: the number of bits beyond \p offset at
+///   which the bit-field starts
+/// \param ns: namespace
+/// \return an iterator pointing to the bit-field, after any padding that
+///   has been inserted before it
+static struct_typet::componentst::iterator place_bit_field(
+  struct_typet::componentst &components,
+  struct_typet::componentst::iterator it,
+  bool struct_is_packed,
+  bytest &offset,
+  std::size_t &bit_field_bits,
+  const namespacet &ns)
+{
+  const c_bit_field_typet &bit_field_type = to_c_bit_field_type(it->type());
+  const typet &underlying_type = bit_field_type.underlying_type();
+  const mp_integer char_width = config.ansi_c.char_width;
+  const mp_integer width = bit_field_type.get_width();
+
+  // a packed attribute of the bit-field's declaration is recorded with its
+  // underlying type
+  const bool is_packed = struct_is_packed ||
+                         bit_field_type.get_bool(ID_C_packed) ||
+                         underlying_type.get_bool(ID_C_packed);
+  const mp_integer pragma_pack_bits = pragma_pack(*it).get() * char_width;
+
+  // the natural alignment and the size of the declared type, in bits
+  typet unpacked_type = underlying_type;
+  unpacked_type.remove(ID_C_packed);
+  const mp_integer type_alignment_bits =
+    alignment(unpacked_type, ns).get() * char_width;
+  const auto type_bits = pointer_offset_bits(underlying_type, ns);
+
+  const mp_integer start = offset.get() * char_width + bit_field_bits;
+  auto align_to = [](const mp_integer &value, const mp_integer &a)
+  { return a <= 1 ? value : (value + a - 1) / a * a; };
+  mp_integer target = start;
+
+  // an alignment attribute of the bit-field's declaration
+  const mp_integer start_alignment_bits =
+    bit_field_start_alignment(*it).get() * char_width;
+  if(start_alignment_bits > char_width)
+    target = align_to(start, start_alignment_bits);
+
+  // GCC's excess_unit_span (Clang's check is equivalent in the absence of
+  // alignment attributes)
+  if(
+    !is_packed && pragma_pack_bits == 0 && type_bits.has_value() &&
+    type_alignment_bits > 0 && type_bits->get() >= type_alignment_bits &&
+    (target % type_alignment_bits + width + type_alignment_bits - 1) /
+        type_alignment_bits >
+      type_bits->get() / type_alignment_bits)
+  {
+    target = align_to(target, type_alignment_bits);
+  }
+
+  if(target == start)
+    return it;
+
+  // Pad to the next byte boundary, and then insert any remaining bytes.
+  DATA_INVARIANT(
+    target % char_width == 0, "bit-fields are moved to a byte boundary");
+  if(bit_field_bits != 0)
+  {
+    it =
+      pad_bit_field(components, it, config.ansi_c.char_width - bit_field_bits);
+    offset += bytest{1};
+    bit_field_bits = 0;
+  }
+  const mp_integer pad_bits = target - offset.get() * char_width;
+  if(pad_bits > 0)
+  {
+    it = pad(components, it, numeric_cast_v<std::size_t>(pad_bits));
+    offset += bits_to_bytes_trunc(bitst{pad_bits}, char_width);
+  }
+  return it;
+}
+
 static void add_padding_gcc(struct_typet &type, const namespacet &ns)
 {
   struct_typet::componentst &components = type.components();
 
-  // First make bit-fields appear on byte boundaries
-  {
-    std::size_t bit_field_bits = 0;
-
-    for(struct_typet::componentst::iterator it = components.begin();
-        it != components.end();
-        it++)
-    {
-      if(
-        it->type().id() == ID_c_bit_field &&
-        to_c_bit_field_type(it->type()).get_width() != 0)
-      {
-        // a bit-field with an alignment attribute starts on a byte boundary
-        if(
-          bit_field_start_alignment(*it) > bytest{1} &&
-          bit_field_bits % config.ansi_c.char_width != 0)
-        {
-          const std::size_t pad = config.ansi_c.char_width -
-                                  bit_field_bits % config.ansi_c.char_width;
-          it = pad_bit_field(components, it, pad);
-          bit_field_bits = 0;
-        }
-
-        // count the bits
-        const std::size_t width = to_c_bit_field_type(it->type()).get_width();
-        bit_field_bits += width;
-      }
-      else if(it->is_boolean())
-      {
-        ++bit_field_bits;
-      }
-      else if(bit_field_bits!=0)
-      {
-        // not on a byte-boundary?
-        if((bit_field_bits % config.ansi_c.char_width) != 0)
-        {
-          const std::size_t pad = config.ansi_c.char_width -
-                                  bit_field_bits % config.ansi_c.char_width;
-          it = pad_bit_field(components, it, pad);
-        }
-
-        bit_field_bits=0;
-      }
-    }
-
-    // Add padding at the end?
-    if((bit_field_bits % config.ansi_c.char_width) != 0)
-    {
-      const std::size_t pad =
-        config.ansi_c.char_width - bit_field_bits % config.ansi_c.char_width;
-      pad_bit_field(components, components.end(), pad);
-    }
-  }
-
   bytest offset{0};
   bytest max_alignment{0};
-  std::size_t bit_field_bits=0;
+  // the number of bits of a sequence of bit-fields beyond offset
+  std::size_t bit_field_bits = 0;
   const bool struct_is_packed = type.get_bool(ID_C_packed);
+
+  // Members other than bit-fields start on a byte boundary: pad any bits of
+  // preceding bit-fields up to the next one, inserting padding before where.
+  auto pad_to_byte_boundary = [&](struct_typet::componentst::iterator where)
+  {
+    if(bit_field_bits != 0)
+    {
+      where = pad_bit_field(
+        components, where, config.ansi_c.char_width - bit_field_bits);
+      offset += bytest{1};
+      bit_field_bits = 0;
+    }
+    return where;
+  };
 
   for(struct_typet::componentst::iterator
       it=components.begin();
@@ -625,8 +675,7 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
         a = alignment(to_c_bit_field_type(it_type).underlying_type(), ns);
         max_alignment = std::max(
           max_alignment, member_layout_alignment(*it, struct_is_packed, ns));
-        DATA_INVARIANT(
-          bit_field_bits == 0, "padding ensures offset at byte boundaries");
+        it = pad_to_byte_boundary(it);
         const bytest displacement = offset % a;
         if(displacement != bytest{0})
         {
@@ -647,27 +696,9 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
         if(contributes_to_aggregate_alignment(*it) && max_alignment < a)
           max_alignment = a;
 
-        // Unless an alignment attribute requests to start the bit-field at an
-        // aligned offset.
-        const bytest start_alignment = bit_field_start_alignment(*it);
-        if(start_alignment > bytest{1})
-        {
-          DATA_INVARIANT(
-            bit_field_bits == 0, "padding ensures offset at byte boundaries");
-          const bytest displacement = offset % start_alignment;
-          if(displacement != bytest{0})
-          {
-            const bytest pad_bytes = start_alignment - displacement;
-            it = pad(
-              components,
-              it,
-              numeric_cast_v<std::size_t>(
-                pad_bytes * config.ansi_c.char_width));
-            offset += pad_bytes;
-          }
-        }
-
-        std::size_t w = to_c_bit_field_type(it_type).get_width();
+        it = place_bit_field(
+          components, it, struct_is_packed, offset, bit_field_bits, ns);
+        const std::size_t w = to_c_bit_field_type(it->type()).get_width();
         bit_field_bits += w;
         const std::size_t bytes = bit_field_bits / config.ansi_c.char_width;
         bit_field_bits %= config.ansi_c.char_width;
@@ -690,8 +721,7 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
     else
       a = member_layout_alignment(*it, struct_is_packed, ns);
 
-    DATA_INVARIANT(
-      bit_field_bits == 0, "padding ensures offset at byte boundaries");
+    it = pad_to_byte_boundary(it);
 
     // check minimum alignment
     if(
@@ -728,6 +758,8 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
     if(size.has_value())
       offset += *size;
   }
+
+  pad_to_byte_boundary(components.end());
 
   // any explicit alignment for the struct?
   const exprt &alignment =

@@ -1,0 +1,10 @@
+CORE
+aapcs.i
+--arch armhf --os linux
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Variant of test.desc for 32-bit Arm Linux (AAPCS).
