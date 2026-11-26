@@ -27,6 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/suffix.h>
 #include <util/symbol.h>
 
+#include "c_expr.h"
 #include "c_misc.h"
 #include "c_qualifiers.h"
 
@@ -3558,26 +3559,26 @@ std::string expr2ct::convert_sizeof(
   return dest;
 }
 
-std::string expr2ct::convert_conditional_target_group(const exprt &src)
+std::string expr2ct::convert_conditional_target_group(
+  const conditional_target_group_exprt &src)
 {
   std::string dest;
   unsigned p;
-  const auto &cond = src.operands().front();
+  const auto &cond = src.condition();
   if(cond != true)
   {
     dest += convert_with_precedence(cond, p);
     dest += ": ";
   }
 
-  const auto &targets = src.operands()[1];
-  forall_operands(it, targets)
+  bool first = true;
+  for(const auto &target : src.targets())
   {
-    std::string op = convert_with_precedence(*it, p);
-
-    if(it != targets.operands().begin())
+    if(!first)
       dest += ", ";
+    first = false;
 
-    dest += op;
+    dest += convert_with_precedence(target, p);
   }
 
   return dest;
@@ -4088,7 +4089,8 @@ std::string expr2ct::convert_with_precedence(
 
   else if(src.id() == ID_conditional_target_group)
   {
-    return convert_conditional_target_group(src);
+    return convert_conditional_target_group(
+      to_conditional_target_group_expr(src));
   }
 
   else if(src.id() == ID_bitreverse)
