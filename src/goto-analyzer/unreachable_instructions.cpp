@@ -160,6 +160,17 @@ static void add_to_json(
   dest.push_back(std::move(entry));
 }
 
+/// \return true if the function \p id is reachable from the entry point.
+/// \param called: the set computed by \ref compute_called_functions, i.e. the
+///   functions transitively reachable from the entry point. This includes
+///   functions whose address is taken (and which may therefore be called
+///   indirectly), so this is reachability rather than strictly "called".
+static bool
+is_reachable(const std::unordered_set<irep_idt> &called, const irep_idt &id)
+{
+  return called.find(id) != called.end();
+}
+
 void unreachable_instructions(
   const goto_modelt &goto_model,
   const bool json,
@@ -179,11 +190,11 @@ void unreachable_instructions(
     const goto_programt &goto_program = gf_entry.second.body;
     dead_mapt dead_map;
 
-    const symbolt &decl = ns.lookup(gf_entry.first);
-
-    if(
-      called.find(decl.name) != called.end() ||
-      to_code_type(decl.type).get_inlined())
+    // A function that is not reachable from the entry point has all of its
+    // instructions reported as unreachable (rather than relying on a
+    // per-instruction analysis, which would e.g. treat uncalled inline
+    // functions as reachable).
+    if(is_reachable(called, gf_entry.first))
     {
       unreachable_instructions(goto_program, dead_map);
     }
@@ -314,9 +325,8 @@ static void list_functions(
   {
     const symbolt &decl = ns.lookup(gf_entry.first);
 
-    if(
-      unreachable == (called.find(decl.name) != called.end() ||
-                      to_code_type(decl.type).get_inlined()))
+    // Skip functions whose reachability does not match what we are listing.
+    if(unreachable == is_reachable(called, decl.name))
     {
       continue;
     }
