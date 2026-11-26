@@ -1,0 +1,12 @@
+CORE
+main.c
+--show-uninitialized
+activate-multi-line-match
+^EXIT=0$
+^SIGNAL=0$
+\*\*\*\* \d+ file main\.c line 6 function main\nmain::1::uninitialized\n\n\s+// \d+ file main\.c line 6 function main\n\s+SET RETURN VALUE main::1::sum
+--
+^warning: ignoring
+--
+Of the local variables, only uninitialized is still uninitialized when sum is
+returned.
