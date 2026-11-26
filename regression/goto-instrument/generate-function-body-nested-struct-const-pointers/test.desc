@@ -1,0 +1,17 @@
+CORE
+main.c
+--generate-function-body havoc_nested_struct_const_pointers --generate-function-body-options havoc,params:.*
+^EXIT=0$
+^SIGNAL=0$
+^\[main.assertion.1\] .* assertion x == 100: SUCCESS$
+^\[main.assertion.2\] .* assertion y == 200: SUCCESS$
+^\[main.assertion.3\] .* assertion z == 300: SUCCESS$
+^\[main.assertion.4\] .* assertion w == 400: SUCCESS$
+^\[main.assertion.5\] .* assertion \*outer_struct.const_inner_ptr->const_ptr == 100: SUCCESS$
+^\[main.assertion.6\] .* assertion \*outer_struct.const_inner_ptr->normal_ptr == 200: SUCCESS$
+^\[main.assertion.7\] .* assertion x == 100: SUCCESS$
+^\[main.assertion.8\] .* assertion z == 300: SUCCESS$
+^\[main.assertion.9\] .* assertion y == 200: SUCCESS$
+^\[main.assertion.10\] .* assertion w == 400: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--

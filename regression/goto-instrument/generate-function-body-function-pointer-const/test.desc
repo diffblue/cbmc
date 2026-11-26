@@ -1,0 +1,8 @@
+CORE
+main.c
+--generate-function-body havoc_const_function_pointer --generate-function-body-options havoc,params:.*
+^EXIT=10$
+^SIGNAL=0$
+^\[main.assertion.1\] .* assertion fp == test_function: FAILURE$
+^VERIFICATION FAILED$
+--
