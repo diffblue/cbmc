@@ -1,0 +1,33 @@
+extern "C" void __CPROVER_assert(bool, const char *);
+// N5008 [class.derived.general]/5, [basic.align]/1: a base class subobject
+// is aligned for its class.  In the Visual Studio layout the members of the
+// subobject keep their offsets within it; the subobject itself starts at a
+// multiple of the base's alignment (x64: the virtual base ios at 16)
+struct ios
+{
+  int q = 5;
+  const int *p = nullptr;
+};
+struct ostream : virtual ios
+{
+  int last = 0;
+};
+struct plain
+{
+  int a = 1;
+};
+struct derived : plain, ios
+{
+  int b = 2;
+};
+int main()
+{
+  ostream o;
+  derived d;
+  __CPROVER_assert(o.q == 5 && o.p == nullptr, "virtual base members");
+  __CPROVER_assert(sizeof(ostream) == 32, "virtual base aligned");
+  __CPROVER_assert(d.q == 5 && d.p == nullptr && d.b == 2, "non-virtual base");
+  __CPROVER_assert(sizeof(derived) == 32, "base subobject aligned");
+  __CPROVER_assert(o.p != nullptr, "WRONG (must FAIL)");
+  return 0;
+}

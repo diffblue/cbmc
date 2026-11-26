@@ -1,0 +1,18 @@
+KNOWNBUG
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ B under construction: SUCCESS$
+^\[main\.assertion\.2\] line \d+ after construction: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Both assertions failed, with out-of-bounds reads: the thunk through which
+V's table enters B::g subtracted V's offset in a complete B from `this',
+also when the table is installed in a D, where V lies further from B.  The
+thunk now reads a vcall offset from the table (Itanium C++ ABI 2.5.3); see
+cpp11_virtual_call_through_virtual_base_with_vcall_offsets.

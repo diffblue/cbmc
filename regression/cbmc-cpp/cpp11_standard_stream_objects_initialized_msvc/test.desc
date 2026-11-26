@@ -1,0 +1,24 @@
+KNOWNBUG msvc-stl
+main.cpp
+--cpp11 --object-bits 12
+^\[main\.assertion\.1\] line \d+ cerr good: SUCCESS$
+^\[main\.assertion\.2\] line \d+ cerr precision: SUCCESS$
+^\[main\.assertion\.3\] line \d+ cerr unitbuf: SUCCESS$
+^\[main\.assertion\.4\] line \d+ cerr tied to cout: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Meaningful only with the MSVC STL (Windows), hence the tag msvc-stl, which
+the other platforms exclude (elsewhere the #error makes it fail).
+provide_standard_stream_objects did not define the stream objects for the
+MSVC STL, and the runtime functions its locale initialization calls had
+no model.  Checked with the MSVC 14.51 headers preprocessed by cl
+(iostream.ii of the VS 2026 CI job) and --winx64 on Linux: 7 s.
+With the MSVC 14.44 STL (VS 2022): --object-bits 12, as there are more than
+256 objects; symbolic execution did not end while the model of
+__std_exception_copy could fail (see cpp11_msvc_exception_copy_of_copy).

@@ -1,0 +1,20 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ string or null: SUCCESS$
+^\[main\.assertion\.2\] line \d+ array or pointer: SUCCESS$
+^\[main\.assertion\.3\] line \d+ function or null: SUCCESS$
+^\[main\.assertion\.4\] line \d+ null or array: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+A conditional expression whose operands are an array (or a function) and
+an operand of another type, `b ? "C" : nullptr', was rejected: "types are
+incompatible".  [expr.cond]/7 applies the array-to-pointer and
+function-to-pointer conversions first; the composite pointer type is then
+the pointer type.  g++ and clang++ accept these.

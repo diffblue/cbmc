@@ -1,0 +1,18 @@
+KNOWNBUG gcc-only
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ returned or thrown: SUCCESS$
+^\[main\.assertion\.2\] line \d+ length_error thrown: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+CBMC took a call of the body-less helpers to return, so allocate() with
+n > 4 fell off its end and returned an arbitrary pointer.  With GCC 16.2's
+headers this made cpp11_ostream_integer_formatting run past 900 s
+(24 s now).

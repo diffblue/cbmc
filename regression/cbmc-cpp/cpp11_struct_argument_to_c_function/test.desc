@@ -1,0 +1,21 @@
+KNOWNBUG
+main.cpp
+other.c
+^\[main\.assertion\.1\] line \d+ sum: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+type mismatch
+--
+A C++ caller passes a struct by value to a function defined in C.  The C
+and the C++ front ends name the members of the same struct differently, so
+the argument's type differs from the parameter's; symbolic execution
+stopped with "parameter type mismatch".  Arguments of layout-compatible
+struct types ([class.mem.general]/27) are now reinterpreted as the
+parameter's type, as integers and unions already are.  This is how C++
+code reaches the C library's vsnprintf on AArch64, whose va_list is a
+struct.

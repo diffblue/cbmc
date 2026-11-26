@@ -1,0 +1,20 @@
+KNOWNBUG
+main.cpp
+--winx64 --cpp11
+^\[main\.assertion\.1\] line \d+ setw: SUCCESS$
+^\[main\.assertion\.2\] line \d+ setprecision: SUCCESS$
+^\[main\.assertion\.3\] line \d+ setbase: SUCCESS$
+^\[main\.assertion\.4\] line \d+ setiosflags: SUCCESS$
+^\[main\.assertion\.5\] line \d+ resetiosflags: SUCCESS$
+^\[main\.assertion\.6\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The manipulators had no model: the _Smanip they returned held an unknown
+function pointer, so inserting one called through an invalid pointer (and
+the MSVC STL's `ss << setw(4)' dispatched to every function of a
+compatible type, cpp11_stream_setw timing out).
