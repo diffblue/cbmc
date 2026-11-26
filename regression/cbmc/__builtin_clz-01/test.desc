@@ -1,4 +1,4 @@
-CORE no-new-smt
+CORE
 main.c
 
 ^\[main.bit_count.\d+\] line 61 count leading zeros is undefined for value zero in __builtin_clz\(0u\): FAILURE$
