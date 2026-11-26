@@ -8,8 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "smt2_parser.h"
 
-#include "smt2_format.h"
-
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/bitvector_types.h>
@@ -19,6 +17,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/mathematical_expr.h>
 #include <util/prefix.h>
 #include <util/range.h>
+
+#include "smt2_format.h"
 
 #include <numeric>
 
@@ -43,7 +43,7 @@ void smt2_parsert::skip_to_end_of_list()
 
 void smt2_parsert::command_sequence()
 {
-  exit=false;
+  exit = false;
 
   while(!exit)
   {
@@ -89,7 +89,7 @@ void smt2_parsert::command_sequence()
 
 void smt2_parsert::ignore_command()
 {
-  std::size_t parentheses=0;
+  std::size_t parentheses = 0;
   while(true)
   {
     switch(smt2_tokenizer.peek())
@@ -100,7 +100,7 @@ void smt2_parsert::ignore_command()
       break;
 
     case smt2_tokenizert::CLOSE:
-      if(parentheses==0)
+      if(parentheses == 0)
         return; // done
 
       next_token();
@@ -122,6 +122,15 @@ void smt2_parsert::ignore_command()
 
 exprt::operandst smt2_parsert::operands()
 {
+  // Fed by the iterative operand collector in expression(): when present,
+  // these have already been parsed and we must not read further tokens.
+  if(precollected_operands.has_value())
+  {
+    auto result = std::move(*precollected_operands);
+    precollected_operands.reset();
+    return result;
+  }
+
   exprt::operandst result;
 
   while(smt2_tokenizer.peek() != smt2_tokenizert::CLOSE)
@@ -164,13 +173,12 @@ exprt smt2_parsert::let_expression()
     irep_idt identifier = binding_token.text;
 
     // note that the previous bindings are _not_ visible yet
-    exprt value=expression();
+    exprt value = expression();
 
     if(next_token() != smt2_tokenizert::CLOSE)
       throw error("expected ')' after value in binding");
 
-    bindings.push_back(
-      std::pair<irep_idt, exprt>(identifier, value));
+    bindings.push_back(std::pair<irep_idt, exprt>(identifier, value));
   }
 
   if(next_token() != smt2_tokenizert::CLOSE)
@@ -234,7 +242,7 @@ std::pair<binding_exprt::variablest, exprt> smt2_parsert::binding(irep_idt id)
 
     irep_idt identifier = binding_token.text;
 
-    typet type=sort();
+    typet type = sort();
 
     if(next_token() != smt2_tokenizert::CLOSE)
       throw error("expected ')' after sort in binding");
@@ -262,7 +270,7 @@ std::pair<binding_exprt::variablest, exprt> smt2_parsert::binding(irep_idt id)
   }
 
   // now parse, with bindings in place
-  exprt expr=expression();
+  exprt expr = expression();
 
   if(next_token() != smt2_tokenizert::CLOSE)
     throw error() << "expected ')' after " << id;
@@ -304,7 +312,7 @@ exprt smt2_parsert::function_application(
   if(op.size() != function_type.domain().size())
     throw error("wrong number of arguments for function");
 
-  for(std::size_t i=0; i<op.size(); i++)
+  for(std::size_t i = 0; i < op.size(); i++)
   {
     if(op[i].type() != function_type.domain()[i])
       throw error("wrong type for arguments for function");
@@ -338,13 +346,13 @@ exprt::operandst smt2_parsert::cast_bv_to_signed(const exprt::operandst &op)
 
 exprt smt2_parsert::cast_bv_to_unsigned(const exprt &expr)
 {
-  if(expr.type().id()==ID_unsignedbv) // no need to cast
+  if(expr.type().id() == ID_unsignedbv) // no need to cast
     return expr;
 
-  if(expr.type().id()!=ID_signedbv)
+  if(expr.type().id() != ID_signedbv)
     throw error("expected signed bitvector");
 
-  const auto width=to_signedbv_type(expr.type()).get_width();
+  const auto width = to_signedbv_type(expr.type()).get_width();
   return typecast_exprt(expr, unsignedbv_typet(width));
 }
 
@@ -377,7 +385,7 @@ exprt smt2_parsert::multi_ary(irep_idt id, const exprt::operandst &op)
 
 exprt smt2_parsert::binary_predicate(irep_idt id, const exprt::operandst &op)
 {
-  if(op.size()!=2)
+  if(op.size() != 2)
     throw error("expression must have two operands");
 
   check_matching_operand_types(op);
@@ -387,7 +395,7 @@ exprt smt2_parsert::binary_predicate(irep_idt id, const exprt::operandst &op)
 
 exprt smt2_parsert::unary(irep_idt id, const exprt::operandst &op)
 {
-  if(op.size()!=1)
+  if(op.size() != 1)
     throw error("expression must have one operand");
 
   return unary_exprt(id, op[0], op[0].type());
@@ -395,7 +403,7 @@ exprt smt2_parsert::unary(irep_idt id, const exprt::operandst &op)
 
 exprt smt2_parsert::binary(irep_idt id, const exprt::operandst &op)
 {
-  if(op.size()!=2)
+  if(op.size() != 2)
     throw error("expression must have two operands");
 
   check_matching_operand_types(op);
@@ -488,6 +496,128 @@ exprt smt2_parsert::function_application_fp(const exprt::operandst &op)
     fp_type);
 }
 
+exprt smt2_parsert::function_application_with_id(const irep_idt &id)
+{
+  if(id == "_") // indexed identifier
+  {
+    // indexed identifier
+    auto id_token = next_token();
+    if(id_token != smt2_tokenizert::SYMBOL)
+      throw error("expected symbol after '_'");
+
+    const auto inner_id = id_token.text;
+
+    if(has_prefix(inner_id, "bv"))
+    {
+      mp_integer i =
+        string2integer(std::string(inner_id, 2, std::string::npos));
+
+      auto width_token = next_token();
+      if(width_token != smt2_tokenizert::NUMERAL)
+        throw error("expected numeral as bitvector literal width");
+
+      auto width = std::stoll(width_token.text);
+
+      if(next_token() != smt2_tokenizert::CLOSE)
+        throw error("expected ')' after bitvector literal");
+
+      return from_integer(i, unsignedbv_typet(width));
+    }
+    else if(inner_id == "+oo" || inner_id == "-oo" || inner_id == "NaN")
+    {
+      // These are the "plus infinity", "minus infinity" and NaN
+      // floating-point literals.
+      auto e_token = next_token();
+      if(e_token != smt2_tokenizert::NUMERAL)
+        throw error() << "expected number after " << inner_id;
+
+      auto width_e = std::stoll(e_token.text);
+
+      auto f_token = next_token();
+      if(f_token != smt2_tokenizert::NUMERAL)
+        throw error() << "expected second number after " << inner_id;
+
+      auto width_f = std::stoll(f_token.text);
+
+      if(next_token() != smt2_tokenizert::CLOSE)
+        throw error() << "expected ')' after " << inner_id;
+
+      // width_f *includes* the hidden bit
+      const ieee_float_spect spec(width_f - 1, width_e);
+
+      if(inner_id == "+oo")
+        return ieee_floatt::plus_infinity(spec).to_expr();
+      else if(inner_id == "-oo")
+        return ieee_floatt::minus_infinity(spec).to_expr();
+      else // NaN
+        return ieee_floatt::NaN(spec).to_expr();
+    }
+    else
+    {
+      throw error() << "unknown indexed identifier " << inner_id;
+    }
+  }
+  else if(id == "!")
+  {
+    // these are "term attributes"
+    const auto term = expression();
+
+    while(smt2_tokenizer.peek() == smt2_tokenizert::KEYWORD)
+    {
+      auto kw_token = next_token(); // eat the keyword
+      if(kw_token.text == "named")
+      {
+        // 'named terms' must be Boolean
+        if(!term.is_boolean())
+          throw error("named terms must be Boolean");
+
+        auto name_token = next_token();
+        if(name_token == smt2_tokenizert::SYMBOL)
+        {
+          const symbol_exprt symbol_expr(name_token.text, bool_typet());
+          named_terms.emplace(
+            symbol_expr.identifier(), named_termt(term, symbol_expr));
+        }
+        else
+          throw error("invalid name attribute, expected symbol");
+      }
+      else
+        throw error("unknown term attribute");
+    }
+
+    if(next_token() != smt2_tokenizert::CLOSE)
+      throw error("expected ')' at end of term attribute");
+    else
+      return term;
+  }
+  else
+  {
+    // non-indexed symbol, look up in expression table
+    const auto e_it = expressions.find(id2string(id));
+    if(e_it != expressions.end())
+      return e_it->second();
+
+    // get the operands
+    auto op = operands();
+
+    // rummage through id_map
+    auto id_it = id_map.find(id);
+    if(id_it != id_map.end())
+    {
+      if(id_it->second.type.id() == ID_mathematical_function)
+      {
+        return function_application(symbol_exprt(id, id_it->second.type), op);
+      }
+      else
+        return symbol_exprt(id, id_it->second.type);
+    }
+    else
+      throw error() << "unknown function symbol '" << id << '\'';
+  }
+
+  UNREACHABLE;
+}
+
 exprt smt2_parsert::function_application()
 {
   auto token = next_token();
@@ -495,123 +625,7 @@ exprt smt2_parsert::function_application()
   switch(token)
   {
   case smt2_tokenizert::SYMBOL:
-    if(token.text == "_") // indexed identifier
-    {
-      // indexed identifier
-      auto id_token = next_token();
-      if(id_token != smt2_tokenizert::SYMBOL)
-        throw error("expected symbol after '_'");
-
-      const auto id = id_token.text;
-
-      if(has_prefix(id, "bv"))
-      {
-        mp_integer i = string2integer(std::string(id, 2, std::string::npos));
-
-        auto width_token = next_token();
-        if(width_token != smt2_tokenizert::NUMERAL)
-          throw error("expected numeral as bitvector literal width");
-
-        auto width = std::stoll(width_token.text);
-
-        if(next_token() != smt2_tokenizert::CLOSE)
-          throw error("expected ')' after bitvector literal");
-
-        return from_integer(i, unsignedbv_typet(width));
-      }
-      else if(id == "+oo" || id == "-oo" || id == "NaN")
-      {
-        // These are the "plus infinity", "minus infinity" and NaN
-        // floating-point literals.
-        auto e_token = next_token();
-        if(e_token != smt2_tokenizert::NUMERAL)
-          throw error() << "expected number after " << id;
-
-        auto width_e = std::stoll(e_token.text);
-
-        auto f_token = next_token();
-        if(f_token != smt2_tokenizert::NUMERAL)
-          throw error() << "expected second number after " << id;
-
-        auto width_f = std::stoll(f_token.text);
-
-        if(next_token() != smt2_tokenizert::CLOSE)
-          throw error() << "expected ')' after " << id;
-
-        // width_f *includes* the hidden bit
-        const ieee_float_spect spec(width_f - 1, width_e);
-
-        if(id == "+oo")
-          return ieee_floatt::plus_infinity(spec).to_expr();
-        else if(id == "-oo")
-          return ieee_floatt::minus_infinity(spec).to_expr();
-        else // NaN
-          return ieee_floatt::NaN(spec).to_expr();
-      }
-      else
-      {
-        throw error() << "unknown indexed identifier " << id;
-      }
-    }
-    else if(token.text == "!")
-    {
-      // these are "term attributes"
-      const auto term = expression();
-
-      while(smt2_tokenizer.peek() == smt2_tokenizert::KEYWORD)
-      {
-        auto kw_token = next_token(); // eat the keyword
-        if(kw_token.text == "named")
-        {
-          // 'named terms' must be Boolean
-          if(!term.is_boolean())
-            throw error("named terms must be Boolean");
-
-          auto name_token = next_token();
-          if(name_token == smt2_tokenizert::SYMBOL)
-          {
-            const symbol_exprt symbol_expr(name_token.text, bool_typet());
-            named_terms.emplace(
-              symbol_expr.identifier(), named_termt(term, symbol_expr));
-          }
-          else
-            throw error("invalid name attribute, expected symbol");
-        }
-        else
-          throw error("unknown term attribute");
-      }
-
-      if(next_token() != smt2_tokenizert::CLOSE)
-        throw error("expected ')' at end of term attribute");
-      else
-        return term;
-    }
-    else
-    {
-      // non-indexed symbol, look up in expression table
-      const auto &id = token.text;
-      const auto e_it = expressions.find(id);
-      if(e_it != expressions.end())
-        return e_it->second();
-
-      // get the operands
-      auto op = operands();
-
-      // rummage through id_map
-      auto id_it = id_map.find(id);
-      if(id_it != id_map.end())
-      {
-        if(id_it->second.type.id() == ID_mathematical_function)
-        {
-          return function_application(symbol_exprt(id, id_it->second.type), op);
-        }
-        else
-          return symbol_exprt(id, id_it->second.type);
-      }
-      else
-        throw error() << "unknown function symbol '" << id << '\'';
-    }
-    break;
+    return function_application_with_id(token.text);
 
   case smt2_tokenizert::OPEN: // likely indexed identifier
     if(smt2_tokenizer.peek() == smt2_tokenizert::SYMBOL)
@@ -626,7 +640,7 @@ exprt smt2_parsert::function_application()
 
         irep_idt id = id_token.text; // hash it
 
-        if(id=="extract")
+        if(id == "extract")
         {
           auto upper_token = next_token();
           if(upper_token != smt2_tokenizert::NUMERAL)
@@ -643,25 +657,23 @@ exprt smt2_parsert::function_application()
           if(next_token() != smt2_tokenizert::CLOSE)
             throw error("expected ')' after extract");
 
-          auto op=operands();
+          auto op = operands();
 
-          if(op.size()!=1)
+          if(op.size() != 1)
             throw error("extract takes one operand");
 
-          if(upper<lower)
+          if(upper < lower)
             throw error("extract got bad indices");
 
           auto lower_e = from_integer(lower, integer_typet());
 
-          unsignedbv_typet t(upper-lower+1);
+          unsignedbv_typet t(upper - lower + 1);
 
           return extractbits_exprt(op[0], lower_e, t);
         }
-        else if(id=="rotate_left" ||
-                id=="rotate_right" ||
-                id == ID_repeat ||
-                id=="sign_extend" ||
-                id=="zero_extend")
+        else if(
+          id == "rotate_left" || id == "rotate_right" || id == ID_repeat ||
+          id == "sign_extend" || id == "zero_extend")
         {
           auto index_token = next_token();
           if(index_token != smt2_tokenizert::NUMERAL)
@@ -672,22 +684,22 @@ exprt smt2_parsert::function_application()
           if(next_token() != smt2_tokenizert::CLOSE)
             throw error() << "expected ')' after " << id << " index";
 
-          auto op=operands();
+          auto op = operands();
 
-          if(op.size()!=1)
+          if(op.size() != 1)
             throw error() << id << " takes one operand";
 
-          if(id=="rotate_left")
+          if(id == "rotate_left")
           {
-            auto dist=from_integer(index, integer_typet());
+            auto dist = from_integer(index, integer_typet());
             return binary_exprt(op[0], ID_rol, dist, op[0].type());
           }
-          else if(id=="rotate_right")
+          else if(id == "rotate_right")
           {
-            auto dist=from_integer(index, integer_typet());
+            auto dist = from_integer(index, integer_typet());
             return binary_exprt(op[0], ID_ror, dist, op[0].type());
           }
-          else if(id=="sign_extend")
+          else if(id == "sign_extend")
           {
             // we first convert to a signed type of the original width,
             // then extend to the new width, and then go to unsigned
@@ -703,7 +715,7 @@ exprt smt2_parsert::function_application()
           }
           else if(id == ID_zero_extend)
           {
-            auto width=to_unsignedbv_type(op[0].type()).get_width();
+            auto width = to_unsignedbv_type(op[0].type()).get_width();
             unsignedbv_typet unsigned_type{width + index};
 
             return zero_extend_exprt{op[0], unsigned_type};
@@ -956,7 +968,7 @@ exprt smt2_parsert::function_application()
       else
       {
         // just double parentheses
-        exprt tmp=expression();
+        exprt tmp = expression();
 
         if(
           next_token() != smt2_tokenizert::CLOSE &&
@@ -971,7 +983,7 @@ exprt smt2_parsert::function_application()
     else
     {
       // just double parentheses
-      exprt tmp=expression();
+      exprt tmp = expression();
 
       if(
         next_token() != smt2_tokenizert::CLOSE &&
@@ -991,7 +1003,7 @@ exprt smt2_parsert::function_application()
   case smt2_tokenizert::NONE:
   case smt2_tokenizert::KEYWORD:
     // just parentheses
-    exprt tmp=expression();
+    exprt tmp = expression();
     if(next_token() != smt2_tokenizert::CLOSE)
       throw error("mismatched parentheses in an expression");
 
@@ -1061,74 +1073,307 @@ exprt smt2_parsert::bv_mod(const exprt::operandst &operands, bool is_signed)
 
 exprt smt2_parsert::expression()
 {
-  auto token = next_token();
-
-  switch(token)
+  // Deeply nested (let ((x v)) (let ((y w)) ...)) expressions -- common in
+  // SMT-COMP benchmarks -- would otherwise descend recursively once per
+  // nested let and overflow the call stack. Collect such nested lets on an
+  // explicit frame stack first, then parse the innermost non-let body, and
+  // finally walk the frame stack back out to build the let_exprt chain.
+  struct let_framet
   {
-  case smt2_tokenizert::SYMBOL:
+    std::vector<std::pair<irep_idt, exprt>> bindings;
+    std::vector<std::pair<irep_idt, idt>> saved_ids;
+  };
+  std::vector<let_framet> let_stack;
+
+  auto apply_let_frames = [&](exprt body) -> exprt
   {
-    const auto &identifier = token.text;
-
-    // in the expression table?
-    const auto e_it = expressions.find(identifier);
-    if(e_it != expressions.end())
-      return e_it->second();
-
-    // rummage through id_map
-    auto id_it = id_map.find(identifier);
-    if(id_it != id_map.end())
+    for(auto it = let_stack.rbegin(); it != let_stack.rend(); ++it)
     {
-      symbol_exprt symbol_expr(identifier, id_it->second.type);
-      if(token.quoted_symbol)
-        symbol_expr.set(ID_C_quoted, true);
-      return std::move(symbol_expr);
+      if(next_token() != smt2_tokenizert::CLOSE)
+        throw error("expected ')' after let");
+
+      binding_exprt::variablest variables;
+      exprt::operandst values;
+      variables.reserve(it->bindings.size());
+      values.reserve(it->bindings.size());
+      for(const auto &b : it->bindings)
+      {
+        variables.emplace_back(b.first, b.second.type());
+        values.push_back(b.second);
+      }
+
+      // delete the bindings from the id_map, restoring any hidden ones
+      for(const auto &b : it->bindings)
+        id_map.erase(b.first);
+      for(auto &saved : it->saved_ids)
+        id_map.insert(std::move(saved));
+
+      body =
+        let_exprt(std::move(variables), std::move(values), std::move(body));
+    }
+    return body;
+  };
+
+  // Parse a leaf (atom): a symbol (expression-table constant or a bound/
+  // declared identifier) or a numeral. Compound terms are handled elsewhere.
+  auto parse_leaf = [this](const smt2_tokenizert::tokent &token) -> exprt
+  {
+    switch(token)
+    {
+    case smt2_tokenizert::SYMBOL:
+    {
+      const auto &identifier = token.text;
+
+      // in the expression table?
+      const auto e_it = expressions.find(identifier);
+      if(e_it != expressions.end())
+        return e_it->second();
+
+      // rummage through id_map
+      auto id_it = id_map.find(identifier);
+      if(id_it != id_map.end())
+      {
+        symbol_exprt symbol_expr(identifier, id_it->second.type);
+        if(token.quoted_symbol)
+          symbol_expr.set(ID_C_quoted, true);
+        return std::move(symbol_expr);
+      }
+
+      // don't know, give up
+      throw error() << "unknown expression '" << identifier << '\'';
     }
 
-    // don't know, give up
-    throw error() << "unknown expression '" << identifier << '\'';
+    case smt2_tokenizert::NUMERAL:
+    {
+      const std::string &buffer = token.text;
+      if(buffer.size() >= 2 && buffer[0] == '#' && buffer[1] == 'x')
+      {
+        mp_integer value =
+          string2integer(std::string(buffer, 2, std::string::npos), 16);
+        const std::size_t width = 4 * (buffer.size() - 2);
+        CHECK_RETURN(width != 0 && width % 4 == 0);
+        unsignedbv_typet type(width);
+        return from_integer(value, type);
+      }
+      else if(buffer.size() >= 2 && buffer[0] == '#' && buffer[1] == 'b')
+      {
+        mp_integer value =
+          string2integer(std::string(buffer, 2, std::string::npos), 2);
+        const std::size_t width = buffer.size() - 2;
+        CHECK_RETURN(width != 0);
+        unsignedbv_typet type(width);
+        return from_integer(value, type);
+      }
+      else
+      {
+        return constant_exprt(buffer, integer_typet());
+      }
+    }
+
+    case smt2_tokenizert::END_OF_FILE:
+      throw error("EOF in an expression");
+
+    case smt2_tokenizert::OPEN:
+    case smt2_tokenizert::CLOSE:
+    case smt2_tokenizert::STRING_LITERAL:
+    case smt2_tokenizert::NONE:
+    case smt2_tokenizert::KEYWORD:
+      throw error("unexpected token in an expression");
+    }
+
+    UNREACHABLE;
+  };
+
+  // A head symbol is a "simple" operand operator iff dispatching it via
+  // function_application_with_id() consumes exactly the operand list (and no
+  // further tokens). All expression-table operators and user-defined function
+  // applications qualify; the listed heads do not, as they read additional
+  // structure (bindings, sorts, indices) and are handled recursively -- which
+  // is fine as they do not form the deeply-nested chains we must linearise.
+  auto is_simple_op = [](const irep_idt &id)
+  {
+    return id != "let" && id != "lambda" && id != "exists" && id != "forall" &&
+           id != "_" && id != "!";
+  };
+
+  // Dispatch an application whose head and operands are both already known,
+  // reusing the expressions[]/id_map logic via precollected_operands.
+  auto dispatch_app = [this](irep_idt head, exprt::operandst ops) -> exprt
+  {
+    precollected_operands = std::move(ops);
+    exprt result = function_application_with_id(head);
+    // A handler that left the operand list unconsumed is a nullary constant
+    // (e.g. 'true') applied as if it were a function. Reject it rather than
+    // silently discarding the operands, matching the recursive parser, which
+    // did not accept such malformed applications.
+    if(precollected_operands.has_value())
+    {
+      precollected_operands.reset();
+      throw error() << "'" << head << "' is not a function";
+    }
+    return result;
+  };
+
+  // Parse the application whose opening '(' and simple head \p head0 have
+  // already been consumed, collecting (possibly nested) operands on an
+  // explicit stack rather than recursing once per nesting level. This is what
+  // keeps a chain like (bvand x (bvand x (bvand x ...))) off the call stack.
+  auto parse_application = [&](irep_idt head0) -> exprt
+  {
+    struct app_framet
+    {
+      irep_idt head;
+      exprt::operandst operands;
+    };
+    std::vector<app_framet> app_stack;
+    app_stack.push_back({std::move(head0), {}});
+
+    // Attach a completed sub-term to the top frame, then collapse every frame
+    // whose closing ')' immediately follows. Returns the final value once the
+    // stack is exhausted, otherwise nullopt (the caller parses the next
+    // operand of the new top frame).
+    auto attach = [&](exprt val) -> std::optional<exprt>
+    {
+      while(true)
+      {
+        app_stack.back().operands.push_back(std::move(val));
+        if(smt2_tokenizer.peek() == smt2_tokenizert::CLOSE)
+        {
+          next_token(); // eat ')'
+          val = dispatch_app(
+            app_stack.back().head, std::move(app_stack.back().operands));
+          app_stack.pop_back();
+          if(app_stack.empty())
+            return val;
+        }
+        else
+          return std::nullopt;
+      }
+    };
+
+    while(true)
+    {
+      // top frame already complete (e.g. a nullary application)?
+      if(smt2_tokenizer.peek() == smt2_tokenizert::CLOSE)
+      {
+        next_token(); // eat ')'
+        exprt val = dispatch_app(
+          app_stack.back().head, std::move(app_stack.back().operands));
+        app_stack.pop_back();
+        if(app_stack.empty())
+          return val;
+        if(auto final_value = attach(std::move(val)))
+          return *final_value;
+        continue;
+      }
+
+      // parse the next operand of the top frame
+      if(smt2_tokenizer.peek() == smt2_tokenizert::OPEN)
+      {
+        next_token(); // consume '('
+
+        if(smt2_tokenizer.peek() != smt2_tokenizert::SYMBOL)
+        {
+          // ((_ ...) ...) and similar -- shallow, recurse
+          if(auto final_value = attach(function_application()))
+            return *final_value;
+          continue;
+        }
+
+        irep_idt op_id = next_token().text;
+        if(is_simple_op(op_id))
+        {
+          app_stack.push_back({std::move(op_id), {}});
+          continue; // start collecting this operand's own operands
+        }
+
+        // let / quantifier / lambda / indexed identifier / attribute operand
+        if(auto final_value = attach(function_application_with_id(op_id)))
+          return *final_value;
+        continue;
+      }
+
+      // leaf operand
+      if(auto final_value = attach(parse_leaf(next_token())))
+        return *final_value;
+    }
+  };
+
+  while(smt2_tokenizer.peek() == smt2_tokenizert::OPEN)
+  {
+    next_token(); // consume '('
+
+    if(smt2_tokenizer.peek() != smt2_tokenizert::SYMBOL)
+    {
+      // '(' not followed by SYMBOL -- this is a nested function application
+      // such as ((_ extract 3 0) op). function_application() consumes the
+      // head token and dispatches; it expects the outer '(' to already be
+      // consumed, which matches our state here.
+      return apply_let_frames(function_application());
+    }
+
+    const irep_idt id = next_token().text; // consume the head SYMBOL
+
+    if(id != "let")
+    {
+      // Not a let -- dispatch using the already-consumed head symbol. Simple
+      // operand operators are collected iteratively (no per-level recursion);
+      // the few heads that read extra structure are handled recursively.
+      if(is_simple_op(id))
+        return apply_let_frames(parse_application(id));
+      else
+        return apply_let_frames(function_application_with_id(id));
+    }
+
+    // It is a let -- parse the bindings and push a frame.
+    let_framet frame;
+
+    if(next_token() != smt2_tokenizert::OPEN)
+      throw error("expected bindings after let");
+
+    while(smt2_tokenizer.peek() == smt2_tokenizert::OPEN)
+    {
+      next_token(); // consume '('
+
+      auto binding_token = next_token();
+      if(binding_token != smt2_tokenizert::SYMBOL)
+        throw error("expected symbol in binding");
+
+      irep_idt binding_identifier = binding_token.text;
+
+      // note that the previous bindings are _not_ visible yet
+      exprt value = expression();
+
+      if(next_token() != smt2_tokenizert::CLOSE)
+        throw error("expected ')' after value in binding");
+
+      frame.bindings.emplace_back(binding_identifier, std::move(value));
+    }
+
+    if(next_token() != smt2_tokenizert::CLOSE)
+      throw error("expected ')' at end of bindings");
+
+    // add the bindings to the id_map, so they are visible for the body;
+    // we may hide identifiers in outer scopes
+    for(const auto &b : frame.bindings)
+    {
+      auto insert_result =
+        id_map.insert({b.first, idt{idt::BINDING, b.second}});
+      if(!insert_result.second) // already there
+      {
+        auto &id_entry = *insert_result.first;
+        frame.saved_ids.emplace_back(
+          id_entry.first, std::move(id_entry.second));
+        id_entry.second = idt{idt::BINDING, b.second};
+      }
+    }
+
+    let_stack.push_back(std::move(frame));
+    // loop back: the body of this let may itself be a let
   }
 
-  case smt2_tokenizert::NUMERAL:
-  {
-    const std::string &buffer = token.text;
-    if(buffer.size() >= 2 && buffer[0] == '#' && buffer[1] == 'x')
-    {
-      mp_integer value =
-        string2integer(std::string(buffer, 2, std::string::npos), 16);
-      const std::size_t width = 4 * (buffer.size() - 2);
-      CHECK_RETURN(width != 0 && width % 4 == 0);
-      unsignedbv_typet type(width);
-      return from_integer(value, type);
-    }
-    else if(buffer.size() >= 2 && buffer[0] == '#' && buffer[1] == 'b')
-    {
-      mp_integer value =
-        string2integer(std::string(buffer, 2, std::string::npos), 2);
-      const std::size_t width = buffer.size() - 2;
-      CHECK_RETURN(width != 0);
-      unsignedbv_typet type(width);
-      return from_integer(value, type);
-    }
-    else
-    {
-      return constant_exprt(buffer, integer_typet());
-    }
-  }
-
-  case smt2_tokenizert::OPEN: // function application
-    return function_application();
-
-  case smt2_tokenizert::END_OF_FILE:
-    throw error("EOF in an expression");
-
-  case smt2_tokenizert::CLOSE:
-  case smt2_tokenizert::STRING_LITERAL:
-  case smt2_tokenizert::NONE:
-  case smt2_tokenizert::KEYWORD:
-    throw error("unexpected token in an expression");
-  }
-
-  UNREACHABLE;
+  // The next token is not '(' -- parse an atom.
+  return apply_let_frames(parse_leaf(next_token()));
 }
 
 void smt2_parsert::setup_expressions()
@@ -1136,52 +1381,62 @@ void smt2_parsert::setup_expressions()
   expressions["true"] = [] { return true_exprt(); };
   expressions["false"] = [] { return false_exprt(); };
 
-  expressions["roundNearestTiesToEven"] = [] {
+  expressions["roundNearestTiesToEven"] = []
+  {
     // we encode as 32-bit unsignedbv
     return from_integer(ieee_floatt::ROUND_TO_EVEN, unsignedbv_typet(32));
   };
 
-  expressions["RNE"] = [] {
+  expressions["RNE"] = []
+  {
     // we encode as 32-bit unsignedbv
     return from_integer(ieee_floatt::ROUND_TO_EVEN, unsignedbv_typet(32));
   };
 
-  expressions["roundNearestTiesToAway"] = [] {
+  expressions["roundNearestTiesToAway"] = []
+  {
     // we encode as 32-bit unsignedbv
     return from_integer(ieee_floatt::ROUND_TO_AWAY, unsignedbv_typet(32));
   };
 
-  expressions["RNA"] = [] {
+  expressions["RNA"] = []
+  {
     // we encode as 32-bit unsignedbv
     return from_integer(ieee_floatt::ROUND_TO_AWAY, unsignedbv_typet(32));
   };
 
-  expressions["roundTowardPositive"] = [] {
+  expressions["roundTowardPositive"] = []
+  {
     // we encode as 32-bit unsignedbv
     return from_integer(ieee_floatt::ROUND_TO_PLUS_INF, unsignedbv_typet(32));
   };
 
-  expressions["RTP"] = [] {
+  expressions["RTP"] = []
+  {
     // we encode as 32-bit unsignedbv
     return from_integer(ieee_floatt::ROUND_TO_PLUS_INF, unsignedbv_typet(32));
   };
 
-  expressions["roundTowardNegative"] = [] {
+  expressions["roundTowardNegative"] = []
+  {
     // we encode as 32-bit unsignedbv
     return from_integer(ieee_floatt::ROUND_TO_MINUS_INF, unsignedbv_typet(32));
   };
 
-  expressions["RTN"] = [] {
+  expressions["RTN"] = []
+  {
     // we encode as 32-bit unsignedbv
     return from_integer(ieee_floatt::ROUND_TO_MINUS_INF, unsignedbv_typet(32));
   };
 
-  expressions["roundTowardZero"] = [] {
+  expressions["roundTowardZero"] = []
+  {
     // we encode as 32-bit unsignedbv
     return from_integer(ieee_floatt::ROUND_TO_ZERO, unsignedbv_typet(32));
   };
 
-  expressions["RTZ"] = [] {
+  expressions["RTZ"] = []
+  {
     // we encode as 32-bit unsignedbv
     return from_integer(ieee_floatt::ROUND_TO_ZERO, unsignedbv_typet(32));
   };
@@ -1202,29 +1457,26 @@ void smt2_parsert::setup_expressions()
 
   expressions["bvule"] = [this] { return binary_predicate(ID_le, operands()); };
 
-  expressions["bvsle"] = [this] {
-    return binary_predicate(ID_le, cast_bv_to_signed(operands()));
-  };
+  expressions["bvsle"] = [this]
+  { return binary_predicate(ID_le, cast_bv_to_signed(operands())); };
 
   expressions["bvuge"] = [this] { return binary_predicate(ID_ge, operands()); };
 
-  expressions["bvsge"] = [this] {
-    return binary_predicate(ID_ge, cast_bv_to_signed(operands()));
-  };
+  expressions["bvsge"] = [this]
+  { return binary_predicate(ID_ge, cast_bv_to_signed(operands())); };
 
   expressions["bvult"] = [this] { return binary_predicate(ID_lt, operands()); };
 
-  expressions["bvslt"] = [this] {
-    return binary_predicate(ID_lt, cast_bv_to_signed(operands()));
-  };
+  expressions["bvslt"] = [this]
+  { return binary_predicate(ID_lt, cast_bv_to_signed(operands())); };
 
   expressions["bvugt"] = [this] { return binary_predicate(ID_gt, operands()); };
 
-  expressions["bvsgt"] = [this] {
-    return binary_predicate(ID_gt, cast_bv_to_signed(operands()));
-  };
+  expressions["bvsgt"] = [this]
+  { return binary_predicate(ID_gt, cast_bv_to_signed(operands())); };
 
-  expressions["bvcomp"] = [this] {
+  expressions["bvcomp"] = [this]
+  {
     auto b0 = from_integer(0, unsignedbv_typet(1));
     auto b1 = from_integer(1, unsignedbv_typet(1));
     return if_exprt(binary_predicate(ID_equal, operands()), b1, b0);
@@ -1253,7 +1505,8 @@ void smt2_parsert::setup_expressions()
   expressions["bvmul"] = [this] { return multi_ary(ID_mult, operands()); };
   expressions["*"] = [this] { return multi_ary(ID_mult, operands()); };
 
-  expressions["-"] = [this] {
+  expressions["-"] = [this]
+  {
     auto op = operands();
     if(op.size() == 1)
       return unary(ID_unary_minus, op);
@@ -1273,14 +1526,16 @@ void smt2_parsert::setup_expressions()
   // We don't have that.
   expressions["bvsmod"] = [this] { return bv_mod(operands(), true); };
 
-  expressions["mod"] = [this] {
+  expressions["mod"] = [this]
+  {
     // SMT-LIB2 uses Boute's Euclidean definition for mod,
     // which is never negative and undefined when the second
     // argument is zero.
     return binary(ID_euclidean_mod, operands());
   };
 
-  expressions["concat"] = [this] {
+  expressions["concat"] = [this]
+  {
     auto op = operands();
 
     // add the widths
@@ -1293,7 +1548,8 @@ void smt2_parsert::setup_expressions()
     return concatenation_exprt(std::move(op), unsignedbv_typet(total_width));
   };
 
-  expressions["distinct"] = [this] {
+  expressions["distinct"] = [this]
+  {
     // pair-wise different constraint, multi-ary
     auto op = operands();
     if(op.size() == 2)
@@ -1314,7 +1570,8 @@ void smt2_parsert::setup_expressions()
     }
   };
 
-  expressions["ite"] = [this] {
+  expressions["ite"] = [this]
+  {
     auto op = operands();
 
     if(op.size() != 3)
@@ -1333,7 +1590,8 @@ void smt2_parsert::setup_expressions()
 
   expressions["=>"] = [this] { return binary(ID_implies, operands()); };
 
-  expressions["select"] = [this] {
+  expressions["select"] = [this]
+  {
     auto op = operands();
 
     // array index
@@ -1346,7 +1604,8 @@ void smt2_parsert::setup_expressions()
     return index_exprt(op[0], op[1]);
   };
 
-  expressions["store"] = [this] {
+  expressions["store"] = [this]
+  {
     auto op = operands();
 
     // array update
@@ -1443,23 +1702,20 @@ void smt2_parsert::setup_expressions()
 
   expressions["fp"] = [this] { return function_application_fp(operands()); };
 
-  expressions["fp.add"] = [this] {
-    return function_application_ieee_float_op("fp.add", operands());
-  };
+  expressions["fp.add"] = [this]
+  { return function_application_ieee_float_op("fp.add", operands()); };
 
-  expressions["fp.mul"] = [this] {
-    return function_application_ieee_float_op("fp.mul", operands());
-  };
+  expressions["fp.mul"] = [this]
+  { return function_application_ieee_float_op("fp.mul", operands()); };
 
-  expressions["fp.sub"] = [this] {
-    return function_application_ieee_float_op("fp.sub", operands());
-  };
+  expressions["fp.sub"] = [this]
+  { return function_application_ieee_float_op("fp.sub", operands()); };
 
-  expressions["fp.div"] = [this] {
-    return function_application_ieee_float_op("fp.div", operands());
-  };
+  expressions["fp.div"] = [this]
+  { return function_application_ieee_float_op("fp.div", operands()); };
 
-  expressions["fp.rem"] = [this] {
+  expressions["fp.rem"] = [this]
+  {
     auto op = operands();
 
     // Note that these do not have a rounding mode.
@@ -1512,19 +1768,16 @@ void smt2_parsert::setup_expressions()
     return floatbv_round_to_integral_exprt(op[1], op[0]);
   };
 
-  expressions["fp.eq"] = [this] {
-    return function_application_ieee_float_eq(operands());
-  };
+  expressions["fp.eq"] = [this]
+  { return function_application_ieee_float_eq(operands()); };
 
-  expressions["fp.leq"] = [this] {
-    return binary_predicate(ID_le, operands());
-  };
+  expressions["fp.leq"] = [this]
+  { return binary_predicate(ID_le, operands()); };
 
   expressions["fp.lt"] = [this] { return binary_predicate(ID_lt, operands()); };
 
-  expressions["fp.geq"] = [this] {
-    return binary_predicate(ID_ge, operands());
-  };
+  expressions["fp.geq"] = [this]
+  { return binary_predicate(ID_ge, operands()); };
 
   expressions["fp.gt"] = [this] { return binary_predicate(ID_gt, operands()); };
 
@@ -1617,18 +1870,14 @@ void smt2_parsert::setup_sorts()
   sorts["Int"] = [] { return integer_typet(); };
   sorts["Real"] = [] { return real_typet(); };
 
-  sorts["Float16"] = [] {
-    return ieee_float_spect::half_precision().to_type();
-  };
-  sorts["Float32"] = [] {
-    return ieee_float_spect::single_precision().to_type();
-  };
-  sorts["Float64"] = [] {
-    return ieee_float_spect::double_precision().to_type();
-  };
-  sorts["Float128"] = [] {
-    return ieee_float_spect::quadruple_precision().to_type();
-  };
+  sorts["Float16"] = []
+  { return ieee_float_spect::half_precision().to_type(); };
+  sorts["Float32"] = []
+  { return ieee_float_spect::single_precision().to_type(); };
+  sorts["Float64"] = []
+  { return ieee_float_spect::double_precision().to_type(); };
+  sorts["Float128"] = []
+  { return ieee_float_spect::quadruple_precision().to_type(); };
 
   sorts["BitVec"] = [this]
   {
@@ -1666,7 +1915,8 @@ void smt2_parsert::setup_sorts()
     return ieee_float_spect(width_f - 1, width_e).to_type();
   };
 
-  sorts["Array"] = [this] {
+  sorts["Array"] = [this]
+  {
     // this gets two sorts as arguments, domain and range
     auto domain = sort();
     auto range = sort();
