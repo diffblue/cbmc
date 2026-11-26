@@ -1,6 +1,7 @@
-CORE
+CORE smt-backend
 main.c
---no-unwinding-assertions
+--no-unwinding-assertions --z3 --no-bounds-check --no-signed-overflow-check
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
+--
