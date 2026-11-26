@@ -1,0 +1,11 @@
+CORE broken-smt-backend no-new-smt
+bounds.c
+--no-bounds-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Elements beyond the size of the arrays (here: index 1 when n is 1) must not be
+compared.

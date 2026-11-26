@@ -528,6 +528,24 @@ void boolbvt::set_to(const exprt &expr, bool value)
   const auto equal_expr = expr_try_dynamic_cast<equal_exprt>(expr);
   if(value && equal_expr && !boolbv_set_equality_to_true(*equal_expr))
     return;
+
+  // An equality of unbounded arrays that is set to true (in the root context)
+  // constrains the arrays to be the same on all indices, as is required to
+  // define one array in terms of another one. Other equalities of unbounded
+  // arrays only compare the elements within bounds, see
+  // convert_unbounded_array_equality.
+  if(
+    value && equal_expr && assumption_stack.empty() &&
+    is_unbounded_array(equal_expr->lhs().type()))
+  {
+    const literalt equal = record_array_equality(
+      has_byte_operator(*equal_expr)
+        ? to_equal_expr(lower_byte_operators(*equal_expr, ns))
+        : *equal_expr);
+    prop.l_set_to_true(equal);
+    return;
+  }
+
   SUB::set_to(expr, value);
 }
 
