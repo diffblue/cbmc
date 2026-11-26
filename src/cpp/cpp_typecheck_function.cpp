@@ -1348,12 +1348,15 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     if(ft.parameters().size() == 2 && !class_id.empty())
     {
       const typet &pt = ft.parameters()[1].type();
+      // the class may be a union ([class.copy.ctor]/15,
+      // [class.copy.assign]/13: its object representation is copied)
       const bool is_ref_to_self =
         pt.id() == ID_pointer &&
         (pt.get_bool(ID_C_reference) || pt.get_bool(ID_C_rvalue_reference)) &&
-        to_pointer_type(pt).base_type().id() == ID_struct_tag &&
-        to_struct_tag_type(to_pointer_type(pt).base_type()).get_identifier() ==
-          class_id;
+        (to_pointer_type(pt).base_type().id() == ID_struct_tag ||
+         to_pointer_type(pt).base_type().id() == ID_union_tag) &&
+        to_struct_or_union_tag_type(to_pointer_type(pt).base_type())
+            .get_identifier() == class_id;
       const symbolt *class_symbol = symbol_table.lookup(class_id);
       bool has_virtual_base = false;
       if(class_symbol != nullptr && class_symbol->type.id() == ID_struct)
@@ -1564,12 +1567,15 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     if(ft.parameters().size() == 2 && !class_id.empty())
     {
       const typet &pt = ft.parameters()[1].type();
+      // the class may be a union ([class.copy.ctor]/15,
+      // [class.copy.assign]/13: its object representation is copied)
       const bool is_ref_to_self =
         pt.id() == ID_pointer &&
         (pt.get_bool(ID_C_reference) || pt.get_bool(ID_C_rvalue_reference)) &&
-        to_pointer_type(pt).base_type().id() == ID_struct_tag &&
-        to_struct_tag_type(to_pointer_type(pt).base_type()).get_identifier() ==
-          class_id;
+        (to_pointer_type(pt).base_type().id() == ID_struct_tag ||
+         to_pointer_type(pt).base_type().id() == ID_union_tag) &&
+        to_struct_or_union_tag_type(to_pointer_type(pt).base_type())
+            .get_identifier() == class_id;
       const symbolt *class_symbol = symbol_table.lookup(class_id);
       if(is_ref_to_self && class_symbol != nullptr)
       {
