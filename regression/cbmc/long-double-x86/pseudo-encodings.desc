@@ -1,0 +1,16 @@
+CORE no-new-smt
+pseudo-encodings.i
+--arch x86_64 --os linux --floatbv --no-simplify
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Non-canonical x86 80-bit extended encodings: pseudo-NaN, pseudo-infinity, and
+unnormals are NaN, and a pseudo-denormal has the value 2^-16382 *
+1.fraction, as on x87 hardware.  pseudo-encodings-simplify.desc runs the same
+test with the simplifier, which constant-folds the values built with constant
+initialisers through ieee_float_valuet; both must agree.  The new SMT2 back end
+(--incremental-smt2-solver) does not yet implement the byte-extract lowering
+that the union accesses require.

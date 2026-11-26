@@ -1,0 +1,13 @@
+CORE no-new-smt
+padding.i
+--arch x86_64 --os linux --floatbv
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Comparisons and classification of x86 80-bit extended long double ignore the
+padding of the 16-byte storage.  The new SMT2 back end
+(--incremental-smt2-solver) does not yet implement the byte-extract lowering
+that the union accesses require.

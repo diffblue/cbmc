@@ -1,0 +1,13 @@
+CORE no-new-smt
+denormal.i
+--arch x86_64 --os linux --floatbv
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Denormal results of x86 80-bit extended long double arithmetic, and the
+transition from the denormal to the normal range.  The new SMT2 back end
+(--incremental-smt2-solver) does not yet implement the byte-extract lowering
+that the union accesses require.
