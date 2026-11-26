@@ -53,8 +53,21 @@ bvt boolbvt::convert_shift(const binary_exprt &expr)
 
     std::size_t distance;
 
-    if(i<0 || i>std::numeric_limits<signed>::max())
-      distance=0;
+    if(i < 0)
+      distance = 0;
+    else if(
+      shift == bv_utilst::shiftt::ROTATE_LEFT ||
+      shift == bv_utilst::shiftt::ROTATE_RIGHT)
+    {
+      // rotations wrap around modulo the width
+      distance =
+        width == 0 ? 0 : numeric_cast_v<std::size_t>(i % mp_integer{width});
+    }
+    else if(i >= mp_integer{width})
+    {
+      // shifting by the width or more shifts out all bits
+      distance = width;
+    }
     else
       distance = numeric_cast_v<std::size_t>(i);
 
