@@ -10,6 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_SMT2_SMT2_DEC_H
 #define CPROVER_SOLVERS_SMT2_SMT2_DEC_H
 
+#include <util/threeval.h>
+
 #include "smt2_conv.h"
 
 class message_handlert;
@@ -41,6 +43,10 @@ public:
 
   std::string decision_procedure_text() const override;
 
+  void print_assignment(std::ostream &) const override;
+
+  exprt get(const exprt &) const override;
+
 protected:
   std::string solver_binary_or_empty;
   message_handlert &message_handler;
@@ -51,6 +57,13 @@ protected:
   std::stringstream cached_output;
 
   resultt read_result(std::istream &in);
+
+  // satisfying assignment
+  std::vector<bool> boolean_assignment;
+  tvt l_get(literalt) const;
+
+  typedef std::unordered_map<irep_idt, exprt> value_mapt;
+  value_mapt value_map;
 };
 
 #endif // CPROVER_SOLVERS_SMT2_SMT2_DEC_H
