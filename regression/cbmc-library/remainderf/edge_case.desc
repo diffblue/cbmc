@@ -1,6 +1,6 @@
-KNOWNBUG
-main.c
---pointer-check --bounds-check
+CORE
+edge_case.c
+
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

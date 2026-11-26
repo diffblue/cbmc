@@ -26,14 +26,14 @@ Author: Daniel Kroening, kroening@kroening.com
 /// yet.
 static bool have_to_adjust_float_expressions(const exprt &expr)
 {
-  if(expr.id()==ID_floatbv_plus ||
-     expr.id()==ID_floatbv_minus ||
-     expr.id()==ID_floatbv_mult ||
-     expr.id()==ID_floatbv_div ||
-     expr.id()==ID_floatbv_div ||
-     expr.id()==ID_floatbv_rem ||
-     expr.id()==ID_floatbv_typecast)
+  if(
+    expr.id() == ID_floatbv_plus || expr.id() == ID_floatbv_minus ||
+    expr.id() == ID_floatbv_mult || expr.id() == ID_floatbv_div ||
+    expr.id() == ID_floatbv_mod || expr.id() == ID_floatbv_rem ||
+    expr.id() == ID_floatbv_typecast)
+  {
     return false;
+  }
 
   const typet &type = expr.type();
 
