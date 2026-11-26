@@ -13,6 +13,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include <util/symbol_table_base.h>
 
 #include "json_symbol.h"
+#include "validate_symtab.h"
 
 void symbol_table_from_json(const jsont &in, symbol_table_baset &symbol_table)
 {
@@ -52,4 +53,9 @@ void symbol_table_from_json(const jsont &in, symbol_table_baset &symbol_table)
   }
 
   symbol_table.validate(validation_modet::EXCEPTION);
+
+  // Later stages (e.g., linking) rely on well-formed types and expressions.
+  // Checks that require looking up symbols (such as struct tags) are left to
+  // the caller, as these may be defined in other input files.
+  check_symbol_table_structure(symbol_table);
 }

@@ -1,0 +1,11 @@
+CORE
+arity.json_symtab
+
+^EXIT=6$
+^SIGNAL=0$
+^malformed symbol table entry .x.: binary expression must have two operands$
+--
+^Invariant check failed
+--
+cbmc loading a JSON symbol table directly checks the structure of its
+expressions.
