@@ -1,0 +1,13 @@
+KNOWNBUG
+Test
+--function Test.check --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+The expression replacing Character.digit does not check that the radix is in
+the range Character.MIN_RADIX to Character.MAX_RADIX (see the TODO in
+character_refine_preprocesst::convert_digit_char).
+All cases are results confirmed with the JVM.

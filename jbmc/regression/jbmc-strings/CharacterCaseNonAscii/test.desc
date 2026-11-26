@@ -1,0 +1,13 @@
+KNOWNBUG
+Test
+--function Test.check --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+The expressions replacing Character.isLowerCase, isUpperCase, toLowerCase,
+toUpperCase and toTitleCase only consider ASCII letters (see the TODOs in
+character_refine_preprocesst).
+All cases are results confirmed with the JVM.

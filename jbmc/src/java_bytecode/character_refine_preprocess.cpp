@@ -21,6 +21,8 @@ Date:   March 2017
 
 #include <goto-programs/goto_instruction_code.h>
 
+#include "java_types.h"
+
 /// converts based on a function on expressions
 /// \param expr_function: A reference to a function on expressions
 /// \param target: A position in a goto program
@@ -36,6 +38,21 @@ codet character_refine_preprocesst::convert_char_function(
   return code_assignt(result, expr_function(arg, type));
 }
 
+/// \p chr, converted to int unless its type can represent \p value. Code
+/// points can exceed the range of the (16-bit) char type, and comparing a char
+/// with such a value in the char type would compare with the value modulo
+/// 2^16.
+/// \param chr: An expression of type character or int
+/// \param value: The value \p chr is to be compared with
+/// \return \p chr, or \p chr converted to int
+static exprt widen_for(const exprt &chr, const mp_integer &value)
+{
+  const auto &type = to_integer_bitvector_type(chr.type());
+  if(value >= type.smallest() && value <= type.largest())
+    return chr;
+  return typecast_exprt{chr, java_int_type()};
+}
+
 /// The returned expression is true when the first argument is in the interval
 /// defined by the lower and upper bounds (included)
 /// \param chr: Expression we want to bound
@@ -47,9 +64,12 @@ exprt character_refine_preprocesst::in_interval_expr(
   const mp_integer &lower_bound,
   const mp_integer &upper_bound)
 {
+  const exprt widened = widen_for(chr, upper_bound);
   return and_exprt(
-    binary_relation_exprt(chr, ID_ge, from_integer(lower_bound, chr.type())),
-    binary_relation_exprt(chr, ID_le, from_integer(upper_bound, chr.type())));
+    binary_relation_exprt(
+      widened, ID_ge, from_integer(lower_bound, widened.type())),
+    binary_relation_exprt(
+      widened, ID_le, from_integer(upper_bound, widened.type())));
 }
 
 /// The returned expression is true when the given character is equal to one of
@@ -62,7 +82,10 @@ exprt character_refine_preprocesst::in_list_expr(
 {
   exprt::operandst ops;
   for(const auto &i : list)
-    ops.push_back(equal_exprt(chr, from_integer(i, chr.type())));
+  {
+    const exprt widened = widen_for(chr, i);
+    ops.push_back(equal_exprt(widened, from_integer(i, widened.type())));
+  }
   return disjunction(ops);
 }
 
@@ -200,11 +223,16 @@ codet character_refine_preprocesst::convert_digit_char(
   // through z ('\uFF5A') and its code is less than radix + '\uFF41' - 10.
   // In this case, ch - '\uFF41' + 10 is returned.
   exprt uFF41=from_integer(0xFF41, arg.type());
+  exprt fullwidth_lower_case = in_interval_expr(arg, 0xFF41, 0xFF5A);
   plus_exprt value5(minus_exprt(arg, uFF41), i10);
   if_exprt case5(
     binary_relation_exprt(value5, ID_lt, radix), value5, invalid);
 
-  if_exprt fullwidth_cases(fullwidth_upper_case, case4, case5);
+  // Any other character is not a digit.
+  if_exprt fullwidth_cases(
+    fullwidth_upper_case,
+    case4,
+    if_exprt(fullwidth_lower_case, case5, invalid));
   if_exprt expr(
     latin_digit,
     case1,
@@ -236,7 +264,7 @@ codet character_refine_preprocesst::convert_for_digit(conversion_inputt &target)
   typecast_exprt casted_digit(digit, type);
 
   exprt d10=from_integer(10, type);
-  binary_relation_exprt small(casted_digit, ID_le, d10);
+  binary_relation_exprt small(casted_digit, ID_lt, d10);
   plus_exprt value1(casted_digit, from_integer('0', type));
   plus_exprt value2(minus_exprt(casted_digit, d10), from_integer('a', type));
   return code_assignt(result, if_exprt(small, value1, value2));
@@ -447,8 +475,9 @@ exprt character_refine_preprocesst::expr_of_is_defined(
   intervals.push_back(in_interval_expr(chr, 0x10840, 0x1CFFF));
   intervals.push_back(in_interval_expr(chr, 0x1D200, 0x1D2FF));
   intervals.push_back(in_interval_expr(chr, 0x1D360, 0x1D3FF));
-  intervals.push_back(
-    binary_relation_exprt(chr, ID_ge, from_integer(0x1D800, chr.type())));
+  const exprt widened = widen_for(chr, 0x1D800);
+  intervals.push_back(binary_relation_exprt(
+    widened, ID_ge, from_integer(0x1D800, widened.type())));
 
   return not_exprt(disjunction(intervals));
 }
@@ -808,12 +837,27 @@ codet character_refine_preprocesst::convert_is_mirrored_int(
   return convert_is_mirrored_char(target);
 }
 
+/// Determines if the specified character is ISO-LATIN-1 white space according
+/// to the deprecated Character.isSpace, i.e., one of '\\t', '\\n', '\\f',
+/// '\\r' and ' '.
+/// \param chr: An expression of type character
+/// \param type: A type for the output
+/// \return A Boolean expression
+exprt character_refine_preprocesst::expr_of_is_space(
+  const exprt &chr,
+  const typet &type)
+{
+  (void)type; // unused parameter
+  return in_list_expr(chr, {'\t', '\n', '\f', '\r', ' '});
+}
+
 /// Converts function call to an assignment of an expression corresponding to
 /// the java method Character.isSpace:(C)Z
 /// \param target: a position in a goto program
 codet character_refine_preprocesst::convert_is_space(conversion_inputt &target)
 {
-  return convert_is_whitespace_char(target);
+  return convert_char_function(
+    &character_refine_preprocesst::expr_of_is_space, target);
 }
 
 /// Determines if the specified character is white space according to Unicode
@@ -860,7 +904,7 @@ exprt character_refine_preprocesst::expr_of_is_supplementary_code_point(
   const exprt &chr, const typet &type)
 {
   (void)type; // unused parameter
-  return binary_relation_exprt(chr, ID_gt, from_integer(0xFFFF, chr.type()));
+  return in_interval_expr(chr, 0x10000, 0x10FFFF);
 }
 
 /// Converts function call to an assignment of an expression corresponding to
@@ -1070,7 +1114,7 @@ exprt character_refine_preprocesst::expr_of_is_valid_code_point(
   const exprt &chr, const typet &type)
 {
   (void)type; // unused parameter
-  return binary_relation_exprt(chr, ID_le, from_integer(0x10FFFF, chr.type()));
+  return in_interval_expr(chr, 0, 0x10FFFF);
 }
 
 /// Converts function call to an assignment of an expression corresponding to
@@ -1198,7 +1242,8 @@ codet character_refine_preprocesst::convert_to_lower_case_int(
   return convert_to_lower_case_char(target);
 }
 
-/// Converts the character argument to titlecase.
+/// Converts the character argument to titlecase. Characters without a
+/// titlecase mapping of their own are converted to uppercase.
 /// \param chr: An expression of type character
 /// \param type: A type for the output
 /// \return An expression of the given type
@@ -1227,7 +1272,10 @@ exprt character_refine_preprocesst::expr_of_to_title_case(
       if_exprt(
         plus_8_set,
         plus_8,
-        if_exprt(in_list_expr(chr, plus_9_list), plus_9, chr))));
+        if_exprt(
+          in_list_expr(chr, plus_9_list),
+          plus_9,
+          expr_of_to_upper_case(chr, type)))));
 }
 
 /// Converts function call to an assignment of an expression corresponding to

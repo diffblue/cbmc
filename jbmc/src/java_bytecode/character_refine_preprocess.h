@@ -127,6 +127,7 @@ private:
   static codet convert_is_upper_case_int(conversion_inputt &target);
   static exprt expr_of_is_valid_code_point(const exprt &chr, const typet &type);
   static codet convert_is_valid_code_point(conversion_inputt &target);
+  static exprt expr_of_is_space(const exprt &chr, const typet &type);
   static exprt expr_of_is_whitespace(const exprt &chr, const typet &type);
   static codet convert_is_whitespace_char(conversion_inputt &target);
   static codet convert_is_whitespace_int(conversion_inputt &target);
