@@ -2405,7 +2405,10 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
 
     cpp_tokent tk1;
 
-    if(lex.get_token(tk1) != TOK_CLASS)
+    // type-parameter-key: `class', or `typename' (N5008 [temp.param]/1, since
+    // C++17; G++ accepts it in earlier modes, too)
+    const int key = lex.get_token(tk1);
+    if(key != TOK_CLASS && key != TOK_TYPENAME)
       return false;
 
     declaration = cpp_declarationt();
