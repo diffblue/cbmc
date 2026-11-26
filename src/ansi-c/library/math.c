@@ -456,127 +456,273 @@ __CPROVER_HIDE:
 
 /* FUNCTION: sin */
 
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
 double __VERIFIER_nondet_double(void);
 
 double sin(double x)
 {
-  // gross over-approximation
+__CPROVER_hide:;
   double ret=__VERIFIER_nondet_double();
 
   if(__CPROVER_isinfd(x) || __CPROVER_isnand(x))
-    __CPROVER_assume(__CPROVER_isnand(ret));
-  else
   {
-    __CPROVER_assume(ret<=1);
-    __CPROVER_assume(ret>=-1);
-    __CPROVER_assume(x!=0 || ret==0);
+    __CPROVER_assume(__CPROVER_isnand(ret));
+    return ret;
   }
+
+  // sin(±0) = ±0 exactly per IEEE 754
+  if(x == 0.0)
+    return x;
+
+  const double pi = 3.14159265358979323846;
+  const double two_pi = 6.28318530717958647692;
+
+  // Range reduction via fmod for inputs outside [-2π, 2π]
+  double xr = x;
+  if(x > two_pi || x < -two_pi)
+    xr = fmod(x, two_pi);
+
+  // Quadrant-based range narrowing
+  if(xr >= 0.0 && xr <= pi)
+    __CPROVER_assume(ret >= 0.0 && ret <= 1.0);
+  else if(xr >= -pi && xr < 0.0)
+    __CPROVER_assume(ret >= -1.0 && ret <= 0.0);
+  else if(xr > pi)
+    __CPROVER_assume(ret >= -1.0 && ret <= 0.0);
+  else if(xr < -pi)
+    __CPROVER_assume(ret >= 0.0 && ret <= 1.0);
+  else
+    __CPROVER_assume(ret >= -1.0 && ret <= 1.0);
 
   return ret;
 }
 
 /* FUNCTION: sinl */
 
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
 long double __VERIFIER_nondet_long_double(void);
 
 long double sinl(long double x)
 {
-  // gross over-approximation
+__CPROVER_hide:;
   long double ret=__VERIFIER_nondet_long_double();
 
   if(__CPROVER_isinfld(x) || __CPROVER_isnanld(x))
-    __CPROVER_assume(__CPROVER_isnanld(ret));
-  else
   {
-    __CPROVER_assume(ret<=1);
-    __CPROVER_assume(ret>=-1);
-    __CPROVER_assume(x!=0 || ret==0);
+    __CPROVER_assume(__CPROVER_isnanld(ret));
+    return ret;
   }
+
+  if(x == 0.0L)
+    return x;
+
+  const long double pi = 3.14159265358979323846L;
+  const long double two_pi = 6.28318530717958647692L;
+
+  long double xr = x;
+  if(x > two_pi || x < -two_pi)
+    xr = fmodl(x, two_pi);
+
+  if(xr >= 0.0L && xr <= pi)
+    __CPROVER_assume(ret >= 0.0L && ret <= 1.0L);
+  else if(xr >= -pi && xr < 0.0L)
+    __CPROVER_assume(ret >= -1.0L && ret <= 0.0L);
+  else if(xr > pi)
+    __CPROVER_assume(ret >= -1.0L && ret <= 0.0L);
+  else if(xr < -pi)
+    __CPROVER_assume(ret >= 0.0L && ret <= 1.0L);
+  else
+    __CPROVER_assume(ret >= -1.0L && ret <= 1.0L);
 
   return ret;
 }
 
 /* FUNCTION: sinf */
 
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
 float __VERIFIER_nondet_float(void);
 
 float sinf(float x)
 {
-  // gross over-approximation
+__CPROVER_hide:;
   float ret=__VERIFIER_nondet_float();
 
   if(__CPROVER_isinff(x) || __CPROVER_isnanf(x))
-    __CPROVER_assume(__CPROVER_isnanf(ret));
-  else
   {
-    __CPROVER_assume(ret<=1);
-    __CPROVER_assume(ret>=-1);
-    __CPROVER_assume(x!=0 || ret==0);
+    __CPROVER_assume(__CPROVER_isnanf(ret));
+    return ret;
   }
+
+  if(x == 0.0f)
+    return x;
+
+  const float pi = 3.14159265f;
+  const float two_pi = 6.28318531f;
+
+  float xr = x;
+  if(x > two_pi || x < -two_pi)
+    xr = fmodf(x, two_pi);
+
+  if(xr >= 0.0f && xr <= pi)
+    __CPROVER_assume(ret >= 0.0f && ret <= 1.0f);
+  else if(xr >= -pi && xr < 0.0f)
+    __CPROVER_assume(ret >= -1.0f && ret <= 0.0f);
+  else if(xr > pi)
+    __CPROVER_assume(ret >= -1.0f && ret <= 0.0f);
+  else if(xr < -pi)
+    __CPROVER_assume(ret >= 0.0f && ret <= 1.0f);
+  else
+    __CPROVER_assume(ret >= -1.0f && ret <= 1.0f);
 
   return ret;
 }
 
 /* FUNCTION: cos */
 
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
 double __VERIFIER_nondet_double(void);
 
 double cos(double x)
 {
-  // gross over-approximation
+__CPROVER_hide:;
   double ret=__VERIFIER_nondet_double();
 
   if(__CPROVER_isinfd(x) || __CPROVER_isnand(x))
-    __CPROVER_assume(__CPROVER_isnand(ret));
-  else
   {
-    __CPROVER_assume(ret<=1);
-    __CPROVER_assume(ret>=-1);
-    __CPROVER_assume(x!=0 || ret==1);
+    __CPROVER_assume(__CPROVER_isnand(ret));
+    return ret;
   }
+
+  // cos(0) = 1 exactly
+  if(x == 0.0)
+    return 1.0;
+
+  const double pi_half = 1.57079632679489661923;
+  const double pi_3half = 4.71238898038468985769;
+  const double two_pi = 6.28318530717958647692;
+
+  // Range reduction via fmod for inputs outside [-2π, 2π]
+  double xr = x;
+  if(x > two_pi || x < -two_pi)
+    xr = fmod(x, two_pi);
+
+  // Quadrant-based range narrowing
+  if(xr >= -pi_half && xr <= pi_half)
+    __CPROVER_assume(ret >= 0.0 && ret <= 1.0);
+  else if(xr > pi_half && xr <= pi_3half)
+    __CPROVER_assume(ret >= -1.0 && ret <= 0.0);
+  else if(xr >= -pi_3half && xr < -pi_half)
+    __CPROVER_assume(ret >= -1.0 && ret <= 0.0);
+  else if(xr > pi_3half || xr < -pi_3half)
+    __CPROVER_assume(ret >= 0.0 && ret <= 1.0);
+  else
+    __CPROVER_assume(ret >= -1.0 && ret <= 1.0);
 
   return ret;
 }
 
 /* FUNCTION: cosl */
 
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
 long double __VERIFIER_nondet_long_double(void);
 
 long double cosl(long double x)
 {
-  // gross over-approximation
+__CPROVER_hide:;
   long double ret=__VERIFIER_nondet_long_double();
 
   if(__CPROVER_isinfld(x) || __CPROVER_isnanld(x))
-    __CPROVER_assume(__CPROVER_isnanld(ret));
-  else
   {
-    __CPROVER_assume(ret<=1);
-    __CPROVER_assume(ret>=-1);
-    __CPROVER_assume(x!=0 || ret==1);
+    __CPROVER_assume(__CPROVER_isnanld(ret));
+    return ret;
   }
+
+  if(x == 0.0L)
+    return 1.0L;
+
+  const long double pi_half = 1.57079632679489661923L;
+  const long double pi_3half = 4.71238898038468985769L;
+  const long double two_pi = 6.28318530717958647692L;
+
+  long double xr = x;
+  if(x > two_pi || x < -two_pi)
+    xr = fmodl(x, two_pi);
+
+  if(xr >= -pi_half && xr <= pi_half)
+    __CPROVER_assume(ret >= 0.0L && ret <= 1.0L);
+  else if(xr > pi_half && xr <= pi_3half)
+    __CPROVER_assume(ret >= -1.0L && ret <= 0.0L);
+  else if(xr >= -pi_3half && xr < -pi_half)
+    __CPROVER_assume(ret >= -1.0L && ret <= 0.0L);
+  else if(xr > pi_3half || xr < -pi_3half)
+    __CPROVER_assume(ret >= 0.0L && ret <= 1.0L);
+  else
+    __CPROVER_assume(ret >= -1.0L && ret <= 1.0L);
 
   return ret;
 }
 
 /* FUNCTION: cosf */
 
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
 float __VERIFIER_nondet_float(void);
 
 float cosf(float x)
 {
 __CPROVER_hide:;
-  // gross over-approximation
   float ret=__VERIFIER_nondet_float();
 
   if(__CPROVER_isinff(x) || __CPROVER_isnanf(x))
-    __CPROVER_assume(__CPROVER_isnanf(ret));
-  else
   {
-    __CPROVER_assume(ret<=1);
-    __CPROVER_assume(ret>=-1);
-    __CPROVER_assume(x!=0 || ret==1);
+    __CPROVER_assume(__CPROVER_isnanf(ret));
+    return ret;
   }
+
+  if(x == 0.0f)
+    return 1.0f;
+
+  const float pi_half = 1.57079633f;
+  const float pi_3half = 4.71238898f;
+  const float two_pi = 6.28318531f;
+
+  float xr = x;
+  if(x > two_pi || x < -two_pi)
+    xr = fmodf(x, two_pi);
+
+  if(xr >= -pi_half && xr <= pi_half)
+    __CPROVER_assume(ret >= 0.0f && ret <= 1.0f);
+  else if(xr > pi_half && xr <= pi_3half)
+    __CPROVER_assume(ret >= -1.0f && ret <= 0.0f);
+  else if(xr >= -pi_3half && xr < -pi_half)
+    __CPROVER_assume(ret >= -1.0f && ret <= 0.0f);
+  else if(xr > pi_3half || xr < -pi_3half)
+    __CPROVER_assume(ret >= 0.0f && ret <= 1.0f);
+  else
+    __CPROVER_assume(ret >= -1.0f && ret <= 1.0f);
 
   return ret;
 }
