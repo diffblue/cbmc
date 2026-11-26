@@ -8,11 +8,18 @@ Author: Daniel Kroening
 
 /// \file
 /// Basic blocks detection for Coverage Instrumentation
+///
+/// This module provides an adapter layer between the generic basic block
+/// detection utility in src/analyses/basic_blocks.h and the coverage
+/// instrumentation system. It extends the basic block detection with
+/// source line tracking needed for coverage reporting.
 
 #ifndef CPROVER_GOTO_INSTRUMENT_COVER_BASIC_BLOCKS_H
 #define CPROVER_GOTO_INSTRUMENT_COVER_BASIC_BLOCKS_H
 
 #include <goto-programs/goto_program.h>
+
+#include <analyses/basic_blocks.h>
 
 #include "source_lines.h"
 
@@ -62,10 +69,18 @@ public:
   }
 };
 
+/// Default basic block detection for C/C++ with source line tracking
+/// This adapter extends the generic basic_blockst with source line
+/// information needed for coverage reporting.
 class cover_basic_blockst final : public cover_blocks_baset
 {
 public:
-  explicit cover_basic_blockst(const goto_programt &goto_program);
+  /// Create basic block detector for the given program
+  /// \param goto_program: The program to analyze
+  /// \param config: Configuration for block detection (optional)
+  explicit cover_basic_blockst(
+    const goto_programt &goto_program,
+    const basic_block_configt &config = basic_block_configt());
 
   /// \param t: a goto instruction
   /// \return the block number of the block
@@ -101,57 +116,32 @@ public:
   void output(std::ostream &out) const override;
 
 private:
-  typedef std::map<
-    goto_programt::const_targett,
-    std::size_t,
-    goto_programt::target_less_than>
-    block_mapt;
+  /// The underlying basic block detector
+  basic_blockst blocks;
 
+  /// Extended block information with source lines
   struct block_infot
   {
-    /// the program location to instrument for this block
-    std::optional<goto_programt::const_targett> representative_inst;
-
-    /// the source location representative for this block
-    /// (we need a separate copy of source locations because we attach
-    ///  the line number ranges to them)
-    source_locationt source_location;
-
     /// the set of source code lines belonging to this block
     source_linest source_lines;
   };
 
-  /// map program locations to block numbers
-  block_mapt block_map;
-  /// map block numbers to block information
+  /// Extended information for each block
   std::vector<block_infot> block_infos;
 
   /// Adds the lines which \p instruction spans to \p block.
   static void add_block_lines(
-    cover_basic_blockst::block_infot &block,
+    block_infot &block,
     const goto_programt::instructiont &instruction);
-
-  /// If this block is a continuation of a previous block through unconditional
-  /// forward gotos, return this blocks number.
-  static std::optional<std::size_t> continuation_of_block(
-    const goto_programt::const_targett &instruction,
-    block_mapt &block_map);
 };
 
+/// Java-specific basic block detection with source line tracking
 class cover_basic_blocks_javat final : public cover_blocks_baset
 {
-private:
-  // map block number to first instruction of the block
-  std::vector<goto_programt::const_targett> block_infos;
-  // map block number to its location
-  std::vector<source_locationt> block_locations;
-  // map java indexes to block indexes
-  std::unordered_map<irep_idt, std::size_t> index_to_block;
-  // map block number to its source lines
-  std::vector<source_linest> block_source_lines;
-
 public:
-  explicit cover_basic_blocks_javat(const goto_programt &_goto_program);
+  /// Create basic block detector for Java programs
+  /// \param goto_program: The program to analyze
+  explicit cover_basic_blocks_javat(const goto_programt &goto_program);
 
   /// \param t: a goto instruction
   /// \return block number the given goto instruction is part of
@@ -173,6 +163,13 @@ public:
 
   /// Outputs the list of blocks
   void output(std::ostream &out) const override;
+
+private:
+  /// The underlying Java basic block detector
+  java_basic_blockst blocks;
+
+  /// Source lines for each block
+  std::vector<source_linest> block_source_lines;
 };
 
 #endif // CPROVER_GOTO_INSTRUMENT_COVER_BASIC_BLOCKS_H
