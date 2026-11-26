@@ -14777,6 +14777,37 @@ void cpp_typecheck_resolvet::resolve_with_arguments(
     if(is_reference(arg_type))
       arg_type = to_reference_type(arg_type).base_type();
 
+    // N5008 [basic.lookup.argdep]/3: for a pointer to U or an array of U, the
+    // associated entities are those of U; for a function type, those of the
+    // parameter and return types; for a pointer to a member of class X, also
+    // those of X.  imagemagick's Magick++ calls MagickCore functions from
+    // namespace Magick that only this finds, through pointer arguments.
+    if(arg_type.id() == ID_pointer)
+    {
+      const irept &to_member = arg_type.find(ID_to_member);
+      if(to_member.is_not_nil())
+        add_associated_class(static_cast<const typet &>(to_member));
+      add_associated_class(to_pointer_type(arg_type).base_type());
+      return;
+    }
+    if(arg_type.id() == ID_array)
+    {
+      add_associated_class(to_array_type(arg_type).element_type());
+      return;
+    }
+    if(arg_type.id() == ID_code)
+    {
+      for(const auto &parameter : to_code_type(arg_type).parameters())
+      {
+        // not the implicit object parameter of a member function's type
+        if(parameter.get_this())
+          continue;
+        add_associated_class(parameter.type());
+      }
+      add_associated_class(to_code_type(arg_type).return_type());
+      return;
+    }
+
     // N5008 [basic.lookup.argdep]/3.3, 4: for an ENUMERATION type the
     // associated entities are its innermost enclosing namespace (and,
     // for a class member, the class).  libc++'s poison-pill pattern
@@ -14830,8 +14861,13 @@ void cpp_typecheck_resolvet::resolve_with_arguments(
         : static_cast<const struct_union_typet &>(
             cpp_typecheck.follow_tag(to_union_tag_type(arg_type)));
 
-    // Search in the struct's own scope (for friend declarations)
-    const irep_idt &struct_name = final_type.get(ID_name);
+    // Search in the struct's own scope (for friend declarations).  The type
+    // of an incomplete class has no ID_name; its associated namespace is
+    // that of its declaration all the same ([basic.lookup.argdep]/3.2).
+    const irep_idt &struct_name =
+      final_type.get(ID_name).empty()
+        ? to_struct_or_union_tag_type(arg_type).get_identifier()
+        : final_type.get(ID_name);
     if(struct_name.empty() || !visited.insert(struct_name).second)
       return;
 
