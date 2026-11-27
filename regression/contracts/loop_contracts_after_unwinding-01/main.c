@@ -1,7 +1,7 @@
 // clang-format off
-int g, lock;
+int lock;
 
-void m_spin(int *l)
+void spin(int *l)
 {
   while(*l)
     __CPROVER_assigns()
@@ -11,19 +11,19 @@ void m_spin(int *l)
   *l = 1;
 }
 
-void a_acq(void)
+void acquire(void)
 {
-  for(int k = 0; k < 5; k++)
-    __CPROVER_loop_invariant(0 <= k && k <= 5)
+  while(1)
+    __CPROVER_loop_invariant(1)
   {
-    m_spin(&lock);
+    spin(&lock);
   }
 }
 
-void z_f(void)
+void f(void)
 {
   do { } while(0);
-  a_acq();
+  acquire();
   for(int i = 0; i < 10; i++)
     __CPROVER_assigns(i)
     __CPROVER_loop_invariant(0 <= i && i <= 10)
@@ -33,6 +33,6 @@ void z_f(void)
 
 int main()
 {
-  z_f();
+  f();
 }
 // clang-format on

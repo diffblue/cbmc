@@ -1,5 +1,5 @@
 // clang-format off
-int lock, g, h;
+int lock, g;
 
 void m_spin(int *l)
 {

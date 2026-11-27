@@ -29,6 +29,7 @@ fi
 rm -f "${name}-mod.gb"
 # Several goto-instrument invocations can be chained by separating their
 # arguments with " -- "; each one reads the output of the previous one.
+# Only the last one may use --dump-c, as the others must write a goto binary.
 if [[ "$args_inst" != *" -- "* ]]
 then
   $goto_instrument ${args_inst} "${name}.gb" "${name}-mod.gb"

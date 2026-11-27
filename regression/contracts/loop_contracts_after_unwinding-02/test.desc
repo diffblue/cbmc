@@ -6,7 +6,9 @@ main.c
 ^VERIFICATION SUCCESSFUL$
 --
 --
-Same setup as loop_contracts_after_unwinding-01. Functions are processed in
-name order, so a_acq is instrumented before it is inlined into z_f. Location
-numbers must be restored before inlining; with stale location numbers the
-instrumentation aborted with a precondition failure in goto_inlinet::add_segment.
+As in loop_contracts_after_unwinding-01, the do-while(0) loop of z_f is unwound
+by a first goto-instrument run, and loop contracts are applied by a second one.
+Functions are processed in name order, so a_acq is instrumented before it is
+inlined into z_f. Location numbers must be restored before inlining; with stale
+location numbers the instrumentation aborted with a precondition failure in
+goto_inlinet::add_segment.
