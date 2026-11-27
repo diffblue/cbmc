@@ -1,0 +1,26 @@
+CORE no-new-smt
+no-missed-overflow.c
+
+^\[main.assertion.1\] line 24 expected to FAIL: the product always overflows: FAILURE$
+^\[main.assertion.2\] line 25 expected to FAIL: truncated product can be 0: FAILURE$
+^\[main.assertion.3\] line 34 expected to FAIL: the signed product always overflows: FAILURE$
+^\[main.assertion.4\] line 43 expected to FAIL: the signed sum always overflows: FAILURE$
+^\[main.assertion.5\] line 52 expected to FAIL: the signed difference always overflows: FAILURE$
+^\[main.assertion.6\] line 65 expected to FAIL: the unsigned sum always overflows: FAILURE$
+^\[main.assertion.7\] line 75 expected to FAIL: the unsigned difference always overflows: FAILURE$
+^\*\* 7 of 7 failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Unsoundness in the other direction: with the fields of the flattened
+overflow_result_exprt struct swapped, the overflow flag is read from the top
+bit of the truncated result. Bit 31 is 0 for every result allowed here, so
+--cprover-smt2 / --bitwuzla / --boolector used to report the first five
+assertions as SUCCESS. The unsigned multiply, signed multiply and signed
+plus/minus are encoded by separate emitters in the SMT2 back-end, so each of
+them is checked. The unsigned plus/minus emitter, which did not have this bug,
+is checked as well. The new SMT back-end does not support the overflow
+expressions yet.
