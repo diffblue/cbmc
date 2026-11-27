@@ -173,15 +173,19 @@ void configure_gcc(const gcc_versiont &gcc_version)
      config.ansi_c.os == configt::ansi_ct::ost::OS_MACOS &&
      config.ansi_c.gcc__float128_type);
 
+  // GCC supports _Float16 and __bf16 on AArch64 since versions 8 and 10,
+  // respectively, which its <arm_neon.h> and <arm_bf16.h> use.
   config.ansi_c.float16_type =
     (gcc_version.flavor == gcc_versiont::flavort::GCC &&
-     gcc_version.is_at_least(12u)) ||
+     (gcc_version.is_at_least(12u) ||
+      (config.ansi_c.arch == "arm64" && gcc_version.is_at_least(8u)))) ||
     (gcc_version.flavor == gcc_versiont::flavort::CLANG &&
      gcc_version.is_at_least(15u));
 
   config.ansi_c.bf16_type =
     (gcc_version.flavor == gcc_versiont::flavort::GCC &&
-     gcc_version.is_at_least(13u)) ||
+     (gcc_version.is_at_least(13u) ||
+      (config.ansi_c.arch == "arm64" && gcc_version.is_at_least(10u)))) ||
     (gcc_version.flavor == gcc_versiont::flavort::CLANG &&
      gcc_version.is_at_least(15u));
 
