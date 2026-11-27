@@ -1,0 +1,11 @@
+CORE gcc-only test-c++-front-end
+zero.c
+
+^EXIT=1$
+^SIGNAL=0$
+error: vector size must be positive, but got 0$
+^CONVERSION ERROR$
+--
+^warning: ignoring
+--
+A neon_vector_type lane count of 0 must be rejected.

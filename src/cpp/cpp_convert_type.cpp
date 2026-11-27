@@ -108,8 +108,6 @@ void cpp_convert_typet::read_rec(const typet &type)
     // ignore, we unfortunately convert multiple times
     other.push_back(type);
   }
-  else if(type.id() == ID_frontend_vector)
-    vector_size = static_cast<const exprt &>(type.find(ID_size));
   else
   {
     ansi_c_convert_typet::read_rec(type);

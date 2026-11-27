@@ -1,0 +1,11 @@
+CORE gcc-only test-c++-front-end
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The size given by neon_vector_type and neon_polyvector_type is a number of
+lanes, not of bytes as for vector_size.
