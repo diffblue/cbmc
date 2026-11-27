@@ -639,7 +639,10 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
   add_parameters_to_symbol_table(symbol);
 
   // typecheck the body code
+  const typet old_function_type = current_function_type;
+  current_function_type = code_type;
   typecheck_code(to_code(symbol.value));
+  current_function_type = old_function_type;
 
   // check the labels
   for(const auto &label : labels_used)

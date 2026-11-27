@@ -10,6 +10,7 @@ int __builtin_va_arg_pack_len();
 void __builtin_va_copy(__builtin_va_list dest, __builtin_va_list src);
 void __builtin_va_end(__builtin_va_list ap);
 void __builtin_va_start(__builtin_va_list ap, ...);
+void __builtin_c23_va_start(__builtin_va_list ap, ...);
 
 // stdlib
 void __builtin__Exit(int);

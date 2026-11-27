@@ -2637,6 +2637,59 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
     typecheck_function_call_arguments(expr);
 }
 
+exprt c_typecheck_baset::typecheck_builtin_va_start(
+  const side_effect_expr_function_callt &expr)
+{
+  const irep_idt &identifier = to_symbol_expr(expr.function()).identifier();
+  const source_locationt &source_location = expr.source_location();
+
+  // C23 only requires the va_list argument of va_start, which GCC 15 and
+  // Clang 21 implement as __builtin_c23_va_start(ap[, ...]), and earlier
+  // versions as __builtin_va_start(ap, 0).
+  if(expr.arguments().empty() || expr.arguments().size() > 2)
+  {
+    throw errort().with_location(source_location)
+      << "'" << identifier << "' expects one or two arguments";
+  }
+
+  if(
+    current_function_type.id() != ID_code ||
+    !to_code_type(current_function_type).has_ellipsis())
+  {
+    throw errort().with_location(source_location)
+      << "'" << identifier << "' used in function with fixed parameters";
+  }
+
+  const code_typet::parameterst &parameters =
+    to_code_type(current_function_type).parameters();
+  if(parameters.empty())
+  {
+    throw errort().with_location(source_location)
+      << "'" << identifier
+      << "' in a function without named parameters is not supported";
+  }
+
+  // GCC and Clang take the variadic arguments to start after the last named
+  // parameter, whatever the second argument is (and warn if it is not that
+  // parameter). goto_convert and symex expect it as second argument of
+  // __builtin_va_start.
+  const symbolt &last_parameter = lookup(parameters.back().get_identifier());
+
+  if(identifier == "__builtin_c23_va_start")
+    builtin_factory("__builtin_va_start");
+  const symbolt &va_start = lookup("__builtin_va_start");
+
+  side_effect_expr_function_callt result{
+    va_start.symbol_expr().with_source_location(expr.function()),
+    {expr.arguments().front(),
+     last_parameter.symbol_expr().with_source_location(expr)},
+    expr.type(),
+    source_location};
+  typecheck_function_call_arguments(result);
+
+  return std::move(result);
+}
+
 exprt c_typecheck_baset::do_special_functions(
   side_effect_expr_function_callt &expr)
 {
@@ -3655,6 +3708,12 @@ exprt c_typecheck_baset::do_special_functions(
     ffs.add_source_location() = source_location;
 
     return std::move(ffs);
+  }
+  else if(
+    (identifier == "__builtin_va_start" && expr.arguments().size() == 2) ||
+    identifier == "__builtin_c23_va_start")
+  {
+    return typecheck_builtin_va_start(expr);
   }
   else if(identifier=="__builtin_expect")
   {
