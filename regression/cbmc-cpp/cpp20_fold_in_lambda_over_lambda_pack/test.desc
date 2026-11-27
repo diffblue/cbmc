@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] .* generic lambda: SUCCESS$
+^\[main\.assertion\.2\] .* lambda with a template parameter list: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+A fold in a lambda over the lambda's own pack, `(f(a), ...)' with f a
+parameter of the enclosing function, was reduced as a one-element fold when
+the enclosing function's body was prepared: f was called once (with every
+element of the pack, or with the first one), without a diagnostic.

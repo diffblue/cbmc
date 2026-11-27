@@ -123,6 +123,36 @@ void cpp_typecheckt::remove_empty_pack_expansion_args(exprt &body)
   strip(static_cast<irept &>(body));
 }
 
+/// \return the names of the template parameter packs and function parameter
+///   packs that the lambda-expression \p lambda declares
+///   (`[]<std::size_t... I>(auto... a)`: I and a)
+static std::set<irep_idt> lambda_pack_names(const irept &lambda)
+{
+  std::set<irep_idt> names;
+  for(const irep_idt &list : {ID_template_parameters, ID_parameters})
+  {
+    for(const auto &declaration : lambda.find(list).get_sub())
+    {
+      for(const auto &declarator : declaration.get_sub())
+      {
+        if(
+          !declaration.get_bool(ID_ellipsis) &&
+          !declarator.get_bool(ID_ellipsis) &&
+          !declarator.find(ID_type).get_bool(ID_ellipsis))
+        {
+          continue;
+        }
+        for(const auto &component : declarator.find(ID_name).get_sub())
+        {
+          if(component.id() == ID_name)
+            names.insert(component.get(ID_identifier));
+        }
+      }
+    }
+  }
+  return names;
+}
+
 /// N5008 [expr.prim.fold]/1-3: reduce a fold expression over this member
 /// function template's parameter pack.  The free-function-template body
 /// expander in cpp_instantiate_template already handles folds; a MEMBER
@@ -301,8 +331,45 @@ void cpp_typecheckt::reduce_parameter_pack_folds(symbolt &method_symbol)
       substitute(pattern);
     };
 
+    // the packs of the lambda-expressions that enclose the node being
+    // reduced
+    std::vector<std::set<irep_idt>> lambda_packs;
+    std::function<bool(const irept &)> mentions_lambda_pack =
+      [&](const irept &n) -> bool
+    {
+      if(n.id() == ID_name)
+      {
+        for(const auto &packs : lambda_packs)
+          if(packs.count(n.get(ID_identifier)) != 0)
+            return true;
+      }
+      for(const auto &sub : n.get_sub())
+        if(mentions_lambda_pack(sub))
+          return true;
+      for(const auto &ns : n.get_named_sub())
+        if(mentions_lambda_pack(ns.second))
+          return true;
+      return false;
+    };
     std::function<void(irept &)> reduce_folds = [&](irept &node)
     {
+      // N5008 [expr.prim.lambda.closure]/4, [temp.variadic]/8: a fold in the
+      // body of a lambda over a pack of the lambda itself (a generic
+      // lambda's `auto... a', a template lambda's `std::size_t... I') is
+      // expanded when the closure's call operator is instantiated; it is no
+      // fold over this function's packs.  Reduced as a one-element fold
+      // here because the pattern `f(a)' names a parameter f of this
+      // function, it called f once, with every element of the pack.
+      if(node.id() == "lambda")
+      {
+        lambda_packs.push_back(lambda_pack_names(node));
+        for(auto &s : node.get_sub())
+          reduce_folds(s);
+        for(auto &ns : node.get_named_sub())
+          reduce_folds(ns.second);
+        lambda_packs.pop_back();
+        return;
+      }
       const bool is_right = node.id() == irep_idt("cpp_right_fold");
       const bool is_left = node.id() == irep_idt("cpp_left_fold");
       const bool is_binary = node.id() == irep_idt("cpp_binary_fold");
@@ -368,6 +435,8 @@ void cpp_typecheckt::reduce_parameter_pack_folds(symbolt &method_symbol)
           pattern = &node.get_sub()[1];
         }
       }
+      if(pattern != nullptr && mentions_lambda_pack(*pattern))
+        pattern = nullptr;
       if(pattern != nullptr)
       {
         const irep_idt fold_op = node.get(irep_idt("fold_op"));
