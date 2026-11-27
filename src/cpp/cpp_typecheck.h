@@ -1392,6 +1392,7 @@ protected:
   /// see cpp_cast_ambiguity.h
   void resolve_cast_ambiguity(exprt &);
   bool ambiguous_cast_names_type(const exprt &cast);
+  bool names_object(const cpp_namet &name);
   void typecheck_expr_main(exprt &) override;
   /// Phase 1B target-typet overload of \ref typecheck_expr_main; the
   /// target is currently discarded.  See

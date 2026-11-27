@@ -10996,6 +10996,17 @@ bool Parser::rPostfixExpr(exprt &exp)
 #endif
 
       {
+        // N5008 [temp.names]/3: `len<insert_offset>(0)' is a call of a
+        // template-id only if `len' is a template; for a variable these are
+        // two comparisons.  For an unqualified name the parser has not seen
+        // declared, let the type checker decide (see cpp_cast_ambiguity.h);
+        // only when no further postfix operator follows the call
+        const bool ambiguous_template_id =
+          exp.id() == ID_cpp_name && exp.get_sub().size() == 2 &&
+          exp.get_sub()[0].id() == ID_name &&
+          exp.get_sub()[1].id() == ID_template_args &&
+          lookup_id(exp.get_sub()[0].get(ID_identifier)) == nullptr;
+
         side_effect_expr_function_callt fc(
           std::move(exp), {}, typet{}, source_locationt{});
         fc.arguments().reserve(e.operands().size());
@@ -11005,6 +11016,16 @@ bool Parser::rPostfixExpr(exprt &exp)
           fc.arguments().push_back(*it);
         e.operands().clear(); // save some
         exp.swap(fc);
+
+        const int next = lex.LookAhead(0);
+        if(
+          ambiguous_template_id && next != '(' && next != '[' && next != '.' &&
+          next != TOK_ARROW && next != TOK_INCR && next != TOK_DECR &&
+          next != TOK_ELLIPSIS)
+        {
+          exp.set(ID_C_ambiguous_template_id(), true);
+          exp.set(ID_C_cast_ambiguity(), true);
+        }
       }
       break;
 

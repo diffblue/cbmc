@@ -1,0 +1,13 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] .* comparisons: SUCCESS$
+^\[main\.assertion\.2\] .* template-id: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+N5008 [temp.names]/3: `a<limit>(0)' with a variable a was read as a call
+of the template-id `a<limit>' ("symbol 'a' is unknown").

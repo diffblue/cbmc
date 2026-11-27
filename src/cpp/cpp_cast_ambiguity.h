@@ -18,7 +18,10 @@ Author: Michael Tautschnig (with Kiro)
 /// grouping may change.  cpp_typecheckt::resolve_cast_ambiguity looks the
 /// name up and, if it does not name a type, regroups the operators of the
 /// region as a parse with x as an operand would have grouped them: `(T)(x) -
-/// y` is `((T)x) - y` and `(x) - y * z` is `x - (y * z)`.
+/// y` is `((T)x) - y` and `(x) - y * z` is `x - (y * z)`.  The same applies
+/// to `a<b>(c)` with an unqualified name a the parser has not seen declared:
+/// the call of a template-id, or `(a < b) > (c)` if a denotes an object
+/// ([temp.names]/3).
 
 #ifndef CPROVER_CPP_CPP_CAST_AMBIGUITY_H
 #define CPROVER_CPP_CPP_CAST_AMBIGUITY_H
@@ -60,6 +63,16 @@ inline const irep_idt &ID_C_cast_ambiguity_root()
 inline const irep_idt &ID_C_cast_ambiguity_group()
 {
   static const irep_idt id{"#cast_ambiguity_group"};
+  return id;
+}
+
+/// On a call `name<arguments>(...)` of an unqualified name the parser has
+/// not seen declared: the call of a template-id, or two comparisons
+/// `name < argument > (...)` if the name is not a template ([temp.names]/3).
+/// Also a member of the region (`#cast_ambiguity`).
+inline const irep_idt &ID_C_ambiguous_template_id()
+{
+  static const irep_idt id{"#ambiguous_template_id"};
   return id;
 }
 

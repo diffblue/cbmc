@@ -12875,9 +12875,10 @@ namespace
 class cast_ambiguity_regiont
 {
 public:
-  explicit cast_ambiguity_regiont(
-    std::function<bool(const exprt &)> _names_type)
-    : names_type(std::move(_names_type))
+  cast_ambiguity_regiont(
+    std::function<bool(const exprt &)> _names_type,
+    std::function<bool(const cpp_namet &)> _names_object)
+    : names_type(std::move(_names_type)), names_object(std::move(_names_object))
   {
   }
 
@@ -12893,6 +12894,8 @@ public:
 private:
   /// whether the name of an ambiguous cast names a type
   std::function<bool(const exprt &)> names_type;
+  /// whether a name denotes an object (not a template)
+  std::function<bool(const cpp_namet &)> names_object;
 
   struct itemt
   {
@@ -12989,6 +12992,21 @@ private:
       }
       else
         flatten_expression(expr, name_expression(expr));
+      return;
+    }
+
+    if(
+      expr.get_bool(ID_C_ambiguous_template_id()) &&
+      expr.id() == ID_side_effect && expr.get(ID_statement) == ID_function_call)
+    {
+      if(!flatten_comparisons(to_side_effect_expr_function_call(expr)))
+      {
+        exprt call = expr;
+        call.remove(ID_C_ambiguous_template_id());
+        call.remove(ID_C_cast_ambiguity());
+        call.remove(ID_C_cast_ambiguity_root());
+        add(itemt::kindt::OPERAND, std::move(call));
+      }
       return;
     }
 
@@ -13150,6 +13168,85 @@ private:
     flatten(operand, false);
   }
 
+  /// The template argument \p argument of `name<argument>(...)` as the
+  /// right operand of `name < argument`, or nil if it is not one: a type, or
+  /// an expression whose operator does not bind tighter than `<` (which may
+  /// have been in parentheses)
+  static exprt comparison_operand(const exprt &argument)
+  {
+    if(argument.id() == "ambiguous" || argument.id() == ID_type)
+    {
+      if(argument.type().id() != ID_cpp_name)
+        return nil_exprt{};
+      return static_cast<const exprt &>(
+        static_cast<const irept &>(argument.type()));
+    }
+    const int p = precedence(argument.id());
+    const irep_idt &statement = argument.get(ID_statement);
+    if(
+      (p != 0 && p <= precedence(ID_lt)) || argument.id() == ID_if ||
+      argument.id() == ID_comma ||
+      (argument.id() == ID_side_effect && statement != ID_function_call &&
+       statement != ID_postincrement && statement != ID_postdecrement &&
+       statement != ID_preincrement && statement != ID_predecrement))
+    {
+      return nil_exprt{};
+    }
+    return argument;
+  }
+
+  /// N5008 [temp.names]/3: the call `name<argument>(arguments)` of a name
+  /// that denotes an object is the comparisons
+  /// `name < argument > (arguments)`.
+  /// \return false if the call stays one
+  bool flatten_comparisons(const side_effect_expr_function_callt &call)
+  {
+    const exprt &function = call.function();
+    if(
+      function.id() != ID_cpp_name || function.get_sub().size() != 2 ||
+      call.arguments().empty())
+    {
+      return false;
+    }
+    const irept::subt &template_arguments =
+      function.get_sub()[1].find(ID_arguments).get_sub();
+    if(template_arguments.size() != 1)
+      return false;
+    cpp_namet name;
+    name.get_sub().push_back(function.get_sub()[0]);
+    if(!names_object(name))
+      return false;
+    exprt argument =
+      comparison_operand(static_cast<const exprt &>(template_arguments[0]));
+    if(argument.is_nil())
+      return false;
+
+    // the parenthesized argument list as an expression
+    exprt operand = call.arguments()[0];
+    for(std::size_t i = 1; i < call.arguments().size(); ++i)
+    {
+      exprt comma{ID_comma};
+      comma.add_to_operands(std::move(operand), exprt{call.arguments()[i]});
+      operand = std::move(comma);
+    }
+    if(operand.id() == ID_cpp_name || operand.id() == ID_member)
+      operand.set(ID_C_parenthesized, true);
+
+    exprt name_expression =
+      static_cast<const exprt &>(static_cast<const irept &>(name));
+    name_expression.add_source_location() = call.source_location();
+    add(itemt::kindt::OPERAND, std::move(name_expression));
+    exprt less{ID_lt};
+    less.add_source_location() = call.source_location();
+    add(itemt::kindt::BINARY, std::move(less));
+    add(itemt::kindt::OPERAND, std::move(argument));
+    exprt greater{ID_gt};
+    greater.add_source_location() = call.source_location();
+    add(itemt::kindt::BINARY, std::move(greater));
+    add(itemt::kindt::OPERAND, std::move(operand));
+    return true;
+  }
+
   exprt parse_unary()
   {
     INVARIANT(next < items.size(), "a region ends in an operand");
@@ -13212,13 +13309,27 @@ bool cpp_typecheckt::ambiguous_cast_names_type(const exprt &cast)
            .id() == ID_type;
 }
 
+/// \return whether \p name denotes an object (a variable, a data member or
+///   a function parameter) or an enumerator, which is no template-name
+bool cpp_typecheckt::names_object(const cpp_namet &name)
+{
+  cpp_typecheck_resolvet resolver(*this);
+  const exprt value = resolver.resolve(
+    name, cpp_typecheck_resolvet::wantt::VAR, cpp_typecheck_fargst(), false);
+  return value.is_not_nil() && value.id() != ID_type &&
+         value.type().id() != ID_code &&
+         !value.type().get_bool(ID_is_template) &&
+         value.type().id() != ID_template && value.id() != ID_cpp_declaration;
+}
+
 /// N5008 [expr.cast]/1 with [dcl.ambig.res]: `( name )` followed by `+`,
 /// `-`, `*`, `&` or `(` is a cast only if the name names a type; see
 /// cpp_cast_ambiguity.h.  Regroup the region rooted at \p expr accordingly.
 void cpp_typecheckt::resolve_cast_ambiguity(exprt &expr)
 {
-  cast_ambiguity_regiont region{[this](const exprt &cast)
-                                { return ambiguous_cast_names_type(cast); }};
+  cast_ambiguity_regiont region{
+    [this](const exprt &cast) { return ambiguous_cast_names_type(cast); },
+    [this](const cpp_namet &name) { return names_object(name); }};
   exprt regrouped = region.regroup(expr);
   expr.swap(regrouped);
 }
