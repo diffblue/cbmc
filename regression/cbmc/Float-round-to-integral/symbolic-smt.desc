@@ -1,0 +1,11 @@
+THOROUGH smt-backend no-new-smt
+symbolic.c
+--smt2 --z3
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+As symbolic.desc, on the non-FPA SMT path. This takes about two minutes with
+Z3.

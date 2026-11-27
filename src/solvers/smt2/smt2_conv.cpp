@@ -3790,7 +3790,13 @@ void smt2_convt::convert_floatbv_round_to_integral(
     out << ")";
   }
   else
-    UNEXPECTEDCASE("TODO floatbv_round_to_integral without FPA");
+  {
+    // Routed via the bvfp_set / define-fun cache (see the
+    // ID_floatbv_round_to_integral entry in find_symbols) so that multiple
+    // call sites share a single SMT model definition rather than duplicating
+    // the float_bvt rewrite.
+    convert_floatbv(expr);
+  }
 }
 
 void smt2_convt::convert_struct(const struct_exprt &expr)
@@ -6068,6 +6074,7 @@ void smt2_convt::find_symbols(const exprt &expr)
            expr.id() == ID_floatbv_div ||
            expr.id() == ID_floatbv_fma ||
            expr.id() == ID_floatbv_typecast ||
+           expr.id() == ID_floatbv_round_to_integral ||
            expr.id() == ID_ieee_float_equal ||
            expr.id() == ID_ieee_float_notequal ||
            ((expr.id() == ID_lt ||

@@ -1373,33 +1373,52 @@ ieee_floatt ieee_floatt::round_to_integral() const
   if(NaN_flag || infinity_flag || is_zero())
     return *this;
 
-  ieee_floatt magic_number{spec, _rounding_mode};
-  magic_number.from_integer(power(2, spec.f));
-
-  if(this->abs() >= magic_number)
+  // |*this| = fraction * 2^exponent, with an odd fraction
+  mp_integer fraction, exponent;
+  extract_base2(fraction, exponent);
+  if(exponent >= 0)
     return *this;
-  else
+
+  // Compute the result exactly: adding and subtracting 2^f is not exact
+  // when 2^f is not a finite value of the format, as in formats with a
+  // narrow exponent.
+  const mp_integer divisor = power(2, -exponent);
+  mp_integer integer = fraction / divisor;
+  const mp_integer remainder = fraction % divisor;
+  const mp_integer half = divisor / 2;
+
+  bool round_up = false;
+  switch(_rounding_mode)
   {
-    ieee_floatt result = *this;
-
-    // add and subtract 2^f
-    // Preserve the original sign bit
-    bool original_sign = result.get_sign();
-
-    if(result.is_negative())
-    {
-      result -= magic_number;
-      result += magic_number;
-    }
-    else
-    {
-      result += magic_number;
-      result -= magic_number;
-    }
-
-    // Restore the original sign bit
-    result.sign_flag = original_sign;
-
-    return result;
+  case ROUND_TO_EVEN:
+    round_up = remainder > half || (remainder == half && integer % 2 == 1);
+    break;
+  case ROUND_TO_AWAY:
+    round_up = remainder >= half;
+    break;
+  case ROUND_TO_PLUS_INF:
+    round_up = !sign_flag;
+    break;
+  case ROUND_TO_MINUS_INF:
+    round_up = sign_flag;
+    break;
+  case ROUND_TO_ZERO:
+    break;
+  case NONDETERMINISTIC:
+  case UNKNOWN:
+    UNREACHABLE;
   }
+
+  if(round_up)
+    ++integer;
+
+  // The integer is exactly representable, unless rounding up exceeds the
+  // largest finite value, which may happen in formats with a narrow
+  // exponent; the result then is infinity.
+  ieee_floatt result{spec, _rounding_mode};
+  result.from_integer(sign_flag ? -integer : integer);
+  if(result.is_zero())
+    result.sign_flag = sign_flag;
+
+  return result;
 }

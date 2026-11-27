@@ -1,0 +1,11 @@
+CORE no-new-smt thorough-z3-smt-backend
+symbolic.c
+-DDOUBLE --floatbv
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+As symbolic.desc, for double.
+Excluded from the --z3 profile: Z3 takes over 40 minutes on this.

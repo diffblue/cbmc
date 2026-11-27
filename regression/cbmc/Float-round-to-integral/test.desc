@@ -1,0 +1,14 @@
+CORE no-new-smt
+main.c
+--floatbv
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Round-to-integral (rintf, rint, __CPROVER_round_to_integralf) under all rounding
+modes, for special values, subnormals, ties, already-integral values, and
+formats with 4-, 2- and 1-bit exponents, including rounding up to infinity.
+The inputs are nondeterministic, so that the flattening encoding is used rather
+than constant folding.
