@@ -266,6 +266,9 @@ public:
   {
     auto d = std::make_unique<variable_sensitivity_domaint>(
       object_factory, configuration);
+    // The qualification works around a false-positive -Warray-bounds of
+    // GCC 16 for the virtual call. d points to a variable_sensitivity_domaint,
+    // so this does not bypass an override.
     CHECK_RETURN(d->variable_sensitivity_domaint::is_bottom());
     return std::unique_ptr<statet>(d.release());
   }
