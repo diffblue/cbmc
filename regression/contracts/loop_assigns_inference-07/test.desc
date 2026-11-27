@@ -1,0 +1,15 @@
+CORE
+main.c
+--apply-loop-contracts _ --no-standard-checks
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+The assigns clauses of the inner loops are inferred. Their targets a[i] and
+*(p + k) have a non-constant index or offset, so they are widened to
+__CPROVER_POINTER_OBJECT(&a[i]) and __CPROVER_POINTER_OBJECT(&p[k]). Like the
+targets built from the may-alias information in loop_assigns_inference-05, the
+widened targets must carry a source location: the instrumentation of the outer
+loop visits the checks generated for the inner loops, and a check without a
+source location failed a precondition in instrument_spec_assigns.h.

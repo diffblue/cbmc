@@ -372,7 +372,11 @@ void widen_assigns(assignst &assigns, const namespacet &ns)
       // index or offset is non-constant.
       if(!is_constant(address_of_expr))
       {
-        result.emplace(pointer_object(address_of_expr));
+        // The instrumentation of the write set relies on the source location
+        // of its targets.
+        exprt widened = pointer_object(address_of_expr);
+        widened.add_source_location() = e.source_location();
+        result.emplace(std::move(widened));
       }
       else
         result.emplace(e);
