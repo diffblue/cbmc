@@ -1513,6 +1513,23 @@ void c_typecheck_baset::typecheck_expr_rel(
 
 void c_typecheck_baset::typecheck_expr_rel_vector(binary_exprt &expr)
 {
+  // GCC also compares a vector with a scalar, which it converts to the vector
+  // type (replicating it in each lane) as for arithmetic operators.
+  exprt &op0 = expr.op0();
+  exprt &op1 = expr.op1();
+  if(
+    op0.type().id() == ID_vector && op1.type().id() != ID_vector &&
+    is_number(op1.type()))
+  {
+    op1 = typecast_exprt{op1, op0.type()};
+  }
+  else if(
+    op0.type().id() != ID_vector && op1.type().id() == ID_vector &&
+    is_number(op0.type()))
+  {
+    op0 = typecast_exprt{op0, op1.type()};
+  }
+
   const typet &o_type0 = as_const(expr).op0().type();
   const typet &o_type1 = as_const(expr).op1().type();
 
