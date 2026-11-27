@@ -1,0 +1,16 @@
+CORE broken-cprover-smt-backend
+main.c
+--no-pointer-check
+^\[main\.assertion\.1\] line \d+ tautology: SUCCESS$
+^\[main\.assertion\.2\] line \d+ unconstrained value: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+^Invariant check failed
+--
+Dereferencing a pointer to a struct that has no byte layout, because a member
+of non-constant size is followed by further members, must not use the byte
+memory model, which cannot represent such a struct. The dereference yields an
+unconstrained value instead.
