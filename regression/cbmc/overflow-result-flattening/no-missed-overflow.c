@@ -1,5 +1,5 @@
-// The mirror image of overflow-result-flattening1: a genuine overflow must
-// still be reported.  If the flattened overflow_result_exprt struct is read
+// The mirror image of no-spurious-failure.c: a genuine overflow must still
+// be reported.  If the flattened overflow_result_exprt struct is read
 // back with the fields swapped, the overflow flag becomes the top bit of the
 // truncated result, and the result becomes (result << 1) | overflow_flag.
 //

@@ -1,5 +1,5 @@
 CORE no-new-smt
-main.c
+no-missed-overflow.c
 
 ^\[main.assertion.1\] line 24 expected to FAIL: the product always overflows: FAILURE$
 ^\[main.assertion.2\] line 25 expected to FAIL: truncated product can be 0: FAILURE$
