@@ -1126,20 +1126,39 @@ void cpp_typecheck_resolvet::guess_function_template_args(
           // N5008 [temp.param]/9 + [temp.constr.decl]/3: the type-constraints
           // of the template parameters (`template<Integral T>' introduces
           // `Integral<T>', recorded by add_type_constraint) are part of the
-          // associated constraints, conjoined with the requires-clause.
-          for(const auto &p : tdecl.template_type().template_parameters())
+          // associated constraints, conjoined with the requires-clause --
+          // FIRST, in the order of the parameters ([temp.constr.decl]/3.1),
+          // as a conjunction is checked from left to right
+          // ([temp.constr.op]/3).
           {
-            const irept &tc = p.find("#C_type_constraint");
-            if(tc.is_nil())
-              continue;
-            if(req_clause.is_nil() || req_clause.id() == ID_nil)
-              req_clause = static_cast<const exprt &>(tc);
-            else
+            exprt type_constraints = nil_exprt{};
+            for(const auto &p : tdecl.template_type().template_parameters())
             {
-              exprt conj(ID_and);
-              conj.add_to_operands(
-                std::move(req_clause), exprt{static_cast<const exprt &>(tc)});
-              req_clause = std::move(conj);
+              const irept &tc = p.find("#C_type_constraint");
+              if(tc.is_nil())
+                continue;
+              if(type_constraints.is_nil())
+                type_constraints = static_cast<const exprt &>(tc);
+              else
+              {
+                exprt conj(ID_and);
+                conj.add_to_operands(
+                  std::move(type_constraints),
+                  exprt{static_cast<const exprt &>(tc)});
+                type_constraints = std::move(conj);
+              }
+            }
+            if(type_constraints.is_not_nil())
+            {
+              if(req_clause.is_nil() || req_clause.id() == ID_nil)
+                req_clause = std::move(type_constraints);
+              else
+              {
+                exprt conj(ID_and);
+                conj.add_to_operands(
+                  std::move(type_constraints), std::move(req_clause));
+                req_clause = std::move(conj);
+              }
             }
           }
           if(!tdecl.declarators().empty())
@@ -1352,6 +1371,51 @@ void cpp_typecheck_resolvet::guess_function_template_args(
               // in std::map.  A throw the evaluator cannot decide keeps
               // the candidate (previous behaviour) since wholesale
               // rejection broke valid concept-using code.
+              // N5008 [temp.constr.op]/3: the right operand of a
+              // conjunction is checked only if the left one is satisfied.
+              // Type-checking the whole clause substituted into every atom:
+              // for libstdc++ 16's `template<__eligible_pair_like<pair>
+              // _UPair> requires (_S_constructible_from_pair_like<_UPair>())'
+              // with _UPair = int that instantiated
+              // _S_constructible_from_pair_like<int>, whose body then failed
+              // and was dropped.  Check the conjuncts before the last one in
+              // order, and stop at one that is definitely false.
+              {
+                std::vector<exprt> conjuncts;
+                std::function<void(const exprt &)> collect = [&](const exprt &c)
+                {
+                  if(c.id() == ID_and && c.operands().size() == 2)
+                  {
+                    collect(to_binary_expr(c).op0());
+                    collect(to_binary_expr(c).op1());
+                  }
+                  else
+                    conjuncts.push_back(c);
+                };
+                collect(req_copy);
+                for(std::size_t ci = 0; ci + 1 < conjuncts.size(); ++ci)
+                {
+                  exprt conjunct = conjuncts[ci];
+                  try
+                  {
+                    cpp_typecheck.typecheck_expr(conjunct);
+                    simplify(conjunct, cpp_typecheck);
+                  }
+                  catch(...)
+                  {
+                    break;
+                  }
+                  if(conjunct.is_false())
+                  {
+                    requires_ok = false;
+                    break;
+                  }
+                  if(!conjunct.is_true())
+                    break;
+                }
+              }
+              if(!requires_ok)
+                throw 0;
               const exprt req_substituted = req_copy;
               bool whole_clause_typecheck_failed = false;
               try
