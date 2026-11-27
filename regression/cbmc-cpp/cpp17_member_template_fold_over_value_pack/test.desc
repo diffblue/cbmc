@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] .* unary right fold over the comma: SUCCESS$
+^\[main\.assertion\.2\] .* unary left fold over the comma: SUCCESS$
+^\[main\.assertion\.3\] .* subtraction: SUCCESS$
+^\[main\.assertion\.4\] .* lambda with a template parameter list: SUCCESS$
+^\*\* 1 of \d+ failed
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+N5008 [expr.prim.fold]/2: a unary right fold over a non-type template
+parameter pack of a member function template started from the first
+element instead of the last: `(g(I), ...)' over 1, 2, 3, 4 called g with 1,
+2, 3 and 1 again.

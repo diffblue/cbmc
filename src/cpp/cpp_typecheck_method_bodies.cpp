@@ -525,9 +525,17 @@ void cpp_typecheckt::reduce_parameter_pack_folds(symbolt &method_symbol)
           // ([temp.variadic]/9).
           auto elem = [&](std::size_t k) -> irept
           {
-            irept c = pat;
+            // the pattern may be the pack's name itself, `(I - ...)', which
+            // replace_value_pack_ref (substituting below the node it is
+            // given) did not replace: every element was the first value
+            irept holder;
+            holder.get_sub().push_back(pat);
             if(k < named_pack_vals.size())
-              replace_value_pack_ref(c, named_pack_short, named_pack_vals[k]);
+            {
+              replace_value_pack_ref(
+                holder, named_pack_short, named_pack_vals[k]);
+            }
+            irept c = holder.get_sub().front();
             reduce_folds(c);
             return c;
           };
@@ -558,9 +566,9 @@ void cpp_typecheckt::reduce_parameter_pack_folds(symbolt &method_symbol)
             node = result;
             return;
           }
-          irept result = elem(0);
-          if(is_left)
+          if(is_left) // ((e0 op e1) op ...) op eN-1
           {
+            irept result = elem(0);
             for(std::size_t k = 1; k < named_pack_n; ++k)
             {
               irept bin(fold_op);
@@ -568,16 +576,19 @@ void cpp_typecheckt::reduce_parameter_pack_folds(symbolt &method_symbol)
               bin.get_sub().push_back(elem(k));
               result = bin;
             }
+            node = result;
+            return;
           }
-          else
+          // e0 op (e1 op (... op eN-1)): the innermost operand is the LAST
+          // element; starting from the first, `(g(I), ...)' over 0..3
+          // called g with 0, 1, 2 and 0 again
+          irept result = elem(named_pack_n - 1);
+          for(std::size_t k = named_pack_n - 1; k-- > 0;)
           {
-            for(std::size_t k = named_pack_n; k-- > 1;)
-            {
-              irept bin(fold_op);
-              bin.get_sub().push_back(elem(k - 1));
-              bin.get_sub().push_back(result);
-              result = bin;
-            }
+            irept bin(fold_op);
+            bin.get_sub().push_back(elem(k));
+            bin.get_sub().push_back(result);
+            result = bin;
           }
           node = result;
           return;
