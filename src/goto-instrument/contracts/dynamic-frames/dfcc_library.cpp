@@ -470,7 +470,10 @@ static const std::map<dfcc_funt, int> to_unwind = {
   {dfcc_funt::WRITE_SET_CHECK_ARRAY_COPY, 0},
   {dfcc_funt::WRITE_SET_CHECK_ARRAY_REPLACE, 0},
   {dfcc_funt::WRITE_SET_CHECK_HAVOC_OBJECT, 0},
-  {dfcc_funt::WRITE_SET_RECORD_DEALLOCATED, 0}};
+  {dfcc_funt::WRITE_SET_RECORD_DEALLOCATED, 0},
+  // (over the candidate's assigns clause, as a loop's inside its
+  // function's)
+  {dfcc_funt::WRITE_SET_CHECK_ASSIGNS_CLAUSE_INCLUSION, 0}};
 
 bool dfcc_libraryt::specialized = false;
 
