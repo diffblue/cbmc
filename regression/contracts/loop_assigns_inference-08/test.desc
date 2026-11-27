@@ -1,0 +1,15 @@
+CORE
+main.c
+--apply-loop-contracts _ --no-standard-checks
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^\[main\.assigns\.\d+\] .*__car_
+--
+The assigns clause of the second loop is inferred. The may-alias analysis that
+the inference uses is computed after the first loop was instrumented, and it
+finds that p may alias the __car_lb and __car_ub snapshots of the write set of
+the first loop, which point to a as well. Inferred targets that write through
+these snapshots, such as *((int *)__car_lb + k), must be removed: they are
+spurious, and checking their validity at the head of the second loop failed.
