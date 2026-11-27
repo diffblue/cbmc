@@ -1,0 +1,10 @@
+CORE dfcc-only
+main.c
+--always-use-function-contracts
+^Option: --always-use-function-contracts$
+^Reason: Requires --dfcc$
+^EXIT=1$
+^SIGNAL=0$
+--
+--
+The opt-in contract replacement mode requires dynamic frames.

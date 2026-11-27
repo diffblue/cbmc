@@ -1,0 +1,10 @@
+CORE dfcc-only
+main.c
+--dfcc main --enforce-contract foo --always-use-function-contracts --keep-function-body callee --replace-call-with-contract callee/precise_contract
+^Option: --keep-function-body$
+^Reason: Function 'callee' cannot both retain its body and be replaced with a contract$
+^EXIT=1$
+^SIGNAL=0$
+--
+--
+Reject a function that is both kept and explicitly replaced.

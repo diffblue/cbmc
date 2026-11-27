@@ -1,0 +1,10 @@
+CORE dfcc-only
+main.c
+--dfcc main --enforce-contract foo --always-use-function-contracts --replace-call-with-contract callee/precise_contract
+^Wrapping 'callee' with contract 'precise_contract' in REPLACE mode$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+An explicit contract mapping takes precedence over the callee's own contract.

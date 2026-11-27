@@ -1,0 +1,10 @@
+CORE dfcc-only
+main.c
+--dfcc main --enforce-contract foo --always-use-function-contracts --inline
+^Option: --always-use-function-contracts$
+^Reason: --inline can inline function bodies before contract replacement$
+^EXIT=1$
+^SIGNAL=0$
+--
+--
+Do not allow full inlining to erase the boundaries before selection.

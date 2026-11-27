@@ -1052,6 +1052,19 @@ wrap \fIfun\fR with an assertion of its contract that can handle recursive calls
 .TP
 \fB\-\-dfcc\fR \fIfun\fR
 instrument dynamic frame condition checks method using \fIfun\fR as entry point
+.TP
+\fB\-\-always\-use\-function\-contracts\fR
+with \fB\-\-dfcc\fR, replace each reachable callee that has a contract with
+that contract. Callees without contracts, the harness and the checked function
+retain their bodies.
+.TP
+\fB\-\-always\-require\-function\-contracts\fR
+like \fB\-\-always\-use\-function\-contracts\fR, but reject reachable
+callees that have a body but no contract.
+.TP
+\fB\-\-keep\-function\-body\fR \fIfun\fR
+with \fB\-\-always\-use\-function\-contracts\fR, retain the body of
+\fIfun\fR (repeatable). Callees of \fIfun\fR are still selected.
 .SS "User-interface options:"
 .TP
 \fB\-\-flush\fR
