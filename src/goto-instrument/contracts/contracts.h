@@ -124,6 +124,7 @@ public:
   void check_apply_loop_contracts(
     const irep_idt &function_name,
     goto_functionst::goto_functiont &goto_function,
+    const std::unordered_set<irep_idt> &symbols_before_instrumentation,
     goto_programt::targett loop_head,
     goto_programt::targett loop_end,
     const loopt &loop,

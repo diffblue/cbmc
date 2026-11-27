@@ -15,6 +15,7 @@ Date: February 2016
 
 #include <util/c_types.h>
 #include <util/exception_utils.h>
+#include <util/find_symbols.h>
 #include <util/format_expr.h>
 #include <util/fresh_symbol.h>
 #include <util/mathematical_expr.h>
@@ -40,6 +41,7 @@ Date: February 2016
 void code_contractst::check_apply_loop_contracts(
   const irep_idt &function_name,
   goto_functionst::goto_functiont &goto_function,
+  const std::unordered_set<irep_idt> &symbols_before_instrumentation,
   goto_programt::targett loop_head,
   goto_programt::targett loop_end,
   const loopt &loop,
@@ -217,6 +219,28 @@ void code_contractst::check_apply_loop_contracts(
 
       // remove loop-local symbols from the inferred set
       cfg_info.erase_locals(to_havoc);
+
+      // The may-alias analysis of the instrumented function also relates
+      // pointers of the program to pointers that instrumenting other loops of
+      // this function introduced, such as the __car_lb and __car_ub snapshots
+      // of their write sets. The instrumentation does not write through these
+      // pointers, so targets that use them only duplicate targets that use the
+      // pointers of the program, and they need not be valid at the loop head.
+      // Remove them.
+      for(auto it = to_havoc.begin(); it != to_havoc.end();)
+      {
+        bool uses_new_symbol = false;
+        for(const auto &symbol : find_symbol_identifiers(*it))
+        {
+          if(symbols_before_instrumentation.count(symbol) == 0)
+            uses_new_symbol = true;
+        }
+
+        if(uses_new_symbol)
+          it = to_havoc.erase(it);
+        else
+          ++it;
+      }
 
       // If the set contains pairs (i, a[i]),
       // we widen them to (i, __CPROVER_POINTER_OBJECT(a))
@@ -870,6 +894,16 @@ void code_contractst::apply_loop_contract(
   // restore internal invariants
   goto_functions.update();
 
+  // The symbols that the function uses before any of its loops is
+  // instrumented, see check_apply_loop_contracts.
+  std::unordered_set<irep_idt> symbols_before_instrumentation;
+  for(const auto &instruction : goto_function.body.instructions)
+  {
+    find_symbols(instruction.code(), symbols_before_instrumentation);
+    if(instruction.has_condition())
+      find_symbols(instruction.condition(), symbols_before_instrumentation);
+  }
+
   natural_loops_mutablet natural_loops(goto_function.body);
 
   // A graph node type that stores information about a loop.
@@ -1119,6 +1153,7 @@ void code_contractst::apply_loop_contract(
     check_apply_loop_contracts(
       function_name,
       goto_function,
+      symbols_before_instrumentation,
       loop_node.head_target,
       loop_node.end_target,
       updated_loops.loop_map[loop_node.head_target],
