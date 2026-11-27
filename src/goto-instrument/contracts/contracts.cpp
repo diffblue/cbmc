@@ -40,7 +40,6 @@ Date: February 2016
 void code_contractst::check_apply_loop_contracts(
   const irep_idt &function_name,
   goto_functionst::goto_functiont &goto_function,
-  const local_may_aliast &local_may_alias,
   goto_programt::targett loop_head,
   goto_programt::targett loop_end,
   const loopt &loop,
@@ -207,6 +206,13 @@ void code_contractst::check_apply_loop_contracts(
     // and the inferred aliasing relation.
     try
     {
+      // Instrumenting inner loops inserts instructions into this function,
+      // and moves some existing ones to new list nodes via
+      // insert_before_swap. A may-alias analysis computed before that
+      // instrumentation does not know these instructions, so compute it
+      // here. The body of the function has not been modified for this loop
+      // yet.
+      const local_may_aliast local_may_alias{goto_function};
       infer_loop_assigns(local_may_alias, loop, to_havoc);
 
       // remove loop-local symbols from the inferred set
@@ -1099,13 +1105,6 @@ void code_contractst::apply_loop_contract(
     goto_functions.update();
     natural_loops_mutablet updated_loops(goto_function.body);
 
-    // The may-alias analysis must be refreshed for the same reason: assigns
-    // clause inference for an outer loop queries it on the instructions of
-    // the loop, which by now may include instructions inserted, or moved to
-    // new list nodes, while instrumenting its inner loops. An analysis
-    // computed before that instrumentation does not know them.
-    local_may_aliast local_may_alias(goto_function);
-
     // We will unwind all transformed loops twice. Store the names of
     // to-unwind-loops here and perform the unwinding after transformation done.
     // As described in `check_apply_loop_contracts`, loops with loop contracts
@@ -1120,7 +1119,6 @@ void code_contractst::apply_loop_contract(
     check_apply_loop_contracts(
       function_name,
       goto_function,
-      local_may_alias,
       loop_node.head_target,
       loop_node.end_target,
       updated_loops.loop_map[loop_node.head_target],

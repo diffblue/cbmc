@@ -57,8 +57,6 @@ Date: February 2016
   " {y--enforce-contract} {ufunction}[/{ucontract}] \t "                       \
   "wrap function with an assertion of contract\n"
 
-class local_may_aliast;
-
 class code_contractst
 {
 public:
@@ -126,7 +124,6 @@ public:
   void check_apply_loop_contracts(
     const irep_idt &function_name,
     goto_functionst::goto_functiont &goto_function,
-    const local_may_aliast &local_may_alias,
     goto_programt::targett loop_head,
     goto_programt::targett loop_end,
     const loopt &loop,
