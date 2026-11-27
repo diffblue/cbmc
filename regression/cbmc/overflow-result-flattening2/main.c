@@ -9,7 +9,7 @@
 // overflows, and bit 31 of the truncated result is 0, so a back-end that reads
 // the overflow flag from there misses the overflow entirely.
 
-unsigned int prod;
+unsigned int prod, usum, udiff;
 signed int sprod, ssum, sdiff;
 
 int main(void)
@@ -52,6 +52,29 @@ int main(void)
   __CPROVER_assert(
     !sdiff_overflow,
     "expected to FAIL: the signed difference always overflows");
+
+  // The unsigned plus/minus emitter uses the (width+1)-bit sum, whose top bit
+  // is the carry, as the flattened struct rather than a concatenation. Check it
+  // in the same way, so that no future change to it can swap the fields.
+  unsigned int ua, ub;
+  __CPROVER_assume(ua >= 0x80000000u && ua <= 0x80000001u);
+  __CPROVER_assume(ub >= 0x80000000u && ub <= 0x80000001u);
+
+  // ua + ub >= 2^32, and the truncated sum lies in [0, 2].
+  int usum_overflow = __builtin_add_overflow(ua, ub, &usum);
+  __CPROVER_assert(
+    !usum_overflow, "expected to FAIL: the unsigned sum always overflows");
+
+  unsigned int uc, ud;
+  __CPROVER_assume(uc <= 1u);
+  __CPROVER_assume(ud >= 0x80000002u && ud <= 0x80000003u);
+
+  // uc - ud < 0, and the truncated difference lies in
+  // [0x7ffffffd, 0x7fffffff].
+  int udiff_overflow = __builtin_sub_overflow(uc, ud, &udiff);
+  __CPROVER_assert(
+    !udiff_overflow,
+    "expected to FAIL: the unsigned difference always overflows");
 
   return 0;
 }
