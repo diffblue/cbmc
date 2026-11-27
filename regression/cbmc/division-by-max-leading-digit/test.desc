@@ -1,0 +1,14 @@
+CORE
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Constant folding of these divisions uses BigInt division. The scale factor that
+normalises the divisor used to be computed as base / (1 + leading digit) in a
+32-bit type, where the addition wrapped around to zero for a leading digit of
+0xffffffff. CBMC then crashed with SIGFPE on x86, and folded the divisions to
+wrong values on AArch64.
