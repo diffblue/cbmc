@@ -26,10 +26,18 @@
 #            -I clang/include clang/include/clang/Basic/arm_neon.td \
 #            -o neon_sema.inc
 #
-#    The resulting "..._BUILTIN_INFOS" section lists every builtin with its
-#    name and the classic compact type encoding (e.g. "V8ScV8ScV8Sci").  This
-#    mode parses that section, prepending the supplied PREFIX (for NEON that is
-#    "__builtin_neon_") to each spelling.
+#    Recent versions of clang-tblgen emit a "..._BUILTIN_INFOS" section that
+#    lists every builtin with its name and the classic compact type encoding
+#    (e.g. "V8ScV8ScV8Sci"); this mode parses that section, prepending the
+#    supplied PREFIX (for NEON that is "__builtin_neon_") to each spelling.
+#    LLVM 20 and earlier instead emit X-macro lines such as
+#
+#        TARGET_BUILTIN(__builtin_neon_vaddv_u8, "UcV8Uc", "n", "neon")
+#
+#    which spell the full name; those are parsed as well, and PREFIX is only
+#    prepended to names that do not already start with it.  LLVM packages ship
+#    these files pre-generated (e.g. /usr/lib/llvm-20/include/clang/Basic/
+#    arm_neon.inc and arm_fp16.inc), so no clang-tblgen run is needed for them.
 #
 # In both cases the resulting declarations are diffed against the declarations
 # already present in the gcc_builtin_headers_*.h files passed as arguments.
@@ -451,7 +459,7 @@ encoding_typespec_map = {
         'c': 'char',
         'd': 'double',
         'f': 'float',
-        'h': '_Float16',
+        'h': '__fp16',     # Clang's "half"; '_Float16' is 'x'
         'i': 'int',
         's': 'short',
         'v': 'void',
@@ -568,14 +576,23 @@ INFO_RE = re.compile(
         r'StrOffsets\{\s*\d+ /\* (\S+) \*/,\s*\d+ /\* (.+?) \*/,'
         r'\s*\d+ /\* .*? \*/,\s*(?:\d+ /\* (.+?) \*/|0)')
 
+# The X-macro form of LLVM 20 and earlier: BUILTIN(name, "types", "attrs") or
+# TARGET_BUILTIN(name, "types", "attrs", "features").
+MACRO_RE = re.compile(
+        r'^\s*(?:TARGET_)?BUILTIN\(\s*(\w+)\s*,\s*"([^"]*)"\s*,\s*"[^"]*"'
+        r'\s*(?:,\s*"([^"]*)"\s*)?\)', re.MULTILINE)
+
 
 def process_inc(text, prefix):
-    """Parse the ..._BUILTIN_INFOS section of a clang-tblgen .inc file,
-    returning {group: {name: decl}}."""
+    """Parse the builtins of a clang-tblgen .inc file, either the
+    ..._BUILTIN_INFOS section (recent LLVM) or the BUILTIN and TARGET_BUILTIN
+    X-macro lines (LLVM 20 and earlier), returning {group: {name: decl}}."""
     out = {}
     stats = {'skipped': 0}
-    for m in INFO_RE.finditer(text):
-        name = prefix + m.group(1)
+    for m in list(INFO_RE.finditer(text)) + list(MACRO_RE.finditer(text)):
+        name = m.group(1)
+        if not name.startswith(prefix):
+            name = prefix + name
         encoding = m.group(2)
         group = m.group(3) if m.group(3) else 'builtins'
         try:
@@ -647,7 +664,7 @@ def run_self_test():
             'ULLLiULLLiULLLi':
                 'unsigned __int128 foo(unsigned __int128, '
                 'unsigned __int128);',
-            'hh': '_Float16 foo(_Float16);',
+            'hh': '__fp16 foo(__fp16);',
             }
     for encoding, expected in cases.items():
         assert decode_encoding('foo', encoding) == expected, encoding
@@ -667,6 +684,18 @@ def run_self_test():
             'neon': {'__builtin_neon_vadd_s64':
                      'long long __builtin_neon_vadd_s64'
                      '(long long, long long);'}}, 'process_inc'
+
+    # process_inc: the X-macro form of LLVM 20 and earlier, which spells the
+    # full name (so the prefix must not be prepended again), with and without
+    # a feature string.
+    inc = ('TARGET_BUILTIN(__builtin_neon_vaddv_s8, "ScV8Sc", "n", "neon")\n'
+           'BUILTIN(__builtin_neon_vabsd_s64, "WiWi", "n")\n')
+    assert process_inc(inc, '__builtin_neon_') == {
+            'neon': {'__builtin_neon_vaddv_s8':
+                     'signed char __builtin_neon_vaddv_s8(__gcc_v8qi);'},
+            'builtins': {'__builtin_neon_vabsd_s64':
+                         'long long __builtin_neon_vabsd_s64(long long);'}}, \
+        'process_inc (X-macro)'
 
     print('self-test: all checks passed')
 
