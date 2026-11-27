@@ -181,6 +181,9 @@ bool builtin_factory(
       // AArch64.
       if(find_pattern(pattern, clang_builtin_headers_neon, s))
         return convert(identifier, s, symbol_table, mh);
+
+      if(find_pattern(pattern, gcc_builtin_headers_aarch64, s))
+        return convert(identifier, s, symbol_table, mh);
     }
     else if(
       config.ansi_c.arch == "armel" || config.ansi_c.arch == "armhf" ||

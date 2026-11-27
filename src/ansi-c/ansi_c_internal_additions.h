@@ -26,6 +26,8 @@ extern const char gcc_builtin_headers_omp[];
 extern const char gcc_builtin_headers_tm[];
 extern const char gcc_builtin_headers_ubsan[];
 extern const char gcc_builtin_headers_ia32[];
+extern const char gcc_builtin_headers_aarch64[];
+extern const char gcc_builtin_headers_aarch64_neon[];
 extern const char gcc_builtin_headers_aarch64_types[];
 extern const char gcc_builtin_headers_alpha[];
 extern const char gcc_builtin_headers_arm[];

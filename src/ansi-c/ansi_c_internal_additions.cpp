@@ -50,6 +50,15 @@ const char gcc_builtin_headers_ia32[] =
 #include "compiler_headers/gcc_builtin_headers_ia32.inc" // IWYU pragma: keep
   ; // NOLINT(whitespace/semicolon)
 
+const char gcc_builtin_headers_aarch64[] =
+#include "compiler_headers/gcc_builtin_headers_aarch64.inc" // IWYU pragma: keep
+  ; // NOLINT(whitespace/semicolon)
+
+const char gcc_builtin_headers_aarch64_neon[] =
+// NOLINTNEXTLINE(whitespace/line_length)
+#include "compiler_headers/gcc_builtin_headers_aarch64_neon.inc" // IWYU pragma: keep
+  ; // NOLINT(whitespace/semicolon)
+
 const char gcc_builtin_headers_aarch64_types[] =
 // NOLINTNEXTLINE(whitespace/line_length)
 #include "compiler_headers/gcc_builtin_headers_aarch64_types.inc" // IWYU pragma: keep
