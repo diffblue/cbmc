@@ -39,8 +39,15 @@
 #    these files pre-generated (e.g. /usr/lib/llvm-20/include/clang/Basic/
 #    arm_neon.inc and arm_fp16.inc), so no clang-tblgen run is needed for them.
 #
+#    clang_builtin_headers_neon.h holds the NEON builtins of both arm_neon.td
+#    and arm_fp16.td.  To find additions, run, e.g.,
+#
+#        B=/usr/lib/llvm-20/include/clang/Basic
+#        clang_builtins.py --inc __builtin_neon_:$B/arm_neon.inc \
+#            --inc __builtin_neon_:$B/arm_fp16.inc clang_builtin_headers_neon.h
+#
 # In both cases the resulting declarations are diffed against the declarations
-# already present in the gcc_builtin_headers_*.h files passed as arguments.
+# already present in the *_builtin_headers*.h files passed as arguments.
 
 import argparse
 import re
@@ -57,6 +64,8 @@ vector_map = {
             64: '__gcc_v64qi'
             },
         'unsigned char': {
+            8: '__gcc_v8uqi',
+            16: '__gcc_v16uqi',
             1024: '__tile'
             },
         'short': {
@@ -66,6 +75,7 @@ vector_map = {
             32: '__gcc_v32hi'
             },
         'unsigned short': {
+            4: '__gcc_v4uhi',
             8: '__gcc_v8uhi',
             16: '__gcc_v16uhi',
             32: '__gcc_v32uhi',
@@ -78,6 +88,7 @@ vector_map = {
             256: '__gcc_v256si'
             },
         'unsigned int': {
+            2: '__gcc_v2usi',
             4: '__gcc_v4usi',
             8: '__gcc_v8usi',
             16: '__gcc_v16usi',
@@ -89,11 +100,13 @@ vector_map = {
             8: '__gcc_v8di'
             },
         'unsigned long long int': {
+            1: '__gcc_v1udi',
             2: '__gcc_v2udi',
             4: '__gcc_v4udi',
             8: '__gcc_v8udi',
             },
         '_Float16': {
+            4: '__gcc_v4hf',
             8: '__gcc_v8hf',
             16: '__gcc_v16hf',
             32: '__gcc_v32hf'
@@ -105,11 +118,13 @@ vector_map = {
             16: '__gcc_v16sf'
             },
         'double': {
+            1: '__gcc_v1df',
             2: '__gcc_v2df',
             4: '__gcc_v4df',
             8: '__gcc_v8df'
             },
         '__bf16': {
+            4: '__gcc_v4hf',
             8: '__gcc_v8hf',
             16: '__gcc_v16hf',
             32: '__gcc_v32hf'
@@ -696,6 +711,16 @@ def run_self_test():
             'builtins': {'__builtin_neon_vabsd_s64':
                          'long long __builtin_neon_vabsd_s64(long long);'}}, \
         'process_inc (X-macro)'
+
+    # The unsigned and one-lane vectors of the NEON builtins.
+    cases = {
+            'UcV8Uc': 'unsigned char foo(__gcc_v8uqi);',
+            'UsV8Us': 'unsigned short foo(__gcc_v8uhi);',
+            'dV1dIi': 'double foo(__gcc_v1df, int);',
+            'yV4yIi': '__bf16 foo(__gcc_v4hf, int);',
+            }
+    for encoding, expected in cases.items():
+        assert decode_encoding('foo', encoding) == expected, encoding
 
     print('self-test: all checks passed')
 

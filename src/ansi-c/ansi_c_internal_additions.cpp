@@ -78,6 +78,10 @@ const char clang_builtin_headers[] =
 #include "compiler_headers/clang_builtin_headers.inc" // IWYU pragma: keep
   ; // NOLINT(whitespace/semicolon)
 
+const char clang_builtin_headers_neon[] =
+#include "compiler_headers/clang_builtin_headers_neon.inc" // IWYU pragma: keep
+  ; // NOLINT(whitespace/semicolon)
+
 const char cprover_builtin_headers[] =
 #include "cprover_builtin_headers.inc" // IWYU pragma: keep
   ;                                    // NOLINT(whitespace/semicolon)

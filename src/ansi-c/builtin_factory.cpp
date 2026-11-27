@@ -175,12 +175,22 @@ bool builtin_factory(
       if(find_pattern(pattern, gcc_builtin_headers_ia32, s))
         return convert(identifier, s, symbol_table, mh);
     }
-    else if(config.ansi_c.arch=="arm64" ||
-            config.ansi_c.arch=="armel" ||
-            config.ansi_c.arch=="armhf" ||
-            config.ansi_c.arch=="arm")
+    else if(config.ansi_c.arch == "arm64")
+    {
+      // The iWMMXt builtins of gcc_builtin_headers_arm do not exist on
+      // AArch64.
+      if(find_pattern(pattern, clang_builtin_headers_neon, s))
+        return convert(identifier, s, symbol_table, mh);
+    }
+    else if(
+      config.ansi_c.arch == "armel" || config.ansi_c.arch == "armhf" ||
+      config.ansi_c.arch == "arm")
     {
       if(find_pattern(pattern, gcc_builtin_headers_arm, s))
+        return convert(identifier, s, symbol_table, mh);
+
+      // Clang's 32-bit <arm_neon.h> uses the same __builtin_neon_* builtins.
+      if(find_pattern(pattern, clang_builtin_headers_neon, s))
         return convert(identifier, s, symbol_table, mh);
     }
     else if(config.ansi_c.arch=="mips64el" ||

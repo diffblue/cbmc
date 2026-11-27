@@ -68,6 +68,7 @@ BUILTIN_FILES = \
   cprover_builtin_headers.inc \
   compiler_headers/arm_builtin_headers.inc \
   compiler_headers/clang_builtin_headers.inc \
+  compiler_headers/clang_builtin_headers_neon.inc \
   compiler_headers/cw_builtin_headers.inc \
   compiler_headers/gcc_builtin_headers_alpha.inc \
   compiler_headers/gcc_builtin_headers_arm.inc \
