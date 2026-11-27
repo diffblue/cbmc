@@ -910,7 +910,8 @@ c_typecheck_baset::make_designator(const typet &src_type, const exprt &src)
       {
         // We will search for anonymous members, in a loop. This isn't supported
         // by GCC (unless the anonymous member is within an unnamed union or
-        // struct), but Visual Studio does allow it.
+        // struct), but Visual Studio does allow it.  The C++ front end names
+        // an unnamed class (`#anon_N') and marks it as anonymous.
 
         bool found = false, repeat;
         typet tmp_type = entry.type;
@@ -942,7 +943,9 @@ c_typecheck_baset::make_designator(const typet &src_type, const exprt &src)
                  configt::ansi_ct::flavourt::VISUAL_STUDIO ||
                follow_tag(to_struct_or_union_tag_type(c.type()))
                  .find(ID_tag)
-                 .is_nil()) &&
+                 .is_nil() ||
+               follow_tag(to_struct_or_union_tag_type(c.type()))
+                 .get_bool(ID_C_is_anonymous)) &&
               has_component_rec(c.type(), component_name, *this))
             {
               entry.index = number;
