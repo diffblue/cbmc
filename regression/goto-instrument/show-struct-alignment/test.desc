@@ -1,0 +1,31 @@
+CORE
+main.c
+--show-struct-alignment
+^EXIT=0$
+^SIGNAL=0$
+^WARNING: declaration of structure narrow at file main\.c line 1$
+^members a and b might interfere$
+^WARNING: declaration of structure pad at file main\.c line 11$
+^members c and s might interfere$
+^WARNING: declaration of structure groups at file main\.c line 16$
+^members g1 and g2 might interfere$
+^members g1 and g3 might interfere$
+^members g1 and g4 might interfere$
+^members h1 and h2 might interfere$
+^members h1 and h3 might interfere$
+^WARNING: declaration of structure tail at file main\.c line 28$
+^members t1 and t2 might interfere$
+^members t1 and t3 might interfere$
+--
+^warning: ignoring
+structure wide
+members x and y
+\$pad
+^members (g2|g3|h2|t2) and
+--
+Members that fit in a single memory operand (an int) may interfere, which a and
+b do, while x and y do not. The padding between c and s counts towards the
+size of the memory operand, but is not reported as a member. Each group of
+members that fit in a single memory operand is reported once, relative to its
+first member: pairs that start from another member of the same group, such as
+g2 and g3, h2 and h3, or t2 and t3, are not reported.

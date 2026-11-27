@@ -17,6 +17,7 @@ Author:
 #include <util/std_types.h>
 #include <util/symbol_table_base.h>
 
+#include <iterator>
 #include <ostream>
 
 void print_struct_alignment_problems(
@@ -46,9 +47,8 @@ void print_struct_alignment_problems(
           // || alignment(it_mem->type())%config.ansi_c.alignment!=0)
           continue;
 
-        for(struct_typet::componentst::const_iterator it_next = it_mem;
-            it_next != components.end();
-            it_next++)
+        struct_typet::componentst::const_iterator it_next = it_mem;
+        for(; it_next != components.end(); it_next++)
         {
           const typet &it_type = it_next->type();
           const namespacet ns(symbol_table);
@@ -60,20 +60,13 @@ void print_struct_alignment_problems(
           cumulated_length += *size;
           // [it_mem;it_next] cannot be covered by an instruction
           if(cumulated_length > config.ansi_c.memory_operand_size)
-          {
-            // if interferences have been found, no need to check with
-            // starting from an already covered member
-            if(!first_time_seen_from)
-              it_mem = it_next - 1;
             break;
-          }
 
           if(it_mem != it_next && !it_next->get_is_padding())
           {
             if(first_time_seen_in_struct)
             {
               first_time_seen_in_struct = false;
-              first_time_seen_from = false;
 
               out << "\nWARNING: "
                   << "declaration of structure "
@@ -81,10 +74,17 @@ void print_struct_alignment_problems(
                   << symbol_pair.second.location << '\n';
             }
 
+            first_time_seen_from = false;
+
             out << "members " << it_mem->get_name() << " and "
                 << it_next->get_name() << " might interfere\n";
           }
         }
+
+        // if interferences have been found, no need to check with
+        // starting from an already covered member
+        if(!first_time_seen_from)
+          it_mem = std::prev(it_next);
       }
     }
     else if(symbol_pair.second.type.id() == ID_array)
