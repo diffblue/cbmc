@@ -118,7 +118,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a8586b536a8698cc300693bc21a3f7455"><td class="mdescLeft">&#160;</td><td class="mdescRight">Turn requires &amp; ensures into assumptions and assertions for each of the named functions.  <br /></td></tr>
 <tr class="memitem:a481adf4209178c6c05270908690c2bff" id="r_a481adf4209178c6c05270908690c2bff"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a481adf4209178c6c05270908690c2bff">apply_loop_contracts</a> (const std::set&lt; std::string &gt; &amp;to_exclude_from_nondet_init={})</td></tr>
 <tr class="memdesc:a481adf4209178c6c05270908690c2bff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies loop contract transformations.  <br /></td></tr>
-<tr class="memitem:a368a74a79d34576fb378b462f3ca60d8" id="r_a368a74a79d34576fb378b462f3ca60d8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a368a74a79d34576fb378b462f3ca60d8">check_apply_loop_contracts</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_name, <a class="el" href="classgoto__functionst.html#aeefe9d65619ecf977dab612de2366762">goto_functionst::goto_functiont</a> &amp;goto_function, const <a class="el" href="classlocal__may__aliast.html">local_may_aliast</a> &amp;local_may_alias, <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> loop_head, <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> loop_end, const <a class="el" href="loop__utils_8h.html#a1b7ef608962ab556c4d637991d616023">loopt</a> &amp;loop, <a class="el" href="classexprt.html">exprt</a> assigns_clause, <a class="el" href="classexprt.html">exprt</a> invariant, <a class="el" href="classexprt.html">exprt</a> decreases_clause, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;mode)</td></tr>
+<tr class="memitem:a2b8b8dd13a9a8e756f2ebee9f2840ab5" id="r_a2b8b8dd13a9a8e756f2ebee9f2840ab5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2b8b8dd13a9a8e756f2ebee9f2840ab5">check_apply_loop_contracts</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_name, <a class="el" href="classgoto__functionst.html#aeefe9d65619ecf977dab612de2366762">goto_functionst::goto_functiont</a> &amp;goto_function, const std::unordered_set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;symbols_before_instrumentation, <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> loop_head, <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> loop_end, const <a class="el" href="loop__utils_8h.html#a1b7ef608962ab556c4d637991d616023">loopt</a> &amp;loop, <a class="el" href="classexprt.html">exprt</a> assigns_clause, <a class="el" href="classexprt.html">exprt</a> invariant, <a class="el" href="classexprt.html">exprt</a> decreases_clause, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;mode)</td></tr>
 <tr class="memitem:ad983ea1d19dd7f7602e400dfe3b5c072" id="r_ad983ea1d19dd7f7602e400dfe3b5c072"><td class="memItemLeft" align="right" valign="top">std::unordered_map&lt; <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a>, unsigned, <a class="el" href="structconst__target__hash.html">const_target_hash</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad983ea1d19dd7f7602e400dfe3b5c072">get_original_loop_number_map</a> () const</td></tr>
 <tr class="memitem:ae6fec8377ae700ea8f7bcb013f2ec444" id="r_ae6fec8377ae700ea8f7bcb013f2ec444"><td class="memItemLeft" align="right" valign="top">std::unordered_set&lt; <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a>, <a class="el" href="structconst__target__hash.html">const_target_hash</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae6fec8377ae700ea8f7bcb013f2ec444">get_loop_havoc_set</a> () const</td></tr>
 <tr class="memitem:a284b149b334ac4072630920b592feb59" id="r_a284b149b334ac4072630920b592feb59"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a284b149b334ac4072630920b592feb59">enforce_contract</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function)</td></tr>
@@ -153,7 +153,7 @@ Protected Attributes</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock">
-<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00062">62</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00060">60</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="aebe8f563585f93342ca31fb2befd993d" name="aebe8f563585f93342ca31fb2befd993d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aebe8f563585f93342ca31fb2befd993d">&#9670;&#160;</a></span>code_contractst()</h2>
@@ -187,7 +187,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00065">65</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00063">63</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
 
 </div>
 </div>
@@ -218,7 +218,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Instruments <span class="tt">wrapper_function</span> adding assumptions based on requires clauses and assertions based on ensures clauses. </p>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01271">1271</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01314">1314</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
@@ -253,7 +253,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Replaces function calls with assertions based on requires clauses, non-deterministic assignments for the write set, and assumptions based on ensures clauses. </p>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l00600">600</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l00630">630</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
@@ -279,7 +279,7 @@ Protected Attributes</h2></td></tr>
 <p>Apply loop contracts, whenever available, to all loops in <span class="tt">function</span>. </p>
 <p>Loop invariants, loop variants, and loop assigns clauses. </p>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l00841">841</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l00871">871</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
@@ -301,7 +301,7 @@ Protected Attributes</h2></td></tr>
 <p>Applies loop contract transformations. </p>
 <p>Static variables of the model are nondet-initialized, except for the ones specified in to_exclude_from_nondet_init. </p>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01484">1484</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01527">1527</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
@@ -322,12 +322,12 @@ Protected Attributes</h2></td></tr>
 
 <p>Throws an exception if some function <span class="tt">functions</span> is found in the program. </p>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01429">1429</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01472">1472</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a368a74a79d34576fb378b462f3ca60d8" name="a368a74a79d34576fb378b462f3ca60d8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a368a74a79d34576fb378b462f3ca60d8">&#9670;&#160;</a></span>check_apply_loop_contracts()</h2>
+<a id="a2b8b8dd13a9a8e756f2ebee9f2840ab5" name="a2b8b8dd13a9a8e756f2ebee9f2840ab5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2b8b8dd13a9a8e756f2ebee9f2840ab5">&#9670;&#160;</a></span>check_apply_loop_contracts()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -345,7 +345,7 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classlocal__may__aliast.html">local_may_aliast</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>local_may_alias</em></span>, </td>
+          <td class="paramtype">const std::unordered_set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>symbols_before_instrumentation</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -385,7 +385,7 @@ Protected Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l00040">40</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l00041">41</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
@@ -406,7 +406,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Instrument functions to check frame conditions. </p>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01124">1124</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01167">1167</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
@@ -427,7 +427,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Enforce contract of a single function. </p>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01215">1215</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01258">1258</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
@@ -456,7 +456,7 @@ Protected Attributes</h2></td></tr>
 <p>Static variables of the model are nondet-initialized, except for the ones specified in to_exclude_from_nondet_init.</p>
 <p>Implementation: mangle the name of each function F into a new name, <span class="tt">__CPROVER_contracts_original_F</span> (<span class="tt">CF</span> for short). Then mint a new function called <span class="tt">F</span> that assumes <span class="tt">CF</span>'s <span class="tt">requires</span> clause, calls <span class="tt">CF</span>, and then asserts <span class="tt">CF</span>'s <span class="tt">ensures</span> clause. </p>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01566">1566</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01609">1609</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
@@ -483,7 +483,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00145">145</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00143">143</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
 
 </div>
 </div>
@@ -510,7 +510,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00139">139</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00137">137</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
 
 </div>
 </div>
@@ -533,7 +533,7 @@ Protected Attributes</h2></td></tr>
 <p>Throws an exception if some <span class="tt">to_replace</span> functions are not found.</p>
 <p>Use this function when proving code that calls into an expensive function, <span class="tt">F</span>. You can write a contract for F using __CPROVER_requires and __CPROVER_ensures, and then use this function to replace all calls to <span class="tt">F</span> with an assertion that the <span class="tt">requires</span> clause holds followed by an assumption that the <span class="tt">ensures</span> clause holds. In order to ensure that <span class="tt">F</span> actually abides by its <span class="tt">ensures</span> and <span class="tt">requires</span> clauses, you should separately call <span class="tt"><a class="el" href="#a8586b536a8698cc300693bc21a3f7455" title="Turn requires &amp; ensures into assumptions and assertions for each of the named functions.">code_contractst::enforce_contracts()</a></span> on <span class="tt">F</span> and verify it using <span class="tt"><a class="el" href="group__cbmc.html">cbmc</a> --function F</span>. </p>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01444">1444</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01487">1487</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
@@ -558,7 +558,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00155">155</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00153">153</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
 
 </div>
 </div>
@@ -582,7 +582,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00153">153</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00151">151</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
 
 </div>
 </div>
@@ -606,7 +606,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00157">157</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00155">155</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
 
 </div>
 </div>
@@ -630,7 +630,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00176">176</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00174">174</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
 
 </div>
 </div>
@@ -656,7 +656,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Loop havoc instructions instrumented during applying loop contracts. </p>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00173">173</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00171">171</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
 
 </div>
 </div>
@@ -682,7 +682,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Name of loops we are going to unwind. </p>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00162">162</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00160">160</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
 
 </div>
 </div>
@@ -698,7 +698,7 @@ Protected Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00150">150</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00148">148</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
 
 </div>
 </div>
@@ -728,7 +728,7 @@ Protected Attributes</h2></td></tr>
 <li>ASSIGN ENTERED_LOOP = TRUE &mdash; end of transformed loops </li>
 </ol>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00169">169</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00167">167</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
 
 </div>
 </div>
@@ -752,7 +752,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00159">159</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00157">157</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
 
 </div>
 </div>
@@ -776,7 +776,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00154">154</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00152">152</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
 
 </div>
 </div>
