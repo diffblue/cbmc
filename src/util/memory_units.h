@@ -18,11 +18,6 @@ public:
   static memory_sizet from_bytes(std::size_t bytes);
 
   memory_sizet();
-  memory_sizet(const memory_sizet &);
-  memory_sizet(memory_sizet &&) noexcept;
-
-  memory_sizet &operator=(const memory_sizet &);
-  memory_sizet &operator=(memory_sizet &&) noexcept;
 
   memory_sizet &operator+=(const memory_sizet &);
   memory_sizet operator+(const memory_sizet &) const;

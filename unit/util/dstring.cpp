@@ -19,6 +19,13 @@ Author: Diffblue Ltd
 
 #include <string>
 #include <string_view>
+#include <type_traits>
+
+// Trivially copyable (and thus noexcept-movable) so that containers can
+// relocate their elements with memmove.
+static_assert(std::is_trivially_copyable<dstringt>::value, "");
+static_assert(std::is_nothrow_move_constructible<dstringt>::value, "");
+static_assert(std::is_nothrow_move_assignable<dstringt>::value, "");
 
 TEST_CASE("dstringt string_view construction", "[core][util][dstring]")
 {

@@ -2,8 +2,30 @@
 
 /// \file Tests that irept memory consumption is fixed
 
-#include <testing-utils/use_catch.h>
 #include <util/irep.h>
+#include <util/source_location.h>
+#include <util/std_code.h>
+#include <util/std_expr.h>
+#include <util/std_types.h>
+
+#include <testing-utils/use_catch.h>
+
+#include <type_traits>
+
+// std::vector (and other containers) only move their elements when
+// reallocating if the move constructor is noexcept (std::move_if_noexcept);
+// otherwise they copy them. Classes derived from irept lose their implicit
+// move operations when they gain a user-declared destructor or copy
+// operation, which would silently bring back the copies.
+static_assert(std::is_nothrow_move_constructible<irept>::value, "");
+static_assert(std::is_nothrow_move_assignable<irept>::value, "");
+static_assert(std::is_nothrow_move_constructible<exprt>::value, "");
+static_assert(std::is_nothrow_move_assignable<exprt>::value, "");
+static_assert(std::is_nothrow_move_constructible<typet>::value, "");
+static_assert(std::is_nothrow_move_constructible<codet>::value, "");
+static_assert(std::is_nothrow_move_constructible<source_locationt>::value, "");
+static_assert(std::is_nothrow_move_constructible<symbol_exprt>::value, "");
+static_assert(std::is_nothrow_move_constructible<struct_typet>::value, "");
 
 SCENARIO("irept_memory", "[core][utils][irept]")
 {
