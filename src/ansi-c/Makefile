@@ -70,6 +70,7 @@ BUILTIN_FILES = \
   compiler_headers/clang_builtin_headers.inc \
   compiler_headers/clang_builtin_headers_neon.inc \
   compiler_headers/cw_builtin_headers.inc \
+  compiler_headers/gcc_builtin_headers_aarch64_types.inc \
   compiler_headers/gcc_builtin_headers_alpha.inc \
   compiler_headers/gcc_builtin_headers_arm.inc \
   compiler_headers/gcc_builtin_headers_generic.inc \

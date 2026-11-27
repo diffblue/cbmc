@@ -64,6 +64,7 @@ make_inc(compiler_headers/arm_builtin_headers)
 make_inc(compiler_headers/clang_builtin_headers)
 make_inc(compiler_headers/clang_builtin_headers_neon)
 make_inc(compiler_headers/cw_builtin_headers)
+make_inc(compiler_headers/gcc_builtin_headers_aarch64_types)
 make_inc(compiler_headers/gcc_builtin_headers_alpha)
 make_inc(compiler_headers/gcc_builtin_headers_arm)
 make_inc(compiler_headers/gcc_builtin_headers_generic)
@@ -84,6 +85,7 @@ set(extra_dependencies
     ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/clang_builtin_headers.inc
     ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/clang_builtin_headers_neon.inc
     ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/cw_builtin_headers.inc
+    ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_aarch64_types.inc
     ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_alpha.inc
     ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_arm.inc
     ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_generic.inc

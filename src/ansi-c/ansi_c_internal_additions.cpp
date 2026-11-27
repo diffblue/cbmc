@@ -50,6 +50,11 @@ const char gcc_builtin_headers_ia32[] =
 #include "compiler_headers/gcc_builtin_headers_ia32.inc" // IWYU pragma: keep
   ; // NOLINT(whitespace/semicolon)
 
+const char gcc_builtin_headers_aarch64_types[] =
+// NOLINTNEXTLINE(whitespace/line_length)
+#include "compiler_headers/gcc_builtin_headers_aarch64_types.inc" // IWYU pragma: keep
+  ; // NOLINT(whitespace/semicolon)
+
 const char gcc_builtin_headers_alpha[] =
 #include "compiler_headers/gcc_builtin_headers_alpha.inc" // IWYU pragma: keep
   ; // NOLINT(whitespace/semicolon)
@@ -260,6 +265,9 @@ void ansi_c_internal_additions(std::string &code, bool support_float16_type)
       code+="typedef signed __int128 __int128_t;\n"
             "typedef unsigned __int128 __uint128_t;\n";
     }
+
+    if(config.ansi_c.arch == "arm64")
+      code += gcc_builtin_headers_aarch64_types;
 
     if(
       config.ansi_c.arch == "arm64" &&
