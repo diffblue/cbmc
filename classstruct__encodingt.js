@@ -8,6 +8,7 @@ var classstruct__encodingt =
     [ "encode", "classstruct__encodingt.html#a95c06cf3804956acc32eab0a44c428e1", null ],
     [ "encode", "classstruct__encodingt.html#a725e836be34675906cab5a1290f983d9", null ],
     [ "encode_member", "classstruct__encodingt.html#a88179d5b2392421dfa49da6af7834067", null ],
+    [ "operator=", "classstruct__encodingt.html#a0455b4ddc711ec8b122f3a4f8685508d", null ],
     [ "boolbv_width", "classstruct__encodingt.html#a2071cd6f7c8c999976d5cfd214fff39b", null ],
     [ "ns", "classstruct__encodingt.html#ac9801e3fe98b4148981fe7a50f87b7e2", null ]
 ];

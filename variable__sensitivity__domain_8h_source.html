@@ -253,60 +253,63 @@ $(function(){initNavTree('variable__sensitivity__domain_8h_source.html','',''); 
 <div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span><span class="keyword">  </span>{</div>
 <div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>    <span class="keyword">auto</span> d = std::make_unique&lt;variable_sensitivity_domaint&gt;(</div>
 <div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>      <a class="code hl_variable" href="classvariable__sensitivity__domain__factoryt.html#aa1dbce0888a47804c6b78790620198f9">object_factory</a>, <a class="code hl_variable" href="classvariable__sensitivity__domain__factoryt.html#aa1d449eb87a8ef1d052a3e27fc7cc7c1">configuration</a>);</div>
-<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>    <a class="code hl_define" href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a>(d-&gt;variable_sensitivity_domaint::is_bottom());</div>
-<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>    <span class="keywordflow">return</span> std::unique_ptr&lt;statet&gt;(d.release());</div>
-<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span>  }</div>
+<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>    <span class="comment">// The qualification works around a false-positive -Warray-bounds of</span></div>
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>    <span class="comment">// GCC 16 for the virtual call. d points to a variable_sensitivity_domaint,</span></div>
+<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span>    <span class="comment">// so this does not bypass an override.</span></div>
+<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>    <a class="code hl_define" href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a>(d-&gt;variable_sensitivity_domaint::is_bottom());</div>
+<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>    <span class="keywordflow">return</span> std::unique_ptr&lt;statet&gt;(d.release());</div>
+<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>  }</div>
 </div>
-<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span> </div>
-<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span><span class="keyword">private</span>:</div>
-<div class="line"><a id="l00274" name="l00274"></a><span class="lineno"><a class="line" href="classvariable__sensitivity__domain__factoryt.html#aa1dbce0888a47804c6b78790620198f9">  274</a></span>  <a class="code hl_typedef" href="abstract__environment_8h.html#acd9298d85ccc3a46e90900c9104347f9">variable_sensitivity_object_factory_ptrt</a> <a class="code hl_variable" href="classvariable__sensitivity__domain__factoryt.html#aa1dbce0888a47804c6b78790620198f9">object_factory</a>;</div>
-<div class="line"><a id="l00275" name="l00275"></a><span class="lineno"><a class="line" href="classvariable__sensitivity__domain__factoryt.html#aa1d449eb87a8ef1d052a3e27fc7cc7c1">  275</a></span>  <span class="keyword">const</span> <a class="code hl_struct" href="structvsd__configt.html">vsd_configt</a> <a class="code hl_variable" href="classvariable__sensitivity__domain__factoryt.html#aa1d449eb87a8ef1d052a3e27fc7cc7c1">configuration</a>;</div>
-<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>};</div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span> </div>
+<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno"><a class="line" href="classvariable__sensitivity__domain__factoryt.html#aa1dbce0888a47804c6b78790620198f9">  277</a></span>  <a class="code hl_typedef" href="abstract__environment_8h.html#acd9298d85ccc3a46e90900c9104347f9">variable_sensitivity_object_factory_ptrt</a> <a class="code hl_variable" href="classvariable__sensitivity__domain__factoryt.html#aa1dbce0888a47804c6b78790620198f9">object_factory</a>;</div>
+<div class="line"><a id="l00278" name="l00278"></a><span class="lineno"><a class="line" href="classvariable__sensitivity__domain__factoryt.html#aa1d449eb87a8ef1d052a3e27fc7cc7c1">  278</a></span>  <span class="keyword">const</span> <a class="code hl_struct" href="structvsd__configt.html">vsd_configt</a> <a class="code hl_variable" href="classvariable__sensitivity__domain__factoryt.html#aa1d449eb87a8ef1d052a3e27fc7cc7c1">configuration</a>;</div>
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>};</div>
 </div>
-<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span> </div>
-<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span><span class="preprocessor">#ifdef ENABLE_STATS</span></div>
-<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span><span class="keyword">template</span> &lt;&gt;</div>
-<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span><span class="keyword">struct </span>get_domain_statisticst&lt;<a class="code hl_class" href="classvariable__sensitivity__domaint.html">variable_sensitivity_domaint</a>&gt;</div>
-<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span>{</div>
-<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span>  <a class="code hl_struct" href="structabstract__object__statisticst.html">abstract_object_statisticst</a> total_statistics = {};</div>
-<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span>  <span class="keywordtype">void</span></div>
-<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span>  add_entry(<span class="keyword">const</span> variable_sensitivity_domaint &amp;domain, <span class="keyword">const</span> namespacet &amp;ns)</div>
-<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span>  {</div>
-<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span>    <span class="keyword">auto</span> statistics = domain.gather_statistics(ns);</div>
-<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span>    total_statistics.number_of_interval_abstract_objects +=</div>
-<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span>      statistics.number_of_interval_abstract_objects;</div>
-<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span>    total_statistics.number_of_globals += statistics.number_of_globals;</div>
-<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span>    total_statistics.number_of_single_value_intervals +=</div>
-<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span>      statistics.number_of_single_value_intervals;</div>
-<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span>    total_statistics.number_of_constants += statistics.number_of_constants;</div>
-<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span>    total_statistics.number_of_pointers += statistics.number_of_constants;</div>
-<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span>    total_statistics.number_of_arrays += statistics.number_of_arrays;</div>
-<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span>    total_statistics.number_of_structs += statistics.number_of_arrays;</div>
-<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span>    total_statistics.objects_memory_usage += statistics.objects_memory_usage;</div>
-<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span>  }</div>
-<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span> </div>
-<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span>  <span class="keywordtype">void</span> print(std::ostream &amp;out)<span class="keyword"> const</span></div>
-<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span><span class="keyword">  </span>{</div>
-<div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span>    out &lt;&lt; <span class="stringliteral">&quot;&lt;&lt; Begin Variable Sensitivity Domain Statistics &gt;&gt;\n&quot;</span></div>
-<div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span>        &lt;&lt; <span class="stringliteral">&quot;  Memory Usage: &quot;</span></div>
-<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span>        &lt;&lt; total_statistics.objects_memory_usage.to_string() &lt;&lt; <span class="charliteral">&#39;\n&#39;</span></div>
-<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span>        &lt;&lt; <span class="stringliteral">&quot;  Number of structs: &quot;</span> &lt;&lt; total_statistics.number_of_structs &lt;&lt; <span class="charliteral">&#39;\n&#39;</span></div>
-<div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span>        &lt;&lt; <span class="stringliteral">&quot;  Number of arrays: &quot;</span> &lt;&lt; total_statistics.number_of_arrays &lt;&lt; <span class="charliteral">&#39;\n&#39;</span></div>
-<div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span>        &lt;&lt; <span class="stringliteral">&quot;  Number of pointers: &quot;</span> &lt;&lt; total_statistics.number_of_pointers</div>
-<div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span>        &lt;&lt; <span class="charliteral">&#39;\n&#39;</span></div>
-<div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span>        &lt;&lt; <span class="stringliteral">&quot;  Number of constants: &quot;</span> &lt;&lt; total_statistics.number_of_constants</div>
-<div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span>        &lt;&lt; <span class="charliteral">&#39;\n&#39;</span></div>
-<div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span>        &lt;&lt; <span class="stringliteral">&quot;  Number of intervals: &quot;</span></div>
-<div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span>        &lt;&lt; total_statistics.number_of_interval_abstract_objects &lt;&lt; <span class="charliteral">&#39;\n&#39;</span></div>
-<div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span>        &lt;&lt; <span class="stringliteral">&quot;  Number of single value intervals: &quot;</span></div>
-<div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span>        &lt;&lt; total_statistics.number_of_single_value_intervals &lt;&lt; <span class="charliteral">&#39;\n&#39;</span></div>
-<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span>        &lt;&lt; <span class="stringliteral">&quot;  Number of globals: &quot;</span> &lt;&lt; total_statistics.number_of_globals &lt;&lt; <span class="charliteral">&#39;\n&#39;</span></div>
-<div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span>        &lt;&lt; <span class="stringliteral">&quot;&lt;&lt; End Variable Sensitivity Domain Statistics &gt;&gt;\n&quot;</span>;</div>
-<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span>  }</div>
-<div class="line"><a id="l00317" name="l00317"></a><span class="lineno">  317</span>};</div>
-<div class="line"><a id="l00318" name="l00318"></a><span class="lineno">  318</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span> </div>
-<div class="line"><a id="l00320" name="l00320"></a><span class="lineno">  320</span><span class="preprocessor">#endif </span><span class="comment">// CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_DOMAIN_H</span></div>
+<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span> </div>
+<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span><span class="preprocessor">#ifdef ENABLE_STATS</span></div>
+<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span><span class="keyword">template</span> &lt;&gt;</div>
+<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span><span class="keyword">struct </span>get_domain_statisticst&lt;<a class="code hl_class" href="classvariable__sensitivity__domaint.html">variable_sensitivity_domaint</a>&gt;</div>
+<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span>{</div>
+<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span>  <a class="code hl_struct" href="structabstract__object__statisticst.html">abstract_object_statisticst</a> total_statistics = {};</div>
+<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span>  <span class="keywordtype">void</span></div>
+<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span>  add_entry(<span class="keyword">const</span> variable_sensitivity_domaint &amp;domain, <span class="keyword">const</span> namespacet &amp;ns)</div>
+<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span>  {</div>
+<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span>    <span class="keyword">auto</span> statistics = domain.gather_statistics(ns);</div>
+<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span>    total_statistics.number_of_interval_abstract_objects +=</div>
+<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span>      statistics.number_of_interval_abstract_objects;</div>
+<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span>    total_statistics.number_of_globals += statistics.number_of_globals;</div>
+<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span>    total_statistics.number_of_single_value_intervals +=</div>
+<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span>      statistics.number_of_single_value_intervals;</div>
+<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span>    total_statistics.number_of_constants += statistics.number_of_constants;</div>
+<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span>    total_statistics.number_of_pointers += statistics.number_of_constants;</div>
+<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span>    total_statistics.number_of_arrays += statistics.number_of_arrays;</div>
+<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span>    total_statistics.number_of_structs += statistics.number_of_arrays;</div>
+<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span>    total_statistics.objects_memory_usage += statistics.objects_memory_usage;</div>
+<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span>  }</div>
+<div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span> </div>
+<div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span>  <span class="keywordtype">void</span> print(std::ostream &amp;out)<span class="keyword"> const</span></div>
+<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span><span class="keyword">  </span>{</div>
+<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span>    out &lt;&lt; <span class="stringliteral">&quot;&lt;&lt; Begin Variable Sensitivity Domain Statistics &gt;&gt;\n&quot;</span></div>
+<div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span>        &lt;&lt; <span class="stringliteral">&quot;  Memory Usage: &quot;</span></div>
+<div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span>        &lt;&lt; total_statistics.objects_memory_usage.to_string() &lt;&lt; <span class="charliteral">&#39;\n&#39;</span></div>
+<div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span>        &lt;&lt; <span class="stringliteral">&quot;  Number of structs: &quot;</span> &lt;&lt; total_statistics.number_of_structs &lt;&lt; <span class="charliteral">&#39;\n&#39;</span></div>
+<div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span>        &lt;&lt; <span class="stringliteral">&quot;  Number of arrays: &quot;</span> &lt;&lt; total_statistics.number_of_arrays &lt;&lt; <span class="charliteral">&#39;\n&#39;</span></div>
+<div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span>        &lt;&lt; <span class="stringliteral">&quot;  Number of pointers: &quot;</span> &lt;&lt; total_statistics.number_of_pointers</div>
+<div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span>        &lt;&lt; <span class="charliteral">&#39;\n&#39;</span></div>
+<div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span>        &lt;&lt; <span class="stringliteral">&quot;  Number of constants: &quot;</span> &lt;&lt; total_statistics.number_of_constants</div>
+<div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span>        &lt;&lt; <span class="charliteral">&#39;\n&#39;</span></div>
+<div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span>        &lt;&lt; <span class="stringliteral">&quot;  Number of intervals: &quot;</span></div>
+<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span>        &lt;&lt; total_statistics.number_of_interval_abstract_objects &lt;&lt; <span class="charliteral">&#39;\n&#39;</span></div>
+<div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span>        &lt;&lt; <span class="stringliteral">&quot;  Number of single value intervals: &quot;</span></div>
+<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span>        &lt;&lt; total_statistics.number_of_single_value_intervals &lt;&lt; <span class="charliteral">&#39;\n&#39;</span></div>
+<div class="line"><a id="l00317" name="l00317"></a><span class="lineno">  317</span>        &lt;&lt; <span class="stringliteral">&quot;  Number of globals: &quot;</span> &lt;&lt; total_statistics.number_of_globals &lt;&lt; <span class="charliteral">&#39;\n&#39;</span></div>
+<div class="line"><a id="l00318" name="l00318"></a><span class="lineno">  318</span>        &lt;&lt; <span class="stringliteral">&quot;&lt;&lt; End Variable Sensitivity Domain Statistics &gt;&gt;\n&quot;</span>;</div>
+<div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span>  }</div>
+<div class="line"><a id="l00320" name="l00320"></a><span class="lineno">  320</span>};</div>
+<div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span> </div>
+<div class="line"><a id="l00323" name="l00323"></a><span class="lineno">  323</span><span class="preprocessor">#endif </span><span class="comment">// CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_DOMAIN_H</span></div>
 <div class="ttc" id="aabstract__environment_8h_html"><div class="ttname"><a href="abstract__environment_8h.html">abstract_environment.h</a></div><div class="ttdoc">An abstract version of a program environment.</div></div>
 <div class="ttc" id="aabstract__environment_8h_html_acd9298d85ccc3a46e90900c9104347f9"><div class="ttname"><a href="abstract__environment_8h.html#acd9298d85ccc3a46e90900c9104347f9">variable_sensitivity_object_factory_ptrt</a></div><div class="ttdeci">std::shared_ptr&lt; variable_sensitivity_object_factoryt &gt; variable_sensitivity_object_factory_ptrt</div><div class="ttdef"><b>Definition</b> <a href="abstract__environment_8h_source.html#l00027">abstract_environment.h:27</a></div></div>
 <div class="ttc" id="aabstract__object_8h_html_ace6b57280e6bcbef1506199e2cb87617"><div class="ttname"><a href="abstract__object_8h.html#ace6b57280e6bcbef1506199e2cb87617">abstract_object_pointert</a></div><div class="ttdeci">sharing_ptrt&lt; class abstract_objectt &gt; abstract_object_pointert</div><div class="ttdef"><b>Definition</b> <a href="abstract__object_8h_source.html#l00069">abstract_object.h:69</a></div></div>
@@ -322,8 +325,8 @@ $(function(){initNavTree('variable__sensitivity__domain_8h_source.html','',''); 
 <div class="ttc" id="aclassexprt_html"><div class="ttname"><a href="classexprt.html">exprt</a></div><div class="ttdoc">Base class for all expressions.</div><div class="ttdef"><b>Definition</b> <a href="expr_8h_source.html#l00056">expr.h:57</a></div></div>
 <div class="ttc" id="aclassexprt_html_a10c073e5cdd14b181d56cf53def8b378"><div class="ttname"><a href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a></div><div class="ttdeci">std::vector&lt; exprt &gt; operandst</div><div class="ttdef"><b>Definition</b> <a href="expr_8h_source.html#l00059">expr.h:59</a></div></div>
 <div class="ttc" id="aclassnamespacet_html"><div class="ttname"><a href="classnamespacet.html">namespacet</a></div><div class="ttdoc">A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t...</div><div class="ttdef"><b>Definition</b> <a href="namespace_8h_source.html#l00090">namespace.h:91</a></div></div>
-<div class="ttc" id="aclassvariable__sensitivity__domain__factoryt_html_aa1d449eb87a8ef1d052a3e27fc7cc7c1"><div class="ttname"><a href="classvariable__sensitivity__domain__factoryt.html#aa1d449eb87a8ef1d052a3e27fc7cc7c1">variable_sensitivity_domain_factoryt::configuration</a></div><div class="ttdeci">const vsd_configt configuration</div><div class="ttdef"><b>Definition</b> <a href="#l00275">variable_sensitivity_domain.h:275</a></div></div>
-<div class="ttc" id="aclassvariable__sensitivity__domain__factoryt_html_aa1dbce0888a47804c6b78790620198f9"><div class="ttname"><a href="classvariable__sensitivity__domain__factoryt.html#aa1dbce0888a47804c6b78790620198f9">variable_sensitivity_domain_factoryt::object_factory</a></div><div class="ttdeci">variable_sensitivity_object_factory_ptrt object_factory</div><div class="ttdef"><b>Definition</b> <a href="#l00274">variable_sensitivity_domain.h:274</a></div></div>
+<div class="ttc" id="aclassvariable__sensitivity__domain__factoryt_html_aa1d449eb87a8ef1d052a3e27fc7cc7c1"><div class="ttname"><a href="classvariable__sensitivity__domain__factoryt.html#aa1d449eb87a8ef1d052a3e27fc7cc7c1">variable_sensitivity_domain_factoryt::configuration</a></div><div class="ttdeci">const vsd_configt configuration</div><div class="ttdef"><b>Definition</b> <a href="#l00278">variable_sensitivity_domain.h:278</a></div></div>
+<div class="ttc" id="aclassvariable__sensitivity__domain__factoryt_html_aa1dbce0888a47804c6b78790620198f9"><div class="ttname"><a href="classvariable__sensitivity__domain__factoryt.html#aa1dbce0888a47804c6b78790620198f9">variable_sensitivity_domain_factoryt::object_factory</a></div><div class="ttdeci">variable_sensitivity_object_factory_ptrt object_factory</div><div class="ttdef"><b>Definition</b> <a href="#l00277">variable_sensitivity_domain.h:277</a></div></div>
 <div class="ttc" id="aclassvariable__sensitivity__domain__factoryt_html_aadeccd6a566d79bb26bd93a4292cbed4"><div class="ttname"><a href="classvariable__sensitivity__domain__factoryt.html#aadeccd6a566d79bb26bd93a4292cbed4">variable_sensitivity_domain_factoryt::variable_sensitivity_domain_factoryt</a></div><div class="ttdeci">variable_sensitivity_domain_factoryt(variable_sensitivity_object_factory_ptrt _object_factory, const vsd_configt &amp;_configuration)</div><div class="ttdef"><b>Definition</b> <a href="#l00258">variable_sensitivity_domain.h:258</a></div></div>
 <div class="ttc" id="aclassvariable__sensitivity__domain__factoryt_html_afe9459f197249f671c3e0507f968a2d8"><div class="ttname"><a href="classvariable__sensitivity__domain__factoryt.html#afe9459f197249f671c3e0507f968a2d8">variable_sensitivity_domain_factoryt::make</a></div><div class="ttdeci">std::unique_ptr&lt; statet &gt; make(locationt l) const override</div><div class="ttdef"><b>Definition</b> <a href="#l00265">variable_sensitivity_domain.h:265</a></div></div>
 <div class="ttc" id="aclassvariable__sensitivity__domaint_html"><div class="ttname"><a href="classvariable__sensitivity__domaint.html">variable_sensitivity_domaint</a></div><div class="ttdef"><b>Definition</b> <a href="#l00115">variable_sensitivity_domain.h:116</a></div></div>
