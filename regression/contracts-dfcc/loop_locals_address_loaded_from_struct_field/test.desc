@@ -1,0 +1,13 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^\[main\.assertion\.\d+\] line \d+ assertion \*p == 0: FAILURE$
+--
+--
+Checks that a pointer loaded from a struct field, which the field-insensitive
+alias analysis considers of unknown origin, may point to any variable whose
+address is taken: `t` is read through `p` before it is overwritten, so it
+is not a loop local.

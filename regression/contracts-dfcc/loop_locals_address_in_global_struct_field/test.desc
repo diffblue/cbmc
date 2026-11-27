@@ -1,0 +1,13 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^\[main\.assertion\.\d+\] line \d+ assertion \*g\.q == 0: FAILURE$
+--
+--
+Checks that a read through a pointer stored in a field of a global struct,
+which the alias analysis does not track, may read any variable whose address is
+taken: `t` holds the previous iteration's value when it is read through
+`g.q`, so it is not a loop local.

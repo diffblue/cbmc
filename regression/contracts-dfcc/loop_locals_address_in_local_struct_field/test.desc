@@ -1,0 +1,12 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^\[main\.assertion\.\d+\] line \d+ assertion \*s\.q == 0: FAILURE$
+--
+--
+Checks that a read through a pointer stored in a field of a local struct
+counts as a read of the variable it points to: `t` holds the previous
+iteration's value when it is read through `s.q`, so it is not a loop local.

@@ -559,6 +559,38 @@ be added to the inferred set.
 At last, we widen `b[j]` to `__CPROVER_object_whole(b)` as its index `j` is
 non constant.
 
+### Loop locals
+
+A loop local is not havoced at the loop head and does not need to be listed in
+the loop assigns clause, whether the clause is inferred or written by the user.
+Variables declared inside the loop body, like `k` above, are loop locals. A
+variable declared before the loop is also a loop local if declaring it at the
+start of the loop body instead would not change what the program does: no
+iteration reads the value it had at the end of the previous one, and no code
+outside the loop reads it.
+
+CBMC checks this conservatively. The address of the variable must never be
+taken, the variable must not appear outside the loop or in any loop contract
+clause, and every path through an iteration must assign the whole variable
+before reading it. Assigning some of its fields or elements is not enough. A
+variable that fails the check is havoced and must be listed in the assigns
+clause.
+
+For example, `t` below is a loop local, so the loop assigns clause need not
+list it, but `u` is not, since the loop reads the value it had in the previous
+iteration:
+
+```
+unsigned t, u;
+for(unsigned i = 0; i < SIZE; i++)
+  __CPROVER_assigns(i, u)
+  __CPROVER_loop_invariant(i <= SIZE)
+  {
+    t = i * 2;
+    u = u + t;
+  }
+```
+
 ### Limitation
 
 The main limitation of the inference algorithm is that the local-may-alias

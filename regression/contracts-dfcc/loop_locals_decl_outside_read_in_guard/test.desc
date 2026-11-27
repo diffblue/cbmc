@@ -1,0 +1,11 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^\[main\.assigns\.\d+\] line \d+ Check that t is assignable: FAILURE$
+--
+--
+Checks that a variable that the loop guard reads before the body writes it is
+live at the loop head, so it is not a loop local.

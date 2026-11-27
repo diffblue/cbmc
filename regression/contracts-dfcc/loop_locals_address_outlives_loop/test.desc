@@ -1,0 +1,11 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^\[main\.assigns\.\d+\] line \d+ Check that t is assignable: FAILURE$
+--
+--
+Checks that a variable whose address outlives the loop (through `p`) is not a
+loop local, since it may be read after the loop.

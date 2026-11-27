@@ -1,0 +1,12 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^\[check\.assertion\.\d+\] line \d+ assertion \*q == 0: FAILURE$
+--
+--
+Checks that passing a pointer of unknown origin (loaded from a struct field)
+to a function escapes all variables whose address is taken: `check` reads the
+previous iteration's `t`, so it is not a loop local.

@@ -14,6 +14,7 @@ Author: Remi Delmas, delmasrd@amazon.com
 
 #include <goto-programs/goto_inline.h>
 
+#include <analyses/dirty.h>
 #include <analyses/local_may_alias.h>
 #include <goto-instrument/contracts/utils.h>
 
@@ -21,6 +22,9 @@ Author: Remi Delmas, delmasrd@amazon.com
 #include "dfcc_loop_nesting_graph.h"
 #include "dfcc_root_object.h"
 #include "dfcc_utils.h"
+
+#include <map>
+#include <vector>
 
 /// Builds a call expression `object_whole(expr)`
 static exprt
@@ -50,12 +54,179 @@ depends_on(const exprt &expr, std::unordered_set<irep_idt> identifiers)
   return false;
 }
 
-/// Collect identifiers that are local to this loop.
-/// A variable is a loop local if and only if it is declared inside the loop
-/// (i.e., there is a DECL instruction for it in the loop body).  Variables
-/// declared outside the loop are never considered loop locals, even when they
-/// are only read or written inside the loop, because their storage persists
-/// across iterations and they must be havoced to ensure soundness.
+/// Turns the assignments to `__CPROVER_dead_object` into SKIP instructions.
+static void remove_dead_object_assignment(goto_functiont &goto_function)
+{
+  Forall_goto_program_instructions(i_it, goto_function.body)
+  {
+    if(i_it->is_assign())
+    {
+      auto &lhs = i_it->assign_lhs();
+
+      if(
+        lhs.id() == ID_symbol &&
+        to_symbol_expr(lhs).identifier() == CPROVER_PREFIX "dead_object")
+      {
+        i_it->turn_into_skip();
+      }
+    }
+  }
+}
+
+/// Adds to \p gen the identifiers of \p candidates that \p instruction reads,
+/// and to \p kill those whose whole value it overwrites (or whose lifetime it
+/// starts or ends). A write to a part of a variable (e.g. `x.f = e`) does not
+/// overwrite its whole value, so it counts as a read of it, which is
+/// conservative for liveness. The candidates are not dirty, so no instruction
+/// reads or writes them through a pointer.
+static void gen_kill(
+  const goto_programt::instructiont &instruction,
+  const std::unordered_set<irep_idt> &candidates,
+  std::unordered_set<irep_idt> &gen,
+  std::unordered_set<irep_idt> &kill)
+{
+  const auto add_reads = [&](const exprt &expr)
+  {
+    for(const auto &id : find_symbol_identifiers(expr))
+    {
+      if(candidates.find(id) != candidates.end())
+        gen.insert(id);
+    }
+  };
+  const auto add_write = [&](const exprt &lhs)
+  {
+    if(lhs.id() == ID_symbol)
+    {
+      const auto &id = to_symbol_expr(lhs).get_identifier();
+      if(candidates.find(id) != candidates.end())
+        kill.insert(id);
+    }
+    else
+      add_reads(lhs);
+  };
+
+  switch(instruction.type())
+  {
+  case ASSIGN:
+    add_reads(instruction.assign_rhs());
+    add_write(instruction.assign_lhs());
+    break;
+  case FUNCTION_CALL:
+    add_reads(instruction.call_function());
+    for(const auto &arg : instruction.call_arguments())
+      add_reads(arg);
+    add_write(instruction.call_lhs());
+    break;
+  case DECL:
+    add_write(instruction.decl_symbol());
+    break;
+  case DEAD:
+    add_write(instruction.dead_symbol());
+    break;
+  case GOTO:
+  case ASSUME:
+  case ASSERT:
+    add_reads(instruction.condition());
+    break;
+  case SET_RETURN_VALUE:
+    add_reads(instruction.return_value());
+    break;
+  case OTHER:
+    for(const auto &op : instruction.code().operands())
+      add_reads(op);
+    break;
+  case END_THREAD:
+  case END_FUNCTION:
+  case ATOMIC_BEGIN:
+  case ATOMIC_END:
+  case SKIP:
+  case LOCATION:
+  case CATCH:
+  case THROW:
+  case START_THREAD:
+    break;
+  case NO_INSTRUCTION_TYPE:
+  case INCOMPLETE_GOTO:
+    UNREACHABLE;
+    break;
+  }
+}
+
+/// The identifiers of \p candidates that are live at \p target, i.e., that
+/// may be read on some path from \p target before being overwritten as a
+/// whole (see \ref gen_kill).
+static std::unordered_set<irep_idt> live_at(
+  const goto_programt &body,
+  goto_programt::const_targett target,
+  const std::unordered_set<irep_idt> &candidates)
+{
+  std::map<
+    goto_programt::const_targett,
+    std::unordered_set<irep_idt>,
+    goto_programt::target_less_than>
+    live;
+  std::vector<goto_programt::const_targett> targets;
+  forall_goto_program_instructions(it, body)
+    targets.push_back(it);
+
+  // Backward analysis to a fixpoint. The sets only grow, so comparing their
+  // sizes detects changes.
+  bool changed = true;
+  while(changed)
+  {
+    changed = false;
+    for(auto t_it = targets.rbegin(); t_it != targets.rend(); ++t_it)
+    {
+      std::unordered_set<irep_idt> live_after;
+      for(const auto &succ : body.get_successors(*t_it))
+      {
+        const auto succ_live = live.find(succ);
+        if(succ_live != live.end())
+          live_after.insert(succ_live->second.begin(), succ_live->second.end());
+      }
+      std::unordered_set<irep_idt> gen, kill;
+      gen_kill(**t_it, candidates, gen, kill);
+      for(const auto &id : kill)
+        live_after.erase(id);
+      live_after.insert(gen.begin(), gen.end());
+      auto &current = live[*t_it];
+      if(current.size() != live_after.size())
+      {
+        current = std::move(live_after);
+        changed = true;
+      }
+    }
+  }
+  return live[target];
+}
+
+/// Collect identifiers that are local to this loop, i.e., the variables that
+/// need neither be havoced at the loop head nor be in the loop's write set.
+///
+/// 1. A variable declared inside the loop (i.e., there is a DECL instruction
+///    for it in the loop) is a loop local: it gets a fresh nondeterministic
+///    value at each iteration, and it does not exist outside of the loop.
+/// 2. A variable declared outside the loop is a loop local if
+///    - its address is not taken (it is not dirty), so no pointer can reach
+///      it,
+///    - no instruction outside the loop uses it, other than its DECL and DEAD
+///      and the assignments to CPROVER instrumentation variables (e.g. the
+///      `__CPROVER_dead_object` updates that front-ends use to model the
+///      lifetime of variables),
+///    - it does not occur in the contract clauses of any loop of the
+///      function, which are evaluated at points where they are not modelled
+///      as instructions, and
+///    - it is dead at the loop head: every path from the head overwrites the
+///      whole variable before reading it.
+///    Then the loop never reads a value that the variable had before an
+///    iteration, so it need not be havoced, and no code after the loop reads a
+///    value that the loop assigned to it, so the loop need not declare that it
+///    assigns it. This is the case, for example, of temporaries that a
+///    front-end declares at the start of a function.
+///
+/// A variable that is only read or written inside the loop is not a loop local
+/// if the loop can read the value it had before an iteration, e.g., `t` in
+/// `while(...) { if(i > 0) assert(t == 0); t = i; }`: it must be havoced.
 std::unordered_set<irep_idt> gen_loop_locals_set(
   goto_functiont &goto_function,
   const dfcc_loop_nesting_graph_nodet &loop_node)
@@ -64,16 +235,84 @@ std::unordered_set<irep_idt> gen_loop_locals_set(
 
   const auto &loop = loop_node.instructions;
 
+  // The variables declared outside the loop.
+  std::unordered_set<irep_idt> declared_outside;
   Forall_goto_program_instructions(i_it, goto_function.body)
   {
-    // Only variables declared inside the loop are loop locals.
-    if(i_it->is_decl() && loop.contains(i_it))
-    {
-      loop_locals.insert(i_it->decl_symbol().identifier());
-    }
+    if(!i_it->is_decl())
+      continue;
+    const auto &id = i_it->decl_symbol().get_identifier();
+    if(loop.contains(i_it))
+      loop_locals.insert(id);
+    else
+      declared_outside.insert(id);
   }
 
+  // The variables declared outside the loop that are used inside and outside
+  // of it, and those that occur in the contract clauses of a loop.
+  std::unordered_set<irep_idt> used_inside, used_outside, in_clauses;
+  Forall_goto_program_instructions(i_it, goto_function.body)
+  {
+    if(i_it->is_goto() && i_it->is_backwards_goto())
+    {
+      for(const exprt &clause :
+          {get_loop_assigns(i_it),
+           get_loop_invariants(i_it, false),
+           get_loop_decreases(i_it, false)})
+      {
+        const auto ids = find_symbol_identifiers(clause);
+        in_clauses.insert(ids.begin(), ids.end());
+      }
+    }
+    if(i_it->is_decl() || i_it->is_dead())
+      continue;
+    if(
+      i_it->is_assign() && i_it->assign_lhs().id() == ID_symbol &&
+      dfcc_is_cprover_static_symbol(
+        to_symbol_expr(i_it->assign_lhs()).get_identifier()))
+    {
+      continue;
+    }
+    std::unordered_set<irep_idt> ids;
+    gen_kill(*i_it, declared_outside, ids, ids);
+    auto &used = loop.contains(i_it) ? used_inside : used_outside;
+    used.insert(ids.begin(), ids.end());
+  }
+
+  const dirtyt dirty(goto_function);
+  std::unordered_set<irep_idt> candidates;
+  for(const auto &id : used_inside)
+  {
+    if(
+      loop_locals.find(id) == loop_locals.end() &&
+      used_outside.find(id) == used_outside.end() &&
+      in_clauses.find(id) == in_clauses.end() && !dirty(id))
+    {
+      candidates.insert(id);
+    }
+  }
+  if(candidates.empty())
+    return loop_locals;
+
+  for(const auto &id : live_at(goto_function.body, loop_node.head, candidates))
+    candidates.erase(id);
+
+  loop_locals.insert(candidates.begin(), candidates.end());
   return loop_locals;
+}
+
+/// The variables declared inside \p loop.
+static std::unordered_set<irep_idt> declared_in_loop(
+  goto_functiont &goto_function,
+  const dfcc_loop_nesting_graph_nodet &loop)
+{
+  std::unordered_set<irep_idt> result;
+  Forall_goto_program_instructions(i_it, goto_function.body)
+  {
+    if(i_it->is_decl() && loop.instructions.contains(i_it))
+      result.insert(i_it->decl_symbol().get_identifier());
+  }
+  return result;
 }
 
 /// Find all identifiers in `src`.
@@ -136,6 +375,7 @@ static assignst dfcc_infer_loop_assigns_for_loop(
   const local_may_aliast &local_may_alias,
   goto_functiont &goto_function,
   const dfcc_loop_nesting_graph_nodet &loop,
+  const std::unordered_set<irep_idt> &original_loop_locals,
   const std::unordered_set<irep_idt> &candidate_targets,
   message_handlert &message_handler,
   const namespacet &ns)
@@ -144,9 +384,13 @@ static assignst dfcc_infer_loop_assigns_for_loop(
   assignst assigns;
   infer_loop_assigns(local_may_alias, loop.instructions, assigns);
 
-  // compute locals
+  // compute locals: the variables declared in the loop of the inlined
+  // function (which include the locals of the inlined callees), and the loop
+  // locals of the original function, computed before inlining so that they
+  // are the same as those that instrumentation uses (see `dfcc_cfg_infot`).
   std::unordered_set<irep_idt> loop_locals =
-    gen_loop_locals_set(goto_function, loop);
+    declared_in_loop(goto_function, loop);
+  loop_locals.insert(original_loop_locals.begin(), original_loop_locals.end());
 
   // widen or drop targets that depend on loop-locals or are non-constant,
   // ie. depend on other locations assigned by the loop.
@@ -766,23 +1010,6 @@ private:
 
 /// Remove assignments to `__CPROVER_dead_object` to avoid aliasing all targets
 /// that are assigned to `__CPROVER_dead_object`.
-static void remove_dead_object_assignment(goto_functiont &goto_function)
-{
-  Forall_goto_program_instructions(i_it, goto_function.body)
-  {
-    if(i_it->is_assign())
-    {
-      auto &lhs = i_it->assign_lhs();
-
-      if(
-        lhs.id() == ID_symbol &&
-        to_symbol_expr(lhs).identifier() == CPROVER_PREFIX "dead_object")
-      {
-        i_it->turn_into_skip();
-      }
-    }
-  }
-}
 
 /// The calls in \p program are not instrumented yet, and hence lack the write
 /// set argument. A callee that has been instrumented already, however, has the
@@ -848,10 +1075,14 @@ void dfcc_infer_loop_assigns_for_function(
     unordered_map<goto_programt::const_targett, std::size_t, const_target_hash>
       loop_number_map;
 
+  // The loop locals of the original function, by loop number.
+  std::map<std::size_t, std::unordered_set<irep_idt>> original_loop_locals;
   for(const auto id : topsorted)
   {
     loop_number_map.emplace(
       loop_nesting_graph[id].head, loop_nesting_graph[id].latch->loop_number);
+    original_loop_locals[loop_nesting_graph[id].latch->loop_number] =
+      gen_loop_locals_set(goto_function_copy, loop_nesting_graph[id]);
   }
 
   // We avoid inlining `malloc` and `free` whose variables are not assigns.
@@ -896,6 +1127,7 @@ void dfcc_infer_loop_assigns_for_function(
         local_may_alias,
         goto_function_copy,
         inlined_loop,
+        original_loop_locals[loop_number],
         candidate_targets,
         message_handler,
         ns);

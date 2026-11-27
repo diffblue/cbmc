@@ -1,0 +1,12 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^\[check\.assertion\.\d+\] line \d+ assertion \*saved->q == 0: FAILURE$
+--
+--
+Checks that storing an address in a field of a local struct whose own address
+escaped (before the loop) escapes it: `check` reads the previous iteration's
+`t` through `saved`, so `t` is not a loop local.

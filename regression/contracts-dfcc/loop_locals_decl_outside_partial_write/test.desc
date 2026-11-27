@@ -1,0 +1,12 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^\[main\.assertion\.\d+\] line \d+ assertion s.b == 0: FAILURE$
+--
+--
+Checks that writes to parts of a variable do not count as overwriting it:
+`s` holds the value of the previous iteration at the loop head, so it is not
+a loop local and is havoced.
