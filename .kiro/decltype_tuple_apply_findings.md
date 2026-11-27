@@ -16840,3 +16840,50 @@ _Scanner body drops ("not determined" in the report).
 Verified: binW235 (13 suites, profiles (z3 complex2 flaky), vacuity
 1063/3, MSVC, macOS 142/142; GCC 16 image; the other ctest CORE suites;
 JBMC jbmc + jbmc-concurrency); unit, lint, format, doxygen, iwyu.
+
+## Round 242 (2026-11-27): user report on folds, designators, attributes
+
+Report ~/cbmc_repro/ (older rework build; all three issues still present):
+- 2669f5de73 unary right fold over a non-type pack of a member function
+  template (also a template lambda's call operator) started from the first
+  element (`(g(I), ...)` over 1..4 called g with 1, 2, 3, 1); a pattern
+  that is the pack name itself (`(I - ...)`) was not substituted at all
+  (replace_value_pack_ref only substitutes below its root).  Silent.
+- f481e3f227 reduce_parameter_pack_folds on the ENCLOSING function's body
+  reduced a fold inside a lambda over the lambda's own pack as a
+  one-element fold, because its "single_by_param" test takes the first
+  name of the pattern (`f` in `(f(a), ...)`) and f was a parameter of the
+  enclosing function: the callback ran once.  Folds naming a pack of an
+  enclosing lambda are now left for the closure's operator().
+- 83e7e5ba72 designators into anonymous structs/unions: the shared C
+  designator lookup required an untagged class; C++ names it `#anon_N`
+  and sets ID_C_is_anonymous.
+- a493b6d1bd `__attribute__((section(...)))` after a declarator: the
+  declarator type was the attribute, whose sub[0] (the string) merge_type
+  took for a subtype.  The C++ front end does not implement the alias
+  attribute at all (a call through the alias has no body).
+Follow-ups from the C++ gaps report:
+- 61e2ee7f3d `len<insert_offset>(0)` with a variable len: an unqualified
+  unknown name's template-id call is marked ambiguous
+  (ID_C_ambiguous_template_id) and regrouped as comparisons when the name
+  denotes an object; a template argument with an operator binding no
+  tighter than `<` keeps the call.
+- 464db7549d associated constraints: type-constraints first
+  ([temp.constr.decl]/3) and the conjuncts before the last checked in order
+  (stop at a definite false); the whole-clause typecheck instantiated
+  _S_constructible_from_pair_like<int> (libstdc++ 16 pair, C++23 format),
+  whose body was dropped.  The report's _Scanner drop no longer occurs on
+  binW234 already.
+Answers given: PR #9039 declares Clang's __builtin_neon_* (Clang's
+arm_neon.h), not GCC's __Int8x8_t/__mfp8 types or __builtin_aarch64_*;
+GCC 13's aarch64 arm_neon.h fails in C and C++ on this branch
+(aarch64-linux-gnu-cpp-13 is installed, no cc1plus).  Pointer to member
+function: besides sizeof 8 vs 16, converting `int (B::*)()` to
+`int (C::*)()` for C : A, B loses the this-adjustment (wrong result).
+Calls to dropped bodies are flagged by symex's "no body for callee"
+property unless --no-standard-checks / --no-unwinding-assertions.
+Verified: binW236 (13 suites, profiles (z3 complex2 flaky), vacuity
+1063/3, MSVC, macOS 142/142, GCC 16 image; one new test failed, fixed in
+2669f5de73) and binW237 for the C++ suites (cbmc-cpp, cpp, libcxx,
+KNOWNBUG, systemc, vacuity, MSVC, macOS, GCC 16 image); other ctest CORE
+suites; JBMC; unit, lint, format, doxygen, iwyu.
