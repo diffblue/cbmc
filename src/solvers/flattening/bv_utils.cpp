@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 
+#include <algorithm>
 #include <list>
 #include <utility>
 
@@ -933,6 +934,20 @@ bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
 
   if(is_constant(op1))
     std::swap(op0, op1);
+
+  // With a constant operand, there is one partial product per one bit of the
+  // constant. Modulo 2^width, the product is also the negation of the product
+  // with the negated constant, which has fewer one bits when the constant has
+  // only few zero bits, e.g., when it represents a negative number of small
+  // magnitude in two's complement.
+  if(is_constant(op0) && !is_constant(op1))
+  {
+    const bvt negated_op0 = negate(op0);
+    const auto ones = [](const bvt &bv)
+    { return std::count(bv.begin(), bv.end(), const_literal(true)); };
+    if(ones(negated_op0) + 1 < ones(op0))
+      return negate(unsigned_multiplier(negated_op0, op1));
+  }
 
   // build the usual quadratic number of partial products
   std::vector<bvt> pps;
