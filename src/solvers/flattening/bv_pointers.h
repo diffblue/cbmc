@@ -13,6 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "boolbv.h"
 #include "pointer_logic.h"
 
+#include <map>
+
 class bv_pointerst:public boolbvt
 {
 public:
@@ -93,7 +95,10 @@ protected:
 
   /// Create Boolean functions describing all objects of each known object size
   /// over \p placeholders as input Boolean variables representing object bits.
-  std::unordered_map<exprt, exprt, irep_hash>
+  /// The result is ordered by object size (using irept's lexicographic
+  /// ordering) to make the sequence of constraints generated from it
+  /// independent of hash values.
+  std::map<exprt, exprt>
   prepare_postponed_object_size(std::vector<symbol_exprt> &placeholders) const;
 
   /// Given a pointer encoded in \p bv, extract the literals identifying the

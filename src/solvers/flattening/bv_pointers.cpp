@@ -950,8 +950,7 @@ std::pair<exprt, exprt> bv_pointerst::prepare_postponed_is_dynamic_object(
   return {bdd_converter.as_expr(dyn_bdd), bdd_converter.as_expr(not_dyn_bdd)};
 }
 
-std::unordered_map<exprt, exprt, irep_hash>
-bv_pointerst::prepare_postponed_object_size(
+std::map<exprt, exprt> bv_pointerst::prepare_postponed_object_size(
   std::vector<symbol_exprt> &placeholders) const
 {
   PRECONDITION(placeholders.empty());
@@ -959,7 +958,10 @@ bv_pointerst::prepare_postponed_object_size(
   const auto &objects = pointer_logic.objects;
   std::size_t number = 0;
 
-  std::unordered_map<exprt, exprt::operandst, irep_hash> per_size_object_ops;
+  // Use ordered maps (here and for the result) as finish_eager_conversion
+  // iterates over the result to produce constraints. See equalityt::typemapt
+  // for why hash maps must not be used for this purpose.
+  std::map<exprt, exprt::operandst> per_size_object_ops;
 
   for(auto it = objects.cbegin(); it != objects.cend(); ++it, ++number)
   {
@@ -994,7 +996,7 @@ bv_pointerst::prepare_postponed_object_size(
     per_size_object_ops[size_expr.value()].push_back(conjunction(conjuncts));
   }
 
-  std::unordered_map<exprt, exprt, irep_hash> result;
+  std::map<exprt, exprt> result;
   for(const auto &size_entry : per_size_object_ops)
   {
     exprt all_objects_this_size = disjunction(size_entry.second);
@@ -1017,7 +1019,7 @@ void bv_pointerst::finish_eager_conversion()
   std::pair<exprt, exprt> is_dynamic_expr = {nil_exprt{}, nil_exprt{}};
   std::vector<symbol_exprt> is_dynamic_placeholders;
 
-  std::unordered_map<exprt, exprt, irep_hash> object_sizes;
+  std::map<exprt, exprt> object_sizes;
   std::vector<symbol_exprt> object_size_placeholders;
 
   for(const postponedt &postponed : postponed_list)
