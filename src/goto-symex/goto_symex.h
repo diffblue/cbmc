@@ -869,6 +869,17 @@ public:
 /// \param state: Symbolic execution state to be transformed
 void symex_transition(goto_symext::statet &state);
 
+/// Transition from `state.source.pc` to \p to, initializing the loop counter
+/// of any loop that is entered by this transition.
+/// \param state: Symbolic execution state to be transformed
+/// \param to: Instruction to transition to
+/// \param is_backwards_goto: True if and only if the move from
+///   `state.source.pc` to \p to follows the back edge of a backward goto,
+///   i.e., \p to is the target of the backward goto `state.source.pc`. A
+///   transition onto a loop head that is not a backward goto, or a backward
+///   one arriving from an outer loop, enters the loop and resets that loop's
+///   unwinding counter. Passing true for any other transition, e.g., a forward
+///   goto or the fall-through of a backward goto, wrongly prevents this reset.
 void symex_transition(
   goto_symext::statet &,
   goto_programt::const_targett to,

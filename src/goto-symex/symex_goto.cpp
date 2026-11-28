@@ -273,6 +273,11 @@ void goto_symext::symex_goto(statet &state)
     return;
   }
 
+  // When resuming the jump-target path of a backward goto, the instructions
+  // were swapped above and state_pc is the instruction following the goto,
+  // which is a forward transition.
+  const bool state_pc_is_backward = backward && state_pc == goto_target;
+
   // put a copy of the current state into the state-queue, to be used by
   // merge_gotos when we visit new_state_pc
   framet::goto_state_listt &goto_state_list =
@@ -287,7 +292,7 @@ void goto_symext::symex_goto(statet &state)
     // and not the entire thing.
     goto_state_list.emplace_back(state.source, std::move(state));
 
-    symex_transition(state, state_pc, backward);
+    symex_transition(state, state_pc, state_pc_is_backward);
 
     state.guard = guardt(false_exprt(), guard_manager);
     state.reachable = false;
@@ -296,7 +301,7 @@ void goto_symext::symex_goto(statet &state)
   {
     goto_state_list.emplace_back(state.source, state);
 
-    symex_transition(state, state_pc, backward);
+    symex_transition(state, state_pc, state_pc_is_backward);
 
     if(!symex_config.doing_path_exploration)
     {
