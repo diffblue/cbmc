@@ -62,19 +62,12 @@ endif()
 
 make_inc(compiler_headers/arm_builtin_headers)
 make_inc(compiler_headers/clang_builtin_headers)
+make_inc(compiler_headers/clang_builtin_headers_neon)
 make_inc(compiler_headers/cw_builtin_headers)
 make_inc(compiler_headers/gcc_builtin_headers_alpha)
 make_inc(compiler_headers/gcc_builtin_headers_arm)
 make_inc(compiler_headers/gcc_builtin_headers_generic)
 make_inc(compiler_headers/gcc_builtin_headers_ia32)
-make_inc(compiler_headers/gcc_builtin_headers_ia32-2)
-make_inc(compiler_headers/gcc_builtin_headers_ia32-3)
-make_inc(compiler_headers/gcc_builtin_headers_ia32-4)
-make_inc(compiler_headers/gcc_builtin_headers_ia32-5)
-make_inc(compiler_headers/gcc_builtin_headers_ia32-6)
-make_inc(compiler_headers/gcc_builtin_headers_ia32-7)
-make_inc(compiler_headers/gcc_builtin_headers_ia32-8)
-make_inc(compiler_headers/gcc_builtin_headers_ia32-9)
 make_inc(compiler_headers/gcc_builtin_headers_math)
 make_inc(compiler_headers/gcc_builtin_headers_mem_string)
 make_inc(compiler_headers/gcc_builtin_headers_mips)
@@ -89,18 +82,11 @@ make_inc(cprover_builtin_headers)
 set(extra_dependencies
     ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/arm_builtin_headers.inc
     ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/clang_builtin_headers.inc
+    ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/clang_builtin_headers_neon.inc
     ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/cw_builtin_headers.inc
     ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_alpha.inc
     ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_arm.inc
     ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_generic.inc
-    ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_ia32-2.inc
-    ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_ia32-3.inc
-    ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_ia32-4.inc
-    ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_ia32-5.inc
-    ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_ia32-6.inc
-    ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_ia32-7.inc
-    ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_ia32-8.inc
-    ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_ia32-9.inc
     ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_ia32.inc
     ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_math.inc
     ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_mem_string.inc

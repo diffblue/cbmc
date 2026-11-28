@@ -68,18 +68,11 @@ BUILTIN_FILES = \
   cprover_builtin_headers.inc \
   compiler_headers/arm_builtin_headers.inc \
   compiler_headers/clang_builtin_headers.inc \
+  compiler_headers/clang_builtin_headers_neon.inc \
   compiler_headers/cw_builtin_headers.inc \
   compiler_headers/gcc_builtin_headers_alpha.inc \
   compiler_headers/gcc_builtin_headers_arm.inc \
   compiler_headers/gcc_builtin_headers_generic.inc \
-  compiler_headers/gcc_builtin_headers_ia32-2.inc \
-  compiler_headers/gcc_builtin_headers_ia32-3.inc \
-  compiler_headers/gcc_builtin_headers_ia32-4.inc \
-  compiler_headers/gcc_builtin_headers_ia32-5.inc \
-  compiler_headers/gcc_builtin_headers_ia32-6.inc \
-  compiler_headers/gcc_builtin_headers_ia32-7.inc \
-  compiler_headers/gcc_builtin_headers_ia32-8.inc \
-  compiler_headers/gcc_builtin_headers_ia32-9.inc \
   compiler_headers/gcc_builtin_headers_ia32.inc \
   compiler_headers/gcc_builtin_headers_math.inc \
   compiler_headers/gcc_builtin_headers_mem_string.inc \

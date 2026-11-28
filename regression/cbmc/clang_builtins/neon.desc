@@ -1,0 +1,12 @@
+CORE
+neon.c
+--arch arm64
+^\[main.assertion.1\] line \d+ reachable: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+--
+is not declared
+^CONVERSION ERROR$
+--
+Clang's <arm_neon.h> calls the __builtin_neon_* builtins, which must be
+declared with the vector types that <arm_neon.h> passes.
