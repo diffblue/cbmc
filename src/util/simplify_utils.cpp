@@ -342,7 +342,7 @@ std::optional<exprt> bits2expr(
       numeric_cast_v<std::size_t>(to_constant_expr(size_expr));
 
     const auto el_size_opt = pointer_offset_bits(array_type.element_type(), ns);
-    CHECK_RETURN(el_size_opt.has_value() && *el_size_opt > bitst{0});
+    CHECK_RETURN(el_size_opt.has_value() && *el_size_opt >= bitst{0});
 
     const std::size_t el_size = numeric_cast_v<std::size_t>(*el_size_opt);
 
