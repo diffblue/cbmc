@@ -1,0 +1,10 @@
+CORE
+main.i
+--arch x86_64 --os freebsd
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Variant of test.desc for x86-64 FreeBSD, where CBMC follows Clang.

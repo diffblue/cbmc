@@ -1,0 +1,10 @@
+CORE
+main.i
+--arch x86_64 --os linux
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Alignment of packed bit-fields with #pragma pack on x86-64 Linux.

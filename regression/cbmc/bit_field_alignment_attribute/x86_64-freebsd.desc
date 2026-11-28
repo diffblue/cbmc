@@ -1,0 +1,11 @@
+CORE
+clang.i
+--arch x86_64 --os freebsd
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Placement of bit-fields with alignment attributes on x86-64 FreeBSD, following
+Clang.

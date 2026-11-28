@@ -1,0 +1,13 @@
+CORE
+main.c
+--winx64
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Visual Studio (checked with MSVC 19 for x64) does not let __declspec(align(n))
+reduce an alignment, and uses the last of several align declspecs (warning
+C4141). goto-cc instead reduced the alignment of objects and typedefs, and used
+the largest of several align declspecs.

@@ -9,10 +9,18 @@ is_windows=$4
 
 sources=${*:$#}
 args=""
-# C files among the options are compiled and linked with the main source file
+goto_cc_args=""
+# C files among the options are compiled and linked with the main source file.
+# Options selecting a Visual Studio target are passed to goto-cc (on other
+# platforms than Windows, where the target is the default anyway).
 for arg in ${*:5:$#-5}; do
   if [[ "$arg" == *.c ]]; then
     sources="$arg $sources"
+  elif [[ "$arg" == --winx64 || "$arg" == --win32 || "$arg" == --i386-win32 ]]
+  then
+    if [[ "${is_windows}" != "true" ]]; then
+      goto_cc_args="$goto_cc_args $arg"
+    fi
   else
     args="$args $arg"
   fi
@@ -35,7 +43,7 @@ target=${target%.c}
 if [[ "${is_windows}" == "true" ]]; then
   $goto_cc ${sources} "/Fe${target}.gb"
 else
-  $goto_cc -o ${target}.gb ${sources}
+  $goto_cc ${goto_cc_args} -o ${target}.gb ${sources}
 fi
 
 rm -f "${target}-mod.gb"
@@ -45,6 +53,11 @@ if [ ! -e "${target}-mod.gb" ] ; then
 elif echo $args | grep -q -- "--dump-c-type-header" ; then
   cat "${target}-mod.gb"
   mv "${target}.gb" "${target}-mod.gb"
+elif echo $args | grep -q -- "--dump-c" && [[ -n "${goto_cc_args}" ]]; then
+  # compiling the output for a Visual Studio target would require Visual
+  # Studio's system headers
+  cat "${target}-mod.gb"
+  cp "${target}.gb" "${target}-mod.gb"
 elif echo $args | grep -q -- "--dump-c" ; then
   cat "${target}-mod.gb"
   mv "${target}-mod.gb" "${target}-mod.c"
