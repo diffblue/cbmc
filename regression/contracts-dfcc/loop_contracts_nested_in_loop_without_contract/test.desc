@@ -1,0 +1,20 @@
+CORE dfcc-only
+main.c
+--dfcc main --enforce-contract foo --apply-loop-contracts _ --no-standard-checks --unwinding-assertions --unwind 5
+^EXIT=0$
+^SIGNAL=0$
+^\[foo.loop_assigns.\d+\] line 21 Check assigns clause inclusion for loop .*: SUCCESS$
+^\[foo.loop_invariant_step.\d+\] line 21 Check invariant after step for loop .*: SUCCESS$
+^\[foo.postcondition.\d+\] .* Check ensures clause of contract contract::foo for function foo: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+^\[foo.loop_assigns.\d+\] .*: FAILURE$
+^\[foo.assigns.\d+\] .*: FAILURE$
+unwinding assertion .*: FAILURE$
+--
+This test checks that a loop with a contract nested in a loop without a contract
+is checked against the write set of the enclosing function, because the outer
+loop is not abstracted and has no write set of its own. Furthermore, locals that
+the inner loop assigns, whether declared at the top level of the function (`i`)
+or inside the outer loop (`x`), must be tracked in the function's write set for
+the assigns clause inclusion check of the inner loop to succeed.

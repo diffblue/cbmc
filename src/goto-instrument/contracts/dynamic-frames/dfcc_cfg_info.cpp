@@ -582,9 +582,6 @@ dfcc_cfg_infot::dfcc_cfg_infot(
          message_handler,
          library,
          symbol_table)});
-
-    if(loop_nesting_graph.get_successors(loop_id).empty())
-      top_level_loops.push_back(loop_id);
   }
 
   // generate set of top level of locals
@@ -608,8 +605,14 @@ dfcc_cfg_infot::dfcc_cfg_infot(
       top_level_local.insert(target->decl_symbol().identifier());
   }
 
+  // Consider all loops, not just the outermost ones: loops with a contract
+  // that are nested in skipped (contract-less) loops are checked against the
+  // top-level write set as well, so top-level locals that they assign must be
+  // tracked. Skipped loops have no assigns clause, and the targets of loops
+  // nested in a loop with a contract are included in that loop's targets, so
+  // this does not track any additional locals in the absence of skipped loops.
   top_level_tracked =
-    gen_tracked_set(top_level_loops, top_level_local, dirty, loop_info_map);
+    gen_tracked_set(topsorted_loops, top_level_local, dirty, loop_info_map);
 }
 
 void dfcc_cfg_infot::output(std::ostream &out) const
@@ -724,10 +727,13 @@ dfcc_cfg_infot::get_local_set(goto_programt::const_targett target) const
 const exprt &dfcc_cfg_infot::get_outer_write_set(std::size_t loop_id) const
 {
   PRECONDITION(is_valid_loop_id(loop_id));
-  auto outer_loop_opt = get_outer_loop_identifier(loop_id);
-  return outer_loop_opt.has_value()
-           ? get_loop_info(outer_loop_opt.value()).addr_of_write_set_var
-           : top_level_write_set;
+  // Skipped outer loops are not instrumented and their write sets are never
+  // initialised; resolve to the scope whose write set they share.
+  const auto outer_id = get_first_id_not_skipped_or_top_level_id(
+    get_outer_loop_identifier(loop_id).value_or(top_level_id()));
+  return is_top_level_id(outer_id)
+           ? top_level_write_set
+           : get_loop_info(outer_id).addr_of_write_set_var;
 }
 
 const dfcc_loop_infot &
