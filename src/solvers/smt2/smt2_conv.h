@@ -69,6 +69,9 @@ public:
   bool use_check_sat_assuming = false;
   bool use_datatypes = false;
   bool use_lambda_for_array = false;
+  /// When true, emit SMT2 options and commands for unsat core
+  /// extraction (e.g., produce-unsat-cores, get-unsat-assumptions).
+  bool produce_unsat_cores = false;
   bool emit_set_logic = true;
 
   exprt handle(const exprt &expr) override;

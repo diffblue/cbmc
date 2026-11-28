@@ -1,0 +1,9 @@
+CORE smt-backend no-new-smt
+main.c
+--z3 --proof-explanation
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+Proof explanation:
+--
+^warning: ignoring

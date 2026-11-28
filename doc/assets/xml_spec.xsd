@@ -239,6 +239,40 @@
 
   <xs:element name="program" type="xs:string"/>
   <xs:element name="cprover-status" type="xs:string"/>
+
+  <xs:element name="proof-explanation">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="step" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:attribute name="type" type="xs:string" use="required"/>
+            <xs:attribute name="description" type="xs:string" use="required"/>
+            <xs:attribute name="in-core" type="xs:boolean" use="required"/>
+            <xs:attribute name="file" type="xs:string"/>
+            <xs:attribute name="line" type="xs:string"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="proof-invariants">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="invariant" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="constraint" type="xs:string"
+                          minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+            <xs:attribute name="variable" type="xs:string" use="required"/>
+            <xs:attribute name="displayName" type="xs:string" use="required"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
   <xs:element name="cprover">
     <xs:complexType>
       <xs:sequence>
@@ -249,6 +283,8 @@
         <xs:element ref="refinement-iteration"/>
         <xs:element ref="fault-localization"/>
         <xs:element ref="goal"/>
+        <xs:element ref="proof-explanation"/>
+        <xs:element ref="proof-invariants"/>
        </xs:choice>
       <xs:element ref="cprover-status" minOccurs="0"/>
       </xs:sequence>
