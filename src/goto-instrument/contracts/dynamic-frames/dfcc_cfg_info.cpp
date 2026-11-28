@@ -542,6 +542,7 @@ dfcc_cfg_infot::dfcc_cfg_infot(
         inferred_loop_assigns_map,
         goto_model.goto_functions,
         goto_function,
+        library.dfcc_type[dfcc_typet::WRITE_SET_PTR],
         message_handler,
         ns);
     }
