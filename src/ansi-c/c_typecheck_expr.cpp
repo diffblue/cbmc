@@ -1128,18 +1128,93 @@ void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
 void c_typecheck_baset::typecheck_expr_alignof(exprt &expr)
 {
   typet argument_type;
+  // whether to report the alignment requirement rather than the preferred
+  // alignment (see below)
+  bool requirement = !expr.get_bool(ID_C_preferred_alignment);
 
-  if(expr.operands().size()==1)
-    argument_type = to_unary_expr(expr).op().type();
+  if(expr.operands().size() == 1)
+  {
+    exprt op = to_unary_expr(expr).op();
+
+    // GCC folds the dereference of the address of an object to that object,
+    // so that, e.g., __alignof__(*&x) is the alignment of x, whereas Clang
+    // only considers the operand as written.
+    const bool is_clang =
+      config.ansi_c.mode == configt::ansi_ct::flavourt::CLANG;
+    while(!is_clang && op.id() == ID_dereference)
+    {
+      const exprt pointer =
+        simplify_expr(to_dereference_expr(op).pointer(), *this);
+      if(pointer.id() != ID_address_of)
+        break;
+      op = to_address_of_expr(pointer).object();
+    }
+
+    // The alignment of an object is the one requested by its declaration, if
+    // any, which (unlike for members) may also be smaller than the alignment
+    // of its type, as is the case with GCC and Clang. Visual Studio does not
+    // let __declspec(align(n)) reduce the alignment (and warns).
+    const auto declaration_alignment =
+      layout_attribute(op.type(), ID_C_declaration_alignment);
+    if(op.id() == ID_symbol && declaration_alignment.has_value())
+    {
+      bytest a = *declaration_alignment;
+      if(config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
+      {
+        typet type = op.type();
+        remove_declaration_alignment(type);
+        a = std::max(a, alignment(type, *this));
+      }
+      exprt tmp = from_integer(a.get(), size_type());
+      tmp.add_source_location() = expr.source_location();
+      expr.swap(tmp);
+      return;
+    }
+
+    argument_type = op.type();
+    requirement = op.id() == ID_member;
+    // The alignment requested by the declaration of an object or member
+    // applies to that object or member only, not to expressions computed from
+    // it (such as x + 0).
+    if(op.id() != ID_symbol && op.id() != ID_member)
+      remove_declaration_alignment(argument_type);
+
+    // For a dereferenced pointer, GCC uses the largest alignment of the
+    // pointee types of the pointer and of any pointers it was converted from:
+    // with int x __attribute__((aligned(16))), __alignof__(*(char *)&x) is 4.
+    if(!is_clang && op.id() == ID_dereference)
+    {
+      bytest a = preferred_alignment(argument_type, *this);
+      for(const exprt *pointer = &to_dereference_expr(op).pointer();
+          pointer->id() == ID_typecast &&
+          to_typecast_expr(*pointer).op().type().id() == ID_pointer;)
+      {
+        pointer = &to_typecast_expr(*pointer).op();
+        typet base_type = to_pointer_type(pointer->type()).base_type();
+        remove_declaration_alignment(base_type);
+        a = std::max(a, preferred_alignment(base_type, *this));
+      }
+
+      exprt tmp = from_integer(a, size_type());
+      tmp.add_source_location() = expr.source_location();
+      expr.swap(tmp);
+      return;
+    }
+  }
   else
   {
-    typet &op_type=static_cast<typet &>(expr.add(ID_type_arg));
+    typet &op_type = static_cast<typet &>(expr.add(ID_type_arg));
     typecheck_type(op_type);
-    argument_type=op_type;
+    argument_type = op_type;
   }
 
-  // we only care about the type
-  bytest a = alignment(argument_type, *this);
+  // The alignment of a member is its alignment requirement, as is the one
+  // that _Alignof reports for a type. That of any other expression, and the
+  // one that GCC's and Clang's __alignof__ reports for a type, is the
+  // preferred alignment, which only differs with the System V ABI for i386:
+  // 8 rather than 4 for 8-byte scalars.
+  bytest a = requirement ? alignment(argument_type, *this)
+                         : preferred_alignment(argument_type, *this);
 
   exprt tmp=from_integer(a, size_type());
   tmp.add_source_location()=expr.source_location();

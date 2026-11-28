@@ -1,0 +1,10 @@
+CORE gcc-only
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+goto-cc aligned complex numbers and vectors to a single byte.

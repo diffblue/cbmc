@@ -92,14 +92,22 @@ STATIC_ASSERT(sizeof(struct Z3_packed) == 1 + 4);
 STATIC_ASSERT(sizeof(struct Z3_packed) == 1 + 1);
 #endif
 
+// the alignment of long long, which is 4 with the System V ABI for i386
+struct long_long_alignment
+{
+  char c;
+  long long x;
+};
+#define LL_ALIGN (sizeof(struct long_long_alignment) - sizeof(long long))
+
 struct Z4
 {
   int i;
-  long long int x; // pads to 8
-  char ch; // 7 end-of-struct padding
+  long long int x; // pads to the alignment of long long
+  char ch;         // end-of-struct padding
 };
 
-STATIC_ASSERT(sizeof(struct Z4) == 4 + 4 + 8 + 1 + 7);
+STATIC_ASSERT(sizeof(struct Z4) == 2 * LL_ALIGN + 8);
 
 #pragma pack(push, 1)
 struct Z4_packed
@@ -115,10 +123,10 @@ STATIC_ASSERT(sizeof(struct Z4_packed) == 4 + 8 + 1);
 struct Z5
 {
   char ch;
-  long long int x[]; // pads to 8, but has no size
+  long long int x[]; // pads to the alignment of long long, but has no size
 };
 
-STATIC_ASSERT(sizeof(struct Z5) == 8);
+STATIC_ASSERT(sizeof(struct Z5) == LL_ALIGN);
 
 #pragma pack(push, 1)
 struct Z5_packed

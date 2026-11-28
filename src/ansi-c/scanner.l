@@ -162,6 +162,16 @@ int conditional_keyword(bool condition, int token)
     return make_identifier();    
 }
 
+/// Marks the operator returned as \p token as one that reports the preferred
+/// alignment (as GCC's and Clang's `__alignof__` does) rather than the
+/// alignment requirement (as `_Alignof` does).
+int preferred_alignof(int token)
+{
+  if(token == TOK_ALIGNOF)
+    parser_stack(yyansi_clval).set(ID_C_preferred_alignment, true);
+  return token;
+}
+
 int MSC_cpp_keyword(int token)
 {
   if(PARSER.cpp98 && PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)
@@ -359,10 +369,11 @@ enable_or_disable ("enable"|"disable")
                   // Done by Visual Studio and gcc
                   // http://msdn.microsoft.com/en-us/library/2e70t5y1%28v=vs.80%29.aspx
                   // push, pop could also use identifiers
+                  // The last element of the stack is the current value, which
+                  // is the default (0) when the stack is empty.
                   if(PARSER.pragma_pack.empty())
                     PARSER.pragma_pack.push_back(convert_integer_literal("0"));
-                  else
-                    PARSER.pragma_pack.push_back(PARSER.pragma_pack.back());
+                  PARSER.pragma_pack.push_back(PARSER.pragma_pack.back());
                 }
 
 <GRAMMAR>{cppstart}"pragma"{ws}"pack"{ws}"("{ws}"push"{ws}","{ws}{integer_s}{ws}")"{ws}{newline} {
@@ -374,32 +385,42 @@ enable_or_disable ("enable"|"disable")
                   while(tmp[p]==' ' || tmp[p]=='\t') ++p;
                   std::string value=std::string(tmp, p, tmp.find_last_not_of(") \t\n\r")+1-p);
                   exprt n=convert_integer_literal(value);
+                  if(PARSER.pragma_pack.empty())
+                    PARSER.pragma_pack.push_back(convert_integer_literal("0"));
                   PARSER.pragma_pack.push_back(n);
                 }
 
 <GRAMMAR>{cppstart}"pragma"{ws}"pack"{ws}"("{ws}{integer_s}{ws}")"{ws}{newline} {
                   // Done by Visual Studio and gcc
                   // http://msdn.microsoft.com/en-us/library/2e70t5y1%28v=vs.80%29.aspx
+                  // sets the current value without pushing (the last element
+                  // of the stack is the current value)
                   std::string tmp(yytext);
                   std::string::size_type p=tmp.find('(')+1;
                   while(tmp[p]==' ' || tmp[p]=='\t') ++p;
                   std::string value=std::string(tmp, p, tmp.find_last_not_of(") \t\n\r")+1-p);
                   exprt n=convert_integer_literal(value);
-                  PARSER.pragma_pack.push_back(n);
+                  if(PARSER.pragma_pack.empty())
+                    PARSER.pragma_pack.push_back(n);
+                  else
+                    PARSER.pragma_pack.back() = n;
                 }
 
 <GRAMMAR>{cppstart}"pragma"{ws}"pack"{ws}"("{ws}"pop"{ws}")"{ws}{newline} {
                   // Done by Visual Studio and gcc
                   // http://msdn.microsoft.com/en-us/library/2e70t5y1%28v=vs.80%29.aspx
                   // push, pop could also use identifiers
-                  if(!PARSER.pragma_pack.empty()) PARSER.pragma_pack.pop_back();
+                  // without a matching push, the current value is retained
+                  if(PARSER.pragma_pack.size() > 1)
+                    PARSER.pragma_pack.pop_back();
                 }
 
 <GRAMMAR>{cppstart}"pragma"{ws}"pack"{ws}"("{ws}")"{ws}{newline} {
                   // Done by Visual Studio and gcc
                   // http://msdn.microsoft.com/en-us/library/2e70t5y1%28v=vs.80%29.aspx
-                  // should be equivalent to pop-all
-                  PARSER.pragma_pack.clear();
+                  // resets the current value to the default without popping
+                  if(!PARSER.pragma_pack.empty())
+                    PARSER.pragma_pack.back() = convert_integer_literal("0");
                 }
 
 <GRAMMAR>{cppstart}"pragma"{ws}"CPROVER" { BEGIN(CPROVER_PRAGMA); }
@@ -674,26 +695,26 @@ enable_or_disable ("enable"|"disable")
                     TOK_CLANG_BUILTIN_CONVERTVECTOR);
                 }
 
-"__alignof__"   { return conditional_keyword(
+"__alignof__"   { return preferred_alignof(conditional_keyword(
                     PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                     PARSER.mode==configt::ansi_ct::flavourt::CLANG ||
                     PARSER.mode==configt::ansi_ct::flavourt::ARM,
-                    TOK_ALIGNOF);
+                    TOK_ALIGNOF));
                 }
 
 "__alignof"     { // MS supports __alignof:
                   // http://msdn.microsoft.com/en-us/library/45t0s5f4%28v=vs.71%29.aspx
-                  return conditional_keyword(
+                  return preferred_alignof(conditional_keyword(
                     PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO ||
                     PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                     PARSER.mode==configt::ansi_ct::flavourt::CLANG ||
                     PARSER.mode==configt::ansi_ct::flavourt::ARM,
-                    TOK_ALIGNOF);
+                    TOK_ALIGNOF));
                 }
 
-"__ALIGNOF__"   { return conditional_keyword(
+"__ALIGNOF__"   { return preferred_alignof(conditional_keyword(
                     PARSER.mode==configt::ansi_ct::flavourt::ARM,
-                    TOK_ALIGNOF);
+                    TOK_ALIGNOF));
                 }
 
 "__builtin_alignof" {

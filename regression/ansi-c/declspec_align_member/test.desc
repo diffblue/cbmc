@@ -1,0 +1,11 @@
+CORE
+main.c
+--winx64
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+goto-cc reported a syntax error for a __declspec preceding the type of a member.
+The expected layouts are those of MSVC 19 for x64.

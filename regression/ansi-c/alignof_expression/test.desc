@@ -1,0 +1,11 @@
+CORE gcc-only
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The values match GCC 15 and Clang 21. The test runs with goto-cc in GCC mode
+and, via --native-compiler clang, in Clang mode.

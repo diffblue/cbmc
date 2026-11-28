@@ -95,12 +95,20 @@ STATIC_ASSERT(sizeof(request_state)==16);
 
 #endif
 
+// the alignment of long long, which is 4 with the System V ABI for i386
+struct long_long_alignment
+{
+  char c;
+  long long x;
+};
+#define LL_ALIGN __builtin_offsetof(struct long_long_alignment, x)
+
 struct my_struct3 {
   char ch1;
   char ch2;
   int i1; // this should be padded for 4-byte alignment
   char ch3;
-  long long i2; // this should be padded for 8-byte alignment
+  long long i2; // this should be padded for the alignment of long long
   char ch4;
   int bf1 : 1; // MSVC pads this, the gcc/clang do not
   int bf2 : 1; // MSVC pads this, the gcc/clang do not
@@ -111,13 +119,13 @@ STATIC_ASSERT(__builtin_offsetof(struct my_struct3, ch1)==0);
 STATIC_ASSERT(__builtin_offsetof(struct my_struct3, ch2)==1);
 STATIC_ASSERT(__builtin_offsetof(struct my_struct3, i1)==4);
 STATIC_ASSERT(__builtin_offsetof(struct my_struct3, ch3)==8);
-STATIC_ASSERT(__builtin_offsetof(struct my_struct3, i2)==16);
-STATIC_ASSERT(__builtin_offsetof(struct my_struct3, ch4)==24);
+STATIC_ASSERT(__builtin_offsetof(struct my_struct3, i2) == 8 + LL_ALIGN);
+STATIC_ASSERT(__builtin_offsetof(struct my_struct3, ch4) == 16 + LL_ALIGN);
 
 #ifdef _MSC_VER
-STATIC_ASSERT(__builtin_offsetof(struct my_struct3, i3) == 32);
+STATIC_ASSERT(__builtin_offsetof(struct my_struct3, i3) == 24 + LL_ALIGN);
 #else
-STATIC_ASSERT(__builtin_offsetof(struct my_struct3, i3)==28);
+STATIC_ASSERT(__builtin_offsetof(struct my_struct3, i3) == 20 + LL_ALIGN);
 #endif
 
 int main()

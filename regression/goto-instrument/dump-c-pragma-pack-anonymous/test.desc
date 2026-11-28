@@ -1,0 +1,12 @@
+KNOWNBUG
+main.c
+--dump-c
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+dump-c prints the type of the member inner as an inline definition, which does
+not reproduce the #pragma pack in effect for the anonymous struct. The output,
+compiled again, therefore places j at offset 12 rather than 8.

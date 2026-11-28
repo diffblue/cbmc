@@ -6052,6 +6052,9 @@ bool Parser::rAlignofExpr(exprt &exp)
   exp=exprt(ID_alignof);
   exp.add(ID_type_arg).swap(tname);
   set_location(exp, tk);
+  // GCC's and Clang's __alignof__ reports the preferred alignment
+  if(tk.text.rfind("__", 0) == 0)
+    exp.set(ID_C_preferred_alignment, true);
   return true;
 }
 
