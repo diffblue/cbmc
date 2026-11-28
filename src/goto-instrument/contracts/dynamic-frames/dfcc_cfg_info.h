@@ -333,6 +333,11 @@ private:
   /// Returns the top level ID
   size_t top_level_id() const;
 
+  /// Returns the id of the scope whose write set, local set and tracked set
+  /// apply to \p target: the innermost loop containing \p target that is not
+  /// [must_skip], or the top level id.
+  std::size_t get_scope_id(goto_programt::const_targett target) const;
+
   /// Loop identifiers sorted from most deeply nested to less deeply nested
   std::vector<std::size_t> topsorted_loops;
 
