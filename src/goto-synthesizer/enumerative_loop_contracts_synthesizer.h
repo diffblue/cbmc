@@ -27,6 +27,31 @@ class goto_modelt;
 /// `goto-instrument` with the `--pointer-check` flag.
 /// When other checks present, it will just enumerate candidates and check
 /// if they are valid.
+///
+/// ## Known Limitations
+///
+/// ### Fixed Grammar
+/// The synthesizer uses a fixed grammar for candidate invariants:
+///   StartBool -> StartBool && StartBool | Start == Start
+///              | Start <= Start | Start < Start
+///   Start -> Start + Start | terminal_symbols
+/// This cannot express subtraction, multiplication, modular arithmetic,
+/// disjunction, or implications. Invariants requiring these operators
+/// (e.g., `i == n - 1`, `result == i * step`, `i > 0 ==> arr[i-1] <= arr[i]`)
+/// cannot be synthesized.
+///
+/// ### No Incremental Solving
+/// Each CEGIS iteration creates a fresh SAT solver and re-encodes the
+/// entire verification problem. Incremental solving (reusing the solver
+/// state and adding clauses for the new candidate) would significantly
+/// reduce the per-iteration cost, especially in the inner enumeration
+/// loop where many candidates are checked against the same program.
+///
+/// ### Per-Iteration Preprocessing
+/// The goto model is preprocessed (library linking, asm removal, contract
+/// application) on every call to `cegis_verifiert::verify()`. This
+/// preprocessing is largely invariant across iterations and could be
+/// cached.
 class enumerative_loop_contracts_synthesizert
   : public loop_contracts_synthesizer_baset
 {

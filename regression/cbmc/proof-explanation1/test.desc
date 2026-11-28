@@ -1,0 +1,9 @@
+CORE paths-lifo-expected-failure
+main.c
+--proof-explanation
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+Proof explanation:
+--
+^warning: ignoring
