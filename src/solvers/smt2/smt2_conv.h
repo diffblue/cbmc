@@ -143,6 +143,11 @@ protected:
   void convert_is_dynamic_object(const unary_exprt &);
   void convert_plus(const plus_exprt &expr);
   void convert_minus(const minus_exprt &expr);
+  void convert_pointer_arithmetic(
+    const exprt &expr,
+    const exprt &pointer,
+    const exprt &offset,
+    const bytest &element_size);
   void convert_div(const div_exprt &expr);
   void convert_mult(const mult_exprt &expr);
   void convert_rounding_mode_FPA(const exprt &expr);
@@ -178,6 +183,12 @@ protected:
   void find_symbols(const exprt &expr);
   void find_symbols(const typet &type);
   void find_symbols_rec(const typet &type, std::set<irep_idt> &recstack);
+  void declare_pointer_arithmetic_offset(
+    const exprt &expr,
+    std::size_t pointer_width);
+  void find_pointer_arithmetic_in_address_of(
+    const exprt &object,
+    std::size_t pointer_width);
 
   // letification
   letifyt letify;
@@ -291,6 +302,12 @@ protected:
   std::unordered_map<irep_idt, bool> set_values;
 
   std::map<object_size_exprt, irep_idt> object_sizes;
+
+  /// Unconstrained offsets of pointer-arithmetic results that do not fit the
+  /// offset field of the pointer encoding, keyed by the pointer-arithmetic
+  /// expression (a pointer-typed `plus` or `minus`, or the `index` or
+  /// `member` operand of an `address_of`).
+  std::map<exprt, irep_idt> pointer_arithmetic_offsets;
 
   typedef std::set<std::string> smt2_identifierst;
   smt2_identifierst smt2_identifiers;
