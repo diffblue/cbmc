@@ -1,0 +1,15 @@
+CORE
+main.c
+--inline
+^\[(main\.)?assertion\.1\] .*enum argument reinterpreted: SUCCESS$
+^\[(main\.)?assertion\.2\] .*double argument is nondet: FAILURE$
+argument type does not match parameter 'x', inserting non-deterministic value
+^EXIT=10$
+^SIGNAL=0$
+--
+^Invariant check failed
+--
+Calls whose argument types differ from the parameter types made the inliner
+fail an invariant. Arguments that symbolic execution reinterprets (here an
+enum) must give the same result after inlining; other arguments (here a
+double) are replaced by a non-deterministic value.
