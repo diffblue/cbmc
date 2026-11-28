@@ -54,86 +54,292 @@ static bool contributes_to_aggregate_alignment(
          unnamed_bit_fields_affect_alignment();
 }
 
-bytest alignment(const typet &type, const namespacet &ns)
+// Forward declaration: the alignment used to lay out a component within an
+// aggregate, which depends on whether the aggregate is packed.
+static bytest member_layout_alignment(
+  const struct_union_typet::componentt &component,
+  bool container_is_packed,
+  const namespacet &ns);
+
+std::optional<bytest> layout_attribute(const irept &src, const irep_idt &id)
 {
-  // we need to consider a number of different cases:
-  // - alignment specified in the source, which will be recorded in
-  // ID_C_alignment
-  // - alignment induced by packing ("The alignment of a member will
-  // be on a boundary that is either a multiple of n or a multiple of
-  // the size of the member, whichever is smaller."); both
-  // ID_C_alignment and ID_C_packed will be set
-  // - natural alignment, when neither ID_C_alignment nor ID_C_packed
-  // are set
-  // - dense packing with only ID_C_packed set.
+  // the cast is safe as exprt adds no data members to irept
+  const exprt &value = static_cast<const exprt &>(src.find(id));
+  if(value.is_nil() || value.id() == ID_default)
+    return {};
+  return numeric_cast<bytest>(value);
+}
 
-  // is the alignment given?
-  const exprt &given_alignment=
-    static_cast<const exprt &>(type.find(ID_C_alignment));
+/// \return the maximum alignment set by a `#pragma pack(n)` in effect for
+///   \p src (a component, or, with Visual Studio, an aggregate), or 0 when
+///   there is none
+static bytest pragma_pack(const irept &src)
+{
+  return layout_attribute(src, ID_C_pragma_pack).value_or(bytest{0});
+}
 
-  bytest a_int{0};
+static bool is_visual_studio()
+{
+  return config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO;
+}
 
-  // we trust it blindly, no matter how nonsensical
-  if(given_alignment.is_not_nil())
+/// \return the value of the alignment attribute \p id (ID_C_alignment or
+///   ID_C_declaration_alignment) of \p src, or 0 when there is none
+static bytest alignment_attribute(const irept &src, const irep_idt &id)
+{
+  return layout_attribute(src, id).value_or(bytest{0});
+}
+
+/// \return the natural alignment of \p type, which must not be a struct,
+///   union, or tag type, ignoring any explicit alignment or packing of
+///   \p type itself
+static bytest natural_alignment(const typet &type, const namespacet &ns)
+{
+  if(type.id() == ID_array)
+    return alignment(to_array_type(type).element_type(), ns);
+  else if(
+    type.id() == ID_unsignedbv || type.id() == ID_signedbv ||
+    type.id() == ID_fixedbv || type.id() == ID_floatbv ||
+    type.id() == ID_c_bool || type.id() == ID_pointer)
   {
-    const auto a = numeric_cast<bytest>(given_alignment);
-    if(a.has_value())
-      a_int = *a;
+    // Scalars are aligned to their size, or, if that is not a power of two,
+    // to the largest power of two that divides the size: the 12-byte long
+    // double of i386 has an alignment of 4.
+    const bytest size = *pointer_offset_size(type, ns);
+    bytest result{1};
+    while(size > bytest{0} && size % (result * 2) == bytest{0})
+      result = result * 2;
+    return result;
+  }
+  else if(type.id() == ID_c_enum)
+    return alignment(to_c_enum_type(type).underlying_type(), ns);
+  else if(type.id() == ID_c_bit_field)
+  {
+    // we align these according to the 'underlying type'
+    return alignment(to_c_bit_field_type(type).underlying_type(), ns);
+  }
+  else
+    return bytest{1};
+}
+
+/// The alignment of \p type, ignoring any alignment that an attribute of a
+/// declaration requests for the declared entity (ID_C_declaration_alignment).
+static bytest type_alignment(const typet &type, const namespacet &ns)
+{
+  // The alignment of a type derives from:
+  // - an explicit alignment of the type (ID_C_alignment), e.g., from a typedef
+  //   or a struct/union definition,
+  // - packing (ID_C_packed), which reduces it,
+  // - or the natural alignment of the type.
+  // For an aggregate the alignment is the maximum of its members' alignments
+  // (computed in the aggregate's own packing context), which an explicit
+  // attribute can only raise. For other types an explicit alignment is taken
+  // verbatim, matching GCC/Clang where a typedef may request an alignment
+  // smaller than the natural one.
+  const bytest a_int = alignment_attribute(type, ID_C_alignment);
+
+  // follow tags to the underlying definition, unless the tag type carries an
+  // alignment of its own (from a typedef)
+  if(
+    type.id() == ID_struct_tag || type.id() == ID_union_tag ||
+    type.id() == ID_c_enum_tag)
+  {
+    if(a_int > bytest{0})
+      return a_int;
+    else if(type.id() == ID_struct_tag)
+      return type_alignment(ns.follow_tag(to_struct_tag_type(type)), ns);
+    else if(type.id() == ID_union_tag)
+      return type_alignment(ns.follow_tag(to_union_tag_type(type)), ns);
+    else
+      return type_alignment(ns.follow_tag(to_c_enum_tag_type(type)), ns);
   }
 
-  // alignment but no packing
-  if(a_int > bytest{0} && !type.get_bool(ID_C_packed))
-    return a_int;
-  // no alignment, packing
-  else if(a_int == bytest{0} && type.get_bool(ID_C_packed))
-    return bytest{1};
+  const bool packed = type.get_bool(ID_C_packed);
 
-  // compute default
-  bytest result{1};
-
-  if(type.id()==ID_array)
-    result = alignment(to_array_type(type).element_type(), ns);
-  else if(type.id()==ID_struct || type.id()==ID_union)
+  // Aggregates: the alignment is the maximum of the members' layout alignments
+  // (padding members do not contribute), which an explicit attribute can only
+  // raise.
+  if(type.id() == ID_struct || type.id() == ID_union)
   {
-    // get the max
-    // (should really be the smallest common denominator)
+    bytest result{1};
     for(const auto &c : to_struct_union_type(type).components())
     {
       if(!contributes_to_aggregate_alignment(c))
         continue;
-
-      result = std::max(result, alignment(c.type(), ns));
+      // With Visual Studio, bit-fields do not affect the alignment of a union
+      // (but its size, see add_padding).
+      if(
+        type.id() == ID_union && c.type().id() == ID_c_bit_field &&
+        is_visual_studio())
+      {
+        continue;
+      }
+      result = std::max(result, member_layout_alignment(c, packed, ns));
     }
-  }
-  else if(type.id()==ID_unsignedbv ||
-          type.id()==ID_signedbv ||
-          type.id()==ID_fixedbv ||
-          type.id()==ID_floatbv ||
-          type.id()==ID_c_bool ||
-          type.id()==ID_pointer)
-  {
-    result = *pointer_offset_size(type, ns);
-  }
-  else if(type.id()==ID_c_enum)
-    result = alignment(to_c_enum_type(type).underlying_type(), ns);
-  else if(type.id()==ID_c_enum_tag)
-    result=alignment(ns.follow_tag(to_c_enum_tag_type(type)), ns);
-  else if(type.id() == ID_struct_tag)
-    result = alignment(ns.follow_tag(to_struct_tag_type(type)), ns);
-  else if(type.id() == ID_union_tag)
-    result = alignment(ns.follow_tag(to_union_tag_type(type)), ns);
-  else if(type.id()==ID_c_bit_field)
-  {
-    // we align these according to the 'underlying type'
-    result = alignment(to_c_bit_field_type(type).underlying_type(), ns);
+    return std::max(result, a_int);
   }
 
-  // if an alignment had been provided and packing was requested, take
-  // the smallest alignment
-  if(a_int > bytest{0} && a_int < result)
-    result=a_int;
+  // An explicit alignment of any other type is taken verbatim, matching
+  // GCC/Clang where a typedef may request an alignment smaller than the
+  // natural one. Visual Studio, however, does not let __declspec(align(n))
+  // reduce the alignment (and warns).
+  if(a_int > bytest{0})
+  {
+    if(is_visual_studio())
+      return std::max(a_int, natural_alignment(type, ns));
+    return a_int;
+  }
 
+  // no explicit alignment, but packing: dense packing, i.e. alignment 1
+  if(packed)
+    return bytest{1};
+
+  return natural_alignment(type, ns);
+}
+
+/// Visual Studio does not let `#pragma pack(n)` reduce an alignment that
+/// `__declspec(align(m))` requires.
+/// \return the largest alignment that `__declspec(align(m))` requires for
+///   \p type or any of its members, or 0 when there is none
+static bytest msvc_declspec_alignment(const typet &type, const namespacet &ns)
+{
+  bytest result = alignment_attribute(type, ID_C_alignment);
+
+  if(type.id() == ID_array)
+  {
+    return std::max(
+      result, msvc_declspec_alignment(to_array_type(type).element_type(), ns));
+  }
+  else if(type.id() == ID_struct_tag || type.id() == ID_union_tag)
+  {
+    // the tag type may carry an alignment of its own (from a typedef)
+    return std::max(
+      result,
+      msvc_declspec_alignment(
+        ns.follow_tag(to_struct_or_union_tag_type(type)), ns));
+  }
+
+  if(type.id() == ID_struct || type.id() == ID_union)
+  {
+    for(const auto &c : to_struct_union_type(type).components())
+      result = std::max(result, msvc_declspec_alignment(c.type(), ns));
+  }
   return result;
+}
+
+bytest alignment(const typet &type, const namespacet &ns)
+{
+  // An alignment that a declaration requests for the declared entity can only
+  // increase the alignment of the entity's type.
+  return std::max(
+    type_alignment(type, ns),
+    alignment_attribute(type, ID_C_declaration_alignment));
+}
+
+/// The alignment of \p comp_type when used as the type of a component in an
+/// aggregate that is packed iff \p container_is_packed, ignoring any
+/// `#pragma pack`.
+static bytest member_layout_alignment_unconstrained(
+  const typet &comp_type,
+  bool container_is_packed,
+  const namespacet &ns)
+{
+  // The component or the enclosing aggregate is packed (e.g.,
+  // struct __attribute__((packed))): members are densely packed to a single
+  // byte, irrespective of the alignment of their type. Otherwise, the
+  // alignment of the type applies, which may also be smaller than the natural
+  // one (e.g., with a typedef that reduces the alignment).
+  const bytest base = container_is_packed || comp_type.get_bool(ID_C_packed)
+                        ? bytest{1}
+                        : type_alignment(comp_type, ns);
+
+  // An alignment attribute of the member's declaration can only raise the
+  // alignment, but it does so even when packed, matching GCC/Clang.
+  return std::max(
+    base, alignment_attribute(comp_type, ID_C_declaration_alignment));
+}
+
+/// \return the alignment that an attribute of the declaration of the bit-field
+///   \p component requests for its start (capped by `#pragma pack(n)`), or 0
+///   when there is none
+static bytest
+bit_field_start_alignment(const struct_union_typet::componentt &component)
+{
+  const bytest a =
+    alignment_attribute(component.type(), ID_C_declaration_alignment);
+  const bytest max_alignment = pragma_pack(component);
+  return max_alignment > bytest{0} ? std::min(a, max_alignment) : a;
+}
+
+/// The alignment used to lay out \p component within an aggregate. This
+/// implements the rules that depend on the context of the component:
+/// - bit-fields are densely packed in a packed aggregate, unless a
+///   `#pragma pack(n)` is in effect, which then caps their alignment at n;
+///   a zero-width bit-field only affects the alignment of the aggregate with
+///   the ARM ABIs (other than Apple's);
+/// - the alignment of any other component is the alignment of its type in
+///   the packing context of the aggregate (see
+///   member_layout_alignment_unconstrained), raised by any alignment that
+///   the declaration of the component requests;
+/// - `#pragma pack(n)` caps the result at n, except that Visual Studio does
+///   not let it reduce an alignment that `__declspec(align(m))` requires.
+/// \param component: the component of the aggregate
+/// \param container_is_packed: whether the aggregate is packed
+/// \param ns: namespace to resolve tag types
+/// \return the alignment of \p component in bytes
+static bytest member_layout_alignment(
+  const struct_union_typet::componentt &component,
+  bool container_is_packed,
+  const namespacet &ns)
+{
+  if(component.type().id() == ID_c_bit_field && !is_visual_studio())
+  {
+    const c_bit_field_typet &bit_field_type =
+      to_c_bit_field_type(component.type());
+
+    // A zero-width bit-field aligns the next member. As it is an unnamed
+    // bit-field, it also affects the alignment of the aggregate only where
+    // unnamed bit-fields do (see unnamed_bit_fields_affect_alignment),
+    // irrespective of packing.
+    if(bit_field_type.get_width() == 0)
+    {
+      if(unnamed_bit_fields_affect_alignment())
+        return alignment(bit_field_type.underlying_type(), ns);
+      return bytest{1};
+    }
+
+    // Bit-fields are densely packed in a packed aggregate -- unless
+    // #pragma pack(n) is in effect, which then caps their alignment at n
+    // instead, as GCC and Clang do. An alignment attribute of the bit-field's
+    // declaration can only raise the alignment (subject to #pragma pack).
+    const bytest natural = alignment(bit_field_type.underlying_type(), ns);
+    const bytest max_alignment = pragma_pack(component);
+    const bytest base =
+      max_alignment > bytest{0} ? std::min(max_alignment, natural)
+      : container_is_packed || bit_field_type.get_bool(ID_C_packed) ? bytest{1}
+                                                                    : natural;
+    return std::max(base, bit_field_start_alignment(component));
+  }
+
+  const bytest a = member_layout_alignment_unconstrained(
+    component.type(), container_is_packed, ns);
+
+  // #pragma pack(n) caps the alignment of each member at n ("a multiple of n
+  // or of the member's size, whichever is smaller"), including any alignment
+  // requested by an attribute on the member.
+  const bytest max_alignment = pragma_pack(component);
+  if(max_alignment > bytest{0})
+  {
+    if(is_visual_studio())
+    {
+      return std::max(
+        std::min(max_alignment, a),
+        msvc_declspec_alignment(component.type(), ns));
+    }
+    return std::min(max_alignment, a);
+  }
+
+  return a;
 }
 
 static std::optional<std::size_t>
@@ -202,9 +408,23 @@ static struct_typet::componentst::iterator pad(
   return std::next(components.insert(where, component));
 }
 
+/// Visual Studio pads the size of an aggregate up to its alignment, but caps
+/// this at the `#pragma pack(n)` in effect at the end of its definition,
+/// unless `__declspec(align(m))` requires a larger alignment.
+static bytest
+msvc_trailing_padding_alignment(const typet &type, const namespacet &ns)
+{
+  const bytest a = alignment(type, ns);
+  const bytest max_alignment = pragma_pack(type);
+  if(max_alignment == bytest{0})
+    return a;
+  return std::max(
+    std::min(a, max_alignment), msvc_declspec_alignment(type, ns));
+}
+
 static void add_padding_msvc(struct_typet &type, const namespacet &ns)
 {
-  struct_typet::componentst &components=type.components();
+  struct_typet::componentst &components = type.components();
 
   std::size_t bit_field_bits = 0, underlying_bits = 0;
   bytest offset{0};
@@ -254,7 +474,7 @@ static void add_padding_msvc(struct_typet &type, const namespacet &ns)
       // pad up to underlying type unless the struct is packed
       if(!is_packed)
       {
-        const bytest a = alignment(it->type(), ns);
+        const bytest a = member_layout_alignment(*it, false, ns);
         if(a > bytest{1})
         {
           const bytest displacement = offset % a;
@@ -311,7 +531,7 @@ static void add_padding_msvc(struct_typet &type, const namespacet &ns)
 
   // alignment of the struct
   // Note that this is done even if the struct is packed.
-  const bytest a = alignment(type, ns);
+  const bytest a = msvc_trailing_padding_alignment(type, ns);
   const bytest displacement = offset % a;
 
   if(displacement != bytest{0})
@@ -330,19 +550,30 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
 
   // First make bit-fields appear on byte boundaries
   {
-    std::size_t bit_field_bits=0;
+    std::size_t bit_field_bits = 0;
 
-    for(struct_typet::componentst::iterator
-        it=components.begin();
-        it!=components.end();
+    for(struct_typet::componentst::iterator it = components.begin();
+        it != components.end();
         it++)
     {
-      if(it->type().id()==ID_c_bit_field &&
-         to_c_bit_field_type(it->type()).get_width()!=0)
+      if(
+        it->type().id() == ID_c_bit_field &&
+        to_c_bit_field_type(it->type()).get_width() != 0)
       {
+        // a bit-field with an alignment attribute starts on a byte boundary
+        if(
+          bit_field_start_alignment(*it) > bytest{1} &&
+          bit_field_bits % config.ansi_c.char_width != 0)
+        {
+          const std::size_t pad = config.ansi_c.char_width -
+                                  bit_field_bits % config.ansi_c.char_width;
+          it = pad_bit_field(components, it, pad);
+          bit_field_bits = 0;
+        }
+
         // count the bits
         const std::size_t width = to_c_bit_field_type(it->type()).get_width();
-        bit_field_bits+=width;
+        bit_field_bits += width;
       }
       else if(it->is_boolean())
       {
@@ -383,23 +614,60 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
   {
     const typet it_type=it->type();
     bytest a{1};
+    const bytest max_alignment_pragma = pragma_pack(*it);
 
-    if(it_type.id()==ID_c_bit_field)
+    if(it_type.id() == ID_c_bit_field)
     {
-      a = alignment(to_c_bit_field_type(it_type).underlying_type(), ns);
-
-      // A zero-width bit-field causes alignment to the base-type.
-      if(to_c_bit_field_type(it_type).get_width()==0)
+      if(to_c_bit_field_type(it_type).get_width() == 0)
       {
+        // A zero-width bit-field causes alignment of the next member to the
+        // underlying type, irrespective of packing.
+        a = alignment(to_c_bit_field_type(it_type).underlying_type(), ns);
+        max_alignment = std::max(
+          max_alignment, member_layout_alignment(*it, struct_is_packed, ns));
+        DATA_INVARIANT(
+          bit_field_bits == 0, "padding ensures offset at byte boundaries");
+        const bytest displacement = offset % a;
+        if(displacement != bytest{0})
+        {
+          const bytest pad_bytes = a - displacement;
+          const std::size_t pad_bits =
+            numeric_cast_v<std::size_t>(pad_bytes * config.ansi_c.char_width);
+          it = pad(components, it, pad_bits);
+          offset += pad_bytes;
+        }
+        continue;
       }
       else
       {
         // Otherwise, ANSI-C says that bit-fields do not get padded!
-        // We still consider the type for aggregate alignment when required.
+        // We consider the type for max_alignment, however, unless this is an
+        // unnamed bit-field that does not contribute.
+        a = member_layout_alignment(*it, struct_is_packed, ns);
         if(contributes_to_aggregate_alignment(*it) && max_alignment < a)
-          max_alignment=a;
+          max_alignment = a;
 
-        std::size_t w=to_c_bit_field_type(it_type).get_width();
+        // Unless an alignment attribute requests to start the bit-field at an
+        // aligned offset.
+        const bytest start_alignment = bit_field_start_alignment(*it);
+        if(start_alignment > bytest{1})
+        {
+          DATA_INVARIANT(
+            bit_field_bits == 0, "padding ensures offset at byte boundaries");
+          const bytest displacement = offset % start_alignment;
+          if(displacement != bytest{0})
+          {
+            const bytest pad_bytes = start_alignment - displacement;
+            it = pad(
+              components,
+              it,
+              numeric_cast_v<std::size_t>(
+                pad_bytes * config.ansi_c.char_width));
+            offset += pad_bytes;
+          }
+        }
+
+        std::size_t w = to_c_bit_field_type(it_type).get_width();
         bit_field_bits += w;
         const std::size_t bytes = bit_field_bits / config.ansi_c.char_width;
         bit_field_bits %= config.ansi_c.char_width;
@@ -420,28 +688,27 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
       continue;
     }
     else
-      a=alignment(it_type, ns);
+      a = member_layout_alignment(*it, struct_is_packed, ns);
 
     DATA_INVARIANT(
       bit_field_bits == 0, "padding ensures offset at byte boundaries");
 
     // check minimum alignment
     if(
-      a < config.ansi_c.alignment && !it_type.get_bool(ID_C_packed) &&
+      a < config.ansi_c.alignment && max_alignment_pragma == bytest{0} &&
+      !it_type.get_bool(ID_C_packed) &&
       (it_type.id() != ID_struct_tag ||
        !ns.follow_tag(to_struct_tag_type(it_type)).get_bool(ID_C_packed)) &&
       (it_type.id() != ID_union_tag ||
        !ns.follow_tag(to_union_tag_type(it_type)).get_bool(ID_C_packed)))
     {
-      a=config.ansi_c.alignment;
+      a = config.ansi_c.alignment;
     }
 
     if(contributes_to_aggregate_alignment(*it) && max_alignment < a)
-      max_alignment=a;
+      max_alignment = a;
 
-    if(
-      a != bytest{1} &&
-      (!struct_is_packed || it_type.find(ID_C_alignment).is_not_nil()))
+    if(a != bytest{1})
     {
       // we may need to align it
       const bytest displacement = offset % a;
@@ -475,8 +742,11 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
         max_alignment = *tmp_i;
     }
   }
-  // Is the struct packed, without any alignment specification?
-  else if(struct_is_packed)
+  // Is the struct packed, without any alignment specification, and with no
+  // member forcing a larger alignment? Then there is no end-of-struct padding.
+  // (If a member carries an explicit alignment attribute, max_alignment is
+  // greater than one and the struct is still padded up to it, as GCC/Clang do.)
+  else if(struct_is_packed && max_alignment <= bytest{1})
     return; // done
 
   // There may be a need for 'end of struct' padding.
@@ -508,8 +778,14 @@ void add_padding(struct_typet &type, const namespacet &ns)
 
 void add_padding(union_typet &type, const namespacet &ns)
 {
-  bitst max_alignment_bits =
-    bytes_to_bits(alignment(type, ns), config.ansi_c.char_width);
+  // The union's size must be a multiple of its alignment. alignment() already
+  // accounts for packing and for an explicit aligned() attribute (which raises
+  // the alignment even when the union is packed), so the size is padded up to
+  // that alignment, matching GCC and Clang.
+  bitst max_alignment_bits = bytes_to_bits(
+    is_visual_studio() ? msvc_trailing_padding_alignment(type, ns)
+                       : alignment(type, ns),
+    config.ansi_c.char_width);
   bitst size_bits{0};
 
   // check per component, and ignore those without fixed size
@@ -518,13 +794,6 @@ void add_padding(union_typet &type, const namespacet &ns)
     auto s = pointer_offset_bits(c.type(), ns);
     if(s.has_value())
       size_bits = std::max(size_bits, *s);
-  }
-
-  // Is the union packed?
-  if(type.get_bool(ID_C_packed))
-  {
-    // The size needs to be a multiple of 1 char only.
-    max_alignment_bits = bitst{config.ansi_c.char_width};
   }
 
   if(config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)

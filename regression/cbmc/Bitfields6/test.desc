@@ -1,0 +1,11 @@
+CORE gcc-only
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+An alignment attribute of the declaration of a bit-field aligns its start, so
+that struct S1 has size 48 with GCC and Clang (#7816).

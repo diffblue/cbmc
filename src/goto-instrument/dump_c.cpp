@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "dump_c.h"
 #include "dump_c_class.h"
 
+#include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/config.h>
@@ -25,12 +26,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string_utils.h>
 
 #include <ansi-c/expr2c.h>
+#include <ansi-c/padding.h>
 #include <ansi-c/type2name.h>
 #include <cpp/cpp_type2name.h>
 #include <cpp/expr2cpp.h>
 #include <linking/static_lifetime_init.h>
 
 #include "goto_program2code.h"
+
+#include <algorithm>
 
 static std::string clean_identifier(const irep_idt &id)
 {
@@ -535,6 +539,37 @@ void dump_ct::convert_compound(
 
   std::stringstream struct_body;
 
+  // Reproduce any #pragma pack(n) that applied to the members: a single
+  // value applying to all members is set before the definition (which works
+  // for all compilers), varying values (which only Visual Studio supports) are
+  // set member by member. Visual Studio additionally uses the value in effect
+  // at the end of the definition, which we reproduce before the closing brace.
+  const auto pragma_pack_of = [](const irept &src)
+  { return layout_attribute(src, ID_C_pragma_pack).value_or(bytest{0}).get(); };
+  std::optional<mp_integer> pragma_pack;
+  bool pragma_pack_varies = false;
+  for(const auto &comp : type.components())
+  {
+    if(comp.get_bool(ID_from_base) || comp.get_is_padding())
+      continue;
+    const mp_integer n = pragma_pack_of(comp);
+    if(!pragma_pack.has_value())
+      pragma_pack = n;
+    else if(*pragma_pack != n)
+      pragma_pack_varies = true;
+  }
+  // only aggregates laid out following Visual Studio's rules record a value
+  const bool is_visual_studio = type.find(ID_C_pragma_pack).is_not_nil();
+  if(
+    is_visual_studio && pragma_pack.has_value() &&
+    *pragma_pack != pragma_pack_of(type))
+  {
+    pragma_pack_varies = true;
+  }
+  const bool use_pragma_pack =
+    pragma_pack.has_value() && (pragma_pack_varies || *pragma_pack != 0);
+  mp_integer current_pragma_pack = pragma_pack.value_or(0);
+
   for(const auto &comp : type.components())
   {
     const typet &comp_type = comp.type();
@@ -544,6 +579,15 @@ void dump_ct::convert_compound(
 
     if(comp.get_bool(ID_from_base) || comp.get_is_padding())
       continue;
+
+    if(pragma_pack_varies && pragma_pack_of(comp) != current_pragma_pack)
+    {
+      current_pragma_pack = pragma_pack_of(comp);
+      struct_body << "#pragma pack(";
+      if(current_pragma_pack != 0)
+        struct_body << integer2string(current_pragma_pack);
+      struct_body << ")\n";
+    }
 
     const typet *non_array_type = &comp_type;
     while(non_array_type->id()==ID_array)
@@ -578,6 +622,21 @@ void dump_ct::convert_compound(
           ? ns.follow_tag(to_struct_or_union_tag_type(comp.type()))
           : comp.type();
       comp_type_to_use.remove(ID_tag);
+      // The padding components are not part of the source program (and are
+      // of a type that a compiler does not accept): the compiler adds the same
+      // padding when it compiles the output.
+      if(
+        comp_type_to_use.id() == ID_struct || comp_type_to_use.id() == ID_union)
+      {
+        auto &components = to_struct_union_type(comp_type_to_use).components();
+        components.erase(
+          std::remove_if(
+            components.begin(),
+            components.end(),
+            [](const struct_union_typet::componentt &c)
+            { return c.get_is_padding(); }),
+          components.end());
+      }
       if(
         recursive && (comp_type_to_use.id() == ID_struct ||
                       comp_type_to_use.id() == ID_union))
@@ -632,6 +691,24 @@ void dump_ct::convert_compound(
     struct_body << ";\n";
   }
 
+  if(
+    pragma_pack_varies && is_visual_studio &&
+    pragma_pack_of(type) != current_pragma_pack)
+  {
+    struct_body << "#pragma pack(";
+    if(pragma_pack_of(type) != 0)
+      struct_body << integer2string(pragma_pack_of(type));
+    struct_body << ")\n";
+  }
+
+  if(use_pragma_pack)
+  {
+    os << "#pragma pack(push";
+    if(*pragma_pack != 0)
+      os << ", " << integer2string(*pragma_pack);
+    os << ")\n";
+  }
+
   typet unresolved_clean=unresolved;
   irep_idt typedef_str;
   for(auto td_entry : typedef_types)
@@ -681,7 +758,10 @@ void dump_ct::convert_compound(
     os << " __attribute__ ((__packed__))";
   if(!typedef_str.empty())
     os << " " << typedef_str;
-  os << ";\n\n";
+  os << ";\n";
+  if(use_pragma_pack)
+    os << "#pragma pack(pop)\n";
+  os << '\n';
 }
 
 void dump_ct::convert_compound_enum(
