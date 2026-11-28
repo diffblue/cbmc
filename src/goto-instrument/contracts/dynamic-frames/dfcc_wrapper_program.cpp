@@ -682,6 +682,7 @@ void dfcc_wrapper_programt::encode_requires_clauses()
     codet requires_statement(statement_type, {std::move(requires_lmbd)}, sl);
     converter.goto_convert(requires_statement, requires_program, language_mode);
   }
+  mark_contract_checks(requires_program);
 
   // fix calls to user-defined memory predicates
   memory_predicates.fix_calls(requires_program);
@@ -738,6 +739,7 @@ void dfcc_wrapper_programt::encode_ensures_clauses()
     codet ensures_statement(statement_type, {std::move(ensures)}, sl);
     converter.goto_convert(ensures_statement, ensures_program, language_mode);
   }
+  mark_contract_checks(ensures_program);
 
   // When checking an ensures clause we link the contract write set to the
   // ensures write set to know what was deallocated by the function so that

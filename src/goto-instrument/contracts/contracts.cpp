@@ -315,6 +315,7 @@ void code_contractst::check_apply_loop_contracts(
 
     goto_convertt converter(symbol_table, log.get_message_handler());
     converter.goto_convert(assertion, pre_loop_head_instrs, mode);
+    mark_contract_checks(pre_loop_head_instrs);
   }
 
   // Insert the first block of pre_loop_head_instrs,
@@ -469,6 +470,7 @@ void code_contractst::check_apply_loop_contracts(
 
     goto_convertt converter(symbol_table, log.get_message_handler());
     converter.goto_convert(assertion, pre_loop_end_instrs, mode);
+    mark_contract_checks(pre_loop_end_instrs);
   }
 
   // Generate: assignments to store the multidimensional decreases clause's
@@ -498,6 +500,7 @@ void code_contractst::check_apply_loop_contracts(
     goto_convertt converter(symbol_table, log.get_message_handler());
     converter.goto_convert(
       monotonic_decreasing_assertion, pre_loop_end_instrs, mode);
+    mark_contract_checks(pre_loop_end_instrs);
 
     // Discard the temporary variables that store decreases clause's value
     for(size_t i = 0; i < old_decreases_vars.size(); i++)
@@ -600,6 +603,7 @@ static void generate_contract_constraints(
     code_assertt assertion(instantiated_clause);
     assertion.add_source_location() = location;
     converter.goto_convert(assertion, constraint, mode);
+    mark_contract_checks(constraint);
   }
   is_fresh_update(constraint);
   throw_on_unsupported(constraint);

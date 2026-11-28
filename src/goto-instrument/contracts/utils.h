@@ -201,6 +201,12 @@ void insert_before_and_update_jumps(
 /// statically simplifies to `false` into SKIP instructions.
 void simplify_gotos(goto_programt &goto_program, const namespacet &ns);
 
+/// Turns the assertions of \p program, the checks of a contract (such as
+/// that a loop invariant is inductive), into checks that are not the
+/// user's: goto_convert marks the assertions that it converts as
+/// user-provided, and --no-assertions would drop them.
+void mark_contract_checks(goto_programt &program);
+
 /// Returns true iff the given program is loop-free,
 /// i.e. if each SCC of its CFG contains a single element.
 bool is_loop_free(

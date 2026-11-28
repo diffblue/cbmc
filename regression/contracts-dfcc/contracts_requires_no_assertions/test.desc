@@ -1,0 +1,12 @@
+CORE
+main.c
+--dfcc main --replace-call-with-contract f _ --no-assertions
+^EXIT=10$
+^SIGNAL=0$
+^\[f\.precondition\.\d+\] line \d+ Check requires clause.*: FAILURE$
+^VERIFICATION FAILED$
+--
+--
+The check of a contract's requires clause where a call is replaced by the
+contract (here main passes an arbitrary x) is not one of the user's
+assertions: --no-assertions keeps it.
