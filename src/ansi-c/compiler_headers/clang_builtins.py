@@ -26,13 +26,28 @@
 #            -I clang/include clang/include/clang/Basic/arm_neon.td \
 #            -o neon_sema.inc
 #
-#    The resulting "..._BUILTIN_INFOS" section lists every builtin with its
-#    name and the classic compact type encoding (e.g. "V8ScV8ScV8Sci").  This
-#    mode parses that section, prepending the supplied PREFIX (for NEON that is
-#    "__builtin_neon_") to each spelling.
+#    Recent versions of clang-tblgen emit a "..._BUILTIN_INFOS" section that
+#    lists every builtin with its name and the classic compact type encoding
+#    (e.g. "V8ScV8ScV8Sci"); this mode parses that section, prepending the
+#    supplied PREFIX (for NEON that is "__builtin_neon_") to each spelling.
+#    LLVM 20 and earlier instead emit X-macro lines such as
+#
+#        TARGET_BUILTIN(__builtin_neon_vaddv_u8, "UcV8Uc", "n", "neon")
+#
+#    which spell the full name; those are parsed as well, and PREFIX is only
+#    prepended to names that do not already start with it.  LLVM packages ship
+#    these files pre-generated (e.g. /usr/lib/llvm-20/include/clang/Basic/
+#    arm_neon.inc and arm_fp16.inc), so no clang-tblgen run is needed for them.
+#
+#    clang_builtin_headers_neon.h holds the NEON builtins of both arm_neon.td
+#    and arm_fp16.td.  To find additions, run, e.g.,
+#
+#        B=/usr/lib/llvm-20/include/clang/Basic
+#        clang_builtins.py --inc __builtin_neon_:$B/arm_neon.inc \
+#            --inc __builtin_neon_:$B/arm_fp16.inc clang_builtin_headers_neon.h
 #
 # In both cases the resulting declarations are diffed against the declarations
-# already present in the gcc_builtin_headers_*.h files passed as arguments.
+# already present in the *_builtin_headers*.h files passed as arguments.
 
 import argparse
 import re
@@ -49,6 +64,8 @@ vector_map = {
             64: '__gcc_v64qi'
             },
         'unsigned char': {
+            8: '__gcc_v8uqi',
+            16: '__gcc_v16uqi',
             1024: '__tile'
             },
         'short': {
@@ -58,6 +75,7 @@ vector_map = {
             32: '__gcc_v32hi'
             },
         'unsigned short': {
+            4: '__gcc_v4uhi',
             8: '__gcc_v8uhi',
             16: '__gcc_v16uhi',
             32: '__gcc_v32uhi',
@@ -70,6 +88,7 @@ vector_map = {
             256: '__gcc_v256si'
             },
         'unsigned int': {
+            2: '__gcc_v2usi',
             4: '__gcc_v4usi',
             8: '__gcc_v8usi',
             16: '__gcc_v16usi',
@@ -81,11 +100,13 @@ vector_map = {
             8: '__gcc_v8di'
             },
         'unsigned long long int': {
+            1: '__gcc_v1udi',
             2: '__gcc_v2udi',
             4: '__gcc_v4udi',
             8: '__gcc_v8udi',
             },
         '_Float16': {
+            4: '__gcc_v4hf',
             8: '__gcc_v8hf',
             16: '__gcc_v16hf',
             32: '__gcc_v32hf'
@@ -97,11 +118,13 @@ vector_map = {
             16: '__gcc_v16sf'
             },
         'double': {
+            1: '__gcc_v1df',
             2: '__gcc_v2df',
             4: '__gcc_v4df',
             8: '__gcc_v8df'
             },
         '__bf16': {
+            4: '__gcc_v4hf',
             8: '__gcc_v8hf',
             16: '__gcc_v16hf',
             32: '__gcc_v32hf'
@@ -451,7 +474,7 @@ encoding_typespec_map = {
         'c': 'char',
         'd': 'double',
         'f': 'float',
-        'h': '_Float16',
+        'h': '__fp16',     # Clang's "half"; '_Float16' is 'x'
         'i': 'int',
         's': 'short',
         'v': 'void',
@@ -568,14 +591,23 @@ INFO_RE = re.compile(
         r'StrOffsets\{\s*\d+ /\* (\S+) \*/,\s*\d+ /\* (.+?) \*/,'
         r'\s*\d+ /\* .*? \*/,\s*(?:\d+ /\* (.+?) \*/|0)')
 
+# The X-macro form of LLVM 20 and earlier: BUILTIN(name, "types", "attrs") or
+# TARGET_BUILTIN(name, "types", "attrs", "features").
+MACRO_RE = re.compile(
+        r'^\s*(?:TARGET_)?BUILTIN\(\s*(\w+)\s*,\s*"([^"]*)"\s*,\s*"[^"]*"'
+        r'\s*(?:,\s*"([^"]*)"\s*)?\)', re.MULTILINE)
+
 
 def process_inc(text, prefix):
-    """Parse the ..._BUILTIN_INFOS section of a clang-tblgen .inc file,
-    returning {group: {name: decl}}."""
+    """Parse the builtins of a clang-tblgen .inc file, either the
+    ..._BUILTIN_INFOS section (recent LLVM) or the BUILTIN and TARGET_BUILTIN
+    X-macro lines (LLVM 20 and earlier), returning {group: {name: decl}}."""
     out = {}
     stats = {'skipped': 0}
-    for m in INFO_RE.finditer(text):
-        name = prefix + m.group(1)
+    for m in list(INFO_RE.finditer(text)) + list(MACRO_RE.finditer(text)):
+        name = m.group(1)
+        if not name.startswith(prefix):
+            name = prefix + name
         encoding = m.group(2)
         group = m.group(3) if m.group(3) else 'builtins'
         try:
@@ -647,7 +679,7 @@ def run_self_test():
             'ULLLiULLLiULLLi':
                 'unsigned __int128 foo(unsigned __int128, '
                 'unsigned __int128);',
-            'hh': '_Float16 foo(_Float16);',
+            'hh': '__fp16 foo(__fp16);',
             }
     for encoding, expected in cases.items():
         assert decode_encoding('foo', encoding) == expected, encoding
@@ -667,6 +699,28 @@ def run_self_test():
             'neon': {'__builtin_neon_vadd_s64':
                      'long long __builtin_neon_vadd_s64'
                      '(long long, long long);'}}, 'process_inc'
+
+    # process_inc: the X-macro form of LLVM 20 and earlier, which spells the
+    # full name (so the prefix must not be prepended again), with and without
+    # a feature string.
+    inc = ('TARGET_BUILTIN(__builtin_neon_vaddv_s8, "ScV8Sc", "n", "neon")\n'
+           'BUILTIN(__builtin_neon_vabsd_s64, "WiWi", "n")\n')
+    assert process_inc(inc, '__builtin_neon_') == {
+            'neon': {'__builtin_neon_vaddv_s8':
+                     'signed char __builtin_neon_vaddv_s8(__gcc_v8qi);'},
+            'builtins': {'__builtin_neon_vabsd_s64':
+                         'long long __builtin_neon_vabsd_s64(long long);'}}, \
+        'process_inc (X-macro)'
+
+    # The unsigned and one-lane vectors of the NEON builtins.
+    cases = {
+            'UcV8Uc': 'unsigned char foo(__gcc_v8uqi);',
+            'UsV8Us': 'unsigned short foo(__gcc_v8uhi);',
+            'dV1dIi': 'double foo(__gcc_v1df, int);',
+            'yV4yIi': '__bf16 foo(__gcc_v4hf, int);',
+            }
+    for encoding, expected in cases.items():
+        assert decode_encoding('foo', encoding) == expected, encoding
 
     print('self-test: all checks passed')
 

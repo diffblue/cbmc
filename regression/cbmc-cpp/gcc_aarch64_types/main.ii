@@ -1,0 +1,13 @@
+// The built-in types that GCC provides for AArch64, as GCC 16's
+// arm_private_fp8.h and arm_private_neon_types.h use them.
+typedef __mfp8 mfloat8_t;
+typedef __Int8x8_t int8x8_t;
+typedef __Poly128_t poly128_t;
+
+int main()
+{
+  __CPROVER_assert(sizeof(mfloat8_t) == 1, "mfloat8_t");
+  __CPROVER_assert(sizeof(int8x8_t) == 8, "int8x8_t");
+  __CPROVER_assert(sizeof(poly128_t) == 16, "poly128_t");
+  return 0;
+}

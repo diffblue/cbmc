@@ -49,29 +49,19 @@ const char gcc_builtin_headers_ubsan[] =
 const char gcc_builtin_headers_ia32[] =
 #include "compiler_headers/gcc_builtin_headers_ia32.inc" // IWYU pragma: keep
   ; // NOLINT(whitespace/semicolon)
-const char gcc_builtin_headers_ia32_2[] =
-#include "compiler_headers/gcc_builtin_headers_ia32-2.inc" // IWYU pragma: keep
+
+const char gcc_builtin_headers_aarch64[] =
+#include "compiler_headers/gcc_builtin_headers_aarch64.inc" // IWYU pragma: keep
   ; // NOLINT(whitespace/semicolon)
-const char gcc_builtin_headers_ia32_3[] =
-#include "compiler_headers/gcc_builtin_headers_ia32-3.inc" // IWYU pragma: keep
+
+const char gcc_builtin_headers_aarch64_neon[] =
+// NOLINTNEXTLINE(whitespace/line_length)
+#include "compiler_headers/gcc_builtin_headers_aarch64_neon.inc" // IWYU pragma: keep
   ; // NOLINT(whitespace/semicolon)
-const char gcc_builtin_headers_ia32_4[] =
-#include "compiler_headers/gcc_builtin_headers_ia32-4.inc" // IWYU pragma: keep
-  ; // NOLINT(whitespace/semicolon)
-const char gcc_builtin_headers_ia32_5[] =
-#include "compiler_headers/gcc_builtin_headers_ia32-5.inc" // IWYU pragma: keep
-  ; // NOLINT(whitespace/semicolon)
-const char gcc_builtin_headers_ia32_6[] =
-#include "compiler_headers/gcc_builtin_headers_ia32-6.inc" // IWYU pragma: keep
-  ; // NOLINT(whitespace/semicolon)
-const char gcc_builtin_headers_ia32_7[] =
-#include "compiler_headers/gcc_builtin_headers_ia32-7.inc" // IWYU pragma: keep
-  ; // NOLINT(whitespace/semicolon)
-const char gcc_builtin_headers_ia32_8[] =
-#include "compiler_headers/gcc_builtin_headers_ia32-8.inc" // IWYU pragma: keep
-  ; // NOLINT(whitespace/semicolon)
-const char gcc_builtin_headers_ia32_9[] =
-#include "compiler_headers/gcc_builtin_headers_ia32-9.inc" // IWYU pragma: keep
+
+const char gcc_builtin_headers_aarch64_types[] =
+// NOLINTNEXTLINE(whitespace/line_length)
+#include "compiler_headers/gcc_builtin_headers_aarch64_types.inc" // IWYU pragma: keep
   ; // NOLINT(whitespace/semicolon)
 
 const char gcc_builtin_headers_alpha[] =
@@ -100,6 +90,10 @@ const char cw_builtin_headers[] =
 
 const char clang_builtin_headers[] =
 #include "compiler_headers/clang_builtin_headers.inc" // IWYU pragma: keep
+  ; // NOLINT(whitespace/semicolon)
+
+const char clang_builtin_headers_neon[] =
+#include "compiler_headers/clang_builtin_headers_neon.inc" // IWYU pragma: keep
   ; // NOLINT(whitespace/semicolon)
 
 const char cprover_builtin_headers[] =
@@ -280,6 +274,9 @@ void ansi_c_internal_additions(std::string &code, bool support_float16_type)
       code+="typedef signed __int128 __int128_t;\n"
             "typedef unsigned __int128 __uint128_t;\n";
     }
+
+    if(config.ansi_c.arch == "arm64")
+      code += gcc_builtin_headers_aarch64_types;
 
     if(
       config.ansi_c.arch == "arm64" &&

@@ -154,6 +154,9 @@ void cpp_internal_additions(std::ostream &out)
       out << "typedef unsigned __int128 __uint128_t;" << '\n';
     }
 
+    if(config.ansi_c.arch == "arm64")
+      out << c2cpp(gcc_builtin_headers_aarch64_types);
+
     if(
       config.ansi_c.arch == "arm64" &&
       config.ansi_c.os != configt::ansi_ct::ost::OS_MACOS)

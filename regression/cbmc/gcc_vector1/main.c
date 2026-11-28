@@ -119,6 +119,20 @@ int main()
   assert(y.members[2]);
   assert(y.members[3]);
 
+  // comparing a vector with a scalar compares each lane with the scalar
+  z.v = (v4si){0, 1, 2, 3};
+  y.v = z.v != 0;
+  assert(!y.members[0]);
+  assert(y.members[1] == -1);
+  assert(y.members[2] == -1);
+  assert(y.members[3] == -1);
+
+  y.v = 1 < z.v;
+  assert(!y.members[0]);
+  assert(!y.members[1]);
+  assert(y.members[2] == -1);
+  assert(y.members[3] == -1);
+
   // build vector with typecast
   z.v=(v4si){ 0, 1, 2, 3 };
   assert(z.members[0]==0 && z.members[1]==1 && z.members[2]==2 && z.members[3]==3);

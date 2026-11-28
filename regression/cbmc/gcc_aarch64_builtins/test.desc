@@ -1,0 +1,12 @@
+CORE
+main.i
+--arch arm64 --os linux
+^\[main.assertion.1\] line \d+ reachable: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+--
+is not declared
+^CONVERSION ERROR$
+--
+The types that GCC declares for AArch64, also at #pragma GCC aarch64, and its
+builtins.

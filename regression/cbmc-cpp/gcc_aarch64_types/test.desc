@@ -1,0 +1,12 @@
+CORE
+main.ii
+--arch arm64 --os linux
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^PARSING ERROR$
+--
+GCC's <arm_neon.h> gives user-visible names to GCC's AArch64 built-in types,
+also in C++.

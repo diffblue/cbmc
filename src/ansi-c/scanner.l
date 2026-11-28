@@ -28,6 +28,7 @@
 static int isatty(int) { return 0; }
 #endif
 
+#include <util/config.h>
 #include <util/string_constant.h>
 #include <util/unicode.h>
 
@@ -44,19 +45,52 @@ static int isatty(int) { return 0; }
 #undef  ECHO
 #define ECHO
 
+#include "ansi_c_internal_additions.h"
 #include "ansi_c_parser.h"
 #include "ansi_c_y.tab.h"
+
+#include <cstring>
 #ifdef ANSI_C_DEBUG
 extern int yyansi_cdebug;
 #endif
 
 static ansi_c_parsert *ansi_c_parser;
+
+// The number of buffers that inject_declarations pushed and that the scanner
+// has not yet finished.
+static std::size_t injected_buffers = 0;
+
+/// Make the scanner read \p text before the rest of the current buffer, as
+/// if \p text had been included at this point.
+static void inject_declarations(const char *text)
+{
+  // Skip the #line directive that file_converter puts at the start of
+  // embedded headers: the declarations take the location of the pragma, and
+  // the location of the remaining input must not change.
+  if(std::strncmp(text, "#line ", 6) == 0)
+  {
+    const char *newline = std::strchr(text, '\n');
+    text = newline == nullptr ? "" : newline + 1;
+  }
+
+  // yy_scan_string switches to the new buffer, which instead has to go on
+  // top of the current one.
+  YY_BUFFER_STATE current = YY_CURRENT_BUFFER;
+  YY_BUFFER_STATE injected = yy_scan_string(text);
+  yy_switch_to_buffer(current);
+  yypush_buffer_state(injected);
+  ++injected_buffers;
+}
+
 void ansi_c_scanner_init(ansi_c_parsert &_ansi_c_parser)
 {
 #ifdef ANSI_C_DEBUG
   yyansi_cdebug=1;
 #endif
   ansi_c_parser = &_ansi_c_parser;
+  // a previous parse may have stopped within injected declarations
+  for(; injected_buffers > 0; --injected_buffers)
+    yypop_buffer_state();
   YY_FLUSH_BUFFER;
   BEGIN(0);
 }
@@ -438,6 +472,24 @@ enable_or_disable ("enable"|"disable")
 <CPROVER_PRAGMA>. {
                   yyansi_cerror("Unsupported #pragma CPROVER");
                   return TOK_SCANNER_ERROR;
+                }
+
+<GRAMMAR>{cppstart}"pragma"{ws}"GCC"{ws}"aarch64"{ws}"\"arm_neon.h\""{ws}{newline} {
+                  // GCC 12 and later declare the NEON tuple types and the
+                  // builtins that use them when processing this pragma.
+                  if(config.ansi_c.arch == "arm64")
+                    inject_declarations(gcc_builtin_headers_aarch64_neon);
+                }
+
+<GRAMMAR>{cppstart}"pragma"{ws}"GCC"{ws}"aarch64"{ws}"\"arm_acle.h\""{ws}{newline} {
+                  // GCC 12 and later declare __arm_data512_t (for the LS64
+                  // extension) when processing this pragma.
+                  if(config.ansi_c.arch == "arm64")
+                  {
+                    inject_declarations(
+                      "typedef struct __arm_data512_t "
+                      "{ unsigned long val[8]; } __arm_data512_t;\n");
+                  }
                 }
 
 <GRAMMAR>{cppstart}"pragma" { BEGIN(OTHER_PRAGMA); }
@@ -1801,4 +1853,14 @@ enable_or_disable ("enable"|"disable")
 .               { BEGIN(GRAMMAR); loc(); return yytext[0]; }
 }
 
-<<EOF>>         { yyterminate(); /* done! */ }
+<<EOF>>         {
+                  if(injected_buffers > 0)
+                  {
+                    // continue with the buffer the declarations were
+                    // injected into
+                    --injected_buffers;
+                    yypop_buffer_state();
+                  }
+                  else
+                    yyterminate(); /* done! */
+                }
