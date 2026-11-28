@@ -40,6 +40,7 @@ SRC = allocate_objects.cpp \
       goto-conversion/format_strings.cpp \
       goto-conversion/goto_convert.cpp \
       goto-conversion/goto_check_c.cpp \
+      goto-conversion/goto_convert_evaluation_order.cpp \
       goto-conversion/goto_convert_exceptions.cpp \
       goto-conversion/goto_clean_expr.cpp \
       goto-conversion/goto_convert_functions.cpp \

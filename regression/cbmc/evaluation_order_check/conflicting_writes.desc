@@ -1,0 +1,17 @@
+CORE
+conflicting_writes.c
+--evaluation-order-check
+^\[main\.assertion\.1\] line 15 n == 2 regardless of evaluation order: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+f() and g() both write n and are indeterminately sequenced, so the final
+value of n is either 1 or 2 depending on the evaluation order chosen by the
+compiler. --evaluation-order-check explores both orders of the two calls, so
+the assertion n == 2, which holds under left-to-right evaluation only, is
+refuted. Without the option the fixed lowering order would wrongly prove it
+(the very miss discussed in the review of the argument evaluation order
+modelling).

@@ -178,6 +178,18 @@ rounding towards zero
 \fB\-\-no\-library\fR
 disable built\-in abstract C library
 .TP
+\fB\-\-evaluation\-order\-check\fR
+The C standard leaves the order of evaluation of most operands, and of the
+arguments of a function call, unspecified. By default, CBMC evaluates each
+expression in one fixed order. With this option, the side effects (function
+calls, assignments, increments and decrements) of each C expression are
+executed in all orders that the standard permits, and assertions (of property
+class \fBevaluation\-order\fR) check that each side-effect-free read of memory
+within the expression has the same value at all points at which the standard
+permits the read to happen. The option applies when C source files are
+converted to goto programs: pass it to \fBgoto\-cc\fR(1) when compiling to goto
+binaries; it has no effect on goto binaries given to this tool.
+.TP
 \fB\-\-max\-nondet\-tree\-depth\fR N
 limit size of nondet (e.g. input) object tree;
 at level N pointers are set to null

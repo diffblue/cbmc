@@ -1,0 +1,16 @@
+CORE
+main.c
+--evaluation-order-check _ --div-by-zero-check
+^\[g\.division-by-zero\.1\] line 10 division by zero in x / y: FAILURE$
+^\[main\.evaluation-order\.\d+\] line 16 value of p is independent of evaluation order: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+has no effect on goto binaries
+--
+The evaluation order is fixed when goto-cc converts the program, hence
+--evaluation-order-check needs to be passed to goto-cc. The arguments of f are
+evaluated in an unspecified order: when p-- happens first, g divides by zero.
+The read of p as an argument of g is moreover unsequenced relative to p--.

@@ -1,0 +1,14 @@
+CORE
+reduction_pointer_update.c
+--evaluation-order-check
+^Evaluation-order reduction: 0 of 3 side effects commute with all side effects they are unordered with$
+^\[main\.assertion\.1\] line 23 y is read before it is written: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+write only writes y when redirect has executed before it. The footprints of
+the calls account for all values that q may have, so none of the calls is
+considered to commute with the others.

@@ -44,6 +44,7 @@ const char *goto_cc_options_without_argument[]=
   "--winx64",
   "--string-abstraction",
   "--no-library",
+  "--evaluation-order-check",
   "--16",
   "--32",
   "--64",

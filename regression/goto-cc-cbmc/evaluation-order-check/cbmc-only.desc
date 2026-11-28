@@ -1,0 +1,17 @@
+CORE
+division.c
+--evaluation-order-check --div-by-zero-check
+^--evaluation-order-check has no effect on goto binaries; pass it to goto-cc when compiling them$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^\[.*evaluation-order
+--
+Passing --evaluation-order-check to cbmc does not affect goto binaries, which
+goto-cc has already converted in one fixed evaluation order; cbmc warns about
+this. In this fixed order, f() executes before a / b, so the division by zero
+that occurs when a / b is evaluated first is not found (see division.desc for
+the result when the option is passed to goto-cc). The fixed order of the
+operands of + does not depend on the target, unlike the order of function
+call arguments.

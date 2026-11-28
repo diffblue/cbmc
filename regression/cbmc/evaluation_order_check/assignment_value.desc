@@ -1,0 +1,14 @@
+CORE
+assignment_value.c
+--evaluation-order-check
+^\[main\.assertion\.1\] line 12 the value of an assignment is the value stored: SUCCESS$
+^\[main\.assertion\.2\] line 13 y == 1 regardless of evaluation order: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+The assignment y = 1 and the call to g are indeterminately sequenced, so y is
+1 or 2 afterwards. The value of the assignment expression is the value stored,
+i.e., 1, whichever order is chosen.

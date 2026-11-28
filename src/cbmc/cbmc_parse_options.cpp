@@ -50,6 +50,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-checker/stop_on_fail_verifier.h>
 #include <goto-checker/stop_on_fail_verifier_with_fault_localization.h>
 #include <goto-instrument/cover.h>
+#include <goto-instrument/evaluation_order_reduction.h>
 #include <goto-instrument/full_slicer.h>
 #include <goto-instrument/nondet_static.h>
 #include <goto-instrument/reachability_slicer.h>
@@ -944,6 +945,10 @@ bool cbmc_parse_optionst::process_goto_program(
                  << messaget::eom;
     nondet_static(goto_model);
   }
+
+  // Avoid exploring evaluation orders that cannot make a difference; this
+  // needs the complete program, with function pointers removed.
+  reduce_evaluation_order(goto_model, log.get_message_handler());
 
   // add failed symbols
   // needs to be done before pointer analysis

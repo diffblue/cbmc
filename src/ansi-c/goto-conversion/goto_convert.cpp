@@ -881,6 +881,12 @@ void goto_convertt::convert_assign(
   goto_programt &dest,
   const irep_idt &mode)
 {
+  if(use_evaluation_order_check(code, mode))
+  {
+    convert_assign_evaluation_order(code, dest, mode);
+    return;
+  }
+
   exprt lhs = code.lhs(), rhs = code.rhs();
 
   clean_expr_resultt side_effects = clean_expr(lhs, mode);

@@ -35,6 +35,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../goto-instrument/cover_util$(OBJEXT) \
       ../goto-instrument/reachability_slicer$(OBJEXT) \
       ../goto-instrument/nondet_static$(OBJEXT) \
+      ../goto-instrument/evaluation_order_reduction$(OBJEXT) \
       ../goto-instrument/full_slicer$(OBJEXT) \
       ../analyses/analyses$(LIBEXT) \
       ../langapi/langapi$(LIBEXT) \

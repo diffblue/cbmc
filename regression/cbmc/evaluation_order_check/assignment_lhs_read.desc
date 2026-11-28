@@ -1,0 +1,13 @@
+CORE
+assignment_lhs_read.c
+--evaluation-order-check
+^\[main\.evaluation-order\.1\] line 12 value of (\([^)]*\))?i is independent of evaluation order: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+The evaluations of the left-hand side and of the right-hand side of an
+assignment are unsequenced, so the index i of a[i] may be read before or after
+the call to f, which modifies i.
