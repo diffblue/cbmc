@@ -518,6 +518,9 @@ void dfcct::transform_goto_model()
   check_transform_goto_model_preconditions();
   link_model_and_load_dfcc_library();
   lift_memory_predicates();
+  // the code generated for contract clauses inlines the functions that these
+  // clauses call as they are before instrumentation
+  contract_clauses_codegen.record_function_bodies();
   instrument_harness_function();
   wrap_checked_function();
   wrap_replaced_functions();
